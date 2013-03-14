@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.servlet.ServletContextUtil;
 import com.liferay.portal.kernel.servlet.ServletResponseUtil;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -42,7 +43,7 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
@@ -90,7 +91,8 @@ public class ComboServlet extends HttpServlet {
 			return;
 		}
 
-		Set<String> modulePathsSet = new HashSet<String>(modulePaths.length);
+		Set<String> modulePathsSet = new LinkedHashSet<String>(
+			modulePaths.length);
 
 		for (String path : modulePaths) {
 			modulePathsSet.add(path);
@@ -98,7 +100,7 @@ public class ComboServlet extends HttpServlet {
 
 		modulePaths = modulePathsSet.toArray(new String[modulePathsSet.size()]);
 
-		Arrays.sort(modulePaths);
+		ArrayUtil.reverse(modulePaths);
 
 		String modulePathsString = null;
 
