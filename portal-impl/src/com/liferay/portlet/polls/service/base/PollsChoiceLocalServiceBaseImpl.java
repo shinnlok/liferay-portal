@@ -224,6 +224,20 @@ public abstract class PollsChoiceLocalServiceBaseImpl
 	}
 
 	/**
+	 * Returns the polls choice matching the UUID and group.
+	 *
+	 * @param uuid the polls choice's UUID
+	 * @param groupId the primary key of the group
+	 * @return the matching polls choice
+	 * @throws PortalException if a matching polls choice could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public PollsChoice getPollsChoiceByUuidAndGroupId(String uuid, long groupId)
+		throws PortalException, SystemException {
+		return pollsChoicePersistence.findByUUID_G(uuid, groupId);
+	}
+
+	/**
 	 * Returns a range of all the polls choices.
 	 *
 	 * <p>

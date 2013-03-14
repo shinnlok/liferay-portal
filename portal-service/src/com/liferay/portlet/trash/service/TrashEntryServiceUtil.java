@@ -69,6 +69,24 @@ public class TrashEntryServiceUtil {
 		getService().deleteEntries(groupId);
 	}
 
+	public static void deleteEntries(long[] entryIds)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		getService().deleteEntries(entryIds);
+	}
+
+	public static void deleteEntry(long entryId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		getService().deleteEntry(entryId);
+	}
+
+	public static void deleteEntry(java.lang.String className, long classPK)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		getService().deleteEntry(className, classPK);
+	}
+
 	/**
 	* Returns the trash entries with the matching group ID.
 	*
@@ -104,6 +122,30 @@ public class TrashEntryServiceUtil {
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portal.security.auth.PrincipalException {
 		return getService().getEntries(groupId, start, end, obc);
+	}
+
+	public static void moveEntry(java.lang.String className, long classPK,
+		long destinationContainerModelId,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		getService()
+			.moveEntry(className, classPK, destinationContainerModelId,
+			serviceContext);
+	}
+
+	public static com.liferay.portlet.trash.model.TrashEntry restoreEntry(
+		long entryId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService().restoreEntry(entryId);
+	}
+
+	public static com.liferay.portlet.trash.model.TrashEntry restoreEntry(
+		long entryId, long overrideClassPK, java.lang.String name)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService().restoreEntry(entryId, overrideClassPK, name);
 	}
 
 	public static TrashEntryService getService() {
