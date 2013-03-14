@@ -23,8 +23,12 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.security.Permission;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Brian Wing Shun Chan
@@ -32,6 +36,7 @@ import java.util.TreeSet;
 public class PortalRuntimeChecker extends BaseChecker {
 
 	public void afterPropertiesSet() {
+		initClassLoaderReferenceIds();
 		initExpandoBridgeClassNames();
 		initGetBeanPropertyClassNames();
 		initSearchEngineIds();
@@ -59,7 +64,11 @@ public class PortalRuntimeChecker extends BaseChecker {
 		String key = null;
 		String value = null;
 
-		if (name.equals(PORTAL_RUNTIME_PERMISSION_EXPANDO_BRIDGE)) {
+		if (name.startsWith(PORTAL_RUNTIME_PERMISSION_GET_CLASSLOADER)) {
+			key = "security-manager-class-loader-reference-ids";
+			value = (String)subject;
+		}
+		else if (name.equals(PORTAL_RUNTIME_PERMISSION_EXPANDO_BRIDGE)) {
 			key = "security-manager-expando-bridge";
 			value = (String)subject;
 		}
@@ -143,6 +152,17 @@ public class PortalRuntimeChecker extends BaseChecker {
 				return false;
 			}
 		}
+		else if (name.startsWith(PORTAL_RUNTIME_PERMISSION_GET_CLASSLOADER)) {
+			String classLoaderReferenceId = (String)subject;
+
+			if (!hasGetClassLoader(classLoaderReferenceId)) {
+				logSecurityException(
+					_log, "Attempted to get class loader " +
+						classLoaderReferenceId);
+
+				return false;
+			}
+		}
 		else if (name.equals(PORTAL_RUNTIME_PERMISSION_SEARCH_ENGINE)) {
 			String searchEngineId = (String)subject;
 
@@ -174,7 +194,7 @@ public class PortalRuntimeChecker extends BaseChecker {
 		else if (name.equals(PORTAL_RUNTIME_PERMISSION_THREAD_POOL_EXECUTOR)) {
 			String threadPoolExecutorName = (String)subject;
 
-			if (!_threadPoolExecutorNames.contains(threadPoolExecutorName)) {
+			if (!hasThreadPoolExecutorNames(threadPoolExecutorName)) {
 				logSecurityException(
 					_log,
 					"Attempted to modify thread pool executor " +
@@ -205,6 +225,13 @@ public class PortalRuntimeChecker extends BaseChecker {
 		return false;
 	}
 
+	protected boolean hasGetClassLoader(String classLoaderReferenceId) {
+
+		// Temporarily return true
+
+		return true;
+	}
+
 	protected boolean hasSetBeanProperty(Class<?> clazz, String property) {
 		String className = clazz.getName();
 
@@ -221,6 +248,39 @@ public class PortalRuntimeChecker extends BaseChecker {
 		}
 
 		return false;
+	}
+
+	protected boolean hasThreadPoolExecutorNames(
+		String threadPoolExecutorName) {
+
+		for (Pattern threadPoolExecutorNamePattern :
+				_threadPoolExecutorNamePatterns) {
+
+			Matcher matcher = threadPoolExecutorNamePattern.matcher(
+				threadPoolExecutorName);
+
+			if (matcher.matches()) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	protected void initClassLoaderReferenceIds() {
+		_classLoaderReferenceIds = getPropertySet(
+			"security-manager-class-loader-reference-ids");
+
+		if (_log.isDebugEnabled()) {
+			Set<String> classLoaderReferenceIds = new TreeSet<String>(
+				_classLoaderReferenceIds);
+
+			for (String classLoaderReferenceId : classLoaderReferenceIds) {
+				_log.debug(
+					"Allowing access to class loader for reference " +
+						classLoaderReferenceId);
+			}
+		}
 	}
 
 	protected void initExpandoBridgeClassNames() {
@@ -278,26 +338,33 @@ public class PortalRuntimeChecker extends BaseChecker {
 	}
 
 	protected void initThreadPoolExecutorNames() {
-		_threadPoolExecutorNames = getPropertySet(
+		Set<String> threadPoolExecutorNames = getPropertySet(
 			"security-manager-thread-pool-executor-names");
 
-		if (_log.isDebugEnabled()) {
-			Set<String> threadPoolExecutorNames = new TreeSet<String>(
-				_threadPoolExecutorNames);
+		_threadPoolExecutorNamePatterns = new ArrayList<Pattern>(
+			threadPoolExecutorNames.size());
 
-			for (String threadPoolExecutorName : threadPoolExecutorNames) {
+		for (String threadPoolExecutorName : threadPoolExecutorNames) {
+			Pattern threadPoolExecutorNamePattern = Pattern.compile(
+				threadPoolExecutorName);
+
+			_threadPoolExecutorNamePatterns.add(threadPoolExecutorNamePattern);
+
+			if (_log.isDebugEnabled()) {
 				_log.debug(
-					"Allowing thread pool executor " + threadPoolExecutorName);
+					"Allowing thread pool executors that match the regular " +
+						"expression " + threadPoolExecutorName);
 			}
 		}
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(PortalRuntimeChecker.class);
 
+	private Set<String> _classLoaderReferenceIds;
 	private Set<String> _expandoBridgeClassNames;
 	private Set<String> _getBeanPropertyClassNames;
 	private Set<String> _searchEngineIds;
 	private Set<String> _setBeanPropertyClassNames;
-	private Set<String> _threadPoolExecutorNames;
+	private List<Pattern> _threadPoolExecutorNamePatterns;
 
 }

@@ -77,6 +77,9 @@ public class VerifyUUID extends VerifyProcess {
 
 	private static final String[][] _MODELS = new String[][] {
 		new String[] {
+			"AssetTag", "tagId"
+		},
+		new String[] {
 			"DLFileRank", "fileRankId"
 		},
 		new String[] {
@@ -99,6 +102,9 @@ public class VerifyUUID extends VerifyProcess {
 		},
 		new String[] {
 			"MBBan", "banId"
+		},
+		new String[] {
+			"MBDiscussion", "discussionId"
 		},
 		new String[] {
 			"MBThread", "threadId"

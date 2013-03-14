@@ -21,7 +21,6 @@ import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.model.BaseModel;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.service.ServiceContext;
@@ -961,9 +960,7 @@ public abstract class BaseAssetSearchTestCase {
 			addBaseModel(parentBaseModel, title, serviceContext);
 		}
 
-		assetEntryQuery.setOrderByCol1(
-			"localized_title_".concat(
-				LocaleUtil.toLanguageId(LocaleUtil.getDefault())));
+		assetEntryQuery.setOrderByCol1("title");
 		assetEntryQuery.setOrderByType1(orderByType);
 
 		Document[] documents = search(assetEntryQuery, searchContext);

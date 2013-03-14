@@ -89,7 +89,17 @@ public class SeleniumBuilderFileUtil {
 	public String getClassSuffix(String fileName) {
 		int x = fileName.indexOf(CharPool.PERIOD);
 
-		return StringUtil.upperCaseFirstLetter(fileName.substring(x + 1));
+		String classSuffix = StringUtil.upperCaseFirstLetter(
+			fileName.substring(x + 1));
+
+		if (classSuffix.equals("Testcase")) {
+			classSuffix = "TestCase";
+		}
+		else if (classSuffix.equals("Testsuite")) {
+			classSuffix = "TestSuite";
+		}
+
+		return classSuffix;
 	}
 
 	public String getJavaFileName(String fileName) {
@@ -171,11 +181,13 @@ public class SeleniumBuilderFileUtil {
 	public int getTargetCount(Element rootElement) {
 		String xml = rootElement.asXML();
 
-		for (int i = 1;;) {
+		for (int i = 1;; i++) {
 			if (xml.contains("${target" + i + "}")) {
-				i++;
-
 				continue;
+			}
+
+			if (i > 1) {
+				i--;
 			}
 
 			return i;
