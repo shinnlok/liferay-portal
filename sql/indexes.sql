@@ -61,6 +61,9 @@ create index IX_91F132C on AssetLink (entryId2, type_);
 
 create index IX_7C9E46BA on AssetTag (groupId);
 create index IX_D63322F9 on AssetTag (groupId, name);
+create index IX_562A3FC4 on AssetTag (uuid_);
+create index IX_84C501E4 on AssetTag (uuid_, companyId);
+create unique index IX_B6ACB166 on AssetTag (uuid_, groupId);
 
 create index IX_DFF1F063 on AssetTagProperty (companyId);
 create index IX_13805BF7 on AssetTagProperty (companyId, key_);
@@ -501,6 +504,9 @@ create unique index IX_F7D28C2F on MBCategory (uuid_, groupId);
 create index IX_79D0120B on MBDiscussion (classNameId);
 create unique index IX_33A4DE38 on MBDiscussion (classNameId, classPK);
 create unique index IX_B5CA2DC on MBDiscussion (threadId);
+create index IX_5477D431 on MBDiscussion (uuid_);
+create index IX_7E965757 on MBDiscussion (uuid_, companyId);
+create unique index IX_F7AAC799 on MBDiscussion (uuid_, groupId);
 
 create index IX_BFEB984F on MBMailingList (active_);
 create unique index IX_76CE9CDD on MBMailingList (groupId, categoryId);
@@ -617,6 +623,8 @@ create unique index IX_7171B2E8 on PluginSetting (companyId, pluginId, pluginTyp
 create index IX_EC370F10 on PollsChoice (questionId);
 create unique index IX_D76DD2CF on PollsChoice (questionId, name);
 create index IX_6660B399 on PollsChoice (uuid_);
+create index IX_8AE746EF on PollsChoice (uuid_, companyId);
+create unique index IX_C222BD31 on PollsChoice (uuid_, groupId);
 
 create index IX_9FF342EA on PollsQuestion (groupId);
 create index IX_51F087F4 on PollsQuestion (uuid_);
