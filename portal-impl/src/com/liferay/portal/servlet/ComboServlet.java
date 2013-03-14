@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.servlet.ServletContextUtil;
 import com.liferay.portal.kernel.servlet.ServletResponseUtil;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -98,6 +99,8 @@ public class ComboServlet extends HttpServlet {
 		}
 
 		modulePaths = modulePathsSet.toArray(new String[modulePathsSet.size()]);
+
+		ArrayUtil.reverse(modulePaths);
 
 		String modulePathsString = null;
 
