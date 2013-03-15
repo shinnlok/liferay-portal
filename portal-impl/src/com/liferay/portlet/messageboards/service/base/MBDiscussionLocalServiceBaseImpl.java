@@ -237,6 +237,20 @@ public abstract class MBDiscussionLocalServiceBaseImpl
 	}
 
 	/**
+	 * Returns the message boards discussion matching the UUID and group.
+	 *
+	 * @param uuid the message boards discussion's UUID
+	 * @param groupId the primary key of the group
+	 * @return the matching message boards discussion
+	 * @throws PortalException if a matching message boards discussion could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public MBDiscussion getMBDiscussionByUuidAndGroupId(String uuid,
+		long groupId) throws PortalException, SystemException {
+		return mbDiscussionPersistence.findByUUID_G(uuid, groupId);
+	}
+
+	/**
 	 * Returns a range of all the message boards discussions.
 	 *
 	 * <p>

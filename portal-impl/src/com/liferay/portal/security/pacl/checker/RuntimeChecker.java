@@ -25,7 +25,6 @@ import java.security.Permission;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -40,7 +39,6 @@ import sun.reflect.Reflection;
 public class RuntimeChecker extends BaseChecker {
 
 	public void afterPropertiesSet() {
-		initClassLoaderReferenceIds();
 		initEnvironmentVariables();
 	}
 
@@ -61,18 +59,7 @@ public class RuntimeChecker extends BaseChecker {
 		String key = null;
 		String value = null;
 
-		if (name.startsWith(RUNTIME_PERMISSION_GET_CLASSLOADER)) {
-			key = "security-manager-class-loader-reference-ids";
-
-			if (name.equals(RUNTIME_PERMISSION_GET_CLASSLOADER)) {
-				value = "portal";
-			}
-			else {
-				value = name.substring(
-					RUNTIME_PERMISSION_GET_CLASSLOADER.length() + 1);
-			}
-		}
-		else if (name.startsWith(RUNTIME_PERMISSION_GET_ENV)) {
+		if (name.startsWith(RUNTIME_PERMISSION_GET_ENV)) {
 			key = "security-manager-environment-variables";
 
 			value = name.substring(RUNTIME_PERMISSION_GET_ENV.length() + 1);
@@ -135,7 +122,7 @@ public class RuntimeChecker extends BaseChecker {
 			}
 		}
 		else if (name.startsWith(RUNTIME_PERMISSION_GET_CLASSLOADER)) {
-			if (!hasGetClassLoader(name)) {
+			if (!hasGetClassLoader()) {
 				logSecurityException(_log, "Attempted to get class loader");
 
 				return false;
@@ -237,7 +224,7 @@ public class RuntimeChecker extends BaseChecker {
 		return false;
 	}
 
-	protected boolean hasGetClassLoader(String name) {
+	protected boolean hasGetClassLoader() {
 
 		// Temporarily return true
 
@@ -306,22 +293,6 @@ public class RuntimeChecker extends BaseChecker {
 		// Temporarily return true
 
 		return true;
-	}
-
-	protected void initClassLoaderReferenceIds() {
-		_classLoaderReferenceIds = getPropertySet(
-			"security-manager-class-loader-reference-ids");
-
-		if (_log.isDebugEnabled()) {
-			Set<String> referenceIds = new TreeSet<String>(
-				_classLoaderReferenceIds);
-
-			for (String referenceId : referenceIds) {
-				_log.debug(
-					"Allowing access to class loader for reference " +
-						referenceId);
-			}
-		}
 	}
 
 	protected void initEnvironmentVariables() {
@@ -403,7 +374,6 @@ public class RuntimeChecker extends BaseChecker {
 
 	private static Log _log = LogFactoryUtil.getLog(RuntimeChecker.class);
 
-	private Set<String> _classLoaderReferenceIds;
 	private List<Pattern> _environmentVariablePatterns;
 
 }

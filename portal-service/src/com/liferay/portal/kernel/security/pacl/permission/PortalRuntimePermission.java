@@ -55,6 +55,20 @@ public class PortalRuntimePermission extends BasicPermission {
 		securityManager.checkPermission(permission);
 	}
 
+	public static void checkGetClassLoader(String classLoaderReferenceId) {
+		SecurityManager securityManager = System.getSecurityManager();
+
+		if (securityManager == null) {
+			return;
+		}
+
+		Permission permission = new PortalRuntimePermission(
+			PACLConstants.PORTAL_RUNTIME_PERMISSION_GET_CLASSLOADER,
+			classLoaderReferenceId);
+
+		securityManager.checkPermission(permission);
+	}
+
 	public static void checkSearchEngine(String searchEngineId) {
 		SecurityManager securityManager = System.getSecurityManager();
 
@@ -83,6 +97,19 @@ public class PortalRuntimePermission extends BasicPermission {
 		Permission permission = new PortalRuntimePermission(
 			PACLConstants.PORTAL_RUNTIME_PERMISSION_SET_BEAN_PROPERTY, clazz,
 			property);
+
+		securityManager.checkPermission(permission);
+	}
+
+	public static void checkThreadPoolExecutor(String name) {
+		SecurityManager securityManager = System.getSecurityManager();
+
+		if (securityManager == null) {
+			return;
+		}
+
+		Permission permission = new PortalRuntimePermission(
+			PACLConstants.PORTAL_RUNTIME_PERMISSION_THREAD_POOL_EXECUTOR, name);
 
 		securityManager.checkPermission(permission);
 	}
