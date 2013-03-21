@@ -190,21 +190,27 @@
 
 	<target name="build-ckeditor">
 		<if>
-			<not>
-				<uptodate
-					srcfile="third-party/${ckeditor.file}"
-					targetfile="docroot/html/js/editor/ckeditor"
-				/>
-			</not>
+			<or>
+				<isset property="ckeditor.devbuild" />
+				<not>
+					<uptodate
+						srcfile="third-party/${ckeditor.file}"
+						targetfile="docroot/html/js/editor/ckeditor"
+					/>
+				</not>
+			</or>
 			<then>
 				<delete dir="docroot/html/js/editor/ckeditor" />
 
 				<unzip src="third-party/${ckeditor.file}" dest="docroot/html/js/editor" />
 
 				<if>
-					<not>
-						<available file="docroot/html/js/editor/ckeditor_diffs/ckeditor.js" />
-					</not>
+					<or>
+						<isset property="ckeditor.devbuild" />
+						<not>
+							<available file="docroot/html/js/editor/ckeditor_diffs/ckeditor.js" />
+						</not>
+					</or>
 					<then>
 						<delete
 							dir="docroot/html/js/editor/ckeditor/dev/builder/release"
@@ -266,6 +272,19 @@
 							</replacevalue>
 						</replace>
 
+						<if>
+							<isset property="ckeditor.devbuild" />
+							<then>
+								<property
+									name="ckeditor.devbuild.nominify"
+									value="--leave-css-unminified --leave-js-unminified"
+								/>
+							</then>
+							<else>
+								<property name="ckeditor.devbuild.nominify" value="" />
+							</else>
+						</if>
+
 						<java
 							classname="ckbuilder.ckbuilder"
 							classpathref="project.classpath"
@@ -277,6 +296,7 @@
 							<arg line="release" />
 							<arg line="--version=&quot;4.0 STABLE&quot;" />
 							<arg line="--build-config ${basedir}/docroot/html/js/editor/ckeditor/dev/builder/build-config.js" />
+							<arg line="${ckeditor.devbuild.nominify}" />
 						</java>
 					</then>
 				</if>
@@ -322,6 +342,12 @@
 			<replacetoken><![CDATA[body = encodeURIComponent( email.body || '' );]]></replacetoken>
 			<replacevalue><![CDATA[body = email.body || ''; body = encodeURIComponent(body).replace(/%/g, '%25');]]></replacevalue>
 		</replace>
+	</target>
+
+	<target name="build-ckeditor-dev">
+		<property name="ckeditor.devbuild" value="true" />
+
+		<antcall target="build-ckeditor" />
 	</target>
 
 	<target name="build-ckeditor-plugins-bbcode">
