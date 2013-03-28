@@ -190,8 +190,17 @@
 
 	<target name="build-ckeditor">
 		<if>
+			<not>
+				<isset property="ckeditor.build.dev.unminify" />
+			</not>
+			<then>
+				<property name="ckeditor.build.dev.unminify" value="" />
+			</then>
+		</if>
+
+		<if>
 			<or>
-				<isset property="ckeditor.devbuild" />
+				<isset property="ckeditor.build.dev" />
 				<not>
 					<uptodate
 						srcfile="third-party/${ckeditor.file}"
@@ -206,7 +215,7 @@
 
 				<if>
 					<or>
-						<isset property="ckeditor.devbuild" />
+						<isset property="ckeditor.build.dev" />
 						<not>
 							<available file="docroot/html/js/editor/ckeditor_diffs/ckeditor.js" />
 						</not>
@@ -272,19 +281,6 @@
 							</replacevalue>
 						</replace>
 
-						<if>
-							<isset property="ckeditor.devbuild" />
-							<then>
-								<property
-									name="ckeditor.devbuild.nominify"
-									value="--leave-css-unminified --leave-js-unminified"
-								/>
-							</then>
-							<else>
-								<property name="ckeditor.devbuild.nominify" value="" />
-							</else>
-						</if>
-
 						<java
 							classname="ckbuilder.ckbuilder"
 							classpathref="project.classpath"
@@ -296,7 +292,7 @@
 							<arg line="release" />
 							<arg line="--version=&quot;4.0 STABLE&quot;" />
 							<arg line="--build-config ${basedir}/docroot/html/js/editor/ckeditor/dev/builder/build-config.js" />
-							<arg line="${ckeditor.devbuild.nominify}" />
+							<arg line="${ckeditor.build.dev.unminify}" />
 						</java>
 					</then>
 				</if>
@@ -345,9 +341,10 @@
 	</target>
 
 	<target name="build-ckeditor-dev">
-		<property name="ckeditor.devbuild" value="true" />
-
-		<antcall target="build-ckeditor" />
+		<antcall target="build-ckeditor">
+			<param name="ckeditor.build.dev" value="true" />
+			<param name="ckeditor.build.dev.unminify" value="--leave-css-unminified --leave-js-unminified" />
+		</antcall>
 	</target>
 
 	<target name="build-ckeditor-plugins-bbcode">
