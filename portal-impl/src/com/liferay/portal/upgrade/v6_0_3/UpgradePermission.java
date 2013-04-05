@@ -193,14 +193,23 @@ public class UpgradePermission extends UpgradeProcess {
 			while (rs.next()) {
 				long userId = rs.getLong("userId");
 
-				if (className.equals(Company.class.getName())) {
+				if (className.equals(Company.class.getName()) &&
+					!hasUserRole(userId, portalContentReviewerRoleId)) {
+
 					addUserRole(userId, portalContentReviewerRoleId);
 				}
-				else if (className.equals(Group.class.getName())) {
+				else if (className.equals(Group.class.getName()) &&
+						 !hasUserGroupRole(
+							 userId, groupId, communityContentReviewerRoleId)) {
+
 					addUserGroupRole(
 						userId, groupId, communityContentReviewerRoleId);
 				}
-				else if (className.equals(Organization.class.getName())) {
+				else if (className.equals(Organization.class.getName()) &&
+						 !hasUserGroupRole(
+							 userId, groupId,
+							 organizationContentReviewerRoleId)) {
+
 					addUserGroupRole(
 						userId, groupId, organizationContentReviewerRoleId);
 				}
@@ -239,6 +248,73 @@ public class UpgradePermission extends UpgradeProcess {
 			}
 
 			return 0;
+		}
+		finally {
+			DataAccess.cleanUp(con, ps, rs);
+		}
+	}
+
+	protected boolean hasUserGroupRole(long userId, long groupId, long roleId)
+		throws Exception {
+
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+			con = DataAccess.getUpgradeOptimizedConnection();
+
+			ps = con.prepareStatement(
+				"select count(*) from UserGroupRole where userId = ? and " +
+					"groupId = ? and roleId = ?");
+
+			ps.setLong(1, userId);
+			ps.setLong(2, groupId);
+			ps.setLong(3, roleId);
+
+			rs = ps.executeQuery();
+
+			if (rs.next()) {
+				int count = rs.getInt(1);
+
+				if (count > 0) {
+					return true;
+				}
+			}
+
+			return false;
+		}
+		finally {
+			DataAccess.cleanUp(con, ps, rs);
+		}
+	}
+
+	protected boolean hasUserRole(long userId, long roleId) throws Exception {
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+			con = DataAccess.getUpgradeOptimizedConnection();
+
+			ps = con.prepareStatement(
+				"select count(*) from Users_Roles where userId = ? and " +
+					"roleId = ?");
+
+			ps.setLong(1, userId);
+			ps.setLong(2, roleId);
+
+			rs = ps.executeQuery();
+
+			if (rs.next()) {
+				int count = rs.getInt(1);
+
+				if (count > 0) {
+					return true;
+				}
+			}
+
+			return false;
 		}
 		finally {
 			DataAccess.cleanUp(con, ps, rs);
