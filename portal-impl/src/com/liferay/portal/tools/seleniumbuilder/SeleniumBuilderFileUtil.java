@@ -157,6 +157,10 @@ public class SeleniumBuilderFileUtil {
 			int x = content.indexOf("<tbody>");
 			int y = content.indexOf("</tbody>");
 
+			if ((x == -1) || (y == -1)) {
+				throwValidationException(1002, fileName, "tbody");
+			}
+
 			String pathTbody = content.substring(x, y + 8);
 
 			Map<String, Object> context = new HashMap<String, Object>();
@@ -377,6 +381,10 @@ public class SeleniumBuilderFileUtil {
 			throw new IllegalArgumentException(
 				prefix + "Poorly formed XML in " + suffix, e);
 		}
+		else if (errorCode == 1008) {
+			throw new IllegalArgumentException(
+				prefix + "Duplicate name " + string + " at " + suffix);
+		}
 		else if (errorCode == 2000) {
 			throw new IllegalArgumentException(
 				prefix + "Too many child elements in the " + string +
@@ -391,6 +399,12 @@ public class SeleniumBuilderFileUtil {
 		int errorCode, String fileName, Exception e) {
 
 		throwValidationException(errorCode, fileName, null, null, null, e);
+	}
+
+	protected void throwValidationException(
+		int errorCode, String fileName, String string) {
+
+		throwValidationException(errorCode, fileName, null, null, string, null);
 	}
 
 	protected void validate(String fileName, Element rootElement)
@@ -917,8 +931,7 @@ public class SeleniumBuilderFileUtil {
 				validateVarElement(fileName, element);
 			}
 			else {
-				throwValidationException(
-					1002, fileName, rootElement, elementName);
+				throwValidationException(1002, fileName, element, elementName);
 			}
 		}
 	}
@@ -953,6 +966,46 @@ public class SeleniumBuilderFileUtil {
 
 		if ((tdText == null) || !shortFileName.equals(tdText)) {
 			throwValidationException(0, fileName);
+		}
+
+		Element tbodyElement = tableElement.element("tbody");
+
+		List<Element> elements = tbodyElement.elements();
+
+		for (Element element : elements) {
+			String elementName = element.getName();
+
+			if (elementName.equals("tr")) {
+				validatePathTrElement(fileName, element);
+			}
+			else {
+				throwValidationException(1002, fileName, element, elementName);
+			}
+		}
+	}
+
+	protected void validatePathTrElement(String fileName, Element trElement) {
+		List<Element> elements = trElement.elements();
+
+		for (Element element : elements) {
+			String elementName = element.getName();
+
+			if (!elementName.equals("td")) {
+				throwValidationException(1002, fileName, element, elementName);
+			}
+		}
+
+		if (elements.size() < 3) {
+			throwValidationException(
+				1001, fileName, trElement, new String[] {"td"});
+		}
+
+		if (elements.size() > 3) {
+			Element element = elements.get(3);
+
+			String elementName = element.getName();
+
+			throwValidationException(1002, fileName, element, elementName);
 		}
 	}
 
@@ -1009,8 +1062,7 @@ public class SeleniumBuilderFileUtil {
 				validateVarElement(fileName, element);
 			}
 			else {
-				throwValidationException(
-					1002, fileName, rootElement, elementName);
+				throwValidationException(1002, fileName, element, elementName);
 			}
 		}
 	}
@@ -1038,8 +1090,7 @@ public class SeleniumBuilderFileUtil {
 					".+", new String[0]);
 			}
 			else {
-				throwValidationException(
-					1002, fileName, rootElement, elementName);
+				throwValidationException(1002, fileName, element, elementName);
 			}
 		}
 	}
