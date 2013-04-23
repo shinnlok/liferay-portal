@@ -31,7 +31,6 @@ import com.liferay.portal.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.service.CMISRepositoryLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.NoSuchFileEntryException;
-import com.liferay.portlet.documentlibrary.model.DLFileVersion;
 import com.liferay.portlet.documentlibrary.service.DLAppHelperLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.util.DLUtil;
 import com.liferay.portlet.expando.model.ExpandoBridge;
@@ -62,6 +61,26 @@ public class CMISFileVersion extends CMISModel implements FileVersion {
 		_uuid = uuid;
 		_fileVersionId = fileVersionId;
 		_document = document;
+	}
+
+	@Override
+	public Object clone() {
+		CMISFileVersion cmisFileVersion = new CMISFileVersion(
+			_cmisRepository, _uuid, _fileVersionId, _document);
+
+		cmisFileVersion.setCompanyId(getCompanyId());
+		setFileVersionId(getFileVersionId());
+		cmisFileVersion.setGroupId(getGroupId());
+
+		try {
+			cmisFileVersion.setParentFolder(getParentFolder());
+		}
+		catch (Exception e) {
+		}
+
+		cmisFileVersion.setPrimaryKey(getPrimaryKey());
+
+		return cmisFileVersion;
 	}
 
 	public Map<String, Serializable> getAttributes() {
@@ -172,12 +191,12 @@ public class CMISFileVersion extends CMISModel implements FileVersion {
 	}
 
 	public Class<?> getModelClass() {
-		return DLFileVersion.class;
+		return CMISFileVersion.class;
 	}
 
 	@Override
 	public String getModelClassName() {
-		return DLFileVersion.class.getName();
+		return CMISFileVersion.class.getName();
 	}
 
 	public Date getModifiedDate() {
@@ -324,6 +343,9 @@ public class CMISFileVersion extends CMISModel implements FileVersion {
 	}
 
 	public void setUserUuid(String userUuid) {
+	}
+
+	public void setUuid(String uuid) {
 	}
 
 	public FileVersion toEscapedModel() {

@@ -183,6 +183,7 @@ create index IX_4FBAC092 on DDMStructure (companyId, classNameId);
 create index IX_C8419FBE on DDMStructure (groupId);
 create index IX_B6ED5E50 on DDMStructure (groupId, classNameId);
 create unique index IX_C8785130 on DDMStructure (groupId, classNameId, structureKey);
+create index IX_43395316 on DDMStructure (groupId, parentStructureId);
 create index IX_20FDE04C on DDMStructure (structureKey);
 create index IX_E61809C8 on DDMStructure (uuid_);
 create index IX_F9FB8D60 on DDMStructure (uuid_, companyId);
@@ -274,10 +275,10 @@ create unique index IX_C99B2650 on DLFileVersion (uuid_, groupId);
 
 create index IX_A74DB14C on DLFolder (companyId);
 create index IX_F2EA1ACE on DLFolder (groupId);
-create index IX_CE2D79BE on DLFolder (groupId, mountPoint, parentFolderId, hidden);
-create index IX_3CAD1AA4 on DLFolder (groupId, mountPoint, parentFolderId, hidden, status);
+create index IX_F78286C5 on DLFolder (groupId, mountPoint, parentFolderId, hidden_);
+create index IX_C88430AB on DLFolder (groupId, mountPoint, parentFolderId, hidden_, status);
 create index IX_49C37475 on DLFolder (groupId, parentFolderId);
-create index IX_C0FD29F9 on DLFolder (groupId, parentFolderId, hidden, status);
+create index IX_CE360BF6 on DLFolder (groupId, parentFolderId, hidden_, status);
 create unique index IX_902FD874 on DLFolder (groupId, parentFolderId, name);
 create index IX_51556082 on DLFolder (parentFolderId, name);
 create index IX_EE29C715 on DLFolder (repositoryId);
@@ -325,6 +326,9 @@ create index IX_6C499099 on Group_ (companyId, parentGroupId, site);
 create index IX_63A2AABD on Group_ (companyId, site);
 create index IX_16218A38 on Group_ (liveGroupId);
 create index IX_7B590A7A on Group_ (type_, active_);
+create index IX_F981514E on Group_ (uuid_);
+create index IX_26CC761A on Group_ (uuid_, companyId);
+create unique index IX_754FBB1C on Group_ (uuid_, groupId);
 
 create index IX_75267DCA on Groups_Orgs (groupId);
 create index IX_6BBB7682 on Groups_Orgs (organizationId);
@@ -801,6 +805,10 @@ create index IX_926CDD04 on SocialActivityCounter (groupId, classNameId, classPK
 create index IX_B15863FA on SocialActivityLimit (classNameId, classPK);
 create unique index IX_F1C1A617 on SocialActivityLimit (groupId, userId, classNameId, classPK, activityType, activityCounterName);
 create index IX_6F9EDE9F on SocialActivityLimit (userId);
+
+create index IX_4460FA14 on SocialActivitySet (classNameId, classPK, type_);
+create index IX_F71071BD on SocialActivitySet (groupId, userId, type_);
+create index IX_62AC101A on SocialActivitySet (userId, classNameId, classPK, type_);
 
 create index IX_8BE5F230 on SocialActivitySetting (groupId);
 create index IX_384788CD on SocialActivitySetting (groupId, activityType);

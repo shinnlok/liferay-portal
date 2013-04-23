@@ -15,6 +15,7 @@
 package com.liferay.portal.service.impl;
 
 import com.liferay.portal.NoSuchLayoutException;
+import com.liferay.portal.kernel.cache.ThreadLocalCachable;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.messaging.DestinationNames;
@@ -53,7 +54,9 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * The implementation of the layout service.
+ * Provides the remote service for accessing, adding, deleting, exporting,
+ * importing, scheduling publishing of, and updating layouts. Its methods
+ * include permission checks.
  *
  * @author Brian Wing Shun Chan
  * @author Wesley Gong
@@ -537,6 +540,20 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 		}
 
 		return LayoutConstants.DEFAULT_PLID;
+	}
+
+	@ThreadLocalCachable
+	public long getDefaultPlid(
+			long groupId, long scopeGroupId, String portletId)
+		throws PortalException, SystemException {
+
+		long plid = getDefaultPlid(groupId, scopeGroupId, false, portletId);
+
+		if (plid == 0) {
+			plid = getDefaultPlid(groupId, scopeGroupId, true, portletId);
+		}
+
+		return plid;
 	}
 
 	/**

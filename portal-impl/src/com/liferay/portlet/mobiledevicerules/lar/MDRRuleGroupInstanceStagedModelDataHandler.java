@@ -15,9 +15,9 @@
 package com.liferay.portlet.mobiledevicerules.lar;
 
 import com.liferay.portal.kernel.lar.BaseStagedModelDataHandler;
+import com.liferay.portal.kernel.lar.ExportImportPathUtil;
 import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
-import com.liferay.portal.kernel.lar.StagedModelPathUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.MapUtil;
@@ -43,9 +43,12 @@ import java.util.Map;
 public class MDRRuleGroupInstanceStagedModelDataHandler
 	extends BaseStagedModelDataHandler<MDRRuleGroupInstance> {
 
+	public static final String[] CLASS_NAMES =
+		{MDRRuleGroupInstance.class.getName()};
+
 	@Override
-	public String getClassName() {
-		return MDRRuleGroupInstance.class.getName();
+	public String[] getClassNames() {
+		return CLASS_NAMES;
 	}
 
 	@Override
@@ -76,8 +79,8 @@ public class MDRRuleGroupInstanceStagedModelDataHandler
 
 		portletDataContext.addClassedModel(
 			ruleGroupInstanceElement,
-			StagedModelPathUtil.getPath(ruleGroupInstance), ruleGroupInstance,
-			MDRPortletDataHandler.NAMESPACE);
+			ExportImportPathUtil.getModelPath(ruleGroupInstance),
+			ruleGroupInstance, MDRPortletDataHandler.NAMESPACE);
 	}
 
 	@Override
@@ -89,7 +92,7 @@ public class MDRRuleGroupInstanceStagedModelDataHandler
 		long userId = portletDataContext.getUserId(
 			ruleGroupInstance.getUserUuid());
 
-		String ruleGroupPath = StagedModelPathUtil.getPath(
+		String ruleGroupPath = ExportImportPathUtil.getModelPath(
 			portletDataContext, MDRRuleGroup.class.getName(),
 			ruleGroupInstance.getRuleGroupId());
 

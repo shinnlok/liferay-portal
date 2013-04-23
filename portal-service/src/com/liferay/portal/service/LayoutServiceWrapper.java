@@ -390,6 +390,13 @@ public class LayoutServiceWrapper implements LayoutService,
 			privateLayout, portletId);
 	}
 
+	public long getDefaultPlid(long groupId, long scopeGroupId,
+		java.lang.String portletId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _layoutService.getDefaultPlid(groupId, scopeGroupId, portletId);
+	}
+
 	/**
 	* Returns the layout matching the UUID, group, and privacy.
 	*

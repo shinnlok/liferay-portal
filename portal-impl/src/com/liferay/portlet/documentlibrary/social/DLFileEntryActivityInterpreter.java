@@ -117,8 +117,11 @@ public class DLFileEntryActivityInterpreter
 	}
 
 	@Override
-	protected String getPath(SocialActivity activity) {
-		return "/document_library/find_file_entry?fileEntryId=";
+	protected String getPath(
+		SocialActivity activity, ServiceContext serviceContext) {
+
+		return "/document_library/find_file_entry?fileEntryId=" +
+			activity.getClassPK();
 	}
 
 	@Override
@@ -129,18 +132,18 @@ public class DLFileEntryActivityInterpreter
 
 		if (activityType == DLActivityKeys.ADD_FILE_ENTRY) {
 			if (Validator.isNull(groupName)) {
-				return "activity-document-library-add-file";
+				return "activity-document-library-file-add-file";
 			}
 			else {
-				return "activity-document-library-add-file-in";
+				return "activity-document-library-file-add-file-in";
 			}
 		}
 		else if (activityType == DLActivityKeys.UPDATE_FILE_ENTRY) {
 			if (Validator.isNull(groupName)) {
-				return "activity-document-library-update-file";
+				return "activity-document-library-file-update-file";
 			}
 			else {
-				return "activity-document-library-update-file-in";
+				return "activity-document-library-file-update-file-in";
 			}
 		}
 		else if (activityType == SocialActivityConstants.TYPE_MOVE_TO_TRASH) {

@@ -276,9 +276,7 @@ public class ConvertDocumentLibrary extends ConvertProcess {
 			}
 
 			@Override
-			protected void performAction(Object object)
-				throws PortalException, SystemException {
-
+			protected void performAction(Object object) throws SystemException {
 				WikiPage wikiPage = (WikiPage)object;
 
 				for (FileEntry fileEntry :

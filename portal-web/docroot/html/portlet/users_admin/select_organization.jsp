@@ -18,7 +18,7 @@
 
 <%
 String p_u_i_d = ParamUtil.getString(request, "p_u_i_d");
-String eventName = ParamUtil.getString(request, "eventName", "selectOrganization");
+String eventName = ParamUtil.getString(request, "eventName", liferayPortletResponse.getNamespace() + "selectOrganization");
 String target = ParamUtil.getString(request, "target");
 
 User selUser = PortalUtil.getSelectedUser(request);
@@ -136,7 +136,7 @@ if (Validator.isNotNull(target)) {
 					Map<String, Object> data = new HashMap<String, Object>();
 
 					data.put("groupid", organization.getGroupId());
-					data.put("name", HtmlUtil.escape(organization.getName()));
+					data.put("name", HtmlUtil.escapeAttribute(organization.getName()));
 					data.put("organizationid", organization.getOrganizationId());
 					data.put("type", LanguageUtil.get(pageContext, organization.getType()));
 					%>
@@ -162,7 +162,7 @@ if (Validator.isNotNull(target)) {
 		function(event) {
 			var result = Util.getAttributes(event.currentTarget, 'data-');
 
-			Util.getOpener().Liferay.fire('<portlet:namespace /><%= eventName %>', result);
+			Util.getOpener().Liferay.fire('<%= HtmlUtil.escapeJS(eventName) %>', result);
 
 			Util.getWindow().close();
 		},

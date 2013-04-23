@@ -1062,7 +1062,7 @@ public class ProcessExecutorTest {
 
 		String agentLine = System.getProperty("junit.cobertura.agent");
 
-		if (!Validator.isNull(agentLine)) {
+		if (Validator.isNotNull(agentLine)) {
 			arguments.add(agentLine);
 			arguments.add("-Djunit.cobertura.agent=" + agentLine);
 		}
@@ -1185,6 +1185,7 @@ public class ProcessExecutorTest {
 
 			serverSocket.setReuseAddress(true);
 		}
+
 	};
 
 	private static class AttachChildProcessCallable1

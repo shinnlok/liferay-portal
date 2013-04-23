@@ -23,7 +23,6 @@ page import="com.liferay.portal.kernel.template.TemplateHandlerRegistryUtil" %><
 page import="com.liferay.portal.kernel.xml.Document" %><%@
 page import="com.liferay.portal.kernel.xml.Element" %><%@
 page import="com.liferay.portal.kernel.xml.SAXReaderUtil" %><%@
-page import="com.liferay.portal.security.permission.comparator.ModelResourceComparator" %><%@
 page import="com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil" %><%@
 page import="com.liferay.portlet.asset.NoSuchEntryException" %><%@
 page import="com.liferay.portlet.asset.NoSuchTagException" %><%@
@@ -47,16 +46,17 @@ page import="com.liferay.portlet.assetpublisher.search.AssetDisplayTerms" %><%@
 page import="com.liferay.portlet.assetpublisher.search.AssetSearch" %><%@
 page import="com.liferay.portlet.assetpublisher.util.AssetPublisherHelperUtil" %><%@
 page import="com.liferay.portlet.assetpublisher.util.AssetPublisherUtil" %><%@
-page import="com.liferay.portlet.documentlibrary.model.DLFileEntry" %><%@
 page import="com.liferay.portlet.documentlibrary.util.DocumentConversionUtil" %><%@
-page import="com.liferay.portlet.journal.model.JournalArticle" %><%@
+page import="com.liferay.portlet.dynamicdatamapping.model.DDMStructure" %><%@
+page import="com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalServiceUtil" %><%@
+page import="com.liferay.portlet.dynamicdatamapping.util.DDMIndexerUtil" %><%@
 page import="com.liferay.portlet.portletdisplaytemplate.util.PortletDisplayTemplateConstants" %><%@
 page import="com.liferay.portlet.portletdisplaytemplate.util.PortletDisplayTemplateUtil" %><%@
 page import="com.liferay.util.RSSUtil" %><%@
 page import="com.liferay.util.xml.DocUtil" %>
 
 <%
-PortletPreferences preferences = renderRequest.getPreferences();
+PortletPreferences preferences = liferayPortletRequest.getPreferences();
 
 String portletResource = ParamUtil.getString(request, "portletResource");
 
@@ -92,8 +92,10 @@ String customUserAttributes = GetterUtil.getString(preferences.getValue("customU
 
 AssetEntryQuery assetEntryQuery = new AssetEntryQuery();
 
+long[] allAssetCategoryIds = new long[0];
 String[] allAssetTagNames = new String[0];
 
+String ddmStructureFieldLabel = StringPool.BLANK;
 String ddmStructureFieldName = StringPool.BLANK;
 String ddmStructureFieldValue = StringPool.BLANK;
 
@@ -110,12 +112,20 @@ if (selectionStyle.equals("dynamic")) {
 	assetEntryQuery.setClassTypeIds(classTypeIds);
 
 	if ((classNameIds.length == 1) && (classTypeIds.length == 1)) {
-		ddmStructureFieldName = GetterUtil.getString(preferences.getValue("ddmStructureFieldName", StringPool.BLANK));
-		ddmStructureFieldValue = GetterUtil.getString(preferences.getValue("ddmStructureFieldValue", StringPool.BLANK));
+		DDMStructure ddmStructure = DDMStructureLocalServiceUtil.fetchDDMStructure(classTypeIds[0]);
 
-		if (Validator.isNotNull(ddmStructureFieldName) && Validator.isNotNull(ddmStructureFieldValue)) {
-			assetEntryQuery.setAttribute("ddmStructureFieldValue", ddmStructureFieldValue);
-			assetEntryQuery.setAttribute("ddmStructureFieldName", ddmStructureFieldName);
+		if (ddmStructure != null) {
+			ddmStructureFieldName = GetterUtil.getString(preferences.getValue("ddmStructureFieldName", StringPool.BLANK));
+			ddmStructureFieldValue = GetterUtil.getString(preferences.getValue("ddmStructureFieldValue", StringPool.BLANK));
+
+			Set<String> fieldNames = ddmStructure.getFieldNames();
+
+			if (Validator.isNotNull(ddmStructureFieldName) && fieldNames.contains(ddmStructureFieldName) && Validator.isNotNull(ddmStructureFieldValue)) {
+				ddmStructureFieldLabel = ddmStructure.getFieldProperty(ddmStructureFieldName, "label");
+
+				assetEntryQuery.setAttribute("ddmStructureFieldName", DDMIndexerUtil.encodeName(ddmStructure.getStructureId(), ddmStructureFieldName, locale));
+				assetEntryQuery.setAttribute("ddmStructureFieldValue", ddmStructureFieldValue);
+			}
 		}
 	}
 
@@ -130,7 +140,7 @@ String assetCategoryTitle = null;
 String assetVocabularyTitle = null;
 
 if (assetCategoryId > 0) {
-	long[] allAssetCategoryIds = assetEntryQuery.getAllCategoryIds();
+	allAssetCategoryIds = assetEntryQuery.getAllCategoryIds();
 
 	if (!ArrayUtil.contains(allAssetCategoryIds, assetCategoryId)) {
 		assetEntryQuery.setAllCategoryIds(ArrayUtil.append(allAssetCategoryIds, assetCategoryId));
@@ -183,6 +193,7 @@ boolean mergeLayoutTags = GetterUtil.getBoolean(preferences.getValue("mergeLayou
 
 String displayStyle = GetterUtil.getString(preferences.getValue("displayStyle", PropsValues.ASSET_PUBLISHER_DISPLAY_STYLE_DEFAULT));
 
+boolean showAddContentButton = GetterUtil.getBoolean(preferences.getValue("showAddContentButton", null), true);
 boolean showAssetTitle = GetterUtil.getBoolean(preferences.getValue("showAssetTitle", null), true);
 boolean showContextLink = GetterUtil.getBoolean(preferences.getValue("showContextLink", null), true);
 int abstractLength = GetterUtil.getInteger(preferences.getValue("abstractLength", null), 200);
@@ -260,9 +271,15 @@ Format dateFormatDate = FastDateFormatFactoryUtil.getDate(locale, timeZone);
 <%@ include file="/html/portlet/asset_publisher/init-ext.jsp" %>
 
 <%!
-private String _checkViewURL(String viewURL, String currentURL, ThemeDisplay themeDisplay) {
-	if (Validator.isNotNull(viewURL) && viewURL.startsWith(themeDisplay.getURLPortal())) {
-		viewURL = HttpUtil.setParameter(viewURL, "redirect", currentURL);
+private String _checkViewURL(AssetEntry assetEntry, boolean viewInContext, String viewURL, String currentURL, ThemeDisplay themeDisplay) {
+	if (Validator.isNotNull(viewURL)) {
+		Layout layout = themeDisplay.getLayout();
+
+		String assetEntryLayoutUuid = assetEntry.getLayoutUuid();
+
+		if (!viewInContext || (Validator.isNotNull(assetEntryLayoutUuid) && !assetEntryLayoutUuid.equals(layout.getUuid()))) {
+			viewURL = HttpUtil.setParameter(viewURL, "redirect", currentURL);
+		}
 	}
 
 	return viewURL;

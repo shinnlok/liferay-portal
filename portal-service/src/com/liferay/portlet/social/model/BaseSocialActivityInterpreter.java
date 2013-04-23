@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.social.model;
 
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -35,6 +37,8 @@ import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portlet.social.service.SocialActivityLocalServiceUtil;
+import com.liferay.portlet.social.service.SocialActivitySetLocalServiceUtil;
+import com.liferay.portlet.social.service.persistence.SocialActivityUtil;
 import com.liferay.portlet.trash.util.TrashUtil;
 
 import java.util.List;
@@ -47,10 +51,6 @@ import javax.portlet.PortletURL;
  */
 public abstract class BaseSocialActivityInterpreter
 	implements SocialActivityInterpreter {
-
-	public long getActivitySetId(long activityId) {
-		return 0;
-	}
 
 	public String getSelector() {
 		return StringPool.BLANK;
@@ -88,6 +88,27 @@ public abstract class BaseSocialActivityInterpreter
 		}
 
 		return null;
+	}
+
+	public void updateActivitySet(long activityId)
+		throws PortalException, SystemException {
+
+		SocialActivity activity = SocialActivityUtil.fetchByPrimaryKey(
+			activityId);
+
+		if ((activity == null) || (activity.getActivitySetId() > 0)) {
+			return;
+		}
+
+		long activitySetId = getActivitySetId(activityId);
+
+		if (activitySetId > 0) {
+			SocialActivitySetLocalServiceUtil.incrementActivityCount(
+				activitySetId, activityId);
+		}
+		else {
+			SocialActivitySetLocalServiceUtil.addActivitySet(activityId);
+		}
 	}
 
 	protected String buildLink(String link, String text) {
@@ -137,6 +158,10 @@ public abstract class BaseSocialActivityInterpreter
 
 		String title = getTitle(activity, serviceContext);
 
+		if (Validator.isNull(title)) {
+			return null;
+		}
+
 		String body = getBody(activity, serviceContext);
 
 		return new SocialActivityFeedEntry(link, title, body);
@@ -152,19 +177,15 @@ public abstract class BaseSocialActivityInterpreter
 		return _deprecatedMarkerSocialActivityFeedEntry;
 	}
 
+	protected long getActivitySetId(long activityId) {
+		return 0;
+	}
+
 	protected String getBody(
 			SocialActivity activity, ServiceContext serviceContext)
 		throws Exception {
 
 		return StringPool.BLANK;
-	}
-
-	protected String getClassName(SocialActivity activity) {
-		return activity.getClassName();
-	}
-
-	protected long getClassPK(SocialActivity activity) {
-		return activity.getClassPK();
 	}
 
 	protected String getEntryTitle(
@@ -289,31 +310,42 @@ public abstract class BaseSocialActivityInterpreter
 		throws Exception {
 
 		TrashHandler trashHandler = TrashHandlerRegistryUtil.getTrashHandler(
-			getClassName(activity));
+			activity.getClassName());
 
-		long classPK = getClassPK(activity);
+		long classPK = activity.getClassPK();
 
 		if ((trashHandler != null) &&
 			(trashHandler.isInTrash(classPK) ||
 			 trashHandler.isInTrashContainer(classPK))) {
 
 			PortletURL portletURL = TrashUtil.getViewContentURL(
-				serviceContext.getRequest(), getClassName(activity), classPK);
+				serviceContext.getRequest(), activity.getClassName(), classPK);
+
+			if (portletURL == null) {
+				return null;
+			}
 
 			return portletURL.toString();
 		}
 
-		StringBundler sb = new StringBundler(4);
+		String path = getPath(activity, serviceContext);
 
-		sb.append(serviceContext.getPortalURL());
-		sb.append(serviceContext.getPathMain());
-		sb.append(getPath(activity));
-		sb.append(classPK);
+		if (Validator.isNull(path)) {
+			return null;
+		}
 
-		return sb.toString();
+		if (!path.startsWith(StringPool.SLASH)) {
+			return path;
+		}
+
+		return serviceContext.getPortalURL() + serviceContext.getPathMain() +
+			path;
 	}
 
-	protected String getPath(SocialActivity activity) {
+	protected String getPath(
+			SocialActivity activity, ServiceContext serviceContext)
+		throws Exception {
+
 		return StringPool.BLANK;
 	}
 
@@ -327,14 +359,18 @@ public abstract class BaseSocialActivityInterpreter
 			groupName = getGroupName(activity.getGroupId(), serviceContext);
 		}
 
+		String titlePattern = getTitlePattern(groupName, activity);
+
+		if (Validator.isNull(titlePattern)) {
+			return null;
+		}
+
 		String link = getLink(activity, serviceContext);
 
 		String entryTitle = getEntryTitle(activity, serviceContext);
 
 		Object[] titleArguments = getTitleArguments(
 			groupName, activity, link, entryTitle, serviceContext);
-
-		String titlePattern = getTitlePattern(groupName, activity);
 
 		return serviceContext.translate(titlePattern, titleArguments);
 	}

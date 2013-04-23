@@ -72,7 +72,6 @@ import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.ImageLocalServiceUtil;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.LayoutSetLocalServiceUtil;
-import com.liferay.portal.service.PortletLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
@@ -876,7 +875,7 @@ public class ServicePreAction extends Action {
 		themeDisplay.setShowSignInIcon(!signedIn);
 		themeDisplay.setShowSignOutIcon(signedIn);
 
-		boolean showSiteContentIcon = false;
+		boolean showManageSiteIcon = false;
 
 		long controlPanelPlid = 0;
 
@@ -887,29 +886,12 @@ public class ServicePreAction extends Action {
 				PortalUtil.getControlPanelPortlets(
 					PortletCategoryKeys.CONTENT, themeDisplay);
 
-			Portlet groupPagesPortlet = PortletLocalServiceUtil.getPortletById(
-				PortletKeys.GROUP_PAGES);
-
-			siteContentPortlets.remove(groupPagesPortlet);
-
-			Portlet siteMembershipsAdminPortlet =
-				PortletLocalServiceUtil.getPortletById(
-					PortletKeys.SITE_MEMBERSHIPS_ADMIN);
-
-			siteContentPortlets.remove(siteMembershipsAdminPortlet);
-
-			Portlet siteSettingsPortlet =
-				PortletLocalServiceUtil.getPortletById(
-					PortletKeys.SITE_SETTINGS);
-
-			siteContentPortlets.remove(siteSettingsPortlet);
-
-			showSiteContentIcon =
+			showManageSiteIcon =
 				PortletPermissionUtil.hasControlPanelAccessPermission(
 					permissionChecker, scopeGroupId, siteContentPortlets);
 		}
 
-		themeDisplay.setShowSiteContentIcon(showSiteContentIcon);
+		themeDisplay.setShowManageSiteIcon(showManageSiteIcon);
 
 		themeDisplay.setShowStagingIcon(false);
 
@@ -970,14 +952,6 @@ public class ServicePreAction extends Action {
 
 		themeDisplay.setURLControlPanel(urlControlPanel);
 
-		String siteContentURL = urlControlPanel;
-
-		siteContentURL = HttpUtil.addParameter(
-			siteContentURL, "controlPanelCategory",
-			PortletCategoryKeys.CONTENT);
-
-		themeDisplay.setURLSiteContent(siteContentURL);
-
 		String currentURL = PortalUtil.getCurrentURL(request);
 
 		themeDisplay.setURLCurrent(currentURL);
@@ -985,6 +959,13 @@ public class ServicePreAction extends Action {
 		String urlHome = PortalUtil.getHomeURL(request);
 
 		themeDisplay.setURLHome(urlHome);
+
+		String manageSiteURL = urlControlPanel;
+
+		manageSiteURL = HttpUtil.addParameter(
+			manageSiteURL, "controlPanelCategory", PortletCategoryKeys.CONTENT);
+
+		themeDisplay.setURLManageSite(manageSiteURL);
 
 		if (layout != null) {
 			if (layout.isTypePortlet()) {
@@ -1007,8 +988,7 @@ public class ServicePreAction extends Action {
 					}
 
 					themeDisplay.setURLAddContent(
-						"Liferay.LayoutConfiguration.toggle('".concat(
-							PortletKeys.LAYOUT_CONFIGURATION).concat("');"));
+						"Liferay.Dockbar.loadAddPanel();");
 				}
 
 				if (hasCustomizeLayoutPermission && customizedView) {
@@ -1019,8 +999,7 @@ public class ServicePreAction extends Action {
 					}
 
 					themeDisplay.setURLAddContent(
-						"Liferay.LayoutConfiguration.toggle('".concat(
-							PortletKeys.LAYOUT_CONFIGURATION).concat("');"));
+						"Liferay.Dockbar.loadAddPanel();");
 				}
 			}
 
@@ -1055,9 +1034,9 @@ public class ServicePreAction extends Action {
 					pageSettingsURL.setWindowState(LiferayWindowState.POP_UP);
 				}
 				else {
-					pageSettingsURL.setPlid(plid);
 					pageSettingsURL.setParameter(
 						"redirect", themeDisplay.getURLHome());
+					pageSettingsURL.setPlid(plid);
 					pageSettingsURL.setWindowState(WindowState.MAXIMIZED);
 				}
 
@@ -1102,11 +1081,11 @@ public class ServicePreAction extends Action {
 							LiferayWindowState.POP_UP);
 					}
 					else {
-						manageSiteMembershipsURL.setPlid(plid);
 						manageSiteMembershipsURL.setParameter(
 							"redirect", themeDisplay.getURLHome());
 						manageSiteMembershipsURL.setParameter(
 							"showBackURL", Boolean.FALSE.toString());
+						manageSiteMembershipsURL.setPlid(plid);
 						manageSiteMembershipsURL.setWindowState(
 							WindowState.MAXIMIZED);
 					}
@@ -1162,9 +1141,9 @@ public class ServicePreAction extends Action {
 					siteSettingsURL.setWindowState(LiferayWindowState.POP_UP);
 				}
 				else {
-					siteSettingsURL.setPlid(plid);
 					siteSettingsURL.setParameter(
 						"redirect", themeDisplay.getURLHome());
+					siteSettingsURL.setPlid(plid);
 					siteSettingsURL.setWindowState(
 						LiferayWindowState.MAXIMIZED);
 				}
@@ -1207,9 +1186,9 @@ public class ServicePreAction extends Action {
 						LiferayWindowState.POP_UP);
 				}
 				else {
-					siteMapSettingsURL.setPlid(plid);
 					siteMapSettingsURL.setParameter(
 						"redirect", themeDisplay.getURLHome());
+					siteMapSettingsURL.setPlid(plid);
 					siteMapSettingsURL.setWindowState(
 						LiferayWindowState.MAXIMIZED);
 				}
@@ -1306,6 +1285,7 @@ public class ServicePreAction extends Action {
 		if (group.isLayoutPrototype()) {
 			themeDisplay.setShowControlPanelIcon(false);
 			themeDisplay.setShowHomeIcon(false);
+			themeDisplay.setShowManageSiteIcon(false);
 			themeDisplay.setShowManageSiteMembershipsIcon(false);
 			themeDisplay.setShowMyAccountIcon(false);
 			themeDisplay.setShowPageCustomizationIcon(false);
@@ -1313,7 +1293,6 @@ public class ServicePreAction extends Action {
 			themeDisplay.setShowPortalIcon(false);
 			themeDisplay.setShowSignInIcon(false);
 			themeDisplay.setShowSignOutIcon(false);
-			themeDisplay.setShowSiteContentIcon(false);
 			themeDisplay.setShowSiteSettingsIcon(false);
 			themeDisplay.setShowStagingIcon(false);
 		}
@@ -1325,9 +1304,9 @@ public class ServicePreAction extends Action {
 
 		if (group.hasStagingGroup() && !group.isStagingGroup()) {
 			themeDisplay.setShowLayoutTemplatesIcon(false);
+			themeDisplay.setShowManageSiteIcon(false);
 			themeDisplay.setShowPageCustomizationIcon(false);
 			themeDisplay.setShowPageSettingsIcon(false);
-			themeDisplay.setShowSiteContentIcon(false);
 			themeDisplay.setShowSiteMapSettingsIcon(false);
 			themeDisplay.setShowSiteSettingsIcon(false);
 		}
@@ -1773,7 +1752,13 @@ public class ServicePreAction extends Action {
 		if (accessibleLayouts.isEmpty()) {
 			layouts = null;
 
-			if (!hasViewLayoutPermission) {
+			if (!isLoginRequest(request) && !hasViewLayoutPermission) {
+				if (user.isDefaultUser() &&
+					PropsValues.AUTH_LOGIN_PROMPT_ENABLED) {
+
+					throw new PrincipalException("User is not authenticated");
+				}
+
 				SessionErrors.add(
 					request, LayoutPermissionException.class.getName());
 			}

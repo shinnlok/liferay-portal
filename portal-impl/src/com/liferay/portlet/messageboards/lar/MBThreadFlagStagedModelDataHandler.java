@@ -15,9 +15,9 @@
 package com.liferay.portlet.messageboards.lar;
 
 import com.liferay.portal.kernel.lar.BaseStagedModelDataHandler;
+import com.liferay.portal.kernel.lar.ExportImportPathUtil;
 import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
-import com.liferay.portal.kernel.lar.StagedModelPathUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -40,9 +40,11 @@ import java.util.Map;
 public class MBThreadFlagStagedModelDataHandler
 	extends BaseStagedModelDataHandler<MBThreadFlag> {
 
+	public static final String[] CLASS_NAMES = {MBThreadFlag.class.getName()};
+
 	@Override
-	public String getClassName() {
-		return MBThreadFlag.class.getName();
+	public String[] getClassNames() {
+		return CLASS_NAMES;
 	}
 
 	@Override
@@ -73,7 +75,7 @@ public class MBThreadFlagStagedModelDataHandler
 			"root-message-id", String.valueOf(rootMessage.getMessageId()));
 
 		portletDataContext.addClassedModel(
-			threadFlagElement, StagedModelPathUtil.getPath(threadFlag),
+			threadFlagElement, ExportImportPathUtil.getModelPath(threadFlag),
 			threadFlag, MBPortletDataHandler.NAMESPACE);
 	}
 
@@ -96,7 +98,7 @@ public class MBThreadFlagStagedModelDataHandler
 			long rootMessageId = GetterUtil.getLong(
 				element.attributeValue("root-message-id"));
 
-			String rootMessagePath = StagedModelPathUtil.getPath(
+			String rootMessagePath = ExportImportPathUtil.getModelPath(
 				portletDataContext, MBMessage.class.getName(), rootMessageId);
 
 			MBMessage rootMessage = (MBMessage)portletDataContext.

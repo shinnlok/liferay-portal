@@ -177,7 +177,9 @@ public class MBMessageServiceImpl extends MBMessageServiceBaseImpl {
 
 		int workFlowAction = serviceContext.getWorkflowAction();
 
-		if ((workFlowAction == WorkflowConstants.STATUS_DRAFT) && !preview) {
+		if ((workFlowAction == WorkflowConstants.STATUS_DRAFT) && !preview &&
+			!serviceContext.isSignedIn()) {
+
 			MBMessagePermission.check(
 				getPermissionChecker(), parentMessageId, ActionKeys.UPDATE);
 		}
@@ -601,8 +603,11 @@ public class MBMessageServiceImpl extends MBMessageServiceBaseImpl {
 			long messageId, String fileName)
 		throws PortalException, SystemException {
 
-		MBMessagePermission.check(
-			getPermissionChecker(), messageId, ActionKeys.ADD_FILE);
+		MBMessage message = mbMessagePersistence.findByPrimaryKey(messageId);
+
+		MBCategoryPermission.check(
+			getPermissionChecker(), message.getGroupId(),
+			message.getCategoryId(), ActionKeys.ADD_FILE);
 
 		mbMessageLocalService.restoreMessageAttachmentFromTrash(
 			getUserId(), messageId, fileName);

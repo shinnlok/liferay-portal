@@ -51,6 +51,8 @@ public class SeleniumBuilder {
 			Set<String> actionNames = seleniumBuilderContext.getActionNames();
 
 			for (String actionName : actionNames) {
+				seleniumBuilderContext.validateActionElements(actionName);
+
 				actionConverter.convert(actionName);
 			}
 		}
@@ -63,6 +65,8 @@ public class SeleniumBuilder {
 				seleniumBuilderContext.getFunctionNames();
 
 			for (String functionName : functionNames) {
+				seleniumBuilderContext.validateFunctionElements(functionName);
+
 				functionConverter.convert(functionName);
 			}
 		}
@@ -74,6 +78,8 @@ public class SeleniumBuilder {
 			Set<String> macroNames = seleniumBuilderContext.getMacroNames();
 
 			for (String macroName : macroNames) {
+				seleniumBuilderContext.validateMacroElements(macroName);
+
 				macroConverter.convert(macroName);
 			}
 		}
@@ -97,6 +103,8 @@ public class SeleniumBuilder {
 				seleniumBuilderContext.getTestCaseNames();
 
 			for (String testCaseName : testCaseNames) {
+				seleniumBuilderContext.validateTestCaseElements(testCaseName);
+
 				testCaseConverter.convert(testCaseName);
 			}
 		}
@@ -109,6 +117,8 @@ public class SeleniumBuilder {
 				seleniumBuilderContext.getTestSuiteNames();
 
 			for (String testSuiteName : testSuiteNames) {
+				seleniumBuilderContext.validateTestSuiteElements(testSuiteName);
+
 				testSuiteConverter.convert(testSuiteName);
 			}
 		}

@@ -14,12 +14,22 @@
 
 				insert into WikiPageResource values ('${wikiPageResource.uuid}', ${wikiPageResource.resourcePrimKey}, ${wikiPageResource.nodeId}, '${wikiPageResource.title}');
 
-				<@insertAssetEntry _entry = wikiPage />
+				<@insertAssetEntry
+					_entry = wikiPage
+					_currentIndex = wikiPageCount
+				/>
 
 				<#assign mbRootMessageId = counter.get()>
 				<#assign mbThreadId = counter.get()>
 
-				<@insertMBDiscussion _classNameId = dataFactory.wikiPageClassNameId _classPK = wikiPage.resourcePrimKey _groupId = groupId _maxCommentCount = maxWikiPageCommentCount _mbRootMessageId = mbRootMessageId  _mbThreadId = mbThreadId />
+				<@insertMBDiscussion
+					_classNameId = dataFactory.wikiPageClassNameId
+					_classPK = wikiPage.resourcePrimKey
+					_groupId = groupId
+					_maxCommentCount = maxWikiPageCommentCount
+					_mbRootMessageId = mbRootMessageId
+					_mbThreadId = mbThreadId
+				/>
 
 				${writerWikiCSV.write(wikiNode.nodeId + "," + wikiNode.name + "," + wikiPage.resourcePrimKey + "," + wikiPage.title + "," + mbThreadId + "," + mbRootMessageId + "\n")}
 			</#list>

@@ -19,13 +19,16 @@ import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.BooleanQuery;
 import com.liferay.portal.kernel.search.BooleanQueryFactoryUtil;
 import com.liferay.portal.kernel.search.Document;
+import com.liferay.portal.kernel.search.DocumentImpl;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerPostProcessor;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.Summary;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.portlet.asset.model.AssetCategory;
 import com.liferay.portlet.asset.service.AssetCategoryLocalServiceUtil;
 import com.liferay.portlet.asset.service.persistence.AssetEntryQuery;
 
@@ -97,6 +100,13 @@ public class AssetSearcher extends BaseIndexer {
 			searchContext);
 
 		for (long allCategoryId : allCategoryIds) {
+			AssetCategory assetCategory =
+				AssetCategoryLocalServiceUtil.fetchAssetCategory(allCategoryId);
+
+			if (assetCategory == null) {
+				continue;
+			}
+
 			List<Long> categoryIds = new ArrayList<Long>();
 
 			if (PropsValues.ASSET_CATEGORIES_SEARCH_HIERARCHICAL) {
@@ -155,6 +165,13 @@ public class AssetSearcher extends BaseIndexer {
 			searchContext);
 
 		for (long anyCategoryId : anyCategoryIds) {
+			AssetCategory assetCategory =
+				AssetCategoryLocalServiceUtil.fetchAssetCategory(anyCategoryId);
+
+			if (assetCategory == null) {
+				continue;
+			}
+
 			List<Long> categoryIds = new ArrayList<Long>();
 
 			if (PropsValues.ASSET_CATEGORIES_SEARCH_HIERARCHICAL) {
@@ -216,6 +233,38 @@ public class AssetSearcher extends BaseIndexer {
 		addSearchNotAnyTags(contextQuery, searchContext);
 	}
 
+	@Override
+	protected void addSearchKeywords(
+			BooleanQuery searchQuery, SearchContext searchContext)
+		throws Exception {
+
+		String keywords = searchContext.getKeywords();
+
+		if (Validator.isNull(keywords)) {
+			return;
+		}
+
+		super.addSearchKeywords(searchQuery, searchContext);
+
+		String field = DocumentImpl.getLocalizedName(
+			searchContext.getLocale(), "localized_title");
+
+		searchQuery.addTerm(field, keywords, true);
+	}
+
+	@Override
+	protected void addSearchLayout(
+			BooleanQuery contextQuery, SearchContext searchContext)
+		throws Exception {
+
+		String layoutUuid = (String)searchContext.getAttribute(
+			Field.LAYOUT_UUID);
+
+		if (Validator.isNotNull(layoutUuid)) {
+			contextQuery.addRequiredTerm(Field.LAYOUT_UUID, layoutUuid);
+		}
+	}
+
 	protected void addSearchNotAllCategories(
 			BooleanQuery contextQuery, SearchContext searchContext)
 		throws Exception {
@@ -230,6 +279,14 @@ public class AssetSearcher extends BaseIndexer {
 			searchContext);
 
 		for (long notAllCategoryId : notAllCategoryIds) {
+			AssetCategory assetCategory =
+				AssetCategoryLocalServiceUtil.fetchAssetCategory(
+					notAllCategoryId);
+
+			if (assetCategory == null) {
+				continue;
+			}
+
 			List<Long> categoryIds = new ArrayList<Long>();
 
 			if (PropsValues.ASSET_CATEGORIES_SEARCH_HIERARCHICAL) {
@@ -288,6 +345,14 @@ public class AssetSearcher extends BaseIndexer {
 			searchContext);
 
 		for (long notAnyCategoryId : notAnyCategoryIds) {
+			AssetCategory assetCategory =
+				AssetCategoryLocalServiceUtil.fetchAssetCategory(
+					notAnyCategoryId);
+
+			if (assetCategory == null) {
+				continue;
+			}
+
 			List<Long> categoryIds = new ArrayList<Long>();
 
 			if (PropsValues.ASSET_CATEGORIES_SEARCH_HIERARCHICAL) {

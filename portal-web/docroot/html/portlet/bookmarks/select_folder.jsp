@@ -20,7 +20,7 @@
 BookmarksFolder folder = (BookmarksFolder)request.getAttribute(WebKeys.BOOKMARKS_FOLDER);
 
 long folderId = BeanParamUtil.getLong(folder, request, "folderId", BookmarksFolderConstants.DEFAULT_PARENT_FOLDER_ID);
-String eventName = ParamUtil.getString(request, "eventName", "selectFolder");
+String eventName = ParamUtil.getString(request, "eventName", liferayPortletResponse.getNamespace() + "selectFolder");
 
 String folderName = LanguageUtil.get(pageContext, "home");
 
@@ -101,7 +101,7 @@ if (folder != null) {
 				Map<String, Object> data = new HashMap<String, Object>();
 
 				data.put("folderid", curFolder.getFolderId());
-				data.put("name", HtmlUtil.escape(curFolder.getName()));
+				data.put("name", HtmlUtil.escapeAttribute(curFolder.getName()));
 				%>
 
 				<aui:button cssClass="selector-button" data="<%= data %>" value="choose" />
@@ -123,7 +123,7 @@ if (folder != null) {
 			Map<String, Object> data = new HashMap<String, Object>();
 
 			data.put("folderid", folderId);
-			data.put("name", HtmlUtil.escape(folderName));
+			data.put("name", HtmlUtil.escapeAttribute(folderName));
 			%>
 
 			<aui:button cssClass="selector-button" data="<%= data %>" value="choose-this-folder" />
@@ -141,7 +141,7 @@ if (folder != null) {
 		function(event) {
 			var result = Util.getAttributes(event.currentTarget, 'data-');
 
-			Util.getOpener().Liferay.fire('<portlet:namespace /><%= eventName %>', result);
+			Util.getOpener().Liferay.fire('<%= HtmlUtil.escapeJS(eventName) %>', result);
 
 			Util.getWindow().close();
 		},

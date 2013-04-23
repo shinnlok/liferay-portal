@@ -41,8 +41,8 @@ String selResourceName = modelResourceName;
 if (Validator.isNull(modelResource)) {
 	PortletURL portletURL = new PortletURLImpl(request, portletResource, plid, PortletRequest.ACTION_PHASE);
 
-	portletURL.setWindowState(WindowState.NORMAL);
 	portletURL.setPortletMode(PortletMode.VIEW);
+	portletURL.setWindowState(WindowState.NORMAL);
 
 	redirect = portletURL.toString();
 
@@ -57,8 +57,13 @@ else {
 	PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(pageContext, "permissions"), currentURL);
 }
 
-Group group = themeDisplay.getScopeGroup();
-long groupId = group.getGroupId();
+long groupId = themeDisplay.getScopeGroupId();
+
+if (resourceGroupId > 0) {
+	groupId = resourceGroupId;
+}
+
+Group group = GroupLocalServiceUtil.getGroup(groupId);
 
 Layout selLayout = null;
 
@@ -132,12 +137,10 @@ long controlPanelPlid = PortalUtil.getControlPanelPlid(company.getCompanyId());
 
 PortletURLImpl definePermissionsURL = new PortletURLImpl(request, PortletKeys.ROLES_ADMIN, controlPanelPlid, PortletRequest.RENDER_PHASE);
 
-definePermissionsURL.setPortletMode(PortletMode.VIEW);
-
-definePermissionsURL.setRefererPlid(plid);
-
 definePermissionsURL.setParameter("struts_action", "/roles_admin/edit_role_permissions");
 definePermissionsURL.setParameter(Constants.CMD, Constants.VIEW);
+definePermissionsURL.setPortletMode(PortletMode.VIEW);
+definePermissionsURL.setRefererPlid(plid);
 %>
 
 <div class="edit-permissions">
@@ -191,7 +194,7 @@ definePermissionsURL.setParameter(Constants.CMD, Constants.VIEW);
 
 			String name = modelResourceRole.getName();
 
-			if (name.equals(RoleConstants.GUEST) || name.equals(RoleConstants.OWNER) || name.equals(RoleConstants.USER)) {
+			if (name.equals(RoleConstants.GUEST) || name.equals(RoleConstants.USER)) {
 				actions = new ArrayList<String>(actions);
 
 				actions.remove(ActionKeys.ASSIGN_MEMBERS);

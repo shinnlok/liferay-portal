@@ -20,11 +20,14 @@ import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
 import com.liferay.portal.kernel.util.IntegerWrapper;
+import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.impl.GroupModelImpl;
@@ -110,6 +113,8 @@ public class GroupPersistenceTest {
 
 		Group newGroup = _persistence.create(pk);
 
+		newGroup.setUuid(ServiceTestUtil.randomString());
+
 		newGroup.setCompanyId(ServiceTestUtil.nextLong());
 
 		newGroup.setCreatorUserId(ServiceTestUtil.nextLong());
@@ -142,6 +147,7 @@ public class GroupPersistenceTest {
 
 		Group existingGroup = _persistence.findByPrimaryKey(newGroup.getPrimaryKey());
 
+		Assert.assertEquals(existingGroup.getUuid(), newGroup.getUuid());
 		Assert.assertEquals(existingGroup.getGroupId(), newGroup.getGroupId());
 		Assert.assertEquals(existingGroup.getCompanyId(),
 			newGroup.getCompanyId());
@@ -187,6 +193,26 @@ public class GroupPersistenceTest {
 		}
 		catch (NoSuchGroupException nsee) {
 		}
+	}
+
+	@Test
+	public void testFindAll() throws Exception {
+		try {
+			_persistence.findAll(QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+				getOrderByComparator());
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	protected OrderByComparator getOrderByComparator() {
+		return OrderByComparatorFactoryUtil.create("Group_", "uuid", true,
+			"groupId", true, "companyId", true, "creatorUserId", true,
+			"classNameId", true, "classPK", true, "parentGroupId", true,
+			"liveGroupId", true, "treePath", true, "name", true, "description",
+			true, "type", true, "typeSettings", true, "friendlyURL", true,
+			"site", true, "active", true);
 	}
 
 	@Test
@@ -311,6 +337,11 @@ public class GroupPersistenceTest {
 
 		GroupModelImpl existingGroupModelImpl = (GroupModelImpl)_persistence.findByPrimaryKey(newGroup.getPrimaryKey());
 
+		Assert.assertTrue(Validator.equals(existingGroupModelImpl.getUuid(),
+				existingGroupModelImpl.getOriginalUuid()));
+		Assert.assertEquals(existingGroupModelImpl.getGroupId(),
+			existingGroupModelImpl.getOriginalGroupId());
+
 		Assert.assertEquals(existingGroupModelImpl.getLiveGroupId(),
 			existingGroupModelImpl.getOriginalLiveGroupId());
 
@@ -353,6 +384,8 @@ public class GroupPersistenceTest {
 		long pk = ServiceTestUtil.nextLong();
 
 		Group group = _persistence.create(pk);
+
+		group.setUuid(ServiceTestUtil.randomString());
 
 		group.setCompanyId(ServiceTestUtil.nextLong());
 

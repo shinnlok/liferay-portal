@@ -557,6 +557,12 @@ public class AssetEntryLocalServiceUtil {
 	}
 
 	public static com.liferay.portlet.asset.model.AssetEntry fetchEntry(
+		long groupId, java.lang.String classUuid)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchEntry(groupId, classUuid);
+	}
+
+	public static com.liferay.portlet.asset.model.AssetEntry fetchEntry(
 		java.lang.String className, long classPK)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().fetchEntry(className, classPK);
@@ -654,17 +660,17 @@ public class AssetEntryLocalServiceUtil {
 	}
 
 	public static com.liferay.portlet.asset.model.AssetEntry incrementViewCounter(
-		long userId, java.lang.String className, long classPK, int increment)
-		throws com.liferay.portal.kernel.exception.SystemException {
-		return getService()
-				   .incrementViewCounter(userId, className, classPK, increment);
-	}
-
-	public static com.liferay.portlet.asset.model.AssetEntry incrementViewCounter(
 		long userId, java.lang.String className, long classPK)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return getService().incrementViewCounter(userId, className, classPK);
+	}
+
+	public static com.liferay.portlet.asset.model.AssetEntry incrementViewCounter(
+		long userId, java.lang.String className, long classPK, int increment)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .incrementViewCounter(userId, className, classPK, increment);
 	}
 
 	public static void reindex(

@@ -29,6 +29,11 @@
 			<bean class="com.liferay.portal.bean.BeanPropertiesImpl" />
 		</property>
 	</bean>
+	<bean id="com.liferay.portal.kernel.bean.ConstantsBeanFactoryUtil" class="com.liferay.portal.kernel.bean.ConstantsBeanFactoryUtil">
+		<property name="constantsBeanFactory">
+			<bean class="com.liferay.portal.bean.ConstantsBeanFactoryImpl" />
+		</property>
+	</bean>
 	<bean id="com.liferay.portal.kernel.bean.Renderer" class="com.liferay.portal.bean.RendererImpl" />
 	<bean id="com.liferay.portal.kernel.bean.RendererUtil" class="com.liferay.portal.kernel.bean.RendererUtil">
 		<property name="renderer" ref="com.liferay.portal.kernel.bean.Renderer" />
@@ -304,7 +309,6 @@
 				<entry key="com.liferay.portal.search.IndexableAdvice" value="nextMethodInterceptor" />
 				<entry key="com.liferay.portal.security.ac.AccessControlAdvice" value="accessControlAdvisor,nextMethodInterceptor" />
 				<entry key="com.liferay.portal.security.ac.AccessControlAdvisorImpl" value="" />
-				<entry key="com.liferay.portal.security.lang.DoPrivilegedFactory" value="" />
 				<entry key="com.liferay.portal.security.pacl.PACLAdvice" value="nextMethodInterceptor" />
 				<entry key="com.liferay.portal.spring.aop.ServiceBeanAutoProxyCreator" value="methodInterceptor" />
 				<entry key="com.liferay.portal.spring.bean.BeanReferenceAnnotationBeanPostProcessor" value="" />
@@ -553,6 +557,17 @@
 	<bean id="com.liferay.portal.language.LanguageResources" class="com.liferay.portal.language.LanguageResources">
 		<property name="config" value="content.Language,content.Language-ext" />
 	</bean>
+	<bean id="com.liferay.portal.layoutconfiguration.util.JettyThreadLocalBinder" class="com.liferay.portal.layoutconfiguration.util.JettyThreadLocalBinder">
+		<property name="threadLocalSources">
+			<map>
+				<entry key="org.eclipse.jetty.server.AbstractHttpConnection" value="__currentConnection" />
+			</map>
+		</property>
+	</bean>
+	<bean id="com.liferay.portal.layoutconfiguration.util.RuntimePage" class="com.liferay.portal.layoutconfiguration.util.RuntimePageImpl" />
+	<bean id="com.liferay.portal.layoutconfiguration.util.RuntimePageUtil" class="com.liferay.portal.layoutconfiguration.util.RuntimePageUtil">
+		<property name="runtimePage" ref="com.liferay.portal.layoutconfiguration.util.RuntimePage" />
+	</bean>
 	<bean id="com.liferay.portal.license.util.LicenseManager" class="com.liferay.portal.license.util.DefaultLicenseManagerImpl" />
 	<bean id="com.liferay.portal.license.util.LicenseManagerUtil" class="com.liferay.portal.license.util.LicenseManagerUtil">
 		<property name="licenseManager" ref="com.liferay.portal.license.util.LicenseManager" />
@@ -620,11 +635,10 @@
 			<bean class="com.liferay.portal.security.permission.PermissionCheckerFactoryImpl" />
 		</property>
 	</bean>
-	<bean id="com.liferay.portal.security.permission.ResourceActions" class="com.liferay.portal.security.permission.ResourceActionsImpl">
-		<property name="portal" ref="com.liferay.portal.util.Portal" />
-	</bean>
 	<bean id="com.liferay.portal.security.permission.ResourceActionsUtil" class="com.liferay.portal.security.permission.ResourceActionsUtil">
-		<property name="resourceActions" ref="com.liferay.portal.security.permission.ResourceActions" />
+		<property name="resourceActions">
+			<bean class="com.liferay.portal.security.permission.ResourceActionsImpl" />
+		</property>
 	</bean>
 	<bean id="com.liferay.portal.security.pwd.PwdToolkitUtil" class="com.liferay.portal.security.pwd.PwdToolkitUtil">
 		<property name="toolkit">
@@ -775,9 +789,10 @@
 			<bean class="com.liferay.portal.util.LayoutTypePortletFactoryImpl" />
 		</property>
 	</bean>
-	<bean id="com.liferay.portal.util.Portal" class="com.liferay.portal.util.PortalImpl" />
 	<bean id="com.liferay.portal.util.PortalUtil" class="com.liferay.portal.util.PortalUtil">
-		<property name="portal" ref="com.liferay.portal.util.Portal" />
+		<property name="portal">
+			<bean class="com.liferay.portal.util.PortalImpl" />
+		</property>
 	</bean>
 	<bean id="com.liferay.portal.util.PortletListerFactoryUtil" class="com.liferay.portal.util.PortletListerFactoryUtil">
 		<property name="portletListerFactory">
@@ -939,17 +954,6 @@
 	<bean id="com.liferay.portlet.journalcontent.util.JournalContent" class="com.liferay.portlet.journalcontent.util.JournalContentImpl" />
 	<bean id="com.liferay.portlet.journalcontent.util.JournalContentUtil" class="com.liferay.portlet.journalcontent.util.JournalContentUtil">
 		<property name="journalContent" ref="com.liferay.portlet.journalcontent.util.JournalContent" />
-	</bean>
-	<bean id="com.liferay.portlet.layoutconfiguration.util.JettyThreadLocalBinder" class="com.liferay.portlet.layoutconfiguration.util.JettyThreadLocalBinder">
-		<property name="threadLocalSources">
-			<map>
-				<entry key="org.eclipse.jetty.server.AbstractHttpConnection" value="__currentConnection" />
-			</map>
-		</property>
-	</bean>
-	<bean id="com.liferay.portlet.layoutconfiguration.util.RuntimePage" class="com.liferay.portlet.layoutconfiguration.util.RuntimePageImpl" />
-	<bean id="com.liferay.portlet.layoutconfiguration.util.RuntimePageUtil" class="com.liferay.portlet.layoutconfiguration.util.RuntimePageUtil">
-		<property name="runtimePage" ref="com.liferay.portlet.layoutconfiguration.util.RuntimePage" />
 	</bean>
 	<bean id="com.liferay.portlet.layoutsadmin.util.SitemapUtil" class="com.liferay.portlet.layoutsadmin.util.SitemapUtil">
 		<property name="sitemap">

@@ -15,8 +15,8 @@
 package com.liferay.portlet.messageboards.lar;
 
 import com.liferay.portal.kernel.lar.BaseStagedModelDataHandler;
+import com.liferay.portal.kernel.lar.ExportImportPathUtil;
 import com.liferay.portal.kernel.lar.PortletDataContext;
-import com.liferay.portal.kernel.lar.StagedModelPathUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.xml.Element;
@@ -32,9 +32,11 @@ import com.liferay.portlet.messageboards.service.MBBanLocalServiceUtil;
 public class MBBanStagedModelDataHandler
 	extends BaseStagedModelDataHandler<MBBan> {
 
+	public static final String[] CLASS_NAMES = {MBBan.class.getName()};
+
 	@Override
-	public String getClassName() {
-		return MBBan.class.getName();
+	public String[] getClassNames() {
+		return CLASS_NAMES;
 	}
 
 	@Override
@@ -48,7 +50,7 @@ public class MBBanStagedModelDataHandler
 		ban.setBanUserUuid(ban.getBanUserUuid());
 
 		portletDataContext.addClassedModel(
-			userBanElement, StagedModelPathUtil.getPath(ban), ban,
+			userBanElement, ExportImportPathUtil.getModelPath(ban), ban,
 			MBPortletDataHandler.NAMESPACE);
 	}
 

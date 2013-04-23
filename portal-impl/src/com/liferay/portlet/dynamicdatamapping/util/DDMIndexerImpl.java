@@ -14,6 +14,9 @@
 
 package com.liferay.portlet.dynamicdatamapping.util;
 
+import com.liferay.portal.kernel.json.JSONArray;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.Document;
@@ -53,7 +56,7 @@ public class DDMIndexerImpl implements DDMIndexer {
 					continue;
 				}
 
-				for (Locale locale : fields.getAvailableLocales()) {
+				for (Locale locale : LanguageUtil.getAvailableLocales()) {
 					String name = encodeName(
 						ddmStructure.getStructureId(), field.getName(), locale);
 
@@ -97,11 +100,31 @@ public class DDMIndexerImpl implements DDMIndexer {
 					else {
 						String valueString = String.valueOf(value);
 
-						if (indexType.equals("keyword")) {
-							document.addKeyword(name, valueString);
+						String type = field.getType();
+
+						if (type.equals(DDMImpl.TYPE_RADIO) ||
+							type.equals(DDMImpl.TYPE_SELECT)) {
+
+							JSONArray jsonArray =
+								JSONFactoryUtil.createJSONArray(valueString);
+
+							String[] stringArray = ArrayUtil.toStringArray(
+								jsonArray);
+
+							if (indexType.equals("keyword")) {
+								document.addKeyword(name, stringArray);
+							}
+							else {
+								document.addText(name, stringArray);
+							}
 						}
 						else {
-							document.addText(name, valueString);
+							if (indexType.equals("keyword")) {
+								document.addKeyword(name, valueString);
+							}
+							else {
+								document.addText(name, valueString);
+							}
 						}
 					}
 				}
@@ -123,7 +146,7 @@ public class DDMIndexerImpl implements DDMIndexer {
 
 		StringBundler sb = new StringBundler(7);
 
-		sb.append(_FIELD_NAMESPACE);
+		sb.append(DDM_FIELD_NAMESPACE);
 		sb.append(StringPool.FORWARD_SLASH);
 		sb.append(ddmStructureId);
 		sb.append(StringPool.FORWARD_SLASH);
@@ -136,8 +159,6 @@ public class DDMIndexerImpl implements DDMIndexer {
 
 		return sb.toString();
 	}
-
-	private static final String _FIELD_NAMESPACE = "ddm";
 
 	private static Log _log = LogFactoryUtil.getLog(DDMIndexerImpl.class);
 

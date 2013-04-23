@@ -21,6 +21,8 @@ import com.liferay.portal.kernel.scripting.ExecutionException;
 import com.liferay.portal.kernel.scripting.ScriptingException;
 import com.liferay.portal.kernel.util.AggregateClassLoader;
 import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.NamedThreadFactory;
+import com.liferay.portal.kernel.util.ReflectionUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.SystemProperties;
 import com.liferay.portal.util.ClassLoaderUtil;
@@ -31,14 +33,20 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
+import java.lang.reflect.Field;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.ThreadFactory;
 
 import jodd.io.ZipUtil;
 
+import org.jruby.Ruby;
 import org.jruby.RubyInstanceConfig.CompileMode;
 import org.jruby.RubyInstanceConfig;
 import org.jruby.embed.LocalContextScope;
@@ -126,7 +134,11 @@ public class RubyExecutor extends BaseScriptingExecutor {
 		return LANGUAGE;
 	}
 
-	protected Map<String, Object> eval(
+	public void setExecuteInSeparateThread(boolean executeInSeparateThread) {
+		_executeInSeparateThread = executeInSeparateThread;
+	}
+
+	protected Map<String, Object> doEval(
 			Set<String> allowedClasses, Map<String, Object> inputObjects,
 			Set<String> outputNames, File scriptFile, String script,
 			ClassLoader... classLoaders)
@@ -195,6 +207,50 @@ public class RubyExecutor extends BaseScriptingExecutor {
 		catch (FileNotFoundException fnfe) {
 			throw new ScriptingException(fnfe);
 		}
+		finally {
+			try {
+				_globalRuntimeField.set(null, null);
+			}
+			catch (Exception e) {
+				_log.error(e, e);
+			}
+		}
+	}
+
+	protected Map<String, Object> eval(
+			Set<String> allowedClasses, Map<String, Object> inputObjects,
+			Set<String> outputNames, File scriptFile, String script,
+			ClassLoader... classLoaders)
+		throws ScriptingException {
+
+		if (!_executeInSeparateThread) {
+			return doEval(
+				allowedClasses, inputObjects, outputNames, scriptFile, script,
+				classLoaders);
+		}
+
+		EvalCallable evalCallable = new EvalCallable(
+			allowedClasses, inputObjects, outputNames, scriptFile, script,
+			classLoaders);
+
+		FutureTask<Map<String, Object>> futureTask =
+			new FutureTask<Map<String, Object>>(evalCallable);
+
+		Thread oneTimeExecutorThread = _threadFactory.newThread(futureTask);
+
+		oneTimeExecutorThread.start();
+
+		try {
+			oneTimeExecutorThread.join();
+
+			return futureTask.get();
+		}
+		catch (Exception e) {
+			futureTask.cancel(true);
+			oneTimeExecutorThread.interrupt();
+
+			throw new ScriptingException(e);
+		}
 	}
 
 	protected void initRubyGems() throws Exception {
@@ -232,8 +288,56 @@ public class RubyExecutor extends BaseScriptingExecutor {
 
 	private static Log _log = LogFactoryUtil.getLog(RubyExecutor.class);
 
+	private static Field _globalRuntimeField;
+
+	private static ThreadFactory _threadFactory =
+		new NamedThreadFactory(
+			RubyExecutor.class.getName(), Thread.NORM_PRIORITY,
+			RubyExecutor.class.getClassLoader());
+
+	static {
+		try {
+			_globalRuntimeField = ReflectionUtil.getDeclaredField(
+				Ruby.class, "globalRuntime");
+		}
+		catch (Exception e) {
+			throw new ExceptionInInitializerError(e);
+		}
+	}
+
 	private String _basePath;
+	private boolean _executeInSeparateThread = true;
 	private List<String> _loadPaths;
 	private ScriptingContainer _scriptingContainer;
+
+	private class EvalCallable implements Callable<Map<String, Object>> {
+
+		public EvalCallable(
+			Set<String> allowedClasses, Map<String, Object> inputObjects,
+			Set<String> outputNames, File scriptFile, String script,
+			ClassLoader[] classLoaders) {
+
+			_allowedClasses = allowedClasses;
+			_inputObjects = inputObjects;
+			_outputNames = outputNames;
+			_scriptFile = scriptFile;
+			_script = script;
+			_classLoaders = classLoaders;
+		}
+
+		public Map<String, Object> call() throws Exception {
+			return doEval(
+				_allowedClasses, _inputObjects, _outputNames, _scriptFile,
+				_script, _classLoaders);
+		}
+
+		private final Set<String> _allowedClasses;
+		private final Map<String, Object> _inputObjects;
+		private final Set<String> _outputNames;
+		private final File _scriptFile;
+		private final String _script;
+		private final ClassLoader[] _classLoaders;
+
+	}
 
 }

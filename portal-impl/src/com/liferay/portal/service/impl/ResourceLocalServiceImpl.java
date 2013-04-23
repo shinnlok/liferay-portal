@@ -15,6 +15,7 @@
 package com.liferay.portal.service.impl;
 
 import com.liferay.portal.ResourceActionsException;
+import com.liferay.portal.kernel.bean.BeanPropertiesUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
@@ -44,8 +45,7 @@ import java.util.List;
 import org.apache.commons.lang.time.StopWatch;
 
 /**
- * The Resource local service is responsible for accessing, creating, modifying,
- * and deleting resources.
+ * Provides the local service for accessing, adding, and updating resources.
  *
  * <p>
  * Permissions in Liferay are defined for resource/action pairs. Some resources,
@@ -126,6 +126,7 @@ public class ResourceLocalServiceImpl extends ResourceLocalServiceBaseImpl {
 	 * com.liferay.portal.service.ServiceContext#setGuesPermissions(String[])}.
 	 * </li>
 	 * </ol>
+	 *
 	 * </li>
 	 * </ol>
 	 *
@@ -941,7 +942,8 @@ public class ResourceLocalServiceImpl extends ResourceLocalServiceBaseImpl {
 		if (auditedModel instanceof GroupedModel) {
 			GroupedModel groupedModel = (GroupedModel)auditedModel;
 
-			groupId = groupedModel.getGroupId();
+			groupId = BeanPropertiesUtil.getLongSilent(
+				groupedModel, "resourceGroupId", groupedModel.getGroupId());
 		}
 
 		return groupId;

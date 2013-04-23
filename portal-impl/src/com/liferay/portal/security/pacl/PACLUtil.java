@@ -84,6 +84,23 @@ public class PACLUtil {
 		return null;
 	}
 
+	public static String getServiceInterfaceName(String serviceClassName) {
+		int pos = serviceClassName.indexOf(".impl.");
+
+		if (pos != -1) {
+			serviceClassName =
+				serviceClassName.substring(0, pos + 1) +
+					serviceClassName.substring(pos + 6);
+		}
+
+		if (serviceClassName.endsWith("Impl")) {
+			serviceClassName = serviceClassName.substring(
+				0, serviceClassName.length() - 4);
+		}
+
+		return serviceClassName;
+	}
+
 	public static boolean isTrustedCaller(
 		Class<?> callerClass, java.security.Permission permission,
 		PACLPolicy paclPolicy) {

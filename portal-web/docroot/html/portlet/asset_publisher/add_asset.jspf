@@ -15,7 +15,7 @@
 --%>
 
 <%
-addPortletURLs = getAddPortletURLs(liferayPortletRequest, liferayPortletResponse, classNameIds, classTypeIds, assetEntryQuery.getAllCategoryIds(), allAssetTagNames);
+addPortletURLs = AssetUtil.getAddPortletURLs(liferayPortletRequest, liferayPortletResponse, classNameIds, classTypeIds, allAssetCategoryIds, allAssetTagNames);
 %>
 
 <c:if test="<%= !addPortletURLs.isEmpty() %>">
@@ -51,14 +51,11 @@ addPortletURLs = getAddPortletURLs(liferayPortletRequest, liferayPortletResponse
 	<liferay-ui:icon-menu
 		align="left"
 		icon='<%= themeDisplay.getPathThemeImages() + "/common/add.png" %>'
-		id='<%= taglibId %>'
-		message='<%= LanguageUtil.format(pageContext, (groupIds.length == 1) ? "add-new" : "add-new-in-x", new Object[] {(GroupLocalServiceUtil.getGroup(groupId)).getDescriptiveName(locale)}) %>'
+		id="<%= taglibId %>"
+		message='<%= LanguageUtil.format(pageContext, (groupIds.length == 1) ? "add-new" : "add-new-in-x", new Object[] {HtmlUtil.escape((GroupLocalServiceUtil.getGroup(groupId)).getDescriptiveName(locale))}) %>'
 	>
 
 		<%
-		boolean hasDLFileEntrySubtype = hasSubtype(DLFileEntry.class.getName(), addPortletURLs);
-		boolean hasJournalArticleSubtype = hasSubtype(JournalArticle.class.getName(), addPortletURLs);
-
 		for (Map.Entry<String, PortletURL> entry : addPortletURLs.entrySet()) {
 			String className = entry.getKey();
 
@@ -75,7 +72,7 @@ addPortletURLs = getAddPortletURLs(liferayPortletRequest, liferayPortletResponse
 			AssetRendererFactory assetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(className);
 
 			if (pos == -1) {
-				message = assetRendererFactory.getTypeName(locale, hasSubtype(className, addPortletURLs));
+				message = assetRendererFactory.getTypeName(locale, AssetUtil.hasSubtype(className, addPortletURLs));
 			}
 
 			PortletURL addPortletURL = entry.getValue();
@@ -87,31 +84,21 @@ addPortletURLs = getAddPortletURLs(liferayPortletRequest, liferayPortletResponse
 			addPortletURLString = HttpUtil.addParameter(addPortletURLString, "doAsGroupId", groupId);
 			addPortletURLString = HttpUtil.addParameter(addPortletURLString, "refererPlid", plid);
 
-			defaultAssetPublisherPortletId = typeSettingsProperties.getProperty(LayoutTypePortletConstants.DEFAULT_ASSET_PUBLISHER_PORTLET_ID);
-
 			if (defaultAssetPublisher) {
 				addPortletURLString = HttpUtil.addParameter(addPortletURLString, "layoutUuid", layout.getUuid());
 			}
+
+			String taglibEditURL = "javascript:Liferay.Util.openWindow({dialog: {align: Liferay.Util.Window.ALIGN_CENTER, width: 960}, id: '" + liferayPortletResponse.getNamespace() + "editAsset', title: '" + HtmlUtil.escapeJS(LanguageUtil.format(pageContext, "new-x", HtmlUtil.escape(message))) + "', uri: '" + HtmlUtil.escapeJS(addPortletURLString) + "'});";
 		%>
 
 			<c:choose>
 				<c:when test="<%= addPortletURLs.size() == 1 %>">
-
-					<%
-					String taglibEditURL = "javascript:Liferay.Util.openWindow({dialog: {width: 960}, id: '" + liferayPortletResponse.getNamespace() + "editAsset', title: '" + LanguageUtil.format(pageContext, "new-x", message) + "', uri:'" + addPortletURLString + "'});";
-					%>
-
 					<aui:button
 						onClick="<%= taglibEditURL %>"
 						value='<%= LanguageUtil.format(pageContext, "add-x", HtmlUtil.escape(message)) %>'
 					/>
 				</c:when>
 				<c:otherwise>
-
-					<%
-					String taglibEditURL = "javascript:Liferay.Util.openWindow({dialog: {width: 960}, id: '" + liferayPortletResponse.getNamespace() + "editAsset', title: '" + LanguageUtil.format(pageContext, "new-x", message) + "', uri:'" + HtmlUtil.escapeURL(addPortletURLString) + "'});";
-					%>
-
 					<liferay-ui:icon
 						message="<%= HtmlUtil.escape(message) %>"
 						src="<%= assetRendererFactory.getIconPath(renderRequest) %>"
@@ -126,66 +113,3 @@ addPortletURLs = getAddPortletURLs(liferayPortletRequest, liferayPortletResponse
 
 	</liferay-ui:icon-menu>
 </c:if>
-
-<%!
-public Map<String, PortletURL> getAddPortletURLs(LiferayPortletRequest liferayPortletRequest, LiferayPortletResponse liferayPortletResponse, long[] classNameIds, long[] classTypeIds, long[] allAssetCategoryIds, String[] allAssetTagNames) throws Exception {
-	ThemeDisplay themeDisplay = (ThemeDisplay)liferayPortletRequest.getAttribute(WebKeys.THEME_DISPLAY);
-
-	Map<String, PortletURL> addPortletURLs = new TreeMap<String, PortletURL>(new ModelResourceComparator(themeDisplay.getLocale()));
-
-	PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
-
-	PortletURL redirectURL = liferayPortletResponse.createLiferayPortletURL(themeDisplay.getPlid(), portletDisplay.getId(), PortletRequest.RENDER_PHASE, false);
-
-	redirectURL.setParameter("struts_action", "/asset_publisher/add_asset_redirect");
-	redirectURL.setWindowState(LiferayWindowState.POP_UP);
-
-	for (long classNameId : classNameIds) {
-		String className = PortalUtil.getClassName(classNameId);
-
-		AssetRendererFactory assetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(className);
-
-		Portlet portlet = PortletLocalServiceUtil.getPortletById(themeDisplay.getCompanyId(), assetRendererFactory.getPortletId());
-
-		if (!portlet.isActive()) {
-			continue;
-		}
-
-		Map<Long, String> classTypes = assetRendererFactory.getClassTypes(new long[] {themeDisplay.getCompanyGroupId(), themeDisplay.getScopeGroupId()}, themeDisplay.getLocale());
-
-		if ((classTypeIds.length == 0) || classTypes.isEmpty()) {
-			PortletURL addPortletURL = AssetUtil.getAddPortletURL(liferayPortletRequest, liferayPortletResponse, className, 0, allAssetCategoryIds, allAssetTagNames, redirectURL.toString());
-
-			if (addPortletURL != null) {
-				addPortletURLs.put(className, addPortletURL);
-			}
-		}
-
-		for (long classTypeId : classTypes.keySet()) {
-			if (ArrayUtil.contains(classTypeIds, classTypeId) || (classTypeIds.length == 0)) {
-				PortletURL addPortletURL = AssetUtil.getAddPortletURL(liferayPortletRequest, liferayPortletResponse, className, classTypeId, allAssetCategoryIds, allAssetTagNames, redirectURL.toString());
-
-				if (addPortletURL != null) {
-					String mesage = className + AssetUtil.CLASSNAME_SEPARATOR + classTypes.get(classTypeId);
-
-					addPortletURLs.put(mesage, addPortletURL);
-				}
-			}
-		}
-	}
-
-	return addPortletURLs;
-}
-
-public boolean hasSubtype(String subtypeClassName, Map<String, PortletURL> addPortletURLs) {
-	for (Map.Entry<String, PortletURL> entry : addPortletURLs.entrySet()) {
-		String className = entry.getKey();
-
-		if (className.startsWith(subtypeClassName) && !className.equals(subtypeClassName)) {
-			return true;
-		}
-	}
-
-	return false;
-}
-%>

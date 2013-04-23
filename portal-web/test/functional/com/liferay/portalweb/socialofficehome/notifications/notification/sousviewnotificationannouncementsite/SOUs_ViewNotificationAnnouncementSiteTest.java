@@ -26,6 +26,10 @@ public class SOUs_ViewNotificationAnnouncementSiteTest extends BaseTestCase {
 		selenium.selectWindow("null");
 		selenium.selectFrame("relative=top");
 		selenium.open("/user/socialoffice01/so/dashboard/");
+		selenium.clickAt("//div[@id='dockbar']",
+			RuntimeVariables.replace("Dockbar"));
+		selenium.waitForElementPresent(
+			"//script[contains(@src,'/aui/aui-editable/aui-editable-min.js')]");
 		selenium.waitForVisible("//span[@class='notification-count']");
 		assertEquals(RuntimeVariables.replace("1"),
 			selenium.getText("//span[@class='notification-count']"));

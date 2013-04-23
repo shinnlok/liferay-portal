@@ -17,6 +17,7 @@ package com.liferay.httpservice.internal.servlet;
 import com.liferay.httpservice.servlet.ResourceServlet;
 import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
+import com.liferay.portal.util.PortalUtil;
 
 import java.text.SimpleDateFormat;
 
@@ -70,7 +71,7 @@ import org.springframework.mock.web.MockServletConfig;
 /**
  * @author Miguel Pastor
  */
-@PrepareForTest(FastDateFormatFactoryUtil.class)
+@PrepareForTest({FastDateFormatFactoryUtil.class, PortalUtil.class})
 @RunWith(PowerMockRunner.class)
 public class BundleServletContextTest extends PowerMockito {
 
@@ -82,6 +83,14 @@ public class BundleServletContextTest extends PowerMockito {
 			FastDateFormatFactoryUtil.getSimpleDateFormat(Mockito.anyString())
 		).thenReturn(
 			new SimpleDateFormat()
+		);
+
+		mockStatic(PortalUtil.class);
+
+		when(
+			PortalUtil.getPathContext()
+		).thenReturn(
+			"sample-test-module"
 		);
 
 		_bundleServletContext = new BundleServletContext(

@@ -279,6 +279,8 @@
 
 		<action path="/asset_publisher/rss" type="com.liferay.portlet.assetpublisher.action.RSSAction" />
 
+		<action path="/asset_publisher/select_structure_field" forward="portlet.asset_publisher.select_structure_field" />
+
 		<action path="/asset_publisher/view" type="com.liferay.portlet.assetpublisher.action.ViewAction">
 			<forward name="portlet.asset_publisher.view" path="portlet.asset_publisher.view" />
 		</action>
@@ -464,7 +466,11 @@
 
 		<!-- Dockbar -->
 
-		<action path="/dockbar/view" forward="portlet.dockbar.view" />
+		<action path="/dockbar/add_panel" forward="portlet.dockbar.add_panel" />
+
+		<action path="/dockbar/view" type="com.liferay.portlet.dockbar.action.ViewAction">
+			<forward name="portlet.dockbar.view" path="portlet.dockbar.view" />
+		</action>
 
 		<!-- Document Library -->
 
@@ -947,10 +953,6 @@
 			<forward name="portlet.language.view" path="portlet.language.view" />
 		</action>
 
-		<!-- Layout Configuration -->
-
-		<action path="/layout_configuration/view" forward="portlet.layout_configuration.view" />
-
 		<!-- Layout Prototypes -->
 
 		<action path="/layout_prototypes/edit_layout_prototype" type="com.liferay.portlet.layoutprototypes.action.EditLayoutPrototypeAction">
@@ -1411,6 +1413,8 @@
 
 		<!-- My Workflow Tasks -->
 
+		<action path="/my_workflow_tasks/add_asset_redirect" forward="portlet.asset_publisher.add_asset_redirect" />
+
 		<action path="/my_workflow_tasks/edit_workflow_task" type="com.liferay.portlet.workflowtasks.action.EditWorkflowTaskAction">
 			<forward name="portlet.workflow_tasks.edit_workflow_task" path="portlet.workflow_tasks.edit_workflow_task" />
 			<forward name="portlet.workflow_tasks.error" path="portlet.workflow_tasks.error" />
@@ -1610,6 +1614,8 @@
 		<action path="/portlet_configuration/get_look_and_feel" type="com.liferay.portlet.portletconfiguration.action.GetLookAndFeelAction" />
 
 		<action path="/portlet_configuration/select_organization" forward="portlet.users_admin.select_organization" />
+
+		<action path="/portlet_configuration/select_structure_field" forward="portlet.asset_publisher.select_structure_field" />
 
 		<action path="/portlet_configuration/update_look_and_feel" type="com.liferay.portlet.portletconfiguration.action.UpdateLookAndFeelAction" />
 
@@ -1869,6 +1875,7 @@
 		<!-- Social Activity -->
 
 		<action path="/social_activity/view" type="com.liferay.portlet.socialactivity.action.ViewAction">
+			<forward name="portlet.social_activity.error" path="portlet.social_activity.error" />
 			<forward name="portlet.social_activity.view" path="portlet.social_activity.view" />
 		</action>
 

@@ -15,7 +15,6 @@
 package com.liferay.portlet.journal.social;
 
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.util.PortalUtil;
@@ -23,13 +22,9 @@ import com.liferay.portlet.journal.model.JournalArticle;
 import com.liferay.portlet.journal.model.JournalArticleConstants;
 import com.liferay.portlet.journal.service.JournalArticleLocalServiceUtil;
 import com.liferay.portlet.journal.service.permission.JournalArticlePermission;
-import com.liferay.portlet.journal.service.permission.JournalPermission;
 import com.liferay.portlet.social.model.BaseSocialActivityInterpreter;
 import com.liferay.portlet.social.model.SocialActivity;
 import com.liferay.portlet.social.model.SocialActivityConstants;
-import com.liferay.portlet.trash.util.TrashUtil;
-
-import javax.portlet.PortletURL;
 
 /**
  * @author Roberto Diaz
@@ -47,44 +42,30 @@ public class JournalArticleActivityInterpreter
 			SocialActivity activity, ServiceContext serviceContext)
 		throws Exception {
 
-		JournalArticle article = JournalArticleLocalServiceUtil.getArticle(
-			activity.getClassPK());
+		JournalArticle article =
+			JournalArticleLocalServiceUtil.getLatestArticle(
+				activity.getClassPK());
 
 		return article.getTitle(serviceContext.getLocale());
 	}
 
 	@Override
-	protected String getLink(
+	protected String getPath(
 			SocialActivity activity, ServiceContext serviceContext)
 		throws Exception {
 
-		JournalArticle article = JournalArticleLocalServiceUtil.getArticle(
-			activity.getClassPK());
-
-		if (TrashUtil.isInTrash(
-				JournalArticle.class.getName(), article.getResourcePrimKey())) {
-
-			PortletURL portletURL = TrashUtil.getViewContentURL(
-				serviceContext.getRequest(), JournalArticle.class.getName(),
-				article.getResourcePrimKey());
-
-			return portletURL.toString();
-		}
-
-		JournalArticle lastestArticle =
+		JournalArticle article =
 			JournalArticleLocalServiceUtil.getLatestArticle(
-				article.getGroupId(), article.getArticleId());
+				activity.getClassPK());
 
-		if (Validator.isNotNull(lastestArticle.getLayoutUuid()) &&
-			!article.isInTrash()) {
-
+		if (Validator.isNotNull(article.getLayoutUuid())) {
 			String groupFriendlyURL = PortalUtil.getGroupFriendlyURL(
 				serviceContext.getScopeGroup(), false,
 				serviceContext.getThemeDisplay());
 
 			return groupFriendlyURL.concat(
 				JournalArticleConstants.CANONICAL_URL_SEPARATOR).concat(
-					lastestArticle.getUrlTitle());
+					article.getUrlTitle());
 		}
 
 		return null;
@@ -98,36 +79,36 @@ public class JournalArticleActivityInterpreter
 
 		if (activityType == JournalActivityKeys.ADD_ARTICLE) {
 			if (Validator.isNull(groupName)) {
-				return "activity-journal-add-article";
+				return "activity-journal-article-add-article";
 			}
 			else {
-				return "activity-journal-add-article-in";
+				return "activity-journal-article-add-article-in";
 			}
 		}
 		else if (activityType == JournalActivityKeys.UPDATE_ARTICLE) {
 			if (Validator.isNull(groupName)) {
-				return "activity-journal-update-article";
+				return "activity-journal-article-update-article";
 			}
 			else {
-				return "activity-journal-update-article-in";
+				return "activity-journal-article-update-article-in";
 			}
 		}
 		else if (activityType == SocialActivityConstants.TYPE_MOVE_TO_TRASH) {
 			if (Validator.isNull(groupName)) {
-				return "activity-journal-move-to-trash";
+				return "activity-journal-article-move-to-trash";
 			}
 			else {
-				return "activity-journal-move-to-trash-in";
+				return "activity-journal-article-move-to-trash-in";
 			}
 		}
 		else if (activityType ==
 					SocialActivityConstants.TYPE_RESTORE_FROM_TRASH) {
 
 			if (Validator.isNull(groupName)) {
-				return "activity-journal-restore-from-trash";
+				return "activity-journal-article-restore-from-trash";
 			}
 			else {
-				return "activity-journal-restore-from-trash-in";
+				return "activity-journal-article-restore-from-trash-in";
 			}
 		}
 
@@ -140,27 +121,8 @@ public class JournalArticleActivityInterpreter
 			String actionId, ServiceContext serviceContext)
 		throws Exception {
 
-		int activityType = activity.getType();
-
-		if ((activityType == JournalActivityKeys.ADD_ARTICLE) &&
-			!JournalPermission.contains(
-				permissionChecker, activity.getGroupId(),
-				ActionKeys.ADD_ARTICLE)) {
-
-			return false;
-		}
-		else if (activityType == JournalActivityKeys.UPDATE_ARTICLE) {
-			JournalArticle article = JournalArticleLocalServiceUtil.getArticle(
-				activity.getClassPK());
-
-			if (!JournalArticlePermission.contains(
-					permissionChecker, article, ActionKeys.UPDATE)) {
-
-				return false;
-			}
-		}
-
-		return true;
+		return JournalArticlePermission.contains(
+			permissionChecker, activity.getClassPK(), actionId);
 	}
 
 	private static final String[] _CLASS_NAMES =

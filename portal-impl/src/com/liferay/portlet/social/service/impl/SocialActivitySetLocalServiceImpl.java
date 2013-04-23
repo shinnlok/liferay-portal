@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portlet.social.model.SocialActivity;
 import com.liferay.portlet.social.model.SocialActivitySet;
 import com.liferay.portlet.social.service.base.SocialActivitySetLocalServiceBaseImpl;
+import com.liferay.portlet.social.util.comparator.SocialActivitySetModifiedDateComparator;
 
 import java.util.List;
 
@@ -49,6 +50,7 @@ public class SocialActivitySetLocalServiceImpl
 		activitySet.setClassName(activity.getClassName());
 		activitySet.setClassPK(activity.getClassPK());
 		activitySet.setType(activity.getType());
+		activitySet.setActivityCount(1);
 
 		socialActivitySetPersistence.update(activitySet);
 
@@ -93,20 +95,55 @@ public class SocialActivitySetLocalServiceImpl
 		}
 	}
 
+	public SocialActivitySet getClassActivitySet(
+			long classNameId, long classPK, int type)
+		throws SystemException {
+
+		return socialActivitySetPersistence.fetchByC_C_T_First(
+			classNameId, classPK, type,
+			new SocialActivitySetModifiedDateComparator());
+	}
+
+	public SocialActivitySet getClassActivitySet(
+			long userId, long classNameId, long classPK, int type)
+		throws SystemException {
+
+		return socialActivitySetPersistence.fetchByU_C_C_T_First(
+			userId, classNameId, classPK, type,
+			new SocialActivitySetModifiedDateComparator());
+	}
+
+	public SocialActivitySet getUserActivitySet(
+			long groupId, long userId, int type)
+		throws SystemException {
+
+		return socialActivitySetPersistence.fetchByG_U_T_First(
+			groupId, userId, type,
+			new SocialActivitySetModifiedDateComparator());
+	}
+
 	public void incrementActivityCount(long activitySetId, long activityId)
 		throws PortalException, SystemException {
 
+		// Activity set
+
 		SocialActivitySet activitySet =
 			socialActivitySetPersistence.findByPrimaryKey(activitySetId);
-
-		activitySet.setActivityCount(activitySet.getActivityCount() + 1);
 
 		SocialActivity activity = socialActivityPersistence.findByPrimaryKey(
 			activityId);
 
 		activitySet.setModifiedDate(activity.getCreateDate());
 
+		activitySet.setActivityCount(activitySet.getActivityCount() + 1);
+
 		socialActivitySetPersistence.update(activitySet);
+
+		// Activity
+
+		activity.setActivitySetId(activitySetId);
+
+		socialActivityPersistence.update(activity);
 	}
 
 }

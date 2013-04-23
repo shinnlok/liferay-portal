@@ -34,10 +34,10 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * The subscription local service is a framework responsible for accessing,
- * creating, and deleting notification subscriptions to entities. It handles
- * subscriptions to entities found in many different places in the portal,
- * including message boards, blogs, and documents and media.
+ * Provides the local service for accessing, adding, and deleting notification
+ * subscriptions to entities. It handles subscriptions to entities found in many
+ * different places in the portal, including message boards, blogs, and
+ * documents and media.
  *
  * @author Charles May
  * @author Zsolt Berentey
@@ -164,10 +164,12 @@ public class SubscriptionLocalServiceImpl
 					extraDataJSONObject.toString(), 0);
 			}
 			else {
-				socialActivityLocalService.addActivity(
-					userId, groupId, className, classPK,
-					SocialActivityConstants.TYPE_SUBSCRIBE, StringPool.BLANK,
-					0);
+				if (classPK != groupId) {
+					socialActivityLocalService.addActivity(
+						userId, groupId, className, classPK,
+						SocialActivityConstants.TYPE_SUBSCRIBE,
+						StringPool.BLANK, 0);
+				}
 			}
 		}
 

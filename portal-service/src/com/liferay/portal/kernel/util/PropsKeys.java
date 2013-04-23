@@ -95,8 +95,6 @@ public interface PropsKeys {
 
 	public static final String ASSET_CATEGORIES_NAVIGATION_DISPLAY_TEMPLATES_CONFIG = "asset.categories.navigation.display.templates.config";
 
-	public static final String ASSET_CATEGORIES_NAVIGATION_DISPLAY_TEMPLATES_HELP = "asset.categories.navigation.display.templates.help";
-
 	public static final String ASSET_CATEGORIES_PROPERTIES_DEFAULT = "asset.categories.properties.default";
 
 	public static final String ASSET_CATEGORIES_SEARCH_HIERARCHICAL = "asset.categories.search.hierarchical";
@@ -112,8 +110,6 @@ public interface PropsKeys {
 	public static final String ASSET_PUBLISHER_DISPLAY_STYLES = "asset.publisher.display.styles";
 
 	public static final String ASSET_PUBLISHER_DISPLAY_TEMPLATES_CONFIG = "asset.publisher.display.templates.config";
-
-	public static final String ASSET_PUBLISHER_DISPLAY_TEMPLATES_HELP = "asset.publisher.display.templates.help";
 
 	public static final String ASSET_PUBLISHER_DYNAMIC_SUBSCRIPTION_LIMIT = "asset.publisher.dynamic.subscription.limit";
 
@@ -136,8 +132,6 @@ public interface PropsKeys {
 	public static final String ASSET_TAG_SUGGESTIONS_ENABLED = "asset.tag.suggestions.enabled";
 
 	public static final String ASSET_TAGS_NAVIGATION_DISPLAY_TEMPLATES_CONFIG = "asset.tags.navigation.display.templates.config";
-
-	public static final String ASSET_TAGS_NAVIGATION_DISPLAY_TEMPLATES_HELP = "asset.tags.navigation.display.templates.help";
 
 	public static final String ASSET_VOCABULARY_DEFAULT = "asset.vocabulary.default";
 
@@ -236,8 +230,6 @@ public interface PropsKeys {
 	public static final String BASIC_AUTH_PASSWORD_REQUIRED = "basic.auth.password.required";
 
 	public static final String BLOGS_DISPLAY_TEMPLATES_CONFIG = "blogs.display.templates.config";
-
-	public static final String BLOGS_DISPLAY_TEMPLATES_HELP = "blogs.display.templates.help";
 
 	public static final String BLOGS_EMAIL_ENTRY_ADDED_BODY = "blogs.email.entry.added.body";
 
@@ -601,8 +593,6 @@ public interface PropsKeys {
 
 	public static final String DL_DISPLAY_TEMPLATES_CONFIG = "dl.display.templates.config";
 
-	public static final String DL_DISPLAY_TEMPLATES_HELP = "dl.display.templates.help";
-
 	public static final String DL_DISPLAY_VIEWS = "dl.display.views";
 
 	public static final String DL_EMAIL_FILE_ENTRY_ADDED_BODY = "dl.email.file.entry.added.body";
@@ -785,6 +775,8 @@ public interface PropsKeys {
 
 	public static final String DYNAMIC_DATA_MAPPING_TEMPLATE_LANGUAGE_CONTENT = "dynamic.data.mapping.template.language.content";
 
+	public static final String DYNAMIC_DATA_MAPPING_TEMPLATE_LANGUAGE_DEFAULT = "dynamic.data.mapping.template.language.default";
+
 	public static final String DYNAMIC_RESOURCE_SERVLET_ALLOWED_PATHS = "dynamic.resource.servlet.allowed.paths";
 
 	public static final String EDITOR_WYSIWYG_DEFAULT = "editor.wysiwyg.default";
@@ -962,6 +954,26 @@ public interface PropsKeys {
 	public static final String INDEX_SORTABLE_TEXT_FIELDS_TRUNCATED_LENGTH = "index.sortable.text.fields.truncated.length";
 
 	public static final String INDEX_WITH_THREAD = "index.with.thread";
+
+	public static final String INTRABAND_MAILBOX_REAPER_THREAD_ENABLED = "intraband.mailbox.reaper.thread.enabled";
+
+	public static final String INTRABAND_MAILBOX_STORAGE_LIFE = "intraband.mailbox.storage.life";
+
+	public static final String INTRABAND_WELDER_IMPL = "intraband.welder.impl";
+
+	public static final String INTRABAND_WELDER_SOCKET_BUFFER_SIZE = "intraband.welder.socket.buffer.size";
+
+	public static final String INTRABAND_WELDER_SOCKET_KEEP_ALIVE = "intraband.welder.socket.keep.alive";
+
+	public static final String INTRABAND_WELDER_SOCKET_REUSE_ADDRESS = "intraband.welder.socket.reuse.address";
+
+	public static final String INTRABAND_WELDER_SOCKET_SERVER_START_PORT = "intraband.welder.socket.server.start.port";
+
+	public static final String INTRABAND_WELDER_SOCKET_SO_LINGER = "intraband.welder.socket.so.linger";
+
+	public static final String INTRABAND_WELDER_SOCKET_SO_TIMEOUT = "intraband.welder.socket.so.timeout";
+
+	public static final String INTRABAND_WELDER_SOCKET_TCP_NO_DELAY = "intraband.welder.socket.tcp.no.delay";
 
 	public static final String INVITATION_EMAIL_MAX_RECIPIENTS = "invitation.email.max.recipients";
 
@@ -1376,6 +1388,8 @@ public interface PropsKeys {
 	public static final String LOCALES = "locales";
 
 	public static final String LOCALES_BETA = "locales.beta";
+
+	public static final String LOCALES_ENABLED = "locales.enabled";
 
 	public static final String LOCK_LISTENERS = "lock.listeners";
 
@@ -2153,8 +2167,6 @@ public interface PropsKeys {
 
 	public static final String SITEMAP_DISPLAY_TEMPLATES_CONFIG = "sitemap.display.templates.config";
 
-	public static final String SITEMAP_DISPLAY_TEMPLATES_HELP = "sitemap.display.templates.help";
-
 	public static final String SITEMINDER_AUTH_ENABLED = "siteminder.auth.enabled";
 
 	public static final String SITEMINDER_IMPORT_FROM_LDAP = "siteminder.import.from.ldap";
@@ -2494,8 +2506,6 @@ public interface PropsKeys {
 	public static final String WIDGET_SERVLET_MAPPING = "widget.servlet.mapping";
 
 	public static final String WIKI_DISPLAY_TEMPLATES_CONFIG = "wiki.display.templates.config";
-
-	public static final String WIKI_DISPLAY_TEMPLATES_HELP = "wiki.display.templates.help";
 
 	public static final String WIKI_EMAIL_FROM_ADDRESS = "wiki.email.from.address";
 

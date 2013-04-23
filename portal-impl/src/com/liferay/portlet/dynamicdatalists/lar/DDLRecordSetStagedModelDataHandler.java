@@ -15,9 +15,9 @@
 package com.liferay.portlet.dynamicdatalists.lar;
 
 import com.liferay.portal.kernel.lar.BaseStagedModelDataHandler;
+import com.liferay.portal.kernel.lar.ExportImportPathUtil;
 import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
-import com.liferay.portal.kernel.lar.StagedModelPathUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.service.ServiceContext;
@@ -36,9 +36,11 @@ import java.util.Map;
 public class DDLRecordSetStagedModelDataHandler
 	extends BaseStagedModelDataHandler<DDLRecordSet> {
 
+	public static final String[] CLASS_NAMES = {DDLRecordSet.class.getName()};
+
 	@Override
-	public String getClassName() {
-		return DDLRecordSet.class.getName();
+	public String[] getClassNames() {
+		return CLASS_NAMES;
 	}
 
 	@Override
@@ -65,8 +67,8 @@ public class DDLRecordSetStagedModelDataHandler
 		}
 
 		portletDataContext.addClassedModel(
-			recordSetElement, StagedModelPathUtil.getPath(recordSet), recordSet,
-			DDLPortletDataHandler.NAMESPACE);
+			recordSetElement, ExportImportPathUtil.getModelPath(recordSet),
+			recordSet, DDLPortletDataHandler.NAMESPACE);
 	}
 
 	@Override
@@ -80,7 +82,7 @@ public class DDLRecordSetStagedModelDataHandler
 			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
 				DDMStructure.class);
 
-		String structurePath = StagedModelPathUtil.getPath(
+		String structurePath = ExportImportPathUtil.getModelPath(
 			portletDataContext, DDMStructure.class.getName(),
 			recordSet.getDDMStructureId());
 
@@ -94,13 +96,13 @@ public class DDLRecordSetStagedModelDataHandler
 			ddmStructureIds, recordSet.getDDMStructureId(),
 			recordSet.getDDMStructureId());
 
-		List<Element> templateElements =
+		List<Element> ddmTemplateElements =
 			portletDataContext.getReferencedDataElements(
 				recordSet, DDMTemplate.class);
 
-		for (Element templateElement : templateElements) {
+		for (Element ddmTemplateElement : ddmTemplateElements) {
 			StagedModelDataHandlerUtil.importStagedModel(
-				portletDataContext, templateElement);
+				portletDataContext, ddmTemplateElement);
 		}
 
 		ServiceContext serviceContext = portletDataContext.createServiceContext(

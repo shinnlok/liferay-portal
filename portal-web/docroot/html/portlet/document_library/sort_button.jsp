@@ -17,9 +17,10 @@
 <%@ include file="/html/portlet/document_library/init.jsp" %>
 
 <%
+String navigation = ParamUtil.getString(request, "navigation", "home");
+
 long folderId = GetterUtil.getLong((String)request.getAttribute("view.jsp-folderId"));
 
-String orderByCol = ParamUtil.getString(request, "orderByCol");
 String orderByType = ParamUtil.getString(request, "orderByType");
 
 String reverseOrderByType = "asc";
@@ -87,6 +88,7 @@ if (orderByType.equals("asc")) {
 				{
 					requestParams: {
 						'<portlet:namespace />folderId': folderId,
+						'<portlet:namespace />navigation': '<%= HtmlUtil.escape(navigation) %>',
 						'<portlet:namespace />struts_action': '/document_library/view',
 						'<portlet:namespace />viewEntries': <%= Boolean.FALSE.toString() %>,
 						'<portlet:namespace />viewEntriesPage': <%= Boolean.TRUE.toString() %>,

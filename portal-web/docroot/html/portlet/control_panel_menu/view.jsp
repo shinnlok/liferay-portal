@@ -152,7 +152,7 @@
 									String message = group.getDescriptiveName(locale);
 
 									if (group.isUser()) {
-										message = LanguageUtil.format(pageContext, "x-personal-site", group.getDescriptiveName(locale));
+										message = LanguageUtil.format(pageContext, "x-personal-site", HtmlUtil.escape(group.getDescriptiveName(locale)));
 									}
 
 									String url = null;
@@ -204,18 +204,6 @@
 			}
 
 			List<Portlet> portlets = PortalUtil.getControlPanelPortlets(curCategory, themeDisplay);
-
-			Iterator<Portlet> itr = portlets.iterator();
-
-			while (itr.hasNext()) {
-				Portlet portlet = itr.next();
-
-				String portletId = portlet.getPortletId();
-
-				if (Validator.isNotNull(controlPanelCategory) && controlPanelCategory.equals(PortletCategoryKeys.CONTENT) && (portletId.equals(PortletKeys.GROUP_PAGES) || portletId.equals(PortletKeys.SITE_MEMBERSHIPS_ADMIN) || portletId.equals(PortletKeys.SITE_SETTINGS))) {
-					itr.remove();
-				}
-			}
 			%>
 
 			<liferay-util:buffer var="categoryPortletsContent">

@@ -238,7 +238,9 @@ public class EditArticleAction extends PortletAction {
 					"portlet.journal.update_translation_redirect");
 			}
 
-			if ((article != null) &&
+			if (!cmd.equals(Constants.DELETE_TRANSLATION) &&
+				!cmd.equals(Constants.TRANSLATE) &&
+				(article != null) &&
 				(workflowAction == WorkflowConstants.ACTION_SAVE_DRAFT)) {
 
 				redirect = getSaveAndContinueRedirect(
@@ -466,8 +468,6 @@ public class EditArticleAction extends PortletAction {
 			actionRequest, portletConfig.getPortletName(),
 			themeDisplay.getPlid(), PortletRequest.RENDER_PHASE);
 
-		portletURL.setWindowState(actionRequest.getWindowState());
-
 		portletURL.setParameter("struts_action", "/journal/edit_article");
 		portletURL.setParameter(Constants.CMD, Constants.UPDATE, false);
 		portletURL.setParameter("redirect", redirect, false);
@@ -479,6 +479,7 @@ public class EditArticleAction extends PortletAction {
 		portletURL.setParameter(
 			"version", String.valueOf(article.getVersion()), false);
 		portletURL.setParameter("languageId", languageId, false);
+		portletURL.setWindowState(actionRequest.getWindowState());
 
 		return portletURL.toString();
 	}

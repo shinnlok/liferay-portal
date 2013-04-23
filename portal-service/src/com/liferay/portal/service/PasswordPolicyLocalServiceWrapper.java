@@ -249,7 +249,11 @@ public class PasswordPolicyLocalServiceWrapper
 	}
 
 	/**
-	* @deprecated As of 6.2.0
+	* @deprecated As of 6.2.0, replaced by {@link #addPasswordPolicy(long,
+	boolean, String, String, boolean, boolean, long, boolean,
+	boolean, int, int, int, int, int, int, String, boolean, int,
+	boolean, long, long, int, boolean, int, long, long, long,
+	ServiceContext)}
 	*/
 	public com.liferay.portal.model.PasswordPolicy addPasswordPolicy(
 		long userId, boolean defaultPolicy, java.lang.String name,
@@ -297,6 +301,12 @@ public class PasswordPolicyLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		_passwordPolicyLocalService.checkDefaultPasswordPolicy(companyId);
+	}
+
+	public com.liferay.portal.model.PasswordPolicy fetchPasswordPolicy(
+		long companyId, java.lang.String name)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _passwordPolicyLocalService.fetchPasswordPolicy(companyId, name);
 	}
 
 	public com.liferay.portal.model.PasswordPolicy fetchPasswordPolicyByUuidAndCompanyId(
@@ -353,7 +363,11 @@ public class PasswordPolicyLocalServiceWrapper
 	}
 
 	/**
-	* @deprecated As of 6.2.0
+	* @deprecated As of 6.2.0, replaced by {@link #updatePasswordPolicy(long,
+	String, String, boolean, boolean, long, boolean, boolean,
+	int, int, int, int, int, int, String, boolean, int, boolean,
+	long, long, int, boolean, int, long, long, long,
+	ServiceContext)}
 	*/
 	public com.liferay.portal.model.PasswordPolicy updatePasswordPolicy(
 		long passwordPolicyId, java.lang.String name,

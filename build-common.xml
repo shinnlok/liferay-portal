@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <project name="build-common" xmlns:antelope="antlib:ise.antelope.tasks">
-	<property name="project.dir" value=".." />
+	<dirname file="${ant.file.build-common}" property="project.dir" />
 
 	<property name="test.properties" value="com/liferay/portal/tools/dependencies/portal-tools.properties" />
 
@@ -842,8 +842,8 @@ Please set the environment variable ANT_OPTS to the recommended value of
 							<exclude name="**/DLAppServiceSoapTest.class" />
 							<exclude name="**/UserServiceHttpTest.class" />
 							<exclude name="**/UserServiceSoapTest.class" />
-							<exclude name="${junit.test.excludes}" />
 							<exclude name="${test.excludes}" />
+							<filename regex="${junit.test.excludes}" negate="true" />
 						</fileset>
 					</batchtest>
 				</junit>

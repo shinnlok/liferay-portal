@@ -51,7 +51,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The implementation of the organization remote service.
+ * Provides the remote service for accessing, adding, deleting, and updating
+ * organizations. Its methods include permission checks.
  *
  * @author Brian Wing Shun Chan
  * @author Jorge Ferrer
@@ -750,6 +751,28 @@ public class OrganizationServiceImpl extends OrganizationServiceBaseImpl {
 
 		OrganizationPermissionUtil.check(
 			getPermissionChecker(), organization, ActionKeys.UPDATE);
+
+		if (organization.getParentOrganizationId() != parentOrganizationId) {
+			if (parentOrganizationId ==
+					OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID) {
+
+				PortalPermissionUtil.check(
+					getPermissionChecker(), ActionKeys.ADD_ORGANIZATION);
+			}
+			else {
+				if (!OrganizationPermissionUtil.contains(
+						getPermissionChecker(), parentOrganizationId,
+						ActionKeys.MANAGE_SUBORGANIZATIONS) &&
+					!PortalPermissionUtil.contains(
+						getPermissionChecker(), ActionKeys.ADD_ORGANIZATION)) {
+
+					throw new PrincipalException(
+						"User " + getUserId() + " does not have permissions " +
+							"to move organization " + organizationId + "to " +
+								"parent " + parentOrganizationId);
+				}
+			}
+		}
 
 		if (addresses != null) {
 			UsersAdminUtil.updateAddresses(

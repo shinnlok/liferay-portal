@@ -28,13 +28,8 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.StringUtil_IW;
-import com.liferay.portal.model.Role;
-import com.liferay.portal.model.User;
 import com.liferay.portal.tools.ArgumentsUtil;
 import com.liferay.portal.util.InitUtil;
-import com.liferay.portlet.documentlibrary.model.DLFileEntry;
-import com.liferay.portlet.dynamicdatalists.model.DDLRecord;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -81,6 +76,8 @@ public class SampleSQLBuilder {
 		String baseDir = arguments.get("sample.sql.base.dir");
 
 		_dbType = arguments.get("sample.sql.db.type");
+		_maxAssetCategoryCount = GetterUtil.getInteger(
+			arguments.get("sample.sql.max.asset.category.count"));
 		_maxBlogsEntryCommentCount = GetterUtil.getInteger(
 			arguments.get("sample.sql.max.blogs.entry.comment.count"));
 		_maxBlogsEntryCount = GetterUtil.getInteger(
@@ -101,6 +98,8 @@ public class SampleSQLBuilder {
 			arguments.get("sample.sql.max.group.count"));
 		_maxJournalArticleCount = GetterUtil.getInteger(
 			arguments.get("sample.sql.max.journal.article.count"));
+		_maxJournalArticlePageCount = GetterUtil.getInteger(
+			arguments.get("sample.sql.max.journal.article.page.count"));
 		_maxJournalArticleSize = GetterUtil.getInteger(
 			arguments.get("sample.sql.max.journal.article.size"));
 		_maxJournalArticleVersionCount = GetterUtil.getInteger(
@@ -128,9 +127,10 @@ public class SampleSQLBuilder {
 			arguments.get("sample.sql.output.merge"));
 
 		_dataFactory = new DataFactory(
-			baseDir, _maxBlogsEntryCount, _maxGroupCount,
-			_maxJournalArticleSize, _maxMBCategoryCount, _maxMBThreadCount,
-			_maxMBMessageCount, _maxUserToGroupCount);
+			baseDir, _maxAssetCategoryCount, _maxBlogsEntryCount,
+			_maxGroupCount, _maxJournalArticleCount, _maxJournalArticleSize,
+			_maxMBCategoryCount, _maxMBThreadCount, _maxMBMessageCount,
+			_maxUserToGroupCount);
 
 		_db = DBFactoryUtil.getDB(_dbType);
 
@@ -189,53 +189,6 @@ public class SampleSQLBuilder {
 		FileUtil.write(
 			new File(_outputDir, "benchmarks-actual.properties"),
 			sb.toString());
-	}
-
-	public void insertDDLRecord(
-			DDLRecord ddlRecord, int ddlRecordCount, long ddmStructureId)
-		throws Exception {
-
-		Map<String, Object> context = getContext();
-
-		put(context, "ddlRecord", ddlRecord);
-		put(context, "ddlRecordCount", ddlRecordCount);
-		put(context, "ddmStructureId", ddmStructureId);
-
-		processTemplate(_tplDDLRecord, context);
-	}
-
-	public void insertDLFileEntry(DLFileEntry dlFileEntry, long ddmStructureId)
-		throws Exception {
-
-		Map<String, Object> context = getContext();
-
-		put(context, "ddmStructureId", ddmStructureId);
-		put(context, "dlFileEntry", dlFileEntry);
-
-		processTemplate(_tplDLFileEntry, context);
-	}
-
-	public void insertResourcePermission(String name, String primKey)
-		throws Exception {
-
-		Map<String, Object> context = getContext();
-
-		put(context, "resourceName", name);
-		put(context, "resourcePrimkey", primKey);
-
-		processTemplate(_tplResourcePermission, context);
-	}
-
-	public void insertUser(List<Long> groupIds, List<Role> roleIds, User user)
-		throws Exception {
-
-		Map<String, Object> context = getContext();
-
-		put(context, "groupIds", groupIds);
-		put(context, "roleIds", roleIds);
-		put(context, "user", user);
-
-		processTemplate(_tplUser, context);
 	}
 
 	protected void compressInsertSQL(String insertSQL) throws IOException {
@@ -383,6 +336,7 @@ public class SampleSQLBuilder {
 
 		put(context, "counter", _dataFactory.getCounter());
 		put(context, "dataFactory", _dataFactory);
+		put(context, "maxAssetCategoryCount", _maxAssetCategoryCount);
 		put(context, "maxDLFileEntrySize", _maxDLFileEntrySize);
 		put(context, "maxBlogsEntryCommentCount", _maxBlogsEntryCommentCount);
 		put(context, "maxBlogsEntryCount", _maxBlogsEntryCount);
@@ -393,6 +347,7 @@ public class SampleSQLBuilder {
 		put(context, "maxDLFolderDepth", _maxDLFolderDepth);
 		put(context, "maxGroupCount", _maxGroupCount);
 		put(context, "maxJournalArticleCount", _maxJournalArticleCount);
+		put(context, "maxJournalArticlePageCount", _maxJournalArticlePageCount);
 		put(
 			context, "maxJournalArticleVersionCount",
 			_maxJournalArticleVersionCount);
@@ -404,8 +359,6 @@ public class SampleSQLBuilder {
 		put(context, "maxWikiNodeCount", _maxWikiNodeCount);
 		put(context, "maxWikiPageCommentCount", _maxWikiPageCommentCount);
 		put(context, "maxWikiPageCount", _maxWikiPageCount);
-		put(context, "sampleSQLBuilder", this);
-		put(context, "stringUtil", StringUtil_IW.getInstance());
 		put(context, "writerBlogsCSV", _writerBlogsCSV);
 		put(context, "writerCompanyCSV", _writerCompanyCSV);
 		put(context, "writerDocumentLibraryCSV", _writerDocumentLibraryCSV);
@@ -536,6 +489,7 @@ public class SampleSQLBuilder {
 		new ConcurrentHashMap<String, StringBundler>();
 	private Map<String, Writer> _insertSQLWriters =
 		new ConcurrentHashMap<String, Writer>();
+	private int _maxAssetCategoryCount;
 	private int _maxBlogsEntryCommentCount;
 	private int _maxBlogsEntryCount;
 	private int _maxDDLRecordCount;
@@ -546,6 +500,7 @@ public class SampleSQLBuilder {
 	private int _maxDLFolderDepth;
 	private int _maxGroupCount;
 	private int _maxJournalArticleCount;
+	private int _maxJournalArticlePageCount;
 	private int _maxJournalArticleSize;
 	private int _maxJournalArticleVersionCount;
 	private int _maxMBCategoryCount;
@@ -561,12 +516,7 @@ public class SampleSQLBuilder {
 	private String _outputDir;
 	private boolean _outputMerge;
 	private File _tempDir;
-	private String _tplDDLRecord = _TPL_ROOT + "ddl_record.ftl";
-	private String _tplDLFileEntry = _TPL_ROOT + "dl_file_entry.ftl";
-	private String _tplResourcePermission =
-		_TPL_ROOT + "resource_permission.ftl";
 	private String _tplSample = _TPL_ROOT + "sample.ftl";
-	private String _tplUser = _TPL_ROOT + "user.ftl";
 	private Writer _writerBlogsCSV;
 	private Writer _writerCompanyCSV;
 	private Writer _writerDocumentLibraryCSV;

@@ -15,9 +15,9 @@
 package com.liferay.portlet.messageboards.lar;
 
 import com.liferay.portal.kernel.lar.BaseStagedModelDataHandler;
+import com.liferay.portal.kernel.lar.ExportImportPathUtil;
 import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
-import com.liferay.portal.kernel.lar.StagedModelPathUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.service.ServiceContext;
+import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.messageboards.model.MBCategory;
 import com.liferay.portlet.messageboards.model.MBCategoryConstants;
 import com.liferay.portlet.messageboards.model.MBMessage;
@@ -49,9 +50,11 @@ import java.util.Map;
 public class MBMessageStagedModelDataHandler
 	extends BaseStagedModelDataHandler<MBMessage> {
 
+	public static final String[] CLASS_NAMES = {MBMessage.class.getName()};
+
 	@Override
-	public String getClassName() {
-		return MBMessage.class.getName();
+	public String[] getClassNames() {
+		return CLASS_NAMES;
 	}
 
 	@Override
@@ -92,7 +95,8 @@ public class MBMessageStagedModelDataHandler
 
 			for (FileEntry fileEntry : message.getAttachmentsFileEntries()) {
 				String name = fileEntry.getTitle();
-				String binPath = StagedModelPathUtil.getPath(message, name);
+				String binPath = ExportImportPathUtil.getModelPath(
+					message, name);
 
 				Element attachmentElement = messageElement.addElement(
 					"attachment");
@@ -104,11 +108,15 @@ public class MBMessageStagedModelDataHandler
 					binPath, fileEntry.getContentStream());
 			}
 
-			message.setAttachmentsFolderId(message.getAttachmentsFolderId());
+			long folderId = message.getAttachmentsFolderId();
+
+			if (folderId != DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
+				message.setAttachmentsFolderId(folderId);
+			}
 		}
 
 		portletDataContext.addClassedModel(
-			messageElement, StagedModelPathUtil.getPath(message), message,
+			messageElement, ExportImportPathUtil.getModelPath(message), message,
 			MBPortletDataHandler.NAMESPACE);
 	}
 
@@ -164,7 +172,7 @@ public class MBMessageStagedModelDataHandler
 					MBCategoryConstants.DISCUSSION_CATEGORY_ID) &&
 				(parentCategoryId == message.getCategoryId())) {
 
-				String categoryPath = StagedModelPathUtil.getPath(
+				String categoryPath = ExportImportPathUtil.getModelPath(
 					portletDataContext, MBCategory.class.getName(),
 					parentCategoryId);
 

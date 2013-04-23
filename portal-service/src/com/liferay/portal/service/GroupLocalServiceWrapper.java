@@ -183,6 +183,22 @@ public class GroupLocalServiceWrapper implements GroupLocalService,
 	}
 
 	/**
+	* Returns the group matching the UUID and group.
+	*
+	* @param uuid the group's UUID
+	* @param groupId the primary key of the group
+	* @return the matching group
+	* @throws PortalException if a matching group could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.portal.model.Group getGroupByUuidAndGroupId(
+		java.lang.String uuid, long groupId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _groupLocalService.getGroupByUuidAndGroupId(uuid, groupId);
+	}
+
+	/**
 	* Returns a range of all the groups.
 	*
 	* <p>
@@ -930,6 +946,21 @@ public class GroupLocalServiceWrapper implements GroupLocalService,
 	}
 
 	/**
+	* Returns the group with the matching UUID and company.
+	*
+	* @param uuid the UUID
+	* @param companyId the primary key of the company
+	* @return the matching group, or <code>null</code> if a matching group
+	could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.portal.model.Group fetchGroupByUuidandCompanyId(
+		java.lang.String uuid, long companyId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _groupLocalService.fetchGroupByUuidandCompanyId(uuid, companyId);
+	}
+
+	/**
 	* Returns the company group.
 	*
 	* @param companyId the primary key of the company
@@ -1317,6 +1348,24 @@ public class GroupLocalServiceWrapper implements GroupLocalService,
 		java.util.List<com.liferay.portal.model.Organization> organizations)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _groupLocalService.getOrganizationsRelatedGroups(organizations);
+	}
+
+	/**
+	* Returns the group followed by all its parent groups ordered by closest
+	* ancestor.
+	*
+	* @param groupId the primary key of the group
+	* @return the group followed by all its parent groups ordered by closest
+	ancestor
+	* @throws PortalException if a group with the primary key could not be
+	found
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.portal.model.Group> getParentGroups(
+		long groupId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _groupLocalService.getParentGroups(groupId);
 	}
 
 	/**

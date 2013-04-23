@@ -214,6 +214,7 @@
 		<asset-renderer-factory>com.liferay.portlet.messageboards.asset.MBMessageAssetRendererFactory</asset-renderer-factory>
 		<custom-attributes-display>com.liferay.portlet.messageboards.MBCategoryCustomAttributesDisplay</custom-attributes-display>
 		<custom-attributes-display>com.liferay.portlet.messageboards.MBMessageCustomAttributesDisplay</custom-attributes-display>
+		<permission-propagator>com.liferay.portlet.messageboards.security.permission.MBPermissionPropagatorImpl</permission-propagator>
 		<trash-handler>com.liferay.portlet.messageboards.trash.MBCategoryTrashHandler</trash-handler>
 		<trash-handler>com.liferay.portlet.messageboards.trash.MBMessageTrashHandler</trash-handler>
 		<trash-handler>com.liferay.portlet.messageboards.trash.MBThreadTrashHandler</trash-handler>
@@ -243,6 +244,13 @@
 		<open-search-class>com.liferay.portlet.documentlibrary.util.DLOpenSearchImpl</open-search-class>
 		<portlet-url-class>com.liferay.portal.struts.StrutsActionPortletURL</portlet-url-class>
 		<portlet-data-handler-class>com.liferay.portlet.documentlibrary.lar.DLPortletDataHandler</portlet-data-handler-class>
+		<staged-model-data-handler-class>com.liferay.portlet.documentlibrary.lar.DLFileRankStagedModelDataHandler</staged-model-data-handler-class>
+		<staged-model-data-handler-class>com.liferay.portlet.documentlibrary.lar.DLFileEntryTypeStagedModelDataHandler</staged-model-data-handler-class>
+		<staged-model-data-handler-class>com.liferay.portlet.documentlibrary.lar.DLFileShortcutStagedModelDataHandler</staged-model-data-handler-class>
+		<staged-model-data-handler-class>com.liferay.portlet.documentlibrary.lar.FileEntryStagedModelDataHandler</staged-model-data-handler-class>
+		<staged-model-data-handler-class>com.liferay.portlet.documentlibrary.lar.FolderStagedModelDataHandler</staged-model-data-handler-class>
+		<staged-model-data-handler-class>com.liferay.portlet.documentlibrary.lar.RepositoryEntryStagedModelDataHandler</staged-model-data-handler-class>
+		<staged-model-data-handler-class>com.liferay.portlet.documentlibrary.lar.RepositoryStagedModelDataHandler</staged-model-data-handler-class>
 		<social-activity-interpreter-class>com.liferay.portlet.documentlibrary.social.DLFileEntryActivityInterpreter</social-activity-interpreter-class>
 		<social-activity-interpreter-class>com.liferay.portlet.documentlibrary.social.DLFolderActivityInterpreter</social-activity-interpreter-class>
 		<webdav-storage-token>document_library</webdav-storage-token>
@@ -847,19 +855,6 @@
 		<system>true</system>
 	</portlet>
 	<portlet>
-		<portlet-name>87</portlet-name>
-		<icon>/html/icons/default.png</icon>
-		<struts-path>layout_configuration</struts-path>
-		<use-default-template>false</use-default-template>
-		<show-portlet-access-denied>false</show-portlet-access-denied>
-		<show-portlet-inactive>false</show-portlet-inactive>
-		<private-request-attributes>false</private-request-attributes>
-		<private-session-attributes>false</private-session-attributes>
-		<render-weight>50</render-weight>
-		<add-default-resource>true</add-default-resource>
-		<system>true</system>
-	</portlet>
-	<portlet>
 		<portlet-name>88</portlet-name>
 		<icon>/html/icons/default.png</icon>
 		<struts-path>layouts_admin</struts-path>
@@ -870,6 +865,7 @@
 		<private-session-attributes>false</private-session-attributes>
 		<render-weight>50</render-weight>
 		<header-portlet-css>/html/portlet/layouts_admin/css/main.css</header-portlet-css>
+		<footer-portlet-javascript>/html/portlet/layouts_admin/js/main.js</footer-portlet-javascript>
 		<css-class-wrapper>portlet-communities</css-class-wrapper>
 		<add-default-resource>true</add-default-resource>
 		<system>true</system>
@@ -1195,6 +1191,7 @@
 		<indexer-class>com.liferay.portlet.usersadmin.util.OrganizationIndexer</indexer-class>
 		<indexer-class>com.liferay.portlet.usersadmin.util.UserIndexer</indexer-class>
 		<portlet-url-class>com.liferay.portal.struts.StrutsActionPortletURL</portlet-url-class>
+		<staged-model-data-handler-class>com.liferay.portlet.usersadmin.lar.OrganizationStagedModelDataHandler</staged-model-data-handler-class>
 		<control-panel-entry-category>portal</control-panel-entry-category>
 		<control-panel-entry-weight>1.0</control-panel-entry-weight>
 		<control-panel-entry-class>com.liferay.portlet.usersadmin.UsersControlPanelEntry</control-panel-entry-class>
@@ -1218,6 +1215,7 @@
 		<struts-path>user_groups_admin</struts-path>
 		<indexer-class>com.liferay.portlet.usergroupsadmin.util.UserGroupIndexer</indexer-class>
 		<portlet-url-class>com.liferay.portal.struts.StrutsActionPortletURL</portlet-url-class>
+		<staged-model-data-handler-class>com.liferay.portlet.usergroupsadmin.lar.UserGroupStagedModelDataHandler</staged-model-data-handler-class>
 		<control-panel-entry-category>portal</control-panel-entry-category>
 		<control-panel-entry-weight>4.5</control-panel-entry-weight>
 		<custom-attributes-display>com.liferay.portlet.usergroupsadmin.UserGroupCustomAttributesDisplay</custom-attributes-display>
@@ -1233,6 +1231,7 @@
 		<icon>/html/icons/roles_admin.png</icon>
 		<struts-path>roles_admin</struts-path>
 		<portlet-url-class>com.liferay.portal.struts.StrutsActionPortletURL</portlet-url-class>
+		<staged-model-data-handler-class>com.liferay.portlet.rolesadmin.lar.RoleStagedModelDataHandler</staged-model-data-handler-class>
 		<control-panel-entry-category>portal</control-panel-entry-category>
 		<control-panel-entry-weight>5.0</control-panel-entry-weight>
 		<custom-attributes-display>com.liferay.portlet.rolesadmin.RoleCustomAttributesDisplay</custom-attributes-display>
@@ -1250,6 +1249,7 @@
 		<icon>/html/icons/password_policies_admin.png</icon>
 		<struts-path>password_policies_admin</struts-path>
 		<portlet-url-class>com.liferay.portal.struts.StrutsActionPortletURL</portlet-url-class>
+		<staged-model-data-handler-class>com.liferay.portlet.passwordpoliciesadmin.lar.PasswordPolicyStagedModelDataHandler</staged-model-data-handler-class>
 		<control-panel-entry-category>portal</control-panel-entry-category>
 		<control-panel-entry-weight>6.0</control-panel-entry-weight>
 		<preferences-owned-by-group>true</preferences-owned-by-group>
@@ -1488,6 +1488,7 @@
 		<icon>/html/icons/layout_prototypes.png</icon>
 		<struts-path>layout_prototypes</struts-path>
 		<portlet-url-class>com.liferay.portal.struts.StrutsActionPortletURL</portlet-url-class>
+		<staged-model-data-handler-class>com.liferay.portlet.layoutsadmin.lar.LayoutPrototypeStagedModelDataHandler</staged-model-data-handler-class>
 		<control-panel-entry-category>portal</control-panel-entry-category>
 		<control-panel-entry-weight>4.0</control-panel-entry-weight>
 		<preferences-owned-by-group>true</preferences-owned-by-group>
@@ -1533,6 +1534,7 @@
 		<icon>/html/icons/layout_set_prototypes.png</icon>
 		<struts-path>layout_set_prototypes</struts-path>
 		<portlet-url-class>com.liferay.portal.struts.StrutsActionPortletURL</portlet-url-class>
+		<staged-model-data-handler-class>com.liferay.portlet.layoutsadmin.lar.LayoutSetPrototypeStagedModelDataHandler</staged-model-data-handler-class>
 		<control-panel-entry-category>portal</control-panel-entry-category>
 		<control-panel-entry-weight>3.0</control-panel-entry-weight>
 		<preferences-owned-by-group>true</preferences-owned-by-group>
@@ -1648,6 +1650,7 @@
 		<private-session-attributes>false</private-session-attributes>
 		<render-weight>50</render-weight>
 		<header-portlet-css>/html/portlet/layouts_admin/css/main.css</header-portlet-css>
+		<footer-portlet-javascript>/html/portlet/layouts_admin/js/main.js</footer-portlet-javascript>
 		<css-class-wrapper>portlet-communities</css-class-wrapper>
 		<add-default-resource>true</add-default-resource>
 		<system>true</system>
@@ -1724,6 +1727,7 @@
 		<portlet-data-handler-class>com.liferay.portlet.messageboards.lar.MBPortletDataHandler</portlet-data-handler-class>
 		<control-panel-entry-category>content</control-panel-entry-category>
 		<control-panel-entry-weight>15.0</control-panel-entry-weight>
+		<permission-propagator>com.liferay.portlet.messageboards.security.permission.MBPermissionPropagatorImpl</permission-propagator>
 		<preferences-owned-by-group>true</preferences-owned-by-group>
 		<use-default-template>false</use-default-template>
 		<scopeable>true</scopeable>

@@ -725,15 +725,17 @@
 
 			var hasErrors = false;
 
-			var liferayForm = Liferay.Form.get(form.attr('id'));
+			if (event.validate) {
+				var liferayForm = Liferay.Form.get(form.attr('id'));
 
-			if (liferayForm) {
-				var validator = liferayForm.formValidator;
+				if (liferayForm) {
+					var validator = liferayForm.formValidator;
 
-				if (A.instanceOf(validator, A.FormValidator)) {
-					validator.validate();
+					if (A.instanceOf(validator, A.FormValidator)) {
+						validator.validate();
 
-					hasErrors = validator.hasErrors();
+						hasErrors = validator.hasErrors();
+					}
 				}
 			}
 
@@ -1658,16 +1660,16 @@
 		function(config, callback) {
 			var dialog = Util.getWindow(config.id);
 
-			if (dialog) {
-				dialog.show();
-			}
-			else {
-				Util.openWindow(config);
+			var eventName = config.eventName || config.id;
 
-				var eventName = config.eventName || config.id;
+			var selectionEvent = Liferay.on(eventName, callback);
 
-				Liferay.on(eventName, callback);
-			}
+			Util.openWindow(
+				config,
+				function(dialogWindow) {
+					dialogWindow.after('close', selectionEvent.detach, selectionEvent);
+				}
+			);
 		},
 		['aui-base']
 	);
@@ -1946,14 +1948,15 @@
 	Liferay.provide(
 		window,
 		'submitForm',
-		function(form, action, singleSubmit) {
+		function(form, action, singleSubmit, validate) {
 			if (!Util._submitLocked) {
 				Liferay.fire(
 					'submitForm',
 					{
 						form: A.one(form),
 						action: action,
-						singleSubmit: singleSubmit
+						singleSubmit: singleSubmit,
+						validate: validate !== false
 					}
 				);
 			}

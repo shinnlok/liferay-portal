@@ -49,6 +49,36 @@ public class LiferayFileEntry extends LiferayModel implements FileEntry {
 		_escapedModel = escapedModel;
 	}
 
+	@Override
+	public Object clone() {
+		LiferayFileEntry liferayFileEntry = new LiferayFileEntry(
+			_dlFileEntry, _escapedModel);
+
+		FileVersion cachedFileVersion = getCachedFileVersion();
+
+		if (cachedFileVersion != null) {
+			liferayFileEntry.setCachedFileVersion(cachedFileVersion);
+		}
+
+		liferayFileEntry.setCompanyId(getCompanyId());
+		liferayFileEntry.setCreateDate(getCreateDate());
+		liferayFileEntry.setGroupId(getGroupId());
+		liferayFileEntry.setModifiedDate(getModifiedDate());
+		liferayFileEntry.setPrimaryKey(getPrimaryKey());
+		liferayFileEntry.setUserId(getUserId());
+		liferayFileEntry.setUserName(getUserName());
+
+		try {
+			liferayFileEntry.setUserUuid(getUserUuid());
+		}
+		catch (SystemException se) {
+		}
+
+		liferayFileEntry.setUuid(getUuid());
+
+		return liferayFileEntry;
+	}
+
 	public boolean containsPermission(
 			PermissionChecker permissionChecker, String actionId)
 		throws PortalException, SystemException {
@@ -186,12 +216,12 @@ public class LiferayFileEntry extends LiferayModel implements FileEntry {
 	}
 
 	public Class<?> getModelClass() {
-		return DLFileEntry.class;
+		return LiferayFileEntry.class;
 	}
 
 	@Override
 	public String getModelClassName() {
-		return DLFileEntry.class.getName();
+		return LiferayFileEntry.class.getName();
 	}
 
 	public Date getModifiedDate() {
@@ -330,6 +360,10 @@ public class LiferayFileEntry extends LiferayModel implements FileEntry {
 
 	public void setUserUuid(String userUuid) {
 		_dlFileEntry.setUserUuid(userUuid);
+	}
+
+	public void setUuid(String uuid) {
+		_dlFileEntry.setUuid(uuid);
 	}
 
 	public FileEntry toEscapedModel() {

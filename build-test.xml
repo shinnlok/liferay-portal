@@ -9,14 +9,6 @@
 	<property file="${project.dir}/test.${env.HOSTNAME}.properties" />
 	<property file="${project.dir}/test.properties" />
 
-	<propertycopy name="db.device.name" from="db.${db.type}.device.name" silent="true" />
-	<propertycopy name="db.driver" from="db.${db.type}.driver" silent="true" />
-	<propertycopy name="db.host" from="db.${db.type}.host" silent="true" />
-	<propertycopy name="db.password" from="db.${db.type}.password" silent="true" />
-	<propertycopy name="db.schema" from="db.${db.type}.schema" silent="true" />
-	<propertycopy name="db.url" from="db.${db.type}.url" silent="true" />
-	<propertycopy name="db.username" from="db.${db.type}.username" silent="true" />
-
 	<property name="plink.executable" location="${project.dir}/tools/putty/plink.exe" />
 	<property name="pscp.executable" location="${project.dir}/tools/putty/pscp.exe" />
 
@@ -48,6 +40,115 @@
 		</loadfile>
 
 		<echo file="portal-web/test-ant-scripts/${ant.script.file.name}" append="true">${template.content}</echo>
+	</target>
+
+	<target name="build-sql-file">
+		<if>
+			<not>
+				<isset property="sql.legacy.zip" />
+			</not>
+			<then>
+				<fail>Please set "sql.legacy.zip" in test.properties to point to the legacy SQL ZIP file.</fail>
+			</then>
+		</if>
+
+		<if>
+			<not>
+				<and>
+					<available file="sql/legacy" />
+					<uptodate
+						srcfile="${sql.legacy.zip}"
+						targetfile="sql/legacy"
+					/>
+				</and>
+			</not>
+			<then>
+				<delete dir="sql/legacy" failonerror="false" />
+
+				<unzip src="${sql.legacy.zip}" dest="sql" />
+
+				<touch>
+					<fileset dir="sql/legacy" />
+				</touch>
+			</then>
+		</if>
+
+		<if>
+			<not>
+				<equals arg1="${database}" arg2="hsql" />
+			</not>
+			<then>
+				<if>
+					<or>
+						<not>
+							<isset property="sql.dir" />
+						</not>
+						<not>
+							<isset property="sql.file" />
+						</not>
+					</or>
+					<then>
+						<if>
+							<isset property="test.database.minimal" />
+							<then>
+								<property name="sql.dir" value="sql\create-minimal\" />
+								<property name="sql.file" value="create-minimal-${database.family}.sql" />
+							</then>
+							<else>
+								<property name="sql.dir" value="sql\create\" />
+								<property name="sql.file" value="create-${database.family}.sql" />
+							</else>
+						</if>
+					</then>
+				</if>
+
+				<copy file="${sql.dir}${sql.file}" tofile="create.sql" />
+
+				<if>
+					<not>
+						<equals arg1="${database.sql-replacement.drop-schema.token}" arg2="" />
+					</not>
+					<then>
+						<replace file="create.sql">
+							<replacefilter token="${database.sql-replacement.drop-schema.token}" value="${database.sql-replacement.drop-schema.value}" />
+						</replace>
+					</then>
+				</if>
+
+				<if>
+					<not>
+						<equals arg1="${database.sql-replacement.create-schema.token}" arg2="" />
+					</not>
+					<then>
+						<replace file="create.sql">
+							<replacefilter token="${database.sql-replacement.create-schema.token}" value="${database.sql-replacement.create-schema.value}" />
+						</replace>
+					</then>
+				</if>
+
+				<if>
+					<not>
+						<equals arg1="${database.sql-replacement.use-schema.token}" arg2="" />
+					</not>
+					<then>
+						<replace file="create.sql">
+							<replacefilter token="${database.sql-replacement.use-schema.token}" value="${database.sql-replacement.use-schema.value}" />
+						</replace>
+					</then>
+				</if>
+
+				<if>
+					<not>
+						<equals arg1="${database.sql-replacement.create-schema-secondary.token}" arg2="" />
+					</not>
+					<then>
+						<replace file="create.sql">
+							<replacefilter token="${database.sql-replacement.create-schema-secondary.token}" value="${database.sql-replacement.create-schema-secondary.value}" />
+						</replace>
+					</then>
+				</if>
+			</then>
+		</if>
 	</target>
 
 	<target name="build-test-ant-script">
@@ -326,7 +427,7 @@
 	</target>
 
 	<target name="build-test-ant-scripts">
-		<property name="build-test-ant-scripts.version" value="2" />
+		<property name="build-test-ant-scripts.version" value="6" />
 
 		<if>
 			<available file="portal-web/test-ant-scripts/version" />
@@ -425,6 +526,11 @@
 		<antcall target="build-test-ant-script">
 			<param name="test.ant.script.command" value="control-panel-categories" />
 			<param name="test.ant.script.suite" value="ControlPanelCategoriesTestSuite" />
+		</antcall>
+
+		<antcall target="build-test-ant-script">
+			<param name="test.ant.script.command" value="control-panel-custom-fields" />
+			<param name="test.ant.script.suite" value="ControlPanelCustomFieldsTestSuite" />
 		</antcall>
 
 		<antcall target="build-test-ant-script">
@@ -879,6 +985,115 @@
 		</antcall>
 
 		<antcall target="build-test-ant-script">
+			<param name="test.ant.script.command" value="development-apis-acceptance" />
+			<param name="test.ant.script.selenium.implementation" value="webdriver" />
+			<param name="test.ant.script.suite" value="DevelopmentAPIsAcceptanceTestSuite" />
+		</antcall>
+
+		<antcall target="build-test-ant-script">
+			<param name="test.ant.script.command" value="development-configuration-acceptance" />
+			<param name="test.ant.script.selenium.implementation" value="webdriver" />
+			<param name="test.ant.script.suite" value="DevelopmentConfigurationAcceptanceTestSuite" />
+		</antcall>
+
+		<antcall target="build-test-ant-script">
+			<param name="test.ant.script.command" value="development-frameworks-acceptance" />
+			<param name="test.ant.script.selenium.implementation" value="webdriver" />
+			<param name="test.ant.script.suite" value="DevelopmentFrameworksAcceptanceTestSuite" />
+		</antcall>
+
+		<antcall target="build-test-ant-script">
+			<param name="test.ant.script.command" value="development-sample-portlet-plugins-acceptance" />
+			<param name="test.ant.script.selenium.implementation" value="webdriver" />
+			<param name="test.ant.script.suite" value="DevelopmentSamplePortletPluginsAcceptanceTestSuite" />
+		</antcall>
+
+		<antcall target="build-test-ant-script">
+			<param name="test.ant.script.command" value="development-theme-development-acceptance" />
+			<param name="test.ant.script.selenium.implementation" value="webdriver" />
+			<param name="test.ant.script.suite" value="DevelopmentThemeDevelopmentAcceptanceTestSuite" />
+		</antcall>
+
+		<antcall target="build-test-ant-script">
+			<param name="test.ant.script.command" value="development-tools-acceptance" />
+			<param name="test.ant.script.selenium.implementation" value="webdriver" />
+			<param name="test.ant.script.suite" value="DevelopmentToolsAcceptanceTestSuite" />
+		</antcall>
+
+		<antcall target="build-test-ant-script">
+			<param name="test.ant.script.command" value="end-user-administration-acceptance" />
+			<param name="test.ant.script.selenium.implementation" value="webdriver" />
+			<param name="test.ant.script.suite" value="EndUserAdministrationAcceptanceTestSuite" />
+		</antcall>
+
+		<antcall target="build-test-ant-script">
+			<param name="test.ant.script.command" value="end-user-business-productivity-acceptance" />
+			<param name="test.ant.script.selenium.implementation" value="webdriver" />
+			<param name="test.ant.script.suite" value="EndUserBusinessProductivityAcceptanceTestSuite" />
+		</antcall>
+
+		<antcall target="build-test-ant-script">
+			<param name="test.ant.script.command" value="end-user-collaboration-acceptance" />
+			<param name="test.ant.script.selenium.implementation" value="webdriver" />
+			<param name="test.ant.script.suite" value="EndUserCollaborationAcceptanceTestSuite" />
+		</antcall>
+
+		<antcall target="build-test-ant-script">
+			<param name="test.ant.script.command" value="end-user-document-management-acceptance" />
+			<param name="test.ant.script.selenium.implementation" value="webdriver" />
+			<param name="test.ant.script.suite" value="EndUserDocumentManagementAcceptanceTestSuite" />
+		</antcall>
+
+		<antcall target="build-test-ant-script">
+			<param name="test.ant.script.command" value="end-user-legacy-acceptance" />
+			<param name="test.ant.script.selenium.implementation" value="webdriver" />
+			<param name="test.ant.script.suite" value="EndUserLegacyAcceptanceTestSuite" />
+		</antcall>
+
+		<antcall target="build-test-ant-script">
+			<param name="test.ant.script.command" value="end-user-personalization-acceptance" />
+			<param name="test.ant.script.selenium.implementation" value="webdriver" />
+			<param name="test.ant.script.suite" value="EndUserPersonalizationAcceptanceTestSuite" />
+		</antcall>
+
+		<antcall target="build-test-ant-script">
+			<param name="test.ant.script.command" value="end-user-search-acceptance" />
+			<param name="test.ant.script.selenium.implementation" value="webdriver" />
+			<param name="test.ant.script.suite" value="EndUserSearchAcceptanceTestSuite" />
+		</antcall>
+
+		<antcall target="build-test-ant-script">
+			<param name="test.ant.script.command" value="end-user-social-networking-acceptance" />
+			<param name="test.ant.script.selenium.implementation" value="webdriver" />
+			<param name="test.ant.script.suite" value="EndUserSocialNetworkingAcceptanceTestSuite" />
+		</antcall>
+
+		<antcall target="build-test-ant-script">
+			<param name="test.ant.script.command" value="end-user-util-acceptance" />
+			<param name="test.ant.script.selenium.implementation" value="webdriver" />
+			<param name="test.ant.script.suite" value="EndUserUtilAcceptanceTestSuite" />
+		</antcall>
+
+		<antcall target="build-test-ant-script">
+			<param name="test.ant.script.command" value="end-user-wcm-acceptance" />
+			<param name="test.ant.script.selenium.implementation" value="webdriver" />
+			<param name="test.ant.script.suite" value="EndUserWCMAcceptanceTestSuite" />
+		</antcall>
+
+		<antcall target="build-test-ant-script">
+			<param name="test.ant.script.command" value="end-user-web-forms-and-data-lists-acceptance" />
+			<param name="test.ant.script.selenium.implementation" value="webdriver" />
+			<param name="test.ant.script.suite" value="EndUserWebFormsAndDataListsAcceptanceTestSuite" />
+		</antcall>
+
+		<antcall target="build-test-ant-script">
+			<param name="test.ant.script.command" value="end-user-workflow-acceptance" />
+			<param name="test.ant.script.kaleo" value="true" />
+			<param name="test.ant.script.selenium.implementation" value="webdriver" />
+			<param name="test.ant.script.suite" value="EndUserWorkflowAcceptanceTestSuite" />
+		</antcall>
+
+		<antcall target="build-test-ant-script">
 			<param name="test.ant.script.command" value="kaleo-asset-publisher" />
 			<param name="test.ant.script.kaleo" value="true" />
 			<param name="test.ant.script.suite" value="KaleoAssetPublisherTestSuite" />
@@ -1088,6 +1303,48 @@
 		<antcall target="build-test-ant-script">
 			<param name="test.ant.script.command" value="permissions-web-content-display" />
 			<param name="test.ant.script.suite" value="PermissionsWebContentDisplayTestSuite" />
+		</antcall>
+
+		<antcall target="build-test-ant-script">
+			<param name="test.ant.script.command" value="platform-application-standard-acceptance" />
+			<param name="test.ant.script.selenium.implementation" value="webdriver" />
+			<param name="test.ant.script.suite" value="PlatformApplicationStandardAcceptanceTestSuite" />
+		</antcall>
+
+		<antcall target="build-test-ant-script">
+			<param name="test.ant.script.command" value="platform-authentication-acceptance" />
+			<param name="test.ant.script.selenium.implementation" value="webdriver" />
+			<param name="test.ant.script.suite" value="PlatformAuthenticationAcceptanceTestSuite" />
+		</antcall>
+
+		<antcall target="build-test-ant-script">
+			<param name="test.ant.script.command" value="platform-deployment-acceptance" />
+			<param name="test.ant.script.selenium.implementation" value="webdriver" />
+			<param name="test.ant.script.suite" value="PlatformDeploymentAcceptanceTestSuite" />
+		</antcall>
+
+		<antcall target="build-test-ant-script">
+			<param name="test.ant.script.command" value="platform-infrastructure-acceptance" />
+			<param name="test.ant.script.selenium.implementation" value="webdriver" />
+			<param name="test.ant.script.suite" value="PlatformInfrastructureAcceptanceTestSuite" />
+		</antcall>
+
+		<antcall target="build-test-ant-script">
+			<param name="test.ant.script.command" value="platform-operations-acceptance" />
+			<param name="test.ant.script.selenium.implementation" value="webdriver" />
+			<param name="test.ant.script.suite" value="PlatformOperationsAcceptanceTestSuite" />
+		</antcall>
+
+		<antcall target="build-test-ant-script">
+			<param name="test.ant.script.command" value="platform-security-acceptance" />
+			<param name="test.ant.script.selenium.implementation" value="webdriver" />
+			<param name="test.ant.script.suite" value="PlatformSecurityAcceptanceTestSuite" />
+		</antcall>
+
+		<antcall target="build-test-ant-script">
+			<param name="test.ant.script.command" value="platform-upgrade-acceptance" />
+			<param name="test.ant.script.selenium.implementation" value="webdriver" />
+			<param name="test.ant.script.suite" value="PlatformUpgradeAcceptanceTestSuite" />
 		</antcall>
 
 		<antcall target="build-test-ant-script">
@@ -2237,6 +2494,85 @@
 		<echo file="portal-web/test-ant-scripts/version">${build-test-ant-scripts.version}</echo>
 	</target>
 
+	<target name="check-config">
+		<if>
+			<not>
+				<isset property="app-server" />
+			</not>
+			<then>
+				<property name="app-server" value="tomcat" />
+			</then>
+		</if>
+
+		<if>
+			<not>
+				<or>
+					<equals arg1="${app-server}" arg2="glassfish" />
+					<equals arg1="${app-server}" arg2="jboss" />
+					<equals arg1="${app-server}" arg2="jonas" />
+					<equals arg1="${app-server}" arg2="resin" />
+					<equals arg1="${app-server}" arg2="tomcat" />
+					<equals arg1="${app-server}" arg2="weblogic" />
+					<equals arg1="${app-server}" arg2="websphere-7.0" />
+					<equals arg1="${app-server}" arg2="websphere-8.0" />
+				</or>
+			</not>
+			<then>
+				<fail>Please set "app-server" to one of the following:${line.separator}glassfish, jboss, jonas, resin, tomcat, weblogic, websphere-7.0, websphere-8.0</fail>
+			</then>
+		</if>
+
+		<if>
+			<not>
+				<isset property="browser" />
+			</not>
+			<then>
+				<property name="browser" value="firefox" />
+			</then>
+		</if>
+
+		<if>
+			<not>
+				<or>
+					<equals arg1="${browser}" arg2="firefox" />
+					<equals arg1="${browser}" arg2="googlechrome" />
+					<equals arg1="${browser}" arg2="ie" />
+				</or>
+			</not>
+			<then>
+				<fail>Please set "browser" to one of the following:${line.separator}firefox, googlechrome, ie</fail>
+			</then>
+		</if>
+
+		<if>
+			<not>
+				<isset property="database" />
+			</not>
+			<then>
+				<property name="database" value="mysql" />
+			</then>
+		</if>
+
+		<if>
+			<not>
+				<or>
+					<equals arg1="${database}" arg2="db2" />
+					<equals arg1="${database}" arg2="mysql" />
+					<equals arg1="${database}" arg2="oracle-10" />
+					<equals arg1="${database}" arg2="oracle-11" />
+					<equals arg1="${database}" arg2="postgresql-8.4" />
+					<equals arg1="${database}" arg2="postgresql-9.0" />
+					<equals arg1="${database}" arg2="sql-server-2005" />
+					<equals arg1="${database}" arg2="sql-server-2008" />
+					<equals arg1="${database}" arg2="sybase" />
+				</or>
+			</not>
+			<then>
+				<fail>Please set "database" to one of the following:${line.separator}db2, mysql, oracle-10, oracle-11, postgresql-8.4, postgresql-9.0, sql-server-2005, sql-server-2008, sybase</fail>
+			</then>
+		</if>
+	</target>
+
 	<target name="clean-up-bundles">
 		<delete file="test.${user.name}.properties" />
 
@@ -2278,8 +2614,8 @@
 		<if>
 			<os family="windows" />
 			<then>
-				<exec executable="${shell.executable}">
-					<arg line="/c jps -l > java-processes" />
+				<exec executable="${shell.executable}" output="java-processes">
+					<arg line="/c jps -l" />
 				</exec>
 			</then>
 			<else>
@@ -2404,70 +2740,70 @@
 
 	<target name="copy-optional-jars">
 		<if>
-			<equals arg1="${db.type}" arg2="db2" />
+			<equals arg1="${database}" arg2="db2" />
 			<then>
 				<delete includeemptydirs="true" failonerror="false">
 					<fileset
 						dir="${simple.server.lib.global.dir}"
-						includes="db2*.jar"
+						includes="${jdbc.db2.driver}"
 					/>
 				</delete>
 
 				<copy todir="${todir}">
 						<fileset
 							dir="${jdbc.drivers.optional.dir}/db2/8.1.18"
-							includes="*.jar"
+							includes="${jdbc.db2.driver}"
 					/>
 				</copy>
 			</then>
 			<elseif>
 				<and>
-					<equals arg1="${db.type}" arg2="mysql" />
+					<equals arg1="${database}" arg2="mysql" />
 					<not>
-						<available file="${simple.server.lib.global.dir}/mysql.jar" />
+						<available file="${simple.server.lib.global.dir}/${jdbc.mysql.driver}" />
 					</not>
 				</and>
 				<then>
 					<copy todir="${todir}">
 						<fileset
 							dir="${jdbc.drivers.optional.dir}/mysql/5.0.7"
-							includes="*.jar"
+							includes="${jdbc.mysql.driver}"
 						/>
 					</copy>
 				</then>
 			</elseif>
 			<elseif>
-				<equals arg1="${db.type}" arg2="oracle-10" />
+				<equals arg1="${database}" arg2="oracle-10" />
 				<then>
 					<delete includeemptydirs="true" failonerror="false">
 						<fileset
 							dir="${simple.server.lib.global.dir}"
-							includes="ojdbc*.jar"
+							includes="${jdbc.oracle.driver}"
 						/>
 					</delete>
 
 					<copy todir="${todir}">
 						<fileset
 							dir="${jdbc.drivers.optional.dir}/oracle/10.2.0.1.0"
-							includes="*.jar"
+							includes="${jdbc.oracle.driver}"
 						/>
 					</copy>
 				</then>
 			</elseif>
 			<elseif>
-				<equals arg1="${db.type}" arg2="oracle-11" />
+				<equals arg1="${database}" arg2="oracle-11" />
 				<then>
 					<delete includeemptydirs="true" failonerror="false">
 						<fileset
 							dir="${simple.server.lib.global.dir}"
-							includes="ojdbc*.jar"
+							includes="${jdbc.oracle.driver}"
 						/>
 					</delete>
 
 					<copy todir="${todir}">
 						<fileset
 							dir="${jdbc.drivers.optional.dir}/oracle/11.2.0.1.0"
-							includes="*.jar"
+							includes="${jdbc.oracle.driver}"
 						/>
 					</copy>
 				</then>
@@ -2536,6 +2872,89 @@
 		<delete file="execute-remote-command.bat" />
 	</target>
 
+	<target name="generate-test-properties" depends="check-config">
+		<xmlproperty
+			file="portal-web/test-config/database.xml"
+			keeproot="true"
+		/>
+
+		<echoproperties destfile="${basedir}/test.run.properties">
+			<propertyset>
+				<propertyref prefix="database.${database}" />
+			</propertyset>
+		</echoproperties>
+
+		<replaceregexp
+			file="${basedir}/test.run.properties"
+			flags="g"
+			match="database\.${database}"
+			replace="database"
+		/>
+
+		<property file="${basedir}/test.run.properties" />
+
+		<loadfile property="test.properties.expanded" srcfile="${basedir}/test.run.properties">
+			<filterchain>
+				<expandproperties />
+			</filterchain>
+		</loadfile>
+
+		<echo file="${basedir}/test.run.properties">${test.properties.expanded}</echo>
+	</target>
+
+	<target name="generate-tests">
+		<script classpathref="project.classpath" language="beanshell">
+			String testCase = "";
+			String testSuite = "";
+
+			String testClass = project.getProperty("test.class");
+
+			if (testClass.endsWith("TestCase")) {
+				testCase = testClass.replaceAll("TestCase", "");
+			}
+			else if (testClass.endsWith("TestSuite")) {
+				testSuite = testClass.replaceAll("TestSuite", "");
+			}
+
+			project.setProperty("test-case", testCase);
+			project.setProperty("test-suite", testSuite);
+		</script>
+
+		<if>
+			<available file="portal-web/test/functional" type="dir" />
+			<then>
+				<resourcecount property="test-case.count">
+					<fileset dir="portal-web/test/functional" includes="**/${test-case}.testcase" />
+				</resourcecount>
+				<resourcecount property="test-suite.count">
+					<fileset dir="portal-web/test/functional" includes="**/${test-suite}.testsuite" />
+				</resourcecount>
+			</then>
+		</if>
+
+		<delete dir="portal-web/test/functional-generated" failonerror="false" />
+
+		<if>
+			<or>
+				<and>
+					<isset property="test-case.count" />
+					<not>
+						<equals arg1="${test-case.count}" arg2="0" />
+					</not>
+				</and>
+				<and>
+					<isset property="test-suite.count" />
+					<not>
+						<equals arg1="${test-suite.count}" arg2="0" />
+					</not>
+				</and>
+			</or>
+			<then>
+				<ant dir="portal-web" target="build-selenium-new" inheritAll="false" />
+			</then>
+		</if>
+	</target>
+
 	<target name="install-vm-java">
 		<if>
 			<not>
@@ -2602,7 +3021,7 @@
 	</target>
 
 	<target name="prepare-common">
-		<echo file="test.${user.name}.properties">db.type=${db.type}</echo>
+		<echo file="test.${user.name}.properties">database=${database}</echo>
 
 		<antcall target="prepare-portal-properties" inheritAll="false" />
 
@@ -2649,15 +3068,15 @@
 		</if>
 	</target>
 
-	<target name="prepare-portal-ext-properties">
+	<target name="prepare-portal-ext-properties" depends="generate-test-properties">
 		<echo file="portal-impl/src/portal-ext.properties">plugin.notifications.enabled=false
 
 jdbc.default.jndi.name=
 
-jdbc.default.driverClassName=${db.driver}
-jdbc.default.url=${db.url}
-jdbc.default.username=${db.username}
-jdbc.default.password=${db.password}
+jdbc.default.driverClassName=${database.driver}
+jdbc.default.url=${database.url}
+jdbc.default.username=${database.username}
+jdbc.default.password=${database.password}
 
 captcha.max.challenges=0
 
@@ -2676,7 +3095,7 @@ tunnel.servlet.hosts.allowed=
 resource.repositories.root=$${user.home}/liferay</echo>
 
 		<if>
-			<contains string="${db.type}" substring="db2" />
+			<contains string="${database}" substring="db2" />
 			<then>
 				<echo file="portal-impl/src/portal-ext.properties" append="true">
 
@@ -2685,7 +3104,7 @@ custom.sql.function.isnull=CAST(? AS VARCHAR(32672)) IS NULL
 custom.sql.function.isnotnull=CAST(? AS VARCHAR(32672)) IS NOT NULL</echo>
 			</then>
 			<elseif>
-				<contains string="${db.type}" substring="oracle" />
+				<contains string="${database}" substring="oracle" />
 				<then>
 					<echo file="portal-impl/src/portal-ext.properties" append="true">
 
@@ -2696,7 +3115,7 @@ jdbc.default.numHelperThreads=1</echo>
 				</then>
 			</elseif>
 			<elseif>
-				<contains string="${db.type}" substring="sybase" />
+				<contains string="${database}" substring="sybase" />
 				<then>
 					<echo file="portal-impl/src/portal-ext.properties" append="true">
 
@@ -3039,10 +3458,10 @@ svn --username ${svn.username} --password ${svn.password} update -r ${svn.info.r
 	name="jdbc/LiferayPool"
 	auth="Container"
 	type="javax.sql.DataSource"
-	driverClassName="${db.driver}"
-	url="${db.url}"
-	username="${db.username}"
-	password="${db.password}"
+	driverClassName="${database.driver}"
+	url="${database.url}"
+	username="${database.username}"
+	password="${database.password}"
 	maxActive="20"
 />
 </Context>]]></echo>
@@ -3156,14 +3575,14 @@ svn --username ${svn.username} --password ${svn.password} update -r ${svn.info.r
 
 	<target name="prepare-test-properties">
 		<echo file="portal-impl/test/portal-test-ext.properties">
-jdbc.default.driverClassName=${db.driver}
-jdbc.default.url=${db.url}
-jdbc.default.username=${db.username}
-jdbc.default.password=${db.password}
+jdbc.default.driverClassName=${database.driver}
+jdbc.default.url=${database.url}
+jdbc.default.username=${database.username}
+jdbc.default.password=${database.password}
 		</echo>
 
 		<if>
-			<contains string="${db.type}" substring="db2" />
+			<contains string="${database}" substring="db2" />
 			<then>
 				<echo file="portal-impl/test/portal-test-ext.properties" append="true">
 
@@ -3172,7 +3591,7 @@ custom.sql.function.isnull=CAST(? AS VARCHAR(32672)) IS NULL
 custom.sql.function.isnotnull=CAST(? AS VARCHAR(32672)) IS NOT NULL</echo>
 			</then>
 			<elseif>
-				<contains string="${db.type}" substring="oracle" />
+				<contains string="${database}" substring="oracle" />
 				<then>
 					<echo file="portal-impl/test/portal-test-ext.properties" append="true">
 
@@ -3183,7 +3602,7 @@ jdbc.default.numHelperThreads=1</echo>
 				</then>
 			</elseif>
 			<elseif>
-				<contains string="${db.type}" substring="sybase" />
+				<contains string="${database}" substring="sybase" />
 				<then>
 					<echo file="portal-impl/test/portal-test-ext.properties" append="true">
 
@@ -3206,36 +3625,36 @@ custom.sql.function.isnotnull=CONVERT(VARCHAR,?) IS NOT NULL</echo>
 				<property name="sql.dir" value="sql\legacy\${sql.version}\create\" />
 
 				<if>
-					<contains string="${db.type}" substring="db2" />
+					<contains string="${database}" substring="db2" />
 					<then>
 						<property name="sql.file" value="create-db2.sql" />
 					</then>
 					<elseif>
-						<contains string="${db.type}" substring="mysql" />
+						<contains string="${database}" substring="mysql" />
 						<then>
 							<property name="sql.file" value="create-mysql.sql" />
 						</then>
 					</elseif>
 					<elseif>
-						<contains string="${db.type}" substring="oracle" />
+						<contains string="${database}" substring="oracle" />
 						<then>
 							<property name="sql.file" value="create-oracle.sql" />
 						</then>
 					</elseif>
 					<elseif>
-						<contains string="${db.type}" substring="postgresql" />
+						<contains string="${database}" substring="postgresql" />
 						<then>
 							<property name="sql.file" value="create-postgresql.sql" />
 						</then>
 					</elseif>
 					<elseif>
-						<contains string="${db.type}" substring="sql-server" />
+						<contains string="${database}" substring="sql-server" />
 						<then>
 							<property name="sql.file" value="create-sql-server.sql" />
 						</then>
 					</elseif>
 					<elseif>
-						<contains string="${db.type}" substring="sybase" />
+						<contains string="${database}" substring="sybase" />
 						<then>
 							<property name="sql.file" value="create-sybase.sql" />
 						</then>
@@ -3251,55 +3670,55 @@ custom.sql.function.isnotnull=CONVERT(VARCHAR,?) IS NOT NULL</echo>
 	</target>
 
 	<target name="prepare-versioned-db2">
-		<echo file="test.${user.name}.properties">db.type=db2</echo>
+		<echo file="test.${user.name}.properties">database=db2</echo>
 
 		<antcall target="prepare-versioned-common" inheritAll="false" />
 	</target>
 
 	<target name="prepare-versioned-mysql">
-		<echo file="test.${user.name}.properties">db.type=mysql</echo>
+		<echo file="test.${user.name}.properties">database=mysql</echo>
 
 		<antcall target="prepare-versioned-common" inheritAll="false" />
 	</target>
 
 	<target name="prepare-versioned-oracle-10">
-		<echo file="test.${user.name}.properties">db.type=oracle-10</echo>
+		<echo file="test.${user.name}.properties">database=oracle-10</echo>
 
 		<antcall target="prepare-versioned-common" inheritAll="false" />
 	</target>
 
 	<target name="prepare-versioned-oracle-11">
-		<echo file="test.${user.name}.properties">db.type=oracle-11</echo>
+		<echo file="test.${user.name}.properties">database=oracle-11</echo>
 
 		<antcall target="prepare-versioned-common" inheritAll="false" />
 	</target>
 
 	<target name="prepare-versioned-postgresql-8.4">
-		<echo file="test.${user.name}.properties">db.type=postgresql-8.4</echo>
+		<echo file="test.${user.name}.properties">database=postgresql-8.4</echo>
 
 		<antcall target="prepare-versioned-common" inheritAll="false" />
 	</target>
 
 	<target name="prepare-versioned-postgresql-9.0">
-		<echo file="test.${user.name}.properties">db.type=postgresql-9.0</echo>
+		<echo file="test.${user.name}.properties">database=postgresql-9.0</echo>
 
 		<antcall target="prepare-versioned-common" inheritAll="false" />
 	</target>
 
 	<target name="prepare-versioned-sql-server-2005">
-		<echo file="test.${user.name}.properties">db.type=sql-server-2005</echo>
+		<echo file="test.${user.name}.properties">database=sql-server-2005</echo>
 
 		<antcall target="prepare-versioned-common" inheritAll="false" />
 	</target>
 
 	<target name="prepare-versioned-sql-server-2008">
-		<echo file="test.${user.name}.properties">db.type=sql-server-2008</echo>
+		<echo file="test.${user.name}.properties">database=sql-server-2008</echo>
 
 		<antcall target="prepare-versioned-common" inheritAll="false" />
 	</target>
 
 	<target name="prepare-versioned-sybase">
-		<echo file="test.${user.name}.properties">db.type=sybase</echo>
+		<echo file="test.${user.name}.properties">database=sybase</echo>
 
 		<antcall target="prepare-versioned-common" inheritAll="false" />
 	</target>
@@ -3426,476 +3845,74 @@ custom.sql.function.isnotnull=CONVERT(VARCHAR,?) IS NOT NULL</echo>
 		</if>
 	</target>
 
-	<target name="rebuild-database">
+	<target name="rebuild-database" depends="generate-test-properties,build-sql-file">
 		<if>
 			<not>
-				<isset property="sql.legacy.zip" />
+				<isset property="skip.rebuild-database" />
 			</not>
 			<then>
-				<fail>
-.
-
-Please set "sql.legacy.zip" in test.properties to point to the legacy SQL ZIP
-file.
-				</fail>
-			</then>
-			<else>
-				<if>
-					<and>
-						<not>
-							<isset property="skip.rebuild-legacy" />
-						</not>
-						<or>
-							<not>
-								<available file="sql/legacy" />
-							</not>
-							<not>
-								<uptodate
-									srcfile="${sql.legacy.zip}"
-									targetfile="sql/legacy"
-								/>
-							</not>
-						</or>
-					</and>
-					<then>
-						<delete dir="sql/legacy" failonerror="false" />
-
-						<unzip src="${sql.legacy.zip}" dest="sql" />
-
-						<touch>
-							<fileset dir="sql/legacy" />
-						</touch>
-					</then>
-				</if>
-
 				<if>
 					<not>
-						<isset property="skip.rebuild-database" />
+						<isset property="skip.delete-liferay-home" />
 					</not>
 					<then>
+						<delete dir="${user.home}/liferay" />
+					</then>
+				</if>
+
+				<if>
+					<equals arg1="${database}" arg2="hsql" />
+					<then>
+						<delete dir="${user.home}/liferay/data" includeemptydirs="true" />
+
 						<if>
 							<not>
-								<isset property="skip.delete-liferay-home" />
+								<isset property="test.database.minimal" />
 							</not>
 							<then>
-								<delete dir="${user.home}/liferay" />
+								<copy file="sql/${database.name}.properties" tofile="${user.home}/liferay/data/hsql/${database.name}.properties" />
+								<copy file="sql/${database.name}.script" tofile="${user.home}/liferay/data/hsql/${database.name}.script" />
 							</then>
 						</if>
-
-						<if>
-							<equals arg1="${db.type}" arg2="db2" />
-							<then>
-								<antcall target="rebuild-database-db2" />
-							</then>
-							<elseif>
-								<equals arg1="${db.type}" arg2="hsql" />
-								<then>
-									<antcall target="rebuild-database-hsql" />
-								</then>
-							</elseif>
-							<elseif>
-								<equals arg1="${db.type}" arg2="mysql" />
-								<then>
-									<antcall target="rebuild-database-mysql" />
-								</then>
-							</elseif>
-							<elseif>
-								<or>
-									<equals arg1="${db.type}" arg2="oracle-10" />
-									<equals arg1="${db.type}" arg2="oracle-11" />
-								</or>
-								<then>
-									<antcall target="rebuild-database-oracle" />
-								</then>
-							</elseif>
-							<elseif>
-								<or>
-									<equals arg1="${db.type}" arg2="postgresql-8.4" />
-									<equals arg1="${db.type}" arg2="postgresql-9.0" />
-								</or>
-								<then>
-									<antcall target="rebuild-database-postgresql" />
-								</then>
-							</elseif>
-							<elseif>
-								<or>
-									<equals arg1="${db.type}" arg2="sql-server-2005" />
-									<equals arg1="${db.type}" arg2="sql-server-2008" />
-								</or>
-								<then>
-									<antcall target="rebuild-database-sql-server" />
-								</then>
-							</elseif>
-							<elseif>
-								<equals arg1="${db.type}" arg2="sybase" />
-								<then>
-									<antcall target="rebuild-database-sybase" />
-								</then>
-							</elseif>
-						</if>
 					</then>
-				</if>
-			</else>
-		</if>
-	</target>
-
-	<target name="rebuild-database-db2">
-		<if>
-			<or>
-				<not>
-					<isset property="sql.dir" />
-				</not>
-				<not>
-					<isset property="sql.file" />
-				</not>
-			</or>
-			<then>
-				<if>
-					<isset property="test.database.minimal" />
-					<then>
-						<property name="sql.dir" value="sql\create-minimal\" />
-						<property name="sql.file" value="create-minimal-db2.sql" />
-					</then>
+					<elseif>
+						<equals arg1="${database.family}" arg2="mysql" />
+						<then>
+							<exec executable="${mysql.executable}" input="create.sql">
+								<arg line="${mysql.arg.line}" />
+							</exec>
+						</then>
+					</elseif>
 					<else>
-						<property name="sql.dir" value="sql\create\" />
-						<property name="sql.file" value="create-db2.sql" />
+						<exec executable="${plink.executable}">
+							<arg line="-pw ${vm.password} ${vm.username}@${database.host} cmd.exe /c mkdir C:\temporary" />
+						</exec>
+
+						<exec executable="${pscp.executable}">
+							<arg line="-pw ${vm.password} create.sql ${vm.username}@${database.host}:\temporary" />
+						</exec>
+
+						<exec executable="${plink.executable}">
+							<arg line="-pw ${vm.password} ${vm.username}@${database.host} ${database.remote-schema-command}" />
+						</exec>
+
+						<exec executable="${plink.executable}">
+							<arg line="-pw ${vm.password} ${vm.username}@${database.host} cmd.exe /c rmdir /q /s C:\temporary" />
+						</exec>
 					</else>
 				</if>
 			</then>
 		</if>
 
-		<tstamp>
-			<format property="tstamp.value" pattern="yyyyMMddkkmmssSSS" />
-		</tstamp>
-
-		<copy file="${sql.dir}${sql.file}" tofile="${sql.file}" />
-
-		<replace file="${sql.file}">
-			<replacefilter token="drop database lportal;" value="drop database ${db.schema};" />
-			<replacefilter token="create database lportal;" value="create database ${db.schema} pagesize 8192;" />
-			<replacefilter token="create database lportal pagesize 8192;" value="create database ${db.schema} pagesize 8192;" />
-			<replacefilter token="connect to lportal;" value="connect to ${db.schema} USER ${db.username} USING ${db.password};" />
-		</replace>
-
-		<exec executable="${plink.executable}">
-			<arg line="-pw ${vm.password} ${vm.username}@${db.host} cmd.exe /c mkdir C:\${tstamp.value}" />
-		</exec>
-
-		<exec executable="${pscp.executable}">
-			<arg line="-pw ${vm.password} ${sql.file} ${vm.username}@${db.host}:\${tstamp.value}" />
-		</exec>
-
-		<exec executable="${plink.executable}">
-			<arg line="-pw ${vm.password} ${vm.username}@${db.host} cmd.exe /c db2cmd /c /w /i /t db2 -f C:\${tstamp.value}\${sql.file} -td;" />
-		</exec>
-
-		<exec executable="${plink.executable}">
-			<arg line="-pw ${vm.password} ${vm.username}@${db.host} cmd.exe /c rmdir /q /s C:\${tstamp.value}" />
-		</exec>
-
-		<delete file="${sql.file}" />
-	</target>
-
-	<target name="rebuild-database-hsql">
-		<delete dir="${app.server.parent.dir}/data" includeemptydirs="true" />
-
-		<if>
-			<not>
-				<isset property="test.database.minimal" />
-			</not>
-			<then>
-				<copy file="sql/${database.name}.properties" tofile="${app.server.parent.dir}/data/hsql/${database.name}.properties" />
-				<copy file="sql/${database.name}.script" tofile="${app.server.parent.dir}/data/hsql/${database.name}.script" />
-			</then>
-		</if>
-	</target>
-
-	<target name="rebuild-database-mysql">
-		<if>
-			<or>
-				<not>
-					<isset property="sql.dir" />
-				</not>
-				<not>
-					<isset property="sql.file" />
-				</not>
-			</or>
-			<then>
-				<if>
-					<isset property="test.database.minimal" />
-					<then>
-						<property name="sql.dir" value="sql\create-minimal\" />
-						<property name="sql.file" value="create-minimal-mysql.sql" />
-					</then>
-					<else>
-						<property name="sql.dir" value="sql\create\" />
-						<property name="sql.file" value="create-mysql.sql" />
-					</else>
-				</if>
-			</then>
-		</if>
-
-		<copy file="${sql.dir}${sql.file}" tofile="${sql.file}" />
-
-		<if>
-			<isset property="test.database.collate" />
-			<then>
-				<replace file="${sql.file}">
-					<replacefilter token="drop database if exists lportal;" value="drop database if exists ${db.schema};" />
-					<replacefilter token="create database lportal character set utf8;" value="create database ${db.schema} character set utf8 collate utf8_bin;" />
-					<replacefilter token="use lportal;" value="use ${db.schema};" />
-				</replace>
-			</then>
-			<else>
-				<replace file="${sql.file}">
-					<replacefilter token="drop database if exists lportal;" value="drop database if exists ${db.schema};" />
-					<replacefilter token="create database lportal character set utf8;" value="create database ${db.schema} character set utf8;" />
-					<replacefilter token="use lportal;" value="use ${db.schema};" />
-				</replace>
-			</else>
-		</if>
-
-		<exec executable="${mysql.executable}" input="${sql.file}">
-			<arg line="${mysql.arg.line}" />
-		</exec>
-
-		<delete file="${sql.file}" />
-	</target>
-
-	<target name="rebuild-database-oracle">
-		<if>
-			<or>
-				<not>
-					<isset property="sql.dir" />
-				</not>
-				<not>
-					<isset property="sql.file" />
-				</not>
-			</or>
-			<then>
-				<if>
-					<isset property="test.database.minimal" />
-					<then>
-						<property name="sql.dir" value="sql\create-minimal\" />
-						<property name="sql.file" value="create-minimal-oracle.sql" />
-					</then>
-					<else>
-						<property name="sql.dir" value="sql\create\" />
-						<property name="sql.file" value="create-oracle.sql" />
-					</else>
-				</if>
-			</then>
-		</if>
-
-		<tstamp>
-			<format property="tstamp.value" pattern="yyyyMMddkkmmssSSS" />
-		</tstamp>
-
-		<exec executable="${plink.executable}">
-			<arg line="-pw ${vm.password} ${vm.username}@${db.host} cmd.exe /c mkdir C:\${tstamp.value}" />
-		</exec>
-
-		<exec executable="${pscp.executable}">
-			<arg line="-pw ${vm.password} ${sql.dir}${sql.file} ${vm.username}@${db.host}:\${tstamp.value}" />
-		</exec>
-
-		<exec executable="${plink.executable}">
-			<arg line="-pw ${vm.password} ${vm.username}@${db.host} sqlplus system/password @C:\${tstamp.value}\${sql.file} ${db.username} ${db.password}" />
-		</exec>
-
-		<exec executable="${plink.executable}">
-			<arg line="-pw ${vm.password} ${vm.username}@${db.host} cmd.exe /c rmdir /q /s C:\${tstamp.value}" />
-		</exec>
-	</target>
-
-	<target name="rebuild-database-postgresql">
-		<if>
-			<or>
-				<not>
-					<isset property="sql.dir" />
-				</not>
-				<not>
-					<isset property="sql.file" />
-				</not>
-			</or>
-			<then>
-				<if>
-					<isset property="test.database.minimal" />
-					<then>
-						<property name="sql.dir" value="sql\create-minimal\" />
-						<property name="sql.file" value="create-minimal-postgresql.sql" />
-					</then>
-					<else>
-						<property name="sql.dir" value="sql\create\" />
-						<property name="sql.file" value="create-postgresql.sql" />
-					</else>
-				</if>
-			</then>
-		</if>
-
-		<tstamp>
-			<format property="tstamp.value" pattern="yyyyMMddkkmmssSSS" />
-		</tstamp>
-
-		<copy file="${sql.dir}${sql.file}" tofile="${sql.file}" />
-
-		<replace file="${sql.file}">
-			<replacefilter token="drop database lportal;" value="drop database ${db.schema};" />
-			<replacefilter token="create database lportal encoding = 'UNICODE';" value="create database ${db.schema} encoding = 'UNICODE';" />
-			<replacefilter token="\c lportal;" value="\c ${db.schema};" />
-		</replace>
-
-		<exec executable="${plink.executable}">
-			<arg line="-pw ${vm.password} ${vm.username}@${db.host} cmd.exe /c mkdir C:\${tstamp.value}" />
-		</exec>
-
-		<exec executable="${pscp.executable}">
-			<arg line="-pw ${vm.password} ${sql.file} ${vm.username}@${db.host}:\${tstamp.value}" />
-		</exec>
-
-		<if>
-			<equals arg1="${db.type}" arg2="postgresql-8.4" />
-			<then>
-				<exec executable="${plink.executable}">
-					<arg line="-pw ${vm.password} ${vm.username}@${db.host} C:\Progra~1\PostgreSQL\8.4\bin\psql.exe -U ${db.username} -f C:\${tstamp.value}\${sql.file}" />
-				</exec>
-			</then>
-			<elseif>
-				<equals arg1="${db.type}" arg2="postgresql-9.0" />
-				<then>
-					<exec executable="${plink.executable}">
-						<arg line="-pw ${vm.password} ${vm.username}@${db.host} C:\Progra~1\PostgreSQL\9.0\bin\psql.exe -U ${db.username} -f C:\${tstamp.value}\${sql.file}" />
-					</exec>
-				</then>
-			</elseif>
-		</if>
-
-		<exec executable="${plink.executable}">
-			<arg line="-pw ${vm.password} ${vm.username}@${db.host} cmd.exe /c rmdir /q /s C:\${tstamp.value}" />
-		</exec>
-
-		<delete file="${sql.file}" />
-	</target>
-
-	<target name="rebuild-database-sql-server">
-		<if>
-			<or>
-				<not>
-					<isset property="sql.dir" />
-				</not>
-				<not>
-					<isset property="sql.file" />
-				</not>
-			</or>
-			<then>
-				<if>
-					<isset property="test.database.minimal" />
-					<then>
-						<property name="sql.dir" value="sql\create-minimal\" />
-						<property name="sql.file" value="create-minimal-sql-server.sql" />
-					</then>
-					<else>
-						<property name="sql.dir" value="sql\create\" />
-						<property name="sql.file" value="create-sql-server.sql" />
-					</else>
-				</if>
-			</then>
-		</if>
-
-		<tstamp>
-			<format property="tstamp.value" pattern="yyyyMMddkkmmssSSS" />
-		</tstamp>
-
-		<copy file="${sql.dir}${sql.file}" tofile="${sql.file}" />
-
-		<replace file="${sql.file}">
-			<replacefilter token="drop database lportal;" value="drop database ${db.schema};" />
-			<replacefilter token="create database lportal;" value="create database ${db.schema};" />
-			<replacefilter token="use lportal;" value="use ${db.schema};" />
-		</replace>
-
-		<exec executable="${plink.executable}">
-			<arg line="-pw ${vm.password} ${vm.username}@${db.host} cmd.exe /c mkdir C:\${tstamp.value}" />
-		</exec>
-
-		<exec executable="${pscp.executable}">
-			<arg line="-pw ${vm.password} ${sql.file} ${vm.username}@${db.host}:\${tstamp.value}" />
-		</exec>
-
-		<exec executable="${plink.executable}">
-			<arg line="-pw ${vm.password} ${vm.username}@${db.host} osql -n -U ${db.username} -P ${db.password} -i C:\${tstamp.value}\${sql.file}" />
-		</exec>
-
-		<exec executable="${plink.executable}">
-			<arg line="-pw ${vm.password} ${vm.username}@${db.host} cmd.exe /c rmdir /q /s C:\${tstamp.value}" />
-		</exec>
-
-		<delete file="${sql.file}" />
-	</target>
-
-	<target name="rebuild-database-sybase">
-		<if>
-			<or>
-				<not>
-					<isset property="sql.dir" />
-				</not>
-				<not>
-					<isset property="sql.file" />
-				</not>
-			</or>
-			<then>
-				<if>
-					<isset property="test.database.minimal" />
-					<then>
-						<property name="sql.dir" value="sql\create-minimal\" />
-						<property name="sql.file" value="create-minimal-sybase.sql" />
-					</then>
-					<else>
-						<property name="sql.dir" value="sql\create\" />
-						<property name="sql.file" value="create-sybase.sql" />
-					</else>
-				</if>
-			</then>
-		</if>
-
-		<tstamp>
-			<format property="tstamp.value" pattern="yyyyMMddkkmmssSSS" />
-		</tstamp>
-
-		<copy file="${sql.dir}${sql.file}" tofile="${sql.file}" />
-
-		<replace file="${sql.file}">
-			<replacefilter token="use master" value="use master${line.separator}dump transaction master with no_log${line.separator}go${line.separator}if exists (select * from master.dbo.sysdatabases where name = &quot;${db.schema}&quot;)${line.separator}begin${line.separator}drop database ${db.schema}${line.separator}end${line.separator}go${line.separator}create database ${db.schema} on ${db.device.name} = &quot;250m&quot;${line.separator}go" />
-			<replacefilter token="exec sp_dboption 'lportal', 'allow nulls by default' , true" value="exec sp_dboption '${db.schema}', 'allow nulls by default' , true" />
-			<replacefilter token="exec sp_dboption 'lportal', 'select into/bulkcopy/pllsort' , true" value="exec sp_dboption '${db.schema}', 'select into/bulkcopy/pllsort' , true" />
-			<replacefilter token="use lportal" value="use ${db.schema}${line.separator}go" />
-		</replace>
-
-		<exec executable="${plink.executable}">
-			<arg line="-pw ${vm.password} ${vm.username}@${db.host} cmd.exe /c mkdir C:\${tstamp.value}" />
-		</exec>
-
-		<exec executable="${pscp.executable}">
-			<arg line="-pw ${vm.password} ${sql.file} ${vm.username}@${db.host}:\${tstamp.value}" />
-		</exec>
-
-		<exec executable="${plink.executable}">
-			<arg line="-pw ${vm.password} ${vm.username}@${db.host} isql -U ${db.username} -P ${db.password} -i C:\${tstamp.value}\${sql.file}" />
-		</exec>
-
-		<exec executable="${plink.executable}">
-			<arg line="-pw ${vm.password} ${vm.username}@${db.host} cmd.exe /c rmdir /q /s C:\${tstamp.value}" />
-		</exec>
-
-		<delete file="${sql.file}" />
+		<delete file="create.sql" />
 	</target>
 
 	<target name="record-java-processes">
 		<if>
 			<os family="windows" />
 			<then>
-				<exec executable="${shell.executable}">
-					<arg line="/c jps -q > java-processes" />
+				<exec executable="${shell.executable}" output="java-processes">
+					<arg line="/c jps -q" />
 				</exec>
 			</then>
 			<else>
@@ -3967,7 +3984,7 @@ file.
 			<and>
 				<equals arg1="${test.class}" arg2="PortalWebTestSuite" />
 				<not>
-					<equals arg1="${db.type}" arg2="hsql" />
+					<equals arg1="${database}" arg2="hsql" />
 				</not>
 			</and>
 			<then>
@@ -3998,6 +4015,10 @@ file.
 				/>
 			</else>
 		</if>
+
+		<antcall target="generate-tests" inheritAll="false">
+			<param name="test.class" value="${test.class}" />
+		</antcall>
 
 		<ant dir="portal-impl" target="compile-test" inheritAll="false" />
 
@@ -4155,6 +4176,16 @@ file.
 			</then>
 		</if>
 
+		<if>
+			<or>
+				<equals arg1="${test.browser}" arg2="iehta" />
+				<equals arg1="${test.browser}" arg2="iexplore" />
+			</or>
+			<then>
+				<antcall target="start-ie-driver" />
+			</then>
+		</if>
+
 		<parallel>
 			<exec dir="${simple.server.bin.dir}" executable="${simple.server.start.executable}" resolveexecutable="true">
 				<arg line="${simple.server.start.executable.arg.line}" />
@@ -4204,6 +4235,16 @@ file.
 				<antcall target="stop-chrome-driver" />
 			</then>
 		</if>
+
+		<if>
+			<or>
+				<equals arg1="${test.browser}" arg2="iehta" />
+				<equals arg1="${test.browser}" arg2="iexplore" />
+			</or>
+			<then>
+				<antcall target="stop-ie-driver" />
+			</then>
+		</if>
 	</target>
 
 	<target name="start-chrome-driver">
@@ -4229,6 +4270,35 @@ which can be downloaded from this website: http://code.google.com/p/chromedriver
 		</if>
 	</target>
 
+	<target name="start-ie-driver">
+		<if>
+			<not>
+				<isset property="ie.driver.zip" />
+			</not>
+			<then>
+				<fail>
+.
+
+Please set "ie.driver.zip" in test.properties to point to "IEDriverServer_x64_2.31.0.zip" or "IEDriverServer_Win32_2.31.0.zip" which can be downloaded from this website: https://code.google.com/p/selenium/wiki/InternetExplorerDriver
+				</fail>
+			</then>
+			<else>
+				<exec executable="taskkill.exe">
+					<arg line="/F /IM IEDriverServer.exe" />
+				</exec>
+
+				<unzip src="${ie.driver.zip}" dest="tools/selenium" />
+			</else>
+		</if>
+	</target>
+
+	<target name="start-ldap">
+		<exec dir="${app.server.parent.dir}/apacheds_1.5.7" executable="cmd">
+			<arg value="/c" />
+			<arg value="apacheds.bat" />
+		</exec>
+	</target>
+
 	<target name="start-selenium">
 		<!--<java
 			jar="lib/development/selenium-server.jar"
@@ -4251,6 +4321,61 @@ which can be downloaded from this website: http://code.google.com/p/chromedriver
 		</exec>
 	</target>
 
+	<target name="stop-ie-driver">
+		<exec executable="taskkill.exe">
+			<arg line="/F /IM IEDriverServer.exe" />
+		</exec>
+	</target>
+
+	<target name="stop-ldap">
+		<if>
+			<os family="windows" />
+			<then>
+				<exec executable="${shell.executable}">
+					<arg line="/c jps -l > java-processes" />
+				</exec>
+			</then>
+			<else>
+				<exec executable="${shell.executable}" output="java-processes">
+					<arg line="-c jps -l" />
+				</exec>
+			</else>
+		</if>
+
+		<loadfile property="java-processes.content" srcfile="java-processes" />
+
+		<delete file="java-processes" />
+
+		<script classpathref="project.classpath" language="beanshell">
+			String javaProcessesNewContent = project.getProperty("java-processes.content");
+
+			if (javaProcessesNewContent.contains("File Not Found")) {
+				javaProcessesNewContent = "";
+			}
+
+			String javaProcessList = javaProcessesNewContent.replaceAll("\r\n", ",");
+
+			if (javaProcessList.endsWith(",")) {
+				javaProcessList = javaProcessList.substring(0, javaProcessList.length() - 1);
+			}
+
+			project.setProperty("java.process.list", javaProcessList);
+		</script>
+
+		<for list="${java.process.list}" param="java.process">
+			<sequential>
+				<if>
+					<contains string="@{java.process}" substring="org.apache.directory.server.UberjarMain" />
+					<then>
+						<antcall target="kill-java-process">
+							<param name="java.process.to.kill" value="@{java.process}" />
+						</antcall>
+					</then>
+				</if>
+			</sequential>
+		</for>
+	</target>
+
 	<target name="stop-selenium">
 		<antelope:post to="http://localhost:14444/selenium-server/driver/?cmd=shutDownSeleniumServer" wantresponse="true" />
 	</target>
@@ -4267,7 +4392,7 @@ which can be downloaded from this website: http://code.google.com/p/chromedriver
 		<antcall target="clean-up-plugins" />
 
 		<antcall target="prepare-common">
-			<param name="db.type" value="mysql" />
+			<param name="database" value="mysql" />
 		</antcall>
 
 		<antcall target="rebuild-database" inheritAll="false">

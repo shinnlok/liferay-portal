@@ -327,6 +327,21 @@ public class LayoutServiceSoap {
 		}
 	}
 
+	public static long getDefaultPlid(long groupId, long scopeGroupId,
+		java.lang.String portletId) throws RemoteException {
+		try {
+			long returnValue = LayoutServiceUtil.getDefaultPlid(groupId,
+					scopeGroupId, portletId);
+
+			return returnValue;
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
 	/**
 	* Returns the layout matching the UUID, group, and privacy.
 	*

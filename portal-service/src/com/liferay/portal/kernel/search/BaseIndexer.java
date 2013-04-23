@@ -236,6 +236,7 @@ public abstract class BaseIndexer implements Indexer {
 			addSearchEntryClassNames(contextQuery, searchContext);
 			addSearchFolderId(contextQuery, searchContext);
 			addSearchGroupId(contextQuery, searchContext);
+			addSearchLayout(contextQuery, searchContext);
 			addSearchUserId(contextQuery, searchContext);
 
 			BooleanQuery fullQuery = createFullQuery(
@@ -424,6 +425,24 @@ public abstract class BaseIndexer implements Indexer {
 			}
 
 			doReindex(ids);
+		}
+		catch (SearchException se) {
+			throw se;
+		}
+		catch (Exception e) {
+			throw new SearchException(e);
+		}
+	}
+
+	public void reindexDDMStructures(List<Long> ddmStructureIds)
+		throws SearchException {
+
+		try {
+			if (SearchEngineUtil.isIndexReadOnly() || !isIndexerEnabled()) {
+				return;
+			}
+
+			doReindexDDMStructures(ddmStructureIds);
 		}
 		catch (SearchException se) {
 			throw se;
@@ -887,9 +906,21 @@ public abstract class BaseIndexer implements Indexer {
 			return;
 		}
 
-		searchQuery.addTerms(Field.KEYWORDS, keywords);
+		searchQuery.addTerms(Field.KEYWORDS, keywords, searchContext.isLike());
 
 		addSearchExpando(searchQuery, searchContext, keywords);
+	}
+
+	protected void addSearchLayout(
+			BooleanQuery contextQuery, SearchContext searchContext)
+		throws Exception {
+
+		MultiValueFacet multiValueFacet = new MultiValueFacet(searchContext);
+
+		multiValueFacet.setFieldName(Field.LAYOUT_UUID);
+		multiValueFacet.setStatic(true);
+
+		searchContext.addFacet(multiValueFacet);
 	}
 
 	protected void addSearchLocalizedDDMStructure(
@@ -1218,6 +1249,10 @@ public abstract class BaseIndexer implements Indexer {
 
 	protected abstract void doReindex(String[] ids) throws Exception;
 
+	protected void doReindexDDMStructures(List<Long> structureIds)
+		throws Exception {
+	}
+
 	protected Hits filterSearch(
 		Hits hits, PermissionChecker permissionChecker,
 		SearchContext searchContext) {
@@ -1261,7 +1296,7 @@ public abstract class BaseIndexer implements Indexer {
 			}
 
 			if (paginationType.equals("more") && (end > 0) &&
-				(docs.size() > end)) {
+				(end < documents.length) && (docs.size() >= end)) {
 
 				hasMore = true;
 

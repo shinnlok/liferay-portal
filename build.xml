@@ -1,8 +1,6 @@
 <?xml version="1.0"?>
 
 <project name="portal" basedir="." default="compile" xmlns:antelope="antlib:ise.antelope.tasks">
-	<property name="project.dir" value="." />
-
 	<import file="build-common.xml" />
 
 	<target name="all">
@@ -216,7 +214,7 @@ ${app.server.tomcat.dir}, then run "ant -buildfile build-dist.xml unzip-tomcat".
 				<copy todir="${app.server.lib.global.dir}">
 					<fileset
 						dir="${jdbc.drivers.optional.dir}"
-						includes="*.jar"
+						includes="${jdbc.drivers}"
 					/>
 				</copy>
 			</then>

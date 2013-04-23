@@ -17,12 +17,20 @@ package com.liferay.portlet.assetpublisher.template;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portletdisplaytemplate.BasePortletDisplayTemplateHandler;
 import com.liferay.portal.kernel.template.TemplateVariableGroup;
-import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.asset.model.AssetEntry;
+import com.liferay.portlet.asset.service.AssetCategoryLocalService;
+import com.liferay.portlet.asset.service.AssetCategoryService;
+import com.liferay.portlet.asset.service.AssetEntryLocalService;
+import com.liferay.portlet.asset.service.AssetEntryService;
+import com.liferay.portlet.asset.service.AssetTagLocalService;
+import com.liferay.portlet.asset.service.AssetTagService;
+import com.liferay.portlet.asset.service.AssetTagStatsLocalService;
+import com.liferay.portlet.asset.service.AssetVocabularyLocalService;
+import com.liferay.portlet.asset.service.AssetVocabularyService;
 import com.liferay.portlet.assetpublisher.util.AssetPublisherHelper;
 import com.liferay.portlet.portletdisplaytemplate.util.PortletDisplayTemplateConstants;
 
@@ -50,11 +58,6 @@ public class AssetPublisherPortletDisplayTemplateHandler
 
 	public String getResourceName() {
 		return "com.liferay.portlet.assetpublisher";
-	}
-
-	@Override
-	public String getTemplatesHelpPropertyKey() {
-		return PropsKeys.ASSET_PUBLISHER_DISPLAY_TEMPLATES_HELP;
 	}
 
 	@Override
@@ -87,6 +90,22 @@ public class AssetPublisherPortletDisplayTemplateHandler
 		fieldsTemplateVariableGroup.addVariable(
 			"asset-entry", AssetEntry.class,
 			PortletDisplayTemplateConstants.ENTRY);
+
+		TemplateVariableGroup assetServicesTemplateVariableGroup =
+			new TemplateVariableGroup("asset-services");
+
+		assetServicesTemplateVariableGroup.setAutocompleteEnabled(false);
+
+		assetServicesTemplateVariableGroup.addServiceLocatorVariables(
+			AssetEntryLocalService.class, AssetEntryService.class,
+			AssetVocabularyLocalService.class, AssetVocabularyService.class,
+			AssetCategoryLocalService.class, AssetCategoryService.class,
+			AssetTagLocalService.class, AssetTagService.class,
+			AssetTagStatsLocalService.class);
+
+		templateVariableGroups.put(
+			assetServicesTemplateVariableGroup.getLabel(),
+			assetServicesTemplateVariableGroup);
 
 		return templateVariableGroups;
 	}

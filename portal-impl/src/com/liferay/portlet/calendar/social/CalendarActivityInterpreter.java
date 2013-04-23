@@ -48,14 +48,11 @@ public class CalendarActivityInterpreter extends BaseSocialActivityInterpreter {
 	}
 
 	@Override
-	protected String getLink(
-			SocialActivity activity, ServiceContext serviceContext)
-		throws Exception {
+	protected String getPath(
+		SocialActivity activity, ServiceContext serviceContext) {
 
-		StringBundler sb = new StringBundler(6);
+		StringBundler sb = new StringBundler(4);
 
-		sb.append(serviceContext.getPortalURL());
-		sb.append(serviceContext.getPathMain());
 		sb.append("/calendar/find_event?redirect=");
 		sb.append(HtmlUtil.escapeURL(serviceContext.getCurrentURL()));
 		sb.append("&eventId=");
@@ -72,18 +69,18 @@ public class CalendarActivityInterpreter extends BaseSocialActivityInterpreter {
 
 		if (activityType == CalendarActivityKeys.ADD_EVENT) {
 			if (Validator.isNull(groupName)) {
-				return "activity-calendar-add-event";
+				return "activity-calendar-event-add-event";
 			}
 			else {
-				return "activity-calendar-add-event-in";
+				return "activity-calendar-event-add-event-in";
 			}
 		}
 		else if (activityType == CalendarActivityKeys.UPDATE_EVENT) {
 			if (Validator.isNull(groupName)) {
-				return "activity-calendar-update-event";
+				return "activity-calendar-event-update-event";
 			}
 			else {
-				return "activity-calendar-update-event-in";
+				return "activity-calendar-event-update-event-in";
 			}
 		}
 

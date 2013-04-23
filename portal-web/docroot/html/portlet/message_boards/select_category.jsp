@@ -21,7 +21,7 @@ MBCategory category = (MBCategory)request.getAttribute(WebKeys.MESSAGE_BOARDS_CA
 
 long categoryId = MBUtil.getCategoryId(request, category);
 
-String eventName = ParamUtil.getString(request, "eventName", "selectCategory");
+String eventName = ParamUtil.getString(request, "eventName", liferayPortletResponse.getNamespace() + "selectCategory");
 
 MBCategoryDisplay categoryDisplay = new MBCategoryDisplayImpl(scopeGroupId, categoryId);
 
@@ -54,10 +54,10 @@ else {
 	<liferay-ui:search-container
 		headerNames="category,num-of-categories,num-of-threads,num-of-posts,"
 		iteratorURL="<%= portletURL %>"
+		total="<%= MBCategoryServiceUtil.getCategoriesCount(scopeGroupId, categoryId, WorkflowConstants.STATUS_APPROVED) %>"
 	>
 		<liferay-ui:search-container-results
 			results="<%= MBCategoryServiceUtil.getCategories(scopeGroupId, categoryId, WorkflowConstants.STATUS_APPROVED, searchContainer.getStart(), searchContainer.getEnd()) %>"
-			total="<%= MBCategoryServiceUtil.getCategoriesCount(scopeGroupId, categoryId, WorkflowConstants.STATUS_APPROVED) %>"
 		/>
 
 		<liferay-ui:search-container-row
@@ -113,7 +113,7 @@ else {
 				Map<String, Object> data = new HashMap<String, Object>();
 
 				data.put("categoryId", curCategory.getCategoryId());
-				data.put("name", HtmlUtil.escape(curCategory.getName()));
+				data.put("name", HtmlUtil.escapeAttribute(curCategory.getName()));
 				%>
 
 				<aui:button cssClass="selector-button" data="<%= data %>" value="choose" />
@@ -126,7 +126,7 @@ else {
 			Map<String, Object> data = new HashMap<String, Object>();
 
 			data.put("categoryId", categoryId);
-			data.put("name", HtmlUtil.escape(categoryName));
+			data.put("name", HtmlUtil.escapeAttribute(categoryName));
 			%>
 
 			<aui:button cssClass="selector-button"  data="<%= data %>" value="choose-this-category" />
@@ -144,7 +144,7 @@ else {
 		function(event) {
 			var result = Util.getAttributes(event.currentTarget, 'data-');
 
-			Util.getOpener().Liferay.fire('<portlet:namespace /><%= eventName %>', result);
+			Util.getOpener().Liferay.fire('<%= HtmlUtil.escapeJS(eventName) %>', result);
 
 			Util.getWindow().close();
 		},

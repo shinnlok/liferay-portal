@@ -14,18 +14,16 @@
 
 package com.liferay.portal.kernel.repository.model;
 
-import java.io.Serializable;
-import java.util.Map;
+import com.liferay.portal.model.StagedGroupedModel;
 
-import com.liferay.portal.model.ClassedModel;
-import com.liferay.portal.model.GroupedModel;
+import java.io.Serializable;
+
+import java.util.Map;
 
 /**
  * @author Alexander Chow
  */
-public interface RepositoryModel<T>
-	extends GroupedModel, ClassedModel, Serializable {
-
+public interface RepositoryModel<T> extends StagedGroupedModel, Serializable {
 	public Map<String, Serializable> getAttributes();
 
 	public Object getModel();

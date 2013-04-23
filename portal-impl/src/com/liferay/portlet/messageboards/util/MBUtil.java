@@ -143,10 +143,9 @@ public class MBUtil {
 			ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
-			portletURL.setWindowState(LiferayWindowState.POP_UP);
-
 			portletURL.setParameter(
 				"struts_action", "/message_boards/select_category");
+			portletURL.setWindowState(LiferayWindowState.POP_UP);
 
 			PortalUtil.addPortletBreadcrumbEntry(
 				request, themeDisplay.translate("categories"),
@@ -941,6 +940,7 @@ public class MBUtil {
 
 				return null;
 			}
+
 		};
 
 		TransactionCommitCallbackRegistryUtil.registerCallback(callable);
@@ -974,6 +974,7 @@ public class MBUtil {
 
 				return null;
 			}
+
 		};
 
 		TransactionCommitCallbackRegistryUtil.registerCallback(callable);
@@ -1004,6 +1005,7 @@ public class MBUtil {
 
 				return null;
 			}
+
 		};
 
 		TransactionCommitCallbackRegistryUtil.registerCallback(callable);
@@ -1033,6 +1035,7 @@ public class MBUtil {
 
 				return null;
 			}
+
 		};
 
 		TransactionCommitCallbackRegistryUtil.registerCallback(callable);

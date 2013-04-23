@@ -19,6 +19,7 @@ import com.liferay.portal.InvalidLockException;
 import com.liferay.portal.NoSuchLockException;
 import com.liferay.portal.NoSuchModelException;
 import com.liferay.portal.kernel.dao.orm.QueryDefinition;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.image.ImageBag;
@@ -114,7 +115,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The document library file entry local service.
+ * Provides the local service for accessing, adding, checking in/out, deleting,
+ * locking/unlocking, moving, reverting, updating, and verifying document
+ * library file entries.
  *
  * <p>
  * Due to legacy code, the names of some file entry properties are not
@@ -157,10 +160,17 @@ public class DLFileEntryLocalServiceImpl
 		String name = String.valueOf(
 			counterLocalService.increment(DLFileEntry.class.getName()));
 		String extension = DLAppUtil.getExtension(title, sourceFileName);
-		fileEntryTypeId = getFileEntryTypeId(
+
+		if (fileEntryTypeId == -1) {
+			fileEntryTypeId =
+				dlFileEntryTypeLocalService.getDefaultFileEntryTypeId(folderId);
+		}
+
+		Date now = new Date();
+
+		validateFileEntryTypeId(
 			PortalUtil.getSiteAndCompanyGroupIds(groupId), folderId,
 			fileEntryTypeId);
-		Date now = new Date();
 
 		validateFile(
 			groupId, folderId, 0, title, extension, sourceFileName, file, is);
@@ -914,6 +924,13 @@ public class DLFileEntryLocalServiceImpl
 		return dlFileEntryPersistence.fetchByG_F_N(groupId, folderId, name);
 	}
 
+	public List<DLFileEntry> getDDMStructureFileEntries(long[] ddmStructureIds)
+		throws SystemException {
+
+		return dlFileEntryFinder.findByDDMStructureIds(
+			ddmStructureIds, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+	}
+
 	public List<DLFileEntry> getExtraSettingsFileEntries(int start, int end)
 		throws SystemException {
 
@@ -1345,7 +1362,7 @@ public class DLFileEntryLocalServiceImpl
 			fileEntryTypeId = dlFileEntry.getFileEntryTypeId();
 		}
 
-		fileEntryTypeId = getFileEntryTypeId(
+		validateFileEntryTypeId(
 			PortalUtil.getSiteAndCompanyGroupIds(dlFileEntry.getGroupId()),
 			dlFileEntry.getFolderId(), fileEntryTypeId);
 
@@ -1802,39 +1819,6 @@ public class DLFileEntryLocalServiceImpl
 		}
 
 		return dlFileVersionStatusOVPs;
-	}
-
-	protected Long getFileEntryTypeId(
-			long[] groupIds, long folderId, long fileEntryTypeId)
-		throws PortalException, SystemException {
-
-		if (fileEntryTypeId == -1) {
-			fileEntryTypeId =
-				dlFileEntryTypeLocalService.getDefaultFileEntryTypeId(folderId);
-		}
-		else {
-			List<DLFileEntryType> dlFileEntryTypes =
-				dlFileEntryTypeLocalService.getFolderFileEntryTypes(
-					groupIds, folderId, true);
-
-			boolean found = false;
-
-			for (DLFileEntryType dlFileEntryType : dlFileEntryTypes) {
-				if (dlFileEntryType.getFileEntryTypeId() == fileEntryTypeId) {
-					found = true;
-
-					break;
-				}
-			}
-
-			if (!found) {
-				throw new InvalidFileEntryTypeException(
-					"Invalid file entry type " + fileEntryTypeId +
-						" for folder " + folderId);
-			}
-		}
-
-		return fileEntryTypeId;
 	}
 
 	protected String getNextVersion(
@@ -2452,6 +2436,25 @@ public class DLFileEntryLocalServiceImpl
 		DLStoreUtil.validate(title, false);
 
 		validateFile(groupId, folderId, fileEntryId, title, extension);
+	}
+
+	protected void validateFileEntryTypeId(
+			long[] groupIds, long folderId, long fileEntryTypeId)
+		throws PortalException, SystemException {
+
+		List<DLFileEntryType> dlFileEntryTypes =
+			dlFileEntryTypeLocalService.getFolderFileEntryTypes(
+				groupIds, folderId, true);
+
+		for (DLFileEntryType dlFileEntryType : dlFileEntryTypes) {
+			if (dlFileEntryType.getFileEntryTypeId() == fileEntryTypeId) {
+				return;
+			}
+		}
+
+		throw new InvalidFileEntryTypeException(
+			"Invalid file entry type " + fileEntryTypeId + " for folder " +
+				folderId);
 	}
 
 	protected void validateFileExtension(String extension)

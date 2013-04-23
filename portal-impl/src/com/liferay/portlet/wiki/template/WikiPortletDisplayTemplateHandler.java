@@ -17,13 +17,16 @@ package com.liferay.portlet.wiki.template;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portletdisplaytemplate.BasePortletDisplayTemplateHandler;
 import com.liferay.portal.kernel.template.TemplateVariableGroup;
-import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.portletdisplaytemplate.util.PortletDisplayTemplateConstants;
 import com.liferay.portlet.wiki.model.WikiPage;
+import com.liferay.portlet.wiki.service.WikiNodeLocalService;
+import com.liferay.portlet.wiki.service.WikiNodeService;
+import com.liferay.portlet.wiki.service.WikiPageLocalService;
+import com.liferay.portlet.wiki.service.WikiPageService;
 
 import java.util.Locale;
 import java.util.Map;
@@ -51,11 +54,6 @@ public class WikiPortletDisplayTemplateHandler
 	}
 
 	@Override
-	public String getTemplatesHelpPropertyKey() {
-		return PropsKeys.WIKI_DISPLAY_TEMPLATES_HELP;
-	}
-
-	@Override
 	public Map<String, TemplateVariableGroup> getTemplateVariableGroups(
 			long classPK, Locale locale)
 		throws Exception {
@@ -72,6 +70,19 @@ public class WikiPortletDisplayTemplateHandler
 			"wiki-page", WikiPage.class, PortletDisplayTemplateConstants.ENTRY);
 		fieldsTemplateVariableGroup.addVariable(
 			"wiki-page-content", String.class, "formattedContent");
+
+		TemplateVariableGroup wikiServicesTemplateVariableGroup =
+			new TemplateVariableGroup("wiki-services");
+
+		wikiServicesTemplateVariableGroup.setAutocompleteEnabled(false);
+
+		wikiServicesTemplateVariableGroup.addServiceLocatorVariables(
+			WikiPageLocalService.class, WikiPageService.class,
+			WikiNodeLocalService.class, WikiNodeService.class);
+
+		templateVariableGroups.put(
+			wikiServicesTemplateVariableGroup.getLabel(),
+			wikiServicesTemplateVariableGroup);
 
 		return templateVariableGroups;
 	}

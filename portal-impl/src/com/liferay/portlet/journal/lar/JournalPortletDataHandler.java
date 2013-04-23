@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.lar.BasePortletDataHandler;
+import com.liferay.portal.kernel.lar.ExportImportPathUtil;
 import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.lar.PortletDataHandlerBoolean;
 import com.liferay.portal.kernel.lar.PortletDataHandlerControl;
@@ -43,6 +44,7 @@ import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Image;
 import com.liferay.portal.model.Layout;
+import com.liferay.portal.model.Repository;
 import com.liferay.portal.model.RepositoryEntry;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.GroupLocalServiceUtil;
@@ -53,7 +55,9 @@ import com.liferay.portal.service.persistence.LayoutUtil;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.portlet.documentlibrary.lar.DLPortletDataHandler;
+import com.liferay.portlet.documentlibrary.model.DLFileEntry;
+import com.liferay.portlet.documentlibrary.model.DLFileRank;
+import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.util.DLUtil;
 import com.liferay.portlet.dynamicdatamapping.lar.DDMPortletDataHandler;
@@ -88,7 +92,6 @@ import java.io.File;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -291,7 +294,9 @@ public class JournalPortletDataHandler extends BasePortletDataHandler {
 
 		StringBundler sb = new StringBundler(8);
 
-		sb.append(portletDataContext.getPortletPath(PortletKeys.JOURNAL));
+		sb.append(
+			ExportImportPathUtil.getPortletPath(
+				portletDataContext, PortletKeys.JOURNAL));
 		sb.append("/articles/");
 		sb.append(article.getArticleResourceUuid());
 		sb.append(StringPool.SLASH);
@@ -961,72 +966,55 @@ public class JournalPortletDataHandler extends BasePortletDataHandler {
 			PortletDataContext portletDataContext, Element entityElement)
 		throws Exception {
 
-		Element dlRepositoriesElement = entityElement.element(
-			"dl-repositories");
+		Element dlRepositoriesElement =
+			portletDataContext.getImportDataGroupElement(Repository.class);
 
-		List<Element> dlRepositoryElements = Collections.emptyList();
-
-		if (dlRepositoriesElement != null) {
-			dlRepositoryElements = dlRepositoriesElement.elements("repository");
-		}
+		List<Element> dlRepositoryElements = dlRepositoriesElement.elements();
 
 		for (Element repositoryElement : dlRepositoryElements) {
-			DLPortletDataHandler.importRepository(
+			StagedModelDataHandlerUtil.importStagedModel(
 				portletDataContext, repositoryElement);
 		}
 
-		Element dlRepositoryEntriesElement = entityElement.element(
-			"dl-repository-entries");
+		Element dlRepositoryEntriesElement =
+			portletDataContext.getImportDataGroupElement(RepositoryEntry.class);
 
-		List<Element> dlRepositoryEntryElements = Collections.emptyList();
+		List<Element> dlRepositoryEntryElements =
+			dlRepositoryEntriesElement.elements();
 
-		if (dlRepositoryEntriesElement != null) {
-			dlRepositoryEntryElements = dlRepositoryEntriesElement.elements(
-				"repository-entry");
+		for (Element dlRepositoryEntryElement : dlRepositoryEntryElements) {
+			StagedModelDataHandlerUtil.importStagedModel(
+				portletDataContext, dlRepositoryEntryElement);
 		}
 
-		for (Element repositoryEntryElement : dlRepositoryEntryElements) {
-			DLPortletDataHandler.importRepositoryEntry(
-				portletDataContext, repositoryEntryElement);
-		}
+		Element dlFoldersElement = portletDataContext.getImportDataGroupElement(
+			DLFolder.class);
 
-		Element dlFoldersElement = entityElement.element("dl-folders");
-
-		List<Element> dlFolderElements = Collections.emptyList();
-
-		if (dlFoldersElement != null) {
-			dlFolderElements = dlFoldersElement.elements("folder");
-		}
+		List<Element> dlFolderElements = dlFoldersElement.elements();
 
 		for (Element folderElement : dlFolderElements) {
-			DLPortletDataHandler.importFolder(
+			StagedModelDataHandlerUtil.importStagedModel(
 				portletDataContext, folderElement);
 		}
 
-		Element dlFileEntriesElement = entityElement.element("dl-file-entries");
+		Element dlFileEntriesElement =
+			portletDataContext.getImportDataGroupElement(DLFileEntry.class);
 
-		List<Element> dlFileEntryElements = Collections.emptyList();
+		List<Element> dlFileEntryElements = dlFileEntriesElement.elements();
 
-		if (dlFileEntriesElement != null) {
-			dlFileEntryElements = dlFileEntriesElement.elements("file-entry");
+		for (Element dlFileEntryElement : dlFileEntryElements) {
+			StagedModelDataHandlerUtil.importStagedModel(
+				portletDataContext, dlFileEntryElement);
 		}
 
-		for (Element fileEntryElement : dlFileEntryElements) {
-			DLPortletDataHandler.importFileEntry(
-				portletDataContext, fileEntryElement);
-		}
+		Element dlFileRanksElement =
+			portletDataContext.getImportDataGroupElement(DLFileRank.class);
 
-		Element dlFileRanksElement = entityElement.element("dl-file-ranks");
+		List<Element> dlFileRankElements = dlFileRanksElement.elements();
 
-		List<Element> dlFileRankElements = Collections.emptyList();
-
-		if (dlFileRanksElement != null) {
-			dlFileRankElements = dlFileRanksElement.elements("file-rank");
-		}
-
-		for (Element fileRankElement : dlFileRankElements) {
-			DLPortletDataHandler.importFileRank(
-				portletDataContext, fileRankElement);
+		for (Element dlFileRankElement : dlFileRankElements) {
+			StagedModelDataHandlerUtil.importStagedModel(
+				portletDataContext, dlFileRankElement);
 		}
 	}
 
@@ -1167,7 +1155,9 @@ public class JournalPortletDataHandler extends BasePortletDataHandler {
 
 		StringBundler sb = new StringBundler(6);
 
-		sb.append(portletDataContext.getPortletPath(PortletKeys.JOURNAL));
+		sb.append(
+			ExportImportPathUtil.getPortletPath(
+				portletDataContext, PortletKeys.JOURNAL));
 		sb.append("/articles/");
 		sb.append(article.getArticleResourceUuid());
 		sb.append(StringPool.SLASH);
@@ -1184,7 +1174,9 @@ public class JournalPortletDataHandler extends BasePortletDataHandler {
 
 		StringBundler sb = new StringBundler(12);
 
-		sb.append(portletDataContext.getPortletPath(PortletKeys.JOURNAL));
+		sb.append(
+			ExportImportPathUtil.getPortletPath(
+				portletDataContext, PortletKeys.JOURNAL));
 		sb.append("/articles/");
 		sb.append(article.getArticleResourceUuid());
 		sb.append(StringPool.SLASH);
@@ -1210,7 +1202,9 @@ public class JournalPortletDataHandler extends BasePortletDataHandler {
 
 		StringBundler sb = new StringBundler(6);
 
-		sb.append(portletDataContext.getPortletPath(PortletKeys.JOURNAL));
+		sb.append(
+			ExportImportPathUtil.getPortletPath(
+				portletDataContext, PortletKeys.JOURNAL));
 		sb.append("/articles/");
 		sb.append(article.getArticleResourceUuid());
 		sb.append("/thumbnail");
@@ -1225,7 +1219,9 @@ public class JournalPortletDataHandler extends BasePortletDataHandler {
 
 		StringBundler sb = new StringBundler(4);
 
-		sb.append(portletDataContext.getPortletPath(PortletKeys.JOURNAL));
+		sb.append(
+			ExportImportPathUtil.getPortletPath(
+				portletDataContext, PortletKeys.JOURNAL));
 		sb.append("/ddm-structures/");
 		sb.append(uuid);
 		sb.append(".xml");
@@ -1238,7 +1234,9 @@ public class JournalPortletDataHandler extends BasePortletDataHandler {
 
 		StringBundler sb = new StringBundler(4);
 
-		sb.append(portletDataContext.getPortletPath(PortletKeys.JOURNAL));
+		sb.append(
+			ExportImportPathUtil.getPortletPath(
+				portletDataContext, PortletKeys.JOURNAL));
 		sb.append("/ddm-templates/");
 		sb.append(ddmTemplate.getUuid());
 		sb.append(".xml");
@@ -1251,7 +1249,9 @@ public class JournalPortletDataHandler extends BasePortletDataHandler {
 
 		StringBundler sb = new StringBundler(4);
 
-		sb.append(portletDataContext.getPortletPath(PortletKeys.JOURNAL));
+		sb.append(
+			ExportImportPathUtil.getPortletPath(
+				portletDataContext, PortletKeys.JOURNAL));
 		sb.append("/feeds/");
 		sb.append(feed.getUuid());
 		sb.append(".xml");
@@ -1264,7 +1264,9 @@ public class JournalPortletDataHandler extends BasePortletDataHandler {
 
 		StringBundler sb = new StringBundler(4);
 
-		sb.append(portletDataContext.getPortletPath(PortletKeys.JOURNAL));
+		sb.append(
+			ExportImportPathUtil.getPortletPath(
+				portletDataContext, PortletKeys.JOURNAL));
 		sb.append("/folders/");
 		sb.append(folder.getFolderId());
 		sb.append(".xml");
@@ -1277,7 +1279,9 @@ public class JournalPortletDataHandler extends BasePortletDataHandler {
 
 		StringBundler sb = new StringBundler(4);
 
-		sb.append(portletDataContext.getSourcePortletPath(PortletKeys.JOURNAL));
+		sb.append(
+			ExportImportPathUtil.getPortletPath(
+				portletDataContext, PortletKeys.JOURNAL));
 		sb.append("/folders/");
 		sb.append(folderId);
 		sb.append(".xml");

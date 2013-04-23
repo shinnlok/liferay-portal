@@ -326,6 +326,7 @@ public class JournalArticleIndexer extends BaseIndexer {
 		document.addLocalizedText(
 			Field.DESCRIPTION, article.getDescriptionMap());
 		document.addKeyword(Field.FOLDER_ID, article.getFolderId());
+		document.addKeyword(Field.LAYOUT_UUID, article.getLayoutUuid());
 		document.addLocalizedText(Field.TITLE, article.getTitleMap());
 		document.addKeyword(Field.TYPE, article.getType());
 		document.addKeyword(Field.VERSION, article.getVersion());
@@ -340,7 +341,6 @@ public class JournalArticleIndexer extends BaseIndexer {
 		document.addKeyword("ddmStructureKey", article.getStructureId());
 		document.addKeyword("ddmTemplateKey", article.getTemplateId());
 		document.addDate("displayDate", article.getDisplayDate());
-		document.addKeyword("layoutUuid", article.getLayoutUuid());
 
 		addDDMStructureAttributes(document, article);
 
@@ -456,6 +456,30 @@ public class JournalArticleIndexer extends BaseIndexer {
 		long companyId = GetterUtil.getLong(ids[0]);
 
 		reindexArticles(companyId);
+	}
+
+	@Override
+	protected void doReindexDDMStructures(List<Long> ddmStructureIds)
+		throws Exception {
+
+		String[] ddmStructureKeys = new String[ddmStructureIds.size()];
+
+		for (int i = 0; i < ddmStructureIds.size(); i++) {
+			long structureId = ddmStructureIds.get(i);
+
+			DDMStructure ddmStructure =
+				DDMStructureLocalServiceUtil.getDDMStructure(structureId);
+
+			ddmStructureKeys[i] = ddmStructure.getStructureKey();
+		}
+
+		List<JournalArticle> articles =
+			JournalArticleLocalServiceUtil.getStructureArticles(
+				ddmStructureKeys);
+
+		for (JournalArticle article : articles) {
+			doReindex(article);
+		}
 	}
 
 	protected String extractContent(JournalArticle article, String languageId) {

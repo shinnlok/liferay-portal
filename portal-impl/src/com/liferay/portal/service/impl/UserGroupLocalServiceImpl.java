@@ -49,13 +49,15 @@ import java.io.File;
 import java.io.Serializable;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * The implementation of the user group local service.
+ * Provides the local service for accessing, adding, deleting, and updating user
+ * groups.
  *
  * @author Charles May
  */
@@ -117,8 +119,7 @@ public class UserGroupLocalServiceImpl extends UserGroupLocalServiceBaseImpl {
 			long userId, long companyId, String name, String description)
 		throws PortalException, SystemException {
 
-		return addUserGroup(
-			userId, companyId, name, description, new ServiceContext());
+		return addUserGroup(userId, companyId, name, description, null);
 	}
 
 	/**
@@ -149,14 +150,33 @@ public class UserGroupLocalServiceImpl extends UserGroupLocalServiceBaseImpl {
 
 		// User group
 
+		Date now = new Date();
+
 		validate(0, companyId, name);
+
+		User user = userPersistence.findByPrimaryKey(userId);
 
 		long userGroupId = counterLocalService.increment();
 
 		UserGroup userGroup = userGroupPersistence.create(userGroupId);
 
-		userGroup.setUuid(serviceContext.getUuid());
+		if (serviceContext != null) {
+			userGroup.setUuid(serviceContext.getUuid());
+		}
+
 		userGroup.setCompanyId(companyId);
+		userGroup.setUserId(user.getUserId());
+		userGroup.setUserName(user.getFullName());
+
+		if (serviceContext != null) {
+			userGroup.setCreateDate(serviceContext.getCreateDate(now));
+			userGroup.setModifiedDate(serviceContext.getModifiedDate(now));
+		}
+		else {
+			userGroup.setCreateDate(now);
+			userGroup.setModifiedDate(now);
+		}
+
 		userGroup.setParentUserGroupId(
 			UserGroupConstants.DEFAULT_PARENT_USER_GROUP_ID);
 		userGroup.setName(name);
@@ -370,6 +390,12 @@ public class UserGroupLocalServiceImpl extends UserGroupLocalServiceBaseImpl {
 		PermissionCacheUtil.clearCache();
 
 		return userGroup;
+	}
+
+	public UserGroup fetchUserGroup(long companyId, String name)
+		throws SystemException {
+
+		return userGroupPersistence.fetchByC_N(companyId, name);
 	}
 
 	public UserGroup fetchUserGroupByUuidAndCompanyId(
@@ -743,6 +769,7 @@ public class UserGroupLocalServiceImpl extends UserGroupLocalServiceBaseImpl {
 		UserGroup userGroup = userGroupPersistence.findByPrimaryKey(
 			userGroupId);
 
+		userGroup.setModifiedDate(new Date());
 		userGroup.setName(name);
 		userGroup.setDescription(description);
 		userGroup.setExpandoBridgeAttributes(serviceContext);

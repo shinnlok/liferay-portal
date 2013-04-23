@@ -18,11 +18,14 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portletdisplaytemplate.BasePortletDisplayTemplateHandler;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.template.TemplateVariableGroup;
-import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.portlet.documentlibrary.service.DLAppLocalService;
+import com.liferay.portlet.documentlibrary.service.DLAppService;
+import com.liferay.portlet.documentlibrary.service.DLFileEntryTypeLocalService;
+import com.liferay.portlet.documentlibrary.service.DLFileEntryTypeService;
 import com.liferay.portlet.portletdisplaytemplate.util.PortletDisplayTemplateConstants;
 
 import java.util.List;
@@ -52,11 +55,6 @@ public class DocumentLibraryPortletDisplayTemplateHandler
 	}
 
 	@Override
-	public String getTemplatesHelpPropertyKey() {
-		return PropsKeys.DL_DISPLAY_TEMPLATES_HELP;
-	}
-
-	@Override
 	public Map<String, TemplateVariableGroup> getTemplateVariableGroups(
 			long classPK, Locale locale)
 		throws Exception {
@@ -72,6 +70,19 @@ public class DocumentLibraryPortletDisplayTemplateHandler
 		templateVariableGroup.addCollectionVariable(
 			"documents", List.class, PortletDisplayTemplateConstants.ENTRIES,
 			"document", FileEntry.class, "curFileEntry");
+
+		TemplateVariableGroup documentServicesTemplateVariableGroup =
+			new TemplateVariableGroup("document-services");
+
+		documentServicesTemplateVariableGroup.setAutocompleteEnabled(false);
+
+		documentServicesTemplateVariableGroup.addServiceLocatorVariables(
+			DLAppLocalService.class, DLAppService.class,
+			DLFileEntryTypeLocalService.class, DLFileEntryTypeService.class);
+
+		templateVariableGroups.put(
+			documentServicesTemplateVariableGroup.getLabel(),
+			documentServicesTemplateVariableGroup);
 
 		return templateVariableGroups;
 	}

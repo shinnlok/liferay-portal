@@ -62,6 +62,7 @@ import com.liferay.portlet.usersadmin.util.UsersAdminUtil;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -69,7 +70,8 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * The implementation of the role local service.
+ * Provides the local service for accessing, adding, checking, deleting, and
+ * updating roles.
  *
  * @author Brian Wing Shun Chan
  * @author Marcellus Tavares
@@ -137,7 +139,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 
 		return addRole(
 			userId, className, classPK, name, titleMap, descriptionMap, type,
-			null, new ServiceContext());
+			null, null);
 	}
 
 	/**
@@ -184,12 +186,29 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 			classPK = roleId;
 		}
 
+		Date now = new Date();
+
 		validate(0, user.getCompanyId(), classNameId, name);
 
 		Role role = rolePersistence.create(roleId);
 
-		role.setUuid(serviceContext.getUuid());
+		if (serviceContext != null) {
+			role.setUuid(serviceContext.getUuid());
+		}
+
 		role.setCompanyId(user.getCompanyId());
+		role.setUserId(user.getUserId());
+		role.setUserName(user.getFullName());
+
+		if (serviceContext != null) {
+			role.setCreateDate(serviceContext.getCreateDate(now));
+			role.setModifiedDate(serviceContext.getModifiedDate(now));
+		}
+		else {
+			role.setCreateDate(now);
+			role.setModifiedDate(now);
+		}
+
 		role.setClassNameId(classNameId);
 		role.setClassPK(classPK);
 		role.setName(name);
@@ -827,8 +846,8 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	 *         search
 	 * @return <code>true</code> if the user is associated with the regular
 	 *         role; <code>false</code> otherwise
-	 * @throws PortalException if a role with the name could not be found in the
-	 *         company or if a default user for the company could not be found
+	 * @throws PortalException if a default user for the company could not be
+	 *         found
 	 * @throws SystemException if a system exception occurred
 	 */
 	@ThreadLocalCachable
@@ -836,7 +855,11 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 			long userId, long companyId, String name, boolean inherited)
 		throws PortalException, SystemException {
 
-		Role role = rolePersistence.findByC_N(companyId, name);
+		Role role = rolePersistence.fetchByC_N(companyId, name);
+
+		if (role == null) {
+			return false;
+		}
 
 		if (role.getType() != RoleConstants.TYPE_REGULAR) {
 			throw new IllegalArgumentException(name + " is not a regular role");
@@ -1264,6 +1287,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 			subtype = null;
 		}
 
+		role.setModifiedDate(new Date());
 		role.setName(name);
 		role.setTitleMap(titleMap);
 		role.setDescriptionMap(descriptionMap);
@@ -1302,7 +1326,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 
 			role = roleLocalService.addRole(
 				user.getUserId(), null, 0, name, null, descriptionMap, type,
-				null, new ServiceContext());
+				null, null);
 
 			if (name.equals(RoleConstants.USER)) {
 				initPersonalControlPanelPortletsPermissions(role);

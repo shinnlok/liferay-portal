@@ -58,22 +58,55 @@ String signature = ParamUtil.getString(request, "signature");
 
 			<div class="lfr-api-param">
 				<span class="lfr-api-param-name">
-					<%= actionClassName.substring(0, pos) %>.<span class="class-name"><%= actionClassName.substring(pos + 1) %></span>#<span class="method-name"><%= actionMethod.getName() %></span>
+					<%= actionClassName.substring(0, pos) %>.<span class="class-name"><%= actionClassName.substring(pos + 1) %></span>
 				</span>
 
 				<%
-				JavadocMethod javadocMethod = JavadocManagerUtil.lookupJavadocMethod(jsonWebServiceActionMapping.getActionMethod());
+				Class<?> serviceClass = actionClass;
 
-				String comment = null;
+				if (actionClassName.contains(".service.") && actionClassName.endsWith("ServiceUtil")) {
+					String implClassName = StringUtil.replace(actionClassName, new String[] {".service.", "ServiceUtil"}, new String[] {".service.impl.", "ServiceImpl"});
 
-				if (javadocMethod != null) {
-					comment = javadocMethod.getComment();
+					try {
+						serviceClass = JavadocUtil.loadClass(actionClass.getClassLoader(), implClassName);
+					}
+					catch (Exception e) {
+					}
+				}
+
+				JavadocClass javadocClass = JavadocManagerUtil.lookupJavadocClass(serviceClass);
+
+				String javadocClassComment = null;
+
+				if (javadocClass != null) {
+					javadocClassComment = javadocClass.getComment();
 				}
 				%>
 
-				<c:if test="<%= Validator.isNotNull(comment) %>">
+				<c:if test="<%= Validator.isNotNull(javadocClassComment) %>">
 					<p class="lfr-api-param-comment">
-						<%= comment %>
+						<%= javadocClassComment %>
+					</p>
+				</c:if>
+			</div>
+			<div class="lfr-api-param">
+				<span class="lfr-api-param-name">
+					<span class="method-name"><%= actionMethod.getName() %></span>
+				</span>
+
+				<%
+				JavadocMethod javadocMethod = JavadocManagerUtil.lookupJavadocMethod(actionMethod);
+
+				String javadocMethodComment = null;
+
+				if (javadocMethod != null) {
+					javadocMethodComment = javadocMethod.getComment();
+				}
+				%>
+
+				<c:if test="<%= Validator.isNotNull(javadocMethodComment) %>">
+					<p class="lfr-api-param-comment">
+						<%= javadocMethodComment %>
 					</p>
 				</c:if>
 			</div>
@@ -157,10 +190,20 @@ String signature = ParamUtil.getString(request, "signature");
 
 				<%
 				Class<?> returnTypeClass = actionMethod.getReturnType();
+
+				String returnTypeName = StringPool.BLANK;
+
+				while (returnTypeClass.isArray()) {
+					returnTypeClass = returnTypeClass.getComponentType();
+
+					returnTypeName += "[]";
+				}
+
+				returnTypeName = returnTypeClass.getName() + returnTypeName;
 				%>
 
 				<span class="lfr-api-param-name">
-					<%= returnTypeClass.getName() %>
+					<%= returnTypeName %>
 				</span>
 
 				<%

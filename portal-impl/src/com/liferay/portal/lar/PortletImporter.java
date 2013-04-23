@@ -24,6 +24,7 @@ import com.liferay.portal.PortletIdException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.lar.ExportImportPathUtil;
 import com.liferay.portal.kernel.lar.ExportImportThreadLocal;
 import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.lar.PortletDataHandler;
@@ -79,7 +80,6 @@ import com.liferay.portal.util.PortletKeys;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portlet.PortletPreferencesImpl;
 import com.liferay.portlet.asset.NoSuchCategoryException;
-import com.liferay.portlet.asset.NoSuchEntryException;
 import com.liferay.portlet.asset.NoSuchTagException;
 import com.liferay.portlet.asset.model.AssetCategory;
 import com.liferay.portlet.asset.model.AssetCategoryConstants;
@@ -369,7 +369,14 @@ public class PortletImporter {
 			}
 		}
 
-		// Import group id
+		// Company group id
+
+		long sourceCompanyGroupId = GetterUtil.getLong(
+			headerElement.attributeValue("company-group-id"));
+
+		portletDataContext.setSourceCompanyGroupId(sourceCompanyGroupId);
+
+		// Group id
 
 		long sourceGroupId = GetterUtil.getLong(
 			headerElement.attributeValue("group-id"));
@@ -487,9 +494,9 @@ public class PortletImporter {
 	}
 
 	/**
-	 * @see com.liferay.portlet.documentlibrary.lar.DLPortletDataHandler#getFileEntryTypeName(
+	 * @see com.liferay.portlet.documentlibrary.lar.DLFileEntryTypeStagedModelDataHandler#getFileEntryTypeName(
 	 *      String, long, String, int)
-	 * @see com.liferay.portlet.documentlibrary.lar.DLPortletDataHandler#getFolderName(
+	 * @see com.liferay.portlet.documentlibrary.lar.DLFileEntryTypeStagedModelDataHandler#getFolderName(
 	 *      String, long, long, String, int)
 	 */
 	protected String getAssetCategoryName(
@@ -522,7 +529,7 @@ public class PortletImporter {
 
 		StringBundler sb = new StringBundler(6);
 
-		sb.append(portletDataContext.getSourceRootPath());
+		sb.append(ExportImportPathUtil.getRootPath(portletDataContext));
 		sb.append("/categories/");
 		sb.append(assetCategoryId);
 		sb.append(".xml");
@@ -1241,7 +1248,7 @@ public class PortletImporter {
 		throws Exception {
 
 		String xml = portletDataContext.getZipEntryAsString(
-			portletDataContext.getSourceRootPath() +
+			ExportImportPathUtil.getSourceRootPath(portletDataContext) +
 				"/categories-hierarchy.xml");
 
 		if (xml == null) {
@@ -1349,7 +1356,8 @@ public class PortletImporter {
 		throws Exception {
 
 		String xml = portletDataContext.getZipEntryAsString(
-			portletDataContext.getSourceRootPath() + "/links.xml");
+			ExportImportPathUtil.getSourceRootPath(portletDataContext) +
+				"/links.xml");
 
 		if (xml == null) {
 			return;
@@ -1373,13 +1381,16 @@ public class PortletImporter {
 			List<Long> assetEntryIds = new ArrayList<Long>();
 
 			for (String assetEntryUuid : assetEntryUuidArray) {
-				try {
-					AssetEntry assetEntry = AssetEntryLocalServiceUtil.getEntry(
-						portletDataContext.getScopeGroupId(), assetEntryUuid);
+				AssetEntry assetEntry = AssetEntryLocalServiceUtil.fetchEntry(
+					portletDataContext.getScopeGroupId(), assetEntryUuid);
 
-					assetEntryIds.add(assetEntry.getEntryId());
+				if (assetEntry == null) {
+					assetEntry = AssetEntryLocalServiceUtil.fetchEntry(
+						portletDataContext.getCompanyGroupId(), assetEntryUuid);
 				}
-				catch (NoSuchEntryException nsee) {
+
+				if (assetEntry != null) {
+					assetEntryIds.add(assetEntry.getEntryId());
 				}
 			}
 
@@ -1390,15 +1401,18 @@ public class PortletImporter {
 			long[] assetEntryIdsArray = ArrayUtil.toArray(
 				assetEntryIds.toArray(new Long[assetEntryIds.size()]));
 
-			try {
-				AssetEntry assetEntry = AssetEntryLocalServiceUtil.getEntry(
-					portletDataContext.getScopeGroupId(), sourceUuid);
+			AssetEntry assetEntry = AssetEntryLocalServiceUtil.fetchEntry(
+				portletDataContext.getScopeGroupId(), sourceUuid);
 
+			if (assetEntry == null) {
+				assetEntry = AssetEntryLocalServiceUtil.fetchEntry(
+					portletDataContext.getCompanyGroupId(), sourceUuid);
+			}
+
+			if (assetEntry != null) {
 				AssetLinkLocalServiceUtil.updateLinks(
 					assetEntry.getUserId(), assetEntry.getEntryId(),
 					assetEntryIdsArray, assetLinkType);
-			}
-			catch (NoSuchEntryException nsee) {
 			}
 		}
 	}
@@ -1407,7 +1421,8 @@ public class PortletImporter {
 		throws Exception {
 
 		String xml = portletDataContext.getZipEntryAsString(
-			portletDataContext.getSourceRootPath() + "/tags.xml");
+			ExportImportPathUtil.getSourceRootPath(portletDataContext) +
+				"/tags.xml");
 
 		if (xml == null) {
 			return;
@@ -1456,7 +1471,8 @@ public class PortletImporter {
 		throws Exception {
 
 		String xml = portletDataContext.getZipEntryAsString(
-			portletDataContext.getSourceRootPath() + "/comments.xml");
+			ExportImportPathUtil.getSourceRootPath(portletDataContext) +
+				"/comments.xml");
 
 		if (xml == null) {
 			return;
@@ -1497,7 +1513,8 @@ public class PortletImporter {
 		throws Exception {
 
 		String xml = portletDataContext.getZipEntryAsString(
-			portletDataContext.getSourceRootPath() + "/expando-tables.xml");
+			ExportImportPathUtil.getSourceRootPath(portletDataContext) +
+				"/expando-tables.xml");
 
 		if (xml == null) {
 			return;
@@ -1570,7 +1587,8 @@ public class PortletImporter {
 		throws Exception {
 
 		String xml = portletDataContext.getZipEntryAsString(
-			portletDataContext.getSourceRootPath() + "/locks.xml");
+			ExportImportPathUtil.getSourceRootPath(portletDataContext) +
+				"/locks.xml");
 
 		if (xml == null) {
 			return;
@@ -1599,7 +1617,8 @@ public class PortletImporter {
 		throws Exception {
 
 		String xml = portletDataContext.getZipEntryAsString(
-			portletDataContext.getSourceRootPath() + "/ratings.xml");
+			ExportImportPathUtil.getSourceRootPath(portletDataContext) +
+				"/ratings.xml");
 
 		if (xml == null) {
 			return;
@@ -1830,6 +1849,11 @@ public class PortletImporter {
 
 				updateAssetPublisherClassNameIds(jxPreferences, name);
 			}
+			else if (name.equals("assetVocabularyId")) {
+				updatePreferencesClassPKs(
+					portletDataContext, jxPreferences, name,
+					AssetVocabulary.class, companyGroup.getGroupId());
+			}
 			else if (name.startsWith("queryName") &&
 					 value.equalsIgnoreCase("assetCategories")) {
 
@@ -1867,9 +1891,7 @@ public class PortletImporter {
 
 		List<String> newValues = new ArrayList<String>(oldValues.length);
 
-		for (int i = 0; i < oldValues.length; i++) {
-			String oldValue = oldValues[i];
-
+		for (String oldValue : oldValues) {
 			String newValue = StringUtil.replace(
 				oldValue, "[$COMPANY_GROUP_SCOPE_ID$]", companyGroupScopeId);
 

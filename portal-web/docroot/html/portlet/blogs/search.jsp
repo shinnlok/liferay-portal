@@ -74,6 +74,13 @@ String keywords = ParamUtil.getString(request, "keywords");
 
 		Hits hits = indexer.search(searchContext);
 
+		if (searchContainer.recalculateCur(hits.getLength())) {
+			searchContext.setEnd(searchContainer.getEnd());
+			searchContext.setStart(searchContainer.getStart());
+
+			hits = indexer.search(searchContext);
+		}
+
 		PortletURL hitURL = renderResponse.createRenderURL();
 
 		hitURL.setParameter("struts_action", "/blogs/view_entry");
@@ -82,7 +89,6 @@ String keywords = ParamUtil.getString(request, "keywords");
 
 		<liferay-ui:search-container-results
 			results="<%= SearchResultUtil.getSearchResults(hits, locale, hitURL) %>"
-			total="<%= hits.getLength() %>"
 		/>
 
 		<liferay-ui:search-container-row

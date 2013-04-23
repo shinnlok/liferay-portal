@@ -251,6 +251,16 @@ serverURL.setParameter("tabs3", tabs3);
 
 				if (tabs3.equals("portal-properties")) {
 					properties = PropsUtil.getProperties();
+
+					PortletPreferences serverPreferences = PrefsPropsUtil.getPreferences();
+
+					request.setAttribute("server.jspf-serverPreferences", serverPreferences);
+					request.setAttribute("server.jspf-serverPreferencesMap", serverPreferences.getMap());
+
+					PortletPreferences companyPreferences = PrefsPropsUtil.getPreferences(company.getCompanyId());
+
+					request.setAttribute("server.jspf-companyPreferences", companyPreferences);
+					request.setAttribute("server.jspf-companyPreferencesMap", companyPreferences.getMap());
 				}
 				else {
 					properties = System.getProperties();
@@ -285,11 +295,16 @@ serverURL.setParameter("tabs3", tabs3);
 
 					// Property
 
-					row.addText(StringUtil.shorten(property, 80));
+					row.addText(HtmlUtil.escape(StringUtil.shorten(property, 80)));
 
 					// Value
 
-					row.addText(StringUtil.shorten(value, 80));
+					if (tabs3.equals("portal-properties")) {
+						row.addJSP("/html/portlet/admin/server_portal_property.jsp");
+					}
+					else {
+						row.addText(HtmlUtil.escape(StringUtil.shorten(value, 80)));
+					}
 
 					// Add result row
 

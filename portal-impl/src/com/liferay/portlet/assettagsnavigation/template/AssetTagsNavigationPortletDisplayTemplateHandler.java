@@ -17,12 +17,14 @@ package com.liferay.portlet.assettagsnavigation.template;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portletdisplaytemplate.BasePortletDisplayTemplateHandler;
 import com.liferay.portal.kernel.template.TemplateVariableGroup;
-import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.asset.model.AssetTag;
+import com.liferay.portlet.asset.service.AssetTagLocalService;
+import com.liferay.portlet.asset.service.AssetTagService;
+import com.liferay.portlet.asset.service.AssetTagStatsLocalService;
 import com.liferay.portlet.portletdisplaytemplate.util.PortletDisplayTemplateConstants;
 
 import java.util.List;
@@ -52,11 +54,6 @@ public class AssetTagsNavigationPortletDisplayTemplateHandler
 	}
 
 	@Override
-	public String getTemplatesHelpPropertyKey() {
-		return PropsKeys.ASSET_TAGS_NAVIGATION_DISPLAY_TEMPLATES_HELP;
-	}
-
-	@Override
 	public Map<String, TemplateVariableGroup> getTemplateVariableGroups(
 			long classPK, Locale locale)
 		throws Exception {
@@ -72,6 +69,19 @@ public class AssetTagsNavigationPortletDisplayTemplateHandler
 		templateVariableGroup.addCollectionVariable(
 			"tags", List.class, PortletDisplayTemplateConstants.ENTRIES, "tag",
 			AssetTag.class, "curTag");
+
+		TemplateVariableGroup assetServicesTemplateVariableGroup =
+			new TemplateVariableGroup("tag-services");
+
+		assetServicesTemplateVariableGroup.setAutocompleteEnabled(false);
+
+		assetServicesTemplateVariableGroup.addServiceLocatorVariables(
+			AssetTagLocalService.class, AssetTagService.class,
+			AssetTagStatsLocalService.class);
+
+		templateVariableGroups.put(
+			assetServicesTemplateVariableGroup.getLabel(),
+			assetServicesTemplateVariableGroup);
 
 		return templateVariableGroups;
 	}

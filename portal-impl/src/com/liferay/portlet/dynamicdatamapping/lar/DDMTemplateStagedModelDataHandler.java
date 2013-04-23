@@ -15,9 +15,9 @@
 package com.liferay.portlet.dynamicdatamapping.lar;
 
 import com.liferay.portal.kernel.lar.BaseStagedModelDataHandler;
+import com.liferay.portal.kernel.lar.ExportImportPathUtil;
 import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
-import com.liferay.portal.kernel.lar.StagedModelPathUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.FileUtil;
@@ -54,9 +54,11 @@ import java.util.Map;
 public class DDMTemplateStagedModelDataHandler
 	extends BaseStagedModelDataHandler<DDMTemplate> {
 
+	public static final String[] CLASS_NAMES = {DDMTemplate.class.getName()};
+
 	@Override
-	public String getClassName() {
-		return DDMTemplate.class.getName();
+	public String[] getClassNames() {
+		return CLASS_NAMES;
 	}
 
 	protected DDMTemplate addTemplate(
@@ -145,7 +147,7 @@ public class DDMTemplateStagedModelDataHandler
 				template.setSmallImageURL(smallImageURL);
 			}
 			else if (smallImage != null) {
-				String smallImagePath = StagedModelPathUtil.getPath(
+				String smallImagePath = ExportImportPathUtil.getModelPath(
 					template, smallImage.getImageId() + StringPool.PERIOD +
 						template.getSmallImageType());
 
@@ -172,8 +174,8 @@ public class DDMTemplateStagedModelDataHandler
 		}
 
 		portletDataContext.addClassedModel(
-			templateElement, StagedModelPathUtil.getPath(template), template,
-			DDMPortletDataHandler.NAMESPACE);
+			templateElement, ExportImportPathUtil.getModelPath(template),
+			template, DDMPortletDataHandler.NAMESPACE);
 	}
 
 	@Override
@@ -187,7 +189,7 @@ public class DDMTemplateStagedModelDataHandler
 			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
 				DDMStructure.class);
 
-		String structurePath = StagedModelPathUtil.getPath(
+		String structurePath = ExportImportPathUtil.getModelPath(
 			portletDataContext, DDMStructure.class.getName(),
 			template.getClassPK());
 

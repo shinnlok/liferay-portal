@@ -35,6 +35,7 @@ import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.trash.model.TrashEntry;
 import com.liferay.portlet.trash.util.TrashUtil;
 import com.liferay.portlet.wiki.DuplicateNodeNameException;
@@ -55,6 +56,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Provides the local service for accessing, adding, deleting, importing,
+ * subscription handling of, trash handling of, and updating wiki nodes.
+ *
  * @author Brian Wing Shun Chan
  * @author Charles May
  * @author Raymond Augé
@@ -200,7 +204,11 @@ public class WikiNodeLocalServiceImpl extends WikiNodeLocalServiceBaseImpl {
 
 		// Attachments
 
-		PortletFileRepositoryUtil.deleteFolder(node.getAttachmentsFolderId());
+		long folderId = node.getAttachmentsFolderId();
+
+		if (folderId != DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
+			PortletFileRepositoryUtil.deleteFolder(folderId);
+		}
 
 		// Subscriptions
 

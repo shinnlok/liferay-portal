@@ -65,6 +65,9 @@ import java.util.Date;
 import java.util.List;
 
 /**
+ * Provides the local service for accessing, deleting, updating, and validating
+ * asset entries.
+ *
  * @author Brian Wing Shun Chan
  * @author Bruno Farache
  * @author Zsolt Berentey
@@ -122,6 +125,12 @@ public class AssetEntryLocalServiceImpl extends AssetEntryLocalServiceBaseImpl {
 
 	public AssetEntry fetchEntry(long entryId) throws SystemException {
 		return assetEntryPersistence.fetchByPrimaryKey(entryId);
+	}
+
+	public AssetEntry fetchEntry(long groupId, String classUuid)
+		throws SystemException {
+
+		return assetEntryPersistence.fetchByG_CU(groupId, classUuid);
 	}
 
 	public AssetEntry fetchEntry(String className, long classPK)

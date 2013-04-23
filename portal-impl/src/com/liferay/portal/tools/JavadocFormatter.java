@@ -14,7 +14,9 @@
 
 package com.liferay.portal.tools;
 
+import com.liferay.portal.kernel.io.unsync.UnsyncBufferedReader;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringReader;
+import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
@@ -42,8 +44,13 @@ import com.thoughtworks.qdox.model.Type;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.io.Writer;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -51,6 +58,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
@@ -154,6 +162,15 @@ public class JavadocFormatter {
 			}
 
 			System.out.println(sb.toString());
+		}
+
+		_languagePropertiesFile = new File("src/content/Language.properties");
+
+		if (_languagePropertiesFile.exists()) {
+			_languageProperties = new Properties();
+
+			_languageProperties.load(
+				new FileInputStream(_languagePropertiesFile.getAbsolutePath()));
 		}
 
 		for (String fileName : fileNames) {
@@ -1478,6 +1495,8 @@ public class JavadocFormatter {
 		JavaClass javaClass = _getJavaClass(
 			fileName, new UnsyncStringReader(javadocLessContent));
 
+		_updateLanguageProperties(document, javaClass.getName());
+
 		List<JavaClass> ancestorJavaClasses = _getAncestorJavaClasses(
 			javaClass);
 
@@ -1578,6 +1597,118 @@ public class JavadocFormatter {
 		}
 	}
 
+	private void _updateLanguageProperties(Document document, String className)
+		throws IOException {
+
+		if (_languageProperties == null) {
+			return;
+		}
+
+		int index = className.indexOf("ServiceImpl");
+
+		if (index <= 0) {
+			return;
+		}
+
+		StringBundler sb = new StringBundler();
+
+		sb.append(Character.toLowerCase(className.charAt(0)));
+
+		for (int i = 1; i < index; i++) {
+			char c = className.charAt(i);
+
+			if (Character.isUpperCase(c)) {
+				if (((i + 1) < index) &&
+					Character.isLowerCase(className.charAt(i + 1))) {
+
+					sb.append(CharPool.DASH);
+				}
+
+				sb.append(Character.toLowerCase(c));
+			}
+			else {
+				sb.append(c);
+			}
+		}
+
+		sb.append("-service-help");
+
+		String key = sb.toString();
+
+		String value = _languageProperties.getProperty(key);
+
+		if (value == null) {
+			return;
+		}
+
+		Element rootElement = document.getRootElement();
+
+		String comment = rootElement.elementText("comment");
+
+		if ((comment == null) || value.equals(comment)) {
+			return;
+		}
+
+		index = comment.indexOf("\n\n");
+
+		if (index != -1) {
+			value = comment.substring(0, index);
+		}
+		else {
+			value = comment;
+		}
+
+		_updateLanguageProperties(key, value);
+	}
+
+	private void _updateLanguageProperties(String key, String value)
+		throws IOException {
+
+		UnsyncBufferedReader unsyncBufferedReader = new UnsyncBufferedReader(
+			new FileReader(_languagePropertiesFile));
+
+		StringBundler sb = new StringBundler();
+
+		boolean begin = false;
+		boolean firstLine = true;
+		String linePrefix = key + "=";
+
+		String line = null;
+
+		while ((line = unsyncBufferedReader.readLine()) != null) {
+			if (line.equals(StringPool.BLANK)) {
+				begin = !begin;
+			}
+
+			if (firstLine) {
+				firstLine = false;
+			}
+			else {
+				sb.append(StringPool.NEW_LINE);
+			}
+
+			if (line.startsWith(linePrefix)) {
+				sb.append(linePrefix + value);
+			}
+			else {
+				sb.append(line);
+			}
+		}
+
+		unsyncBufferedReader.close();
+
+		Writer writer = new OutputStreamWriter(
+			new FileOutputStream(_languagePropertiesFile, false),
+			StringPool.UTF8);
+
+		writer.write(sb.toString());
+
+		writer.close();
+
+		System.out.println(
+			"Updating " + _languagePropertiesFile + " key " + key);
+	}
+
 	private String _wrapText(String text, String indent) {
 		int indentLength = _getIndentLength(indent);
 
@@ -1625,6 +1756,8 @@ public class JavadocFormatter {
 	private String _inputDir;
 	private Map<String, Tuple> _javadocxXmlTuples =
 		new HashMap<String, Tuple>();
+	private Properties _languageProperties;
+	private File _languagePropertiesFile;
 	private String _outputFilePrefix;
 	private boolean _updateJavadocs;
 

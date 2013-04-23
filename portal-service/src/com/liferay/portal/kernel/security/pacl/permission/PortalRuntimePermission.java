@@ -15,6 +15,8 @@
 package com.liferay.portal.kernel.security.pacl.permission;
 
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.security.BasicPermission;
@@ -24,6 +26,10 @@ import java.security.BasicPermission;
  * @author Raymond Augé
  */
 public class PortalRuntimePermission extends BasicPermission {
+
+	public static void checkDynamicQuery(Class<?> implClass) {
+		_pacl.checkDynamicQuery(implClass);
+	}
 
 	public static void checkExpandoBridge(String className) {
 		_pacl.checkExpandoBridge(className);
@@ -85,21 +91,34 @@ public class PortalRuntimePermission extends BasicPermission {
 		_pacl.checkThreadPoolExecutor(name);
 	}
 
+	public PortalRuntimePermission(String name, String property) {
+		super(name);
+
+		_property = property;
+
+		_init();
+	}
+
 	public PortalRuntimePermission(
-		String name, String servletContextName, Object subject) {
+		String name, String servletContextName, String subject) {
 
 		this(name, servletContextName, subject, null);
 	}
 
 	public PortalRuntimePermission(
-		String name, String servletContextName, Object subject,
+		String name, String servletContextName, String subject,
 		String property) {
 
-		super(name);
+		super(_createLongName(name, servletContextName, subject));
 
-		_servletContextName = servletContextName;
 		_property = property;
-		_subject = subject;
+
+		_init();
+	}
+
+	@Override
+	public String getActions() {
+		return _property;
 	}
 
 	public String getProperty() {
@@ -107,42 +126,15 @@ public class PortalRuntimePermission extends BasicPermission {
 	}
 
 	public String getServletContextName() {
-		if (Validator.isNull(_servletContextName)) {
-			return "portal";
-		}
-
 		return _servletContextName;
 	}
 
-	public Object getSubject() {
-		return _subject;
+	public String getShortName() {
+		return _shortName;
 	}
 
-	@Override
-	public String toString() {
-		StringBundler sb = new StringBundler(11);
-
-		sb.append("{class=");
-
-		Class<?> clazz = getClass();
-
-		sb.append(clazz.getName());
-
-		sb.append(", name=");
-		sb.append(getName());
-
-		if (_property != null) {
-			sb.append(", property=");
-			sb.append(_property);
-		}
-
-		sb.append(", servletContextName=");
-		sb.append(getServletContextName());
-		sb.append(", subject=");
-		sb.append(getSubject());
-		sb.append("}");
-
-		return sb.toString();
+	public String getSubject() {
+		return _subject;
 	}
 
 	/**
@@ -154,13 +146,52 @@ public class PortalRuntimePermission extends BasicPermission {
 		_pacl.checkGetBeanProperty(servletContextName, clazz, property);
 	}
 
+	private static String _createLongName(
+		String name, String servletContextName, String subject) {
+
+		StringBundler sb = new StringBundler(5);
+
+		sb.append(name);
+		sb.append(StringPool.POUND);
+
+		if (Validator.isNull(servletContextName)) {
+			sb.append("portal");
+		}
+		else {
+			sb.append(servletContextName);
+		}
+
+		sb.append(StringPool.POUND);
+		sb.append(subject);
+
+		return sb.toString();
+	}
+
+	private void _init() {
+		String[] nameParts = StringUtil.split(getName(), StringPool.POUND);
+
+		if (nameParts.length != 3) {
+			throw new IllegalArgumentException(
+				"Name " + getName() + " does not follow the format " +
+					"[name]#[servletContextName]#[subject]");
+		}
+
+		_shortName = nameParts[0];
+		_servletContextName = nameParts[1];
+		_subject = nameParts[2];
+	}
+
 	private static PACL _pacl = new NoPACL();
 
 	private String _property;
 	private String _servletContextName;
-	private Object _subject;
+	private String _shortName;
+	private String _subject;
 
 	private static class NoPACL implements PACL {
+
+		public void checkDynamicQuery(Class<?> implClass) {
+		}
 
 		public void checkExpandoBridge(String className) {
 		}
@@ -188,6 +219,8 @@ public class PortalRuntimePermission extends BasicPermission {
 	}
 
 	public static interface PACL {
+
+		public void checkDynamicQuery(Class<?> implClass);
 
 		public void checkExpandoBridge(String className);
 

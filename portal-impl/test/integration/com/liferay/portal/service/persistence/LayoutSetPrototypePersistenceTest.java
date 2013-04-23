@@ -20,11 +20,14 @@ import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
 import com.liferay.portal.kernel.util.IntegerWrapper;
+import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.model.LayoutSetPrototype;
 import com.liferay.portal.service.ServiceTestUtil;
@@ -112,6 +115,10 @@ public class LayoutSetPrototypePersistenceTest {
 
 		newLayoutSetPrototype.setCompanyId(ServiceTestUtil.nextLong());
 
+		newLayoutSetPrototype.setUserId(ServiceTestUtil.nextLong());
+
+		newLayoutSetPrototype.setUserName(ServiceTestUtil.randomString());
+
 		newLayoutSetPrototype.setCreateDate(ServiceTestUtil.nextDate());
 
 		newLayoutSetPrototype.setModifiedDate(ServiceTestUtil.nextDate());
@@ -134,6 +141,10 @@ public class LayoutSetPrototypePersistenceTest {
 			newLayoutSetPrototype.getLayoutSetPrototypeId());
 		Assert.assertEquals(existingLayoutSetPrototype.getCompanyId(),
 			newLayoutSetPrototype.getCompanyId());
+		Assert.assertEquals(existingLayoutSetPrototype.getUserId(),
+			newLayoutSetPrototype.getUserId());
+		Assert.assertEquals(existingLayoutSetPrototype.getUserName(),
+			newLayoutSetPrototype.getUserName());
 		Assert.assertEquals(Time.getShortTimestamp(
 				existingLayoutSetPrototype.getCreateDate()),
 			Time.getShortTimestamp(newLayoutSetPrototype.getCreateDate()));
@@ -171,6 +182,25 @@ public class LayoutSetPrototypePersistenceTest {
 		}
 		catch (NoSuchLayoutSetPrototypeException nsee) {
 		}
+	}
+
+	@Test
+	public void testFindAll() throws Exception {
+		try {
+			_persistence.findAll(QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+				getOrderByComparator());
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	protected OrderByComparator getOrderByComparator() {
+		return OrderByComparatorFactoryUtil.create("LayoutSetPrototype",
+			"uuid", true, "layoutSetPrototypeId", true, "companyId", true,
+			"userId", true, "userName", true, "createDate", true,
+			"modifiedDate", true, "name", true, "description", true,
+			"settings", true, "active", true);
 	}
 
 	@Test
@@ -295,6 +325,10 @@ public class LayoutSetPrototypePersistenceTest {
 		layoutSetPrototype.setUuid(ServiceTestUtil.randomString());
 
 		layoutSetPrototype.setCompanyId(ServiceTestUtil.nextLong());
+
+		layoutSetPrototype.setUserId(ServiceTestUtil.nextLong());
+
+		layoutSetPrototype.setUserName(ServiceTestUtil.randomString());
 
 		layoutSetPrototype.setCreateDate(ServiceTestUtil.nextDate());
 

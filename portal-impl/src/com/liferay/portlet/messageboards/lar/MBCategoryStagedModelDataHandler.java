@@ -15,9 +15,9 @@
 package com.liferay.portlet.messageboards.lar;
 
 import com.liferay.portal.kernel.lar.BaseStagedModelDataHandler;
+import com.liferay.portal.kernel.lar.ExportImportPathUtil;
 import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
-import com.liferay.portal.kernel.lar.StagedModelPathUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.service.ServiceContext;
@@ -34,9 +34,11 @@ import java.util.Map;
 public class MBCategoryStagedModelDataHandler
 	extends BaseStagedModelDataHandler<MBCategory> {
 
+	public static final String[] CLASS_NAMES = {MBCategory.class.getName()};
+
 	@Override
-	public String getClassName() {
-		return MBCategory.class.getName();
+	public String[] getClassNames() {
+		return CLASS_NAMES;
 	}
 
 	@Override
@@ -61,8 +63,8 @@ public class MBCategoryStagedModelDataHandler
 			portletDataContext.getExportDataStagedModelElement(category);
 
 		portletDataContext.addClassedModel(
-			categoryElement, StagedModelPathUtil.getPath(category), category,
-			MBPortletDataHandler.NAMESPACE);
+			categoryElement, ExportImportPathUtil.getModelPath(category),
+			category, MBPortletDataHandler.NAMESPACE);
 	}
 
 	@Override
@@ -105,8 +107,9 @@ public class MBCategoryStagedModelDataHandler
 			(parentCategoryId != MBCategoryConstants.DISCUSSION_CATEGORY_ID) &&
 			(parentCategoryId == category.getParentCategoryId())) {
 
-			String parentCategoryPath = StagedModelPathUtil.getPath(
-				portletDataContext, getClassName(), parentCategoryId);
+			String parentCategoryPath = ExportImportPathUtil.getModelPath(
+				portletDataContext, MBCategory.class.getName(),
+				parentCategoryId);
 
 			MBCategory parentCategory =
 				(MBCategory)portletDataContext.getZipEntryAsObject(

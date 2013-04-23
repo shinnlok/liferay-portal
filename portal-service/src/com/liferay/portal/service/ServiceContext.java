@@ -795,6 +795,35 @@ public class ServiceContext implements Cloneable, Serializable {
 		return _deriveDefaultPermissions;
 	}
 
+	/**
+	 * Returns <code>true</code> if portal exceptions should be handled as
+	 * failures, possibly halting processing, or <code>false</code> if the
+	 * exceptions should be handled differently, possibly allowing processing to
+	 * continue in some manner. Services may check this flag to execute desired
+	 * behavior.
+	 *
+	 * <p>
+	 * Batch invocation of such services (exposed as a JSON web services) can
+	 * result in execution of all service invocations, in spite of portal
+	 * exceptions.
+	 * </p>
+	 *
+	 * <p>
+	 * If this flag is set to <code>false</code>, services can implement logic
+	 * that allows processing to continue, while collecting information
+	 * regarding the exceptions for returning to the caller. For example, the
+	 * {@link
+	 * com.liferay.portlet.asset.service.impl.AssetVocabularyServiceImpl#deleteVocabularies(
+	 * long[], ServiceContext)} method uses the list it returns to give
+	 * information on vocabularies it fails to delete; it returns an empty list
+	 * if all deletions are successful.
+	 * </p>
+	 *
+	 * @return <code>true</code> if portal exceptions are to be handled as
+	 *         failures; <code>false</code> if portal exceptions can be handled
+	 *         differently, possibly allowing processing to continue in some
+	 *         manner
+	 */
 	public boolean isFailOnPortalException() {
 		return _failOnPortalException;
 	}
@@ -819,6 +848,122 @@ public class ServiceContext implements Cloneable, Serializable {
 	 */
 	public boolean isSignedIn() {
 		return _signedIn;
+	}
+
+	public void merge(ServiceContext serviceContext) {
+		setAddGroupPermissions(serviceContext.isAddGroupPermissions());
+		setAddGuestPermissions(serviceContext.isAddGuestPermissions());
+
+		if (serviceContext.getAssetCategoryIds() != null) {
+			setAssetCategoryIds(serviceContext.getAssetCategoryIds());
+		}
+
+		if (serviceContext.getAssetLinkEntryIds() != null) {
+			setAssetLinkEntryIds(serviceContext.getAssetLinkEntryIds());
+		}
+
+		if (serviceContext.getAssetTagNames() != null) {
+			setAssetTagNames(serviceContext.getAssetTagNames());
+		}
+
+		if (serviceContext.getAttributes() != null) {
+			setAttributes(serviceContext.getAttributes());
+		}
+
+		if (Validator.isNotNull(serviceContext.getCommand())) {
+			setCommand(serviceContext.getCommand());
+		}
+
+		if (serviceContext.getCompanyId() > 0) {
+			setCompanyId(serviceContext.getCompanyId());
+		}
+
+		if (serviceContext.getCreateDate() != null) {
+			setCreateDate(serviceContext.getCreateDate());
+		}
+
+		if (Validator.isNotNull(serviceContext.getCurrentURL())) {
+			setCurrentURL(serviceContext.getCurrentURL());
+		}
+
+		if (serviceContext.getExpandoBridgeAttributes() != null) {
+			setExpandoBridgeAttributes(
+				serviceContext.getExpandoBridgeAttributes());
+		}
+
+		if (serviceContext.getGroupPermissions() != null) {
+			setGroupPermissions(serviceContext.getGroupPermissions());
+		}
+
+		if (serviceContext.getGuestPermissions() != null) {
+			setGuestPermissions(serviceContext.getGuestPermissions());
+		}
+
+		if (serviceContext.getHeaders() != null) {
+			setHeaders(serviceContext.getHeaders());
+		}
+
+		setFailOnPortalException(serviceContext.isFailOnPortalException());
+		setLanguageId(serviceContext.getLanguageId());
+
+		if (Validator.isNotNull(serviceContext.getLayoutFullURL())) {
+			setLayoutFullURL(serviceContext.getLayoutFullURL());
+		}
+
+		if (Validator.isNotNull(serviceContext.getLayoutURL())) {
+			setLayoutURL(serviceContext.getLayoutURL());
+		}
+
+		if (serviceContext.getModifiedDate() != null) {
+			setModifiedDate(serviceContext.getModifiedDate());
+		}
+
+		if (Validator.isNotNull(serviceContext.getPathMain())) {
+			setPathMain(serviceContext.getPathMain());
+		}
+
+		if (serviceContext.getPlid() > 0) {
+			setPlid(serviceContext.getPlid());
+		}
+
+		if (Validator.isNotNull(serviceContext.getPortalURL())) {
+			setPortalURL(serviceContext.getPortalURL());
+		}
+
+		if (serviceContext.getPortletPreferencesIds() != null) {
+			setPortletPreferencesIds(serviceContext.getPortletPreferencesIds());
+		}
+
+		if (Validator.isNotNull(serviceContext.getRemoteAddr())) {
+			setRemoteAddr(serviceContext.getRemoteAddr());
+		}
+
+		if (Validator.isNotNull(serviceContext.getRemoteHost())) {
+			setRemoteHost(serviceContext.getRemoteHost());
+		}
+
+		if (serviceContext.getScopeGroupId() > 0) {
+			setScopeGroupId(serviceContext.getScopeGroupId());
+		}
+
+		setSignedIn(serviceContext.isSignedIn());
+
+		if (Validator.isNotNull(serviceContext.getUserDisplayURL())) {
+
+			setUserDisplayURL(serviceContext.getUserDisplayURL());
+		}
+
+		if (serviceContext.getUserId() > 0) {
+			setUserId(serviceContext.getUserId());
+		}
+
+		if (Validator.isNotNull(serviceContext.getUuid())) {
+			setUuid(serviceContext.getUuid());
+		}
+
+		if (serviceContext.getWorkflowAction() > 0) {
+			setWorkflowAction(serviceContext.getWorkflowAction());
+		}
 	}
 
 	/**
@@ -1004,6 +1149,17 @@ public class ServiceContext implements Cloneable, Serializable {
 		_expandoBridgeAttributes = expandoBridgeAttributes;
 	}
 
+	/**
+	 * Sets whether portal exceptions should be handled as failures, possibly
+	 * halting processing, or if exceptions should be handled differently,
+	 * possibly allowing processing to continue in some manner.
+	 *
+	 * @param failOnPortalException whether portal exceptions should be handled
+	 *        as failures, or if portal exceptions should be handled
+	 *        differently, possibly allowing processing to continue in some
+	 *        manner
+	 * @see   #isFailOnPortalException()
+	 */
 	public void setFailOnPortalException(boolean failOnPortalException) {
 		_failOnPortalException = failOnPortalException;
 	}
@@ -1012,7 +1168,6 @@ public class ServiceContext implements Cloneable, Serializable {
 	 * Sets the date when an <code>aui:form</code> was generated in this service
 	 * context. The form date can be used in detecting situations in which an
 	 * entity has been modified while another client was editing that entity.
-	 * </p>
 	 *
 	 * <p>
 	 * Example:
@@ -1023,7 +1178,7 @@ public class ServiceContext implements Cloneable, Serializable {
 	 * article. Person1 publishes changes to the article first. When person2
 	 * attempts to publish changes to that article, the service implementation
 	 * finds that a modification to that article has already been published some
-	 * time after person2 started editing the article. Since the the article
+	 * time after person2 started editing the article. Since the article
 	 * modification date was found to be later than the form date for person2,
 	 * person2 could be alerted to the modification and make a backup copy of
 	 * his edits before synchronizing with the published changes by person1.

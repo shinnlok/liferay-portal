@@ -15,8 +15,8 @@
 package com.liferay.portlet.bookmarks.lar;
 
 import com.liferay.portal.kernel.lar.BaseStagedModelDataHandler;
+import com.liferay.portal.kernel.lar.ExportImportPathUtil;
 import com.liferay.portal.kernel.lar.PortletDataContext;
-import com.liferay.portal.kernel.lar.StagedModelPathUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.service.ServiceContext;
@@ -34,9 +34,12 @@ import java.util.Map;
 public class BookmarksFolderStagedModelDataHandler
 	extends BaseStagedModelDataHandler<BookmarksFolder> {
 
+	public static final String[] CLASS_NAMES =
+		{BookmarksFolder.class.getName()};
+
 	@Override
-	public String getClassName() {
-		return BookmarksFolder.class.getName();
+	public String[] getClassNames() {
+		return CLASS_NAMES;
 	}
 
 	@Override
@@ -54,7 +57,7 @@ public class BookmarksFolderStagedModelDataHandler
 			portletDataContext.getExportDataStagedModelElement(folder);
 
 		portletDataContext.addClassedModel(
-			folderElement, StagedModelPathUtil.getPath(folder), folder,
+			folderElement, ExportImportPathUtil.getModelPath(folder), folder,
 			BookmarksPortletDataHandler.NAMESPACE);
 	}
 
@@ -76,7 +79,7 @@ public class BookmarksFolderStagedModelDataHandler
 				BookmarksFolderConstants.DEFAULT_PARENT_FOLDER_ID) &&
 			(parentFolderId == folder.getParentFolderId())) {
 
-			String parentFolderPath = StagedModelPathUtil.getPath(
+			String parentFolderPath = ExportImportPathUtil.getModelPath(
 				portletDataContext, BookmarksFolder.class.getName(),
 				parentFolderId);
 

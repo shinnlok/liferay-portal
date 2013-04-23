@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.cluster.ClusterRequest;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.lar.ExportImportPathUtil;
 import com.liferay.portal.kernel.lar.ExportImportThreadLocal;
 import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.lar.PortletDataHandlerKeys;
@@ -401,6 +402,13 @@ public class LayoutImporter {
 		List<Element> layoutElements = layoutsElement.elements("layout");
 
 		validateLayoutPrototypes(companyId, layoutsElement, layoutElements);
+
+		// Company group id
+
+		long sourceCompanyGroupId = GetterUtil.getLong(
+			headerElement.attributeValue("company-group-id"));
+
+		portletDataContext.setSourceCompanyGroupId(sourceCompanyGroupId);
 
 		// Group id
 
@@ -913,16 +921,11 @@ public class LayoutImporter {
 			url.substring(0, x) + group.getFriendlyURL() + url.substring(y));
 	}
 
-	protected String getLayoutSetPrototype(
+	protected String getLayoutSetPrototypePath(
 		PortletDataContext portletDataContext, String layoutSetPrototypeUuid) {
 
-		StringBundler sb = new StringBundler(3);
-
-		sb.append(portletDataContext.getSourceRootPath());
-		sb.append("/layout-set-prototype/");
-		sb.append(layoutSetPrototypeUuid);
-
-		return sb.toString();
+		return ExportImportPathUtil.getSourceRootPath(portletDataContext) +
+			"/layout-set-prototype/" + layoutSetPrototypeUuid;
 	}
 
 	protected void importJournalArticle(
@@ -1363,8 +1366,7 @@ public class LayoutImporter {
 		}
 
 		_portletImporter.importPortletData(
-			portletDataContext, PortletKeys.LAYOUT_CONFIGURATION, null,
-			layoutElement);
+			portletDataContext, PortletKeys.DOCKBAR, null, layoutElement);
 	}
 
 	protected void importLayoutSetPrototype(
@@ -1372,7 +1374,7 @@ public class LayoutImporter {
 			String layoutSetPrototypeUuid, ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
-		String path = getLayoutSetPrototype(
+		String path = getLayoutSetPrototypePath(
 			portletDataContext, layoutSetPrototypeUuid);
 
 		LayoutSetPrototype layoutSetPrototype = null;

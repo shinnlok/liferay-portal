@@ -16,6 +16,7 @@ package com.liferay.portal.lar;
 
 import com.liferay.portal.NoSuchLayoutException;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.lar.ExportImportPathUtil;
 import com.liferay.portal.kernel.lar.ExportImportThreadLocal;
 import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.lar.PortletDataHandler;
@@ -314,6 +315,11 @@ public class LayoutExporter {
 				"end-date", String.valueOf(portletDataContext.getEndDate()));
 		}
 
+		Group companyGroup = GroupLocalServiceUtil.getCompanyGroup(companyId);
+
+		headerElement.addAttribute(
+			"company-group-id", String.valueOf(companyGroup.getGroupId()));
+
 		headerElement.addAttribute("group-id", String.valueOf(groupId));
 		headerElement.addAttribute(
 			"private-layout", String.valueOf(privateLayout));
@@ -374,8 +380,7 @@ public class LayoutExporter {
 
 		Portlet layoutConfigurationPortlet =
 			PortletLocalServiceUtil.getPortletById(
-				portletDataContext.getCompanyId(),
-				PortletKeys.LAYOUT_CONFIGURATION);
+				portletDataContext.getCompanyId(), PortletKeys.DOCKBAR);
 
 		Map<String, Object[]> portletIds =
 			new LinkedHashMap<String, Object[]>();
@@ -592,7 +597,8 @@ public class LayoutExporter {
 		_portletExporter.exportAssetCategories(portletDataContext, rootElement);
 
 		portletDataContext.addZipEntry(
-			portletDataContext.getRootPath() + "/categories-hierarchy.xml",
+			ExportImportPathUtil.getRootPath(portletDataContext) +
+				"/categories-hierarchy.xml",
 			document.formattedString());
 	}
 
@@ -666,8 +672,8 @@ public class LayoutExporter {
 			boolean exportPermissions, Layout layout, Element layoutsElement)
 		throws Exception {
 
-		String path = portletDataContext.getLayoutPath(
-			layout.getLayoutId()) + "/layout.xml";
+		String path = ExportImportPathUtil.getLayoutPath(
+			portletDataContext, layout.getLayoutId()) + "/layout.xml";
 
 		if (!portletDataContext.isPathNotProcessed(path)) {
 			return;
@@ -1143,7 +1149,9 @@ public class LayoutExporter {
 
 		StringBundler sb = new StringBundler(5);
 
-		sb.append(portletDataContext.getLayoutPath(layout.getLayoutId()));
+		sb.append(
+			ExportImportPathUtil.getLayoutPath(
+				portletDataContext, layout.getLayoutId()));
 		sb.append("/icons/");
 		sb.append(image.getImageId());
 		sb.append(StringPool.PERIOD);
@@ -1155,7 +1163,8 @@ public class LayoutExporter {
 	protected String getLayoutSetLogoPath(
 		PortletDataContext portletDataContext) {
 
-		return portletDataContext.getRootPath().concat("/logo/");
+		return ExportImportPathUtil.getRootPath(portletDataContext).concat(
+			"/logo/");
 	}
 
 	protected String getLayoutSetPrototype(
@@ -1163,7 +1172,7 @@ public class LayoutExporter {
 
 		StringBundler sb = new StringBundler(3);
 
-		sb.append(portletDataContext.getRootPath());
+		sb.append(ExportImportPathUtil.getRootPath(portletDataContext));
 		sb.append("/layout-set-prototype/");
 		sb.append(layoutSetPrototypeUuid);
 

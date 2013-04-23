@@ -25,16 +25,6 @@ if (layout != null) {
 	layoutSet = layout.getLayoutSet();
 }
 
-List<Portlet> portlets = new ArrayList<Portlet>();
-
-for (String portletId : PropsValues.DOCKBAR_ADD_PORTLETS) {
-	Portlet portlet = PortletLocalServiceUtil.getPortletById(portletId);
-
-	if ((portlet != null) && portlet.isInclude() && portlet.isActive() && PortletPermissionUtil.contains(permissionChecker, layout, portlet, ActionKeys.ADD_TO_PAGE)) {
-		portlets.add(portlet);
-	}
-}
-
 boolean hasLayoutCustomizePermission = LayoutPermissionUtil.contains(permissionChecker, layout, ActionKeys.CUSTOMIZE);
 boolean hasLayoutUpdatePermission = LayoutPermissionUtil.contains(permissionChecker, layout, ActionKeys.UPDATE);
 %>
@@ -65,53 +55,15 @@ boolean hasLayoutUpdatePermission = LayoutPermissionUtil.contains(permissionChec
 							</c:if>
 
 							<c:if test="<%= !themeDisplay.isStateMaximized() && layout.isTypePortlet() && !layout.isLayoutPrototypeLinkActive() %>">
-								<li class="last common-items">
-									<div class="aui-menugroup">
-										<div class="aui-menugroup-content">
-											<c:if test="<%= hasLayoutUpdatePermission || (layoutTypePortlet.isCustomizable() && layoutTypePortlet.isCustomizedView() && hasLayoutCustomizePermission) %>">
-												<span class="aui-menu-label"><liferay-ui:message key="applications" /></span>
+								<li class="add-application last">
+									<portlet:renderURL var="addContentURL" windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>">
+										<portlet:param name="struts_action" value="/dockbar/add_panel" />
+										<portlet:param name="viewEntries" value="<%= Boolean.TRUE.toString() %>" />
+									</portlet:renderURL>
 
-												<ul>
-
-													<%
-													int j = 0;
-
-													for (int i = 0; i < portlets.size(); i++) {
-														Portlet portlet = portlets.get(i);
-
-														boolean portletInstanceable = portlet.isInstanceable();
-
-														boolean portletUsed = layoutTypePortlet.hasPortletId(portlet.getPortletId());
-
-														boolean portletLocked = !portletInstanceable && portletUsed;
-
-														if (!PortletPermissionUtil.contains(permissionChecker, layout, portlet.getPortletId(), ActionKeys.ADD_TO_PAGE)) {
-															continue;
-														}
-													%>
-
-														<li class="<%= (j == 0) ? "first" : "" %>">
-															<a class="app-shortcut <c:if test="<%= portletLocked %>">lfr-portlet-used</c:if> <c:if test="<%= portletInstanceable %>">lfr-instanceable</c:if>" data-portlet-id="<%= portlet.getPortletId() %>" href="javascript:;" <c:if test="<%= portletLocked %>">tabIndex="-1"</c:if>>
-																<liferay-portlet:icon-portlet portlet="<%= portlet %>" />
-
-																<%= PortalUtil.getPortletTitle(portlet.getPortletId(), locale) %>
-															</a>
-														</li>
-
-													<%
-														j++;
-													}
-													%>
-
-													<li class="add-application last more-applications">
-														<a href="javascript:;" id="<portlet:namespace />addApplication">
-															<liferay-ui:message key="more" />&hellip;
-														</a>
-													</li>
-												</ul>
-											</c:if>
-										</div>
-									</div>
+									<a href="<%= addContentURL.toString() %>" id="<portlet:namespace />addPanel">
+										<liferay-ui:message key="content-and-applications" />
+									</a>
 								</li>
 							</c:if>
 						</ul>
@@ -120,7 +72,7 @@ boolean hasLayoutUpdatePermission = LayoutPermissionUtil.contains(permissionChec
 			</li>
 		</c:if>
 
-		<c:if test="<%= !group.isControlPanel() && (themeDisplay.isShowLayoutTemplatesIcon() || themeDisplay.isShowManageSiteMembershipsIcon() || themeDisplay.isShowPageSettingsIcon() || themeDisplay.isShowSiteContentIcon() || themeDisplay.isShowSiteMapSettingsIcon() || themeDisplay.isShowSiteSettingsIcon()) %>">
+		<c:if test="<%= !group.isControlPanel() && (themeDisplay.isShowLayoutTemplatesIcon() || themeDisplay.isShowManageSiteIcon() || themeDisplay.isShowPageSettingsIcon()) %>">
 			<li class="manage-content has-submenu" id="<portlet:namespace />manageContent">
 				<a class="menu-button" href="javascript:;">
 					<span>
@@ -158,27 +110,9 @@ boolean hasLayoutUpdatePermission = LayoutPermissionUtil.contains(permissionChec
 								</li>
 							</c:if>
 
-							<c:if test="<%= themeDisplay.isShowSiteSettingsIcon() %>">
+							<c:if test="<%= themeDisplay.isShowManageSiteIcon() %>">
 								<li class='<%= "settings" + useDialogFullDialog %>'>
-									<aui:a href="<%= themeDisplay.getURLSiteSettings().toString() %>" label="site-settings" title="edit-site-settings" />
-								</li>
-							</c:if>
-
-							<c:if test="<%= themeDisplay.isShowSiteMapSettingsIcon() %>">
-								<li class='<%= "sitemap" + useDialogFullDialog %>'>
-									<aui:a href="<%= themeDisplay.getURLSiteMapSettings().toString() %>" label="site-pages" title="manage-site-pages" />
-								</li>
-							</c:if>
-
-							<c:if test="<%= themeDisplay.isShowManageSiteMembershipsIcon() %>">
-								<li class='<%= "manage-site-memberships" + useDialogFullDialog %>'>
-									<aui:a href="<%= themeDisplay.getURLManageSiteMemberships().toString() %>" label="site-memberships" title="manage-site-memberships" />
-								</li>
-							</c:if>
-
-							<c:if test="<%= themeDisplay.isShowSiteContentIcon() %>">
-								<li class='<%= "manage-site-content" + useDialogFullDialog %>'>
-									<aui:a href="<%= themeDisplay.getURLSiteContent() %>" label="site-content" title="manage-site-content" />
+									<aui:a href="<%= themeDisplay.getURLManageSite() %>" label="site" title="manage-site" />
 								</li>
 							</c:if>
 						</ul>

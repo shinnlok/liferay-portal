@@ -310,7 +310,7 @@ update DLFileShortcut set active_ = TRUE;
 
 alter table DLFileVersion add checksum VARCHAR(75) null;
 
-alter table DLFolder add hidden BOOLEAN;
+alter table DLFolder add hidden_ BOOLEAN;
 alter table DLFolder add status INTEGER;
 alter table DLFolder add statusByUserId LONG;
 alter table DLFolder add statusByUserName VARCHAR(75) null;
@@ -318,7 +318,7 @@ alter table DLFolder add statusDate DATE null;
 
 COMMIT_TRANSACTION;
 
-update DLFolder set hidden = FALSE;
+update DLFolder set hidden_ = FALSE;
 update DLFolder set status = 0;
 update DLFolder set statusByUserId = userId;
 update DLFolder set statusByUserName = userName;
@@ -330,6 +330,7 @@ COMMIT_TRANSACTION;
 
 update ExpandoRow set modifiedDate = CURRENT_TIMESTAMP;
 
+alter table Group_ add uuid_ VARCHAR(75) null;
 alter table Group_ add treePath STRING null;
 
 update Group_ set site = FALSE where name = 'Control Panel';
@@ -357,6 +358,14 @@ create table JournalFolder (
 	statusByUserName VARCHAR(75) null,
 	statusDate DATE null
 );
+
+alter table LayoutPrototype add userId LONG;
+alter table LayoutPrototype add userName VARCHAR(75) null;
+alter table LayoutPrototype add createDate DATE null;
+alter table LayoutPrototype add modifiedDate DATE null;
+
+alter table LayoutSetPrototype add userId LONG;
+alter table LayoutSetPrototype add userName VARCHAR(75) null;
 
 drop index IX_228562AD on Lock_;
 drop index IX_DD635956 on Lock_;
@@ -400,6 +409,10 @@ alter table MBThreadFlag add userName VARCHAR(75) null;
 alter table MBThreadFlag add createDate DATE null;
 
 alter table Organization_ add uuid_ VARCHAR(75) null;
+alter table Organization_ add userId LONG;
+alter table Organization_ add userName VARCHAR(75) null;
+alter table Organization_ add createDate DATE null;
+alter table Organization_ add modifiedDate DATE null;
 
 drop table OrgGroupPermission;
 
@@ -439,6 +452,10 @@ drop index IX_4A1F4402 on ResourcePermission;
 drop index IX_8DB864A9 on ResourcePermission;
 
 alter table Role_ add uuid_ VARCHAR(75) null;
+alter table Role_ add userId LONG;
+alter table Role_ add userName VARCHAR(75) null;
+alter table Role_ add createDate DATE null;
+alter table Role_ add modifiedDate DATE null;
 
 drop table Roles_Permissions;
 
@@ -491,6 +508,10 @@ COMMIT_TRANSACTION;
 update User_ set ldapServerId = -1;
 
 alter table UserGroup add uuid_ VARCHAR(75) null;
+alter table UserGroup add userId LONG;
+alter table UserGroup add userName VARCHAR(75) null;
+alter table UserGroup add createDate DATE null;
+alter table UserGroup add modifiedDate DATE null;
 
 drop table Users_Permissions;
 

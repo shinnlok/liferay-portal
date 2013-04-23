@@ -14,9 +14,9 @@
 
 package com.liferay.portal.model;
 
-import java.io.Serializable;
-
 import com.liferay.portlet.expando.model.ExpandoBridge;
+
+import java.io.Serializable;
 
 /**
  * @author Brian Wing Shun Chan

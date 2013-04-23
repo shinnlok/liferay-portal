@@ -634,6 +634,8 @@ public class PropsValues {
 
 	public static final String[] DYNAMIC_DATA_MAPPING_STRUCTURE_PRIVATE_FIELD_NAMES = PropsUtil.getArray(PropsKeys.DYNAMIC_DATA_MAPPING_STRUCTURE_PRIVATE_FIELD_NAMES);
 
+	public static final String DYNAMIC_DATA_MAPPING_TEMPLATE_LANGUAGE_DEFAULT = PropsUtil.get(PropsKeys.DYNAMIC_DATA_MAPPING_TEMPLATE_LANGUAGE_DEFAULT);
+
 	public static final String[] DYNAMIC_RESOURCE_SERVLET_ALLOWED_PATHS = PropsUtil.getArray(PropsKeys.DYNAMIC_RESOURCE_SERVLET_ALLOWED_PATHS);
 
 	public static final String EDITOR_WYSIWYG_DEFAULT = PropsUtil.get(PropsKeys.EDITOR_WYSIWYG_DEFAULT);
@@ -979,6 +981,8 @@ public class PropsValues {
 	public static String[] LOCALES = PropsUtil.getArray(PropsKeys.LOCALES);
 
 	public static String[] LOCALES_BETA = PropsUtil.getArray(PropsKeys.LOCALES_BETA);
+
+	public static String[] LOCALES_ENABLED = PropsUtil.getArray(PropsKeys.LOCALES_ENABLED);
 
 	public static boolean LOGIN_CREATE_ACCOUNT_ALLOW_CUSTOM_PASSWORD = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.LOGIN_CREATE_ACCOUNT_ALLOW_CUSTOM_PASSWORD));
 

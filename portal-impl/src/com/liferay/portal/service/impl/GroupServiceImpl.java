@@ -57,11 +57,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The group remote service is responsible for accessing, creating, modifying
- * and deleting groups. For more information on group services and Group, see
- * {@link com.liferay.portal.service.impl.GroupLocalServiceImpl}.
+ * Provides the remote service for accessing, adding, deleting, and updating
+ * groups. Its methods include permission checks. Groups are mostly used in
+ * Liferay as a resource container for permissioning and content scoping
+ * purposes.
  *
  * @author Brian Wing Shun Chan
+ * @see    com.liferay.portal.service.impl.GroupLocalServiceImpl
  */
 public class GroupServiceImpl extends GroupServiceBaseImpl {
 
@@ -850,6 +852,26 @@ public class GroupServiceImpl extends GroupServiceBaseImpl {
 
 		GroupPermissionUtil.check(
 			getPermissionChecker(), group, ActionKeys.UPDATE);
+
+		if (group.getParentGroupId() != parentGroupId) {
+			if (parentGroupId == GroupConstants.DEFAULT_PARENT_GROUP_ID) {
+				PortalPermissionUtil.check(
+					getPermissionChecker(), ActionKeys.ADD_COMMUNITY);
+			}
+			else {
+				if (!GroupPermissionUtil.contains(
+						getPermissionChecker(), parentGroupId,
+						ActionKeys.MANAGE_SUBGROUPS) &&
+					!PortalPermissionUtil.contains(
+						getPermissionChecker(), ActionKeys.ADD_COMMUNITY)) {
+
+					throw new PrincipalException(
+						"User " + getUserId() + " does not have permissions " +
+							"to move site " + groupId + "to parent " +
+								parentGroupId);
+				}
+			}
+		}
 
 		if (group.isSite()) {
 			Group oldGroup = group;

@@ -585,8 +585,8 @@ public class SourceFormatter {
 				lastCriteriumLineLeadingWhiteSpace = line.indexOf(
 					StringPool.OPEN_PARENTHESIS);
 			}
-			else if (previousLine.endsWith("||") ||
-					 previousLine.endsWith("&&")) {
+			else if (previousLine.endsWith("|") || previousLine.endsWith("&") ||
+					 previousLine.endsWith("^")) {
 
 				int expectedLeadingWhiteSpace =
 					lastCriteriumLineLeadingWhiteSpace +
@@ -1624,6 +1624,11 @@ public class SourceFormatter {
 				_processErrorMessage(fileName, "Proxy: " + fileName);
 			}
 
+			if (newContent.contains("import edu.emory.mathcs.backport.java")) {
+				_processErrorMessage(
+					fileName, "edu.emory.mathcs.backport.java: " + fileName);
+			}
+
 			// LPS-28266
 
 			for (int pos1 = -1;;) {
@@ -1975,66 +1980,67 @@ public class SourceFormatter {
 						}
 					}
 				}
-			}
 
-			if ((line.contains(" && ") || line.contains(" || ")) &&
-				line.endsWith(StringPool.OPEN_PARENTHESIS)) {
+				if ((line.contains(" && ") || line.contains(" || ")) &&
+					line.endsWith(StringPool.OPEN_PARENTHESIS)) {
 
-				_processErrorMessage(
-					fileName, "line break: " + fileName + " " + lineCount);
-			}
-
-			if (trimmedLine.endsWith(StringPool.PLUS) &&
-				!trimmedLine.startsWith(StringPool.OPEN_PARENTHESIS)) {
-
-				String strippedQuotesLine = _stripQuotes(
-					trimmedLine, StringPool.QUOTE);
-
-				int closeParenthesisCount = StringUtil.count(
-					strippedQuotesLine, StringPool.CLOSE_PARENTHESIS);
-				int openParenthesisCount = StringUtil.count(
-					strippedQuotesLine, StringPool.OPEN_PARENTHESIS);
-
-				if (openParenthesisCount > closeParenthesisCount) {
 					_processErrorMessage(
 						fileName, "line break: " + fileName + " " + lineCount);
 				}
-			}
 
-			if (line.contains(StringPool.COMMA) &&
-				!line.contains(StringPool.CLOSE_PARENTHESIS) &&
-				!line.contains(StringPool.GREATER_THAN) &&
-				!line.contains(StringPool.QUOTE) &&
-				line.endsWith(StringPool.OPEN_PARENTHESIS)) {
+				if (trimmedLine.endsWith(StringPool.PLUS) &&
+					!trimmedLine.startsWith(StringPool.OPEN_PARENTHESIS)) {
 
-				_processErrorMessage(
-					fileName, "line break: " + fileName + " " + lineCount);
-			}
+					String strippedQuotesLine = _stripQuotes(
+						trimmedLine, StringPool.QUOTE);
 
-			if (line.endsWith(" +") || line.endsWith(" -") ||
-				line.endsWith(" *") || line.endsWith(" /")) {
+					int closeParenthesisCount = StringUtil.count(
+						strippedQuotesLine, StringPool.CLOSE_PARENTHESIS);
+					int openParenthesisCount = StringUtil.count(
+						strippedQuotesLine, StringPool.OPEN_PARENTHESIS);
 
-				int x = line.indexOf(" = ");
-
-				if (x != -1) {
-					int y = line.indexOf(StringPool.QUOTE);
-
-					if ((y == -1) || (x < y)) {
+					if (openParenthesisCount > closeParenthesisCount) {
 						_processErrorMessage(
 							fileName,
 							"line break: " + fileName + " " + lineCount);
 					}
 				}
-			}
 
-			if (line.endsWith(" throws") ||
-				(previousLine.endsWith(
-					StringPool.OPEN_PARENTHESIS) &&
-				 line.contains(" throws " ) &&
-				 line.endsWith(StringPool.OPEN_CURLY_BRACE))) {
+				if (line.contains(StringPool.COMMA) &&
+					!line.contains(StringPool.CLOSE_PARENTHESIS) &&
+					!line.contains(StringPool.GREATER_THAN) &&
+					!line.contains(StringPool.QUOTE) &&
+					line.endsWith(StringPool.OPEN_PARENTHESIS)) {
 
-				_processErrorMessage(
-					fileName, "line break: " + fileName + " " + lineCount);
+					_processErrorMessage(
+						fileName, "line break: " + fileName + " " + lineCount);
+				}
+
+				if (line.endsWith(" +") || line.endsWith(" -") ||
+					line.endsWith(" *") || line.endsWith(" /")) {
+
+					int x = line.indexOf(" = ");
+
+					if (x != -1) {
+						int y = line.indexOf(StringPool.QUOTE);
+
+						if ((y == -1) || (x < y)) {
+							_processErrorMessage(
+								fileName,
+								"line break: " + fileName + " " + lineCount);
+						}
+					}
+				}
+
+				if (line.endsWith(" throws") ||
+					(previousLine.endsWith(
+						StringPool.OPEN_PARENTHESIS) &&
+					 line.contains(" throws " ) &&
+					 line.endsWith(StringPool.OPEN_CURLY_BRACE))) {
+
+					_processErrorMessage(
+						fileName, "line break: " + fileName + " " + lineCount);
+				}
 			}
 
 			if (line.contains("    ") && !line.matches("\\s*\\*.*")) {
@@ -2226,7 +2232,8 @@ public class SourceFormatter {
 
 					if (Validator.isNotNull(previousLine) &&
 						Validator.isNotNull(trimmedLine) &&
-						!previousLine.contains("/*")) {
+						!previousLine.contains("/*") &&
+						!previousLine.endsWith("*/")) {
 
 						String trimmedPreviousLine = StringUtil.trimLeading(
 							previousLine);
@@ -2235,6 +2242,15 @@ public class SourceFormatter {
 							 !trimmedLine.startsWith("// ")) ||
 							(!trimmedPreviousLine.startsWith("// ") &&
 							 trimmedLine.startsWith("// "))) {
+
+							sb.append("\n");
+						}
+						else if (!trimmedPreviousLine.endsWith(
+									StringPool.OPEN_CURLY_BRACE) &&
+								 !trimmedPreviousLine.endsWith(
+									StringPool.COLON) &&
+								 (trimmedLine.startsWith("for (") ||
+								  trimmedLine.startsWith("if ("))) {
 
 							sb.append("\n");
 						}
@@ -2630,6 +2646,14 @@ public class SourceFormatter {
 							_processErrorMessage(
 								fileName,
 								"attribute: " + fileName + " " + lineCount);
+
+							readAttributes = false;
+						}
+						else if (trimmedLine.endsWith(StringPool.APOSTROPHE) &&
+								 !trimmedLine.contains(StringPool.QUOTE)) {
+
+							line = StringUtil.replace(
+								line, StringPool.APOSTROPHE, StringPool.QUOTE);
 
 							readAttributes = false;
 						}
@@ -4199,9 +4223,6 @@ public class SourceFormatter {
 			"**\\bin\\**", "**\\model\\*Clp.java",
 			"**\\model\\impl\\*BaseImpl.java", "**\\model\\impl\\*Model.java",
 			"**\\model\\impl\\*ModelImpl.java",
-			"**\\service\\**\\model\\*Model.java",
-			"**\\service\\**\\model\\*Soap.java",
-			"**\\service\\**\\model\\*Wrapper.java",
 			"**\\service\\**\\service\\*Service.java",
 			"**\\service\\**\\service\\*ServiceClp.java",
 			"**\\service\\**\\service\\*ServiceFactory.java",
@@ -4272,11 +4293,7 @@ public class SourceFormatter {
 			"**\\classes\\*", "**\\counter\\service\\**", "**\\jsp\\*",
 			"**\\model\\impl\\*BaseImpl.java", "**\\model\\impl\\*Model.java",
 			"**\\model\\impl\\*ModelImpl.java", "**\\portal\\service\\**",
-			"**\\portal-client\\**",
-			"**\\portal-service\\**\\model\\*Model.java",
-			"**\\portal-service\\**\\model\\*Soap.java",
-			"**\\portal-service\\**\\model\\*Wrapper.java",
-			"**\\portal-web\\classes\\**\\*.java",
+			"**\\portal-client\\**", "**\\portal-web\\classes\\**\\*.java",
 			"**\\portal-web\\test\\**\\*Test.java",
 			"**\\portal-web\\test\\**\\*Tests.java",
 			"**\\portlet\\**\\service\\**", "**\\test\\*-generated\\**",

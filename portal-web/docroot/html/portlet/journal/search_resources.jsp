@@ -73,6 +73,17 @@ else if ((searchType == JournalSearchConstants.SINGLE) && !ajaxRequest) {
 int total = 0;
 
 boolean advancedSearch = ParamUtil.getBoolean(liferayPortletRequest, ArticleDisplayTerms.ADVANCED_SEARCH);
+
+PortletURL portletURL = liferayPortletResponse.createRenderURL();
+
+portletURL.setParameter("struts_action", "/journal/search");
+portletURL.setParameter("redirect", redirect);
+portletURL.setParameter("breadcrumbsFolderId", String.valueOf(breadcrumbsFolderId));
+portletURL.setParameter("searchFolderId", String.valueOf(searchFolderId));
+portletURL.setParameter("searchFolderIds", String.valueOf(searchFolderIds));
+portletURL.setParameter("keywords", keywords);
+
+ArticleSearch searchContainer = new ArticleSearch(liferayPortletRequest, entryEnd / (entryEnd - entryStart), entryEnd - entryStart, portletURL);
 %>
 
 <c:if test="<%= showSearchInfo %>">
@@ -163,17 +174,6 @@ boolean advancedSearch = ParamUtil.getBoolean(liferayPortletRequest, ArticleDisp
 			<aui:input name="searchFolderIds" type="hidden" value="<%= searchFolderIds %>" />
 
 			<%
-			PortletURL portletURL = liferayPortletResponse.createRenderURL();
-
-			portletURL.setParameter("struts_action", "/journal/search");
-			portletURL.setParameter("redirect", redirect);
-			portletURL.setParameter("breadcrumbsFolderId", String.valueOf(breadcrumbsFolderId));
-			portletURL.setParameter("searchFolderId", String.valueOf(searchFolderId));
-			portletURL.setParameter("searchFolderIds", String.valueOf(searchFolderIds));
-			portletURL.setParameter("keywords", keywords);
-
-			SearchContainer searchContainer = new ArticleSearch(liferayPortletRequest, portletURL);
-
 			searchContainer.setRowChecker(new EntriesChecker(liferayPortletRequest, liferayPortletResponse));
 
 			ArticleSearchTerms searchTerms = (ArticleSearchTerms)searchContainer.getSearchTerms();
@@ -249,7 +249,12 @@ boolean advancedSearch = ParamUtil.getBoolean(liferayPortletRequest, ArticleDisp
 
 						total = hits.getLength();
 
-						request.setAttribute("view.jsp-total", String.valueOf(total));
+						if (searchContainer.recalculateCur(total)) {
+							searchContext.setEnd(searchContainer.getEnd());
+							searchContext.setStart(searchContainer.getStart());
+
+							hits = indexer.search(searchContext);
+						}
 
 						PortletURL hitURL = liferayPortletResponse.createRenderURL();
 
@@ -303,7 +308,7 @@ boolean advancedSearch = ParamUtil.getBoolean(liferayPortletRequest, ArticleDisp
 										rowCheckerName="<%= JournalArticle.class.getSimpleName() %>"
 										showCheckbox="<%= JournalArticlePermission.contains(permissionChecker, article, ActionKeys.DELETE) || JournalArticlePermission.contains(permissionChecker, article, ActionKeys.UPDATE) %>"
 										status="<%= article.getStatus() %>"
-										thumbnailSrc='<%= Validator.isNotNull(article.getArticleImageURL(themeDisplay)) ? article.getArticleImageURL(themeDisplay) : themeDisplay.getPathThemeImages() + "/file_system/large/default.png" %>'
+										thumbnailSrc='<%= Validator.isNotNull(article.getArticleImageURL(themeDisplay)) ? article.getArticleImageURL(themeDisplay) : themeDisplay.getPathThemeImages() + "/file_system/large/article.png" %>'
 										title="<%= (summary != null) ? HtmlUtil.escape(summary.getTitle()) : article.getTitle(locale) %>"
 										url="<%= rowURL.toString() %>"
 									/>
@@ -366,8 +371,6 @@ boolean advancedSearch = ParamUtil.getBoolean(liferayPortletRequest, ArticleDisp
 						<%
 						emptySearchResults = results.isEmpty();
 
-						request.setAttribute("view.jsp-total", String.valueOf(total));
-
 						String[] queryTerms = StringUtil.split(keywords);
 
 						for (int i = 0; i < results.size(); i++) {
@@ -401,7 +404,7 @@ boolean advancedSearch = ParamUtil.getBoolean(liferayPortletRequest, ArticleDisp
 										rowCheckerName="<%= JournalArticle.class.getSimpleName() %>"
 										showCheckbox="<%= JournalArticlePermission.contains(permissionChecker, curArticle, ActionKeys.DELETE) || JournalArticlePermission.contains(permissionChecker, curArticle, ActionKeys.UPDATE) %>"
 										status="<%= curArticle.getStatus() %>"
-										thumbnailSrc='<%= themeDisplay.getPathThemeImages() + "/file_system/large/default.png" %>'
+										thumbnailSrc='<%= themeDisplay.getPathThemeImages() + "/file_system/large/article.png" %>'
 										title="<%= curArticle.getTitle(locale) %>"
 										url="<%= rowURL.toString() %>"
 									/>
@@ -446,6 +449,13 @@ boolean advancedSearch = ParamUtil.getBoolean(liferayPortletRequest, ArticleDisp
 		</aui:form>
 	</div>
 
+	<%
+	request.setAttribute("view.jsp-total", String.valueOf(total));
+
+	request.setAttribute("view_entries.jsp-entryStart", String.valueOf(searchContainer.getStart()));
+	request.setAttribute("view_entries.jsp-entryEnd", String.valueOf(searchContainer.getEnd()));
+	%>
+
 	<aui:script>
 		Liferay.fire(
 			'<portlet:namespace />pageLoaded',
@@ -453,8 +463,8 @@ boolean advancedSearch = ParamUtil.getBoolean(liferayPortletRequest, ArticleDisp
 				paginator: {
 					name: 'entryPaginator',
 					state: {
-						page: <%= (total == 0) ? 0 : entryEnd / (entryEnd - entryStart) %>,
-						rowsPerPage: <%= (entryEnd - entryStart) %>,
+						page: <%= searchContainer.getCur() %>,
+						rowsPerPage: <%= searchContainer.getDelta() %>,
 						total: <%= total %>
 					}
 				},

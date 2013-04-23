@@ -43,7 +43,11 @@ public class PasswordPolicyLocalServiceImpl
 	extends PasswordPolicyLocalServiceBaseImpl {
 
 	/**
-	 * @deprecated As of 6.2.0
+	 * @deprecated As of 6.2.0, replaced by {@link #addPasswordPolicy(long,
+	 *             boolean, String, String, boolean, boolean, long, boolean,
+	 *             boolean, int, int, int, int, int, int, String, boolean, int,
+	 *             boolean, long, long, int, boolean, int, long, long, long,
+	 *             ServiceContext)}
 	 */
 	public PasswordPolicy addPasswordPolicy(
 			long userId, boolean defaultPolicy, String name, String description,
@@ -91,11 +95,12 @@ public class PasswordPolicyLocalServiceImpl
 			passwordPolicyId);
 
 		passwordPolicy.setUuid(serviceContext.getUuid());
-		passwordPolicy.setUserId(userId);
+
 		passwordPolicy.setCompanyId(user.getCompanyId());
+		passwordPolicy.setUserId(userId);
 		passwordPolicy.setUserName(user.getFullName());
-		passwordPolicy.setCreateDate(now);
-		passwordPolicy.setModifiedDate(now);
+		passwordPolicy.setCreateDate(serviceContext.getCreateDate(now));
+		passwordPolicy.setModifiedDate(serviceContext.getModifiedDate(now));
 		passwordPolicy.setDefaultPolicy(defaultPolicy);
 		passwordPolicy.setName(name);
 		passwordPolicy.setDescription(description);
@@ -123,6 +128,7 @@ public class PasswordPolicyLocalServiceImpl
 		passwordPolicy.setRequireUnlock(lockoutDuration == 0);
 		passwordPolicy.setResetFailureCount(resetFailureCount);
 		passwordPolicy.setResetTicketMaxAge(resetTicketMaxAge);
+		passwordPolicy.setExpandoBridgeAttributes(serviceContext);
 
 		passwordPolicyPersistence.update(passwordPolicy);
 
@@ -213,6 +219,12 @@ public class PasswordPolicyLocalServiceImpl
 		// Password policy
 
 		return passwordPolicyPersistence.remove(passwordPolicy);
+	}
+
+	public PasswordPolicy fetchPasswordPolicy(long companyId, String name)
+		throws SystemException {
+
+		return passwordPolicyPersistence.fetchByC_N(companyId, name);
 	}
 
 	public PasswordPolicy fetchPasswordPolicyByUuidAndCompanyId(
@@ -329,7 +341,11 @@ public class PasswordPolicyLocalServiceImpl
 	}
 
 	/**
-	 * @deprecated As of 6.2.0
+	 * @deprecated As of 6.2.0, replaced by {@link #updatePasswordPolicy(long,
+	 *             String, String, boolean, boolean, long, boolean, boolean,
+	 *             int, int, int, int, int, int, String, boolean, int, boolean,
+	 *             long, long, int, boolean, int, long, long, long,
+	 *             ServiceContext)}
 	 */
 	public PasswordPolicy updatePasswordPolicy(
 			long passwordPolicyId, String name, String description,
@@ -375,7 +391,7 @@ public class PasswordPolicyLocalServiceImpl
 			passwordPolicy.setName(name);
 		}
 
-		passwordPolicy.setModifiedDate(now);
+		passwordPolicy.setModifiedDate(serviceContext.getModifiedDate(now));
 		passwordPolicy.setDescription(description);
 		passwordPolicy.setChangeable(changeable);
 		passwordPolicy.setChangeRequired(changeRequired);
@@ -401,6 +417,7 @@ public class PasswordPolicyLocalServiceImpl
 		passwordPolicy.setRequireUnlock(lockoutDuration == 0);
 		passwordPolicy.setResetFailureCount(resetFailureCount);
 		passwordPolicy.setResetTicketMaxAge(resetTicketMaxAge);
+		passwordPolicy.setExpandoBridgeAttributes(serviceContext);
 
 		passwordPolicyPersistence.update(passwordPolicy);
 

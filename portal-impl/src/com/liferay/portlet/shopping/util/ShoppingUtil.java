@@ -331,6 +331,7 @@ public class ShoppingUtil {
 			for (int i = 0; i < range.length - 1; i++) {
 				if ((subtotal > range[i]) && (subtotal <= range[i + 1])) {
 					int rangeId = i / 2;
+
 					if (MathUtil.isOdd(i)) {
 						rangeId = (i + 1) / 2;
 					}
@@ -404,6 +405,7 @@ public class ShoppingUtil {
 			for (int i = 0; i < range.length - 1; i++) {
 				if ((subtotal > range[i]) && (subtotal <= range[i + 1])) {
 					int rangeId = i / 2;
+
 					if (MathUtil.isOdd(i)) {
 						rangeId = (i + 1) / 2;
 					}
@@ -500,6 +502,7 @@ public class ShoppingUtil {
 		double shipping = calculateAlternativeShipping(items, altShipping);
 
 		double insurance = 0.0;
+
 		if (insure) {
 			insurance = calculateInsurance(items);
 		}
@@ -561,16 +564,14 @@ public class ShoppingUtil {
 		WindowState windowState = renderRequest.getWindowState();
 
 		if (windowState.equals(LiferayWindowState.POP_UP)) {
-			categoriesURL.setWindowState(LiferayWindowState.POP_UP);
-
 			categoriesURL.setParameter(
 				"struts_action", "/shopping/select_category");
+			categoriesURL.setWindowState(LiferayWindowState.POP_UP);
 		}
 		else {
-			//categoriesURL.setWindowState(WindowState.MAXIMIZED);
-
 			categoriesURL.setParameter("struts_action", "/shopping/view");
 			categoriesURL.setParameter("tabs1", "categories");
+			//categoriesURL.setWindowState(WindowState.MAXIMIZED);
 		}
 
 		String categoriesLink =
@@ -590,20 +591,18 @@ public class ShoppingUtil {
 				PortletURL portletURL = renderResponse.createRenderURL();
 
 				if (windowState.equals(LiferayWindowState.POP_UP)) {
-					portletURL.setWindowState(LiferayWindowState.POP_UP);
-
 					portletURL.setParameter(
 						"struts_action", "/shopping/select_category");
 					portletURL.setParameter(
 						"categoryId", String.valueOf(category.getCategoryId()));
+					portletURL.setWindowState(LiferayWindowState.POP_UP);
 				}
 				else {
-					//portletURL.setWindowState(WindowState.MAXIMIZED);
-
 					portletURL.setParameter("struts_action", "/shopping/view");
 					portletURL.setParameter("tabs1", "categories");
 					portletURL.setParameter(
 						"categoryId", String.valueOf(category.getCategoryId()));
+					//portletURL.setWindowState(WindowState.MAXIMIZED);
 				}
 
 				String categoryLink =
@@ -752,6 +751,7 @@ public class ShoppingUtil {
 				String[] vArray = values.get(j);
 
 				int arrayPos;
+
 				for (arrayPos = i / numOfRepeats;
 					arrayPos >= vArray.length;
 					arrayPos = arrayPos - vArray.length) {

@@ -59,6 +59,26 @@ public class CMISFolder extends CMISModel implements Folder {
 		_cmisFolder = cmisFolder;
 	}
 
+	@Override
+	public Object clone() {
+		CMISFolder cmisFolder = new CMISFolder(
+			_cmisRepository, _uuid, _folderId, _cmisFolder);
+
+		cmisFolder.setCompanyId(getCompanyId());
+		cmisFolder.setFolderId(getFolderId());
+		cmisFolder.setGroupId(getGroupId());
+
+		try {
+			cmisFolder.setParentFolder(getParentFolder());
+		}
+		catch (Exception e) {
+		}
+
+		cmisFolder.setPrimaryKey(getPrimaryKey());
+
+		return cmisFolder;
+	}
+
 	public boolean containsPermission(
 			PermissionChecker permissionChecker, String actionId)
 		throws SystemException {
@@ -153,12 +173,12 @@ public class CMISFolder extends CMISModel implements Folder {
 	}
 
 	public Class<?> getModelClass() {
-		return DLFolder.class;
+		return CMISFolder.class;
 	}
 
 	@Override
 	public String getModelClassName() {
-		return DLFolder.class.getName();
+		return CMISFolder.class.getName();
 	}
 
 	public Date getModifiedDate() {
@@ -388,6 +408,9 @@ public class CMISFolder extends CMISModel implements Folder {
 	}
 
 	public void setUserUuid(String userUuid) {
+	}
+
+	public void setUuid(String uuid) {
 	}
 
 	public Folder toEscapedModel() {

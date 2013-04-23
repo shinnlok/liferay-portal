@@ -92,52 +92,62 @@ List<Group> groups = (List<Group>)request.getAttribute("user.groups");
 
 	<liferay-ui:icon
 		cssClass="modify-link"
+		id="selectSiteLink"
 		image="add"
 		label="<%= true %>"
 		message="select"
-		url='<%= "javascript:" + renderResponse.getNamespace() + "openGroupSelector();" %>'
+		url="javascript:;"
 	/>
+
+	<portlet:renderURL var="groupSelectorURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
+		<portlet:param name="struts_action" value="/users_admin/select_site" />
+		<portlet:param name="p_u_i_d" value="<%= String.valueOf(selUser.getUserId()) %>" />
+	</portlet:renderURL>
+
+	<aui:script use="escape,liferay-search-container">
+		A.one('#<portlet:namespace />selectSiteLink').on(
+			'click',
+			function(event) {
+				Liferay.Util.selectEntity(
+					{
+						dialog: {
+							align: Liferay.Util.Window.ALIGN_CENTER,
+							constrain: true,
+							modal: true,
+							stack: true,
+							width: 600
+						},
+						id: '<portlet:namespace />selectGroup',
+						title: '<%= UnicodeLanguageUtil.format(pageContext, "select-x", "site") %>',
+						uri: '<%= groupSelectorURL.toString() %>'
+					},
+					function(event) {
+						var searchContainer = Liferay.SearchContainer.get('<portlet:namespace />groupsSearchContainer');
+
+						var rowColumns = [];
+
+						rowColumns.push(A.Escape.html(event.groupname));
+						rowColumns.push('');
+						rowColumns.push('<a class="modify-link" data-rowId="' + event.groupid + '" href="javascript:;"><%= UnicodeFormatter.toString(removeGroupIcon) %></a>');
+
+						searchContainer.addRow(rowColumns, event.groupid);
+						searchContainer.updateDataStore();
+					}
+				);
+			}
+		);
+
+		var searchContainer = Liferay.SearchContainer.get('<portlet:namespace />groupsSearchContainer');
+
+		searchContainer.get('contentBox').delegate(
+			'click',
+			function(event) {
+				var link = event.currentTarget;
+				var tr = link.ancestor('tr');
+
+				searchContainer.deleteRow(tr, link.getAttribute('data-rowId'));
+			},
+			'.modify-link'
+		);
+	</aui:script>
 </c:if>
-
-<aui:script>
-	function <portlet:namespace />openGroupSelector() {
-		var groupWindow = window.open('<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>"><portlet:param name="struts_action" value="/users_admin/select_site" /><portlet:param name="p_u_i_d" value="<%= String.valueOf(selUser.getUserId()) %>" /></portlet:renderURL>', 'group', 'directories=no,height=640,location=no,menubar=no,resizable=yes,scrollbars=yes,status=no,toolbar=no,width=680');
-
-		groupWindow.focus();
-	}
-
-	Liferay.provide(
-		window,
-		'<portlet:namespace />selectGroup',
-		function(groupId, name) {
-			var A = AUI();
-
-			var searchContainer = Liferay.SearchContainer.get('<portlet:namespace />groupsSearchContainer');
-
-			var rowColumns = [];
-
-			rowColumns.push(name);
-			rowColumns.push('');
-			rowColumns.push('<a class="modify-link" data-rowId="' + groupId + '" href="javascript:;"><%= UnicodeFormatter.toString(removeGroupIcon) %></a>');
-
-			searchContainer.addRow(rowColumns, groupId);
-			searchContainer.updateDataStore();
-		},
-		['liferay-search-container']
-	);
-</aui:script>
-
-<aui:script use="liferay-search-container">
-	var searchContainer = Liferay.SearchContainer.get('<portlet:namespace />groupsSearchContainer');
-
-	searchContainer.get('contentBox').delegate(
-		'click',
-		function(event) {
-			var link = event.currentTarget;
-			var tr = link.ancestor('tr');
-
-			searchContainer.deleteRow(tr, link.getAttribute('data-rowId'));
-		},
-		'.modify-link'
-	);
-</aui:script>

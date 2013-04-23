@@ -1,56 +1,89 @@
 <definition>
-	<command name="pgAdd">
-		<execute action="Home#open" locator-key1="HOME_URL" />
-
-		<execute action="Home#click" locator1="link=${pageName}" />
-
-		<execute action="PGMessageboards#click" locator-key1="ADD_CATEGORY" />
-
-		<execute action="PGMessageboardsAddcategory#type" locator-key1="NAME" value1="${categoryName}" />
-
-		<execute action="PGMessageboardsAddcategory#click" locator-key1="SAVE" value1="Save" />
-
-		<execute action="PGMessageboards#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request completed successfully." />
-
-		<execute action="Home#open" locator-key1="HOME_URL" />
-
-		<execute action="Home#click" locator1="link=${pageName}" />
-
-		<execute action="PGMessageboards#assertTextEquals" locator-key1="CATEGORIES_CATEGORY" value1="${categoryName}" />
-
-		<execute action="PGMessageboards#assertTextEquals" locator-key1="CATEGORIES_CATEGORIES" value1="0" />
-
-		<execute action="PGMessageboards#assertTextEquals" locator-key1="CATEGORIES_THREADS" value1="0" />
-
-		<execute action="PGMessageboards#assertTextEquals" locator-key1="CATEGORIES_POSTS" value1="0" />
-
-		<execute action="PGMessageboards#click" locator-key1="CATEGORIES_CATEGORY" value1="${categoryName}" />
-
-		<execute action="PGMessageboardsCategory#assertTextEquals" locator-key1="NAME" value1="${categoryName}" />
-
-		<execute action="PGMessageboardsCategory#assertTextEquals" locator-key1="PORTLET_MESSAGE" value1="There are no threads in this category." />
-	</command>
-
 	<command name="cpTearDown">
-		<execute action="Home#open" locator-key1="HOME_URL" />
-
-		<execute action="Dockbar#mouseOver" locator-key1="GO_TO" />
-
-		<execute action="Dockbar#click" locator-key1="GO_TO_CONTROL_PANEL" />
-
-		<execute action="Home#click" locator1="link=Message Boards" />
+		<execute macro="Page#cpGoto">
+			<var name="portletName" value="Message Boards" />
+		</execute>
 
 		<while>
-			<condition action="CPMessageboards#isElementPresent" locator-key1="CATEGORIES_SELECT_ALL" />
+			<condition action="CPMessageboards#isElementPresent" locator-key1="CATEGORY_TABLE_ALL_ROWS" />
 			<then>
-				<execute action="CPMessageboards#click" locator-key1="CATEGORIES_SELECT_ALL" />
+				<execute action="CPMessageboards#click" locator-key1="CATEGORY_TABLE_ALL_ROWS" />
 
-				<execute action="CPMessageboards#click" locator-key1="CATEGORIES_MOVE_TO_THE_RECYCLE_BIN" />
+				<execute action="CPMessageboards#click" locator-key1="CATEGORIES_RECYCLE_BIN" />
 
 				<execute action="CPMessageboards#confirm" locator-key1="CONFIRMATION" value1="Are you sure you want to move the selected entries to the Recycle Bin?" />
 			</then>
 		</while>
 
 		<execute macro="RecycleBin#cpEmptyRecycleBin" />
+	</command>
+
+	<command name="pgAdd">
+		<execute macro="Page#pgGoto">
+			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute action="PGMessageboards#click" locator-key1="ADD_CATEGORY" />
+
+		<execute action="PGMessageboardsAddcategory#type" locator-key1="NAME" value1="${categoryName}" />
+
+		<execute action="PGMessageboardsAddcategory#click" locator-key1="SAVE" />
+
+		<execute action="PGMessageboards#assertTextEquals" locator-key1="SUCCESS_MESSAGE" />
+
+		<execute macro="Page#pgGoto">
+			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute action="PGMessageboards#assertTextEquals" locator-key1="CATEGORY_TABLE_CATEGORY_1" value1="${categoryName}" />
+
+		<execute action="PGMessageboards#assertTextEquals" locator-key1="CATEGORY_TABLE_CATEGORIES_1" value1="0" />
+
+		<execute action="PGMessageboards#assertTextEquals" locator-key1="CATEGORY_TABLE_THREADS_1" value1="0" />
+
+		<execute action="PGMessageboards#assertTextEquals" locator-key1="CATEGORY_TABLE_POSTS_1" value1="0" />
+
+		<execute action="PGMessageboards#click" locator-key1="CATEGORY_TABLE_CATEGORY_1" value1="${categoryName}" />
+
+		<execute action="PGMessageboardsCategory#assertTextEquals" locator-key1="NAME" value1="${categoryName}" />
+	</command>
+
+	<command name="pgDelete">
+		<execute macro="Page#pgGoto">
+			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute action="PGMessageboards#assertTextEquals" locator-key1="CATEGORY_TABLE_CATEGORY_1" value1="${categoryName}" />
+
+		<execute action="PGMessageboards#click" locator-key1="CATEGORY_TABLE_ACTIONS_1" />
+
+		<execute action="PGMessageboards#click" locator-key1="CATEGORY_ACTIONS_RECYCLE_BIN" />
+
+		<execute action="PGMessageboards#assertTextEquals" locator-key1="RECYCLE_BIN_SUCCESS_MESSAGE" />
+
+		<execute action="PGMessageboards#assertTextNotPresent" value1="${categoryName}" />
+
+		<execute macro="RecycleBin#cpEmptyRecycleBin" />
+
+	</command>
+
+	<command name="pgEdit">
+		<execute macro="Page#pgGoto">
+			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute action="PGMessageboards#assertTextEquals" locator-key1="CATEGORY_TABLE_CATEGORY_1" value1="${categoryName}" />
+
+		<execute action="PGMessageboards#click" locator-key1="CATEGORY_TABLE_ACTIONS_1" />
+
+		<execute action="PGMessageboards#click" locator-key1="CATEGORY_ACTIONS_EDIT" />
+
+		<execute action="PGMessageboardsAddcategory#type" locator-key1="NAME" value1="${categoryNameNew}" />
+
+		<execute action="PGMessageboardsAddcategory#click" locator-key1="SAVE" value1="Save" />
+
+		<execute action="PGMessageboards#assertTextEquals" locator-key1="SUCCESS_MESSAGE" />
+
+		<execute action="PGMessageboards#assertTextEquals" locator-key1="CATEGORY_TABLE_CATEGORY_1" value1="${categoryNameNew}" />
 	</command>
 </definition>

@@ -78,7 +78,6 @@ AUI.add(
 						instance._eventDataProcessed = instance.ns('dataProcessed');
 						instance._eventDataRequest = instance.ns('dataRequest');
 						instance._eventDataRetrieveSuccess = instance.ns('dataRetrieveSuccess');
-						instance._eventOpenDocument = instance.ns('openDocument');
 						instance._eventChangeSearchFolder = instance.ns('changeSearchFolder');
 
 						instance._entriesContainer = instance.byId('entriesContainer');
@@ -170,7 +169,6 @@ AUI.add(
 
 						var eventHandles = [
 							Liferay.on(instance._eventDataRetrieveSuccess, instance._onDataRetrieveSuccess, instance),
-							Liferay.on(instance._eventOpenDocument, instance._openDocument, instance),
 							Liferay.on(instance._eventPageLoaded, instance._onPageLoaded, instance),
 							History.after('stateChange', instance._afterStateChange, instance),
 							Liferay.on('showTab', instance._onShowTab, instance),
@@ -373,57 +371,42 @@ AUI.add(
 					_onShowTab: function(event) {
 						var instance = this;
 
-						var tabSection = event.tabSection;
+						if (event.namespace.indexOf(instance.get('namespace')) === 0) {
+							var tabSection = event.tabSection;
 
-						var searchResultsWrapper = tabSection.one('[data-repositoryId]');
+							var searchResultsWrapper = tabSection.one('[data-repositoryId]');
 
-						var repositoryId = searchResultsWrapper.attr('data-repositoryId');
+							var repositoryId = searchResultsWrapper.attr('data-repositoryId');
 
-						var repositoryData = instance._repositoriesData[repositoryId];
+							var repositoryData = instance._repositoriesData[repositoryId];
 
-						if (repositoryData) {
-							var paginatorData = repositoryData.paginatorData;
+							if (repositoryData) {
+								var paginatorData = repositoryData.paginatorData;
 
-							if (paginatorData) {
-								instance._appViewPaginator.set(STR_PAGINATOR_DATA, paginatorData);
+								if (paginatorData) {
+									instance._appViewPaginator.set(STR_PAGINATOR_DATA, paginatorData);
+								}
+							}
+
+							if (!searchResultsWrapper.hasAttribute(STR_DATA_SEARCH_PROCESSED)) {
+								searchResultsWrapper.setAttribute(STR_DATA_SEARCH_PROCESSED, true);
+
+								var selectedFolder = instance._appViewSelect.get(STR_SELECTED_FOLDER);
+
+								var searchData = {
+									folderId: selectedFolder.id,
+									keywords: instance._keywordsNode.get('value'),
+									repositoryId: selectedFolder.repositoryId,
+									searchFolderId: DEFAULT_FOLDER_ID,
+									searchRepositoryId: repositoryId
+								};
+
+								instance._searchFileEntry(searchData);
+							}
+							else {
+								instance._documentLibraryContainer.all('.document-entries-paginator').show();
 							}
 						}
-
-						if (!searchResultsWrapper.hasAttribute(STR_DATA_SEARCH_PROCESSED)) {
-							searchResultsWrapper.setAttribute(STR_DATA_SEARCH_PROCESSED, true);
-
-							var selectedFolder = instance._appViewSelect.get(STR_SELECTED_FOLDER);
-
-							var searchData = {
-								folderId: selectedFolder.id,
-								keywords: instance._keywordsNode.get('value'),
-								repositoryId: selectedFolder.repositoryId,
-								searchFolderId: DEFAULT_FOLDER_ID,
-								searchRepositoryId: repositoryId
-							};
-
-							instance._searchFileEntry(searchData);
-						}
-						else {
-							instance._documentLibraryContainer.all('.document-entries-paginator').show();
-						}
-					},
-
-					_openDocument: function(event) {
-						var instance = this;
-
-						Liferay.Util.openDocument(
-							event.webDavUrl,
-							null,
-							function(exception) {
-								var errorMessage = Lang.sub(
-									Liferay.Language.get('cannot-open-the-requested-document-due-to-the-following-reason'),
-									[exception.message]
-								);
-
-								instance._appViewFolders.displayMessage(MESSAGE_TYPE_ERROR, errorMessage);
-							}
-						);
 					},
 
 					_searchFileEntry: function(searchData) {
