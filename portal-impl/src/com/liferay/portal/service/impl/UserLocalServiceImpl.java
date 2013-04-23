@@ -5117,12 +5117,6 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 				headerMap, parameterMap);
 		}
 
-		boolean skipLiferayCheck = false;
-
-		if (authResult == Authenticator.SKIP_LIFERAY_CHECK) {
-			skipLiferayCheck = true;
-		}
-
 		// Get user
 
 		User user = null;
@@ -5191,6 +5185,12 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		}
 
 		// Post-authentication pipeline
+
+		boolean skipLiferayCheck = false;
+
+		if (authResult == Authenticator.SKIP_LIFERAY_CHECK) {
+			skipLiferayCheck = true;
+		}
 
 		if ((authResult == Authenticator.SUCCESS) || skipLiferayCheck) {
 			if (authType.equals(CompanyConstants.AUTH_TYPE_EA)) {
