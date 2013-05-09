@@ -185,11 +185,7 @@ public class RowChecker {
 			sb.append("disabled ");
 		}
 
-		String cssClass = "aui-input-field-checkbox ";
-
-		sb.append("class=\"");
-		sb.append(cssClass);
-		sb.append("\" name=\"");
+		sb.append("class=\"aui-input-field-checkbox\" name=\"");
 		sb.append(name);
 		sb.append("\" type=\"checkbox\" value=\"");
 		sb.append(value);
