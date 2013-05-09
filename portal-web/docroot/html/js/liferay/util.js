@@ -955,7 +955,10 @@
 		function(form, name, allBox) {
 			var totalBoxes = 0;
 			var totalOn = 0;
+
 			var inputs = A.one(form).all('input[type=checkbox]');
+
+			var checkboxes = inputs.filter('.aui-input-field-checkbox');
 
 			allBox = A.one(allBox) || A.one(form).one('input[name=' + allBox + STR_RIGHT_SQUARE_BRACKET);
 
@@ -963,7 +966,7 @@
 				name = [name];
 			}
 
-			inputs.each(
+			checkboxes.each(
 				function(item, index, collection) {
 					if (!item.compareTo(allBox)) {
 						if (arrayIndexOf(name, item.getAttribute('name')) > -1) {
