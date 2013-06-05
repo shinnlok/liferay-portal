@@ -142,7 +142,7 @@ ManifestSummary manifestSummary = com.liferay.portal.kernel.lar.ExportImportUtil
 						Date exportDate = manifestSummary.getExportDate();
 						%>
 
-						<span onmouseover="Liferay.Portal.ToolTip.show(this, '<%= dateFormatDateTime.format(exportDate) %>')">
+						<span onmouseover="Liferay.Portal.ToolTip.show(this, '<%= format.format(exportDate) %>')">
 							<liferay-ui:message arguments="<%= LanguageUtil.getTimeDescription(pageContext, System.currentTimeMillis() - exportDate.getTime(), true) %>" key="x-ago" />
 						</span>
 					</dd>

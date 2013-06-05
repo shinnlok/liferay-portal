@@ -35,6 +35,6 @@ String rowHREF = (String)objArray[1];
 	</div>
 
 	<div class="blogger-date">
-		<span><liferay-ui:message key="date" />:</span><aui:spacer /><%= dateFormatDate.format(statsUser.getLastPostDate()) %>
+		<span><liferay-ui:message key="date" />:</span><aui:spacer /><%= format.format(statsUser.getLastPostDate()) %>
 	</div>
 </liferay-ui:user-display>

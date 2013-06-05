@@ -138,8 +138,8 @@ boolean childrenMessagesTaggable = true;
 boolean includeFormTag = true;
 boolean showSearch = true;
 
-Format dateFormatDate = FastDateFormatFactoryUtil.getDate(locale, timeZone);
-Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);
+Format dateFormat = FastDateFormatFactoryUtil.getDate(locale, timeZone);
+Format dateTimeFormat = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);
 
 NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
 %>

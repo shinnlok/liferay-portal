@@ -101,7 +101,7 @@ request.setAttribute("view_entry.jsp-entry", entry);
 			</div>
 
 			<div class="lfr-asset-icon lfr-asset-date">
-				<%= dateFormatDate.format(entry.getCreateDate()) %>
+				<%= format.format(entry.getCreateDate()) %>
 			</div>
 
 			<div class="lfr-asset-icon lfr-asset-downloads last">

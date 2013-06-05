@@ -1101,7 +1101,7 @@ public class WebServerServlet extends HttpServlet {
 		Template template = TemplateManagerUtil.getTemplate(
 			TemplateConstants.LANG_TYPE_FTL, _templateResource, true);
 
-		template.put("dateFormat", _dateFormat);
+		template.put("dateFormat", _format);
 		template.put("entries", webServerEntries);
 		template.put("path", HttpUtil.encodePath(path));
 
@@ -1264,7 +1264,7 @@ public class WebServerServlet extends HttpServlet {
 	private static Set<String> _acceptRangesMimeTypes = SetUtil.fromArray(
 		PropsValues.WEB_SERVER_SERVLET_ACCEPT_RANGES_MIME_TYPES);
 
-	private static Format _dateFormat =
+	private static Format _format =
 		FastDateFormatFactoryUtil.getSimpleDateFormat(_DATE_FORMAT_PATTERN);
 
 	private boolean _lastModified = true;

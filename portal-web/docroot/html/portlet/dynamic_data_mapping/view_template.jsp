@@ -202,7 +202,7 @@ String title = ddmDisplay.getViewTemplatesTitle(structure, controlPanel, locale)
 				>
 
 					<%
-					buffer.append(dateFormatDateTime.format(template.getModifiedDate()));
+					buffer.append(format.format(template.getModifiedDate()));
 					%>
 
 				</liferay-ui:search-container-column-text>

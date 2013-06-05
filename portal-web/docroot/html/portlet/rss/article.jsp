@@ -60,7 +60,7 @@ catch (Exception e) {
 			<aui:a cssClass="font-large" href="<%= entry.getLink() %>" style="font-weight: bold;" target="_blank"><%= entry.getTitle() %></aui:a><br />
 
 			<c:if test="<%= entry.getPublishedDate() != null %>">
-				<%= dateFormatDateTime.format(entry.getPublishedDate()) %><br />
+				<%= dateTimeFormat.format(entry.getPublishedDate()) %><br />
 			</c:if>
 
 			<div class="font-small">

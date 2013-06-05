@@ -222,7 +222,7 @@ List updatablePackageIds = new ArrayList();
 
 						<div>
 							<c:if test="<%= PluginPackageUtil.getLastUpdateDate() != null %>">
-								<%= LanguageUtil.format(pageContext, "list-of-plugins-was-last-refreshed-on-x", dateFormatDateTime.format(PluginPackageUtil.getLastUpdateDate())) %>
+								<%= LanguageUtil.format(pageContext, "list-of-plugins-was-last-refreshed-on-x", format.format(PluginPackageUtil.getLastUpdateDate())) %>
 							</c:if>
 
 							<aui:button onClick='<%= renderResponse.getNamespace() + "reloadRepositories();" %>' value="refresh" />

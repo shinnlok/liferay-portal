@@ -77,10 +77,10 @@ request.setAttribute("view_event.jsp-event", event);
 			<dd>
 				<c:choose>
 					<c:when test="<%= event.isTimeZoneSensitive() %>">
-						<%= dateFormatDate.format(Time.getDate(event.getStartDate(), timeZone)) %>
+						<%= dateFormat.format(Time.getDate(event.getStartDate(), timeZone)) %>
 					</c:when>
 					<c:otherwise>
-						<%= dateFormatDate.format(Time.getDate(event.getStartDate(), TimeZoneUtil.getDefault())) %>
+						<%= dateFormat.format(Time.getDate(event.getStartDate(), TimeZoneUtil.getDefault())) %>
 					</c:otherwise>
 				</c:choose>
 			</dd>
@@ -109,7 +109,7 @@ request.setAttribute("view_event.jsp-event", event);
 				</c:if>
 
 				<c:if test="<%= (endDateType == CalEventConstants.END_DATE_TYPE_END_BY) %>">
-					<%= event.isTimeZoneSensitive() ? dateFormatDate.format(Time.getDate(event.getEndDate(), timeZone)) : dateFormatDate.format(event.getEndDate()) %>
+					<%= event.isTimeZoneSensitive() ? dateFormat.format(Time.getDate(event.getEndDate(), timeZone)) : dateFormat.format(event.getEndDate()) %>
 				</c:if>
 			</dd>
 			<dt>
@@ -135,23 +135,23 @@ request.setAttribute("view_event.jsp-event", event);
 					<c:otherwise>
 						<c:choose>
 							<c:when test="<%= event.isTimeZoneSensitive() %>">
-								<span class="dtstart" title="<%= dateFormatISO8601.format(Time.getDate(event.getStartDate(), timeZone)) %>">
-									<%= dateFormatTime.format(Time.getDate(event.getStartDate(), timeZone)) %>
+								<span class="dtstart" title="<%= iso8601DateFormat.format(Time.getDate(event.getStartDate(), timeZone)) %>">
+									<%= timeFormat.format(Time.getDate(event.getStartDate(), timeZone)) %>
 								</span>
 							</c:when>
 							<c:otherwise>
-								<span class="dtstart" title="<%= dateFormatISO8601.format(event.getStartDate()) %>">
-									<%= dateFormatTime.format(Time.getDate(event.getStartDate(), TimeZoneUtil.getDefault())) %>
+								<span class="dtstart" title="<%= iso8601DateFormat.format(event.getStartDate()) %>">
+									<%= timeFormat.format(Time.getDate(event.getStartDate(), TimeZoneUtil.getDefault())) %>
 								</span>
 							</c:otherwise>
 						</c:choose>
 						&#150;
 						<c:choose>
 							<c:when test="<%= event.isTimeZoneSensitive() %>">
-								<%= dateFormatTime.format(Time.getDate(CalUtil.getEndTime(event), timeZone)) %>
+								<%= timeFormat.format(Time.getDate(CalUtil.getEndTime(event), timeZone)) %>
 							</c:when>
 							<c:otherwise>
-								<%= dateFormatTime.format(Time.getDate(CalUtil.getEndTime(event), TimeZoneUtil.getDefault())) %>
+								<%= timeFormat.format(Time.getDate(CalUtil.getEndTime(event), TimeZoneUtil.getDefault())) %>
 							</c:otherwise>
 						</c:choose>
 					</c:otherwise>

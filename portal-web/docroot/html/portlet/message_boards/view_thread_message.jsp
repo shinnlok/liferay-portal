@@ -65,7 +65,7 @@ MBThread thread = (MBThread)request.getAttribute("edit_message.jsp-thread");
 						</div>
 
 						<div class="thread-user-join-date">
-							<span><liferay-ui:message key="join-date" />:</span><aui:spacer /><%= dateFormatDate.format(userDisplay.getCreateDate()) %>
+							<span><liferay-ui:message key="join-date" />:</span><aui:spacer /><%= dateFormat.format(userDisplay.getCreateDate()) %>
 						</div>
 
 						<portlet:renderURL var="recentPostsURL">
@@ -160,7 +160,7 @@ MBThread thread = (MBThread)request.getAttribute("edit_message.jsp-thread");
 						</c:if>
 					</div>
 
-					<%= dateFormatDateTime.format(message.getModifiedDate()) %>
+					<%= dateTimeFormat.format(message.getModifiedDate()) %>
 
 					<c:if test="<%= (message != null) && !message.isApproved() %>">
 						<aui:model-context bean="<%= message %>" model="<%= MBMessage.class %>" />

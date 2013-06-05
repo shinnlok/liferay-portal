@@ -287,7 +287,7 @@ public class DataFactory {
 			return null;
 		}
 
-		return _simpleDateFormat.format(date);
+		return _format.format(date);
 	}
 
 	public long getDDLRecordSetClassNameId() {
@@ -2179,6 +2179,8 @@ public class DataFactory {
 	private long _defaultUserId;
 	private String _dlDDMStructureContent;
 	private List<String> _firstNames;
+	private Format _format = FastDateFormatFactoryUtil.getSimpleDateFormat(
+		"yyyy-MM-dd HH:mm:ss");
 	private SimpleCounter _futureDateCounter;
 	private Group _globalGroup;
 	private long _globalGroupId;
@@ -2207,8 +2209,6 @@ public class DataFactory {
 	private List<Role> _roles;
 	private User _sampleUser;
 	private long _sampleUserId;
-	private Format _simpleDateFormat =
-		FastDateFormatFactoryUtil.getSimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private Role _siteMemberRole;
 	private SimpleCounter _socialActivityCounter;
 	private SimpleCounter _timeCounter;

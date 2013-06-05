@@ -81,7 +81,7 @@ String rssFeedType = preferences.getValue("rssFeedType", RSSUtil.FEED_TYPE_DEFAU
 boolean showSearch = true;
 boolean showEditEntryPermissions = true;
 
-Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);
+Format format = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);
 %>
 
 <%@ include file="/html/portlet/blogs/init-ext.jsp" %>

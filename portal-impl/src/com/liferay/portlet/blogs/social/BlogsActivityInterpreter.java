@@ -69,12 +69,12 @@ public class BlogsActivityInterpreter extends BaseSocialActivityInterpreter {
 
 			link = null;
 
-			Format dateFormatDate =
+			Format format =
 				FastDateFormatFactoryUtil.getSimpleDateFormat(
 					"MMMM d", serviceContext.getLocale(),
 					serviceContext.getTimeZone());
 
-			displayDate = dateFormatDate.format(entry.getDisplayDate());
+			displayDate = format.format(entry.getDisplayDate());
 		}
 
 		String displayTitle = wrapLink(link, entry.getTitle());

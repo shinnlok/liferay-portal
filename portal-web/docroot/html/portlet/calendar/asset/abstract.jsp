@@ -32,9 +32,9 @@ CalEvent event = (CalEvent)request.getAttribute(WebKeys.CALENDAR_EVENT);
 
 <c:choose>
 	<c:when test="<%= event.isTimeZoneSensitive() %>">
-		<%= dateFormatDate.format(Time.getDate(event.getStartDate(), timeZone)) %>
+		<%= dateFormat.format(Time.getDate(event.getStartDate(), timeZone)) %>
 	</c:when>
 	<c:otherwise>
-		<%= dateFormatDate.format(event.getStartDate()) %>
+		<%= dateFormat.format(event.getStartDate()) %>
 	</c:otherwise>
 </c:choose>

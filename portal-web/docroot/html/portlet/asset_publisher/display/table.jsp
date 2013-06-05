@@ -113,17 +113,17 @@ request.setAttribute("view.jsp-showIconLabel", false);
 		String value = null;
 
 		if (metadataFields[m].equals("create-date")) {
-			value = dateFormatDate.format(assetEntry.getCreateDate());
+			value = format.format(assetEntry.getCreateDate());
 		}
 		else if (metadataFields[m].equals("modified-date")) {
-			value = dateFormatDate.format(assetEntry.getModifiedDate());
+			value = format.format(assetEntry.getModifiedDate());
 		}
 		else if (metadataFields[m].equals("publish-date")) {
 			if (assetEntry.getPublishDate() == null) {
 				value = StringPool.BLANK;
 			}
 			else {
-				value = dateFormatDate.format(assetEntry.getPublishDate());
+				value = format.format(assetEntry.getPublishDate());
 			}
 		}
 		else if (metadataFields[m].equals("expiration-date")) {
@@ -131,7 +131,7 @@ request.setAttribute("view.jsp-showIconLabel", false);
 				value = StringPool.BLANK;
 			}
 			else {
-				value = dateFormatDate.format(assetEntry.getExpirationDate());
+				value = format.format(assetEntry.getExpirationDate());
 			}
 		}
 		else if (metadataFields[m].equals("priority")) {

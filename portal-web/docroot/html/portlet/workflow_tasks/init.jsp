@@ -37,8 +37,8 @@ page import="com.liferay.portlet.workflowtasks.search.WorkflowTaskSearch" %><%@
 page import="com.liferay.portlet.workflowtasks.search.WorkflowTaskSearchTerms" %>
 
 <%
-Format dateFormatDate = FastDateFormatFactoryUtil.getDate(locale, timeZone);
-Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);
+Format dateFormat = FastDateFormatFactoryUtil.getDate(locale, timeZone);
+Format dateTimeFormat = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);
 %>
 
 <%@ include file="/html/portlet/workflow_tasks/init-ext.jsp" %>

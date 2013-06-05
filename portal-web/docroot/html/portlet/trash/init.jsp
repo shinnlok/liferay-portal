@@ -39,5 +39,5 @@ page import="com.liferay.portlet.trash.util.TrashUtil" %>
 <%@ include file="/html/portlet/trash/init-ext.jsp" %>
 
 <%
-Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);
+Format format = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);
 %>

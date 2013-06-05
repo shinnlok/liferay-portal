@@ -171,7 +171,7 @@ long portletDisplayDDMTemplateId = PortletDisplayTemplateUtil.getPortletDisplayT
 
 								<div class="lfr-asset-metadata">
 									<div class="lfr-asset-icon lfr-asset-date">
-										<%= LanguageUtil.format(pageContext, "last-updated-x", dateFormatDate.format(folder.getModifiedDate())) %>
+										<%= LanguageUtil.format(pageContext, "last-updated-x", format.format(folder.getModifiedDate())) %>
 									</div>
 
 									<div class="lfr-asset-icon lfr-asset-subfolders">

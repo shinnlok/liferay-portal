@@ -234,7 +234,7 @@ public class TrashImpl implements Trash {
 
 	@Override
 	public String getNewName(ThemeDisplay themeDisplay, String oldName) {
-		Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(
+		Format format = FastDateFormatFactoryUtil.getDateTime(
 			themeDisplay.getLocale(), themeDisplay.getTimeZone());
 
 		StringBundler sb = new StringBundler(5);
@@ -244,8 +244,7 @@ public class TrashImpl implements Trash {
 		sb.append(StringPool.OPEN_PARENTHESIS);
 		sb.append(
 			StringUtil.replace(
-				dateFormatDateTime.format(new Date()), CharPool.SLASH,
-				CharPool.PERIOD));
+				format.format(new Date()), CharPool.SLASH, CharPool.PERIOD));
 		sb.append(StringPool.CLOSE_PARENTHESIS);
 
 		return sb.toString();

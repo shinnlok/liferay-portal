@@ -114,11 +114,11 @@ public class GetArticlesAction extends Action {
 			request, "displayDateGT");
 
 		if (Validator.isNotNull(displayDateGTParam)) {
-			DateFormat displayDateGTFormat = DateUtil.getISOFormat(
+			DateFormat displayDateGTDateFormat = DateUtil.getISOFormat(
 				displayDateGTParam);
 
 			displayDateGT = GetterUtil.getDate(
-				displayDateGTParam, displayDateGTFormat);
+				displayDateGTParam, displayDateGTDateFormat);
 		}
 
 		if (_log.isDebugEnabled()) {
@@ -131,11 +131,11 @@ public class GetArticlesAction extends Action {
 			request, "displayDateLT");
 
 		if (Validator.isNotNull(displayDateLTParam)) {
-			DateFormat displayDateLTFormat = DateUtil.getISOFormat(
+			DateFormat displayDateLTDateFormat = DateUtil.getISOFormat(
 				displayDateLTParam);
 
 			displayDateLT = GetterUtil.getDate(
-				displayDateLTParam, displayDateLTFormat);
+				displayDateLTParam, displayDateLTDateFormat);
 		}
 
 		if (displayDateLT == null) {
