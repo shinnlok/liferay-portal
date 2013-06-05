@@ -12,18 +12,13 @@
  * details.
  */
 
-package com.liferay.portal.kernel.util;
+package com.liferay.portal.kernel.search;
 
 /**
- * @author Brian Wing Shun Chan
+ * @author Michael C. Han
  */
-public class BreadcrumbsUtil {
+public interface NGramHolderBuilder {
 
-	public static String removeLastClass(String breadcrumbs) {
-		return StringUtil.replace(
-			breadcrumbs,
-			new String[] {"class=\"last\"", "class=\"first last\""},
-			new String[] {StringPool.BLANK, "class=\"first\""});
-	}
+	public NGramHolder buildNGramHolder(String input) throws SearchException;
 
 }

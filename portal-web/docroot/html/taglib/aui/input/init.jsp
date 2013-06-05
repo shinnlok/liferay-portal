@@ -36,6 +36,7 @@ boolean autoSize = GetterUtil.getBoolean(String.valueOf(request.getAttribute("au
 java.lang.Object bean = (java.lang.Object)request.getAttribute("aui:input:bean");
 boolean changesContext = GetterUtil.getBoolean(String.valueOf(request.getAttribute("aui:input:changesContext")));
 boolean checked = GetterUtil.getBoolean(String.valueOf(request.getAttribute("aui:input:checked")));
+String checkBoxLabel = GetterUtil.getString(String.valueOf(request.getAttribute("aui:input:checkBoxLabel")));
 long classPK = GetterUtil.getLong(String.valueOf(request.getAttribute("aui:input:classPK")));
 java.lang.String cssClass = GetterUtil.getString((java.lang.String)request.getAttribute("aui:input:cssClass"));
 java.util.Map data = (java.util.Map)request.getAttribute("aui:input:data");
@@ -61,6 +62,7 @@ java.lang.String onClick = GetterUtil.getString((java.lang.String)request.getAtt
 java.lang.String placeholder = GetterUtil.getString((java.lang.String)request.getAttribute("aui:input:placeholder"));
 java.lang.String prefix = GetterUtil.getString((java.lang.String)request.getAttribute("aui:input:prefix"));
 boolean required = GetterUtil.getBoolean(String.valueOf(request.getAttribute("aui:input:required")));
+boolean resizable = GetterUtil.getBoolean(String.valueOf(request.getAttribute("aui:input:resizable")));
 boolean showRequiredLabel = GetterUtil.getBoolean(String.valueOf(request.getAttribute("aui:input:showRequiredLabel")), true);
 java.lang.String suffix = GetterUtil.getString((java.lang.String)request.getAttribute("aui:input:suffix"));
 java.lang.String title = GetterUtil.getString((java.lang.String)request.getAttribute("aui:input:title"));
@@ -71,6 +73,7 @@ java.lang.Object value = (java.lang.Object)request.getAttribute("aui:input:value
 _updateOptions(_options, "autoSize", autoSize);
 _updateOptions(_options, "bean", bean);
 _updateOptions(_options, "changesContext", changesContext);
+_updateOptions(_options, "checkBoxLabel", checkBoxLabel);
 _updateOptions(_options, "checked", checked);
 _updateOptions(_options, "classPK", classPK);
 _updateOptions(_options, "cssClass", cssClass);
@@ -97,6 +100,7 @@ _updateOptions(_options, "onClick", onClick);
 _updateOptions(_options, "placeholder", placeholder);
 _updateOptions(_options, "prefix", prefix);
 _updateOptions(_options, "required", required);
+_updateOptions(_options, "resizable", resizable);
 _updateOptions(_options, "showRequiredLabel", showRequiredLabel);
 _updateOptions(_options, "suffix", suffix);
 _updateOptions(_options, "title", title);

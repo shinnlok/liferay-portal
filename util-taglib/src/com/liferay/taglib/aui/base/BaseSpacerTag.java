@@ -12,21 +12,33 @@
  * details.
  */
 
-package com.liferay.portal.kernel.portlet;
+package com.liferay.taglib.aui.base;
 
-import java.util.Set;
+import javax.servlet.jsp.JspException;
 
 /**
- * @author Tomas Polesovsky
+ * @author Eduardo Lundgren
+ * @author Bruno Basto
+ * @author Nathan Cavanaugh
+ * @author Julio Camarero
+ * @generated
  */
-public interface PortletContainerSecurity {
+public class BaseSpacerTag extends com.liferay.portal.kernel.servlet.taglib.TagSupport {
 
-	public Set<String> getWhitelist();
+	@Override
+	public int doStartTag() throws JspException {
+		return super.doStartTag();
+	}
 
-	public Set<String> getWhitelistActions();
+	protected void cleanUp() {
+	}
 
-	public Set<String> resetWhitelist();
+	protected String getPage() {
+		return _PAGE;
+	}
 
-	public Set<String> resetWhitelistActions();
+	private static final String _PAGE =
+		"/html/taglib/aui/spacer/page.jsp";
+
 
 }

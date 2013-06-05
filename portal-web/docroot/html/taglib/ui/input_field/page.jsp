@@ -18,6 +18,7 @@
 
 <%
 boolean autoSize = GetterUtil.getBoolean((String)request.getAttribute("liferay-ui:input-field:autoSize"));
+String checkBoxLabel = GetterUtil.getString((String) request.getAttribute("liferay-ui:input-field:checkBoxLabel"));
 String cssClass = GetterUtil.getString((String)request.getAttribute("liferay-ui:input-field:cssClass"));
 String formName = (String)request.getAttribute("liferay-ui:input-field:formName");
 String defaultLanguageId = (String)request.getAttribute("liferay-ui:input-field:defaultLanguageId");
@@ -305,6 +306,47 @@ if (hints != null) {
 					/>
 				</c:if>
 			</div>
+
+			<c:if test="<%= Validator.isNotNull(checkBoxLabel) %>">
+
+				<div class="clearfix">
+					<aui:input id="<%= formName + fieldParam %>" name="<%= checkBoxLabel %>" type="checkbox" value="<%= disabled %>" />
+				</div>
+
+				<aui:script use="aui-base">
+					var checkbox = A.one('#<portlet:namespace /><%= formName + fieldParam %>Checkbox');
+
+					checkbox.once(
+						['click', 'mouseover'],
+						function() {
+							Liferay.component('<portlet:namespace /><%= fieldParam %>datePicker');
+						}
+					);
+
+					checkbox.on(
+						['click', 'mouseover'],
+						function(event) {
+							var checked = document.getElementById('<portlet:namespace /><%= formName + fieldParam %>Checkbox').checked;
+
+							document.<portlet:namespace /><%= formName %>["<portlet:namespace /><%= fieldParam %>Month"].disabled = checked;
+							document.<portlet:namespace /><%= formName %>["<portlet:namespace /><%= fieldParam %>Day"].disabled = checked;
+							document.<portlet:namespace /><%= formName %>["<portlet:namespace /><%= fieldParam %>Year"].disabled = checked;
+
+							<c:if test="<%= showTime %>">
+								document.<portlet:namespace /><%= formName %>["<portlet:namespace /><%= fieldParam %>Hour"].disabled = checked;
+								document.<portlet:namespace /><%= formName %>["<portlet:namespace /><%= fieldParam %>Minute"].disabled = checked;
+								document.<portlet:namespace /><%= formName %>["<portlet:namespace /><%= fieldParam %>AmPm"].disabled = checked;
+							</c:if>
+
+							var calendarWidget = A.Widget.getByNode(document.<portlet:namespace />fm["<portlet:namespace /><%= fieldParam %>Month"]);
+
+							if (calendarWidget) {
+								calendarWidget.set('disabled', checked);
+							}
+						}
+					);
+				</aui:script>
+			</c:if>
 		</c:when>
 		<c:when test='<%= type.equals("double") || type.equals("int") || type.equals("long") || type.equals("String") %>'>
 

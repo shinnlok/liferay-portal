@@ -12,14 +12,31 @@
  * details.
  */
 
-package com.liferay.portal.service.persistence;
+package com.liferay.portal.kernel.search;
+
+import java.util.List;
+import java.util.Map;
 
 /**
- * @author Brian Wing Shun Chan
+ * @author Michael C. Han
  */
-public interface LayoutSetBranchFinder {
-	public com.liferay.portal.model.LayoutSetBranch findByMaster(long groupId,
-		boolean privateLayout)
-		throws com.liferay.portal.NoSuchLayoutSetBranchException,
-			com.liferay.portal.kernel.exception.SystemException;
+public class CollatorUtil {
+
+	public static String collate(
+			Map<String, List<String>> suggestions, List<String> tokens)
+		throws SearchException {
+
+		return _getCollator().collate(suggestions, tokens);
+	}
+
+	public void setCollator(Collator collator) {
+		_collator = collator;
+	}
+
+	private static Collator _getCollator() {
+		return _collator;
+	}
+
+	private static Collator _collator;
+
 }

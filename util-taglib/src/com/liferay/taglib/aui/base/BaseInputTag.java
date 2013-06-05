@@ -49,6 +49,10 @@ public class BaseInputTag extends com.liferay.taglib.util.IncludeTag {
 		return _checked;
 	}
 
+	public java.lang.String getCheckBoxLabel() {
+		return _checkBoxLabel;
+	}
+
 	public long getClassPK() {
 		return _classPK;
 	}
@@ -149,6 +153,10 @@ public class BaseInputTag extends com.liferay.taglib.util.IncludeTag {
 		return _required;
 	}
 
+	public boolean getResizable() {
+		return _resizable;
+	}
+
 	public boolean getShowRequiredLabel() {
 		return _showRequiredLabel;
 	}
@@ -195,6 +203,12 @@ public class BaseInputTag extends com.liferay.taglib.util.IncludeTag {
 		_checked = checked;
 
 		setScopedAttribute("checked", checked);
+	}
+
+	public void setCheckBoxLabel(java.lang.String checkBoxLabel) {
+		_checkBoxLabel = checkBoxLabel;
+
+		setScopedAttribute("checkBoxLabel", checkBoxLabel);
 	}
 
 	public void setClassPK(long classPK) {
@@ -347,6 +361,12 @@ public class BaseInputTag extends com.liferay.taglib.util.IncludeTag {
 		setScopedAttribute("required", required);
 	}
 
+	public void setResizable(boolean resizable) {
+		_resizable = resizable;
+
+		setScopedAttribute("resizable", resizable);
+	}
+
 	public void setShowRequiredLabel(boolean showRequiredLabel) {
 		_showRequiredLabel = showRequiredLabel;
 
@@ -389,6 +409,7 @@ public class BaseInputTag extends com.liferay.taglib.util.IncludeTag {
 		_bean = null;
 		_changesContext = false;
 		_checked = false;
+		_checkBoxLabel = null;
 		_classPK = 0;
 		_cssClass = null;
 		_data = null;
@@ -414,6 +435,7 @@ public class BaseInputTag extends com.liferay.taglib.util.IncludeTag {
 		_placeholder = null;
 		_prefix = null;
 		_required = false;
+		_resizable = false;
 		_showRequiredLabel = true;
 		_suffix = null;
 		_title = null;
@@ -433,6 +455,7 @@ public class BaseInputTag extends com.liferay.taglib.util.IncludeTag {
 		setNamespacedAttribute(request, "bean", _bean);
 		setNamespacedAttribute(request, "changesContext", _changesContext);
 		setNamespacedAttribute(request, "checked", _checked);
+		setNamespacedAttribute(request, "checkBoxLabel", _checkBoxLabel);
 		setNamespacedAttribute(request, "classPK", _classPK);
 		setNamespacedAttribute(request, "cssClass", _cssClass);
 		setNamespacedAttribute(request, "data", _data);
@@ -458,6 +481,7 @@ public class BaseInputTag extends com.liferay.taglib.util.IncludeTag {
 		setNamespacedAttribute(request, "placeholder", _placeholder);
 		setNamespacedAttribute(request, "prefix", _prefix);
 		setNamespacedAttribute(request, "required", _required);
+		setNamespacedAttribute(request, "resizable", _resizable);
 		setNamespacedAttribute(request, "showRequiredLabel", _showRequiredLabel);
 		setNamespacedAttribute(request, "suffix", _suffix);
 		setNamespacedAttribute(request, "title", _title);
@@ -475,6 +499,7 @@ public class BaseInputTag extends com.liferay.taglib.util.IncludeTag {
 	private java.lang.Object _bean = null;
 	private boolean _changesContext = false;
 	private boolean _checked = false;
+	private java.lang.String _checkBoxLabel = null;
 	private long _classPK = 0;
 	private java.lang.String _cssClass = null;
 	private java.lang.Object _data = null;
@@ -500,6 +525,7 @@ public class BaseInputTag extends com.liferay.taglib.util.IncludeTag {
 	private java.lang.String _placeholder = null;
 	private java.lang.String _prefix = null;
 	private boolean _required = false;
+	private boolean _resizable = false;
 	private boolean _showRequiredLabel = true;
 	private java.lang.String _suffix = null;
 	private java.lang.String _title = null;

@@ -399,6 +399,9 @@ public class LayoutStagedModelDataHandler
 			importedLayout = existingLayout;
 		}
 
+		portletDataContext.setPlid(importedLayout.getPlid());
+		portletDataContext.setOldPlid(layout.getPlid());
+
 		newLayoutsMap.put(oldLayoutId, importedLayout);
 
 		long parentLayoutId = layout.getParentLayoutId();
@@ -521,9 +524,6 @@ public class LayoutStagedModelDataHandler
 		List<Layout> newLayouts = portletDataContext.getNewLayouts();
 
 		newLayouts.add(importedLayout);
-
-		portletDataContext.setPlid(importedLayout.getPlid());
-		portletDataContext.setOldPlid(layout.getPlid());
 
 		portletDataContext.importClassedModel(
 			layout, importedLayout, LayoutPortletDataHandler.NAMESPACE);
