@@ -51,7 +51,7 @@
 >
 
 	<%
-	buffer.append(dateFormatDateTime.format(recordSet.getModifiedDate()));
+	buffer.append(dateTimeFormat.format(recordSet.getModifiedDate()));
 	%>
 
 </liferay-ui:search-container-column-text>

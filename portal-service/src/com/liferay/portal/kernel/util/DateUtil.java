@@ -111,19 +111,19 @@ public class DateUtil {
 	}
 
 	public static String getDate(Date date, String pattern, Locale locale) {
-		Format dateFormat = FastDateFormatFactoryUtil.getSimpleDateFormat(
+		Format format = FastDateFormatFactoryUtil.getSimpleDateFormat(
 			pattern, locale);
 
-		return dateFormat.format(date);
+		return format.format(date);
 	}
 
 	public static String getDate(
 		Date date, String pattern, Locale locale, TimeZone timeZone) {
 
-		Format dateFormat = FastDateFormatFactoryUtil.getSimpleDateFormat(
+		Format format = FastDateFormatFactoryUtil.getSimpleDateFormat(
 			pattern, locale, timeZone);
 
-		return dateFormat.format(date);
+		return format.format(date);
 	}
 
 	public static int getDaysBetween(Date date1, Date date2) {
@@ -276,10 +276,10 @@ public class DateUtil {
 	public static Date parseDate(String dateString, Locale locale)
 		throws ParseException {
 
-		DateFormat dateFormat = DateFormat.getDateInstance(
+		DateFormat format = DateFormat.getDateInstance(
 			DateFormat.SHORT, locale);
 
-		return dateFormat.parse(dateString);
+		return format.parse(dateString);
 	}
 
 	private static Map<Locale, Boolean> _formatAmPmMap =

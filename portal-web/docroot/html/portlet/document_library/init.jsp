@@ -193,7 +193,7 @@ else if (!portletId.equals(PortletKeys.DOCUMENT_LIBRARY) && !ArrayUtil.contains(
 boolean enableRatings = GetterUtil.getBoolean(preferences.getValue("enableRatings", null), true);
 boolean enableCommentRatings = GetterUtil.getBoolean(preferences.getValue("enableCommentRatings", null), true);
 
-Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);
+Format format = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);
 %>
 
 <%@ include file="/html/portlet/document_library/init-ext.jsp" %>

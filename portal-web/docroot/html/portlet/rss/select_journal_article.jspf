@@ -92,11 +92,11 @@ for (int i = 0; i < results.size(); i++) {
 
 	// Modified date
 
-	row.addText(dateFormatDate.format(article.getModifiedDate()), rowHREF);
+	row.addText(dateFormat.format(article.getModifiedDate()), rowHREF);
 
 	// Display date
 
-	row.addText(dateFormatDate.format(article.getDisplayDate()), rowHREF);
+	row.addText(dateFormat.format(article.getDisplayDate()), rowHREF);
 
 	// Author
 

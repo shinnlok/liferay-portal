@@ -108,7 +108,7 @@ if (!portletId.equals(PortletKeys.BOOKMARKS)) {
 	entryColumns = ArrayUtil.remove(entryColumns, "action");
 }
 
-Format dateFormatDate = FastDateFormatFactoryUtil.getDate(locale, timeZone);
+Format format = FastDateFormatFactoryUtil.getDate(locale, timeZone);
 %>
 
 <%@ include file="/html/portlet/bookmarks/init-ext.jsp" %>

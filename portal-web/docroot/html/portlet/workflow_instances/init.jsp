@@ -33,8 +33,8 @@ page import="com.liferay.portlet.asset.model.AssetRenderer" %><%@
 page import="com.liferay.portlet.asset.model.AssetRendererFactory" %>
 
 <%
-Format dateFormatDate = FastDateFormatFactoryUtil.getDate(locale, timeZone);
-Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);
+Format dateFormat = FastDateFormatFactoryUtil.getDate(locale, timeZone);
+Format dateTimeFormat = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);
 %>
 
 <%@ include file="/html/portlet/workflow_instances/init-ext.jsp" %>

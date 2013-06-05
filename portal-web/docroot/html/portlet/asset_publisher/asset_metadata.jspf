@@ -21,17 +21,17 @@ for (int j = 0; j < metadataFields.length; j++) {
 	String value = null;
 
 	if (metadataFields[j].equals("create-date")) {
-		value = dateFormatDate.format(assetEntry.getCreateDate());
+		value = dateFormat.format(assetEntry.getCreateDate());
 	}
 	else if (metadataFields[j].equals("modified-date")) {
-		value = dateFormatDate.format(assetEntry.getModifiedDate());
+		value = dateFormat.format(assetEntry.getModifiedDate());
 	}
 	else if (metadataFields[j].equals("publish-date")) {
 		if (assetEntry.getPublishDate() == null) {
 			value = StringPool.BLANK;
 		}
 		else {
-			value = dateFormatDate.format(assetEntry.getPublishDate());
+			value = dateFormat.format(assetEntry.getPublishDate());
 		}
 	}
 	else if (metadataFields[j].equals("expiration-date")) {
@@ -39,7 +39,7 @@ for (int j = 0; j < metadataFields.length; j++) {
 			value = StringPool.BLANK;
 		}
 		else {
-			value = dateFormatDate.format(assetEntry.getExpirationDate());
+			value = dateFormat.format(assetEntry.getExpirationDate());
 		}
 	}
 	else if (metadataFields[j].equals("priority")) {

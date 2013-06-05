@@ -82,9 +82,9 @@ public class Table {
 			sb.append(value);
 		}
 		else if (value instanceof Date) {
-			DateFormat df = DateUtil.getISOFormat();
+			DateFormat dateFormat = DateUtil.getISOFormat();
 
-			sb.append(df.format(value));
+			sb.append(dateFormat.format(value));
 		}
 		else {
 			sb.append(value);
@@ -575,10 +575,10 @@ public class Table {
 				ps.setTimestamp(paramIndex, null);
 			}
 			else {
-				DateFormat df = DateUtil.getISOFormat();
+				DateFormat dateFormat = DateUtil.getISOFormat();
 
 				ps.setTimestamp(
-					paramIndex, new Timestamp(df.parse(value).getTime()));
+					paramIndex, new Timestamp(dateFormat.parse(value).getTime()));
 			}
 		}
 		else {

@@ -17,7 +17,7 @@
 <%
 Calendar cal = (Calendar)selCal.clone();
 
-dateFormatDate = FastDateFormatFactoryUtil.getSimpleDateFormat("MMMMM d, yyyy", locale);
+dateFormat = FastDateFormatFactoryUtil.getSimpleDateFormat("MMMMM d, yyyy", locale);
 %>
 
 <div>
@@ -61,7 +61,7 @@ dateFormatDate = FastDateFormatFactoryUtil.getSimpleDateFormat("MMMMM d, yyyy", 
 			cal.add(Calendar.DATE, 1);
 			%>
 
-			<strong><%= dateFormatDate.format(Time.getDate(cal)) %></strong>
+			<strong><%= dateFormat.format(Time.getDate(cal)) %></strong>
 		</td>
 		<td>
 
@@ -293,14 +293,14 @@ if (!partDayResults.isEmpty()) {
 					<div class="event-time">
 						<c:choose>
 							<c:when test="<%= event.isTimeZoneSensitive() %>">
-								<%= dateFormatTime.format(Time.getDate(startDate, timeZone)) %>
+								<%= timeFormat.format(Time.getDate(startDate, timeZone)) %>
 								-
-								<%= dateFormatTime.format(Time.getDate(endDate, timeZone)) %>
+								<%= timeFormat.format(Time.getDate(endDate, timeZone)) %>
 							</c:when>
 							<c:otherwise>
-								<%= dateFormatTime.format(Time.getDate(event.getStartDate(), TimeZoneUtil.getDefault())) %>
+								<%= timeFormat.format(Time.getDate(event.getStartDate(), TimeZoneUtil.getDefault())) %>
 								-
-								<%= dateFormatTime.format(Time.getDate(CalUtil.getEndTime(event), TimeZoneUtil.getDefault())) %>
+								<%= timeFormat.format(Time.getDate(CalUtil.getEndTime(event), TimeZoneUtil.getDefault())) %>
 							</c:otherwise>
 						</c:choose>
 					</div>
@@ -329,5 +329,5 @@ if (!partDayResults.isEmpty()) {
 <%
 cal.add(Calendar.DATE, -1);
 
-PortalUtil.setPageSubtitle(dateFormatDate.format(Time.getDate(cal)), request);
+PortalUtil.setPageSubtitle(dateFormat.format(Time.getDate(cal)), request);
 %>

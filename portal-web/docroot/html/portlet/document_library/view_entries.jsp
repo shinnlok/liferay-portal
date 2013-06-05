@@ -438,7 +438,7 @@ for (int i = 0; i < results.size(); i++) {
 						}
 
 						if (columnName.equals("create-date")) {
-							row.addText(dateFormatDateTime.format(fileEntry.getCreateDate()));
+							row.addText(format.format(fileEntry.getCreateDate()));
 						}
 
 						if (columnName.equals("downloads")) {
@@ -446,7 +446,7 @@ for (int i = 0; i < results.size(); i++) {
 						}
 
 						if (columnName.equals("modified-date")) {
-							row.addText(dateFormatDateTime.format(fileEntry.getModifiedDate()));
+							row.addText(format.format(fileEntry.getModifiedDate()));
 						}
 
 						if (columnName.equals("name")) {
@@ -560,7 +560,7 @@ for (int i = 0; i < results.size(); i++) {
 						}
 
 						if (columnName.equals("create-date")) {
-							row.addText(dateFormatDateTime.format(curFolder.getCreateDate()));
+							row.addText(format.format(curFolder.getCreateDate()));
 						}
 
 						if (columnName.equals("downloads")) {
@@ -568,7 +568,7 @@ for (int i = 0; i < results.size(); i++) {
 						}
 
 						if (columnName.equals("modified-date")) {
-							row.addText(dateFormatDateTime.format(curFolder.getModifiedDate()));
+							row.addText(format.format(curFolder.getModifiedDate()));
 						}
 
 						if (columnName.equals("name")) {

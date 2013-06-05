@@ -232,7 +232,7 @@ portletURL.setParameter("tabs1", tabs1);
 			name="removed-date"
 			orderable="<%= true %>"
 		>
-			<span title="<liferay-ui:message arguments="<%= dateFormatDateTime.format(entry.getCreateDate()) %>" key="deleted-x" />">
+			<span title="<liferay-ui:message arguments="<%= format.format(entry.getCreateDate()) %>" key="deleted-x" />">
 
 				<%
 				Date createDate = entry.getCreateDate();

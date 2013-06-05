@@ -86,7 +86,7 @@ request.setAttribute(WebKeys.WORKFLOW_ASSET_PREVIEW, Boolean.TRUE);
 			<aui:col width="<%= 33 %>">
 				<div class="lfr-asset-date">
 					<aui:field-wrapper label="end-date">
-						<%= (workflowInstance.getEndDate() == null) ? LanguageUtil.get(pageContext, "never") : dateFormatDateTime.format(workflowInstance.getEndDate()) %>
+						<%= (workflowInstance.getEndDate() == null) ? LanguageUtil.get(pageContext, "never") : dateTimeFormat.format(workflowInstance.getEndDate()) %>
 					</aui:field-wrapper>
 				</div>
 			</aui:col>
@@ -197,7 +197,7 @@ request.setAttribute(WebKeys.WORKFLOW_ASSET_PREVIEW, Boolean.TRUE);
 									buffer.append(LanguageUtil.get(pageContext, "never"));
 								}
 								else {
-									buffer.append(dateFormatDateTime.format(workflowTask.getDueDate()));
+									buffer.append(dateTimeFormat.format(workflowTask.getDueDate()));
 								}
 								%>
 

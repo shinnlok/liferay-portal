@@ -450,10 +450,10 @@ if (Validator.isNull(redirect)) {
 				<div class="alert alert-info">
 
 					<%
-					Format dateFormatDate = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);
+					Format format = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);
 					%>
 
-					<%= LanguageUtil.format(pageContext, "this-page-cannot-be-edited-because-user-x-is-modifying-it-and-the-results-have-not-been-published-yet", new Object[] {wikiPage.getUserName(), dateFormatDate.format(wikiPage.getModifiedDate())}) %>
+					<%= LanguageUtil.format(pageContext, "this-page-cannot-be-edited-because-user-x-is-modifying-it-and-the-results-have-not-been-published-yet", new Object[] {wikiPage.getUserName(), format.format(wikiPage.getModifiedDate())}) %>
 				</div>
 			</c:if>
 		</c:otherwise>

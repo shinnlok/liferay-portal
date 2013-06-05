@@ -286,7 +286,7 @@ boolean allowEmptyResults = false;
 
 Map<String, PortletURL> addPortletURLs = null;
 
-Format dateFormatDate = FastDateFormatFactoryUtil.getDate(locale, timeZone);
+Format format = FastDateFormatFactoryUtil.getDate(locale, timeZone);
 %>
 
 <%@ include file="/html/portlet/asset_publisher/init-ext.jsp" %>

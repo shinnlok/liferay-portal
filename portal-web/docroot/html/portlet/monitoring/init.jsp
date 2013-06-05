@@ -21,7 +21,7 @@ page import="com.liferay.portal.liveusers.LiveUsers" %><%@
 page import="com.liferay.portal.util.comparator.UserTrackerModifiedDateComparator" %>
 
 <%
-Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);
+Format format = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);
 %>
 
 <%@ include file="/html/portlet/monitoring/init-ext.jsp" %>

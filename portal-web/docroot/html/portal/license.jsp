@@ -70,9 +70,9 @@ List<ClusterNode> clusterNodes = ClusterExecutorUtil.getClusterNodes();
 
 Collections.sort(clusterNodes);
 
-DateFormat dateFormatDateTime = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, locale);
+DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, locale);
 
-dateFormatDateTime.setTimeZone(timeZone);
+dateFormat.setTimeZone(timeZone);
 %>
 
 <h2 class="version-info">
@@ -250,10 +250,10 @@ dateFormatDateTime.setTimeZone(timeZone);
 									<liferay-ui:message key='<%= curLicenseProperties.get("type") %>' />
 								</td>
 								<td>
-									<%= dateFormatDateTime.format(new Date(startDateTime)) %>
+									<%= dateFormat.format(new Date(startDateTime)) %>
 								</td>
 								<td>
-									<%= dateFormatDateTime.format(new Date(expirationDateTime)) %>
+									<%= dateFormat.format(new Date(expirationDateTime)) %>
 								</td>
 								<td>
 									<c:if test="<%= maxConcurrentUsers > 0 %>">

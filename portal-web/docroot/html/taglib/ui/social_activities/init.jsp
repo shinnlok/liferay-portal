@@ -39,8 +39,8 @@ if (activities == null) {
 
 String selector = StringPool.BLANK;
 
-Format dateFormatDate = FastDateFormatFactoryUtil.getSimpleDateFormat("MMMM d", locale, timeZone);
-Format timeFormatDate = FastDateFormatFactoryUtil.getTime(locale, timeZone);
+Format dateFormat = FastDateFormatFactoryUtil.getSimpleDateFormat("MMMM d", locale, timeZone);
+Format timeFormat = FastDateFormatFactoryUtil.getTime(locale, timeZone);
 %>
 
 <%@ include file="/html/taglib/ui/social_activities/init-ext.jsp" %>

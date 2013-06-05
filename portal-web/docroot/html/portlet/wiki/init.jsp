@@ -122,7 +122,7 @@ int rssDelta = GetterUtil.getInteger(preferences.getValue("rssDelta", StringPool
 String rssDisplayStyle = preferences.getValue("rssDisplayStyle", RSSUtil.DISPLAY_STYLE_DEFAULT);
 String rssFeedType = preferences.getValue("rssFeedType", RSSUtil.FEED_TYPE_DEFAULT);
 
-Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);
+Format format = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);
 %>
 
 <%@ include file="/html/portlet/wiki/init-ext.jsp" %>

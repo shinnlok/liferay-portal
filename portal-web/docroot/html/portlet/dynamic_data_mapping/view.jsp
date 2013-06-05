@@ -147,7 +147,7 @@ portletURL.setParameter("tabs1", tabs1);
 			>
 
 				<%
-				buffer.append(dateFormatDateTime.format(structure.getModifiedDate()));
+				buffer.append(format.format(structure.getModifiedDate()));
 				%>
 
 			</liferay-ui:search-container-column-text>

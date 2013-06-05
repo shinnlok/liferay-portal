@@ -94,7 +94,7 @@ else {
 	}
 }
 
-Format timeFormat = FastDateFormatFactoryUtil.getSimpleDateFormat("HH:mm", locale);
+Format format = FastDateFormatFactoryUtil.getSimpleDateFormat("HH:mm", locale);
 %>
 
 <liferay-ui:error-marker key="errorSection" value="services" />
@@ -177,7 +177,7 @@ Format timeFormat = FastDateFormatFactoryUtil.getSimpleDateFormat("HH:mm", local
 								int today = cal.get(Calendar.DATE);
 
 								while (cal.get(Calendar.DATE) == today) {
-									String timeOfDayDisplay = timeFormat.format(cal.getTime());
+									String timeOfDayDisplay = format.format(cal.getTime());
 									int timeOfDayValue = GetterUtil.getInteger(StringUtil.replace(timeOfDayDisplay, StringPool.COLON, StringPool.BLANK));
 
 									cal.add(Calendar.MINUTE, 30);
@@ -221,7 +221,7 @@ Format timeFormat = FastDateFormatFactoryUtil.getSimpleDateFormat("HH:mm", local
 								int today = cal.get(Calendar.DATE);
 
 								while (cal.get(Calendar.DATE) == today) {
-									String timeOfDayDisplay = timeFormat.format(cal.getTime());
+									String timeOfDayDisplay = format.format(cal.getTime());
 									int timeOfDayValue = GetterUtil.getInteger(StringUtil.replace(timeOfDayDisplay, StringPool.COLON, StringPool.BLANK));
 
 									cal.add(Calendar.MINUTE, 30);

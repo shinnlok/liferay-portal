@@ -84,7 +84,7 @@ catch (Exception e) {
 
 			<c:if test="<%= (publishedDate != null) && showFeedPublishedDate %>">
 				<div class="feed-published-date feed-date">
-					<aui:a href="<%= feedLink %>" target="_new"><%= dateFormatDateTime.format(publishedDate) %></aui:a>
+					<aui:a href="<%= feedLink %>" target="_new"><%= dateTimeFormat.format(publishedDate) %></aui:a>
 				</div>
 			</c:if>
 
@@ -158,7 +158,7 @@ catch (Exception e) {
 						<div class="feed-entry-content <%= (windowState.equals(WindowState.MAXIMIZED) || (j < expandedEntriesPerFeed)) ? "" : "hide" %>">
 							<c:if test="<%= entry.getPublishedDate() != null %>">
 								<div class="feed-date">
-									<%= dateFormatDateTime.format(entry.getPublishedDate()) %>
+									<%= dateTimeFormat.format(entry.getPublishedDate()) %>
 								</div>
 							</c:if>
 

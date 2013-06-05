@@ -990,7 +990,7 @@ public class LayoutTypePortletImpl
 
 		_portalPreferences.setValue(
 			CustomizedPages.namespacePlid(plid), _MODIFIED_DATE,
-			_dateFormat.format(new Date()));
+			_format.format(new Date()));
 	}
 
 	@Override
@@ -1799,7 +1799,7 @@ public class LayoutTypePortletImpl
 
 		_portalPreferences.setValue(
 			CustomizedPages.namespacePlid(getPlid()), _MODIFIED_DATE,
-			_dateFormat.format(new Date()));
+			_format.format(new Date()));
 	}
 
 	private static final String _MODIFIED_DATE = "modifiedDate";
@@ -1812,10 +1812,10 @@ public class LayoutTypePortletImpl
 	private static String _nestedPortletsNamespace;
 
 	private boolean _customizedView;
-	private Format _dateFormat = FastDateFormatFactoryUtil.getSimpleDateFormat(
-		PropsValues.INDEX_DATE_FORMAT_PATTERN);
 	private List<Portlet> _embeddedPortlets;
 	private boolean _enablePortletLayoutListener = true;
+	private Format _format = FastDateFormatFactoryUtil.getSimpleDateFormat(
+		PropsValues.INDEX_DATE_FORMAT_PATTERN);
 	private Layout _layoutSetPrototypeLayout;
 	private PortalPreferences _portalPreferences;
 	private boolean _updatePermission;

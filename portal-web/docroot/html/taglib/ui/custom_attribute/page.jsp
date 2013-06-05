@@ -62,7 +62,7 @@ ExpandoBridge expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(company.
 		localizedName = HtmlUtil.escape(TextFormatter.format(name, TextFormatter.J));
 	}
 
-	Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);
+	Format format = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);
 	%>
 
 	<c:if test="<%= !propertyHidden && ExpandoColumnPermissionUtil.contains(permissionChecker, company.getCompanyId(), className, ExpandoTableConstants.DEFAULT_TABLE_NAME, name, ActionKeys.VIEW) %>">
@@ -689,7 +689,7 @@ ExpandoBridge expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(company.
 					}
 				}
 				else if (type == ExpandoColumnConstants.DATE) {
-					sb.append(dateFormatDateTime.format((Date)value));
+					sb.append(format.format((Date)value));
 				}
 				else if (type == ExpandoColumnConstants.DATE_ARRAY) {
 					if (!Arrays.deepEquals((Date[])value, (Date[])defaultValue)) {
@@ -700,7 +700,7 @@ ExpandoBridge expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(company.
 								sb.append(StringPool.COMMA_AND_SPACE);
 							}
 
-							sb.append(dateFormatDateTime.format(dates[i]));
+							sb.append(format.format(dates[i]));
 						}
 					}
 				}

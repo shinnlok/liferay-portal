@@ -112,10 +112,10 @@ String[] months = CalendarUtil.getMonths(locale);
 
 String[] days = CalendarUtil.getDays(locale);
 
-Format dateFormatDate = FastDateFormatFactoryUtil.getDate(locale);
-Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale);
-Format dateFormatTime = FastDateFormatFactoryUtil.getTime(locale);
-DateFormat dateFormatISO8601 = DateUtil.getISO8601Format();
+Format dateFormat = FastDateFormatFactoryUtil.getDate(locale);
+Format dateTimeFormat = FastDateFormatFactoryUtil.getDateTime(locale);
+Format timeFormat = FastDateFormatFactoryUtil.getTime(locale);
+DateFormat iso8601DateFormat = DateUtil.getISO8601Format();
 %>
 
 <%@ include file="/html/portlet/calendar/init-ext.jsp" %>
