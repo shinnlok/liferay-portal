@@ -40,7 +40,7 @@ import com.liferay.portal.kernel.portlet.LiferayPortletURL;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.PortletBag;
 import com.liferay.portal.kernel.portlet.PortletBagPool;
-import com.liferay.portal.kernel.portlet.PortletContainerSecurityUtil;
+import com.liferay.portal.kernel.portlet.PortletSecurityUtil;
 import com.liferay.portal.kernel.security.pacl.DoPrivileged;
 import com.liferay.portal.kernel.servlet.BrowserSnifferUtil;
 import com.liferay.portal.kernel.servlet.DynamicServletRequest;
@@ -1160,22 +1160,24 @@ public class PortalImpl implements Portal {
 			boolean forceLayoutFriendlyURL)
 		throws PortalException, SystemException {
 
-		completeURL = removeRedirectParameter(completeURL);
-
+		String groupFriendlyURL = StringPool.BLANK;
 		String parametersURL = StringPool.BLANK;
 
-		int pos = completeURL.indexOf(Portal.FRIENDLY_URL_SEPARATOR);
+		if (Validator.isNotNull(completeURL)) {
+			completeURL = removeRedirectParameter(completeURL);
 
-		if (pos == -1) {
-			pos = completeURL.indexOf(StringPool.QUESTION);
-		}
+			int pos = completeURL.indexOf(Portal.FRIENDLY_URL_SEPARATOR);
 
-		String groupFriendlyURL = completeURL;
+			if (pos == -1) {
+				pos = completeURL.indexOf(StringPool.QUESTION);
+			}
 
-		if (pos != -1) {
-			groupFriendlyURL = completeURL.substring(0, pos);
+			groupFriendlyURL = completeURL;
 
-			parametersURL = completeURL.substring(pos);
+			if (pos != -1) {
+				groupFriendlyURL = completeURL.substring(0, pos);
+				parametersURL = completeURL.substring(pos);
+			}
 		}
 
 		if (layout == null) {
@@ -2257,6 +2259,20 @@ public class PortalImpl implements Portal {
 		}
 
 		return facebookURL;
+	}
+
+	@Override
+	public Portlet getFirstMyAccountPortlet(ThemeDisplay themeDisplay)
+		throws SystemException {
+
+		List<Portlet> portlets = PortalUtil.getControlPanelPortlets(
+			PortletCategoryKeys.MY, themeDisplay);
+
+		if (portlets.isEmpty()) {
+			return null;
+		}
+
+		return portlets.get(0);
 	}
 
 	@Override
@@ -3744,12 +3760,12 @@ public class PortalImpl implements Portal {
 
 	@Override
 	public Set<String> getPortletAddDefaultResourceCheckWhitelist() {
-		return PortletContainerSecurityUtil.getWhitelist();
+		return PortletSecurityUtil.getWhitelist();
 	}
 
 	@Override
 	public Set<String> getPortletAddDefaultResourceCheckWhitelistActions() {
-		return PortletContainerSecurityUtil.getWhitelistActions();
+		return PortletSecurityUtil.getWhitelistActions();
 	}
 
 	/**
@@ -5054,18 +5070,7 @@ public class PortalImpl implements Portal {
 
 		HttpSession session = request.getSession();
 
-		String jRemoteUser = null;
-
-		if (PropsValues.PORTAL_JAAS_ENABLE) {
-			jRemoteUser = (String)session.getAttribute("j_remoteuser");
-		}
-
-		if (Validator.isNotNull(jRemoteUser)) {
-			userIdObj = GetterUtil.getLong(jRemoteUser);
-		}
-		else {
-			userIdObj = (Long)session.getAttribute(WebKeys.USER_ID);
-		}
+		userIdObj = (Long)session.getAttribute(WebKeys.USER_ID);
 
 		if (userIdObj != null) {
 			request.setAttribute(WebKeys.USER_ID, userIdObj);
@@ -5574,7 +5579,7 @@ public class PortalImpl implements Portal {
 			return true;
 		}
 
-		Set<String> whiteList = PortletContainerSecurityUtil.getWhitelist();
+		Set<String> whiteList = PortletSecurityUtil.getWhitelist();
 
 		if (whiteList.contains(portletId)) {
 			return true;
@@ -5590,7 +5595,7 @@ public class PortalImpl implements Portal {
 		}
 
 		Set<String> whitelistActions =
-			PortletContainerSecurityUtil.getWhitelistActions();
+			PortletSecurityUtil.getWhitelistActions();
 
 		if (whitelistActions.contains(strutsAction)) {
 			return true;
@@ -6060,12 +6065,12 @@ public class PortalImpl implements Portal {
 
 	@Override
 	public Set<String> resetPortletAddDefaultResourceCheckWhitelist() {
-		return PortletContainerSecurityUtil.resetWhitelist();
+		return PortletSecurityUtil.resetWhitelist();
 	}
 
 	@Override
 	public Set<String> resetPortletAddDefaultResourceCheckWhitelistActions() {
-		return PortletContainerSecurityUtil.resetWhitelistActions();
+		return PortletSecurityUtil.resetWhitelistActions();
 	}
 
 	@Override

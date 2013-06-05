@@ -19,6 +19,7 @@
 <%
 String randomNamespace = PortalUtil.generateRandomKey(request, "taglib_ui_input_localized_page");
 
+boolean autoFocus = GetterUtil.getBoolean((String)request.getAttribute("liferay-ui:input-localized:autoFocus"));
 boolean autoSize = GetterUtil.getBoolean((String)request.getAttribute("liferay-ui:input-localized:autoSize"));
 String cssClass = GetterUtil.getString((String)request.getAttribute("liferay-ui:input-localized:cssClass"));
 String defaultLanguageId = (String)request.getAttribute("liferay-ui:input-localized:defaultLanguageId");
@@ -71,6 +72,8 @@ String fieldSuffix = StringPool.BLANK;
 if ((locales.length > 1) && !Validator.isNull(languageId)) {
 	fieldSuffix = StringPool.UNDERLINE + mainLanguageId;
 }
+
+List<String> languageIds = new ArrayList<String>();
 %>
 
 <span class="liferay-input-localized" id="<portlet:namespace /><%= id %>BoundingBox">
@@ -91,11 +94,15 @@ if ((locales.length > 1) && !Validator.isNull(languageId)) {
 		</c:when>
 	</c:choose>
 
+	<c:if test="<%= autoFocus %>">
+		<aui:script>
+			Liferay.Util.focusFormField('#<portlet:namespace /><%= id + StringPool.UNDERLINE + mainLanguageId %>');
+		</aui:script>
+	</c:if>
+
 	<c:if test="<%= (locales.length > 1) && Validator.isNull(languageId) %>">
 
 		<%
-		List<String> languageIds = new ArrayList<String>();
-
 		languageIds.add(defaultLanguageId);
 
 		if (Validator.isNotNull(xml)) {
@@ -162,7 +169,8 @@ if ((locales.length > 1) && !Validator.isNull(languageId)) {
 				contentBox: '#<portlet:namespace /><%= id %>ContentBox',
 				inputNamespace: '<portlet:namespace /><%= id + StringPool.UNDERLINE %>',
 				inputPlaceholder: '#<portlet:namespace /><%= HtmlUtil.escapeJS(id + fieldSuffix) %>',
-				toggleSelection: false
+				toggleSelection: false,
+				translatedLanguages: '<%= StringUtil.merge(languageIds) %>'
 			}
 		);
 	</aui:script>

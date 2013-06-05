@@ -413,6 +413,11 @@
 	<component name="Input">
 		<attributes>
 			<attribute>
+				<name>autoFocus</name>
+				<inputType>boolean</inputType>
+				<outputType>boolean</outputType>
+			</attribute>
+			<attribute>
 				<name>autoSize</name>
 				<inputType>boolean</inputType>
 				<outputType>boolean</outputType>
@@ -555,6 +560,11 @@
 			</attribute>
 			<attribute>
 				<name>required</name>
+				<inputType>boolean</inputType>
+				<outputType>boolean</outputType>
+			</attribute>
+			<attribute>
+				<name>resizable</name>
 				<inputType>boolean</inputType>
 				<outputType>boolean</outputType>
 			</attribute>
@@ -974,6 +984,7 @@
 			</attribute>
 		</attributes>
 	</component>
+	<component name="Spacer" dynamicAttributes="false" parentClass="com.liferay.portal.kernel.servlet.taglib.TagSupport" writeBaseClass="false" writeJSP="false" />
 	<component name="TranslationManager" dynamicAttributes="false">
 		<attributes>
 			<attribute>
