@@ -171,15 +171,15 @@ long portletDisplayDDMTemplateId = PortletDisplayTemplateUtil.getPortletDisplayT
 
 								<div class="lfr-asset-metadata">
 									<div class="lfr-asset-icon lfr-asset-date">
-										<%= LanguageUtil.format(pageContext, "last-updated-x", dateFormatDate.format(folder.getModifiedDate())) %>
+										<%= LanguageUtil.format(pageContext, "last-updated-x", format.format(folder.getModifiedDate())) %>
 									</div>
 
 									<div class="lfr-asset-icon lfr-asset-subfolders">
-										<%= foldersCount %> <liferay-ui:message key='<%= (foldersCount == 1) ? "subfolder" : "subfolders" %>' />
+										<%= foldersCount %><aui:spacer /><liferay-ui:message key='<%= (foldersCount == 1) ? "subfolder" : "subfolders" %>' />
 									</div>
 
 									<div class="lfr-asset-icon lfr-asset-items last">
-										<%= imagesCount %> <liferay-ui:message key='<%= (imagesCount == 1) ? "image" : "images" %>' />
+										<%= imagesCount %><aui:spacer /><liferay-ui:message key='<%= (imagesCount == 1) ? "image" : "images" %>' />
 									</div>
 								</div>
 

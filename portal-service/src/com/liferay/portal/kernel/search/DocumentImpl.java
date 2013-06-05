@@ -57,10 +57,11 @@ public class DocumentImpl implements Document {
 
 		String languageId = LocaleUtil.toLanguageId(locale);
 
-		String localizedName = name.concat(StringPool.UNDERLINE).concat(
-			languageId);
+		return getLocalizedName(languageId, name);
+	}
 
-		return localizedName;
+	public static String getLocalizedName(String languageId, String name) {
+		return name.concat(StringPool.UNDERLINE).concat(languageId);
 	}
 
 	public static String getSortableFieldName(String name) {
@@ -83,7 +84,7 @@ public class DocumentImpl implements Document {
 			return;
 		}
 
-		addKeyword(name, _dateFormat.format(value));
+		addKeyword(name, _format.format(value));
 	}
 
 	@Override
@@ -95,7 +96,7 @@ public class DocumentImpl implements Document {
 		String[] dates = new String[values.length];
 
 		for (int i = 0; i < values.length; i++) {
-			dates[i] = _dateFormat.format(values[i]);
+			dates[i] = _format.format(values[i]);
 		}
 
 		addKeyword(name, dates);
@@ -794,12 +795,12 @@ public class DocumentImpl implements Document {
 
 	private static final String _UID_PORTLET = "_PORTLET_";
 
-	private static Format _dateFormat =
-		FastDateFormatFactoryUtil.getSimpleDateFormat(
-			_INDEX_DATE_FORMAT_PATTERN);
 	private static Set<String> _defaultSortableTextFields = SetUtil.fromArray(
 		PropsUtil.getArray(PropsKeys.INDEX_SORTABLE_TEXT_FIELDS));
 
+	private static Format _format =
+		FastDateFormatFactoryUtil.getSimpleDateFormat(
+			_INDEX_DATE_FORMAT_PATTERN);
 	private Map<String, Field> _fields = new HashMap<String, Field>();
 	private Set<String> _sortableTextFields = _defaultSortableTextFields;
 

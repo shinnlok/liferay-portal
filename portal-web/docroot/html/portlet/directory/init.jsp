@@ -34,7 +34,7 @@ String tabs1 = ParamUtil.getString(request, "tabs1", "users");
 
 boolean filterManageableOrganizations = false;
 
-Format dateFormatDate = FastDateFormatFactoryUtil.getDate(locale);
+Format format = FastDateFormatFactoryUtil.getDate(locale);
 %>
 
 <%@ include file="/html/portlet/directory/init-ext.jsp" %>

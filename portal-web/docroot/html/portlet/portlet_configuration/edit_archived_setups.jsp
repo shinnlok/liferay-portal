@@ -96,7 +96,7 @@ portletURL.setParameter("portletResource", portletResource);
 
 		// Date
 
-		row.addText(dateFormatDateTime.format(portletItem.getModifiedDate()));
+		row.addText(format.format(portletItem.getModifiedDate()));
 
 		// Action
 

@@ -22,7 +22,7 @@ page import="com.liferay.portal.plugin.PluginPackageException" %><%@
 page import="com.liferay.portal.plugin.PluginPackageUtil" %>
 
 <%
-Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);
+Format format = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);
 %>
 
 <%@ include file="/html/portlet/update_manager/init-ext.jsp" %>

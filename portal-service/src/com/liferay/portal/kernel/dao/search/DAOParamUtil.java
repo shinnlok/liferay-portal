@@ -74,9 +74,9 @@ public class DAOParamUtil {
 				cal.set(year, month, day, hour, minute, 0);
 			}
 
-			DateFormat isoFormat = DateUtil.getISOFormat();
+			DateFormat isoDateFormat = DateUtil.getISOFormat();
 
-			return isoFormat.format(cal.getTime());
+			return isoDateFormat.format(cal.getTime());
 		}
 		else {
 			return null;
@@ -107,9 +107,9 @@ public class DAOParamUtil {
 				cal.set(year, month, day, hour, minute, 0);
 			}
 
-			DateFormat isoFormat = DateUtil.getISOFormat();
+			DateFormat isoDateFormat = DateUtil.getISOFormat();
 
-			return isoFormat.format(cal.getTime());
+			return isoDateFormat.format(cal.getTime());
 		}
 		else {
 			return null;

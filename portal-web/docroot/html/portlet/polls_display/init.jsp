@@ -39,7 +39,7 @@ if (Validator.isNotNull(portletResource)) {
 
 long questionId = GetterUtil.getLong(preferences.getValue("questionId", StringPool.BLANK));
 
-Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);
+Format format = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);
 %>
 
 <%@ include file="/html/portlet/polls_display/init-ext.jsp" %>

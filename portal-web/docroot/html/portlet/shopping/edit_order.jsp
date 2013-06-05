@@ -72,7 +72,7 @@ long orderId = BeanParamUtil.getLong(order, request, "orderId");
 			<liferay-ui:message key="order-date" />:
 		</td>
 		<td>
-			<%= dateFormatDateTime.format(order.getCreateDate()) %>
+			<%= format.format(order.getCreateDate()) %>
 		</td>
 	</tr>
 	<tr>
@@ -80,7 +80,7 @@ long orderId = BeanParamUtil.getLong(order, request, "orderId");
 			<liferay-ui:message key="last-modified" />:
 		</td>
 		<td>
-			<%= dateFormatDateTime.format(order.getModifiedDate()) %>
+			<%= format.format(order.getModifiedDate()) %>
 		</td>
 	</tr>
 	</table>
@@ -485,7 +485,7 @@ long orderId = BeanParamUtil.getLong(order, request, "orderId");
 	</tr>
 	<tr>
 		<td>
-			<liferay-ui:message key="shipping" /> <%= Validator.isNotNull(order.getAltShipping()) ? "(" + order.getAltShipping() + ")" : StringPool.BLANK %>
+			<liferay-ui:message key="shipping" /><aui:spacer /><%= Validator.isNotNull(order.getAltShipping()) ? "(" + order.getAltShipping() + ")" : StringPool.BLANK %>
 		</td>
 		<td>
 			<%= currencyFormat.format(order.getShipping()) %>

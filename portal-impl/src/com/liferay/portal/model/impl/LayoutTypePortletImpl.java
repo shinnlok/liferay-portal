@@ -19,8 +19,8 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.portlet.PortletContainerSecurityUtil;
 import com.liferay.portal.kernel.portlet.PortletLayoutListener;
+import com.liferay.portal.kernel.portlet.PortletSecurityUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
@@ -990,7 +990,7 @@ public class LayoutTypePortletImpl
 
 		_portalPreferences.setValue(
 			CustomizedPages.namespacePlid(plid), _MODIFIED_DATE,
-			_dateFormat.format(new Date()));
+			_format.format(new Date()));
 	}
 
 	@Override
@@ -1384,7 +1384,7 @@ public class LayoutTypePortletImpl
 					PortletKeys.PREFS_OWNER_TYPE_USER, layout.getPlid()));
 		}
 
-		Set<String> whiteList = PortletContainerSecurityUtil.getWhitelist();
+		Set<String> whiteList = PortletSecurityUtil.getWhitelist();
 
 		for (PortletPreferences portletPreference : portletPreferences) {
 			String portletId = portletPreference.getPortletId();
@@ -1799,7 +1799,7 @@ public class LayoutTypePortletImpl
 
 		_portalPreferences.setValue(
 			CustomizedPages.namespacePlid(getPlid()), _MODIFIED_DATE,
-			_dateFormat.format(new Date()));
+			_format.format(new Date()));
 	}
 
 	private static final String _MODIFIED_DATE = "modifiedDate";
@@ -1812,10 +1812,10 @@ public class LayoutTypePortletImpl
 	private static String _nestedPortletsNamespace;
 
 	private boolean _customizedView;
-	private Format _dateFormat = FastDateFormatFactoryUtil.getSimpleDateFormat(
-		PropsValues.INDEX_DATE_FORMAT_PATTERN);
 	private List<Portlet> _embeddedPortlets;
 	private boolean _enablePortletLayoutListener = true;
+	private Format _format = FastDateFormatFactoryUtil.getSimpleDateFormat(
+		PropsValues.INDEX_DATE_FORMAT_PATTERN);
 	private Layout _layoutSetPrototypeLayout;
 	private PortalPreferences _portalPreferences;
 	private boolean _updatePermission;

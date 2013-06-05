@@ -27,6 +27,9 @@ page import="com.liferay.portal.NoSuchResourceException" %><%@
 page import="com.liferay.portal.PortletIdException" %><%@
 page import="com.liferay.portal.PortletItemNameException" %><%@
 page import="com.liferay.portal.ResourcePrimKeyException" %><%@
+page import="com.liferay.portal.kernel.lar.ManifestSummary" %><%@
+page import="com.liferay.portal.kernel.lar.PortletDataContext" %><%@
+page import="com.liferay.portal.kernel.lar.PortletDataContextFactoryUtil" %><%@
 page import="com.liferay.portal.kernel.lar.PortletDataException" %><%@
 page import="com.liferay.portal.kernel.lar.PortletDataHandler" %><%@
 page import="com.liferay.portal.kernel.lar.PortletDataHandlerBoolean" %><%@
@@ -49,7 +52,7 @@ String portletResource = ParamUtil.getString(request, "portletResource");
 
 Portlet selPortlet = PortletLocalServiceUtil.getPortletById(company.getCompanyId(), portletResource);
 
-Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);
+Format format = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);
 %>
 
 <%@ include file="/html/portlet/portlet_configuration/init-ext.jsp" %>

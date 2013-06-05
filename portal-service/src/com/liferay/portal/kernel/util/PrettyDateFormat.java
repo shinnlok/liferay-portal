@@ -62,27 +62,27 @@ public class PrettyDateFormat extends DateFormat {
 
 		Date yesterday = cal.getTime();
 
-		Format dateFormatDate = FastDateFormatFactoryUtil.getDate(
+		Format dateFormat = FastDateFormatFactoryUtil.getDate(
 			_locale, _timeZone);
-		Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(
+		Format dateTimeFormat = FastDateFormatFactoryUtil.getDateTime(
 			_locale, _timeZone);
-		Format dateFormatTime = FastDateFormatFactoryUtil.getTime(
+		Format timeFormat = FastDateFormatFactoryUtil.getTime(
 			_locale, _timeZone);
 
-		dateString = dateFormatDate.format(date);
+		dateString = dateFormat.format(date);
 
-		if (dateString.equals(dateFormatDate.format(today))) {
+		if (dateString.equals(dateFormat.format(today))) {
 			dateString =
 				_todayString + StringPool.SPACE +
-					dateFormatTime.format(date);
+					timeFormat.format(date);
 		}
-		else if (dateString.equals(dateFormatDate.format(yesterday))) {
+		else if (dateString.equals(dateFormat.format(yesterday))) {
 			dateString =
 				_yesterdayString + StringPool.SPACE +
-					dateFormatTime.format(date);
+					timeFormat.format(date);
 		}
 		else {
-			dateString = dateFormatDateTime.format(date);
+			dateString = dateTimeFormat.format(date);
 		}
 
 		return sb.append(dateString);
@@ -90,9 +90,9 @@ public class PrettyDateFormat extends DateFormat {
 
 	@Override
 	public Date parse(String source, ParsePosition pos) {
-		Format dateFormatDate = FastDateFormatFactoryUtil.getDate(
+		Format dateFormat = FastDateFormatFactoryUtil.getDate(
 			_locale, _timeZone);
-		DateFormat dateFormatDateTime = DateFormatFactoryUtil.getDateTime(
+		DateFormat dateTimeFormat = DateFormatFactoryUtil.getDateTime(
 			_locale, _timeZone);
 
 		Date today = new Date();
@@ -101,7 +101,7 @@ public class PrettyDateFormat extends DateFormat {
 
 		if (dateString.startsWith(_todayString)) {
 			dateString = dateString.replaceFirst(
-				_todayString, dateFormatDate.format(today));
+				_todayString, dateFormat.format(today));
 		}
 		else if (dateString.startsWith(_yesterdayString)) {
 			Calendar cal = Calendar.getInstance(_timeZone, _locale);
@@ -112,10 +112,10 @@ public class PrettyDateFormat extends DateFormat {
 			Date yesterday = cal.getTime();
 
 			dateString = dateString.replaceFirst(
-				_todayString, dateFormatDate.format(yesterday));
+				_todayString, dateFormat.format(yesterday));
 		}
 
-		return dateFormatDateTime.parse(dateString, new ParsePosition(0));
+		return dateTimeFormat.parse(dateString, new ParsePosition(0));
 	}
 
 	private Locale _locale;

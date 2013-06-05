@@ -38,6 +38,7 @@ import com.liferay.portal.model.Group;
 import com.liferay.portal.model.GroupConstants;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.LayoutConstants;
+import com.liferay.portal.model.LayoutFriendlyURL;
 import com.liferay.portal.model.LayoutSet;
 import com.liferay.portal.model.LayoutTypePortletConstants;
 import com.liferay.portal.model.ModelHintsUtil;
@@ -56,6 +57,7 @@ import com.liferay.portal.model.impl.ClassNameImpl;
 import com.liferay.portal.model.impl.CompanyImpl;
 import com.liferay.portal.model.impl.ContactImpl;
 import com.liferay.portal.model.impl.GroupImpl;
+import com.liferay.portal.model.impl.LayoutFriendlyURLImpl;
 import com.liferay.portal.model.impl.LayoutImpl;
 import com.liferay.portal.model.impl.LayoutSetImpl;
 import com.liferay.portal.model.impl.PortletPreferencesImpl;
@@ -285,7 +287,7 @@ public class DataFactory {
 			return null;
 		}
 
-		return _simpleDateFormat.format(date);
+		return _format.format(date);
 	}
 
 	public long getDDLRecordSetClassNameId() {
@@ -1218,6 +1220,24 @@ public class DataFactory {
 		layout.setTypeSettings(typeSettings);
 
 		return layout;
+	}
+
+	public LayoutFriendlyURL newLayoutFriendlyURL(Layout layout) {
+		LayoutFriendlyURL layoutFriendlyURL = new LayoutFriendlyURLImpl();
+
+		layoutFriendlyURL.setUuid(SequentialUUID.generate());
+		layoutFriendlyURL.setLayoutFriendlyURLId(_counter.get());
+		layoutFriendlyURL.setGroupId(layout.getGroupId());
+		layoutFriendlyURL.setCompanyId(_companyId);
+		layoutFriendlyURL.setUserId(_sampleUserId);
+		layoutFriendlyURL.setUserName(_SAMPLE_USER_NAME);
+		layoutFriendlyURL.setCreateDate(new Date());
+		layoutFriendlyURL.setModifiedDate(new Date());
+		layoutFriendlyURL.setPlid(layout.getPlid());
+		layoutFriendlyURL.setFriendlyURL(layout.getFriendlyURL());
+		layoutFriendlyURL.setLanguageId("en_US");
+
+		return layoutFriendlyURL;
 	}
 
 	public List<LayoutSet> newLayoutSets(
@@ -2159,6 +2179,8 @@ public class DataFactory {
 	private long _defaultUserId;
 	private String _dlDDMStructureContent;
 	private List<String> _firstNames;
+	private Format _format = FastDateFormatFactoryUtil.getSimpleDateFormat(
+		"yyyy-MM-dd HH:mm:ss");
 	private SimpleCounter _futureDateCounter;
 	private Group _globalGroup;
 	private long _globalGroupId;
@@ -2187,8 +2209,6 @@ public class DataFactory {
 	private List<Role> _roles;
 	private User _sampleUser;
 	private long _sampleUserId;
-	private Format _simpleDateFormat =
-		FastDateFormatFactoryUtil.getSimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private Role _siteMemberRole;
 	private SimpleCounter _socialActivityCounter;
 	private SimpleCounter _timeCounter;

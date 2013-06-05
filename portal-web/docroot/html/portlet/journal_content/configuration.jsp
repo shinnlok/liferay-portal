@@ -217,11 +217,11 @@ catch (NoSuchArticleException nsae) {
 
 		// Modified date
 
-		row.addText(dateFormatDate.format(curArticle.getModifiedDate()), rowHREF);
+		row.addText(format.format(curArticle.getModifiedDate()), rowHREF);
 
 		// Display date
 
-		row.addText(dateFormatDate.format(curArticle.getDisplayDate()), rowHREF);
+		row.addText(format.format(curArticle.getDisplayDate()), rowHREF);
 
 		// Author
 
@@ -261,7 +261,7 @@ catch (NoSuchArticleException nsae) {
 			%>
 
 				<aui:field-wrapper inlineField="<%= true %>" inlineLabel="left" label="<%= conversion.toUpperCase() %>">
-					<input <%= ArrayUtil.contains(extensions, conversion) ? "checked": "" %> <%= !openOfficeServerEnabled ? "disabled" : "" %> name="<portlet:namespace />extensions" type="checkbox" value="<%= conversion %>" />
+					<input <%= ArrayUtil.contains(extensions, conversion) ? "checked": "" %><aui:spacer /><%= !openOfficeServerEnabled ? "disabled" : "" %> name="<portlet:namespace />extensions" type="checkbox" value="<%= conversion %>" />
 				</aui:field-wrapper>
 
 			<%

@@ -60,16 +60,16 @@ int weekNumber = 1;
 	<c:if test="<%= Validator.isNotNull(headerPattern) || (headerFormat != null) %>">
 
 		<%
-		Format dateFormat = headerFormat;
+		Format format = headerFormat;
 
 		if (Validator.isNotNull(headerPattern)) {
-			dateFormat = FastDateFormatFactoryUtil.getSimpleDateFormat(headerPattern, locale);
+			format = FastDateFormatFactoryUtil.getSimpleDateFormat(headerPattern, locale);
 		}
 		%>
 
 		<tr class="calendar-header">
 			<th class="table-header" colspan="7">
-				<%= dateFormat.format(Time.getDate(selCal.getTime(), timeZone)) %>
+				<%= format.format(Time.getDate(selCal.getTime(), timeZone)) %>
 			</th>
 		</tr>
 	</c:if>

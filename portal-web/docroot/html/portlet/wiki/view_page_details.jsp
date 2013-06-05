@@ -90,7 +90,7 @@ int count = 0;
 		<liferay-ui:message key="created-by" />
 	</th>
 	<td class="table-cell">
-		<%= HtmlUtil.escape(initialPage.getUserName()) %> (<%= dateFormatDateTime.format(initialPage.getCreateDate()) %>)
+		<%= HtmlUtil.escape(initialPage.getUserName()) %> (<%= format.format(initialPage.getCreateDate()) %>)
 	</td>
 </tr>
 <tr>
@@ -98,7 +98,7 @@ int count = 0;
 		<liferay-ui:message key="last-changed-by" />
 	</th>
 	<td class="table-cell">
-		<%= HtmlUtil.escape(wikiPage.getUserName()) %> (<%= dateFormatDateTime.format(wikiPage.getCreateDate()) %>)
+		<%= HtmlUtil.escape(wikiPage.getUserName()) %> (<%= format.format(wikiPage.getCreateDate()) %>)
 	</td>
 </tr>
 <tr>

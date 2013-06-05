@@ -62,7 +62,7 @@
 							<liferay-ui:message key="yesterday" />
 						</c:when>
 						<c:otherwise>
-							<%= dateFormatDate.format(activity.getCreateDate()) %>
+							<%= dateFormat.format(activity.getCreateDate()) %>
 						</c:otherwise>
 					</c:choose>
 				</td>
@@ -78,7 +78,7 @@
 					<%= activityFeedEntry.getTitle() %>
 				</div>
 				<div class="activity-body">
-					<span class="time"><%= timeFormatDate.format(activity.getCreateDate()) %></span>
+					<span class="time"><%= timeFormat.format(activity.getCreateDate()) %></span>
 
 					<%= activityFeedEntry.getBody() %>
 				</div>

@@ -167,7 +167,7 @@ request.setAttribute("view_file_entry.jsp-fileEntry", fileEntry);
 					</c:when>
 					<c:otherwise>
 						<div class="alert alert-error">
-							<%= LanguageUtil.format(pageContext, "you-cannot-modify-this-document-because-it-was-locked-by-x-on-x", new Object[] {HtmlUtil.escape(PortalUtil.getUserName(lock.getUserId(), String.valueOf(lock.getUserId()))), dateFormatDateTime.format(lock.getCreateDate())}, false) %>
+							<%= LanguageUtil.format(pageContext, "you-cannot-modify-this-document-because-it-was-locked-by-x-on-x", new Object[] {HtmlUtil.escape(PortalUtil.getUserName(lock.getUserId(), String.valueOf(lock.getUserId()))), format.format(lock.getCreateDate())}, false) %>
 						</div>
 					</c:otherwise>
 				</c:choose>
@@ -181,7 +181,7 @@ request.setAttribute("view_file_entry.jsp-fileEntry", fileEntry);
 								<c:when test="<%= versionSpecific %>">
 									<%= fileVersion.getTitle() %>
 
-									(<liferay-ui:message key="version" /> <%= HtmlUtil.escape(fileVersion.getVersion()) %>)
+									(<liferay-ui:message key="version" /><aui:spacer /><%= HtmlUtil.escape(fileVersion.getVersion()) %>)
 								</c:when>
 								<c:otherwise>
 									<%= title %>
@@ -218,7 +218,7 @@ request.setAttribute("view_file_entry.jsp-fileEntry", fileEntry);
 							}
 							%>
 
-							<liferay-ui:icon image="../document_library/add_document" label="<%= true %>" message='<%= LanguageUtil.format(pageContext, "uploaded-by-x-x", new Object[] {displayURL, HtmlUtil.escape(fileEntry.getUserName()), dateFormatDateTime.format(fileEntry.getCreateDate())}) %>' />
+							<liferay-ui:icon image="../document_library/add_document" label="<%= true %>" message='<%= LanguageUtil.format(pageContext, "uploaded-by-x-x", new Object[] {displayURL, HtmlUtil.escape(fileEntry.getUserName()), format.format(fileEntry.getCreateDate())}) %>' />
 						</span>
 
 						<c:if test="<%= enableRatings && fileEntry.isSupportsSocial() %>">
@@ -450,7 +450,7 @@ request.setAttribute("view_file_entry.jsp-fileEntry", fileEntry);
 				<c:if test="<%= showAssetMetadata %>">
 					<div class="asset-details-content">
 						<h3 class="version <%= fileEntry.isCheckedOut() ? "document-locked" : StringPool.BLANK %>">
-							<liferay-ui:message key="version" /> <%= HtmlUtil.escape(fileVersion.getVersion()) %>
+							<liferay-ui:message key="version" /><aui:spacer /><%= HtmlUtil.escape(fileVersion.getVersion()) %>
 						</h3>
 
 						<div class="lfr-asset-icon lfr-asset-author">
@@ -458,7 +458,7 @@ request.setAttribute("view_file_entry.jsp-fileEntry", fileEntry);
 						</div>
 
 						<div class="lfr-asset-icon lfr-asset-date">
-							<%= dateFormatDateTime.format(fileVersion.getModifiedDate()) %>
+							<%= format.format(fileVersion.getModifiedDate()) %>
 						</div>
 
 						<c:if test="<%= !portletId.equals(PortletKeys.TRASH) %>">
@@ -576,7 +576,7 @@ request.setAttribute("view_file_entry.jsp-fileEntry", fileEntry);
 									}
 						%>
 
-									<liferay-ui:panel collapsible="<%= true %>" cssClass="metadata" extended="<%= true %>" id="documentLibraryMetadataPanel" persistState="<%= true %>" title="<%= HtmlUtil.escape(ddmStructure.getName(LocaleUtil.getDefault())) %>">
+									<liferay-ui:panel collapsible="<%= true %>" cssClass="metadata" extended="<%= true %>" id="documentLibraryMetadataPanel" persistState="<%= true %>" title="<%= HtmlUtil.escape(ddmStructure.getName(locale)) %>">
 
 										<liferay-ddm:html
 											classNameId="<%= PortalUtil.getClassNameId(DDMStructure.class) %>"
@@ -624,7 +624,7 @@ request.setAttribute("view_file_entry.jsp-fileEntry", fileEntry);
 								}
 
 								if (fields != null) {
-									String name = "metadata." + ddmStructure.getName(LocaleUtil.getDefault(), true);
+									String name = "metadata." + ddmStructure.getName(locale, true);
 						%>
 
 									<liferay-ui:panel collapsible="<%= true %>" cssClass="lfr-asset-metadata" id="documentLibraryAssetMetadataPanel" persistState="<%= true %>" title="<%= name %>">
@@ -708,7 +708,7 @@ request.setAttribute("view_file_entry.jsp-fileEntry", fileEntry);
 									// Statistics
 
 									row.addText(String.valueOf(curFileVersion.getVersion()));
-									row.addText(dateFormatDateTime.format(curFileVersion.getCreateDate()));
+									row.addText(format.format(curFileVersion.getCreateDate()));
 									row.addText(TextFormatter.formatStorageSize(curFileVersion.getSize(), locale));
 
 									// Status

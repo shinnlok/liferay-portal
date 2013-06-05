@@ -74,7 +74,7 @@ String eventName = ParamUtil.getString(request, "eventName", "selectStructure");
 
 			<liferay-ui:search-container-column-text
 				name="modified-date"
-				value="<%= dateFormatDateTime.format(structure.getModifiedDate()) %>"
+				value="<%= format.format(structure.getModifiedDate()) %>"
 			/>
 
 			<liferay-ui:search-container-column-text>

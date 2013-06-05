@@ -44,7 +44,7 @@ if (organizationId == 0) {
 	}
 }
 
-Format dateFormatDate = FastDateFormatFactoryUtil.getDate(locale, timeZone);
+Format format = FastDateFormatFactoryUtil.getDate(locale, timeZone);
 %>
 
 <%@ include file="/html/portlet/recent_bloggers/init-ext.jsp" %>

@@ -86,9 +86,9 @@ public class ReleaseInfo {
 	public static final int RELEASE_6_2_0_BUILD_NUMBER = 6200;
 
 	public static final Date getBuildDate() {
-		DateFormat df = DateFormat.getDateInstance(DateFormat.LONG);
+		DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.LONG);
 
-		return GetterUtil.getDate(_DATE, df);
+		return GetterUtil.getDate(_DATE, dateFormat);
 	}
 
 	public static final int getBuildNumber() {
@@ -140,7 +140,7 @@ public class ReleaseInfo {
 
 	private static final String _CODE_NAME = "Newton";
 
-	private static final String _DATE = "May 24, 2013";
+	private static final String _DATE = "June 07, 2013";
 
 	private static final String _NAME = "Liferay Portal Community Edition";
 

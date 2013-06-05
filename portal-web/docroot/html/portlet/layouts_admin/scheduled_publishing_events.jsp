@@ -50,14 +50,14 @@ for (int i = 0; i < results.size(); i++) {
 
 	Date startDate = SchedulerEngineHelperUtil.getStartTime(schedulerResponse);
 
-	row.addText(dateFormatDateTime.format(startDate));
+	row.addText(format.format(startDate));
 
 	// End date
 
 	Date endDate = SchedulerEngineHelperUtil.getEndTime(schedulerResponse);
 
 	if (endDate != null) {
-		row.addText(dateFormatDateTime.format(endDate));
+		row.addText(format.format(endDate));
 	}
 	else {
 		row.addText(LanguageUtil.get(pageContext, "no-end-date"));

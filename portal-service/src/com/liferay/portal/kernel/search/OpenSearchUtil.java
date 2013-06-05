@@ -50,7 +50,7 @@ public class OpenSearchUtil {
 	public static Element addElement(
 		Element el, String name, int namespaceType, Date value) {
 
-		return addElement(el, name, namespaceType, _dateFormat.format(value));
+		return addElement(el, name, namespaceType, _format.format(value));
 	}
 
 	public static Element addElement(
@@ -128,7 +128,7 @@ public class OpenSearchUtil {
 		}
 	}
 
-	private static Format _dateFormat =
+	private static Format _format =
 		FastDateFormatFactoryUtil.getSimpleDateFormat(
 			"yyyy-MM-dd'T'HH:mm:sszzz");
 

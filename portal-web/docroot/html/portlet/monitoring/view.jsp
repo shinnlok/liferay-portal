@@ -96,7 +96,7 @@ String portletURLString = portletURL.toString();
 				<liferay-ui:search-container-column-text
 					href="<%= rowURL %>"
 					name="last-request"
-					value="<%= dateFormatDateTime.format(userTracker.getModifiedDate()) %>"
+					value="<%= format.format(userTracker.getModifiedDate()) %>"
 				/>
 
 				<liferay-ui:search-container-column-text

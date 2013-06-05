@@ -82,7 +82,7 @@ userTracker = userTracker.toEscapedModel();
 				</aui:field-wrapper>
 
 				<aui:field-wrapper label="last-request">
-					<%= dateFormatDateTime.format(userTracker.getModifiedDate()) %>
+					<%= format.format(userTracker.getModifiedDate()) %>
 				</aui:field-wrapper>
 
 				<aui:field-wrapper label="num-of-hits">
@@ -111,7 +111,7 @@ userTracker = userTracker.toEscapedModel();
 										<%= StringUtil.replace(userTrackerPath.getPath(), "&", "& ") %>
 									</td>
 									<td class="table-cell lfr-top" nowrap="nowrap">
-										<%= dateFormatDateTime.format(userTrackerPath.getPathDate()) %>
+										<%= format.format(userTrackerPath.getPathDate()) %>
 									</td>
 								</tr>
 

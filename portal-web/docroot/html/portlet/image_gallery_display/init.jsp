@@ -92,7 +92,7 @@ boolean enableCommentRatings = GetterUtil.getBoolean(preferences.getValue("enabl
 
 String displayTemplate = preferences.getValue("displayTemplate", StringPool.BLANK);
 
-Format dateFormatDate = FastDateFormatFactoryUtil.getDate(locale, timeZone);
+Format format = FastDateFormatFactoryUtil.getDate(locale, timeZone);
 %>
 
 <%@ include file="/html/portlet/image_gallery_display/init-ext.jsp" %>
