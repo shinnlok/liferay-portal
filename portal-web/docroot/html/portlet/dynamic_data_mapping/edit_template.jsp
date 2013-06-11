@@ -380,11 +380,11 @@ if (Validator.isNotNull(structureAvailableFields)) {
 		function <portlet:namespace />openDDMStructureSelector() {
 			Liferay.Util.openDDMPortlet(
 				{
+					basePortletURL: '<%= PortletURLFactoryUtil.create(request, PortletKeys.DYNAMIC_DATA_MAPPING, themeDisplay.getPlid(), PortletRequest.RENDER_PHASE) %>',
 					classNameId: '<%= PortalUtil.getClassNameId(DDMStructure.class) %>',
 					classPK: 0,
 					dialog: {
-						modal: true,
-						width: 820
+						zIndex: Liferay.zIndex.WINDOW + 2
 					},
 					eventName: '<portlet:namespace />selectStructure',
 					groupId: <%= groupId %>,

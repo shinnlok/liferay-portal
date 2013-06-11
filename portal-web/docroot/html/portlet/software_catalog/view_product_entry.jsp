@@ -149,7 +149,7 @@ viewProductEntryURL.setParameter("productEntryId", String.valueOf(productEntryId
 				<liferay-ui:message key="modified-date" />:
 			</td>
 			<td>
-				<%= dateFormatDateTime.format(latestProductVersion.getModifiedDate()) %>
+				<%= format.format(latestProductVersion.getModifiedDate()) %>
 			</td>
 		</tr>
 		<tr>
@@ -312,7 +312,7 @@ List productScreenshots = SCProductScreenshotLocalServiceUtil.getProductScreensh
 			row.addText(sb.toString());
 
 			row.addText(_getFrameworkVersions(curProductVersion.getFrameworkVersions()));
-			row.addText(dateFormatDateTime.format(curProductVersion.getModifiedDate()));
+			row.addText(format.format(curProductVersion.getModifiedDate()));
 
 			// Action
 

@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.security.pacl.DoPrivileged;
+import com.liferay.portal.kernel.template.TemplateConstants;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -71,10 +72,9 @@ import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
- * @author Marcelllus Tavares
+ * @author Marcellus Tavares
  * @author Eduardo Lundgren
  */
 @DoPrivileged
@@ -307,6 +307,7 @@ public class DDLImpl implements DDL {
 		contextObjects.put(
 			DDLConstants.RESERVED_RECORD_SET_NAME,
 			recordSet.getName(themeDisplay.getLocale()));
+		contextObjects.put(TemplateConstants.TEMPLATE_ID, ddmTemplateId);
 
 		String viewMode = ParamUtil.getString(renderRequest, "viewMode");
 
@@ -343,28 +344,6 @@ public class DDLImpl implements DDL {
 			preferences.getValue("editable", null), true);
 
 		return isEditable(portletId, groupId, defaultValue);
-	}
-
-	@Override
-	public void sendRecordFileUpload(
-			HttpServletRequest request, HttpServletResponse response,
-			DDLRecord record, String fieldName, int valueIndex)
-		throws Exception {
-
-		Field field = record.getField(fieldName);
-
-		DDMUtil.sendFieldFile(request, response, field, valueIndex);
-	}
-
-	@Override
-	public void sendRecordFileUpload(
-			HttpServletRequest request, HttpServletResponse response,
-			long recordId, String fieldName, int valueIndex)
-		throws Exception {
-
-		DDLRecord record = DDLRecordServiceUtil.getRecord(recordId);
-
-		sendRecordFileUpload(request, response, record, fieldName, valueIndex);
 	}
 
 	@Override
@@ -428,8 +407,6 @@ public class DDLImpl implements DDL {
 
 		}
 
-		uploadRecordFieldFiles(record, serviceContext);
-
 		return record;
 	}
 
@@ -441,22 +418,6 @@ public class DDLImpl implements DDL {
 
 		return updateRecord(
 			recordId, recordSetId, mergeFields, true, serviceContext);
-	}
-
-	@Override
-	public void uploadRecordFieldFile(
-			DDLRecord record, String fieldName, ServiceContext serviceContext)
-		throws Exception {
-
-		DDLRecordSet recordSet = record.getRecordSet();
-
-		DDMStructure ddmStructure = recordSet.getDDMStructure();
-
-		DDLRecordVersion recordVersion = record.getLatestRecordVersion();
-
-		DDMUtil.uploadFieldFile(
-			ddmStructure.getStructureId(), recordVersion.getDDMStorageId(),
-			record, fieldName, serviceContext);
 	}
 
 	protected String getFileEntryTitle(String uuid, long groupId) {
@@ -491,23 +452,6 @@ public class DDLImpl implements DDL {
 		}
 
 		return defaultValue;
-	}
-
-	protected void uploadRecordFieldFiles(
-			DDLRecord record, ServiceContext serviceContext)
-		throws Exception {
-
-		DDLRecordSet recordSet = record.getRecordSet();
-
-		DDMStructure ddmStructure = recordSet.getDDMStructure();
-
-		for (String fieldName : ddmStructure.getFieldNames()) {
-			String fieldDataType = ddmStructure.getFieldDataType(fieldName);
-
-			if (fieldDataType.equals(FieldConstants.FILE_UPLOAD)) {
-				uploadRecordFieldFile(record, fieldName, serviceContext);
-			}
-		}
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(DDLImpl.class);

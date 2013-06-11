@@ -389,7 +389,7 @@ request.setAttribute("view.jsp-viewCategory", Boolean.TRUE.toString());
 								else {
 									buffer.append(LanguageUtil.get(pageContext, "date"));
 									buffer.append(": ");
-									buffer.append(dateFormatDateTime.format(thread.getLastPostDate()));
+									buffer.append(dateTimeFormat.format(thread.getLastPostDate()));
 
 									String lastPostByUserName = HtmlUtil.escape(PortalUtil.getUserName(thread.getLastPostByUserId(), StringPool.BLANK));
 
@@ -574,7 +574,7 @@ request.setAttribute("view.jsp-viewCategory", Boolean.TRUE.toString());
 						else {
 							buffer.append(LanguageUtil.get(pageContext, "date"));
 							buffer.append(": ");
-							buffer.append(dateFormatDateTime.format(thread.getLastPostDate()));
+							buffer.append(dateTimeFormat.format(thread.getLastPostDate()));
 
 							String lastPostByUserName = HtmlUtil.escape(PortalUtil.getUserName(thread.getLastPostByUserId(), StringPool.BLANK));
 
@@ -699,13 +699,13 @@ request.setAttribute("view.jsp-viewCategory", Boolean.TRUE.toString());
 
 				<liferay-ui:search-container-column-text
 					name="ban-date"
-					value="<%= dateFormatDateTime.format(ban.getCreateDate()) %>"
+					value="<%= dateTimeFormat.format(ban.getCreateDate()) %>"
 				/>
 
 				<c:if test="<%= PropsValues.MESSAGE_BOARDS_EXPIRE_BAN_INTERVAL > 0 %>">
 					<liferay-ui:search-container-column-text
 						name="unban-date"
-						value="<%= dateFormatDateTime.format(MBUtil.getUnbanDate(ban, PropsValues.MESSAGE_BOARDS_EXPIRE_BAN_INTERVAL)) %>"
+						value="<%= dateTimeFormat.format(MBUtil.getUnbanDate(ban, PropsValues.MESSAGE_BOARDS_EXPIRE_BAN_INTERVAL)) %>"
 					/>
 				</c:if>
 

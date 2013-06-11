@@ -33,7 +33,7 @@ page import="com.liferay.portlet.expando.util.comparator.CustomAttributesDisplay
 <%
 PortalPreferences portalPreferences = PortletPreferencesFactoryUtil.getPortalPreferences(request);
 
-Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);
+Format format = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);
 %>
 
 <%@ include file="/html/portlet/expando/init-ext.jsp" %>

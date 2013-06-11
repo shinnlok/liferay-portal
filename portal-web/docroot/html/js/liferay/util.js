@@ -1274,7 +1274,14 @@
 
 			config = A.merge(defaultValues,	config);
 
-			var ddmURL = Liferay.PortletURL.createRenderURL();
+			var ddmURL;
+
+			if (config.basePortletURL) {
+				ddmURL = Liferay.PortletURL.createURL(config.basePortletURL);
+			}
+			else {
+				ddmURL = Liferay.PortletURL.createRenderURL();
+			}
 
 			ddmURL.setEscapeXML(false);
 
@@ -1620,16 +1627,26 @@
 
 			var eventName = config.eventName || config.id;
 
-			var selectionEvent = Liferay.on(eventName, callback);
+			var eventHandles = [];
+
+			eventHandles.push(Liferay.on(eventName, callback));
+
+			var detachSelectionOnHideFn = function(event) {
+				if (!event.newVal) {
+					(new A.EventHandle(eventHandles)).detach();
+				}
+			};
 
 			if (dialog) {
+				eventHandles.push(dialog.after('visibleChange', detachSelectionOnHideFn));
+
 				dialog.show();
 			}
 			else {
 				Util.openWindow(
 					config,
 					function(dialogWindow) {
-						dialogWindow.after('close', selectionEvent.detach, selectionEvent);
+						eventHandles.push(dialogWindow.after('visibleChange', detachSelectionOnHideFn));
 					}
 				);
 			}
@@ -1959,7 +1976,11 @@
 		Util,
 		'_openWindowProvider',
 		function(config, callback) {
-			Window.getWindow(config, callback);
+			var dialog = Window.getWindow(config);
+
+			if (Lang.isFunction(callback)) {
+				callback(dialog);
+			}
 		},
 		['liferay-util-window']
 	);

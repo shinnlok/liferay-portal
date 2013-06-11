@@ -31,6 +31,21 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
+ * Provides the local service for accessing, adding, deleting, and updating
+ * friendly URLs for layouts.
+ *
+ * <p>
+ * All custom service methods should be put in this class. Whenever methods are
+ * added, rerun ServiceBuilder to copy their definitions into the {@link
+ * com.liferay.portal.service.LayoutFriendlyURLLocalService} interface.
+ * </p>
+ *
+ * <p>
+ * Methods of this service will not have security checks based on the propagated
+ * JAAS credentials because this service can only be accessed from within the
+ * same VM.
+ * </p>
+ *
  * @author Brian Wing Shun Chan
  */
 public class LayoutFriendlyURLLocalServiceImpl
@@ -126,6 +141,14 @@ public class LayoutFriendlyURLLocalServiceImpl
 	}
 
 	@Override
+	public LayoutFriendlyURL fetchLayoutFriendlyURLByUuidAndGroupId(
+			String uuid, long groupId)
+		throws SystemException {
+
+		return layoutFriendlyURLPersistence.fetchByUUID_G(uuid, groupId, true);
+	}
+
+	@Override
 	public LayoutFriendlyURL getLayoutFriendlyURL(long plid, String languageId)
 		throws PortalException, SystemException {
 
@@ -158,6 +181,15 @@ public class LayoutFriendlyURLLocalServiceImpl
 		throws SystemException {
 
 		return layoutFriendlyURLPersistence.findByPlid(plid);
+	}
+
+	@Override
+	public List<LayoutFriendlyURL> getLayoutFriendlyURLs(
+			long plid, String friendlyURL, int start, int end)
+		throws SystemException {
+
+		return layoutFriendlyURLPersistence.findByP_F(
+			plid, friendlyURL, start, end);
 	}
 
 	@Override

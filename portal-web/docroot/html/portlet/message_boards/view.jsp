@@ -431,13 +431,13 @@ request.setAttribute("view.jsp-portletURL", portletURL);
 
 				<liferay-ui:search-container-column-text
 					name="ban-date"
-					value="<%= dateFormatDateTime.format(ban.getCreateDate()) %>"
+					value="<%= dateTimeFormat.format(ban.getCreateDate()) %>"
 				/>
 
 				<c:if test="<%= PropsValues.MESSAGE_BOARDS_EXPIRE_BAN_INTERVAL > 0 %>">
 					<liferay-ui:search-container-column-text
 						name="unban-date"
-						value="<%= dateFormatDateTime.format(MBUtil.getUnbanDate(ban, PropsValues.MESSAGE_BOARDS_EXPIRE_BAN_INTERVAL)) %>"
+						value="<%= dateTimeFormat.format(MBUtil.getUnbanDate(ban, PropsValues.MESSAGE_BOARDS_EXPIRE_BAN_INTERVAL)) %>"
 					/>
 				</c:if>
 

@@ -23,7 +23,7 @@ long organizationId = (organization != null) ? organization.getOrganizationId() 
 
 List<OrgLabor> orgLabors = OrgLaborServiceUtil.getOrgLabors(organizationId);
 
-Format timeFormat = FastDateFormatFactoryUtil.getSimpleDateFormat("HH:mm", locale);
+Format format = FastDateFormatFactoryUtil.getSimpleDateFormat("HH:mm", locale);
 %>
 
 <c:if test="<%= !orgLabors.isEmpty() %>">
@@ -87,7 +87,7 @@ Format timeFormat = FastDateFormatFactoryUtil.getSimpleDateFormat("HH:mm", local
 					%>
 
 						<td>
-							<%= curOpen != -1 ? timeFormat.format(cal.getTime()) : "" %>
+							<%= curOpen != -1 ? format.format(cal.getTime()) : "" %>
 						</td>
 
 					<%
@@ -112,7 +112,7 @@ Format timeFormat = FastDateFormatFactoryUtil.getSimpleDateFormat("HH:mm", local
 					%>
 
 						<td>
-							<%= curClose != -1 ? timeFormat.format(cal.getTime()) : "" %>
+							<%= curClose != -1 ? format.format(cal.getTime()) : "" %>
 						</td>
 
 					<%

@@ -333,17 +333,11 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 	}
 
 	@Override
-	public void checkEvents() throws PortalException, SystemException {
+	public void checkEvents() throws SystemException {
 		List<CalEvent> events = calEventFinder.findByFutureReminders();
 
 		for (CalEvent event : events) {
 			User user = userPersistence.fetchByPrimaryKey(event.getUserId());
-
-			if (user == null) {
-				calEventLocalService.deleteEvent(event);
-
-				continue;
-			}
 
 			Calendar now = CalendarFactoryUtil.getCalendar(
 				user.getTimeZone(), user.getLocale());
@@ -1296,7 +1290,7 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 			String subject = CalUtil.getEmailEventReminderSubject(preferences);
 			String body = CalUtil.getEmailEventReminderBody(preferences);
 
-			Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(
+			Format format = FastDateFormatFactoryUtil.getDateTime(
 				user.getLocale(), user.getTimeZone());
 
 			subject = StringUtil.replace(
@@ -1308,8 +1302,7 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 					"[$TO_NAME$]"
 				},
 				new String[] {
-					event.getLocation(),
-					dateFormatDateTime.format(startDate.getTime()),
+					event.getLocation(), format.format(startDate.getTime()),
 					event.getTitle(), fromAddress, fromName,
 					company.getPortalURL(event.getGroupId()), portletName,
 					HtmlUtil.escape(toAddress), HtmlUtil.escape(toName),
@@ -1324,8 +1317,7 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 					"[$TO_NAME$]"
 				},
 				new String[] {
-					event.getLocation(),
-					dateFormatDateTime.format(startDate.getTime()),
+					event.getLocation(), format.format(startDate.getTime()),
 					event.getTitle(), fromAddress, fromName,
 					company.getPortalURL(event.getGroupId()), portletName,
 					HtmlUtil.escape(toAddress), HtmlUtil.escape(toName),

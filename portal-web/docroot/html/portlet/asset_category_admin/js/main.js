@@ -72,7 +72,7 @@ AUI.add(
 
 		var LIFECYCLE_RENDER = 0;
 
-		var LIFECYCLE_PROCESS = 1;
+		var LIFECYCLE_ACTION = 1;
 
 		var MESSAGE_TYPE_ALERT = 'alert';
 
@@ -735,11 +735,13 @@ AUI.add(
 
 						var url;
 
+						var config = instance._originalConfig;
+
 						if (lifecycle == LIFECYCLE_RENDER) {
-							url = Liferay.PortletURL.createRenderURL();
+							url = Liferay.PortletURL.createURL(config.baseRenderURL);
 						}
 						else if (lifecycle == LIFECYCLE_PROCESS) {
-							url = Liferay.PortletURL.createActionURL();
+							url = Liferay.PortletURL.createURL(config.baseActionURL);
 						}
 						else {
 							throw 'Internal error. Unimplemented lifecycle.';
@@ -1476,6 +1478,7 @@ AUI.add(
 									name: query,
 									start: start,
 									end: end,
+									addDefaultVocabulary: true,
 									obc: null,
 									'vocabularies.$categoriesCount = /assetcategory/get-vocabulary-root-categories-count': {
 										groupId: parentGroupId,
@@ -2794,7 +2797,7 @@ AUI.add(
 					_updateCategory: function(categoryId, parentCategoryId, vocabularyId) {
 						var instance = this;
 
-						var moveURL = instance._createURL(CATEGORY, ACTION_MOVE, LIFECYCLE_PROCESS);
+						var moveURL = instance._createURL(CATEGORY, ACTION_MOVE, LIFECYCLE_ACTION);
 
 						var prefix = instance._prefixedPortletId;
 

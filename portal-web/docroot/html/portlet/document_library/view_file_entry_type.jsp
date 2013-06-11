@@ -67,7 +67,7 @@ portletURL.setParameter("struts_action", "/document_library/view_file_entry_type
 		>
 
 			<%
-			buffer.append(dateFormatDateTime.format(fileEntryType.getModifiedDate()));
+			buffer.append(format.format(fileEntryType.getModifiedDate()));
 			%>
 
 		</liferay-ui:search-container-column-text>

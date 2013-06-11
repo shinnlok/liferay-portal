@@ -53,6 +53,8 @@ public class PortletKeys {
 
 	public static final String CHAT = "1_WAR_chatportlet";
 
+	public static final String CONTROL_PANEL_HOME = "190";
+
 	public static final String CONTROL_PANEL_MENU = "160";
 
 	public static final String CURRENCY_CONVERTER = "16";
@@ -163,6 +165,8 @@ public class PortletKeys {
 	public static final String PORTLET_CSS = "113";
 
 	public static final String PORTLET_DISPLAY_TEMPLATES = "183";
+
+	public static final String PORTLET_SHARING = "133";
 
 	public static final long PREFS_OWNER_ID_DEFAULT = 0;
 

@@ -65,10 +65,10 @@ for (int i = 0; i < results.size(); i++) {
 			endDate = CalUtil.getDaylightSavingTimeOffsetDate(event, timeZone, selCal, endDate);
 		}
 
-		row.addText(dateFormatTime.format(Time.getDate(startDate, timeZone)) + " &#150; " + dateFormatTime.format(Time.getDate(endDate, timeZone)), rowURL);
+		row.addText(timeFormat.format(Time.getDate(startDate, timeZone)) + " &#150; " + timeFormat.format(Time.getDate(endDate, timeZone)), rowURL);
 	}
 	else {
-		row.addText(dateFormatTime.format(Time.getDate(event.getStartDate(), TimeZoneUtil.getDefault())) + " &#150; " + dateFormatTime.format(Time.getDate(CalUtil.getEndTime(event), TimeZoneUtil.getDefault())), rowURL);
+		row.addText(timeFormat.format(Time.getDate(event.getStartDate(), TimeZoneUtil.getDefault())) + " &#150; " + timeFormat.format(Time.getDate(CalUtil.getEndTime(event), TimeZoneUtil.getDefault())), rowURL);
 	}
 
 	// Title and type

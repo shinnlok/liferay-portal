@@ -139,7 +139,7 @@ boolean enableCommentRatings = GetterUtil.getBoolean(preferences.getValue("enabl
 
 boolean mergedView = false;
 
-Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);
+Format format = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);
 %>
 
 <%@ include file="/html/portlet/document_library_display/init-ext.jsp" %>

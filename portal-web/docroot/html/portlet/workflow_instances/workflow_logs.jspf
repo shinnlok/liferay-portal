@@ -32,7 +32,7 @@ for (WorkflowLog workflowLog : workflowLogs) {
 
 	<div class="task-activity task-type-<%= workflowLog.getType() %>">
 		<div class="task-activity-date">
-			<%= dateFormatDateTime.format(workflowLog.getCreateDate()) %>
+			<%= dateTimeFormat.format(workflowLog.getCreateDate()) %>
 		</div>
 
 		<c:choose>

@@ -180,7 +180,7 @@ double version = ParamUtil.getDouble(request, "version");
 
 			rowTextEntry = (TextSearchEntry)rowTextEntry.clone();
 
-			rowTextEntry.setName(dateFormatDateTime.format(article.getDisplayDate()));
+			rowTextEntry.setName(format.format(article.getDisplayDate()));
 
 			row.addText(rowTextEntry);
 

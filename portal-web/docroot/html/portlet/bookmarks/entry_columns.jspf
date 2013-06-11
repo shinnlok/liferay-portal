@@ -39,7 +39,7 @@ for (int j = 0; j < entryColumns.length; j++) {
 			<liferay-ui:search-container-column-text
 				href="<%= rowHREF %>"
 				name="<%= bookmarksEntryColumn %>"
-				value="<%= dateFormatDate.format(entry.getModifiedDate()) %>"
+				value="<%= dateFormat.format(entry.getModifiedDate()) %>"
 			/>
 		</c:when>
 		<c:when test='<%= bookmarksEntryColumn.equals("name") %>'>

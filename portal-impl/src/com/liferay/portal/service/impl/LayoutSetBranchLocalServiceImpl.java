@@ -346,7 +346,8 @@ public class LayoutSetBranchLocalServiceImpl
 			long groupId, boolean privateLayout)
 		throws PortalException, SystemException {
 
-		return layoutSetBranchFinder.findByMaster(groupId, privateLayout);
+		return layoutSetBranchPersistence.findByG_P_M_First(
+			groupId, privateLayout, true, null);
 	}
 
 	/**
@@ -384,10 +385,11 @@ public class LayoutSetBranchLocalServiceImpl
 		}
 
 		if (layoutSetBranchId > 0) {
-			try {
-				return getLayoutSetBranch(layoutSetBranchId);
-			}
-			catch (NoSuchLayoutSetBranchException nslsbe) {
+			LayoutSetBranch layoutSetBranch = fetchLayoutSetBranch(
+				layoutSetBranchId);
+
+			if (layoutSetBranch != null) {
+				return layoutSetBranch;
 			}
 		}
 
@@ -407,10 +409,9 @@ public class LayoutSetBranchLocalServiceImpl
 
 		Locale locale = serviceContext.getLocale();
 
-		Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(
-			locale);
+		Format format = FastDateFormatFactoryUtil.getDateTime(locale);
 
-		String nowString = dateFormatDateTime.format(new Date());
+		String nowString = format.format(new Date());
 
 		serviceContext.setWorkflowAction(WorkflowConstants.STATUS_DRAFT);
 
@@ -549,7 +550,8 @@ public class LayoutSetBranchLocalServiceImpl
 		if (master) {
 			try {
 				LayoutSetBranch masterLayoutSetBranch =
-					layoutSetBranchFinder.findByMaster(groupId, privateLayout);
+					layoutSetBranchPersistence.findByG_P_M_First(
+						groupId, privateLayout, true, null);
 
 				if (layoutSetBranchId !=
 						masterLayoutSetBranch.getLayoutSetBranchId()) {

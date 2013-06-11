@@ -43,7 +43,7 @@ Format timeFormat = FastDateFormatFactoryUtil.getSimpleDateFormat("h:mma", local
 			for (int i = 0; i < CalEventConstants.TYPES.length; i++) {
 			%>
 
-				<aui:option selected="<%= eventType.equals(CalEventConstants.TYPES[i]) %>" value="<%= HtmlUtil.escapeAttribute(CalEventConstants.TYPES[i]) %>"><%= HtmlUtil.escape(CalEventConstants.TYPES[i]) %></aui:option>
+				<aui:option label="<%= HtmlUtil.escape(CalEventConstants.TYPES[i]) %>" selected="<%= eventType.equals(CalEventConstants.TYPES[i]) %>" value="<%= HtmlUtil.escapeAttribute(CalEventConstants.TYPES[i]) %>" />
 
 			<%
 			}
@@ -226,10 +226,10 @@ Format timeFormat = FastDateFormatFactoryUtil.getSimpleDateFormat("h:mma", local
 							<c:if test="<%= !allDay %>">
 								<c:choose>
 									<c:when test="<%= event.isTimeZoneSensitive() %>">
-										<%= dateFormatTime.format(Time.getDate(startDate, timeZone)) %>
+										<%= timeFormat.format(Time.getDate(startDate, timeZone)) %>
 									</c:when>
 									<c:otherwise>
-										<%= dateFormatTime.format(Time.getDate(startDate, TimeZoneUtil.getDefault())) %>
+										<%= timeFormat.format(Time.getDate(startDate, TimeZoneUtil.getDefault())) %>
 									</c:otherwise>
 								</c:choose>
 							</c:if>

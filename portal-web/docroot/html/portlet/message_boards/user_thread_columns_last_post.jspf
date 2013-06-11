@@ -27,7 +27,7 @@
 	else {
 		buffer.append(LanguageUtil.get(pageContext, "date"));
 		buffer.append(": ");
-		buffer.append(dateFormatDateTime.format(thread.getLastPostDate()));
+		buffer.append(dateTimeFormat.format(thread.getLastPostDate()));
 
 		String lastPostByUserName = HtmlUtil.escape(PortalUtil.getUserName(thread.getLastPostByUserId(), StringPool.BLANK));
 

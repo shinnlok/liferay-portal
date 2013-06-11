@@ -62,7 +62,7 @@ if (Validator.isNotNull(ddmStructureKey)) {
 	ddmStructure = DDMStructureLocalServiceUtil.fetchStructure(groupId, PortalUtil.getClassNameId(JournalArticle.class), ddmStructureKey);
 }
 
-Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);
+Format format = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);
 %>
 
 <%@ include file="/html/portlet/journal_articles/init-ext.jsp" %>

@@ -70,7 +70,7 @@ int depth = ((Integer)request.getAttribute(WebKeys.MESSAGE_BOARDS_TREE_WALKER_DE
 	<td class="table-cell"></td>
 	<td class="table-cell" nowrap="nowrap">
 		<a href="<%= rowHREF %>">
-		<%= dateFormatDateTime.format(message.getModifiedDate()) %>
+		<%= dateTimeFormat.format(message.getModifiedDate()) %>
 		</a>
 	</td>
 </tr>

@@ -17,8 +17,8 @@ package com.liferay.portal.service;
 /**
  * Provides a wrapper for {@link LayoutFriendlyURLLocalService}.
  *
- * @author    Brian Wing Shun Chan
- * @see       LayoutFriendlyURLLocalService
+ * @author Brian Wing Shun Chan
+ * @see LayoutFriendlyURLLocalService
  * @generated
  */
 public class LayoutFriendlyURLLocalServiceWrapper
@@ -319,6 +319,14 @@ public class LayoutFriendlyURLLocalServiceWrapper
 	}
 
 	@Override
+	public com.liferay.portal.model.LayoutFriendlyURL fetchLayoutFriendlyURLByUuidAndGroupId(
+		java.lang.String uuid, long groupId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _layoutFriendlyURLLocalService.fetchLayoutFriendlyURLByUuidAndGroupId(uuid,
+			groupId);
+	}
+
+	@Override
 	public com.liferay.portal.model.LayoutFriendlyURL getLayoutFriendlyURL(
 		long plid, java.lang.String languageId)
 		throws com.liferay.portal.kernel.exception.PortalException,
@@ -340,6 +348,14 @@ public class LayoutFriendlyURLLocalServiceWrapper
 	public java.util.List<com.liferay.portal.model.LayoutFriendlyURL> getLayoutFriendlyURLs(
 		long plid) throws com.liferay.portal.kernel.exception.SystemException {
 		return _layoutFriendlyURLLocalService.getLayoutFriendlyURLs(plid);
+	}
+
+	@Override
+	public java.util.List<com.liferay.portal.model.LayoutFriendlyURL> getLayoutFriendlyURLs(
+		long plid, java.lang.String friendlyURL, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _layoutFriendlyURLLocalService.getLayoutFriendlyURLs(plid,
+			friendlyURL, start, end);
 	}
 
 	@Override

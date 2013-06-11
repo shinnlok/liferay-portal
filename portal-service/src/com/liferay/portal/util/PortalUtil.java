@@ -549,6 +549,12 @@ public class PortalUtil {
 			portlet, facebookCanvasPageURL, themeDisplay);
 	}
 
+	public static Portlet getFirstMyAccountPortlet(ThemeDisplay themeDisplay)
+		throws SystemException {
+
+		return getPortal().getFirstMyAccountPortlet(themeDisplay);
+	}
+
 	public static String getFirstPageLayoutTypes(PageContext pageContext) {
 		return getPortal().getFirstPageLayoutTypes(pageContext);
 	}
@@ -1030,7 +1036,7 @@ public class PortalUtil {
 
 	/**
 	 * @deprecated As of 6.2.0 replaced by {@link
-	 * PortletContainerSecurityUtil#getWhitelist()}
+	 * PortletSecurityUtil#getWhitelist()}
 	 */
 	public static Set<String> getPortletAddDefaultResourceCheckWhitelist() {
 		return getPortal().getPortletAddDefaultResourceCheckWhitelist();
@@ -1038,7 +1044,7 @@ public class PortalUtil {
 
 	/**
 	 * @deprecated As of 6.2.0 replaced by {@link
-	 * PortletContainerSecurityUtil#getWhitelistActions()}
+	 * PortletSecurityUtil#getWhitelistActions()}
 	 */
 	public static Set<String>
 		getPortletAddDefaultResourceCheckWhitelistActions() {
@@ -1471,16 +1477,6 @@ public class PortalUtil {
 		return getPortal().getValidUserId(companyId, userId);
 	}
 
-	public static LayoutFriendlyURLComposite
-		getVirtualLayoutFriendlyURLComposite(
-			boolean privateLayout, String friendlyURL,
-			Map<String, String[]> params, Map<String, Object> requestContext)
-		throws PortalException, SystemException {
-
-		return getPortal().getVirtualLayoutFriendlyURLComposite(
-			privateLayout, friendlyURL, params, requestContext);
-	}
-
 	public static String getVirtualLayoutActualURL(
 			long groupId, boolean privateLayout, String mainPath,
 			String friendlyURL, Map<String, String[]> params,
@@ -1490,6 +1486,16 @@ public class PortalUtil {
 		return getPortal().getVirtualLayoutActualURL(
 			groupId, privateLayout, mainPath, friendlyURL, params,
 			requestContext);
+	}
+
+	public static LayoutFriendlyURLComposite
+		getVirtualLayoutFriendlyURLComposite(
+			boolean privateLayout, String friendlyURL,
+			Map<String, String[]> params, Map<String, Object> requestContext)
+		throws PortalException, SystemException {
+
+		return getPortal().getVirtualLayoutFriendlyURLComposite(
+			privateLayout, friendlyURL, params, requestContext);
 	}
 
 	public static String getWidgetURL(
@@ -1700,7 +1706,7 @@ public class PortalUtil {
 
 	/**
 	 * @deprecated As of 6.2.0 replaced by {@link
-	 * PortletContainerSecurityUtil#resetWhitelist()}
+	 * PortletSecurityUtil#resetWhitelist()}
 	 */
 	public static Set<String> resetPortletAddDefaultResourceCheckWhitelist() {
 		return getPortal().resetPortletAddDefaultResourceCheckWhitelist();
@@ -1708,7 +1714,7 @@ public class PortalUtil {
 
 	/**
 	 * @deprecated As of 6.2.0 replaced by {@link
-	 * PortletContainerSecurityUtil#resetWhitelistActions()}
+	 * PortletSecurityUtil#resetWhitelistActions()}
 	 */
 	public static Set<String>
 		resetPortletAddDefaultResourceCheckWhitelistActions() {

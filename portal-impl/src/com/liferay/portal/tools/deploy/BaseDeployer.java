@@ -1103,7 +1103,7 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 		String dmId = PropsUtil.get(prefix + "dm.id");
 		String dmUser = PropsUtil.get(prefix + "dm.user");
 		String dmPassword = PropsUtil.get(prefix + "dm.passwd");
-		String dfClassName = PropsUtil.get(prefix + "df.classname");
+		String dfClassName = PropsUtil.get(prefix + "dateFormat.classname");
 
 		return new DeploymentHandler(dmId, dmUser, dmPassword, dfClassName);
 	}

@@ -101,7 +101,7 @@ for (int i = 0; i < results.size(); i++) {
 
 	// Date
 
-	row.addText(dateFormatDate.format(membershipRequest.getCreateDate()));
+	row.addText(dateFormat.format(membershipRequest.getCreateDate()));
 
 	// User
 
@@ -122,7 +122,7 @@ for (int i = 0; i < results.size(); i++) {
 
 		// Reply Date
 
-		row.addText(dateFormatDate.format(membershipRequest.getReplyDate()));
+		row.addText(dateFormat.format(membershipRequest.getReplyDate()));
 
 		// Replier
 

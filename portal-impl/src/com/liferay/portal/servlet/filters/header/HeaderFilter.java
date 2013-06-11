@@ -52,7 +52,7 @@ public class HeaderFilter extends BasePortalFilter {
 		super.init(filterConfig);
 
 		_filterConfig = filterConfig;
-		_dateFormat = FastDateFormatFactoryUtil.getSimpleDateFormat(
+		_format = FastDateFormatFactoryUtil.getSimpleDateFormat(
 			_DATE_FORMAT, Locale.US, TimeZoneUtil.getTimeZone(_TIME_ZONE));
 	}
 
@@ -95,7 +95,7 @@ public class HeaderFilter extends BasePortalFilter {
 
 				cal.add(Calendar.SECOND, seconds);
 
-				value = _dateFormat.format(cal.getTime());
+				value = _format.format(cal.getTime());
 			}
 
 			// LEP-5895 and LPS-15802
@@ -159,7 +159,7 @@ public class HeaderFilter extends BasePortalFilter {
 	private static Set<String> _requestHeaderIgnoreInitParams =
 		SetUtil.fromArray(PropsValues.REQUEST_HEADER_IGNORE_INIT_PARAMS);
 
-	private Format _dateFormat;
 	private FilterConfig _filterConfig;
+	private Format _format;
 
 }

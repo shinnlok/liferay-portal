@@ -61,6 +61,10 @@ public class BaseInputTag extends com.liferay.taglib.util.IncludeTag {
 		return _data;
 	}
 
+	public java.lang.String getDateTogglerCheckboxLabel() {
+		return _dateTogglerCheckboxLabel;
+	}
+
 	public java.lang.String getDefaultLanguageId() {
 		return _defaultLanguageId;
 	}
@@ -149,6 +153,10 @@ public class BaseInputTag extends com.liferay.taglib.util.IncludeTag {
 		return _required;
 	}
 
+	public boolean getResizable() {
+		return _resizable;
+	}
+
 	public boolean getShowRequiredLabel() {
 		return _showRequiredLabel;
 	}
@@ -213,6 +221,12 @@ public class BaseInputTag extends com.liferay.taglib.util.IncludeTag {
 		_data = data;
 
 		setScopedAttribute("data", data);
+	}
+
+	public void setDateTogglerCheckboxLabel(java.lang.String dateTogglerCheckboxLabel) {
+		_dateTogglerCheckboxLabel = dateTogglerCheckboxLabel;
+
+		setScopedAttribute("dateTogglerCheckboxLabel", dateTogglerCheckboxLabel);
 	}
 
 	public void setDefaultLanguageId(java.lang.String defaultLanguageId) {
@@ -347,6 +361,12 @@ public class BaseInputTag extends com.liferay.taglib.util.IncludeTag {
 		setScopedAttribute("required", required);
 	}
 
+	public void setResizable(boolean resizable) {
+		_resizable = resizable;
+
+		setScopedAttribute("resizable", resizable);
+	}
+
 	public void setShowRequiredLabel(boolean showRequiredLabel) {
 		_showRequiredLabel = showRequiredLabel;
 
@@ -392,6 +412,7 @@ public class BaseInputTag extends com.liferay.taglib.util.IncludeTag {
 		_classPK = 0;
 		_cssClass = null;
 		_data = null;
+		_dateTogglerCheckboxLabel = null;
 		_defaultLanguageId = null;
 		_disabled = false;
 		_field = null;
@@ -414,6 +435,7 @@ public class BaseInputTag extends com.liferay.taglib.util.IncludeTag {
 		_placeholder = null;
 		_prefix = null;
 		_required = false;
+		_resizable = false;
 		_showRequiredLabel = true;
 		_suffix = null;
 		_title = null;
@@ -436,6 +458,7 @@ public class BaseInputTag extends com.liferay.taglib.util.IncludeTag {
 		setNamespacedAttribute(request, "classPK", _classPK);
 		setNamespacedAttribute(request, "cssClass", _cssClass);
 		setNamespacedAttribute(request, "data", _data);
+		setNamespacedAttribute(request, "dateTogglerCheckboxLabel", _dateTogglerCheckboxLabel);
 		setNamespacedAttribute(request, "defaultLanguageId", _defaultLanguageId);
 		setNamespacedAttribute(request, "disabled", _disabled);
 		setNamespacedAttribute(request, "field", _field);
@@ -458,6 +481,7 @@ public class BaseInputTag extends com.liferay.taglib.util.IncludeTag {
 		setNamespacedAttribute(request, "placeholder", _placeholder);
 		setNamespacedAttribute(request, "prefix", _prefix);
 		setNamespacedAttribute(request, "required", _required);
+		setNamespacedAttribute(request, "resizable", _resizable);
 		setNamespacedAttribute(request, "showRequiredLabel", _showRequiredLabel);
 		setNamespacedAttribute(request, "suffix", _suffix);
 		setNamespacedAttribute(request, "title", _title);
@@ -478,6 +502,7 @@ public class BaseInputTag extends com.liferay.taglib.util.IncludeTag {
 	private long _classPK = 0;
 	private java.lang.String _cssClass = null;
 	private java.lang.Object _data = null;
+	private java.lang.String _dateTogglerCheckboxLabel = null;
 	private java.lang.String _defaultLanguageId = null;
 	private boolean _disabled = false;
 	private java.lang.String _field = null;
@@ -500,6 +525,7 @@ public class BaseInputTag extends com.liferay.taglib.util.IncludeTag {
 	private java.lang.String _placeholder = null;
 	private java.lang.String _prefix = null;
 	private boolean _required = false;
+	private boolean _resizable = false;
 	private boolean _showRequiredLabel = true;
 	private java.lang.String _suffix = null;
 	private java.lang.String _title = null;

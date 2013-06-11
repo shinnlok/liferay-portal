@@ -17,8 +17,8 @@ package com.liferay.portal.service;
 /**
  * Provides a wrapper for {@link LayoutRevisionLocalService}.
  *
- * @author    Brian Wing Shun Chan
- * @see       LayoutRevisionLocalService
+ * @author Brian Wing Shun Chan
+ * @see LayoutRevisionLocalService
  * @generated
  */
 public class LayoutRevisionLocalServiceWrapper
@@ -403,6 +403,15 @@ public class LayoutRevisionLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _layoutRevisionLocalService.getLayoutRevisions(layoutSetBranchId,
 			plid, status);
+	}
+
+	@Override
+	public java.util.List<com.liferay.portal.model.LayoutRevision> getLayoutRevisions(
+		long layoutSetBranchId, long plid, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _layoutRevisionLocalService.getLayoutRevisions(layoutSetBranchId,
+			plid, start, end, orderByComparator);
 	}
 
 	@Override

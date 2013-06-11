@@ -85,7 +85,7 @@ searchContainer.setResults(results);
 			row.addText(LanguageUtil.get(pageContext, "never"), rowURL);
 		}
 		else {
-			row.addText(dateFormatDateTime.format(node.getLastPostDate()), rowURL);
+			row.addText(format.format(node.getLastPostDate()), rowURL);
 		}
 
 		// Action

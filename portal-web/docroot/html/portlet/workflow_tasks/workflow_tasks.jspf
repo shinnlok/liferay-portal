@@ -141,7 +141,7 @@ else if (type.equals("assigned-to-my-roles")) {
 			else {
 				WorkflowLog workflowLog = workflowLogs.get(0);
 
-				buffer.append(dateFormatDateTime.format(workflowLog.getCreateDate()));
+				buffer.append(dateTimeFormat.format(workflowLog.getCreateDate()));
 			}
 			%>
 
@@ -159,7 +159,7 @@ else if (type.equals("assigned-to-my-roles")) {
 				buffer.append(LanguageUtil.get(pageContext, "never"));
 			}
 			else {
-				buffer.append(dateFormatDateTime.format(workflowTask.getDueDate()));
+				buffer.append(dateTimeFormat.format(workflowTask.getDueDate()));
 			}
 			%>
 

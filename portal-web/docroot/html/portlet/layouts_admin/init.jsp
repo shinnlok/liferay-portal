@@ -74,7 +74,7 @@ page import="com.liferay.portlet.mobiledevicerules.service.permission.MDRRuleGro
 page import="com.liferay.portlet.mobiledevicerules.util.RuleGroupInstancePriorityComparator" %>
 
 <%
-Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);
+Format format = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);
 %>
 
 <%@ include file="/html/portlet/layouts_admin/init-ext.jsp" %>

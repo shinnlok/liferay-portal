@@ -32,6 +32,8 @@ AssetEntry layoutAssetEntry = AssetEntryLocalServiceUtil.getEntry(BookmarksEntry
 request.setAttribute(WebKeys.LAYOUT_ASSET_ENTRY, layoutAssetEntry);
 
 request.setAttribute("view_entry.jsp-entry", entry);
+
+BookmarksUtil.addPortletBreadcrumbEntries(entry, request, renderResponse);
 %>
 
 <liferay-util:include page="/html/portlet/bookmarks/top_links.jsp" />
@@ -101,7 +103,7 @@ request.setAttribute("view_entry.jsp-entry", entry);
 			</div>
 
 			<div class="lfr-asset-icon lfr-asset-date">
-				<%= dateFormatDate.format(entry.getCreateDate()) %>
+				<%= format.format(entry.getCreateDate()) %>
 			</div>
 
 			<div class="lfr-asset-icon lfr-asset-downloads last">
@@ -149,7 +151,3 @@ request.setAttribute("view_entry.jsp-entry", entry);
 		<liferay-util:include page="/html/portlet/bookmarks/entry_action.jsp" />
 	</aui:col>
 </aui:row>
-
-<%
-BookmarksUtil.addPortletBreadcrumbEntries(entry, request, renderResponse);
-%>

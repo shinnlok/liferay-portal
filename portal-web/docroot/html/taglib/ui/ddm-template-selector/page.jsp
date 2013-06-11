@@ -134,9 +134,11 @@ Group ddmTemplateGroup = GroupLocalServiceUtil.getGroup(ddmTemplateGroupId);
 			function (event) {
 				Liferay.Util.openDDMPortlet(
 					{
+						basePortletURL: '<%= PortletURLFactoryUtil.create(request, PortletKeys.DYNAMIC_DATA_MAPPING, themeDisplay.getPlid(), PortletRequest.RENDER_PHASE) %>',
 						classNameId: '<%= classNameId %>',
 						dialog: {
-							width: 820
+							width: 820,
+							zIndex: Liferay.zIndex.WINDOW + 2
 						},
 						groupId: <%= ddmTemplateGroupId %>,
 						refererPortletName: '<%= PortletKeys.PORTLET_DISPLAY_TEMPLATES %>',

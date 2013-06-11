@@ -114,7 +114,7 @@
 			else {
 				WorkflowLog workflowLog = workflowLogs.get(0);
 
-				buffer.append(dateFormatDateTime.format(workflowLog.getCreateDate()));
+				buffer.append(dateTimeFormat.format(workflowLog.getCreateDate()));
 			}
 			%>
 
@@ -131,7 +131,7 @@
 				buffer.append(LanguageUtil.get(pageContext, "never"));
 			}
 			else {
-				buffer.append(dateFormatDateTime.format(workflowInstance.getEndDate()));
+				buffer.append(dateTimeFormat.format(workflowInstance.getEndDate()));
 			}
 			%>
 

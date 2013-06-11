@@ -52,7 +52,7 @@ for (int i = 1; i<organizations.size(); i++) {
 				<liferay-ui:message key="birthday" />
 			</dt>
 			<dd>
-				<%= dateFormatDate.format(selUser.getBirthday()) %>
+				<%= format.format(selUser.getBirthday()) %>
 			</dd>
 		</c:if>
 

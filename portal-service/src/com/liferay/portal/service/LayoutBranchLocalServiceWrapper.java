@@ -17,8 +17,8 @@ package com.liferay.portal.service;
 /**
  * Provides a wrapper for {@link LayoutBranchLocalService}.
  *
- * @author    Brian Wing Shun Chan
- * @see       LayoutBranchLocalService
+ * @author Brian Wing Shun Chan
+ * @see LayoutBranchLocalService
  * @generated
  */
 public class LayoutBranchLocalServiceWrapper implements LayoutBranchLocalService,
@@ -312,6 +312,16 @@ public class LayoutBranchLocalServiceWrapper implements LayoutBranchLocalService
 			com.liferay.portal.kernel.exception.SystemException {
 		return _layoutBranchLocalService.getMasterLayoutBranch(layoutSetBranchId,
 			plid);
+	}
+
+	@Override
+	public com.liferay.portal.model.LayoutBranch getMasterLayoutBranch(
+		long layoutSetBranchId, long plid,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _layoutBranchLocalService.getMasterLayoutBranch(layoutSetBranchId,
+			plid, serviceContext);
 	}
 
 	@Override
