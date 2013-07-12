@@ -27,7 +27,13 @@ long defaultFolderId = GetterUtil.getLong(portletPreferences.getValue("rootFolde
 
 long folderId = BeanParamUtil.getLong(folder, request, "folderId", defaultFolderId);
 
+boolean viewDefaultFolder = false;
+
 if ((folder == null) && (defaultFolderId != DLFolderConstants.DEFAULT_PARENT_FOLDER_ID)) {
+	viewDefaultFolder = true;
+}
+
+if (viewDefaultFolder) {
 	try {
 		folder = DLAppLocalServiceUtil.getFolder(folderId);
 	}
@@ -205,8 +211,10 @@ request.setAttribute("view.jsp-useAssetEntryQuery", String.valueOf(useAssetEntry
 		if (folder != null) {
 			DLUtil.addPortletBreadcrumbEntries(folder, request, renderResponse);
 
-			PortalUtil.setPageSubtitle(folder.getName(), request);
-			PortalUtil.setPageDescription(folder.getDescription(), request);
+			if (!viewDefaultFolder) {
+				PortalUtil.setPageSubtitle(folder.getName(), request);
+				PortalUtil.setPageDescription(folder.getDescription(), request);
+			}
 		}
 		%>
 
