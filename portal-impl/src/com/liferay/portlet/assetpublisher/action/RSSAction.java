@@ -69,7 +69,7 @@ public class RSSAction extends com.liferay.portal.struts.RSSAction {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
-		
+
 		SyndFeed syndFeed = new SyndFeedImpl();
 
 		syndFeed.setDescription(GetterUtil.getString(description, name));
@@ -132,7 +132,7 @@ public class RSSAction extends com.liferay.portal.struts.RSSAction {
 		selfSyndLink.setHref(feedURL);
 
 		selfSyndLink.setRel("self");
-		
+
 		SyndLink alternateSyndLink = new SyndLinkImpl();
 
 		syndLinks.add(alternateSyndLink);
