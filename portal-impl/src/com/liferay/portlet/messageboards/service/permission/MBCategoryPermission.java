@@ -106,25 +106,18 @@ public class MBCategoryPermission {
 			return false;
 		}
 
-		long categoryId = category.getCategoryId();
-
 		if (PropsValues.PERMISSIONS_VIEW_DYNAMIC_INHERITANCE) {
-			long originalCategoryId = categoryId;
+			MBCategory originalCategory = category;
 
 			try {
-				while (categoryId !=
-							MBCategoryConstants.DEFAULT_PARENT_CATEGORY_ID) {
-
-					category = MBCategoryLocalServiceUtil.getCategory(
-						categoryId);
-
+				while (category != null) {
 					if (!_hasPermission(
 							permissionChecker, category, ActionKeys.VIEW)) {
 
 						return false;
 					}
 
-					categoryId = category.getParentCategoryId();
+					category = category.getParentCategory();
 				}
 			}
 			catch (NoSuchCategoryException nsce) {
@@ -137,20 +130,24 @@ public class MBCategoryPermission {
 				return true;
 			}
 
-			categoryId = originalCategoryId;
+			category = originalCategory;
 		}
 
 		try {
-			while (categoryId !=
-						MBCategoryConstants.DEFAULT_PARENT_CATEGORY_ID) {
+			if (_hasPermission(permissionChecker, category, actionId)) {
+				return true;
+			}
 
-				category = MBCategoryLocalServiceUtil.getCategory(categoryId);
+			if (PropsValues.PERMISSIONS_PARENT_INHERITANCE_ENABLED) {
+				category = category.getParentCategory();
 
-				if (_hasPermission(permissionChecker, category, actionId)) {
-					return true;
+				while (category != null) {
+					if (_hasPermission(permissionChecker, category, actionId)) {
+						return true;
+					}
+
+					category = category.getParentCategory();
 				}
-
-				categoryId = category.getParentCategoryId();
 			}
 		}
 		catch (NoSuchCategoryException nsce) {

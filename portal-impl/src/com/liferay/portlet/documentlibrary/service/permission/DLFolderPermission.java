@@ -27,7 +27,6 @@ import com.liferay.portlet.documentlibrary.NoSuchFolderException;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
-import com.liferay.portlet.documentlibrary.service.DLFolderLocalServiceUtil;
 
 /**
  * @author Brian Wing Shun Chan
@@ -80,22 +79,18 @@ public class DLFolderPermission {
 			return hasPermission.booleanValue();
 		}
 
-		long folderId = dlFolder.getFolderId();
-
 		if (PropsValues.PERMISSIONS_VIEW_DYNAMIC_INHERITANCE) {
-			long originalFolderId = folderId;
+			DLFolder originalFolder = dlFolder;
 
 			try {
-				while (folderId != DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
-					dlFolder = DLFolderLocalServiceUtil.getFolder(folderId);
-
+				while (dlFolder != null) {
 					if (!_hasPermission(
 							permissionChecker, dlFolder, ActionKeys.VIEW)) {
 
 						return false;
 					}
 
-					folderId = dlFolder.getParentFolderId();
+					dlFolder = dlFolder.getParentFolder();
 				}
 			}
 			catch (NoSuchFolderException nsfe) {
@@ -108,18 +103,24 @@ public class DLFolderPermission {
 				return true;
 			}
 
-			folderId = originalFolderId;
+			dlFolder = originalFolder;
 		}
 
 		try {
-			while (folderId != DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
-				dlFolder = DLFolderLocalServiceUtil.getFolder(folderId);
+			if (_hasPermission(permissionChecker, dlFolder, actionId)) {
+				return true;
+			}
 
-				if (_hasPermission(permissionChecker, dlFolder, actionId)) {
-					return true;
+			if (PropsValues.PERMISSIONS_PARENT_INHERITANCE_ENABLED) {
+				dlFolder = dlFolder.getParentFolder();
+
+				while (dlFolder != null) {
+					if (_hasPermission(permissionChecker, dlFolder, actionId)) {
+						return true;
+					}
+
+					dlFolder = dlFolder.getParentFolder();
 				}
-
-				folderId = dlFolder.getParentFolderId();
 			}
 		}
 		catch (NoSuchFolderException nsfe) {

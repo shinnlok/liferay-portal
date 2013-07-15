@@ -60,25 +60,18 @@ public class BookmarksFolderPermission {
 			actionId = ActionKeys.ADD_SUBFOLDER;
 		}
 
-		long folderId = folder.getFolderId();
-
 		if (PropsValues.PERMISSIONS_VIEW_DYNAMIC_INHERITANCE) {
-			long originalFolderId = folderId;
+			BookmarksFolder originalFolder = folder;
 
 			try {
-				while (folderId !=
-							BookmarksFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
-
-					folder = BookmarksFolderLocalServiceUtil.getFolder(
-						folderId);
-
+				while (folder != null) {
 					if (!_hasPermission(
 							permissionChecker, folder, ActionKeys.VIEW)) {
 
 						return false;
 					}
 
-					folderId = folder.getParentFolderId();
+					folder = folder.getParentFolder();
 				}
 			}
 			catch (NoSuchFolderException nsfe) {
@@ -91,20 +84,24 @@ public class BookmarksFolderPermission {
 				return true;
 			}
 
-			folderId = originalFolderId;
+			folder = originalFolder;
 		}
 
 		try {
-			while (folderId !=
-						BookmarksFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
+			if (_hasPermission(permissionChecker, folder, actionId)) {
+				return true;
+			}
 
-				folder = BookmarksFolderLocalServiceUtil.getFolder(folderId);
+			if (PropsValues.PERMISSIONS_PARENT_INHERITANCE_ENABLED) {
+				folder = folder.getParentFolder();
 
-				if (_hasPermission(permissionChecker, folder, actionId)) {
-					return true;
+				while (folder != null) {
+					if (_hasPermission(permissionChecker, folder, actionId)) {
+						return true;
+					}
+
+					folder = folder.getParentFolder();
 				}
-
-				folderId = folder.getParentFolderId();
 			}
 		}
 		catch (NoSuchFolderException nsfe) {
