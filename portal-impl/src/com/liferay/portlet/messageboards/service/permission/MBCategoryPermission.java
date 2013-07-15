@@ -138,7 +138,9 @@ public class MBCategoryPermission {
 				return true;
 			}
 
-			if (PropsValues.PERMISSIONS_PARENT_INHERITANCE_ENABLED) {
+			if (PropsValues.
+					PERMISSIONS_PARENT_INHERITANCE_MESSAGE_BOARDS_ENABLED) {
+
 				category = category.getParentCategory();
 
 				while (category != null) {

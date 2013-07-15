@@ -92,7 +92,7 @@ public class BookmarksFolderPermission {
 				return true;
 			}
 
-			if (PropsValues.PERMISSIONS_PARENT_INHERITANCE_ENABLED) {
+			if (PropsValues.PERMISSIONS_PARENT_INHERITANCE_BOOKMARKS_ENABLED) {
 				folder = folder.getParentFolder();
 
 				while (folder != null) {
