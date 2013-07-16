@@ -130,39 +130,32 @@ public class WikiPagePermission {
 			if (redirectPage != null) {
 				page = redirectPage;
 			}
-		}
 
-		WikiNode node = page.getNode();
+			if (PropsValues.PERMISSIONS_VIEW_DYNAMIC_INHERITANCE) {
+				WikiNode node = page.getNode();
 
-		if (PropsValues.PERMISSIONS_VIEW_DYNAMIC_INHERITANCE) {
-			WikiPage originalPage = page;
+				if (!WikiNodePermission.contains(
+						permissionChecker, node, actionId)) {
 
-			if (!WikiNodePermission.contains(
-					permissionChecker, node, ActionKeys.VIEW)) {
-
-				return false;
-			}
-
-			while (page != null) {
-				if (!_hasPermission(permissionChecker, page, ActionKeys.VIEW)) {
 					return false;
 				}
 
-				page = page.getParentPage();
-			}
+				while (page != null) {
+					if (!_hasPermission(permissionChecker, page, actionId)) {
+						return false;
+					}
 
-			if (actionId.equals(ActionKeys.VIEW)) {
+					page = page.getParentPage();
+				}
+
 				return true;
 			}
-
-			page = originalPage;
 		}
 
 		if (page.isPending()) {
 			Boolean hasPermission = WorkflowPermissionUtil.hasPermission(
-				permissionChecker, page.getGroupId(),
-				WikiPage.class.getName(), page.getResourcePrimKey(),
-				actionId);
+				permissionChecker, page.getGroupId(), WikiPage.class.getName(),
+				page.getResourcePrimKey(), actionId);
 
 			if ((hasPermission != null) && hasPermission.booleanValue()) {
 				return true;
@@ -175,11 +168,7 @@ public class WikiPagePermission {
 			return true;
 		}
 
-		if (_hasPermission(permissionChecker, page, actionId)) {
-			return true;
-		}
-
-		return false;
+		return _hasPermission(permissionChecker, page, actionId);
 	}
 
 	private static boolean _hasPermission(
