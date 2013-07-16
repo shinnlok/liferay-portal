@@ -59,12 +59,12 @@ public class BookmarksEntryPermission {
 		if (PropsValues.PERMISSIONS_VIEW_DYNAMIC_INHERITANCE &&
 			actionId.equals(ActionKeys.VIEW)) {
 
-			long entryId = entry.getFolderId();
+			long folderId = entry.getFolderId();
 
-			if (entryId != BookmarksFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
+			if (folderId != BookmarksFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
 				try {
 					BookmarksFolder folder =
-						BookmarksFolderLocalServiceUtil.getFolder(entryId);
+						BookmarksFolderLocalServiceUtil.getFolder(folderId);
 
 					if (!BookmarksFolderPermission.contains(
 							permissionChecker, folder, ActionKeys.ACCESS) &&

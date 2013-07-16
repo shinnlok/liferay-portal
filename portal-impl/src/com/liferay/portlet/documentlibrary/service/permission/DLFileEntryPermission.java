@@ -99,12 +99,12 @@ public class DLFileEntryPermission {
 		if (PropsValues.PERMISSIONS_VIEW_DYNAMIC_INHERITANCE &&
 			actionId.equals(ActionKeys.VIEW)) {
 
-			long dlFileEntryId = dlFileEntry.getFolderId();
+			long folderId = dlFileEntry.getFolderId();
 
-			if (dlFileEntryId != DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
+			if (folderId != DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
 				try {
 					DLFolder dlFolder = DLFolderLocalServiceUtil.getFolder(
-						dlFileEntryId);
+						folderId);
 
 					if (!DLFolderPermission.contains(
 							permissionChecker, dlFolder, ActionKeys.ACCESS) &&
