@@ -144,14 +144,7 @@ public class WikiPagePermission {
 			}
 
 			while (page != null) {
-				if (!permissionChecker.hasOwnerPermission(
-						page.getCompanyId(), WikiPage.class.getName(),
-						page.getResourcePrimKey(), page.getUserId(),
-						ActionKeys.VIEW) &&
-					!permissionChecker.hasPermission(
-						page.getGroupId(), WikiPage.class.getName(),
-						page.getResourcePrimKey(), ActionKeys.VIEW)) {
-
+				if (!_hasPermission(permissionChecker, page, ActionKeys.VIEW)) {
 					return false;
 				}
 
@@ -187,17 +180,27 @@ public class WikiPagePermission {
 				return true;
 			}
 
-			if (permissionChecker.hasOwnerPermission(
-					page.getCompanyId(), WikiPage.class.getName(),
-					page.getResourcePrimKey(), page.getUserId(), actionId) ||
-				permissionChecker.hasPermission(
-					page.getGroupId(), WikiPage.class.getName(),
-					page.getResourcePrimKey(), actionId)) {
-
+			if (_hasPermission(permissionChecker, page, actionId)) {
 				return true;
 			}
 
 			page = page.getParentPage();
+		}
+
+		return false;
+	}
+
+	private static boolean _hasPermission(
+		PermissionChecker permissionChecker, WikiPage page, String actionId) {
+
+		if (permissionChecker.hasOwnerPermission(
+				page.getCompanyId(), WikiPage.class.getName(),
+				page.getResourcePrimKey(), page.getUserId(), actionId) ||
+			permissionChecker.hasPermission(
+				page.getGroupId(), WikiPage.class.getName(),
+				page.getResourcePrimKey(), actionId)) {
+
+			return true;
 		}
 
 		return false;
