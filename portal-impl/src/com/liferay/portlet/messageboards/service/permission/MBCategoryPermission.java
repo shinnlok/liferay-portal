@@ -106,12 +106,12 @@ public class MBCategoryPermission {
 			return false;
 		}
 
-		long categoryId = category.getCategoryId();
-
-		if (PropsValues.PERMISSIONS_VIEW_DYNAMIC_INHERITANCE) {
-			long originalCategoryId = categoryId;
+		if (actionId.equals(ActionKeys.VIEW) &&
+			PropsValues.PERMISSIONS_VIEW_DYNAMIC_INHERITANCE) {
 
 			try {
+				long categoryId = category.getCategoryId();
+
 				while (categoryId !=
 							MBCategoryConstants.DEFAULT_PARENT_CATEGORY_ID) {
 
@@ -119,7 +119,7 @@ public class MBCategoryPermission {
 						categoryId);
 
 					if (!_hasPermission(
-							permissionChecker, category, ActionKeys.VIEW)) {
+							permissionChecker, category, actionId)) {
 
 						return false;
 					}
@@ -133,33 +133,10 @@ public class MBCategoryPermission {
 				}
 			}
 
-			if (actionId.equals(ActionKeys.VIEW)) {
-				return true;
-			}
-
-			categoryId = originalCategoryId;
+			return true;
 		}
 
-		try {
-			while (categoryId !=
-						MBCategoryConstants.DEFAULT_PARENT_CATEGORY_ID) {
-
-				category = MBCategoryLocalServiceUtil.getCategory(categoryId);
-
-				if (_hasPermission(permissionChecker, category, actionId)) {
-					return true;
-				}
-
-				categoryId = category.getParentCategoryId();
-			}
-		}
-		catch (NoSuchCategoryException nsce) {
-			if (!category.isInTrash()) {
-				throw nsce;
-			}
-		}
-
-		return false;
+		return _hasPermission(permissionChecker, category, actionId);
 	}
 
 	private static boolean _hasPermission(

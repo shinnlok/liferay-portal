@@ -60,12 +60,12 @@ public class BookmarksFolderPermission {
 			actionId = ActionKeys.ADD_SUBFOLDER;
 		}
 
-		long folderId = folder.getFolderId();
-
-		if (PropsValues.PERMISSIONS_VIEW_DYNAMIC_INHERITANCE) {
-			long originalFolderId = folderId;
+		if (actionId.equals(ActionKeys.VIEW) &&
+			PropsValues.PERMISSIONS_VIEW_DYNAMIC_INHERITANCE) {
 
 			try {
+				long folderId = folder.getFolderId();
+
 				while (folderId !=
 							BookmarksFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
 
@@ -85,33 +85,10 @@ public class BookmarksFolderPermission {
 				}
 			}
 
-			if (actionId.equals(ActionKeys.VIEW)) {
-				return true;
-			}
-
-			folderId = originalFolderId;
+			return true;
 		}
 
-		try {
-			while (folderId !=
-						BookmarksFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
-
-				folder = BookmarksFolderLocalServiceUtil.getFolder(folderId);
-
-				if (_hasPermission(permissionChecker, folder, actionId)) {
-					return true;
-				}
-
-				folderId = folder.getParentFolderId();
-			}
-		}
-		catch (NoSuchFolderException nsfe) {
-			if (!folder.isInTrash()) {
-				throw nsfe;
-			}
-		}
-
-		return false;
+		return _hasPermission(permissionChecker, folder, actionId);
 	}
 
 	public static boolean contains(
