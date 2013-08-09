@@ -221,6 +221,12 @@ public class ConfigurationActionImpl extends DefaultConfigurationAction {
 
 		Serializable fieldValue = field.getValue(themeDisplay.getLocale());
 
+		if (field.isRepeatable()) {
+			List<Serializable> fieldValueRepeatable = field.getValues(themeDisplay.getLocale());
+
+			fieldValue = fieldValueRepeatable.get(0);
+		}
+
 		DDMStructure ddmStructure = field.getDDMStructure();
 
 		String type = ddmStructure.getFieldType(fieldName);
