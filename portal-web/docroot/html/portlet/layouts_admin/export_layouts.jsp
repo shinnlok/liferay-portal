@@ -130,8 +130,6 @@ portletURL.setParameter("rootNodeName", rootNodeName);
 										<liferay-util:param name="tabs1" value='<%= privateLayout ? "private-pages" : "public-pages" %>' />
 										<liferay-util:param name="treeId" value="<%= treeId %>" />
 										<liferay-util:param name="defaultStateChecked" value="1" />
-										<liferay-util:param name="expandFirstNode" value="1" />
-										<liferay-util:param name="saveState" value="1" />
 										<liferay-util:param name="selectableTree" value="1" />
 									</liferay-util:include>
 
@@ -191,7 +189,7 @@ portletURL.setParameter("rootNodeName", rootNodeName);
 
 												PortletDataHandlerControl[] configurationControls = portletDataHandler.getExportConfigurationControls(company.getCompanyId(), groupId, portlet, privateLayout);
 
-												if ((configurationControls != null) && (configurationControls.length > 0)) {
+												if (ArrayUtil.isNotEmpty(configurationControls)) {
 													String portletTitle = PortalUtil.getPortletTitle(portlet, application, locale);
 											%>
 
@@ -294,8 +292,6 @@ portletURL.setParameter("rootNodeName", rootNodeName);
 																			monthParam="startDateMonth"
 																			monthValue="<%= yesterday.get(Calendar.MONTH) %>"
 																			yearParam="startDateYear"
-																			yearRangeEnd="<%= yesterday.get(Calendar.YEAR) %>"
-																			yearRangeStart="<%= yesterday.get(Calendar.YEAR) - 100 %>"
 																			yearValue="<%= yesterday.get(Calendar.YEAR) %>"
 																		/>
 
@@ -307,7 +303,6 @@ portletURL.setParameter("rootNodeName", rootNodeName);
 																			disabled="<%= false %>"
 																			hourParam='<%= "startDateHour" %>'
 																			hourValue="<%= yesterday.get(Calendar.HOUR) %>"
-																			minuteInterval="<%= 1 %>"
 																			minuteParam='<%= "startDateMinute" %>'
 																			minuteValue="<%= yesterday.get(Calendar.MINUTE) %>"
 																		/>
@@ -324,8 +319,6 @@ portletURL.setParameter("rootNodeName", rootNodeName);
 																			monthParam="endDateMonth"
 																			monthValue="<%= today.get(Calendar.MONTH) %>"
 																			yearParam="endDateYear"
-																			yearRangeEnd="<%= today.get(Calendar.YEAR) %>"
-																			yearRangeStart="<%= today.get(Calendar.YEAR) - 100 %>"
 																			yearValue="<%= today.get(Calendar.YEAR) %>"
 																		/>
 
@@ -337,7 +330,6 @@ portletURL.setParameter("rootNodeName", rootNodeName);
 																			disabled="<%= false %>"
 																			hourParam='<%= "endDateHour" %>'
 																			hourValue="<%= today.get(Calendar.HOUR) %>"
-																			minuteInterval="<%= 1 %>"
 																			minuteParam='<%= "endDateMinute" %>'
 																			minuteValue="<%= today.get(Calendar.MINUTE) %>"
 																		/>
@@ -417,7 +409,7 @@ portletURL.setParameter("rootNodeName", rootNodeName);
 															PortletDataHandlerControl[] exportControls = portletDataHandler.getExportControls();
 															PortletDataHandlerControl[] metadataControls = portletDataHandler.getExportMetadataControls();
 
-															if (Validator.isNotNull(exportControls) || Validator.isNotNull(metadataControls)) {
+															if (ArrayUtil.isNotEmpty(exportControls) || ArrayUtil.isNotEmpty(metadataControls)) {
 															%>
 
 																<div class="hide" id="<portlet:namespace />content_<%= portlet.getPortletId() %>">
@@ -433,7 +425,7 @@ portletURL.setParameter("rootNodeName", rootNodeName);
 																					request.setAttribute("render_controls.jsp-portletDisabled", !portletDataHandler.isPublishToLiveByDefault());
 																				%>
 
-																					<aui:field-wrapper label='<%= Validator.isNotNull(metadataControls) ? "content" : StringPool.BLANK %>'>
+																					<aui:field-wrapper label='<%= ArrayUtil.isNotEmpty(metadataControls) ? "content" : StringPool.BLANK %>'>
 																						<ul class="lfr-tree unstyled">
 																							<liferay-util:include page="/html/portlet/layouts_admin/render_controls.jsp" />
 																						</ul>
@@ -455,7 +447,7 @@ portletURL.setParameter("rootNodeName", rootNodeName);
 
 																						PortletDataHandlerControl[] childrenControls = control.getChildren();
 
-																						if ((childrenControls != null) && (childrenControls.length > 0)) {
+																						if (ArrayUtil.isNotEmpty(childrenControls)) {
 																							request.setAttribute("render_controls.jsp-controls", childrenControls);
 																						%>
 
@@ -594,6 +586,7 @@ portletURL.setParameter("rootNodeName", rootNodeName);
 			layoutSetSettingsNode: '#<%= PortletDataHandlerKeys.LAYOUT_SET_SETTINGS %>Checkbox',
 			logoNode: '#<%= PortletDataHandlerKeys.LOGO %>Checkbox',
 			namespace: '<portlet:namespace />',
+			pageTreeId: '<%= treeId %>',
 			processesNode: '#exportProcesses',
 			processesResourceURL: '<%= exportProcessesURL.toString() %>',
 			rangeAllNode: '#rangeAll',

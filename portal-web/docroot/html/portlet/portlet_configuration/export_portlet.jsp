@@ -64,7 +64,7 @@ portletURL.setParameter("tabs3", "current-and-previous");
 				PortletDataHandlerControl[] configurationControls = portletDataHandler.getExportConfigurationControls(company.getCompanyId(), themeDisplay.getScopeGroupId(), selPortlet, exportableLayout.getPlid(), false);
 				%>
 
-				<c:if test="<%= (configurationControls != null) && (configurationControls.length > 0) %>">
+				<c:if test="<%= ArrayUtil.isNotEmpty(configurationControls) %>">
 					<aui:fieldset cssClass="options-group" label="application">
 						<ul class="lfr-tree select-options unstyled">
 							<li class="options">
@@ -172,8 +172,6 @@ portletURL.setParameter("tabs3", "current-and-previous");
 															monthParam="startDateMonth"
 															monthValue="<%= yesterday.get(Calendar.MONTH) %>"
 															yearParam="startDateYear"
-															yearRangeEnd="<%= yesterday.get(Calendar.YEAR) %>"
-															yearRangeStart="<%= yesterday.get(Calendar.YEAR) - 100 %>"
 															yearValue="<%= yesterday.get(Calendar.YEAR) %>"
 														/>
 
@@ -185,7 +183,6 @@ portletURL.setParameter("tabs3", "current-and-previous");
 															disabled="<%= false %>"
 															hourParam='<%= "startDateHour" %>'
 															hourValue="<%= yesterday.get(Calendar.HOUR) %>"
-															minuteInterval="<%= 1 %>"
 															minuteParam='<%= "startDateMinute" %>'
 															minuteValue="<%= yesterday.get(Calendar.MINUTE) %>"
 														/>
@@ -202,8 +199,6 @@ portletURL.setParameter("tabs3", "current-and-previous");
 															monthParam="endDateMonth"
 															monthValue="<%= today.get(Calendar.MONTH) %>"
 															yearParam="endDateYear"
-															yearRangeEnd="<%= today.get(Calendar.YEAR) %>"
-															yearRangeStart="<%= today.get(Calendar.YEAR) - 100 %>"
 															yearValue="<%= today.get(Calendar.YEAR) %>"
 														/>
 
@@ -263,7 +258,7 @@ portletURL.setParameter("tabs3", "current-and-previous");
 												PortletDataHandlerControl[] exportControls = portletDataHandler.getExportControls();
 												PortletDataHandlerControl[] metadataControls = portletDataHandler.getExportMetadataControls();
 
-												if (Validator.isNotNull(exportControls) || Validator.isNotNull(metadataControls)) {
+												if (ArrayUtil.isNotEmpty(exportControls) || ArrayUtil.isNotEmpty(metadataControls)) {
 												%>
 
 													<div class="hide" id="<portlet:namespace />content_<%= selPortlet.getRootPortletId() %>">
@@ -279,7 +274,7 @@ portletURL.setParameter("tabs3", "current-and-previous");
 																		request.setAttribute("render_controls.jsp-portletDisabled", !portletDataHandler.isPublishToLiveByDefault());
 																		%>
 
-																		<aui:field-wrapper label='<%= Validator.isNotNull(metadataControls) ? "content" : StringPool.BLANK %>'>
+																		<aui:field-wrapper label='<%= ArrayUtil.isNotEmpty(metadataControls) ? "content" : StringPool.BLANK %>'>
 																			<ul class="lfr-tree unstyled">
 																				<liferay-util:include page="/html/portlet/layouts_admin/render_controls.jsp" />
 																			</ul>
@@ -294,7 +289,7 @@ portletURL.setParameter("tabs3", "current-and-previous");
 
 																			PortletDataHandlerControl[] childrenControls = control.getChildren();
 
-																			if ((childrenControls != null) && (childrenControls.length > 0)) {
+																			if (ArrayUtil.isNotEmpty(childrenControls)) {
 																				request.setAttribute("render_controls.jsp-controls", childrenControls);
 																			%>
 

@@ -10,7 +10,7 @@
 	docroot/html/js/editor/ckeditor_diffs/ckeditor.js.
 	-->
 
-	<property name="ckeditor.file" value="ckeditor-4.0-stable.zip" />
+	<property name="ckeditor.file" value="ckeditor_4.0.3-r2_liferay-min.zip" />
 
 	<property name="fckeditor.file" value="FCKeditor_2.6.3.zip" />
 	<property name="font-awesome.file" value="font-awesome-3.2.1.zip" />
@@ -229,78 +229,16 @@
 
 	<target name="build-ckeditor">
 		<if>
-			<or>
-				<not>
-					<available file="docroot/html/js/editor/ckeditor_diffs/ckeditor.js" />
-				</not>
-				<not>
-					<uptodate
-						srcfile="third-party/${ckeditor.file}"
-						targetfile="docroot/html/js/editor/ckeditor"
-					/>
-				</not>
-			</or>
+			<not>
+				<uptodate
+					srcfile="third-party/${ckeditor.file}"
+					targetfile="docroot/html/js/editor/ckeditor"
+				/>
+			</not>
 			<then>
 				<delete dir="docroot/html/js/editor/ckeditor" />
 
 				<unzip src="third-party/${ckeditor.file}" dest="docroot/html/js/editor" />
-
-				<if>
-					<not>
-						<available file="docroot/html/js/editor/ckeditor_diffs/ckeditor.js" />
-					</not>
-					<then>
-						<delete dir="docroot/html/js/editor/ckeditor/dev/builder/release" />
-
-						<replace file="docroot/html/js/editor/ckeditor/plugins/wysiwygarea/plugin.js">
-							<replacetoken><![CDATA[var data = fullPage]]></replacetoken>
-							<replacevalue>
-								<![CDATA[
-									if (!doc) {
-										return null;
-									}
-
-									var data = fullPage
-								]]>
-							</replacevalue>
-						</replace>
-
-						<property name="arg.line" value="" />
-
-						<java
-							classname="ckbuilder.ckbuilder"
-							classpathref="project.classpath"
-							dir="${basedir}/docroot/html/js/editor/ckeditor/dev/builder"
-							fork="true"
-							newenvironment="true"
-						>
-							<arg line="--build ../../" />
-							<arg line="release" />
-							<arg line="--version=&quot;4.0 STABLE&quot;" />
-							<arg line="--build-config ${basedir}/docroot/html/js/editor/ckeditor/dev/builder/build-config.js" />
-							<arg line="${arg.line}" />
-						</java>
-					</then>
-				</if>
-
-				<move
-					file="docroot/html/js/editor/ckeditor/dev/builder/release/ckeditor"
-					preservelastmodified="true"
-					tofile="docroot/html/js/editor/ckeditor.tmp"
-				/>
-
-				<delete dir="docroot/html/js/editor/ckeditor" />
-
-				<move
-					file="docroot/html/js/editor/ckeditor.tmp"
-					preservelastmodified="true"
-					tofile="docroot/html/js/editor/ckeditor"
-				/>
-
-				<copy
-					file="docroot/html/js/editor/ckeditor/ckeditor.js"
-					tofile="docroot/html/js/editor/ckeditor_diffs/ckeditor.js"
-				/>
 
 				<copy todir="docroot/html/js/editor/ckeditor" overwrite="true" preservelastmodified="true">
 					<fileset dir="docroot/html/js/editor/ckeditor_diffs" />
@@ -316,27 +254,7 @@
 				</copy>
 			</else>
 		</if>
-
-		<replace file="docroot/html/js/editor/ckeditor/plugins/link/dialogs/link.js">
-			<replacetoken><![CDATA[return 'mailto:' +]]></replacetoken>
-			<replacevalue><![CDATA[rest = decodeURIComponent(rest); return "mailto:" + ]]></replacevalue>
-		</replace>
-
-		<replace file="docroot/html/js/editor/ckeditor/plugins/link/dialogs/link.js">
-			<replacetoken><![CDATA[body = encodeURIComponent( email.body || '' );]]></replacetoken>
-			<replacevalue><![CDATA[body = email.body || ''; body = encodeURIComponent(body).replace(/%/g, '%25');]]></replacevalue>
-		</replace>
 	</target>
-
-	<target name="build-ckeditor-dev">
-		<delete file="docroot/html/js/editor/ckeditor_diffs/ckeditor.js" />
-
-		<antcall target="build-ckeditor">
-			<param name="arg.line" value="--leave-css-unminified --leave-js-unminified" />
-		</antcall>
-
-		<delete file="docroot/html/js/editor/ckeditor_diffs/ckeditor.js" />
- 	</target>
 
 	<target name="build-ckeditor-plugins-bbcode">
 		<concat destfile="docroot/html/js/editor/ckeditor_diffs/plugins/bbcode/bbcode_parser.js">
@@ -672,9 +590,19 @@
 					</replacevalue>
 				</replace>
 
+				<replace file="docroot/html/js/editor/fckeditor/editor/filemanager/browser/liferay/frmresourceslist.html">
+					<replacetoken><![CDATA[oListManager.GetFileRowHtml = function( fileName, fileUrl, fileSize )]]></replacetoken>
+					<replacevalue><![CDATA[oListManager.GetFileRowHtml = function( fileName, fileUrl, fileSize, errorMessage )]]></replacevalue>
+				</replace>
+
+				<replace file="docroot/html/js/editor/fckeditor/editor/filemanager/browser/liferay/frmresourceslist.html">
+					<replacetoken><![CDATA[var sLink = '<a href="#" onclick="OpenFile(\'' + ProtectPath( fileUrl ) + '\');return false;">' ;]]></replacetoken>
+					<replacevalue><![CDATA[var errorMessageText = (errorMessage ? '\'' + errorMessage + '\'' : null);var sLink = '<a href="#" onclick="OpenFile(\'' + ProtectPath( fileUrl ) + '\' , ' + errorMessageText + ');return false;">' ;]]></replacevalue>
+				</replace>
+
 				<replaceregexp file="docroot/html/js/editor/fckeditor/editor/filemanager/browser/liferay/frmresourceslist.html"
 					match="(\t*)// Get the optional [^;]*?;\r?(\n).*?sFileSize \) \) ;"
-					replace="\1var sFileDesc = oNode.attributes.getNamedItem('desc').value ;\2\1var sFileUrl = oNode.attributes.getNamedItem('url').value ;\2\2\1oHtml.Append( oListManager.GetFileRowHtml( sFileDesc, sFileUrl, sFileSize ) ) ;"
+					replace="\1var sFileDesc = oNode.attributes.getNamedItem('desc').value ;\2\1var sFileErrorMessageNamedItem = oNode.attributes.getNamedItem('errorMessage');\2\1var sFileErrorMessage = null;\2\1 if (sFileErrorMessageNamedItem) {sFileErrorMessage = sFileErrorMessageNamedItem.value;}\2\1var sFileUrl = oNode.attributes.getNamedItem('url').value ;\2\2\1oHtml.Append( oListManager.GetFileRowHtml( sFileDesc, sFileUrl, sFileSize, sFileErrorMessage ) ) ;"
 					flags="s"
 				/>
 
@@ -682,7 +610,7 @@
 
 				<replaceregexp file="docroot/html/js/editor/fckeditor/editor/filemanager/browser/liferay/frmresourcetype.html"
 					match="var aTypes = \[\r?(\n)(\t*)(.)+\] ;"
-					replace="var aTypes = [\1\2['Document','Document'],\1\2['Page','Page'],\1\2['Attachment', 'Attachment']\1] ;"
+					replace="var aTypes = [\1\2['Document','Document'],\1\2['Page','Page'],\1\2['Attachment', 'Attachment'],\1\2['Video', 'Video']\1] ;"
 					flags="s"
 				/>
 
@@ -767,7 +695,9 @@
 							case 209:
 								alert( 'An internal server error occured.' );
 								break ;
-
+							case 210:
+								alert( 'You cannot upload a video file if video preview generation is disabled.' );
+								break ;
 							default :
 						]]>
 					</replacevalue>
@@ -811,14 +741,24 @@
 				</replace>
 
 				<replace file="docroot/html/js/editor/ckeditor/editor/filemanager/browser/liferay/frmresourceslist.html">
+					<replacetoken><![CDATA[function OpenFile( fileUrl )]]></replacetoken>
+					<replacevalue><![CDATA[function OpenFile( fileUrl, errorMessage )]]></replacevalue>
+				</replace>
+
+				<replace file="docroot/html/js/editor/ckeditor/editor/filemanager/browser/liferay/frmresourceslist.html">
 					<replacetoken><![CDATA[window.top.opener.SetUrl( encodeURI( fileUrl ).replace( '#', '%23' ) ) ;]]></replacetoken>
 					<replacevalue>
 						<![CDATA[
-							var match = window.top.location.search.match(/(?:[\?&]|&amp;)CKEditorFuncNum=([^&]+)/i);
+							if (!errorMessage) {
+								var match = window.top.location.search.match(/(?:[\?&]|&amp;)CKEditorFuncNum=([^&]+)/i);
 
-							var funcNum = (match && match.length) ? match[1] : '';
+								var funcNum = (match && match.length) ? match[1] : '';
 
-							window.top.opener.CKEDITOR.tools.callFunction(funcNum, fileUrl);
+								window.top.opener.CKEDITOR.tools.callFunction(funcNum, fileUrl);
+							}
+							else {
+								alert(errorMessage);
+							}
 						]]>
 					</replacevalue>
 				</replace>
