@@ -23,7 +23,6 @@ import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.template.BaseTemplateManager;
 import com.liferay.portal.template.RestrictedTemplate;
-import com.liferay.portal.template.TemplateContextHelper;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
 
@@ -49,14 +48,14 @@ public class VelocityManager extends BaseTemplateManager {
 
 		_velocityEngine = null;
 
-		_templateContextHelper.removeAllHelperUtilities();
+		templateContextHelper.removeAllHelperUtilities();
 
-		_templateContextHelper = null;
+		templateContextHelper = null;
 	}
 
 	@Override
 	public void destroy(ClassLoader classLoader) {
-		_templateContextHelper.removeHelperUtilities(classLoader);
+		templateContextHelper.removeHelperUtilities(classLoader);
 	}
 
 	@Override
@@ -73,6 +72,11 @@ public class VelocityManager extends BaseTemplateManager {
 		_velocityEngine = new VelocityEngine();
 
 		ExtendedProperties extendedProperties = new FastExtendedProperties();
+
+		extendedProperties.setProperty(
+			VelocityEngine.DIRECTIVE_IF_TOSTRING_NULLCHECK,
+			String.valueOf(
+				PropsValues.VELOCITY_ENGINE_DIRECTIVE_IF_TO_STRING_NULL_CHECK));
 
 		extendedProperties.setProperty(
 			VelocityEngine.EVENTHANDLER_METHODEXCEPTION,
@@ -126,11 +130,12 @@ public class VelocityManager extends BaseTemplateManager {
 			PropsUtil.get(PropsKeys.VELOCITY_ENGINE_VELOCIMACRO_LIBRARY));
 
 		extendedProperties.setProperty(
-			VelocityEngine.VM_LIBRARY_AUTORELOAD, String.valueOf(cacheEnabled));
+			VelocityEngine.VM_LIBRARY_AUTORELOAD,
+			String.valueOf(!cacheEnabled));
 
 		extendedProperties.setProperty(
 			VelocityEngine.VM_PERM_ALLOW_INLINE_REPLACE_GLOBAL,
-			String.valueOf(cacheEnabled));
+			String.valueOf(!cacheEnabled));
 
 		_velocityEngine.setExtendedProperties(extendedProperties);
 
@@ -140,12 +145,6 @@ public class VelocityManager extends BaseTemplateManager {
 		catch (Exception e) {
 			throw new TemplateException(e);
 		}
-	}
-
-	public void setTemplateContextHelper(
-		TemplateContextHelper templateContextHelper) {
-
-		_templateContextHelper = templateContextHelper;
 	}
 
 	@Override
@@ -158,19 +157,14 @@ public class VelocityManager extends BaseTemplateManager {
 
 		Template template = new VelocityTemplate(
 			templateResource, errorTemplateResource, velocityContext,
-			_velocityEngine, _templateContextHelper);
+			_velocityEngine, templateContextHelper);
 
 		if (restricted) {
 			template = new RestrictedTemplate(
-				template, _templateContextHelper.getRestrictedVariables());
+				template, templateContextHelper.getRestrictedVariables());
 		}
 
 		return template;
-	}
-
-	@Override
-	protected TemplateContextHelper getTemplateContextHelper() {
-		return _templateContextHelper;
 	}
 
 	protected VelocityContext getVelocityContext(
@@ -185,7 +179,6 @@ public class VelocityManager extends BaseTemplateManager {
 		return velocityContext;
 	}
 
-	private TemplateContextHelper _templateContextHelper;
 	private VelocityEngine _velocityEngine;
 
 }

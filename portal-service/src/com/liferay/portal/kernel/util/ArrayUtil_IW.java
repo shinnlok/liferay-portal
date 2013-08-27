@@ -326,6 +326,78 @@ public class ArrayUtil_IW {
 		return ArrayUtil.getValue(array, pos);
 	}
 
+	public boolean isEmpty(boolean[] array) {
+		return ArrayUtil.isEmpty(array);
+	}
+
+	public boolean isEmpty(byte[] array) {
+		return ArrayUtil.isEmpty(array);
+	}
+
+	public boolean isEmpty(char[] array) {
+		return ArrayUtil.isEmpty(array);
+	}
+
+	public boolean isEmpty(double[] array) {
+		return ArrayUtil.isEmpty(array);
+	}
+
+	public boolean isEmpty(float[] array) {
+		return ArrayUtil.isEmpty(array);
+	}
+
+	public boolean isEmpty(int[] array) {
+		return ArrayUtil.isEmpty(array);
+	}
+
+	public boolean isEmpty(long[] array) {
+		return ArrayUtil.isEmpty(array);
+	}
+
+	public boolean isEmpty(java.lang.Object[] array) {
+		return ArrayUtil.isEmpty(array);
+	}
+
+	public boolean isEmpty(short[] array) {
+		return ArrayUtil.isEmpty(array);
+	}
+
+	public boolean isNotEmpty(boolean[] array) {
+		return ArrayUtil.isNotEmpty(array);
+	}
+
+	public boolean isNotEmpty(byte[] array) {
+		return ArrayUtil.isNotEmpty(array);
+	}
+
+	public boolean isNotEmpty(char[] array) {
+		return ArrayUtil.isNotEmpty(array);
+	}
+
+	public boolean isNotEmpty(double[] array) {
+		return ArrayUtil.isNotEmpty(array);
+	}
+
+	public boolean isNotEmpty(float[] array) {
+		return ArrayUtil.isNotEmpty(array);
+	}
+
+	public boolean isNotEmpty(int[] array) {
+		return ArrayUtil.isNotEmpty(array);
+	}
+
+	public boolean isNotEmpty(long[] array) {
+		return ArrayUtil.isNotEmpty(array);
+	}
+
+	public boolean isNotEmpty(java.lang.Object[] array) {
+		return ArrayUtil.isNotEmpty(array);
+	}
+
+	public boolean isNotEmpty(short[] array) {
+		return ArrayUtil.isNotEmpty(array);
+	}
+
 	public boolean[] remove(boolean[] array, boolean value) {
 		return ArrayUtil.remove(array, value);
 	}
