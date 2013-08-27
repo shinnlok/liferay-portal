@@ -1644,6 +1644,8 @@ public class PropsValues {
 
 	public static final String SESSION_COOKIE_DOMAIN = PropsUtil.get(PropsKeys.SESSION_COOKIE_DOMAIN);
 
+	public static final boolean SESSION_COOKIE_USE_FULL_HOSTNAME = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.SESSION_COOKIE_USE_FULL_HOSTNAME));
+
 	public static final boolean SESSION_DISABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.SESSION_DISABLED));
 
 	public static final boolean SESSION_ENABLE_PERSISTENT_COOKIES = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.SESSION_ENABLE_PERSISTENT_COOKIES));
@@ -1919,6 +1921,8 @@ public class PropsValues {
 	public static final boolean VALUE_OBJECT_FINDER_CACHE_ENABLED = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.VALUE_OBJECT_FINDER_CACHE_ENABLED));
 
 	public static final int VALUE_OBJECT_FINDER_THREAD_LOCAL_CACHE_MAX_SIZE = GetterUtil.getInteger(PropsUtil.get(PropsKeys.VALUE_OBJECT_FINDER_THREAD_LOCAL_CACHE_MAX_SIZE));
+
+	public static final boolean VELOCITY_ENGINE_DIRECTIVE_IF_TO_STRING_NUL_LCHECK = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.VELOCITY_ENGINE_DIRECTIVE_IF_TO_STRING_NUL_LCHECK));
 
 	public static final int VELOCITY_ENGINE_RESOURCE_MODIFICATION_CHECK_INTERVAL = GetterUtil.getInteger(PropsUtil.get(PropsKeys.VELOCITY_ENGINE_RESOURCE_MODIFICATION_CHECK_INTERVAL));
 

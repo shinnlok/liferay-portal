@@ -68,6 +68,7 @@ import com.liferay.portlet.asset.model.AssetCategory;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetRenderer;
 import com.liferay.portlet.asset.model.AssetRendererFactory;
+import com.liferay.portlet.asset.model.AssetTag;
 import com.liferay.portlet.asset.service.AssetCategoryLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetEntryServiceUtil;
@@ -372,6 +373,40 @@ public class AssetPublisherImpl implements AssetPublisher {
 			PortletRequest portletRequest,
 			PortletPreferences portletPreferences,
 			PermissionChecker permissionChecker, long[] groupIds,
+			long[] allCategoryIds, String[] assetEntryXmls,
+			String[] allTagNames, boolean deleteMissingAssetEntries,
+			boolean checkPermission)
+		throws Exception {
+
+		List<AssetEntry> assetEntries = getAssetEntries(
+			portletRequest, portletPreferences, permissionChecker, groupIds,
+			assetEntryXmls, deleteMissingAssetEntries, checkPermission);
+
+		if (assetEntries.isEmpty() ||
+			(ArrayUtil.isEmpty(allCategoryIds) &&
+			 ArrayUtil.isEmpty(allTagNames))) {
+
+			return assetEntries;
+		}
+
+		if (!ArrayUtil.isEmpty(allCategoryIds)) {
+			assetEntries = _filterAssetCategoriesAssetEntries(
+				assetEntries, allCategoryIds);
+		}
+
+		if (!ArrayUtil.isEmpty(allTagNames)) {
+			assetEntries = _filterAssetTagNamesAssetEntries(
+				assetEntries, allTagNames);
+		}
+
+		return assetEntries;
+	}
+
+	@Override
+	public List<AssetEntry> getAssetEntries(
+			PortletRequest portletRequest,
+			PortletPreferences portletPreferences,
+			PermissionChecker permissionChecker, long[] groupIds,
 			String[] assetEntryXmls, boolean deleteMissingAssetEntries,
 			boolean checkPermission)
 		throws Exception {
@@ -473,7 +508,7 @@ public class AssetPublisherImpl implements AssetPublisher {
 			String[] queryValues = portletPreferences.getValues(
 				"queryValues" + i, null);
 
-			if ((queryValues == null) || (queryValues.length == 0)) {
+			if (ArrayUtil.isEmpty(queryValues)) {
 				break;
 			}
 
@@ -564,7 +599,7 @@ public class AssetPublisherImpl implements AssetPublisher {
 			String[] queryValues = portletPreferences.getValues(
 				"queryValues" + i, null);
 
-			if ((queryValues == null) || (queryValues.length == 0)) {
+			if (ArrayUtil.isEmpty(queryValues)) {
 				break;
 			}
 
@@ -622,7 +657,7 @@ public class AssetPublisherImpl implements AssetPublisher {
 		long[] classNameIds = GetterUtil.getLongValues(
 			portletPreferences.getValues("classNameIds", null));
 
-		if ((classNameIds != null) && (classNameIds.length > 0)) {
+		if (ArrayUtil.isNotEmpty(classNameIds)) {
 			return classNameIds;
 		}
 		else {
@@ -919,7 +954,9 @@ public class AssetPublisherImpl implements AssetPublisher {
 				return false;
 			}
 
-			if (SitesUtil.isContentSharingWithChildrenEnabled(siteGroup)) {
+			Group group = GroupLocalServiceUtil.getGroup(groupId);
+
+			if (SitesUtil.isContentSharingWithChildrenEnabled(group)) {
 				return true;
 			}
 
@@ -1134,6 +1171,48 @@ public class AssetPublisherImpl implements AssetPublisher {
 		catch (PortletException pe) {
 			throw new SystemException(pe);
 		}
+	}
+
+	private List<AssetEntry> _filterAssetCategoriesAssetEntries(
+			List<AssetEntry> assetEntries, long[] assetCategoryIds)
+		throws Exception {
+
+		List<AssetEntry> filteredAssetEntries = new ArrayList<AssetEntry>();
+
+		for (AssetEntry assetEntry : assetEntries) {
+			if (ArrayUtil.containsAll(
+					assetEntry.getCategoryIds(), assetCategoryIds)) {
+
+				filteredAssetEntries.add(assetEntry);
+			}
+		}
+
+		return filteredAssetEntries;
+	}
+
+	private List<AssetEntry> _filterAssetTagNamesAssetEntries(
+			List<AssetEntry> assetEntries, String[] assetTagNames)
+		throws Exception {
+
+		List<AssetEntry> filteredAssetEntries = new ArrayList<AssetEntry>();
+
+		for (AssetEntry assetEntry : assetEntries) {
+			List<AssetTag> assetTags = assetEntry.getTags();
+
+			String[] assetEntryAssetTagNames = new String[assetTags.size()];
+
+			for (int i = 0; i < assetTags.size(); i++) {
+				AssetTag assetTag = assetTags.get(i);
+
+				assetEntryAssetTagNames[i] = assetTag.getName();
+			}
+
+			if (ArrayUtil.containsAll(assetEntryAssetTagNames, assetTagNames)) {
+				filteredAssetEntries.add(assetEntry);
+			}
+		}
+
+		return filteredAssetEntries;
 	}
 
 	private String _getAssetEntryXml(

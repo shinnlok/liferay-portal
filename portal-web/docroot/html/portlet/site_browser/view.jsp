@@ -36,12 +36,14 @@ String target = ParamUtil.getString(request, "target");
 PortletURL portletURL = renderResponse.createRenderURL();
 
 portletURL.setParameter("struts_action", "/site_browser/view");
+portletURL.setParameter("groupId", String.valueOf(groupId));
+portletURL.setParameter("selectedGroupIds", StringUtil.merge(selectedGroupIds));
 portletURL.setParameter("type", type);
 portletURL.setParameter("types", types);
-portletURL.setParameter("groupId", String.valueOf(groupId));
 portletURL.setParameter("filter", filter);
 portletURL.setParameter("includeCompany", String.valueOf(includeCompany));
 portletURL.setParameter("includeUserPersonalSite", String.valueOf(includeUserPersonalSite));
+portletURL.setParameter("eventName", eventName);
 portletURL.setParameter("target", target);
 %>
 
@@ -200,13 +202,13 @@ portletURL.setParameter("target", target);
 				<%
 				Map<String, Object> data = new HashMap<String, Object>();
 
+				data.put("groupdescriptivename", HtmlUtil.escape(group.getDescriptiveName(locale)));
 				data.put("groupid", group.getGroupId());
-				data.put("groupname", HtmlUtil.escape(group.getDescriptiveName(locale)));
 				data.put("scopeid", HtmlUtil.escape(AssetPublisherUtil.getScopeId(group, scopeGroupId)));
 				data.put("target", target);
 				%>
 
-				<aui:button cssClass="selector-button" data="<%= data %>" value="choose" />
+				<aui:button disabled="<%= ArrayUtil.contains(selectedGroupIds, group.getGroupId())%>" cssClass="selector-button" data="<%= data %>" value="choose" />
 			</liferay-ui:search-container-column-text>
 
 		</liferay-ui:search-container-row>
