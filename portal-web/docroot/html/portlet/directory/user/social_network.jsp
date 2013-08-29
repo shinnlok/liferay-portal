@@ -37,15 +37,6 @@ String twitter = selContact.getTwitterSn();
 			</dd>
 		</c:if>
 
-		<c:if test="<%= Validator.isNotNull(mySpace) %>">
-			<dt>
-				<liferay-ui:message key="myspace" />
-			</dt>
-			<dd>
-				<%= HtmlUtil.escape(mySpace) %>
-			</dd>
-		</c:if>
-
 		<c:if test="<%= Validator.isNotNull(twitter) %>">
 			<dt>
 				<liferay-ui:message key="twitter" />
