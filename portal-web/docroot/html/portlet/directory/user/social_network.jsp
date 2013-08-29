@@ -20,11 +20,10 @@
 Contact selContact = (Contact)request.getAttribute("user.selContact");
 
 String facebook = selContact.getFacebookSn();
-String mySpace = selContact.getMySpaceSn();
 String twitter = selContact.getTwitterSn();
 %>
 
-<c:if test="<%= Validator.isNotNull(facebook) || Validator.isNotNull(mySpace) || Validator.isNotNull(twitter) %>">
+<c:if test="<%= Validator.isNotNull(facebook) || Validator.isNotNull(twitter) %>">
 	<h3><liferay-ui:message key="social-network" /></h3>
 
 	<dl class="property-list">
