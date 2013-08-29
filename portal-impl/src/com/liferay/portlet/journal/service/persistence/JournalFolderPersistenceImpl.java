@@ -363,6 +363,10 @@ public class JournalFolderPersistenceImpl extends BasePersistenceImpl<JournalFol
 		OrderByComparator orderByComparator) throws SystemException {
 		int count = countByUuid(uuid);
 
+		if (count == 0) {
+			return null;
+		}
+
 		List<JournalFolder> list = findByUuid(uuid, count - 1, count,
 				orderByComparator);
 
@@ -1185,6 +1189,10 @@ public class JournalFolderPersistenceImpl extends BasePersistenceImpl<JournalFol
 		OrderByComparator orderByComparator) throws SystemException {
 		int count = countByUuid_C(uuid, companyId);
 
+		if (count == 0) {
+			return null;
+		}
+
 		List<JournalFolder> list = findByUuid_C(uuid, companyId, count - 1,
 				count, orderByComparator);
 
@@ -1717,6 +1725,10 @@ public class JournalFolderPersistenceImpl extends BasePersistenceImpl<JournalFol
 	public JournalFolder fetchByGroupId_Last(long groupId,
 		OrderByComparator orderByComparator) throws SystemException {
 		int count = countByGroupId(groupId);
+
+		if (count == 0) {
+			return null;
+		}
 
 		List<JournalFolder> list = findByGroupId(groupId, count - 1, count,
 				orderByComparator);
@@ -2573,6 +2585,10 @@ public class JournalFolderPersistenceImpl extends BasePersistenceImpl<JournalFol
 		OrderByComparator orderByComparator) throws SystemException {
 		int count = countByCompanyId(companyId);
 
+		if (count == 0) {
+			return null;
+		}
+
 		List<JournalFolder> list = findByCompanyId(companyId, count - 1, count,
 				orderByComparator);
 
@@ -3085,6 +3101,10 @@ public class JournalFolderPersistenceImpl extends BasePersistenceImpl<JournalFol
 	public JournalFolder fetchByG_P_Last(long groupId, long parentFolderId,
 		OrderByComparator orderByComparator) throws SystemException {
 		int count = countByG_P(groupId, parentFolderId);
+
+		if (count == 0) {
+			return null;
+		}
 
 		List<JournalFolder> list = findByG_P(groupId, parentFolderId,
 				count - 1, count, orderByComparator);
@@ -4583,6 +4603,10 @@ public class JournalFolderPersistenceImpl extends BasePersistenceImpl<JournalFol
 		throws SystemException {
 		int count = countByG_P_S(groupId, parentFolderId, status);
 
+		if (count == 0) {
+			return null;
+		}
+
 		List<JournalFolder> list = findByG_P_S(groupId, parentFolderId, status,
 				count - 1, count, orderByComparator);
 
@@ -5536,6 +5560,10 @@ public class JournalFolderPersistenceImpl extends BasePersistenceImpl<JournalFol
 		throws SystemException {
 		int count = countByG_P_NotS(groupId, parentFolderId, status);
 
+		if (count == 0) {
+			return null;
+		}
+
 		List<JournalFolder> list = findByG_P_NotS(groupId, parentFolderId,
 				status, count - 1, count, orderByComparator);
 
@@ -6192,6 +6220,10 @@ public class JournalFolderPersistenceImpl extends BasePersistenceImpl<JournalFol
 	private static final String _FINDER_COLUMN_G_P_NOTS_GROUPID_2 = "journalFolder.groupId = ? AND ";
 	private static final String _FINDER_COLUMN_G_P_NOTS_PARENTFOLDERID_2 = "journalFolder.parentFolderId = ? AND ";
 	private static final String _FINDER_COLUMN_G_P_NOTS_STATUS_2 = "journalFolder.status != ?";
+
+	public JournalFolderPersistenceImpl() {
+		setModelClass(JournalFolder.class);
+	}
 
 	/**
 	 * Caches the journal folder in the entity cache if it is enabled.

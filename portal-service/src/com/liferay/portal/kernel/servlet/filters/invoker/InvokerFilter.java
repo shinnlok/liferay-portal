@@ -20,7 +20,7 @@ import com.liferay.portal.kernel.concurrent.ConcurrentLFUCache;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.NonSerializableObjectRequestWrapper;
-import com.liferay.portal.kernel.servlet.SecureHttpServletResponseWrapper;
+import com.liferay.portal.kernel.servlet.SanitizedServletResponse;
 import com.liferay.portal.kernel.util.BasePortalLifecycle;
 import com.liferay.portal.kernel.util.ContextPathUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -47,6 +47,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * @author Mika Koivisto
  * @author Brian Wing Shun Chan
+ * @author Shuyang Zhou
  */
 public class InvokerFilter extends BasePortalLifecycle implements Filter {
 
@@ -69,7 +70,7 @@ public class InvokerFilter extends BasePortalLifecycle implements Filter {
 
 		HttpServletResponse response = (HttpServletResponse)servletResponse;
 
-		response = secureResponseHeaders(response);
+		response = secureResponseHeaders(request, response);
 
 		request.setAttribute(WebKeys.INVOKER_FILTER_URI, uri);
 
@@ -253,10 +254,22 @@ public class InvokerFilter extends BasePortalLifecycle implements Filter {
 	}
 
 	protected HttpServletResponse secureResponseHeaders(
-		HttpServletResponse response) {
+		HttpServletRequest request, HttpServletResponse response) {
 
-		return new SecureHttpServletResponseWrapper(response);
+		if (!GetterUtil.getBoolean(
+				request.getAttribute(_SECURE_RESPONSE), true)) {
+
+			return response;
+		}
+
+		request.setAttribute(_SECURE_RESPONSE, Boolean.FALSE);
+
+		return SanitizedServletResponse.getSanitizedServletResponse(
+			request, response);
 	}
+
+	private static final String _SECURE_RESPONSE =
+		InvokerFilter.class.getName() + "SECURE_RESPONSE";
 
 	private static Log _log = LogFactoryUtil.getLog(InvokerFilter.class);
 

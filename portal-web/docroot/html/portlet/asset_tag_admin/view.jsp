@@ -35,7 +35,7 @@
 				<aui:nav-item data-url="<%= permissionsURL %>" id="tagsPermissionsButton" label="permissions" />
 			</c:if>
 
-			<aui:nav-item dropdown="<%= true %>" label="actions">
+			<aui:nav-item cssClass="hide" dropdown="<%= true %>" id="tagsActionsButton" label="actions">
 				<aui:nav-item iconClass="icon-remove" id="deleteSelectedTags" label="delete" />
 
 				<aui:nav-item iconClass="icon-random" id="mergeSelectedTags" label="merge" />
@@ -43,9 +43,7 @@
 		</aui:nav>
 
 		<div class="navbar-search pull-right">
-			<div class="form-search">
-				<input class="search-query span9" id="<portlet:namespace/>tagsAdminSearchInput" name="<portlet:namespace/>tagsAdminSearchInput" type="text" />
-			</div>
+			<liferay-ui:input-search cssClass="form-search" id="tagsAdminSearchInput" name="tagsAdminSearchInput" showButton="<%= false %>" />
 		</div>
 	</aui:nav-bar>
 

@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.image.ImageBag;
 import com.liferay.portal.kernel.image.ImageToolUtil;
 import com.liferay.portal.kernel.increment.BufferedIncrement;
 import com.liferay.portal.kernel.increment.NumberIncrement;
+import com.liferay.portal.kernel.lar.ExportImportThreadLocal;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.Field;
@@ -38,6 +39,7 @@ import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.DigesterUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -1257,6 +1259,10 @@ public class DLFileEntryLocalServiceImpl
 	public void incrementViewCounter(DLFileEntry dlFileEntry, int increment)
 		throws SystemException {
 
+		if (ExportImportThreadLocal.isImportInProcess()) {
+			return;
+		}
+
 		dlFileEntry.setReadCount(dlFileEntry.getReadCount() + increment);
 
 		dlFileEntryPersistence.update(dlFileEntry);
@@ -1407,7 +1413,7 @@ public class DLFileEntryLocalServiceImpl
 				Field.USER_ID, String.valueOf(creatorUserId));
 		}
 
-		if (Validator.isNotNull(mimeTypes)) {
+		if (ArrayUtil.isNotEmpty(mimeTypes)) {
 			searchContext.setAttribute("mimeTypes", mimeTypes);
 		}
 

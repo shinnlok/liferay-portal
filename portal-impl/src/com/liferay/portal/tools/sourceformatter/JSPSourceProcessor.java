@@ -264,7 +264,7 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 		String oldContent = content;
 		String newContent = StringPool.BLANK;
 
-		for (;;) {
+		while (true) {
 			newContent = formatJSP(fileName, oldContent);
 
 			if (oldContent.equals(newContent)) {
@@ -320,7 +320,7 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 			}
 		}
 
-		if (fileName.endsWith("init.jsp")) {
+		if (fileName.endsWith("init.jsp") || fileName.endsWith("init.jspf")) {
 			int x = newContent.indexOf("<%@ page import=");
 
 			int y = newContent.lastIndexOf("<%@ page import=");
@@ -411,6 +411,8 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 
 			String trimmedLine = StringUtil.trimLeading(line);
 			String trimmedPreviousLine = StringUtil.trimLeading(previousLine);
+
+			checkStringBundler(trimmedLine, fileName, lineCount);
 
 			if (trimmedLine.equals("<%") || trimmedLine.equals("<%!")) {
 				javaSource = true;
@@ -860,7 +862,7 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 
 		fileName = fileName.replaceFirst(docrootPath, StringPool.BLANK);
 
-		if (fileName.endsWith("init.jsp") ||
+		if (fileName.endsWith("init.jsp") || fileName.endsWith("init.jspf") ||
 			fileName.contains("init-ext.jsp")) {
 
 			addJSPReferenceFileNames(fileName, includeFileNames);
@@ -995,7 +997,7 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 
 			int y = -1;
 
-			for (;;) {
+			while (true) {
 				y = s.indexOf(delimeter, y + 1);
 
 				if ((y == -1) || (s.length() <= (y + 1))) {

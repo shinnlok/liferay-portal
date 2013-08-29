@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.increment.BufferedIncrement;
 import com.liferay.portal.kernel.increment.NumberIncrement;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.lar.ExportImportThreadLocal;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.Indexer;
@@ -653,6 +654,10 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 
 		MBThread thread = mbThreadPersistence.findByPrimaryKey(threadId);
 
+		if (ExportImportThreadLocal.isImportInProcess()) {
+			return thread;
+		}
+
 		thread.setViewCount(thread.getViewCount() + increment);
 
 		mbThreadPersistence.update(thread);
@@ -1166,11 +1171,6 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 						false);
 				}
 
-				// Social
-
-				socialActivityCounterLocalService.disableActivityCounters(
-					MBMessage.class.getName(), message.getMessageId());
-
 				// Indexer
 
 				Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
@@ -1199,11 +1199,6 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 						MBMessage.class.getName(), message.getMessageId(),
 						true);
 				}
-
-				// Social
-
-				socialActivityCounterLocalService.enableActivityCounters(
-					MBMessage.class.getName(), message.getMessageId());
 
 				// Indexer
 

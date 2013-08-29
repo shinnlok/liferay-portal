@@ -533,7 +533,7 @@ public class PortalLDAPImporterImpl implements PortalLDAPImporter {
 		if (ldapUser.isUpdatePortrait()) {
 			byte[] portraitBytes = ldapUser.getPortraitBytes();
 
-			if ((portraitBytes != null) && (portraitBytes.length > 0)) {
+			if (ArrayUtil.isNotEmpty(portraitBytes)) {
 				user = UserLocalServiceUtil.updatePortrait(
 					user.getUserId(), portraitBytes);
 			}
@@ -958,9 +958,13 @@ public class PortalLDAPImporterImpl implements PortalLDAPImporter {
 			userGroup = UserGroupLocalServiceUtil.getUserGroup(
 				companyId, ldapGroup.getGroupName());
 
-			UserGroupLocalServiceUtil.updateUserGroup(
-				companyId, userGroup.getUserGroupId(), ldapGroup.getGroupName(),
-				ldapGroup.getDescription(), null);
+			if (!Validator.equals(
+					userGroup.getDescription(), ldapGroup.getDescription())) {
+
+				UserGroupLocalServiceUtil.updateUserGroup(
+					companyId, userGroup.getUserGroupId(),
+					ldapGroup.getGroupName(), ldapGroup.getDescription(), null);
+			}
 		}
 		catch (NoSuchUserGroupException nsuge) {
 			if (_log.isDebugEnabled()) {
@@ -1289,7 +1293,7 @@ public class PortalLDAPImporterImpl implements PortalLDAPImporter {
 		if (ldapUser.isUpdatePortrait()) {
 			byte[] portraitBytes = ldapUser.getPortraitBytes();
 
-			if ((portraitBytes != null) && (portraitBytes.length > 0)) {
+			if (ArrayUtil.isNotEmpty(portraitBytes)) {
 				UserLocalServiceUtil.updatePortrait(
 					user.getUserId(), portraitBytes);
 			}

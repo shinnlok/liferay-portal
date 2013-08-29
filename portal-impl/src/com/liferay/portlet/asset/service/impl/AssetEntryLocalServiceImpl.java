@@ -379,7 +379,7 @@ public class AssetEntryLocalServiceImpl extends AssetEntryLocalServiceBaseImpl {
 			long userId, String className, long classPK, int increment)
 		throws SystemException {
 
-		if (classPK <= 0) {
+		if (ExportImportThreadLocal.isImportInProcess() || (classPK <= 0)) {
 			return null;
 		}
 
@@ -1054,12 +1054,18 @@ public class AssetEntryLocalServiceImpl extends AssetEntryLocalServiceBaseImpl {
 				assetTagLocalService.incrementAssetCount(
 					tag.getTagId(), entry.getClassNameId());
 			}
+
+			socialActivityCounterLocalService.enableActivityCounters(
+				entry.getClassNameId(), entry.getClassPK());
 		}
 		else {
 			for (AssetTag tag : tags) {
 				assetTagLocalService.decrementAssetCount(
 					tag.getTagId(), entry.getClassNameId());
 			}
+
+			socialActivityCounterLocalService.disableActivityCounters(
+				entry.getClassNameId(), entry.getClassPK());
 		}
 
 		entry.setVisible(visible);

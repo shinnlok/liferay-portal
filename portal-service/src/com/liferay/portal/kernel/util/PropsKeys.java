@@ -495,6 +495,8 @@ public interface PropsKeys {
 
 	public static final String CONVERT_PROCESSES = "convert.processes";
 
+	public static final String COOKIE_HTTP_ONLY_NAMES_EXCLUDES = "cookie.http.only.names.excludes";
+
 	public static final String COUNTER_INCREMENT = "counter.increment";
 
 	public static final String COUNTER_INCREMENT_PREFIX = "counter.increment.";
@@ -912,6 +914,14 @@ public interface PropsKeys {
 	public static final String HOT_UNDEPLOY_INTERVAL = "hot.undeploy.interval";
 
 	public static final String HOT_UNDEPLOY_ON_REDEPLOY = "hot.undeploy.on.redeploy";
+
+	public static final String HTTP_HEADER_SECURE_X_CONTENT_TYPE_OPTIONS = "http.header.secure.x.content.type.options";
+
+	public static final String HTTP_HEADER_SECURE_X_CONTENT_TYPE_OPTIONS_URLS_EXCLUDES = "http.header.secure.x.content.type.options.urls.excludes";
+
+	public static final String HTTP_HEADER_SECURE_X_FRAME_OPTIONS = "http.header.secure.x.frame.options";
+
+	public static final String HTTP_HEADER_SECURE_X_XSS_PROTECTION = "http.header.secure.x.xss.protection";
 
 	public static final String HTTP_HEADER_VERSION_VERBOSITY = "http.header.version.verbosity";
 
@@ -2526,6 +2536,8 @@ public interface PropsKeys {
 	public static final String VALUE_OBJECT_FINDER_THREAD_LOCAL_CACHE_MAX_SIZE = "value.object.finder.thread.local.cache.max.size";
 
 	public static final String VALUE_OBJECT_LISTENER = "value.object.listener.";
+
+	public static final String VELOCITY_ENGINE_DIRECTIVE_IF_TO_STRING_NULL_CHECK = "velocity.engine.directive.if.to.string.null.check";
 
 	public static final String VELOCITY_ENGINE_LOGGER = "velocity.engine.logger";
 

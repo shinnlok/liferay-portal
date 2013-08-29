@@ -208,8 +208,9 @@
 	</target>
 
 	<target name="build-dist-tcat">
-		<property name="tcat.dir" value="${app.server.parent.dir}/tcat-7.0.2" />
-		<property name="tcat.zip.name" value="TcatServer-7.0.2.zip" />
+		<property name="tcat.version" value="7.0.2" />
+		<property name="tcat.dir" value="${app.server.parent.dir}/tcat-${tcat.version}" />
+		<property name="tcat.zip.name" value="TcatServer-${tcat.version}.zip" />
 		<property name="tcat.zip.url" value="http://files.liferay.com/public/bundles/trunk/${tcat.zip.name}" />
 
 		<echo file="app.server.${user.name}.properties">
@@ -1561,6 +1562,20 @@ rerun this task.
 			src="${app.server.parent.dir}/${app.server.weblogic.zip.name}"
 		/>
 
+		<if>
+			<equals arg1="${app.server.weblogic.version.build}" arg2="1212" />
+			<then>
+				<move todir="${app.server.weblogic.dir}">
+					<fileset dir="${app.server.weblogic.dir}/wls12120" />
+				</move>
+
+				<property name="app.server.weblogic.template.dir" value="${app.server.weblogic.wlserver.dir}/common/templates/wls" />
+			</then>
+			<else>
+				<property name="app.server.weblogic.template.dir" value="${app.server.weblogic.wlserver.dir}/common/templates/domains" />
+			</else>
+		</if>
+
 		<tstamp>
 			<format property="tstamp.value" pattern="yyyyMMddkkmmssSSS" />
 		</tstamp>
@@ -1568,7 +1583,7 @@ rerun this task.
 		<mkdir dir="${tstamp.value}" />
 
 		<echo file="${tstamp.value}/create-weblogic-domain.py">
-readTemplate('${app.server.weblogic.wlserver.dir}/common/templates/domains/wls.jar')
+readTemplate('${app.server.weblogic.template.dir}/wls.jar')
 
 set('Name', '${app.server.weblogic.instance.name}')
 
@@ -2456,7 +2471,7 @@ plugins.includes=</echo>
 	</target>
 
 	<target name="zip-tcat">
-		<property name="tcat.dir" value="${app.server.parent.dir}/tcat-6.4.5" />
+		<property name="tcat.dir" value="${app.server.parent.dir}/tcat-${tcat.version}" />
 
 		<antcall target="zip-executable">
 			<param name="zip.executable.file" value="liferay-portal-tcat-admin" />

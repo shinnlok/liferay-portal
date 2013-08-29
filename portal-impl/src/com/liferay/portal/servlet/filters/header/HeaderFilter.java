@@ -15,6 +15,7 @@
 package com.liferay.portal.servlet.filters.header;
 
 import com.liferay.portal.kernel.servlet.HttpHeaders;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
@@ -53,7 +54,7 @@ public class HeaderFilter extends BasePortalFilter {
 
 		_filterConfig = filterConfig;
 		_dateFormat = FastDateFormatFactoryUtil.getSimpleDateFormat(
-			_DATE_FORMAT, LocaleUtil.US, TimeZoneUtil.getTimeZone(_TIME_ZONE));
+			_DATE_FORMAT, LocaleUtil.US, TimeZoneUtil.GMT);
 	}
 
 	protected long getLastModified(HttpServletRequest request) {
@@ -64,7 +65,7 @@ public class HeaderFilter extends BasePortalFilter {
 
 		String[] value = parameterMap.get("t");
 
-		if ((value != null) && (value.length > 0)) {
+		if (ArrayUtil.isNotEmpty(value)) {
 			lasModified = GetterUtil.getLong(value[0]);
 		}
 
@@ -153,8 +154,6 @@ public class HeaderFilter extends BasePortalFilter {
 	private static final String _DATE_FORMAT = "EEE, dd MMM yyyy HH:mm:ss z";
 
 	private static final String _EXPIRES = "Expires";
-
-	private static final String _TIME_ZONE = "GMT";
 
 	private static Set<String> _requestHeaderIgnoreInitParams =
 		SetUtil.fromArray(PropsValues.REQUEST_HEADER_IGNORE_INIT_PARAMS);

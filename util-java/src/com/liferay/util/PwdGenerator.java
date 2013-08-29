@@ -16,10 +16,13 @@ package com.liferay.util;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.AutoResetThreadLocal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.security.SecureRandom;
+
+import java.util.Random;
 
 /**
  * @author Brian Wing Shun Chan
@@ -82,8 +85,10 @@ public class PwdGenerator {
 
 		StringBuilder sb = new StringBuilder(length);
 
+		Random random = _randomThreadLocal.get();
+
 		for (int i = 0; i < length; i++) {
-			sb.append(key.charAt(_secureRandom.nextInt(key.length())));
+			sb.append(key.charAt(random.nextInt(key.length())));
 		}
 
 		String password = sb.toString();
@@ -121,6 +126,17 @@ public class PwdGenerator {
 
 	private static Log _log = LogFactoryUtil.getLog(PwdGenerator.class);
 
-	private static SecureRandom _secureRandom = new SecureRandom();;
+	private static ThreadLocal<Random> _randomThreadLocal =
+		new AutoResetThreadLocal<Random>(
+			PwdGenerator.class.getName() + "._randomThreadLocal") {
+
+			@Override
+			protected Random initialValue() {
+				return new Random(_secureRandom.nextLong());
+			}
+
+		};
+
+	private static SecureRandom _secureRandom = new SecureRandom();
 
 }
