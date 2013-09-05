@@ -16,6 +16,7 @@ package com.liferay.taglib.ui;
 
 import com.liferay.portal.kernel.dao.search.DisplayTerms;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.taglib.util.IncludeTag;
 
@@ -69,7 +70,7 @@ public class InputSearchTag extends IncludeTag {
 		_name = null;
 		_placeholder = null;
 		_showButton = true;
-		_title = null;
+		_title = StringPool.BLANK;
 	}
 
 	@Override
@@ -112,7 +113,7 @@ public class InputSearchTag extends IncludeTag {
 		String title = _title;
 
 		if (Validator.isNull(title)) {
-			title = "";
+			title = StringPool.BLANK;
 		}
 
 		request.setAttribute(
@@ -137,6 +138,6 @@ public class InputSearchTag extends IncludeTag {
 	private String _name;
 	private String _placeholder;
 	private boolean _showButton = true;
-	private String _title;
+	private String _title = StringPool.BLANK;
 
 }
