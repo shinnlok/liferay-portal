@@ -16,6 +16,7 @@ package com.liferay.taglib.ui;
 
 import com.liferay.portal.kernel.dao.search.DisplayTerms;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.taglib.util.IncludeTag;
 
@@ -54,6 +55,10 @@ public class InputSearchTag extends IncludeTag {
 		_showButton = showButton;
 	}
 
+	public void setTitle(String title) {
+		_title = title;
+	}
+
 	@Override
 	protected void cleanUp() {
 		super.cleanUp();
@@ -65,6 +70,7 @@ public class InputSearchTag extends IncludeTag {
 		_name = null;
 		_placeholder = null;
 		_showButton = true;
+		_title = StringPool.BLANK;
 	}
 
 	@Override
@@ -104,6 +110,12 @@ public class InputSearchTag extends IncludeTag {
 			placeholder = buttonLabel;
 		}
 
+		String title = _title;
+
+		if (Validator.isNull(title)) {
+			title = StringPool.BLANK;
+		}
+
 		request.setAttribute(
 			"liferay-ui:input-search:autoFocus", String.valueOf(_autoFocus));
 		request.setAttribute(
@@ -114,6 +126,7 @@ public class InputSearchTag extends IncludeTag {
 		request.setAttribute(
 			"liferay-ui:input-search:placeholder", placeholder);
 		request.setAttribute("liferay-ui:input-search:showButton", _showButton);
+		request.setAttribute("liferay-ui:input-search:title", _title);
 	}
 
 	private static final String _PAGE = "/html/taglib/ui/input_search/page.jsp";
@@ -125,5 +138,6 @@ public class InputSearchTag extends IncludeTag {
 	private String _name;
 	private String _placeholder;
 	private boolean _showButton = true;
+	private String _title = StringPool.BLANK;
 
 }
