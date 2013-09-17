@@ -457,7 +457,7 @@
 	</target>
 
 	<target name="build-test-ant-scripts">
-		<property name="build-test-ant-scripts.version" value="9" />
+		<property name="build-test-ant-scripts.version" value="0" />
 
 		<if>
 			<available file="portal-web/test-ant-scripts/version" />
@@ -2318,6 +2318,20 @@ custom.sql.function.isnotnull=CONVERT(VARCHAR,?) IS NOT NULL</echo>
 		</exec>
 	</target>
 
+	<target name="run-selenium-smoke-test">
+		<antcall target="compile" />
+
+		<antcall target="start-selenium" />
+
+		<ant dir="portal-impl" target="compile-test" inheritAll="false" />
+
+		<ant dir="portal-web" target="test-class" inheritAll="false">
+			<property name="class" value="SeleniumSmokeTestSuite" />
+		</ant>
+
+		<antcall target="stop-selenium" />
+	</target>
+
 	<target name="run-selenium-test">
 		<if>
 			<and>
@@ -2419,6 +2433,13 @@ custom.sql.function.isnotnull=CONVERT(VARCHAR,?) IS NOT NULL</echo>
 			</then>
 		</if>
 
+		<ant antfile="build-test-plugins.xml" target="deploy-simple-server-plugins">
+			<property name="plugin.types" value="portlets" />
+			<property name="plugins.includes" value="marketplace-portlet" />
+		</ant>
+
+		<property name="plugins.deployed" value="true" />
+
 		<if>
 			<isset property="hook.plugins.includes" />
 			<then>
@@ -2427,8 +2448,6 @@ custom.sql.function.isnotnull=CONVERT(VARCHAR,?) IS NOT NULL</echo>
 					<property name="plugins.deployed" value="${plugins.deployed}" />
 					<property name="plugins.includes" value="${hook.plugins.includes}" />
 				</ant>
-
-				<property name="plugins.deployed" value="true" />
 			</then>
 		</if>
 
@@ -2440,8 +2459,6 @@ custom.sql.function.isnotnull=CONVERT(VARCHAR,?) IS NOT NULL</echo>
 					<property name="plugins.deployed" value="${plugins.deployed}" />
 					<property name="plugins.includes" value="${layouttpl.plugins.includes}" />
 				</ant>
-
-				<property name="plugins.deployed" value="true" />
 			</then>
 		</if>
 
@@ -2462,8 +2479,6 @@ custom.sql.function.isnotnull=CONVERT(VARCHAR,?) IS NOT NULL</echo>
 					<property name="plugins.deployed" value="${plugins.deployed}" />
 					<property name="plugins.includes" value="${portlet.plugins.includes}" />
 				</ant>
-
-				<property name="plugins.deployed" value="true" />
 			</then>
 		</if>
 
@@ -2475,8 +2490,6 @@ custom.sql.function.isnotnull=CONVERT(VARCHAR,?) IS NOT NULL</echo>
 					<property name="plugins.deployed" value="${plugins.deployed}" />
 					<property name="plugins.includes" value="chat-portlet,flash-portlet,portal-compat-hook,sample-service-builder-portlet,test-pacl-portlet" />
 				</ant>
-
-				<property name="plugins.deployed" value="true" />
 			</then>
 		</if>
 
@@ -2488,8 +2501,6 @@ custom.sql.function.isnotnull=CONVERT(VARCHAR,?) IS NOT NULL</echo>
 					<property name="plugins.deployed" value="${plugins.deployed}" />
 					<property name="plugins.includes" value="${theme.plugins.includes}" />
 				</ant>
-
-				<property name="plugins.deployed" value="true" />
 			</then>
 		</if>
 
@@ -2501,8 +2512,6 @@ custom.sql.function.isnotnull=CONVERT(VARCHAR,?) IS NOT NULL</echo>
 					<property name="plugins.deployed" value="${plugins.deployed}" />
 					<property name="plugins.includes" value="${web.plugins.includes}" />
 				</ant>
-
-				<property name="plugins.deployed" value="true" />
 			</then>
 		</if>
 
@@ -2544,6 +2553,13 @@ custom.sql.function.isnotnull=CONVERT(VARCHAR,?) IS NOT NULL</echo>
 			<exec dir="${simple.server.bin.dir}" executable="${simple.server.start.executable}" resolveexecutable="true">
 				<arg line="${simple.server.start.executable.arg.line}" />
 			</exec>
+
+			<if>
+				<equals arg1="${simple.server.type}" arg2="jboss" />
+				<then>
+					<echo file="${simple.server.deploy.dir}/ROOT.war.dodeploy"></echo>
+				</then>
+			</if>
 
 			<sequential>
 				<waitfor>
