@@ -71,6 +71,10 @@ public class StringUtil_IW {
 		return StringUtil.endsWith(s, end);
 	}
 
+	public boolean equalsIgnoreCase(java.lang.String s1, java.lang.String s2) {
+		return StringUtil.equalsIgnoreCase(s1, s2);
+	}
+
 	public java.lang.String extract(java.lang.String s, char[] chars) {
 		return StringUtil.extract(s, chars);
 	}
@@ -573,6 +577,24 @@ public class StringUtil_IW {
 
 	public java.lang.String toHexString(java.lang.Object obj) {
 		return StringUtil.toHexString(obj);
+	}
+
+	public java.lang.String toLowerCase(java.lang.String s) {
+		return StringUtil.toLowerCase(s);
+	}
+
+	public java.lang.String toLowerCase(java.lang.String s,
+		java.util.Locale locale) {
+		return StringUtil.toLowerCase(s, locale);
+	}
+
+	public java.lang.String toUpperCase(java.lang.String s) {
+		return StringUtil.toUpperCase(s);
+	}
+
+	public java.lang.String toUpperCase(java.lang.String s,
+		java.util.Locale locale) {
+		return StringUtil.toUpperCase(s, locale);
 	}
 
 	public java.lang.String trim(java.lang.String s) {

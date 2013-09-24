@@ -853,6 +853,12 @@ public class RoleLocalServiceUtil {
 		return getService().getRoles(companyId);
 	}
 
+	public static java.util.List<com.liferay.portal.model.Role> getRoles(
+		long companyId, int[] types)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().getRoles(companyId, types);
+	}
+
 	/**
 	* Returns all the roles with the primary keys.
 	*
@@ -909,6 +915,27 @@ public class RoleLocalServiceUtil {
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return getService().getTeamRole(companyId, teamId);
+	}
+
+	public static java.util.Map<com.liferay.portal.model.Team, com.liferay.portal.model.Role> getTeamRoleMap(
+		long groupId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService().getTeamRoleMap(groupId);
+	}
+
+	public static java.util.List<com.liferay.portal.model.Role> getTeamRoles(
+		long groupId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService().getTeamRoles(groupId);
+	}
+
+	public static java.util.List<com.liferay.portal.model.Role> getTeamRoles(
+		long groupId, long[] skipRoleIds)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService().getTeamRoles(groupId, skipRoleIds);
 	}
 
 	/**

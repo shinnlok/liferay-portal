@@ -24,6 +24,16 @@
 	<td></td>
 </tr>
 <tr>
+	<td>PERMISSIONS_TITLE</td>
+	<td>//h3[contains(.,'Permissions')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>HEADER_TITLE</td>
+	<td>//h3[@class='header-title']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>SUCCESS_MESSAGE</td>
 	<td>//div[@class='alert alert-success']</td>
 	<td></td>
@@ -93,6 +103,16 @@
 <tr>
 	<td>INLINE_PERMISSIONS_SUBSCRIBE_CHECKBOX</td>
 	<td>//input[@id='${key_roleName}_ACTION_SUBSCRIBE']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>INLINE_PERMISSIONS_UPDATE</td>
+	<td>//input[@id='${key_roleName}_ACTION_UPDATE']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>INLINE_PERMISSIONS_VIEW</td>
+	<td>//input[@id='${key_roleName}_ACTION_VIEW']</td>
 	<td></td>
 </tr>
 <tr>

@@ -901,6 +901,13 @@ public class RoleLocalServiceWrapper implements RoleLocalService,
 		return _roleLocalService.getRoles(companyId);
 	}
 
+	@Override
+	public java.util.List<com.liferay.portal.model.Role> getRoles(
+		long companyId, int[] types)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _roleLocalService.getRoles(companyId, types);
+	}
+
 	/**
 	* Returns all the roles with the primary keys.
 	*
@@ -960,6 +967,30 @@ public class RoleLocalServiceWrapper implements RoleLocalService,
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return _roleLocalService.getTeamRole(companyId, teamId);
+	}
+
+	@Override
+	public java.util.Map<com.liferay.portal.model.Team, com.liferay.portal.model.Role> getTeamRoleMap(
+		long groupId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _roleLocalService.getTeamRoleMap(groupId);
+	}
+
+	@Override
+	public java.util.List<com.liferay.portal.model.Role> getTeamRoles(
+		long groupId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _roleLocalService.getTeamRoles(groupId);
+	}
+
+	@Override
+	public java.util.List<com.liferay.portal.model.Role> getTeamRoles(
+		long groupId, long[] skipRoleIds)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _roleLocalService.getTeamRoles(groupId, skipRoleIds);
 	}
 
 	/**

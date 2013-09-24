@@ -206,7 +206,7 @@ definePermissionsURL.setRefererPlid(plid);
 			}
 		}
 
-		List<Role> roles = ResourceActionsUtil.getRoles(company.getCompanyId(), group, modelResource, roleTypes);
+		List<Role> roles = ListUtil.copy(ResourceActionsUtil.getRoles(company.getCompanyId(), group, modelResource, roleTypes));
 
 		Role administratorRole = RoleLocalServiceUtil.getRole(company.getCompanyId(), RoleConstants.ADMINISTRATOR);
 
@@ -240,26 +240,7 @@ definePermissionsURL.setRefererPlid(plid);
 			roles.remove(role);
 		}
 
-		List<Team> teams = null;
-
-		if (group.isOrganization() || group.isRegularSite()) {
-			teams = TeamLocalServiceUtil.getGroupTeams(groupId);
-		}
-		else if (group.isLayout()) {
-			teams = TeamLocalServiceUtil.getGroupTeams(group.getParentGroupId());
-		}
-
-		if (teams != null) {
-			for (Team team : teams) {
-				Role role = RoleLocalServiceUtil.getTeamRole(team.getCompanyId(), team.getTeamId());
-
-				if (role.getRoleId() == modelResourceRoleId) {
-					continue;
-				}
-
-				roles.add(role);
-			}
-		}
+		roles.addAll(RoleLocalServiceUtil.getTeamRoles(groupId, new long[] {modelResourceRoleId}));
 
 		Iterator<Role> itr = roles.iterator();
 

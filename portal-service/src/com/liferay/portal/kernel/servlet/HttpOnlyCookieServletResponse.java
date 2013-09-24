@@ -29,6 +29,26 @@ import javax.servlet.http.HttpServletResponseWrapper;
  */
 public class HttpOnlyCookieServletResponse extends HttpServletResponseWrapper {
 
+	public static HttpServletResponse getHttpOnlyCookieServletResponse(
+		HttpServletResponse response) {
+
+		HttpServletResponse wrappedResponse = response;
+
+		while (wrappedResponse instanceof HttpServletResponseWrapper) {
+			if (wrappedResponse instanceof HttpOnlyCookieServletResponse) {
+				return response;
+			}
+
+			HttpServletResponseWrapper httpServletResponseWrapper =
+				(HttpServletResponseWrapper)wrappedResponse;
+
+			wrappedResponse =
+				(HttpServletResponse)httpServletResponseWrapper.getResponse();
+		}
+
+		return new HttpOnlyCookieServletResponse(response);
+	}
+
 	public HttpOnlyCookieServletResponse(HttpServletResponse response) {
 		super(response);
 	}

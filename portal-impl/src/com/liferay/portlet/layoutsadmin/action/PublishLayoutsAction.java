@@ -79,9 +79,13 @@ public class PublishLayoutsAction extends EditLayoutsAction {
 					StagingUtil.copyFromLive(actionRequest);
 				}
 				else if (cmd.equals("publish_to_live")) {
+					hideDefaultSuccessMessage(portletConfig, actionRequest);
+
 					StagingUtil.publishToLive(actionRequest);
 				}
 				else if (cmd.equals("publish_to_remote")) {
+					hideDefaultSuccessMessage(portletConfig, actionRequest);
+
 					StagingUtil.publishToRemote(actionRequest);
 				}
 				else if (cmd.equals("schedule_copy_from_live")) {
@@ -108,7 +112,8 @@ public class PublishLayoutsAction extends EditLayoutsAction {
 					closeRedirect);
 			}
 			else {
-				long groupId = ParamUtil.getLong(actionRequest, "groupId");
+				long groupId = ParamUtil.getLong(
+					actionRequest, "stagingGroupId");
 				boolean privateLayout = ParamUtil.getBoolean(
 					actionRequest, "privateLayout");
 
