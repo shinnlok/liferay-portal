@@ -1120,6 +1120,13 @@ AUI.add(
 								return {
 									alwaysShowHitArea: item.hasChildren,
 									id: STR_CATEGORY_NODE + item.categoryId,
+									io: {
+										cfg: {
+											data: A.bind('_formatRequestData', instance)
+										},
+										formatter: A.bind('_formatJSONResult', instance),
+										url: themeDisplay.getPathMain() + '/asset/get_categories'
+									},
 									label: Liferay.Util.escapeHTML(item.titleCurrentValue),
 									paginator: paginatorConfig,
 									type: 'check',
@@ -1871,6 +1878,10 @@ AUI.add(
 									instance._hideSection(instance._categoryViewContainer);
 								}
 							);
+
+							if (action === ACTION_EDIT) {
+								instance._showCategoryViewContainer(response.categoryId);
+							}
 
 							instance._hidePanels();
 						}

@@ -235,7 +235,6 @@
 		<custom-attributes-display>com.liferay.portlet.documentlibrary.DLFileEntryCustomAttributesDisplay</custom-attributes-display>
 		<custom-attributes-display>com.liferay.portlet.documentlibrary.DLFolderCustomAttributesDisplay</custom-attributes-display>
 		<ddm-display>com.liferay.portlet.documentlibrary.ddm.DLDDMDisplay</ddm-display>
-		<permission-propagator>com.liferay.portlet.documentlibrary.security.permission.DLPermissionPropagatorImpl</permission-propagator>
 		<trash-handler>com.liferay.portlet.documentlibrary.trash.DLFileEntryTrashHandler</trash-handler>
 		<trash-handler>com.liferay.portlet.documentlibrary.trash.DLFileShortcutTrashHandler</trash-handler>
 		<trash-handler>com.liferay.portlet.documentlibrary.trash.DLFolderTrashHandler</trash-handler>
@@ -1016,7 +1015,6 @@
 		<portlet-data-handler-class>com.liferay.portlet.documentlibrary.lar.DLDisplayPortletDataHandler</portlet-data-handler-class>
 		<webdav-storage-token>document_library</webdav-storage-token>
 		<webdav-storage-class>com.liferay.portlet.documentlibrary.webdav.DLWebDAVStorageImpl</webdav-storage-class>
-		<permission-propagator>com.liferay.portlet.documentlibrary.security.permission.DLPermissionPropagatorImpl</permission-propagator>
 		<preferences-owned-by-group>true</preferences-owned-by-group>
 		<use-default-template>false</use-default-template>
 		<instanceable>true</instanceable>
@@ -1565,7 +1563,6 @@
 		<friendly-url-mapper-class>com.liferay.portal.kernel.portlet.DefaultFriendlyURLMapper</friendly-url-mapper-class>
 		<friendly-url-mapping>my_workflow_tasks</friendly-url-mapping>
 		<friendly-url-routes>com/liferay/portlet/workflowtasks/workflow-tasks-friendly-url-routes.xml</friendly-url-routes>
-		<user-notification-definitions>com/liferay/portlet/workflowtasks/workflow-tasks-user-notification-definitions.xml</user-notification-definitions>
 		<user-notification-handler-class>com.liferay.portlet.workflowtasks.notifications.WorkflowTasksUserNotificationHandler</user-notification-handler-class>
 		<control-panel-entry-category>my</control-panel-entry-category>
 		<control-panel-entry-weight>3.0</control-panel-entry-weight>

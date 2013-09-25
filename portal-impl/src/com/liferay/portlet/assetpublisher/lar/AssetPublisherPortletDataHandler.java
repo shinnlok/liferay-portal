@@ -29,6 +29,7 @@ import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.Portlet;
+import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.security.permission.PermissionThreadLocal;
 import com.liferay.portal.service.CompanyLocalServiceUtil;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
@@ -180,7 +181,7 @@ public class AssetPublisherPortletDataHandler
 					AssetVocabulary.class.getName(), rootElement);
 			}
 			else if (name.startsWith("queryName") &&
-					 value.equalsIgnoreCase("assetCategories")) {
+					 StringUtil.equalsIgnoreCase(value, "assetCategories")) {
 
 				String index = name.substring(9);
 
@@ -346,7 +347,7 @@ public class AssetPublisherPortletDataHandler
 					AssetVocabulary.class, companyGroup.getGroupId());
 			}
 			else if (name.startsWith("queryName") &&
-					 value.equalsIgnoreCase("assetCategories")) {
+					 StringUtil.equalsIgnoreCase(value, "assetCategories")) {
 
 				String index = name.substring(9, name.length());
 
@@ -400,8 +401,16 @@ public class AssetPublisherPortletDataHandler
 			catch (NoSuchGroupException nsge) {
 				if (_log.isInfoEnabled()) {
 					_log.info(
-						"Ignoring scope " + newValue + "because the " +
+						"Ignoring scope " + newValue + " because the " +
 							"referenced group was not found");
+				}
+			}
+			catch (PrincipalException pe) {
+				if (_log.isInfoEnabled()) {
+					_log.info(
+						"Ignoring scope " + newValue + " because the " +
+							"referenced parent group no longer allows " +
+								"sharing content with child sites");
 				}
 			}
 		}

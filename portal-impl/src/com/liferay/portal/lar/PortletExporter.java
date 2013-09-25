@@ -60,6 +60,8 @@ import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.PortletItemLocalServiceUtil;
 import com.liferay.portal.service.PortletLocalServiceUtil;
 import com.liferay.portal.service.PortletPreferencesLocalServiceUtil;
+import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.service.ServiceContextThreadLocal;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PortletKeys;
@@ -190,6 +192,8 @@ public class PortletExporter {
 
 		portletDataContext.setGroupId(portletDataContext.getScopeGroupId());
 
+		portletDataContext.clearScopedPrimaryKeys();
+
 		try {
 			data = portletDataHandler.exportData(
 				portletDataContext, portletId, jxPortletPreferences);
@@ -299,12 +303,13 @@ public class PortletExporter {
 			exportPortletData = true;
 		}
 		else if (parameterMap.containsKey(
-					PortletDataHandlerKeys.PORTLET_DATA + "_" +
+					PortletDataHandlerKeys.PORTLET_DATA + StringPool.UNDERLINE +
 						rootPortletId)) {
 
 			exportPortletData = MapUtil.getBoolean(
 				parameterMap,
-				PortletDataHandlerKeys.PORTLET_DATA + "_" + rootPortletId);
+				PortletDataHandlerKeys.PORTLET_DATA + StringPool.UNDERLINE +
+					rootPortletId);
 		}
 
 		boolean exportPortletArchivedSetups = exportPortletConfiguration;
@@ -388,8 +393,27 @@ public class PortletExporter {
 				"Layout type " + layout.getType() + " is not valid");
 		}
 
-		long defaultUserId = UserLocalServiceUtil.getDefaultUserId(
-			layout.getCompanyId());
+		ServiceContext serviceContext =
+			ServiceContextThreadLocal.getServiceContext();
+
+		if (serviceContext == null) {
+			serviceContext = new ServiceContext();
+
+			serviceContext.setCompanyId(layout.getCompanyId());
+			serviceContext.setSignedIn(false);
+
+			long defaultUserId = UserLocalServiceUtil.getDefaultUserId(
+				layout.getCompanyId());
+
+			serviceContext.setUserId(defaultUserId);
+
+			ServiceContextThreadLocal.pushServiceContext(serviceContext);
+		}
+
+		long layoutSetBranchId = MapUtil.getLong(
+			parameterMap, "layoutSetBranchId");
+
+		serviceContext.setAttribute("layoutSetBranchId", layoutSetBranchId);
 
 		ZipWriter zipWriter = ZipWriterFactoryUtil.getZipWriter();
 
@@ -480,9 +504,8 @@ public class PortletExporter {
 
 		exportPortlet(
 			portletDataContext, layoutCache, portletId, layout, rootElement,
-			defaultUserId, exportPermissions, exportPortletArchivedSetups,
-			exportPortletData, exportPortletSetup,
-			exportPortletUserPreferences);
+			exportPermissions, exportPortletArchivedSetups, exportPortletData,
+			exportPortletSetup, exportPortletUserPreferences);
 
 		exportAssetCategories(portletDataContext);
 		exportAssetLinks(portletDataContext);
@@ -507,8 +530,6 @@ public class PortletExporter {
 		if (_log.isInfoEnabled()) {
 			_log.info("Exporting portlet took " + stopWatch.getTime() + " ms");
 		}
-
-		portletDataContext.clearScopedPrimaryKeys();
 
 		try {
 			portletDataContext.addZipEntry(
@@ -976,9 +997,9 @@ public class PortletExporter {
 	protected void exportPortlet(
 			PortletDataContext portletDataContext, LayoutCache layoutCache,
 			String portletId, Layout layout, Element parentElement,
-			long defaultUserId, boolean exportPermissions,
-			boolean exportPortletArchivedSetups, boolean exportPortletData,
-			boolean exportPortletSetup, boolean exportPortletUserPreferences)
+			boolean exportPermissions, boolean exportPortletArchivedSetups,
+			boolean exportPortletData, boolean exportPortletSetup,
+			boolean exportPortletUserPreferences)
 		throws Exception {
 
 		long plid = PortletKeys.PREFS_OWNER_ID_DEFAULT;
@@ -1060,23 +1081,31 @@ public class PortletExporter {
 		// Portlet preferences
 
 		if (exportPortletSetup) {
-			exportPortletPreferences(
-				portletDataContext, PortletKeys.PREFS_OWNER_ID_DEFAULT,
-				PortletKeys.PREFS_OWNER_TYPE_LAYOUT, false, layout, plid,
-				portletId, portletElement);
 
-			exportPortletPreferences(
-				portletDataContext, portletDataContext.getScopeGroupId(),
-				PortletKeys.PREFS_OWNER_TYPE_GROUP, false, layout, plid,
-				portletId, portletElement);
+			// Company
 
 			exportPortletPreferences(
 				portletDataContext, portletDataContext.getCompanyId(),
 				PortletKeys.PREFS_OWNER_TYPE_COMPANY, false, layout, plid,
+				portlet.getRootPortletId(), portletElement);
+
+			// Group
+
+			exportPortletPreferences(
+				portletDataContext, portletDataContext.getScopeGroupId(),
+				PortletKeys.PREFS_OWNER_TYPE_GROUP, false, layout,
+				PortletKeys.PREFS_PLID_SHARED, portlet.getRootPortletId(),
+				portletElement);
+
+			// Layout
+
+			exportPortletPreferences(
+				portletDataContext, PortletKeys.PREFS_OWNER_ID_DEFAULT,
+				PortletKeys.PREFS_OWNER_TYPE_LAYOUT, false, layout, plid,
 				portletId, portletElement);
 		}
 
-		// Portlet preferences
+		// Portlet user preferences
 
 		if (exportPortletUserPreferences) {
 			List<PortletPreferences> portletPreferencesList =
@@ -1105,12 +1134,13 @@ public class PortletExporter {
 					PortletPreferencesLocalServiceUtil.getPortletPreferences(
 						portletDataContext.getScopeGroupId(),
 						PortletKeys.PREFS_OWNER_TYPE_GROUP,
-						PortletKeys.PREFS_PLID_SHARED, portletId);
+						PortletKeys.PREFS_PLID_SHARED,
+						portlet.getRootPortletId());
 
 				exportPortletPreference(
 					portletDataContext, portletDataContext.getScopeGroupId(),
 					PortletKeys.PREFS_OWNER_TYPE_GROUP, false,
-					groupPortletPreferences, portletId,
+					groupPortletPreferences, portlet.getRootPortletId(),
 					PortletKeys.PREFS_PLID_SHARED, portletElement);
 			}
 			catch (NoSuchPortletPreferencesException nsppe) {
@@ -1312,7 +1342,7 @@ public class PortletExporter {
 
 				portletPreferences =
 					PortletPreferencesLocalServiceUtil.getPortletPreferences(
-						ownerId, ownerType, PortletKeys.PREFS_OWNER_ID_DEFAULT,
+						ownerId, ownerType, LayoutConstants.DEFAULT_PLID,
 						portletId);
 			}
 			else {

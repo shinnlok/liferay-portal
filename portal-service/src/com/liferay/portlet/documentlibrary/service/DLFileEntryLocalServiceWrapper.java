@@ -645,6 +645,15 @@ public class DLFileEntryLocalServiceWrapper implements DLFileEntryLocalService,
 	}
 
 	@Override
+	public int getFileEntriesCount(long groupId,
+		com.liferay.portal.kernel.util.DateRange dateRange, long repositoryId,
+		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _dlFileEntryLocalService.getFileEntriesCount(groupId, dateRange,
+			repositoryId, queryDefinition);
+	}
+
+	@Override
 	public int getFileEntriesCount(long groupId, long folderId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _dlFileEntryLocalService.getFileEntriesCount(groupId, folderId);
@@ -798,6 +807,13 @@ public class DLFileEntryLocalServiceWrapper implements DLFileEntryLocalService,
 			com.liferay.portal.kernel.exception.SystemException {
 		return _dlFileEntryLocalService.moveFileEntry(userId, fileEntryId,
 			newFolderId, serviceContext);
+	}
+
+	@Override
+	public void rebuildTree(long companyId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_dlFileEntryLocalService.rebuildTree(companyId);
 	}
 
 	@Override

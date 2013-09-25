@@ -521,16 +521,16 @@ public class StagingImpl implements Staging {
 				liveGroup.getFriendlyURL(), false, liveGroup.isActive(),
 				serviceContext);
 
-			if (liveGroup.hasPrivateLayouts()) {
-				Map<String, String[]> parameterMap = getStagingParameters();
+			Map<String, String[]> parameterMap = getStagingParameters();
 
+			if (liveGroup.hasPrivateLayouts()) {
 				publishLayouts(
 					userId, liveGroup.getGroupId(), stagingGroup.getGroupId(),
 					true, parameterMap, null, null);
 			}
 
-			if (liveGroup.hasPublicLayouts()) {
-				Map<String, String[]> parameterMap = getStagingParameters();
+			if (liveGroup.hasPublicLayouts() ||
+				!liveGroup.hasPrivateLayouts()) {
 
 				publishLayouts(
 					userId, liveGroup.getGroupId(), stagingGroup.getGroupId(),
@@ -2040,7 +2040,7 @@ public class StagingImpl implements Staging {
 
 		PortalPreferences portalPreferences =
 			PortletPreferencesFactoryUtil.getPortalPreferences(
-				user.getCompanyId(), user.getUserId(), signedIn);
+				user.getUserId(), signedIn);
 
 		return portalPreferences;
 	}
@@ -2537,18 +2537,18 @@ public class StagingImpl implements Staging {
 			remoteURL, user.getScreenName(), user.getPassword(),
 			user.getPasswordEncrypted());
 
-		List<String> stagedPortletIds = new ArrayList<String>();
+		Map<String, String> stagedPortletIds = new HashMap<String, String>();
 
 		for (String key : typeSettingsProperties.keySet()) {
 			if (key.startsWith(StagingConstants.STAGED_PORTLET)) {
-				stagedPortletIds.add(key);
+				stagedPortletIds.put(
+					key, typeSettingsProperties.getProperty(key));
 			}
 		}
 
 		try {
 			GroupServiceHttp.updateStagedPortlets(
-				httpPrincipal, remoteGroupId,
-				StringUtil.merge(stagedPortletIds));
+				httpPrincipal, remoteGroupId, stagedPortletIds);
 		}
 		catch (NoSuchGroupException nsge) {
 			RemoteExportException ree = new RemoteExportException(
