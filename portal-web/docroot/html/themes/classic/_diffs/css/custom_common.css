@@ -2,8 +2,8 @@
 @import "compass/css3/user-interface";
 @import "mixins";
 
-@import "aui/font-awesome/scss/mixins";
-@import "aui/font-awesome/scss/variables";
+@import "aui/alloy-font-awesome/scss/mixins-alloy";
+@import "aui/alloy-font-awesome/scss/variables";
 
 @import url(custom_responsive.css);
 
@@ -67,10 +67,6 @@
 		min-width: 100%;
 	}
 
-	form .accordion-heading .accordion-toggle {
-		padding-left: 0;
-	}
-
 	input[type="color"], input[type="date"], input[type="datetime"], input[type="datetime-local"], input[type="email"], input[type="month"], input[type="number"], input[type="password"], input[type="search"], input[type="tel"], input[type="text"], input[type="time"], input[type="url"], input[type="week"], select, textarea, .uneditable-input {
 		border: 1px solid #DDD;
 		color: #8D8D8D;
@@ -97,14 +93,14 @@
 		font-weight: 200;
 	}
 
+	li {
+		line-height: 27px;
+	}
+
 	select:focus {
 		border: 1px solid rgba(0, 172, 255, 0.8);
 		outline: 5px auto rgba(82, 168, 236, 0.6);
 		outline-offset: -2px;
-	}
-
-	li {
-		line-height: 27px;
 	}
 
 	.form-search, .lfr-translation-manager-selector {
@@ -118,7 +114,7 @@
 	}
 
 	.btn.disabled, .btn[disabled] {
-		opacity: 0.4;
+		@include opacity(0.4);
 	}
 
 	.btn-link {
@@ -141,8 +137,10 @@
 		margin-bottom: 30px;
 	}
 
-	.lfr-ddm-container .control-group {
-		margin-bottom: 15px;
+	.lfr-ddm-container, .portlet-staging-bar {
+		.control-group {
+			margin-bottom: 15px;
+		}
 	}
 
 	.input-append {
@@ -179,22 +177,12 @@
 	}
 
 	.portlet-options {
-		&, &.open {
-			.dropdown-toggle {
-				background: url(../images/portlet/options.png) no-repeat;
-				display: inline-block;
-				height: 16px;
-				vertical-align: middle;
-				width: 16px;
-
-				.caret {
-					display: none;
-				}
-			}
+		.dropdown-toggle .caret {
+			display: none;
 		}
 	}
 
-	/* ---------- Help Icon ---------- */
+	/* ---------- Help icon ---------- */
 
 	.taglib-icon-help {
 		img {
@@ -211,9 +199,28 @@
 	/* ---------- Dockbar ---------- */
 
 	.dockbar-split {
-		.dockbar .navbar-inner {
-			background: none;
-			visibility: hidden;
+		.dockbar {
+			.nav {
+				li.dropdown {
+					> .dropdown-toggle {
+						@extend %dockbar-caret;
+					}
+
+					&.open, &.active, &.open.active {
+						> .dropdown-toggle {
+							background-color: transparent;
+							color: #FFF;
+
+							@extend %dockbar-caret;
+						}
+					}
+				}
+			}
+
+			.navbar-inner {
+				background: none;
+				visibility: hidden;
+			}
 		}
 
 		&.dockbar-ready .dockbar .navbar-inner {
@@ -224,6 +231,10 @@
 	.dockbar {
 		.navbar-inner {
 			background: #333;
+
+			.container .btn-navbar {
+				color: #FFF;
+			}
 		}
 
 		.nav {
@@ -273,16 +284,17 @@
 					}
 				}
 
-				.dropdown-menu {
+				.dropdown-menu , .site-administration-menu {
 					background: #009AE5;
 					border-width: 0;
 					left: 0;
 					margin: 0;
 					right: auto;
 
-					li a {
+					> li > a {
 						color: #FFF;
 						font-size: 0.9em;
+						font-weight: 300;
 
 						&:hover {
 							background: #2FA4F5;
@@ -315,10 +327,6 @@
 					right: 0;
 					left: auto;
 				}
-
-				.user-avatar-image {
-					width: 27px;
-				}
 			}
 		}
 
@@ -335,7 +343,7 @@
 	}
 
 	.navbar {
-		.container .btn-navbar {
+		.container .btn {
 			background: transparent;
 			border-color: #DDD;
 
@@ -407,6 +415,36 @@
 		.only .divider {
 			display: none;
 		}
+
+		@include respond-to(phone) {
+			padding-left: 5px;
+			padding-right: 5px;
+
+			li {
+				display: none;
+
+				&.only, &.first, &.last, &.current-parent {
+					display: inline-block;
+				}
+
+				&.breadcrumb-truncate {
+					&.only, &.first a, &.last a, &.active, &.current-parent a {
+						display: inline-block;
+						max-width: 65px;
+						overflow: hidden;
+						text-overflow: ellipsis;
+						vertical-align: bottom;
+						white-space: nowrap;
+					}
+
+					&.current-parent:before {
+						color: #999;
+						content: " ... / ";
+						font-weight: bold;
+					}
+				}
+			}
+		}
 	}
 
 	/* ---------- Form navigator ---------- */
@@ -446,7 +484,7 @@
 		}
 	}
 
-	/* ---------- Hidden Accessible ---------- */
+	/* ---------- Hidden accessible ---------- */
 
 	#banner h2, #banner h3, .site-breadcrumbs h1, #skip-to-content {
 		clip: rect(0 0 0 0);
@@ -471,6 +509,29 @@
 		border-width: 1px 0;
 	}
 
+	.accordion .accordion-group {
+		.accordion-heading .accordion-toggle {
+			padding-left: 15px;
+		}
+
+		.toggler-content-expanded {
+			border-width: 1px 0 0 0;
+		}
+	}
+
+	%toggler-header-icon-base {
+		content: $chevron-sign-right;
+
+		@include icon-FontAwesome();
+
+		display: inline-block;
+		margin-right: 5px;
+	}
+
+	%toggler-header-icon-expanded {
+		content: $chevron-sign-down;
+	}
+
 	.accordion-group {
 		border-width: 0;
 
@@ -488,12 +549,7 @@
 				background-image: none;
 
 				.accordion-toggle:before {
-					content: $chevron-sign-right;
-
-					@include icon-FontAwesome();
-
-					display: inline-block;
-					margin-right: 5px;
+					@extend %toggler-header-icon-base;
 
 					@include opacity(0.5);
 				}
@@ -512,7 +568,7 @@
 			}
 
 			&.toggler-header-expanded .accordion-toggle:before {
-				content: $chevron-sign-down;
+				@extend %toggler-header-icon-expanded;
 			}
 		}
 
@@ -536,18 +592,20 @@
 
 					.accordion-toggle {
 						color: #999;
-						font-size: 11px;
-						font-weight: bold;
 						padding-left: 8px;
-						text-transform: uppercase;
 
 						&:after, &:before {
-							display: none;
+							float: right;
+							font-size: 22px;
 						}
 					}
 				}
 			}
 		}
+	}
+
+	.accordion-heading .accordion-toggle {
+		padding-left: 0;
 	}
 
 	.toggler-content-collapsed {
@@ -580,7 +638,7 @@
 		}
 	}
 
-	/* ---------- Side Accordion Navigations ---------- */
+	/* ---------- Side accordion navigations ---------- */
 
 	.add-content-menu, .lfr-edit-layout-panel, .panel-page-menu .portlet-borderless-container {
 		.accordion {
@@ -599,7 +657,6 @@
 						font-size: 16px;
 						font-weight: 300;
 						padding: 0;
-						text-transform: capitalize;
 					}
 				}
 
@@ -627,23 +684,70 @@
 
 					.accordion-toggle {
 						background-position: 100% 0;
+
+						&:before {
+							display: none;
+						}
 					}
+				}
+
+				.toggler-header-expanded .accordion-toggle:before {
+					display: none;
+				}
+			}
+
+			.toggler-content-expanded {
+				border-width: 0;
+			}
+		}
+	}
+
+	.lfr-add-panel {
+		.add-content-menu {
+			.lfr-content-item {
+				color: #009AE5;
+
+				&:hover {
+					background-color: #E5F5FC;
+				}
+
+				&.lfr-portlet-used {
+					color: #BBB;
+				}
+			}
+		}
+
+		.lfr-page-template .lfr-page-template-title {
+			&.toggler-header-collapsed, &.toggler-header-expanded {
+				&:before {
+					@extend %toggler-header-icon-base;
+
+					color: #8D8D8D;
+					position: absolute;
+					right: 5px;
+					top: 0;
+				}
+			}
+
+			&.toggler-header-expanded {
+				&:before {
+					@extend %toggler-header-icon-expanded;
+				}
+			}
+
+			&.active {
+				&:before {
+					color: #FFF;
 				}
 			}
 		}
 	}
 
-	.lfr-add-panel .add-content-menu {
-		.lfr-content-item {
-			color: #009AE5;
-
-			&:hover {
-				background-color: #E5F5FC;
-			}
-
-			&.lfr-portlet-used {
-				color: #BBB;
-			}
+	.lfr-add-panel, .lfr-device-preview-panel, .lfr-edit-layout-panel {
+		&.lfr-admin-panel h1 {
+			color: #3EA9DB;
+			font-size: 26px;
+			line-height: 26px;
 		}
 	}
 
@@ -718,7 +822,7 @@
 	}
 
 	.navbar {
-		.container .btn-navbar {
+		.container .btn {
 			&, .icon-bar {
 				@include box-shadow(0 1px 0 #FFF);
 			}
@@ -735,10 +839,8 @@
 		}
 	}
 
-	.dockbar-split {
-		.dockbar .container .btn-navbar {
-			@include box-shadow(none);
-		}
+	.dockbar .container .btn {
+		@include box-shadow(none);
 	}
 
 	body.yui3-skin-sam .yui3-widget-mask {

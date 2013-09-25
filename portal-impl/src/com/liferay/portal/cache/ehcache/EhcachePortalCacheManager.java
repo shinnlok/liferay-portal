@@ -15,15 +15,15 @@
 package com.liferay.portal.cache.ehcache;
 
 import com.liferay.portal.cache.transactional.TransactionalPortalCache;
-import com.liferay.portal.dao.orm.common.EntityCacheImpl;
-import com.liferay.portal.dao.orm.common.FinderCacheImpl;
 import com.liferay.portal.kernel.cache.BlockingPortalCache;
 import com.liferay.portal.kernel.cache.PortalCache;
 import com.liferay.portal.kernel.cache.PortalCacheManager;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.resiliency.spi.SPIUtil;
+import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.ReflectionUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
@@ -136,8 +136,7 @@ public class EhcachePortalCacheManager<K extends Serializable, V>
 		}
 
 		if (PropsValues.TRANSACTIONAL_CACHE_ENABLED &&
-			(name.startsWith(EntityCacheImpl.CACHE_NAME) ||
-			 name.startsWith(FinderCacheImpl.CACHE_NAME))) {
+			isTransactionalPortalCache(name)) {
 
 			portalCache = new TransactionalPortalCache<K, V>(portalCache);
 		}
@@ -256,6 +255,19 @@ public class EhcachePortalCacheManager<K extends Serializable, V>
 		}
 
 		return ehcachePortalCache;
+	}
+
+	protected boolean isTransactionalPortalCache(String name) {
+		for (String namePattern : PropsValues.TRANSACTIONAL_CACHE_NAMES) {
+			if (StringUtil.wildcardMatches(
+					name, namePattern, CharPool.QUESTION, CharPool.STAR,
+					CharPool.PERCENT, true)) {
+
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	private static final String _DEFAULT_CLUSTERED_EHCACHE_CONFIG_FILE =

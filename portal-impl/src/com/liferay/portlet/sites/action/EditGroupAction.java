@@ -136,7 +136,7 @@ public class EditGroupAction extends PortletAction {
 
 					redirect = siteAdministrationURL.toString();
 
-					hideDefaultSuccessMessage(portletConfig, actionRequest);
+					hideDefaultSuccessMessage(actionRequest);
 				}
 				else {
 					String oldFriendlyURL = (String)returnValue[1];
@@ -580,7 +580,7 @@ public class EditGroupAction extends PortletAction {
 			StringPool.NEW_LINE);
 
 		for (String analyticsType : analyticsTypes) {
-			if (analyticsType.equalsIgnoreCase("google")) {
+			if (StringUtil.equalsIgnoreCase(analyticsType, "google")) {
 				String googleAnalyticsId = ParamUtil.getString(
 					actionRequest, "googleAnalyticsId",
 					typeSettingsProperties.getProperty("googleAnalyticsId"));

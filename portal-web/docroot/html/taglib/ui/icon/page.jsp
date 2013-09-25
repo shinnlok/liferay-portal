@@ -25,9 +25,16 @@ if (Validator.isNotNull(src) && themeDisplay.isThemeImagesFastLoad() && !auiImag
 	String imageFileName = StringUtil.replace(src, "common/../", "");
 
 	if (imageFileName.contains(Http.PROTOCOL_DELIMITER)) {
-		URL imageURL = new URL(imageFileName);
+		String portalURL = PortalUtil.getPortalURL(request);
 
-		imageFileName = imageURL.getPath();
+		if (imageFileName.startsWith(portalURL)) {
+			imageFileName = imageFileName.substring(portalURL.length());
+		}
+		else {
+			URL imageURL = new URL(imageFileName);
+
+			imageFileName = imageURL.getPath();
+		}
 	}
 
 	String contextPath = theme.getContextPath();
@@ -122,10 +129,7 @@ boolean urlIsNotNull = Validator.isNotNull(url);
 
 	<c:choose>
 		<c:when test="<%= (iconMenuIconCount != null) && ((iconMenuSingleIcon == null) || iconMenuShowWhenSingleIcon) %>">
-			<liferay-ui:message key="<%= message %>" localizeKey="<%= localizeMessage %>" />
-		</c:when>
-		<c:when test="<%= (iconListIconCount != null) && ((iconListSingleIcon == null) || iconListShowWhenSingleIcon) %>">
-			<span class="taglib-text"><liferay-ui:message key="<%= message %>" localizeKey="<%= localizeMessage %>" /></span>
+			<span class="taglib-text-icon"><liferay-ui:message key="<%= message %>" localizeKey="<%= localizeMessage %>" /></span>
 		</c:when>
 		<c:otherwise>
 			<c:if test="<%= label %>">
@@ -137,10 +141,10 @@ boolean urlIsNotNull = Validator.isNotNull(url);
 
 <c:choose>
 	<c:when test="<%= (iconListIconCount != null) && ((iconListSingleIcon == null) || iconListShowWhenSingleIcon) %>">
-		<li class="<%= cssClass %>">
+		<li class="<%= cssClass %>" role="presentation">
 			<c:choose>
 				<c:when test="<%= urlIsNotNull %>">
-					<aui:a cssClass='<%= linkCssClass + " taglib-icon" %>' data="<%= data %>" href="<%= url %>" id="<%= id %>" lang="<%= lang %>" target="<%= target %>">
+					<aui:a ariaRole="menuitem" cssClass='<%= linkCssClass + " taglib-icon" %>' data="<%= data %>" href="<%= url %>" id="<%= id %>" lang="<%= lang %>" target="<%= target %>">
 						<%= linkContent %>
 					</aui:a>
 				</c:when>
@@ -151,10 +155,10 @@ boolean urlIsNotNull = Validator.isNotNull(url);
 		</li>
 	</c:when>
 	<c:when test="<%= (iconMenuIconCount != null) && ((iconMenuSingleIcon == null) || iconMenuShowWhenSingleIcon) %>">
-		<li class="<%= cssClass %>">
+		<li class="<%= cssClass %>" role="presentation">
 			<c:choose>
 				<c:when test="<%= urlIsNotNull %>">
-					<aui:a cssClass='<%= linkCssClass + " taglib-icon" %>' data="<%= data %>" href="<%= url %>" id="<%= id %>" lang="<%= lang %>" onClick='<%= Validator.isNotNull(onClick) ? onClick : "" %>' target="<%= target %>">
+					<aui:a ariaRole="menuitem" cssClass='<%= linkCssClass + " taglib-icon" %>' data="<%= data %>" href="<%= url %>" id="<%= id %>" lang="<%= lang %>" onClick='<%= Validator.isNotNull(onClick) ? onClick : "" %>' target="<%= target %>">
 						<%= linkContent %>
 					</aui:a>
 				</c:when>
@@ -168,7 +172,7 @@ boolean urlIsNotNull = Validator.isNotNull(url);
 		<span class="<%= cssClass %>">
 			<c:choose>
 				<c:when test="<%= urlIsNotNull %>">
-					<aui:a cssClass='<%= linkCssClass + " taglib-icon" %>' data="<%= data %>" href="<%= url %>" id="<%= id %>" lang="<%= lang %>" onClick='<%= Validator.isNotNull(onClick) ? onClick : "" %>' target="<%= target %>">
+					<aui:a ariaRole="<%= ariaRole %>" cssClass='<%= linkCssClass + " taglib-icon" %>' data="<%= data %>" href="<%= url %>" id="<%= id %>" lang="<%= lang %>" onClick='<%= Validator.isNotNull(onClick) ? onClick : "" %>' target="<%= target %>">
 						<%= linkContent %>
 					</aui:a>
 				</c:when>

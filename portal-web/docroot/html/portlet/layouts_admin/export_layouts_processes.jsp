@@ -37,7 +37,7 @@ else {
 	orderByType = portalPreferences.getValue(PortletKeys.BACKGROUND_TASK, "entries-order-by-type", "desc");
 }
 
-OrderByComparator orderByComparator = BackgroundTaskUtil.getBackgroundTaskOrderByComparator(orderByCol, orderByType);
+OrderByComparator orderByComparator = BackgroundTaskComparatorFactoryUtil.getBackgroundTaskOrderByComparator(orderByCol, orderByType);
 %>
 
 <liferay-ui:search-container
@@ -125,7 +125,7 @@ OrderByComparator orderByComparator = BackgroundTaskUtil.getBackgroundTaskOrderB
 					<liferay-ui:icon
 						image="download"
 						label="<%= true %>"
-						message='<%= MapUtil.getString(taskContextMap, "fileName") %>'
+						message='<%= HtmlUtil.escape(MapUtil.getString(taskContextMap, "fileName")) %>'
 					/>
 				</c:otherwise>
 			</c:choose>

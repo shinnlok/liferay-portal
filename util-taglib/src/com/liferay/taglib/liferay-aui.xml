@@ -10,6 +10,11 @@
 	<component name="A" bodyContent="true" writeJSP="false">
 		<attributes>
 			<attribute>
+				<name>ariaRole</name>
+				<inputType>java.lang.String</inputType>
+				<outputType>java.lang.String</outputType>
+			</attribute>
+			<attribute>
 				<name>cssClass</name>
 				<inputType>java.lang.String</inputType>
 				<outputType>java.lang.String</outputType>
@@ -579,9 +584,21 @@
 				<outputType>boolean</outputType>
 			</attribute>
 			<attribute>
+				<name>max</name>
+				<inputType>java.lang.Object</inputType>
+				<outputType>java.lang.Number</outputType>
+				<defaultValue>null</defaultValue>
+			</attribute>
+			<attribute>
 				<name>model</name>
 				<inputType><![CDATA[java.lang.Class<?>]]></inputType>
 				<outputType><![CDATA[java.lang.Class<?>]]></outputType>
+			</attribute>
+			<attribute>
+				<name>min</name>
+				<inputType>java.lang.Object</inputType>
+				<outputType>java.lang.Number</outputType>
+				<defaultValue>null</defaultValue>
 			</attribute>
 			<attribute>
 				<name>multiple</name>
@@ -655,6 +672,12 @@
 				<name>value</name>
 				<inputType>java.lang.Object</inputType>
 				<outputType>java.lang.Object</outputType>
+			</attribute>
+			<attribute>
+				<name>wrapperCssClass</name>
+				<required>false</required>
+				<rtexprvalue>true</rtexprvalue>
+				<type>java.lang.String</type>
 			</attribute>
 		</attributes>
 	</component>
