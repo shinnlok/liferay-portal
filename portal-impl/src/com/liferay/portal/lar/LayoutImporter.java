@@ -538,7 +538,7 @@ public class LayoutImporter {
 
 		if (_log.isDebugEnabled()) {
 			if (portletElements.size() > 0) {
-				_log.debug("Importing portlets");
+				_log.debug("Importing " + portletElements.size() + " portlets");
 			}
 		}
 
@@ -552,6 +552,10 @@ public class LayoutImporter {
 
 			Portlet portlet = PortletLocalServiceUtil.getPortletById(
 				portletDataContext.getCompanyId(), portletId);
+
+			if (_log.isDebugEnabled()) {
+				_log.debug("Start import for " + portlet.getDisplayName());
+			}
 
 			if (!portlet.isActive() || portlet.isUndeployedPortlet()) {
 				continue;
@@ -595,6 +599,10 @@ public class LayoutImporter {
 
 				// Portlet preferences
 
+				if (_log.isDebugEnabled()) {
+					_log.debug("Importing portlet preferences");
+				}
+
 				_portletImporter.importPortletPreferences(
 					portletDataContext, layoutSet.getCompanyId(),
 					portletPreferencesGroupId, layout, null, portletElement,
@@ -617,6 +625,10 @@ public class LayoutImporter {
 			// Portlet permissions
 
 			if (importPermissions) {
+				if (_log.isDebugEnabled()) {
+					_log.debug("Importing portlet permissions");
+				}
+
 				_permissionImporter.importPortletPermissions(
 					layoutCache, companyId, groupId, userId, layout,
 					portletElement, portletId);
@@ -624,11 +636,19 @@ public class LayoutImporter {
 
 			// Archived setups
 
+			if (_log.isDebugEnabled()) {
+				_log.debug("Importing portlet archived setups");
+			}
+
 			_portletImporter.importPortletPreferences(
 				portletDataContext, layoutSet.getCompanyId(), groupId, null,
 				null, portletElement, importPortletControls[2],
 				importPortletControls[0], importPortletControls[3], false,
 				importPortletControls[1]);
+
+			if (_log.isDebugEnabled()) {
+				_log.debug("Finish import for " + portlet.getDisplayName());
+			}
 		}
 
 		if (importPermissions) {
