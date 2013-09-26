@@ -14,28 +14,39 @@
 
 package com.liferay.portal.service.permission;
 
+import com.liferay.portal.NoSuchRepositoryEntryException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.workflow.WorkflowInstance;
 import com.liferay.portal.model.Group;
+import com.liferay.portal.model.Layout;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.GroupLocalServiceUtil;
+import com.liferay.portal.util.PortletKeys;
 import com.liferay.portlet.blogs.model.BlogsEntry;
 import com.liferay.portlet.blogs.service.permission.BlogsPermission;
 import com.liferay.portlet.bookmarks.model.BookmarksEntry;
 import com.liferay.portlet.bookmarks.service.permission.BookmarksEntryPermission;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
+import com.liferay.portlet.documentlibrary.model.DLFolder;
+import com.liferay.portlet.documentlibrary.service.DLFolderLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.permission.DLFileEntryPermission;
+import com.liferay.portlet.documentlibrary.service.permission.DLFolderPermission;
+import com.liferay.portlet.documentlibrary.service.permission.DLPermission;
 import com.liferay.portlet.journal.model.JournalArticle;
 import com.liferay.portlet.journal.service.permission.JournalPermission;
 import com.liferay.portlet.messageboards.NoSuchDiscussionException;
 import com.liferay.portlet.messageboards.model.MBCategory;
+import com.liferay.portlet.messageboards.model.MBDiscussion;
 import com.liferay.portlet.messageboards.model.MBThread;
 import com.liferay.portlet.messageboards.service.MBDiscussionLocalServiceUtil;
 import com.liferay.portlet.messageboards.service.MBThreadLocalServiceUtil;
 import com.liferay.portlet.messageboards.service.permission.MBCategoryPermission;
+import com.liferay.portlet.messageboards.service.permission.MBDiscussionPermission;
 import com.liferay.portlet.messageboards.service.permission.MBMessagePermission;
 import com.liferay.portlet.messageboards.service.permission.MBPermission;
 import com.liferay.portlet.wiki.model.WikiNode;
@@ -99,28 +110,36 @@ public class SubscriptionPermissionImpl implements SubscriptionPermission {
 			return false;
 		}
 
-		try {
-			MBDiscussionLocalServiceUtil.getDiscussion(
-				subscriptionClassName, subscriptionClassPK);
+		MBThread discussionThread = null;
 
-			return true;
+		try {
+			MBDiscussion discussion =
+				MBDiscussionLocalServiceUtil.getDiscussion(
+					subscriptionClassName, subscriptionClassPK);
+
+			discussionThread = MBThreadLocalServiceUtil.fetchThread(
+				discussion.getThreadId());
 		}
 		catch (NoSuchDiscussionException nsde) {
 		}
 
 		if (Validator.isNotNull(inferredClassName)) {
-			Boolean hasPermission = hasPermission(
-				permissionChecker, inferredClassName, inferredClassPK,
-				ActionKeys.VIEW);
+			try {
+				Boolean hasPermission = hasPermission(
+					permissionChecker, inferredClassName, inferredClassPK,
+					ActionKeys.VIEW, discussionThread);
 
-			if ((hasPermission == null) || !hasPermission) {
-				return false;
+				if ((hasPermission == null) || !hasPermission) {
+					return false;
+				}
+			}
+			catch (NoSuchRepositoryEntryException nsree) {
 			}
 		}
 
 		Boolean hasPermission = hasPermission(
 			permissionChecker, subscriptionClassName, subscriptionClassPK,
-			ActionKeys.SUBSCRIBE);
+			ActionKeys.SUBSCRIBE, discussionThread);
 
 		if (hasPermission != null) {
 			return hasPermission;
@@ -131,10 +150,27 @@ public class SubscriptionPermissionImpl implements SubscriptionPermission {
 
 	protected Boolean hasPermission(
 			PermissionChecker permissionChecker, String className, long classPK,
-			String actionId)
+			String actionId, MBThread discussionThread)
 		throws PortalException, SystemException {
 
-		if (className.equals(BlogsEntry.class.getName())) {
+		if (discussionThread != null) {
+			if (className.equals(Layout.class.getName())) {
+				return LayoutPermissionUtil.contains(
+					permissionChecker, classPK, ActionKeys.VIEW);
+			}
+			else if (className.equals(WorkflowInstance.class.getName())) {
+				return permissionChecker.hasPermission(
+					discussionThread.getGroupId(),
+					PortletKeys.WORKFLOW_DEFINITIONS,
+					discussionThread.getGroupId(), ActionKeys.VIEW);
+			}
+
+			return MBDiscussionPermission.contains(
+				permissionChecker, discussionThread.getCompanyId(),
+				discussionThread.getGroupId(), className, classPK,
+				discussionThread.getUserId(), ActionKeys.VIEW);
+		}
+		else if (className.equals(BlogsEntry.class.getName())) {
 			return BlogsPermission.contains(
 				permissionChecker, classPK, actionId);
 		}
@@ -145,6 +181,17 @@ public class SubscriptionPermissionImpl implements SubscriptionPermission {
 		else if (className.equals(DLFileEntry.class.getName())) {
 			return DLFileEntryPermission.contains(
 				permissionChecker, classPK, actionId);
+		}
+		else if (className.equals(Folder.class.getName())) {
+			DLFolder dlFolder = DLFolderLocalServiceUtil.fetchDLFolder(classPK);
+
+			if (dlFolder != null) {
+				return DLFolderPermission.contains(
+					permissionChecker, dlFolder, ActionKeys.VIEW);
+			}
+
+			return DLPermission.contains(
+				permissionChecker, classPK, ActionKeys.VIEW);
 		}
 		else if (className.equals(JournalArticle.class.getName())) {
 			return JournalPermission.contains(
