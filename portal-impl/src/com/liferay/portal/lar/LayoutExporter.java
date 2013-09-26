@@ -508,6 +508,12 @@ public class LayoutExporter {
 
 		Element portletsElement = rootElement.addElement("portlets");
 
+		if (_log.isDebugEnabled()) {
+			if (portletIds.size() > 0) {
+				_log.debug("Exporting " + portletIds.size() + " portlets");
+			}
+		}
+
 		for (Map.Entry<String, Object[]> portletIdsEntry :
 				portletIds.entrySet()) {
 
@@ -556,6 +562,10 @@ public class LayoutExporter {
 				portletsElement, exportPermissions, exportPortletControls[0],
 				exportPortletControls[1], exportPortletControls[2],
 				exportPortletControls[3]);
+
+			if (_log.isDebugEnabled()) {
+				_log.debug("Finish export for " + portlet.getDisplayName());
+			}
 		}
 
 		portletDataContext.setScopeGroupId(previousScopeGroupId);

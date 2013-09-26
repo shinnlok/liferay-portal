@@ -142,7 +142,7 @@ public class PortletExporter {
 		if (!staged && ExportImportThreadLocal.isLayoutExportInProcess()) {
 			if (_log.isDebugEnabled()) {
 				_log.debug(
-					"Not exporting data for " + portletId +
+					"Not exporting data for " + portlet.getDisplayName() +
 						" because it is configured not to be staged");
 			}
 
@@ -150,7 +150,7 @@ public class PortletExporter {
 		}
 
 		if (_log.isDebugEnabled()) {
-			_log.debug("Exporting data for " + portletId);
+			_log.debug("Exporting data for " + portlet.getDisplayName());
 		}
 
 		StringBundler sb = new StringBundler(4);
@@ -209,7 +209,7 @@ public class PortletExporter {
 		if (Validator.isNull(data)) {
 			if (_log.isDebugEnabled()) {
 				_log.debug(
-					"Not exporting data for " + portletId +
+					"Not exporting data for " + portlet.getDisplayName() +
 						" because null data was returned");
 			}
 
@@ -234,9 +234,9 @@ public class PortletExporter {
 			catch (UnsupportedOperationException uoe) {
 				if (_log.isDebugEnabled()) {
 					_log.debug(
-						"Not updating the portlet setup for " + portletId +
-							" because no setup was returned for the current " +
-								"page");
+						"Not updating the portlet setup for " +
+							portlet.getDisplayName() + " because no setup " +
+								"was returned for the current page");
 				}
 			}
 			catch (Exception e) {
@@ -1030,6 +1030,10 @@ public class PortletExporter {
 			return;
 		}
 
+		if (_log.isDebugEnabled()) {
+			_log.debug("Start export for " + portlet.getDisplayName());
+		}
+
 		Document document = SAXReaderUtil.createDocument();
 
 		Element portletElement = document.addElement("portlet");
@@ -1081,6 +1085,9 @@ public class PortletExporter {
 		// Portlet preferences
 
 		if (exportPortletSetup) {
+			if (_log.isDebugEnabled()) {
+				_log.debug("Exporting portlet preferences");
+			}
 
 			// Company
 
@@ -1108,6 +1115,10 @@ public class PortletExporter {
 		// Portlet user preferences
 
 		if (exportPortletUserPreferences) {
+			if (_log.isDebugEnabled()) {
+				_log.debug("Exporting portlet user preferences");
+			}
+
 			List<PortletPreferences> portletPreferencesList =
 				PortletPreferencesLocalServiceUtil.getPortletPreferences(
 					PortletKeys.PREFS_OWNER_TYPE_USER, plid, portletId);
@@ -1150,6 +1161,10 @@ public class PortletExporter {
 		// Archived setups
 
 		if (exportPortletArchivedSetups) {
+			if (_log.isDebugEnabled()) {
+				_log.debug("Exporting portlet archived setups");
+			}
+
 			String rootPortletId = PortletConstants.getRootPortletId(portletId);
 
 			List<PortletItem> portletItems =
@@ -1168,6 +1183,10 @@ public class PortletExporter {
 		// Permissions
 
 		if (exportPermissions) {
+			if (_log.isDebugEnabled()) {
+				_log.debug("Exporting portlet permissions");
+			}
+
 			_permissionExporter.exportPortletPermissions(
 				portletDataContext, layoutCache, portletId, layout,
 				portletElement);

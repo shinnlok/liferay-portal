@@ -157,16 +157,16 @@ public class PortletImporter {
 		if (portletDataHandler == null) {
 			if (_log.isDebugEnabled()) {
 				_log.debug(
-					"Do not import portlet data for " + portletId +
-						" because the portlet does not have a " +
-							"PortletDataHandler");
+					"Do not import portlet data for " +
+						portlet.getDisplayName() + " because the portlet " +
+							"does not have a PortletDataHandler");
 			}
 
 			return null;
 		}
 
 		if (_log.isDebugEnabled()) {
-			_log.debug("Importing data for " + portletId);
+			_log.debug("Importing data for " + portlet.getDisplayName());
 		}
 
 		PortletPreferencesImpl portletPreferencesImpl = null;
@@ -303,9 +303,9 @@ public class PortletImporter {
 		if (portletDataHandler == null) {
 			if (_log.isDebugEnabled()) {
 				_log.debug(
-					"Do not delete portlet data for " + portletId +
-						" because the portlet does not have a " +
-							"PortletDataHandler");
+					"Do not delete portlet data for " +
+						portlet.getDisplayName() + " because the portlet " +
+							"does not have a PortletDataHandler");
 			}
 
 			return null;
