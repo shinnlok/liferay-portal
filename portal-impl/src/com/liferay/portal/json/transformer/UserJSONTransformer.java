@@ -38,9 +38,10 @@ public class UserJSONTransformer extends FlexjsonObjectJSONTransformer {
 		if (permissionChecker != null) {
 			boolean hasViewPermission = UserPermissionUtil.contains(
 				permissionChecker, user.getUserId(), ActionKeys.VIEW);
+
 			long userId = permissionChecker.getUserId();
 
-			if (hasViewPermission || user.getUserId() == userId) {
+			if (hasViewPermission || (user.getUserId() == userId)) {
 				hidePrivateUserData = false;
 			}
 		}
