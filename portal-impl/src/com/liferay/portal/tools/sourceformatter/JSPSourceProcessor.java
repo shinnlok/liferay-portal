@@ -101,7 +101,8 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 			String referenceFileName = entry.getKey();
 			String content = entry.getValue();
 
-			if (content.contains("<%@ include file=\"" + fileName) &&
+			if ((content.contains("<%@ include file=\"" + fileName) ||
+				 content.contains("<%@include file=\"" + fileName)) &&
 				!includeFileNames.contains(referenceFileName)) {
 
 				includeFileNames.add(referenceFileName);
@@ -277,14 +278,14 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 		newContent = StringUtil.replace(
 			newContent,
 			new String[] {
-				"<br/>", "\"/>", "\" >", "@page import", "\"%>", ")%>", "else{",
-				"for(", "function (", "if(", "javascript: ", "while(", "){\n",
-				"\n\n\n"
+				"<br/>", "\"/>", "\" >", "@include file", "@page import",
+				"\"%>", ")%>", "else{", "for(", "function (", "if(",
+				"javascript: ", "while(", "){\n", "\n\n\n"
 			},
 			new String[] {
-				"<br />", "\" />", "\">", "@ page import", "\" %>", ") %>",
-				"else {", "for (", "function(", "if (", "javascript:",
-				"while (", ") {\n", "\n\n"
+				"<br />", "\" />", "\">", "@ include file", "@ page import",
+				"\" %>", ") %>", "else {", "for (", "function(", "if (",
+				"javascript:", "while (", ") {\n", "\n\n"
 			});
 
 		newContent = fixCompatClassImports(file, newContent);
