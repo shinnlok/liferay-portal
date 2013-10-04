@@ -15,8 +15,7 @@
 package com.liferay.portal.kernel.util;
 
 /**
- * @author     Brian Wing Shun Chan
- * @deprecated As of 6.2.0
+ * @author Brian Wing Shun Chan
  */
 public class Randomizer_IW {
 	public static Randomizer_IW getInstance() {

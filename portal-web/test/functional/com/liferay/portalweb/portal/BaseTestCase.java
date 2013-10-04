@@ -14,14 +14,16 @@
 
 package com.liferay.portalweb.portal;
 
-import com.liferay.portal.kernel.util.OSDetector;
 import com.liferay.portal.util.InitUtil;
+import com.liferay.portalweb.portal.util.BrowserCommands;
 import com.liferay.portalweb.portal.util.LiferaySeleneseTestCase;
 import com.liferay.portalweb.portal.util.SeleniumUtil;
 import com.liferay.portalweb.portal.util.TestPropsValues;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import org.openqa.selenium.os.ProcessUtils.ProcessStillAliveException;
 
 /**
  * @author Brian Wing Shun Chan
@@ -33,25 +35,30 @@ public class BaseTestCase extends LiferaySeleneseTestCase {
 	}
 
 	@Override
-	public void setUp() throws Exception {
+	public void runBare() throws Throwable {
 		try {
-			Class<?> clazz = getClass();
-
-			String className = clazz.getName();
-
-			if (className.contains("evaluatelog")) {
-				return;
-			}
-
-			selenium = SeleniumUtil.getSelenium();
-
-			selenium.startLogger();
+			super.runBare();
 		}
-		catch (Exception e) {
-			killBrowser();
+		catch (ProcessStillAliveException psae) {
+			BrowserCommands.killBrowser();
 
-			throw e;
+			throw psae;
 		}
+	}
+
+	@Override
+	public void setUp() throws Exception {
+		Class<?> clazz = getClass();
+
+		String className = clazz.getName();
+
+		if (className.contains("evaluatelog")) {
+			return;
+		}
+
+		selenium = SeleniumUtil.getSelenium();
+
+		selenium.startLogger();
 	}
 
 	@Override
@@ -65,36 +72,11 @@ public class BaseTestCase extends LiferaySeleneseTestCase {
 		if (!primaryTestSuiteName.endsWith("TestSuite") &&
 			(testCaseCount < 1)) {
 
-			try {
-				SeleniumUtil.stopSelenium();
-			}
-			catch (Exception e) {
-				killBrowser();
-
-				throw e;
-			}
+			SeleniumUtil.stopSelenium();
 		}
 
 		if (TestPropsValues.TESTING_CLASS_METHOD) {
-			try {
-				SeleniumUtil.stopSelenium();
-			}
-			catch (Exception e) {
-				killBrowser();
-
-				throw e;
-			}
-		}
-	}
-
-	protected void killBrowser() throws Exception {
-		Runtime runtime = Runtime.getRuntime();
-
-		if (OSDetector.isWindows()) {
-			runtime.exec(new String[] {"tskill", "firefox"});
-		}
-		else {
-			runtime.exec(new String[] {"killall", "firefox"});
+			SeleniumUtil.stopSelenium();
 		}
 	}
 
