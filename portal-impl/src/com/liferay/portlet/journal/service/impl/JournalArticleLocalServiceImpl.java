@@ -761,7 +761,7 @@ public class JournalArticleLocalServiceImpl
 			if (journalArticlePersistence.countByG_A(
 					groupId, newArticleId) > 0) {
 
-				throw new DuplicateArticleIdException();
+				throw new DuplicateArticleIdException(newArticleId);
 			}
 		}
 
@@ -4614,7 +4614,7 @@ public class JournalArticleLocalServiceImpl
 		}
 		else {
 			if ((version > 0) && (version != latestVersion)) {
-				throw new ArticleVersionException();
+				throw new ArticleVersionException(articleId);
 			}
 
 			serviceContext.validateModifiedDate(
@@ -4666,7 +4666,7 @@ public class JournalArticleLocalServiceImpl
 
 		validate(
 			user.getCompanyId(), groupId, latestArticle.getClassNameId(),
-			titleMap, content, type, ddmStructureKey, ddmTemplateKey,
+			titleMap, articleId, content, type, ddmStructureKey, ddmTemplateKey,
 			expirationDate, smallImage, smallImageURL, smallImageFile,
 			smallImageBytes);
 
@@ -4893,7 +4893,7 @@ public class JournalArticleLocalServiceImpl
 			Map<String, byte[]> images, ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
-		validateContent(content);
+		validateContent(content, articleId);
 
 		JournalArticle oldArticle = getLatestArticle(
 			groupId, articleId, WorkflowConstants.STATUS_ANY);
@@ -4901,7 +4901,7 @@ public class JournalArticleLocalServiceImpl
 		double oldVersion = oldArticle.getVersion();
 
 		if ((version > 0) && (version != oldVersion)) {
-			throw new ArticleVersionException();
+			throw new ArticleVersionException(articleId);
 		}
 
 		boolean incrementVersion = false;
@@ -6459,10 +6459,10 @@ public class JournalArticleLocalServiceImpl
 
 	protected void validate(
 			long companyId, long groupId, long classNameId,
-			Map<Locale, String> titleMap, String content, String type,
-			String ddmStructureKey, String ddmTemplateKey, Date expirationDate,
-			boolean smallImage, String smallImageURL, File smallImageFile,
-			byte[] smallImageBytes)
+			Map<Locale, String> titleMap, String articleId, String content,
+			String type, String ddmStructureKey, String ddmTemplateKey,
+			Date expirationDate, boolean smallImage, String smallImageURL,
+			File smallImageFile, byte[] smallImageBytes)
 		throws PortalException, SystemException {
 
 		Locale articleDefaultLocale = LocaleUtil.fromLanguageId(
@@ -6488,13 +6488,13 @@ public class JournalArticleLocalServiceImpl
 			(titleMap.isEmpty() ||
 			 Validator.isNull(titleMap.get(articleDefaultLocale)))) {
 
-			throw new ArticleTitleException();
+			throw new ArticleTitleException(articleId);
 		}
 		else if (Validator.isNull(type)) {
-			throw new ArticleTypeException();
+			throw new ArticleTypeException(articleId);
 		}
 
-		validateContent(content);
+		validateContent(content, articleId);
 
 		if (Validator.isNotNull(ddmStructureKey)) {
 			Group companyGroup = groupLocalService.getCompanyGroup(companyId);
@@ -6531,20 +6531,20 @@ public class JournalArticleLocalServiceImpl
 				}
 
 				if (ddmTemplate.getClassPK() != ddmStructure.getStructureId()) {
-					throw new NoSuchTemplateException();
+					throw new NoSuchTemplateException(articleId);
 				}
 			}
 			else if (classNameId ==
 						JournalArticleConstants.CLASSNAME_ID_DEFAULT) {
 
-				throw new NoSuchTemplateException();
+				throw new NoSuchTemplateException(articleId);
 			}
 		}
 
 		if ((expirationDate != null) && expirationDate.before(new Date()) &&
 			!ExportImportThreadLocal.isImportInProcess()) {
 
-			throw new ArticleExpirationDateException();
+			throw new ArticleExpirationDateException(articleId);
 		}
 
 		String[] imageExtensions = PrefsPropsUtil.getStringArray(
@@ -6572,7 +6572,7 @@ public class JournalArticleLocalServiceImpl
 			}
 
 			if (!validSmallImageExtension) {
-				throw new ArticleSmallImageNameException(smallImageName);
+				throw new ArticleSmallImageNameException(articleId);
 			}
 		}
 
@@ -6583,7 +6583,7 @@ public class JournalArticleLocalServiceImpl
 			((smallImageBytes == null) ||
 			 (smallImageBytes.length > smallImageMaxSize))) {
 
-			throw new ArticleSmallImageSizeException();
+			throw new ArticleSmallImageSizeException(articleId);
 		}
 	}
 
@@ -6603,11 +6603,11 @@ public class JournalArticleLocalServiceImpl
 			groupId, articleId, version);
 
 		if (article != null) {
-			throw new DuplicateArticleIdException();
+			throw new DuplicateArticleIdException(articleId);
 		}
 
 		validate(
-			companyId, groupId, classNameId, titleMap, content, type,
+			companyId, groupId, classNameId, titleMap, articleId, content, type,
 			ddmStructureKey, ddmTemplateKey, expirationDate, smallImage,
 			smallImageURL, smallImageFile, smallImageBytes);
 	}
@@ -6617,13 +6617,15 @@ public class JournalArticleLocalServiceImpl
 			(articleId.indexOf(CharPool.COMMA) != -1) ||
 			(articleId.indexOf(CharPool.SPACE) != -1)) {
 
-			throw new ArticleIdException();
+			throw new ArticleIdException(articleId);
 		}
 	}
 
-	protected void validateContent(String content) throws PortalException {
+	protected void validateContent(String content, String articleId)
+			throws PortalException {
+
 		if (Validator.isNull(content)) {
-			throw new ArticleContentException("Content is null");
+			throw new ArticleContentException(articleId);
 		}
 
 		try {
