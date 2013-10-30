@@ -127,11 +127,7 @@ public class TabsTag extends IncludeTag {
 				}
 			}
 
-			boolean match = false;
-
-			if (ArrayUtil.contains(_tabsValues, _value)) {
-				match = true;
-			}
+			boolean match = ArrayUtil.contains(_tabsValues, _value);
 
 			if (!match) {
 				if (_tabsValues.length > 0) {
