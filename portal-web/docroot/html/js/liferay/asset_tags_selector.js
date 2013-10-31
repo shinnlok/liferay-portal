@@ -61,11 +61,11 @@ AUI.add(
 			'</fieldset>'
 		);
 
-		var TPL_SEARCH_FORM = '<form class="form-search lfr-tag-selector-search row-fluid">' +
+		var TPL_SEARCH_FORM = '<form action="javascript:;" class="form-search lfr-tag-selector-search row-fluid">' +
 			'<input class="lfr-tag-selector-input search-query span12" placeholder="{0}" type="text" />' +
 		'</form>';
 
-		var TPL_SUGGESTIONS_QUERY = 'select * from search.termextract where context="{context}"';
+		var TPL_SUGGESTIONS_QUERY = 'select * from search.termextract where context="{0}"';
 
 		var TPL_TAGS_CONTAINER = '<div class="' + CSS_TAGS_LIST + '"></div>';
 
@@ -238,7 +238,8 @@ AUI.add(
 								{
 									dialog: {
 										cssClass: CSS_POPUP,
-										hideClass: 'hide-accessible'
+										hideClass: 'hide-accessible',
+										width: 600
 									}
 								}
 							);
@@ -247,7 +248,7 @@ AUI.add(
 
 							bodyNode.html(STR_BLANK);
 
-							var searchForm = A.Node.create(A.Lang.sub(TPL_SEARCH_FORM, [Liferay.Language.get('search')]));
+							var searchForm = A.Node.create(Lang.sub(TPL_SEARCH_FORM, [Liferay.Language.get('search')]));
 
 							bodyNode.append(searchForm);
 
@@ -527,36 +528,33 @@ AUI.add(
 
 						var context = STR_BLANK;
 
-						var data = [];
-
 						if (contentCallback) {
 							context = contentCallback();
 
 							context = String(context);
 						}
 
-						var query = Lang.sub(
-							TPL_SUGGESTIONS_QUERY,
-							{
-								context: context
-							}
-						);
+						context = Lang.String.stripTags(context);
+						context = Liferay.Util.escapeHTML(context);
+
+						var query = Lang.sub(TPL_SUGGESTIONS_QUERY, [context]);
 
 						A.YQL(
 							query,
 							function(response) {
-								var results = response.query.results;
+								var results = response.query && response.query.results;
+
+								var data = [];
 
 								if (results) {
-									var resultData = results.Result;
-
-									for (var i = 0; i < resultData.length; i++) {
-										data.push(
-											{
-												name: resultData[i]
-											}
-										);
-									}
+									data = AArray.map(
+										AArray(results.Result),
+										function(item, index, collection) {
+											return {
+												name: item
+											};
+										}
+									);
 								}
 
 								instance._updateSelectList(AArray.unique(data));

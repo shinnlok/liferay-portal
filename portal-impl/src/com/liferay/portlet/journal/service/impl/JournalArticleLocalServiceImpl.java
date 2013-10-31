@@ -928,6 +928,18 @@ public class JournalArticleLocalServiceImpl
 
 		expandoRowLocalService.deleteRows(article.getId());
 
+		// Trash
+
+		if (article.isInTrash()) {
+			TrashEntry trashEntry = article.getTrashEntry();
+
+			if (trashEntry != null) {
+				trashVersionLocalService.deleteTrashVersion(
+					trashEntry.getEntryId(), JournalArticle.class.getName(),
+					article.getId());
+			}
+		}
+
 		// Workflow
 
 		if (!article.isDraft()) {
@@ -6305,7 +6317,7 @@ public class JournalArticleLocalServiceImpl
 		}
 
 		subscriptionSender.addPersistedSubscribers(
-			JournalFolder.class.getName(), article.getGroupId());
+			JournalArticle.class.getName(), article.getGroupId());
 
 		subscriptionSender.flushNotificationsAsync();
 	}

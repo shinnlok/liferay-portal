@@ -233,6 +233,7 @@ else {
 					for (Folder mountFolder : mountFolders) {
 						request.setAttribute("view_entries.jsp-folder", mountFolder);
 						request.setAttribute("view_entries.jsp-folderId", String.valueOf(mountFolder.getFolderId()));
+						request.setAttribute("view_entries.jsp-folderSelected", String.valueOf(folderId == mountFolder.getFolderId()));
 						request.setAttribute("view_entries.jsp-repositoryId", String.valueOf(mountFolder.getRepositoryId()));
 
 						try {
@@ -429,8 +430,8 @@ else {
 					for (Folder curFolder : folders) {
 						request.setAttribute("view_entries.jsp-folder", curFolder);
 						request.setAttribute("view_entries.jsp-folderId", String.valueOf(curFolder.getFolderId()));
-						request.setAttribute("view_entries.jsp-repositoryId", String.valueOf(curFolder.getRepositoryId()));
 						request.setAttribute("view_entries.jsp-folderSelected", String.valueOf(folderId == curFolder.getFolderId()));
+						request.setAttribute("view_entries.jsp-repositoryId", String.valueOf(curFolder.getRepositoryId()));
 					%>
 
 						<liferay-portlet:renderURL varImpl="viewURL">

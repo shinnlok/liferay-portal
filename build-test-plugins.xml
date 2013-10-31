@@ -10,7 +10,6 @@
 			</not>
 			<then>
 				<delete dir="${liferay.home}/data" />
-				<delete dir="${liferay.home}/deploy" />
 				<delete dir="${liferay.home}/logs" />
 			</then>
 		</if>
@@ -46,10 +45,27 @@ plugins.includes=${plugins.includes}</echo>
 			</then>
 		</if>
 
-		<ant dir="${lp.plugins.dir}/${plugin.types}" inheritAll="false">
-			<target name="clean" />
-			<target name="deploy" />
-		</ant>
+		<if>
+			<matches pattern="http" string="${test.build.plugins.war.zip.url}" />
+			<then>
+				<for list="${plugins.includes}" param="plugin.includes">
+					<sequential>
+						<copy todir="${liferay.home}/deploy">
+							<fileset
+								dir="plugins"
+								includes="@{plugin.includes}*.war"
+							/>
+						</copy>
+					</sequential>
+				</for>
+			</then>
+			<else>
+				<ant dir="${lp.plugins.dir}/${plugin.types}" inheritAll="false">
+					<target name="clean" />
+					<target name="deploy" />
+				</ant>
+			</else>
+		</if>
 
 		<delete dir="${lp.plugins.dir}/dist" />
 		<mkdir dir="${lp.plugins.dir}/dist" />
