@@ -36,6 +36,16 @@ public interface Organization extends OrganizationModel, PersistedModel {
 			public String get(Organization organization) {
 				return organization.getName();
 			}
+
+			@Override
+			public Class<Organization> getTClass() {
+				return Organization.class;
+			}
+
+			@Override
+			public Class<String> getVClass() {
+				return String.class;
+			}
 		};
 
 	public java.lang.String buildTreePath()

@@ -37,6 +37,16 @@ public interface JournalArticle extends JournalArticleModel, PersistedModel {
 			public String get(JournalArticle journalArticle) {
 				return journalArticle.getArticleId();
 			}
+
+			@Override
+			public Class<JournalArticle> getTClass() {
+				return JournalArticle.class;
+			}
+
+			@Override
+			public Class<String> getVClass() {
+				return String.class;
+			}
 		};
 
 	public java.lang.String buildTreePath()
