@@ -58,6 +58,7 @@
 	<path id="test.classpath">
 		<pathelement path="test-classes/${test.type}" />
 		<pathelement path="${classpath}" />
+		<pathelement path="${imported.classpath}" />
 		<fileset dir="${project.dir}/lib/development" includes="*.jar" excludes="jalopy.jar,jetty*.jar,tomcat*.jar" />
 		<fileset dir="${project.dir}/lib/global" includes="*.jar" />
 		<fileset dir="${project.dir}/lib/portal" includes="*.jar" excludes="ant.jar" />
@@ -543,7 +544,6 @@ Please set the environment variable ANT_OPTS to the recommended value of
 
 			<release-to-repo
 				bndRootFile="@{bndRootFile}"
-				deployRepo="baselinerepo"
 				file="@{file}"
 			/>
 		</sequential>

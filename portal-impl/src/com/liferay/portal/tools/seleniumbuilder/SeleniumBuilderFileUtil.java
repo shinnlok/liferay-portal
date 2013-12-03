@@ -124,6 +124,30 @@ public class SeleniumBuilderFileUtil {
 		return childElementAttributeValues;
 	}
 
+	public Set<String> getChildElementLineNumbers(Element element) {
+		Set<String> childElementLineNumbers = new TreeSet<String>();
+
+		List<Element> childElements = element.elements();
+
+		if (childElements.isEmpty()) {
+			return childElementLineNumbers;
+		}
+
+		for (Element childElement : childElements) {
+			String childElementLineNumber = childElement.attributeValue(
+				"line-number");
+
+			if (childElementLineNumber != null) {
+				childElementLineNumbers.add(childElementLineNumber);
+			}
+
+			childElementLineNumbers.addAll(
+				getChildElementLineNumbers(childElement));
+		}
+
+		return childElementLineNumbers;
+	}
+
 	public String getClassName(String fileName) {
 		String classSuffix = getClassSuffix(fileName);
 
@@ -1153,9 +1177,17 @@ public class SeleniumBuilderFileUtil {
 
 		List<Element> elements = rootElement.elements();
 
-		if (elements.isEmpty()) {
+		String extendsName = rootElement.attributeValue("extends");
+
+		if (elements.isEmpty() && (extendsName == null)) {
 			throwValidationException(
 				1001, fileName, rootElement, new String[] {"command", "var"});
+		}
+		else if (extendsName != null) {
+			if (Validator.isNull(extendsName)) {
+				throwValidationException(
+					1006, fileName, rootElement, "extends");
+			}
 		}
 
 		for (Element element : elements) {

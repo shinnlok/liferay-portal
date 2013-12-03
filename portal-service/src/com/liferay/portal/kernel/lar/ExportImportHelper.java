@@ -14,6 +14,8 @@
 
 package com.liferay.portal.kernel.lar;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
@@ -37,6 +39,7 @@ import javax.portlet.PortletRequest;
 /**
  * @author Zsolt Berentey
  */
+@ProviderType
 public interface ExportImportHelper {
 
 	public static final String DATA_HANDLER_COMPANY_SECURE_URL =
@@ -88,6 +91,21 @@ public interface ExportImportHelper {
 		throws PortalException, SystemException;
 
 	public String getExportableRootPortletId(long companyId, String portletId)
+		throws Exception;
+
+	public boolean[] getExportPortletControls(
+			long companyId, String portletId,
+			Map<String, String[]> parameterMap)
+		throws Exception;
+
+	public boolean[] getExportPortletControls(
+			long companyId, String portletId,
+			Map<String, String[]> parameterMap, String type)
+		throws Exception;
+
+	public boolean[] getImportPortletControls(
+			long companyId, String portletId,
+			Map<String, String[]> parameterMap, Element portletDataElement)
 		throws Exception;
 
 	public Map<Long, Boolean> getLayoutIdMap(PortletRequest portletRequest)

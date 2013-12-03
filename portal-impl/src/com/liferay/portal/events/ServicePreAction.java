@@ -1234,7 +1234,7 @@ public class ServicePreAction extends Action {
 			themeDisplay.setShowPageSettingsIcon(false);
 		}
 
-		if (layout.isLayoutPrototypeLinkActive()) {
+		if ((layout != null) && layout.isLayoutPrototypeLinkActive()) {
 			themeDisplay.setShowPageCustomizationIcon(false);
 		}
 

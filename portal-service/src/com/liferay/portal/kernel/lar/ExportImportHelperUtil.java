@@ -14,6 +14,8 @@
 
 package com.liferay.portal.kernel.lar;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
@@ -38,6 +40,7 @@ import javax.portlet.PortletRequest;
 /**
  * @author Zsolt Berentey
  */
+@ProviderType
 public class ExportImportHelperUtil {
 
 	public static Calendar getCalendar(
@@ -77,6 +80,33 @@ public class ExportImportHelperUtil {
 			ExportImportHelperUtil.class);
 
 		return _exportImportHelper;
+	}
+
+	public static boolean[] getExportPortletControls(
+			long companyId, String portletId,
+			Map<String, String[]> parameterMap)
+		throws Exception {
+
+		return getExportImportHelper().getExportPortletControls(
+			companyId, portletId, parameterMap);
+	}
+
+	public static boolean[] getExportPortletControls(
+			long companyId, String portletId,
+			Map<String, String[]> parameterMap, String type)
+		throws Exception {
+
+		return getExportImportHelper().getExportPortletControls(
+			companyId, portletId, parameterMap, type);
+	}
+
+	public static boolean[] getImportPortletControls(
+			long companyId, String portletId,
+			Map<String, String[]> parameterMap, Element portletDataElement)
+		throws Exception {
+
+		return getExportImportHelper().getImportPortletControls(
+			companyId, portletId, parameterMap, portletDataElement);
 	}
 
 	public static Map<Long, Boolean> getLayoutIdMap(

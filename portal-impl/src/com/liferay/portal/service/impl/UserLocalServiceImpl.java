@@ -2060,6 +2060,19 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	}
 
 	/**
+	 * Returns the user with the portrait ID.
+	 *
+	 * @param  portraitId the user's portrait ID
+	 * @return the user with the portrait ID, or <code>null</code> if a user
+	 *         with the portrait ID could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	@Override
+	public User fetchUserByPortraitId(long portraitId) throws SystemException {
+		return userPersistence.fetchByPortraitId(portraitId);
+	}
+
+	/**
 	 * Returns the user with the screen name.
 	 *
 	 * @param  companyId the primary key of the user's company
@@ -6178,8 +6191,13 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		Group group = groupPersistence.fetchByC_F(companyId, friendlyURL);
 
 		if ((group != null) && (group.getClassPK() != userId)) {
-			throw new GroupFriendlyURLException(
+			GroupFriendlyURLException gfurle = new GroupFriendlyURLException(
 				GroupFriendlyURLException.DUPLICATE);
+
+			gfurle.setDuplicateClassPK(group.getGroupId());
+			gfurle.setDuplicateClassName(Group.class.getName());
+
+			throw gfurle;
 		}
 
 		int exceptionType = LayoutImpl.validateFriendlyURL(friendlyURL);
