@@ -3876,7 +3876,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		assetEntryLocalService.updateEntry(
 			userId, companyGroup.getGroupId(), user.getCreateDate(),
 			user.getModifiedDate(), User.class.getName(), user.getUserId(),
-			user.getUuid(), 0, assetCategoryIds, assetTagNames, false, null,
+			user.getUuid(), 0, assetCategoryIds, assetTagNames, true, null,
 			null, null, null, user.getFullName(), null, null, null, null, 0, 0,
 			null, false);
 	}
@@ -6178,8 +6178,13 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		Group group = groupPersistence.fetchByC_F(companyId, friendlyURL);
 
 		if ((group != null) && (group.getClassPK() != userId)) {
-			throw new GroupFriendlyURLException(
+			GroupFriendlyURLException gfurle = new GroupFriendlyURLException(
 				GroupFriendlyURLException.DUPLICATE);
+
+			gfurle.setDuplicateClassPK(group.getGroupId());
+			gfurle.setDuplicateClassName(Group.class.getName());
+
+			throw gfurle;
 		}
 
 		int exceptionType = LayoutImpl.validateFriendlyURL(friendlyURL);
