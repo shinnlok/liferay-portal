@@ -2120,9 +2120,9 @@ public class ServiceBuilder {
 		}
 
 		int firstClass = newContent.indexOf(
-			"<class name=\"" + _packagePath + ".model.impl.");
+			"<class name=\"" + _packagePath + ".model.");
 		int lastClass = newContent.lastIndexOf(
-			"<class name=\"" + _packagePath + ".model.impl.");
+			"<class name=\"" + _packagePath + ".model.");
 
 		if (firstClass == -1) {
 			int x = newContent.indexOf("</hibernate-mapping>");
@@ -3505,7 +3505,7 @@ public class ServiceBuilder {
 				_createSQLTables(sqlFile, createTableSQL, entity, true);
 
 				_updateSQLFile(
-					"update-6.1.1-6.2.0.sql", createTableSQL, entity);
+					"update-6.2.0-7.0.0.sql", createTableSQL, entity);
 			}
 		}
 
@@ -3543,7 +3543,7 @@ public class ServiceBuilder {
 		int y = content.indexOf(");", x);
 
 		if (x != -1) {
-			String oldCreateTableString = content.substring(x + 1, y);
+			String oldCreateTableString = content.substring(x, y + 2);
 
 			if (!oldCreateTableString.equals(newCreateTableString)) {
 				content =

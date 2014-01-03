@@ -710,6 +710,13 @@ public class DDLRecordLocalServiceImpl extends DDLRecordLocalServiceBaseImpl {
 			return false;
 		}
 
+		if (Validator.equals(
+				lastRecordVersion.getVersion(),
+				latestRecordVersion.getVersion())) {
+
+			return false;
+		}
+
 		Fields lastFields = StorageEngineUtil.getFields(
 			lastRecordVersion.getDDMStorageId());
 		Fields latestFields = StorageEngineUtil.getFields(

@@ -127,11 +127,7 @@ public class TabsTag extends IncludeTag {
 				}
 			}
 
-			boolean match = false;
-
-			if (ArrayUtil.contains(_tabsValues, _value)) {
-				match = true;
-			}
+			boolean match = ArrayUtil.contains(_tabsValues, _value);
 
 			if (!match) {
 				if (_tabsValues.length > 0) {
@@ -222,9 +218,9 @@ public class TabsTag extends IncludeTag {
 	}
 
 	public boolean getSectionSelected() {
-		if ((_names.length == 0) ||
-			((_names.length > _namesPos) &&
-			 _names[_namesPos].equals(_value))) {
+		if ((_tabsValues.length == 0) ||
+			((_tabsValues.length > _namesPos) &&
+			 _tabsValues[_namesPos].equals(_value))) {
 
 			return true;
 		}

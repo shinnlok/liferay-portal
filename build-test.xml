@@ -587,7 +587,7 @@ jdbc.default.url=${database.url}
 jdbc.default.username=${database.username}
 jdbc.default.password=${database.password}
 
-captcha.max.challenges=0
+captcha.max.challenges=-1
 
 browser.launcher.url=
 
@@ -849,7 +849,10 @@ message.boards.subscribe.by.default=false</echo>
 			</elseif>
 			<elseif>
 				<or>
+					<equals arg1="${portal.version}" arg2="6.1.2" />
+					<equals arg1="${portal.version}" arg2="6.1.10" />
 					<equals arg1="${portal.version}" arg2="6.1.20" />
+					<equals arg1="${portal.version}" arg2="6.1.30" />
 				</or>
 				<then>
 					<echo file="portal-impl/src/portal-ext.properties" append="true">
