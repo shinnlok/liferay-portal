@@ -348,13 +348,17 @@ public class HtmlImpl implements Html {
 			return text;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		StringBundler sb = new StringBundler(text.length());
 
-		for(int i =0; i < text.length(); i++) {
+		for (int i = 0; i < text.length(); i++) {
 			char c = text.charAt(i);
 
-			if (Character.isUpperCase(c) || Character.isLowerCase(c) 
-				|| Character.isDigit(c) || c == CharPool.UNDERLINE) {
+			if (((c >= CharPool.UPPER_CASE_A) &&
+				 (c <= CharPool.UPPER_CASE_Z)) ||
+				((c >= CharPool.LOWER_CASE_A) &&
+				 (c <= CharPool.LOWER_CASE_Z)) ||
+				((c >= CharPool.NUMBER_0) && (c <= CharPool.NUMBER_0)) ||
+				(c == CharPool.UNDERLINE)) {
 
 				sb.append(c);
 			}
@@ -362,6 +366,7 @@ public class HtmlImpl implements Html {
 				sb.append(Integer.toHexString(c));
 			}
 		}
+
 		return sb.toString();
 	}
 
