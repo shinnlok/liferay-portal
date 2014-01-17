@@ -14,12 +14,30 @@
 
 package com.liferay.portalweb.portal.util.liferayselenium;
 
+import com.liferay.portal.kernel.util.DateUtil;
+import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.xml.Document;
+import com.liferay.portal.kernel.xml.Element;
+import com.liferay.portal.kernel.xml.SAXReaderUtil;
+import com.liferay.portal.util.PropsValues;
 import com.liferay.portalweb.portal.BaseTestCase;
 import com.liferay.portalweb.portal.util.EmailCommands;
 import com.liferay.portalweb.portal.util.RuntimeVariables;
 import com.liferay.portalweb.portal.util.TestPropsValues;
+
+import java.awt.Rectangle;
+import java.awt.Robot;
+import java.awt.Toolkit;
+import java.awt.image.BufferedImage;
+
+import java.io.File;
+
+import java.util.List;
+
+import javax.imageio.ImageIO;
 
 /**
  * @author Brian Wing Shun Chan
@@ -90,6 +108,58 @@ public class LiferaySeleniumHelper {
 
 		BaseTestCase.assertEquals(
 			subject, liferaySelenium.getEmailSubject(index));
+	}
+
+	public static void assertLiferayErrors() throws Exception {
+		String currentDate = DateUtil.getCurrentDate(
+			"yyyy-MM-dd", LocaleUtil.getDefault());
+
+		String log4jXMLFile =
+			PropsValues.LIFERAY_HOME + "/logs/liferay." + currentDate + ".xml";
+
+		if (!FileUtil.exists(log4jXMLFile)) {
+			return;
+		}
+
+		String content = FileUtil.read(log4jXMLFile);
+
+		if (content.equals("")) {
+			return;
+		}
+
+		content = "<log4j>" + content + "</log4j>";
+		content = content.replaceAll("log4j:", "");
+
+		Document document = SAXReaderUtil.read(content, true);
+
+		Element rootElement = document.getRootElement();
+
+		List<Element> eventElements = rootElement.elements("event");
+
+		for (Element eventElement : eventElements) {
+			String level = eventElement.attributeValue("level");
+
+			if (level.equals("ERROR")) {
+				Element messageElement = eventElement.element("message");
+
+				String messageText = messageElement.getText();
+
+				if (isIgnorableErrorLine(messageText)) {
+					continue;
+				}
+
+				FileUtil.write(log4jXMLFile, "");
+
+				Element throwableElement = eventElement.element("throwable");
+
+				if (throwableElement != null) {
+					throw new Exception(
+						messageText + throwableElement.getText());
+				}
+
+				throw new Exception(messageText);
+			}
+		}
 	}
 
 	public static void assertLocation(
@@ -333,6 +403,148 @@ public class LiferaySeleniumHelper {
 		return !liferaySelenium.isElementPresent(locator);
 	}
 
+	public static boolean isIgnorableErrorLine(String line) {
+		if (line.contains("[antelope:post]")) {
+			return true;
+		}
+
+		if (line.contains("[junit]")) {
+			return true;
+		}
+
+		if (line.contains("BasicResourcePool")) {
+			return true;
+		}
+
+		if (line.contains("Caused by:")) {
+			return true;
+		}
+
+		if (line.contains("INFO:")) {
+			return true;
+		}
+
+		if (line.matches(
+				".*The web application \\[.*\\] appears to have started a " +
+					"thread.*")) {
+
+			if (line.contains("[AWT-Windows]")) {
+				return true;
+			}
+
+			if (line.contains("[com.google.inject.internal.Finalizer]")) {
+				return true;
+			}
+
+			if (line.contains("[MultiThreadedHttpConnectionManager cleanup]")) {
+				return true;
+			}
+
+			if (line.contains(
+					"[org.python.google.common.base.internal.Finalizer]")) {
+
+				return true;
+			}
+
+			if (line.matches(".*\\[Thread-[0-9]+\\].*")) {
+				return true;
+			}
+
+			if (line.matches(".*[TrueZIP InputStream Reader].*")) {
+				return true;
+			}
+		}
+
+		// LPS-17639
+
+		if (line.contains("Table 'lportal.lock_' doesn't exist")) {
+			return true;
+		}
+
+		// LPS-22821
+
+		if (line.contains(
+				"Exception sending context destroyed event to listener " +
+					"instance of class com.liferay.portal.spring.context." +
+					"PortalContextLoaderListener")) {
+
+			return true;
+		}
+
+		// LPS-23351
+
+		if (line.contains("user lacks privilege or object not found: LOCK_")) {
+			return true;
+		}
+
+		// LPS-23498
+
+		if (line.contains("JBREM00200: ")) {
+			return true;
+		}
+
+		// LPS-28734
+
+		if (line.contains("java.nio.channels.ClosedChannelException")) {
+			return true;
+		}
+
+		// LPS-28954
+
+		if (line.matches(
+				".*The web application \\[/wsrp-portlet\\] created a " +
+					"ThreadLocal with key of type.*")) {
+
+			if (line.contains(
+					"[org.apache.axis.utils.XMLUtils." +
+						"ThreadLocalDocumentBuilder]")) {
+
+				return true;
+			}
+
+			if (line.contains(
+					"[org.apache.xml.security.utils." +
+						"UnsyncByteArrayOutputStream$1]")) {
+
+				return true;
+			}
+		}
+
+		// LPS-37574
+
+		if (line.contains("java.util.zip.ZipException: ZipFile closed")) {
+			return true;
+		}
+
+		// LPS-39742
+
+		if (line.contains("java.lang.IllegalStateException")) {
+			return true;
+		}
+
+		// LPS-41257
+
+		if (line.matches(
+				".*The web application \\[\\] created a ThreadLocal with key " +
+					"of type.*")) {
+
+			if (line.contains("[de.schlichtherle")) {
+				return true;
+			}
+		}
+
+		// LPS-41863
+
+		if (line.contains("Disabling contextual LOB") &&
+			line.contains("MSC service thread") &&
+			line.contains("[org.hibernate.engine.jdbc.JdbcSupportLoader]")) {
+
+			return true;
+		}
+
+		return false;
+	}
+
 	public static boolean isNotChecked(
 		LiferaySelenium liferaySelenium, String locator) {
 
@@ -380,6 +592,37 @@ public class LiferaySeleniumHelper {
 		EmailCommands.replyToEmail(to, body);
 
 		liferaySelenium.pause("3000");
+	}
+
+	public static void saveScreenshot(
+			LiferaySelenium liferaySelenium, String fileName)
+		throws Exception {
+
+		if (_screenshotFileName.equals(fileName)) {
+			_screenshotCount++;
+		}
+		else {
+			_screenshotCount = 0;
+
+			_screenshotFileName = fileName;
+		}
+
+		File file = new File(
+			liferaySelenium.getProjectDir() + "portal-web\\test-results\\" +
+				"functional\\" + _screenshotFileName + "\\" +
+				_screenshotFileName + _screenshotCount + ".jpg");
+
+		file.mkdirs();
+
+		Robot robot = new Robot();
+
+		Toolkit toolkit = Toolkit.getDefaultToolkit();
+
+		Rectangle rectangle = new Rectangle(toolkit.getScreenSize());
+
+		BufferedImage bufferedImage = robot.createScreenCapture(rectangle);
+
+		ImageIO.write(bufferedImage, "jpg", file);
 	}
 
 	public static void sendEmail(
@@ -718,5 +961,8 @@ public class LiferaySeleniumHelper {
 			Thread.sleep(1000);
 		}
 	}
+
+	private static int _screenshotCount = 0;
+	private static String _screenshotFileName = "";
 
 }

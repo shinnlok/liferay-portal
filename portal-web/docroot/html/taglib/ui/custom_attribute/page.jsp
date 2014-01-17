@@ -62,7 +62,7 @@ ExpandoBridge expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(company.
 	<c:if test="<%= !propertyHidden && ExpandoColumnPermissionUtil.contains(permissionChecker, company.getCompanyId(), className, ExpandoTableConstants.DEFAULT_TABLE_NAME, name, ActionKeys.VIEW) %>">
 
 		<%
-		String escapedName = HtmlUtil.escape(name);
+		String escapedName = HtmlUtil.escapeAttribute(name);
 		%>
 
 		<c:choose>
@@ -151,6 +151,9 @@ ExpandoBridge expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(company.
 								if ((minute == -1) && (valueDate != null)) {
 									minute = valueDate.get(Calendar.MINUTE);
 								}
+
+								String inputDateName = fieldParam + "Date";
+								String inputTimeName = fieldParam + "Time";
 								%>
 
 								<liferay-ui:input-date
@@ -160,6 +163,7 @@ ExpandoBridge expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(company.
 									firstDayOfWeek="<%= valueDate.getFirstDayOfWeek() - 1 %>"
 									monthParam='<%= fieldParam + "Month" %>'
 									monthValue="<%= month %>"
+									name="<%= inputDateName %>"
 									yearParam='<%= fieldParam + "Year" %>'
 									yearValue="<%= year %>"
 								/>
@@ -172,6 +176,7 @@ ExpandoBridge expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(company.
 									hourValue="<%= hour %>"
 									minuteParam='<%= fieldParam + "Minute" %>'
 									minuteValue="<%= minute %>"
+									name="<%= inputTimeName %>"
 								/>
 							</span>
 						</c:when>
@@ -187,7 +192,7 @@ ExpandoBridge expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(company.
 									for (double curDefaultValue : (double[])defaultValue) {
 									%>
 
-										<input <%= ((curValue.length > 0) && ArrayUtil.contains(curValue, curDefaultValue)) ? "checked" : "" %> name="<portlet:namespace />ExpandoAttribute--<%= escapedName %>--" type="checkbox" value="<%= curDefaultValue %>"><%= curDefaultValue %></input><br />
+										<aui:input checked="<%= ((curValue.length > 0) && ArrayUtil.contains(curValue,curDefaultValue)) %>" id="<%= StringUtil.randomId() %>" includeHiddenField="<%= false %>" label="<%= String.valueOf(curDefaultValue) %>" name='<%= "ExpandoAttribute--" + escapedName + "--" %>' type="checkbox" value="<%= curDefaultValue %>" />
 
 									<%
 									}
@@ -202,7 +207,7 @@ ExpandoBridge expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(company.
 									for (double curDefaultValue : (double[])defaultValue) {
 									%>
 
-										<input <%= ((curValue.length > 0) && ArrayUtil.contains(curValue, curDefaultValue)) ? "checked" : "" %> name="<portlet:namespace />ExpandoAttribute--<%= escapedName %>--" type="radio" value="<%= curDefaultValue %>"><%= curDefaultValue %></input><br />
+										<aui:input checked="<%= ((curValue.length > 0) && ArrayUtil.contains(curValue,curDefaultValue)) %>" includeHiddenField="<%= false %>" label="<%= String.valueOf(curDefaultValue) %>" name='<%= "ExpandoAttribute--" + escapedName + "--" %>' type="radio" value="<%= curDefaultValue %>" />
 
 									<%
 									}
@@ -233,7 +238,7 @@ ExpandoBridge expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(company.
 										value = defaultValue;
 									}
 
-									double[] values = ParamUtil.getDoubleValues(request, "ExpandoAttribute--" + escapedName + "--", (double[])value);
+									double[] values = ParamUtil.getDoubleValues(request, "ExpandoAttribute--" + HtmlUtil.escape(name) + "--", (double[])value);
 									%>
 
 									<textarea class="lfr-textarea" id="<%= randomNamespace %><%= escapedName %>" name="<portlet:namespace />ExpandoAttribute--<%= escapedName %>--"><%= StringUtil.merge(values, StringPool.NEW_LINE) %></textarea>
@@ -250,7 +255,7 @@ ExpandoBridge expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(company.
 									for (float curDefaultValue : (float[])defaultValue) {
 									%>
 
-										<input <%= ((curValue.length > 0) && ArrayUtil.contains(curValue, curDefaultValue)) ? "checked" : "" %> name="<portlet:namespace />ExpandoAttribute--<%= escapedName %>--" type="checkbox" value="<%= curDefaultValue %>"><%= curDefaultValue %></input><br>
+										<aui:input checked="<%= ((curValue.length > 0) && ArrayUtil.contains(curValue,curDefaultValue)) %>" id="<%= StringUtil.randomId() %>" includeHiddenField="<%= false %>" label="<%= String.valueOf(curDefaultValue) %>" name='<%= "ExpandoAttribute--" + escapedName + "--" %>' type="checkbox" value="<%= curDefaultValue %>" />
 
 									<%
 									}
@@ -265,7 +270,7 @@ ExpandoBridge expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(company.
 									for (float curDefaultValue : (float[])defaultValue) {
 									%>
 
-										<input <%= ((curValue.length > 0) && ArrayUtil.contains(curValue, curDefaultValue)) ? "checked" : "" %> name="<portlet:namespace />ExpandoAttribute--<%= escapedName %>--" type="radio" value="<%= curDefaultValue %>"><%= curDefaultValue %></input><br>
+										<aui:input checked="<%= ((curValue.length > 0) && ArrayUtil.contains(curValue,curDefaultValue)) %>" includeHiddenField="<%= false %>" label="<%= String.valueOf(curDefaultValue) %>" name='<%= "ExpandoAttribute--" + escapedName + "--" %>' type="radio" value="<%= curDefaultValue %>" />
 
 									<%
 									}
@@ -296,7 +301,7 @@ ExpandoBridge expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(company.
 										value = defaultValue;
 									}
 
-									float[] values = ParamUtil.getFloatValues(request, "ExpandoAttribute--" + escapedName + "--", (float[])value);
+									float[] values = ParamUtil.getFloatValues(request, "ExpandoAttribute--" + HtmlUtil.escape(name) + "--", (float[])value);
 									%>
 
 									<textarea class="lfr-textarea" id="<%= randomNamespace %><%= escapedName %>" name="<portlet:namespace />ExpandoAttribute--<%= escapedName %>--"><%= StringUtil.merge((float[])value, StringPool.NEW_LINE) %></textarea>
@@ -313,7 +318,7 @@ ExpandoBridge expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(company.
 									for (int curDefaultValue : (int[])defaultValue) {
 									%>
 
-										<input <%= ((curValue.length > 0) && ArrayUtil.contains(curValue,curDefaultValue)) ? "checked" : "" %> name="<portlet:namespace />ExpandoAttribute--<%= escapedName %>--" type="checkbox" value="<%= curDefaultValue %>"><%= curDefaultValue %></input><br />
+										<aui:input checked="<%= ((curValue.length > 0) && ArrayUtil.contains(curValue,curDefaultValue)) %>" id="<%= StringUtil.randomId() %>" includeHiddenField="<%= false %>" label="<%= String.valueOf(curDefaultValue) %>" name='<%= "ExpandoAttribute--" + escapedName + "--" %>' type="checkbox" value="<%= curDefaultValue %>" />
 
 									<%
 									}
@@ -328,7 +333,7 @@ ExpandoBridge expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(company.
 									for (int curDefaultValue : (int[])defaultValue) {
 									%>
 
-										<input <%= ((curValue.length > 0) && ArrayUtil.contains(curValue,curDefaultValue)) ? "checked" : "" %> name="<portlet:namespace />ExpandoAttribute--<%= escapedName %>--" type="radio" value="<%= curDefaultValue %>"><%= curDefaultValue %></input><br />
+										<aui:input checked="<%= ((curValue.length > 0) && ArrayUtil.contains(curValue,curDefaultValue)) %>" includeHiddenField="<%= false %>" label="<%= String.valueOf(curDefaultValue) %>" name='<%= "ExpandoAttribute--" + escapedName + "--" %>' type="radio" value="<%= curDefaultValue %>" />
 
 									<%
 									}
@@ -359,7 +364,7 @@ ExpandoBridge expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(company.
 										value = defaultValue;
 									}
 
-									int[] values = ParamUtil.getIntegerValues(request, "ExpandoAttribute--" + escapedName + "--", (int[])value);
+									int[] values = ParamUtil.getIntegerValues(request, "ExpandoAttribute--" + HtmlUtil.escape(name) + "--", (int[])value);
 									%>
 
 									<textarea class="lfr-textarea" id="<%= randomNamespace %><%= escapedName %>" name="<portlet:namespace />ExpandoAttribute--<%= escapedName %>--"><%= StringUtil.merge(values, StringPool.NEW_LINE) %></textarea>
@@ -376,7 +381,7 @@ ExpandoBridge expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(company.
 									for (long curDefaultValue : (long[])defaultValue) {
 									%>
 
-										<input <%= ((curValue.length > 0) && ArrayUtil.contains(curValue, curDefaultValue)) ? "checked" : "" %> name="<portlet:namespace />ExpandoAttribute--<%= escapedName %>--" type="checkbox" value="<%= curDefaultValue %>"><%= curDefaultValue %></input><br />
+										<aui:input checked="<%= ((curValue.length > 0) && ArrayUtil.contains(curValue,curDefaultValue)) %>" id="<%= StringUtil.randomId() %>" includeHiddenField="<%= false %>" label="<%= String.valueOf(curDefaultValue) %>" name='<%= "ExpandoAttribute--" + escapedName + "--" %>' type="checkbox" value="<%= curDefaultValue %>" />
 
 									<%
 									}
@@ -391,7 +396,7 @@ ExpandoBridge expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(company.
 									for (long curDefaultValue : (long[])defaultValue) {
 									%>
 
-										<input <%= ((curValue.length > 0) && ArrayUtil.contains(curValue, curDefaultValue)) ? "checked" : "" %> name="<portlet:namespace />ExpandoAttribute--<%= escapedName %>--" type="radio" value="<%= curDefaultValue %>"><%= curDefaultValue %></input><br />
+										<aui:input checked="<%= ((curValue.length > 0) && ArrayUtil.contains(curValue,curDefaultValue)) %>" includeHiddenField="<%= false %>" label="<%= String.valueOf(curDefaultValue) %>" name='<%= "ExpandoAttribute--" + escapedName + "--" %>' type="radio" value="<%= curDefaultValue %>" />
 
 									<%
 									}
@@ -422,7 +427,7 @@ ExpandoBridge expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(company.
 										value = defaultValue;
 									}
 
-									long[] values = ParamUtil.getLongValues(request, "ExpandoAttribute--" + escapedName + "--", (long[])value);
+									long[] values = ParamUtil.getLongValues(request, "ExpandoAttribute--" + HtmlUtil.escape(name) + "--", (long[])value);
 									%>
 
 									<textarea class="lfr-textarea" id="<%= randomNamespace %><%= escapedName %>" name="<portlet:namespace />ExpandoAttribute--<%= escapedName %>--"><%= StringUtil.merge(values, StringPool.NEW_LINE) %></textarea>
@@ -439,7 +444,7 @@ ExpandoBridge expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(company.
 									for (Number curDefaultValue : (Number[])defaultValue) {
 									%>
 
-										<input <%= ((curValue.length > 0) && ArrayUtil.contains(curValue, curDefaultValue)) ? "checked" : "" %> name="<portlet:namespace />ExpandoAttribute--<%= escapedName %>--" type="checkbox" value="<%= curDefaultValue %>"><%= curDefaultValue %></input><br />
+										<aui:input checked="<%= ((curValue.length > 0) && ArrayUtil.contains(curValue,curDefaultValue)) %>" id="<%= StringUtil.randomId() %>" includeHiddenField="<%= false %>" label="<%= String.valueOf(curDefaultValue) %>" name='<%= "ExpandoAttribute--" + escapedName + "--" %>' type="checkbox" value="<%= curDefaultValue %>" />
 
 									<%
 									}
@@ -454,7 +459,7 @@ ExpandoBridge expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(company.
 									for (Number curDefaultValue : (Number[])defaultValue) {
 									%>
 
-										<input <%= ((curValue.length > 0) && ArrayUtil.contains(curValue, curDefaultValue)) ? "checked" : "" %> name="<portlet:namespace />ExpandoAttribute--<%= escapedName %>--" type="radio" value="<%= curDefaultValue %>"><%= curDefaultValue %></input><br />
+										<aui:input checked="<%= ((curValue.length > 0) && ArrayUtil.contains(curValue,curDefaultValue)) %>" includeHiddenField="<%= false %>" label="<%= String.valueOf(curDefaultValue) %>" name='<%= "ExpandoAttribute--" + escapedName + "--" %>' type="radio" value="<%= curDefaultValue %>" />
 
 									<%
 									}
@@ -485,7 +490,7 @@ ExpandoBridge expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(company.
 										value = defaultValue;
 									}
 
-									Number[] values = ParamUtil.getNumberValues(request, "ExpandoAttribute--" + escapedName + "--", (Number[])value);
+									Number[] values = ParamUtil.getNumberValues(request, "ExpandoAttribute--" + HtmlUtil.escape(name) + "--", (Number[])value);
 									%>
 
 									<textarea class="lfr-textarea" id="<%= randomNamespace %><%= escapedName %>" name="<portlet:namespace />ExpandoAttribute--<%= escapedName %>--"><%= StringUtil.merge(values, StringPool.NEW_LINE) %></textarea>
@@ -503,7 +508,7 @@ ExpandoBridge expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(company.
 									for (short curDefaultValue : (short[])defaultValue) {
 									%>
 
-										<input <%= ((curValue.length > 0) && ArrayUtil.contains(curValue, curDefaultValue)) ? "checked" : "" %> name="<portlet:namespace />ExpandoAttribute--<%= escapedName %>--" type="checkbox" value="<%= curDefaultValue %>"><%= curDefaultValue %></input><br />
+										<aui:input checked="<%= ((curValue.length > 0) && ArrayUtil.contains(curValue,curDefaultValue)) %>" id="<%= StringUtil.randomId() %>" includeHiddenField="<%= false %>" label="<%= String.valueOf(curDefaultValue) %>" name='<%= "ExpandoAttribute--" + escapedName + "--" %>' type="checkbox" value="<%= curDefaultValue %>" />
 
 									<%
 									}
@@ -518,7 +523,7 @@ ExpandoBridge expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(company.
 									for (short curDefaultValue : (short[])defaultValue) {
 									%>
 
-										<input <%= ((curValue.length > 0) && ArrayUtil.contains(curValue, curDefaultValue)) ? "checked" : "" %> name="<portlet:namespace />ExpandoAttribute--<%= escapedName %>--" type="radio" value="<%= curDefaultValue %>"><%= curDefaultValue %></input><br />
+										<aui:input checked="<%= ((curValue.length > 0) && ArrayUtil.contains(curValue,curDefaultValue)) %>" includeHiddenField="<%= false %>" label="<%= String.valueOf(curDefaultValue) %>" name='<%= "ExpandoAttribute--" + escapedName + "--" %>' type="radio" value="<%= curDefaultValue %>" />
 
 									<%
 									}
@@ -549,7 +554,7 @@ ExpandoBridge expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(company.
 										value = defaultValue;
 									}
 
-									short[] values = ParamUtil.getShortValues(request, "ExpandoAttribute--" + escapedName + "--", (short[])value);
+									short[] values = ParamUtil.getShortValues(request, "ExpandoAttribute--" + HtmlUtil.escape(name) + "--", (short[])value);
 									%>
 
 									<textarea class="lfr-textarea" id="<%= randomNamespace %><%= escapedName %>" name="<portlet:namespace />ExpandoAttribute--<%= escapedName %>--"><%= StringUtil.merge(values, StringPool.NEW_LINE) %></textarea>
@@ -566,7 +571,7 @@ ExpandoBridge expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(company.
 									for (String curDefaultValue : (String[])defaultValue) {
 									%>
 
-										<input <%= ((curValue.length > 0) && ArrayUtil.contains(curValue, curDefaultValue)) ? "checked" : "" %> name="<portlet:namespace />ExpandoAttribute--<%= escapedName %>--" type="checkbox" value="<%= HtmlUtil.escapeAttribute(curDefaultValue) %>"><%= HtmlUtil.escape(curDefaultValue) %></input><br />
+										<aui:input checked="<%= ((curValue.length > 0) && ArrayUtil.contains(curValue,curDefaultValue)) %>" id="<%= StringUtil.randomId() %>" includeHiddenField="<%= false %>" label="<%= String.valueOf(curDefaultValue) %>" name='<%= "ExpandoAttribute--" + escapedName + "--" %>' type="checkbox" value="<%= curDefaultValue %>" />
 
 									<%
 									}
@@ -581,7 +586,7 @@ ExpandoBridge expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(company.
 									for (String curDefaultValue : (String[])defaultValue) {
 									%>
 
-										<input <%= ((curValue.length > 0) && ArrayUtil.contains(curValue, curDefaultValue)) ? "checked" : "" %> name="<portlet:namespace />ExpandoAttribute--<%= escapedName %>--" type="radio" value="<%= HtmlUtil.escapeAttribute(curDefaultValue) %>"><%= HtmlUtil.escape(curDefaultValue) %></input><br />
+										<aui:input checked="<%= ((curValue.length > 0) && ArrayUtil.contains(curValue,curDefaultValue)) %>" includeHiddenField="<%= false %>" label="<%= curDefaultValue %>" name='<%= "ExpandoAttribute--" + escapedName + "--" %>' type="radio" value="<%= curDefaultValue %>" />
 
 									<%
 									}
@@ -639,7 +644,7 @@ ExpandoBridge expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(company.
 							}
 							%>
 
-							<liferay-ui:input-localized cssClass="lfr-input-text" id="<%= randomNamespace + escapedName %>" name='<%= "ExpandoAttribute--" + escapedName + "--" %>' xml="<%= xml %>" />
+							<liferay-ui:input-localized cssClass="lfr-input-text" id="<%= randomNamespace + name %>" name='<%= "ExpandoAttribute--" + name + "--" %>' xml="<%= xml %>" />
 						</c:when>
 						<c:otherwise>
 

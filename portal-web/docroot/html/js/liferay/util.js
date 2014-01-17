@@ -1757,7 +1757,7 @@
 			};
 
 			if (dialog) {
-				eventHandles.push(dialog.after('visibleChange', detachSelectionOnHideFn));
+				eventHandles.push(dialog.after(['destroy', 'visibleChange'], detachSelectionOnHideFn));
 
 				dialog.show();
 			}
@@ -1765,7 +1765,7 @@
 				Util.openWindow(
 					config,
 					function(dialogWindow) {
-						eventHandles.push(dialogWindow.after('visibleChange', detachSelectionOnHideFn));
+						eventHandles.push(dialogWindow.after(['destroy', 'visibleChange'], detachSelectionOnHideFn));
 					}
 				);
 			}
@@ -1779,7 +1779,9 @@
 		function(folderData, namespace) {
 			A.byIdNS(namespace, folderData.idString).val(folderData.idValue);
 
-			A.byIdNS(namespace, folderData.nameString).val(folderData.nameValue);
+			var name = AString.unescapeEntities(folderData.nameValue);
+
+			A.byIdNS(namespace, folderData.nameString).val(name);
 
 			var button = A.byIdNS(namespace, 'removeFolderButton');
 

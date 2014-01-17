@@ -1,4 +1,4 @@
-<definition>
+<definition component-name="portal-administration">
 	<var name="siteName" value="Site Name" />
 
 	<set-up>
@@ -19,7 +19,7 @@
 		<execute macro="SitePage#addCP">
 			<var name="siteName" value="${siteName}" />
 			<var name="sitePageName" value="Staging Test Page" />
-			<var name="sitePageType" value="Public" />
+			<var name="sitePagePrivacy" value="Public" />
 		</execute>
 	</set-up>
 
@@ -125,6 +125,7 @@
 
 		<execute macro="Page#gotoPG">
 			<var name="pageName" value="Staging Test Page" />
+			<var name="pageStaging" value="true" />
 			<var name="siteName" value="${siteName}" />
 			<var name="siteURL" value="true" />
 		</execute>

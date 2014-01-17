@@ -18,7 +18,6 @@ import com.liferay.portal.kernel.concurrent.CompeteLatch;
 
 import java.io.Serializable;
 
-import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -26,24 +25,15 @@ import java.util.concurrent.ConcurrentMap;
  * @author Shuyang Zhou
  */
 public class BlockingPortalCache<K extends Serializable, V>
-	implements PortalCache<K, V> {
+	extends PortalCacheWrapper<K, V> {
 
 	public BlockingPortalCache(PortalCache<K, V> portalCache) {
-		_portalCache = portalCache;
-	}
-
-	@Override
-	public void destroy() {
-	}
-
-	@Override
-	public Collection<V> get(Collection<K> keys) {
-		return _portalCache.get(keys);
+		super(portalCache);
 	}
 
 	@Override
 	public V get(K key) {
-		V value = _portalCache.get(key);
+		V value = portalCache.get(key);
 
 		if (value != null) {
 			return value;
@@ -81,15 +71,10 @@ public class BlockingPortalCache<K extends Serializable, V>
 
 			_competeLatch.set(null);
 
-			value = _portalCache.get(key);
+			value = portalCache.get(key);
 		}
 
 		return value;
-	}
-
-	@Override
-	public String getName() {
-		return _portalCache.getName();
 	}
 
 	@Override
@@ -102,7 +87,7 @@ public class BlockingPortalCache<K extends Serializable, V>
 			throw new IllegalArgumentException("Value is null");
 		}
 
-		_portalCache.put(key, value);
+		portalCache.put(key, value);
 
 		CompeteLatch competeLatch = _competeLatch.get();
 
@@ -125,7 +110,7 @@ public class BlockingPortalCache<K extends Serializable, V>
 			throw new IllegalArgumentException("Value is null");
 		}
 
-		_portalCache.put(key, value, timeToLive);
+		portalCache.put(key, value, timeToLive);
 
 		CompeteLatch competeLatch = _competeLatch.get();
 
@@ -139,21 +124,8 @@ public class BlockingPortalCache<K extends Serializable, V>
 	}
 
 	@Override
-	public void registerCacheListener(CacheListener<K, V> cacheListener) {
-		_portalCache.registerCacheListener(cacheListener);
-	}
-
-	@Override
-	public void registerCacheListener(
-		CacheListener<K, V> cacheListener,
-		CacheListenerScope cacheListenerScope) {
-
-		_portalCache.registerCacheListener(cacheListener, cacheListenerScope);
-	}
-
-	@Override
 	public void remove(K key) {
-		_portalCache.remove(key);
+		portalCache.remove(key);
 
 		CompeteLatch competeLatch = _competeLatchMap.remove(key);
 
@@ -164,18 +136,8 @@ public class BlockingPortalCache<K extends Serializable, V>
 
 	@Override
 	public void removeAll() {
-		_portalCache.removeAll();
+		portalCache.removeAll();
 		_competeLatchMap.clear();
-	}
-
-	@Override
-	public void unregisterCacheListener(CacheListener<K, V> cacheListener) {
-		_portalCache.unregisterCacheListener(cacheListener);
-	}
-
-	@Override
-	public void unregisterCacheListeners() {
-		_portalCache.unregisterCacheListeners();
 	}
 
 	private static ThreadLocal<CompeteLatch> _competeLatch =
@@ -183,6 +145,5 @@ public class BlockingPortalCache<K extends Serializable, V>
 
 	private final ConcurrentMap<K, CompeteLatch> _competeLatchMap =
 		new ConcurrentHashMap<K, CompeteLatch>();
-	private final PortalCache<K, V> _portalCache;
 
 }

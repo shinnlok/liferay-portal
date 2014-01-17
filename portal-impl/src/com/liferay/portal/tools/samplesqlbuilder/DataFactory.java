@@ -82,6 +82,7 @@ import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.PortletPreferencesFactory;
 import com.liferay.portlet.PortletPreferencesFactoryImpl;
+import com.liferay.portlet.PortletPreferencesImpl;
 import com.liferay.portlet.asset.model.AssetCategory;
 import com.liferay.portlet.asset.model.AssetCategoryConstants;
 import com.liferay.portlet.asset.model.AssetCategoryModel;
@@ -199,6 +200,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.portlet.PortletPreferences;
+
 /**
  * @author Brian Wing Shun Chan
  */
@@ -241,6 +244,13 @@ public class DataFactory {
 
 		_dlDDMStructureContent = StringUtil.read(
 			getResourceInputStream("ddm_structure_basic_document.xml"));
+
+		String defaultAssetPublisherPreference = StringUtil.read(
+			getResourceInputStream("default_asset_publisher_preference.xml"));
+
+		_defaultAssetPublisherPortletPreference =
+			(PortletPreferencesImpl)_portletPreferencesFactory.fromDefaultXML(
+				defaultAssetPublisherPreference);
 
 		initAssetCategoryModels();
 		initAssetTagModels();
@@ -1183,6 +1193,32 @@ public class DataFactory {
 			"Test DDM Structure", sb.toString());
 	}
 
+	public List<PortletPreferencesModel>
+		newDDLPortletPreferencesModels(long plid) {
+
+		List<PortletPreferencesModel> portletPreferencesModels =
+			new ArrayList<PortletPreferencesModel>(2);
+
+		portletPreferencesModels.add(
+			newPortletPreferencesModel(
+				plid, PortletKeys.DOCKBAR,
+				PortletConstants.DEFAULT_PREFERENCES));
+		portletPreferencesModels.add(
+			newPortletPreferencesModel(
+				plid, PortletKeys.DYNAMIC_DATA_LIST_DISPLAY,
+				PortletConstants.DEFAULT_PREFERENCES));
+		portletPreferencesModels.add(
+			newPortletPreferencesModel(
+				plid, PortletKeys.DYNAMIC_DATA_LISTS,
+				PortletConstants.DEFAULT_PREFERENCES));
+		portletPreferencesModels.add(
+			newPortletPreferencesModel(
+				plid, PortletKeys.DYNAMIC_DATA_MAPPING,
+				PortletConstants.DEFAULT_PREFERENCES));
+
+		return portletPreferencesModels;
+	}
+
 	public DDLRecordModel newDDLRecordModel(
 		DDLRecordSetModel dDLRecordSetModel) {
 
@@ -1520,6 +1556,24 @@ public class DataFactory {
 		return journalContentSearchModel;
 	}
 
+	public List<PortletPreferencesModel>
+		newJournalPortletPreferencesModels(long plid) {
+
+		List<PortletPreferencesModel> portletPreferencesModels =
+			new ArrayList<PortletPreferencesModel>(2);
+
+		portletPreferencesModels.add(
+			newPortletPreferencesModel(
+				plid, PortletKeys.DOCKBAR,
+				PortletConstants.DEFAULT_PREFERENCES));
+		portletPreferencesModels.add(
+			newPortletPreferencesModel(
+				plid, PortletKeys.JOURNAL,
+				PortletConstants.DEFAULT_PREFERENCES));
+
+		return portletPreferencesModels;
+	}
+
 	public LayoutFriendlyURLModel newLayoutFriendlyURLModel(
 		LayoutModel layoutModel) {
 
@@ -1826,8 +1880,8 @@ public class DataFactory {
 				assetTagModels, (int)counter.get());
 		}
 
-		javax.portlet.PortletPreferences jxPortletPreferences =
-			new com.liferay.portlet.PortletPreferencesImpl();
+		PortletPreferences jxPortletPreferences =
+			(PortletPreferences)_defaultAssetPublisherPortletPreference.clone();
 
 		jxPortletPreferences.setValue("queryAndOperator0", "false");
 		jxPortletPreferences.setValue("queryContains0", "true");
@@ -1853,8 +1907,7 @@ public class DataFactory {
 			long plid, String portletId, DDLRecordSetModel ddlRecordSetModel)
 		throws Exception {
 
-		javax.portlet.PortletPreferences jxPortletPreferences =
-			new com.liferay.portlet.PortletPreferencesImpl();
+		PortletPreferences jxPortletPreferences = new PortletPreferencesImpl();
 
 		jxPortletPreferences.setValue("editable", "true");
 		jxPortletPreferences.setValue(
@@ -1871,8 +1924,7 @@ public class DataFactory {
 			JournalArticleResourceModel journalArticleResourceModel)
 		throws Exception {
 
-		javax.portlet.PortletPreferences jxPortletPreferences =
-			new com.liferay.portlet.PortletPreferencesImpl();
+		PortletPreferences jxPortletPreferences = new PortletPreferencesImpl();
 
 		jxPortletPreferences.setValue(
 			"articleId", journalArticleResourceModel.getArticleId());
@@ -1890,24 +1942,6 @@ public class DataFactory {
 		return newPortletPreferencesModel(
 			plid, portletId,
 			_portletPreferencesFactory.toXML(jxPortletPreferences));
-	}
-
-	public List<PortletPreferencesModel> newPortletPreferencesModels(
-		long plid) {
-
-		List<PortletPreferencesModel> portletPreferencesModels =
-			new ArrayList<PortletPreferencesModel>(2);
-
-		portletPreferencesModels.add(
-			newPortletPreferencesModel(
-				plid, PortletKeys.DOCKBAR,
-				PortletConstants.DEFAULT_PREFERENCES));
-		portletPreferencesModels.add(
-			newPortletPreferencesModel(
-				plid, PortletKeys.PORTLET_CONFIGURATION,
-				PortletConstants.DEFAULT_PREFERENCES));
-
-		return portletPreferencesModels;
 	}
 
 	public List<LayoutModel> newPublicLayoutModels(long groupId) {
@@ -2065,6 +2099,13 @@ public class DataFactory {
 			portletPreferencesModel.getPlid(), portletId);
 
 		return newResourcePermissionModels(name, primKey, 0);
+	}
+
+	public List<ResourcePermissionModel> newResourcePermissionModels(
+		String name, long primKey) {
+
+		return newResourcePermissionModels(
+			name, String.valueOf(primKey), _sampleUserId);
 	}
 
 	public List<ResourcePermissionModel> newResourcePermissionModels(
@@ -2901,6 +2942,7 @@ public class DataFactory {
 	private long _companyId;
 	private CompanyModel _companyModel;
 	private SimpleCounter _counter;
+	private PortletPreferencesImpl _defaultAssetPublisherPortletPreference;
 	private AssetVocabularyModel _defaultAssetVocabularyModel;
 	private DDMStructureModel _defaultDLDDMStructureModel;
 	private DLFileEntryTypeModel _defaultDLFileEntryTypeModel;

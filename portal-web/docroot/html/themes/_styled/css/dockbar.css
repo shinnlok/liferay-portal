@@ -10,18 +10,35 @@ $editLayoutPanelWidth: 460px;
 	@include respond-to(phone, tablet) {
 		#navigation {
 			display: none;
+			left: 0;
+			position: fixed;
+			top: 60px;
+			width: 100%;
+			z-index: 301;
 
 			&.open {
 				display: block;
 
 				.navbar-inner {
-					@include border-radius(3px);
-
-					padding: 10px;
+					padding: 0;
 
 					.nav-collapse {
 						height: auto;
 						overflow: visible;
+
+						li a {
+							font-size: 16px;
+							font-weight: 300;
+							line-height: 27px;
+							margin: 0;
+							max-width: none;
+							padding: 9px 15px;
+
+							b {
+								position: absolute;
+								right: 5px;
+							}
+						}
 					}
 				}
 			}
@@ -43,6 +60,11 @@ $editLayoutPanelWidth: 460px;
 		@include respond-to(phone, tablet) {
 			#_145_navSiteNavigationNavbarBtn {
 				display: inline-block;
+				padding: 12px;
+
+				> i {
+					margin-top: 2px;
+				}
 			}
 		}
 
@@ -107,28 +129,23 @@ $editLayoutPanelWidth: 460px;
 			top: 9px;
 		}
 
-		.info-items {
-			left: 0;
-			position: absolute;
-			top: 100%;
-			width: 100%;
-			z-index: 1;
-		}
-
 		.navbar-inner {
 			padding: 0 20px;
 
 			@include respond-to(phone, tablet) {
+				border-width: 0;
 				padding: 0;
 			}
 
-			.brand {
-				h1 {
-					display: inline-block;
-					font-size: inherit;
-					line-height: 1;
-					margin-bottom: 0;
-					margin-top: 0;
+			.brand h1 {
+				display: inline-block;
+				font-size: inherit;
+				line-height: 1;
+				margin-bottom: 0;
+				margin-top: 0;
+
+				@include respond-to(phone, tablet) {
+					line-height: 16px;
 				}
 			}
 
@@ -189,16 +206,12 @@ $editLayoutPanelWidth: 460px;
 								}
 							}
 
-							> a {
-								@include respond-to(phone, tablet) {
+							@include respond-to(phone, tablet) {
+								> a {
 									display: inline-block;
 									margin-left: 5px;
 									margin-top: 5px;
-									padding: 12px 15px;
-
-									> .nav-item-icon {
-										margin-top: 3px;
-									}
+									padding: 0;
 
 									> .nav-item-label {
 										display: none;
@@ -213,9 +226,28 @@ $editLayoutPanelWidth: 460px;
 										}
 									}
 								}
-							}
 
-							@include respond-to(phone, tablet) {
+								&.user-avatar {
+									.user-avatar-link {
+										padding: 15px 13px 12px;
+
+										.nav-item-label {
+											display: inline;
+
+											.user-avatar-image {
+												background-size: auto 26px;
+												height: 26px;
+												margin-top: 0;
+												width: 26px;
+											}
+
+											.user-full-name {
+												display: none;
+											}
+										}
+									}
+								}
+
 								.icon-caret-down {
 									display: none;
 								}
@@ -243,10 +275,6 @@ $editLayoutPanelWidth: 460px;
 								@include respond-to(phone, tablet) {
 									display: inline-block;
 								}
-							}
-
-							.user-avatar-image {
-								display: none;
 							}
 						}
 
@@ -333,6 +361,10 @@ $editLayoutPanelWidth: 460px;
 										> .nav-item-icon {
 											margin-right: 0;
 											margin-top: 3px;
+
+											@include respond-to(phone, tablet) {
+												margin-top: 0;
+											}
 										}
 
 										.nav-item-label {
@@ -389,9 +421,12 @@ $editLayoutPanelWidth: 460px;
 			}
 		}
 
-		.user-avatar img {
+		.user-avatar .user-avatar-image {
+			background: #333 no-repeat center;
+			background-size: auto 20px;
+			display: inline-block;
+			height: 20px;
 			margin-top: -2px;
-			text-decoration: none;
 			vertical-align: middle;
 			width: 20px;
 		}
@@ -464,17 +499,6 @@ $editLayoutPanelWidth: 460px;
 					}
 
 					> .nav {
-						border-bottom-width: 0;
-						left: auto;
-						position: fixed;
-						right: 0;
-						z-index: 400;
-
-						@include respond-to(phone, tablet) {
-							min-width: 0;
-							position: static;
-						}
-
 						&.nav-account-controls {
 							background: #333;
 							left: auto;
@@ -503,6 +527,7 @@ $editLayoutPanelWidth: 460px;
 								display: block;
 								min-width: 0;
 								position: fixed;
+								right: auto;
 								top: 10%;
 								z-index: 350;
 
@@ -563,6 +588,7 @@ $editLayoutPanelWidth: 460px;
 
 											@include respond-to(phone, tablet) {
 												font-size: inherit;
+												margin-top: 0;
 											}
 										}
 
@@ -620,10 +646,6 @@ $editLayoutPanelWidth: 460px;
 								@include respond-to(phone, tablet) {
 									color: inherit;
 								}
-
-								.nav-item-icon {
-									margin-top: 3px;
-								}
 							}
 
 							&.active > a {
@@ -649,12 +671,12 @@ $editLayoutPanelWidth: 460px;
 		}
 
 		.info-link-container {
+			position: relative;
 			width: 0;
 		}
 
 		.info-items {
 			height: 1px;
-			width: 715px;
 
 			a, .btn-link {
 				color: #FFF;
@@ -731,7 +753,7 @@ $editLayoutPanelWidth: 460px;
 		}
 
 		.current-version {
-			color: #41801d;
+			color: #41801D;
 			display: block;
 		}
 
@@ -767,7 +789,7 @@ $editLayoutPanelWidth: 460px;
 			padding-left: 0;
 
 			.workflow-status-ready-for-publication {
-				color: #41801d;
+				color: #41801D;
 				font-weight: bold;
 			}
 		}
@@ -829,6 +851,10 @@ $editLayoutPanelWidth: 460px;
 			position: static;
 			width: auto;
 
+			@include respond-to(tablet) {
+				margin: 0;
+			}
+
 			&.lfr-add-panel .add-content-menu .lfr-add-page-toolbar, &.lfr-edit-layout-panel .taglib-form-navigator .button-holder {
 				margin-top: 0;
 				position: static;
@@ -860,9 +886,13 @@ $editLayoutPanelWidth: 460px;
 		padding-left: $editLayoutPanelWidth;
 	}
 
-	@include respond-to(phone) {
-		.lfr-has-add-content, .lfr-has-device-preview, .lfr-has-edit-layout {
+	.lfr-has-add-content, .lfr-has-device-preview, .lfr-has-edit-layout {
+		@include respond-to(phone) {
 			padding-left: 20px;
+		}
+
+		@include respond-to(tablet) {
+			padding-left: 0;
 		}
 	}
 
@@ -887,7 +917,7 @@ $editLayoutPanelWidth: 460px;
 		}
 
 		a:hover .site-type {
-			color: #FFFFFF;
+			color: #FFF;
 			display: inline-block;
 		}
 	}
@@ -1043,9 +1073,37 @@ $editLayoutPanelWidth: 460px;
 		}
 	}
 
-	@media (max-width: 1140px) {
-		.dockbar-split .dockbar .info-items {
-			width: 515px;
+	.page-customization-bar-container {
+		top: -1px;
+		position: absolute;
+		right: 100%;
+		width: 320px;
+	}
+
+	@media (min-width: 1400px) {
+		.page-customization-bar-container {
+			width: 815px;
+		}
+
+		.staging-ready .page-customization-bar-container {
+			width: 680px;
+		}
+	}
+
+	@media (min-width: 1152px) and (max-width: 1399px) {
+		.page-customization-bar-container {
+			width: 715px;
+		}
+
+		.staging-ready .page-customization-bar-container {
+			width: 475px;
+		}
+	}
+
+	.page-customization-bar-container {
+		@include respond-to(phone, tablet) {
+			position: static;
+			width: 100%;
 		}
 	}
 

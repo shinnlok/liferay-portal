@@ -125,10 +125,6 @@
 
 			&.open a {
 				@include border-radius(4px);
-
-				@include respond-to(phone) {
-					@include border-radius(0);
-				}
 			}
 
 			> ul {
@@ -146,7 +142,7 @@
 
 .portlet-document-library, .portlet-dynamic-data-mapping {
 	.lfr-ddm-small-image-preview {
-		@include box-shadow(0 1px 3px #ccc);
+		@include box-shadow(0 1px 3px #CCC);
 	}
 }
 
@@ -358,7 +354,7 @@ body:first-of-type {
 		}
 	}
 
-	.portlet-content {
+	.portlet-borderless-container, .portlet-content {
 		&:hover {
 			.lfr-icon-actions {
 				@extend %portlet-action-bar-fx-hover;

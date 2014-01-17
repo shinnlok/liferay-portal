@@ -1735,6 +1735,12 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	}
 
 	@Override
+	public java.lang.String getDefaultThemeSetting(java.lang.String key,
+		java.lang.String device, boolean inheritLookAndFeel) {
+		return _layout.getDefaultThemeSetting(key, device, inheritLookAndFeel);
+	}
+
+	@Override
 	public java.lang.String getFriendlyURL(java.util.Locale locale) {
 		return _layout.getFriendlyURL(locale);
 	}
@@ -1839,6 +1845,12 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	public java.lang.String getThemeSetting(java.lang.String key,
 		java.lang.String device) {
 		return _layout.getThemeSetting(key, device);
+	}
+
+	@Override
+	public java.lang.String getThemeSetting(java.lang.String key,
+		java.lang.String device, boolean inheritLookAndFeel) {
+		return _layout.getThemeSetting(key, device, inheritLookAndFeel);
 	}
 
 	@Override

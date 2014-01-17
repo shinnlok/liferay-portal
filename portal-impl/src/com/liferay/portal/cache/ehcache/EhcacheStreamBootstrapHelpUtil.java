@@ -118,7 +118,9 @@ public class EhcacheStreamBootstrapHelpUtil {
 		List<String> cacheNames = new ArrayList<String>();
 
 		for (Ehcache ehcache : ehcaches) {
-			cacheNames.add(ehcache.getName());
+			if (cacheManager == ehcache.getCacheManager()) {
+				cacheNames.add(ehcache.getName());
+			}
 		}
 
 		ClusterRequest clusterRequest = ClusterRequest.createMulticastRequest(

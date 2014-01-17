@@ -111,6 +111,17 @@ public class MBMessageIndexer extends BaseIndexer {
 			long entryClassPK, String actionId)
 		throws Exception {
 
+		MBMessage message = MBMessageLocalServiceUtil.getMessage(entryClassPK);
+
+		if (message.isDiscussion()) {
+			Indexer indexer = IndexerRegistryUtil.getIndexer(
+				message.getClassName());
+
+			return indexer.hasPermission(
+				permissionChecker, message.getClassName(), message.getClassPK(),
+				ActionKeys.VIEW);
+		}
+
 		return MBMessagePermission.contains(
 			permissionChecker, entryClassPK, ActionKeys.VIEW);
 	}
@@ -435,6 +446,10 @@ public class MBMessageIndexer extends BaseIndexer {
 			@Override
 			protected void performAction(Object object) throws PortalException {
 				MBMessage message = (MBMessage)object;
+
+				if (message.isDiscussion() && message.isRoot()) {
+					return;
+				}
 
 				Document document = getDocument(message);
 

@@ -24,6 +24,10 @@
 	<#if name == "echo">
 		<#assign message = element.attributeValue("message")>
 
+		<#assign actionElement = element>
+
+		<#include "action_log_element.ftl">
+
 		${selenium}.echo(RuntimeVariables.evaluateVariable("${seleniumBuilderFileUtil.escapeJava(message)}", commandScopeVariables));
 
 		<#assign lineNumber = element.attributeValue("line-number")>
@@ -55,7 +59,7 @@
 
 			<#include "action_log_element.ftl">
 
-			<#if !(action?contains("#confirm")) && !(action?contains("#is"))>
+			<#if !(action?contains("#is"))>
 				<#if testCaseName??>
 					selenium
 				<#else>
@@ -98,6 +102,10 @@
 		</#if>
 	<#elseif name == "fail">
 		<#assign message = element.attributeValue("message")>
+
+		<#assign actionElement = element>
+
+		<#include "action_log_element.ftl">
 
 		${selenium}.fail(RuntimeVariables.evaluateVariable("${message}", commandScopeVariables));
 

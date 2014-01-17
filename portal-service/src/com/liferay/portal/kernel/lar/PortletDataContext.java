@@ -14,6 +14,8 @@
 
 package com.liferay.portal.kernel.lar;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -49,7 +51,9 @@ import java.util.Set;
  *
  * @author Brian Wing Shun Chan
  * @author Raymond Augé
+ * @author Mate Thurzo
  */
+@ProviderType
 public interface PortletDataContext extends Serializable {
 
 	public static final String REFERENCE_TYPE_CHILD = "child";
@@ -240,6 +244,10 @@ public interface PortletDataContext extends Serializable {
 
 	public long[] getAssetCategoryIds(Class<?> clazz, long classPK);
 
+	/**
+	 * @deprecated As of 7.0.0
+	 */
+	@Deprecated
 	public Map<String, long[]> getAssetCategoryIdsMap();
 
 	public Map<String, String[]> getAssetCategoryUuidsMap();
@@ -318,6 +326,10 @@ public interface PortletDataContext extends Serializable {
 
 	public Map<?, ?> getNewPrimaryKeysMap(String className);
 
+	/**
+	 * @deprecated As of 7.0.0
+	 */
+	@Deprecated
 	public long getOldPlid();
 
 	public Map<String, String[]> getParameterMap();
@@ -351,6 +363,10 @@ public interface PortletDataContext extends Serializable {
 		StagedModel parentStagedModel, Class<?> clazz, long groupId,
 		String uuid);
 
+	/**
+	 * @deprecated As of 7.0.0
+	 */
+	@Deprecated
 	public List<Element> getReferenceDataElements(
 		Element parentElement, Class<?> clazz);
 
@@ -362,6 +378,10 @@ public interface PortletDataContext extends Serializable {
 
 	public List<Element> getReferenceDataElements(
 		StagedModel parentStagedModel, Class<?> clazz, String referenceType);
+
+	public Element getReferenceElement(
+		Element parentElement, Class<?> clazz, long groupId, String uuid,
+		String referenceType);
 
 	public Element getReferenceElement(
 		StagedModel parentStagedModel, Class<?> clazz, long classPK);
@@ -376,6 +396,10 @@ public interface PortletDataContext extends Serializable {
 	@Deprecated
 	public String getRootPath();
 
+	/**
+	 * @deprecated As of 7.0.0
+	 */
+	@Deprecated
 	public Set<String> getScopedPrimaryKeys();
 
 	public long getScopeGroupId();
@@ -423,6 +447,10 @@ public interface PortletDataContext extends Serializable {
 
 	public long getUserPersonalSiteGroupId();
 
+	/**
+	 * @deprecated As of 7.0.0
+	 */
+	@Deprecated
 	public List<String> getZipEntries();
 
 	public byte[] getZipEntryAsByteArray(String path);
@@ -435,6 +463,10 @@ public interface PortletDataContext extends Serializable {
 
 	public String getZipEntryAsString(String path);
 
+	/**
+	 * @deprecated As of 7.0.0
+	 */
+	@Deprecated
 	public List<String> getZipFolderEntries();
 
 	public List<String> getZipFolderEntries(String path);
@@ -515,6 +547,10 @@ public interface PortletDataContext extends Serializable {
 
 	public boolean isPathExportedInScope(String path);
 
+	/**
+	 * @deprecated As of 7.0.0
+	 */
+	@Deprecated
 	public boolean isPathNotExportedInScope(String path);
 
 	public boolean isPathNotProcessed(String path);

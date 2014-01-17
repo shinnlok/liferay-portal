@@ -15,10 +15,13 @@
 package com.liferay.portlet.language.action;
 
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Contact;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
@@ -125,7 +128,8 @@ public class ViewAction extends PortletAction {
 
 		Group group = layout.getGroup();
 
-		if (PortalUtil.isGroupFriendlyURL(
+		if (Validator.isNull(layoutURL) ||
+			PortalUtil.isGroupFriendlyURL(
 				layoutURL, group.getFriendlyURL(),
 				layout.getFriendlyURL(locale))) {
 
@@ -153,7 +157,12 @@ public class ViewAction extends PortletAction {
 			}
 		}
 
-		redirect = redirect + queryString;
+		int lifecycle = GetterUtil.getInteger(
+			HttpUtil.getParameter(queryString, "p_p_lifecycle", false));
+
+		if (lifecycle == 0) {
+			redirect = redirect + queryString;
+		}
 
 		actionResponse.sendRedirect(redirect);
 	}

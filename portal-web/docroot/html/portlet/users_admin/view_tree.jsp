@@ -129,13 +129,14 @@ if (organization != null) {
 			%>
 
 			<portlet:renderURL var="headerBackURL">
-				<portlet:param name="struts_action" value="/organization/view" />
+				<portlet:param name="struts_action" value="/users_admin/view" />
+				<portlet:param name="toolbarItem" value="<%= toolbarItem %>" />
 				<portlet:param name="organizationId" value="<%= String.valueOf(parentOrganizationId) %>" />
 			</portlet:renderURL>
 
 			<liferay-ui:header
 				backLabel="<%= parentOrganizationName %>"
-				backURL="<%= headerBackURL.toString() %>"
+				backURL="<%= Validator.isNotNull(backURL) ? backURL : headerBackURL.toString() %>"
 				localizeTitle="<%= false %>"
 				title="<%= organization.getName() %>"
 			/>
@@ -254,10 +255,10 @@ if (organization != null) {
 								organizationsTitle = LanguageUtil.get(pageContext, filterManageableOrganizations ? "my-organizations" : "top-level-organizations");
 							}
 							else if (organizationsCount == 1) {
-								organizationsTitle = LanguageUtil.format(pageContext, "x-suborganization", String.valueOf(organizationsCount));
+								organizationsTitle = LanguageUtil.format(pageContext, "x-suborganization", String.valueOf(organizationsCount), false);
 							}
 							else {
-								organizationsTitle = LanguageUtil.format(pageContext, "x-suborganizations", String.valueOf(organizationsCount));
+								organizationsTitle = LanguageUtil.format(pageContext, "x-suborganizations", String.valueOf(organizationsCount), false);
 							}
 							%>
 
@@ -270,7 +271,11 @@ if (organization != null) {
 							<%
 							SearchContainer searchContainer = new OrganizationSearch(renderRequest, "cur1", currentURLObj);
 
-							searchContainer.setRowChecker(new RowChecker(renderResponse));
+							RowChecker rowChecker = new RowChecker(renderResponse);
+
+							rowChecker.setRowIds("rowIdsOrganizationCheckbox");
+
+							searchContainer.setRowChecker(rowChecker);
 							%>
 
 							<liferay-ui:search-container
@@ -354,6 +359,7 @@ if (organization != null) {
 								>
 									<liferay-portlet:renderURL varImpl="rowURL">
 										<portlet:param name="struts_action" value="/users_admin/view" />
+										<portlet:param name="toolbarItem" value="<%= toolbarItem %>" />
 										<portlet:param name="organizationId" value="<%= String.valueOf(curOrganization.getOrganizationId()) %>" />
 										<portlet:param name="usersListView" value="<%= UserConstants.LIST_VIEW_TREE %>" />
 									</liferay-portlet:renderURL>
@@ -395,10 +401,10 @@ if (organization != null) {
 							}
 							else {
 								if ((active && (usersCount == 1)) || (!active && (inactiveUsersCount == 1))) {
-									usersTitle = LanguageUtil.format(pageContext, (active ? "x-user" : "x-inactive-user"), String.valueOf((active ? usersCount : inactiveUsersCount)));
+									usersTitle = LanguageUtil.format(pageContext, (active ? "x-user" : "x-inactive-user"), String.valueOf((active ? usersCount : inactiveUsersCount)), false);
 								}
 								else {
-									usersTitle = LanguageUtil.format(pageContext, (active ? "x-users" : "x-inactive-users"), String.valueOf((active ? usersCount : inactiveUsersCount)));
+									usersTitle = LanguageUtil.format(pageContext, (active ? "x-users" : "x-inactive-users"), String.valueOf((active ? usersCount : inactiveUsersCount)), false);
 								}
 							}
 							%>

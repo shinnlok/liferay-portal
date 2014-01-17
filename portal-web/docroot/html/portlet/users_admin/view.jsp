@@ -19,8 +19,9 @@
 <%
 String toolbarItem = ParamUtil.getString(request, "toolbarItem", "browse");
 
+String redirect = ParamUtil.getString(request, "redirect");
 String viewUsersRedirect = ParamUtil.getString(request, "viewUsersRedirect");
-String backURL = ParamUtil.getString(request, "backURL", viewUsersRedirect);
+String backURL = ParamUtil.getString(request, "backURL", redirect);
 
 int status = ParamUtil.getInteger(request, "status", WorkflowConstants.STATUS_APPROVED);
 
@@ -216,7 +217,7 @@ request.setAttribute("view.jsp-portletURL", portletURL);
 		function() {
 			<portlet:namespace />doDeleteOrganization(
 				'<%= Organization.class.getName() %>',
-				Liferay.Util.listCheckedExcept(document.<portlet:namespace />fm, '<portlet:namespace />allRowIds')
+				Liferay.Util.listCheckedExcept(document.<portlet:namespace />fm, '<portlet:namespace />allRowIds', '<portlet:namespace />rowIdsOrganizationCheckbox')
 			);
 		},
 		['liferay-util-list-fields']
@@ -230,7 +231,7 @@ request.setAttribute("view.jsp-portletURL", portletURL);
 				document.<portlet:namespace />fm.method = "post";
 				document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = cmd;
 				document.<portlet:namespace />fm.<portlet:namespace />redirect.value = document.<portlet:namespace />fm.<portlet:namespace />usersRedirect.value;
-				document.<portlet:namespace />fm.<portlet:namespace />deleteUserIds.value = Liferay.Util.listCheckedExcept(document.<portlet:namespace />fm, '<portlet:namespace />allRowIds');
+				document.<portlet:namespace />fm.<portlet:namespace />deleteUserIds.value = Liferay.Util.listCheckedExcept(document.<portlet:namespace />fm, '<portlet:namespace />allRowIds', '<portlet:namespace />rowIdsUserCheckbox');
 
 				submitForm(document.<portlet:namespace />fm, "<portlet:actionURL><portlet:param name="struts_action" value="/users_admin/edit_user" /></portlet:actionURL>");
 			}

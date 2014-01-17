@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
@@ -309,9 +310,9 @@ public class JournalConverterImpl implements JournalConverter {
 
 		sb.append("entry[@");
 		sb.append(attributeName);
-		sb.append("='");
-		sb.append(attributeValue);
-		sb.append("']");
+		sb.append(StringPool.EQUAL);
+		sb.append(HtmlUtil.escapeXPathAttribute(attributeValue));
+		sb.append(StringPool.CLOSE_BRACKET);
 
 		XPath xPathSelector = SAXReaderUtil.createXPath(sb.toString());
 
@@ -504,8 +505,14 @@ public class JournalConverterImpl implements JournalConverter {
 		String indexType = ddmStructure.getFieldProperty(
 			fieldName, "indexType");
 
-		dynamicElementElement.addAttribute(
-			"type", _ddmTypesToJournalTypes.get(fieldType));
+		String type = _ddmTypesToJournalTypes.get(fieldType);
+
+		if (type == null) {
+			type = fieldType;
+		}
+
+		dynamicElementElement.addAttribute("type", type);
+
 		dynamicElementElement.addAttribute("index-type", indexType);
 
 		for (Locale locale : ddmField.getAvailableLocales()) {
@@ -811,7 +818,13 @@ public class JournalConverterImpl implements JournalConverter {
 
 		element.remove(element.attribute("type"));
 
-		element.addAttribute("dataType", _ddmDataTypes.get(type));
+		String dataType = _ddmDataTypes.get(type);
+
+		if (dataType == null) {
+			dataType = "string";
+		}
+
+		element.addAttribute("dataType", dataType);
 		element.addAttribute("indexType", indexType);
 
 		String required = "false";
@@ -828,6 +841,10 @@ public class JournalConverterImpl implements JournalConverter {
 		element.addAttribute("showLabel", "true");
 
 		String newType = _journalTypesToDDMTypes.get(type);
+
+		if (newType == null) {
+			newType = type;
+		}
 
 		element.addAttribute("type", newType);
 
