@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -13,6 +13,8 @@
  */
 
 package com.liferay.portal.util;
+
+import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -37,6 +39,8 @@ import com.liferay.portlet.expando.model.ExpandoBridge;
 import java.io.IOException;
 import java.io.Serializable;
 
+import java.net.InetAddress;
+
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -56,7 +60,6 @@ import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
 import javax.portlet.PreferencesValidator;
 import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse;
 import javax.portlet.ValidatorException;
 import javax.portlet.WindowState;
 
@@ -71,6 +74,7 @@ import javax.servlet.jsp.PageContext;
  * @author Brian Wing Shun Chan
  * @author Eduardo Lundgren
  */
+@ProviderType
 public interface Portal {
 
 	public static final String FRIENDLY_URL_SEPARATOR = "/-/";
@@ -128,12 +132,20 @@ public interface Portal {
 	 */
 	public void addPageTitle(String title, HttpServletRequest request);
 
+	public boolean addPortalInetSocketAddressEventListener(
+		PortalInetSocketAddressEventListener
+			portalInetSocketAddressEventListener);
+
 	/**
 	 * Adds the portal port event listener to the portal. The listener will be
 	 * notified whenever the portal port is set.
 	 *
-	 * @param portalPortEventListener the portal port event listener to add
+	 * @param      portalPortEventListener the portal port event listener to add
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             #addPortalInetSocketAddressEventListener(
+	 *             PortalInetSocketAddressEventListener)}
 	 */
+	@Deprecated
 	public void addPortalPortEventListener(
 		PortalPortEventListener portalPortEventListener);
 
@@ -273,20 +285,31 @@ public interface Portal {
 		throws PortalException, SystemException;
 
 	/**
-	 * Returns the alternate URL of the page, to distinguish it from its
-	 * canonical URL.
+	 * Returns the alternate URL for the requested canonical URL in the given
+	 * locale.
 	 *
-	 * @param  canonicalURL the canonical URL previously obtained
+	 * <p>
+	 * The alternate URL lets search engines know that an equivalent page is
+	 * available for the given locale. For more information, see <a
+	 * href="https://support.google.com/webmasters/answer/189077?hl=en">https://support.google.com/webmasters/answer/189077?hl=en</a>.
+	 * </p>
+	 *
+	 * @param  canonicalURL the canonical URL being requested. For more
+	 *         information, see {@link #getCanonicalURL}.
 	 * @param  themeDisplay the theme display
-	 * @param  locale the locale of the translated page
-	 * @param  layout the layout
-	 * @return the alternate URL
+	 * @param  locale the locale of the alternate (translated) page
+	 * @param  layout the page being requested
+	 * @return the alternate URL for the requested canonical URL in the given
+	 *         locale
 	 * @throws PortalException if a portal exception occurred
 	 * @throws SystemException if a system exception occurred
 	 */
 	public String getAlternateURL(
 			String canonicalURL, ThemeDisplay themeDisplay, Locale locale,
 			Layout layout)
+		throws PortalException, SystemException;
+
+	public long[] getAncestorSiteGroupIds(long groupId)
 		throws PortalException, SystemException;
 
 	/**
@@ -533,6 +556,9 @@ public interface Portal {
 			HttpServletRequest request, ThemeDisplay themeDisplay)
 		throws Exception;
 
+	public long[] getCurrentAndAncestorSiteGroupIds(long groupId)
+		throws PortalException, SystemException;
+
 	public String getCurrentCompleteURL(HttpServletRequest request);
 
 	public String getCurrentURL(HttpServletRequest request);
@@ -544,12 +570,13 @@ public interface Portal {
 	public String getCustomSQLFunctionIsNull();
 
 	/**
-	 * Returns the date object for the specified month, day, and year.
+	 * Returns the date object for the specified month, day, and year, or
+	 * <code>null</code> if the date is invalid.
 	 *
 	 * @param  month the month (0-based, meaning 0 for January)
 	 * @param  day the day of the month
 	 * @param  year the year
-	 * @return the date object
+	 * @return the date object, or <code>null</code> if the date is invalid
 	 */
 	public Date getDate(int month, int day, int year);
 
@@ -565,8 +592,8 @@ public interface Portal {
 	 *         date.
 	 * @return the date object, or <code>null</code> if the date is invalid and
 	 *         no exception to throw was provided
-	 * @throws PortalException if the date was invalid and <code>pe</code> was
-	 *         not <code>null</code>
+	 * @throws PortalException if the date was invalid and <code>clazz</code>
+	 *         was not <code>null</code>
 	 */
 	public Date getDate(
 			int month, int day, int year,
@@ -587,8 +614,8 @@ public interface Portal {
 	 *         date.
 	 * @return the date object, or <code>null</code> if the date is invalid and
 	 *         no exception to throw was provided
-	 * @throws PortalException if the date was invalid and <code>pe</code> was
-	 *         not <code>null</code>
+	 * @throws PortalException if the date was invalid and <code>clazz</code>
+	 *         was not <code>null</code>
 	 */
 	public Date getDate(
 			int month, int day, int year, int hour, int min,
@@ -610,8 +637,8 @@ public interface Portal {
 	 *         date.
 	 * @return the date object, or <code>null</code> if the date is invalid and
 	 *         no exception to throw was provided
-	 * @throws PortalException if the date was invalid and <code>pe</code> was
-	 *         not <code>null</code>
+	 * @throws PortalException if the date was invalid and <code>clazz</code>
+	 *         was not <code>null</code>
 	 */
 	public Date getDate(
 			int month, int day, int year, int hour, int min, TimeZone timeZone,
@@ -631,8 +658,8 @@ public interface Portal {
 	 *         date.
 	 * @return the date object, or <code>null</code> if the date is invalid and
 	 *         no exception to throw was provided
-	 * @throws PortalException if the date was invalid and <code>pe</code> was
-	 *         not <code>null</code>
+	 * @throws PortalException if the date was invalid and <code>clazz</code>
+	 *         was not <code>null</code>
 	 */
 	public Date getDate(
 			int month, int day, int year, TimeZone timeZone,
@@ -799,6 +826,13 @@ public interface Portal {
 	public String getLayoutFullURL(ThemeDisplay themeDisplay)
 		throws PortalException, SystemException;
 
+	public String getLayoutRelativeURL(Layout layout, ThemeDisplay themeDisplay)
+		throws PortalException, SystemException;
+
+	public String getLayoutRelativeURL(
+			Layout layout, ThemeDisplay themeDisplay, boolean doAsUser)
+		throws PortalException, SystemException;
+
 	public String getLayoutSetFriendlyURL(
 			LayoutSet layoutSet, ThemeDisplay themeDisplay)
 		throws PortalException, SystemException;
@@ -891,7 +925,14 @@ public interface Portal {
 	public long getPlidFromPortletId(long groupId, String portletId)
 		throws PortalException, SystemException;
 
+	public PortalInetSocketAddressEventListener[]
+		getPortalInetSocketAddressEventListeners();
+
 	public String getPortalLibDir();
+
+	public InetAddress getPortalLocalInetAddress(boolean secure);
+
+	public int getPortalLocalPort(boolean secure);
 
 	/**
 	 * @deprecated As of 6.2.0, replaced by the more general {@link
@@ -900,9 +941,18 @@ public interface Portal {
 	@Deprecated
 	public int getPortalPort();
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             #getPortalServerPort(boolean)}
+	 */
+	@Deprecated
 	public int getPortalPort(boolean secure);
 
 	public Properties getPortalProperties();
+
+	public InetAddress getPortalServerInetAddress(boolean secure);
+
+	public int getPortalServerPort(boolean secure);
 
 	public String getPortalURL(HttpServletRequest request);
 
@@ -993,9 +1043,9 @@ public interface Portal {
 
 	public String getPortletTitle(Portlet portlet, User user);
 
-	public String getPortletTitle(RenderRequest renderRequest);
+	public String getPortletTitle(PortletRequest portletRequest);
 
-	public String getPortletTitle(RenderResponse renderResponse);
+	public String getPortletTitle(PortletResponse portletResponse);
 
 	public String getPortletTitle(String portletId, Locale locale);
 
@@ -1048,6 +1098,10 @@ public interface Portal {
 
 	public String getServletContextName();
 
+	public long[] getSharedContentSiteGroupIds(
+			long companyId, long groupId, long userId)
+		throws PortalException, SystemException;
+
 	public Map<String, List<Portlet>> getSiteAdministrationCategoriesMap(
 			HttpServletRequest request)
 		throws SystemException;
@@ -1068,9 +1122,19 @@ public interface Portal {
 		PortletResponse portletResponse, ThemeDisplay themeDisplay,
 		String portletName);
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             #getCurrentAndAncestorSiteGroupIds(long)}
+	 */
+	@Deprecated
 	public long[] getSiteAndCompanyGroupIds(long groupId)
 		throws PortalException, SystemException;
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             #getCurrentAndAncestorSiteGroupIds(long)}
+	 */
+	@Deprecated
 	public long[] getSiteAndCompanyGroupIds(ThemeDisplay themeDisplay)
 		throws PortalException, SystemException;
 
@@ -1163,6 +1227,10 @@ public interface Portal {
 
 	public String getUserPassword(PortletRequest portletRequest);
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	public String getUserValue(long userId, String param, String defaultValue)
 		throws SystemException;
 
@@ -1195,7 +1263,7 @@ public interface Portal {
 		throws Exception;
 
 	/**
-	 * @deprecated As of 6.2.0 with no direct replacement
+	 * @deprecated As of 6.2.0, with no direct replacement
 	 */
 	@Deprecated
 	public boolean isAllowAddPortletDefaultResource(
@@ -1291,6 +1359,16 @@ public interface Portal {
 
 	public boolean isValidResourceId(String resourceId);
 
+	public boolean removePortalInetSocketAddressEventListener(
+		PortalInetSocketAddressEventListener
+			portalInetSocketAddressEventListener);
+
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             #removePortalInetSocketAddressEventListener(
+	 *             PortalInetSocketAddressEventListener)}
+	 */
+	@Deprecated
 	public void removePortalPortEventListener(
 		PortalPortEventListener portalPortEventListener);
 
@@ -1361,9 +1439,15 @@ public interface Portal {
 	 */
 	public void setPageTitle(String title, HttpServletRequest request);
 
+	public void setPortalInetSocketAddresses(HttpServletRequest request);
+
 	/**
 	 * Sets the port obtained on the first request to the portal.
+	 *
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             #setPortalInetSocketAddresses(HttpServletRequest)}
 	 */
+	@Deprecated
 	public void setPortalPort(HttpServletRequest request);
 
 	public void storePreferences(PortletPreferences portletPreferences)

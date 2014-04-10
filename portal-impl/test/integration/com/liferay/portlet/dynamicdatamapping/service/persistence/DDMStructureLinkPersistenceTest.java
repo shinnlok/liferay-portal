@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -131,6 +131,42 @@ public class DDMStructureLinkPersistenceTest {
 			newDDMStructureLink.getClassPK());
 		Assert.assertEquals(existingDDMStructureLink.getStructureId(),
 			newDDMStructureLink.getStructureId());
+	}
+
+	@Test
+	public void testCountByClassNameId() {
+		try {
+			_persistence.countByClassNameId(ServiceTestUtil.nextLong());
+
+			_persistence.countByClassNameId(0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByClassPK() {
+		try {
+			_persistence.countByClassPK(ServiceTestUtil.nextLong());
+
+			_persistence.countByClassPK(0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByStructureId() {
+		try {
+			_persistence.countByStructureId(ServiceTestUtil.nextLong());
+
+			_persistence.countByStructureId(0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
 	}
 
 	@Test

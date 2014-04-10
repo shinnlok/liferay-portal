@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,6 +24,8 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletURL;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
+import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.search.BaseIndexer;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.BooleanQuery;
@@ -47,6 +49,7 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Group;
+import com.liferay.portal.repository.liferayrepository.model.LiferayFileEntry;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.persistence.GroupActionableDynamicQuery;
@@ -59,6 +62,7 @@ import com.liferay.portlet.documentlibrary.model.DLFileEntryMetadata;
 import com.liferay.portlet.documentlibrary.model.DLFileVersion;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
+import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryMetadataLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.permission.DLFileEntryPermission;
@@ -85,6 +89,7 @@ import java.util.List;
 import java.util.Locale;
 
 import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
 import javax.portlet.WindowStateException;
 
@@ -100,6 +105,10 @@ public class DLFileEntryIndexer extends BaseIndexer {
 	public static final String PORTLET_ID = PortletKeys.DOCUMENT_LIBRARY;
 
 	public DLFileEntryIndexer() {
+		setDefaultSelectedFieldNames(
+			new String[] {
+				Field.COMPANY_ID, Field.CONTENT, Field.ENTRY_CLASS_NAME,
+				Field.ENTRY_CLASS_PK, Field.TITLE, Field.UID});
 		setFilterSearch(true);
 		setPermissionAware(true);
 	}
@@ -110,11 +119,25 @@ public class DLFileEntryIndexer extends BaseIndexer {
 
 		MBMessage message = (MBMessage)obj;
 
-		DLFileEntry dlFileEntry = DLFileEntryLocalServiceUtil.getDLFileEntry(
-			message.getClassPK());
+		FileEntry fileEntry = null;
 
-		document.addKeyword(Field.FOLDER_ID, dlFileEntry.getFolderId());
-		document.addKeyword(Field.HIDDEN, dlFileEntry.isInHiddenFolder());
+		try {
+			fileEntry = DLAppLocalServiceUtil.getFileEntry(
+				message.getClassPK());
+		}
+		catch (Exception e) {
+			return;
+		}
+
+		if (fileEntry instanceof LiferayFileEntry) {
+			DLFileEntry dlFileEntry = (DLFileEntry)fileEntry.getModel();
+
+			document.addKeyword(Field.FOLDER_ID, dlFileEntry.getFolderId());
+			document.addKeyword(Field.HIDDEN, dlFileEntry.isInHiddenFolder());
+			document.addKeyword(
+				Field.TREE_PATH,
+				StringUtil.split(dlFileEntry.getTreePath(), CharPool.SLASH));
+		}
 	}
 
 	@Override
@@ -135,6 +158,35 @@ public class DLFileEntryIndexer extends BaseIndexer {
 
 		return DLFileEntryPermission.contains(
 			permissionChecker, entryClassPK, ActionKeys.VIEW);
+	}
+
+	@Override
+	public boolean isVisible(long classPK, int status) throws Exception {
+		FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(classPK);
+
+		FileVersion fileVersion = fileEntry.getFileVersion();
+
+		return isVisible(fileVersion.getStatus(), status);
+	}
+
+	@Override
+	public boolean isVisibleRelatedEntry(long classPK, int status)
+		throws Exception {
+
+		FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(classPK);
+
+		if (fileEntry instanceof LiferayFileEntry) {
+			DLFileEntry dlFileEntry = (DLFileEntry)fileEntry.getModel();
+
+			if (dlFileEntry.isInHiddenFolder()) {
+				Indexer indexer = IndexerRegistryUtil.getIndexer(
+					dlFileEntry.getClassName());
+
+				return indexer.isVisible(dlFileEntry.getClassPK(), status);
+			}
+		}
+
+		return true;
 	}
 
 	@Override
@@ -415,8 +467,8 @@ public class DLFileEntryIndexer extends BaseIndexer {
 
 	@Override
 	protected Summary doGetSummary(
-		Document document, Locale locale, String snippet,
-		PortletURL portletURL) {
+		Document document, Locale locale, String snippet, PortletURL portletURL,
+		PortletRequest portletRequest, PortletResponse portletResponse) {
 
 		LiferayPortletURL liferayPortletURL = (LiferayPortletURL)portletURL;
 

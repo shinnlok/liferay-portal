@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -35,10 +35,10 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.model.CacheModel;
+import com.liferay.portal.model.MVCCModel;
 import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.UserGroup;
 import com.liferay.portal.model.impl.UserGroupImpl;
@@ -242,7 +242,7 @@ public class UserGroupPersistenceImpl extends BasePersistenceImpl<UserGroup>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<UserGroup>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<UserGroup>)QueryUtil.list(q, getDialect(),
@@ -650,7 +650,7 @@ public class UserGroupPersistenceImpl extends BasePersistenceImpl<UserGroup>
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
 				q.addEntity(_FILTER_ENTITY_ALIAS, UserGroupImpl.class);
@@ -837,7 +837,7 @@ public class UserGroupPersistenceImpl extends BasePersistenceImpl<UserGroup>
 		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
 				UserGroup.class.getName(), _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
 
-		SQLQuery q = session.createSQLQuery(sql);
+		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 		q.setFirstResult(0);
 		q.setMaxResults(2);
@@ -993,7 +993,7 @@ public class UserGroupPersistenceImpl extends BasePersistenceImpl<UserGroup>
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addScalar(COUNT_COLUMN_NAME,
 				com.liferay.portal.kernel.dao.orm.Type.LONG);
@@ -1191,7 +1191,7 @@ public class UserGroupPersistenceImpl extends BasePersistenceImpl<UserGroup>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<UserGroup>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<UserGroup>)QueryUtil.list(q, getDialect(),
@@ -1624,7 +1624,7 @@ public class UserGroupPersistenceImpl extends BasePersistenceImpl<UserGroup>
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
 				q.addEntity(_FILTER_ENTITY_ALIAS, UserGroupImpl.class);
@@ -1817,7 +1817,7 @@ public class UserGroupPersistenceImpl extends BasePersistenceImpl<UserGroup>
 		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
 				UserGroup.class.getName(), _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
 
-		SQLQuery q = session.createSQLQuery(sql);
+		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 		q.setFirstResult(0);
 		q.setMaxResults(2);
@@ -1987,7 +1987,7 @@ public class UserGroupPersistenceImpl extends BasePersistenceImpl<UserGroup>
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addScalar(COUNT_COLUMN_NAME,
 				com.liferay.portal.kernel.dao.orm.Type.LONG);
@@ -2162,7 +2162,7 @@ public class UserGroupPersistenceImpl extends BasePersistenceImpl<UserGroup>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<UserGroup>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<UserGroup>)QueryUtil.list(q, getDialect(),
@@ -2547,7 +2547,7 @@ public class UserGroupPersistenceImpl extends BasePersistenceImpl<UserGroup>
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
 				q.addEntity(_FILTER_ENTITY_ALIAS, UserGroupImpl.class);
@@ -2721,7 +2721,7 @@ public class UserGroupPersistenceImpl extends BasePersistenceImpl<UserGroup>
 		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
 				UserGroup.class.getName(), _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
 
-		SQLQuery q = session.createSQLQuery(sql);
+		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 		q.setFirstResult(0);
 		q.setMaxResults(2);
@@ -2849,7 +2849,7 @@ public class UserGroupPersistenceImpl extends BasePersistenceImpl<UserGroup>
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addScalar(COUNT_COLUMN_NAME,
 				com.liferay.portal.kernel.dao.orm.Type.LONG);
@@ -3026,7 +3026,7 @@ public class UserGroupPersistenceImpl extends BasePersistenceImpl<UserGroup>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<UserGroup>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<UserGroup>)QueryUtil.list(q, getDialect(),
@@ -3434,7 +3434,7 @@ public class UserGroupPersistenceImpl extends BasePersistenceImpl<UserGroup>
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
 				q.addEntity(_FILTER_ENTITY_ALIAS, UserGroupImpl.class);
@@ -3614,7 +3614,7 @@ public class UserGroupPersistenceImpl extends BasePersistenceImpl<UserGroup>
 		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
 				UserGroup.class.getName(), _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
 
-		SQLQuery q = session.createSQLQuery(sql);
+		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 		q.setFirstResult(0);
 		q.setMaxResults(2);
@@ -3756,7 +3756,7 @@ public class UserGroupPersistenceImpl extends BasePersistenceImpl<UserGroup>
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addScalar(COUNT_COLUMN_NAME,
 				com.liferay.portal.kernel.dao.orm.Type.LONG);
@@ -4098,7 +4098,7 @@ public class UserGroupPersistenceImpl extends BasePersistenceImpl<UserGroup>
 			CacheRegistryUtil.clear(UserGroupImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(UserGroupImpl.class.getName());
+		EntityCacheUtil.clearCache(UserGroupImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -4422,7 +4422,7 @@ public class UserGroupPersistenceImpl extends BasePersistenceImpl<UserGroup>
 		}
 
 		EntityCacheUtil.putResult(UserGroupModelImpl.ENTITY_CACHE_ENABLED,
-			UserGroupImpl.class, userGroup.getPrimaryKey(), userGroup);
+			UserGroupImpl.class, userGroup.getPrimaryKey(), userGroup, false);
 
 		clearUniqueFindersCache(userGroup);
 		cacheUniqueFindersCache(userGroup);
@@ -4442,6 +4442,7 @@ public class UserGroupPersistenceImpl extends BasePersistenceImpl<UserGroup>
 		userGroupImpl.setNew(userGroup.isNew());
 		userGroupImpl.setPrimaryKey(userGroup.getPrimaryKey());
 
+		userGroupImpl.setMvccVersion(userGroup.getMvccVersion());
 		userGroupImpl.setUuid(userGroup.getUuid());
 		userGroupImpl.setUserGroupId(userGroup.getUserGroupId());
 		userGroupImpl.setCompanyId(userGroup.getCompanyId());
@@ -4656,7 +4657,7 @@ public class UserGroupPersistenceImpl extends BasePersistenceImpl<UserGroup>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<UserGroup>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<UserGroup>)QueryUtil.list(q, getDialect(),
@@ -5002,9 +5003,6 @@ public class UserGroupPersistenceImpl extends BasePersistenceImpl<UserGroup>
 		catch (Exception e) {
 			throw processException(e);
 		}
-		finally {
-			FinderCacheUtil.clearCache(UserGroupModelImpl.MAPPING_TABLE_GROUPS_USERGROUPS_NAME);
-		}
 	}
 
 	/**
@@ -5275,9 +5273,6 @@ public class UserGroupPersistenceImpl extends BasePersistenceImpl<UserGroup>
 		}
 		catch (Exception e) {
 			throw processException(e);
-		}
-		finally {
-			FinderCacheUtil.clearCache(UserGroupModelImpl.MAPPING_TABLE_USERGROUPS_TEAMS_NAME);
 		}
 	}
 
@@ -5550,9 +5545,6 @@ public class UserGroupPersistenceImpl extends BasePersistenceImpl<UserGroup>
 		catch (Exception e) {
 			throw processException(e);
 		}
-		finally {
-			FinderCacheUtil.clearCache(UserGroupModelImpl.MAPPING_TABLE_USERS_USERGROUPS_NAME);
-		}
 	}
 
 	@Override
@@ -5644,10 +5636,22 @@ public class UserGroupPersistenceImpl extends BasePersistenceImpl<UserGroup>
 			}
 		};
 
-	private static CacheModel<UserGroup> _nullUserGroupCacheModel = new CacheModel<UserGroup>() {
-			@Override
-			public UserGroup toEntityModel() {
-				return _nullUserGroup;
-			}
-		};
+	private static CacheModel<UserGroup> _nullUserGroupCacheModel = new NullCacheModel();
+
+	private static class NullCacheModel implements CacheModel<UserGroup>,
+		MVCCModel {
+		@Override
+		public long getMvccVersion() {
+			return 0;
+		}
+
+		@Override
+		public void setMvccVersion(long mvccVersion) {
+		}
+
+		@Override
+		public UserGroup toEntityModel() {
+			return _nullUserGroup;
+		}
+	}
 }

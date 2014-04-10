@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,7 +32,6 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.ModelListener;
@@ -225,7 +224,7 @@ public class ExpandoValuePersistenceImpl extends BasePersistenceImpl<ExpandoValu
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<ExpandoValue>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<ExpandoValue>)QueryUtil.list(q, getDialect(),
@@ -717,7 +716,7 @@ public class ExpandoValuePersistenceImpl extends BasePersistenceImpl<ExpandoValu
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<ExpandoValue>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<ExpandoValue>)QueryUtil.list(q, getDialect(),
@@ -1207,7 +1206,7 @@ public class ExpandoValuePersistenceImpl extends BasePersistenceImpl<ExpandoValu
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<ExpandoValue>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<ExpandoValue>)QueryUtil.list(q, getDialect(),
@@ -1708,7 +1707,7 @@ public class ExpandoValuePersistenceImpl extends BasePersistenceImpl<ExpandoValu
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<ExpandoValue>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<ExpandoValue>)QueryUtil.list(q, getDialect(),
@@ -2238,7 +2237,7 @@ public class ExpandoValuePersistenceImpl extends BasePersistenceImpl<ExpandoValu
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<ExpandoValue>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<ExpandoValue>)QueryUtil.list(q, getDialect(),
@@ -2766,7 +2765,7 @@ public class ExpandoValuePersistenceImpl extends BasePersistenceImpl<ExpandoValu
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<ExpandoValue>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<ExpandoValue>)QueryUtil.list(q, getDialect(),
@@ -3526,7 +3525,7 @@ public class ExpandoValuePersistenceImpl extends BasePersistenceImpl<ExpandoValu
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<ExpandoValue>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<ExpandoValue>)QueryUtil.list(q, getDialect(),
@@ -4341,7 +4340,7 @@ public class ExpandoValuePersistenceImpl extends BasePersistenceImpl<ExpandoValu
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<ExpandoValue>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<ExpandoValue>)QueryUtil.list(q, getDialect(),
@@ -4829,7 +4828,7 @@ public class ExpandoValuePersistenceImpl extends BasePersistenceImpl<ExpandoValu
 			CacheRegistryUtil.clear(ExpandoValueImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(ExpandoValueImpl.class.getName());
+		EntityCacheUtil.clearCache(ExpandoValueImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -5262,7 +5261,8 @@ public class ExpandoValuePersistenceImpl extends BasePersistenceImpl<ExpandoValu
 		}
 
 		EntityCacheUtil.putResult(ExpandoValueModelImpl.ENTITY_CACHE_ENABLED,
-			ExpandoValueImpl.class, expandoValue.getPrimaryKey(), expandoValue);
+			ExpandoValueImpl.class, expandoValue.getPrimaryKey(), expandoValue,
+			false);
 
 		clearUniqueFindersCache(expandoValue);
 		cacheUniqueFindersCache(expandoValue);
@@ -5493,7 +5493,7 @@ public class ExpandoValuePersistenceImpl extends BasePersistenceImpl<ExpandoValu
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<ExpandoValue>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<ExpandoValue>)QueryUtil.list(q, getDialect(),

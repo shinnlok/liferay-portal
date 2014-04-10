@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -27,6 +27,8 @@ import com.liferay.portal.service.persistence.RepositoryUtil;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.test.MainServletExecutionTestListener;
 import com.liferay.portal.test.TransactionalExecutionTestListener;
+import com.liferay.portlet.documentlibrary.model.DLFileEntry;
+import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.messageboards.model.MBCategory;
 import com.liferay.portlet.messageboards.model.MBMessage;
 import com.liferay.portlet.messageboards.service.MBCategoryLocalServiceUtil;
@@ -90,6 +92,8 @@ public class MBMessageStagedModelDataHandlerTest
 			group.getGroupId(), category.getCategoryId(), true,
 			objectValuePairs);
 
+		MBMessageLocalServiceUtil.updateAnswer(message, true, false);
+
 		List<FileEntry> attachmentsFileEntries =
 			message.getAttachmentsFileEntries();
 
@@ -99,13 +103,13 @@ public class MBMessageStagedModelDataHandlerTest
 
 		while (folder != null) {
 			addDependentStagedModel(
-				dependentStagedModelsMap, Folder.class, folder);
+				dependentStagedModelsMap, DLFolder.class, folder);
 
 			folder = folder.getParentFolder();
 		}
 
 		addDependentStagedModel(
-			dependentStagedModelsMap, FileEntry.class,
+			dependentStagedModelsMap, DLFileEntry.class,
 			attachmentsFileEntries.get(0));
 
 		Repository repository = RepositoryUtil.fetchByPrimaryKey(
@@ -180,6 +184,7 @@ public class MBMessageStagedModelDataHandlerTest
 
 		Assert.assertEquals(
 			1, importedMessage.getAttachmentsFileEntriesCount());
+		Assert.assertTrue(importedMessage.isAnswer());
 	}
 
 }

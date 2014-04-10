@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -41,7 +41,7 @@ import java.util.Date;
  */
 @ProviderType
 public interface SubscriptionModel extends AttachedModel, AuditedModel,
-	BaseModel<Subscription> {
+	BaseModel<Subscription>, MVCCModel {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -61,6 +61,22 @@ public interface SubscriptionModel extends AttachedModel, AuditedModel,
 	 * @param primaryKey the primary key of this subscription
 	 */
 	public void setPrimaryKey(long primaryKey);
+
+	/**
+	 * Returns the mvcc version of this subscription.
+	 *
+	 * @return the mvcc version of this subscription
+	 */
+	@Override
+	public long getMvccVersion();
+
+	/**
+	 * Sets the mvcc version of this subscription.
+	 *
+	 * @param mvccVersion the mvcc version of this subscription
+	 */
+	@Override
+	public void setMvccVersion(long mvccVersion);
 
 	/**
 	 * Returns the subscription ID of this subscription.

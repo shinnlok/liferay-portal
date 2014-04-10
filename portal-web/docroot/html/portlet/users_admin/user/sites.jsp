@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,6 +19,7 @@
 <%
 User selUser = (User)request.getAttribute("user.selUser");
 List<Group> groups = (List<Group>)request.getAttribute("user.groups");
+List<Group> inheritedSites = (List<Group>)request.getAttribute("user.inheritedSites");
 %>
 
 <liferay-ui:error-marker key="errorSection" value="sites" />
@@ -90,8 +91,6 @@ List<Group> groups = (List<Group>)request.getAttribute("user.groups");
 </liferay-ui:search-container>
 
 <c:if test="<%= !portletName.equals(PortletKeys.MY_ACCOUNT) %>">
-	<br />
-
 	<liferay-ui:icon
 		cssClass="modify-link"
 		iconCssClass="icon-search"
@@ -107,11 +106,13 @@ List<Group> groups = (List<Group>)request.getAttribute("user.groups");
 		<portlet:param name="p_u_i_d" value="<%= String.valueOf(selUser.getUserId()) %>" />
 	</portlet:renderURL>
 
-	<aui:script use="escape,liferay-search-container">
+	<aui:script use="liferay-search-container">
+		var Util = Liferay.Util;
+
 		A.one('#<portlet:namespace />selectSiteLink').on(
 			'click',
 			function(event) {
-				Liferay.Util.selectEntity(
+				Util.selectEntity(
 					{
 						dialog: {
 							constrain: true,
@@ -127,7 +128,7 @@ List<Group> groups = (List<Group>)request.getAttribute("user.groups");
 
 						var rowColumns = [];
 
-						rowColumns.push(A.Escape.html(event.groupdescriptivename));
+						rowColumns.push(event.groupdescriptivename);
 						rowColumns.push('');
 						rowColumns.push('<a class="modify-link" data-rowId="' + event.groupid + '" href="javascript:;"><%= UnicodeFormatter.toString(removeGroupIcon) %></a>');
 
@@ -140,15 +141,92 @@ List<Group> groups = (List<Group>)request.getAttribute("user.groups");
 
 		var searchContainer = Liferay.SearchContainer.get('<portlet:namespace />groupsSearchContainer');
 
-		searchContainer.get('contentBox').delegate(
+		var searchContainerContentBox = searchContainer.get('contentBox');
+
+		searchContainerContentBox.delegate(
 			'click',
 			function(event) {
 				var link = event.currentTarget;
-				var tr = link.ancestor('tr');
 
-				searchContainer.deleteRow(tr, link.getAttribute('data-rowId'));
+				var tr = link.ancestor('tr');
+				var rowId = link.attr('data-rowId');
+
+				var selectGroup = Util.getWindow('<portlet:namespace />selectGroup');
+
+				if (selectGroup) {
+					var selectButton = selectGroup.iframe.node.get('contentWindow.document').one('.selector-button[data-groupid="' + rowId + '"]');
+
+					Util.toggleDisabled(selectButton, false);
+				}
+
+				searchContainer.deleteRow(tr, rowId);
 			},
 			'.modify-link'
 		);
+
+		Liferay.on(
+			'<portlet:namespace />enableRemovedSites',
+			function(event) {
+				event.selectors.each(
+					function(item, index, collection) {
+						var modifyLink = searchContainerContentBox.one('.modify-link[data-rowid="' + item.attr('data-groupid') + '"]');
+
+						if (!modifyLink) {
+							Util.toggleDisabled(item, false);
+						}
+					}
+				);
+			}
+		);
 	</aui:script>
 </c:if>
+
+<h3><liferay-ui:message key="inherited-sites" /></h3>
+
+<c:if test="<%= inheritedSites.isEmpty() %>">
+	<liferay-ui:message key="this-user-does-not-have-any-inherited-sites" />
+</c:if>
+
+<liferay-ui:search-container
+	headerNames="name,roles"
+>
+	<liferay-ui:search-container-results
+		results="<%= inheritedSites %>"
+		total="<%= inheritedSites.size() %>"
+	/>
+
+	<liferay-ui:search-container-row
+		className="com.liferay.portal.model.Group"
+		escapedModel="<%= true %>"
+		keyProperty="groupId"
+		modelVar="inheritedSite"
+		rowIdProperty="friendlyURL"
+	>
+		<liferay-ui:search-container-column-text
+			name="name"
+			value="<%= HtmlUtil.escape(inheritedSite.getDescriptiveName(locale)) %>"
+		/>
+
+		<liferay-ui:search-container-column-text
+			buffer="buffer"
+			name="roles"
+		>
+
+			<%
+			List<Role> inheritedRoles = RoleLocalServiceUtil.getUserGroupGroupRoles(selUser.getUserId(), inheritedSite.getGroupId());
+
+			for (Role role : inheritedRoles) {
+				buffer.append(HtmlUtil.escape(role.getTitle(locale)));
+				buffer.append(StringPool.COMMA_AND_SPACE);
+			}
+
+			if (!inheritedRoles.isEmpty()) {
+				buffer.setIndex(buffer.index() - 1);
+			}
+			%>
+
+		</liferay-ui:search-container-column-text>
+	</liferay-ui:search-container-row>
+
+	<liferay-ui:search-iterator paginate="<%= false %>" />
+</liferay-ui:search-container>

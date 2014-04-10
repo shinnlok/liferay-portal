@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -33,10 +33,10 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.Company;
+import com.liferay.portal.model.MVCCModel;
 import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.impl.CompanyImpl;
 import com.liferay.portal.model.impl.CompanyModelImpl;
@@ -926,7 +926,7 @@ public class CompanyPersistenceImpl extends BasePersistenceImpl<Company>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<Company>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<Company>)QueryUtil.list(q, getDialect(),
@@ -1331,7 +1331,7 @@ public class CompanyPersistenceImpl extends BasePersistenceImpl<Company>
 			CacheRegistryUtil.clear(CompanyImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(CompanyImpl.class.getName());
+		EntityCacheUtil.clearCache(CompanyImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -1624,7 +1624,7 @@ public class CompanyPersistenceImpl extends BasePersistenceImpl<Company>
 		}
 
 		EntityCacheUtil.putResult(CompanyModelImpl.ENTITY_CACHE_ENABLED,
-			CompanyImpl.class, company.getPrimaryKey(), company);
+			CompanyImpl.class, company.getPrimaryKey(), company, false);
 
 		clearUniqueFindersCache(company);
 		cacheUniqueFindersCache(company);
@@ -1644,6 +1644,7 @@ public class CompanyPersistenceImpl extends BasePersistenceImpl<Company>
 		companyImpl.setNew(company.isNew());
 		companyImpl.setPrimaryKey(company.getPrimaryKey());
 
+		companyImpl.setMvccVersion(company.getMvccVersion());
 		companyImpl.setCompanyId(company.getCompanyId());
 		companyImpl.setAccountId(company.getAccountId());
 		companyImpl.setWebId(company.getWebId());
@@ -1854,7 +1855,7 @@ public class CompanyPersistenceImpl extends BasePersistenceImpl<Company>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<Company>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<Company>)QueryUtil.list(q, getDialect(),
@@ -1989,10 +1990,22 @@ public class CompanyPersistenceImpl extends BasePersistenceImpl<Company>
 			}
 		};
 
-	private static CacheModel<Company> _nullCompanyCacheModel = new CacheModel<Company>() {
-			@Override
-			public Company toEntityModel() {
-				return _nullCompany;
-			}
-		};
+	private static CacheModel<Company> _nullCompanyCacheModel = new NullCacheModel();
+
+	private static class NullCacheModel implements CacheModel<Company>,
+		MVCCModel {
+		@Override
+		public long getMvccVersion() {
+			return 0;
+		}
+
+		@Override
+		public void setMvccVersion(long mvccVersion) {
+		}
+
+		@Override
+		public Company toEntityModel() {
+			return _nullCompany;
+		}
+	}
 }

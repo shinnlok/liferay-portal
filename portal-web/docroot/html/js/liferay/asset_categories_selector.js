@@ -17,15 +17,21 @@ AUI.add(
 
 		var STR_EXPANDED = 'expanded';
 
+		var STR_MORE_RESULTS_LABEL = 'moreResultsLabel';
+
 		var STR_PREV_EXPANDED = '_LFR_prevExpanded';
+
+		var STR_MAX_ENTRIES = 'maxEntries';
+
+		var STR_START = 'start';
 
 		var TPL_CHECKED = ' checked="checked" ';
 
 		var TPL_INPUT =
-			'<label title="{name}">' +
-				'<span class="lfr-categories-selector-category-name" title="{name}">' +
-					'<input data-categoryId="{categoryId}" data-vocabularyid="{vocabularyId}" name="{inputName}" type="{type}" value="{name}" {checked} />' +
-					'{name}' +
+			'<label title="{titleCurrentValue}">' +
+				'<span class="lfr-categories-selector-category-name" title="{titleCurrentValue}">' +
+					'<input data-categoryId="{categoryId}" data-vocabularyid="{vocabularyId}" name="{inputName}" type="{type}" value="{titleCurrentValue}" {checked} />' +
+					'{titleCurrentValue}' +
 				'</span>' +
 				'<span class="lfr-categories-selector-search-results-path" title="{path}">{path}</span>' +
 			'</label>';
@@ -37,8 +43,6 @@ AUI.add(
 		var TPL_RADIO_ID = ' id="{0}" ';
 
 		var TPL_RADIO_IMAGE = '<div class="lfr-categories-selector-radio-image category{0}"></div>';
-
-		var TPL_SEARCH_QUERY = '%{0}%';
 
 		var TPL_SEARCH_RESULTS = '<div class="lfr-categories-selector-search-results"></div>';
 
@@ -245,6 +249,7 @@ AUI.add(
 									id: treeId,
 									label: Liferay.Util.escapeHTML(item.titleCurrentValue),
 									leaf: !item.hasChildren,
+									paginator: instance._getPaginatorConfig(item),
 									type: type
 								};
 
@@ -292,7 +297,7 @@ AUI.add(
 									'$vocabularies = /assetvocabulary/get-vocabularies': {
 										vocabularyIds: vocabularyIds,
 
-										'$categoriesCount = /assetcategory/get-vocabulary-categories-count': {
+										'$childrenCount = /assetcategory/get-vocabulary-root-categories-count': {
 											'@groupId': '$vocabularies.groupId',
 											'@vocabularyId': '$vocabularies.vocabularyId'
 										}
@@ -314,7 +319,7 @@ AUI.add(
 										groupIds: groupIds,
 										className: className,
 
-										'$categoriesCount = /assetcategory/get-vocabulary-categories-count': {
+										'$childrenCount = /assetcategory/get-vocabulary-root-categories-count': {
 											'groupId': '$vocabularies.groupId',
 											'@vocabularyId': '$vocabularies.vocabularyId'
 										}
@@ -323,6 +328,28 @@ AUI.add(
 								callback
 							);
 						}
+					},
+
+					_getPaginatorConfig: function(item) {
+						var instance = this;
+
+						var paginatorConfig = {
+							offsetParam: STR_START
+						};
+
+						var maxEntries = instance.get(STR_MAX_ENTRIES);
+
+						if (maxEntries > 0) {
+							paginatorConfig.limit = maxEntries;
+							paginatorConfig.moreResultsLabel = instance.get(STR_MORE_RESULTS_LABEL);
+							paginatorConfig.total = item.childrenCount;
+						}
+						else {
+							paginatorConfig.end = -1;
+							paginatorConfig.start = -1;
+						}
+
+						return paginatorConfig;
 					},
 
 					_getTreeNodeAssetId: function(treeNode) {
@@ -485,7 +512,9 @@ AUI.add(
 
 						buffer.length = 0;
 
-						if (results.length > 0) {
+						var categories = results.categories;
+
+						if (categories.length > 0) {
 							var inputType = 'checkbox';
 
 							if (instance.get('singleSelect')) {
@@ -495,7 +524,7 @@ AUI.add(
 							var inputName = A.guid();
 
 							A.each(
-								results,
+								categories,
 								function(item, index, collection) {
 									item.checked = instance.entries.findIndexBy('categoryId', item.categoryId) > -1 ? TPL_CHECKED : '';
 
@@ -553,13 +582,17 @@ AUI.add(
 							searchResults.addClass('loading-animation');
 
 							Liferay.Service(
-								'/assetcategory/search',
 								{
-									groupIds: vocabularyGroupIds,
-									name: Lang.sub(TPL_SEARCH_QUERY, [searchValue]),
-									vocabularyIds: vocabularyIds,
-									start: -1,
-									end: -1
+									'$display = /assetcategory/search-categories-display': {
+										groupIds: vocabularyGroupIds,
+										title: searchValue,
+										vocabularyIds: vocabularyIds,
+										start: -1,
+										end: -1,
+										'categories.$path = /assetcategory/get-category-path': {
+											'@categoryId': '$display.categories.categoryId'
+										}
+									}
 								},
 								callback
 							);
@@ -626,28 +659,12 @@ AUI.add(
 
 						var treeId = 'vocabulary' + vocabularyId;
 
-						var paginatorConfig = {
-							offsetParam: 'start'
-						};
-
-						var maxEntries = instance.get('maxEntries');
-
-						if (maxEntries > 0) {
-							paginatorConfig.limit = maxEntries;
-							paginatorConfig.moreResultsLabel = instance.get('moreResultsLabel');
-							paginatorConfig.total = item.categoriesCount;
-						}
-						else {
-							paginatorConfig.end = -1;
-							paginatorConfig.start = -1;
-						}
-
 						var vocabularyRootNode = {
 							alwaysShowHitArea: true,
 							id: treeId,
 							label: vocabularyTitle,
 							leaf: false,
-							paginator: paginatorConfig,
+							paginator: instance._getPaginatorConfig(item),
 							type: 'io'
 						};
 

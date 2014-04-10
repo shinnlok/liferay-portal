@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -163,7 +163,7 @@ if (row == null) {
 
 				<liferay-ui:icon
 					image="add_location"
-					message='<%= LanguageUtil.format(pageContext, "add-x", new String [] {LanguageUtil.get(pageContext, childrenType)}) %>'
+					message='<%= LanguageUtil.format(pageContext, "add-x", childrenType) %>'
 					url="<%= addSuborganizationURL %>"
 				/>
 			</c:if>

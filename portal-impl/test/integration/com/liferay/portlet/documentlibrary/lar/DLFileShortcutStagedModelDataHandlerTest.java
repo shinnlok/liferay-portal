@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,13 +24,10 @@ import com.liferay.portal.service.ServiceTestUtil;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.test.MainServletExecutionTestListener;
 import com.liferay.portal.test.TransactionalExecutionTestListener;
-import com.liferay.portlet.asset.model.AssetCategory;
 import com.liferay.portlet.asset.model.AssetEntry;
-import com.liferay.portlet.asset.model.AssetVocabulary;
-import com.liferay.portlet.asset.service.AssetCategoryLocalServiceUtil;
-import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
-import com.liferay.portlet.asset.service.AssetVocabularyLocalServiceUtil;
+import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFileShortcut;
+import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFileShortcutLocalServiceUtil;
@@ -65,17 +62,17 @@ public class DLFileShortcutStagedModelDataHandlerTest
 			new HashMap<String, List<StagedModel>>();
 
 		Folder folder = DLAppTestUtil.addFolder(
-			group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
-			ServiceTestUtil.randomString());
+			group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
 
-		addDependentStagedModel(dependentStagedModelsMap, Folder.class, folder);
+		addDependentStagedModel(
+			dependentStagedModelsMap, DLFolder.class, folder);
 
 		FileEntry fileEntry = DLAppTestUtil.addFileEntry(
 			group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			ServiceTestUtil.randomString());
 
 		addDependentStagedModel(
-			dependentStagedModelsMap, FileEntry.class, fileEntry);
+			dependentStagedModelsMap, DLFileEntry.class, fileEntry);
 
 		return dependentStagedModelsMap;
 	}
@@ -87,17 +84,24 @@ public class DLFileShortcutStagedModelDataHandlerTest
 		throws Exception {
 
 		List<StagedModel> folderDependentStagedModels =
-			dependentStagedModelsMap.get(Folder.class.getSimpleName());
+			dependentStagedModelsMap.get(DLFolder.class.getSimpleName());
 
 		Folder folder = (Folder)folderDependentStagedModels.get(0);
 
 		List<StagedModel> fileEntryDependentStagedModels =
-			dependentStagedModelsMap.get(FileEntry.class.getSimpleName());
+			dependentStagedModelsMap.get(DLFileEntry.class.getSimpleName());
 
 		FileEntry fileEntry = (FileEntry)fileEntryDependentStagedModels.get(0);
 
 		return DLAppTestUtil.addDLFileShortcut(
 			fileEntry, group.getGroupId(), folder.getFolderId());
+	}
+
+	@Override
+	protected AssetEntry fetchAssetEntry(StagedModel stagedModel, Group group)
+		throws Exception {
+
+		return null;
 	}
 
 	@Override
@@ -117,43 +121,13 @@ public class DLFileShortcutStagedModelDataHandlerTest
 	}
 
 	@Override
-	protected void validateAssets(
-			String classUuid, StagedModelAssets stagedModelAssets, Group group)
-		throws Exception {
-
-		AssetEntry assetEntry = AssetEntryLocalServiceUtil.getEntry(
-			group.getGroupId(), classUuid);
-
-		List<AssetCategory> assetCategories =
-			AssetCategoryLocalServiceUtil.getEntryCategories(
-				assetEntry.getEntryId());
-
-		Assert.assertEquals(1, assetCategories.size());
-
-		AssetCategory assetCategory = stagedModelAssets.getAssetCategory();
-		AssetCategory importedAssetCategory = assetCategories.get(0);
-
-		Assert.assertEquals(
-			assetCategory.getUuid(), importedAssetCategory.getUuid());
-
-		AssetVocabulary assetVocabulary =
-			stagedModelAssets.getAssetVocabulary();
-		AssetVocabulary importedAssetVocabulary =
-			AssetVocabularyLocalServiceUtil.getVocabulary(
-				importedAssetCategory.getVocabularyId());
-
-		Assert.assertEquals(
-			assetVocabulary.getUuid(), importedAssetVocabulary.getUuid());
-	}
-
-	@Override
 	protected void validateImport(
 			Map<String, List<StagedModel>> dependentStagedModelsMap,
 			Group group)
 		throws Exception {
 
 		List<StagedModel> fileEntryDependentStagedModels =
-			dependentStagedModelsMap.get(FileEntry.class.getSimpleName());
+			dependentStagedModelsMap.get(DLFileEntry.class.getSimpleName());
 
 		Assert.assertEquals(1, fileEntryDependentStagedModels.size());
 
@@ -163,7 +137,7 @@ public class DLFileShortcutStagedModelDataHandlerTest
 			fileEntry.getUuid(), group.getGroupId());
 
 		List<StagedModel> folderDependentStagedModels =
-			dependentStagedModelsMap.get(Folder.class.getSimpleName());
+			dependentStagedModelsMap.get(DLFolder.class.getSimpleName());
 
 		Assert.assertEquals(1, folderDependentStagedModels.size());
 

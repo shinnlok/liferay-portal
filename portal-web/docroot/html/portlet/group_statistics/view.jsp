@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -45,7 +45,7 @@ for (int displayActivityCounterNameIndex : displayActivityCounterNameIndexes) {
 			assetTags = AssetTagLocalServiceUtil.getSocialActivityCounterOffsetTags(scopeGroupId, displayActivityCounterName, -12, 0);
 		}
 
-		title = title + LanguageUtil.format(pageContext, "tag-cloud-for-x", new Object[] {LanguageUtil.get(pageContext, "group.statistics.title." + displayActivityCounterName)});
+		title = title + LanguageUtil.format(pageContext, "tag-cloud-for-x", LanguageUtil.get(pageContext, "group.statistics.title." + displayActivityCounterName), false);
 
 		dataSize = assetTags.size();
 	}
@@ -81,7 +81,7 @@ for (int displayActivityCounterNameIndex : displayActivityCounterNameIndexes) {
 
 	<div class="group-statistics-container">
 		<liferay-ui:panel collapsible="<%= true %>" extended="<%= true %>" id='<%= "groupStatisticsPanel" + displayActivityCounterNameIndex %>' persistState="<%= true %>" title="<%= title %>">
-			<div class="group-statistics-body chart-<%= chartType %>" style="min-height: <%= displayHeight %>px;">
+			<div class="group-statistics-body chart-<%= HtmlUtil.escapeAttribute(chartType) %>" style="min-height: <%= displayHeight %>px;">
 				<c:choose>
 					<c:when test="<%= dataSize > 0 %>">
 						<c:choose>

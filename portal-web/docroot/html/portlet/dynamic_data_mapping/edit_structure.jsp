@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -100,7 +100,7 @@ if (Validator.isNotNull(script)) {
 		title = structure.getName(locale);
 	}
 	else {
-		title = LanguageUtil.format(pageContext, "new-x", ddmDisplay.getStructureName(locale));
+		title = LanguageUtil.format(pageContext, "new-x", ddmDisplay.getStructureName(locale), false);
 	}
 	%>
 
@@ -115,7 +115,7 @@ if (Validator.isNotNull(script)) {
 
 	<aui:fieldset>
 		<aui:field-wrapper>
-			<c:if test="<%= (DDMStorageLinkLocalServiceUtil.getStructureStorageLinksCount(classPK) > 0) || (JournalArticleLocalServiceUtil.getStructureArticlesCount(groupId, structureKey) > 0) %>">
+			<c:if test="<%= (structure != null) && ((DDMStorageLinkLocalServiceUtil.getStructureStorageLinksCount(classPK) > 0) || (JournalArticleLocalServiceUtil.getStructureArticlesCount(groupId, structureKey) > 0)) %>">
 				<div class="alert alert-warning">
 					<liferay-ui:message key="there-are-content-references-to-this-structure.-you-may-lose-data-if-a-field-name-is-renamed-or-removed" />
 				</div>
@@ -176,7 +176,7 @@ if (Validator.isNotNull(script)) {
 
 				<aui:input name="description" />
 
-				<aui:field-wrapper label='<%= LanguageUtil.format(pageContext, "parent-x", ddmDisplay.getStructureName(locale)) %>'>
+				<aui:field-wrapper label='<%= LanguageUtil.format(pageContext, "parent-x", ddmDisplay.getStructureName(locale), false) %>'>
 					<aui:input name="parentStructureId" type="hidden" value="<%= parentStructureId %>" />
 
 					<div class="input-append">
@@ -243,12 +243,15 @@ if (Validator.isNotNull(script)) {
 				title: '<%= HtmlUtil.escapeJS(scopeTitle) %>'
 			},
 			function(event) {
+				var A = AUI();
+
 				document.<portlet:namespace />fm.<portlet:namespace />parentStructureId.value = event.ddmstructureid;
 
 				var nameEl = document.getElementById('<portlet:namespace />parentStructureName');
 
 				nameEl.href = '<portlet:renderURL><portlet:param name="struts_action" value="/dynamic_data_mapping/edit_structure" /><portlet:param name="redirect" value="<%= currentURL %>" /><portlet:param name="groupId" value="<%= String.valueOf(scopeGroupId) %>" /><portlet:param name="classNameId" value="<%= String.valueOf(classNameId) %>" /></portlet:renderURL>&<portlet:namespace />classPK=' + event.ddmstructureid;
-				nameEl.value = event.name;
+
+				nameEl.value = A.Lang.String.unescapeEntities(event.name);
 
 				document.getElementById('<portlet:namespace />removeParentStructureButton').disabled = false;
 			}

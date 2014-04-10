@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,7 +18,6 @@ import com.liferay.portal.NoSuchCountryException;
 import com.liferay.portal.NoSuchModelException;
 import com.liferay.portal.NoSuchRegionException;
 import com.liferay.portal.kernel.configuration.Filter;
-import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -39,7 +38,6 @@ import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -55,7 +53,6 @@ import com.liferay.portal.model.ResourcedModel;
 import com.liferay.portal.model.TrashedModel;
 import com.liferay.portal.model.User;
 import com.liferay.portal.model.WorkflowedModel;
-import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.security.permission.PermissionThreadLocal;
 import com.liferay.portal.service.CountryServiceUtil;
@@ -96,6 +93,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
 
 /**
@@ -105,13 +104,6 @@ import javax.portlet.PortletURL;
  * @author Raymond Augé
  */
 public abstract class BaseIndexer implements Indexer {
-
-	public static final int INDEX_FILTER_SEARCH_LIMIT = GetterUtil.getInteger(
-		PropsUtil.get(PropsKeys.INDEX_FILTER_SEARCH_LIMIT));
-
-	public BaseIndexer() {
-		_document = new DocumentImpl();
-	}
 
 	@Override
 	public void addRelatedEntryFields(Document document, Object obj)
@@ -143,6 +135,11 @@ public abstract class BaseIndexer implements Indexer {
 		catch (Exception e) {
 			throw new SearchException(e);
 		}
+	}
+
+	@Override
+	public int getDatabaseCount() throws Exception {
+		return 0;
 	}
 
 	@Override
@@ -320,15 +317,31 @@ public abstract class BaseIndexer implements Indexer {
 		return getSortField(orderByCol);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #getSummary(Document, Locale,
+	 *             String, PortletURL, PortletRequest, PortletResponse)}
+	 */
+	@Deprecated
 	@Override
 	public Summary getSummary(
 			Document document, Locale locale, String snippet,
 			PortletURL portletURL)
 		throws SearchException {
 
+		return getSummary(document, locale, snippet, portletURL, null, null);
+	}
+
+	@Override
+	public Summary getSummary(
+			Document document, Locale locale, String snippet,
+			PortletURL portletURL, PortletRequest portletRequest,
+			PortletResponse portletResponse)
+		throws SearchException {
+
 		try {
 			Summary summary = doGetSummary(
-				document, locale, snippet, portletURL);
+				document, locale, snippet, portletURL, portletRequest,
+				portletResponse);
 
 			for (IndexerPostProcessor indexerPostProcessor :
 					_indexerPostProcessors) {
@@ -373,6 +386,18 @@ public abstract class BaseIndexer implements Indexer {
 	@Override
 	public boolean isStagingAware() {
 		return _stagingAware;
+	}
+
+	@Override
+	public boolean isVisible(long classPK, int status) throws Exception {
+		return true;
+	}
+
+	@Override
+	public boolean isVisibleRelatedEntry(long classPK, int status)
+		throws Exception {
+
+		return true;
 	}
 
 	@Override
@@ -486,30 +511,33 @@ public abstract class BaseIndexer implements Indexer {
 	@Override
 	public Hits search(SearchContext searchContext) throws SearchException {
 		try {
-			searchContext.setSearchEngineId(getSearchEngineId());
+			Hits hits = null;
 
-			BooleanQuery fullQuery = getFullQuery(searchContext);
+			QueryConfig queryConfig = searchContext.getQueryConfig();
 
-			fullQuery.setQueryConfig(searchContext.getQueryConfig());
+			if (ArrayUtil.isEmpty(queryConfig.getSelectedFieldNames()) &&
+				!ArrayUtil.isEmpty(getDefaultSelectedFieldNames())) {
+
+				queryConfig.setSelectedFieldNames(
+					getDefaultSelectedFieldNames());
+			}
+
+			addFacetSelectedFieldNames(searchContext, queryConfig);
 
 			PermissionChecker permissionChecker =
 				PermissionThreadLocal.getPermissionChecker();
 
-			int end = searchContext.getEnd();
-			int start = searchContext.getStart();
+			if ((permissionChecker != null) &&
+				isUseSearchResultPermissionFilter(searchContext)) {
 
-			if (isFilterSearch() && (permissionChecker != null)) {
-				searchContext.setEnd(end + INDEX_FILTER_SEARCH_LIMIT);
-				searchContext.setStart(0);
+				SearchResultPermissionFilter searchResultPermissionFilter =
+					new DefaultSearchResultPermissionFilter(
+						this, permissionChecker);
+
+				hits = searchResultPermissionFilter.search(searchContext);
 			}
-
-			Hits hits = SearchEngineUtil.search(searchContext, fullQuery);
-
-			searchContext.setEnd(end);
-			searchContext.setStart(start);
-
-			if (isFilterSearch() && (permissionChecker != null)) {
-				hits = filterSearch(hits, permissionChecker, searchContext);
+			else {
+				hits = doSearch(searchContext);
 			}
 
 			processHits(searchContext, hits);
@@ -522,6 +550,18 @@ public abstract class BaseIndexer implements Indexer {
 		catch (Exception e) {
 			throw new SearchException(e);
 		}
+	}
+
+	@Override
+	public Hits search(
+			SearchContext searchContext, String... selectedFieldNames)
+		throws SearchException {
+
+		QueryConfig queryConfig = searchContext.getQueryConfig();
+
+		queryConfig.setSelectedFieldNames(selectedFieldNames);
+
+		return search(searchContext);
 	}
 
 	@Override
@@ -592,6 +632,32 @@ public abstract class BaseIndexer implements Indexer {
 
 		document.addLocalizedKeyword(
 			"localized_title", assetEntry.getTitleMap(), true);
+		document.addKeyword("visible", assetEntry.isVisible());
+	}
+
+	protected void addFacetSelectedFieldNames(
+		SearchContext searchContext, QueryConfig queryConfig) {
+
+		String[] selectedFieldNames = queryConfig.getSelectedFieldNames();
+
+		if (ArrayUtil.isEmpty(selectedFieldNames) ||
+			(selectedFieldNames.length == 1) &&
+			selectedFieldNames[0].equals(Field.ANY)) {
+
+			return;
+		}
+
+		Set<String> selectedFieldNameSet = SetUtil.fromArray(
+			selectedFieldNames);
+
+		Map<String, Facet> facets = searchContext.getFacets();
+
+		selectedFieldNameSet.addAll(facets.keySet());
+
+		selectedFieldNames = selectedFieldNameSet.toArray(
+			new String[selectedFieldNameSet.size()]);
+
+		queryConfig.setSelectedFieldNames(selectedFieldNames);
 	}
 
 	/**
@@ -1307,7 +1373,8 @@ public abstract class BaseIndexer implements Indexer {
 
 	protected abstract Summary doGetSummary(
 			Document document, Locale locale, String snippet,
-			PortletURL portletURL)
+			PortletURL portletURL, PortletRequest portletRequest,
+			PortletResponse portletResponse)
 		throws Exception;
 
 	protected abstract void doReindex(Object obj) throws Exception;
@@ -1321,87 +1388,18 @@ public abstract class BaseIndexer implements Indexer {
 		throws Exception {
 	}
 
-	protected Hits filterSearch(
-		Hits hits, PermissionChecker permissionChecker,
-		SearchContext searchContext) {
+	protected Hits doSearch(SearchContext searchContext)
+		throws SearchException {
 
-		List<Document> docs = new ArrayList<Document>();
-		List<Float> scores = new ArrayList<Float>();
+		searchContext.setSearchEngineId(getSearchEngineId());
 
-		int start = searchContext.getStart();
-		int end = searchContext.getEnd();
+		BooleanQuery fullQuery = getFullQuery(searchContext);
 
-		String paginationType = GetterUtil.getString(
-			searchContext.getAttribute("paginationType"), "more");
+		QueryConfig queryConfig = searchContext.getQueryConfig();
 
-		boolean hasMore = false;
+		fullQuery.setQueryConfig(queryConfig);
 
-		Document[] documents = hits.getDocs();
-
-		int excludeDocsSize = 0;
-
-		for (int i = 0; i < documents.length; i++) {
-			try {
-				Document document = documents[i];
-
-				String entryClassName = document.get(Field.ENTRY_CLASS_NAME);
-				long entryClassPK = GetterUtil.getLong(
-					document.get(Field.ENTRY_CLASS_PK));
-
-				Indexer indexer = IndexerRegistryUtil.getIndexer(
-					entryClassName);
-
-				if ((indexer.isFilterSearch() &&
-					 indexer.hasPermission(
-						 permissionChecker, entryClassName, entryClassPK,
-						 ActionKeys.VIEW)) ||
-					!indexer.isFilterSearch() ||
-					!indexer.isPermissionAware()) {
-
-					docs.add(document);
-					scores.add(hits.score(i));
-				}
-				else {
-					excludeDocsSize++;
-				}
-			}
-			catch (Exception e) {
-				excludeDocsSize++;
-			}
-
-			if (paginationType.equals("more") && (end > 0) &&
-				(end < documents.length) && (docs.size() >= end)) {
-
-				hasMore = true;
-
-				break;
-			}
-		}
-
-		int length = docs.size();
-
-		if (hasMore) {
-			length = documents.length - excludeDocsSize;
-		}
-
-		hits.setLength(length);
-
-		if ((start != QueryUtil.ALL_POS) && (end != QueryUtil.ALL_POS)) {
-			if (end > length) {
-				end = length;
-			}
-
-			docs = docs.subList(start, end);
-		}
-
-		hits.setDocs(docs.toArray(new Document[docs.size()]));
-		hits.setScores(scores.toArray(new Float[scores.size()]));
-
-		hits.setSearchTime(
-			(float)(System.currentTimeMillis() - hits.getStart()) /
-				Time.SECOND);
-
-		return hits;
+		return SearchEngineUtil.search(searchContext, fullQuery);
 	}
 
 	protected Document getBaseModelDocument(
@@ -1534,6 +1532,10 @@ public abstract class BaseIndexer implements Indexer {
 		return classNames[0];
 	}
 
+	protected String[] getDefaultSelectedFieldNames() {
+		return _defaultSelectedFieldNames;
+	}
+
 	protected Set<String> getLocalizedCountryNames(Country country) {
 		Set<String> countryNames = new HashSet<String>();
 
@@ -1594,6 +1596,23 @@ public abstract class BaseIndexer implements Indexer {
 		}
 
 		return null;
+	}
+
+	protected boolean isUseSearchResultPermissionFilter(
+		SearchContext searchContext) {
+
+		return isFilterSearch();
+	}
+
+	protected boolean isVisible(int entryStatus, int queryStatus) {
+		if (((queryStatus != WorkflowConstants.STATUS_ANY) &&
+			 (entryStatus == queryStatus)) ||
+			(entryStatus != WorkflowConstants.STATUS_IN_TRASH)) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	protected Document newDocument() {
@@ -1674,6 +1693,12 @@ public abstract class BaseIndexer implements Indexer {
 		}
 	}
 
+	protected void setDefaultSelectedFieldNames(
+		String[] getDefaultSelectedFieldNames) {
+
+		_defaultSelectedFieldNames = getDefaultSelectedFieldNames;
+	}
+
 	protected void setFilterSearch(boolean filterSearch) {
 		_filterSearch = filterSearch;
 	}
@@ -1696,7 +1721,8 @@ public abstract class BaseIndexer implements Indexer {
 
 	private static Log _log = LogFactoryUtil.getLog(BaseIndexer.class);
 
-	private Document _document;
+	private String[] _defaultSelectedFieldNames;
+	private Document _document = new DocumentImpl();
 	private boolean _filterSearch;
 	private boolean _indexerEnabled = true;
 	private IndexerPostProcessor[] _indexerPostProcessors =

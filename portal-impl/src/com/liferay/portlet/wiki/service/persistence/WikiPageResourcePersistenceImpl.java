@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,7 +32,6 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.model.CacheModel;
@@ -241,7 +240,7 @@ public class WikiPageResourcePersistenceImpl extends BasePersistenceImpl<WikiPag
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<WikiPageResource>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<WikiPageResource>)QueryUtil.list(q,
@@ -939,7 +938,7 @@ public class WikiPageResourcePersistenceImpl extends BasePersistenceImpl<WikiPag
 			CacheRegistryUtil.clear(WikiPageResourceImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(WikiPageResourceImpl.class.getName());
+		EntityCacheUtil.clearCache(WikiPageResourceImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -1200,7 +1199,7 @@ public class WikiPageResourcePersistenceImpl extends BasePersistenceImpl<WikiPag
 
 		EntityCacheUtil.putResult(WikiPageResourceModelImpl.ENTITY_CACHE_ENABLED,
 			WikiPageResourceImpl.class, wikiPageResource.getPrimaryKey(),
-			wikiPageResource);
+			wikiPageResource, false);
 
 		clearUniqueFindersCache(wikiPageResource);
 		cacheUniqueFindersCache(wikiPageResource);
@@ -1429,7 +1428,7 @@ public class WikiPageResourcePersistenceImpl extends BasePersistenceImpl<WikiPag
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<WikiPageResource>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<WikiPageResource>)QueryUtil.list(q,

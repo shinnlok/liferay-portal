@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,9 +32,9 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.CacheModel;
+import com.liferay.portal.model.MVCCModel;
 import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.UserTracker;
 import com.liferay.portal.model.impl.UserTrackerImpl;
@@ -222,7 +222,7 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<UserTracker>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<UserTracker>)QueryUtil.list(q, getDialect(),
@@ -712,7 +712,7 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<UserTracker>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<UserTracker>)QueryUtil.list(q, getDialect(),
@@ -1215,7 +1215,7 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<UserTracker>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<UserTracker>)QueryUtil.list(q, getDialect(),
@@ -1645,7 +1645,7 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 			CacheRegistryUtil.clear(UserTrackerImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(UserTrackerImpl.class.getName());
+		EntityCacheUtil.clearCache(UserTrackerImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -1878,7 +1878,8 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 		}
 
 		EntityCacheUtil.putResult(UserTrackerModelImpl.ENTITY_CACHE_ENABLED,
-			UserTrackerImpl.class, userTracker.getPrimaryKey(), userTracker);
+			UserTrackerImpl.class, userTracker.getPrimaryKey(), userTracker,
+			false);
 
 		userTracker.resetOriginalValues();
 
@@ -1895,6 +1896,7 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 		userTrackerImpl.setNew(userTracker.isNew());
 		userTrackerImpl.setPrimaryKey(userTracker.getPrimaryKey());
 
+		userTrackerImpl.setMvccVersion(userTracker.getMvccVersion());
 		userTrackerImpl.setUserTrackerId(userTracker.getUserTrackerId());
 		userTrackerImpl.setCompanyId(userTracker.getCompanyId());
 		userTrackerImpl.setUserId(userTracker.getUserId());
@@ -2106,7 +2108,7 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<UserTracker>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<UserTracker>)QueryUtil.list(q, getDialect(),
@@ -2233,10 +2235,22 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 			}
 		};
 
-	private static CacheModel<UserTracker> _nullUserTrackerCacheModel = new CacheModel<UserTracker>() {
-			@Override
-			public UserTracker toEntityModel() {
-				return _nullUserTracker;
-			}
-		};
+	private static CacheModel<UserTracker> _nullUserTrackerCacheModel = new NullCacheModel();
+
+	private static class NullCacheModel implements CacheModel<UserTracker>,
+		MVCCModel {
+		@Override
+		public long getMvccVersion() {
+			return 0;
+		}
+
+		@Override
+		public void setMvccVersion(long mvccVersion) {
+		}
+
+		@Override
+		public UserTracker toEntityModel() {
+			return _nullUserTracker;
+		}
+	}
 }

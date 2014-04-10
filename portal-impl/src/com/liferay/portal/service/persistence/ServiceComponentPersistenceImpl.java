@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -33,9 +33,9 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.CacheModel;
+import com.liferay.portal.model.MVCCModel;
 import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.ServiceComponent;
 import com.liferay.portal.model.impl.ServiceComponentImpl;
@@ -249,7 +249,7 @@ public class ServiceComponentPersistenceImpl extends BasePersistenceImpl<Service
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<ServiceComponent>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<ServiceComponent>)QueryUtil.list(q,
@@ -961,7 +961,7 @@ public class ServiceComponentPersistenceImpl extends BasePersistenceImpl<Service
 			CacheRegistryUtil.clear(ServiceComponentImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(ServiceComponentImpl.class.getName());
+		EntityCacheUtil.clearCache(ServiceComponentImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -1218,7 +1218,7 @@ public class ServiceComponentPersistenceImpl extends BasePersistenceImpl<Service
 
 		EntityCacheUtil.putResult(ServiceComponentModelImpl.ENTITY_CACHE_ENABLED,
 			ServiceComponentImpl.class, serviceComponent.getPrimaryKey(),
-			serviceComponent);
+			serviceComponent, false);
 
 		clearUniqueFindersCache(serviceComponent);
 		cacheUniqueFindersCache(serviceComponent);
@@ -1239,6 +1239,7 @@ public class ServiceComponentPersistenceImpl extends BasePersistenceImpl<Service
 		serviceComponentImpl.setNew(serviceComponent.isNew());
 		serviceComponentImpl.setPrimaryKey(serviceComponent.getPrimaryKey());
 
+		serviceComponentImpl.setMvccVersion(serviceComponent.getMvccVersion());
 		serviceComponentImpl.setServiceComponentId(serviceComponent.getServiceComponentId());
 		serviceComponentImpl.setBuildNamespace(serviceComponent.getBuildNamespace());
 		serviceComponentImpl.setBuildNumber(serviceComponent.getBuildNumber());
@@ -1448,7 +1449,7 @@ public class ServiceComponentPersistenceImpl extends BasePersistenceImpl<Service
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<ServiceComponent>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<ServiceComponent>)QueryUtil.list(q,
@@ -1583,10 +1584,22 @@ public class ServiceComponentPersistenceImpl extends BasePersistenceImpl<Service
 			}
 		};
 
-	private static CacheModel<ServiceComponent> _nullServiceComponentCacheModel = new CacheModel<ServiceComponent>() {
-			@Override
-			public ServiceComponent toEntityModel() {
-				return _nullServiceComponent;
-			}
-		};
+	private static CacheModel<ServiceComponent> _nullServiceComponentCacheModel = new NullCacheModel();
+
+	private static class NullCacheModel implements CacheModel<ServiceComponent>,
+		MVCCModel {
+		@Override
+		public long getMvccVersion() {
+			return 0;
+		}
+
+		@Override
+		public void setMvccVersion(long mvccVersion) {
+		}
+
+		@Override
+		public ServiceComponent toEntityModel() {
+			return _nullServiceComponent;
+		}
+	}
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,7 @@
 
 package com.liferay.portal.kernel.dao.search;
 
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -198,7 +199,7 @@ public class RowChecker {
 		sb.append("name=\"");
 		sb.append(name);
 		sb.append("\" type=\"checkbox\" value=\"");
-		sb.append(value);
+		sb.append(HtmlUtil.escapeAttribute(value));
 		sb.append("\" ");
 
 		if (Validator.isNotNull(_allRowIds)) {

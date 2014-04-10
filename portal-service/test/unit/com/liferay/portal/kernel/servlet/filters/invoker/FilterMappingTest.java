@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -65,27 +65,7 @@ public class FilterMappingTest extends PowerMockito {
 	}
 
 	@Test
-	public void testIsMatchWithJSessionId() {
-		List<String> urlPatterns = new ArrayList<String>();
-
-		urlPatterns.add("/c/portal/login");
-
-		FilterMapping filterMapping = new FilterMapping(
-			_filter, _filterConfig, urlPatterns, _dispatchers);
-
-		String uri = "/c/portal/login;jsessionid=ACD311312312323BF.worker1";
-
-		MockHttpServletRequest mockHttpServletRequest =
-			new MockHttpServletRequest(HttpMethods.GET, uri);
-
-		Assert.assertEquals(
-			true,
-			filterMapping.isMatch(
-				mockHttpServletRequest, Dispatcher.REQUEST, uri));
-	}
-
-	@Test
-	public void testIsMatchWithoutJSessionId() {
+	public void testIsMatchURLPattern() {
 		List<String> urlPatterns = new ArrayList<String>();
 
 		urlPatterns.add("/c/portal/login");

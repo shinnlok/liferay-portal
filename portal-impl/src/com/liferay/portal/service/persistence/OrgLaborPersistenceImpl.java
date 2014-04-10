@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,8 +32,8 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.model.CacheModel;
+import com.liferay.portal.model.MVCCModel;
 import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.OrgLabor;
 import com.liferay.portal.model.impl.OrgLaborImpl;
@@ -226,7 +226,7 @@ public class OrgLaborPersistenceImpl extends BasePersistenceImpl<OrgLabor>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<OrgLabor>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<OrgLabor>)QueryUtil.list(q, getDialect(),
@@ -628,7 +628,7 @@ public class OrgLaborPersistenceImpl extends BasePersistenceImpl<OrgLabor>
 			CacheRegistryUtil.clear(OrgLaborImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(OrgLaborImpl.class.getName());
+		EntityCacheUtil.clearCache(OrgLaborImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -823,7 +823,7 @@ public class OrgLaborPersistenceImpl extends BasePersistenceImpl<OrgLabor>
 		}
 
 		EntityCacheUtil.putResult(OrgLaborModelImpl.ENTITY_CACHE_ENABLED,
-			OrgLaborImpl.class, orgLabor.getPrimaryKey(), orgLabor);
+			OrgLaborImpl.class, orgLabor.getPrimaryKey(), orgLabor, false);
 
 		orgLabor.resetOriginalValues();
 
@@ -840,6 +840,7 @@ public class OrgLaborPersistenceImpl extends BasePersistenceImpl<OrgLabor>
 		orgLaborImpl.setNew(orgLabor.isNew());
 		orgLaborImpl.setPrimaryKey(orgLabor.getPrimaryKey());
 
+		orgLaborImpl.setMvccVersion(orgLabor.getMvccVersion());
 		orgLaborImpl.setOrgLaborId(orgLabor.getOrgLaborId());
 		orgLaborImpl.setOrganizationId(orgLabor.getOrganizationId());
 		orgLaborImpl.setTypeId(orgLabor.getTypeId());
@@ -1058,7 +1059,7 @@ public class OrgLaborPersistenceImpl extends BasePersistenceImpl<OrgLabor>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<OrgLabor>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<OrgLabor>)QueryUtil.list(q, getDialect(),
@@ -1185,10 +1186,22 @@ public class OrgLaborPersistenceImpl extends BasePersistenceImpl<OrgLabor>
 			}
 		};
 
-	private static CacheModel<OrgLabor> _nullOrgLaborCacheModel = new CacheModel<OrgLabor>() {
-			@Override
-			public OrgLabor toEntityModel() {
-				return _nullOrgLabor;
-			}
-		};
+	private static CacheModel<OrgLabor> _nullOrgLaborCacheModel = new NullCacheModel();
+
+	private static class NullCacheModel implements CacheModel<OrgLabor>,
+		MVCCModel {
+		@Override
+		public long getMvccVersion() {
+			return 0;
+		}
+
+		@Override
+		public void setMvccVersion(long mvccVersion) {
+		}
+
+		@Override
+		public OrgLabor toEntityModel() {
+			return _nullOrgLabor;
+		}
+	}
 }

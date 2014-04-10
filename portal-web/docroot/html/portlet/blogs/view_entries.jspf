@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,7 +17,7 @@
 <%
 boolean showAddEntryButton = BlogsPermission.contains(permissionChecker, scopeGroupId, ActionKeys.ADD_ENTRY);
 boolean showPermissionsButton = BlogsPermission.contains(permissionChecker, scopeGroupId, ActionKeys.PERMISSIONS);
-boolean showSubscribeButton = BlogsPermission.contains(permissionChecker, scopeGroupId, ActionKeys.SUBSCRIBE) && (BlogsUtil.getEmailEntryAddedEnabled(portletPreferences) || BlogsUtil.getEmailEntryUpdatedEnabled(portletPreferences));
+boolean showSubscribeButton = BlogsPermission.contains(permissionChecker, scopeGroupId, ActionKeys.SUBSCRIBE) && (blogsSettings.getEmailEntryAddedEnabled() || blogsSettings.getEmailEntryUpdatedEnabled());
 showSearch = showSearch && !results.isEmpty();
 %>
 
@@ -58,58 +58,6 @@ showSearch = showSearch && !results.isEmpty();
 		</c:if>
 	</aui:nav-bar>
 </c:if>
-
-<liferay-ui:categorization-filter
-	assetType="entries"
-	portletURL="<%= portletURL %>"
-/>
-
-<%
-long portletDisplayDDMTemplateId = PortletDisplayTemplateUtil.getPortletDisplayTemplateDDMTemplateId(displayStyleGroupId, displayStyle);
-
-if (portletDisplayDDMTemplateId > 0) {
-%>
-
-	<%= PortletDisplayTemplateUtil.renderDDMTemplate(pageContext, portletDisplayDDMTemplateId, _convertToBlogEntries(results)) %>
-
-<%
-}
-else {
-	for (Object result : results) {
-		BlogsEntry entry = null;
-
-		AssetEntry assetEntry = null;
-
-		if (result instanceof AssetEntry) {
-			assetEntry = (AssetEntry)result;
-
-			entry = BlogsEntryLocalServiceUtil.getEntry(assetEntry.getClassPK());
-
-			AssetUtil.addLayoutTags(request, assetEntry.getTags());
-		}
-		else {
-			entry = (BlogsEntry)result;
-		}
-
-		if (((entry.getStatus() == WorkflowConstants.STATUS_DRAFT) || entry.getDisplayDate().after(new Date())) && (entry.getUserId() != user.getUserId()) && !permissionChecker.isGroupAdmin(scopeGroupId)) {
-			searchContainer.setTotal(searchContainer.getTotal() - 1);
-
-			continue;
-		}
-
-		request.setAttribute("view_entry_content.jsp-searchContainer", searchContainer);
-
-		request.setAttribute("view_entry_content.jsp-entry", entry);
-
-		request.setAttribute("view_entry_content.jsp-assetEntry", assetEntry);
-%>
-
-	<liferay-util:include page="/html/portlet/blogs/view_entry_content.jsp" />
-
-<%
-	}
-}
-%>
 
 <div class="subscribe">
 	<c:if test="<%= enableRSS %>">
@@ -156,6 +104,60 @@ else {
 		</c:choose>
 	</c:if>
 </div>
+
+<liferay-ui:categorization-filter
+	assetType="entries"
+	portletURL="<%= portletURL %>"
+/>
+
+<%
+long portletDisplayDDMTemplateId = PortletDisplayTemplateUtil.getPortletDisplayTemplateDDMTemplateId(displayStyleGroupId, displayStyle);
+
+if (portletDisplayDDMTemplateId > 0) {
+%>
+
+	<div class="entry-body">
+		<%= PortletDisplayTemplateUtil.renderDDMTemplate(pageContext, portletDisplayDDMTemplateId, _convertToBlogEntries(results)) %>
+	</div>
+
+<%
+}
+else {
+	for (Object result : results) {
+		BlogsEntry entry = null;
+
+		AssetEntry assetEntry = null;
+
+		if (result instanceof AssetEntry) {
+			assetEntry = (AssetEntry)result;
+
+			entry = BlogsEntryLocalServiceUtil.getEntry(assetEntry.getClassPK());
+
+			AssetUtil.addLayoutTags(request, assetEntry.getTags());
+		}
+		else {
+			entry = (BlogsEntry)result;
+		}
+
+		if (((entry.getStatus() == WorkflowConstants.STATUS_DRAFT) || entry.getDisplayDate().after(new Date())) && (entry.getUserId() != user.getUserId()) && !permissionChecker.isGroupAdmin(scopeGroupId)) {
+			searchContainer.setTotal(searchContainer.getTotal() - 1);
+
+			continue;
+		}
+
+		request.setAttribute("view_entry_content.jsp-searchContainer", searchContainer);
+
+		request.setAttribute("view_entry_content.jsp-entry", entry);
+
+		request.setAttribute("view_entry_content.jsp-assetEntry", assetEntry);
+%>
+
+	<liferay-util:include page="/html/portlet/blogs/view_entry_content.jsp" />
+
+<%
+	}
+}
+%>
 
 <liferay-ui:search-paginator searchContainer="<%= searchContainer %>" />
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -107,16 +107,44 @@ public class OrgGroupRolePersistenceTest {
 
 		OrgGroupRole newOrgGroupRole = _persistence.create(pk);
 
+		newOrgGroupRole.setMvccVersion(ServiceTestUtil.nextLong());
+
 		_persistence.update(newOrgGroupRole);
 
 		OrgGroupRole existingOrgGroupRole = _persistence.findByPrimaryKey(newOrgGroupRole.getPrimaryKey());
 
+		Assert.assertEquals(existingOrgGroupRole.getMvccVersion(),
+			newOrgGroupRole.getMvccVersion());
 		Assert.assertEquals(existingOrgGroupRole.getOrganizationId(),
 			newOrgGroupRole.getOrganizationId());
 		Assert.assertEquals(existingOrgGroupRole.getGroupId(),
 			newOrgGroupRole.getGroupId());
 		Assert.assertEquals(existingOrgGroupRole.getRoleId(),
 			newOrgGroupRole.getRoleId());
+	}
+
+	@Test
+	public void testCountByGroupId() {
+		try {
+			_persistence.countByGroupId(ServiceTestUtil.nextLong());
+
+			_persistence.countByGroupId(0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByRoleId() {
+		try {
+			_persistence.countByRoleId(ServiceTestUtil.nextLong());
+
+			_persistence.countByRoleId(0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
 	}
 
 	@Test
@@ -249,6 +277,8 @@ public class OrgGroupRolePersistenceTest {
 				ServiceTestUtil.nextLong(), ServiceTestUtil.nextLong());
 
 		OrgGroupRole orgGroupRole = _persistence.create(pk);
+
+		orgGroupRole.setMvccVersion(ServiceTestUtil.nextLong());
 
 		_persistence.update(orgGroupRole);
 

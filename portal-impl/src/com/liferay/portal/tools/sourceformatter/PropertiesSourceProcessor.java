@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -66,13 +66,8 @@ public class PropertiesSourceProcessor extends BaseSourceProcessor {
 			newContent = newContent.substring(0, newContent.length() - 1);
 		}
 
-		if (isAutoFix() && (newContent != null) &&
-			!_portalPortalProperties.equals(newContent)) {
-
-			fileUtil.write(file, newContent);
-
-			sourceFormatterHelper.printError(fileName, file);
-		}
+		compareAndAutoFixContent(
+			file, fileName, _portalPortalProperties, newContent);
 	}
 
 	protected void formatPortalProperties() throws Exception {
@@ -92,23 +87,20 @@ public class PropertiesSourceProcessor extends BaseSourceProcessor {
 			_portalPortalProperties = ContentUtil.get("portal.properties");
 		}
 
-		String[] excludes = null;
 		String[] includes = null;
 
 		if (portalSource) {
-			excludes = new String[] {"**\\bin\\**", "**\\classes\\**"};
 			includes = new String[] {
 				"**\\portal-ext.properties", "**\\portal-legacy-*.properties"
 			};
 		}
 		else {
-			excludes = new String[0];
 			includes = new String[] {
 				"**\\portal.properties", "**\\portal-ext.properties"
 			};
 		}
 
-		List<String> fileNames = getFileNames(excludes, includes);
+		List<String> fileNames = getFileNames(new String[0], includes);
 
 		for (String fileName : fileNames) {
 			File file = new File(BASEDIR + fileName);

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,7 +32,6 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.model.CacheModel;
@@ -241,7 +240,7 @@ public class DLFileEntryMetadataPersistenceImpl extends BasePersistenceImpl<DLFi
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<DLFileEntryMetadata>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<DLFileEntryMetadata>)QueryUtil.list(q,
@@ -771,7 +770,7 @@ public class DLFileEntryMetadataPersistenceImpl extends BasePersistenceImpl<DLFi
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<DLFileEntryMetadata>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<DLFileEntryMetadata>)QueryUtil.list(q,
@@ -1275,7 +1274,7 @@ public class DLFileEntryMetadataPersistenceImpl extends BasePersistenceImpl<DLFi
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<DLFileEntryMetadata>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<DLFileEntryMetadata>)QueryUtil.list(q,
@@ -1775,7 +1774,7 @@ public class DLFileEntryMetadataPersistenceImpl extends BasePersistenceImpl<DLFi
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<DLFileEntryMetadata>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<DLFileEntryMetadata>)QueryUtil.list(q,
@@ -2424,7 +2423,7 @@ public class DLFileEntryMetadataPersistenceImpl extends BasePersistenceImpl<DLFi
 			CacheRegistryUtil.clear(DLFileEntryMetadataImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(DLFileEntryMetadataImpl.class.getName());
+		EntityCacheUtil.clearCache(DLFileEntryMetadataImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -2753,7 +2752,7 @@ public class DLFileEntryMetadataPersistenceImpl extends BasePersistenceImpl<DLFi
 
 		EntityCacheUtil.putResult(DLFileEntryMetadataModelImpl.ENTITY_CACHE_ENABLED,
 			DLFileEntryMetadataImpl.class, dlFileEntryMetadata.getPrimaryKey(),
-			dlFileEntryMetadata);
+			dlFileEntryMetadata, false);
 
 		clearUniqueFindersCache(dlFileEntryMetadata);
 		cacheUniqueFindersCache(dlFileEntryMetadata);
@@ -2985,7 +2984,7 @@ public class DLFileEntryMetadataPersistenceImpl extends BasePersistenceImpl<DLFi
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<DLFileEntryMetadata>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<DLFileEntryMetadata>)QueryUtil.list(q,

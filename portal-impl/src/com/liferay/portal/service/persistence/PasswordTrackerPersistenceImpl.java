@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -33,8 +33,8 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.model.CacheModel;
+import com.liferay.portal.model.MVCCModel;
 import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.PasswordTracker;
 import com.liferay.portal.model.impl.PasswordTrackerImpl;
@@ -226,7 +226,7 @@ public class PasswordTrackerPersistenceImpl extends BasePersistenceImpl<Password
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<PasswordTracker>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<PasswordTracker>)QueryUtil.list(q,
@@ -628,7 +628,7 @@ public class PasswordTrackerPersistenceImpl extends BasePersistenceImpl<Password
 			CacheRegistryUtil.clear(PasswordTrackerImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(PasswordTrackerImpl.class.getName());
+		EntityCacheUtil.clearCache(PasswordTrackerImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -824,7 +824,7 @@ public class PasswordTrackerPersistenceImpl extends BasePersistenceImpl<Password
 
 		EntityCacheUtil.putResult(PasswordTrackerModelImpl.ENTITY_CACHE_ENABLED,
 			PasswordTrackerImpl.class, passwordTracker.getPrimaryKey(),
-			passwordTracker);
+			passwordTracker, false);
 
 		passwordTracker.resetOriginalValues();
 
@@ -841,6 +841,7 @@ public class PasswordTrackerPersistenceImpl extends BasePersistenceImpl<Password
 		passwordTrackerImpl.setNew(passwordTracker.isNew());
 		passwordTrackerImpl.setPrimaryKey(passwordTracker.getPrimaryKey());
 
+		passwordTrackerImpl.setMvccVersion(passwordTracker.getMvccVersion());
 		passwordTrackerImpl.setPasswordTrackerId(passwordTracker.getPasswordTrackerId());
 		passwordTrackerImpl.setUserId(passwordTracker.getUserId());
 		passwordTrackerImpl.setCreateDate(passwordTracker.getCreateDate());
@@ -1049,7 +1050,7 @@ public class PasswordTrackerPersistenceImpl extends BasePersistenceImpl<Password
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<PasswordTracker>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<PasswordTracker>)QueryUtil.list(q,
@@ -1184,10 +1185,22 @@ public class PasswordTrackerPersistenceImpl extends BasePersistenceImpl<Password
 			}
 		};
 
-	private static CacheModel<PasswordTracker> _nullPasswordTrackerCacheModel = new CacheModel<PasswordTracker>() {
-			@Override
-			public PasswordTracker toEntityModel() {
-				return _nullPasswordTracker;
-			}
-		};
+	private static CacheModel<PasswordTracker> _nullPasswordTrackerCacheModel = new NullCacheModel();
+
+	private static class NullCacheModel implements CacheModel<PasswordTracker>,
+		MVCCModel {
+		@Override
+		public long getMvccVersion() {
+			return 0;
+		}
+
+		@Override
+		public void setMvccVersion(long mvccVersion) {
+		}
+
+		@Override
+		public PasswordTracker toEntityModel() {
+			return _nullPasswordTracker;
+		}
+	}
 }

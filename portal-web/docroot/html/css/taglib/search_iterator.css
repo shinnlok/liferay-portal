@@ -12,6 +12,12 @@
 			max-width: none;
 		}
 	}
+
+	@include respond-to(phone) {
+		.selector-button {
+			width: auto;
+		}
+	}
 }
 
 .taglib-search-iterator-page-iterator-top {
@@ -29,14 +35,11 @@
 		margin: 0;
 
 		@include respond-to(phone, tablet) {
+			width: 100%;
+
 			@include respond-to(phone) {
 				float: none;
 				margin-top: 20px;
-				width: 100%;
-			}
-
-			@include respond-to(tablet) {
-				width: 50%;
 			}
 
 			> li {
@@ -51,7 +54,7 @@
 				> a {
 					line-height: 20px;
 					padding: 11px 19px;
-					width: 65%;
+					width: 50%;
 				}
 			}
 		}

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -76,7 +76,7 @@ public class SocialActivityCounterFinderImpl
 
 			sql = StringUtil.replace(sql, "[$NAME$]", getNames(names));
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addScalar(COUNT_COLUMN_NAME, Type.LONG);
 
@@ -148,7 +148,7 @@ public class SocialActivityCounterFinderImpl
 
 			String sql = CustomSQLUtil.get(FIND_AC_BY_G_N_S_E_1);
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -210,7 +210,7 @@ public class SocialActivityCounterFinderImpl
 
 			String sql = CustomSQLUtil.get(FIND_AC_BY_G_N_S_E_2);
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -271,7 +271,7 @@ public class SocialActivityCounterFinderImpl
 				sql, new String[] {"[$CLASS_PK$]", "[$NAME$]"},
 				new String[] {StringUtil.merge(userIds), getNames(names)});
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addEntity(
 				"SocialActivityCounter", SocialActivityCounterImpl.class);
@@ -312,7 +312,7 @@ public class SocialActivityCounterFinderImpl
 
 			sql = StringUtil.replace(sql, "[$NAME$]", getNames(names));
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addScalar("classPK", Type.LONG);
 

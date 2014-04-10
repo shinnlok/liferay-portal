@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -95,8 +95,6 @@ List<Organization> organizations = (List<Organization>)request.getAttribute("use
 </liferay-ui:search-container>
 
 <c:if test="<%= !portletName.equals(PortletKeys.MY_ACCOUNT) %>">
-	<br />
-
 	<liferay-ui:icon
 		cssClass="modify-link"
 		iconCssClass="icon-search"
@@ -110,17 +108,47 @@ List<Organization> organizations = (List<Organization>)request.getAttribute("use
 </c:if>
 
 <aui:script use="liferay-search-container">
+	var Util = Liferay.Util;
+
 	var searchContainer = Liferay.SearchContainer.get('<portlet:namespace />organizationsSearchContainer');
 
-	searchContainer.get('contentBox').delegate(
+	var searchContainerContentBox = searchContainer.get('contentBox');
+
+	searchContainerContentBox.delegate(
 		'click',
 		function(event) {
 			var link = event.currentTarget;
+
+			var rowId = link.attr('data-rowId');
+
 			var tr = link.ancestor('tr');
 
-			searchContainer.deleteRow(tr, link.getAttribute('data-rowId'));
+			var selectOrganization = Util.getWindow('<portlet:namespace />selectOrganization');
+
+			if (selectOrganization) {
+				var selectButton = selectOrganization.iframe.node.get('contentWindow.document').one('.selector-button[data-organizationid="' + rowId + '"]');
+
+				Util.toggleDisabled(selectButton, false);
+			}
+
+			searchContainer.deleteRow(tr, rowId);
 		},
 		'.modify-link'
+	);
+
+	Liferay.on(
+		'<portlet:namespace />enableRemovedOrganizations',
+		function(event) {
+			event.selectors.each(
+				function(item, index, collection) {
+					var modifyLink = searchContainerContentBox.one('.modify-link[data-rowid="' + item.attr('data-organizationid') + '"]');
+
+					if (!modifyLink) {
+						Util.toggleDisabled(item, false);
+					}
+				}
+			);
+		}
 	);
 
 	var selectOrganizationLink = A.one('#<portlet:namespace />selectOrganizationLink');
@@ -129,7 +157,7 @@ List<Organization> organizations = (List<Organization>)request.getAttribute("use
 		selectOrganizationLink.on(
 			'click',
 			function(event) {
-				Liferay.Util.selectEntity(
+				Util.selectEntity(
 					{
 						dialog: {
 							constrain: true,

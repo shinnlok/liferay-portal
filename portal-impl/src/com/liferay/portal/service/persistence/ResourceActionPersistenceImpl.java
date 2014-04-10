@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,9 +32,9 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.CacheModel;
+import com.liferay.portal.model.MVCCModel;
 import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.ResourceAction;
 import com.liferay.portal.model.impl.ResourceActionImpl;
@@ -238,7 +238,7 @@ public class ResourceActionPersistenceImpl extends BasePersistenceImpl<ResourceA
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<ResourceAction>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<ResourceAction>)QueryUtil.list(q,
@@ -965,7 +965,7 @@ public class ResourceActionPersistenceImpl extends BasePersistenceImpl<ResourceA
 			CacheRegistryUtil.clear(ResourceActionImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(ResourceActionImpl.class.getName());
+		EntityCacheUtil.clearCache(ResourceActionImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -1215,7 +1215,7 @@ public class ResourceActionPersistenceImpl extends BasePersistenceImpl<ResourceA
 
 		EntityCacheUtil.putResult(ResourceActionModelImpl.ENTITY_CACHE_ENABLED,
 			ResourceActionImpl.class, resourceAction.getPrimaryKey(),
-			resourceAction);
+			resourceAction, false);
 
 		clearUniqueFindersCache(resourceAction);
 		cacheUniqueFindersCache(resourceAction);
@@ -1235,6 +1235,7 @@ public class ResourceActionPersistenceImpl extends BasePersistenceImpl<ResourceA
 		resourceActionImpl.setNew(resourceAction.isNew());
 		resourceActionImpl.setPrimaryKey(resourceAction.getPrimaryKey());
 
+		resourceActionImpl.setMvccVersion(resourceAction.getMvccVersion());
 		resourceActionImpl.setResourceActionId(resourceAction.getResourceActionId());
 		resourceActionImpl.setName(resourceAction.getName());
 		resourceActionImpl.setActionId(resourceAction.getActionId());
@@ -1443,7 +1444,7 @@ public class ResourceActionPersistenceImpl extends BasePersistenceImpl<ResourceA
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<ResourceAction>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<ResourceAction>)QueryUtil.list(q,
@@ -1570,10 +1571,22 @@ public class ResourceActionPersistenceImpl extends BasePersistenceImpl<ResourceA
 			}
 		};
 
-	private static CacheModel<ResourceAction> _nullResourceActionCacheModel = new CacheModel<ResourceAction>() {
-			@Override
-			public ResourceAction toEntityModel() {
-				return _nullResourceAction;
-			}
-		};
+	private static CacheModel<ResourceAction> _nullResourceActionCacheModel = new NullCacheModel();
+
+	private static class NullCacheModel implements CacheModel<ResourceAction>,
+		MVCCModel {
+		@Override
+		public long getMvccVersion() {
+			return 0;
+		}
+
+		@Override
+		public void setMvccVersion(long mvccVersion) {
+		}
+
+		@Override
+		public ResourceAction toEntityModel() {
+			return _nullResourceAction;
+		}
+	}
 }

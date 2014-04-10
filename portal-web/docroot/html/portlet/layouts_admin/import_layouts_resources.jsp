@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,12 +28,6 @@ else {
 	group = (Group)request.getAttribute(WebKeys.GROUP);
 }
 
-Group liveGroup = group;
-
-if (group.isStagingGroup()) {
-	liveGroup = group.getLiveGroup();
-}
-
 boolean privateLayout = ParamUtil.getBoolean(request, "privateLayout");
 
 FileEntry fileEntry = ExportImportHelperUtil.getTempFileEntry(groupId, themeDisplay.getUserId(), ExportImportHelper.TEMP_FOLDER_NAME);
@@ -44,16 +38,16 @@ ManifestSummary manifestSummary = ExportImportHelperUtil.getManifestSummary(user
 <liferay-ui:error exception="<%= LARFileException.class %>" message="please-specify-a-lar-file-to-import" />
 
 <liferay-ui:error exception="<%= LARFileSizeException.class %>">
-	<liferay-ui:message arguments="<%= PrefsPropsUtil.getLong(PropsKeys.UPLOAD_SERVLET_REQUEST_IMPL_MAX_SIZE) / 1024 %>" key="please-enter-a-file-with-a-valid-file-size-no-larger-than-x" />
+	<liferay-ui:message arguments="<%= TextFormatter.formatStorageSize(PrefsPropsUtil.getLong(PropsKeys.UPLOAD_SERVLET_REQUEST_IMPL_MAX_SIZE), locale) %>" key="please-enter-a-file-with-a-valid-file-size-no-larger-than-x" translateArguments="<%= false %>" />
 </liferay-ui:error>
 
 <liferay-ui:error exception="<%= LARTypeException.class %>">
 
 	<%
-	LARTypeException lpe = (LARTypeException)errorException;
+	LARTypeException lte = (LARTypeException)errorException;
 	%>
 
-	<liferay-ui:message arguments="<%= lpe.getMessage() %>" key="please-import-a-lar-file-of-the-correct-type-x-is-not-valid" />
+	<liferay-ui:message arguments="<%= lte.getMessage() %>" key="please-import-a-lar-file-of-the-correct-type-x-is-not-valid" />
 </liferay-ui:error>
 
 <liferay-ui:error exception="<%= LayoutImportException.class %>" message="an-unexpected-error-occurred-while-importing-your-file" />
@@ -78,7 +72,7 @@ ManifestSummary manifestSummary = ExportImportHelperUtil.getManifestSummary(user
 		%>
 
 			<li>
-				<%= ResourceActionsUtil.getModelResource(locale, layoutPrototypeClassName) %>: <strong><%= layoutPrototypeName %></strong> (<%= layoutPrototypeUuid %>)
+				<%= ResourceActionsUtil.getModelResource(locale, layoutPrototypeClassName) %>: <strong><%= HtmlUtil.escape(layoutPrototypeName) %></strong> (<%= HtmlUtil.escape(layoutPrototypeUuid) %>)
 			</li>
 
 		<%
@@ -95,7 +89,7 @@ ManifestSummary manifestSummary = ExportImportHelperUtil.getManifestSummary(user
 	%>
 
 	<c:if test="<%= le.getType() == LocaleException.TYPE_EXPORT_IMPORT %>">
-		<liferay-ui:message arguments="<%= new String[] {StringUtil.merge(le.getSourceAvailableLocales(), StringPool.COMMA_AND_SPACE), StringUtil.merge(le.getTargetAvailableLocales(), StringPool.COMMA_AND_SPACE)} %>" key="the-available-languages-in-the-lar-file-x-do-not-match-the-site's-available-languages-x" />
+		<liferay-ui:message arguments="<%= new String[] {StringUtil.merge(le.getSourceAvailableLocales(), StringPool.COMMA_AND_SPACE), StringUtil.merge(le.getTargetAvailableLocales(), StringPool.COMMA_AND_SPACE)} %>" key="the-available-languages-in-the-lar-file-x-do-not-match-the-site's-available-languages-x" translateArguments="<%= false %>" />
 	</c:if>
 </liferay-ui:error>
 
@@ -105,7 +99,7 @@ ManifestSummary manifestSummary = ExportImportHelperUtil.getManifestSummary(user
 	RecordSetDuplicateRecordSetKeyException rsdrske = (RecordSetDuplicateRecordSetKeyException)errorException;
 	%>
 
-	<liferay-ui:message arguments="<%= rsdrske.getRecordSetKey() %>" key="dynamic-data-list-record-set-with-record-set-key-x-already-exists" />
+	<liferay-ui:message arguments="<%= rsdrske.getRecordSetKey() %>" key="dynamic-data-list-record-set-with-record-set-key-x-already-exists" translateArguments="<%= false %>" />
 </liferay-ui:error>
 
 <liferay-ui:error exception="<%= StructureDuplicateStructureKeyException.class %>">
@@ -114,7 +108,7 @@ ManifestSummary manifestSummary = ExportImportHelperUtil.getManifestSummary(user
 	StructureDuplicateStructureKeyException sdske = (StructureDuplicateStructureKeyException)errorException;
 	%>
 
-	<liferay-ui:message arguments="<%= sdske.getStructureKey() %>" key="dynamic-data-mapping-structure-with-structure-key-x-already-exists" />
+	<liferay-ui:message arguments="<%= sdske.getStructureKey() %>" key="dynamic-data-mapping-structure-with-structure-key-x-already-exists" translateArguments="<%= false %>" />
 </liferay-ui:error>
 
 <portlet:actionURL var="importPagesURL">
@@ -142,7 +136,7 @@ ManifestSummary manifestSummary = ExportImportHelperUtil.getManifestSummary(user
 						<liferay-ui:message key="name" />
 					</dt>
 					<dd>
-						<%= fileEntry.getTitle() %>
+						<%= HtmlUtil.escape(fileEntry.getTitle()) %>
 					</dd>
 					<dt>
 						<liferay-ui:message key="export" />
@@ -154,20 +148,20 @@ ManifestSummary manifestSummary = ExportImportHelperUtil.getManifestSummary(user
 						%>
 
 						<span onmouseover="Liferay.Portal.ToolTip.show(this, '<%= dateFormatDateTime.format(exportDate) %>')">
-							<liferay-ui:message arguments="<%= LanguageUtil.getTimeDescription(pageContext, System.currentTimeMillis() - exportDate.getTime(), true) %>" key="x-ago" />
+							<liferay-ui:message arguments="<%= LanguageUtil.getTimeDescription(pageContext, System.currentTimeMillis() - exportDate.getTime(), true) %>" key="x-ago" translateArguments="<%= false %>" />
 						</span>
 					</dd>
 					<dt>
 						<liferay-ui:message key="author" />
 					</dt>
 					<dd>
-						<%= fileEntry.getUserName() %>
+						<%= HtmlUtil.escape(fileEntry.getUserName()) %>
 					</dd>
 					<dt>
 						<liferay-ui:message key="size" />
 					</dt>
 					<dd>
-						<%= fileEntry.getSize() / 1024 %>k
+						<%= TextFormatter.formatStorageSize(fileEntry.getSize(), locale) %>
 					</dd>
 				</dl>
 			</aui:fieldset>
@@ -342,8 +336,6 @@ ManifestSummary manifestSummary = ExportImportHelperUtil.getManifestSummary(user
 										<aui:input name="<%= PortletDataHandlerKeys.PORTLET_DATA_CONTROL_DEFAULT %>" type="hidden" value="<%= true %>" />
 
 										<aui:input name="<%= PortletDataHandlerKeys.PORTLET_DATA %>" type="hidden" value="<%= true %>" />
-
-										<aui:input helpMessage="export-import-categories-help" label="categories" name="<%= PortletDataHandlerKeys.CATEGORIES %>" type="checkbox" value="<%= true %>" />
 
 										<%
 										Set<String> displayedControls = new HashSet<String>();
@@ -526,15 +518,14 @@ ManifestSummary manifestSummary = ExportImportHelperUtil.getManifestSummary(user
 			</aui:fieldset>
 
 			<aui:button-row>
-				<portlet:renderURL var="importPagesURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
+				<portlet:renderURL var="backURL">
 					<portlet:param name="struts_action" value="/layouts_admin/import_layouts" />
 					<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.VALIDATE %>" />
 					<portlet:param name="groupId" value="<%= String.valueOf(groupId) %>" />
-					<portlet:param name="liveGroupId" value="<%= String.valueOf(liveGroup.getGroupId()) %>" />
 					<portlet:param name="privateLayout" value="<%= String.valueOf(privateLayout) %>" />
 				</portlet:renderURL>
 
-				<aui:button href="<%= importPagesURL %>" name="back1" value="back" />
+				<aui:button href="<%= backURL %>" name="back1" value="back" />
 
 				<aui:button name="continue" primary="<%= true %>" value="continue" />
 			</aui:button-row>
@@ -575,7 +566,8 @@ ManifestSummary manifestSummary = ExportImportHelperUtil.getManifestSummary(user
 	A.one('#<portlet:namespace />continue').on(
 		'click',
 		function() {
-			A.one('#<portlet:namespace />importConfiguration').hide()
+			A.one('#<portlet:namespace />importConfiguration').hide();
+
 			A.one('#<portlet:namespace />importStrategy').show();
 		}
 	);
@@ -583,8 +575,9 @@ ManifestSummary manifestSummary = ExportImportHelperUtil.getManifestSummary(user
 	A.one('#<portlet:namespace />back').on(
 		'click',
 		function() {
-			A.one('#<portlet:namespace />importConfiguration').show()
 			A.one('#<portlet:namespace />importStrategy').hide();
+
+			A.one('#<portlet:namespace />importConfiguration').show();
 		}
 	);
 </aui:script>

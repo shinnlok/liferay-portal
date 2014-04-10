@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -86,12 +86,17 @@ public class PortletPreferencesFinderImpl
 				sql = StringUtil.replace(sql, _OWNER_ID_SQL, StringPool.BLANK);
 			}
 
-			if (!excludeDefaultPreferences) {
+			if (excludeDefaultPreferences) {
+				sql = StringUtil.replace(
+					sql, "[$PORTLET_PREFERENCES_PREFERENCES_DEFAULT$]",
+					PortletConstants.DEFAULT_PREFERENCES);
+			}
+			else {
 				sql = StringUtil.replace(
 					sql, _PREFERENCES_SQL, StringPool.BLANK);
 			}
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addScalar(COUNT_COLUMN_NAME, Type.LONG);
 
@@ -162,7 +167,7 @@ public class PortletPreferencesFinderImpl
 					sql, _PREFERENCES_SQL, StringPool.BLANK);
 			}
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addScalar(COUNT_COLUMN_NAME, Type.LONG);
 
@@ -215,7 +220,7 @@ public class PortletPreferencesFinderImpl
 
 			String sql = CustomSQLUtil.get(FIND_BY_PORTLET_ID);
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addEntity("PortletPreferences", PortletPreferencesImpl.class);
 
@@ -269,7 +274,7 @@ public class PortletPreferencesFinderImpl
 
 				String sql = CustomSQLUtil.get(FIND_BY_C_G_O_O_P_P);
 
-				SQLQuery q = session.createSQLQuery(sql);
+				SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 				q.addEntity("PortletPreferences", PortletPreferencesImpl.class);
 

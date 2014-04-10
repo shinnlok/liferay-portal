@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -52,7 +52,7 @@ WorkflowTask workflowTask = (WorkflowTask)row.getObject();
 			String message = "proceed";
 
 			if (Validator.isNotNull(transitionName)) {
-				message = transitionName;
+				message = HtmlUtil.escape(transitionName);
 			}
 		%>
 
@@ -129,7 +129,7 @@ WorkflowTask workflowTask = (WorkflowTask)row.getObject();
 					},
 					width: 350
 				},
-				title: title
+				title: Liferay.Util.escapeHTML(title)
 			}
 		);
 	};

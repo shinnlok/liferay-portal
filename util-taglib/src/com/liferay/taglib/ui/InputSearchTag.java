@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -109,6 +109,12 @@ public class InputSearchTag extends IncludeTag {
 			placeholder = buttonLabel;
 		}
 
+		String title = _title;
+
+		if (title == null) {
+			title = LanguageUtil.get(pageContext, "search");
+		}
+
 		request.setAttribute(
 			"liferay-ui:input-search:autoFocus", String.valueOf(_autoFocus));
 		request.setAttribute(
@@ -119,7 +125,7 @@ public class InputSearchTag extends IncludeTag {
 		request.setAttribute(
 			"liferay-ui:input-search:placeholder", placeholder);
 		request.setAttribute("liferay-ui:input-search:showButton", _showButton);
-		request.setAttribute("liferay-ui:input-search:title", _title);
+		request.setAttribute("liferay-ui:input-search:title", title);
 	}
 
 	private static final String _PAGE = "/html/taglib/ui/input_search/page.jsp";

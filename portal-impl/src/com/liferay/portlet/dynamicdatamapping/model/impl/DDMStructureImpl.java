@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -80,7 +80,7 @@ public class DDMStructureImpl extends DDMStructureBaseImpl {
 
 		List<String> fieldNames = new ArrayList<String>();
 
-		Map<String, Map<String, String>> fieldsMap = getFieldsMap();
+		Map<String, Map<String, String>> fieldsMap = getFieldsMap(true);
 
 		for (Map<String, String> field : fieldsMap.values()) {
 			String parentNameKey = _getPrivateAttributeKey("parentName");
@@ -191,7 +191,7 @@ public class DDMStructureImpl extends DDMStructureBaseImpl {
 			throw new StructureFieldException();
 		}
 
-		Map<String, Map<String, String>> fieldsMap = getFieldsMap(locale);
+		Map<String, Map<String, String>> fieldsMap = getFieldsMap(locale, true);
 
 		Map<String, String> field = fieldsMap.get(fieldName);
 
@@ -261,18 +261,37 @@ public class DDMStructureImpl extends DDMStructureBaseImpl {
 	}
 
 	@Override
+	public Map<String, Map<String, String>> getFieldsMap(
+			boolean includeTransientFields)
+		throws PortalException, SystemException {
+
+		return getFieldsMap(getDefaultLanguageId(), includeTransientFields);
+	}
+
+	@Override
 	public Map<String, Map<String, String>> getFieldsMap(String locale)
+		throws PortalException, SystemException {
+
+		return getFieldsMap(locale, false);
+	}
+
+	@Override
+	public Map<String, Map<String, String>> getFieldsMap(
+			String locale, boolean includeTransientFields)
 		throws PortalException, SystemException {
 
 		_indexFieldsMap(locale);
 
-		Map<String, Map<String, Map<String, String>>> localizedFieldsMap =
-			getLocalizedFieldsMap();
+		Map<String, Map<String, Map<String, String>>> fieldsMap = null;
 
-		Map<String, Map<String, String>> fieldsMap = localizedFieldsMap.get(
-			locale);
+		if (includeTransientFields) {
+			fieldsMap = getLocalizedFieldsMap();
+		}
+		else {
+			fieldsMap = getLocalizedPersistentFieldsMap();
+		}
 
-		return fieldsMap;
+		return fieldsMap.get(locale);
 	}
 
 	@Override
@@ -312,6 +331,19 @@ public class DDMStructureImpl extends DDMStructureBaseImpl {
 
 	@Override
 	public Map<String, Map<String, Map<String, String>>>
+		getLocalizedPersistentFieldsMap() {
+
+		if (_localizedPersistentFieldsMap == null) {
+			_localizedPersistentFieldsMap =
+				new ConcurrentHashMap
+					<String, Map<String, Map<String, String>>>();
+		}
+
+		return _localizedPersistentFieldsMap;
+	}
+
+	@Override
+	public Map<String, Map<String, Map<String, String>>>
 		getLocalizedTransientFieldsMap() {
 
 		if (_localizedTransientFieldsMap == null) {
@@ -324,12 +356,28 @@ public class DDMStructureImpl extends DDMStructureBaseImpl {
 	}
 
 	@Override
+	public Map<String, Map<String, String>> getPersistentFieldsMap(
+			String locale)
+		throws PortalException, SystemException {
+
+		_indexFieldsMap(locale);
+
+		Map<String, Map<String, Map<String, String>>>
+			localizedPersistentFieldsMap = getLocalizedPersistentFieldsMap();
+
+		Map<String, Map<String, String>> fieldsMap =
+			localizedPersistentFieldsMap.get(locale);
+
+		return fieldsMap;
+	}
+
+	@Override
 	public List<String> getRootFieldNames()
 		throws PortalException, SystemException {
 
 		List<String> fieldNames = new ArrayList<String>();
 
-		Map<String, Map<String, String>> fieldsMap = getFieldsMap();
+		Map<String, Map<String, String>> fieldsMap = getFieldsMap(true);
 
 		for (Map.Entry<String, Map<String, String>> entry :
 				fieldsMap.entrySet()) {
@@ -414,7 +462,7 @@ public class DDMStructureImpl extends DDMStructureBaseImpl {
 	public boolean hasField(String fieldName)
 		throws PortalException, SystemException {
 
-		Map<String, Map<String, String>> fieldsMap = getFieldsMap();
+		Map<String, Map<String, String>> fieldsMap = getFieldsMap(true);
 
 		boolean hasField = fieldsMap.containsKey(fieldName);
 
@@ -441,6 +489,20 @@ public class DDMStructureImpl extends DDMStructureBaseImpl {
 		throws PortalException, SystemException {
 
 		return GetterUtil.getBoolean(getFieldProperty(fieldName, "repeatable"));
+	}
+
+	@Override
+	public boolean isFieldTransient(String fieldName)
+		throws PortalException, SystemException {
+
+		if (!hasField(fieldName)) {
+			throw new StructureFieldException();
+		}
+
+		Map<String, Map<String, String>> transientFieldsMap =
+			getTransientFieldsMap(getDefaultLanguageId());
+
+		return transientFieldsMap.containsKey(fieldName);
 	}
 
 	@Override
@@ -475,6 +537,14 @@ public class DDMStructureImpl extends DDMStructureBaseImpl {
 	}
 
 	@Override
+	public void setLocalizedPersistentFieldsMap(
+		Map<String, Map<String, Map<String, String>>>
+			localizedPersistentFieldsMap) {
+
+		_localizedPersistentFieldsMap = localizedPersistentFieldsMap;
+	}
+
+	@Override
 	public void setLocalizedTransientFieldsMap(
 		Map<String, Map<String, Map<String, String>>>
 			localizedTransientFieldsMap) {
@@ -488,6 +558,7 @@ public class DDMStructureImpl extends DDMStructureBaseImpl {
 
 		_document = null;
 		_localizedFieldsMap = null;
+		_localizedPersistentFieldsMap = null;
 		_localizedTransientFieldsMap = null;
 	}
 
@@ -573,31 +644,31 @@ public class DDMStructureImpl extends DDMStructureBaseImpl {
 		Map<String, Map<String, Map<String, String>>> localizedFieldsMap =
 			getLocalizedFieldsMap();
 
-		Map<String, Map<String, String>> fieldsMap = localizedFieldsMap.get(
-			locale);
-
-		Map<String, Map<String, Map<String, String>>>
-			localizedTransientFieldsMap = getLocalizedTransientFieldsMap();
-
-		Map<String, Map<String, String>> transientFieldsMap =
-			localizedTransientFieldsMap.get(locale);
-
-		if (fieldsMap != null) {
+		if (localizedFieldsMap.containsKey(locale)) {
 			return;
 		}
+
+		Map<String, Map<String, Map<String, String>>>
+			localizedPersistentFieldsMap = getLocalizedPersistentFieldsMap();
+		Map<String, Map<String, Map<String, String>>>
+			localizedTransientFieldsMap = getLocalizedTransientFieldsMap();
+		Map<String, Map<String, String>> fieldsMap =
+			new LinkedHashMap<String, Map<String, String>>();
+		Map<String, Map<String, String>> persistentFieldsMap =
+			new LinkedHashMap<String, Map<String, String>>();
+		Map<String, Map<String, String>> transientFieldsMap =
+			new LinkedHashMap<String, Map<String, String>>();
 
 		if (getParentStructureId() > 0) {
 			DDMStructure parentStructure =
 				DDMStructureLocalServiceUtil.getStructure(
 					getParentStructureId());
 
-			fieldsMap = parentStructure.getFieldsMap(locale);
-			transientFieldsMap = parentStructure.getTransientFieldsMap(locale);
-		}
-		else {
-			fieldsMap = new LinkedHashMap<String, Map<String, String>>();
-			transientFieldsMap =
-				new LinkedHashMap<String, Map<String, String>>();
+			fieldsMap.putAll(parentStructure.getFieldsMap(locale, true));
+			persistentFieldsMap.putAll(
+				parentStructure.getPersistentFieldsMap(locale));
+			transientFieldsMap.putAll(
+				parentStructure.getTransientFieldsMap(locale));
 		}
 
 		XPath xPathSelector = SAXReaderUtil.createXPath("//dynamic-element");
@@ -609,8 +680,10 @@ public class DDMStructureImpl extends DDMStructureBaseImpl {
 
 			String name = element.attributeValue("name");
 
+			fieldsMap.put(name, _getField(element, locale));
+
 			if (Validator.isNotNull(element.attributeValue("dataType"))) {
-				fieldsMap.put(name, _getField(element, locale));
+				persistentFieldsMap.put(name, _getField(element, locale));
 			}
 			else {
 				transientFieldsMap.put(name, _getField(element, locale));
@@ -625,9 +698,11 @@ public class DDMStructureImpl extends DDMStructureBaseImpl {
 				privateFieldName);
 
 			fieldsMap.put(privateFieldName, privateField);
+			persistentFieldsMap.put(privateFieldName, privateField);
 		}
 
 		localizedFieldsMap.put(locale, fieldsMap);
+		localizedPersistentFieldsMap.put(locale, persistentFieldsMap);
 		localizedTransientFieldsMap.put(locale, transientFieldsMap);
 	}
 
@@ -659,6 +734,10 @@ public class DDMStructureImpl extends DDMStructureBaseImpl {
 
 	@CacheField
 	private Map<String, Map<String, Map<String, String>>> _localizedFieldsMap;
+
+	@CacheField
+	private Map<String, Map<String, Map<String, String>>>
+		_localizedPersistentFieldsMap;
 
 	@CacheField
 	private Map<String, Map<String, Map<String, String>>>

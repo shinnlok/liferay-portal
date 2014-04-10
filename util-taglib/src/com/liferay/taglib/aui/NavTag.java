@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,9 +14,12 @@
 
 package com.liferay.taglib.aui;
 
+import com.liferay.portal.kernel.dao.search.DisplayTerms;
+import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.User;
@@ -51,12 +54,26 @@ public class NavTag extends BaseNavTag {
 
 			StringBundler sb = navBarTag.getResponsiveButtonsSB();
 
-			sb.append("<a class=\"btn btn-navbar\" id=\"");
+			sb.append("<a class=\"btn btn-navbar");
+
+			String cssClass = getCssClass();
+
+			if (Validator.isNotNull(cssClass)) {
+				sb.append(StringPool.SPACE);
+				sb.append(cssClass);
+				sb.append("-btn");
+			}
+
+			if (_hasSearchResults()) {
+				sb.append(" hide");
+			}
+
+			sb.append("\" id=\"");
 			sb.append(_getNamespacedId());
 			sb.append("NavbarBtn\" ");
 			sb.append("data-navId=\"");
 			sb.append(_getNamespacedId());
-			sb.append("\">");
+			sb.append("\" tabindex=\"0\">");
 
 			String icon = getIcon();
 
@@ -136,6 +153,26 @@ public class NavTag extends BaseNavTag {
 		}
 
 		return _namespacedId;
+	}
+
+	private boolean _hasSearchResults() {
+		SearchContainer<?> searchContainer = getSearchContainer();
+
+		if (searchContainer == null) {
+			return false;
+		}
+
+		DisplayTerms displayTerms = searchContainer.getDisplayTerms();
+
+		String keywords = displayTerms.getKeywords();
+
+		if (displayTerms.isAdvancedSearch() ||
+			!keywords.equals(StringPool.BLANK)) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	private boolean _calledCollapsibleSetter;

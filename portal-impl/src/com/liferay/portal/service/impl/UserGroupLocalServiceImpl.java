@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,19 +18,23 @@ import com.liferay.portal.DuplicateUserGroupException;
 import com.liferay.portal.NoSuchUserGroupException;
 import com.liferay.portal.RequiredUserGroupException;
 import com.liferay.portal.UserGroupNameException;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.lar.PortletDataHandlerKeys;
 import com.liferay.portal.kernel.lar.UserIdStrategy;
+import com.liferay.portal.kernel.search.BaseModelSearchResult;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.QueryConfig;
 import com.liferay.portal.kernel.search.SearchContext;
+import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Group;
@@ -45,7 +49,9 @@ import com.liferay.portal.security.ldap.LDAPUserGroupTransactionThreadLocal;
 import com.liferay.portal.security.permission.PermissionCacheUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.base.UserGroupLocalServiceBaseImpl;
+import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.portlet.usersadmin.util.UsersAdminUtil;
 
 import java.io.File;
 import java.io.Serializable;
@@ -659,44 +665,12 @@ public class UserGroupLocalServiceImpl extends UserGroupLocalServiceBaseImpl {
 		throws SystemException {
 
 		try {
-			SearchContext searchContext = new SearchContext();
-
-			searchContext.setAndSearch(andSearch);
-
-			Map<String, Serializable> attributes =
-				new HashMap<String, Serializable>();
-
-			attributes.put("description", description);
-			attributes.put("name", name);
-
-			searchContext.setAttributes(attributes);
-
-			searchContext.setCompanyId(companyId);
-			searchContext.setEnd(end);
-
-			if (params != null) {
-				String keywords = (String)params.remove("keywords");
-
-				if (Validator.isNotNull(keywords)) {
-					searchContext.setKeywords(keywords);
-				}
-			}
-
-			QueryConfig queryConfig = new QueryConfig();
-
-			queryConfig.setHighlightEnabled(false);
-			queryConfig.setScoreEnabled(false);
-
-			searchContext.setQueryConfig(queryConfig);
-
-			if (sort != null) {
-				searchContext.setSorts(sort);
-			}
-
-			searchContext.setStart(start);
-
 			Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
 				UserGroup.class);
+
+			SearchContext searchContext = buildSearchContext(
+				companyId, name, description, params, andSearch, start, end,
+				sort);
 
 			return indexer.search(searchContext);
 		}
@@ -724,7 +698,43 @@ public class UserGroupLocalServiceImpl extends UserGroupLocalServiceBaseImpl {
 			LinkedHashMap<String, Object> params)
 		throws SystemException {
 
-		return userGroupFinder.countByKeywords(companyId, keywords, params);
+		if (!PropsValues.USER_GROUPS_INDEXER_ENABLED ||
+			!PropsValues.USER_GROUPS_SEARCH_WITH_INDEX) {
+
+			return userGroupFinder.countByKeywords(companyId, keywords, params);
+		}
+
+		String name = null;
+		String description = null;
+		boolean andOperator = false;
+
+		if (Validator.isNotNull(keywords)) {
+			name = keywords;
+			description = keywords;
+		}
+		else {
+			andOperator = true;
+		}
+
+		if (params != null) {
+			params.put("keywords", keywords);
+		}
+
+		try {
+			Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
+				UserGroup.class);
+
+			SearchContext searchContext = buildSearchContext(
+				companyId, name, description, params, andOperator,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+
+			Hits hits = indexer.search(searchContext);
+
+			return hits.getLength();
+		}
+		catch (Exception e) {
+			throw new SystemException(e);
+		}
 	}
 
 	/**
@@ -749,8 +759,83 @@ public class UserGroupLocalServiceImpl extends UserGroupLocalServiceBaseImpl {
 			LinkedHashMap<String, Object> params, boolean andOperator)
 		throws SystemException {
 
-		return userGroupFinder.countByC_N_D(
-			companyId, name, description, params, andOperator);
+		if (!PropsValues.USER_GROUPS_INDEXER_ENABLED ||
+			!PropsValues.USER_GROUPS_SEARCH_WITH_INDEX) {
+
+			return userGroupFinder.countByC_N_D(
+				companyId, name, description, params, andOperator);
+		}
+
+		try {
+			Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
+				UserGroup.class);
+
+			SearchContext searchContext = buildSearchContext(
+				companyId, name, description, params, true, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS, null);
+
+			Hits hits = indexer.search(searchContext);
+
+			return hits.getLength();
+		}
+		catch (Exception e) {
+			throw new SystemException(e);
+		}
+	}
+
+	@Override
+	public BaseModelSearchResult<UserGroup> searchUserGroups(
+			long companyId, String keywords,
+			LinkedHashMap<String, Object> params, int start, int end, Sort sort)
+		throws PortalException, SystemException {
+
+		String name = null;
+		String description = null;
+		boolean andOperator = false;
+
+		if (Validator.isNotNull(keywords)) {
+			name = keywords;
+			description = keywords;
+		}
+		else {
+			andOperator = true;
+		}
+
+		if (params != null) {
+			params.put("keywords", keywords);
+		}
+
+		return searchUserGroups(
+			companyId, name, description, params, andOperator, start, end,
+			sort);
+	}
+
+	@Override
+	public BaseModelSearchResult<UserGroup> searchUserGroups(
+			long companyId, String name, String description,
+			LinkedHashMap<String, Object> params, boolean andSearch, int start,
+			int end, Sort sort)
+		throws PortalException, SystemException {
+
+		Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
+			UserGroup.class);
+
+		SearchContext searchContext = buildSearchContext(
+			companyId, name, description, params, andSearch, start, end, sort);
+
+		for (int i = 0; i < 10; i++) {
+			Hits hits = indexer.search(searchContext);
+
+			List<UserGroup> userGroups = UsersAdminUtil.getUserGroups(hits);
+
+			if (userGroups != null) {
+				return new BaseModelSearchResult<UserGroup>(
+					userGroups, hits.getLength());
+			}
+		}
+
+		throw new SearchException(
+			"Unable to fix the search index after 10 attempts");
 	}
 
 	/**
@@ -767,7 +852,9 @@ public class UserGroupLocalServiceImpl extends UserGroupLocalServiceBaseImpl {
 	public void setUserUserGroups(long userId, long[] userGroupIds)
 		throws PortalException, SystemException {
 
-		copyUserGroupLayouts(userGroupIds, userId);
+		if (PropsValues.USER_GROUPS_COPY_LAYOUTS_TO_USER_PERSONAL_SITE) {
+			copyUserGroupLayouts(userGroupIds, userId);
+		}
 
 		userPersistence.setUserGroups(userId, userGroupIds);
 
@@ -887,6 +974,48 @@ public class UserGroupLocalServiceImpl extends UserGroupLocalServiceBaseImpl {
 		return userGroup;
 	}
 
+	protected SearchContext buildSearchContext(
+		long companyId, String name, String description,
+		LinkedHashMap<String, Object> params, boolean andSearch, int start,
+		int end, Sort sort) {
+
+		SearchContext searchContext = new SearchContext();
+
+		searchContext.setAndSearch(andSearch);
+
+		Map<String, Serializable> attributes =
+			new HashMap<String, Serializable>();
+
+		attributes.put("description", description);
+		attributes.put("name", name);
+
+		searchContext.setAttributes(attributes);
+
+		searchContext.setCompanyId(companyId);
+		searchContext.setEnd(end);
+
+		if (params != null) {
+			String keywords = (String)params.remove("keywords");
+
+			if (Validator.isNotNull(keywords)) {
+				searchContext.setKeywords(keywords);
+			}
+		}
+
+		if (sort != null) {
+			searchContext.setSorts(sort);
+		}
+
+		searchContext.setStart(start);
+
+		QueryConfig queryConfig = searchContext.getQueryConfig();
+
+		queryConfig.setHighlightEnabled(false);
+		queryConfig.setScoreEnabled(false);
+
+		return searchContext;
+	}
+
 	protected File[] exportLayouts(
 			long userGroupId, Map<String, String[]> parameterMap)
 		throws PortalException, SystemException {
@@ -916,9 +1045,6 @@ public class UserGroupLocalServiceImpl extends UserGroupLocalServiceBaseImpl {
 			new LinkedHashMap<String, String[]>();
 
 		parameterMap.put(
-			PortletDataHandlerKeys.CATEGORIES,
-			new String[] {Boolean.TRUE.toString()});
-		parameterMap.put(
 			PortletDataHandlerKeys.DATA_STRATEGY,
 			new String[] {PortletDataHandlerKeys.DATA_STRATEGY_MIRROR});
 		parameterMap.put(
@@ -932,8 +1058,9 @@ public class UserGroupLocalServiceImpl extends UserGroupLocalServiceBaseImpl {
 			new String[] {Boolean.FALSE.toString()});
 		parameterMap.put(
 			PortletDataHandlerKeys.LAYOUTS_IMPORT_MODE,
-			new String[] {PortletDataHandlerKeys.
-				LAYOUTS_IMPORT_MODE_CREATED_FROM_PROTOTYPE});
+			new String[] {
+				PortletDataHandlerKeys.LAYOUTS_IMPORT_MODE_MERGE_BY_LAYOUT_NAME
+			});
 		parameterMap.put(
 			PortletDataHandlerKeys.LOGO,
 			new String[] {Boolean.FALSE.toString()});
@@ -950,6 +1077,10 @@ public class UserGroupLocalServiceImpl extends UserGroupLocalServiceBaseImpl {
 			PortletDataHandlerKeys.PORTLET_DATA,
 			new String[] {Boolean.TRUE.toString()});
 		parameterMap.put(
+			PortletDataHandlerKeys.PORTLET_DATA + StringPool.UNDERLINE +
+				PortletKeys.ASSET_CATEGORIES_ADMIN,
+			new String[] {Boolean.TRUE.toString()});
+		parameterMap.put(
 			PortletDataHandlerKeys.PORTLET_DATA_ALL,
 			new String[] {Boolean.TRUE.toString()});
 		parameterMap.put(
@@ -957,8 +1088,9 @@ public class UserGroupLocalServiceImpl extends UserGroupLocalServiceBaseImpl {
 			new String[] {Boolean.TRUE.toString()});
 		parameterMap.put(
 			PortletDataHandlerKeys.PORTLETS_MERGE_MODE,
-			new String[] {PortletDataHandlerKeys.
-				PORTLETS_MERGE_MODE_ADD_TO_BOTTOM});
+			new String[] {
+				PortletDataHandlerKeys.PORTLETS_MERGE_MODE_ADD_TO_BOTTOM
+			});
 		parameterMap.put(
 			PortletDataHandlerKeys.THEME_REFERENCE,
 			new String[] {Boolean.TRUE.toString()});
@@ -1012,7 +1144,8 @@ public class UserGroupLocalServiceImpl extends UserGroupLocalServiceBaseImpl {
 			UserGroup userGroup = userGroupFinder.findByC_N(companyId, name);
 
 			if (userGroup.getUserGroupId() != userGroupId) {
-				throw new DuplicateUserGroupException();
+				throw new DuplicateUserGroupException(
+					"{userGroupId=" + userGroupId + "}");
 			}
 		}
 		catch (NoSuchUserGroupException nsuge) {

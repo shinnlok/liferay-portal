@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -34,7 +34,6 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.security.permission.InlineSQLHelperUtil;
@@ -229,7 +228,7 @@ public class SCLicensePersistenceImpl extends BasePersistenceImpl<SCLicense>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<SCLicense>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<SCLicense>)QueryUtil.list(q, getDialect(),
@@ -612,7 +611,7 @@ public class SCLicensePersistenceImpl extends BasePersistenceImpl<SCLicense>
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
 				q.addEntity(_FILTER_ENTITY_ALIAS, SCLicenseImpl.class);
@@ -785,7 +784,7 @@ public class SCLicensePersistenceImpl extends BasePersistenceImpl<SCLicense>
 		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
 				SCLicense.class.getName(), _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
 
-		SQLQuery q = session.createSQLQuery(sql);
+		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 		q.setFirstResult(0);
 		q.setMaxResults(2);
@@ -913,7 +912,7 @@ public class SCLicensePersistenceImpl extends BasePersistenceImpl<SCLicense>
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addScalar(COUNT_COLUMN_NAME,
 				com.liferay.portal.kernel.dao.orm.Type.LONG);
@@ -1091,7 +1090,7 @@ public class SCLicensePersistenceImpl extends BasePersistenceImpl<SCLicense>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<SCLicense>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<SCLicense>)QueryUtil.list(q, getDialect(),
@@ -1498,7 +1497,7 @@ public class SCLicensePersistenceImpl extends BasePersistenceImpl<SCLicense>
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
 				q.addEntity(_FILTER_ENTITY_ALIAS, SCLicenseImpl.class);
@@ -1677,7 +1676,7 @@ public class SCLicensePersistenceImpl extends BasePersistenceImpl<SCLicense>
 		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
 				SCLicense.class.getName(), _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
 
-		SQLQuery q = session.createSQLQuery(sql);
+		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 		q.setFirstResult(0);
 		q.setMaxResults(2);
@@ -1819,7 +1818,7 @@ public class SCLicensePersistenceImpl extends BasePersistenceImpl<SCLicense>
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addScalar(COUNT_COLUMN_NAME,
 				com.liferay.portal.kernel.dao.orm.Type.LONG);
@@ -1895,7 +1894,7 @@ public class SCLicensePersistenceImpl extends BasePersistenceImpl<SCLicense>
 			CacheRegistryUtil.clear(SCLicenseImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(SCLicenseImpl.class.getName());
+		EntityCacheUtil.clearCache(SCLicenseImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -2113,7 +2112,7 @@ public class SCLicensePersistenceImpl extends BasePersistenceImpl<SCLicense>
 		}
 
 		EntityCacheUtil.putResult(SCLicenseModelImpl.ENTITY_CACHE_ENABLED,
-			SCLicenseImpl.class, scLicense.getPrimaryKey(), scLicense);
+			SCLicenseImpl.class, scLicense.getPrimaryKey(), scLicense, false);
 
 		scLicense.resetOriginalValues();
 
@@ -2339,7 +2338,7 @@ public class SCLicensePersistenceImpl extends BasePersistenceImpl<SCLicense>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<SCLicense>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<SCLicense>)QueryUtil.list(q, getDialect(),
@@ -2704,9 +2703,6 @@ public class SCLicensePersistenceImpl extends BasePersistenceImpl<SCLicense>
 		}
 		catch (Exception e) {
 			throw processException(e);
-		}
-		finally {
-			FinderCacheUtil.clearCache(SCLicenseModelImpl.MAPPING_TABLE_SCLICENSES_SCPRODUCTENTRIES_NAME);
 		}
 	}
 

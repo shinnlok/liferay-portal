@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -27,7 +27,6 @@ import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.CalendarUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.InstanceFactory;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -35,10 +34,10 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.model.CacheModel;
+import com.liferay.portal.model.MVCCModel;
 import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.User;
 import com.liferay.portal.model.impl.UserImpl;
@@ -48,6 +47,8 @@ import com.liferay.portal.service.persistence.impl.TableMapper;
 import com.liferay.portal.service.persistence.impl.TableMapperFactory;
 
 import java.io.Serializable;
+
+import java.sql.Timestamp;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -241,7 +242,7 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<User>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<User>)QueryUtil.list(q, getDialect(), start,
@@ -783,7 +784,7 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<User>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<User>)QueryUtil.list(q, getDialect(), start,
@@ -1325,7 +1326,7 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<User>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<User>)QueryUtil.list(q, getDialect(), start,
@@ -2041,7 +2042,7 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<User>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<User>)QueryUtil.list(q, getDialect(), start,
@@ -3025,7 +3026,7 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 				qPos.add(companyId);
 
 				if (bindCreateDate) {
-					qPos.add(CalendarUtil.getTimestamp(createDate));
+					qPos.add(new Timestamp(createDate.getTime()));
 				}
 
 				if (!pagination) {
@@ -3034,7 +3035,7 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<User>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<User>)QueryUtil.list(q, getDialect(), start,
@@ -3319,7 +3320,7 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 		qPos.add(companyId);
 
 		if (bindCreateDate) {
-			qPos.add(CalendarUtil.getTimestamp(createDate));
+			qPos.add(new Timestamp(createDate.getTime()));
 		}
 
 		if (orderByComparator != null) {
@@ -3406,7 +3407,7 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 				qPos.add(companyId);
 
 				if (bindCreateDate) {
-					qPos.add(CalendarUtil.getTimestamp(createDate));
+					qPos.add(new Timestamp(createDate.getTime()));
 				}
 
 				count = (Long)q.uniqueResult();
@@ -3584,7 +3585,7 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 				qPos.add(companyId);
 
 				if (bindModifiedDate) {
-					qPos.add(CalendarUtil.getTimestamp(modifiedDate));
+					qPos.add(new Timestamp(modifiedDate.getTime()));
 				}
 
 				if (!pagination) {
@@ -3593,7 +3594,7 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<User>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<User>)QueryUtil.list(q, getDialect(), start,
@@ -3878,7 +3879,7 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 		qPos.add(companyId);
 
 		if (bindModifiedDate) {
-			qPos.add(CalendarUtil.getTimestamp(modifiedDate));
+			qPos.add(new Timestamp(modifiedDate.getTime()));
 		}
 
 		if (orderByComparator != null) {
@@ -3965,7 +3966,7 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 				qPos.add(companyId);
 
 				if (bindModifiedDate) {
-					qPos.add(CalendarUtil.getTimestamp(modifiedDate));
+					qPos.add(new Timestamp(modifiedDate.getTime()));
 				}
 
 				count = (Long)q.uniqueResult();
@@ -5415,7 +5416,7 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<User>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<User>)QueryUtil.list(q, getDialect(), start,
@@ -5963,11 +5964,11 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 				qPos.add(companyId);
 
 				if (bindCreateDate) {
-					qPos.add(CalendarUtil.getTimestamp(createDate));
+					qPos.add(new Timestamp(createDate.getTime()));
 				}
 
 				if (bindModifiedDate) {
-					qPos.add(CalendarUtil.getTimestamp(modifiedDate));
+					qPos.add(new Timestamp(modifiedDate.getTime()));
 				}
 
 				if (!pagination) {
@@ -5976,7 +5977,7 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<User>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<User>)QueryUtil.list(q, getDialect(), start,
@@ -6287,11 +6288,11 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 		qPos.add(companyId);
 
 		if (bindCreateDate) {
-			qPos.add(CalendarUtil.getTimestamp(createDate));
+			qPos.add(new Timestamp(createDate.getTime()));
 		}
 
 		if (bindModifiedDate) {
-			qPos.add(CalendarUtil.getTimestamp(modifiedDate));
+			qPos.add(new Timestamp(modifiedDate.getTime()));
 		}
 
 		if (orderByComparator != null) {
@@ -6391,11 +6392,11 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 				qPos.add(companyId);
 
 				if (bindCreateDate) {
-					qPos.add(CalendarUtil.getTimestamp(createDate));
+					qPos.add(new Timestamp(createDate.getTime()));
 				}
 
 				if (bindModifiedDate) {
-					qPos.add(CalendarUtil.getTimestamp(modifiedDate));
+					qPos.add(new Timestamp(modifiedDate.getTime()));
 				}
 
 				count = (Long)q.uniqueResult();
@@ -6493,7 +6494,7 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 			CacheRegistryUtil.clear(UserImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(UserImpl.class.getName());
+		EntityCacheUtil.clearCache(UserImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -7116,7 +7117,7 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 		}
 
 		EntityCacheUtil.putResult(UserModelImpl.ENTITY_CACHE_ENABLED,
-			UserImpl.class, user.getPrimaryKey(), user);
+			UserImpl.class, user.getPrimaryKey(), user, false);
 
 		clearUniqueFindersCache(user);
 		cacheUniqueFindersCache(user);
@@ -7136,6 +7137,7 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 		userImpl.setNew(user.isNew());
 		userImpl.setPrimaryKey(user.getPrimaryKey());
 
+		userImpl.setMvccVersion(user.getMvccVersion());
 		userImpl.setUuid(user.getUuid());
 		userImpl.setUserId(user.getUserId());
 		userImpl.setCompanyId(user.getCompanyId());
@@ -7376,7 +7378,7 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<User>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<User>)QueryUtil.list(q, getDialect(), start,
@@ -7720,9 +7722,6 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 		catch (Exception e) {
 			throw processException(e);
 		}
-		finally {
-			FinderCacheUtil.clearCache(UserModelImpl.MAPPING_TABLE_USERS_GROUPS_NAME);
-		}
 	}
 
 	/**
@@ -8011,9 +8010,6 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 		catch (Exception e) {
 			throw processException(e);
 		}
-		finally {
-			FinderCacheUtil.clearCache(UserModelImpl.MAPPING_TABLE_USERS_ORGS_NAME);
-		}
 	}
 
 	/**
@@ -8284,9 +8280,6 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 		catch (Exception e) {
 			throw processException(e);
 		}
-		finally {
-			FinderCacheUtil.clearCache(UserModelImpl.MAPPING_TABLE_USERS_ROLES_NAME);
-		}
 	}
 
 	/**
@@ -8556,9 +8549,6 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 		}
 		catch (Exception e) {
 			throw processException(e);
-		}
-		finally {
-			FinderCacheUtil.clearCache(UserModelImpl.MAPPING_TABLE_USERS_TEAMS_NAME);
 		}
 	}
 
@@ -8843,9 +8833,6 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 		catch (Exception e) {
 			throw processException(e);
 		}
-		finally {
-			FinderCacheUtil.clearCache(UserModelImpl.MAPPING_TABLE_USERS_USERGROUPS_NAME);
-		}
 	}
 
 	@Override
@@ -8939,10 +8926,21 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 			}
 		};
 
-	private static CacheModel<User> _nullUserCacheModel = new CacheModel<User>() {
-			@Override
-			public User toEntityModel() {
-				return _nullUser;
-			}
-		};
+	private static CacheModel<User> _nullUserCacheModel = new NullCacheModel();
+
+	private static class NullCacheModel implements CacheModel<User>, MVCCModel {
+		@Override
+		public long getMvccVersion() {
+			return 0;
+		}
+
+		@Override
+		public void setMvccVersion(long mvccVersion) {
+		}
+
+		@Override
+		public User toEntityModel() {
+			return _nullUser;
+		}
+	}
 }

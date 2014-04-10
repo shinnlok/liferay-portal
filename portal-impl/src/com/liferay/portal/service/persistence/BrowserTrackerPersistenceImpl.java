@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,9 +32,9 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.model.BrowserTracker;
 import com.liferay.portal.model.CacheModel;
+import com.liferay.portal.model.MVCCModel;
 import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.impl.BrowserTrackerImpl;
 import com.liferay.portal.model.impl.BrowserTrackerModelImpl;
@@ -345,7 +345,7 @@ public class BrowserTrackerPersistenceImpl extends BasePersistenceImpl<BrowserTr
 			CacheRegistryUtil.clear(BrowserTrackerImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(BrowserTrackerImpl.class.getName());
+		EntityCacheUtil.clearCache(BrowserTrackerImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -565,7 +565,7 @@ public class BrowserTrackerPersistenceImpl extends BasePersistenceImpl<BrowserTr
 
 		EntityCacheUtil.putResult(BrowserTrackerModelImpl.ENTITY_CACHE_ENABLED,
 			BrowserTrackerImpl.class, browserTracker.getPrimaryKey(),
-			browserTracker);
+			browserTracker, false);
 
 		clearUniqueFindersCache(browserTracker);
 		cacheUniqueFindersCache(browserTracker);
@@ -585,6 +585,7 @@ public class BrowserTrackerPersistenceImpl extends BasePersistenceImpl<BrowserTr
 		browserTrackerImpl.setNew(browserTracker.isNew());
 		browserTrackerImpl.setPrimaryKey(browserTracker.getPrimaryKey());
 
+		browserTrackerImpl.setMvccVersion(browserTracker.getMvccVersion());
 		browserTrackerImpl.setBrowserTrackerId(browserTracker.getBrowserTrackerId());
 		browserTrackerImpl.setUserId(browserTracker.getUserId());
 		browserTrackerImpl.setBrowserKey(browserTracker.getBrowserKey());
@@ -792,7 +793,7 @@ public class BrowserTrackerPersistenceImpl extends BasePersistenceImpl<BrowserTr
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<BrowserTracker>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<BrowserTracker>)QueryUtil.list(q,
@@ -919,10 +920,22 @@ public class BrowserTrackerPersistenceImpl extends BasePersistenceImpl<BrowserTr
 			}
 		};
 
-	private static CacheModel<BrowserTracker> _nullBrowserTrackerCacheModel = new CacheModel<BrowserTracker>() {
-			@Override
-			public BrowserTracker toEntityModel() {
-				return _nullBrowserTracker;
-			}
-		};
+	private static CacheModel<BrowserTracker> _nullBrowserTrackerCacheModel = new NullCacheModel();
+
+	private static class NullCacheModel implements CacheModel<BrowserTracker>,
+		MVCCModel {
+		@Override
+		public long getMvccVersion() {
+			return 0;
+		}
+
+		@Override
+		public void setMvccVersion(long mvccVersion) {
+		}
+
+		@Override
+		public BrowserTracker toEntityModel() {
+			return _nullBrowserTracker;
+		}
+	}
 }

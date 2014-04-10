@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -61,20 +61,18 @@ public class UserWorkflowHandler extends BaseWorkflowHandler {
 
 		User user = UserLocalServiceUtil.getUser(userId);
 
+		ServiceContext serviceContext = (ServiceContext)workflowContext.get(
+			WorkflowConstants.CONTEXT_SERVICE_CONTEXT);
+
 		if (((user.getStatus() == WorkflowConstants.STATUS_DRAFT) ||
 			 (user.getStatus() == WorkflowConstants.STATUS_PENDING)) &&
 			(status == WorkflowConstants.STATUS_APPROVED)) {
 
-			ServiceContext serviceContext = (ServiceContext)workflowContext.get(
-				WorkflowConstants.CONTEXT_SERVICE_CONTEXT);
-
 			UserLocalServiceUtil.completeUserRegistration(user, serviceContext);
-
-			serviceContext.setAttribute(
-				"passwordUnencrypted", user.getPasswordUnencrypted());
 		}
 
-		return UserLocalServiceUtil.updateStatus(userId, status);
+		return UserLocalServiceUtil.updateStatus(
+			userId, status, serviceContext);
 	}
 
 	@Override

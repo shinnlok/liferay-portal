@@ -1,3 +1,5 @@
+@import "compass";
+
 .portlet-asset-tag-admin {
 	.lfr-app-column-view {
 		border: none;
@@ -23,7 +25,7 @@
 
 			.tags-admin-toolbar {
 				background: #F6F8FB;
-				border-bottom: 1px solid #dedede;
+				border-bottom: 1px solid #DEDEDE;
 				overflow: hidden;
 				padding: 5px 0;
 			}
@@ -32,6 +34,17 @@
 				position: absolute;
 				right: 5px;
 				top: 2px;
+			}
+		}
+
+		.lfr-token {
+			max-width: 100%;
+			white-space: nowrap;
+
+			.lfr-token-text {
+				@include ellipsis;
+
+				max-width: 95%;
 			}
 		}
 	}
@@ -60,7 +73,7 @@
 	.tag-item-actions-trigger {
 		background-image: url(@theme_image_path@/common/edit.png);
 		background-repeat: no-repeat;
-		clip: rect(0pt, 0pt, 0pt, 0pt);
+		clip: rect(0, 0, 0, 0);
 		display: block;
 		height: 16px;
 		margin-top: -8px;
@@ -80,6 +93,10 @@
 	.tags-admin-content {
 		.tag-item-container {
 			position: relative;
+
+			a {
+				@include ellipsis;
+			}
 
 			.tag-item-name {
 				margin-top: 2px;
@@ -137,7 +154,7 @@
 
 		&:after {
 			clear: both;
-			content: "";
+			content: '';
 			display: block;
 			height: 0;
 		}
@@ -204,8 +221,8 @@
 .ie6, .ie7, .ie8 {
 	.portlet-asset-tag-admin {
 		.tag-item-merge {
-			font-weight: normal;
 			font-size: 120%;
+			font-weight: normal;
 		}
 	}
 }

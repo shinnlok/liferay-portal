@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.UserNotificationDelivery;
+import com.liferay.portal.model.UserNotificationDeliveryConstants;
 import com.liferay.portal.model.UserNotificationEvent;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.UserNotificationDeliveryLocalServiceUtil;
@@ -53,6 +54,7 @@ public abstract class BaseUserNotificationHandler
 				userNotificationEvent, serviceContext);
 
 			if (userNotificationFeedEntry != null) {
+				userNotificationFeedEntry.setOpenDialog(isOpenDialog());
 				userNotificationFeedEntry.setPortletId(getPortletId());
 			}
 
@@ -75,6 +77,14 @@ public abstract class BaseUserNotificationHandler
 			UserNotificationManagerUtil.fetchUserNotificationDefinition(
 				_portletId, classNameId, notificationType);
 
+		if (userNotificationDefinition == null) {
+			if (deliveryType == UserNotificationDeliveryConstants.TYPE_EMAIL) {
+				return true;
+			}
+
+			return false;
+		}
+
 		UserNotificationDeliveryType userNotificationDeliveryType =
 			userNotificationDefinition.getUserNotificationDeliveryType(
 				deliveryType);
@@ -86,6 +96,11 @@ public abstract class BaseUserNotificationHandler
 					deliveryType, userNotificationDeliveryType.isDefault());
 
 		return userNotificationDelivery.isDeliver();
+	}
+
+	@Override
+	public boolean isOpenDialog() {
+		return _openDialog;
 	}
 
 	protected UserNotificationFeedEntry doInterpret(
@@ -120,6 +135,10 @@ public abstract class BaseUserNotificationHandler
 		return StringPool.BLANK;
 	}
 
+	protected void setOpenDialog(boolean openDialog) {
+		_openDialog = openDialog;
+	}
+
 	protected void setPortletId(String portletId) {
 		_portletId = portletId;
 	}
@@ -131,6 +150,7 @@ public abstract class BaseUserNotificationHandler
 	private static Log _log = LogFactoryUtil.getLog(
 		BaseUserNotificationHandler.class);
 
+	private boolean _openDialog;
 	private String _portletId;
 	private String _selector = StringPool.BLANK;
 

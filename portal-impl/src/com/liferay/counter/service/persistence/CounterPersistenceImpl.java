@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -34,7 +34,6 @@ import com.liferay.portal.kernel.util.InstanceFactory;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.service.persistence.impl.BasePersistenceImpl;
@@ -128,7 +127,7 @@ public class CounterPersistenceImpl extends BasePersistenceImpl<Counter>
 			CacheRegistryUtil.clear(CounterImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(CounterImpl.class.getName());
+		EntityCacheUtil.clearCache(CounterImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -299,7 +298,7 @@ public class CounterPersistenceImpl extends BasePersistenceImpl<Counter>
 		}
 
 		EntityCacheUtil.putResult(CounterModelImpl.ENTITY_CACHE_ENABLED,
-			CounterImpl.class, counter.getPrimaryKey(), counter);
+			CounterImpl.class, counter.getPrimaryKey(), counter, false);
 
 		counter.resetOriginalValues();
 
@@ -518,7 +517,7 @@ public class CounterPersistenceImpl extends BasePersistenceImpl<Counter>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<Counter>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<Counter>)QueryUtil.list(q, getDialect(),

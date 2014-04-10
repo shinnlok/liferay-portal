@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.sql.Blob;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
@@ -64,11 +65,19 @@ public class AssertUtils {
 		Assert.assertArrayEquals(expectedArray, actualArray, 0);
 	}
 
+	public static void assertEquals(List<?> expectedList, List<?> actualList) {
+		Assert.assertEquals(
+			"The lists have different sizes", expectedList.size(),
+			actualList.size());
+
+		Assert.assertTrue(expectedList.containsAll(actualList));
+	}
+
 	public static void assertEquals(
 		Map<String, ?> expectedMap, Map<String, ?> actualMap) {
 
 		Assert.assertEquals(
-			"The maps are different sizes", expectedMap.size(),
+			"The maps have different sizes", expectedMap.size(),
 			actualMap.size());
 
 		for (String name : expectedMap.keySet()) {

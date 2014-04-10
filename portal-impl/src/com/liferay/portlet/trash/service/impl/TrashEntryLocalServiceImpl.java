@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,11 +17,13 @@ package com.liferay.portlet.trash.service.impl;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.search.BaseModelSearchResult;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.search.QueryConfig;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.trash.TrashHandler;
@@ -133,6 +135,10 @@ public class TrashEntryLocalServiceImpl extends TrashEntryLocalServiceBaseImpl {
 				throws PortalException, SystemException {
 
 				Group group = (Group)object;
+
+				if (!TrashUtil.isTrashEnabled(group.getGroupId())) {
+					return;
+				}
 
 				Date date = getMaxAge(group);
 
@@ -352,28 +358,68 @@ public class TrashEntryLocalServiceImpl extends TrashEntryLocalServiceBaseImpl {
 		throws SystemException {
 
 		try {
-			SearchContext searchContext = new SearchContext();
-
-			searchContext.setCompanyId(companyId);
-			searchContext.setEnd(end);
-			searchContext.setKeywords(keywords);
-			searchContext.setGroupIds(new long[] {groupId});
-
-			if (sort != null) {
-				searchContext.setSorts(sort);
-			}
-
-			searchContext.setStart(start);
-			searchContext.setUserId(userId);
-
 			Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
 				TrashEntry.class);
+
+			SearchContext searchContext = buildSearchContext(
+				companyId, groupId, userId, keywords, start, end, sort);
 
 			return indexer.search(searchContext);
 		}
 		catch (Exception e) {
 			throw new SystemException(e);
 		}
+	}
+
+	@Override
+	public BaseModelSearchResult<TrashEntry> searchTrashEntries(
+			long companyId, long groupId, long userId, String keywords,
+			int start, int end, Sort sort)
+		throws SystemException {
+
+		try {
+			Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
+				TrashEntry.class);
+
+			SearchContext searchContext = buildSearchContext(
+				companyId, groupId, userId, keywords, start, end, sort);
+
+			Hits hits = indexer.search(searchContext);
+
+			List<TrashEntry> trashEntries = TrashUtil.getEntries(hits);
+
+			return new BaseModelSearchResult<TrashEntry>(
+				trashEntries, hits.getLength());
+		}
+		catch (Exception e) {
+			throw new SystemException(e);
+		}
+	}
+
+	protected SearchContext buildSearchContext(
+		long companyId, long groupId, long userId, String keywords, int start,
+		int end, Sort sort) {
+
+		SearchContext searchContext = new SearchContext();
+
+		searchContext.setCompanyId(companyId);
+		searchContext.setEnd(end);
+		searchContext.setKeywords(keywords);
+		searchContext.setGroupIds(new long[] {groupId});
+
+		if (sort != null) {
+			searchContext.setSorts(sort);
+		}
+
+		searchContext.setStart(start);
+		searchContext.setUserId(userId);
+
+		QueryConfig queryConfig = searchContext.getQueryConfig();
+
+		queryConfig.setHighlightEnabled(false);
+		queryConfig.setScoreEnabled(false);
+
+		return searchContext;
 	}
 
 	protected Date getMaxAge(Group group)

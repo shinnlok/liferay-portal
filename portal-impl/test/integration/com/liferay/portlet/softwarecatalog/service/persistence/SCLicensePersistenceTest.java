@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -135,6 +135,32 @@ public class SCLicensePersistenceTest {
 			newSCLicense.getActive());
 		Assert.assertEquals(existingSCLicense.getRecommended(),
 			newSCLicense.getRecommended());
+	}
+
+	@Test
+	public void testCountByActive() {
+		try {
+			_persistence.countByActive(ServiceTestUtil.randomBoolean());
+
+			_persistence.countByActive(ServiceTestUtil.randomBoolean());
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByA_R() {
+		try {
+			_persistence.countByA_R(ServiceTestUtil.randomBoolean(),
+				ServiceTestUtil.randomBoolean());
+
+			_persistence.countByA_R(ServiceTestUtil.randomBoolean(),
+				ServiceTestUtil.randomBoolean());
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
 	}
 
 	@Test

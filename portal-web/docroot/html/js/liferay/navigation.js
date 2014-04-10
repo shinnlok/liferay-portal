@@ -369,7 +369,7 @@ AUI.add(
 						var tabHtml = Lang.sub(
 							tabTPL,
 							{
-								pageTitle: Lang.String.escapeHTML(data.title),
+								pageTitle: data.title,
 								url: data.url
 							}
 						);
@@ -802,7 +802,7 @@ AUI.add(
 
 								var regex = new RegExp(prevVal, 'g');
 
-								newTitle = oldTitle.replace(regex, pageTitle);
+								var newTitle = oldTitle.replace(regex, pageTitle);
 
 								doc.set('title', newTitle);
 							};

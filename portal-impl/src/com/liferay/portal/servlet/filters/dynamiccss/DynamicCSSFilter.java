@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -29,6 +29,7 @@ import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.servlet.filters.IgnoreModuleRequestFilter;
+import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsUtil;
 
 import java.io.File;
@@ -80,6 +81,10 @@ public class DynamicCSSFilter extends IgnoreModuleRequestFilter {
 
 		if (queryString != null) {
 			cacheKeyGenerator.append(sterilizeQueryString(queryString));
+		}
+
+		if (PortalUtil.isRightToLeft(request)) {
+			cacheKeyGenerator.append("_rtl");
 		}
 
 		return String.valueOf(cacheKeyGenerator.finish());

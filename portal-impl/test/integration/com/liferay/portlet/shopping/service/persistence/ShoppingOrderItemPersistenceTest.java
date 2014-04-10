@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -156,6 +156,18 @@ public class ShoppingOrderItemPersistenceTest {
 		Assert.assertEquals(Time.getShortTimestamp(
 				existingShoppingOrderItem.getShippedDate()),
 			Time.getShortTimestamp(newShoppingOrderItem.getShippedDate()));
+	}
+
+	@Test
+	public void testCountByOrderId() {
+		try {
+			_persistence.countByOrderId(ServiceTestUtil.nextLong());
+
+			_persistence.countByOrderId(0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
 	}
 
 	@Test

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -31,7 +31,6 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.ModelListener;
@@ -225,7 +224,7 @@ public class JournalArticleImagePersistenceImpl extends BasePersistenceImpl<Jour
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<JournalArticleImage>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<JournalArticleImage>)QueryUtil.list(q,
@@ -720,7 +719,7 @@ public class JournalArticleImagePersistenceImpl extends BasePersistenceImpl<Jour
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<JournalArticleImage>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<JournalArticleImage>)QueryUtil.list(q,
@@ -1259,7 +1258,7 @@ public class JournalArticleImagePersistenceImpl extends BasePersistenceImpl<Jour
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<JournalArticleImage>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<JournalArticleImage>)QueryUtil.list(q,
@@ -2213,7 +2212,7 @@ public class JournalArticleImagePersistenceImpl extends BasePersistenceImpl<Jour
 			CacheRegistryUtil.clear(JournalArticleImageImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(JournalArticleImageImpl.class.getName());
+		EntityCacheUtil.clearCache(JournalArticleImageImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -2527,7 +2526,7 @@ public class JournalArticleImagePersistenceImpl extends BasePersistenceImpl<Jour
 
 		EntityCacheUtil.putResult(JournalArticleImageModelImpl.ENTITY_CACHE_ENABLED,
 			JournalArticleImageImpl.class, journalArticleImage.getPrimaryKey(),
-			journalArticleImage);
+			journalArticleImage, false);
 
 		clearUniqueFindersCache(journalArticleImage);
 		cacheUniqueFindersCache(journalArticleImage);
@@ -2760,7 +2759,7 @@ public class JournalArticleImagePersistenceImpl extends BasePersistenceImpl<Jour
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<JournalArticleImage>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<JournalArticleImage>)QueryUtil.list(q,

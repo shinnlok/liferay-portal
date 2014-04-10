@@ -73,6 +73,8 @@
 	<target name="clean">
 		<ant dir="classes" target="clean" inheritAll="false" />
 
+		<ant dir="osgi/modules" target="clean" inheritAll="false" />
+
 		<ant dir="portal-service" target="clean" inheritAll="false" />
 
 		<ant dir="util-bridges" target="clean" inheritAll="false" />
@@ -225,6 +227,7 @@
 		<ant dir="portal-pacl" target="compile" inheritAll="false" />
 
 		<ant dir="osgi/bootstrap" target="deploy" inheritAll="false" />
+		<ant dir="osgi/modules" target="deploy" inheritAll="false" />
 	</target>
 
 	<target name="compile-test">
@@ -264,6 +267,8 @@ ${app.server.tomcat.dir}, then run "ant -buildfile build-dist.xml unzip-tomcat".
 				</fail>
 			</then>
 		</if>
+
+		<ant dir="osgi/modules" target="deploy" inheritAll="false" />
 
 		<ant dir="portal-service" target="deploy" inheritAll="false" />
 
@@ -678,6 +683,8 @@ print AdminControl.invoke(appManager, 'startApplication', 'liferay-portal')
 	</target>
 
 	<target name="jar">
+		<ant dir="osgi/modules" target="jar" inheritAll="false" />
+
 		<ant dir="portal-service" target="jar" inheritAll="false" />
 
 		<ant dir="util-bridges" target="jar" inheritAll="false" />
@@ -848,13 +855,26 @@ print AdminControl.invoke(appManager, 'startApplication', 'liferay-portal')
 	<target name="record-git-commit-plugins">
 		<script classpathref="project.classpath" language="beanshell">
 			<![CDATA[
-				File projectDir = new File(project.getProperty("project.dir"));
+				File pluginsDir = null;
 
-				String projectDirName = projectDir.getName();
+				String lpPluginsDirName = project.getProperty("lp.plugins.dir");
 
-				String pluginsDirName = "liferay-plugins" + projectDirName.substring("liferay-portal".length());
+				if ((lpPluginsDirName == null) || lpPluginsDirName.equals("")) {
+					File projectDir = new File(project.getProperty("project.dir"));
 
-				File pluginsDir = new File(projectDir.getParent(), pluginsDirName);
+					String projectDirName = projectDir.getName();
+
+					String pluginsDirName = "liferay-plugins" + projectDirName.substring("liferay-portal".length());
+
+					pluginsDir = new File(projectDir.getParent(), pluginsDirName);
+				}
+				else {
+					if (lpPluginsDirName.contains("${basedir.name}")) {
+						lpPluginsDirName = lpPluginsDirName.substring(0, lpPluginsDirName.lastIndexOf("/"));
+					}
+
+					pluginsDir = new File(lpPluginsDirName);
+				}
 
 				project.setProperty("git.plugins.dir", pluginsDir.toString());
 			]]>
@@ -863,6 +883,8 @@ print AdminControl.invoke(appManager, 'startApplication', 'liferay-portal')
 		<exec dir="${git.plugins.dir}" executable="git" outputproperty="git.commit.plugins.rev.parse">
 			<arg line="rev-parse HEAD" />
 		</exec>
+
+		<echo>Recording ${git.plugins.dir} with ${git.commit.plugins.rev.parse}.</echo>
 
 		<var name="git.plugins.dir" unset="true" />
 

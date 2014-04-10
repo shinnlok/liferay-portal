@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -52,6 +52,7 @@ public class PhoneWrapper implements Phone, ModelWrapper<Phone> {
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
+		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("uuid", getUuid());
 		attributes.put("phoneId", getPhoneId());
 		attributes.put("companyId", getCompanyId());
@@ -71,6 +72,12 @@ public class PhoneWrapper implements Phone, ModelWrapper<Phone> {
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
+		Long mvccVersion = (Long)attributes.get("mvccVersion");
+
+		if (mvccVersion != null) {
+			setMvccVersion(mvccVersion);
+		}
+
 		String uuid = (String)attributes.get("uuid");
 
 		if (uuid != null) {
@@ -168,6 +175,26 @@ public class PhoneWrapper implements Phone, ModelWrapper<Phone> {
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_phone.setPrimaryKey(primaryKey);
+	}
+
+	/**
+	* Returns the mvcc version of this phone.
+	*
+	* @return the mvcc version of this phone
+	*/
+	@Override
+	public long getMvccVersion() {
+		return _phone.getMvccVersion();
+	}
+
+	/**
+	* Sets the mvcc version of this phone.
+	*
+	* @param mvccVersion the mvcc version of this phone
+	*/
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		_phone.setMvccVersion(mvccVersion);
 	}
 
 	/**

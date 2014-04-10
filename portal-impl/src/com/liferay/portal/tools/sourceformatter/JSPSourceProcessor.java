@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -262,9 +262,7 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 		_unusedVariablesExclusions = getExclusionsProperties(
 			"source_formatter_jsp_unused_variables_exclusions.properties");
 
-		String[] excludes = new String[] {
-			"**\\portal\\aui\\**", "**\\null.jsp", "**\\tools\\**"
-		};
+		String[] excludes = new String[] {"**\\null.jsp", "**\\tools\\**"};
 		String[] includes = new String[] {
 			"**\\*.jsp", "**\\*.jspf", "**\\*.vm"
 		};
@@ -293,11 +291,7 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 					matcher.start());
 			}
 
-			if (isAutoFix() && !content.equals(newContent)) {
-				fileUtil.write(file, newContent);
-
-				sourceFormatterHelper.printError(fileName, file);
-			}
+			compareAndAutoFixContent(file, fileName, content, newContent);
 
 			if (portalSource &&
 				!mainReleaseVersion.equals(MAIN_RELEASE_VERSION_6_1_0) &&
@@ -437,13 +431,7 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 		checkLanguageKeys(fileName, newContent, _taglibLanguageKeyPattern);
 		checkXSS(fileName, newContent);
 
-		if (isAutoFix() && (newContent != null) &&
-			!content.equals(newContent)) {
-
-			fileUtil.write(file, newContent);
-
-			sourceFormatterHelper.printError(fileName, file);
-		}
+		compareAndAutoFixContent(file, fileName, content, newContent);
 
 		return newContent;
 	}
@@ -512,14 +500,8 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 				checkInefficientStringMethods(line, fileName, lineCount);
 			}
 
-			String excluded = null;
-
-			if (_unusedVariablesExclusions != null) {
-				excluded = _unusedVariablesExclusions.getProperty(
-					fileName + StringPool.AT + lineCount);
-			}
-
-			if ((excluded == null) && javaSource && portalSource &&
+			if (javaSource && portalSource &&
+				!isExcluded(_unusedVariablesExclusions, fileName, lineCount) &&
 				!_jspContents.isEmpty() &&
 				hasUnusedVariable(fileName, trimmedLine)) {
 
@@ -1179,9 +1161,11 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 			if ((delimeter == CharPool.APOSTROPHE) &&
 				!value.contains(StringPool.QUOTE)) {
 
-				return StringUtil.replace(
+				line = StringUtil.replace(
 					line, StringPool.APOSTROPHE + value + StringPool.APOSTROPHE,
 					StringPool.QUOTE + value + StringPool.QUOTE);
+
+				return sortJSPAttributes(fileName, line, lineCount);
 			}
 
 			StringBundler sb = new StringBundler(5);
@@ -1205,6 +1189,8 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 					line = StringUtil.replaceLast(
 						line, currentAttributeAndValue,
 						previousAttributeAndValue);
+
+					return sortJSPAttributes(fileName, line, lineCount);
 				}
 
 				return line;
@@ -1270,7 +1256,9 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 			}
 		}
 
-		imports = formatImports(imports, 17);
+		ImportsFormatter importsFormatter = new JSPImportsFormatter();
+
+		imports = importsFormatter.format(imports);
 
 		String beforeImports = content.substring(0, matcher.start());
 
@@ -1296,8 +1284,8 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 
 	private static final String[] _TAG_LIBRARIES = new String[] {
 		"aui", "c", "html", "jsp", "liferay-portlet", "liferay-security",
-		"liferay-theme", "liferay-ui", "liferay-util", "portlet", "struts",
-		"tiles"
+		"liferay-staging", "liferay-theme", "liferay-ui", "liferay-util",
+		"portlet", "struts", "tiles"
 	};
 
 	private List<String> _duplicateImportClassNames = new ArrayList<String>();

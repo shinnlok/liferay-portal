@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,15 +21,16 @@ long groupId = ParamUtil.getLong(request, "groupId");
 long[] selectedGroupIds = StringUtil.split(ParamUtil.getString(request, "selectedGroupIds"), 0L);
 long refererAssetEntryId = ParamUtil.getLong(request, "refererAssetEntryId");
 String typeSelection = ParamUtil.getString(request, "typeSelection");
+long subtypeSelectionId = ParamUtil.getLong(request, "subtypeSelectionId");
 String eventName = ParamUtil.getString(request, "eventName", liferayPortletResponse.getNamespace() + "selectAsset");
 
 PortletURL portletURL = renderResponse.createRenderURL();
 
 portletURL.setParameter("struts_action", "/asset_browser/view");
-portletURL.setParameter("groupId", String.valueOf(groupId));
 portletURL.setParameter("selectedGroupIds", StringUtil.merge(selectedGroupIds));
 portletURL.setParameter("refererAssetEntryId", String.valueOf(refererAssetEntryId));
 portletURL.setParameter("typeSelection", typeSelection);
+portletURL.setParameter("subtypeSelectionId", String.valueOf(subtypeSelectionId));
 portletURL.setParameter("eventName", eventName);
 
 request.setAttribute("view.jsp-portletURL", portletURL);
@@ -43,18 +44,15 @@ request.setAttribute("view.jsp-portletURL", portletURL);
 			searchContainer="<%= new AssetSearch(renderRequest, portletURL) %>"
 		>
 			<aui:nav-bar>
-				<aui:nav>
+				<aui:nav searchContainer="<%= searchContainer %>">
 					<liferay-util:include page="/html/portlet/asset_browser/toolbar.jsp">
 						<liferay-util:param name="groupId" value="<%= String.valueOf(groupId) %>" />
 						<liferay-util:param name="typeSelection" value="<%= typeSelection %>" />
+						<liferay-util:param name="subtypeSelectionId" value="<%= String.valueOf(subtypeSelectionId) %>" />
 					</liferay-util:include>
 				</aui:nav>
 
-				<aui:nav-bar-search cssClass="pull-right">
-					<liferay-ui:search-form
-						page="/html/portlet/asset_publisher/asset_search.jsp"
-					/>
-				</aui:nav-bar-search>
+				<aui:nav-bar-search cssClass="navbar-search-advanced" file="/html/portlet/asset_publisher/asset_search.jsp" searchContainer="<%= searchContainer %>" />
 			</aui:nav-bar>
 
 			<%
@@ -68,8 +66,6 @@ request.setAttribute("view.jsp-portletURL", portletURL);
 			<liferay-ui:search-container-results>
 				<%@ include file="/html/portlet/asset_publisher/asset_search_results.jspf" %>
 			</liferay-ui:search-container-results>
-
-			<div class="separator"><!-- --></div>
 
 			<liferay-ui:search-container-row
 				className="com.liferay.portal.kernel.search.Document"
@@ -107,17 +103,17 @@ request.setAttribute("view.jsp-portletURL", portletURL);
 				/>
 
 				<liferay-ui:search-container-column-text
-					name="userName"
-					value="<%= PortalUtil.getUserName(assetEntry) %>"
+					name="user-name"
+					value="<%= HtmlUtil.escape(PortalUtil.getUserName(assetEntry)) %>"
 				/>
 
 				<liferay-ui:search-container-column-date
-					name="modifiedDate"
+					name="modified-date"
 					value="<%= assetEntry.getModifiedDate() %>"
 				/>
 
 				<liferay-ui:search-container-column-text
-					name="descriptiveName"
+					name="site"
 					value="<%= HtmlUtil.escape(group.getDescriptiveName(locale)) %>"
 				/>
 
@@ -129,9 +125,9 @@ request.setAttribute("view.jsp-portletURL", portletURL);
 
 						data.put("assetentryid", assetEntry.getEntryId());
 						data.put("assetclassname", assetEntry.getClassName());
-						data.put("assettype", assetRendererFactory.getTypeName(locale, true));
-						data.put("assettitle", HtmlUtil.escape(assetEntry.getTitle(locale)));
-						data.put("groupdescriptivename", HtmlUtil.escape(group.getDescriptiveName(locale)));
+						data.put("assettype", assetRendererFactory.getTypeName(locale, subtypeSelectionId));
+						data.put("assettitle", assetEntry.getTitle(locale));
+						data.put("groupdescriptivename", group.getDescriptiveName(locale));
 						%>
 
 						<aui:button cssClass="selector-button" data="<%= data %>" value="choose" />
@@ -146,17 +142,5 @@ request.setAttribute("view.jsp-portletURL", portletURL);
 </div>
 
 <aui:script use="aui-base">
-	var Util = Liferay.Util;
-
-	A.one('#<portlet:namespace />selectAssetFm').delegate(
-		'click',
-		function(event) {
-			var result = Util.getAttributes(event.currentTarget, 'data-');
-
-			Util.getOpener().Liferay.fire('<%= HtmlUtil.escapeJS(eventName) %>', result);
-
-			Util.getWindow().hide();
-		},
-		'.selector-button'
-	);
+	Liferay.Util.selectEntityHandler('#<portlet:namespace />selectAssetFm', '<%= HtmlUtil.escapeJS(eventName) %>');
 </aui:script>

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -143,6 +143,55 @@ public class SCProductScreenshotPersistenceTest {
 			newSCProductScreenshot.getFullImageId());
 		Assert.assertEquals(existingSCProductScreenshot.getPriority(),
 			newSCProductScreenshot.getPriority());
+	}
+
+	@Test
+	public void testCountByProductEntryId() {
+		try {
+			_persistence.countByProductEntryId(ServiceTestUtil.nextLong());
+
+			_persistence.countByProductEntryId(0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByThumbnailId() {
+		try {
+			_persistence.countByThumbnailId(ServiceTestUtil.nextLong());
+
+			_persistence.countByThumbnailId(0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByFullImageId() {
+		try {
+			_persistence.countByFullImageId(ServiceTestUtil.nextLong());
+
+			_persistence.countByFullImageId(0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByP_P() {
+		try {
+			_persistence.countByP_P(ServiceTestUtil.nextLong(),
+				ServiceTestUtil.nextInt());
+
+			_persistence.countByP_P(0L, 0);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
 	}
 
 	@Test

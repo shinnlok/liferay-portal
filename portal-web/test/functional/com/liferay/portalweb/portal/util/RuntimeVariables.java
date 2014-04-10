@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,6 +21,8 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.util.ContextReplace;
 
 import java.io.File;
+
+import java.net.InetAddress;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -70,17 +72,13 @@ public class RuntimeVariables {
 
 		String varValue = value;
 
-		Pattern pattern = Pattern.compile("\\$\\{([^}]*?)\\}");
-
-		Matcher matcher = pattern.matcher(varValue);
-
-		Pattern statementPattern = Pattern.compile(
-			"(.*)\\?(.*)\\(([^\\)]*?)\\)");
+		Matcher matcher = _variablePattern.matcher(varValue);
 
 		while (matcher.find()) {
 			String statement = matcher.group(1);
 
-			Matcher statementMatcher = statementPattern.matcher(statement);
+			Matcher statementMatcher = _variableStatementPattern.matcher(
+				statement);
 
 			if (statementMatcher.find()) {
 				String operand = statementMatcher.group(1);
@@ -104,12 +102,6 @@ public class RuntimeVariables {
 
 				String operandValue = context.get(operand);
 
-				if ((_forParameterName != null) &&
-					operand.equals(_forParameterName)) {
-
-					operandValue = _forParameterValue;
-				}
-
 				String replaceRegex = "\\$\\{([^}]*?)\\}";
 
 				String result = "";
@@ -132,27 +124,34 @@ public class RuntimeVariables {
 					result = operandValue.replace(
 						argumentsList.get(0), argumentsList.get(1));
 				}
+				else if (method.startsWith("uppercase")) {
+					result = StringUtil.toUpperCase(operandValue);
+				}
 
 				varValue = varValue.replaceFirst(replaceRegex, result);
+			}
+			else if (statement.equals("getIPAddress()")) {
+				try {
+					InetAddress inetAddress = InetAddress.getLocalHost();
+
+					String result = inetAddress.getHostAddress();
+
+					varValue = varValue.replaceFirst(
+						"\\$\\{([^}]*?)\\}", result);
+				}
+				catch (Exception e) {
+				}
 			}
 			else {
 				String varName = statement;
 
-				if (!context.containsKey(varName) &&
-					!varName.equals(_forParameterName)) {
-
+				if (!context.containsKey(varName)) {
 					continue;
 				}
 
 				String replaceRegex = "\\$\\{([^}]*?)\\}";
 
 				String result = context.get(varName);
-
-				if ((_forParameterName != null) &&
-					_forParameterName.equals(varName)) {
-
-					result = _forParameterValue;
-				}
 
 				result = Matcher.quoteReplacement(result);
 
@@ -171,30 +170,44 @@ public class RuntimeVariables {
 		return _instance._getValue(key);
 	}
 
+	public static boolean isVariableSet(
+		String varName, Map<String, String> context) {
+
+		if (!context.containsKey(varName)) {
+			return false;
+		}
+
+		String varValue = context.get(varName);
+
+		varValue = StringUtil.replace(varValue, "${line.separator}", "");
+
+		if (varValue.contains("${") && varValue.contains("}")) {
+			return false;
+		}
+
+		return true;
+	}
+
 	public static String replace(String text) {
 		return _instance._replace(text);
 	}
 
-	public static void resetForParameter() {
-		_forParameterName = null;
+	public static String replaceRegularExpression(
+		String content, String regex, int group) {
 
-		_forParameterValue = null;
-	}
+		Pattern pattern = Pattern.compile(regex);
 
-	public static void setForParameter(String name, String value) {
-		_forParameterName = name;
+		Matcher matcher = pattern.matcher(content);
 
-		_forParameterValue = value;
+		if (matcher.find()) {
+			return matcher.group(group);
+		}
+
+		return StringPool.BLANK;
 	}
 
 	public static void setValue(String key, String value) {
 		_instance._setValue(key, value);
-	}
-
-	public static boolean variableExists(
-		String name, Map<String, String> context) {
-
-		return (context.containsKey(name) || name.equals(_forParameterName));
 	}
 
 	private RuntimeVariables() {
@@ -286,8 +299,10 @@ public class RuntimeVariables {
 
 	private static RuntimeVariables _instance = new RuntimeVariables();
 
-	private static String _forParameterName;
-	private static String _forParameterValue;
+	private static Pattern _variablePattern = Pattern.compile(
+		"\\$\\{([^}]*?)\\}");
+	private static Pattern _variableStatementPattern = Pattern.compile(
+		"(.*)\\?(.*)\\(([^\\)]*?)\\)");
 
 	private ContextReplace _contextReplace;
 	private Map<String, String> _runtimeVariables =

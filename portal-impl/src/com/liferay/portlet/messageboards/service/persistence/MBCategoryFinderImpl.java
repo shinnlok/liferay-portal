@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -26,7 +26,6 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.security.permission.InlineSQLHelperUtil;
@@ -41,6 +40,7 @@ import com.liferay.portlet.messageboards.service.MBMessageLocalServiceUtil;
 import com.liferay.portlet.messageboards.service.MBThreadLocalServiceUtil;
 import com.liferay.util.dao.orm.CustomSQLUtil;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -130,7 +130,7 @@ public class MBCategoryFinderImpl
 					groupId);
 			}
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addScalar(COUNT_COLUMN_NAME, Type.LONG);
 
@@ -212,7 +212,7 @@ public class MBCategoryFinderImpl
 					groupId);
 			}
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addEntity("MBCategory", MBCategoryImpl.class);
 
@@ -249,7 +249,7 @@ public class MBCategoryFinderImpl
 
 				category.setGroupId(group.getGroupId());
 				category.setCompanyId(group.getCompanyId());
-				category.setName(group.getName());
+				category.setName(group.getDescriptiveName());
 				category.setDescription(group.getDescription());
 				category.setThreadCount(threadCount);
 				category.setMessageCount(messageCount);
@@ -259,7 +259,7 @@ public class MBCategoryFinderImpl
 			catch (NoSuchSubscriptionException nsse) {
 			}
 
-			return new UnmodifiableList<MBCategory>(
+			return Collections.unmodifiableList(
 				ListUtil.subList(
 					list, queryDefinition.getStart(),
 					queryDefinition.getEnd()));

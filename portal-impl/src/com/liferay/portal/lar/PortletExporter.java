@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -31,7 +31,6 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.staging.StagingUtil;
 import com.liferay.portal.kernel.util.CharPool;
-import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.ReleaseInfo;
@@ -68,26 +67,14 @@ import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
-import com.liferay.portlet.asset.model.AssetCategory;
-import com.liferay.portlet.asset.model.AssetCategoryConstants;
-import com.liferay.portlet.asset.model.AssetCategoryProperty;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetLink;
 import com.liferay.portlet.asset.model.AssetTag;
 import com.liferay.portlet.asset.model.AssetTagProperty;
-import com.liferay.portlet.asset.model.AssetVocabulary;
-import com.liferay.portlet.asset.service.AssetCategoryLocalServiceUtil;
-import com.liferay.portlet.asset.service.AssetCategoryPropertyLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetTagLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetTagPropertyLocalServiceUtil;
-import com.liferay.portlet.asset.service.persistence.AssetCategoryUtil;
-import com.liferay.portlet.asset.service.persistence.AssetVocabularyUtil;
 import com.liferay.portlet.expando.model.ExpandoColumn;
-import com.liferay.portlet.messageboards.model.MBDiscussion;
-import com.liferay.portlet.messageboards.model.MBMessage;
-import com.liferay.portlet.messageboards.service.MBDiscussionLocalServiceUtil;
-import com.liferay.portlet.ratings.model.RatingsEntry;
 import com.liferay.util.xml.DocUtil;
 
 import java.io.File;
@@ -239,26 +226,6 @@ public class PortletExporter {
 		}
 	}
 
-	@Deprecated
-	public byte[] exportPortletInfo(
-			long plid, long groupId, String portletId,
-			Map<String, String[]> parameterMap, Date startDate, Date endDate)
-		throws Exception {
-
-		File file = exportPortletInfoAsFile(
-			plid, groupId, portletId, parameterMap, startDate, endDate);
-
-		try {
-			return FileUtil.getBytes(file);
-		}
-		catch (IOException ioe) {
-			throw new SystemException(ioe);
-		}
-		finally {
-			file.delete();
-		}
-	}
-
 	public File exportPortletInfoAsFile(
 			long plid, long groupId, String portletId,
 			Map<String, String[]> parameterMap, Date startDate, Date endDate)
@@ -287,13 +254,9 @@ public class PortletExporter {
 			_log.debug("Export permissions " + exportPermissions);
 		}
 
-		StopWatch stopWatch = null;
+		StopWatch stopWatch = new StopWatch();
 
-		if (_log.isInfoEnabled()) {
-			stopWatch = new StopWatch();
-
-			stopWatch.start();
-		}
+		stopWatch.start();
 
 		LayoutCache layoutCache = new LayoutCache();
 
@@ -415,20 +378,22 @@ public class PortletExporter {
 		portletDataContext.setMissingReferencesElement(
 			missingReferencesElement);
 
-		boolean[] exportPortletControls =
-			ExportImportHelperUtil.getExportPortletControls(
+		Map<String, Boolean> exportPortletControlsMap =
+			ExportImportHelperUtil.getExportPortletControlsMap(
 				layout.getCompanyId(), portletId, parameterMap);
 
 		exportPortlet(
 			portletDataContext, layoutCache, portletId, layout, rootElement,
-			exportPermissions, exportPortletControls[0],
-			exportPortletControls[1], exportPortletControls[2],
-			exportPortletControls[3]);
+			exportPermissions,
+			exportPortletControlsMap.get(
+				PortletDataHandlerKeys.PORTLET_ARCHIVED_SETUPS),
+			exportPortletControlsMap.get(PortletDataHandlerKeys.PORTLET_DATA),
+			exportPortletControlsMap.get(PortletDataHandlerKeys.PORTLET_SETUP),
+			exportPortletControlsMap.get(
+				PortletDataHandlerKeys.PORTLET_USER_PREFERENCES));
 
-		exportAssetCategories(portletDataContext);
 		exportAssetLinks(portletDataContext);
 		exportAssetTags(portletDataContext);
-		exportComments(portletDataContext);
 		exportExpandoTables(portletDataContext);
 		exportLocks(portletDataContext);
 
@@ -439,8 +404,6 @@ public class PortletExporter {
 			_permissionExporter.exportPortletDataPermissions(
 				portletDataContext);
 		}
-
-		exportRatingsEntries(portletDataContext, rootElement);
 
 		ExportImportHelperUtil.writeManifestSummary(
 			document, portletDataContext.getManifestSummary());
@@ -458,145 +421,6 @@ public class PortletExporter {
 		}
 
 		return zipWriter.getFile();
-	}
-
-	protected void exportAssetCategories(PortletDataContext portletDataContext)
-		throws Exception {
-
-		Document document = SAXReaderUtil.createDocument();
-
-		Element rootElement = document.addElement("categories-hierarchy");
-
-		exportAssetCategories(portletDataContext, rootElement);
-
-		portletDataContext.addZipEntry(
-			ExportImportPathUtil.getRootPath(portletDataContext) +
-				"/categories-hierarchy.xml",
-			document.formattedString());
-	}
-
-	protected void exportAssetCategories(
-			PortletDataContext portletDataContext, Element rootElement)
-		throws Exception {
-
-		Element assetsElement = rootElement.element("assets");
-
-		if (assetsElement == null) {
-			assetsElement = rootElement.addElement("assets");
-		}
-
-		Element assetCategoriesElement = rootElement.element("categories");
-
-		if (assetCategoriesElement == null) {
-			assetCategoriesElement = rootElement.addElement("categories");
-		}
-
-		Element assetVocabulariesElement = rootElement.element("vocabularies");
-
-		if (assetVocabulariesElement == null) {
-			assetVocabulariesElement = rootElement.addElement("vocabularies");
-		}
-
-		Map<String, String[]> assetCategoryUuidsMap =
-			portletDataContext.getAssetCategoryUuidsMap();
-
-		for (Map.Entry<String, String[]> entry :
-				assetCategoryUuidsMap.entrySet()) {
-
-			String[] assetCategoryEntryParts = StringUtil.split(
-				entry.getKey(), CharPool.POUND);
-
-			String className = assetCategoryEntryParts[0];
-			String classPK = assetCategoryEntryParts[1];
-
-			Element assetElement = assetsElement.addElement("asset");
-
-			assetElement.addAttribute("class-name", className);
-			assetElement.addAttribute("class-pk", classPK);
-			assetElement.addAttribute(
-				"category-uuids", StringUtil.merge(entry.getValue()));
-
-			List<AssetCategory> assetCategories =
-				AssetCategoryLocalServiceUtil.getCategories(
-					className, GetterUtil.getLong(classPK));
-
-			for (AssetCategory assestCategory : assetCategories) {
-				exportAssetCategory(
-					portletDataContext, assetVocabulariesElement,
-					assetCategoriesElement, assestCategory);
-			}
-		}
-	}
-
-	protected void exportAssetCategory(
-			PortletDataContext portletDataContext,
-			Element assetVocabulariesElement, Element assetCategoriesElement,
-			AssetCategory assetCategory)
-		throws Exception {
-
-		exportAssetVocabulary(
-			portletDataContext, assetVocabulariesElement,
-			assetCategory.getVocabularyId());
-
-		if (assetCategory.getParentCategoryId() !=
-				AssetCategoryConstants.DEFAULT_PARENT_CATEGORY_ID) {
-
-			exportAssetCategory(
-				portletDataContext, assetVocabulariesElement,
-				assetCategoriesElement, assetCategory.getParentCategoryId());
-		}
-
-		String path = getAssetCategoryPath(
-			portletDataContext, assetCategory.getCategoryId());
-
-		if (!portletDataContext.isPathNotProcessed(path)) {
-			return;
-		}
-
-		Element assetCategoryElement = assetCategoriesElement.addElement(
-			"category");
-
-		assetCategoryElement.addAttribute("path", path);
-
-		assetCategory.setUserUuid(assetCategory.getUserUuid());
-
-		portletDataContext.addZipEntry(path, assetCategory);
-
-		List<AssetCategoryProperty> assetCategoryProperties =
-			AssetCategoryPropertyLocalServiceUtil.getCategoryProperties(
-				assetCategory.getCategoryId());
-
-		for (AssetCategoryProperty assetCategoryProperty :
-				assetCategoryProperties) {
-
-			Element propertyElement = assetCategoryElement.addElement(
-				"property");
-
-			propertyElement.addAttribute(
-				"userUuid", assetCategoryProperty.getUserUuid());
-			propertyElement.addAttribute("key", assetCategoryProperty.getKey());
-			propertyElement.addAttribute(
-				"value", assetCategoryProperty.getValue());
-		}
-
-		portletDataContext.addPermissions(
-			AssetCategory.class, assetCategory.getCategoryId());
-	}
-
-	protected void exportAssetCategory(
-			PortletDataContext portletDataContext,
-			Element assetVocabulariesElement, Element assetCategoriesElement,
-			long assetCategoryId)
-		throws Exception {
-
-		AssetCategory assetCategory = AssetCategoryUtil.fetchByPrimaryKey(
-			assetCategoryId);
-
-		if (assetCategory != null) {
-			exportAssetCategory(
-				portletDataContext, assetVocabulariesElement,
-				assetCategoriesElement, assetCategory);
-		}
 	}
 
 	protected void exportAssetLinks(PortletDataContext portletDataContext)
@@ -721,104 +545,6 @@ public class PortletExporter {
 
 		portletDataContext.addZipEntry(
 			ExportImportPathUtil.getRootPath(portletDataContext) + "/tags.xml",
-			document.formattedString());
-	}
-
-	protected void exportAssetVocabulary(
-			PortletDataContext portletDataContext,
-			Element assetVocabulariesElement, AssetVocabulary assetVocabulary)
-		throws Exception {
-
-		String path = getAssetVocabulariesPath(
-			portletDataContext, assetVocabulary.getVocabularyId());
-
-		if (!portletDataContext.isPathNotProcessed(path)) {
-			return;
-		}
-
-		Element assetVocabularyElement = assetVocabulariesElement.addElement(
-			"vocabulary");
-
-		assetVocabularyElement.addAttribute("path", path);
-
-		assetVocabulary.setUserUuid(assetVocabulary.getUserUuid());
-
-		portletDataContext.addZipEntry(path, assetVocabulary);
-
-		portletDataContext.addPermissions(
-			AssetVocabulary.class, assetVocabulary.getVocabularyId());
-	}
-
-	protected void exportAssetVocabulary(
-			PortletDataContext portletDataContext,
-			Element assetVocabulariesElement, long assetVocabularyId)
-		throws Exception {
-
-		AssetVocabulary assetVocabulary = AssetVocabularyUtil.findByPrimaryKey(
-			assetVocabularyId);
-
-		exportAssetVocabulary(
-			portletDataContext, assetVocabulariesElement, assetVocabulary);
-	}
-
-	protected void exportComments(PortletDataContext portletDataContext)
-		throws Exception {
-
-		Document document = SAXReaderUtil.createDocument();
-
-		Element rootElement = document.addElement("comments");
-
-		Map<String, List<MBMessage>> commentsMap =
-			portletDataContext.getComments();
-
-		for (Map.Entry<String, List<MBMessage>> entry :
-				commentsMap.entrySet()) {
-
-			String[] commentParts = StringUtil.split(
-				entry.getKey(), CharPool.POUND);
-
-			String className = commentParts[0];
-			String classPK = commentParts[1];
-
-			String commentsPath = getCommentsPath(
-				portletDataContext, className, classPK);
-
-			Element assetElement = rootElement.addElement("asset");
-
-			assetElement.addAttribute("path", commentsPath);
-			assetElement.addAttribute("class-name", className);
-			assetElement.addAttribute("class-pk", classPK);
-
-			List<MBMessage> mbMessages = entry.getValue();
-
-			for (MBMessage mbMessage : mbMessages) {
-				String commentPath = getCommentPath(
-					portletDataContext, className, classPK, mbMessage);
-
-				if (portletDataContext.isPathNotProcessed(commentPath)) {
-					User user = UserLocalServiceUtil.fetchUser(
-						mbMessage.getUserId());
-
-					if (user == null) {
-						continue;
-					}
-
-					portletDataContext.addZipEntry(commentPath, mbMessage);
-
-					MBDiscussion mbDiscussion =
-						MBDiscussionLocalServiceUtil.getDiscussion(
-							className, GetterUtil.getLong(classPK));
-
-					portletDataContext.addReferenceElement(
-						mbDiscussion, assetElement, user,
-						PortletDataContext.REFERENCE_TYPE_WEAK, true);
-				}
-			}
-		}
-
-		portletDataContext.addZipEntry(
-			ExportImportPathUtil.getRootPath(portletDataContext) +
-				"/comments.xml",
 			document.formattedString());
 	}
 
@@ -1289,75 +1015,6 @@ public class PortletExporter {
 		}
 	}
 
-	protected void exportRatingsEntries(
-			PortletDataContext portletDataContext, Element parentElement)
-		throws Exception {
-
-		Document document = SAXReaderUtil.createDocument();
-
-		Element rootElement = document.addElement("ratings");
-
-		Map<String, List<RatingsEntry>> ratingsEntriesMap =
-			portletDataContext.getRatingsEntries();
-
-		for (Map.Entry<String, List<RatingsEntry>> entry :
-				ratingsEntriesMap.entrySet()) {
-
-			String[] ratingsEntryParts = StringUtil.split(
-				entry.getKey(), CharPool.POUND);
-
-			String className = ratingsEntryParts[0];
-			String classPK = ratingsEntryParts[1];
-
-			String ratingsEntriesPath = getRatingsEntriesPath(
-				portletDataContext, className, classPK);
-
-			Element assetElement = rootElement.addElement("asset");
-
-			assetElement.addAttribute("path", ratingsEntriesPath);
-			assetElement.addAttribute("class-name", className);
-			assetElement.addAttribute("class-pk", classPK);
-
-			List<RatingsEntry> ratingsEntries = entry.getValue();
-
-			for (RatingsEntry ratingsEntry : ratingsEntries) {
-				String ratingsEntryPath = getRatingsEntryPath(
-					portletDataContext, className, classPK, ratingsEntry);
-
-				User user = UserLocalServiceUtil.fetchUser(
-					ratingsEntry.getUserId());
-
-				if (user == null) {
-					continue;
-				}
-
-				portletDataContext.addZipEntry(ratingsEntryPath, ratingsEntry);
-
-				portletDataContext.addReferenceElement(
-					ratingsEntry, assetElement, user, User.class,
-					PortletDataContext.REFERENCE_TYPE_WEAK, true);
-			}
-		}
-
-		portletDataContext.addZipEntry(
-			ExportImportPathUtil.getRootPath(portletDataContext) +
-				"/ratings.xml",
-			document.formattedString());
-	}
-
-	protected String getAssetCategoryPath(
-		PortletDataContext portletDataContext, long assetCategoryId) {
-
-		StringBundler sb = new StringBundler(4);
-
-		sb.append(ExportImportPathUtil.getRootPath(portletDataContext));
-		sb.append("/categories/");
-		sb.append(assetCategoryId);
-		sb.append(".xml");
-
-		return sb.toString();
-	}
-
 	protected String getAssetLinkPath(
 		PortletDataContext portletDataContext, long assetLinkId) {
 
@@ -1380,53 +1037,6 @@ public class PortletExporter {
 		sb.append("/tags/");
 		sb.append(assetCategoryId);
 		sb.append(".xml");
-
-		return sb.toString();
-	}
-
-	protected String getAssetVocabulariesPath(
-		PortletDataContext portletDataContext, long assetVocabularyId) {
-
-		StringBundler sb = new StringBundler(4);
-
-		sb.append(ExportImportPathUtil.getRootPath(portletDataContext));
-		sb.append("/vocabularies/");
-		sb.append(assetVocabularyId);
-		sb.append(".xml");
-
-		return sb.toString();
-	}
-
-	protected String getCommentPath(
-		PortletDataContext portletDataContext, String className, String classPK,
-		MBMessage mbMessage) {
-
-		StringBundler sb = new StringBundler(8);
-
-		sb.append(ExportImportPathUtil.getRootPath(portletDataContext));
-		sb.append("/comments/");
-		sb.append(PortalUtil.getClassNameId(className));
-		sb.append(CharPool.FORWARD_SLASH);
-		sb.append(classPK);
-		sb.append(CharPool.FORWARD_SLASH);
-		sb.append(mbMessage.getMessageId());
-		sb.append(".xml");
-
-		return sb.toString();
-	}
-
-	protected String getCommentsPath(
-		PortletDataContext portletDataContext, String className,
-		String classPK) {
-
-		StringBundler sb = new StringBundler(6);
-
-		sb.append(ExportImportPathUtil.getRootPath(portletDataContext));
-		sb.append("/comments/");
-		sb.append(PortalUtil.getClassNameId(className));
-		sb.append(CharPool.FORWARD_SLASH);
-		sb.append(classPK);
-		sb.append(CharPool.FORWARD_SLASH);
 
 		return sb.toString();
 	}
@@ -1480,40 +1090,6 @@ public class PortletExporter {
 		sb.append(plid);
 		sb.append(CharPool.FORWARD_SLASH);
 		sb.append("portlet-preferences.xml");
-
-		return sb.toString();
-	}
-
-	protected String getRatingsEntriesPath(
-		PortletDataContext portletDataContext, String className,
-		String classPK) {
-
-		StringBundler sb = new StringBundler(6);
-
-		sb.append(ExportImportPathUtil.getRootPath(portletDataContext));
-		sb.append("/ratings/");
-		sb.append(PortalUtil.getClassNameId(className));
-		sb.append(CharPool.FORWARD_SLASH);
-		sb.append(classPK);
-		sb.append(CharPool.FORWARD_SLASH);
-
-		return sb.toString();
-	}
-
-	protected String getRatingsEntryPath(
-		PortletDataContext portletDataContext, String className, String classPK,
-		RatingsEntry ratingsEntry) {
-
-		StringBundler sb = new StringBundler(8);
-
-		sb.append(ExportImportPathUtil.getRootPath(portletDataContext));
-		sb.append("/ratings/");
-		sb.append(PortalUtil.getClassNameId(className));
-		sb.append(CharPool.FORWARD_SLASH);
-		sb.append(classPK);
-		sb.append(CharPool.FORWARD_SLASH);
-		sb.append(ratingsEntry.getEntryId());
-		sb.append(".xml");
 
 		return sb.toString();
 	}

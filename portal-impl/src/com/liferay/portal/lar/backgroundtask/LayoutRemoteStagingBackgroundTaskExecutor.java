@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -112,12 +112,14 @@ public class LayoutRemoteStagingBackgroundTaskExecutor
 					new byte[PropsValues.STAGING_REMOTE_TRANSFER_BUFFER_SIZE];
 			}
 
-			backgroundTask = markBackgroundTask(backgroundTask, "exported");
+			markBackgroundTask(
+				backgroundTask.getBackgroundTaskId(), "exported");
 
 			missingReferences = StagingServiceHttp.validateStagingRequest(
 				httpPrincipal, stagingRequestId, privateLayout, parameterMap);
 
-			backgroundTask = markBackgroundTask(backgroundTask, "validated");
+			markBackgroundTask(
+				backgroundTask.getBackgroundTaskId(), "validated");
 
 			StagingServiceHttp.publishStagingRequest(
 				httpPrincipal, stagingRequestId, privateLayout, parameterMap);
@@ -141,7 +143,8 @@ public class LayoutRemoteStagingBackgroundTaskExecutor
 			}
 		}
 
-		return processMissingReferences(backgroundTask, missingReferences);
+		return processMissingReferences(
+			backgroundTask.getBackgroundTaskId(), missingReferences);
 	}
 
 	protected File exportLayoutsAsFile(
@@ -201,7 +204,7 @@ public class LayoutRemoteStagingBackgroundTaskExecutor
 	}
 
 	/**
-	 * @see com.liferay.portal.staging.StagingImpl#getMissingParentLayouts(
+	 * @see com.liferay.portal.lar.ExportImportHelperImpl#getMissingParentLayouts(
 	 *      Layout, long)
 	 */
 	protected List<Layout> getMissingRemoteParentLayouts(
@@ -221,7 +224,7 @@ public class LayoutRemoteStagingBackgroundTaskExecutor
 					httpPrincipal, parentLayout.getUuid(), remoteGroupId,
 					parentLayout.getPrivateLayout());
 
-				// If one parent is found all others are assumed to exist
+				// If one parent is found, all others are assumed to exist
 
 				break;
 			}

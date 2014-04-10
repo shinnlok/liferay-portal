@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -163,8 +163,8 @@ public class DLCheckInCheckOutTest {
 			folder = DLAppServiceUtil.getFolder(_folder.getFolderId());
 
 			if (i == 1) {
-				Assert.assertTrue(
-					lastPostDate.before(folder.getLastPostDate()));
+				Assert.assertFalse(
+					lastPostDate.after(folder.getLastPostDate()));
 			}
 			else {
 				Assert.assertTrue(
@@ -213,7 +213,7 @@ public class DLCheckInCheckOutTest {
 
 		folder = DLAppServiceUtil.getFolder(_folder.getFolderId());
 
-		Assert.assertTrue(lastPostDate.before(folder.getLastPostDate()));
+		Assert.assertFalse(lastPostDate.after(folder.getLastPostDate()));
 
 		Assert.assertEquals("1.1", fileEntry.getVersion());
 
@@ -243,7 +243,7 @@ public class DLCheckInCheckOutTest {
 
 		folder = DLAppServiceUtil.getFolder(_folder.getFolderId());
 
-		Assert.assertTrue(lastPostDate.before(folder.getLastPostDate()));
+		Assert.assertFalse(lastPostDate.after(folder.getLastPostDate()));
 
 		fileEntry = DLAppServiceUtil.getFileEntry(_fileEntry.getFileEntryId());
 
@@ -385,8 +385,8 @@ public class DLCheckInCheckOutTest {
 
 				folder = DLAppServiceUtil.getFolder(_folder.getFolderId());
 
-				Assert.assertTrue(
-					lastPostDate.before(folder.getLastPostDate()));
+				Assert.assertFalse(
+					lastPostDate.after(folder.getLastPostDate()));
 
 				fileEntry = DLAppServiceUtil.getFileEntry(fileEntryId);
 

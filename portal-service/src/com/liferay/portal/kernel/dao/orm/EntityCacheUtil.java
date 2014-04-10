@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,7 @@
 
 package com.liferay.portal.kernel.dao.orm;
 
+import com.liferay.portal.kernel.cache.PortalCache;
 import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
 
 import java.io.Serializable;
@@ -27,8 +28,8 @@ public class EntityCacheUtil {
 		getEntityCache().clearCache();
 	}
 
-	public static void clearCache(String className) {
-		getEntityCache().clearCache(className);
+	public static void clearCache(Class<?> clazz) {
+		getEntityCache().clearCache(clazz);
 	}
 
 	public static void clearLocalCache() {
@@ -39,6 +40,12 @@ public class EntityCacheUtil {
 		PortalRuntimePermission.checkGetBeanProperty(EntityCacheUtil.class);
 
 		return _entityCache;
+	}
+
+	public static PortalCache<Serializable, Serializable> getPortalCache(
+		Class<?> clazz) {
+
+		return getEntityCache().getPortalCache(clazz);
 	}
 
 	public static Serializable getResult(
@@ -66,6 +73,14 @@ public class EntityCacheUtil {
 
 		getEntityCache().putResult(
 			entityCacheEnabled, clazz, primaryKey, result);
+	}
+
+	public static void putResult(
+		boolean entityCacheEnabled, Class<?> clazz, Serializable primaryKey,
+		Serializable result, boolean quiet) {
+
+		getEntityCache().putResult(
+			entityCacheEnabled, clazz, primaryKey, result, quiet);
 	}
 
 	public static void removeCache(String className) {

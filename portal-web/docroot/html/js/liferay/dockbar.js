@@ -19,13 +19,19 @@ AUI.add(
 
 		var EVENT_CLICK = 'click';
 
+		var EVENT_MOUSEDOWN_OUTSIDE = 'mousedownoutside';
+
 		var SELECTOR_NAV_ACCOUNT_CONTROLS = '.nav-account-controls';
 
 		var SELECTOR_NAV_ADD_CONTROLS = '.nav-add-controls';
 
+		var STR_ACTIVE = 'active';
+
 		var STR_ADD_PANEL = 'addPanel';
 
 		var STR_EDIT_LAYOUT_PANEL = 'editLayoutPanel';
+
+		var STR_OPEN = 'open';
 
 		var STR_PREVIEW_PANEL = 'previewPanel';
 
@@ -60,7 +66,7 @@ AUI.add(
 
 							eventHandle.detach();
 
-							if (themeDisplay.isSignedIn() && !A.UA.touch) {
+							if (!A.UA.touch) {
 								instance._initInteraction(target, type);
 							}
 						}
@@ -138,11 +144,16 @@ AUI.add(
 
 						if (panelTrigger) {
 							panelTrigger.on(
-								EVENT_CLICK,
+								'gesturemovestart',
 								function(event) {
-									event.halt();
+									event.currentTarget.once(
+										'gesturemoveend',
+										function(event) {
+											event.halt();
 
-									instance._togglePanel(panelId);
+											instance._togglePanel(panelId);
+										}
+									);
 								}
 							);
 						}
@@ -298,23 +309,25 @@ AUI.add(
 
 				instance._registerPanels();
 
-				var btnNavigation = A.oneNS(namespace, '#navSiteNavigationNavbarBtn');
+				var btnNavigation = A.oneNS(namespace, '#navSiteNavigation');
 
 				var navigation = A.one(Liferay.Data.NAV_SELECTOR);
 
 				if (btnNavigation && navigation) {
-					btnNavigation.on(
-						EVENT_CLICK,
-						function(event) {
-							btnNavigation.toggleClass('open');
-							navigation.toggleClass('open');
+					btnNavigation.setData('menuItem', navigation);
+
+					var toggleMenu = new Liferay.MenuToggle(
+						{
+							content: [btnNavigation, navigation],
+							toggleTouch: false,
+							trigger: btnNavigation
 						}
 					);
 				}
 
 				Liferay.fire('dockbarLoaded');
 			},
-			['aui-io-request', 'liferay-node', 'liferay-store', 'node-focusmanager']
+			['aui-io-request', 'liferay-menu-toggle', 'liferay-node', 'liferay-store', 'node-focusmanager']
 		);
 
 		Liferay.provide(
@@ -339,16 +352,14 @@ AUI.add(
 				}
 
 				if (BODY.hasClass('dockbar-split')) {
-					if (navAccountControls) {
-						navAccountControls.plug(Liferay.DockbarKeyboardInteraction);
-					}
+					dockBar.plug(Liferay.DockbarKeyboardInteraction);
 
-					if (navAddControls) {
+					if (themeDisplay.isSignedIn() && navAddControls) {
 						navAddControls.plug(
 							A.Plugin.NodeFocusManager,
 							{
 								circular: true,
-								descendants: 'li a',
+								descendants: '.dropdown-menu li:visible a',
 								keys: {
 									next: 'down:39,40',
 									previous: 'down:37,38'
@@ -368,7 +379,7 @@ AUI.add(
 						);
 					}
 				}
-				else if (navAddControls) {
+				else if (themeDisplay.isSignedIn() && navAddControls) {
 					var brand = dockBar.one('.brand');
 
 					if (brand) {
@@ -464,6 +475,6 @@ AUI.add(
 	},
 	'',
 	{
-		requires: ['aui-node', 'aui-overlay-mask-deprecated', 'event-touch']
+		requires: ['aui-node', 'aui-overlay-mask-deprecated', 'event-move', 'event-touch']
 	}
 );

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -52,12 +52,24 @@ if (threadFlag != null) {
 			</c:if>
 
 			<%
-			String layoutFullURL = PortalUtil.getLayoutFullURL(themeDisplay);
+			String messageURL = null;
 
-			String messageURL = layoutFullURL + Portal.FRIENDLY_URL_SEPARATOR + "message_boards/view_message/" + selMessage.getMessageId();
+			if (portletName.equals(PortletKeys.MESSAGE_BOARDS_ADMIN)) {
+				PortletURL selMessageURL = renderResponse.createRenderURL();
 
-			if (windowState.equals(WindowState.MAXIMIZED)) {
-				messageURL += "/maximized";
+				selMessageURL.setParameter("struts_action", "/message_boards/view_message");
+				selMessageURL.setParameter("messageId", String.valueOf(selMessage.getMessageId()));
+
+				messageURL = selMessageURL.toString();
+			}
+			else {
+				String layoutFullURL = PortalUtil.getLayoutFullURL(themeDisplay);
+
+				messageURL = layoutFullURL + Portal.FRIENDLY_URL_SEPARATOR + "message_boards/view_message/" + selMessage.getMessageId();
+
+				if (windowState.equals(WindowState.MAXIMIZED)) {
+					messageURL += "/maximized";
+				}
 			}
 
 			String rowHREF = "#" + renderResponse.getNamespace() + "message_" + message.getMessageId();

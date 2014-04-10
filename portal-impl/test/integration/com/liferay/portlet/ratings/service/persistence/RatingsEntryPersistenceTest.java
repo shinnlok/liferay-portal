@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.test.ExecutionTestListeners;
 import com.liferay.portal.kernel.util.IntegerWrapper;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.service.ServiceTestUtil;
 import com.liferay.portal.service.persistence.BasePersistence;
@@ -115,6 +116,8 @@ public class RatingsEntryPersistenceTest {
 
 		RatingsEntry newRatingsEntry = _persistence.create(pk);
 
+		newRatingsEntry.setUuid(ServiceTestUtil.randomString());
+
 		newRatingsEntry.setCompanyId(ServiceTestUtil.nextLong());
 
 		newRatingsEntry.setUserId(ServiceTestUtil.nextLong());
@@ -135,6 +138,8 @@ public class RatingsEntryPersistenceTest {
 
 		RatingsEntry existingRatingsEntry = _persistence.findByPrimaryKey(newRatingsEntry.getPrimaryKey());
 
+		Assert.assertEquals(existingRatingsEntry.getUuid(),
+			newRatingsEntry.getUuid());
 		Assert.assertEquals(existingRatingsEntry.getEntryId(),
 			newRatingsEntry.getEntryId());
 		Assert.assertEquals(existingRatingsEntry.getCompanyId(),
@@ -155,6 +160,74 @@ public class RatingsEntryPersistenceTest {
 			newRatingsEntry.getClassPK());
 		AssertUtils.assertEquals(existingRatingsEntry.getScore(),
 			newRatingsEntry.getScore());
+	}
+
+	@Test
+	public void testCountByUuid() {
+		try {
+			_persistence.countByUuid(StringPool.BLANK);
+
+			_persistence.countByUuid(StringPool.NULL);
+
+			_persistence.countByUuid((String)null);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByUuid_C() {
+		try {
+			_persistence.countByUuid_C(StringPool.BLANK,
+				ServiceTestUtil.nextLong());
+
+			_persistence.countByUuid_C(StringPool.NULL, 0L);
+
+			_persistence.countByUuid_C((String)null, 0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByC_C() {
+		try {
+			_persistence.countByC_C(ServiceTestUtil.nextLong(),
+				ServiceTestUtil.nextLong());
+
+			_persistence.countByC_C(0L, 0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByU_C_C() {
+		try {
+			_persistence.countByU_C_C(ServiceTestUtil.nextLong(),
+				ServiceTestUtil.nextLong(), ServiceTestUtil.nextLong());
+
+			_persistence.countByU_C_C(0L, 0L, 0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByC_C_S() {
+		try {
+			_persistence.countByC_C_S(ServiceTestUtil.nextLong(),
+				ServiceTestUtil.nextLong(), ServiceTestUtil.nextDouble());
+
+			_persistence.countByC_C_S(0L, 0L, 0D);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
 	}
 
 	@Test
@@ -191,10 +264,10 @@ public class RatingsEntryPersistenceTest {
 	}
 
 	protected OrderByComparator getOrderByComparator() {
-		return OrderByComparatorFactoryUtil.create("RatingsEntry", "entryId",
-			true, "companyId", true, "userId", true, "userName", true,
-			"createDate", true, "modifiedDate", true, "classNameId", true,
-			"classPK", true, "score", true);
+		return OrderByComparatorFactoryUtil.create("RatingsEntry", "uuid",
+			true, "entryId", true, "companyId", true, "userId", true,
+			"userName", true, "createDate", true, "modifiedDate", true,
+			"classNameId", true, "classPK", true, "score", true);
 	}
 
 	@Test
@@ -331,6 +404,8 @@ public class RatingsEntryPersistenceTest {
 		long pk = ServiceTestUtil.nextLong();
 
 		RatingsEntry ratingsEntry = _persistence.create(pk);
+
+		ratingsEntry.setUuid(ServiceTestUtil.randomString());
 
 		ratingsEntry.setCompanyId(ServiceTestUtil.nextLong());
 

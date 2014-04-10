@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -38,7 +38,7 @@ import java.io.Serializable;
  * @generated
  */
 @ProviderType
-public interface UserGroupRoleModel extends BaseModel<UserGroupRole> {
+public interface UserGroupRoleModel extends BaseModel<UserGroupRole>, MVCCModel {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -58,6 +58,22 @@ public interface UserGroupRoleModel extends BaseModel<UserGroupRole> {
 	 * @param primaryKey the primary key of this user group role
 	 */
 	public void setPrimaryKey(UserGroupRolePK primaryKey);
+
+	/**
+	 * Returns the mvcc version of this user group role.
+	 *
+	 * @return the mvcc version of this user group role
+	 */
+	@Override
+	public long getMvccVersion();
+
+	/**
+	 * Sets the mvcc version of this user group role.
+	 *
+	 * @param mvccVersion the mvcc version of this user group role
+	 */
+	@Override
+	public void setMvccVersion(long mvccVersion);
 
 	/**
 	 * Returns the user ID of this user group role.

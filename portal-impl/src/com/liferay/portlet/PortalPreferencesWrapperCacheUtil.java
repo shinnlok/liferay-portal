@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -40,7 +40,7 @@ public class PortalPreferencesWrapperCacheUtil {
 		String cacheKey = StringUtil.toHexString(ownerId).concat(
 			StringUtil.toHexString(ownerType));
 
-		_portalPreferencesWrapperPortalCache.put(
+		_portalPreferencesWrapperPortalCache.putQuiet(
 			cacheKey, portalPreferencesWrapper);
 	}
 

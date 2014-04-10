@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -27,11 +27,12 @@ DDLRecord record = (DDLRecord)row.getObject();
 
 long formDDMTemplateId = GetterUtil.getLong((String)row.getParameter("formDDMTemplateId"));
 
-boolean editable = GetterUtil.getBoolean((String)row.getParameter("editable"));
+boolean hasDeletePermission = GetterUtil.getBoolean((String)row.getParameter("hasDeletePermission"));
+boolean hasUpdatePermission = GetterUtil.getBoolean((String)row.getParameter("hasUpdatePermission"));
 
 DDLRecordVersion recordVersion = record.getRecordVersion();
 
-if (editable) {
+if (hasUpdatePermission) {
 	recordVersion = record.getLatestRecordVersion();
 }
 %>
@@ -48,11 +49,12 @@ if (editable) {
 
 		<liferay-ui:icon
 			image="view"
+			message="view[action]"
 			url="<%= viewRecordURL %>"
 		/>
 	</c:if>
 
-	<c:if test="<%= DDLRecordSetPermission.contains(permissionChecker, record.getRecordSet(), ActionKeys.UPDATE) %>">
+	<c:if test="<%= hasUpdatePermission %>">
 		<portlet:renderURL var="editRecordURL" windowState="<%= WindowState.MAXIMIZED.toString() %>">
 			<portlet:param name="struts_action" value="/dynamic_data_lists/edit_record" />
 			<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.UPDATE %>" />
@@ -67,7 +69,7 @@ if (editable) {
 		/>
 	</c:if>
 
-	<c:if test="<%= DDLRecordSetPermission.contains(permissionChecker, record.getRecordSet(), ActionKeys.DELETE) %>">
+	<c:if test="<%= hasDeletePermission %>">
 		<portlet:actionURL var="deleteRecordURL">
 			<portlet:param name="struts_action" value="/dynamic_data_mapping_list/edit_record" />
 			<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.DELETE %>" />

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -52,7 +52,7 @@ public class ResourceBlockFinderImpl
 			sql = StringUtil.replace(
 				sql, "[$ROLE_ID$]", StringUtil.merge(roleIds));
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addScalar("resourceBlockId", Type.LONG);
 			q.addScalar("actionIds", Type.LONG);

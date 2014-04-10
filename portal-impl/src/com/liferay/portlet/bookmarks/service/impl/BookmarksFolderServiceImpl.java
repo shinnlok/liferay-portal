@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -212,9 +212,22 @@ public class BookmarksFolderServiceImpl extends BookmarksFolderServiceBaseImpl {
 		}
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #getSubfolderIds(List, long,
+	 *             long, boolean)}
+	 */
+	@Deprecated
 	@Override
 	public void getSubfolderIds(
 			List<Long> folderIds, long groupId, long folderId)
+		throws SystemException {
+
+		getSubfolderIds(folderIds, groupId, folderId, true);
+	}
+
+	@Override
+	public void getSubfolderIds(
+			List<Long> folderIds, long groupId, long folderId, boolean recurse)
 		throws SystemException {
 
 		List<BookmarksFolder> folders =
@@ -224,8 +237,11 @@ public class BookmarksFolderServiceImpl extends BookmarksFolderServiceBaseImpl {
 		for (BookmarksFolder folder : folders) {
 			folderIds.add(folder.getFolderId());
 
-			getSubfolderIds(
-				folderIds, folder.getGroupId(), folder.getFolderId());
+			if (recurse) {
+				getSubfolderIds(
+					folderIds, folder.getGroupId(), folder.getFolderId(),
+					recurse);
+			}
 		}
 	}
 
@@ -236,7 +252,7 @@ public class BookmarksFolderServiceImpl extends BookmarksFolderServiceBaseImpl {
 
 		List<Long> folderIds = new ArrayList<Long>();
 
-		getSubfolderIds(folderIds, groupId, folderId);
+		getSubfolderIds(folderIds, groupId, folderId, recurse);
 
 		return folderIds;
 	}
@@ -294,7 +310,7 @@ public class BookmarksFolderServiceImpl extends BookmarksFolderServiceBaseImpl {
 			getPermissionChecker(), folder, ActionKeys.UPDATE);
 
 		bookmarksFolderLocalService.restoreFolderFromTrash(
-				getUserId(), folderId);
+			getUserId(), folderId);
 	}
 
 	@Override

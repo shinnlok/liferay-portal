@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,15 +14,11 @@
 
 package com.liferay.portal.tools.sourceformatter;
 
-import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
-
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 /**
  * @author Hugo Huijser
  */
-@RunWith(LiferayIntegrationJUnitTestRunner.class)
 public class JavaSourceProcessorTest extends BaseSourceProcessorTestCase {
 
 	@Test
@@ -97,8 +93,8 @@ public class JavaSourceProcessorTest extends BaseSourceProcessorTestCase {
 	public void testIncorrectTabs() throws Exception {
 		test(
 			"IncorrectTabs.testjava",
-			new String[] {"tab:", "tab:", "tab:", "tab:", "tab:"},
-			new Integer[] {23, 27, 31, 37, 44});
+			new String[] {"tab:", "tab:", "tab:", "tab:"},
+			new Integer[] {23, 27, 33, 40});
 	}
 
 	@Test

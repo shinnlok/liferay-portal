@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -162,6 +162,64 @@ public class DLContentPersistenceTest {
 		Assert.assertTrue(Arrays.equals(existingData.getBytes(1,
 					(int)existingData.length()), newDataBytes));
 		Assert.assertEquals(existingDLContent.getSize(), newDLContent.getSize());
+	}
+
+	@Test
+	public void testCountByC_R() {
+		try {
+			_persistence.countByC_R(ServiceTestUtil.nextLong(),
+				ServiceTestUtil.nextLong());
+
+			_persistence.countByC_R(0L, 0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByC_R_P() {
+		try {
+			_persistence.countByC_R_P(ServiceTestUtil.nextLong(),
+				ServiceTestUtil.nextLong(), StringPool.BLANK);
+
+			_persistence.countByC_R_P(0L, 0L, StringPool.NULL);
+
+			_persistence.countByC_R_P(0L, 0L, (String)null);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByC_R_LikeP() {
+		try {
+			_persistence.countByC_R_LikeP(ServiceTestUtil.nextLong(),
+				ServiceTestUtil.nextLong(), StringPool.BLANK);
+
+			_persistence.countByC_R_LikeP(0L, 0L, StringPool.NULL);
+
+			_persistence.countByC_R_LikeP(0L, 0L, (String)null);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByC_R_P_V() {
+		try {
+			_persistence.countByC_R_P_V(ServiceTestUtil.nextLong(),
+				ServiceTestUtil.nextLong(), StringPool.BLANK, StringPool.BLANK);
+
+			_persistence.countByC_R_P_V(0L, 0L, StringPool.NULL, StringPool.NULL);
+
+			_persistence.countByC_R_P_V(0L, 0L, (String)null, (String)null);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
 	}
 
 	@Test

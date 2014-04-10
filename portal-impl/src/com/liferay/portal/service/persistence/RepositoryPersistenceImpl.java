@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -33,10 +33,10 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.model.CacheModel;
+import com.liferay.portal.model.MVCCModel;
 import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.Repository;
 import com.liferay.portal.model.impl.RepositoryImpl;
@@ -235,7 +235,7 @@ public class RepositoryPersistenceImpl extends BasePersistenceImpl<Repository>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<Repository>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<Repository>)QueryUtil.list(q, getDialect(),
@@ -1044,7 +1044,7 @@ public class RepositoryPersistenceImpl extends BasePersistenceImpl<Repository>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<Repository>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<Repository>)QueryUtil.list(q, getDialect(),
@@ -1588,7 +1588,7 @@ public class RepositoryPersistenceImpl extends BasePersistenceImpl<Repository>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<Repository>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<Repository>)QueryUtil.list(q, getDialect(),
@@ -2315,7 +2315,7 @@ public class RepositoryPersistenceImpl extends BasePersistenceImpl<Repository>
 			CacheRegistryUtil.clear(RepositoryImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(RepositoryImpl.class.getName());
+		EntityCacheUtil.clearCache(RepositoryImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -2654,7 +2654,7 @@ public class RepositoryPersistenceImpl extends BasePersistenceImpl<Repository>
 		}
 
 		EntityCacheUtil.putResult(RepositoryModelImpl.ENTITY_CACHE_ENABLED,
-			RepositoryImpl.class, repository.getPrimaryKey(), repository);
+			RepositoryImpl.class, repository.getPrimaryKey(), repository, false);
 
 		clearUniqueFindersCache(repository);
 		cacheUniqueFindersCache(repository);
@@ -2674,6 +2674,7 @@ public class RepositoryPersistenceImpl extends BasePersistenceImpl<Repository>
 		repositoryImpl.setNew(repository.isNew());
 		repositoryImpl.setPrimaryKey(repository.getPrimaryKey());
 
+		repositoryImpl.setMvccVersion(repository.getMvccVersion());
 		repositoryImpl.setUuid(repository.getUuid());
 		repositoryImpl.setRepositoryId(repository.getRepositoryId());
 		repositoryImpl.setGroupId(repository.getGroupId());
@@ -2891,7 +2892,7 @@ public class RepositoryPersistenceImpl extends BasePersistenceImpl<Repository>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<Repository>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<Repository>)QueryUtil.list(q, getDialect(),
@@ -3026,10 +3027,22 @@ public class RepositoryPersistenceImpl extends BasePersistenceImpl<Repository>
 			}
 		};
 
-	private static CacheModel<Repository> _nullRepositoryCacheModel = new CacheModel<Repository>() {
-			@Override
-			public Repository toEntityModel() {
-				return _nullRepository;
-			}
-		};
+	private static CacheModel<Repository> _nullRepositoryCacheModel = new NullCacheModel();
+
+	private static class NullCacheModel implements CacheModel<Repository>,
+		MVCCModel {
+		@Override
+		public long getMvccVersion() {
+			return 0;
+		}
+
+		@Override
+		public void setMvccVersion(long mvccVersion) {
+		}
+
+		@Override
+		public Repository toEntityModel() {
+			return _nullRepository;
+		}
+	}
 }

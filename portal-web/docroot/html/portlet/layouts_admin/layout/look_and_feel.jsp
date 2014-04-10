@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -75,9 +75,7 @@ else {
 				<%= HtmlUtil.escape(rootNodeName) %>
 			</c:when>
 			<c:otherwise>
-				<aui:a href="<%= redirectURL.toString() %>">
-					<%= HtmlUtil.escape(rootNodeName) %>
-				</aui:a>
+				<aui:a href="<%= redirectURL.toString() %>"><%= HtmlUtil.escape(rootNodeName) %></aui:a>
 			</c:otherwise>
 		</c:choose>
 	</liferay-util:buffer>
@@ -89,7 +87,7 @@ else {
 		taglibLabel = LanguageUtil.get(pageContext, "use-the-same-look-and-feel-of-the-pages-in-which-this-template-is-used");
 	}
 	else {
-		taglibLabel = LanguageUtil.format(pageContext, "use-the-same-look-and-feel-of-the-x", rootNodeNameLink);
+		taglibLabel = LanguageUtil.format(pageContext, "use-the-same-look-and-feel-of-the-x", rootNodeNameLink, false);
 	}
 	%>
 

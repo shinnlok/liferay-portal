@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -72,7 +72,7 @@ if (layoutSetBranches.contains(layoutSetBranch)) {
 					buffer.append("' data-layoutSetBranchName='");
 					buffer.append(HtmlUtil.escapeAttribute(curLayoutSetBranch.getName()));
 					buffer.append("' data-layoutSetBranchMessage='");
-					buffer.append(HtmlUtil.escapeAttribute(LanguageUtil.format(pageContext, "are-you-sure-you-want-to-merge-changes-from-x", curLayoutSetBranch.getName())));
+					buffer.append(HtmlUtil.escapeAttribute(LanguageUtil.format(pageContext, "are-you-sure-you-want-to-merge-changes-from-x", curLayoutSetBranch.getName(), false)));
 					buffer.append("' href='#'>");
 					buffer.append(LanguageUtil.get(pageContext, "select"));
 					buffer.append("</a>");

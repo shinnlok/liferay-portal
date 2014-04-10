@@ -1,5 +1,6 @@
-<definition>
+<definition component-name="portal-workflow">
 	<property name="web.plugins.includes" value="kaleo-web" />
+	<property name="testray.main.component.name" value="Workflow" />
 
 	<var name="pageName" value="Message Boards Page" />
 	<var name="portletName" value="Message Boards" />
@@ -102,6 +103,7 @@
 
 		<execute macro="MessageboardsThread#viewPG">
 			<var name="pageName" value="${pageName}" />
+			<var name="postCount" value="1" />
 			<var name="threadBody" value="${threadBody}" />
 			<var name="threadSubject" value="${threadSubject}" />
 		</execute>

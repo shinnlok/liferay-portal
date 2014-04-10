@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -31,7 +31,6 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.service.persistence.impl.BasePersistenceImpl;
@@ -221,7 +220,7 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<MBStatsUser>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<MBStatsUser>)QueryUtil.list(q, getDialect(),
@@ -710,7 +709,7 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<MBStatsUser>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<MBStatsUser>)QueryUtil.list(q, getDialect(),
@@ -1442,7 +1441,7 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<MBStatsUser>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<MBStatsUser>)QueryUtil.list(q, getDialect(),
@@ -1895,7 +1894,7 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 			CacheRegistryUtil.clear(MBStatsUserImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(MBStatsUserImpl.class.getName());
+		EntityCacheUtil.clearCache(MBStatsUserImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -2161,7 +2160,8 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 		}
 
 		EntityCacheUtil.putResult(MBStatsUserModelImpl.ENTITY_CACHE_ENABLED,
-			MBStatsUserImpl.class, mbStatsUser.getPrimaryKey(), mbStatsUser);
+			MBStatsUserImpl.class, mbStatsUser.getPrimaryKey(), mbStatsUser,
+			false);
 
 		clearUniqueFindersCache(mbStatsUser);
 		cacheUniqueFindersCache(mbStatsUser);
@@ -2389,7 +2389,7 @@ public class MBStatsUserPersistenceImpl extends BasePersistenceImpl<MBStatsUser>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<MBStatsUser>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<MBStatsUser>)QueryUtil.list(q, getDialect(),

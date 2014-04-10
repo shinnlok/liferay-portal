@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,7 +32,7 @@ portletURL.setParameter("classTypeId", String.valueOf(classTypeId));
 %>
 
 <div class="alert alert-error hide" id="<portlet:namespace />message">
-	<span class="error-message"><%= UnicodeLanguageUtil.get(locale, "the-field-value-is-invalid") %></span>
+	<span class="error-message"><%= LanguageUtil.get(pageContext, "the-field-value-is-invalid") %></span>
 </div>
 
 <div id="<portlet:namespace />selectDDMStructureFieldForm">

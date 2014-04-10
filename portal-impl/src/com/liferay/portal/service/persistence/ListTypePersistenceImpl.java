@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -33,10 +33,10 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.ListType;
+import com.liferay.portal.model.MVCCModel;
 import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.impl.ListTypeImpl;
 import com.liferay.portal.model.impl.ListTypeModelImpl;
@@ -235,7 +235,7 @@ public class ListTypePersistenceImpl extends BasePersistenceImpl<ListType>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<ListType>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<ListType>)QueryUtil.list(q, getDialect(),
@@ -662,7 +662,7 @@ public class ListTypePersistenceImpl extends BasePersistenceImpl<ListType>
 			CacheRegistryUtil.clear(ListTypeImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(ListTypeImpl.class.getName());
+		EntityCacheUtil.clearCache(ListTypeImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -853,7 +853,7 @@ public class ListTypePersistenceImpl extends BasePersistenceImpl<ListType>
 		}
 
 		EntityCacheUtil.putResult(ListTypeModelImpl.ENTITY_CACHE_ENABLED,
-			ListTypeImpl.class, listType.getPrimaryKey(), listType);
+			ListTypeImpl.class, listType.getPrimaryKey(), listType, false);
 
 		listType.resetOriginalValues();
 
@@ -870,6 +870,7 @@ public class ListTypePersistenceImpl extends BasePersistenceImpl<ListType>
 		listTypeImpl.setNew(listType.isNew());
 		listTypeImpl.setPrimaryKey(listType.getPrimaryKey());
 
+		listTypeImpl.setMvccVersion(listType.getMvccVersion());
 		listTypeImpl.setListTypeId(listType.getListTypeId());
 		listTypeImpl.setName(listType.getName());
 		listTypeImpl.setType(listType.getType());
@@ -1073,7 +1074,7 @@ public class ListTypePersistenceImpl extends BasePersistenceImpl<ListType>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<ListType>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<ListType>)QueryUtil.list(q, getDialect(),
@@ -1208,10 +1209,22 @@ public class ListTypePersistenceImpl extends BasePersistenceImpl<ListType>
 			}
 		};
 
-	private static CacheModel<ListType> _nullListTypeCacheModel = new CacheModel<ListType>() {
-			@Override
-			public ListType toEntityModel() {
-				return _nullListType;
-			}
-		};
+	private static CacheModel<ListType> _nullListTypeCacheModel = new NullCacheModel();
+
+	private static class NullCacheModel implements CacheModel<ListType>,
+		MVCCModel {
+		@Override
+		public long getMvccVersion() {
+			return 0;
+		}
+
+		@Override
+		public void setMvccVersion(long mvccVersion) {
+		}
+
+		@Override
+		public ListType toEntityModel() {
+			return _nullListType;
+		}
+	}
 }

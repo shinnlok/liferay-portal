@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -33,10 +33,10 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.model.CacheModel;
+import com.liferay.portal.model.MVCCModel;
 import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.UserNotificationEvent;
 import com.liferay.portal.model.impl.UserNotificationEventImpl;
@@ -241,7 +241,7 @@ public class UserNotificationEventPersistenceImpl extends BasePersistenceImpl<Us
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<UserNotificationEvent>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<UserNotificationEvent>)QueryUtil.list(q,
@@ -794,7 +794,7 @@ public class UserNotificationEventPersistenceImpl extends BasePersistenceImpl<Us
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<UserNotificationEvent>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<UserNotificationEvent>)QueryUtil.list(q,
@@ -1344,7 +1344,7 @@ public class UserNotificationEventPersistenceImpl extends BasePersistenceImpl<Us
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<UserNotificationEvent>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<UserNotificationEvent>)QueryUtil.list(q,
@@ -1852,7 +1852,7 @@ public class UserNotificationEventPersistenceImpl extends BasePersistenceImpl<Us
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<UserNotificationEvent>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<UserNotificationEvent>)QueryUtil.list(q,
@@ -2386,7 +2386,7 @@ public class UserNotificationEventPersistenceImpl extends BasePersistenceImpl<Us
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<UserNotificationEvent>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<UserNotificationEvent>)QueryUtil.list(q,
@@ -2814,7 +2814,7 @@ public class UserNotificationEventPersistenceImpl extends BasePersistenceImpl<Us
 			CacheRegistryUtil.clear(UserNotificationEventImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(UserNotificationEventImpl.class.getName());
+		EntityCacheUtil.clearCache(UserNotificationEventImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -3102,7 +3102,7 @@ public class UserNotificationEventPersistenceImpl extends BasePersistenceImpl<Us
 
 		EntityCacheUtil.putResult(UserNotificationEventModelImpl.ENTITY_CACHE_ENABLED,
 			UserNotificationEventImpl.class,
-			userNotificationEvent.getPrimaryKey(), userNotificationEvent);
+			userNotificationEvent.getPrimaryKey(), userNotificationEvent, false);
 
 		userNotificationEvent.resetOriginalValues();
 
@@ -3120,6 +3120,7 @@ public class UserNotificationEventPersistenceImpl extends BasePersistenceImpl<Us
 		userNotificationEventImpl.setNew(userNotificationEvent.isNew());
 		userNotificationEventImpl.setPrimaryKey(userNotificationEvent.getPrimaryKey());
 
+		userNotificationEventImpl.setMvccVersion(userNotificationEvent.getMvccVersion());
 		userNotificationEventImpl.setUuid(userNotificationEvent.getUuid());
 		userNotificationEventImpl.setUserNotificationEventId(userNotificationEvent.getUserNotificationEventId());
 		userNotificationEventImpl.setCompanyId(userNotificationEvent.getCompanyId());
@@ -3334,7 +3335,7 @@ public class UserNotificationEventPersistenceImpl extends BasePersistenceImpl<Us
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<UserNotificationEvent>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<UserNotificationEvent>)QueryUtil.list(q,
@@ -3470,10 +3471,22 @@ public class UserNotificationEventPersistenceImpl extends BasePersistenceImpl<Us
 		};
 
 	private static CacheModel<UserNotificationEvent> _nullUserNotificationEventCacheModel =
-		new CacheModel<UserNotificationEvent>() {
-			@Override
-			public UserNotificationEvent toEntityModel() {
-				return _nullUserNotificationEvent;
-			}
-		};
+		new NullCacheModel();
+
+	private static class NullCacheModel implements CacheModel<UserNotificationEvent>,
+		MVCCModel {
+		@Override
+		public long getMvccVersion() {
+			return 0;
+		}
+
+		@Override
+		public void setMvccVersion(long mvccVersion) {
+		}
+
+		@Override
+		public UserNotificationEvent toEntityModel() {
+			return _nullUserNotificationEvent;
+		}
+	}
 }

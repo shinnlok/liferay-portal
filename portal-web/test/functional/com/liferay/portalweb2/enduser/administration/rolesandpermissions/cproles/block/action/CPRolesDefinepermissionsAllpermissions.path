@@ -106,6 +106,21 @@
 	<td></td>
 </tr>
 <tr>
+	<td>CONTROL_PANEL_USERS_USERS_AND_ORGANIZATIONS_VIEW</td>
+	<td>//input[@value='125VIEW']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CONTROL_PANEL_USERS_USERS_AND_ORGANIZATIONS_USER_IMPERSONATE</td>
+	<td>//input[@value='com.liferay.portal.model.UserIMPERSONATE']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CONTROL_PANEL_USERS_USERS_AND_ORGANIZATIONS_USER_VIEW</td>
+	<td>//input[@value='com.liferay.portal.model.UserVIEW']</td>
+	<td></td>
+</tr>
+<tr>
 	<td></td>
 	<td></td>
 	<td></td>
@@ -181,6 +196,31 @@
 </tr>
 <!--SITE_ADMIN_PAGES_SITE_PAGES_SITE-->
 <tr>
+	<td>SITE_ADMIN_PAGES_SITE_PAGES_SITE_GENERAL_PERMISSIONS_ACTION</td>
+	<td>//input[@name='_128_allRowIds']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SITE_ADMIN_PAGES_SITE_PAGES_SITE_RESOURCE_PERMISSIONS_SITE_ACTION</td>
+	<td>xpath=(//input[@name='_128_allRowIds'])[2]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SITE_ADMIN_PAGES_SITE_PAGES_SITE_RESOURCE_PERMISSIONS_PAGE_ACTION</td>
+	<td>xpath=(//input[@name='_128_allRowIds'])[3]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SITE_ADMIN_PAGES_SITE_PAGES_SITE_RESOURCE_PERMISSIONS_PAGE_VARIATION_ACTION</td>
+	<td>xpath=(//input[@name='_128_allRowIds'])[4]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SITE_ADMIN_PAGES_SITE_PAGES_SITE_RESOURCE_PERMISSIONS_SITE_PAGES_VARIATION_ACTION</td>
+	<td>xpath=(//input[@name='_128_allRowIds'])[5]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>SITE_ADMIN_PAGES_SITE_PAGES_SITE_ADD_SITE</td>
 	<td>//input[@value='com.liferay.portal.model.GroupADD_COMMUNITY']</td>
 	<td></td>
@@ -212,8 +252,38 @@
 </tr>
 <!--SITE_ADMIN_CONTENT_WEB_CONTENT_GENERAL-->
 <tr>
-	<td>SITE_ADMIN_CONTENT_WEB_CONTENT_GENERAL_ALL_CHECKBOX</td>
+	<td>SITE_ADMIN_CONTENT_WEB_CONTENT_GENERAL_PERMISSIONS_ACTION_CHECKBOX</td>
 	<td>xpath=(//input[@name='_128_allRowIds'])[1]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SITE_ADMIN_CONTENT_WEB_CONTENT_RESOURCE_PERMISSIONS_WEB_CONTENT_ACTION_CHECKBOX</td>
+	<td>xpath=(//input[@name='_128_allRowIds'])[2]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SITE_ADMIN_CONTENT_WEB_CONTENT_RESOURCE_PERMISSIONS_WEB_CONTENT_FOLDER_ACTION_CHECKBOX</td>
+	<td>xpath=(//input[@name='_128_allRowIds'])[3]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SITE_ADMIN_CONTENT_WEB_CONTENT_RESOURCE_PERMISSIONS_WEB_CONTENT_ARTICLE_ACTION_CHECKBOX</td>
+	<td>xpath=(//input[@name='_128_allRowIds'])[4]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SITE_ADMIN_CONTENT_WEB_CONTENT_RESOURCE_PERMISSIONS_WEB_CONTENT_FEED_ACTION_CHECKBOX</td>
+	<td>xpath=(//input[@name='_128_allRowIds'])[5]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SITE_ADMIN_CONTENT_WEB_CONTENT_RESOURCE_PERMISSIONS_WEB_CONTENT_STRUCTURE_ACTION_CHECKBOX</td>
+	<td>xpath=(//input[@name='_128_allRowIds'])[6]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SITE_ADMIN_CONTENT_WEB_CONTENT_RESOURCE_PERMISSIONS_WEB_CONTENT_TEMPLATE_ACTION_CHECKBOX</td>
+	<td>xpath=(//input[@name='_128_allRowIds'])[7]</td>
 	<td></td>
 </tr>
 <tr>
@@ -282,6 +352,22 @@
 <tr>
 	<td>SITE_ADMIN_CONTENT_DOCUMENTS_AND_MEDIA_DOCUMENTS_ADD_REPOSITORY</td>
 	<td>//input[@value='com.liferay.portlet.documentlibraryADD_REPOSITORY']</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+<!--SITE_ADMIN_CONTENT_DOCUMENTS_AND_MEDIA_DOCUMENT-->
+<tr>
+	<td>SITE_ADMIN_CONTENT_DOCUMENTS_AND_MEDIA_DOCUMENT_ACTION_CHECKBOX</td>
+	<td>xpath=(//input[@name='_128_allRowIds'])[4]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SITE_ADMIN_CONTENT_DOCUMENTS_AND_MEDIA_DOCUMENT_VIEW</td>
+	<td>//input[@value='com.liferay.portlet.documentlibrary.model.DLFileEntryVIEW']</td>
 	<td></td>
 </tr>
 <tr>
@@ -403,6 +489,27 @@
 	<td></td>
 	<td></td>
 </tr>
+<!--SITE_ADMIN_CONTENT_BOOKMARKS_BOOKMARKS_ENTRY-->
+<tr>
+	<td>SITE_ADMIN_CONTENT_BOOKMARKS_BOOKMARKS_ENTRY_VIEW_CHECKBOX</td>
+	<td>//input[@value='com.liferay.portlet.bookmarks.model.BookmarksEntryVIEW']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SITE_ADMIN_CONTENT_BOOKMARKS_BOOKMARKS_ENTRY_VIEW_CHANGE_LINK</td>
+	<td>//a[@id='_128_comliferayportletbookmarksmodelBookmarksEntryVIEW']/span[contains(.,'Change')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SITE_ADMIN_CONTENT_BOOKMARKS_BOOKMARKS_ENTRY_VIEW_SITE_SCOPE</td>
+	<td>//span[@id='_128_groupHTMLcom.liferay.portlet.bookmarks.model.BookmarksEntryVIEW']/span[contains(.,'${key_siteNameScope}')]/span</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
 <!--SITE_ADMIN_CONTENT_MESSAGE_BOARDS_GENERAL-->
 <tr>
 	<td>SITE_ADMIN_CONTENT_MESSAGE_BOARDS_GENERAL_ALL_CHECKBOX</td>
@@ -412,6 +519,54 @@
 <tr>
 	<td>SITE_ADMIN_CONTENT_MESSAGE_BOARDS_GENERAL_ACCESS_IN_SITE_ADMINISTRATION</td>
 	<td>//input[@value='162ACCESS_IN_CONTROL_PANEL']</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+<!--SITE_ADMIN_CONTENT_MESSAGE_BOARDS_MESSAGES-->
+<tr>
+	<td>SITE_ADMIN_CONTENT_MESSAGE_BOARDS_MESSAGES_ADD_CATEGORY_CHECKBOX</td>
+	<td>//input[@value='com.liferay.portlet.messageboardsADD_CATEGORY']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SITE_ADMIN_CONTENT_MESSAGE_BOARDS_MESSAGES_ADD_MESSAGE_CHECKBOX</td>
+	<td>//input[@value='com.liferay.portlet.messageboardsADD_MESSAGE']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SITE_ADMIN_CONTENT_MESSAGE_BOARDS_MESSAGES_VIEW_CHECKBOX</td>
+	<td>//input[@value='com.liferay.portlet.messageboardsVIEW']</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+<!--SITE_ADMIN_CONTENT_MESSAGE_BOARDS_CATEGORY-->
+<tr>
+	<td>SITE_ADMIN_CONTENT_MESSAGE_BOARDS_CATEGORY_ADD_MESSAGE_CHECKBOX</td>
+	<td>//input[@value='com.liferay.portlet.messageboards.model.MBCategoryADD_MESSAGE']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SITE_ADMIN_CONTENT_MESSAGE_BOARDS_CATEGORY_VIEW_CHECKBOX</td>
+	<td>//input[@value='com.liferay.portlet.messageboards.model.MBCategoryVIEW']</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+<!--SITE_ADMIN_CONTENT_MESSAGE_BOARDS_MESSAGE-->
+<tr>
+	<td>SITE_ADMIN_CONTENT_MESSAGE_BOARDS_MESSAGE_VIEW_CHECKBOX</td>
+	<td>//input[@value='com.liferay.portlet.messageboards.model.MBMessageVIEW']</td>
 	<td></td>
 </tr>
 <tr>
@@ -433,6 +588,120 @@
 <tr>
 	<td></td>
 	<td></td>
+	<td></td>
+</tr>
+<!--SITE_ADMIN_CONTENT_CATEGORIES_GENERAL-->
+<tr>
+	<td>SITE_ADMIN_CONTENT_CATEGORIES_GENERAL_ACCESS_IN_SITE_ADMINISTRATION_CHECKBOX</td>
+	<td>//input[@value='147ACCESS_IN_CONTROL_PANEL']</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+<!--SITE_ADMIN_CONTENT_CATEGORIES_ASSET_ENTRIES-->
+<tr>
+	<td>SITE_ADMIN_CONTENT_CATEGORIES_ASSET_ENTRIES_ADD_CATEGORY_CHECKBOX</td>
+	<td>//input[@value='com.liferay.portlet.assetADD_CATEGORY']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SITE_ADMIN_CONTENT_CATEGORIES_ASSET_ENTRIES_ADD_VOCABULARY_CHECKBOX</td>
+	<td>//input[@value='com.liferay.portlet.assetADD_VOCABULARY']</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+<!--SITE_ADMIN_CONTENT_CATEGORIES_CATEGORY_VOCABULARY-->
+<tr>
+	<td>SITE_ADMIN_CONTENT_CATEGORIES_CATEGORY_VOCABULARY_VIEW_CHECKBOX</td>
+	<td>//input[@value='com.liferay.portlet.asset.model.AssetVocabularyVIEW']</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+<!--SITE_ADMIN_CONTENT_CATEGORIES_CATEGORY-->
+<tr>
+	<td>SITE_ADMIN_CONTENT_CATEGORIES_CATEGORY_ADD_CATEGORY_CHECKBOX</td>
+	<td>//input[@value='com.liferay.portlet.asset.model.AssetCategoryADD_CATEGORY']</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+<!--SITE_ADMIN_CONTENT_DYNAMIC_DATA_LISTS-->
+<tr>
+	<td>SITE_ADMIN_CONTENT_DYNAMIC_DATA_LISTS_ADD_RECORD_CHECKBOX</td>
+	<td>//input[@value='com.liferay.portlet.dynamicdatalists.model.DDLRecordSetADD_RECORD']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SITE_ADMIN_CONTENT_DYNAMIC_DATA_LISTS_UPDATE_CHECKBOX</td>
+	<td>//input[@value='com.liferay.portlet.dynamicdatalists.model.DDLRecordSetUPDATE']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SITE_ADMIN_CONTENT_DYNAMIC_DATA_LISTS_VIEW_CHECKBOX</td>
+	<td>//input[@value='com.liferay.portlet.dynamicdatalists.model.DDLRecordSetVIEW']</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+<!--SITE_ADMIN_USERS_SITE_MEMBERSHIPS_GENERAL-->
+<tr>
+	<td>SITE_ADMIN_USERS_SITE_MEMBERSHIPS_GENERAL_ALL_CHECKBOX</td>
+	<td>xpath=(//input[@name='_128_allRowIds'])[1]</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+<!--SITE_ADMIN_USERS_SITE_MEMBERSHIPS_TEAM-->
+<tr>
+	<td>SITE_ADMIN_USERS_SITE_MEMBERSHIPS_TEAM_ALL_CHECKBOX</td>
+	<td>xpath=(//input[@name='_128_allRowIds'])[3]</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+<!--SITE_ADMIN_APPLICATIONS_WEB_CONTENT_DISPLAY-->
+<tr>
+	<td>SITE_ADMIN_APPLICATIONS_WEB_CONTENT_DISPLAY_APPLICATIONS_PERMISSIONS_ACTION</td>
+	<td>//input[@name='_128_allRowIds']</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+<!--SITE_ADMIN_APPLICATIONS_ASSET_PUBLISHER-->
+<tr>
+	<td>SITE_ADMIN_APPLICATIONS_ASSET_PUBLISHER_ADD_TO_PAGE_CHECKBOX</td>
+	<td>//input[contains(@value,'ADD_TO_PAGE')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SITE_ADMIN_APPLICATIONS_ASSET_PUBLISHER_VIEW_CHECKBOX</td>
+	<td>//input[contains(@value,'VIEW')]</td>
 	<td></td>
 </tr>
 </tbody>

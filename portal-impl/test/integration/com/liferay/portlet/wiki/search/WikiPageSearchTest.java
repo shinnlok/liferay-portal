@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -31,6 +31,7 @@ import com.liferay.portal.util.TestPropsValues;
 import com.liferay.portlet.wiki.asset.WikiPageAssetRenderer;
 import com.liferay.portlet.wiki.model.WikiPage;
 import com.liferay.portlet.wiki.service.WikiNodeLocalServiceUtil;
+import com.liferay.portlet.wiki.service.WikiPageLocalServiceUtil;
 import com.liferay.portlet.wiki.service.WikiPageServiceUtil;
 import com.liferay.portlet.wiki.util.WikiTestUtil;
 
@@ -166,6 +167,14 @@ public class WikiPageSearchTest extends BaseSearchTestCase {
 	@Override
 	protected boolean isExpirableAllVersions() {
 		return true;
+	}
+
+	@Override
+	protected void moveBaseModelToTrash(long primaryKey) throws Exception {
+		WikiPage page = WikiPageLocalServiceUtil.getPageByPageId(primaryKey);
+
+		WikiPageLocalServiceUtil.movePageToTrash(
+			TestPropsValues.getUserId(), page.getNodeId(), page.getTitle());
 	}
 
 	@Override

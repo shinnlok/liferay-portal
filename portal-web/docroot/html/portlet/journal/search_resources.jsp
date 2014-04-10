@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -96,7 +96,7 @@ ArticleSearch searchContainer = new ArticleSearch(liferayPortletRequest, entryEn
 
 				if (advancedSearch) {
 					if (folder != null) {
-						message = LanguageUtil.format(pageContext, "advanced-search-in-x", new Object[] {folder.getName()});
+						message = LanguageUtil.format(pageContext, "advanced-search-in-x", folder.getName(), false);
 					}
 					else {
 						message = LanguageUtil.get(pageContext, "advanced-search-everywhere");
@@ -104,10 +104,10 @@ ArticleSearch searchContainer = new ArticleSearch(liferayPortletRequest, entryEn
 				}
 				else {
 					if (folder != null) {
-						message = LanguageUtil.format(pageContext, "searched-for-x-in-x", new Object[] {HtmlUtil.escape(keywords), folder.getName()});
+						message = LanguageUtil.format(pageContext, "searched-for-x-in-x", new Object[] {HtmlUtil.escape(keywords), folder.getName()}, false);
 					}
 					else {
-						message = LanguageUtil.format(pageContext, "searched-for-x-everywhere", HtmlUtil.escape(keywords));
+						message = LanguageUtil.format(pageContext, "searched-for-x-everywhere", HtmlUtil.escape(keywords), false);
 					}
 				}
 				%>
@@ -160,7 +160,7 @@ ArticleSearch searchContainer = new ArticleSearch(liferayPortletRequest, entryEn
 	</liferay-portlet:renderURL>
 
 	<div class="journal-container" id="<portlet:namespace />entriesContainer">
-		<aui:form action="<%= searchURL %>" method="get" name="fm">
+		<aui:form action="<%= searchURL %>" method="get" name="fm2">
 			<liferay-portlet:renderURLParams varImpl="searchURL" />
 			<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 			<aui:input name="breadcrumbsFolderId" type="hidden" value="<%= breadcrumbsFolderId %>" />
@@ -232,13 +232,6 @@ ArticleSearch searchContainer = new ArticleSearch(liferayPortletRequest, entryEn
 						searchContext.setAttribute("params", params);
 						searchContext.setEnd(searchContainer.getEnd());
 						searchContext.setFolderIds(searchTerms.getFolderIds());
-
-						QueryConfig queryConfig = new QueryConfig();
-
-						queryConfig.setHighlightEnabled(true);
-
-						searchContext.setQueryConfig(queryConfig);
-
 						searchContext.setStart(searchContainer.getStart());
 
 						Hits hits = indexer.search(searchContext);
@@ -249,7 +242,7 @@ ArticleSearch searchContainer = new ArticleSearch(liferayPortletRequest, entryEn
 
 						PortletURL hitURL = liferayPortletResponse.createRenderURL();
 
-						List<SearchResult> searchResultsList = SearchResultUtil.getSearchResults(hits, locale, hitURL);
+						List<SearchResult> searchResultsList = SearchResultUtil.getSearchResults(hits, locale, hitURL, liferayPortletRequest, liferayPortletResponse);
 
 						emptySearchResults = searchResultsList.isEmpty();
 
@@ -294,7 +287,7 @@ ArticleSearch searchContainer = new ArticleSearch(liferayPortletRequest, entryEn
 										actionJsp="/html/portlet/journal/article_action.jsp"
 										containerName="<%= JournalUtil.getAbsolutePath(liferayPortletRequest, article.getFolderId()) %>"
 										cssClass='<%= MathUtil.isEven(i) ? "alt" : StringPool.BLANK %>'
-										description="<%= (summary != null) ? HtmlUtil.escape(summary.getContent()) : article.getDescription(locale) %>"
+										description="<%= (summary != null) ? summary.getContent() : article.getDescription(locale) %>"
 										mbMessages="<%= searchResult.getMBMessages() %>"
 										queryTerms="<%= hits.getQueryTerms() %>"
 										rowCheckerId="<%= String.valueOf(article.getArticleId()) %>"
@@ -302,7 +295,7 @@ ArticleSearch searchContainer = new ArticleSearch(liferayPortletRequest, entryEn
 										showCheckbox="<%= JournalArticlePermission.contains(permissionChecker, article, ActionKeys.DELETE) || JournalArticlePermission.contains(permissionChecker, article, ActionKeys.UPDATE) %>"
 										status="<%= article.getStatus() %>"
 										thumbnailSrc='<%= Validator.isNotNull(article.getArticleImageURL(themeDisplay)) ? article.getArticleImageURL(themeDisplay) : themeDisplay.getPathThemeImages() + "/file_system/large/article.png" %>'
-										title="<%= (summary != null) ? HtmlUtil.escape(summary.getTitle()) : article.getTitle(locale) %>"
+										title="<%= (summary != null) ? summary.getTitle() : article.getTitle(locale) %>"
 										url="<%= rowURL.toString() %>"
 										versions="<%= versions %>"
 									/>
@@ -331,13 +324,13 @@ ArticleSearch searchContainer = new ArticleSearch(liferayPortletRequest, entryEn
 										actionJsp="/html/portlet/journal/folder_action.jsp"
 										containerName="<%= JournalUtil.getAbsolutePath(liferayPortletRequest, curFolder.getParentFolderId()) %>"
 										cssClass='<%= MathUtil.isEven(i) ? "alt" : StringPool.BLANK %>'
-										description="<%= (summary != null) ? HtmlUtil.escape(summary.getContent()) : curFolder.getDescription() %>"
+										description="<%= (summary != null) ? summary.getContent() : curFolder.getDescription() %>"
 										queryTerms="<%= hits.getQueryTerms() %>"
 										rowCheckerId="<%= String.valueOf(curFolder.getFolderId()) %>"
 										rowCheckerName="<%= JournalFolder.class.getSimpleName() %>"
 										showCheckbox="<%= JournalFolderPermission.contains(permissionChecker, curFolder, ActionKeys.DELETE) || JournalFolderPermission.contains(permissionChecker, curFolder, ActionKeys.UPDATE) %>"
 										thumbnailSrc='<%= themeDisplay.getPathThemeImages() + "/file_system/large/" + folderImage + ".png" %>'
-										title="<%= (summary != null) ? HtmlUtil.escape(summary.getTitle()) : curFolder.getName() %>"
+										title="<%= (summary != null) ? summary.getTitle() : curFolder.getName() %>"
 										url="<%= rowURL.toString() %>"
 									/>
 								</c:when>
@@ -427,7 +420,7 @@ ArticleSearch searchContainer = new ArticleSearch(liferayPortletRequest, entryEn
 						String message = LanguageUtil.get(pageContext, "no-web-content-was-found-that-matched-the-specified-filters");
 
 						if (!advancedSearch) {
-							message = LanguageUtil.format(pageContext, "no-web-content-was-found-that-matched-the-keywords-x", "<strong>" + HtmlUtil.escape(keywords) + "</strong>");
+							message = LanguageUtil.format(pageContext, "no-web-content-was-found-that-matched-the-keywords-x", "<strong>" + HtmlUtil.escape(keywords) + "</strong>", false);
 						}
 						%>
 

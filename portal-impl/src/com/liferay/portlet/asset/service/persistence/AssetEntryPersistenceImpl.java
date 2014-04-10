@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -26,7 +26,6 @@ import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.CalendarUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.InstanceFactory;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -34,7 +33,6 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.ModelListener;
@@ -48,6 +46,8 @@ import com.liferay.portlet.asset.model.impl.AssetEntryImpl;
 import com.liferay.portlet.asset.model.impl.AssetEntryModelImpl;
 
 import java.io.Serializable;
+
+import java.sql.Timestamp;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -231,7 +231,7 @@ public class AssetEntryPersistenceImpl extends BasePersistenceImpl<AssetEntry>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<AssetEntry>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<AssetEntry>)QueryUtil.list(q, getDialect(),
@@ -721,7 +721,7 @@ public class AssetEntryPersistenceImpl extends BasePersistenceImpl<AssetEntry>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<AssetEntry>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<AssetEntry>)QueryUtil.list(q, getDialect(),
@@ -1212,7 +1212,7 @@ public class AssetEntryPersistenceImpl extends BasePersistenceImpl<AssetEntry>
 				QueryPos qPos = QueryPos.getInstance(q);
 
 				if (bindPublishDate) {
-					qPos.add(CalendarUtil.getTimestamp(publishDate));
+					qPos.add(new Timestamp(publishDate.getTime()));
 				}
 
 				if (!pagination) {
@@ -1221,7 +1221,7 @@ public class AssetEntryPersistenceImpl extends BasePersistenceImpl<AssetEntry>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<AssetEntry>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<AssetEntry>)QueryUtil.list(q, getDialect(),
@@ -1493,7 +1493,7 @@ public class AssetEntryPersistenceImpl extends BasePersistenceImpl<AssetEntry>
 		QueryPos qPos = QueryPos.getInstance(q);
 
 		if (bindPublishDate) {
-			qPos.add(CalendarUtil.getTimestamp(publishDate));
+			qPos.add(new Timestamp(publishDate.getTime()));
 		}
 
 		if (orderByComparator != null) {
@@ -1572,7 +1572,7 @@ public class AssetEntryPersistenceImpl extends BasePersistenceImpl<AssetEntry>
 				QueryPos qPos = QueryPos.getInstance(q);
 
 				if (bindPublishDate) {
-					qPos.add(CalendarUtil.getTimestamp(publishDate));
+					qPos.add(new Timestamp(publishDate.getTime()));
 				}
 
 				count = (Long)q.uniqueResult();
@@ -1744,7 +1744,7 @@ public class AssetEntryPersistenceImpl extends BasePersistenceImpl<AssetEntry>
 				QueryPos qPos = QueryPos.getInstance(q);
 
 				if (bindExpirationDate) {
-					qPos.add(CalendarUtil.getTimestamp(expirationDate));
+					qPos.add(new Timestamp(expirationDate.getTime()));
 				}
 
 				if (!pagination) {
@@ -1753,7 +1753,7 @@ public class AssetEntryPersistenceImpl extends BasePersistenceImpl<AssetEntry>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<AssetEntry>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<AssetEntry>)QueryUtil.list(q, getDialect(),
@@ -2025,7 +2025,7 @@ public class AssetEntryPersistenceImpl extends BasePersistenceImpl<AssetEntry>
 		QueryPos qPos = QueryPos.getInstance(q);
 
 		if (bindExpirationDate) {
-			qPos.add(CalendarUtil.getTimestamp(expirationDate));
+			qPos.add(new Timestamp(expirationDate.getTime()));
 		}
 
 		if (orderByComparator != null) {
@@ -2106,7 +2106,7 @@ public class AssetEntryPersistenceImpl extends BasePersistenceImpl<AssetEntry>
 				QueryPos qPos = QueryPos.getInstance(q);
 
 				if (bindExpirationDate) {
-					qPos.add(CalendarUtil.getTimestamp(expirationDate));
+					qPos.add(new Timestamp(expirationDate.getTime()));
 				}
 
 				count = (Long)q.uniqueResult();
@@ -2284,7 +2284,7 @@ public class AssetEntryPersistenceImpl extends BasePersistenceImpl<AssetEntry>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<AssetEntry>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<AssetEntry>)QueryUtil.list(q, getDialect(),
@@ -3224,7 +3224,7 @@ public class AssetEntryPersistenceImpl extends BasePersistenceImpl<AssetEntry>
 			CacheRegistryUtil.clear(AssetEntryImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(AssetEntryImpl.class.getName());
+		EntityCacheUtil.clearCache(AssetEntryImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -3589,7 +3589,7 @@ public class AssetEntryPersistenceImpl extends BasePersistenceImpl<AssetEntry>
 		}
 
 		EntityCacheUtil.putResult(AssetEntryModelImpl.ENTITY_CACHE_ENABLED,
-			AssetEntryImpl.class, assetEntry.getPrimaryKey(), assetEntry);
+			AssetEntryImpl.class, assetEntry.getPrimaryKey(), assetEntry, false);
 
 		clearUniqueFindersCache(assetEntry);
 		cacheUniqueFindersCache(assetEntry);
@@ -3837,7 +3837,7 @@ public class AssetEntryPersistenceImpl extends BasePersistenceImpl<AssetEntry>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<AssetEntry>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<AssetEntry>)QueryUtil.list(q, getDialect(),
@@ -4201,9 +4201,6 @@ public class AssetEntryPersistenceImpl extends BasePersistenceImpl<AssetEntry>
 		catch (Exception e) {
 			throw processException(e);
 		}
-		finally {
-			FinderCacheUtil.clearCache(AssetEntryModelImpl.MAPPING_TABLE_ASSETENTRIES_ASSETCATEGORIES_NAME);
-		}
 	}
 
 	/**
@@ -4490,9 +4487,6 @@ public class AssetEntryPersistenceImpl extends BasePersistenceImpl<AssetEntry>
 		}
 		catch (Exception e) {
 			throw processException(e);
-		}
-		finally {
-			FinderCacheUtil.clearCache(AssetEntryModelImpl.MAPPING_TABLE_ASSETENTRIES_ASSETTAGS_NAME);
 		}
 	}
 

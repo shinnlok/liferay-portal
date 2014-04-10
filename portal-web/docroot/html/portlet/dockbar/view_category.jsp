@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -189,7 +189,17 @@ if (!categories.isEmpty() || !portlets.isEmpty()) {
 								portletItemData.put("title", HtmlUtil.escape(portletItem.getName()));
 							%>
 
-								<aui:nav-item cssClass="lfr-content-item lfr-archived-setup" data="<%= portletItemData %>" href="" iconCssClass='<%= portletInstanceable ? "icon-th-large" : "icon-stop" %>' label="<%= HtmlUtil.escape(portletItem.getName()) %>">
+								<aui:nav-item cssClass="lfr-content-item lfr-archived-setup" href="">
+									<span <%= AUIUtil.buildData(portletItemData) %> class="<%= cssClass %>">
+										<i class="<%= portletInstanceable ? "icon-th-large" : "icon-stop" %>"></i>
+
+										<liferay-ui:message key="<%= HtmlUtil.escape(portletItem.getName()) %>" />
+									</span>
+
+									<%
+									data.remove("draggable");
+									%>
+
 									<span <%= AUIUtil.buildData(portletItemData) %> class='add-content-item <%= portletLocked ? "lfr-portlet-used" : StringPool.BLANK %>'>
 										<liferay-ui:message key="add" />
 									</span>

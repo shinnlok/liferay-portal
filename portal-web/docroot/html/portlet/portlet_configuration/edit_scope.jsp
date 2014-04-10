@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -59,7 +59,7 @@ for (Layout scopeGroupLayout : LayoutLocalServiceUtil.getScopeGroupLayouts(layou
 
 <aui:fieldset>
 	<aui:field-wrapper label="scope" name="scopeId">
-		<liferay-ui:icon-menu direction="down" icon="<%= group.getIconURL(themeDisplay) %>" message="<%= group.getDescriptiveName(locale) %>" showWhenSingleIcon="<%= true %>">
+		<liferay-ui:icon-menu direction="down" icon="<%= group.getIconURL(themeDisplay) %>" message="<%= HtmlUtil.escape(group.getDescriptiveName(locale)) %>" showWhenSingleIcon="<%= true %>">
 
 			<%
 			for (Group availableGroup : availableGroups) {
@@ -89,7 +89,7 @@ for (Layout scopeGroupLayout : LayoutLocalServiceUtil.getScopeGroupLayouts(layou
 
 				<liferay-ui:icon
 					id='<%= "scope" + availableGroup.getGroupId() %>'
-					message="<%= availableGroup.getDescriptiveName(locale) %>"
+					message="<%= HtmlUtil.escape(availableGroup.getDescriptiveName(locale)) %>"
 					method="post"
 					src="<%= availableGroup.getIconURL(themeDisplay) %>"
 					url="<%= setScopeURL %>"

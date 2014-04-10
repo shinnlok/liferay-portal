@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,20 +16,17 @@ package com.liferay.portlet.documentlibrary.asset;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.LiferayPortletURL;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Tuple;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortletKeys;
-import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.asset.model.AssetRenderer;
 import com.liferay.portlet.asset.model.BaseAssetRendererFactory;
 import com.liferay.portlet.assetpublisher.util.AssetPublisherUtil;
@@ -63,6 +60,11 @@ import javax.portlet.WindowStateException;
 public class DLFileEntryAssetRendererFactory extends BaseAssetRendererFactory {
 
 	public static final String TYPE = "document";
+
+	public DLFileEntryAssetRendererFactory() {
+		setLinkable(true);
+		setSupportsClassTypes(true);
+	}
 
 	@Override
 	public AssetRenderer getAssetRenderer(long classPK, int type)
@@ -158,42 +160,22 @@ public class DLFileEntryAssetRendererFactory extends BaseAssetRendererFactory {
 	}
 
 	@Override
-	public String getTypeName(Locale locale, boolean hasSubtypes) {
-		if (hasSubtypes) {
-			return LanguageUtil.get(locale, "basic-document");
-		}
+	public String getTypeName(Locale locale, long subtypeId) {
+		try {
+			DLFileEntryType dlFileEntryType =
+				DLFileEntryTypeLocalServiceUtil.getFileEntryType(subtypeId);
 
-		return super.getTypeName(locale, hasSubtypes);
+			return dlFileEntryType.getName(locale);
+		}
+		catch (Exception e) {
+			return super.getTypeName(locale, subtypeId);
+		}
 	}
 
 	@Override
 	public PortletURL getURLAdd(
-			LiferayPortletRequest liferayPortletRequest,
-			LiferayPortletResponse liferayPortletResponse)
-		throws PortalException, SystemException {
-
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)liferayPortletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
-
-		if (!DLPermission.contains(
-				themeDisplay.getPermissionChecker(),
-				themeDisplay.getScopeGroupId(), ActionKeys.ADD_DOCUMENT)) {
-
-			return null;
-		}
-
-		long classTypeId = GetterUtil.getLong(
-			liferayPortletRequest.getAttribute(
-				WebKeys.ASSET_RENDERER_FACTORY_CLASS_TYPE_ID));
-
-		if ((classTypeId > 0) &&
-			!DLFileEntryTypePermission.contains(
-				themeDisplay.getPermissionChecker(), classTypeId,
-				ActionKeys.VIEW)) {
-
-			return null;
-		}
+		LiferayPortletRequest liferayPortletRequest,
+		LiferayPortletResponse liferayPortletResponse) {
 
 		PortletURL portletURL = liferayPortletResponse.createRenderURL(
 			PortletKeys.DOCUMENT_LIBRARY);
@@ -229,6 +211,22 @@ public class DLFileEntryAssetRendererFactory extends BaseAssetRendererFactory {
 	}
 
 	@Override
+	public boolean hasAddPermission(
+			PermissionChecker permissionChecker, long groupId, long classTypeId)
+		throws Exception {
+
+		if ((classTypeId > 0) &&
+			!DLFileEntryTypePermission.contains(
+				permissionChecker, classTypeId, ActionKeys.VIEW)) {
+
+			return false;
+		}
+
+		return DLPermission.contains(
+			permissionChecker, groupId, ActionKeys.ADD_DOCUMENT);
+	}
+
+	@Override
 	public boolean hasPermission(
 			PermissionChecker permissionChecker, long classPK, String actionId)
 		throws Exception {
@@ -238,15 +236,8 @@ public class DLFileEntryAssetRendererFactory extends BaseAssetRendererFactory {
 	}
 
 	@Override
-	public boolean isLinkable() {
-		return _LINKABLE;
-	}
-
-	@Override
 	protected String getIconPath(ThemeDisplay themeDisplay) {
 		return themeDisplay.getPathThemeImages() + "/common/clip.png";
 	}
-
-	private static final boolean _LINKABLE = true;
 
 }

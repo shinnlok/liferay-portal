@@ -71,12 +71,17 @@
 </tr>
 <tr>
 	<td>NAVIGATION_PAGE</td>
-	<td>//div[@id='content']//li[contains(.,'${pageName}')]/a/span</td>
+	<td>//div[@id='content']//li[contains(.,'${key_pageName}')]/a/span</td>
+	<td></td>
+</tr>
+<tr>
+	<td>NAVIGATION_USER_ADDED_PAGE</td>
+	<td>xpath=(//div[@id='content']//li[contains(@class,'lfr-nav-deletable')]/a/span)[2]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>NAVIGATION_PAGE_DELETE</td>
-	<td>//span[contains(@class,'delete-tab')]</td>
+	<td>xpath=(//div[@id='content']//li[contains(@class,'lfr-nav-deletable')]/span[contains(@class,'delete')])[2]</td>
 	<td></td>
 </tr>
 <tr>
@@ -97,7 +102,7 @@
 </tr>
 <tr>
 	<td>WHATS_HAPPENING_CONTENT_COUNTDOWN</td>
-	<td>//span[@class='microblogs-countdown']</td>
+	<td>//span[contains(@class,'microblogs-countdown')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -117,7 +122,7 @@
 </tr>
 <tr>
 	<td>WHATS_HAPPENING_INFO_MESSAGE</td>
-	<td>//div[@class='portlet-msg-info']</td>
+	<td>//div[@class='alert alert-info']</td>
 	<td></td>
 </tr>
 <tr>
@@ -127,6 +132,11 @@
 </tr>
 <!--ANNOUNCEMENTS-->
 <tr>
+	<td>ANNOUNCEMENTS_PORTLET_TITLE</td>
+	<td>//h1[@class='portlet-title'][contains(.,'Announcement')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>ANNOUNCEMENTS_ADD_ENTRY_BUTTON</td>
 	<td>//button[contains(.,'Add Entry')]</td>
 	<td></td>
@@ -134,6 +144,11 @@
 <tr>
 	<td>ANNOUNCEMENTS_MANAGE_ENTRIES_BUTTON</td>
 	<td>//button[contains(.,'Manage Entries')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ANNOUNCEMENTS_ENTRY_SECTION</td>
+	<td>//div[@class='unread-entries-container']</td>
 	<td></td>
 </tr>
 <tr>
@@ -173,17 +188,22 @@
 </tr>
 <tr>
 	<td>ANNOUNCEMENTS_ENTRY_READ_ENTRIES_DROPDOWN</td>
-	<td>//div[contains(@class,'read-entries')]/div/span</td>
+	<td>//div[contains(@class,'header toggler-header')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>ANNOUNCEMENTS_ENTRY_COLLAPSED</td>
-	<td>//div[contains(@class,'content-collapsed')]</td>
+	<td>//div[contains(@class,'toggler-header-collapsed')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>ANNOUNCEMENTS_ENTRY_EXPANDED</td>
-	<td>//div[contains(@class,'content-expanded')]</td>
+	<td>//div[contains(@class,'toggler-header-expanded')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ANNOUNCEMENTS_NO_ANNOUNCEMENTS</td>
+	<td>//div[@class='no-announcements']</td>
 	<td></td>
 </tr>
 <tr>
@@ -193,33 +213,23 @@
 </tr>
 <!--UPCOMING_TASKS-->
 <tr>
-	<td>TASK_DESCRIPTION_NORMAL</td>
-	<td>//li[@class='tasks-title normal']/a</td>
+	<td>TASK_PORTLET_TITLE</td>
+	<td>//h1[@class='portlet-title'][contains(.,'Upcoming Tasks')]</td>
 	<td></td>
 </tr>
 <tr>
-	<td>TASK_DESCRIPTION_NORMAL_INCREMENT</td>
-	<td>xpath=(//li[@class='tasks-title normal']/a)[contains(.,'${number}')]</td>
+	<td>TASK_DESCRIPTION_NORMAL</td>
+	<td>xpath=(//li[@class='tasks-title normal']/a)[contains(.,'${key_taskDescription}')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>TASK_DESCRIPTION_HIGH</td>
-	<td>//li[@class='tasks-title high']/a</td>
-	<td></td>
-</tr>
-<tr>
-	<td>TASK_DESCRIPTION_HIGH_INCREMENT</td>
-	<td>xpath=(//li[@class='tasks-title high']/a)[contains(.,'${key_number}')]</td>
+	<td>xpath=(//li[@class='tasks-title high']/a)[contains(.,'${key_taskDescription}')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>TASK_DESCRIPTION_LOW</td>
-	<td>//li[@class='tasks-title low']/a</td>
-	<td></td>
-</tr>
-<tr>
-	<td>TASK_DESCRIPTION_LOW_INCREMENT</td>
-	<td>xpath=(//li[@class='tasks-title low']/a)[contains(.,'${number}')]</td>
+	<td>xpath=(//li[@class='tasks-title low']/a)[contains(.,'${key_taskDescription}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -234,33 +244,53 @@
 </tr>
 <!--EVENTS_DISPLAY-->
 <tr>
+	<td>EVENTS_PORTLET_TITLE</td>
+	<td>//h1[@class='portlet-title'][contains(.,'Events')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>EVENTS_DISPLAY_TODAYS_EVENTS_EVENT_TITLE</td>
+	<td>//div[@class='today-events']//tr[contains(.,'${key_eventTitle}')]//span[@class='event-name']/a</td>
+	<td></td>
+</tr>
+<tr>
+	<td>EVENTS_DISPLAY_TODAYS_EVENTS_EVENT_TITLE_GENERIC</td>
 	<td>//div[@class='today-events']//span[@class='event-name']/a</td>
 	<td></td>
 </tr>
 <tr>
 	<td>EVENTS_DISPLAY_TODAYS_EVENTS_EVENT_CREATOR</td>
-	<td>//div[@class='today-events']//span[@class='event-site']/a</td>
+	<td>//div[@class='today-events']//tr[contains(.,'${key_eventTitle}')]//span[@class='event-site']/a</td>
 	<td></td>
 </tr>
 <tr>
 	<td>EVENTS_DISPLAY_TODAYS_EVENTS_EVENT_TIME</td>
-	<td>//div[@class='today-events']//span[@class='event-time']</td>
+	<td>//div[@class='today-events']//tr[contains(.,'${key_eventTitle}')]//span[@class='event-time']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>EVENTS_DISPLAY_UPCOMING_EVENTS_EVENT_TITLE</td>
+	<td>//div[@class='upcoming-events']//tr[contains(.,'${key_eventTitle}')]//span[@class='event-name']/a</td>
+	<td></td>
+</tr>
+<tr>
+	<td>EVENTS_DISPLAY_UPCOMING_EVENTS_EVENT_TITLE_GENERIC</td>
 	<td>//div[@class='upcoming-events']//span[@class='event-name']/a</td>
 	<td></td>
 </tr>
 <tr>
 	<td>EVENTS_DISPLAY_UPCOMING_EVENTS_EVENT_CREATOR</td>
-	<td>//div[@class='upcoming-events']//span[@class='event-site']/a</td>
+	<td>//div[@class='upcoming-events']//tr[contains(.,'${key_eventTitle}')]//span[@class='event-site']/a</td>
 	<td></td>
 </tr>
 <tr>
 	<td>EVENTS_DISPLAY_UPCOMING_EVENTS_EVENT_TIME</td>
-	<td>//div[@class='upcoming-events']//span[@class='event-time']</td>
+	<td>//div[@class='upcoming-events']//tr[contains(.,'${key_eventTitle}')]//span[@class='event-time']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>EVENTS_DISPLAY_NO_EVENTS_MESSAGE</td>
+	<td>//section[@id='portlet_1_WAR_eventsdisplayportlet']//div[@class='portlet-body']</td>
 	<td></td>
 </tr>
 </tbody>

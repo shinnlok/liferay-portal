@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,15 +21,16 @@ import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.notifications.UserNotificationDefinition;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.search.QueryConfig;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.Sort;
-import com.liferay.portal.kernel.transaction.TransactionCommitCallbackRegistryUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -61,12 +62,10 @@ import com.liferay.portlet.social.model.SocialActivityConstants;
 import com.liferay.portlet.trash.model.TrashEntry;
 import com.liferay.portlet.trash.model.TrashVersion;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 import javax.portlet.PortletPreferences;
 
@@ -235,7 +234,17 @@ public class BookmarksEntryLocalServiceImpl
 			long groupId, long folderId, int status, int start, int end)
 		throws SystemException {
 
-		return getEntries(groupId, folderId, start, end, null);
+		return getEntries(groupId, folderId, status, start, end, null);
+	}
+
+	@Override
+	public List<BookmarksEntry> getEntries(
+			long groupId, long folderId, int status, int start, int end,
+			OrderByComparator orderByComparator)
+		throws SystemException {
+
+		return bookmarksEntryPersistence.findByG_F_S(
+			groupId, folderId, status, start, end, orderByComparator);
 	}
 
 	@Override
@@ -244,7 +253,7 @@ public class BookmarksEntryLocalServiceImpl
 			OrderByComparator orderByComparator)
 		throws SystemException {
 
-		return bookmarksEntryPersistence.findByG_F_S(
+		return getEntries(
 			groupId, folderId, WorkflowConstants.STATUS_APPROVED, start, end,
 			orderByComparator);
 	}
@@ -506,6 +515,11 @@ public class BookmarksEntryLocalServiceImpl
 		searchContext.setStart(start);
 		searchContext.setUserId(userId);
 
+		QueryConfig queryConfig = searchContext.getQueryConfig();
+
+		queryConfig.setHighlightEnabled(false);
+		queryConfig.setScoreEnabled(false);
+
 		return indexer.search(searchContext);
 	}
 
@@ -673,28 +687,13 @@ public class BookmarksEntryLocalServiceImpl
 		return folderId;
 	}
 
-	protected void notify(final SubscriptionSender subscriptionSender) {
-		TransactionCommitCallbackRegistryUtil.registerCallback(
-			new Callable<Void>() {
-
-				@Override
-				public Void call() throws Exception {
-					subscriptionSender.flushNotificationsAsync();
-
-					return null;
-				}
-
-			}
-		);
-	}
-
 	protected void notifySubscribers(
 			BookmarksEntry entry, ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
 		String layoutFullURL = serviceContext.getLayoutFullURL();
 
-		if (Validator.isNull(layoutFullURL)) {
+		if (!entry.isApproved() || Validator.isNull(layoutFullURL)) {
 			return;
 		}
 
@@ -733,6 +732,7 @@ public class BookmarksEntryLocalServiceImpl
 			_log.error(e, e);
 		}
 
+		String entryTitle = entry.getName();
 		String entryURL =
 			layoutFullURL + Portal.FRIENDLY_URL_SEPARATOR + "bookmarks" +
 				StringPool.SLASH + entry.getEntryId();
@@ -760,16 +760,31 @@ public class BookmarksEntryLocalServiceImpl
 
 		SubscriptionSender subscriptionSender = new SubscriptionSender();
 
+		subscriptionSender.setClassName(entry.getModelClassName());
+		subscriptionSender.setClassPK(entry.getEntryId());
 		subscriptionSender.setCompanyId(entry.getCompanyId());
 		subscriptionSender.setContextAttributes(
 			"[$BOOKMARKS_ENTRY_STATUS_BY_USER_NAME$]", statusByUserName,
 			"[$BOOKMARKS_ENTRY_URL$]", entryURL);
 		subscriptionSender.setContextUserPrefix("BOOKMARKS_ENTRY");
+		subscriptionSender.setEntryTitle(entryTitle);
+		subscriptionSender.setEntryURL(entryURL);
 		subscriptionSender.setFrom(fromAddress, fromName);
 		subscriptionSender.setHtmlFormat(true);
 		subscriptionSender.setLocalizedBodyMap(localizedBodyMap);
 		subscriptionSender.setLocalizedSubjectMap(localizedSubjectMap);
 		subscriptionSender.setMailId("bookmarks_entry", entry.getEntryId());
+
+		int notificationType =
+			UserNotificationDefinition.NOTIFICATION_TYPE_ADD_ENTRY;
+
+		if (serviceContext.isCommandUpdate()) {
+			notificationType =
+				UserNotificationDefinition.NOTIFICATION_TYPE_UPDATE_ENTRY;
+		}
+
+		subscriptionSender.setNotificationType(notificationType);
+
 		subscriptionSender.setPortletId(PortletKeys.BOOKMARKS);
 		subscriptionSender.setReplyToAddress(fromAddress);
 		subscriptionSender.setScopeGroupId(entry.getGroupId());
@@ -778,17 +793,14 @@ public class BookmarksEntryLocalServiceImpl
 
 		BookmarksFolder folder = entry.getFolder();
 
-		List<Long> folderIds = new ArrayList<Long>();
-
 		if (folder != null) {
-			folderIds.add(folder.getFolderId());
-
-			folderIds.addAll(folder.getAncestorFolderIds());
-		}
-
-		for (long curFolderId : folderIds) {
 			subscriptionSender.addPersistedSubscribers(
-				BookmarksFolder.class.getName(), curFolderId);
+				BookmarksFolder.class.getName(), folder.getFolderId());
+
+			for (Long ancestorFolderId : folder.getAncestorFolderIds()) {
+				subscriptionSender.addPersistedSubscribers(
+					BookmarksFolder.class.getName(), ancestorFolderId);
+			}
 		}
 
 		subscriptionSender.addPersistedSubscribers(
@@ -797,7 +809,7 @@ public class BookmarksEntryLocalServiceImpl
 		subscriptionSender.addPersistedSubscribers(
 			BookmarksEntry.class.getName(), entry.getEntryId());
 
-		notify(subscriptionSender);
+		subscriptionSender.flushNotificationsAsync();
 	}
 
 	protected void validate(String url) throws PortalException {

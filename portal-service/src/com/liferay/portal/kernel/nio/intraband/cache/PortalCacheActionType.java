@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,6 +19,7 @@ package com.liferay.portal.kernel.nio.intraband.cache;
  */
 public enum PortalCacheActionType {
 
-	DESTROY, GET, GET_BULK, PUT, PUT_TTL, RECONFIGURE, REMOVE, REMOVE_ALL
+	CLEAR_ALL, DESTROY, GET, PUT, PUT_QUIET, PUT_QUIET_TTL, PUT_TTL,
+	RECONFIGURE, REMOVE, REMOVE_ALL, REMOVE_CACHE
 
 }

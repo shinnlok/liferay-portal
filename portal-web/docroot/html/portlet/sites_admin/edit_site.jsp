@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -119,16 +119,13 @@ if ((group != null) && group.isCompany()) {
 	miscellaneousSections = new String[0];
 }
 
-if ((group != null) && group.hasLocalOrRemoteStagingGroup()) {
+if ((group != null) && (group.hasStagingGroup() || (group.hasRemoteStagingGroup() && !PropsValues.STAGING_LIVE_GROUP_REMOTE_STAGING_ENABLED))) {
 	advancedSections = ArrayUtil.remove(advancedSections, "staging");
 }
 
 String[][] categorySections = {mainSections, seoSections, advancedSections, miscellaneousSections};
-%>
 
-<c:if test="<%= !portletName.equals(PortletKeys.SITE_SETTINGS) %>">
-
-	<%
+if (!portletName.equals(PortletKeys.SITE_SETTINGS)) {
 	if (group != null) {
 		PortalUtil.addPortletBreadcrumbEntry(request, group.getDescriptiveName(locale), null);
 		PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(pageContext, "edit"), currentURL);
@@ -138,9 +135,10 @@ String[][] categorySections = {mainSections, seoSections, advancedSections, misc
 
 		PortalUtil.addPortletBreadcrumbEntry(request, parentGroup.getDescriptiveName(locale), null);
 	}
-	%>
+}
+%>
 
-</c:if>
+<liferay-ui:success key='<%= PortletKeys.SITE_SETTINGS + "requestProcessed" %>' message="site-was-added" />
 
 <c:if test="<%= (group == null) || !layout.isTypeControlPanel() %>">
 
@@ -239,13 +237,13 @@ String[][] categorySections = {mainSections, seoSections, advancedSections, misc
 				ok = false;
 
 				if (0 == currentValue) {
-					ok = confirm('<%= UnicodeLanguageUtil.format(pageContext, "are-you-sure-you-want-to-deactivate-staging-for-x", liveGroup.getDescriptiveName(locale)) %>');
+					ok = confirm('<%= UnicodeLanguageUtil.format(pageContext, "are-you-sure-you-want-to-deactivate-staging-for-x", liveGroup.getDescriptiveName(locale), false) %>');
 				}
 				else if (1 == currentValue) {
-					ok = confirm('<%= UnicodeLanguageUtil.format(pageContext, "are-you-sure-you-want-to-activate-local-staging-for-x", liveGroup.getDescriptiveName(locale)) %>');
+					ok = confirm('<%= UnicodeLanguageUtil.format(pageContext, "are-you-sure-you-want-to-activate-local-staging-for-x", liveGroup.getDescriptiveName(locale), false) %>');
 				}
 				else if (2 == currentValue) {
-					ok = confirm('<%= UnicodeLanguageUtil.format(pageContext, "are-you-sure-you-want-to-activate-remote-staging-for-x", liveGroup.getDescriptiveName(locale)) %>');
+					ok = confirm('<%= UnicodeLanguageUtil.format(pageContext, "are-you-sure-you-want-to-activate-remote-staging-for-x", liveGroup.getDescriptiveName(locale), false) %>');
 				}
 			}
 		</c:if>

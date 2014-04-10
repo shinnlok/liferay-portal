@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -120,7 +120,7 @@ portletURL.setParameter("tabs3", "current-and-previous");
 				<c:if test="<%= !portletDataHandler.isDisplayPortlet() %>">
 
 					<%
-					DateRange dateRange = ExportImportHelperUtil.getDateRange(renderRequest, themeDisplay.getScopeGroupId(), false, exportableLayout.getPlid(), selPortlet.getPortletId(), "all");
+					DateRange dateRange = ExportImportDateUtil.getDateRange(renderRequest, themeDisplay.getScopeGroupId(), false, exportableLayout.getPlid(), selPortlet.getPortletId(), ExportImportDateUtil.RANGE_ALL);
 
 					Date startDate = dateRange.getStartDate();
 					Date endDate = dateRange.getEndDate();
@@ -232,10 +232,10 @@ portletURL.setParameter("tabs3", "current-and-previous");
 											<ul class="hide unstyled" id="<portlet:namespace />rangeLastInputs">
 												<li>
 													<aui:select cssClass="relative-range" label="" name="last">
-														<aui:option label='<%= LanguageUtil.format(pageContext, "x-hours", "12") %>' value="12" />
-														<aui:option label='<%= LanguageUtil.format(pageContext, "x-hours", "24") %>' value="24" />
-														<aui:option label='<%= LanguageUtil.format(pageContext, "x-hours", "48") %>' value="48" />
-														<aui:option label='<%= LanguageUtil.format(pageContext, "x-days", "7") %>' value="168" />
+														<aui:option label='<%= LanguageUtil.format(pageContext, "x-hours", "12", false) %>' value="12" />
+														<aui:option label='<%= LanguageUtil.format(pageContext, "x-hours", "24", false) %>' value="24" />
+														<aui:option label='<%= LanguageUtil.format(pageContext, "x-hours", "48", false) %>' value="48" />
+														<aui:option label='<%= LanguageUtil.format(pageContext, "x-days", "7", false) %>' value="168" />
 													</aui:select>
 												</li>
 											</ul>
@@ -384,17 +384,12 @@ portletURL.setParameter("tabs3", "current-and-previous");
 					</c:if>
 
 					<aui:fieldset cssClass="options-group" label="permissions">
-						<ul class="lfr-tree unstyled">
-							<li class="tree-item">
-								<aui:input helpMessage="export-import-portlet-permissions-help" label="permissions" name="<%= PortletDataHandlerKeys.PERMISSIONS %>" type="checkbox" />
 
-								<ul id="<portlet:namespace />permissionsUl">
-									<li class="tree-item">
-										<aui:input label="permissions-assigned-to-roles" name="permissionsAssignedToRoles" type="checkbox" value="<%= true %>" />
-									</li>
-								</ul>
-							</li>
-						</ul>
+						<%
+						Group group = themeDisplay.getScopeGroup();
+						%>
+
+						<%@ include file="/html/portlet/layouts_admin/export_configuration/permissions.jspf" %>
 					</aui:fieldset>
 				</c:if>
 
@@ -453,8 +448,6 @@ portletURL.setParameter("tabs3", "current-and-previous");
 </aui:script>
 
 <aui:script>
-	Liferay.Util.toggleBoxes('<portlet:namespace /><%= PortletDataHandlerKeys.PERMISSIONS %>Checkbox', '<portlet:namespace />permissionsUl');
-
 	Liferay.Util.toggleRadio('<portlet:namespace />rangeAll', '', ['<portlet:namespace />startEndDate', '<portlet:namespace />rangeLastInputs']);
 	Liferay.Util.toggleRadio('<portlet:namespace />rangeDateRange', '<portlet:namespace />startEndDate', '<portlet:namespace />rangeLastInputs');
 	Liferay.Util.toggleRadio('<portlet:namespace />rangeLast', '<portlet:namespace />rangeLastInputs', ['<portlet:namespace />startEndDate']);

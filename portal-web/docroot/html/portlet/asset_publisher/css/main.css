@@ -235,7 +235,7 @@
 		}
 
 		.asset-query-rule-error {
-			background-color: #fee5e2;
+			background-color: #FEE5E2;
 		}
 
 		.general-display-settings {
@@ -287,8 +287,8 @@
 	}
 
 	.asset-subtypefield-selected {
-		padding-top: 10px;
 		margin-left: 6em;
+		padding-top: 10px;
 	}
 
 	.select-asset-selector {

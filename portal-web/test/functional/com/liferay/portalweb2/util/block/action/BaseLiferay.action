@@ -5,6 +5,20 @@
 		</default>
 	</command>
 
+	<command name="antCommand">
+		<default>
+			<execute function="AntCommand#antCommand" />
+		</default>
+	</command>
+
+	<command name="assertAlertNotPresent">
+		<default>
+			<description message="Fail if the alert is present." />
+
+			<execute function="AssertAlertNotPresent#assertAlertNotPresent" />
+		</default>
+	</command>
+
 	<command name="assertChecked">
 		<default>
 			<execute function="AssertChecked#assertChecked" />
@@ -17,18 +31,40 @@
 		</case>
 
 		<default>
+			<description message="Click on the ${locator1} with the value ${value1}." />
+
 			<execute function="AssertClick#assertTextClickAt" />
+		</default>
+	</command>
+
+	<command name="assertConsoleTextNotPresent">
+		<default>
+			<description message="Assert that the text ${value1} is NOT present within the console output." />
+
+			<execute function="AssertConsoleTextNotPresent#assertConsoleTextNotPresent" />
+		</default>
+	</command>
+
+	<command name="assertConsoleTextPresent">
+		<default>
+			<description message="Assert that the text ${value1} is present within the console output." />
+
+			<execute function="AssertConsoleTextPresent#assertConsoleTextPresent" />
 		</default>
 	</command>
 
 	<command name="assertElementNotPresent">
 		<default>
+			<description message="Assert that the ${locator1} is NOT present." />
+
 			<execute function="AssertElementNotPresent#assertElementNotPresent" />
 		</default>
 	</command>
 
 	<command name="assertElementPresent">
 		<default>
+			<description message="Assert that the ${locator1} is present." />
+
 			<execute function="AssertElementPresent#assertVisible" />
 		</default>
 	</command>
@@ -57,6 +93,8 @@
 		</case>
 
 		<default>
+			<description message="Assert that the text at the ${locator1} is ${value1}." />
+
 			<execute function="AssertTextEquals#assertText" />
 		</default>
 	</command>
@@ -67,19 +105,33 @@
 		</case>
 
 		<default>
+			<description message="Assert that the text at the ${locator1} is NOT ${value1}." />
+
 			<execute function="AssertTextNotEquals#assertNotText" />
 		</default>
 	</command>
 
 	<command name="assertTextNotPresent">
 		<default>
+			<description message="Assert that the text ${value1} is NOT present." />
+
 			<execute function="AssertTextNotPresent#assertTextNotPresent" />
 		</default>
 	</command>
 
 	<command name="assertTextPresent">
 		<default>
+			<description message="Assert that the text ${value1} is present." />
+
 			<execute function="AssertTextPresent#assertTextPresent" />
+		</default>
+	</command>
+
+	<command name="assertVisible">
+		<default>
+			<description message="Assert that the ${locator1} is visible." />
+
+			<execute function="AssertVisible#assertVisible" />
 		</default>
 	</command>
 
@@ -91,6 +143,8 @@
 
 	<command name="click">
 		<default>
+			<description message="Click on the ${locator1}." />
+
 			<execute function="Click#clickAt" />
 		</default>
 	</command>
@@ -103,6 +157,8 @@
 
 	<command name="confirm">
 		<default>
+			<description message="Assert confirmation window has the value ${value1}." />
+
 			<execute function="Confirm#assertConfirmation" />
 		</default>
 	</command>
@@ -131,7 +187,7 @@
 
 	<command name="dragAndDrop">
 		<default>
-			<execute function="DragAndDrop#dragAndDrop" />
+			<execute function="DragAndDrop#dragAndDropToObject" />
 		</default>
 	</command>
 
@@ -144,6 +200,12 @@
 	<command name="isElementPresent">
 		<default>
 			<execute function="IsElementPresent#isElementPresent" />
+		</default>
+	</command>
+
+	<command name="isNotVisible">
+		<default>
+			<execute function="IsNotVisible#isNotVisible" />
 		</default>
 	</command>
 
@@ -167,6 +229,12 @@
 		</default>
 	</command>
 
+	<command name="isVisible">
+		<default>
+			<execute function="IsVisible#isVisible" />
+		</default>
+	</command>
+
 	<command name="keyPress">
 		<default>
 			<execute function="KeyPress#keyPress" />
@@ -179,14 +247,36 @@
 		</default>
 	</command>
 
+	<command name="mouseDown">
+		<default>
+			<execute function="MouseDown#mouseDown" />
+		</default>
+	</command>
+
+	<command name="mouseMove">
+		<default>
+			<execute function="MouseMove#mouseMove" />
+		</default>
+	</command>
+
 	<command name="mouseOver">
 		<default>
+			<description message="Mouse over the ${locator1}." />
+
 			<execute function="MouseOver#mouseOver" />
+		</default>
+	</command>
+
+	<command name="mouseUp">
+		<default>
+			<execute function="MouseUp#mouseUp" />
 		</default>
 	</command>
 
 	<command name="open">
 		<default>
+			<description message="Open the browser to the URL ${locator1}." />
+
 			<execute function="Open#open" />
 		</default>
 	</command>
@@ -239,6 +329,8 @@
 
 	<command name="type">
 		<default>
+			<description message="Type into the ${locator1} with the value ${value1}." />
+
 			<execute function="Type#type" />
 		</default>
 	</command>

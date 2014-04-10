@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -60,7 +60,7 @@ public class LayoutFinderImpl
 
 			String sql = CustomSQLUtil.get(FIND_BY_NO_PERMISSIONS);
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addEntity("Layout", LayoutImpl.class);
 
@@ -88,7 +88,7 @@ public class LayoutFinderImpl
 
 			String sql = CustomSQLUtil.get(FIND_BY_NULL_FRIENDLY_URL);
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addEntity("Layout", LayoutImpl.class);
 
@@ -113,7 +113,7 @@ public class LayoutFinderImpl
 
 			String sql = CustomSQLUtil.get(FIND_BY_SCOPE_GROUP);
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addEntity("Layout", LayoutImpl.class);
 
@@ -149,7 +149,7 @@ public class LayoutFinderImpl
 
 			String sql = CustomSQLUtil.get(FIND_BY_C_P_P);
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addScalar("layoutPlid", Type.LONG);
 			q.addScalar("preferencesPortletId", Type.STRING);

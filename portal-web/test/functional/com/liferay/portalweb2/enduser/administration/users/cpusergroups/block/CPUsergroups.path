@@ -29,6 +29,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>OPTIONS_ICON</td>
+	<td>//menu[@class='portlet-topper-toolbar']/div/a/i</td>
+	<td></td>
+</tr>
+<tr>
 	<td>SUCCESS_MESSAGE</td>
 	<td>//div[contains(@class,'alert') and contains(@class,'alert-success')]</td>
 	<td></td>
@@ -71,7 +76,7 @@
 </tr>
 <tr>
 	<td>BASIC_SEARCH_ADVANCED</td>
-	<td>//button[@id='toggle_id_users_groups_admin_group_searchtoggleAdvanced'] | //span[@id='toggle_id_users_groups_admin_group_searchtoggleAdvanced']</td>
+	<td>//a[@id='toggle_id_users_groups_admin_group_searchtoggleAdvanced']</td>
 	<td></td>
 </tr>
 <tr>
@@ -128,7 +133,7 @@
 </tr>
 <tr>
 	<td>USER_GROUP_TABLE_ACTIONS</td>
-	<td>//tr[contains(.,'${key_userGroupName}')]/td[4]/div/a[@title='Actions']</td>
+	<td>//tr[contains(.,'${key_userGroupName}')]/td[4]/div/a[@title='Actions']/span</td>
 	<td></td>
 </tr>
 <tr>

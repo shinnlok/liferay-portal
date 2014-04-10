@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,7 +19,7 @@ import com.liferay.portal.kernel.cache.SingleVMPoolUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
-import com.liferay.portal.kernel.servlet.ServletContextUtil;
+import com.liferay.portal.kernel.servlet.ServletContextPool;
 import com.liferay.portal.kernel.servlet.ServletResponseUtil;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.ContentTypes;
@@ -33,9 +33,9 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.minifier.MinifierUtil;
 import com.liferay.portal.servlet.filters.dynamiccss.DynamicCSSUtil;
 import com.liferay.portal.util.AggregateUtil;
-import com.liferay.portal.util.MinifierUtil;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.PropsValues;
@@ -109,7 +109,7 @@ public class ComboServlet extends HttpServlet {
 			modulePathsSet.add(name);
 		}
 
-		if (modulePathsSet.size() == 0) {
+		if (modulePathsSet.isEmpty()) {
 			response.sendError(
 				HttpServletResponse.SC_BAD_REQUEST,
 				"Modules paths set is empty");
@@ -120,6 +120,24 @@ public class ComboServlet extends HttpServlet {
 		String[] modulePaths = modulePathsSet.toArray(
 			new String[modulePathsSet.size()]);
 
+		String firstModulePath = modulePaths[0];
+
+		String extension = FileUtil.getExtension(firstModulePath);
+
+		String minifierType = ParamUtil.getString(request, "minifierType");
+
+		if (Validator.isNull(minifierType)) {
+			minifierType = "js";
+
+			if (StringUtil.equalsIgnoreCase(extension, _CSS_EXTENSION)) {
+				minifierType = "css";
+			}
+		}
+
+		if (!minifierType.equals("css") && !minifierType.equals("js")) {
+			minifierType = "js";
+		}
+
 		String modulePathsString = null;
 
 		byte[][] bytesArray = null;
@@ -127,32 +145,16 @@ public class ComboServlet extends HttpServlet {
 		if (!PropsValues.COMBO_CHECK_TIMESTAMP) {
 			modulePathsString = Arrays.toString(modulePaths);
 
+			if (minifierType.equals("css") &&
+				PortalUtil.isRightToLeft(request)) {
+
+				modulePathsString += ".rtl";
+			}
+
 			bytesArray = _bytesArrayPortalCache.get(modulePathsString);
 		}
 
-		String firstModulePath = modulePaths[0];
-
-		String extension = FileUtil.getExtension(firstModulePath);
-
 		if (bytesArray == null) {
-			ServletContext servletContext = getServletContext();
-
-			String rootPath = ServletContextUtil.getRootPath(servletContext);
-
-			String minifierType = ParamUtil.getString(request, "minifierType");
-
-			if (Validator.isNull(minifierType)) {
-				minifierType = "js";
-
-				if (StringUtil.equalsIgnoreCase(extension, _CSS_EXTENSION)) {
-					minifierType = "css";
-				}
-			}
-
-			if (!minifierType.equals("css") && !minifierType.equals("js")) {
-				minifierType = "js";
-			}
-
 			bytesArray = new byte[modulePaths.length][];
 
 			for (int i = 0; i < modulePaths.length; i++) {
@@ -170,12 +172,7 @@ public class ComboServlet extends HttpServlet {
 				byte[] bytes = new byte[0];
 
 				if (Validator.isNotNull(modulePath)) {
-					modulePath = StringUtil.replaceFirst(
-						modulePath, PortalUtil.getPathContext(),
-						StringPool.BLANK);
-
-					URL url = getResourceURL(
-						servletContext, rootPath, modulePath);
+					URL url = getResourceURL(modulePath);
 
 					if (url == null) {
 						response.setHeader(
@@ -215,6 +212,14 @@ public class ComboServlet extends HttpServlet {
 			HttpServletRequest request, HttpServletResponse response,
 			URL resourceURL, String resourcePath, String minifierType)
 		throws IOException {
+
+		int colonIndex = resourcePath.indexOf(CharPool.COLON);
+
+		if (colonIndex > 0) {
+			resourcePath =
+				resourcePath.substring(0, colonIndex) +
+					resourcePath.substring(colonIndex + 1);
+		}
 
 		String fileContentKey = resourcePath.concat(StringPool.QUESTION).concat(
 			minifierType);
@@ -280,10 +285,10 @@ public class ComboServlet extends HttpServlet {
 
 					String baseURL = StringPool.BLANK;
 
-					int index = resourcePath.lastIndexOf(CharPool.SLASH);
+					int slashIndex = resourcePath.lastIndexOf(CharPool.SLASH);
 
-					if (index != -1) {
-						baseURL = resourcePath.substring(0, index + 1);
+					if (slashIndex != -1) {
+						baseURL = resourcePath.substring(0, slashIndex + 1);
 					}
 
 					stringFileContent = AggregateUtil.updateRelativeURLs(
@@ -294,7 +299,7 @@ public class ComboServlet extends HttpServlet {
 				}
 				else if (minifierType.equals("js")) {
 					stringFileContent = MinifierUtil.minifyJavaScript(
-						stringFileContent);
+						resourcePath, stringFileContent);
 				}
 			}
 
@@ -314,26 +319,41 @@ public class ComboServlet extends HttpServlet {
 		return fileContentBag._fileContent;
 	}
 
-	protected URL getResourceURL(
-			ServletContext servletContext, String rootPath, String path)
-		throws Exception {
+	protected URL getResourceURL(String modulePath) throws Exception {
+		ModulePathContainer modulePathContainer = new ModulePathContainer(
+			modulePath);
 
-		URL url = servletContext.getResource(path);
+		ServletContext servletContext = getServletContext(
+			modulePathContainer.getModuleContextPath());
+
+		URL url = servletContext.getResource(
+			modulePathContainer.getResourcePath());
 
 		if (url == null) {
-			return null;
+			throw new ServletException(
+				"Resource " + modulePathContainer.getResourcePath() +
+					" does not exist in " +
+						modulePathContainer.getModuleContextPath());
 		}
 
-		String filePath = ServletContextUtil.getResourcePath(url);
+		return url;
+	}
 
-		int pos = filePath.indexOf(
-			rootPath.concat(StringPool.SLASH).concat(_JAVASCRIPT_DIR));
+	protected ServletContext getServletContext(String contextName)
+		throws ServletException {
 
-		if (pos == 0) {
-			return url;
+		if (Validator.isNull(contextName)) {
+			return getServletContext();
 		}
 
-		return null;
+		ServletContext servletContext = ServletContextPool.get(contextName);
+
+		if (servletContext != null) {
+			return servletContext;
+		}
+
+		throw new ServletException(
+			"Servlet context " + contextName + " does not exist");
 	}
 
 	protected boolean validateModuleExtension(String moduleName)
@@ -357,14 +377,43 @@ public class ComboServlet extends HttpServlet {
 		return validModuleExtension;
 	}
 
+	protected static class ModulePathContainer {
+
+		public String getModuleContextPath() {
+			return _moduleContextPath;
+		}
+
+		public String getResourcePath() {
+			return _resourcePath;
+		}
+
+		ModulePathContainer(String modulePathString) {
+			int index = modulePathString.indexOf(CharPool.COLON);
+
+			if (index > 0) {
+				String moduleContextPath = modulePathString.substring(0, index);
+
+				String resourcePath = modulePathString.substring(index + 1);
+
+				_moduleContextPath = moduleContextPath;
+				_resourcePath = resourcePath;
+			}
+			else {
+				_moduleContextPath = StringPool.BLANK;
+				_resourcePath = modulePathString;
+			}
+		}
+
+		private String _moduleContextPath;
+		private String _resourcePath;
+	}
+
 	private static final String _CSS_EXTENSION = "css";
 
 	private static final String _CSS_MINIFIED_SUFFIX = "-min.css";
 
 	private static final FileContentBag _EMPTY_FILE_CONTENT_BAG =
 		new FileContentBag(new byte[0], 0);
-
-	private static final String _JAVASCRIPT_DIR = "html/js";
 
 	private static final String _JAVASCRIPT_MINIFIED_SUFFIX = "-min.js";
 
@@ -375,7 +424,9 @@ public class ComboServlet extends HttpServlet {
 	private PortalCache<String, FileContentBag> _fileContentBagPortalCache =
 		SingleVMPoolUtil.getCache(FileContentBag.class.getName());
 	private Set<String> _protectedParameters = SetUtil.fromArray(
-		new String[] {"b", "browserId", "minifierType", "languageId", "t"});
+		new String[] {
+			"b", "browserId", "minifierType", "languageId", "t", "themeId"
+		});
 
 	private static class FileContentBag implements Serializable {
 

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -35,7 +35,7 @@ long currentLayoutSetBranchId = GetterUtil.getLong((String)request.getAttribute(
 		</portlet:renderURL>
 
 		<%
-		String taglibURL = "javascript:Liferay.StagingBar.updateBranch({uri: '" + HtmlUtil.escapeJS(editURL) + "', dialogTitle: '" + UnicodeLanguageUtil.get(pageContext, "update-site-pages-variation") + "'});";
+		String taglibURL = "javascript:Liferay.StagingBar.updateBranch({uri: '" + HtmlUtil.escapeJS(editURL) + "', dialogTitle: '" + HtmlUtil.escapeJS(LanguageUtil.get(pageContext, "update-site-pages-variation")) + "'});";
 		%>
 
 		<liferay-ui:icon
@@ -86,7 +86,7 @@ long currentLayoutSetBranchId = GetterUtil.getLong((String)request.getAttribute(
 		</portlet:renderURL>
 
 		<%
-		String taglibURL = "javascript:Liferay.StagingBar.mergeBranch({uri: '" + HtmlUtil.escapeJS(mergeURL) + "', dialogTitle: '" + UnicodeLanguageUtil.get(pageContext, "merge-site-pages-variation") + "'});";
+		String taglibURL = "javascript:Liferay.StagingBar.mergeBranch({uri: '" + HtmlUtil.escapeJS(mergeURL) + "', dialogTitle: '" + HtmlUtil.escapeJS(LanguageUtil.get(pageContext, "merge-site-pages-variation")) + "'});";
 		%>
 
 		<liferay-ui:icon

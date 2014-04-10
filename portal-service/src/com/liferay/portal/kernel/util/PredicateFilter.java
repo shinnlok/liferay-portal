@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,6 +18,26 @@ package com.liferay.portal.kernel.util;
  * @author Carlos Sierra Andrés
  */
 public interface PredicateFilter<T> {
+
+	@SuppressWarnings("rawtypes")
+	public static PredicateFilter ALL = new PredicateFilter<Object>() {
+
+		@Override
+		public boolean filter(Object object) {
+			return true;
+		}
+
+	};
+
+	@SuppressWarnings("rawtypes")
+	public static PredicateFilter NONE = new PredicateFilter<Object>() {
+
+		@Override
+		public boolean filter(Object object) {
+			return false;
+		}
+
+	};
 
 	public boolean filter(T t);
 

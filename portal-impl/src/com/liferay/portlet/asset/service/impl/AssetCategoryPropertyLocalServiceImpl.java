@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -130,7 +130,7 @@ public class AssetCategoryPropertyLocalServiceImpl
 
 	@Override
 	public AssetCategoryProperty updateCategoryProperty(
-			long categoryPropertyId, String key, String value)
+			long userId, long categoryPropertyId, String key, String value)
 		throws PortalException, SystemException {
 
 		validate(key, value);
@@ -139,6 +139,13 @@ public class AssetCategoryPropertyLocalServiceImpl
 			assetCategoryPropertyPersistence.findByPrimaryKey(
 				categoryPropertyId);
 
+		if (userId != 0) {
+			User user = userPersistence.findByPrimaryKey(userId);
+
+			categoryProperty.setUserId(userId);
+			categoryProperty.setUserName(user.getFullName());
+		}
+
 		categoryProperty.setModifiedDate(new Date());
 		categoryProperty.setKey(key);
 		categoryProperty.setValue(value);
@@ -146,6 +153,14 @@ public class AssetCategoryPropertyLocalServiceImpl
 		assetCategoryPropertyPersistence.update(categoryProperty);
 
 		return categoryProperty;
+	}
+
+	@Override
+	public AssetCategoryProperty updateCategoryProperty(
+			long categoryPropertyId, String key, String value)
+		throws PortalException, SystemException {
+
+		return updateCategoryProperty(0, categoryPropertyId, key, value);
 	}
 
 	protected void validate(String key, String value) throws PortalException {

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -84,7 +84,7 @@ portletURL.setParameter("fileShortcutId", String.valueOf(fileShortcutId));
 
 	<liferay-ui:header
 		backURL="<%= redirect %>"
-		title='<%= (fileShortcut != null)? LanguageUtil.format(pageContext, "shortcut-to-x", fileShortcut.getToTitle()) : "new-file-shortcut" %>'
+		title='<%= (fileShortcut != null)? LanguageUtil.format(pageContext, "shortcut-to-x", fileShortcut.getToTitle(), false) : "new-file-shortcut" %>'
 	/>
 
 	<liferay-ui:error exception="<%= FileShortcutPermissionException.class %>" message="you-do-not-have-permission-to-create-a-shortcut-to-the-selected-document" />
@@ -102,7 +102,7 @@ portletURL.setParameter("fileShortcutId", String.valueOf(fileShortcutId));
 			%>
 
 			<div class="input-append">
-				<liferay-ui:input-resource id="toGroupName" url="<%= toGroupName %>" />
+				<liferay-ui:input-resource id="toGroupName" label="name" url="<%= toGroupName %>" />
 
 				<aui:button name="selectGroupButton" value="select" />
 			</div>
@@ -115,7 +115,7 @@ portletURL.setParameter("fileShortcutId", String.valueOf(fileShortcutId));
 			%>
 
 			<div class="input-append">
-				<liferay-ui:input-resource id="toFileEntryTitle" url="<%= toFileEntryTitle %>" />
+				<liferay-ui:input-resource id="toFileEntryTitle" label="title" url="<%= toFileEntryTitle %>" />
 
 				<aui:button disabled="<%= (toGroup == null) %>" name="selectToFileEntryButton" value="select" />
 			</div>

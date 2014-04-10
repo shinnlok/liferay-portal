@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -131,6 +131,43 @@ public class AssetTagStatsPersistenceTest {
 			newAssetTagStats.getClassNameId());
 		Assert.assertEquals(existingAssetTagStats.getAssetCount(),
 			newAssetTagStats.getAssetCount());
+	}
+
+	@Test
+	public void testCountByTagId() {
+		try {
+			_persistence.countByTagId(ServiceTestUtil.nextLong());
+
+			_persistence.countByTagId(0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByClassNameId() {
+		try {
+			_persistence.countByClassNameId(ServiceTestUtil.nextLong());
+
+			_persistence.countByClassNameId(0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByT_C() {
+		try {
+			_persistence.countByT_C(ServiceTestUtil.nextLong(),
+				ServiceTestUtil.nextLong());
+
+			_persistence.countByT_C(0L, 0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
 	}
 
 	@Test

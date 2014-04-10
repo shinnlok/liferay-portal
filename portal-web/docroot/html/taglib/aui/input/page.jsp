@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -237,15 +237,10 @@
 </c:if>
 
 <c:if test='<%= !type.equals("assetCategories") && !type.equals("hidden") && Validator.isNotNull(label) %>'>
-	<c:if test='<%= !choiceField && inlineLabel.equals("right") %>'>
-		<label <%= labelTag %>>
+	<c:if test='<%= choiceField || inlineLabel.equals("right") %>'>
 			<%= labelContent %>
+		</label>
 	</c:if>
-	<c:if test="<%= choiceField %>">
-		<%= labelContent %>
-	</c:if>
-
-	</label>
 </c:if>
 
 <c:if test='<%= !choiceField && !type.equals("hidden") && !wrappedField %>'>

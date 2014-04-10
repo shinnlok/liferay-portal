@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,7 +32,7 @@ boolean minQuantityMultiple = PrefsPropsUtil.getBoolean(company.getCompanyId(), 
 	var itemsInStock = true;
 
 	function <portlet:namespace />checkout() {
-		if (<%= ShoppingUtil.meetsMinOrder(shoppingPrefs, items) ? "true" : "false" %>) {
+		if (<%= ShoppingUtil.meetsMinOrder(shoppingSettings, items) ? "true" : "false" %>) {
 			if (!itemsInStock) {
 				if (confirm("<%= UnicodeLanguageUtil.get(pageContext, "your-cart-has-items-that-are-out-of-stock") %>")) {
 					document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = "<%= Constants.CHECKOUT %>";
@@ -47,7 +47,7 @@ boolean minQuantityMultiple = PrefsPropsUtil.getBoolean(company.getCompanyId(), 
 			}
 		}
 		else {
-			alert("<%= UnicodeLanguageUtil.format(pageContext, "your-order-cannot-be-processed-because-it-falls-below-the-minimum-required-amount-of-x", currencyFormat.format(shoppingPrefs.getMinOrder()), false) %>");
+			alert("<%= UnicodeLanguageUtil.format(pageContext, "your-order-cannot-be-processed-because-it-falls-below-the-minimum-required-amount-of-x", currencyFormat.format(shoppingSettings.getMinOrder()), false) %>");
 		}
 	}
 
@@ -81,11 +81,11 @@ boolean minQuantityMultiple = PrefsPropsUtil.getBoolean(company.getCompanyId(), 
 					invalidSKUs += ", ";
 				}
 
-				invalidSKUs += "<%= item.getSku() %>";
+				invalidSKUs += "<%= HtmlUtil.escapeJS(item.getSku()) %>";
 			}
 
 			for (var i = 0; i < count; i++) {
-				itemIds += "<%= cartItem.getCartItemId() %>,";
+				itemIds += "<%= HtmlUtil.escapeJS(cartItem.getCartItemId()) %>,";
 			}
 
 			count = 0;
@@ -145,7 +145,7 @@ boolean minQuantityMultiple = PrefsPropsUtil.getBoolean(company.getCompanyId(), 
 			ShoppingItem item = ShoppingItemServiceUtil.getItem(badItemIds[i]);
 		%>
 
-			<strong><%= item.getSku() %></strong><c:if test="<%= i + 1 < badItemIds.length %>">,</c:if>
+			<strong><%= HtmlUtil.escape(item.getSku()) %></strong><c:if test="<%= i + 1 < badItemIds.length %>">,</c:if>
 
 		<%
 		}
@@ -294,9 +294,9 @@ boolean minQuantityMultiple = PrefsPropsUtil.getBoolean(company.getCompanyId(), 
 			String fieldValue = fieldsArray[j].substring(pos + 1);
 
 			sb.append("<br />");
-			sb.append(fieldName);
+			sb.append(HtmlUtil.escape(fieldName));
 			sb.append(": ");
-			sb.append(fieldValue);
+			sb.append(HtmlUtil.escape(fieldValue));
 		}
 
 		if (itemPrices.length > 0) {
@@ -439,7 +439,7 @@ boolean minQuantityMultiple = PrefsPropsUtil.getBoolean(company.getCompanyId(), 
 		</c:if>
 
 		<c:choose>
-			<c:when test="<%= !shoppingPrefs.useAlternativeShipping() %>">
+			<c:when test="<%= !shoppingSettings.useAlternativeShipping() %>">
 				<aui:field-wrapper label="shipping">
 					<liferay-ui:input-resource url="<%= currencyFormat.format(ShoppingUtil.calculateShipping(items)) %>" />
 				</aui:field-wrapper>
@@ -448,7 +448,7 @@ boolean minQuantityMultiple = PrefsPropsUtil.getBoolean(company.getCompanyId(), 
 				<aui:select label="shipping" name="alternativeShipping">
 
 					<%
-					String[][] alternativeShipping = shoppingPrefs.getAlternativeShipping();
+					String[][] alternativeShipping = shoppingSettings.getAlternativeShipping();
 
 					for (int i = 0; i < 10; i++) {
 						String altShippingName = alternativeShipping[0][i];
@@ -503,9 +503,9 @@ boolean minQuantityMultiple = PrefsPropsUtil.getBoolean(company.getCompanyId(), 
 	</aui:fieldset>
 
 	<%
-	String[] ccTypes = shoppingPrefs.getCcTypes();
+	String[] ccTypes = shoppingSettings.getCcTypes();
 
-	if (shoppingPrefs.usePayPal()) {
+	if (shoppingSettings.usePayPal()) {
 	%>
 
 		<img alt="paypal" src="<%= themeDisplay.getPathThemeImages() %>/shopping/cc_paypal.png" />
@@ -514,11 +514,11 @@ boolean minQuantityMultiple = PrefsPropsUtil.getBoolean(company.getCompanyId(), 
 
 	<%
 	}
-	else if (!shoppingPrefs.usePayPal() && (ccTypes.length > 0)) {
+	else if (!shoppingSettings.usePayPal() && (ccTypes.length > 0)) {
 		for (int i = 0; i < ccTypes.length; i++) {
 	%>
 
-			<img alt="<%= ccTypes[i] %>" src="<%= themeDisplay.getPathThemeImages() %>/shopping/cc_<%= ccTypes[i] %>.png" />
+			<img alt="<%= HtmlUtil.escapeAttribute(ccTypes[i]) %>" src="<%= themeDisplay.getPathThemeImages() %>/shopping/cc_<%= HtmlUtil.escapeAttribute(ccTypes[i]) %>.png" />
 
 	<%
 		}

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,4 +16,15 @@
 
 <%@ include file="/html/portlet/document_library/init.jsp" %>
 
-<liferay-util:include page="/html/portlet/document_library/view_file_entry.jsp" />
+<%
+boolean showExtraInfo = ParamUtil.getBoolean(request, "showExtraInfo");
+%>
+
+<c:choose>
+	<c:when test="<%= PropsValues.DL_FILE_ENTRY_PREVIEW_ENABLED && !showExtraInfo %>">
+		<liferay-util:include page="/html/portlet/document_library/view_file_entry_simple_view.jsp" />
+	</c:when>
+	<c:otherwise>
+		<liferay-util:include page="/html/portlet/document_library/view_file_entry.jsp" />
+	</c:otherwise>
+</c:choose>

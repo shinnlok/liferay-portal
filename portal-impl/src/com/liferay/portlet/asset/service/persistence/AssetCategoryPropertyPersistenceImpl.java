@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,7 +32,6 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.ModelListener;
@@ -231,7 +230,7 @@ public class AssetCategoryPropertyPersistenceImpl extends BasePersistenceImpl<As
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<AssetCategoryProperty>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<AssetCategoryProperty>)QueryUtil.list(q,
@@ -728,7 +727,7 @@ public class AssetCategoryPropertyPersistenceImpl extends BasePersistenceImpl<As
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<AssetCategoryProperty>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<AssetCategoryProperty>)QueryUtil.list(q,
@@ -1249,7 +1248,7 @@ public class AssetCategoryPropertyPersistenceImpl extends BasePersistenceImpl<As
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<AssetCategoryProperty>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<AssetCategoryProperty>)QueryUtil.list(q,
@@ -1976,7 +1975,7 @@ public class AssetCategoryPropertyPersistenceImpl extends BasePersistenceImpl<As
 			CacheRegistryUtil.clear(AssetCategoryPropertyImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(AssetCategoryPropertyImpl.class.getName());
+		EntityCacheUtil.clearCache(AssetCategoryPropertyImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -2279,7 +2278,7 @@ public class AssetCategoryPropertyPersistenceImpl extends BasePersistenceImpl<As
 
 		EntityCacheUtil.putResult(AssetCategoryPropertyModelImpl.ENTITY_CACHE_ENABLED,
 			AssetCategoryPropertyImpl.class,
-			assetCategoryProperty.getPrimaryKey(), assetCategoryProperty);
+			assetCategoryProperty.getPrimaryKey(), assetCategoryProperty, false);
 
 		clearUniqueFindersCache(assetCategoryProperty);
 		cacheUniqueFindersCache(assetCategoryProperty);
@@ -2513,7 +2512,7 @@ public class AssetCategoryPropertyPersistenceImpl extends BasePersistenceImpl<As
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<AssetCategoryProperty>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<AssetCategoryProperty>)QueryUtil.list(q,

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -38,7 +38,6 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.model.CacheModel;
@@ -245,7 +244,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<MBMessage>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<MBMessage>)QueryUtil.list(q, getDialect(),
@@ -1054,7 +1053,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<MBMessage>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<MBMessage>)QueryUtil.list(q, getDialect(),
@@ -1599,7 +1598,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<MBMessage>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<MBMessage>)QueryUtil.list(q, getDialect(),
@@ -1983,7 +1982,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
 				q.addEntity(_FILTER_ENTITY_ALIAS, MBMessageImpl.class);
@@ -2158,7 +2157,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 				MBMessage.class.getName(),
 				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
-		SQLQuery q = session.createSQLQuery(sql);
+		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 		q.setFirstResult(0);
 		q.setMaxResults(2);
@@ -2287,7 +2286,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addScalar(COUNT_COLUMN_NAME,
 				com.liferay.portal.kernel.dao.orm.Type.LONG);
@@ -2452,7 +2451,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<MBMessage>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<MBMessage>)QueryUtil.list(q, getDialect(),
@@ -2943,7 +2942,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<MBMessage>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<MBMessage>)QueryUtil.list(q, getDialect(),
@@ -3433,7 +3432,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<MBMessage>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<MBMessage>)QueryUtil.list(q, getDialect(),
@@ -3923,7 +3922,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<MBMessage>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<MBMessage>)QueryUtil.list(q, getDialect(),
@@ -4424,7 +4423,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<MBMessage>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<MBMessage>)QueryUtil.list(q, getDialect(),
@@ -4831,7 +4830,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
 				q.addEntity(_FILTER_ENTITY_ALIAS, MBMessageImpl.class);
@@ -5011,7 +5010,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 				MBMessage.class.getName(),
 				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
-		SQLQuery q = session.createSQLQuery(sql);
+		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 		q.setFirstResult(0);
 		q.setMaxResults(2);
@@ -5153,7 +5152,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addScalar(COUNT_COLUMN_NAME,
 				com.liferay.portal.kernel.dao.orm.Type.LONG);
@@ -5332,7 +5331,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<MBMessage>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<MBMessage>)QueryUtil.list(q, getDialect(),
@@ -5740,7 +5739,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
 				q.addEntity(_FILTER_ENTITY_ALIAS, MBMessageImpl.class);
@@ -5920,7 +5919,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 				MBMessage.class.getName(),
 				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
-		SQLQuery q = session.createSQLQuery(sql);
+		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 		q.setFirstResult(0);
 		q.setMaxResults(2);
@@ -6063,7 +6062,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addScalar(COUNT_COLUMN_NAME,
 				com.liferay.portal.kernel.dao.orm.Type.LONG);
@@ -6242,7 +6241,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<MBMessage>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<MBMessage>)QueryUtil.list(q, getDialect(),
@@ -6648,7 +6647,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
 				q.addEntity(_FILTER_ENTITY_ALIAS, MBMessageImpl.class);
@@ -6828,7 +6827,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 				MBMessage.class.getName(),
 				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
-		SQLQuery q = session.createSQLQuery(sql);
+		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 		q.setFirstResult(0);
 		q.setMaxResults(2);
@@ -6969,7 +6968,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addScalar(COUNT_COLUMN_NAME,
 				com.liferay.portal.kernel.dao.orm.Type.LONG);
@@ -7148,7 +7147,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<MBMessage>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<MBMessage>)QueryUtil.list(q, getDialect(),
@@ -7679,7 +7678,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<MBMessage>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<MBMessage>)QueryUtil.list(q, getDialect(),
@@ -8034,7 +8033,14 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	public List<MBMessage> findByU_C(long userId, long[] classNameIds,
 		int start, int end, OrderByComparator orderByComparator)
 		throws SystemException {
-		if ((classNameIds != null) && (classNameIds.length == 1)) {
+		if (classNameIds == null) {
+			classNameIds = new long[0];
+		}
+		else {
+			classNameIds = ArrayUtil.unique(classNameIds);
+		}
+
+		if (classNameIds.length == 1) {
 			return findByU_C(userId, classNameIds[0], start, end,
 				orderByComparator);
 		}
@@ -8075,35 +8081,22 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 			query.append(_SQL_SELECT_MBMESSAGE_WHERE);
 
-			boolean conjunctionable = false;
+			query.append(_FINDER_COLUMN_U_C_USERID_2);
 
-			if (conjunctionable) {
-				query.append(WHERE_AND);
-			}
-
-			query.append(_FINDER_COLUMN_U_C_USERID_5);
-
-			conjunctionable = true;
-
-			if ((classNameIds == null) || (classNameIds.length > 0)) {
-				if (conjunctionable) {
-					query.append(WHERE_AND);
-				}
-
+			if (classNameIds.length > 0) {
 				query.append(StringPool.OPEN_PARENTHESIS);
 
-				for (int i = 0; i < classNameIds.length; i++) {
-					query.append(_FINDER_COLUMN_U_C_CLASSNAMEID_5);
+				query.append(_FINDER_COLUMN_U_C_CLASSNAMEID_7);
 
-					if ((i + 1) < classNameIds.length) {
-						query.append(WHERE_OR);
-					}
-				}
+				query.append(StringUtil.merge(classNameIds));
 
 				query.append(StringPool.CLOSE_PARENTHESIS);
 
-				conjunctionable = true;
+				query.append(StringPool.CLOSE_PARENTHESIS);
 			}
+
+			query.setStringAt(removeConjunction(query.stringAt(query.index() -
+						1)), query.index() - 1);
 
 			if (orderByComparator != null) {
 				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
@@ -8127,17 +8120,13 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 				qPos.add(userId);
 
-				if (classNameIds != null) {
-					qPos.add(classNameIds);
-				}
-
 				if (!pagination) {
 					list = (List<MBMessage>)QueryUtil.list(q, getDialect(),
 							start, end, false);
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<MBMessage>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<MBMessage>)QueryUtil.list(q, getDialect(),
@@ -8249,6 +8238,13 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	@Override
 	public int countByU_C(long userId, long[] classNameIds)
 		throws SystemException {
+		if (classNameIds == null) {
+			classNameIds = new long[0];
+		}
+		else {
+			classNameIds = ArrayUtil.unique(classNameIds);
+		}
+
 		Object[] finderArgs = new Object[] {
 				userId, StringUtil.merge(classNameIds)
 			};
@@ -8261,35 +8257,22 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 			query.append(_SQL_COUNT_MBMESSAGE_WHERE);
 
-			boolean conjunctionable = false;
+			query.append(_FINDER_COLUMN_U_C_USERID_2);
 
-			if (conjunctionable) {
-				query.append(WHERE_AND);
-			}
-
-			query.append(_FINDER_COLUMN_U_C_USERID_5);
-
-			conjunctionable = true;
-
-			if ((classNameIds == null) || (classNameIds.length > 0)) {
-				if (conjunctionable) {
-					query.append(WHERE_AND);
-				}
-
+			if (classNameIds.length > 0) {
 				query.append(StringPool.OPEN_PARENTHESIS);
 
-				for (int i = 0; i < classNameIds.length; i++) {
-					query.append(_FINDER_COLUMN_U_C_CLASSNAMEID_5);
+				query.append(_FINDER_COLUMN_U_C_CLASSNAMEID_7);
 
-					if ((i + 1) < classNameIds.length) {
-						query.append(WHERE_OR);
-					}
-				}
+				query.append(StringUtil.merge(classNameIds));
 
 				query.append(StringPool.CLOSE_PARENTHESIS);
 
-				conjunctionable = true;
+				query.append(StringPool.CLOSE_PARENTHESIS);
 			}
+
+			query.setStringAt(removeConjunction(query.stringAt(query.index() -
+						1)), query.index() - 1);
 
 			String sql = query.toString();
 
@@ -8303,10 +8286,6 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 				QueryPos qPos = QueryPos.getInstance(q);
 
 				qPos.add(userId);
-
-				if (classNameIds != null) {
-					qPos.add(classNameIds);
-				}
 
 				count = (Long)q.uniqueResult();
 
@@ -8328,11 +8307,8 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	}
 
 	private static final String _FINDER_COLUMN_U_C_USERID_2 = "mbMessage.userId = ? AND ";
-	private static final String _FINDER_COLUMN_U_C_USERID_5 = "(" +
-		removeConjunction(_FINDER_COLUMN_U_C_USERID_2) + ")";
 	private static final String _FINDER_COLUMN_U_C_CLASSNAMEID_2 = "mbMessage.classNameId = ?";
-	private static final String _FINDER_COLUMN_U_C_CLASSNAMEID_5 = "(" +
-		removeConjunction(_FINDER_COLUMN_U_C_CLASSNAMEID_2) + ")";
+	private static final String _FINDER_COLUMN_U_C_CLASSNAMEID_7 = "mbMessage.classNameId IN (";
 	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_C_C = new FinderPath(MBMessageModelImpl.ENTITY_CACHE_ENABLED,
 			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_C",
@@ -8487,7 +8463,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<MBMessage>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<MBMessage>)QueryUtil.list(q, getDialect(),
@@ -9016,7 +8992,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<MBMessage>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<MBMessage>)QueryUtil.list(q, getDialect(),
@@ -9544,7 +9520,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<MBMessage>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<MBMessage>)QueryUtil.list(q, getDialect(),
@@ -10072,7 +10048,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<MBMessage>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<MBMessage>)QueryUtil.list(q, getDialect(),
@@ -10599,7 +10575,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<MBMessage>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<MBMessage>)QueryUtil.list(q, getDialect(),
@@ -11143,7 +11119,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<MBMessage>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<MBMessage>)QueryUtil.list(q, getDialect(),
@@ -11572,7 +11548,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
 				q.addEntity(_FILTER_ENTITY_ALIAS, MBMessageImpl.class);
@@ -11758,7 +11734,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 				MBMessage.class.getName(),
 				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
-		SQLQuery q = session.createSQLQuery(sql);
+		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 		q.setFirstResult(0);
 		q.setMaxResults(2);
@@ -11912,7 +11888,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addScalar(COUNT_COLUMN_NAME,
 				com.liferay.portal.kernel.dao.orm.Type.LONG);
@@ -12108,7 +12084,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<MBMessage>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<MBMessage>)QueryUtil.list(q, getDialect(),
@@ -12539,7 +12515,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
 				q.addEntity(_FILTER_ENTITY_ALIAS, MBMessageImpl.class);
@@ -12725,7 +12701,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 				MBMessage.class.getName(),
 				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
-		SQLQuery q = session.createSQLQuery(sql);
+		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 		q.setFirstResult(0);
 		q.setMaxResults(2);
@@ -12879,7 +12855,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addScalar(COUNT_COLUMN_NAME,
 				com.liferay.portal.kernel.dao.orm.Type.LONG);
@@ -13078,7 +13054,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<MBMessage>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<MBMessage>)QueryUtil.list(q, getDialect(),
@@ -13509,7 +13485,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
 				q.addEntity(_FILTER_ENTITY_ALIAS, MBMessageImpl.class);
@@ -13695,7 +13671,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 				MBMessage.class.getName(),
 				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
-		SQLQuery q = session.createSQLQuery(sql);
+		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 		q.setFirstResult(0);
 		q.setMaxResults(2);
@@ -13849,7 +13825,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addScalar(COUNT_COLUMN_NAME,
 				com.liferay.portal.kernel.dao.orm.Type.LONG);
@@ -14045,7 +14021,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<MBMessage>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<MBMessage>)QueryUtil.list(q, getDialect(),
@@ -14621,7 +14597,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<MBMessage>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<MBMessage>)QueryUtil.list(q, getDialect(),
@@ -14996,7 +14972,14 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	public List<MBMessage> findByU_C_S(long userId, long[] classNameIds,
 		int status, int start, int end, OrderByComparator orderByComparator)
 		throws SystemException {
-		if ((classNameIds != null) && (classNameIds.length == 1)) {
+		if (classNameIds == null) {
+			classNameIds = new long[0];
+		}
+		else {
+			classNameIds = ArrayUtil.unique(classNameIds);
+		}
+
+		if (classNameIds.length == 1) {
 			return findByU_C_S(userId, classNameIds[0], status, start, end,
 				orderByComparator);
 		}
@@ -15040,43 +15023,26 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 			query.append(_SQL_SELECT_MBMESSAGE_WHERE);
 
-			boolean conjunctionable = false;
+			query.append(_FINDER_COLUMN_U_C_S_USERID_2);
 
-			if (conjunctionable) {
-				query.append(WHERE_AND);
-			}
-
-			query.append(_FINDER_COLUMN_U_C_S_USERID_5);
-
-			conjunctionable = true;
-
-			if ((classNameIds == null) || (classNameIds.length > 0)) {
-				if (conjunctionable) {
-					query.append(WHERE_AND);
-				}
-
+			if (classNameIds.length > 0) {
 				query.append(StringPool.OPEN_PARENTHESIS);
 
-				for (int i = 0; i < classNameIds.length; i++) {
-					query.append(_FINDER_COLUMN_U_C_S_CLASSNAMEID_5);
+				query.append(_FINDER_COLUMN_U_C_S_CLASSNAMEID_7);
 
-					if ((i + 1) < classNameIds.length) {
-						query.append(WHERE_OR);
-					}
-				}
+				query.append(StringUtil.merge(classNameIds));
 
 				query.append(StringPool.CLOSE_PARENTHESIS);
 
-				conjunctionable = true;
-			}
+				query.append(StringPool.CLOSE_PARENTHESIS);
 
-			if (conjunctionable) {
 				query.append(WHERE_AND);
 			}
 
-			query.append(_FINDER_COLUMN_U_C_S_STATUS_5);
+			query.append(_FINDER_COLUMN_U_C_S_STATUS_2);
 
-			conjunctionable = true;
+			query.setStringAt(removeConjunction(query.stringAt(query.index() -
+						1)), query.index() - 1);
 
 			if (orderByComparator != null) {
 				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
@@ -15100,10 +15066,6 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 				qPos.add(userId);
 
-				if (classNameIds != null) {
-					qPos.add(classNameIds);
-				}
-
 				qPos.add(status);
 
 				if (!pagination) {
@@ -15112,7 +15074,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<MBMessage>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<MBMessage>)QueryUtil.list(q, getDialect(),
@@ -15231,6 +15193,13 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	@Override
 	public int countByU_C_S(long userId, long[] classNameIds, int status)
 		throws SystemException {
+		if (classNameIds == null) {
+			classNameIds = new long[0];
+		}
+		else {
+			classNameIds = ArrayUtil.unique(classNameIds);
+		}
+
 		Object[] finderArgs = new Object[] {
 				userId, StringUtil.merge(classNameIds), status
 			};
@@ -15243,43 +15212,26 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 			query.append(_SQL_COUNT_MBMESSAGE_WHERE);
 
-			boolean conjunctionable = false;
+			query.append(_FINDER_COLUMN_U_C_S_USERID_2);
 
-			if (conjunctionable) {
-				query.append(WHERE_AND);
-			}
-
-			query.append(_FINDER_COLUMN_U_C_S_USERID_5);
-
-			conjunctionable = true;
-
-			if ((classNameIds == null) || (classNameIds.length > 0)) {
-				if (conjunctionable) {
-					query.append(WHERE_AND);
-				}
-
+			if (classNameIds.length > 0) {
 				query.append(StringPool.OPEN_PARENTHESIS);
 
-				for (int i = 0; i < classNameIds.length; i++) {
-					query.append(_FINDER_COLUMN_U_C_S_CLASSNAMEID_5);
+				query.append(_FINDER_COLUMN_U_C_S_CLASSNAMEID_7);
 
-					if ((i + 1) < classNameIds.length) {
-						query.append(WHERE_OR);
-					}
-				}
+				query.append(StringUtil.merge(classNameIds));
 
 				query.append(StringPool.CLOSE_PARENTHESIS);
 
-				conjunctionable = true;
-			}
+				query.append(StringPool.CLOSE_PARENTHESIS);
 
-			if (conjunctionable) {
 				query.append(WHERE_AND);
 			}
 
-			query.append(_FINDER_COLUMN_U_C_S_STATUS_5);
+			query.append(_FINDER_COLUMN_U_C_S_STATUS_2);
 
-			conjunctionable = true;
+			query.setStringAt(removeConjunction(query.stringAt(query.index() -
+						1)), query.index() - 1);
 
 			String sql = query.toString();
 
@@ -15293,10 +15245,6 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 				QueryPos qPos = QueryPos.getInstance(q);
 
 				qPos.add(userId);
-
-				if (classNameIds != null) {
-					qPos.add(classNameIds);
-				}
 
 				qPos.add(status);
 
@@ -15320,14 +15268,9 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	}
 
 	private static final String _FINDER_COLUMN_U_C_S_USERID_2 = "mbMessage.userId = ? AND ";
-	private static final String _FINDER_COLUMN_U_C_S_USERID_5 = "(" +
-		removeConjunction(_FINDER_COLUMN_U_C_S_USERID_2) + ")";
 	private static final String _FINDER_COLUMN_U_C_S_CLASSNAMEID_2 = "mbMessage.classNameId = ? AND ";
-	private static final String _FINDER_COLUMN_U_C_S_CLASSNAMEID_5 = "(" +
-		removeConjunction(_FINDER_COLUMN_U_C_S_CLASSNAMEID_2) + ")";
+	private static final String _FINDER_COLUMN_U_C_S_CLASSNAMEID_7 = "mbMessage.classNameId IN (";
 	private static final String _FINDER_COLUMN_U_C_S_STATUS_2 = "mbMessage.status = ?";
-	private static final String _FINDER_COLUMN_U_C_S_STATUS_5 = "(" +
-		removeConjunction(_FINDER_COLUMN_U_C_S_STATUS_2) + ")";
 	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_C_C_S = new FinderPath(MBMessageModelImpl.ENTITY_CACHE_ENABLED,
 			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_C_S",
@@ -15499,7 +15442,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<MBMessage>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<MBMessage>)QueryUtil.list(q, getDialect(),
@@ -16081,7 +16024,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<MBMessage>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<MBMessage>)QueryUtil.list(q, getDialect(),
@@ -16535,7 +16478,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
 				q.addEntity(_FILTER_ENTITY_ALIAS, MBMessageImpl.class);
@@ -16728,7 +16671,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 				MBMessage.class.getName(),
 				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
-		SQLQuery q = session.createSQLQuery(sql);
+		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 		q.setFirstResult(0);
 		q.setMaxResults(2);
@@ -16893,7 +16836,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addScalar(COUNT_COLUMN_NAME,
 				com.liferay.portal.kernel.dao.orm.Type.LONG);
@@ -17107,7 +17050,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<MBMessage>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<MBMessage>)QueryUtil.list(q, getDialect(),
@@ -17561,7 +17504,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
 				q.addEntity(_FILTER_ENTITY_ALIAS, MBMessageImpl.class);
@@ -17754,7 +17697,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 				MBMessage.class.getName(),
 				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
-		SQLQuery q = session.createSQLQuery(sql);
+		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 		q.setFirstResult(0);
 		q.setMaxResults(2);
@@ -17919,7 +17862,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addScalar(COUNT_COLUMN_NAME,
 				com.liferay.portal.kernel.dao.orm.Type.LONG);
@@ -18132,7 +18075,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<MBMessage>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<MBMessage>)QueryUtil.list(q, getDialect(),
@@ -18607,7 +18550,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 			CacheRegistryUtil.clear(MBMessageImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(MBMessageImpl.class.getName());
+		EntityCacheUtil.clearCache(MBMessageImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -19422,7 +19365,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		}
 
 		EntityCacheUtil.putResult(MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageImpl.class, mbMessage.getPrimaryKey(), mbMessage);
+			MBMessageImpl.class, mbMessage.getPrimaryKey(), mbMessage, false);
 
 		clearUniqueFindersCache(mbMessage);
 		cacheUniqueFindersCache(mbMessage);
@@ -19670,7 +19613,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<MBMessage>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<MBMessage>)QueryUtil.list(q, getDialect(),

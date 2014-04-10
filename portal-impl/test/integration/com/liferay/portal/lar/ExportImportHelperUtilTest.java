@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -310,7 +310,8 @@ public class ExportImportHelperUtilTest extends PowerMockito {
 
 		setFinalStaticField(
 			ExportImportHelperImpl.class.getDeclaredField(
-				"_PRIVATE_USER_SERVLET_MAPPING"), "/en/");
+				"_PRIVATE_USER_SERVLET_MAPPING"),
+			"/en/");
 
 		Element rootElement =
 			_portletDataContextExport.getExportDataRootElement();
@@ -399,6 +400,9 @@ public class ExportImportHelperUtilTest extends PowerMockito {
 		content = ExportImportHelperUtil.replaceExportContentReferences(
 			_portletDataContextExport, _referrerStagedModel,
 			referrerStagedModelElement, content, true);
+
+		_portletDataContextImport.setScopeGroupId(_fileEntry.getGroupId());
+
 		content = ExportImportHelperUtil.replaceImportContentReferences(
 			_portletDataContextImport, _referrerStagedModel,
 			referrerStagedModelElement, content, true);
@@ -499,9 +503,7 @@ public class ExportImportHelperUtilTest extends PowerMockito {
 	}
 
 	protected List<String> getURLs(String content) {
-		Pattern pattern = Pattern.compile("href=|\\{|\\[");
-
-		Matcher matcher = pattern.matcher(StringPool.BLANK);
+		Matcher matcher = _pattern.matcher(StringPool.BLANK);
 
 		String[] lines = StringUtil.split(content, StringPool.NEW_LINE);
 
@@ -540,7 +542,8 @@ public class ExportImportHelperUtilTest extends PowerMockito {
 			content,
 			new String[] {
 				"[$GROUP_FRIENDLY_URL$]", "[$GROUP_ID$]", "[$IMAGE_ID$]",
-				"[$PATH_CONTEXT$]", "[$PATH_FRIENDLY_URL_PRIVATE_GROUP$]",
+				"[$LIVE_GROUP_ID$]", "[$PATH_CONTEXT$]",
+				"[$PATH_FRIENDLY_URL_PRIVATE_GROUP$]",
 				"[$PATH_FRIENDLY_URL_PRIVATE_USER$]",
 				"[$PATH_FRIENDLY_URL_PUBLIC$]", "[$TITLE$]", "[$UUID$]"
 			},
@@ -548,6 +551,7 @@ public class ExportImportHelperUtilTest extends PowerMockito {
 				_stagingGroup.getFriendlyURL(),
 				String.valueOf(fileEntry.getGroupId()),
 				String.valueOf(fileEntry.getFileEntryId()),
+				String.valueOf(fileEntry.getGroupId()),
 				PortalUtil.getPathContext(),
 				PropsValues.LAYOUT_FRIENDLY_URL_PRIVATE_GROUP_SERVLET_MAPPING,
 				PropsValues.LAYOUT_FRIENDLY_URL_PRIVATE_USER_SERVLET_MAPPING,
@@ -620,6 +624,7 @@ public class ExportImportHelperUtilTest extends PowerMockito {
 	private FileEntry _fileEntry;
 	private Group _liveGroup;
 	private Layout _livePublicLayout;
+	private Pattern _pattern = Pattern.compile("href=|\\{|\\[");
 	private PortletDataContext _portletDataContextExport;
 	private PortletDataContext _portletDataContextImport;
 	private StagedModel _referrerStagedModel;

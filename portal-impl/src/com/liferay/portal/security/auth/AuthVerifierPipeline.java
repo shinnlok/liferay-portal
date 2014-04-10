@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -326,9 +326,11 @@ public class AuthVerifierPipeline {
 					accessControlContext, properties);
 			}
 			catch (Exception e) {
-				Class<?> authVerifierClass = authVerifier.getClass();
+				if (_log.isDebugEnabled()) {
+					Class<?> authVerifierClass = authVerifier.getClass();
 
-				_log.error("Skipping " + authVerifierClass.getName(), e);
+					_log.debug("Skipping " + authVerifierClass.getName(), e);
+				}
 
 				continue;
 			}

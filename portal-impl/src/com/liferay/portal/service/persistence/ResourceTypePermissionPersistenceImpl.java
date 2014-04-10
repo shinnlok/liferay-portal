@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,9 +32,9 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.CacheModel;
+import com.liferay.portal.model.MVCCModel;
 import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.ResourceTypePermission;
 import com.liferay.portal.model.impl.ResourceTypePermissionImpl;
@@ -224,7 +224,7 @@ public class ResourceTypePermissionPersistenceImpl extends BasePersistenceImpl<R
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<ResourceTypePermission>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<ResourceTypePermission>)QueryUtil.list(q,
@@ -761,7 +761,7 @@ public class ResourceTypePermissionPersistenceImpl extends BasePersistenceImpl<R
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<ResourceTypePermission>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<ResourceTypePermission>)QueryUtil.list(q,
@@ -1568,7 +1568,7 @@ public class ResourceTypePermissionPersistenceImpl extends BasePersistenceImpl<R
 			CacheRegistryUtil.clear(ResourceTypePermissionImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(ResourceTypePermissionImpl.class.getName());
+		EntityCacheUtil.clearCache(ResourceTypePermissionImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -1857,7 +1857,8 @@ public class ResourceTypePermissionPersistenceImpl extends BasePersistenceImpl<R
 
 		EntityCacheUtil.putResult(ResourceTypePermissionModelImpl.ENTITY_CACHE_ENABLED,
 			ResourceTypePermissionImpl.class,
-			resourceTypePermission.getPrimaryKey(), resourceTypePermission);
+			resourceTypePermission.getPrimaryKey(), resourceTypePermission,
+			false);
 
 		clearUniqueFindersCache(resourceTypePermission);
 		cacheUniqueFindersCache(resourceTypePermission);
@@ -1878,6 +1879,7 @@ public class ResourceTypePermissionPersistenceImpl extends BasePersistenceImpl<R
 		resourceTypePermissionImpl.setNew(resourceTypePermission.isNew());
 		resourceTypePermissionImpl.setPrimaryKey(resourceTypePermission.getPrimaryKey());
 
+		resourceTypePermissionImpl.setMvccVersion(resourceTypePermission.getMvccVersion());
 		resourceTypePermissionImpl.setResourceTypePermissionId(resourceTypePermission.getResourceTypePermissionId());
 		resourceTypePermissionImpl.setCompanyId(resourceTypePermission.getCompanyId());
 		resourceTypePermissionImpl.setGroupId(resourceTypePermission.getGroupId());
@@ -2089,7 +2091,7 @@ public class ResourceTypePermissionPersistenceImpl extends BasePersistenceImpl<R
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<ResourceTypePermission>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<ResourceTypePermission>)QueryUtil.list(q,
@@ -2217,10 +2219,22 @@ public class ResourceTypePermissionPersistenceImpl extends BasePersistenceImpl<R
 		};
 
 	private static CacheModel<ResourceTypePermission> _nullResourceTypePermissionCacheModel =
-		new CacheModel<ResourceTypePermission>() {
-			@Override
-			public ResourceTypePermission toEntityModel() {
-				return _nullResourceTypePermission;
-			}
-		};
+		new NullCacheModel();
+
+	private static class NullCacheModel implements CacheModel<ResourceTypePermission>,
+		MVCCModel {
+		@Override
+		public long getMvccVersion() {
+			return 0;
+		}
+
+		@Override
+		public void setMvccVersion(long mvccVersion) {
+		}
+
+		@Override
+		public ResourceTypePermission toEntityModel() {
+			return _nullResourceTypePermission;
+		}
+	}
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -55,7 +55,7 @@ public class JSONWebServiceServiceAction extends JSONServiceAction {
 			WebKeys.UPLOAD_EXCEPTION);
 
 		if (uploadException != null) {
-			return JSONFactoryUtil.serializeException(uploadException);
+			return JSONFactoryUtil.serializeThrowable(uploadException);
 		}
 
 		JSONWebServiceAction jsonWebServiceAction = null;
@@ -88,7 +88,7 @@ public class JSONWebServiceServiceAction extends JSONServiceAction {
 				_log.warn(e, e);
 			}
 
-			return JSONFactoryUtil.serializeException(e);
+			return JSONFactoryUtil.serializeThrowable(e);
 		}
 	}
 

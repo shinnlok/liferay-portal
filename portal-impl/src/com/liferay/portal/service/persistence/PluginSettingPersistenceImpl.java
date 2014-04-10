@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -33,9 +33,9 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.CacheModel;
+import com.liferay.portal.model.MVCCModel;
 import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.PluginSetting;
 import com.liferay.portal.model.impl.PluginSettingImpl;
@@ -227,7 +227,7 @@ public class PluginSettingPersistenceImpl extends BasePersistenceImpl<PluginSett
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<PluginSetting>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<PluginSetting>)QueryUtil.list(q, getDialect(),
@@ -956,7 +956,7 @@ public class PluginSettingPersistenceImpl extends BasePersistenceImpl<PluginSett
 			CacheRegistryUtil.clear(PluginSettingImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(PluginSettingImpl.class.getName());
+		EntityCacheUtil.clearCache(PluginSettingImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -1213,7 +1213,7 @@ public class PluginSettingPersistenceImpl extends BasePersistenceImpl<PluginSett
 
 		EntityCacheUtil.putResult(PluginSettingModelImpl.ENTITY_CACHE_ENABLED,
 			PluginSettingImpl.class, pluginSetting.getPrimaryKey(),
-			pluginSetting);
+			pluginSetting, false);
 
 		clearUniqueFindersCache(pluginSetting);
 		cacheUniqueFindersCache(pluginSetting);
@@ -1233,6 +1233,7 @@ public class PluginSettingPersistenceImpl extends BasePersistenceImpl<PluginSett
 		pluginSettingImpl.setNew(pluginSetting.isNew());
 		pluginSettingImpl.setPrimaryKey(pluginSetting.getPrimaryKey());
 
+		pluginSettingImpl.setMvccVersion(pluginSetting.getMvccVersion());
 		pluginSettingImpl.setPluginSettingId(pluginSetting.getPluginSettingId());
 		pluginSettingImpl.setCompanyId(pluginSetting.getCompanyId());
 		pluginSettingImpl.setPluginId(pluginSetting.getPluginId());
@@ -1442,7 +1443,7 @@ public class PluginSettingPersistenceImpl extends BasePersistenceImpl<PluginSett
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<PluginSetting>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<PluginSetting>)QueryUtil.list(q, getDialect(),
@@ -1577,10 +1578,22 @@ public class PluginSettingPersistenceImpl extends BasePersistenceImpl<PluginSett
 			}
 		};
 
-	private static CacheModel<PluginSetting> _nullPluginSettingCacheModel = new CacheModel<PluginSetting>() {
-			@Override
-			public PluginSetting toEntityModel() {
-				return _nullPluginSetting;
-			}
-		};
+	private static CacheModel<PluginSetting> _nullPluginSettingCacheModel = new NullCacheModel();
+
+	private static class NullCacheModel implements CacheModel<PluginSetting>,
+		MVCCModel {
+		@Override
+		public long getMvccVersion() {
+			return 0;
+		}
+
+		@Override
+		public void setMvccVersion(long mvccVersion) {
+		}
+
+		@Override
+		public PluginSetting toEntityModel() {
+			return _nullPluginSetting;
+		}
+	}
 }

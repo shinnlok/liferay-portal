@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -35,9 +35,9 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.CacheModel;
+import com.liferay.portal.model.MVCCModel;
 import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.Team;
 import com.liferay.portal.model.impl.TeamImpl;
@@ -228,7 +228,7 @@ public class TeamPersistenceImpl extends BasePersistenceImpl<Team>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<Team>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<Team>)QueryUtil.list(q, getDialect(), start,
@@ -611,7 +611,7 @@ public class TeamPersistenceImpl extends BasePersistenceImpl<Team>
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
 				q.addEntity(_FILTER_ENTITY_ALIAS, TeamImpl.class);
@@ -784,7 +784,7 @@ public class TeamPersistenceImpl extends BasePersistenceImpl<Team>
 				Team.class.getName(), _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN,
 				groupId);
 
-		SQLQuery q = session.createSQLQuery(sql);
+		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 		q.setFirstResult(0);
 		q.setMaxResults(2);
@@ -913,7 +913,7 @@ public class TeamPersistenceImpl extends BasePersistenceImpl<Team>
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addScalar(COUNT_COLUMN_NAME,
 				com.liferay.portal.kernel.dao.orm.Type.LONG);
@@ -1248,7 +1248,7 @@ public class TeamPersistenceImpl extends BasePersistenceImpl<Team>
 			CacheRegistryUtil.clear(TeamImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(TeamImpl.class.getName());
+		EntityCacheUtil.clearCache(TeamImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -1486,7 +1486,7 @@ public class TeamPersistenceImpl extends BasePersistenceImpl<Team>
 		}
 
 		EntityCacheUtil.putResult(TeamModelImpl.ENTITY_CACHE_ENABLED,
-			TeamImpl.class, team.getPrimaryKey(), team);
+			TeamImpl.class, team.getPrimaryKey(), team, false);
 
 		clearUniqueFindersCache(team);
 		cacheUniqueFindersCache(team);
@@ -1506,6 +1506,7 @@ public class TeamPersistenceImpl extends BasePersistenceImpl<Team>
 		teamImpl.setNew(team.isNew());
 		teamImpl.setPrimaryKey(team.getPrimaryKey());
 
+		teamImpl.setMvccVersion(team.getMvccVersion());
 		teamImpl.setTeamId(team.getTeamId());
 		teamImpl.setCompanyId(team.getCompanyId());
 		teamImpl.setUserId(team.getUserId());
@@ -1715,7 +1716,7 @@ public class TeamPersistenceImpl extends BasePersistenceImpl<Team>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<Team>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<Team>)QueryUtil.list(q, getDialect(), start,
@@ -2057,9 +2058,6 @@ public class TeamPersistenceImpl extends BasePersistenceImpl<Team>
 		catch (Exception e) {
 			throw processException(e);
 		}
-		finally {
-			FinderCacheUtil.clearCache(TeamModelImpl.MAPPING_TABLE_USERS_TEAMS_NAME);
-		}
 	}
 
 	/**
@@ -2343,9 +2341,6 @@ public class TeamPersistenceImpl extends BasePersistenceImpl<Team>
 		catch (Exception e) {
 			throw processException(e);
 		}
-		finally {
-			FinderCacheUtil.clearCache(TeamModelImpl.MAPPING_TABLE_USERGROUPS_TEAMS_NAME);
-		}
 	}
 
 	/**
@@ -2423,10 +2418,21 @@ public class TeamPersistenceImpl extends BasePersistenceImpl<Team>
 			}
 		};
 
-	private static CacheModel<Team> _nullTeamCacheModel = new CacheModel<Team>() {
-			@Override
-			public Team toEntityModel() {
-				return _nullTeam;
-			}
-		};
+	private static CacheModel<Team> _nullTeamCacheModel = new NullCacheModel();
+
+	private static class NullCacheModel implements CacheModel<Team>, MVCCModel {
+		@Override
+		public long getMvccVersion() {
+			return 0;
+		}
+
+		@Override
+		public void setMvccVersion(long mvccVersion) {
+		}
+
+		@Override
+		public Team toEntityModel() {
+			return _nullTeam;
+		}
+	}
 }

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -47,9 +47,9 @@ if (Validator.isNull(displayStyle)) {
 
 		</aui:select>
 
-		<aui:select label="display-position" name="preferences--socialBookmarksDisplayPosition--">
-			<aui:option label="top" selected='<%= displayPosition.equals("top") %>' />
-			<aui:option label="bottom" selected='<%= displayPosition.equals("bottom") %>' />
+		<aui:select label="display-position" name="preferences--socialBookmarksDisplayPosition--" value="<%= displayPosition %>">
+			<aui:option label="top" />
+			<aui:option label="bottom" />
 		</aui:select>
 
 		<c:if test="<%= Validator.isNotNull(types) %>">

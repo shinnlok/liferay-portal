@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,11 +21,8 @@ ResultRow row = (ResultRow)request.getAttribute(WebKeys.SEARCH_CONTAINER_RESULT_
 
 Object[] objArray = (Object[])row.getObject();
 
-String[] queryTerms = (String[])objArray[0];
-Document doc = (Document)objArray[1];
-Summary summary = (Summary)objArray[2];
-
-String content = StringUtil.highlight(summary.getContent(), queryTerms);
+Document doc = (Document)objArray[0];
+Summary summary = (Summary)objArray[1];
 
 long articleGroupId = GetterUtil.getLong(doc.get(Field.GROUP_ID));
 String articleId = doc.get("articleId");
@@ -33,7 +30,7 @@ String articleId = doc.get("articleId");
 List hitLayoutIds = JournalContentSearchLocalServiceUtil.getLayoutIds(layout.getGroupId(), layout.isPrivateLayout(), articleId);
 %>
 
-<%= content %><br />
+<%= summary.getHighlightedContent() %><br />
 
 <c:choose>
 	<c:when test="<%= !hitLayoutIds.isEmpty() %>">

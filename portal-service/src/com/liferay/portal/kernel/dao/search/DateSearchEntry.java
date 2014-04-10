@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -60,8 +60,8 @@ public class DateSearchEntry extends TextSearchEntry {
 						pageContext, "x-ago",
 						LanguageUtil.getTimeDescription(
 							pageContext,
-							System.currentTimeMillis() - _date.getTime(),
-							true)));
+							System.currentTimeMillis() - _date.getTime(), true),
+						false));
 			}
 			else {
 				sb.append(
@@ -69,8 +69,8 @@ public class DateSearchEntry extends TextSearchEntry {
 						pageContext, "within-x",
 						LanguageUtil.getTimeDescription(
 							pageContext,
-							_date.getTime() - System.currentTimeMillis(),
-							true)));
+							_date.getTime() - System.currentTimeMillis(), true),
+						false));
 			}
 
 			sb.append("</span>");

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -43,17 +43,17 @@ else {
 }
 %>
 
-<portlet:actionURL var="editLayoutActionURL" windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>">
-	<portlet:param name="struts_action" value="/layouts_admin/edit_layouts" />
+<portlet:actionURL var="editLayoutActionURL" windowState="<%= themeDisplay.isStateExclusive() ? LiferayWindowState.EXCLUSIVE.toString() : WindowState.NORMAL.toString() %>">
+	<portlet:param name="struts_action" value='<%= portletName.equals(PortletKeys.DOCKBAR) ? "/layouts_admin/add_layout" : "/layouts_admin/edit_layouts" %>' />
 </portlet:actionURL>
 
-<portlet:renderURL var="editLayoutRenderURL" windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>">
-	<portlet:param name="struts_action" value="/layouts_admin/edit_layouts" />
+<portlet:renderURL var="editLayoutRenderURL" windowState="<%= themeDisplay.isStateExclusive() ? LiferayWindowState.EXCLUSIVE.toString() : WindowState.NORMAL.toString() %>">
+	<portlet:param name="struts_action" value='<%= portletName.equals(PortletKeys.DOCKBAR) ? "/layouts_admin/add_layout" : "/layouts_admin/edit_layouts" %>' />
 </portlet:renderURL>
 
 <aui:form action="<%= editLayoutActionURL %>" enctype="multipart/form-data" method="post" name="addPageFm" onSubmit="event.preventDefault()">
 	<aui:input id="addLayoutCMD" name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.ADD %>" />
-	<aui:input id="addLayoutRedirect" name="redirect" type="hidden" value="<%= layout.isTypeControlPanel() ? currentURL : editLayoutRenderURL.toString() %>" />
+	<aui:input id="addLayoutRedirect" name="redirect" type="hidden" value="<%= portletName.equals(PortletKeys.DOCKBAR) ? editLayoutRenderURL : currentURL %>" />
 	<aui:input id="addLayoutGroupId" name="groupId" type="hidden" value="<%= groupId %>" />
 	<aui:input id="addLayoutPrivateLayout" name="privateLayout" type="hidden" value="<%= privateLayout %>" />
 	<aui:input id="addLayoutParentPlid" name="parentPlid" type="hidden" value="<%= parentPlid %>" />
@@ -133,7 +133,7 @@ else {
 						List<LayoutPrototype> layoutPrototypes = LayoutPrototypeServiceUtil.search(company.getCompanyId(), Boolean.TRUE, null);
 
 						for (LayoutPrototype layoutPrototype : layoutPrototypes) {
-							String name = HtmlUtil.escape(layoutPrototype.getName(user.getLanguageId()));
+							String name = HtmlUtil.escape(layoutPrototype.getName(locale));
 						%>
 
 							<aui:nav-item cssClass="lfr-page-template" data-search="<%= name %>">
@@ -141,7 +141,7 @@ else {
 									<aui:input id='<%= "addLayoutSelectedPageTemplate" + layoutPrototype.getUuid() %>' label="<%= name %>" name="selectedPageTemplate" type="radio" />
 
 									<div class="lfr-page-template-description">
-										<small><%= HtmlUtil.escape(layoutPrototype.getDescription()) %></small>
+										<small><%= HtmlUtil.escape(layoutPrototype.getDescription(locale)) %></small>
 									</div>
 								</div>
 
@@ -155,7 +155,9 @@ else {
 						%>
 
 						<%
-						liferayPortletRequest.setAttribute(WebKeys.LAYOUT_LISTER_LIST, layoutView.getList());
+						liferayPortletRequest.setAttribute(WebKeys.LAYOUT_DESCRIPTIONS, layoutDescriptions);
+
+						int layoutsCount = LayoutLocalServiceUtil.getLayoutsCount(group, privateLayout);
 
 						for (int i = 0; i < PropsValues.LAYOUT_TYPES.length; i++) {
 							if (PropsValues.LAYOUT_TYPES[i].equals("portlet")) {
@@ -165,7 +167,7 @@ else {
 
 							<aui:nav-item cssClass="lfr-page-template" data-search='<%= LanguageUtil.get(pageContext, "layout.types." + PropsValues.LAYOUT_TYPES[i]) %>'>
 								<div class="lfr-page-template-title toggler-header toggler-header-collapsed" data-type="<%= PropsValues.LAYOUT_TYPES[i] %>">
-									<aui:input id='<%= "addLayoutSelectedPageTemplate" + PropsValues.LAYOUT_TYPES[i] %>' label='<%= "layout.types." + PropsValues.LAYOUT_TYPES[i] %>' name="selectedPageTemplate" type="radio" />
+									<aui:input disabled="<%= (layoutsCount == 0) && !PortalUtil.isLayoutFirstPageable(PropsValues.LAYOUT_TYPES[i]) %>" id='<%= "addLayoutSelectedPageTemplate" + PropsValues.LAYOUT_TYPES[i] %>' label='<%= "layout.types." + PropsValues.LAYOUT_TYPES[i] %>' name="selectedPageTemplate" type="radio" />
 
 									<div class="lfr-page-template-description">
 										<small><%= LanguageUtil.get(pageContext, "layout.types." + PropsValues.LAYOUT_TYPES[i] + ".description" ) %></small>
@@ -229,7 +231,7 @@ else {
 					data: {
 						layoutId: <%= addedLayout.getLayoutId() %>,
 						parentLayoutId: <%= addedLayout.getParentLayoutId() %>,
-						title: A.Lang.String.escapeHTML('<%= navItem.getName() %>'),
+						title: '<%= navItem.getName() %>',
 						url: '<%= navItem.getURL() %>'
 					}
 				}
@@ -241,7 +243,7 @@ else {
 <aui:script use="liferay-dockbar-add-page">
 	new Liferay.Dockbar.AddPage(
 		{
-			createPageMessage: '<%= LanguageUtil.get(pageContext, "loading") %>',
+			createPageMessage: '<liferay-ui:message key="loading" />',
 			focusItem: A.one('#<portlet:namespace />addLayoutName'),
 			namespace: '<portlet:namespace />',
 			nodeList: A.one('#<portlet:namespace />templateList'),

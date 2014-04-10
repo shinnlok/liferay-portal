@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,8 +32,8 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.model.CacheModel;
+import com.liferay.portal.model.MVCCModel;
 import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.UserGroupRole;
 import com.liferay.portal.model.impl.UserGroupRoleImpl;
@@ -222,7 +222,7 @@ public class UserGroupRolePersistenceImpl extends BasePersistenceImpl<UserGroupR
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<UserGroupRole>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<UserGroupRole>)QueryUtil.list(q, getDialect(),
@@ -713,7 +713,7 @@ public class UserGroupRolePersistenceImpl extends BasePersistenceImpl<UserGroupR
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<UserGroupRole>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<UserGroupRole>)QueryUtil.list(q, getDialect(),
@@ -1205,7 +1205,7 @@ public class UserGroupRolePersistenceImpl extends BasePersistenceImpl<UserGroupR
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<UserGroupRole>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<UserGroupRole>)QueryUtil.list(q, getDialect(),
@@ -1710,7 +1710,7 @@ public class UserGroupRolePersistenceImpl extends BasePersistenceImpl<UserGroupR
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<UserGroupRole>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<UserGroupRole>)QueryUtil.list(q, getDialect(),
@@ -2239,7 +2239,7 @@ public class UserGroupRolePersistenceImpl extends BasePersistenceImpl<UserGroupR
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<UserGroupRole>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<UserGroupRole>)QueryUtil.list(q, getDialect(),
@@ -2664,7 +2664,7 @@ public class UserGroupRolePersistenceImpl extends BasePersistenceImpl<UserGroupR
 			CacheRegistryUtil.clear(UserGroupRoleImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(UserGroupRoleImpl.class.getName());
+		EntityCacheUtil.clearCache(UserGroupRoleImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -2936,7 +2936,7 @@ public class UserGroupRolePersistenceImpl extends BasePersistenceImpl<UserGroupR
 
 		EntityCacheUtil.putResult(UserGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
 			UserGroupRoleImpl.class, userGroupRole.getPrimaryKey(),
-			userGroupRole);
+			userGroupRole, false);
 
 		userGroupRole.resetOriginalValues();
 
@@ -2953,6 +2953,7 @@ public class UserGroupRolePersistenceImpl extends BasePersistenceImpl<UserGroupR
 		userGroupRoleImpl.setNew(userGroupRole.isNew());
 		userGroupRoleImpl.setPrimaryKey(userGroupRole.getPrimaryKey());
 
+		userGroupRoleImpl.setMvccVersion(userGroupRole.getMvccVersion());
 		userGroupRoleImpl.setUserId(userGroupRole.getUserId());
 		userGroupRoleImpl.setGroupId(userGroupRole.getGroupId());
 		userGroupRoleImpl.setRoleId(userGroupRole.getRoleId());
@@ -3159,7 +3160,7 @@ public class UserGroupRolePersistenceImpl extends BasePersistenceImpl<UserGroupR
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<UserGroupRole>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<UserGroupRole>)QueryUtil.list(q, getDialect(),
@@ -3286,10 +3287,22 @@ public class UserGroupRolePersistenceImpl extends BasePersistenceImpl<UserGroupR
 			}
 		};
 
-	private static CacheModel<UserGroupRole> _nullUserGroupRoleCacheModel = new CacheModel<UserGroupRole>() {
-			@Override
-			public UserGroupRole toEntityModel() {
-				return _nullUserGroupRole;
-			}
-		};
+	private static CacheModel<UserGroupRole> _nullUserGroupRoleCacheModel = new NullCacheModel();
+
+	private static class NullCacheModel implements CacheModel<UserGroupRole>,
+		MVCCModel {
+		@Override
+		public long getMvccVersion() {
+			return 0;
+		}
+
+		@Override
+		public void setMvccVersion(long mvccVersion) {
+		}
+
+		@Override
+		public UserGroupRole toEntityModel() {
+			return _nullUserGroupRole;
+		}
+	}
 }

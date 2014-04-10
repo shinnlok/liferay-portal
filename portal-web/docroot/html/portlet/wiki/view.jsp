@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -235,7 +235,7 @@ long portletDisplayDDMTemplateId = PortletDisplayTemplateUtil.getPortletDisplayT
 			%>
 
 			<div class="page-redirect" onClick="location.href = '<%= originalViewPageURL.toString() %>';">
-				(<%= LanguageUtil.format(pageContext, "redirected-from-x", originalPage.getTitle()) %>)
+				(<%= LanguageUtil.format(pageContext, "redirected-from-x", originalPage.getTitle(), false) %>)
 			</div>
 		</c:if>
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,7 +23,6 @@ import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.trash.TrashRenderer;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.FileUtil;
-import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
@@ -45,7 +44,9 @@ import com.liferay.portlet.trash.util.TrashUtil;
 import java.util.Date;
 import java.util.Locale;
 
+import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
@@ -142,8 +143,10 @@ public class DLFileEntryAssetRenderer
 	}
 
 	@Override
-	public String getSummary(Locale locale) {
-		return HtmlUtil.stripHtml(_fileEntry.getDescription());
+	public String getSummary(
+		PortletRequest portletRequest, PortletResponse portletResponse) {
+
+		return _fileEntry.getDescription();
 	}
 
 	@Override
@@ -351,6 +354,18 @@ public class DLFileEntryAssetRenderer
 		else {
 			return null;
 		}
+	}
+
+	@Override
+	public void setAddToPagePreferences(
+			PortletPreferences preferences, String portletId,
+			ThemeDisplay themeDisplay)
+		throws Exception {
+
+		preferences.setValue("showAssetTitle", Boolean.FALSE.toString());
+		preferences.setValue("showExtraInfo", Boolean.FALSE.toString());
+
+		super.setAddToPagePreferences(preferences, portletId, themeDisplay);
 	}
 
 	private FileEntry _fileEntry;

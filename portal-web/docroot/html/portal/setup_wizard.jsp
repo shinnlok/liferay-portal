@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -69,7 +69,7 @@
 
 						<div class="row-fluid">
 							<aui:fieldset cssClass="span6" label="portal">
-								<aui:input helpTextCssClass="help-inline" label="portal-name" name="companyName" suffix='<%= LanguageUtil.format(pageContext, "for-example-x", "Liferay") %>' value="<%= PropsValues.COMPANY_DEFAULT_NAME %>" />
+								<aui:input helpTextCssClass="help-inline" label="portal-name" name="companyName" suffix='<%= LanguageUtil.format(pageContext, "for-example-x", "Liferay", false) %>' value="<%= PropsValues.COMPANY_DEFAULT_NAME %>" />
 
 								<aui:select inlineField="<%= true %>" label="default-language" name="companyLocale">
 
@@ -95,9 +95,7 @@
 							</aui:fieldset>
 
 							<aui:fieldset cssClass="column-last span6" label="administrator-user">
-								<aui:input label="first-name" name="adminFirstName" value="<%= PropsValues.DEFAULT_ADMIN_FIRST_NAME %>" />
-
-								<aui:input label="last-name" name="adminLastName" value="<%= PropsValues.DEFAULT_ADMIN_LAST_NAME %>" />
+								<%@ include file="/html/portal/setup_wizard_user_name.jspf" %>
 
 								<aui:input label="email" name="adminEmailAddress" value="<%= emailAddress %>">
 									<aui:validator name="email" />
@@ -390,7 +388,7 @@
 									String taglibArguments = "<span class=\"lfr-inline-code\">" + PropsValues.LIFERAY_HOME + StringPool.SLASH + SetupWizardUtil.PROPERTIES_FILE_NAME + "</span>";
 									%>
 
-									<liferay-ui:message arguments="<%= taglibArguments %>" key="the-configuration-was-saved-in" />
+									<liferay-ui:message arguments="<%= taglibArguments %>" key="the-configuration-was-saved-in" translateArguments="<%= false %>" />
 								</p>
 
 								<%
@@ -399,7 +397,7 @@
 
 								<c:if test="<%= !passwordUpdated %>">
 									<p class="lfr-setup-notice">
-										<liferay-ui:message arguments="<%= PropsValues.DEFAULT_ADMIN_PASSWORD %>" key="your-password-is-x.-you-will-be-required-to-change-your-password-the-next-time-you-log-into-the-portal" />
+										<liferay-ui:message arguments="<%= PropsValues.DEFAULT_ADMIN_PASSWORD %>" key="your-password-is-x.-you-will-be-required-to-change-your-password-the-next-time-you-log-into-the-portal" translateArguments="<%= false %>" />
 									</p>
 								</c:if>
 
@@ -414,7 +412,7 @@
 									String taglibArguments = "<span class=\"lfr-inline-code\">" + PropsValues.LIFERAY_HOME + "</span>";
 									%>
 
-									<liferay-ui:message arguments="<%= taglibArguments %>" key="sorry,-we-were-not-able-to-save-the-configuration-file-in-x" />
+									<liferay-ui:message arguments="<%= taglibArguments %>" key="sorry,-we-were-not-able-to-save-the-configuration-file-in-x" translateArguments="<%= false %>" />
 								</div>
 							</p>
 

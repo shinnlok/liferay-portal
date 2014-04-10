@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -13,6 +13,8 @@
  */
 
 package com.liferay.portal.kernel.staging;
+
+import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -46,6 +48,7 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * @author Raymond Augé
  */
+@ProviderType
 public class StagingUtil {
 
 	public static String buildRemoteURL(
@@ -255,6 +258,12 @@ public class StagingUtil {
 		return getStaging().getLiveGroupId(groupId);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, moved to {@link
+	 *             com.liferay.portal.kernel.lar.ExportImportHelperUtil#getMissingParentLayouts(
+	 *             Layout, long)}
+	 */
+	@Deprecated
 	public static List<Layout> getMissingParentLayouts(
 			Layout layout, long liveGroupId)
 		throws Exception {
@@ -364,6 +373,11 @@ public class StagingUtil {
 			parameterMap, startDate, endDate);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #publishLayouts(long, long,
+	 *             long, boolean, long[], Map, Date, Date)}
+	 */
+	@Deprecated
 	public static void publishLayouts(
 			long userId, long sourceGroupId, long targetGroupId,
 			boolean privateLayout, Map<Long, Boolean> layoutIdMap,
@@ -470,6 +484,10 @@ public class StagingUtil {
 
 		getStaging().setRecentLayoutSetBranchId(
 			user, layoutSetId, layoutSetBranchId);
+	}
+
+	public static String stripProtocolFromRemoteAddress(String remoteAddress) {
+		return getStaging().stripProtocolFromRemoteAddress(remoteAddress);
 	}
 
 	public static void unlockGroup(long groupId) throws SystemException {

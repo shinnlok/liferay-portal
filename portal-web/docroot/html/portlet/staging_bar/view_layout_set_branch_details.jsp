@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -29,7 +29,7 @@ String stagingFriendlyURL = (String)request.getAttribute("view.jsp-stagingFriend
 			<liferay-util:buffer var="taglibMessage">
 				<liferay-ui:message key="<%= HtmlUtil.escape(layoutSetBranch.getName()) %>" />
 
-				<small>(<liferay-ui:message arguments="<%= layouts.size() %>" key='<%= (layouts.size() == 1) ? "1-page" : "x-pages" %>' />)</small>
+				<small>(<liferay-ui:message arguments="<%= layouts.size() %>" key='<%= (layouts.size() == 1) ? "1-page" : "x-pages" %>' translateArguments="<%= false %>" />)</small>
 			</liferay-util:buffer>
 
 			<c:choose>

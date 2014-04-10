@@ -8,6 +8,7 @@
 		<xs:attribute name="dataType" type="data-type" />
 		<xs:attribute name="fieldNamespace" type="xs:string" />
 		<xs:attribute name="indexType" type="index-type" />
+		<xs:attribute name="localizable" type="xs:boolean" />
 		<xs:attribute name="multiple" type="xs:boolean" />
 		<xs:attribute name="name" type="name" use="required" />
 		<xs:attribute name="readOnly" type="xs:boolean" />
@@ -62,6 +63,7 @@
 			<xs:enumeration value="date" />
 			<xs:enumeration value="double" />
 			<xs:enumeration value="float" />
+			<xs:enumeration value="geolocation" />
 			<xs:enumeration value="integer" />
 			<xs:enumeration value="long" />
 			<xs:enumeration value="number" />
@@ -95,23 +97,7 @@
 	</xs:simpleType>
 	<xs:simpleType name="type">
 		<xs:restriction base="xs:string">
-			<xs:enumeration value="checkbox" />
-			<xs:enumeration value="ddm-date" />
-			<xs:enumeration value="ddm-decimal" />
-			<xs:enumeration value="ddm-documentlibrary" />
-			<xs:enumeration value="ddm-integer" />
-			<xs:enumeration value="ddm-link-to-page" />
-			<xs:enumeration value="ddm-number" />
-			<xs:enumeration value="ddm-paragraph" />
-			<xs:enumeration value="ddm-separator" />
-			<xs:enumeration value="ddm-text-html" />
-			<xs:enumeration value="fieldset" />
-			<xs:enumeration value="option" />
-			<xs:enumeration value="radio" />
-			<xs:enumeration value="select" />
-			<xs:enumeration value="text" />
-			<xs:enumeration value="textarea" />
-			<xs:enumeration value="wcm-image" />
+			<xs:pattern value="(\w|\-|_)+" />
 		</xs:restriction>
 	</xs:simpleType>
 </xs:schema>

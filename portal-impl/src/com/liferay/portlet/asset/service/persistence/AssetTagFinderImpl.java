@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -65,7 +65,7 @@ public class AssetTagFinderImpl
 		AssetTagFinder.class.getName() + ".findByG_N_P";
 
 	public static final String FIND_BY_G_N_S_E =
-			AssetTagFinder.class.getName() + ".findByG_N_S_E";
+		AssetTagFinder.class.getName() + ".findByG_N_S_E";
 
 	@Override
 	public int countByG_C_N(long groupId, long classNameId, String name)
@@ -168,7 +168,7 @@ public class AssetTagFinderImpl
 			session = openSession();
 
 			String sql = CustomSQLUtil.get(FIND_BY_G_N_S_E);
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -222,7 +222,7 @@ public class AssetTagFinderImpl
 					PortalUtil.getSiteGroupId(groupId));
 			}
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addScalar(COUNT_COLUMN_NAME, Type.LONG);
 
@@ -325,7 +325,7 @@ public class AssetTagFinderImpl
 					sql, AssetTag.class.getName(), "AssetTag.tagId", groupId);
 			}
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addScalar(COUNT_COLUMN_NAME, Type.LONG);
 
@@ -378,7 +378,7 @@ public class AssetTagFinderImpl
 					sql, AssetTag.class.getName(), "AssetTag.tagId", groupId);
 			}
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addEntity("AssetTag", AssetTagImpl.class);
 
@@ -435,7 +435,7 @@ public class AssetTagFinderImpl
 					PortalUtil.getSiteGroupId(groupId));
 			}
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addEntity("AssetTag", AssetTagImpl.class);
 
@@ -481,7 +481,7 @@ public class AssetTagFinderImpl
 					sql, AssetTag.class.getName(), "AssetTag.tagId", groupIds);
 			}
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addEntity("AssetTag", AssetTagImpl.class);
 

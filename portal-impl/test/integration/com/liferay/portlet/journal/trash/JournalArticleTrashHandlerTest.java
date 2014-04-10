@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -49,8 +49,6 @@ import com.liferay.portlet.journal.util.JournalTestUtil;
 import com.liferay.portlet.trash.BaseTrashHandlerTestCase;
 import com.liferay.portlet.trash.util.TrashUtil;
 
-import java.io.InputStream;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -81,8 +79,14 @@ public class JournalArticleTrashHandlerTest extends BaseTrashHandlerTestCase {
 			JournalArticleImageLocalServiceUtil.getArticleImagesCount(
 				group.getGroupId());
 
+		Class<?> clazz = getClass();
+
+		ClassLoader classLoader = clazz.getClassLoader();
+
 		String xsd = StringUtil.read(
-			getFile("test-ddm-structure-image-field.xml"));
+			classLoader,
+			"com/liferay/portlet/journal/dependencies" +
+				"/test-ddm-structure-image-field.xml");
 
 		DDMStructure ddmStructure = DDMStructureTestUtil.addStructure(
 			serviceContext.getScopeGroupId(), JournalArticle.class.getName(),
@@ -92,12 +96,17 @@ public class JournalArticleTrashHandlerTest extends BaseTrashHandlerTestCase {
 			serviceContext.getScopeGroupId(), ddmStructure.getStructureId());
 
 		String content = StringUtil.read(
-			getFile("test-journal-content-image-field.xml"));
+			classLoader,
+			"com/liferay/portlet/journal/dependencies" +
+				"/test-journal-content-image-field.xml");
 
 		Map<String, byte[]> images = new HashMap<String, byte[]>();
 
 		images.put(
-			"_image_1_0_en_US", FileUtil.getBytes(getFile("liferay.png")));
+			"_image_1_0_en_US",
+			FileUtil.getBytes(
+				clazz,
+				"/com/liferay/portlet/journal/dependencies/liferay.png"));
 
 		baseModel = JournalTestUtil.addArticleWithXMLContent(
 			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, content,
@@ -170,16 +179,21 @@ public class JournalArticleTrashHandlerTest extends BaseTrashHandlerTestCase {
 
 	@Override
 	protected Long getAssetClassPK(ClassedModel classedModel) {
-		JournalArticle article = (JournalArticle)classedModel;
+		if (classedModel instanceof JournalArticle) {
+			JournalArticle article = (JournalArticle)classedModel;
 
-		try {
-			JournalArticleResource journalArticleResource =
-				JournalArticleResourceLocalServiceUtil.getArticleResource(
-					article.getResourcePrimKey());
+			try {
+				JournalArticleResource journalArticleResource =
+					JournalArticleResourceLocalServiceUtil.getArticleResource(
+						article.getResourcePrimKey());
 
-			return journalArticleResource.getResourcePrimKey();
+				return journalArticleResource.getResourcePrimKey();
+			}
+			catch (Exception e) {
+				return super.getAssetClassPK(classedModel);
+			}
 		}
-		catch (Exception e) {
+		else {
 			return super.getAssetClassPK(classedModel);
 		}
 	}
@@ -212,17 +226,6 @@ public class JournalArticleTrashHandlerTest extends BaseTrashHandlerTestCase {
 			folder.getGroupId(), folder.getFolderId());
 	}
 
-	protected InputStream getFile(String fileName) throws Exception {
-		Class<?> clazz = getClass();
-
-		ClassLoader classLoader = clazz.getClassLoader();
-
-		InputStream inputStream = classLoader.getResourceAsStream(
-			"com/liferay/portlet/journal/dependencies/" + fileName);
-
-		return inputStream;
-	}
-
 	@Override
 	protected int getMineBaseModelsCount(long groupId, long userId)
 		throws Exception {
@@ -243,12 +246,22 @@ public class JournalArticleTrashHandlerTest extends BaseTrashHandlerTestCase {
 
 	@Override
 	protected BaseModel<?> getParentBaseModel(
-			Group group, ServiceContext serviceContext)
+			Group group, long parentBaseModelId, ServiceContext serviceContext)
 		throws Exception {
 
 		return JournalTestUtil.addFolder(
-			group.getGroupId(), JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+			group.getGroupId(), parentBaseModelId,
 			ServiceTestUtil.randomString(_FOLDER_NAME_MAX_LENGTH));
+	}
+
+	@Override
+	protected BaseModel<?> getParentBaseModel(
+			Group group, ServiceContext serviceContext)
+		throws Exception {
+
+		return getParentBaseModel(
+			group, JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+			serviceContext);
 	}
 
 	@Override

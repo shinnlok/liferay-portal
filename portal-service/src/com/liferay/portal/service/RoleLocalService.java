@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -941,8 +941,8 @@ public interface RoleLocalService extends BaseLocalService,
 	* @param groups the groups (optionally <code>null</code>)
 	* @return the union of all the user's roles within the groups
 	* @throws SystemException if a system exception occurred
-	* @see com.liferay.portal.service.persistence.RoleFinder#findByU_G(
-	long, List)
+	* @see com.liferay.portal.service.persistence.RoleFinder#findByU_G(long,
+	List)
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portal.model.Role> getUserRelatedRoles(
@@ -956,8 +956,8 @@ public interface RoleLocalService extends BaseLocalService,
 	* @param groupId the primary key of the group
 	* @return the user's roles within the group
 	* @throws SystemException if a system exception occurred
-	* @see com.liferay.portal.service.persistence.RoleFinder#findByU_G(
-	long, long)
+	* @see com.liferay.portal.service.persistence.RoleFinder#findByU_G(long,
+	long)
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portal.model.Role> getUserRelatedRoles(
@@ -971,8 +971,8 @@ public interface RoleLocalService extends BaseLocalService,
 	* @param groupIds the primary keys of the groups
 	* @return the union of all the user's roles within the groups
 	* @throws SystemException if a system exception occurred
-	* @see com.liferay.portal.service.persistence.RoleFinder#findByU_G(
-	long, long[])
+	* @see com.liferay.portal.service.persistence.RoleFinder#findByU_G(long,
+	long[])
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portal.model.Role> getUserRelatedRoles(

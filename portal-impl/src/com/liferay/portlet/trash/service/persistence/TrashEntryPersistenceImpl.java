@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,14 +25,12 @@ import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.CalendarUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.InstanceFactory;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.service.persistence.impl.BasePersistenceImpl;
@@ -43,6 +41,8 @@ import com.liferay.portlet.trash.model.impl.TrashEntryImpl;
 import com.liferay.portlet.trash.model.impl.TrashEntryModelImpl;
 
 import java.io.Serializable;
+
+import java.sql.Timestamp;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -223,7 +223,7 @@ public class TrashEntryPersistenceImpl extends BasePersistenceImpl<TrashEntry>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<TrashEntry>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<TrashEntry>)QueryUtil.list(q, getDialect(),
@@ -713,7 +713,7 @@ public class TrashEntryPersistenceImpl extends BasePersistenceImpl<TrashEntry>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<TrashEntry>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<TrashEntry>)QueryUtil.list(q, getDialect(),
@@ -1206,7 +1206,7 @@ public class TrashEntryPersistenceImpl extends BasePersistenceImpl<TrashEntry>
 				qPos.add(groupId);
 
 				if (bindCreateDate) {
-					qPos.add(CalendarUtil.getTimestamp(createDate));
+					qPos.add(new Timestamp(createDate.getTime()));
 				}
 
 				if (!pagination) {
@@ -1215,7 +1215,7 @@ public class TrashEntryPersistenceImpl extends BasePersistenceImpl<TrashEntry>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<TrashEntry>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<TrashEntry>)QueryUtil.list(q, getDialect(),
@@ -1502,7 +1502,7 @@ public class TrashEntryPersistenceImpl extends BasePersistenceImpl<TrashEntry>
 		qPos.add(groupId);
 
 		if (bindCreateDate) {
-			qPos.add(CalendarUtil.getTimestamp(createDate));
+			qPos.add(new Timestamp(createDate.getTime()));
 		}
 
 		if (orderByComparator != null) {
@@ -1589,7 +1589,7 @@ public class TrashEntryPersistenceImpl extends BasePersistenceImpl<TrashEntry>
 				qPos.add(groupId);
 
 				if (bindCreateDate) {
-					qPos.add(CalendarUtil.getTimestamp(createDate));
+					qPos.add(new Timestamp(createDate.getTime()));
 				}
 
 				count = (Long)q.uniqueResult();
@@ -1767,7 +1767,7 @@ public class TrashEntryPersistenceImpl extends BasePersistenceImpl<TrashEntry>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<TrashEntry>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<TrashEntry>)QueryUtil.list(q, getDialect(),
@@ -2427,7 +2427,7 @@ public class TrashEntryPersistenceImpl extends BasePersistenceImpl<TrashEntry>
 			CacheRegistryUtil.clear(TrashEntryImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(TrashEntryImpl.class.getName());
+		EntityCacheUtil.clearCache(TrashEntryImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -2715,7 +2715,7 @@ public class TrashEntryPersistenceImpl extends BasePersistenceImpl<TrashEntry>
 		}
 
 		EntityCacheUtil.putResult(TrashEntryModelImpl.ENTITY_CACHE_ENABLED,
-			TrashEntryImpl.class, trashEntry.getPrimaryKey(), trashEntry);
+			TrashEntryImpl.class, trashEntry.getPrimaryKey(), trashEntry, false);
 
 		clearUniqueFindersCache(trashEntry);
 		cacheUniqueFindersCache(trashEntry);
@@ -2948,7 +2948,7 @@ public class TrashEntryPersistenceImpl extends BasePersistenceImpl<TrashEntry>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<TrashEntry>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<TrashEntry>)QueryUtil.list(q, getDialect(),

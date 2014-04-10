@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -109,16 +109,82 @@ public class UserGroupGroupRolePersistenceTest {
 
 		UserGroupGroupRole newUserGroupGroupRole = _persistence.create(pk);
 
+		newUserGroupGroupRole.setMvccVersion(ServiceTestUtil.nextLong());
+
 		_persistence.update(newUserGroupGroupRole);
 
 		UserGroupGroupRole existingUserGroupGroupRole = _persistence.findByPrimaryKey(newUserGroupGroupRole.getPrimaryKey());
 
+		Assert.assertEquals(existingUserGroupGroupRole.getMvccVersion(),
+			newUserGroupGroupRole.getMvccVersion());
 		Assert.assertEquals(existingUserGroupGroupRole.getUserGroupId(),
 			newUserGroupGroupRole.getUserGroupId());
 		Assert.assertEquals(existingUserGroupGroupRole.getGroupId(),
 			newUserGroupGroupRole.getGroupId());
 		Assert.assertEquals(existingUserGroupGroupRole.getRoleId(),
 			newUserGroupGroupRole.getRoleId());
+	}
+
+	@Test
+	public void testCountByUserGroupId() {
+		try {
+			_persistence.countByUserGroupId(ServiceTestUtil.nextLong());
+
+			_persistence.countByUserGroupId(0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByGroupId() {
+		try {
+			_persistence.countByGroupId(ServiceTestUtil.nextLong());
+
+			_persistence.countByGroupId(0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByRoleId() {
+		try {
+			_persistence.countByRoleId(ServiceTestUtil.nextLong());
+
+			_persistence.countByRoleId(0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByU_G() {
+		try {
+			_persistence.countByU_G(ServiceTestUtil.nextLong(),
+				ServiceTestUtil.nextLong());
+
+			_persistence.countByU_G(0L, 0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByG_R() {
+		try {
+			_persistence.countByG_R(ServiceTestUtil.nextLong(),
+				ServiceTestUtil.nextLong());
+
+			_persistence.countByG_R(0L, 0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
 	}
 
 	@Test
@@ -272,6 +338,8 @@ public class UserGroupGroupRolePersistenceTest {
 				ServiceTestUtil.nextLong(), ServiceTestUtil.nextLong());
 
 		UserGroupGroupRole userGroupGroupRole = _persistence.create(pk);
+
+		userGroupGroupRole.setMvccVersion(ServiceTestUtil.nextLong());
 
 		_persistence.update(userGroupGroupRole);
 

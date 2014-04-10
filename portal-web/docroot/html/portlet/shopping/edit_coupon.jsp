@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -135,7 +135,7 @@ String discountType = BeanParamUtil.getString(coupon, request, "discountType");
 				List categoryIds = (List)errorException;
 				%>
 
-				<liferay-ui:message key="the-following-are-invalid-category-ids" /> <%= StringUtil.merge((String[])categoryIds.toArray(new String[0])) %>
+				<liferay-ui:message key="the-following-are-invalid-category-ids" /> <%= HtmlUtil.escape(StringUtil.merge((String[])categoryIds.toArray(new String[0]))) %>
 			</liferay-ui:error>
 
 			<liferay-ui:error exception="<%= CouponLimitSKUsException.class %>">
@@ -144,7 +144,7 @@ String discountType = BeanParamUtil.getString(coupon, request, "discountType");
 				List skus = (List)errorException;
 				%>
 
-				<liferay-ui:message key="the-following-are-invalid-item-skus" /> <%= StringUtil.merge((String[])skus.toArray(new String[0])) %>
+				<liferay-ui:message key="the-following-are-invalid-item-skus" /> <%= HtmlUtil.escape(StringUtil.merge((String[])skus.toArray(new String[0]))) %>
 			</liferay-ui:error>
 
 			<aui:fieldset>

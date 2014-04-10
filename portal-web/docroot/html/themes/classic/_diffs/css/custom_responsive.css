@@ -23,6 +23,10 @@
 			}
 		}
 
+		#navigation.open .navbar-inner {
+			background: #009AE5;
+		}
+
 		.dockbar .navbar-inner .container .nav-collapse .nav-add-controls ul.dropdown-menu {
 			background: transparent;
 			padding: 0;
@@ -44,21 +48,25 @@
 				width: 300px;
 			}
 
+			.nav .staging-toggle {
+				padding: 2px 0;
+			}
+
 			.navbar-inner {
 				width: auto;
 
 				.container {
+					.site-navigation-btn.open {
+						background-color: #F5AF45;
+					}
+
 					.btn-navbar {
 						background: transparent;
 						border-width: 0;
 						font-size: 24px;
 
-						&:hover {
+						&:hover, &.nav-account-controls-btn.open, &.nav-add-controls-btn.open {
 							background-color: #5BBAE8;
-						}
-
-						&.open {
-							background-color: #F5AF45;
 						}
 					}
 
@@ -83,11 +91,6 @@
 
 									&:focus, &:hover {
 										background-color: #5BBAE8;
-									}
-
-									.nav-item-icon {
-										font-size: 22px;
-										margin-top: 0;
 									}
 
 									&.toggle-controls-link {
@@ -116,9 +119,20 @@
 									}
 
 									.dropdown-menu {
-										> li > a {
+										li a {
 											font-size: 16px;
-											line-height: 31px;
+											line-height: 27px;
+											margin: 0;
+
+											.nav-item-icon {
+												font-size: 22px;
+												margin-top: 0;
+												vertical-align: middle;
+											}
+
+											.nav-item-label {
+												vertical-align: middle;
+											}
 										}
 									}
 								}
@@ -147,14 +161,23 @@
 									color: #FFF;
 									font-size: 16px;
 									line-height: 20px;
-									padding: 12px 15px;
+									margin-bottom: 5px;
+									padding: 12px 10px;
 
 									&:focus, &:hover {
 										background-color: #5BBAE8;
 									}
 								}
+
+								&.sign-in > a {
+									padding: 15px;
+								}
 							}
 						}
+					}
+
+					.dockbar-user-notifications .user-notifications-count {
+						margin: 0;
 					}
 				}
 			}
@@ -165,8 +188,26 @@
 			width: 100%;
 		}
 
+		.portlet-staging-bar .staging-toggle .variations-options {
+			.page-variations {
+				right: 0;
+
+				a {
+					padding: 3px 6px;
+				}
+			}
+
+			.staging-variation-selector {
+				margin-right: 0;
+			}
+		}
+
 		.signed-out #_145_navAddControlsNavbarBtn {
 			display: none;
+		}
+
+		.staging-toggle .variations-options a {
+			padding: 0;
 		}
 	}
 }

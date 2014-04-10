@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.messaging.DestinationNames;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;
+import com.liferay.portal.kernel.notifications.UserNotificationDefinition;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.repository.model.Folder;
@@ -31,6 +32,7 @@ import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.transaction.TransactionCommitCallbackRegistryUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ObjectValuePair;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
@@ -38,15 +40,18 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.workflow.WorkflowHandlerRegistryUtil;
 import com.liferay.portal.kernel.workflow.WorkflowThreadLocal;
 import com.liferay.portal.model.Group;
+import com.liferay.portal.model.LayoutConstants;
 import com.liferay.portal.model.Lock;
 import com.liferay.portal.repository.liferayrepository.model.LiferayFileEntry;
 import com.liferay.portal.repository.liferayrepository.model.LiferayFileVersion;
 import com.liferay.portal.repository.liferayrepository.model.LiferayFolder;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextUtil;
+import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.SubscriptionSender;
+import com.liferay.portlet.PortletURLFactoryUtil;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetLink;
 import com.liferay.portlet.asset.model.AssetLinkConstants;
@@ -82,6 +87,10 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 import javax.portlet.PortletPreferences;
+import javax.portlet.PortletRequest;
+import javax.portlet.PortletURL;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Provides the local service helper for the document library application.
@@ -834,7 +843,7 @@ public class DLAppHelperLocalServiceImpl
 		}
 
 		if (!event.equals(DLSyncConstants.EVENT_DELETE) &&
-			!event.equals(DLSyncConstants.EVENT_MOVE_TO_TRASH)) {
+			!event.equals(DLSyncConstants.EVENT_TRASH)) {
 
 			FileVersion fileVersion = fileEntry.getFileVersion();
 
@@ -999,7 +1008,7 @@ public class DLAppHelperLocalServiceImpl
 				// Folders, file entries, and file shortcuts
 
 				QueryDefinition queryDefinition = new QueryDefinition(
-					WorkflowConstants.STATUS_ANY);
+					WorkflowConstants.STATUS_IN_TRASH);
 
 				List<Object> foldersAndFileEntriesAndFileShortcuts =
 					dlFolderLocalService.
@@ -1068,7 +1077,7 @@ public class DLAppHelperLocalServiceImpl
 			// Sync
 
 			registerDLSyncEventCallback(
-				DLSyncConstants.EVENT_RESTORE_FROM_TRASH, fileEntry);
+				DLSyncConstants.EVENT_RESTORE, fileEntry);
 		}
 
 		// Trash
@@ -1174,8 +1183,7 @@ public class DLAppHelperLocalServiceImpl
 
 		// Sync
 
-		registerDLSyncEventCallback(
-			DLSyncConstants.EVENT_RESTORE_FROM_TRASH, folder);
+		registerDLSyncEventCallback(DLSyncConstants.EVENT_RESTORE, folder);
 
 		// Trash
 
@@ -1653,8 +1661,7 @@ public class DLAppHelperLocalServiceImpl
 
 		// Sync
 
-		registerDLSyncEventCallback(
-			DLSyncConstants.EVENT_RESTORE_FROM_TRASH, fileEntry);
+		registerDLSyncEventCallback(DLSyncConstants.EVENT_RESTORE, fileEntry);
 
 		// Social
 
@@ -1705,8 +1712,7 @@ public class DLAppHelperLocalServiceImpl
 
 			// Sync
 
-			registerDLSyncEventCallback(
-				DLSyncConstants.EVENT_MOVE_TO_TRASH, fileEntry);
+			registerDLSyncEventCallback(DLSyncConstants.EVENT_TRASH, fileEntry);
 		}
 
 		// Trash
@@ -1835,8 +1841,7 @@ public class DLAppHelperLocalServiceImpl
 
 			// Sync
 
-			registerDLSyncEventCallback(
-				DLSyncConstants.EVENT_RESTORE_FROM_TRASH, folder);
+			registerDLSyncEventCallback(DLSyncConstants.EVENT_RESTORE, folder);
 
 			// Social
 
@@ -1898,8 +1903,7 @@ public class DLAppHelperLocalServiceImpl
 
 		// Sync
 
-		registerDLSyncEventCallback(
-			DLSyncConstants.EVENT_MOVE_TO_TRASH, folder);
+		registerDLSyncEventCallback(DLSyncConstants.EVENT_TRASH, folder);
 
 		// Social
 
@@ -1939,6 +1943,42 @@ public class DLAppHelperLocalServiceImpl
 		return dlFileVersionStatusOVPs;
 	}
 
+	protected String getEntryURL(
+			FileVersion fileVersion, ServiceContext serviceContext)
+		throws PortalException, SystemException {
+
+		HttpServletRequest request = serviceContext.getRequest();
+
+		if (request == null) {
+			return StringPool.BLANK;
+		}
+
+		long plid = serviceContext.getPlid();
+
+		long controlPanelPlid = PortalUtil.getControlPanelPlid(
+			serviceContext.getCompanyId());
+
+		if (plid == controlPanelPlid) {
+			plid = PortalUtil.getPlidFromPortletId(
+				fileVersion.getGroupId(), PortletKeys.DOCUMENT_LIBRARY);
+		}
+
+		if (plid == LayoutConstants.DEFAULT_PLID) {
+			plid = controlPanelPlid;
+		}
+
+		PortletURL portletURL = PortletURLFactoryUtil.create(
+			request, PortletKeys.DOCUMENT_LIBRARY, plid,
+			PortletRequest.RENDER_PHASE);
+
+		portletURL.setParameter(
+			"struts_action", "/document_library/view_file_entry");
+		portletURL.setParameter(
+			"fileEntryId", String.valueOf(fileVersion.getFileEntryId()));
+
+		return portletURL.toString();
+	}
+
 	protected long getFileEntryTypeId(FileEntry fileEntry) {
 		if (fileEntry instanceof LiferayFileEntry) {
 			DLFileEntry dlFileEntry = (DLFileEntry)fileEntry.getModel();
@@ -1961,26 +2001,13 @@ public class DLAppHelperLocalServiceImpl
 		}
 	}
 
-	protected void notify(final SubscriptionSender subscriptionSender) {
-		TransactionCommitCallbackRegistryUtil.registerCallback(
-			new Callable<Void>() {
-
-				@Override
-				public Void call() throws Exception {
-					subscriptionSender.flushNotificationsAsync();
-
-					return null;
-				}
-
-			}
-		);
-	}
-
 	protected void notifySubscribers(
 			FileVersion fileVersion, ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
-		if (!fileVersion.isApproved()) {
+		String layoutFullURL = serviceContext.getLayoutFullURL();
+
+		if (!fileVersion.isApproved() || Validator.isNull(layoutFullURL)) {
 			return;
 		}
 
@@ -2008,6 +2035,9 @@ public class DLAppHelperLocalServiceImpl
 		else {
 			return;
 		}
+
+		String entryTitle = fileVersion.getTitle();
+		String entryURL = getEntryURL(fileVersion, serviceContext);
 
 		String fromName = DLUtil.getEmailFromName(
 			preferences, fileVersion.getCompanyId());
@@ -2055,20 +2085,35 @@ public class DLAppHelperLocalServiceImpl
 			dlFileEntryTypeLocalService.getDLFileEntryType(
 				dlFileEntry.getFileEntryTypeId());
 
+		subscriptionSender.setClassPK(fileVersion.getFileEntryId());
+		subscriptionSender.setClassName(DLFileEntryConstants.getClassName());
 		subscriptionSender.setCompanyId(fileVersion.getCompanyId());
 		subscriptionSender.setContextAttributes(
 			"[$DOCUMENT_STATUS_BY_USER_NAME$]",
-			fileVersion.getStatusByUserName(), "[$DOCUMENT_TITLE$]",
-			fileVersion.getTitle(), "[$DOCUMENT_TYPE$]",
+			fileVersion.getStatusByUserName(), "[$DOCUMENT_TITLE$]", entryTitle,
+			"[$DOCUMENT_TYPE$]",
 			dlFileEntryType.getName(serviceContext.getLocale()),
-			"[$FOLDER_NAME$]", folderName);
+			"[$DOCUMENT_URL$]", entryURL, "[$FOLDER_NAME$]", folderName);
 		subscriptionSender.setContextUserPrefix("DOCUMENT");
+		subscriptionSender.setEntryTitle(entryTitle);
+		subscriptionSender.setEntryURL(entryURL);
 		subscriptionSender.setFrom(fromAddress, fromName);
 		subscriptionSender.setHtmlFormat(true);
 		subscriptionSender.setLocalizedBodyMap(localizedBodyMap);
 		subscriptionSender.setLocalizedSubjectMap(localizedSubjectMap);
 		subscriptionSender.setMailId(
 			"file_entry", fileVersion.getFileEntryId());
+
+		int notificationType =
+			UserNotificationDefinition.NOTIFICATION_TYPE_ADD_ENTRY;
+
+		if (serviceContext.isCommandUpdate()) {
+			notificationType =
+				UserNotificationDefinition.NOTIFICATION_TYPE_UPDATE_ENTRY;
+		}
+
+		subscriptionSender.setNotificationType(notificationType);
+
 		subscriptionSender.setPortletId(PortletKeys.DOCUMENT_LIBRARY);
 		subscriptionSender.setReplyToAddress(fromAddress);
 		subscriptionSender.setScopeGroupId(fileVersion.getGroupId());
@@ -2078,17 +2123,14 @@ public class DLAppHelperLocalServiceImpl
 		subscriptionSender.addPersistedSubscribers(
 			Folder.class.getName(), fileVersion.getGroupId());
 
-		List<Long> folderIds = new ArrayList<Long>();
-
 		if (folder != null) {
-			folderIds.add(folder.getFolderId());
-
-			folderIds.addAll(folder.getAncestorFolderIds());
-		}
-
-		for (long curFolderId : folderIds) {
 			subscriptionSender.addPersistedSubscribers(
-				Folder.class.getName(), curFolderId);
+				Folder.class.getName(), folder.getFolderId());
+
+			for (Long ancestorFolderId : folder.getAncestorFolderIds()) {
+				subscriptionSender.addPersistedSubscribers(
+					Folder.class.getName(), ancestorFolderId);
+			}
 		}
 
 		if (dlFileEntryType.getFileEntryTypeId() ==
@@ -2106,7 +2148,7 @@ public class DLAppHelperLocalServiceImpl
 		subscriptionSender.addPersistedSubscribers(
 			DLFileEntry.class.getName(), fileEntry.getFileEntryId());
 
-		notify(subscriptionSender);
+		subscriptionSender.flushNotificationsAsync();
 	}
 
 	protected void registerDLProcessorCallback(

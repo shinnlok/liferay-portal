@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -34,10 +34,10 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.model.CacheModel;
+import com.liferay.portal.model.MVCCModel;
 import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.PasswordPolicy;
 import com.liferay.portal.model.impl.PasswordPolicyImpl;
@@ -242,7 +242,7 @@ public class PasswordPolicyPersistenceImpl extends BasePersistenceImpl<PasswordP
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<PasswordPolicy>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<PasswordPolicy>)QueryUtil.list(q,
@@ -652,7 +652,7 @@ public class PasswordPolicyPersistenceImpl extends BasePersistenceImpl<PasswordP
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
 				q.addEntity(_FILTER_ENTITY_ALIAS, PasswordPolicyImpl.class);
@@ -842,7 +842,7 @@ public class PasswordPolicyPersistenceImpl extends BasePersistenceImpl<PasswordP
 				PasswordPolicy.class.getName(),
 				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
 
-		SQLQuery q = session.createSQLQuery(sql);
+		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 		q.setFirstResult(0);
 		q.setMaxResults(2);
@@ -999,7 +999,7 @@ public class PasswordPolicyPersistenceImpl extends BasePersistenceImpl<PasswordP
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addScalar(COUNT_COLUMN_NAME,
 				com.liferay.portal.kernel.dao.orm.Type.LONG);
@@ -1199,7 +1199,7 @@ public class PasswordPolicyPersistenceImpl extends BasePersistenceImpl<PasswordP
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<PasswordPolicy>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<PasswordPolicy>)QueryUtil.list(q,
@@ -1633,7 +1633,7 @@ public class PasswordPolicyPersistenceImpl extends BasePersistenceImpl<PasswordP
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
 				q.addEntity(_FILTER_ENTITY_ALIAS, PasswordPolicyImpl.class);
@@ -1829,7 +1829,7 @@ public class PasswordPolicyPersistenceImpl extends BasePersistenceImpl<PasswordP
 				PasswordPolicy.class.getName(),
 				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
 
-		SQLQuery q = session.createSQLQuery(sql);
+		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 		q.setFirstResult(0);
 		q.setMaxResults(2);
@@ -2000,7 +2000,7 @@ public class PasswordPolicyPersistenceImpl extends BasePersistenceImpl<PasswordP
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addScalar(COUNT_COLUMN_NAME,
 				com.liferay.portal.kernel.dao.orm.Type.LONG);
@@ -2176,7 +2176,7 @@ public class PasswordPolicyPersistenceImpl extends BasePersistenceImpl<PasswordP
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<PasswordPolicy>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<PasswordPolicy>)QueryUtil.list(q,
@@ -2564,7 +2564,7 @@ public class PasswordPolicyPersistenceImpl extends BasePersistenceImpl<PasswordP
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
 				q.addEntity(_FILTER_ENTITY_ALIAS, PasswordPolicyImpl.class);
@@ -2741,7 +2741,7 @@ public class PasswordPolicyPersistenceImpl extends BasePersistenceImpl<PasswordP
 				PasswordPolicy.class.getName(),
 				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
 
-		SQLQuery q = session.createSQLQuery(sql);
+		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 		q.setFirstResult(0);
 		q.setMaxResults(2);
@@ -2870,7 +2870,7 @@ public class PasswordPolicyPersistenceImpl extends BasePersistenceImpl<PasswordP
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addScalar(COUNT_COLUMN_NAME,
 				com.liferay.portal.kernel.dao.orm.Type.LONG);
@@ -3454,7 +3454,7 @@ public class PasswordPolicyPersistenceImpl extends BasePersistenceImpl<PasswordP
 			CacheRegistryUtil.clear(PasswordPolicyImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(PasswordPolicyImpl.class.getName());
+		EntityCacheUtil.clearCache(PasswordPolicyImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -3795,7 +3795,7 @@ public class PasswordPolicyPersistenceImpl extends BasePersistenceImpl<PasswordP
 
 		EntityCacheUtil.putResult(PasswordPolicyModelImpl.ENTITY_CACHE_ENABLED,
 			PasswordPolicyImpl.class, passwordPolicy.getPrimaryKey(),
-			passwordPolicy);
+			passwordPolicy, false);
 
 		clearUniqueFindersCache(passwordPolicy);
 		cacheUniqueFindersCache(passwordPolicy);
@@ -3815,6 +3815,7 @@ public class PasswordPolicyPersistenceImpl extends BasePersistenceImpl<PasswordP
 		passwordPolicyImpl.setNew(passwordPolicy.isNew());
 		passwordPolicyImpl.setPrimaryKey(passwordPolicy.getPrimaryKey());
 
+		passwordPolicyImpl.setMvccVersion(passwordPolicy.getMvccVersion());
 		passwordPolicyImpl.setUuid(passwordPolicy.getUuid());
 		passwordPolicyImpl.setPasswordPolicyId(passwordPolicy.getPasswordPolicyId());
 		passwordPolicyImpl.setCompanyId(passwordPolicy.getCompanyId());
@@ -4053,7 +4054,7 @@ public class PasswordPolicyPersistenceImpl extends BasePersistenceImpl<PasswordP
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<PasswordPolicy>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<PasswordPolicy>)QueryUtil.list(q,
@@ -4198,10 +4199,22 @@ public class PasswordPolicyPersistenceImpl extends BasePersistenceImpl<PasswordP
 			}
 		};
 
-	private static CacheModel<PasswordPolicy> _nullPasswordPolicyCacheModel = new CacheModel<PasswordPolicy>() {
-			@Override
-			public PasswordPolicy toEntityModel() {
-				return _nullPasswordPolicy;
-			}
-		};
+	private static CacheModel<PasswordPolicy> _nullPasswordPolicyCacheModel = new NullCacheModel();
+
+	private static class NullCacheModel implements CacheModel<PasswordPolicy>,
+		MVCCModel {
+		@Override
+		public long getMvccVersion() {
+			return 0;
+		}
+
+		@Override
+		public void setMvccVersion(long mvccVersion) {
+		}
+
+		@Override
+		public PasswordPolicy toEntityModel() {
+			return _nullPasswordPolicy;
+		}
+	}
 }

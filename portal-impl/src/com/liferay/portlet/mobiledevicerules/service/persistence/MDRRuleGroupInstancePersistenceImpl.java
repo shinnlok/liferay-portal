@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -33,7 +33,6 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.model.CacheModel;
@@ -243,7 +242,7 @@ public class MDRRuleGroupInstancePersistenceImpl extends BasePersistenceImpl<MDR
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<MDRRuleGroupInstance>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<MDRRuleGroupInstance>)QueryUtil.list(q,
@@ -1059,7 +1058,7 @@ public class MDRRuleGroupInstancePersistenceImpl extends BasePersistenceImpl<MDR
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<MDRRuleGroupInstance>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<MDRRuleGroupInstance>)QueryUtil.list(q,
@@ -1607,7 +1606,7 @@ public class MDRRuleGroupInstancePersistenceImpl extends BasePersistenceImpl<MDR
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<MDRRuleGroupInstance>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<MDRRuleGroupInstance>)QueryUtil.list(q,
@@ -1996,7 +1995,7 @@ public class MDRRuleGroupInstancePersistenceImpl extends BasePersistenceImpl<MDR
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
 				q.addEntity(_FILTER_ENTITY_ALIAS, MDRRuleGroupInstanceImpl.class);
@@ -2173,7 +2172,7 @@ public class MDRRuleGroupInstancePersistenceImpl extends BasePersistenceImpl<MDR
 				MDRRuleGroupInstance.class.getName(),
 				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
-		SQLQuery q = session.createSQLQuery(sql);
+		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 		q.setFirstResult(0);
 		q.setMaxResults(2);
@@ -2302,7 +2301,7 @@ public class MDRRuleGroupInstancePersistenceImpl extends BasePersistenceImpl<MDR
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addScalar(COUNT_COLUMN_NAME,
 				com.liferay.portal.kernel.dao.orm.Type.LONG);
@@ -2469,7 +2468,7 @@ public class MDRRuleGroupInstancePersistenceImpl extends BasePersistenceImpl<MDR
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<MDRRuleGroupInstance>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<MDRRuleGroupInstance>)QueryUtil.list(q,
@@ -2976,7 +2975,7 @@ public class MDRRuleGroupInstancePersistenceImpl extends BasePersistenceImpl<MDR
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<MDRRuleGroupInstance>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<MDRRuleGroupInstance>)QueryUtil.list(q,
@@ -3522,7 +3521,7 @@ public class MDRRuleGroupInstancePersistenceImpl extends BasePersistenceImpl<MDR
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<MDRRuleGroupInstance>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<MDRRuleGroupInstance>)QueryUtil.list(q,
@@ -3956,7 +3955,7 @@ public class MDRRuleGroupInstancePersistenceImpl extends BasePersistenceImpl<MDR
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
 				q.addEntity(_FILTER_ENTITY_ALIAS, MDRRuleGroupInstanceImpl.class);
@@ -4146,7 +4145,7 @@ public class MDRRuleGroupInstancePersistenceImpl extends BasePersistenceImpl<MDR
 				MDRRuleGroupInstance.class.getName(),
 				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
-		SQLQuery q = session.createSQLQuery(sql);
+		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 		q.setFirstResult(0);
 		q.setMaxResults(2);
@@ -4300,7 +4299,7 @@ public class MDRRuleGroupInstancePersistenceImpl extends BasePersistenceImpl<MDR
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addScalar(COUNT_COLUMN_NAME,
 				com.liferay.portal.kernel.dao.orm.Type.LONG);
@@ -4654,7 +4653,7 @@ public class MDRRuleGroupInstancePersistenceImpl extends BasePersistenceImpl<MDR
 			CacheRegistryUtil.clear(MDRRuleGroupInstanceImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(MDRRuleGroupInstanceImpl.class.getName());
+		EntityCacheUtil.clearCache(MDRRuleGroupInstanceImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -5069,7 +5068,7 @@ public class MDRRuleGroupInstancePersistenceImpl extends BasePersistenceImpl<MDR
 
 		EntityCacheUtil.putResult(MDRRuleGroupInstanceModelImpl.ENTITY_CACHE_ENABLED,
 			MDRRuleGroupInstanceImpl.class,
-			mdrRuleGroupInstance.getPrimaryKey(), mdrRuleGroupInstance);
+			mdrRuleGroupInstance.getPrimaryKey(), mdrRuleGroupInstance, false);
 
 		clearUniqueFindersCache(mdrRuleGroupInstance);
 		cacheUniqueFindersCache(mdrRuleGroupInstance);
@@ -5306,7 +5305,7 @@ public class MDRRuleGroupInstancePersistenceImpl extends BasePersistenceImpl<MDR
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<MDRRuleGroupInstance>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<MDRRuleGroupInstance>)QueryUtil.list(q,

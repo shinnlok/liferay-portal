@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,10 +32,10 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.ClassName;
+import com.liferay.portal.model.MVCCModel;
 import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.impl.ClassNameImpl;
 import com.liferay.portal.model.impl.ClassNameModelImpl;
@@ -374,7 +374,7 @@ public class ClassNamePersistenceImpl extends BasePersistenceImpl<ClassName>
 			CacheRegistryUtil.clear(ClassNameImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(ClassNameImpl.class.getName());
+		EntityCacheUtil.clearCache(ClassNameImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -592,7 +592,7 @@ public class ClassNamePersistenceImpl extends BasePersistenceImpl<ClassName>
 		}
 
 		EntityCacheUtil.putResult(ClassNameModelImpl.ENTITY_CACHE_ENABLED,
-			ClassNameImpl.class, className.getPrimaryKey(), className);
+			ClassNameImpl.class, className.getPrimaryKey(), className, false);
 
 		clearUniqueFindersCache(className);
 		cacheUniqueFindersCache(className);
@@ -612,6 +612,7 @@ public class ClassNamePersistenceImpl extends BasePersistenceImpl<ClassName>
 		classNameImpl.setNew(className.isNew());
 		classNameImpl.setPrimaryKey(className.getPrimaryKey());
 
+		classNameImpl.setMvccVersion(className.getMvccVersion());
 		classNameImpl.setClassNameId(className.getClassNameId());
 		classNameImpl.setValue(className.getValue());
 
@@ -817,7 +818,7 @@ public class ClassNamePersistenceImpl extends BasePersistenceImpl<ClassName>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<ClassName>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<ClassName>)QueryUtil.list(q, getDialect(),
@@ -944,10 +945,22 @@ public class ClassNamePersistenceImpl extends BasePersistenceImpl<ClassName>
 			}
 		};
 
-	private static CacheModel<ClassName> _nullClassNameCacheModel = new CacheModel<ClassName>() {
-			@Override
-			public ClassName toEntityModel() {
-				return _nullClassName;
-			}
-		};
+	private static CacheModel<ClassName> _nullClassNameCacheModel = new NullCacheModel();
+
+	private static class NullCacheModel implements CacheModel<ClassName>,
+		MVCCModel {
+		@Override
+		public long getMvccVersion() {
+			return 0;
+		}
+
+		@Override
+		public void setMvccVersion(long mvccVersion) {
+		}
+
+		@Override
+		public ClassName toEntityModel() {
+			return _nullClassName;
+		}
+	}
 }

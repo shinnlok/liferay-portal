@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -52,6 +52,7 @@ public class BackgroundTaskWrapper implements BackgroundTask,
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
+		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("backgroundTaskId", getBackgroundTaskId());
 		attributes.put("groupId", getGroupId());
 		attributes.put("companyId", getCompanyId());
@@ -73,6 +74,12 @@ public class BackgroundTaskWrapper implements BackgroundTask,
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
+		Long mvccVersion = (Long)attributes.get("mvccVersion");
+
+		if (mvccVersion != null) {
+			setMvccVersion(mvccVersion);
+		}
+
 		Long backgroundTaskId = (Long)attributes.get("backgroundTaskId");
 
 		if (backgroundTaskId != null) {
@@ -184,6 +191,26 @@ public class BackgroundTaskWrapper implements BackgroundTask,
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_backgroundTask.setPrimaryKey(primaryKey);
+	}
+
+	/**
+	* Returns the mvcc version of this background task.
+	*
+	* @return the mvcc version of this background task
+	*/
+	@Override
+	public long getMvccVersion() {
+		return _backgroundTask.getMvccVersion();
+	}
+
+	/**
+	* Sets the mvcc version of this background task.
+	*
+	* @param mvccVersion the mvcc version of this background task
+	*/
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		_backgroundTask.setMvccVersion(mvccVersion);
 	}
 
 	/**

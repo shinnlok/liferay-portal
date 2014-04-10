@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,11 +23,13 @@ import com.liferay.portal.kernel.configuration.Filter;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.search.BaseModelSearchResult;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.QueryConfig;
 import com.liferay.portal.kernel.search.SearchContext;
+import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -41,11 +43,13 @@ import com.liferay.portal.kernel.util.TreePathUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Company;
+import com.liferay.portal.model.Country;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.GroupConstants;
 import com.liferay.portal.model.ListTypeConstants;
 import com.liferay.portal.model.Organization;
 import com.liferay.portal.model.OrganizationConstants;
+import com.liferay.portal.model.Region;
 import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.RoleConstants;
@@ -61,6 +65,7 @@ import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.comparator.OrganizationIdComparator;
 import com.liferay.portal.util.comparator.OrganizationNameComparator;
+import com.liferay.portlet.usersadmin.util.UsersAdminUtil;
 import com.liferay.util.dao.orm.CustomSQLUtil;
 
 import java.io.Serializable;
@@ -1357,52 +1362,12 @@ public class OrganizationLocalServiceImpl
 		throws SystemException {
 
 		try {
-			SearchContext searchContext = new SearchContext();
-
-			searchContext.setAndSearch(andSearch);
-
-			Map<String, Serializable> attributes =
-				new HashMap<String, Serializable>();
-
-			attributes.put("city", city);
-			attributes.put("country", country);
-			attributes.put("name", name);
-			attributes.put("params", params);
-			attributes.put(
-				"parentOrganizationId", String.valueOf(parentOrganizationId));
-			attributes.put("region", region);
-			attributes.put("street", street);
-			attributes.put("type", type);
-			attributes.put("zip", zip);
-
-			searchContext.setAttributes(attributes);
-
-			searchContext.setCompanyId(companyId);
-			searchContext.setEnd(end);
-
-			if (params != null) {
-				String keywords = (String)params.remove("keywords");
-
-				if (Validator.isNotNull(keywords)) {
-					searchContext.setKeywords(keywords);
-				}
-			}
-
-			QueryConfig queryConfig = new QueryConfig();
-
-			queryConfig.setHighlightEnabled(false);
-			queryConfig.setScoreEnabled(false);
-
-			searchContext.setQueryConfig(queryConfig);
-
-			if (sort != null) {
-				searchContext.setSorts(sort);
-			}
-
-			searchContext.setStart(start);
-
 			Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
 				Organization.class);
+
+			SearchContext searchContext = buildSearchContext(
+				companyId, parentOrganizationId, name, type, street, city, zip,
+				region, country, params, andSearch, start, end, sort);
 
 			return indexer.search(searchContext);
 		}
@@ -1440,17 +1405,58 @@ public class OrganizationLocalServiceImpl
 			LinkedHashMap<String, Object> params)
 		throws SystemException {
 
-		String parentOrganizationIdComparator = StringPool.EQUAL;
+		if (!PropsValues.ORGANIZATIONS_INDEXER_ENABLED ||
+			!PropsValues.ORGANIZATIONS_SEARCH_WITH_INDEX) {
 
-		if (parentOrganizationId ==
-				OrganizationConstants.ANY_PARENT_ORGANIZATION_ID) {
+			String parentOrganizationIdComparator = StringPool.EQUAL;
 
-			parentOrganizationIdComparator = StringPool.NOT_EQUAL;
+			if (parentOrganizationId ==
+					OrganizationConstants.ANY_PARENT_ORGANIZATION_ID) {
+
+				parentOrganizationIdComparator = StringPool.NOT_EQUAL;
+			}
+
+			return organizationFinder.countByKeywords(
+				companyId, parentOrganizationId, parentOrganizationIdComparator,
+				keywords, type, regionId, countryId, params);
 		}
 
-		return organizationFinder.countByKeywords(
-			companyId, parentOrganizationId, parentOrganizationIdComparator,
-			keywords, type, regionId, countryId, params);
+		try {
+			String name = null;
+			String street = null;
+			String city = null;
+			String zip = null;
+			boolean andOperator = false;
+
+			if (Validator.isNotNull(keywords)) {
+				name = keywords;
+				street = keywords;
+				city = keywords;
+				zip = keywords;
+			}
+			else {
+				andOperator = true;
+			}
+
+			if (params != null) {
+				params.put("keywords", keywords);
+			}
+
+			Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
+				Organization.class);
+
+			SearchContext searchContext = buildSearchContext(
+				companyId, parentOrganizationId, name, type, street, city, zip,
+				regionId, countryId, params, andOperator, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS, null);
+
+			Hits hits = indexer.search(searchContext);
+
+			return hits.getLength();
+		}
+		catch (Exception e) {
+			throw new SystemException(e);
+		}
 	}
 
 	/**
@@ -1490,18 +1496,107 @@ public class OrganizationLocalServiceImpl
 			boolean andOperator)
 		throws SystemException {
 
-		String parentOrganizationIdComparator = StringPool.EQUAL;
+		if (!PropsValues.ORGANIZATIONS_INDEXER_ENABLED ||
+			!PropsValues.ORGANIZATIONS_SEARCH_WITH_INDEX) {
 
-		if (parentOrganizationId ==
-				OrganizationConstants.ANY_PARENT_ORGANIZATION_ID) {
+			String parentOrganizationIdComparator = StringPool.EQUAL;
 
-			parentOrganizationIdComparator = StringPool.NOT_EQUAL;
+			if (parentOrganizationId ==
+					OrganizationConstants.ANY_PARENT_ORGANIZATION_ID) {
+
+				parentOrganizationIdComparator = StringPool.NOT_EQUAL;
+			}
+
+			return organizationFinder.countByC_PO_N_T_S_C_Z_R_C(
+				companyId, parentOrganizationId, parentOrganizationIdComparator,
+				name, type, street, city, zip, regionId, countryId, params,
+				andOperator);
 		}
 
-		return organizationFinder.countByC_PO_N_T_S_C_Z_R_C(
-			companyId, parentOrganizationId, parentOrganizationIdComparator,
-			name, type, street, city, zip, regionId, countryId, params,
-			andOperator);
+		try {
+			Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
+				Organization.class);
+
+			SearchContext searchContext = buildSearchContext(
+				companyId, parentOrganizationId, name, type, street, city, zip,
+				regionId, countryId, params, andOperator, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS, null);
+
+			Hits hits = indexer.search(searchContext);
+
+			return hits.getLength();
+		}
+		catch (Exception e) {
+			throw new SystemException(e);
+		}
+	}
+
+	@Override
+	public BaseModelSearchResult<Organization> searchOrganizations(
+			long companyId, long parentOrganizationId, String keywords,
+			LinkedHashMap<String, Object> params, int start, int end, Sort sort)
+		throws PortalException, SystemException {
+
+		String name = null;
+		String type = null;
+		String street = null;
+		String city = null;
+		String zip = null;
+		String region = null;
+		String country = null;
+		boolean andOperator = false;
+
+		if (Validator.isNotNull(keywords)) {
+			name = keywords;
+			type = keywords;
+			street = keywords;
+			city = keywords;
+			zip = keywords;
+			region = keywords;
+			country = keywords;
+		}
+		else {
+			andOperator = true;
+		}
+
+		if (params != null) {
+			params.put("keywords", keywords);
+		}
+
+		return searchOrganizations(
+			companyId, parentOrganizationId, name, type, street, city, zip,
+			region, country, params, andOperator, start, end, sort);
+	}
+
+	@Override
+	public BaseModelSearchResult<Organization> searchOrganizations(
+			long companyId, long parentOrganizationId, String name, String type,
+			String street, String city, String zip, String region,
+			String country, LinkedHashMap<String, Object> params,
+			boolean andSearch, int start, int end, Sort sort)
+		throws PortalException, SystemException {
+
+		Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
+			Organization.class);
+
+		SearchContext searchContext = buildSearchContext(
+			companyId, parentOrganizationId, name, type, street, city, zip,
+			region, country, params, andSearch, start, end, sort);
+
+		for (int i = 0; i < 10; i++) {
+			Hits hits = indexer.search(searchContext);
+
+			List<Organization> organizations = UsersAdminUtil.getOrganizations(
+				hits);
+
+			if (organizations != null) {
+				return new BaseModelSearchResult<Organization>(
+					organizations, hits.getLength());
+			}
+		}
+
+		throw new SearchException(
+			"Unable to fix the search index after 10 attempts");
 	}
 
 	/**
@@ -1831,6 +1926,85 @@ public class OrganizationLocalServiceImpl
 				addSuborganizations(allSuborganizations, suborganizations);
 			}
 		}
+	}
+
+	protected SearchContext buildSearchContext(
+			long companyId, long parentOrganizationId, String name, String type,
+			String street, String city, String zip, Long regionId,
+			Long countryId, LinkedHashMap<String, Object> params,
+			boolean andSearch, int start, int end, Sort sort)
+		throws SystemException {
+
+		String regionCode = null;
+
+		if (regionId != null) {
+			Region region = regionService.fetchRegion(regionId);
+
+			regionCode = region.getRegionCode();
+		}
+
+		String countryName = null;
+
+		if (countryId != null) {
+			Country country = countryService.fetchCountry(countryId);
+
+			countryName = country.getName();
+		}
+
+		return buildSearchContext(
+			companyId, parentOrganizationId, name, type, street, city, zip,
+			regionCode, countryName, params, andSearch, start, end, sort);
+	}
+
+	protected SearchContext buildSearchContext(
+		long companyId, long parentOrganizationId, String name, String type,
+		String street, String city, String zip, String region, String country,
+		LinkedHashMap<String, Object> params, boolean andSearch, int start,
+		int end, Sort sort) {
+
+		SearchContext searchContext = new SearchContext();
+
+		searchContext.setAndSearch(andSearch);
+
+		Map<String, Serializable> attributes =
+			new HashMap<String, Serializable>();
+
+		attributes.put("city", city);
+		attributes.put("country", country);
+		attributes.put("name", name);
+		attributes.put("params", params);
+		attributes.put(
+			"parentOrganizationId", String.valueOf(parentOrganizationId));
+		attributes.put("region", region);
+		attributes.put("street", street);
+		attributes.put("type", type);
+		attributes.put("zip", zip);
+
+		searchContext.setAttributes(attributes);
+
+		searchContext.setCompanyId(companyId);
+		searchContext.setEnd(end);
+
+		if (params != null) {
+			String keywords = (String)params.remove("keywords");
+
+			if (Validator.isNotNull(keywords)) {
+				searchContext.setKeywords(keywords);
+			}
+		}
+
+		if (sort != null) {
+			searchContext.setSorts(sort);
+		}
+
+		searchContext.setStart(start);
+
+		QueryConfig queryConfig = searchContext.getQueryConfig();
+
+		queryConfig.setHighlightEnabled(false);
+		queryConfig.setScoreEnabled(false);
+
+		return searchContext;
 	}
 
 	protected long getParentOrganizationId(

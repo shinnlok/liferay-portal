@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -57,7 +57,7 @@ ManifestSummary manifestSummary = ExportImportHelperUtil.getManifestSummary(them
 						<liferay-ui:message key="name" />
 					</dt>
 					<dd>
-						<%= fileEntry.getTitle() %>
+						<%= HtmlUtil.escape(fileEntry.getTitle()) %>
 					</dd>
 					<dt>
 						<liferay-ui:message key="export" />
@@ -69,20 +69,20 @@ ManifestSummary manifestSummary = ExportImportHelperUtil.getManifestSummary(them
 						%>
 
 						<span onmouseover="Liferay.Portal.ToolTip.show(this, '<%= dateFormatDateTime.format(exportDate) %>')">
-							<liferay-ui:message arguments="<%= LanguageUtil.getTimeDescription(pageContext, System.currentTimeMillis() - exportDate.getTime(), true) %>" key="x-ago" />
+							<liferay-ui:message arguments="<%= LanguageUtil.getTimeDescription(pageContext, System.currentTimeMillis() - exportDate.getTime(), true) %>" key="x-ago" translateArguments="<%= false %>" />
 						</span>
 					</dd>
 					<dt>
 						<liferay-ui:message key="author" />
 					</dt>
 					<dd>
-						<%= fileEntry.getUserName() %>
+						<%= HtmlUtil.escape(fileEntry.getUserName()) %>
 					</dd>
 					<dt>
 						<liferay-ui:message key="size" />
 					</dt>
 					<dd>
-						<%= fileEntry.getSize() / 1024 %>k
+						<%= TextFormatter.formatStorageSize(fileEntry.getSize(), locale) %>
 					</dd>
 				</dl>
 			</aui:fieldset>
@@ -357,7 +357,8 @@ ManifestSummary manifestSummary = ExportImportHelperUtil.getManifestSummary(them
 	A.one('#<portlet:namespace />continue').on(
 		'click',
 		function() {
-			A.one('#<portlet:namespace />importConfiguration').hide()
+			A.one('#<portlet:namespace />importConfiguration').hide();
+
 			A.one('#<portlet:namespace />importStrategy').show();
 		}
 	);
@@ -365,8 +366,9 @@ ManifestSummary manifestSummary = ExportImportHelperUtil.getManifestSummary(them
 	A.one('#<portlet:namespace />back').on(
 		'click',
 		function() {
-			A.one('#<portlet:namespace />importConfiguration').show()
 			A.one('#<portlet:namespace />importStrategy').hide();
+
+			A.one('#<portlet:namespace />importConfiguration').show();
 		}
 	);
 </aui:script>

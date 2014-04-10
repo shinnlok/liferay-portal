@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -56,10 +56,10 @@ private void _buildLayoutView(Layout layout, String cssClass, boolean useHtmlTit
 
 	sb.append("> ");
 
-	String layoutName = layout.getName(themeDisplay.getLocale());
+	String layoutName = HtmlUtil.escape(layout.getName(themeDisplay.getLocale()));
 
 	if (useHtmlTitle) {
-		layoutName = layout.getHTMLTitle(themeDisplay.getLocale());
+		layoutName = HtmlUtil.escape(layout.getHTMLTitle(themeDisplay.getLocale()));
 	}
 
 	sb.append(layoutName);

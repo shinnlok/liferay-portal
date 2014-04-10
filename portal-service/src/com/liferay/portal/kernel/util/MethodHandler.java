@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -47,18 +47,26 @@ public class MethodHandler implements Serializable {
 		return _methodKey;
 	}
 
-	public Object invoke(boolean newInstance) throws Exception {
+	public Object invoke() throws Exception {
 		Method method = _methodKey.getMethod();
 
 		Object targetObject = null;
 
-		if (newInstance && !Modifier.isStatic(method.getModifiers())) {
+		if (!Modifier.isStatic(method.getModifiers())) {
 			Class<?> targetClass = _methodKey.getDeclaringClass();
 
 			targetObject = targetClass.newInstance();
 		}
 
 		return method.invoke(targetObject, _arguments);
+	}
+
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #invoke}
+	 */
+	@Deprecated
+	public Object invoke(boolean newInstance) throws Exception {
+		return invoke();
 	}
 
 	public Object invoke(Object target) throws Exception {

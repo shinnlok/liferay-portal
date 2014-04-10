@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -193,7 +193,7 @@ public class ResourcePermissionLocalServiceImpl
 				sql, "[$ROLE_ID$]",
 				ListUtil.toString(roles, Role.ROLE_ID_ACCESSOR));
 
-			SQLQuery sqlQuery = session.createSQLQuery(sql);
+			SQLQuery sqlQuery = session.createSynchronizedSQLQuery(sql);
 
 			QueryPos qPos = QueryPos.getInstance(sqlQuery);
 
@@ -208,7 +208,7 @@ public class ResourcePermissionLocalServiceImpl
 
 			sql = CustomSQLUtil.get(_FIND_MISSING_RESOURCE_PERMISSIONS);
 
-			sqlQuery = session.createSQLQuery(sql);
+			sqlQuery = session.createSynchronizedSQLQuery(sql);
 
 			sqlQuery.addScalar("companyId", Type.LONG);
 			sqlQuery.addScalar("name", Type.STRING);

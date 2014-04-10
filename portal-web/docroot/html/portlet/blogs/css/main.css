@@ -22,14 +22,6 @@
 		display: block;
 	}
 
-	.edit-actions {
-		margin: 1.5em 0;
-	}
-
-	.entry {
-		clear: both;
-	}
-
 	.entry-author {
 		background: url(@theme_image_path@/portlet/edit_guest.png) no-repeat 0 50%;
 		border-right: 1px solid #999;
@@ -53,7 +45,7 @@
 
 	.entry-footer:after {
 		clear: both;
-		content: ".";
+		content: '';
 		display: block;
 		height: 0;
 		visibility: hidden;
@@ -71,8 +63,8 @@
 	}
 
 	.entry.draft, .entry.pending, .entry.scheduled {
-		background: #eee;
-		border: 1px solid #ccc;
+		background: #EEE;
+		border: 1px solid #CCC;
 		color: #555;
 		padding: 5px;
 
@@ -84,8 +76,8 @@
 	}
 
 	.entry-navigation {
-		background: #eee;
-		border-top: 1px solid #ccc;
+		background: #EEE;
+		border-top: 1px solid #CCC;
 		margin: 15px 0 0;
 		overflow: hidden;
 		padding: 5px;
@@ -117,7 +109,7 @@
 	}
 
 	.preview {
-		background: #ffc;
+		background: #FFC;
 		border: 1px dotted gray;
 		padding: 3px;
 	}
@@ -139,6 +131,7 @@
 
 	.subscribe {
 		margin-bottom: 1.5em;
+		text-align: right;
 	}
 
 	.taglib-flags {
@@ -150,7 +143,6 @@
 
 	.taglib-ratings.stars {
 		float: left;
-		margin-top: 0.5em;
 	}
 
 	.taglib-social-bookmarks {
@@ -159,7 +151,7 @@
 
 	.form-search:after {
 		clear: both;
-		content: ".";
+		content: '';
 		display: block;
 		height: 0;
 		visibility: hidden;

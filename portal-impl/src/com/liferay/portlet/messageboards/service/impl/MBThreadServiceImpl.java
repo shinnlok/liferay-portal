@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -301,6 +301,10 @@ public class MBThreadServiceImpl extends MBThreadServiceBaseImpl {
 	@Override
 	public MBThread moveThread(long categoryId, long threadId)
 		throws PortalException, SystemException {
+
+		if (lockLocalService.isLocked(MBThread.class.getName(), threadId)) {
+			throw new LockedThreadException();
+		}
 
 		MBThread thread = mbThreadLocalService.getThread(threadId);
 

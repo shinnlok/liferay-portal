@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -234,7 +234,13 @@ public class HttpImpl implements Http {
 		sb.append(encodeURL(value));
 		sb.append(anchor);
 
-		return sb.toString();
+		String result = sb.toString();
+
+		if (result.length() > URL_MAXIMUM_LENGTH) {
+			result = shortenURL(result, 2);
+		}
+
+		return result;
 	}
 
 	@Override
@@ -831,6 +837,10 @@ public class HttpImpl implements Http {
 				protocol = Http.HTTPS;
 			}
 
+			if (port == -1) {
+				port = urlObj.getPort();
+			}
+
 			urlObj = new URL(
 				protocol, urlObj.getHost(), port, urlObj.getFile());
 
@@ -939,6 +949,39 @@ public class HttpImpl implements Http {
 	}
 
 	@Override
+	public String removePathParameters(String uri) {
+		if (Validator.isNull(uri)) {
+			return uri;
+		}
+
+		int pos = uri.indexOf(StringPool.SEMICOLON);
+
+		if (pos == -1) {
+			return uri;
+		}
+
+		String[] uriParts = StringUtil.split(
+			uri.substring(1), StringPool.SLASH);
+
+		StringBundler sb = new StringBundler(uriParts.length * 2);
+
+		for (String uriPart : uriParts) {
+			pos = uriPart.indexOf(StringPool.SEMICOLON);
+
+			if (pos == -1) {
+				sb.append(StringPool.SLASH);
+				sb.append(uriPart);
+			}
+			else {
+				sb.append(StringPool.SLASH);
+				sb.append(uriPart.substring(0, pos));
+			}
+		}
+
+		return sb.toString();
+	}
+
+	@Override
 	public String removeProtocol(String url) {
 		if (Validator.isNull(url)) {
 			return url;
@@ -1016,6 +1059,57 @@ public class HttpImpl implements Http {
 		url = removeParameter(url, name);
 
 		return addParameter(url, name, value);
+	}
+
+	@Override
+	public String shortenURL(String url, int count) {
+		if (count == 0) {
+			return null;
+		}
+
+		StringBundler sb = new StringBundler();
+
+		String[] params = url.split(StringPool.AMPERSAND);
+
+		for (int i = 0; i < params.length; i++) {
+			String param = params[i];
+
+			if (param.contains("_backURL=") || param.contains("_redirect=") ||
+				param.contains("_returnToFullPageURL=") ||
+				param.startsWith("redirect")) {
+
+				int pos = param.indexOf(StringPool.EQUAL);
+
+				String qName = param.substring(0, pos);
+
+				String redirect = param.substring(pos + 1);
+
+				redirect = decodeURL(redirect);
+
+				String newURL = shortenURL(redirect, count - 1);
+
+				if (newURL != null) {
+					newURL = encodeURL(newURL);
+
+					sb.append(qName);
+					sb.append(StringPool.EQUAL);
+					sb.append(newURL);
+
+					if (i < (params.length - 1)) {
+						sb.append(StringPool.AMPERSAND);
+					}
+				}
+			}
+			else {
+				sb.append(param);
+
+				if (i < (params.length - 1)) {
+					sb.append(StringPool.AMPERSAND);
+				}
+			}
+		}
+
+		return sb.toString();
 	}
 
 	@Override
@@ -1449,7 +1543,7 @@ public class HttpImpl implements Http {
 
 					try {
 						progressInputStream.readAll(
-						unsyncByteArrayOutputStream);
+							unsyncByteArrayOutputStream);
 					}
 					finally {
 						progressInputStream.clearProgress();

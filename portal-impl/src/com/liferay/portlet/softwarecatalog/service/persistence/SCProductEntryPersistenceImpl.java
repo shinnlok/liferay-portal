@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -34,7 +34,6 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.ModelListener;
@@ -235,7 +234,7 @@ public class SCProductEntryPersistenceImpl extends BasePersistenceImpl<SCProduct
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<SCProductEntry>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<SCProductEntry>)QueryUtil.list(q,
@@ -622,7 +621,7 @@ public class SCProductEntryPersistenceImpl extends BasePersistenceImpl<SCProduct
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
 				q.addEntity(_FILTER_ENTITY_ALIAS, SCProductEntryImpl.class);
@@ -798,7 +797,7 @@ public class SCProductEntryPersistenceImpl extends BasePersistenceImpl<SCProduct
 				SCProductEntry.class.getName(),
 				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
-		SQLQuery q = session.createSQLQuery(sql);
+		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 		q.setFirstResult(0);
 		q.setMaxResults(2);
@@ -927,7 +926,7 @@ public class SCProductEntryPersistenceImpl extends BasePersistenceImpl<SCProduct
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addScalar(COUNT_COLUMN_NAME,
 				com.liferay.portal.kernel.dao.orm.Type.LONG);
@@ -1095,7 +1094,7 @@ public class SCProductEntryPersistenceImpl extends BasePersistenceImpl<SCProduct
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<SCProductEntry>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<SCProductEntry>)QueryUtil.list(q,
@@ -1602,7 +1601,7 @@ public class SCProductEntryPersistenceImpl extends BasePersistenceImpl<SCProduct
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<SCProductEntry>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<SCProductEntry>)QueryUtil.list(q,
@@ -2010,7 +2009,7 @@ public class SCProductEntryPersistenceImpl extends BasePersistenceImpl<SCProduct
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
 				q.addEntity(_FILTER_ENTITY_ALIAS, SCProductEntryImpl.class);
@@ -2191,7 +2190,7 @@ public class SCProductEntryPersistenceImpl extends BasePersistenceImpl<SCProduct
 				SCProductEntry.class.getName(),
 				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
-		SQLQuery q = session.createSQLQuery(sql);
+		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 		q.setFirstResult(0);
 		q.setMaxResults(2);
@@ -2333,7 +2332,7 @@ public class SCProductEntryPersistenceImpl extends BasePersistenceImpl<SCProduct
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addScalar(COUNT_COLUMN_NAME,
 				com.liferay.portal.kernel.dao.orm.Type.LONG);
@@ -2497,11 +2496,11 @@ public class SCProductEntryPersistenceImpl extends BasePersistenceImpl<SCProduct
 				QueryPos qPos = QueryPos.getInstance(q);
 
 				if (bindRepoGroupId) {
-					qPos.add(repoGroupId.toLowerCase());
+					qPos.add(StringUtil.toLowerCase(repoGroupId));
 				}
 
 				if (bindRepoArtifactId) {
-					qPos.add(repoArtifactId.toLowerCase());
+					qPos.add(StringUtil.toLowerCase(repoArtifactId));
 				}
 
 				List<SCProductEntry> list = q.list();
@@ -2633,11 +2632,11 @@ public class SCProductEntryPersistenceImpl extends BasePersistenceImpl<SCProduct
 				QueryPos qPos = QueryPos.getInstance(q);
 
 				if (bindRepoGroupId) {
-					qPos.add(repoGroupId.toLowerCase());
+					qPos.add(StringUtil.toLowerCase(repoGroupId));
 				}
 
 				if (bindRepoArtifactId) {
-					qPos.add(repoArtifactId.toLowerCase());
+					qPos.add(StringUtil.toLowerCase(repoArtifactId));
 				}
 
 				count = (Long)q.uniqueResult();
@@ -2720,7 +2719,7 @@ public class SCProductEntryPersistenceImpl extends BasePersistenceImpl<SCProduct
 			CacheRegistryUtil.clear(SCProductEntryImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(SCProductEntryImpl.class.getName());
+		EntityCacheUtil.clearCache(SCProductEntryImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -3015,7 +3014,7 @@ public class SCProductEntryPersistenceImpl extends BasePersistenceImpl<SCProduct
 
 		EntityCacheUtil.putResult(SCProductEntryModelImpl.ENTITY_CACHE_ENABLED,
 			SCProductEntryImpl.class, scProductEntry.getPrimaryKey(),
-			scProductEntry);
+			scProductEntry, false);
 
 		clearUniqueFindersCache(scProductEntry);
 		cacheUniqueFindersCache(scProductEntry);
@@ -3255,7 +3254,7 @@ public class SCProductEntryPersistenceImpl extends BasePersistenceImpl<SCProduct
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<SCProductEntry>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<SCProductEntry>)QueryUtil.list(q,
@@ -3616,9 +3615,6 @@ public class SCProductEntryPersistenceImpl extends BasePersistenceImpl<SCProduct
 		}
 		catch (Exception e) {
 			throw processException(e);
-		}
-		finally {
-			FinderCacheUtil.clearCache(SCProductEntryModelImpl.MAPPING_TABLE_SCLICENSES_SCPRODUCTENTRIES_NAME);
 		}
 	}
 

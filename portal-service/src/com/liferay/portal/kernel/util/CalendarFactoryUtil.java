@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -68,6 +68,14 @@ public class CalendarFactoryUtil {
 		return getCalendarFactory().getCalendar(locale);
 	}
 
+	public static Calendar getCalendar(long time) {
+		return getCalendarFactory().getCalendar(time);
+	}
+
+	public static Calendar getCalendar(long time, TimeZone timeZone) {
+		return getCalendarFactory().getCalendar(time, timeZone);
+	}
+
 	public static Calendar getCalendar(TimeZone timeZone) {
 		return getCalendarFactory().getCalendar(timeZone);
 	}
@@ -80,14 +88,6 @@ public class CalendarFactoryUtil {
 		PortalRuntimePermission.checkGetBeanProperty(CalendarFactoryUtil.class);
 
 		return _calendarFactory;
-	}
-
-	public Calendar getCalendar(long time) {
-		return getCalendarFactory().getCalendar(time);
-	}
-
-	public Calendar getCalendar(long time, TimeZone timeZone) {
-		return getCalendarFactory().getCalendar(time, timeZone);
 	}
 
 	public void setCalendarFactory(CalendarFactory calendarFactory) {

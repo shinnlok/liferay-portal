@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -137,6 +137,31 @@ public class AnnouncementsFlagPersistenceTest {
 			newAnnouncementsFlag.getEntryId());
 		Assert.assertEquals(existingAnnouncementsFlag.getValue(),
 			newAnnouncementsFlag.getValue());
+	}
+
+	@Test
+	public void testCountByEntryId() {
+		try {
+			_persistence.countByEntryId(ServiceTestUtil.nextLong());
+
+			_persistence.countByEntryId(0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByU_E_V() {
+		try {
+			_persistence.countByU_E_V(ServiceTestUtil.nextLong(),
+				ServiceTestUtil.nextLong(), ServiceTestUtil.nextInt());
+
+			_persistence.countByU_E_V(0L, 0L, 0);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
 	}
 
 	@Test

@@ -1762,6 +1762,12 @@
 			<type>java.lang.String</type>
 		</attribute>
 		<attribute>
+			<name>searchContainer</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+			<type>com.liferay.portal.kernel.dao.search.SearchContainer</type>
+		</attribute>
+		<attribute>
 			<name>useNamespace</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
@@ -1894,6 +1900,12 @@
 			<type>java.lang.String</type>
 		</attribute>
 		<attribute>
+			<name>localizeLabel</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+			<type>boolean</type>
+		</attribute>
+		<attribute>
 			<name>selected</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
@@ -1913,6 +1925,12 @@
 		</attribute>
 		<attribute>
 			<name>toggle</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+			<type>boolean</type>
+		</attribute>
+		<attribute>
+			<name>toggleTouch</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
 			<type>boolean</type>
@@ -2214,6 +2232,12 @@
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
 			<type>boolean</type>
+		</attribute>
+		<attribute>
+			<name>value</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+			<type>java.lang.Object</type>
 		</attribute>
 		<dynamic-attributes>true</dynamic-attributes>
 	</tag>

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -52,6 +52,7 @@ public class UserTrackerWrapper implements UserTracker,
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
+		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("userTrackerId", getUserTrackerId());
 		attributes.put("companyId", getCompanyId());
 		attributes.put("userId", getUserId());
@@ -66,6 +67,12 @@ public class UserTrackerWrapper implements UserTracker,
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
+		Long mvccVersion = (Long)attributes.get("mvccVersion");
+
+		if (mvccVersion != null) {
+			setMvccVersion(mvccVersion);
+		}
+
 		Long userTrackerId = (Long)attributes.get("userTrackerId");
 
 		if (userTrackerId != null) {
@@ -133,6 +140,26 @@ public class UserTrackerWrapper implements UserTracker,
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_userTracker.setPrimaryKey(primaryKey);
+	}
+
+	/**
+	* Returns the mvcc version of this user tracker.
+	*
+	* @return the mvcc version of this user tracker
+	*/
+	@Override
+	public long getMvccVersion() {
+		return _userTracker.getMvccVersion();
+	}
+
+	/**
+	* Sets the mvcc version of this user tracker.
+	*
+	* @param mvccVersion the mvcc version of this user tracker
+	*/
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		_userTracker.setMvccVersion(mvccVersion);
 	}
 
 	/**

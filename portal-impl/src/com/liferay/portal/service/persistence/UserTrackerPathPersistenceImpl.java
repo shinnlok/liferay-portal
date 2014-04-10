@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -33,8 +33,8 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.model.CacheModel;
+import com.liferay.portal.model.MVCCModel;
 import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.UserTrackerPath;
 import com.liferay.portal.model.impl.UserTrackerPathImpl;
@@ -232,7 +232,7 @@ public class UserTrackerPathPersistenceImpl extends BasePersistenceImpl<UserTrac
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<UserTrackerPath>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<UserTrackerPath>)QueryUtil.list(q,
@@ -637,7 +637,7 @@ public class UserTrackerPathPersistenceImpl extends BasePersistenceImpl<UserTrac
 			CacheRegistryUtil.clear(UserTrackerPathImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(UserTrackerPathImpl.class.getName());
+		EntityCacheUtil.clearCache(UserTrackerPathImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -835,7 +835,7 @@ public class UserTrackerPathPersistenceImpl extends BasePersistenceImpl<UserTrac
 
 		EntityCacheUtil.putResult(UserTrackerPathModelImpl.ENTITY_CACHE_ENABLED,
 			UserTrackerPathImpl.class, userTrackerPath.getPrimaryKey(),
-			userTrackerPath);
+			userTrackerPath, false);
 
 		userTrackerPath.resetOriginalValues();
 
@@ -852,6 +852,7 @@ public class UserTrackerPathPersistenceImpl extends BasePersistenceImpl<UserTrac
 		userTrackerPathImpl.setNew(userTrackerPath.isNew());
 		userTrackerPathImpl.setPrimaryKey(userTrackerPath.getPrimaryKey());
 
+		userTrackerPathImpl.setMvccVersion(userTrackerPath.getMvccVersion());
 		userTrackerPathImpl.setUserTrackerPathId(userTrackerPath.getUserTrackerPathId());
 		userTrackerPathImpl.setUserTrackerId(userTrackerPath.getUserTrackerId());
 		userTrackerPathImpl.setPath(userTrackerPath.getPath());
@@ -1060,7 +1061,7 @@ public class UserTrackerPathPersistenceImpl extends BasePersistenceImpl<UserTrac
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<UserTrackerPath>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<UserTrackerPath>)QueryUtil.list(q,
@@ -1195,10 +1196,22 @@ public class UserTrackerPathPersistenceImpl extends BasePersistenceImpl<UserTrac
 			}
 		};
 
-	private static CacheModel<UserTrackerPath> _nullUserTrackerPathCacheModel = new CacheModel<UserTrackerPath>() {
-			@Override
-			public UserTrackerPath toEntityModel() {
-				return _nullUserTrackerPath;
-			}
-		};
+	private static CacheModel<UserTrackerPath> _nullUserTrackerPathCacheModel = new NullCacheModel();
+
+	private static class NullCacheModel implements CacheModel<UserTrackerPath>,
+		MVCCModel {
+		@Override
+		public long getMvccVersion() {
+			return 0;
+		}
+
+		@Override
+		public void setMvccVersion(long mvccVersion) {
+		}
+
+		@Override
+		public UserTrackerPath toEntityModel() {
+			return _nullUserTrackerPath;
+		}
+	}
 }

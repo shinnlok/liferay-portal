@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -113,7 +113,7 @@ portletURL.setParameter("folderId", String.valueOf(folderId));
 					List<DLFileEntryType> fileEntryTypes = Collections.emptyList();
 
 					if ((folder == null) || folder.isSupportsMetadata()) {
-						fileEntryTypes = DLFileEntryTypeLocalServiceUtil.getFolderFileEntryTypes(PortalUtil.getSiteAndCompanyGroupIds(themeDisplay), folderId, true);
+						fileEntryTypes = DLFileEntryTypeLocalServiceUtil.getFolderFileEntryTypes(PortalUtil.getCurrentAndAncestorSiteGroupIds(scopeGroupId), folderId, true);
 					}
 					%>
 
@@ -188,9 +188,9 @@ portletURL.setParameter("folderId", String.valueOf(folderId));
 			StringBundler sb = new StringBundler(4);
 
 			sb.append("<img align=\"left\" border=\"0\" src=\"");
-			sb.append(themeDisplay.getPathThemeImages());
+			sb.append(HtmlUtil.escapeAttribute(themeDisplay.getPathThemeImages()));
 			sb.append("/common/folder.png\">");
-			sb.append(curFolder.getName());
+			sb.append(HtmlUtil.escape(curFolder.getName()));
 
 			row.addText(sb.toString(), rowURL);
 

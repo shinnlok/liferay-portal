@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,9 +32,9 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.CacheModel;
+import com.liferay.portal.model.MVCCModel;
 import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.ResourceBlock;
 import com.liferay.portal.model.impl.ResourceBlockImpl;
@@ -252,7 +252,7 @@ public class ResourceBlockPersistenceImpl extends BasePersistenceImpl<ResourceBl
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<ResourceBlock>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<ResourceBlock>)QueryUtil.list(q, getDialect(),
@@ -842,7 +842,7 @@ public class ResourceBlockPersistenceImpl extends BasePersistenceImpl<ResourceBl
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<ResourceBlock>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<ResourceBlock>)QueryUtil.list(q, getDialect(),
@@ -1680,7 +1680,7 @@ public class ResourceBlockPersistenceImpl extends BasePersistenceImpl<ResourceBl
 			CacheRegistryUtil.clear(ResourceBlockImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(ResourceBlockImpl.class.getName());
+		EntityCacheUtil.clearCache(ResourceBlockImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -1963,7 +1963,7 @@ public class ResourceBlockPersistenceImpl extends BasePersistenceImpl<ResourceBl
 
 		EntityCacheUtil.putResult(ResourceBlockModelImpl.ENTITY_CACHE_ENABLED,
 			ResourceBlockImpl.class, resourceBlock.getPrimaryKey(),
-			resourceBlock);
+			resourceBlock, false);
 
 		clearUniqueFindersCache(resourceBlock);
 		cacheUniqueFindersCache(resourceBlock);
@@ -1983,6 +1983,7 @@ public class ResourceBlockPersistenceImpl extends BasePersistenceImpl<ResourceBl
 		resourceBlockImpl.setNew(resourceBlock.isNew());
 		resourceBlockImpl.setPrimaryKey(resourceBlock.getPrimaryKey());
 
+		resourceBlockImpl.setMvccVersion(resourceBlock.getMvccVersion());
 		resourceBlockImpl.setResourceBlockId(resourceBlock.getResourceBlockId());
 		resourceBlockImpl.setCompanyId(resourceBlock.getCompanyId());
 		resourceBlockImpl.setGroupId(resourceBlock.getGroupId());
@@ -2192,7 +2193,7 @@ public class ResourceBlockPersistenceImpl extends BasePersistenceImpl<ResourceBl
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<ResourceBlock>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<ResourceBlock>)QueryUtil.list(q, getDialect(),
@@ -2319,10 +2320,22 @@ public class ResourceBlockPersistenceImpl extends BasePersistenceImpl<ResourceBl
 			}
 		};
 
-	private static CacheModel<ResourceBlock> _nullResourceBlockCacheModel = new CacheModel<ResourceBlock>() {
-			@Override
-			public ResourceBlock toEntityModel() {
-				return _nullResourceBlock;
-			}
-		};
+	private static CacheModel<ResourceBlock> _nullResourceBlockCacheModel = new NullCacheModel();
+
+	private static class NullCacheModel implements CacheModel<ResourceBlock>,
+		MVCCModel {
+		@Override
+		public long getMvccVersion() {
+			return 0;
+		}
+
+		@Override
+		public void setMvccVersion(long mvccVersion) {
+		}
+
+		@Override
+		public ResourceBlock toEntityModel() {
+			return _nullResourceBlock;
+		}
+	}
 }

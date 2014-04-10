@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,10 @@
 
 package com.liferay.portlet.layoutsadmin.action;
 
+import com.liferay.portal.LARFileNameException;
 import com.liferay.portal.NoSuchGroupException;
+import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.lar.ExportImportDateUtil;
 import com.liferay.portal.kernel.lar.ExportImportHelperUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -23,6 +26,7 @@ import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.DateRange;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.UniqueList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Layout;
@@ -67,37 +71,50 @@ public class ExportLayoutsAction extends PortletAction {
 
 		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
 
+		if (Validator.isNull(cmd)) {
+			return;
+		}
+
 		try {
-			String fileName = ParamUtil.getString(
-				actionRequest, "exportFileName");
-			long groupId = ParamUtil.getLong(actionRequest, "groupId");
+			long groupId = ParamUtil.getLong(actionRequest, "liveGroupId");
 			boolean privateLayout = ParamUtil.getBoolean(
 				actionRequest, "privateLayout");
 			long[] layoutIds = getLayoutIds(actionRequest);
-			DateRange dateRange = ExportImportHelperUtil.getDateRange(
-				actionRequest, groupId, privateLayout, 0, null, "all");
+			DateRange dateRange = ExportImportDateUtil.getDateRange(
+				actionRequest, groupId, privateLayout, 0, null,
+				ExportImportDateUtil.RANGE_ALL);
 
-			if (Validator.isNotNull(cmd)) {
-				LayoutServiceUtil.exportLayoutsAsFileInBackground(
-					fileName, groupId, privateLayout, layoutIds,
-					actionRequest.getParameterMap(), dateRange.getStartDate(),
-					dateRange.getEndDate(), fileName);
+			String fileName = StringPool.BLANK;
 
-				String redirect = ParamUtil.getString(
-					actionRequest, "redirect");
-
-				sendRedirect(actionRequest, actionResponse, redirect);
+			if (privateLayout) {
+				fileName = LanguageUtil.get(
+					actionRequest.getLocale(), "private-pages");
 			}
+			else {
+				fileName = LanguageUtil.get(
+					actionRequest.getLocale(), "public-pages");
+			}
+
+			LayoutServiceUtil.exportLayoutsAsFileInBackground(
+				fileName, groupId, privateLayout, layoutIds,
+				actionRequest.getParameterMap(), dateRange.getStartDate(),
+				dateRange.getEndDate(), fileName);
+
+			String redirect = ParamUtil.getString(actionRequest, "redirect");
+
+			sendRedirect(actionRequest, actionResponse, redirect);
 		}
 		catch (Exception e) {
-			_log.error(e, e);
-
 			SessionErrors.add(actionRequest, e.getClass());
 
-			String pagesRedirect = ParamUtil.getString(
-				actionRequest, "pagesRedirect");
+			if (!(e instanceof LARFileNameException)) {
+				_log.error(e, e);
 
-			sendRedirect(actionRequest, actionResponse, pagesRedirect);
+				String pagesRedirect = ParamUtil.getString(
+					actionRequest, "pagesRedirect");
+
+				sendRedirect(actionRequest, actionResponse, pagesRedirect);
+			}
 		}
 	}
 

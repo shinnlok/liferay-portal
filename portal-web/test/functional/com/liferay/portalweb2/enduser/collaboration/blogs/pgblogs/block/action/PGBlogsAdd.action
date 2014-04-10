@@ -4,7 +4,7 @@
 			<execute function="AssertClick#assertTextClickAtAndWaitCKEditor" />
 		</case>
 
-		<case locator-key1="TAGS_SELECT_BUTTON">
+		<case locator-key1="CATEGORIZATION_TAGS_SELECT_BUTTON">
 			<execute function="AssertClick#assertTextClickAtAndWait" />
 		</case>
 	</command>
@@ -18,6 +18,18 @@
 	<command name="type">
 		<case locator-key1="CONTENT_FIELD">
 			<execute function="Type#typeFrameWaitForCKEditor" />
+		</case>
+
+		<case locator-key1="DISPLAY_DATE_DATE_INPUT">
+			<execute function="Type#clickAtSendKeys" />
+		</case>
+
+		<case locator-key1="DISPLAY_DATE_TIME_INPUT">
+			<execute function="Type#clickAtSendKeys" />
+		</case>
+
+		<case locator-key1="CATEGORIZATION_TAGS_FIELD">
+			<execute function="Type#clickAtSendKeys" />
 		</case>
 	</command>
 </definition>

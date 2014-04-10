@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -33,10 +33,10 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.model.CacheModel;
+import com.liferay.portal.model.MVCCModel;
 import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.Phone;
 import com.liferay.portal.model.impl.PhoneImpl;
@@ -236,7 +236,7 @@ public class PhonePersistenceImpl extends BasePersistenceImpl<Phone>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<Phone>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<Phone>)QueryUtil.list(q, getDialect(), start,
@@ -780,7 +780,7 @@ public class PhonePersistenceImpl extends BasePersistenceImpl<Phone>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<Phone>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<Phone>)QueryUtil.list(q, getDialect(), start,
@@ -1324,7 +1324,7 @@ public class PhonePersistenceImpl extends BasePersistenceImpl<Phone>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<Phone>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<Phone>)QueryUtil.list(q, getDialect(), start,
@@ -1810,7 +1810,7 @@ public class PhonePersistenceImpl extends BasePersistenceImpl<Phone>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<Phone>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<Phone>)QueryUtil.list(q, getDialect(), start,
@@ -2310,7 +2310,7 @@ public class PhonePersistenceImpl extends BasePersistenceImpl<Phone>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<Phone>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<Phone>)QueryUtil.list(q, getDialect(), start,
@@ -2850,7 +2850,7 @@ public class PhonePersistenceImpl extends BasePersistenceImpl<Phone>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<Phone>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<Phone>)QueryUtil.list(q, getDialect(), start,
@@ -3431,7 +3431,7 @@ public class PhonePersistenceImpl extends BasePersistenceImpl<Phone>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<Phone>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<Phone>)QueryUtil.list(q, getDialect(), start,
@@ -3903,7 +3903,7 @@ public class PhonePersistenceImpl extends BasePersistenceImpl<Phone>
 			CacheRegistryUtil.clear(PhoneImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(PhoneImpl.class.getName());
+		EntityCacheUtil.clearCache(PhoneImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -4225,7 +4225,7 @@ public class PhonePersistenceImpl extends BasePersistenceImpl<Phone>
 		}
 
 		EntityCacheUtil.putResult(PhoneModelImpl.ENTITY_CACHE_ENABLED,
-			PhoneImpl.class, phone.getPrimaryKey(), phone);
+			PhoneImpl.class, phone.getPrimaryKey(), phone, false);
 
 		phone.resetOriginalValues();
 
@@ -4242,6 +4242,7 @@ public class PhonePersistenceImpl extends BasePersistenceImpl<Phone>
 		phoneImpl.setNew(phone.isNew());
 		phoneImpl.setPrimaryKey(phone.getPrimaryKey());
 
+		phoneImpl.setMvccVersion(phone.getMvccVersion());
 		phoneImpl.setUuid(phone.getUuid());
 		phoneImpl.setPhoneId(phone.getPhoneId());
 		phoneImpl.setCompanyId(phone.getCompanyId());
@@ -4455,7 +4456,7 @@ public class PhonePersistenceImpl extends BasePersistenceImpl<Phone>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<Phone>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<Phone>)QueryUtil.list(q, getDialect(), start,
@@ -4590,10 +4591,21 @@ public class PhonePersistenceImpl extends BasePersistenceImpl<Phone>
 			}
 		};
 
-	private static CacheModel<Phone> _nullPhoneCacheModel = new CacheModel<Phone>() {
-			@Override
-			public Phone toEntityModel() {
-				return _nullPhone;
-			}
-		};
+	private static CacheModel<Phone> _nullPhoneCacheModel = new NullCacheModel();
+
+	private static class NullCacheModel implements CacheModel<Phone>, MVCCModel {
+		@Override
+		public long getMvccVersion() {
+			return 0;
+		}
+
+		@Override
+		public void setMvccVersion(long mvccVersion) {
+		}
+
+		@Override
+		public Phone toEntityModel() {
+			return _nullPhone;
+		}
+	}
 }

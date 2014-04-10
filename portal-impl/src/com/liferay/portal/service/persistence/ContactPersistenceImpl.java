@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,9 +32,9 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.Contact;
+import com.liferay.portal.model.MVCCModel;
 import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.impl.ContactImpl;
 import com.liferay.portal.model.impl.ContactModelImpl;
@@ -221,7 +221,7 @@ public class ContactPersistenceImpl extends BasePersistenceImpl<Contact>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<Contact>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<Contact>)QueryUtil.list(q, getDialect(),
@@ -710,7 +710,7 @@ public class ContactPersistenceImpl extends BasePersistenceImpl<Contact>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<Contact>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<Contact>)QueryUtil.list(q, getDialect(),
@@ -1210,7 +1210,7 @@ public class ContactPersistenceImpl extends BasePersistenceImpl<Contact>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<Contact>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<Contact>)QueryUtil.list(q, getDialect(),
@@ -1634,7 +1634,7 @@ public class ContactPersistenceImpl extends BasePersistenceImpl<Contact>
 			CacheRegistryUtil.clear(ContactImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(ContactImpl.class.getName());
+		EntityCacheUtil.clearCache(ContactImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -1868,7 +1868,7 @@ public class ContactPersistenceImpl extends BasePersistenceImpl<Contact>
 		}
 
 		EntityCacheUtil.putResult(ContactModelImpl.ENTITY_CACHE_ENABLED,
-			ContactImpl.class, contact.getPrimaryKey(), contact);
+			ContactImpl.class, contact.getPrimaryKey(), contact, false);
 
 		contact.resetOriginalValues();
 
@@ -1885,6 +1885,7 @@ public class ContactPersistenceImpl extends BasePersistenceImpl<Contact>
 		contactImpl.setNew(contact.isNew());
 		contactImpl.setPrimaryKey(contact.getPrimaryKey());
 
+		contactImpl.setMvccVersion(contact.getMvccVersion());
 		contactImpl.setContactId(contact.getContactId());
 		contactImpl.setCompanyId(contact.getCompanyId());
 		contactImpl.setUserId(contact.getUserId());
@@ -2118,7 +2119,7 @@ public class ContactPersistenceImpl extends BasePersistenceImpl<Contact>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<Contact>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<Contact>)QueryUtil.list(q, getDialect(),
@@ -2245,10 +2246,22 @@ public class ContactPersistenceImpl extends BasePersistenceImpl<Contact>
 			}
 		};
 
-	private static CacheModel<Contact> _nullContactCacheModel = new CacheModel<Contact>() {
-			@Override
-			public Contact toEntityModel() {
-				return _nullContact;
-			}
-		};
+	private static CacheModel<Contact> _nullContactCacheModel = new NullCacheModel();
+
+	private static class NullCacheModel implements CacheModel<Contact>,
+		MVCCModel {
+		@Override
+		public long getMvccVersion() {
+			return 0;
+		}
+
+		@Override
+		public void setMvccVersion(long mvccVersion) {
+		}
+
+		@Override
+		public Contact toEntityModel() {
+			return _nullContact;
+		}
+	}
 }

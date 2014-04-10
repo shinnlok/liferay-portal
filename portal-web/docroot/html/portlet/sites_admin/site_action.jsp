@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -115,7 +115,7 @@ if (row == null) {
 		</liferay-portlet:renderURL>
 
 		<%
-		String taglibExportURL = "javascript:Liferay.Util.openWindow({id: '" + renderResponse.getNamespace() + "exportDialog', title: '" + UnicodeLanguageUtil.get(pageContext, "export") + "', uri: '" + HtmlUtil.escapeURL(exportURL.toString()) + "'});";
+		String taglibExportURL = "javascript:Liferay.Util.openWindow({id: '" + renderResponse.getNamespace() + "exportDialog', title: '" + HtmlUtil.escapeJS(LanguageUtil.get(pageContext, "export")) + "', uri: '" + HtmlUtil.escapeJS(exportURL.toString()) + "'});";
 		%>
 
 		<liferay-ui:icon
@@ -132,7 +132,7 @@ if (row == null) {
 		</liferay-portlet:renderURL>
 
 		<%
-		String taglibImportURL = "javascript:Liferay.Util.openWindow({id: '" + renderResponse.getNamespace() + "importDialog', title: '" + UnicodeLanguageUtil.get(pageContext, "import") + "', uri: '" + HtmlUtil.escapeURL(importURL.toString()) + "'});";
+		String taglibImportURL = "javascript:Liferay.Util.openWindow({id: '" + renderResponse.getNamespace() + "importDialog', title: '" + HtmlUtil.escapeJS(LanguageUtil.get(pageContext, "import")) + "', uri: '" + HtmlUtil.escapeJS(importURL.toString()) + "'});";
 		%>
 
 		<liferay-ui:icon
@@ -141,7 +141,7 @@ if (row == null) {
 			url="<%= taglibImportURL %>"
 		/>
 
-		<liferay-ui:staging extended="<%= true %>" groupId="<%= group.getGroupId() %>" onlyActions="<%= true %>" showManageBranches="<%= false %>" />
+		<liferay-staging:menu extended="<%= true %>" groupId="<%= group.getGroupId() %>" onlyActions="<%= true %>" showManageBranches="<%= false %>" />
 	</c:if>
 
 	<c:if test="<%= group.getPublicLayoutsPageCount() > 0 %>">

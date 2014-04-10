@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -34,7 +34,7 @@ for (int i = 0; i < results.size(); i++) {
 	sb.append("\" style=\"");
 	sb.append(DLUtil.getThumbnailStyle());
 	sb.append("\">");
-	sb.append(fileEntry.getTitle());
+	sb.append(HtmlUtil.escape(fileEntry.getTitle()));
 
 	row.addText(sb.toString(), rowHREF);
 
@@ -59,7 +59,7 @@ for (int i = 0; i < results.size(); i++) {
 	sb.append("selectDocumentLibrary('");
 	sb.append(DLUtil.getPreviewURL(fileEntry, fileEntry.getFileVersion(), themeDisplay, StringPool.BLANK, false, false));
 	sb.append("', '");
-	sb.append(fileEntry.getUuid());
+	sb.append(HtmlUtil.escapeJS(fileEntry.getUuid()));
 	sb.append("', '");
 	sb.append(fileEntry.getGroupId());
 	sb.append("', '");

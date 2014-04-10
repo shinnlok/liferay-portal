@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -234,6 +234,10 @@ public class HttpUtil {
 		return getHttp().removeParameter(url, name);
 	}
 
+	public static String removePathParameters(String uri) {
+		return getHttp().removePathParameters(uri);
+	}
+
 	public static String removeProtocol(String url) {
 		return getHttp().removeProtocol(url);
 	}
@@ -264,6 +268,10 @@ public class HttpUtil {
 
 	public static String setParameter(String url, String name, String value) {
 		return getHttp().setParameter(url, name, value);
+	}
+
+	public static String shortenURL(String url, int count) {
+		return getHttp().shortenURL(url, count);
 	}
 
 	public static byte[] URLtoByteArray(Http.Options options)

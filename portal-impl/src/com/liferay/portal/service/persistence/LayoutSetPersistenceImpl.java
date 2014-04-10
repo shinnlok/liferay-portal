@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -33,10 +33,10 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.LayoutSet;
+import com.liferay.portal.model.MVCCModel;
 import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.impl.LayoutSetImpl;
 import com.liferay.portal.model.impl.LayoutSetModelImpl;
@@ -222,7 +222,7 @@ public class LayoutSetPersistenceImpl extends BasePersistenceImpl<LayoutSet>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<LayoutSet>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<LayoutSet>)QueryUtil.list(q, getDialect(),
@@ -736,7 +736,7 @@ public class LayoutSetPersistenceImpl extends BasePersistenceImpl<LayoutSet>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<LayoutSet>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<LayoutSet>)QueryUtil.list(q, getDialect(),
@@ -1411,7 +1411,7 @@ public class LayoutSetPersistenceImpl extends BasePersistenceImpl<LayoutSet>
 			CacheRegistryUtil.clear(LayoutSetImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(LayoutSetImpl.class.getName());
+		EntityCacheUtil.clearCache(LayoutSetImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -1679,7 +1679,7 @@ public class LayoutSetPersistenceImpl extends BasePersistenceImpl<LayoutSet>
 		}
 
 		EntityCacheUtil.putResult(LayoutSetModelImpl.ENTITY_CACHE_ENABLED,
-			LayoutSetImpl.class, layoutSet.getPrimaryKey(), layoutSet);
+			LayoutSetImpl.class, layoutSet.getPrimaryKey(), layoutSet, false);
 
 		clearUniqueFindersCache(layoutSet);
 		cacheUniqueFindersCache(layoutSet);
@@ -1699,6 +1699,7 @@ public class LayoutSetPersistenceImpl extends BasePersistenceImpl<LayoutSet>
 		layoutSetImpl.setNew(layoutSet.isNew());
 		layoutSetImpl.setPrimaryKey(layoutSet.getPrimaryKey());
 
+		layoutSetImpl.setMvccVersion(layoutSet.getMvccVersion());
 		layoutSetImpl.setLayoutSetId(layoutSet.getLayoutSetId());
 		layoutSetImpl.setGroupId(layoutSet.getGroupId());
 		layoutSetImpl.setCompanyId(layoutSet.getCompanyId());
@@ -1918,7 +1919,7 @@ public class LayoutSetPersistenceImpl extends BasePersistenceImpl<LayoutSet>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<LayoutSet>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<LayoutSet>)QueryUtil.list(q, getDialect(),
@@ -2053,10 +2054,22 @@ public class LayoutSetPersistenceImpl extends BasePersistenceImpl<LayoutSet>
 			}
 		};
 
-	private static CacheModel<LayoutSet> _nullLayoutSetCacheModel = new CacheModel<LayoutSet>() {
-			@Override
-			public LayoutSet toEntityModel() {
-				return _nullLayoutSet;
-			}
-		};
+	private static CacheModel<LayoutSet> _nullLayoutSetCacheModel = new NullCacheModel();
+
+	private static class NullCacheModel implements CacheModel<LayoutSet>,
+		MVCCModel {
+		@Override
+		public long getMvccVersion() {
+			return 0;
+		}
+
+		@Override
+		public void setMvccVersion(long mvccVersion) {
+		}
+
+		@Override
+		public LayoutSet toEntityModel() {
+			return _nullLayoutSet;
+		}
+	}
 }

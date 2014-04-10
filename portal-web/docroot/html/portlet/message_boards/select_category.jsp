@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,6 +21,7 @@ MBCategory category = (MBCategory)request.getAttribute(WebKeys.MESSAGE_BOARDS_CA
 
 long categoryId = MBUtil.getCategoryId(request, category);
 
+long excludedCategoryId = ParamUtil.getLong(request, "excludedMBCategoryId");
 String eventName = ParamUtil.getString(request, "eventName", liferayPortletResponse.getNamespace() + "selectCategory");
 
 MBCategoryDisplay categoryDisplay = new MBCategoryDisplayImpl(scopeGroupId, categoryId);
@@ -54,10 +55,10 @@ else {
 	<liferay-ui:search-container
 		headerNames="category[message-board],num-of-categories,num-of-threads,num-of-posts,"
 		iteratorURL="<%= portletURL %>"
-		total="<%= MBCategoryServiceUtil.getCategoriesCount(scopeGroupId, categoryId, WorkflowConstants.STATUS_APPROVED) %>"
+		total="<%= MBCategoryServiceUtil.getCategoriesCount(scopeGroupId, excludedCategoryId, categoryId, WorkflowConstants.STATUS_APPROVED) %>"
 	>
 		<liferay-ui:search-container-results
-			results="<%= MBCategoryServiceUtil.getCategories(scopeGroupId, categoryId, WorkflowConstants.STATUS_APPROVED, searchContainer.getStart(), searchContainer.getEnd()) %>"
+			results="<%= MBCategoryServiceUtil.getCategories(scopeGroupId, excludedCategoryId, categoryId, WorkflowConstants.STATUS_APPROVED, searchContainer.getStart(), searchContainer.getEnd()) %>"
 		/>
 
 		<liferay-ui:search-container-row
@@ -113,7 +114,7 @@ else {
 				Map<String, Object> data = new HashMap<String, Object>();
 
 				data.put("categoryId", curCategory.getCategoryId());
-				data.put("name", HtmlUtil.escapeAttribute(curCategory.getName()));
+				data.put("name", curCategory.getName());
 				%>
 
 				<aui:button cssClass="selector-button" data="<%= data %>" value="choose" />
@@ -126,7 +127,7 @@ else {
 			Map<String, Object> data = new HashMap<String, Object>();
 
 			data.put("categoryId", categoryId);
-			data.put("name", HtmlUtil.escapeAttribute(categoryName));
+			data.put("name", categoryName);
 			%>
 
 			<aui:button cssClass="selector-button"  data="<%= data %>" value="choose-this-category" />
@@ -137,17 +138,5 @@ else {
 </aui:form>
 
 <aui:script use="aui-base">
-	var Util = Liferay.Util;
-
-	A.one('#<portlet:namespace />selectCategoryFm').delegate(
-		'click',
-		function(event) {
-			var result = Util.getAttributes(event.currentTarget, 'data-');
-
-			Util.getOpener().Liferay.fire('<%= HtmlUtil.escapeJS(eventName) %>', result);
-
-			Util.getWindow().hide();
-		},
-		'.selector-button'
-	);
+	Liferay.Util.selectEntityHandler('#<portlet:namespace />selectCategoryFm', '<%= HtmlUtil.escapeJS(eventName) %>');
 </aui:script>

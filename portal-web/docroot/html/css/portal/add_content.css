@@ -28,15 +28,6 @@
 			.accordion-group .accordion-inner {
 				padding: 6px 0;
 			}
-
-			.nav-list {
-				padding-left: 0;
-				padding-right: 0;
-
-				.lfr-content-item {
-					padding-left: 15px;
-				}
-			}
 		}
 
 		.btn-toolbar {
@@ -46,10 +37,37 @@
 				.search-query, .aui-field-select {
 					margin-bottom: 0;
 				}
+
+				@include respond-to(phone, tablet) {
+					.search-query {
+						width: 65%;
+					}
+				}
 			}
 
 			.control-group-inline, .btn-group {
 				margin-right: 5px;
+			}
+		}
+
+		.display-style-buttons-container {
+			float: right;
+			margin-right: 0;
+
+			.lfr-icon-menu {
+				.lfr-icon-menu-arrow {
+					border-bottom-color: #333;
+					border-top-color: #333;
+				}
+
+				@include respond-to(phone, tablet) {
+					margin: 5px 0;
+
+					.dropdown-toggle {
+						font-size: 17.5px;
+						padding: 7px 10px;
+					}
+				}
 			}
 		}
 
@@ -105,11 +123,15 @@
 			margin-bottom: 25px;
 		}
 
+		.drag-content-item {
+			cursor: move;
+		}
+
 		.lfr-content-item {
+			padding-left: 15px;
 			position: relative;
 
 			.drag-content-item {
-				cursor: move;
 				display: inline-block;
 				width: 100%;
 			}
@@ -127,6 +149,10 @@
 				position: absolute;
 				right: 0;
 				top: 0;
+
+				@include respond-to(phone, tablet) {
+					display: inline;
+				}
 			}
 
 			.lfr-portlet-used {
@@ -153,8 +179,8 @@
 				position: relative;
 
 				label {
-					margin-left: 0;
 					margin-bottom: 5px;
+					margin-left: 0;
 					padding: 2px;
 				}
 
@@ -206,7 +232,7 @@
 
 				&:after {
 					clear: both;
-					content: ".";
+					content: '';
 					display: block;
 					height: 0;
 					visibility: hidden;
@@ -248,12 +274,7 @@
 		margin-bottom: 10px;
 	}
 
-	.asset-information {
-		margin-bottom: 20px;
-	}
-
 	.asset-image-preview {
-		margin-bottom: 5px;
 		text-align: center;
 
 		img {
@@ -261,22 +282,16 @@
 		}
 	}
 
-	.asset-metadata {
-		margin-bottom: 20px;
-
-		.categories {
-			margin-bottom: 5px;
-		}
-	}
-
-	.asset-summary {
+	.asset-information, .asset-metadata, .asset-summary {
 		margin-bottom: 20px;
 	}
 
-	.asset-title {
-		@include ellipsis;
-
+	.asset-image-preview, .asset-metadata .categories, .asset-title {
 		margin-bottom: 5px;
+	}
+
+	.asset-summary, .asset-title {
+		@include ellipsis;
 	}
 }
 
@@ -307,7 +322,7 @@
 			background-color: #FFF;
 		}
 
-		lfr-content-item {
+		.lfr-content-item {
 			color: #3EA9DB;
 
 			&:hover {

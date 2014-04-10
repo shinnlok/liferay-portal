@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,8 +17,6 @@
 <%@ include file="/html/portlet/amazon_rankings/init.jsp" %>
 
 <%
-String redirect = ParamUtil.getString(request, "redirect");
-
 String isbnsString = StringUtil.merge(isbns, StringPool.SPACE);
 
 isbns = StringUtil.split(ParamUtil.getString(request, "isbns", isbnsString), CharPool.SPACE);
@@ -26,11 +24,13 @@ isbns = StringUtil.split(ParamUtil.getString(request, "isbns", isbnsString), Cha
 isbnsString = StringUtil.merge(isbns, StringPool.SPACE);
 %>
 
-<liferay-portlet:actionURL portletConfiguration="true" var="configurationURL" />
+<liferay-portlet:actionURL portletConfiguration="true" var="configurationActionURL" />
 
-<aui:form action="<%= configurationURL %>" method="post" name="fm">
+<liferay-portlet:renderURL portletConfiguration="true" var="configurationRenderURL" />
+
+<aui:form action="<%= configurationActionURL %>" method="post" name="fm">
 	<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.UPDATE %>" />
-	<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
+	<aui:input name="redirect" type="hidden" value="<%= configurationRenderURL %>" />
 
 	<liferay-ui:error exception="<%= ValidatorException.class %>">
 

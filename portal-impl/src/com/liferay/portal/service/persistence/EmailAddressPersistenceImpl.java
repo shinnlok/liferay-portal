@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -33,11 +33,11 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.EmailAddress;
+import com.liferay.portal.model.MVCCModel;
 import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.impl.EmailAddressImpl;
 import com.liferay.portal.model.impl.EmailAddressModelImpl;
@@ -236,7 +236,7 @@ public class EmailAddressPersistenceImpl extends BasePersistenceImpl<EmailAddres
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<EmailAddress>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<EmailAddress>)QueryUtil.list(q, getDialect(),
@@ -783,7 +783,7 @@ public class EmailAddressPersistenceImpl extends BasePersistenceImpl<EmailAddres
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<EmailAddress>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<EmailAddress>)QueryUtil.list(q, getDialect(),
@@ -1330,7 +1330,7 @@ public class EmailAddressPersistenceImpl extends BasePersistenceImpl<EmailAddres
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<EmailAddress>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<EmailAddress>)QueryUtil.list(q, getDialect(),
@@ -1821,7 +1821,7 @@ public class EmailAddressPersistenceImpl extends BasePersistenceImpl<EmailAddres
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<EmailAddress>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<EmailAddress>)QueryUtil.list(q, getDialect(),
@@ -2324,7 +2324,7 @@ public class EmailAddressPersistenceImpl extends BasePersistenceImpl<EmailAddres
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<EmailAddress>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<EmailAddress>)QueryUtil.list(q, getDialect(),
@@ -2866,7 +2866,7 @@ public class EmailAddressPersistenceImpl extends BasePersistenceImpl<EmailAddres
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<EmailAddress>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<EmailAddress>)QueryUtil.list(q, getDialect(),
@@ -3448,7 +3448,7 @@ public class EmailAddressPersistenceImpl extends BasePersistenceImpl<EmailAddres
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<EmailAddress>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<EmailAddress>)QueryUtil.list(q, getDialect(),
@@ -3924,7 +3924,7 @@ public class EmailAddressPersistenceImpl extends BasePersistenceImpl<EmailAddres
 			CacheRegistryUtil.clear(EmailAddressImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(EmailAddressImpl.class.getName());
+		EntityCacheUtil.clearCache(EmailAddressImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -4255,7 +4255,8 @@ public class EmailAddressPersistenceImpl extends BasePersistenceImpl<EmailAddres
 		}
 
 		EntityCacheUtil.putResult(EmailAddressModelImpl.ENTITY_CACHE_ENABLED,
-			EmailAddressImpl.class, emailAddress.getPrimaryKey(), emailAddress);
+			EmailAddressImpl.class, emailAddress.getPrimaryKey(), emailAddress,
+			false);
 
 		emailAddress.resetOriginalValues();
 
@@ -4272,6 +4273,7 @@ public class EmailAddressPersistenceImpl extends BasePersistenceImpl<EmailAddres
 		emailAddressImpl.setNew(emailAddress.isNew());
 		emailAddressImpl.setPrimaryKey(emailAddress.getPrimaryKey());
 
+		emailAddressImpl.setMvccVersion(emailAddress.getMvccVersion());
 		emailAddressImpl.setUuid(emailAddress.getUuid());
 		emailAddressImpl.setEmailAddressId(emailAddress.getEmailAddressId());
 		emailAddressImpl.setCompanyId(emailAddress.getCompanyId());
@@ -4487,7 +4489,7 @@ public class EmailAddressPersistenceImpl extends BasePersistenceImpl<EmailAddres
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<EmailAddress>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<EmailAddress>)QueryUtil.list(q, getDialect(),
@@ -4622,10 +4624,22 @@ public class EmailAddressPersistenceImpl extends BasePersistenceImpl<EmailAddres
 			}
 		};
 
-	private static CacheModel<EmailAddress> _nullEmailAddressCacheModel = new CacheModel<EmailAddress>() {
-			@Override
-			public EmailAddress toEntityModel() {
-				return _nullEmailAddress;
-			}
-		};
+	private static CacheModel<EmailAddress> _nullEmailAddressCacheModel = new NullCacheModel();
+
+	private static class NullCacheModel implements CacheModel<EmailAddress>,
+		MVCCModel {
+		@Override
+		public long getMvccVersion() {
+			return 0;
+		}
+
+		@Override
+		public void setMvccVersion(long mvccVersion) {
+		}
+
+		@Override
+		public EmailAddress toEntityModel() {
+			return _nullEmailAddress;
+		}
+	}
 }

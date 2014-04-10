@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -87,8 +87,8 @@ long classNameId = BeanParamUtil.getLong(article, request, "classNameId");
 							Liferay.fire(
 								'previewArticle',
 								{
-									title: '<%= HtmlUtil.escapeJS(article.getTitle(locale)) %>',
-									uri: '<%= HtmlUtil.escapeJS(previewArticleContentURL.toString()) %>'
+									title: '<%= HtmlUtil.escape(article.getTitle(locale)) %>',
+									uri: '<%= HtmlUtil.escape(previewArticleContentURL.toString()) %>'
 								}
 							);
 						}
@@ -110,7 +110,8 @@ long classNameId = BeanParamUtil.getLong(article, request, "classNameId");
 					render: function(event) {
 						new A.Tooltip(
 							{
-								trigger: '#<portlet:namespace/>basicPreviewButton'
+								trigger: '#<portlet:namespace/>basicPreviewButton',
+								zIndex: Liferay.zIndex.TOOLTIP
 							}
 						).render();
 					}

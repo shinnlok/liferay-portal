@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -105,7 +105,7 @@ if (!StringUtil.contains(tabs4Names, tabs4)) {
 						for (LayoutPrototype layoutPrototype : layoutPrototypes) {
 						%>
 
-							<option value="<%= layoutPrototype.getLayoutPrototypeId() %>"><%= HtmlUtil.escape(layoutPrototype.getName(user.getLanguageId())) %></option>
+							<option value="<%= layoutPrototype.getLayoutPrototypeId() %>"><%= HtmlUtil.escape(layoutPrototype.getName(locale)) %></option>
 
 						<%
 						}
@@ -255,14 +255,14 @@ if (!StringUtil.contains(tabs4Names, tabs4)) {
 		boolean mergeGuestPublicPages = PropertiesParamUtil.getBoolean(groupTypeSettings, request, "mergeGuestPublicPages");
 		%>
 
-		<liferay-ui:message arguments="<%= HtmlUtil.escape(company.getGroup().getDescriptiveName(locale)) %>" key="you-can-configure-the-top-level-pages-of-this-public-site-to-merge-with-the-top-level-pages-of-the-public-x-site" />
+		<liferay-ui:message arguments="<%= HtmlUtil.escape(company.getGroup().getDescriptiveName(locale)) %>" key="you-can-configure-the-top-level-pages-of-this-public-site-to-merge-with-the-top-level-pages-of-the-public-x-site" translateArguments="<%= false %>" />
 
 		<br /><br />
 
 		<table class="lfr-table">
 		<tr>
 			<td class="lfr-label">
-				<liferay-ui:message arguments="<%= HtmlUtil.escape(company.getGroup().getDescriptiveName(locale)) %>" key="merge-x-public-pages" />
+				<liferay-ui:message arguments="<%= HtmlUtil.escape(company.getGroup().getDescriptiveName(locale)) %>" key="merge-x-public-pages" translateArguments="<%= false %>" />
 			</td>
 			<td>
 				<liferay-ui:input-checkbox defaultValue="<%= mergeGuestPublicPages %>" param="mergeGuestPublicPages" />

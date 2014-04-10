@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -33,7 +33,6 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.ModelListener;
@@ -239,7 +238,7 @@ public class SCProductVersionPersistenceImpl extends BasePersistenceImpl<SCProdu
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<SCProductVersion>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<SCProductVersion>)QueryUtil.list(q,
@@ -710,7 +709,7 @@ public class SCProductVersionPersistenceImpl extends BasePersistenceImpl<SCProdu
 				QueryPos qPos = QueryPos.getInstance(q);
 
 				if (bindDirectDownloadURL) {
-					qPos.add(directDownloadURL.toLowerCase());
+					qPos.add(StringUtil.toLowerCase(directDownloadURL));
 				}
 
 				List<SCProductVersion> list = q.list();
@@ -823,7 +822,7 @@ public class SCProductVersionPersistenceImpl extends BasePersistenceImpl<SCProdu
 				QueryPos qPos = QueryPos.getInstance(q);
 
 				if (bindDirectDownloadURL) {
-					qPos.add(directDownloadURL.toLowerCase());
+					qPos.add(StringUtil.toLowerCase(directDownloadURL));
 				}
 
 				count = (Long)q.uniqueResult();
@@ -905,7 +904,7 @@ public class SCProductVersionPersistenceImpl extends BasePersistenceImpl<SCProdu
 			CacheRegistryUtil.clear(SCProductVersionImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(SCProductVersionImpl.class.getName());
+		EntityCacheUtil.clearCache(SCProductVersionImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -1160,7 +1159,7 @@ public class SCProductVersionPersistenceImpl extends BasePersistenceImpl<SCProdu
 
 		EntityCacheUtil.putResult(SCProductVersionModelImpl.ENTITY_CACHE_ENABLED,
 			SCProductVersionImpl.class, scProductVersion.getPrimaryKey(),
-			scProductVersion);
+			scProductVersion, false);
 
 		clearUniqueFindersCache(scProductVersion);
 		cacheUniqueFindersCache(scProductVersion);
@@ -1397,7 +1396,7 @@ public class SCProductVersionPersistenceImpl extends BasePersistenceImpl<SCProdu
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<SCProductVersion>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<SCProductVersion>)QueryUtil.list(q,
@@ -1763,9 +1762,6 @@ public class SCProductVersionPersistenceImpl extends BasePersistenceImpl<SCProdu
 		}
 		catch (Exception e) {
 			throw processException(e);
-		}
-		finally {
-			FinderCacheUtil.clearCache(SCProductVersionModelImpl.MAPPING_TABLE_SCFRAMEWORKVERSI_SCPRODUCTVERS_NAME);
 		}
 	}
 

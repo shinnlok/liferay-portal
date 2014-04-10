@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,6 +28,7 @@
 <%@ taglib uri="http://liferay.com/tld/ddm" prefix="liferay-ddm" %>
 <%@ taglib uri="http://liferay.com/tld/portlet" prefix="liferay-portlet" %>
 <%@ taglib uri="http://liferay.com/tld/security" prefix="liferay-security" %>
+<%@ taglib uri="http://liferay.com/tld/staging" prefix="liferay-staging" %>
 <%@ taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %>
 <%@ taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
 <%@ taglib uri="http://liferay.com/tld/util" prefix="liferay-util" %>
@@ -58,6 +59,7 @@ page import="com.liferay.portal.kernel.dao.search.DisplayTerms" %><%@
 page import="com.liferay.portal.kernel.dao.search.ResultRow" %><%@
 page import="com.liferay.portal.kernel.dao.search.RowChecker" %><%@
 page import="com.liferay.portal.kernel.dao.search.SearchContainer" %><%@
+page import="com.liferay.portal.kernel.dao.search.SearchContainerResults" %><%@
 page import="com.liferay.portal.kernel.dao.search.SearchEntry" %><%@
 page import="com.liferay.portal.kernel.dao.search.TextSearchEntry" %><%@
 page import="com.liferay.portal.kernel.exception.LocalizedException" %><%@
@@ -80,8 +82,10 @@ page import="com.liferay.portal.kernel.portlet.LiferayPortletRequest" %><%@
 page import="com.liferay.portal.kernel.portlet.LiferayPortletResponse" %><%@
 page import="com.liferay.portal.kernel.portlet.LiferayPortletURL" %><%@
 page import="com.liferay.portal.kernel.portlet.LiferayWindowState" %><%@
+page import="com.liferay.portal.kernel.portlet.PortletRequestModel" %><%@
 page import="com.liferay.portal.kernel.repository.model.FileEntry" %><%@
 page import="com.liferay.portal.kernel.repository.model.FileVersion" %><%@
+page import="com.liferay.portal.kernel.search.BaseModelSearchResult" %><%@
 page import="com.liferay.portal.kernel.search.Field" %><%@
 page import="com.liferay.portal.kernel.search.Hits" %><%@
 page import="com.liferay.portal.kernel.search.Indexer" %><%@
@@ -95,6 +99,7 @@ page import="com.liferay.portal.kernel.search.SortFactoryUtil" %><%@
 page import="com.liferay.portal.kernel.search.Summary" %><%@
 page import="com.liferay.portal.kernel.servlet.BrowserSnifferUtil" %><%@
 page import="com.liferay.portal.kernel.servlet.BufferCacheServletResponse" %><%@
+page import="com.liferay.portal.kernel.servlet.MultiSessionMessages" %><%@
 page import="com.liferay.portal.kernel.servlet.PortalMessages" %><%@
 page import="com.liferay.portal.kernel.servlet.ServletContextPool" %><%@
 page import="com.liferay.portal.kernel.servlet.ServletContextUtil" %><%@
@@ -175,13 +180,15 @@ page import="com.liferay.portal.service.permission.LayoutSetPrototypePermissionU
 page import="com.liferay.portal.service.permission.PortalPermissionUtil" %><%@
 page import="com.liferay.portal.service.permission.PortletPermissionUtil" %><%@
 page import="com.liferay.portal.service.permission.RolePermissionUtil" %><%@
+page import="com.liferay.portal.settings.Settings" %><%@
+page import="com.liferay.portal.settings.SettingsFactoryUtil" %><%@
 page import="com.liferay.portal.struts.StrutsUtil" %><%@
 page import="com.liferay.portal.struts.TilesAttributeUtil" %><%@
 page import="com.liferay.portal.theme.ThemeDisplay" %><%@
 page import="com.liferay.portal.util.ClassLoaderUtil" %><%@
 page import="com.liferay.portal.util.JavaScriptBundleUtil" %><%@
-page import="com.liferay.portal.util.LayoutLister" %><%@
-page import="com.liferay.portal.util.LayoutView" %><%@
+page import="com.liferay.portal.util.LayoutDescription" %><%@
+page import="com.liferay.portal.util.LayoutListUtil" %><%@
 page import="com.liferay.portal.util.Portal" %><%@
 page import="com.liferay.portal.util.PortalUtil" %><%@
 page import="com.liferay.portal.util.PortletCategoryKeys" %><%@
@@ -230,6 +237,7 @@ page import="com.liferay.portlet.asset.service.AssetVocabularyServiceUtil" %><%@
 page import="com.liferay.portlet.asset.service.persistence.AssetEntryQuery" %><%@
 page import="com.liferay.portlet.asset.util.AssetUtil" %><%@
 page import="com.liferay.portlet.blogs.model.BlogsEntry" %><%@
+page import="com.liferay.portlet.documentlibrary.FileExtensionException" %><%@
 page import="com.liferay.portlet.documentlibrary.FileSizeException" %><%@
 page import="com.liferay.portlet.documentlibrary.NoSuchFileException" %><%@
 page import="com.liferay.portlet.documentlibrary.model.DLFileEntry" %><%@
@@ -244,6 +252,7 @@ page import="com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalSer
 page import="com.liferay.portlet.dynamicdatamapping.service.DDMTemplateLocalServiceUtil" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.service.permission.DDMTemplatePermission" %><%@
 page import="com.liferay.portlet.expando.model.ExpandoBridge" %><%@
+page import="com.liferay.portlet.journal.NoSuchArticleException" %><%@
 page import="com.liferay.portlet.journal.action.EditArticleAction" %><%@
 page import="com.liferay.portlet.journal.model.JournalArticle" %><%@
 page import="com.liferay.portlet.journal.model.JournalArticleConstants" %><%@
@@ -255,6 +264,7 @@ page import="com.liferay.portlet.journal.service.JournalArticleServiceUtil" %><%
 page import="com.liferay.portlet.journalcontent.util.JournalContentUtil" %><%@
 page import="com.liferay.portlet.messageboards.model.MBMessage" %><%@
 page import="com.liferay.portlet.messageboards.service.MBMessageLocalServiceUtil" %><%@
+page import="com.liferay.portlet.messageboards.util.MBUtil" %><%@
 page import="com.liferay.portlet.portletconfiguration.util.PortletConfigurationUtil" %><%@
 page import="com.liferay.portlet.portletdisplaytemplate.util.PortletDisplayTemplateUtil" %><%@
 page import="com.liferay.portlet.rolesadmin.util.RolesAdminUtil" %><%@
@@ -281,13 +291,13 @@ page import="com.liferay.util.PwdGenerator" %><%@
 page import="com.liferay.util.State" %><%@
 page import="com.liferay.util.StateUtil" %><%@
 page import="com.liferay.util.log4j.Levels" %><%@
-page import="com.liferay.util.portlet.PortletRequestUtil" %><%@
 page import="com.liferay.util.xml.XMLFormatter" %>
 
 <%@ page import="java.io.Serializable" %>
 
 <%@ page import="java.text.DateFormat" %><%@
 page import="java.text.DecimalFormat" %><%@
+page import="java.text.DecimalFormatSymbols" %><%@
 page import="java.text.Format" %><%@
 page import="java.text.NumberFormat" %><%@
 page import="java.text.SimpleDateFormat" %>

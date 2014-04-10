@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -133,6 +133,18 @@ public class ShoppingItemFieldPersistenceTest {
 			newShoppingItemField.getValues());
 		Assert.assertEquals(existingShoppingItemField.getDescription(),
 			newShoppingItemField.getDescription());
+	}
+
+	@Test
+	public void testCountByItemId() {
+		try {
+			_persistence.countByItemId(ServiceTestUtil.nextLong());
+
+			_persistence.countByItemId(0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
 	}
 
 	@Test

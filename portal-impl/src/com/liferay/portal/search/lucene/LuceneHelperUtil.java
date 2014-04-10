@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -283,6 +283,11 @@ public class LuceneHelperUtil {
 		getLuceneHelper().addTerm(booleanQuery, field, values, like);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #releaseIndexSearcher(long,
+	 *             IndexSearcher)}
+	 */
+	@Deprecated
 	public static void cleanUp(IndexSearcher indexSearcher) {
 		getLuceneHelper().cleanUp(indexSearcher);
 	}
@@ -315,6 +320,12 @@ public class LuceneHelperUtil {
 		return getLuceneHelper().getIndexAccessor(companyId);
 	}
 
+	public static IndexSearcher getIndexSearcher(long companyId)
+		throws IOException {
+
+		return getLuceneHelper().getIndexSearcher(companyId);
+	}
+
 	public static long getLastGeneration(long companyId) {
 		return getLuceneHelper().getLastGeneration(companyId);
 	}
@@ -335,6 +346,10 @@ public class LuceneHelperUtil {
 		return getLuceneHelper().getQueryTerms(query);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #getIndexSearcher(long)}
+	 */
+	@Deprecated
 	public static IndexSearcher getSearcher(long companyId, boolean readOnly)
 		throws IOException {
 
@@ -385,6 +400,13 @@ public class LuceneHelperUtil {
 		throws SystemException {
 
 		getLuceneHelper().loadIndexesFromCluster(companyId);
+	}
+
+	public static void releaseIndexSearcher(
+			long companyId, IndexSearcher indexSearcher)
+		throws IOException {
+
+		getLuceneHelper().releaseIndexSearcher(companyId, indexSearcher);
 	}
 
 	public static void shutdown() {

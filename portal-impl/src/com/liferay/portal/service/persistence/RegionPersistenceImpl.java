@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -33,9 +33,9 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.CacheModel;
+import com.liferay.portal.model.MVCCModel;
 import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.Region;
 import com.liferay.portal.model.impl.RegionImpl;
@@ -225,7 +225,7 @@ public class RegionPersistenceImpl extends BasePersistenceImpl<Region>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<Region>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<Region>)QueryUtil.list(q, getDialect(), start,
@@ -711,7 +711,7 @@ public class RegionPersistenceImpl extends BasePersistenceImpl<Region>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<Region>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<Region>)QueryUtil.list(q, getDialect(), start,
@@ -1474,7 +1474,7 @@ public class RegionPersistenceImpl extends BasePersistenceImpl<Region>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<Region>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<Region>)QueryUtil.list(q, getDialect(), start,
@@ -1899,7 +1899,7 @@ public class RegionPersistenceImpl extends BasePersistenceImpl<Region>
 			CacheRegistryUtil.clear(RegionImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(RegionImpl.class.getName());
+		EntityCacheUtil.clearCache(RegionImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -2181,7 +2181,7 @@ public class RegionPersistenceImpl extends BasePersistenceImpl<Region>
 		}
 
 		EntityCacheUtil.putResult(RegionModelImpl.ENTITY_CACHE_ENABLED,
-			RegionImpl.class, region.getPrimaryKey(), region);
+			RegionImpl.class, region.getPrimaryKey(), region, false);
 
 		clearUniqueFindersCache(region);
 		cacheUniqueFindersCache(region);
@@ -2201,6 +2201,7 @@ public class RegionPersistenceImpl extends BasePersistenceImpl<Region>
 		regionImpl.setNew(region.isNew());
 		regionImpl.setPrimaryKey(region.getPrimaryKey());
 
+		regionImpl.setMvccVersion(region.getMvccVersion());
 		regionImpl.setRegionId(region.getRegionId());
 		regionImpl.setCountryId(region.getCountryId());
 		regionImpl.setRegionCode(region.getRegionCode());
@@ -2406,7 +2407,7 @@ public class RegionPersistenceImpl extends BasePersistenceImpl<Region>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<Region>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<Region>)QueryUtil.list(q, getDialect(), start,
@@ -2541,10 +2542,22 @@ public class RegionPersistenceImpl extends BasePersistenceImpl<Region>
 			}
 		};
 
-	private static CacheModel<Region> _nullRegionCacheModel = new CacheModel<Region>() {
-			@Override
-			public Region toEntityModel() {
-				return _nullRegion;
-			}
-		};
+	private static CacheModel<Region> _nullRegionCacheModel = new NullCacheModel();
+
+	private static class NullCacheModel implements CacheModel<Region>,
+		MVCCModel {
+		@Override
+		public long getMvccVersion() {
+			return 0;
+		}
+
+		@Override
+		public void setMvccVersion(long mvccVersion) {
+		}
+
+		@Override
+		public Region toEntityModel() {
+			return _nullRegion;
+		}
+	}
 }

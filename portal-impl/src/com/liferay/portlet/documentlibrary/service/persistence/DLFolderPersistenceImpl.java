@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -34,7 +34,6 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.model.CacheModel;
@@ -244,7 +243,7 @@ public class DLFolderPersistenceImpl extends BasePersistenceImpl<DLFolder>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<DLFolder>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<DLFolder>)QueryUtil.list(q, getDialect(),
@@ -1054,7 +1053,7 @@ public class DLFolderPersistenceImpl extends BasePersistenceImpl<DLFolder>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<DLFolder>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<DLFolder>)QueryUtil.list(q, getDialect(),
@@ -1599,7 +1598,7 @@ public class DLFolderPersistenceImpl extends BasePersistenceImpl<DLFolder>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<DLFolder>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<DLFolder>)QueryUtil.list(q, getDialect(),
@@ -1983,7 +1982,7 @@ public class DLFolderPersistenceImpl extends BasePersistenceImpl<DLFolder>
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
 				q.addEntity(_FILTER_ENTITY_ALIAS, DLFolderImpl.class);
@@ -2158,7 +2157,7 @@ public class DLFolderPersistenceImpl extends BasePersistenceImpl<DLFolder>
 				DLFolder.class.getName(),
 				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
-		SQLQuery q = session.createSQLQuery(sql);
+		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 		q.setFirstResult(0);
 		q.setMaxResults(2);
@@ -2287,7 +2286,7 @@ public class DLFolderPersistenceImpl extends BasePersistenceImpl<DLFolder>
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addScalar(COUNT_COLUMN_NAME,
 				com.liferay.portal.kernel.dao.orm.Type.LONG);
@@ -2453,7 +2452,7 @@ public class DLFolderPersistenceImpl extends BasePersistenceImpl<DLFolder>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<DLFolder>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<DLFolder>)QueryUtil.list(q, getDialect(),
@@ -3173,7 +3172,7 @@ public class DLFolderPersistenceImpl extends BasePersistenceImpl<DLFolder>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<DLFolder>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<DLFolder>)QueryUtil.list(q, getDialect(),
@@ -3582,7 +3581,7 @@ public class DLFolderPersistenceImpl extends BasePersistenceImpl<DLFolder>
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
 				q.addEntity(_FILTER_ENTITY_ALIAS, DLFolderImpl.class);
@@ -3762,7 +3761,7 @@ public class DLFolderPersistenceImpl extends BasePersistenceImpl<DLFolder>
 				DLFolder.class.getName(),
 				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
-		SQLQuery q = session.createSQLQuery(sql);
+		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 		q.setFirstResult(0);
 		q.setMaxResults(2);
@@ -3905,7 +3904,7 @@ public class DLFolderPersistenceImpl extends BasePersistenceImpl<DLFolder>
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addScalar(COUNT_COLUMN_NAME,
 				com.liferay.portal.kernel.dao.orm.Type.LONG);
@@ -4069,7 +4068,7 @@ public class DLFolderPersistenceImpl extends BasePersistenceImpl<DLFolder>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<DLFolder>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<DLFolder>)QueryUtil.list(q, getDialect(),
@@ -4611,7 +4610,7 @@ public class DLFolderPersistenceImpl extends BasePersistenceImpl<DLFolder>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<DLFolder>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<DLFolder>)QueryUtil.list(q, getDialect(),
@@ -5179,7 +5178,7 @@ public class DLFolderPersistenceImpl extends BasePersistenceImpl<DLFolder>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<DLFolder>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<DLFolder>)QueryUtil.list(q, getDialect(),
@@ -5916,7 +5915,7 @@ public class DLFolderPersistenceImpl extends BasePersistenceImpl<DLFolder>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<DLFolder>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<DLFolder>)QueryUtil.list(q, getDialect(),
@@ -6371,7 +6370,7 @@ public class DLFolderPersistenceImpl extends BasePersistenceImpl<DLFolder>
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
 				q.addEntity(_FILTER_ENTITY_ALIAS, DLFolderImpl.class);
@@ -6565,7 +6564,7 @@ public class DLFolderPersistenceImpl extends BasePersistenceImpl<DLFolder>
 				DLFolder.class.getName(),
 				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
-		SQLQuery q = session.createSQLQuery(sql);
+		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 		q.setFirstResult(0);
 		q.setMaxResults(2);
@@ -6733,7 +6732,7 @@ public class DLFolderPersistenceImpl extends BasePersistenceImpl<DLFolder>
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addScalar(COUNT_COLUMN_NAME,
 				com.liferay.portal.kernel.dao.orm.Type.LONG);
@@ -6948,7 +6947,7 @@ public class DLFolderPersistenceImpl extends BasePersistenceImpl<DLFolder>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<DLFolder>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<DLFolder>)QueryUtil.list(q, getDialect(),
@@ -7403,7 +7402,7 @@ public class DLFolderPersistenceImpl extends BasePersistenceImpl<DLFolder>
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
 				q.addEntity(_FILTER_ENTITY_ALIAS, DLFolderImpl.class);
@@ -7596,7 +7595,7 @@ public class DLFolderPersistenceImpl extends BasePersistenceImpl<DLFolder>
 				DLFolder.class.getName(),
 				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
-		SQLQuery q = session.createSQLQuery(sql);
+		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 		q.setFirstResult(0);
 		q.setMaxResults(2);
@@ -7763,7 +7762,7 @@ public class DLFolderPersistenceImpl extends BasePersistenceImpl<DLFolder>
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addScalar(COUNT_COLUMN_NAME,
 				com.liferay.portal.kernel.dao.orm.Type.LONG);
@@ -7994,7 +7993,7 @@ public class DLFolderPersistenceImpl extends BasePersistenceImpl<DLFolder>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<DLFolder>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<DLFolder>)QueryUtil.list(q, getDialect(),
@@ -8477,7 +8476,7 @@ public class DLFolderPersistenceImpl extends BasePersistenceImpl<DLFolder>
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
 				q.addEntity(_FILTER_ENTITY_ALIAS, DLFolderImpl.class);
@@ -8676,7 +8675,7 @@ public class DLFolderPersistenceImpl extends BasePersistenceImpl<DLFolder>
 				DLFolder.class.getName(),
 				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
-		SQLQuery q = session.createSQLQuery(sql);
+		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 		q.setFirstResult(0);
 		q.setMaxResults(2);
@@ -8859,7 +8858,7 @@ public class DLFolderPersistenceImpl extends BasePersistenceImpl<DLFolder>
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addScalar(COUNT_COLUMN_NAME,
 				com.liferay.portal.kernel.dao.orm.Type.LONG);
@@ -8956,7 +8955,7 @@ public class DLFolderPersistenceImpl extends BasePersistenceImpl<DLFolder>
 			CacheRegistryUtil.clear(DLFolderImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(DLFolderImpl.class.getName());
+		EntityCacheUtil.clearCache(DLFolderImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -9462,7 +9461,7 @@ public class DLFolderPersistenceImpl extends BasePersistenceImpl<DLFolder>
 		}
 
 		EntityCacheUtil.putResult(DLFolderModelImpl.ENTITY_CACHE_ENABLED,
-			DLFolderImpl.class, dlFolder.getPrimaryKey(), dlFolder);
+			DLFolderImpl.class, dlFolder.getPrimaryKey(), dlFolder, false);
 
 		clearUniqueFindersCache(dlFolder);
 		cacheUniqueFindersCache(dlFolder);
@@ -9704,7 +9703,7 @@ public class DLFolderPersistenceImpl extends BasePersistenceImpl<DLFolder>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<DLFolder>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<DLFolder>)QueryUtil.list(q, getDialect(),
@@ -10069,9 +10068,6 @@ public class DLFolderPersistenceImpl extends BasePersistenceImpl<DLFolder>
 		}
 		catch (Exception e) {
 			throw processException(e);
-		}
-		finally {
-			FinderCacheUtil.clearCache(DLFolderModelImpl.MAPPING_TABLE_DLFILEENTRYTYPES_DLFOLDERS_NAME);
 		}
 	}
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,6 +15,7 @@
 package com.liferay.portal.tools.servicebuilder;
 
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TextFormatter;
 import com.liferay.portal.kernel.util.Validator;
@@ -402,6 +403,41 @@ public class EntityColumn implements Cloneable, Comparable<EntityColumn> {
 
 	public void setParentContainerModel(boolean parentContainerModel) {
 		_parentContainerModel = parentContainerModel;
+	}
+
+	public void validate() {
+		if (Validator.isNotNull(_arrayableOperator)) {
+			if (!_type.equals("char") && !_type.equals("int") &&
+				!_type.equals("long") && !_type.equals("short") &&
+				!_type.equals("String")) {
+
+				throw new IllegalArgumentException(
+					"Type " + _type + " cannot be arrayable");
+			}
+		}
+
+		String comparator = _comparator;
+
+		if (comparator == null) {
+			comparator = StringPool.EQUAL;
+		}
+
+		if (_arrayableOperator.equals("AND") &&
+			!comparator.equals(StringPool.NOT_EQUAL)) {
+
+			throw new IllegalArgumentException(
+				"Illegal combination of arrayable \"AND\" and comparator \"" +
+					comparator + "\"");
+		}
+
+		if (_arrayableOperator.equals("OR") &&
+			!comparator.equals(StringPool.EQUAL) &&
+			!comparator.equals(StringPool.LIKE)) {
+
+			throw new IllegalArgumentException(
+				"Illegal combination of arrayable \"OR\" and comparator \"" +
+					comparator + "\"");
+		}
 	}
 
 	protected String convertComparatorToHtml(String comparator) {

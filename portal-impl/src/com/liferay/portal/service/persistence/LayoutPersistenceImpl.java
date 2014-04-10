@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -34,11 +34,11 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.Layout;
+import com.liferay.portal.model.MVCCModel;
 import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.impl.LayoutImpl;
 import com.liferay.portal.model.impl.LayoutModelImpl;
@@ -239,7 +239,7 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<Layout>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<Layout>)QueryUtil.list(q, getDialect(), start,
@@ -1074,7 +1074,7 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<Layout>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<Layout>)QueryUtil.list(q, getDialect(), start,
@@ -1617,7 +1617,7 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<Layout>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<Layout>)QueryUtil.list(q, getDialect(), start,
@@ -2000,7 +2000,7 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
 				q.addEntity(_FILTER_ENTITY_ALIAS, LayoutImpl.class);
@@ -2174,7 +2174,7 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 				Layout.class.getName(), _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN,
 				groupId);
 
-		SQLQuery q = session.createSQLQuery(sql);
+		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 		q.setFirstResult(0);
 		q.setMaxResults(2);
@@ -2303,7 +2303,7 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addScalar(COUNT_COLUMN_NAME,
 				com.liferay.portal.kernel.dao.orm.Type.LONG);
@@ -2469,7 +2469,7 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<Layout>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<Layout>)QueryUtil.list(q, getDialect(), start,
@@ -3200,7 +3200,7 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<Layout>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<Layout>)QueryUtil.list(q, getDialect(), start,
@@ -3755,7 +3755,7 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<Layout>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<Layout>)QueryUtil.list(q, getDialect(), start,
@@ -4299,7 +4299,7 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<Layout>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<Layout>)QueryUtil.list(q, getDialect(), start,
@@ -4708,7 +4708,7 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
 				q.addEntity(_FILTER_ENTITY_ALIAS, LayoutImpl.class);
@@ -4888,7 +4888,7 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 				Layout.class.getName(), _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN,
 				groupId);
 
-		SQLQuery q = session.createSQLQuery(sql);
+		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 		q.setFirstResult(0);
 		q.setMaxResults(2);
@@ -5031,7 +5031,7 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addScalar(COUNT_COLUMN_NAME,
 				com.liferay.portal.kernel.dao.orm.Type.LONG);
@@ -5486,7 +5486,7 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<Layout>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<Layout>)QueryUtil.list(q, getDialect(), start,
@@ -5919,7 +5919,7 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
 				q.addEntity(_FILTER_ENTITY_ALIAS, LayoutImpl.class);
@@ -6106,7 +6106,7 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 				Layout.class.getName(), _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN,
 				groupId);
 
-		SQLQuery q = session.createSQLQuery(sql);
+		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 		q.setFirstResult(0);
 		q.setMaxResults(2);
@@ -6262,7 +6262,7 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addScalar(COUNT_COLUMN_NAME,
 				com.liferay.portal.kernel.dao.orm.Type.LONG);
@@ -6766,7 +6766,7 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<Layout>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<Layout>)QueryUtil.list(q, getDialect(), start,
@@ -7223,7 +7223,7 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
 				q.addEntity(_FILTER_ENTITY_ALIAS, LayoutImpl.class);
@@ -7422,7 +7422,7 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 				Layout.class.getName(), _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN,
 				groupId);
 
-		SQLQuery q = session.createSQLQuery(sql);
+		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 		q.setFirstResult(0);
 		q.setMaxResults(2);
@@ -7604,7 +7604,7 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addScalar(COUNT_COLUMN_NAME,
 				com.liferay.portal.kernel.dao.orm.Type.LONG);
@@ -8026,7 +8026,7 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 			CacheRegistryUtil.clear(LayoutImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(LayoutImpl.class.getName());
+		EntityCacheUtil.clearCache(LayoutImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -8604,7 +8604,7 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 		}
 
 		EntityCacheUtil.putResult(LayoutModelImpl.ENTITY_CACHE_ENABLED,
-			LayoutImpl.class, layout.getPrimaryKey(), layout);
+			LayoutImpl.class, layout.getPrimaryKey(), layout, false);
 
 		clearUniqueFindersCache(layout);
 		cacheUniqueFindersCache(layout);
@@ -8624,6 +8624,7 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 		layoutImpl.setNew(layout.isNew());
 		layoutImpl.setPrimaryKey(layout.getPrimaryKey());
 
+		layoutImpl.setMvccVersion(layout.getMvccVersion());
 		layoutImpl.setUuid(layout.getUuid());
 		layoutImpl.setPlid(layout.getPlid());
 		layoutImpl.setGroupId(layout.getGroupId());
@@ -8854,7 +8855,7 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<Layout>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<Layout>)QueryUtil.list(q, getDialect(), start,
@@ -8999,10 +9000,22 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 			}
 		};
 
-	private static CacheModel<Layout> _nullLayoutCacheModel = new CacheModel<Layout>() {
-			@Override
-			public Layout toEntityModel() {
-				return _nullLayout;
-			}
-		};
+	private static CacheModel<Layout> _nullLayoutCacheModel = new NullCacheModel();
+
+	private static class NullCacheModel implements CacheModel<Layout>,
+		MVCCModel {
+		@Override
+		public long getMvccVersion() {
+			return 0;
+		}
+
+		@Override
+		public void setMvccVersion(long mvccVersion) {
+		}
+
+		@Override
+		public Layout toEntityModel() {
+			return _nullLayout;
+		}
+	}
 }

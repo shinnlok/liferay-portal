@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -33,9 +33,9 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.Image;
+import com.liferay.portal.model.MVCCModel;
 import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.impl.ImageImpl;
 import com.liferay.portal.model.impl.ImageModelImpl;
@@ -206,7 +206,7 @@ public class ImagePersistenceImpl extends BasePersistenceImpl<Image>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<Image>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<Image>)QueryUtil.list(q, getDialect(), start,
@@ -600,7 +600,7 @@ public class ImagePersistenceImpl extends BasePersistenceImpl<Image>
 			CacheRegistryUtil.clear(ImageImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(ImageImpl.class.getName());
+		EntityCacheUtil.clearCache(ImageImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -771,7 +771,7 @@ public class ImagePersistenceImpl extends BasePersistenceImpl<Image>
 		}
 
 		EntityCacheUtil.putResult(ImageModelImpl.ENTITY_CACHE_ENABLED,
-			ImageImpl.class, image.getPrimaryKey(), image);
+			ImageImpl.class, image.getPrimaryKey(), image, false);
 
 		image.resetOriginalValues();
 
@@ -788,6 +788,7 @@ public class ImagePersistenceImpl extends BasePersistenceImpl<Image>
 		imageImpl.setNew(image.isNew());
 		imageImpl.setPrimaryKey(image.getPrimaryKey());
 
+		imageImpl.setMvccVersion(image.getMvccVersion());
 		imageImpl.setImageId(image.getImageId());
 		imageImpl.setModifiedDate(image.getModifiedDate());
 		imageImpl.setType(image.getType());
@@ -994,7 +995,7 @@ public class ImagePersistenceImpl extends BasePersistenceImpl<Image>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<Image>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<Image>)QueryUtil.list(q, getDialect(), start,
@@ -1129,10 +1130,21 @@ public class ImagePersistenceImpl extends BasePersistenceImpl<Image>
 			}
 		};
 
-	private static CacheModel<Image> _nullImageCacheModel = new CacheModel<Image>() {
-			@Override
-			public Image toEntityModel() {
-				return _nullImage;
-			}
-		};
+	private static CacheModel<Image> _nullImageCacheModel = new NullCacheModel();
+
+	private static class NullCacheModel implements CacheModel<Image>, MVCCModel {
+		@Override
+		public long getMvccVersion() {
+			return 0;
+		}
+
+		@Override
+		public void setMvccVersion(long mvccVersion) {
+		}
+
+		@Override
+		public Image toEntityModel() {
+			return _nullImage;
+		}
+	}
 }

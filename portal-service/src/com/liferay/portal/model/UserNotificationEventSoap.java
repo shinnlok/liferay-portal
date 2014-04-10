@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -30,6 +30,7 @@ public class UserNotificationEventSoap implements Serializable {
 		UserNotificationEvent model) {
 		UserNotificationEventSoap soapModel = new UserNotificationEventSoap();
 
+		soapModel.setMvccVersion(model.getMvccVersion());
 		soapModel.setUuid(model.getUuid());
 		soapModel.setUserNotificationEventId(model.getUserNotificationEventId());
 		soapModel.setCompanyId(model.getCompanyId());
@@ -93,6 +94,14 @@ public class UserNotificationEventSoap implements Serializable {
 
 	public void setPrimaryKey(long pk) {
 		setUserNotificationEventId(pk);
+	}
+
+	public long getMvccVersion() {
+		return _mvccVersion;
+	}
+
+	public void setMvccVersion(long mvccVersion) {
+		_mvccVersion = mvccVersion;
 	}
 
 	public String getUuid() {
@@ -183,6 +192,7 @@ public class UserNotificationEventSoap implements Serializable {
 		_archived = archived;
 	}
 
+	private long _mvccVersion;
 	private String _uuid;
 	private long _userNotificationEventId;
 	private long _companyId;

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,7 +32,6 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.model.CacheModel;
@@ -236,7 +235,7 @@ public class DDLRecordPersistenceImpl extends BasePersistenceImpl<DDLRecord>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<DDLRecord>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<DDLRecord>)QueryUtil.list(q, getDialect(),
@@ -1044,7 +1043,7 @@ public class DDLRecordPersistenceImpl extends BasePersistenceImpl<DDLRecord>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<DDLRecord>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<DDLRecord>)QueryUtil.list(q, getDialect(),
@@ -1590,7 +1589,7 @@ public class DDLRecordPersistenceImpl extends BasePersistenceImpl<DDLRecord>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<DDLRecord>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<DDLRecord>)QueryUtil.list(q, getDialect(),
@@ -2081,7 +2080,7 @@ public class DDLRecordPersistenceImpl extends BasePersistenceImpl<DDLRecord>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<DDLRecord>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<DDLRecord>)QueryUtil.list(q, getDialect(),
@@ -2584,7 +2583,7 @@ public class DDLRecordPersistenceImpl extends BasePersistenceImpl<DDLRecord>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<DDLRecord>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<DDLRecord>)QueryUtil.list(q, getDialect(),
@@ -3012,7 +3011,7 @@ public class DDLRecordPersistenceImpl extends BasePersistenceImpl<DDLRecord>
 			CacheRegistryUtil.clear(DDLRecordImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(DDLRecordImpl.class.getName());
+		EntityCacheUtil.clearCache(DDLRecordImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -3349,7 +3348,7 @@ public class DDLRecordPersistenceImpl extends BasePersistenceImpl<DDLRecord>
 		}
 
 		EntityCacheUtil.putResult(DDLRecordModelImpl.ENTITY_CACHE_ENABLED,
-			DDLRecordImpl.class, ddlRecord.getPrimaryKey(), ddlRecord);
+			DDLRecordImpl.class, ddlRecord.getPrimaryKey(), ddlRecord, false);
 
 		clearUniqueFindersCache(ddlRecord);
 		cacheUniqueFindersCache(ddlRecord);
@@ -3585,7 +3584,7 @@ public class DDLRecordPersistenceImpl extends BasePersistenceImpl<DDLRecord>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<DDLRecord>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<DDLRecord>)QueryUtil.list(q, getDialect(),

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -53,7 +53,7 @@
 			headerNames.add("name");
 			headerNames.add("content");
 
-			SearchContainer searchContainer = new SearchContainer(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM, SearchContainer.DEFAULT_DELTA, portletURL, headerNames, LanguageUtil.format(pageContext, "no-pages-were-found-that-matched-the-keywords-x", "<strong>" + HtmlUtil.escape(keywords) + "</strong>"));
+			SearchContainer searchContainer = new SearchContainer(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM, SearchContainer.DEFAULT_DELTA, portletURL, headerNames, LanguageUtil.format(pageContext, "no-pages-were-found-that-matched-the-keywords-x", "<strong>" + HtmlUtil.escape(keywords) + "</strong>", false));
 
 			try {
 				Indexer indexer = IndexerRegistryUtil.getIndexer(JournalArticle.class);
@@ -63,12 +63,6 @@
 				searchContext.setAttribute("articleType", type);
 				searchContext.setGroupIds(null);
 				searchContext.setKeywords(keywords);
-
-				QueryConfig queryConfig = new QueryConfig();
-
-				queryConfig.setHighlightEnabled(true);
-
-				searchContext.setQueryConfig(queryConfig);
 
 				Hits hits = indexer.search(searchContext);
 
@@ -93,9 +87,12 @@
 
 					PortletURL summaryURL = PortletURLUtil.clone(portletURL, renderResponse);
 
-					Summary summary = indexer.getSummary(doc, locale, StringPool.BLANK, summaryURL);
+					Summary summary = indexer.getSummary(doc, locale, StringPool.BLANK, summaryURL, renderRequest, renderResponse);
 
-					ResultRow row = new ResultRow(new Object[] {queryTerms, doc, summary}, i, i);
+					summary.setHighlight(PropsValues.INDEX_SEARCH_HIGHLIGHT_ENABLED);
+					summary.setQueryTerms(queryTerms);
+
+					ResultRow row = new ResultRow(new Object[] {doc, summary}, i, i);
 
 					// Position
 
@@ -105,9 +102,7 @@
 
 					// Title
 
-					String title = HtmlUtil.escape(summary.getTitle());
-
-					title = StringUtil.highlight(title, queryTerms);
+					String title = summary.getHighlightedTitle();
 
 					row.addText(title);
 

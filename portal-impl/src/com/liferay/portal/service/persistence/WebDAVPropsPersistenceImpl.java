@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,8 +32,8 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.model.CacheModel;
+import com.liferay.portal.model.MVCCModel;
 import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.WebDAVProps;
 import com.liferay.portal.model.impl.WebDAVPropsImpl;
@@ -365,7 +365,7 @@ public class WebDAVPropsPersistenceImpl extends BasePersistenceImpl<WebDAVProps>
 			CacheRegistryUtil.clear(WebDAVPropsImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(WebDAVPropsImpl.class.getName());
+		EntityCacheUtil.clearCache(WebDAVPropsImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -593,7 +593,8 @@ public class WebDAVPropsPersistenceImpl extends BasePersistenceImpl<WebDAVProps>
 		}
 
 		EntityCacheUtil.putResult(WebDAVPropsModelImpl.ENTITY_CACHE_ENABLED,
-			WebDAVPropsImpl.class, webDAVProps.getPrimaryKey(), webDAVProps);
+			WebDAVPropsImpl.class, webDAVProps.getPrimaryKey(), webDAVProps,
+			false);
 
 		clearUniqueFindersCache(webDAVProps);
 		cacheUniqueFindersCache(webDAVProps);
@@ -613,6 +614,7 @@ public class WebDAVPropsPersistenceImpl extends BasePersistenceImpl<WebDAVProps>
 		webDAVPropsImpl.setNew(webDAVProps.isNew());
 		webDAVPropsImpl.setPrimaryKey(webDAVProps.getPrimaryKey());
 
+		webDAVPropsImpl.setMvccVersion(webDAVProps.getMvccVersion());
 		webDAVPropsImpl.setWebDavPropsId(webDAVProps.getWebDavPropsId());
 		webDAVPropsImpl.setCompanyId(webDAVProps.getCompanyId());
 		webDAVPropsImpl.setCreateDate(webDAVProps.getCreateDate());
@@ -823,7 +825,7 @@ public class WebDAVPropsPersistenceImpl extends BasePersistenceImpl<WebDAVProps>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<WebDAVProps>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<WebDAVProps>)QueryUtil.list(q, getDialect(),
@@ -950,10 +952,22 @@ public class WebDAVPropsPersistenceImpl extends BasePersistenceImpl<WebDAVProps>
 			}
 		};
 
-	private static CacheModel<WebDAVProps> _nullWebDAVPropsCacheModel = new CacheModel<WebDAVProps>() {
-			@Override
-			public WebDAVProps toEntityModel() {
-				return _nullWebDAVProps;
-			}
-		};
+	private static CacheModel<WebDAVProps> _nullWebDAVPropsCacheModel = new NullCacheModel();
+
+	private static class NullCacheModel implements CacheModel<WebDAVProps>,
+		MVCCModel {
+		@Override
+		public long getMvccVersion() {
+			return 0;
+		}
+
+		@Override
+		public void setMvccVersion(long mvccVersion) {
+		}
+
+		@Override
+		public WebDAVProps toEntityModel() {
+			return _nullWebDAVProps;
+		}
+	}
 }

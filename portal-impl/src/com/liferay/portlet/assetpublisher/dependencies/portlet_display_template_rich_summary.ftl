@@ -38,7 +38,7 @@
 			<div class="asset-summary">
 				<@getMetadataField fieldName="author" />
 
-				${htmlUtil.escape(assetRenderer.getSummary(locale))}
+				${htmlUtil.escape(assetRenderer.getSummary(renderRequest, renderResponse))}
 
 				<a href="${viewURL}"><@liferay.language key="read-more" /><span class="hide-accessible"><@liferay.language key="about" />${entryTitle}</span> &raquo;</a>
 			</div>
@@ -54,7 +54,7 @@
 </#list>
 
 <#macro getDiscussion>
-	<#if validator.isNotNull(assetRenderer.getDiscussionPath()) && (enableComments == "true")>
+	<#if validator.isNotNull(assetRenderer.getDiscussionPath()) && (getterUtil.getBoolean(enableComments))>
 		<br />
 
 		<#assign discussionURL = renderResponse.createActionURL() />
@@ -66,7 +66,7 @@
 			classPK=entry.getClassPK()
 			formAction=discussionURL?string
 			formName="fm" + entry.getClassPK()
-			ratingsEnabled=enableCommentRatings == "true"
+			ratingsEnabled=getterUtil.getBoolean(enableCommentRatings)
 			redirect=portalUtil.getCurrentURL(request)
 			userId=assetRenderer.getUserId()
 		/>
@@ -83,7 +83,7 @@
 		<#assign editPortletURL = assetRenderer.getURLEdit(renderRequest, renderResponse, windowStateFactory.getWindowState("pop_up"), redirectURL)!"" />
 
 		<#if validator.isNotNull(editPortletURL)>
-			<#assign title = languageUtil.format(locale, "edit-x", entryTitle) />
+			<#assign title = languageUtil.format(locale, "edit-x", entryTitle, false) />
 
 			<@liferay_ui["icon"]
 				image="edit"
@@ -95,7 +95,7 @@
 </#macro>
 
 <#macro getFlagsIcon>
-	<#if enableFlags == "true">
+	<#if getterUtil.getBoolean(enableFlags)>
 		<@liferay_ui["flags"]
 			className=entry.getClassName()
 			classPK=entry.getClassPK()
@@ -149,7 +149,7 @@
 </#macro>
 
 <#macro getPrintIcon>
-	<#if enablePrint == "true" >
+	<#if getterUtil.getBoolean(enablePrint)>
 		<#assign printURL = renderResponse.createRenderURL() />
 
 		${printURL.setParameter("struts_action", "/asset_publisher/view_content")}
@@ -170,13 +170,13 @@
 		<@liferay_ui["icon"]
 			image="print"
 			message="print"
-			url="javascript:Liferay.Util.openWindow({id:'" + renderResponse.getNamespace() + "printAsset', title: '" + languageUtil.format(locale, "print-x-x", ["hide-accessible", entryTitle]) + "', uri: '" + htmlUtil.escapeURL(printURL.toString()) + "'});"
+			url="javascript:Liferay.Util.openWindow({id:'" + renderResponse.getNamespace() + "printAsset', title: '" + languageUtil.format(locale, "print-x-x", ["hide-accessible", entryTitle], false) + "', uri: '" + htmlUtil.escapeURL(printURL.toString()) + "'});"
 		/>
 	</#if>
 </#macro>
 
 <#macro getRatings>
-	<#if (enableRatings == "true")>
+	<#if getterUtil.getBoolean(enableRatings)>
 		<div class="asset-ratings">
 			<@liferay_ui["ratings"]
 				className=entry.getClassName()
@@ -187,7 +187,7 @@
 </#macro>
 
 <#macro getRelatedAssets>
-	<#if enableRelatedAssets == "true">
+	<#if getterUtil.getBoolean(enableRelatedAssets)>
 		<@liferay_ui["asset-links"]
 			assetEntryId=entry.getEntryId()
 		/>
@@ -195,7 +195,7 @@
 </#macro>
 
 <#macro getSocialBookmarks>
-	<#if enableSocialBookmarks == "true">
+	<#if getterUtil.getBoolean(enableSocialBookmarks)>
 		<@liferay_ui["social-bookmarks"]
 			displayStyle="${socialBookmarksDisplayStyle}"
 			target="_blank"

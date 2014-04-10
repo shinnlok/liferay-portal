@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,7 +32,6 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.service.persistence.impl.BasePersistenceImpl;
@@ -227,7 +226,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<SocialActivity>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<SocialActivity>)QueryUtil.list(q,
@@ -722,7 +721,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<SocialActivity>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<SocialActivity>)QueryUtil.list(q,
@@ -1215,7 +1214,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<SocialActivity>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<SocialActivity>)QueryUtil.list(q,
@@ -1714,7 +1713,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<SocialActivity>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<SocialActivity>)QueryUtil.list(q,
@@ -2431,7 +2430,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<SocialActivity>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<SocialActivity>)QueryUtil.list(q,
@@ -2931,7 +2930,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<SocialActivity>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<SocialActivity>)QueryUtil.list(q,
@@ -3440,7 +3439,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<SocialActivity>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<SocialActivity>)QueryUtil.list(q,
@@ -3986,7 +3985,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<SocialActivity>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<SocialActivity>)QueryUtil.list(q,
@@ -4562,7 +4561,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<SocialActivity>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<SocialActivity>)QueryUtil.list(q,
@@ -5172,7 +5171,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<SocialActivity>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<SocialActivity>)QueryUtil.list(q,
@@ -6070,7 +6069,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 			CacheRegistryUtil.clear(SocialActivityImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(SocialActivityImpl.class.getName());
+		EntityCacheUtil.clearCache(SocialActivityImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -6564,7 +6563,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 
 		EntityCacheUtil.putResult(SocialActivityModelImpl.ENTITY_CACHE_ENABLED,
 			SocialActivityImpl.class, socialActivity.getPrimaryKey(),
-			socialActivity);
+			socialActivity, false);
 
 		clearUniqueFindersCache(socialActivity);
 		cacheUniqueFindersCache(socialActivity);
@@ -6802,7 +6801,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<SocialActivity>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<SocialActivity>)QueryUtil.list(q,

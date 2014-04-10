@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -95,7 +95,7 @@ request.setAttribute("view.jsp-showIconLabel", false);
 		}
 		%>
 
-		<c:if test="<%= assetRenderer.hasEditPermission(permissionChecker) && (editPortletURL != null) && !stageableGroup.hasStagingGroup() %>">
+		<c:if test="<%= !stageableGroup.hasStagingGroup() %>">
 			<th class="table-header"></th>
 		</c:if>
 	</tr>
@@ -194,9 +194,11 @@ request.setAttribute("view.jsp-showIconLabel", false);
 	}
 	%>
 
-	<c:if test="<%= assetRenderer.hasEditPermission(permissionChecker) && (editPortletURL != null) && !stageableGroup.hasStagingGroup() %>">
+	<c:if test="<%= !stageableGroup.hasStagingGroup() %>">
 		<td class="table-cell">
-			<liferay-util:include page="/html/portlet/asset_publisher/asset_actions.jsp" />
+			<c:if test="<%= assetRenderer.hasEditPermission(permissionChecker) && (editPortletURL != null) %>">
+				<liferay-util:include page="/html/portlet/asset_publisher/asset_actions.jsp" />
+			</c:if>
 		</td>
 	</c:if>
 </tr>

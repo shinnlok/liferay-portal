@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,7 @@
 
 package com.liferay.portal.kernel.nio.intraband.cache;
 
+import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.cache.PortalCache;
 import com.liferay.portal.kernel.cache.PortalCacheException;
 import com.liferay.portal.kernel.cache.PortalCacheManager;
@@ -28,13 +29,18 @@ import java.io.Serializable;
 
 import java.net.URL;
 
-import java.util.Collection;
-
 /**
  * @author Shuyang Zhou
  */
 public class PortalCacheDatagramReceiveHandler
 	extends BaseAsyncDatagramReceiveHandler {
+
+	public PortalCacheDatagramReceiveHandler() {
+		_portalCacheManager =
+			(PortalCacheManager<Serializable, Serializable>)
+				PortalBeanLocatorUtil.locate(
+					_MULTI_VM_PORTAL_CACHE_MANAGER_BEAN_NAME);
+	}
 
 	@Override
 	protected void doReceive(
@@ -47,21 +53,20 @@ public class PortalCacheDatagramReceiveHandler
 		PortalCacheActionType portalCacheActionType =
 			PortalCacheActionType.values()[deserializer.readInt()];
 
-		PortalCacheManager<Serializable, Serializable> portalCacheManager =
-			IntrabandPortalCacheManager.getPortalCacheManager();
-
 		switch (portalCacheActionType) {
-			case DESTROY:
-				PortalCache<Serializable, Serializable> portalCache =
-					portalCacheManager.getCache(deserializer.readString());
+			case CLEAR_ALL:
+				_portalCacheManager.clearAll();
 
-				portalCache.destroy();
+				break;
+
+			case DESTROY:
+				_portalCacheManager.destroy();
 
 				break;
 
 			case GET:
-				portalCache = portalCacheManager.getCache(
-					deserializer.readString());
+				PortalCache<Serializable, Serializable> portalCache =
+					_portalCacheManager.getCache(deserializer.readString());
 
 				Serializable key = deserializer.readObject();
 
@@ -71,22 +76,8 @@ public class PortalCacheDatagramReceiveHandler
 
 				break;
 
-			case GET_BULK:
-				portalCache = portalCacheManager.getCache(
-					deserializer.readString());
-
-				Collection<Serializable> keys =
-					(Collection<Serializable>)deserializer.readObject();
-
-				Collection<Serializable> values = portalCache.get(keys);
-
-				_sendResponse(
-					registrationReference, datagram, (Serializable)values);
-
-				break;
-
 			case PUT:
-				portalCache = portalCacheManager.getCache(
+				portalCache = _portalCacheManager.getCache(
 					deserializer.readString());
 
 				key = deserializer.readObject();
@@ -96,26 +87,49 @@ public class PortalCacheDatagramReceiveHandler
 
 				break;
 
-			case PUT_TTL:
-				portalCache = portalCacheManager.getCache(
+			case PUT_QUIET:
+				portalCache = _portalCacheManager.getCache(
+					deserializer.readString());
+
+				key = deserializer.readObject();
+				value = deserializer.readObject();
+
+				portalCache.putQuiet(key, value);
+
+				break;
+
+			case PUT_QUIET_TTL:
+				portalCache = _portalCacheManager.getCache(
 					deserializer.readString());
 
 				key = deserializer.readObject();
 				value = deserializer.readObject();
 				int ttl = deserializer.readInt();
 
+				portalCache.putQuiet(key, value, ttl);
+
+				break;
+
+			case PUT_TTL:
+				portalCache = _portalCacheManager.getCache(
+					deserializer.readString());
+
+				key = deserializer.readObject();
+				value = deserializer.readObject();
+				ttl = deserializer.readInt();
+
 				portalCache.put(key, value, ttl);
 
 				break;
 
 			case RECONFIGURE:
-				portalCacheManager.reconfigureCaches(
+				_portalCacheManager.reconfigureCaches(
 					new URL(deserializer.readString()));
 
 				break;
 
 			case REMOVE:
-				portalCache = portalCacheManager.getCache(
+				portalCache = _portalCacheManager.getCache(
 					deserializer.readString());
 
 				key = deserializer.readObject();
@@ -125,10 +139,15 @@ public class PortalCacheDatagramReceiveHandler
 				break;
 
 			case REMOVE_ALL:
-				portalCache = portalCacheManager.getCache(
+				portalCache = _portalCacheManager.getCache(
 					deserializer.readString());
 
 				portalCache.removeAll();
+
+				break;
+
+			case REMOVE_CACHE:
+				_portalCacheManager.removeCache(deserializer.readString());
 
 				break;
 
@@ -160,5 +179,11 @@ public class PortalCacheDatagramReceiveHandler
 			Datagram.createResponseDatagram(
 				datagram, serializer.toByteBuffer()));
 	}
+
+	private static final String _MULTI_VM_PORTAL_CACHE_MANAGER_BEAN_NAME =
+		"com.liferay.portal.kernel.cache.MultiVMPortalCacheManager";
+
+	private final PortalCacheManager<Serializable, Serializable>
+		_portalCacheManager;
 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,7 +19,6 @@ import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.model.Group;
-import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.ServiceTestUtil;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.test.MainServletExecutionTestListener;
@@ -53,6 +52,7 @@ import org.junit.runner.RunWith;
 		TransactionalExecutionTestListener.class
 	})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
+@Transactional
 public class WikiAttachmentsTest {
 
 	@Before
@@ -64,13 +64,11 @@ public class WikiAttachmentsTest {
 
 	@After
 	public void tearDown() {
-		_group = null;
 		_node = null;
 		_page = null;
 	}
 
 	@Test
-	@Transactional
 	public void testDeleteAttachmentsWhenDeletingWikiNode() throws Exception {
 		int initialFileEntriesCount =
 			DLFileEntryLocalServiceUtil.getFileEntriesCount();
@@ -89,7 +87,6 @@ public class WikiAttachmentsTest {
 	}
 
 	@Test
-	@Transactional
 	public void testDeleteAttachmentsWhenDeletingWikiPage() throws Exception {
 		int initialFileEntriesCount =
 			DLFileEntryLocalServiceUtil.getFileEntriesCount();
@@ -109,7 +106,6 @@ public class WikiAttachmentsTest {
 	}
 
 	@Test
-	@Transactional
 	public void testFoldersCountWhenAddingAttachmentsToSameWikiPage()
 		throws Exception {
 
@@ -129,7 +125,6 @@ public class WikiAttachmentsTest {
 	}
 
 	@Test
-	@Transactional
 	public void testFoldersCountWhenAddingWikiNode() throws Exception {
 		int initialFoldersCount = DLFolderLocalServiceUtil.getDLFoldersCount();
 
@@ -140,7 +135,6 @@ public class WikiAttachmentsTest {
 	}
 
 	@Test
-	@Transactional
 	public void testFoldersCountWhenAddingWikiPage() throws Exception {
 		int initialFoldersCount = DLFolderLocalServiceUtil.getDLFoldersCount();
 
@@ -151,7 +145,6 @@ public class WikiAttachmentsTest {
 	}
 
 	@Test
-	@Transactional
 	public void testFoldersCountWhenAddingWikiPageAttachment()
 		throws Exception {
 
@@ -165,7 +158,6 @@ public class WikiAttachmentsTest {
 	}
 
 	@Test
-	@Transactional
 	public void testFoldersCountWhenAddingWikiPageAttachments()
 		throws Exception {
 
@@ -208,7 +200,6 @@ public class WikiAttachmentsTest {
 	}
 
 	@Test
-	@Transactional
 	public void testFoldersCountWhenDeletingWikiNodeWithAttachments()
 		throws Exception {
 
@@ -228,7 +219,6 @@ public class WikiAttachmentsTest {
 	}
 
 	@Test
-	@Transactional
 	public void testFoldersCountWhenDeletingWikiNodeWithoutAttachments()
 		throws Exception {
 
@@ -246,7 +236,6 @@ public class WikiAttachmentsTest {
 	}
 
 	@Test
-	@Transactional
 	public void testFoldersCountWhenDeletingWikiPageWithAttachments()
 		throws Exception {
 
@@ -267,7 +256,6 @@ public class WikiAttachmentsTest {
 	}
 
 	@Test
-	@Transactional
 	public void testFoldersCountWhenDeletingWikiPageWithoutAttachments()
 		throws Exception {
 
@@ -290,8 +278,6 @@ public class WikiAttachmentsTest {
 		addWikiPage();
 
 		_trashWikiAttachments(false);
-
-		GroupLocalServiceUtil.deleteGroup(_group);
 	}
 
 	@Test
@@ -299,8 +285,6 @@ public class WikiAttachmentsTest {
 		addWikiPage();
 
 		_trashWikiAttachments(true);
-
-		GroupLocalServiceUtil.deleteGroup(_group);
 	}
 
 	protected void addWikiNode() throws Exception {
@@ -308,9 +292,7 @@ public class WikiAttachmentsTest {
 			_group = GroupTestUtil.addGroup();
 		}
 
-		_node = WikiTestUtil.addNode(
-			TestPropsValues.getUserId(), _group.getGroupId(),
-			ServiceTestUtil.randomString(), ServiceTestUtil.randomString(50));
+		_node = WikiTestUtil.addNode(_group.getGroupId());
 	}
 
 	protected void addWikiPage() throws Exception {
@@ -319,8 +301,7 @@ public class WikiAttachmentsTest {
 		}
 
 		_page = WikiTestUtil.addPage(
-			_node.getUserId(), _group.getGroupId(), _node.getNodeId(),
-			ServiceTestUtil.randomString(), true);
+			_group.getGroupId(), _node.getNodeId(), true);
 	}
 
 	protected void addWikiPageAttachment() throws Exception {

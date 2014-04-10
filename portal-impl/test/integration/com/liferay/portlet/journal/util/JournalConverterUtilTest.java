@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -116,7 +116,7 @@ public class JournalConverterUtilTest extends BaseDDMServiceTestCase {
 
 		FileEntry fileEntry = DLAppTestUtil.addFileEntry(
 			TestPropsValues.getGroupId(),
-			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, true, "Test 2.txt");
+			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, "Test 2.txt");
 
 		Field docLibrary = getDocumentLibraryField(
 			fileEntry, _ddmStructure.getStructureId());
@@ -351,7 +351,7 @@ public class JournalConverterUtilTest extends BaseDDMServiceTestCase {
 
 		FileEntry fileEntry = DLAppTestUtil.addFileEntry(
 			TestPropsValues.getGroupId(),
-			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, true, "Test 1.txt");
+			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, "Test 1.txt");
 
 		Field documentLibraryField = getDocumentLibraryField(
 			fileEntry, _ddmStructure.getStructureId());
@@ -819,7 +819,7 @@ public class JournalConverterUtilTest extends BaseDDMServiceTestCase {
 			List<Element> optionElements = dynamicContentElement.elements(
 				"option");
 
-			if (optionElements.size() > 0) {
+			if (!optionElements.isEmpty()) {
 				for (Element optionElement : optionElements) {
 					values.add(optionElement.getText());
 				}

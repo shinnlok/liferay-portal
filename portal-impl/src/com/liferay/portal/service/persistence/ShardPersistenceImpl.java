@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,9 +32,9 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.CacheModel;
+import com.liferay.portal.model.MVCCModel;
 import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.Shard;
 import com.liferay.portal.model.impl.ShardImpl;
@@ -622,7 +622,7 @@ public class ShardPersistenceImpl extends BasePersistenceImpl<Shard>
 			CacheRegistryUtil.clear(ShardImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(ShardImpl.class.getName());
+		EntityCacheUtil.clearCache(ShardImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -869,7 +869,7 @@ public class ShardPersistenceImpl extends BasePersistenceImpl<Shard>
 		}
 
 		EntityCacheUtil.putResult(ShardModelImpl.ENTITY_CACHE_ENABLED,
-			ShardImpl.class, shard.getPrimaryKey(), shard);
+			ShardImpl.class, shard.getPrimaryKey(), shard, false);
 
 		clearUniqueFindersCache(shard);
 		cacheUniqueFindersCache(shard);
@@ -889,6 +889,7 @@ public class ShardPersistenceImpl extends BasePersistenceImpl<Shard>
 		shardImpl.setNew(shard.isNew());
 		shardImpl.setPrimaryKey(shard.getPrimaryKey());
 
+		shardImpl.setMvccVersion(shard.getMvccVersion());
 		shardImpl.setShardId(shard.getShardId());
 		shardImpl.setClassNameId(shard.getClassNameId());
 		shardImpl.setClassPK(shard.getClassPK());
@@ -1093,7 +1094,7 @@ public class ShardPersistenceImpl extends BasePersistenceImpl<Shard>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<Shard>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<Shard>)QueryUtil.list(q, getDialect(), start,
@@ -1220,10 +1221,21 @@ public class ShardPersistenceImpl extends BasePersistenceImpl<Shard>
 			}
 		};
 
-	private static CacheModel<Shard> _nullShardCacheModel = new CacheModel<Shard>() {
-			@Override
-			public Shard toEntityModel() {
-				return _nullShard;
-			}
-		};
+	private static CacheModel<Shard> _nullShardCacheModel = new NullCacheModel();
+
+	private static class NullCacheModel implements CacheModel<Shard>, MVCCModel {
+		@Override
+		public long getMvccVersion() {
+			return 0;
+		}
+
+		@Override
+		public void setMvccVersion(long mvccVersion) {
+		}
+
+		@Override
+		public Shard toEntityModel() {
+			return _nullShard;
+		}
+	}
 }

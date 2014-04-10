@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,10 @@
 
 package com.liferay.taglib.ui;
 
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.Tuple;
 import com.liferay.portlet.messageboards.model.MBMessage;
 import com.liferay.taglib.util.IncludeTag;
@@ -25,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Eudaldo Alonso
+ * @author Tibor Lipusz
  */
 public class AppViewSearchEntryTag extends IncludeTag {
 
@@ -63,6 +67,10 @@ public class AppViewSearchEntryTag extends IncludeTag {
 
 	public void setFileEntryTuples(List<Tuple> fileEntryTuples) {
 		_fileEntryTuples = fileEntryTuples;
+	}
+
+	public void setHighlightEnabled(boolean highlightEnabled) {
+		_highlightEnabled = highlightEnabled;
 	}
 
 	public void setLocked(boolean locked) {
@@ -119,6 +127,7 @@ public class AppViewSearchEntryTag extends IncludeTag {
 		_cssClass = null;
 		_description = null;
 		_fileEntryTuples = null;
+		_highlightEnabled = _HIGHLIGHT_ENABLED;
 		_locked = false;
 		_mbMessages = null;
 		_queryTerms = null;
@@ -162,6 +171,9 @@ public class AppViewSearchEntryTag extends IncludeTag {
 			"liferay-ui:app-view-search-entry:fileEntryTuples",
 			_fileEntryTuples);
 		request.setAttribute(
+			"liferay-ui:app-view-search-entry:highlightEnabled",
+			_highlightEnabled);
+		request.setAttribute(
 			"liferay-ui:app-view-search-entry:locked", _locked);
 		request.setAttribute(
 			"liferay-ui:app-view-search-entry:mbMessages", _mbMessages);
@@ -185,6 +197,10 @@ public class AppViewSearchEntryTag extends IncludeTag {
 
 	private static final boolean _CLEAN_UP_SET_ATTRIBUTES = true;
 
+	private static final boolean _HIGHLIGHT_ENABLED =
+		GetterUtil.getBoolean(
+			PropsUtil.get(PropsKeys.INDEX_SEARCH_HIGHLIGHT_ENABLED));
+
 	private static final String _PAGE =
 		"/html/taglib/ui/app_view_search_entry/page.jsp";
 
@@ -196,6 +212,7 @@ public class AppViewSearchEntryTag extends IncludeTag {
 	private String _cssClass;
 	private String _description;
 	private List<Tuple> _fileEntryTuples;
+	private boolean _highlightEnabled = _HIGHLIGHT_ENABLED;
 	private boolean _locked;
 	private List<MBMessage> _mbMessages;
 	private String[] _queryTerms;

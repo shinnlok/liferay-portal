@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -72,7 +72,7 @@ public class ClusterMasterExecutorImpl implements ClusterMasterExecutor {
 			}
 
 			try {
-				return new LocalFuture<T>((T)methodHandler.invoke(true));
+				return new LocalFuture<T>((T)methodHandler.invoke());
 			}
 			catch (Exception e) {
 				throw new SystemException(e);
@@ -125,6 +125,11 @@ public class ClusterMasterExecutorImpl implements ClusterMasterExecutor {
 			throw new RuntimeException(
 				"Unable to initialize cluster master executor", e);
 		}
+	}
+
+	@Override
+	public boolean isEnabled() {
+		return _enabled;
 	}
 
 	@Override
@@ -241,7 +246,7 @@ public class ClusterMasterExecutorImpl implements ClusterMasterExecutor {
 	private ClusterExecutor _clusterExecutor;
 	private Set<ClusterMasterTokenTransitionListener>
 		_clusterMasterTokenTransitionListeners =
-		new HashSet<ClusterMasterTokenTransitionListener>();
+			new HashSet<ClusterMasterTokenTransitionListener>();
 	private volatile boolean _enabled;
 	private volatile String _localClusterNodeAddress;
 

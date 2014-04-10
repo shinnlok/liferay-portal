@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,9 +32,9 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.CacheModel;
+import com.liferay.portal.model.MVCCModel;
 import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.WorkflowDefinitionLink;
 import com.liferay.portal.model.impl.WorkflowDefinitionLinkImpl;
@@ -228,7 +228,7 @@ public class WorkflowDefinitionLinkPersistenceImpl extends BasePersistenceImpl<W
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<WorkflowDefinitionLink>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<WorkflowDefinitionLink>)QueryUtil.list(q,
@@ -773,7 +773,7 @@ public class WorkflowDefinitionLinkPersistenceImpl extends BasePersistenceImpl<W
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<WorkflowDefinitionLink>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<WorkflowDefinitionLink>)QueryUtil.list(q,
@@ -1596,7 +1596,7 @@ public class WorkflowDefinitionLinkPersistenceImpl extends BasePersistenceImpl<W
 			CacheRegistryUtil.clear(WorkflowDefinitionLinkImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(WorkflowDefinitionLinkImpl.class.getName());
+		EntityCacheUtil.clearCache(WorkflowDefinitionLinkImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -1893,7 +1893,8 @@ public class WorkflowDefinitionLinkPersistenceImpl extends BasePersistenceImpl<W
 
 		EntityCacheUtil.putResult(WorkflowDefinitionLinkModelImpl.ENTITY_CACHE_ENABLED,
 			WorkflowDefinitionLinkImpl.class,
-			workflowDefinitionLink.getPrimaryKey(), workflowDefinitionLink);
+			workflowDefinitionLink.getPrimaryKey(), workflowDefinitionLink,
+			false);
 
 		clearUniqueFindersCache(workflowDefinitionLink);
 		cacheUniqueFindersCache(workflowDefinitionLink);
@@ -1914,6 +1915,7 @@ public class WorkflowDefinitionLinkPersistenceImpl extends BasePersistenceImpl<W
 		workflowDefinitionLinkImpl.setNew(workflowDefinitionLink.isNew());
 		workflowDefinitionLinkImpl.setPrimaryKey(workflowDefinitionLink.getPrimaryKey());
 
+		workflowDefinitionLinkImpl.setMvccVersion(workflowDefinitionLink.getMvccVersion());
 		workflowDefinitionLinkImpl.setWorkflowDefinitionLinkId(workflowDefinitionLink.getWorkflowDefinitionLinkId());
 		workflowDefinitionLinkImpl.setGroupId(workflowDefinitionLink.getGroupId());
 		workflowDefinitionLinkImpl.setCompanyId(workflowDefinitionLink.getCompanyId());
@@ -2131,7 +2133,7 @@ public class WorkflowDefinitionLinkPersistenceImpl extends BasePersistenceImpl<W
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<WorkflowDefinitionLink>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<WorkflowDefinitionLink>)QueryUtil.list(q,
@@ -2259,10 +2261,22 @@ public class WorkflowDefinitionLinkPersistenceImpl extends BasePersistenceImpl<W
 		};
 
 	private static CacheModel<WorkflowDefinitionLink> _nullWorkflowDefinitionLinkCacheModel =
-		new CacheModel<WorkflowDefinitionLink>() {
-			@Override
-			public WorkflowDefinitionLink toEntityModel() {
-				return _nullWorkflowDefinitionLink;
-			}
-		};
+		new NullCacheModel();
+
+	private static class NullCacheModel implements CacheModel<WorkflowDefinitionLink>,
+		MVCCModel {
+		@Override
+		public long getMvccVersion() {
+			return 0;
+		}
+
+		@Override
+		public void setMvccVersion(long mvccVersion) {
+		}
+
+		@Override
+		public WorkflowDefinitionLink toEntityModel() {
+			return _nullWorkflowDefinitionLink;
+		}
+	}
 }

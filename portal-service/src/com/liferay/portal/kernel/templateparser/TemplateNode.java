@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -37,10 +37,12 @@ import java.util.Map;
 public class TemplateNode extends LinkedHashMap<String, Object> {
 
 	public TemplateNode(
-		ThemeDisplay themeDisplay, String name, String data, String type) {
+		ThemeDisplay themeDisplay, String name, String data, String type,
+		Map<String, String> attributes) {
 
 		_themeDisplay = themeDisplay;
 
+		put("attributes", attributes);
 		put("name", name);
 		put("data", data);
 		put("type", type);
@@ -73,6 +75,20 @@ public class TemplateNode extends LinkedHashMap<String, Object> {
 
 	public void appendSibling(TemplateNode templateNode) {
 		_siblingTemplateNodes.add(templateNode);
+	}
+
+	public String getAttribute(String name) {
+		Map<String, String> attributes = getAttributes();
+
+		if (attributes == null) {
+			return StringPool.BLANK;
+		}
+
+		return attributes.get(name);
+	}
+
+	public Map<String, String> getAttributes() {
+		return (Map<String, String>)get("attributes");
 	}
 
 	public TemplateNode getChild(String name) {
@@ -119,7 +135,7 @@ public class TemplateNode extends LinkedHashMap<String, Object> {
 
 		try {
 			Layout layout = LayoutLocalServiceUtil.getLayout(
-				_themeDisplay.getScopeGroupId(), privateLayout, getLayoutId());
+				getLayoutGroupId(), privateLayout, getLayoutId());
 
 			return PortalUtil.getLayoutFriendlyURL(layout, _themeDisplay);
 		}
@@ -181,6 +197,18 @@ public class TemplateNode extends LinkedHashMap<String, Object> {
 		sb.append(getLayoutId());
 
 		return sb.toString();
+	}
+
+	protected long getLayoutGroupId() {
+		String data = (String)get("data");
+
+		int pos = data.lastIndexOf(CharPool.AT);
+
+		if (pos != -1) {
+			data = data.substring(pos + 1);
+		}
+
+		return GetterUtil.getLong(data);
 	}
 
 	protected long getLayoutId() {

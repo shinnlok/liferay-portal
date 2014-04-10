@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,11 +14,12 @@
 
 package com.liferay.portlet.usersadmin.util;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.util.OrderByComparator;
-import com.liferay.portal.kernel.util.Tuple;
 import com.liferay.portal.model.Address;
 import com.liferay.portal.model.EmailAddress;
 import com.liferay.portal.model.Group;
@@ -45,6 +46,7 @@ import javax.servlet.http.HttpServletRequest;
  * @author Jorge Ferrer
  * @author Julio Camarero
  */
+@ProviderType
 public interface UsersAdmin {
 
 	public static final String CUSTOM_QUESTION = "write-my-own-question";
@@ -111,7 +113,7 @@ public interface UsersAdmin {
 	public OrderByComparator getOrganizationOrderByComparator(
 		String orderByCol, String orderByType);
 
-	public Tuple getOrganizations(Hits hits)
+	public List<Organization> getOrganizations(Hits hits)
 		throws PortalException, SystemException;
 
 	public List<OrgLabor> getOrgLabors(ActionRequest actionRequest);
@@ -130,13 +132,14 @@ public interface UsersAdmin {
 	public List<UserGroupRole> getUserGroupRoles(PortletRequest portletRequest)
 		throws PortalException, SystemException;
 
-	public Tuple getUserGroups(Hits hits)
+	public List<UserGroup> getUserGroups(Hits hits)
 		throws PortalException, SystemException;
 
 	public OrderByComparator getUserOrderByComparator(
 		String orderByCol, String orderByType);
 
-	public Tuple getUsers(Hits hits) throws PortalException, SystemException;
+	public List<User> getUsers(Hits hits)
+		throws PortalException, SystemException;
 
 	public List<Website> getWebsites(ActionRequest actionRequest);
 

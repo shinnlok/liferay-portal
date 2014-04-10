@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,9 +32,9 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.LayoutRevision;
+import com.liferay.portal.model.MVCCModel;
 import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.impl.LayoutRevisionImpl;
 import com.liferay.portal.model.impl.LayoutRevisionModelImpl;
@@ -231,7 +231,7 @@ public class LayoutRevisionPersistenceImpl extends BasePersistenceImpl<LayoutRev
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<LayoutRevision>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<LayoutRevision>)QueryUtil.list(q,
@@ -728,7 +728,7 @@ public class LayoutRevisionPersistenceImpl extends BasePersistenceImpl<LayoutRev
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<LayoutRevision>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<LayoutRevision>)QueryUtil.list(q,
@@ -1233,7 +1233,7 @@ public class LayoutRevisionPersistenceImpl extends BasePersistenceImpl<LayoutRev
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<LayoutRevision>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<LayoutRevision>)QueryUtil.list(q,
@@ -1766,7 +1766,7 @@ public class LayoutRevisionPersistenceImpl extends BasePersistenceImpl<LayoutRev
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<LayoutRevision>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<LayoutRevision>)QueryUtil.list(q,
@@ -2297,7 +2297,7 @@ public class LayoutRevisionPersistenceImpl extends BasePersistenceImpl<LayoutRev
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<LayoutRevision>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<LayoutRevision>)QueryUtil.list(q,
@@ -2822,7 +2822,7 @@ public class LayoutRevisionPersistenceImpl extends BasePersistenceImpl<LayoutRev
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<LayoutRevision>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<LayoutRevision>)QueryUtil.list(q,
@@ -3330,7 +3330,7 @@ public class LayoutRevisionPersistenceImpl extends BasePersistenceImpl<LayoutRev
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<LayoutRevision>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<LayoutRevision>)QueryUtil.list(q,
@@ -3874,7 +3874,7 @@ public class LayoutRevisionPersistenceImpl extends BasePersistenceImpl<LayoutRev
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<LayoutRevision>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<LayoutRevision>)QueryUtil.list(q,
@@ -4452,7 +4452,7 @@ public class LayoutRevisionPersistenceImpl extends BasePersistenceImpl<LayoutRev
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<LayoutRevision>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<LayoutRevision>)QueryUtil.list(q,
@@ -5300,7 +5300,7 @@ public class LayoutRevisionPersistenceImpl extends BasePersistenceImpl<LayoutRev
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<LayoutRevision>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<LayoutRevision>)QueryUtil.list(q,
@@ -5756,7 +5756,7 @@ public class LayoutRevisionPersistenceImpl extends BasePersistenceImpl<LayoutRev
 			CacheRegistryUtil.clear(LayoutRevisionImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(LayoutRevisionImpl.class.getName());
+		EntityCacheUtil.clearCache(LayoutRevisionImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -6184,7 +6184,7 @@ public class LayoutRevisionPersistenceImpl extends BasePersistenceImpl<LayoutRev
 
 		EntityCacheUtil.putResult(LayoutRevisionModelImpl.ENTITY_CACHE_ENABLED,
 			LayoutRevisionImpl.class, layoutRevision.getPrimaryKey(),
-			layoutRevision);
+			layoutRevision, false);
 
 		clearUniqueFindersCache(layoutRevision);
 		cacheUniqueFindersCache(layoutRevision);
@@ -6204,6 +6204,7 @@ public class LayoutRevisionPersistenceImpl extends BasePersistenceImpl<LayoutRev
 		layoutRevisionImpl.setNew(layoutRevision.isNew());
 		layoutRevisionImpl.setPrimaryKey(layoutRevision.getPrimaryKey());
 
+		layoutRevisionImpl.setMvccVersion(layoutRevision.getMvccVersion());
 		layoutRevisionImpl.setLayoutRevisionId(layoutRevision.getLayoutRevisionId());
 		layoutRevisionImpl.setGroupId(layoutRevision.getGroupId());
 		layoutRevisionImpl.setCompanyId(layoutRevision.getCompanyId());
@@ -6438,7 +6439,7 @@ public class LayoutRevisionPersistenceImpl extends BasePersistenceImpl<LayoutRev
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<LayoutRevision>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<LayoutRevision>)QueryUtil.list(q,
@@ -6565,10 +6566,22 @@ public class LayoutRevisionPersistenceImpl extends BasePersistenceImpl<LayoutRev
 			}
 		};
 
-	private static CacheModel<LayoutRevision> _nullLayoutRevisionCacheModel = new CacheModel<LayoutRevision>() {
-			@Override
-			public LayoutRevision toEntityModel() {
-				return _nullLayoutRevision;
-			}
-		};
+	private static CacheModel<LayoutRevision> _nullLayoutRevisionCacheModel = new NullCacheModel();
+
+	private static class NullCacheModel implements CacheModel<LayoutRevision>,
+		MVCCModel {
+		@Override
+		public long getMvccVersion() {
+			return 0;
+		}
+
+		@Override
+		public void setMvccVersion(long mvccVersion) {
+		}
+
+		@Override
+		public LayoutRevision toEntityModel() {
+			return _nullLayoutRevision;
+		}
+	}
 }

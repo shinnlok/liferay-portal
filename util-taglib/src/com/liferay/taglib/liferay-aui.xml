@@ -748,6 +748,11 @@
 				<outputType>java.lang.String</outputType>
 			</attribute>
 			<attribute>
+				<name>searchContainer</name>
+				<inputType><![CDATA[com.liferay.portal.kernel.dao.search.SearchContainer<?>]]></inputType>
+				<outputType><![CDATA[com.liferay.portal.kernel.dao.search.SearchContainer<?>]]></outputType>
+			</attribute>
+			<attribute>
 				<name>useNamespace</name>
 				<inputType>boolean</inputType>
 				<outputType>boolean</outputType>
@@ -857,6 +862,12 @@
 				<outputType>java.lang.String</outputType>
 			</attribute>
 			<attribute>
+				<name>localizeLabel</name>
+				<inputType>boolean</inputType>
+				<outputType>boolean</outputType>
+				<defaultValue>true</defaultValue>
+			</attribute>
+			<attribute>
 				<name>selected</name>
 				<inputType>boolean</inputType>
 				<outputType>boolean</outputType>
@@ -875,6 +886,12 @@
 				<name>toggle</name>
 				<inputType>boolean</inputType>
 				<outputType>boolean</outputType>
+			</attribute>
+			<attribute>
+				<name>toggleTouch</name>
+				<inputType>boolean</inputType>
+				<outputType>boolean</outputType>
+				<defaultValue>true</defaultValue>
 			</attribute>
 			<attribute>
 				<name>useDialog</name>
@@ -1129,6 +1146,11 @@
 				<inputType>boolean</inputType>
 				<outputType>boolean</outputType>
 				<defaultValue>true</defaultValue>
+			</attribute>
+			<attribute>
+				<name>value</name>
+				<inputType>java.lang.Object</inputType>
+				<outputType>java.lang.Object</outputType>
 			</attribute>
 		</attributes>
 	</component>

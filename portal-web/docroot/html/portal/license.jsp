@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -464,16 +464,16 @@ dateFormatDateTime.setTimeZone(timeZone);
 				sendClusterRequest(
 					'serverInfo',
 					'<%= clusterNode.getClusterNodeId() %>',
-					'<%= clusterNode.getInetAddress().getHostAddress() %>',
-					'<%= clusterNode.getPort() %>',
+					'<%= clusterNode.getBindInetAddress().getHostAddress() %>',
+					'<%= clusterNode.getPortalPort() %>',
 					function(message) {
 						var A = AUI();
 
-						<c:if test="<%= clusterNode.getPort() == -1 %>">
+						<c:if test="<%= clusterNode.getPortalPort() == -1 %>">
 							A.one('#portHelp').removeAttribute('style');
 						</c:if>
 
-						A.one('#node_<%= clusterNode.getClusterNodeId() %>_hostName').html(message.hostName + ':<%= clusterNode.getPort() %><%= (clusterNode.getPort() == -1) ? "*" : "" %>');
+						A.one('#node_<%= clusterNode.getClusterNodeId() %>_hostName').html(message.hostName + ':<%= clusterNode.getPortalPort() %><%= (clusterNode.getPortalPort() == -1) ? "*" : "" %>');
 						A.one('#node_<%= clusterNode.getClusterNodeId() %>_ipAddresses').html(message.ipAddresses.split(',').join('<br />'));
 						A.one('#node_<%= clusterNode.getClusterNodeId() %>_macAddresses').html(message.macAddresses.split(',').join('<br />'));
 					}
@@ -482,8 +482,8 @@ dateFormatDateTime.setTimeZone(timeZone);
 				sendClusterRequest(
 					'licenseProperties',
 					'<%= clusterNode.getClusterNodeId() %>',
-					'<%= clusterNode.getInetAddress().getHostAddress() %>',
-					'<%= clusterNode.getPort() %>',
+					'<%= clusterNode.getBindInetAddress().getHostAddress() %>',
+					'<%= clusterNode.getPortalPort() %>',
 					function(message) {
 						var A = AUI();
 

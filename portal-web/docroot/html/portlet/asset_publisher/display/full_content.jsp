@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -158,6 +158,7 @@ request.setAttribute("view.jsp-showIconLabel", true);
 		%>
 
 		<liferay-util:include page="<%= path %>" portletId="<%= assetRendererFactory.getPortletId() %>">
+			<liferay-util:param name="showExtraInfo" value="<%= String.valueOf(assetPublisherDisplayContext.isShowExtraInfo()) %>" />
 			<liferay-util:param name="showHeader" value="<%= Boolean.FALSE.toString() %>" />
 		</liferay-util:include>
 
@@ -239,6 +240,8 @@ request.setAttribute("view.jsp-showIconLabel", true);
 		<div class="asset-metadata">
 
 			<%
+			boolean filterByMetadata = true;
+
 			String[] metadataFields = assetPublisherDisplayContext.getMetadataFields();
 			%>
 

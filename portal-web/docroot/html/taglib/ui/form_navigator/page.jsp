@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -175,13 +175,20 @@ if (Validator.isNotNull(historyKey)) {
 			<aui:script use="aui-event-input,aui-tabview,aui-url,history,io-form">
 				var formNode = A.one('#<portlet:namespace /><%= formName %>');
 
-				var tabview = new A.TabView(
-					{
-						boundingBox: '#<portlet:namespace />tabsBoundingBox',
-						srcNode: '#<portlet:namespace />tabs',
-						type: 'list'
+				Liferay.component(
+					'<portlet:namespace /><%= formName %>Tabview',
+					function() {
+						return new A.TabView(
+							{
+								boundingBox: '#<portlet:namespace />tabsBoundingBox',
+								srcNode: '#<portlet:namespace />tabs',
+								type: 'list'
+							}
+						).render();
 					}
-				).render();
+				);
+
+				var tabview = Liferay.component('<portlet:namespace /><%= formName %>Tabview');
 
 				var history = new A.HistoryHash();
 
@@ -331,6 +338,36 @@ if (Validator.isNotNull(historyKey)) {
 					formNode.on('blur', updateSectionError, 'input, select, textarea');
 
 					formNode.on('autofields:update', updateSectionError);
+
+					Liferay.after(
+						'form:registered',
+						function(event) {
+							var form = event.form;
+
+							if (form.formNode.compareTo(formNode)) {
+								var validator = form.formValidator;
+
+								validator.on(
+									'submitError',
+									function() {
+										var errorClass = validator.get('errorClass');
+
+										var errorField = formNode.one('.' + errorClass);
+
+										if (errorField) {
+											var errorSection = errorField.ancestor('.form-section');
+
+											var errorSectionId = errorSection.attr('id');
+
+											selectTabBySectionId(errorSectionId);
+
+											updateSectionError();
+										}
+									}
+								);
+							}
+						}
+					);
 				}
 			</aui:script>
 		</c:otherwise>

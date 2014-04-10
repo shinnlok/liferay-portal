@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,18 +16,12 @@ package com.liferay.portal.kernel.cache;
 
 import java.io.Serializable;
 
-import java.util.Collection;
-
 /**
  * @author Brian Wing Shun Chan
  * @author Edward Han
  * @author Shuyang Zhou
  */
 public interface PortalCache<K extends Serializable, V> {
-
-	public void destroy();
-
-	public Collection<V> get(Collection<K> keys);
 
 	public V get(K key);
 
@@ -36,6 +30,10 @@ public interface PortalCache<K extends Serializable, V> {
 	public void put(K key, V value);
 
 	public void put(K key, V value, int timeToLive);
+
+	public void putQuiet(K key, V value);
+
+	public void putQuiet(K key, V value, int timeToLive);
 
 	public void registerCacheListener(CacheListener<K, V> cacheListener);
 

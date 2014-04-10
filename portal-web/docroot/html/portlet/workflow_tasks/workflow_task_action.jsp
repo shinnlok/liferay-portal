@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -47,7 +47,7 @@ long[] pooledActorsIds = WorkflowTaskManagerUtil.getPooledActorsIds(company.getC
 			String message = "proceed";
 
 			if (Validator.isNotNull(transitionName)) {
-				message = transitionName;
+				message = HtmlUtil.escape(transitionName);
 			}
 		%>
 
@@ -66,7 +66,7 @@ long[] pooledActorsIds = WorkflowTaskManagerUtil.getPooledActorsIds(company.getC
 
 			<liferay-ui:icon
 				cssClass='<%= "workflow-task-" + randomId + " task-change-status-link" %>'
-				id='<%= randomId + transitionName + "taskChangeStatusLink" %>'
+				id='<%= randomId + HtmlUtil.escapeAttribute(transitionName) + "taskChangeStatusLink" %>'
 				image="../aui/random"
 				message="<%= message %>"
 				method="get"
@@ -186,7 +186,7 @@ long[] pooledActorsIds = WorkflowTaskManagerUtil.getPooledActorsIds(company.getC
 			}
 		%>
 
-			Liferay.delegateClick('<portlet:namespace /><%= randomId + transitionName %>taskChangeStatusLink', onTaskClickFn);
+			Liferay.delegateClick('<portlet:namespace /><%= randomId + HtmlUtil.escapeJS(transitionName) %>taskChangeStatusLink', onTaskClickFn);
 
 		<%
 		}

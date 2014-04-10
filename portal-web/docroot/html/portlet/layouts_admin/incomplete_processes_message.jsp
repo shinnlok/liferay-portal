@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -26,7 +26,7 @@ int incompleteBackgroundTaskCount = ParamUtil.getInteger(request, "incompleteBac
 			<liferay-ui:message key="there-is-currently-1-process-in-progress" />
 		</c:when>
 		<c:when test="<%= incompleteBackgroundTaskCount > 1 %>">
-			<liferay-ui:message arguments="<%= incompleteBackgroundTaskCount - 1 %>" key="there-is-currently-1-process-in-progress-and-x-pending" />
+			<liferay-ui:message arguments="<%= incompleteBackgroundTaskCount - 1 %>" key="there-is-currently-1-process-in-progress-and-x-pending" translateArguments="<%= false %>" />
 		</c:when>
 		<c:otherwise>
 			<liferay-ui:message key="there-are-no-processes-in-progress-anymore" />

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,7 +32,6 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.model.CacheModel;
@@ -236,7 +235,7 @@ public class MDRActionPersistenceImpl extends BasePersistenceImpl<MDRAction>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<MDRAction>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<MDRAction>)QueryUtil.list(q, getDialect(),
@@ -1044,7 +1043,7 @@ public class MDRActionPersistenceImpl extends BasePersistenceImpl<MDRAction>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<MDRAction>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<MDRAction>)QueryUtil.list(q, getDialect(),
@@ -1596,7 +1595,7 @@ public class MDRActionPersistenceImpl extends BasePersistenceImpl<MDRAction>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<MDRAction>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<MDRAction>)QueryUtil.list(q, getDialect(),
@@ -2004,7 +2003,7 @@ public class MDRActionPersistenceImpl extends BasePersistenceImpl<MDRAction>
 			CacheRegistryUtil.clear(MDRActionImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(MDRActionImpl.class.getName());
+		EntityCacheUtil.clearCache(MDRActionImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -2301,7 +2300,7 @@ public class MDRActionPersistenceImpl extends BasePersistenceImpl<MDRAction>
 		}
 
 		EntityCacheUtil.putResult(MDRActionModelImpl.ENTITY_CACHE_ENABLED,
-			MDRActionImpl.class, mdrAction.getPrimaryKey(), mdrAction);
+			MDRActionImpl.class, mdrAction.getPrimaryKey(), mdrAction, false);
 
 		clearUniqueFindersCache(mdrAction);
 		cacheUniqueFindersCache(mdrAction);
@@ -2538,7 +2537,7 @@ public class MDRActionPersistenceImpl extends BasePersistenceImpl<MDRAction>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<MDRAction>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<MDRAction>)QueryUtil.list(q, getDialect(),

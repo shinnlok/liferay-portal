@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -62,8 +62,6 @@ public abstract class BaseLocalServiceImpl implements BaseLocalService {
 			long groupId, String portletId, ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
-		String layoutURL = StringPool.BLANK;
-
 		long plid = serviceContext.getPlid();
 
 		long controlPanelPlid = PortalUtil.getControlPanelPlid(
@@ -71,12 +69,14 @@ public abstract class BaseLocalServiceImpl implements BaseLocalService {
 
 		if (plid == controlPanelPlid) {
 			plid = PortalUtil.getPlidFromPortletId(groupId, portletId);
+		}
 
-			if (plid != LayoutConstants.DEFAULT_PLID) {
-				Layout layout = layoutPersistence.findByPrimaryKey(plid);
+		String layoutURL = StringPool.BLANK;
 
-				layoutURL = getLayoutURL(layout, serviceContext);
-			}
+		if (plid != LayoutConstants.DEFAULT_PLID) {
+			Layout layout = layoutPersistence.findByPrimaryKey(plid);
+
+			layoutURL = getLayoutURL(layout, serviceContext);
 		}
 
 		return layoutURL;

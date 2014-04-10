@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -74,69 +74,65 @@ AssetEntry assetEntry = (AssetEntry)request.getAttribute("view_entry_content.jsp
 			</c:if>
 
 			<c:if test="<%= BlogsEntryPermission.contains(permissionChecker, entry, ActionKeys.DELETE) || BlogsEntryPermission.contains(permissionChecker, entry, ActionKeys.PERMISSIONS) || BlogsEntryPermission.contains(permissionChecker, entry, ActionKeys.UPDATE) %>">
-				<div class="lfr-meta-actions edit-actions entry">
-					<table class="lfr-table">
-					<tr>
-						<c:if test="<%= BlogsEntryPermission.contains(permissionChecker, entry, ActionKeys.UPDATE) %>">
-							<td>
-								<portlet:renderURL var="editEntryURL">
-									<portlet:param name="struts_action" value="/blogs/edit_entry" />
-									<portlet:param name="redirect" value="<%= currentURL %>" />
-									<portlet:param name="backURL" value="<%= currentURL %>" />
-									<portlet:param name="entryId" value="<%= String.valueOf(entry.getEntryId()) %>" />
-								</portlet:renderURL>
+				<ul class="edit-actions entry icons-container lfr-meta-actions">
+					<c:if test="<%= BlogsEntryPermission.contains(permissionChecker, entry, ActionKeys.UPDATE) %>">
+						<li class="edit-entry">
+							<portlet:renderURL var="editEntryURL">
+								<portlet:param name="struts_action" value="/blogs/edit_entry" />
+								<portlet:param name="redirect" value="<%= currentURL %>" />
+								<portlet:param name="backURL" value="<%= currentURL %>" />
+								<portlet:param name="entryId" value="<%= String.valueOf(entry.getEntryId()) %>" />
+							</portlet:renderURL>
 
-								<liferay-ui:icon
-									image="edit"
-									label="<%= true %>"
-									url="<%= editEntryURL %>"
-								/>
-							</td>
-						</c:if>
+							<liferay-ui:icon
+								image="edit"
+								label="<%= true %>"
+								url="<%= editEntryURL %>"
+							/>
+						</li>
+					</c:if>
 
-						<c:if test="<%= showEditEntryPermissions && BlogsEntryPermission.contains(permissionChecker, entry, ActionKeys.PERMISSIONS) %>">
-							<td>
-								<liferay-security:permissionsURL
-									modelResource="<%= BlogsEntry.class.getName() %>"
-									modelResourceDescription="<%= entry.getTitle() %>"
-									resourcePrimKey="<%= String.valueOf(entry.getEntryId()) %>"
-									var="permissionsEntryURL"
-									windowState="<%= LiferayWindowState.POP_UP.toString() %>"
-								/>
+					<c:if test="<%= showEditEntryPermissions && BlogsEntryPermission.contains(permissionChecker, entry, ActionKeys.PERMISSIONS) %>">
+						<li class="edit-entry-permissions">
+							<liferay-security:permissionsURL
+								modelResource="<%= BlogsEntry.class.getName() %>"
+								modelResourceDescription="<%= entry.getTitle() %>"
+								resourcePrimKey="<%= String.valueOf(entry.getEntryId()) %>"
+								var="permissionsEntryURL"
+								windowState="<%= LiferayWindowState.POP_UP.toString() %>"
+							/>
 
-								<liferay-ui:icon
-									image="permissions"
-									label="<%= true %>"
-									method="get"
-									url="<%= permissionsEntryURL %>"
-									useDialog="<%= true %>"
-								/>
-							</td>
-						</c:if>
+							<liferay-ui:icon
+								image="permissions"
+								label="<%= true %>"
+								method="get"
+								url="<%= permissionsEntryURL %>"
+								useDialog="<%= true %>"
+							/>
+						</li>
+					</c:if>
 
-						<c:if test="<%= BlogsEntryPermission.contains(permissionChecker, entry, ActionKeys.DELETE) %>">
-							<td>
-								<portlet:renderURL var="viewURL">
-									<portlet:param name="struts_action" value="/blogs/view" />
-								</portlet:renderURL>
+					<c:if test="<%= BlogsEntryPermission.contains(permissionChecker, entry, ActionKeys.DELETE) %>">
+						<li class="delete-entry">
+							<portlet:renderURL var="viewURL">
+								<portlet:param name="struts_action" value="/blogs/view" />
+							</portlet:renderURL>
 
-								<portlet:actionURL var="deleteEntryURL">
-									<portlet:param name="struts_action" value="/blogs/edit_entry" />
-									<portlet:param name="<%= Constants.CMD %>" value="<%= TrashUtil.isTrashEnabled(scopeGroupId) ? Constants.MOVE_TO_TRASH : Constants.DELETE %>" />
-									<portlet:param name="redirect" value="<%= viewURL %>" />
-									<portlet:param name="entryId" value="<%= String.valueOf(entry.getEntryId()) %>" />
-								</portlet:actionURL>
+							<portlet:actionURL var="deleteEntryURL">
+								<portlet:param name="struts_action" value="/blogs/edit_entry" />
+								<portlet:param name="<%= Constants.CMD %>" value="<%= TrashUtil.isTrashEnabled(scopeGroupId) ? Constants.MOVE_TO_TRASH : Constants.DELETE %>" />
+								<portlet:param name="redirect" value="<%= viewURL %>" />
+								<portlet:param name="entryId" value="<%= String.valueOf(entry.getEntryId()) %>" />
+							</portlet:actionURL>
 
-								<liferay-ui:icon-delete
-									label="<%= true %>"
-									trash="<%= TrashUtil.isTrashEnabled(scopeGroupId) %>"
-									url="<%= deleteEntryURL %>"
-								/>
-							</td>
-						</c:if>
-					</tr>
-					</table>
-				</div>
+							<liferay-ui:icon-delete
+								label="<%= true %>"
+								trash="<%= TrashUtil.isTrashEnabled(scopeGroupId) %>"
+								url="<%= deleteEntryURL %>"
+							/>
+						</li>
+					</c:if>
+				</ul>
 			</c:if>
 
 			<div class="entry-body">
@@ -160,17 +156,17 @@ AssetEntry assetEntry = (AssetEntry)request.getAttribute("view_entry_content.jsp
 
 						<br />
 
-						<aui:a href="<%= viewEntryURL %>"><liferay-ui:message arguments='<%= new Object[] {"hide-accessible", HtmlUtil.escape(entry.getTitle())} %>' key="read-more-x-about-x" /> &raquo;</aui:a>
+						<aui:a href="<%= viewEntryURL %>"><liferay-ui:message arguments='<%= new Object[] {"hide-accessible", HtmlUtil.escape(entry.getTitle())} %>' key="read-more-x-about-x" translateArguments="<%= false %>" /> &raquo;</aui:a>
 					</c:when>
 					<c:when test='<%= displayStyle.equals(BlogsUtil.DISPLAY_STYLE_FULL_CONTENT) || strutsAction.equals("/blogs/view_entry") %>'>
 
 						<%
 						String entryContentId = "blogs-entry-content-" + entry.getEntryId();
 
-						boolean inlineEditEnabled = BlogsEntryPermission.contains(permissionChecker, entry, ActionKeys.UPDATE) && BrowserSnifferUtil.isRtf(request) && !WorkflowDefinitionLinkLocalServiceUtil.hasWorkflowDefinitionLink(themeDisplay.getCompanyId(), scopeGroupId, BlogsEntry.class.getName());
+						boolean inlineEditEnabled = BlogsEntryPermission.contains(permissionChecker, entry, ActionKeys.UPDATE) && BrowserSnifferUtil.isRtf(request) && !WorkflowDefinitionLinkLocalServiceUtil.hasWorkflowDefinitionLink(themeDisplay.getCompanyId(), scopeGroupId, BlogsEntry.class.getName()) && Validator.equals(GetterUtil.getString(SessionClicks.get(request, "liferay_toggle_controls", "")), "visible");
 						%>
 
-						<div <%= inlineEditEnabled ? "class=\"lfr-editable\" contenteditable=\"true\" id=\"" + entryContentId + "\" spellcheck=\"false\"" : StringPool.BLANK %>>
+						<div id="<%= entryContentId %>" <%= inlineEditEnabled ? "class=\"lfr-editable\" contenteditable=\"true\" spellcheck=\"false\"" : StringPool.BLANK %>>
 							<%= entry.getContent() %>
 						</div>
 
@@ -199,7 +195,7 @@ AssetEntry assetEntry = (AssetEntry)request.getAttribute("view_entry_content.jsp
 						</c:if>
 					</c:when>
 					<c:when test='<%= displayStyle.equals(BlogsUtil.DISPLAY_STYLE_TITLE) && !strutsAction.equals("/blogs/view_entry") %>'>
-						<aui:a href="<%= viewEntryURL %>"><liferay-ui:message arguments='<%= new Object[] {"hide-accessible", HtmlUtil.escape(entry.getTitle())} %>' key="read-more-x-about-x" /> &raquo;</aui:a>
+						<aui:a href="<%= viewEntryURL %>"><liferay-ui:message arguments='<%= new Object[] {"hide-accessible", HtmlUtil.escape(entry.getTitle())} %>' key="read-more-x-about-x" translateArguments="<%= false %>" /> &raquo;</aui:a>
 					</c:when>
 				</c:choose>
 			</div>
@@ -280,6 +276,13 @@ AssetEntry assetEntry = (AssetEntry)request.getAttribute("view_entry_content.jsp
 						</div>
 					</c:if>
 
+					<c:if test="<%= enableRatings %>">
+						<liferay-ui:ratings
+							className="<%= BlogsEntry.class.getName() %>"
+							classPK="<%= entry.getEntryId() %>"
+						/>
+					</c:if>
+
 					<c:if test='<%= enableSocialBookmarks && socialBookmarksDisplayPosition.equals("bottom") %>'>
 						<liferay-ui:social-bookmarks
 							contentId="<%= String.valueOf(entry.getEntryId()) %>"
@@ -288,13 +291,6 @@ AssetEntry assetEntry = (AssetEntry)request.getAttribute("view_entry_content.jsp
 							title="<%= entry.getTitle() %>"
 							types="<%= socialBookmarksTypes %>"
 							url="<%= PortalUtil.getCanonicalURL(bookmarkURL.toString(), themeDisplay, layout) %>"
-						/>
-					</c:if>
-
-					<c:if test="<%= enableRatings %>">
-						<liferay-ui:ratings
-							className="<%= BlogsEntry.class.getName() %>"
-							classPK="<%= entry.getEntryId() %>"
 						/>
 					</c:if>
 				</c:if>

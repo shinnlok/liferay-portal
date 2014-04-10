@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,7 +18,6 @@ import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
-import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.search.BaseIndexer;
@@ -51,6 +50,8 @@ import com.liferay.portlet.wiki.service.persistence.WikiPageActionableDynamicQue
 
 import java.util.Locale;
 
+import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
 
 /**
@@ -66,6 +67,10 @@ public class WikiPageIndexer extends BaseIndexer {
 	public static final String PORTLET_ID = PortletKeys.WIKI;
 
 	public WikiPageIndexer() {
+		setDefaultSelectedFieldNames(
+			new String[] {
+				Field.COMPANY_ID, Field.CONTENT, Field.ENTRY_CLASS_NAME,
+				Field.ENTRY_CLASS_PK, Field.TITLE, Field.UID});
 		setFilterSearch(true);
 		setPermissionAware(true);
 	}
@@ -87,7 +92,14 @@ public class WikiPageIndexer extends BaseIndexer {
 			classPK = message.getClassPK();
 		}
 
-		WikiPage page = WikiPageLocalServiceUtil.getPage(classPK);
+		WikiPage page = null;
+
+		try {
+			page = WikiPageLocalServiceUtil.getPage(classPK);
+		}
+		catch (Exception e) {
+			return;
+		}
 
 		document.addKeyword(Field.NODE_ID, page.getNodeId());
 	}
@@ -112,6 +124,13 @@ public class WikiPageIndexer extends BaseIndexer {
 
 		return WikiPagePermission.contains(
 			permissionChecker, page, ActionKeys.VIEW);
+	}
+
+	@Override
+	public boolean isVisible(long classPK, int status) throws Exception {
+		WikiPage page = WikiPageLocalServiceUtil.getPage(classPK);
+
+		return isVisible(page.getStatus(), status);
 	}
 
 	@Override
@@ -144,10 +163,6 @@ public class WikiPageIndexer extends BaseIndexer {
 
 	@Override
 	protected void doDelete(Object obj) throws Exception {
-		SearchContext searchContext = new SearchContext();
-
-		searchContext.setSearchEngineId(getSearchEngineId());
-
 		if (obj instanceof Object[]) {
 			Object[] array = (Object[])obj;
 
@@ -165,6 +180,11 @@ public class WikiPageIndexer extends BaseIndexer {
 		else if (obj instanceof WikiNode) {
 			WikiNode node = (WikiNode)obj;
 
+			SearchContext searchContext = new SearchContext();
+
+			searchContext.setCompanyId(node.getCompanyId());
+			searchContext.setSearchEngineId(getSearchEngineId());
+
 			BooleanQuery booleanQuery = BooleanQueryFactoryUtil.create(
 				searchContext);
 
@@ -172,9 +192,7 @@ public class WikiPageIndexer extends BaseIndexer {
 
 			booleanQuery.addRequiredTerm("nodeId", node.getNodeId());
 
-			Hits hits = SearchEngineUtil.search(
-				getSearchEngineId(), node.getCompanyId(), booleanQuery,
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+			Hits hits = SearchEngineUtil.search(searchContext, booleanQuery);
 
 			for (int i = 0; i < hits.getLength(); i++) {
 				Document document = hits.doc(i);
@@ -218,8 +236,8 @@ public class WikiPageIndexer extends BaseIndexer {
 
 	@Override
 	protected Summary doGetSummary(
-		Document document, Locale locale, String snippet,
-		PortletURL portletURL) {
+		Document document, Locale locale, String snippet, PortletURL portletURL,
+		PortletRequest portletRequest, PortletResponse portletResponse) {
 
 		Summary summary = createSummary(document, Field.TITLE, Field.CONTENT);
 

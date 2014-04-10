@@ -1,4 +1,6 @@
-<definition>
+<definition component-name="portal-wcm">
+	<property name="testray.main.component.name" value="WCM" />
+
 	<set-up>
 		<execute macro="User#firstLoginPG" />
 	</set-up>
@@ -88,9 +90,9 @@
 
 		<execute macro="RecycleBin#restoreCP">
 			<var name="assetName" value="${threadSubject}" />
-			<var name="assetType" value="${assetType}" />
 			<var name="assetRestoreLocation" value="${assetRestoreLocation}" />
 			<var name="assetRestoreType" value="${assetRestoreType}" />
+			<var name="assetType" value="${assetType}" />
 		</execute>
 
 		<execute macro="Page#gotoContentCP">
@@ -106,6 +108,7 @@
 		</execute>
 
 		<execute macro="MessageboardsThread#viewCP">
+			<var name="postsNumber" value="1" />
 			<var name="threadBody" value="${threadBody}" />
 			<var name="threadSubject" value="${threadSubject}" />
 		</execute>

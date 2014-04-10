@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -33,7 +33,7 @@ public class DLFileRankFinderImpl
 	extends BasePersistenceImpl<DLFileRank> implements DLFileRankFinder {
 
 	public static final String FIND_BY_STALE_RANKS =
-	DLFileRankFinder.class.getName() + ".findByStaleRanks";
+		DLFileRankFinder.class.getName() + ".findByStaleRanks";
 
 	public static final String FIND_BY_FOLDER_ID =
 		DLFileRankFinder.class.getName() + ".findByFolderId";
@@ -47,7 +47,7 @@ public class DLFileRankFinderImpl
 
 			String sql = CustomSQLUtil.get(FIND_BY_STALE_RANKS);
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addScalar("groupId", Type.LONG);
 			q.addScalar("userId", Type.LONG);
@@ -77,7 +77,7 @@ public class DLFileRankFinderImpl
 
 			String sql = CustomSQLUtil.get(FIND_BY_FOLDER_ID);
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addEntity("DLFileRank", DLFileRankImpl.class);
 

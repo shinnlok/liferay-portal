@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,7 +32,6 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.model.CacheModel;
@@ -238,7 +237,7 @@ public class PollsChoicePersistenceImpl extends BasePersistenceImpl<PollsChoice>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<PollsChoice>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<PollsChoice>)QueryUtil.list(q, getDialect(),
@@ -1049,7 +1048,7 @@ public class PollsChoicePersistenceImpl extends BasePersistenceImpl<PollsChoice>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<PollsChoice>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<PollsChoice>)QueryUtil.list(q, getDialect(),
@@ -1596,7 +1595,7 @@ public class PollsChoicePersistenceImpl extends BasePersistenceImpl<PollsChoice>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<PollsChoice>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<PollsChoice>)QueryUtil.list(q, getDialect(),
@@ -2267,7 +2266,7 @@ public class PollsChoicePersistenceImpl extends BasePersistenceImpl<PollsChoice>
 			CacheRegistryUtil.clear(PollsChoiceImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(PollsChoiceImpl.class.getName());
+		EntityCacheUtil.clearCache(PollsChoiceImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -2603,7 +2602,8 @@ public class PollsChoicePersistenceImpl extends BasePersistenceImpl<PollsChoice>
 		}
 
 		EntityCacheUtil.putResult(PollsChoiceModelImpl.ENTITY_CACHE_ENABLED,
-			PollsChoiceImpl.class, pollsChoice.getPrimaryKey(), pollsChoice);
+			PollsChoiceImpl.class, pollsChoice.getPrimaryKey(), pollsChoice,
+			false);
 
 		clearUniqueFindersCache(pollsChoice);
 		cacheUniqueFindersCache(pollsChoice);
@@ -2837,7 +2837,7 @@ public class PollsChoicePersistenceImpl extends BasePersistenceImpl<PollsChoice>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<PollsChoice>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<PollsChoice>)QueryUtil.list(q, getDialect(),

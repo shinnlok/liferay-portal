@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,8 +32,8 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.model.CacheModel;
+import com.liferay.portal.model.MVCCModel;
 import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.WorkflowInstanceLink;
 import com.liferay.portal.model.impl.WorkflowInstanceLinkImpl;
@@ -267,7 +267,7 @@ public class WorkflowInstanceLinkPersistenceImpl extends BasePersistenceImpl<Wor
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<WorkflowInstanceLink>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<WorkflowInstanceLink>)QueryUtil.list(q,
@@ -748,7 +748,7 @@ public class WorkflowInstanceLinkPersistenceImpl extends BasePersistenceImpl<Wor
 			CacheRegistryUtil.clear(WorkflowInstanceLinkImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(WorkflowInstanceLinkImpl.class.getName());
+		EntityCacheUtil.clearCache(WorkflowInstanceLinkImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -953,7 +953,7 @@ public class WorkflowInstanceLinkPersistenceImpl extends BasePersistenceImpl<Wor
 
 		EntityCacheUtil.putResult(WorkflowInstanceLinkModelImpl.ENTITY_CACHE_ENABLED,
 			WorkflowInstanceLinkImpl.class,
-			workflowInstanceLink.getPrimaryKey(), workflowInstanceLink);
+			workflowInstanceLink.getPrimaryKey(), workflowInstanceLink, false);
 
 		workflowInstanceLink.resetOriginalValues();
 
@@ -971,6 +971,7 @@ public class WorkflowInstanceLinkPersistenceImpl extends BasePersistenceImpl<Wor
 		workflowInstanceLinkImpl.setNew(workflowInstanceLink.isNew());
 		workflowInstanceLinkImpl.setPrimaryKey(workflowInstanceLink.getPrimaryKey());
 
+		workflowInstanceLinkImpl.setMvccVersion(workflowInstanceLink.getMvccVersion());
 		workflowInstanceLinkImpl.setWorkflowInstanceLinkId(workflowInstanceLink.getWorkflowInstanceLinkId());
 		workflowInstanceLinkImpl.setGroupId(workflowInstanceLink.getGroupId());
 		workflowInstanceLinkImpl.setCompanyId(workflowInstanceLink.getCompanyId());
@@ -1185,7 +1186,7 @@ public class WorkflowInstanceLinkPersistenceImpl extends BasePersistenceImpl<Wor
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<WorkflowInstanceLink>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<WorkflowInstanceLink>)QueryUtil.list(q,
@@ -1313,10 +1314,22 @@ public class WorkflowInstanceLinkPersistenceImpl extends BasePersistenceImpl<Wor
 		};
 
 	private static CacheModel<WorkflowInstanceLink> _nullWorkflowInstanceLinkCacheModel =
-		new CacheModel<WorkflowInstanceLink>() {
-			@Override
-			public WorkflowInstanceLink toEntityModel() {
-				return _nullWorkflowInstanceLink;
-			}
-		};
+		new NullCacheModel();
+
+	private static class NullCacheModel implements CacheModel<WorkflowInstanceLink>,
+		MVCCModel {
+		@Override
+		public long getMvccVersion() {
+			return 0;
+		}
+
+		@Override
+		public void setMvccVersion(long mvccVersion) {
+		}
+
+		@Override
+		public WorkflowInstanceLink toEntityModel() {
+			return _nullWorkflowInstanceLink;
+		}
+	}
 }

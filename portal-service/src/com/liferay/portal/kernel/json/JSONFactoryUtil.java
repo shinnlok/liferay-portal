@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portal.kernel.json;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
 
 import java.util.List;
@@ -21,6 +23,7 @@ import java.util.List;
 /**
  * @author Brian Wing Shun Chan
  */
+@ProviderType
 public class JSONFactoryUtil {
 
 	public static String convertJSONMLArrayToXML(String jsonml) {
@@ -137,10 +140,6 @@ public class JSONFactoryUtil {
 
 	public static String serialize(Object object) {
 		return getJSONFactory().serialize(object);
-	}
-
-	public static String serializeException(Exception exception) {
-		return getJSONFactory().serializeException(exception);
 	}
 
 	public static String serializeThrowable(Throwable throwable) {

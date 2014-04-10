@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -36,10 +36,10 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.model.CacheModel;
+import com.liferay.portal.model.MVCCModel;
 import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.Organization;
 import com.liferay.portal.model.impl.OrganizationImpl;
@@ -243,7 +243,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<Organization>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<Organization>)QueryUtil.list(q, getDialect(),
@@ -652,7 +652,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
 				q.addEntity(_FILTER_ENTITY_ALIAS, OrganizationImpl.class);
@@ -842,7 +842,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 				Organization.class.getName(),
 				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
 
-		SQLQuery q = session.createSQLQuery(sql);
+		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 		q.setFirstResult(0);
 		q.setMaxResults(2);
@@ -999,7 +999,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addScalar(COUNT_COLUMN_NAME,
 				com.liferay.portal.kernel.dao.orm.Type.LONG);
@@ -1198,7 +1198,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<Organization>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<Organization>)QueryUtil.list(q, getDialect(),
@@ -1632,7 +1632,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
 				q.addEntity(_FILTER_ENTITY_ALIAS, OrganizationImpl.class);
@@ -1827,7 +1827,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 				Organization.class.getName(),
 				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
 
-		SQLQuery q = session.createSQLQuery(sql);
+		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 		q.setFirstResult(0);
 		q.setMaxResults(2);
@@ -1998,7 +1998,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addScalar(COUNT_COLUMN_NAME,
 				com.liferay.portal.kernel.dao.orm.Type.LONG);
@@ -2173,7 +2173,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<Organization>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<Organization>)QueryUtil.list(q, getDialect(),
@@ -2560,7 +2560,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
 				q.addEntity(_FILTER_ENTITY_ALIAS, OrganizationImpl.class);
@@ -2736,7 +2736,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 				Organization.class.getName(),
 				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
 
-		SQLQuery q = session.createSQLQuery(sql);
+		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 		q.setFirstResult(0);
 		q.setMaxResults(2);
@@ -2865,7 +2865,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addScalar(COUNT_COLUMN_NAME,
 				com.liferay.portal.kernel.dao.orm.Type.LONG);
@@ -3030,7 +3030,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<Organization>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<Organization>)QueryUtil.list(q, getDialect(),
@@ -3417,7 +3417,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
 				q.addEntity(_FILTER_ENTITY_ALIAS, OrganizationImpl.class);
@@ -3593,7 +3593,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 				Organization.class.getName(),
 				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
 
-		SQLQuery q = session.createSQLQuery(sql);
+		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 		q.setFirstResult(0);
 		q.setMaxResults(2);
@@ -3722,7 +3722,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addScalar(COUNT_COLUMN_NAME,
 				com.liferay.portal.kernel.dao.orm.Type.LONG);
@@ -3900,7 +3900,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<Organization>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<Organization>)QueryUtil.list(q, getDialect(),
@@ -4313,7 +4313,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
 				q.addEntity(_FILTER_ENTITY_ALIAS, OrganizationImpl.class);
@@ -4495,7 +4495,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 				Organization.class.getName(),
 				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
 
-		SQLQuery q = session.createSQLQuery(sql);
+		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 		q.setFirstResult(0);
 		q.setMaxResults(2);
@@ -4638,7 +4638,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addScalar(COUNT_COLUMN_NAME,
 				com.liferay.portal.kernel.dao.orm.Type.LONG);
@@ -4820,7 +4820,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<Organization>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<Organization>)QueryUtil.list(q, getDialect(),
@@ -5254,7 +5254,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
 				q.addEntity(_FILTER_ENTITY_ALIAS, OrganizationImpl.class);
@@ -5449,7 +5449,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 				Organization.class.getName(),
 				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
 
-		SQLQuery q = session.createSQLQuery(sql);
+		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 		q.setFirstResult(0);
 		q.setMaxResults(2);
@@ -5620,7 +5620,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addScalar(COUNT_COLUMN_NAME,
 				com.liferay.portal.kernel.dao.orm.Type.LONG);
@@ -6064,7 +6064,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<Organization>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<Organization>)QueryUtil.list(q, getDialect(),
@@ -6341,7 +6341,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
 				q.addEntity(_FILTER_ENTITY_ALIAS, OrganizationImpl.class);
@@ -6487,7 +6487,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 		try {
 			session = openSession();
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			q.addScalar(COUNT_COLUMN_NAME,
 				com.liferay.portal.kernel.dao.orm.Type.LONG);
@@ -6569,7 +6569,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 			CacheRegistryUtil.clear(OrganizationImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(OrganizationImpl.class.getName());
+		EntityCacheUtil.clearCache(OrganizationImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -6912,7 +6912,8 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 		}
 
 		EntityCacheUtil.putResult(OrganizationModelImpl.ENTITY_CACHE_ENABLED,
-			OrganizationImpl.class, organization.getPrimaryKey(), organization);
+			OrganizationImpl.class, organization.getPrimaryKey(), organization,
+			false);
 
 		clearUniqueFindersCache(organization);
 		cacheUniqueFindersCache(organization);
@@ -6932,6 +6933,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 		organizationImpl.setNew(organization.isNew());
 		organizationImpl.setPrimaryKey(organization.getPrimaryKey());
 
+		organizationImpl.setMvccVersion(organization.getMvccVersion());
 		organizationImpl.setUuid(organization.getUuid());
 		organizationImpl.setOrganizationId(organization.getOrganizationId());
 		organizationImpl.setCompanyId(organization.getCompanyId());
@@ -7152,7 +7154,7 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<Organization>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<Organization>)QueryUtil.list(q, getDialect(),
@@ -7499,9 +7501,6 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 		catch (Exception e) {
 			throw processException(e);
 		}
-		finally {
-			FinderCacheUtil.clearCache(OrganizationModelImpl.MAPPING_TABLE_GROUPS_ORGS_NAME);
-		}
 	}
 
 	/**
@@ -7775,9 +7774,6 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 		catch (Exception e) {
 			throw processException(e);
 		}
-		finally {
-			FinderCacheUtil.clearCache(OrganizationModelImpl.MAPPING_TABLE_USERS_ORGS_NAME);
-		}
 	}
 
 	@Override
@@ -7863,10 +7859,22 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 			}
 		};
 
-	private static CacheModel<Organization> _nullOrganizationCacheModel = new CacheModel<Organization>() {
-			@Override
-			public Organization toEntityModel() {
-				return _nullOrganization;
-			}
-		};
+	private static CacheModel<Organization> _nullOrganizationCacheModel = new NullCacheModel();
+
+	private static class NullCacheModel implements CacheModel<Organization>,
+		MVCCModel {
+		@Override
+		public long getMvccVersion() {
+			return 0;
+		}
+
+		@Override
+		public void setMvccVersion(long mvccVersion) {
+		}
+
+		@Override
+		public Organization toEntityModel() {
+			return _nullOrganization;
+		}
+	}
 }

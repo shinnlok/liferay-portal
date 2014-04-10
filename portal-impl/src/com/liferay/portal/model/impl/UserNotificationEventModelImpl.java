@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,16 +15,18 @@
 package com.liferay.portal.model.impl;
 
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
+import com.liferay.portal.model.User;
 import com.liferay.portal.model.UserNotificationEvent;
 import com.liferay.portal.model.UserNotificationEventModel;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.util.PortalUtil;
+import com.liferay.portal.service.UserLocalServiceUtil;
 
 import com.liferay.portlet.expando.model.ExpandoBridge;
 import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
@@ -58,6 +60,7 @@ public class UserNotificationEventModelImpl extends BaseModelImpl<UserNotificati
 	 */
 	public static final String TABLE_NAME = "UserNotificationEvent";
 	public static final Object[][] TABLE_COLUMNS = {
+			{ "mvccVersion", Types.BIGINT },
 			{ "uuid_", Types.VARCHAR },
 			{ "userNotificationEventId", Types.BIGINT },
 			{ "companyId", Types.BIGINT },
@@ -69,7 +72,7 @@ public class UserNotificationEventModelImpl extends BaseModelImpl<UserNotificati
 			{ "payload", Types.CLOB },
 			{ "archived", Types.BOOLEAN }
 		};
-	public static final String TABLE_SQL_CREATE = "create table UserNotificationEvent (uuid_ VARCHAR(75) null,userNotificationEventId LONG not null primary key,companyId LONG,userId LONG,type_ VARCHAR(75) null,timestamp LONG,deliverBy LONG,delivered BOOLEAN,payload TEXT null,archived BOOLEAN)";
+	public static final String TABLE_SQL_CREATE = "create table UserNotificationEvent (mvccVersion LONG default 0,uuid_ VARCHAR(75) null,userNotificationEventId LONG not null primary key,companyId LONG,userId LONG,type_ VARCHAR(75) null,timestamp LONG,deliverBy LONG,delivered BOOLEAN,payload TEXT null,archived BOOLEAN)";
 	public static final String TABLE_SQL_DROP = "drop table UserNotificationEvent";
 	public static final String ORDER_BY_JPQL = " ORDER BY userNotificationEvent.timestamp DESC";
 	public static final String ORDER_BY_SQL = " ORDER BY UserNotificationEvent.timestamp DESC";
@@ -131,6 +134,7 @@ public class UserNotificationEventModelImpl extends BaseModelImpl<UserNotificati
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
+		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("uuid", getUuid());
 		attributes.put("userNotificationEventId", getUserNotificationEventId());
 		attributes.put("companyId", getCompanyId());
@@ -150,6 +154,12 @@ public class UserNotificationEventModelImpl extends BaseModelImpl<UserNotificati
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
+		Long mvccVersion = (Long)attributes.get("mvccVersion");
+
+		if (mvccVersion != null) {
+			setMvccVersion(mvccVersion);
+		}
+
 		String uuid = (String)attributes.get("uuid");
 
 		if (uuid != null) {
@@ -210,6 +220,16 @@ public class UserNotificationEventModelImpl extends BaseModelImpl<UserNotificati
 		if (archived != null) {
 			setArchived(archived);
 		}
+	}
+
+	@Override
+	public long getMvccVersion() {
+		return _mvccVersion;
+	}
+
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		_mvccVersion = mvccVersion;
 	}
 
 	@Override
@@ -287,12 +307,18 @@ public class UserNotificationEventModelImpl extends BaseModelImpl<UserNotificati
 
 	@Override
 	public String getUserUuid() throws SystemException {
-		return PortalUtil.getUserValue(getUserId(), "uuid", _userUuid);
+		try {
+			User user = UserLocalServiceUtil.getUserById(getUserId());
+
+			return user.getUuid();
+		}
+		catch (PortalException pe) {
+			return StringPool.BLANK;
+		}
 	}
 
 	@Override
 	public void setUserUuid(String userUuid) {
-		_userUuid = userUuid;
 	}
 
 	public long getOriginalUserId() {
@@ -436,6 +462,7 @@ public class UserNotificationEventModelImpl extends BaseModelImpl<UserNotificati
 	public Object clone() {
 		UserNotificationEventImpl userNotificationEventImpl = new UserNotificationEventImpl();
 
+		userNotificationEventImpl.setMvccVersion(getMvccVersion());
 		userNotificationEventImpl.setUuid(getUuid());
 		userNotificationEventImpl.setUserNotificationEventId(getUserNotificationEventId());
 		userNotificationEventImpl.setCompanyId(getCompanyId());
@@ -541,6 +568,8 @@ public class UserNotificationEventModelImpl extends BaseModelImpl<UserNotificati
 	public CacheModel<UserNotificationEvent> toCacheModel() {
 		UserNotificationEventCacheModel userNotificationEventCacheModel = new UserNotificationEventCacheModel();
 
+		userNotificationEventCacheModel.mvccVersion = getMvccVersion();
+
 		userNotificationEventCacheModel.uuid = getUuid();
 
 		String uuid = userNotificationEventCacheModel.uuid;
@@ -584,9 +613,11 @@ public class UserNotificationEventModelImpl extends BaseModelImpl<UserNotificati
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(21);
+		StringBundler sb = new StringBundler(23);
 
-		sb.append("{uuid=");
+		sb.append("{mvccVersion=");
+		sb.append(getMvccVersion());
+		sb.append(", uuid=");
 		sb.append(getUuid());
 		sb.append(", userNotificationEventId=");
 		sb.append(getUserNotificationEventId());
@@ -613,12 +644,16 @@ public class UserNotificationEventModelImpl extends BaseModelImpl<UserNotificati
 
 	@Override
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(34);
+		StringBundler sb = new StringBundler(37);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.portal.model.UserNotificationEvent");
 		sb.append("</model-name>");
 
+		sb.append(
+			"<column><column-name>mvccVersion</column-name><column-value><![CDATA[");
+		sb.append(getMvccVersion());
+		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>uuid</column-name><column-value><![CDATA[");
 		sb.append(getUuid());
@@ -669,6 +704,7 @@ public class UserNotificationEventModelImpl extends BaseModelImpl<UserNotificati
 	private static Class<?>[] _escapedModelInterfaces = new Class[] {
 			UserNotificationEvent.class
 		};
+	private long _mvccVersion;
 	private String _uuid;
 	private String _originalUuid;
 	private long _userNotificationEventId;
@@ -676,7 +712,6 @@ public class UserNotificationEventModelImpl extends BaseModelImpl<UserNotificati
 	private long _originalCompanyId;
 	private boolean _setOriginalCompanyId;
 	private long _userId;
-	private String _userUuid;
 	private long _originalUserId;
 	private boolean _setOriginalUserId;
 	private String _type;

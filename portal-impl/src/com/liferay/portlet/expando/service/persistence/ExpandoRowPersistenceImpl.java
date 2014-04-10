@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,7 +32,6 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.service.persistence.impl.BasePersistenceImpl;
@@ -222,7 +221,7 @@ public class ExpandoRowPersistenceImpl extends BasePersistenceImpl<ExpandoRow>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<ExpandoRow>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<ExpandoRow>)QueryUtil.list(q, getDialect(),
@@ -709,7 +708,7 @@ public class ExpandoRowPersistenceImpl extends BasePersistenceImpl<ExpandoRow>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<ExpandoRow>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<ExpandoRow>)QueryUtil.list(q, getDialect(),
@@ -1341,7 +1340,7 @@ public class ExpandoRowPersistenceImpl extends BasePersistenceImpl<ExpandoRow>
 			CacheRegistryUtil.clear(ExpandoRowImpl.class.getName());
 		}
 
-		EntityCacheUtil.clearCache(ExpandoRowImpl.class.getName());
+		EntityCacheUtil.clearCache(ExpandoRowImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -1606,7 +1605,7 @@ public class ExpandoRowPersistenceImpl extends BasePersistenceImpl<ExpandoRow>
 		}
 
 		EntityCacheUtil.putResult(ExpandoRowModelImpl.ENTITY_CACHE_ENABLED,
-			ExpandoRowImpl.class, expandoRow.getPrimaryKey(), expandoRow);
+			ExpandoRowImpl.class, expandoRow.getPrimaryKey(), expandoRow, false);
 
 		clearUniqueFindersCache(expandoRow);
 		cacheUniqueFindersCache(expandoRow);
@@ -1833,7 +1832,7 @@ public class ExpandoRowPersistenceImpl extends BasePersistenceImpl<ExpandoRow>
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<ExpandoRow>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<ExpandoRow>)QueryUtil.list(q, getDialect(),

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,7 +22,7 @@ import com.liferay.portal.kernel.util.StringUtil;
  */
 public class TestPropsValues extends com.liferay.portal.util.TestPropsValues {
 
-	public static final String BROWSER_COMMANDS_DIR = TestPropsUtil.get(
+	public static final String BROWSER_COMMANDS_DIR_NAME = TestPropsUtil.get(
 		"browser.commands.dir");
 
 	public static final String BROWSER_TYPE = TestPropsUtil.get("browser.type");
@@ -48,7 +48,16 @@ public class TestPropsValues extends com.liferay.portal.util.TestPropsValues {
 	public static final String[] FIXED_ISSUES = StringUtil.split(
 		TestPropsUtil.get("fixed.issues"));
 
-	public static final String OUTPUT_DIR = TestPropsUtil.get("output.dir");
+	public static final String IGNORE_ERROR = TestPropsUtil.get("ignore.error");
+
+	public static final String LIFERAY_PORTAL_BRANCH = TestPropsUtil.get(
+		"liferay.portal.branch");
+
+	public static final String LIFERAY_PORTAL_BUNDLE = TestPropsUtil.get(
+		"liferay.portal.bundle");
+
+	public static final String OUTPUT_DIR_NAME = TestPropsUtil.get(
+		"output.dir");
 
 	public static final String PORTAL_URL = TestPropsUtil.get("portal.url");
 
@@ -58,7 +67,7 @@ public class TestPropsValues extends com.liferay.portal.util.TestPropsValues {
 	public static final boolean SAVE_SOURCE = GetterUtil.getBoolean(
 		TestPropsUtil.get("save.source"));
 
-	public static final String SELENIUM_EXECUTABLE_DIR = TestPropsUtil.get(
+	public static final String SELENIUM_EXECUTABLE_DIR_NAME = TestPropsUtil.get(
 		"selenium.executable.dir");
 
 	public static final String SELENIUM_HOST = TestPropsUtil.get(
@@ -73,11 +82,18 @@ public class TestPropsValues extends com.liferay.portal.util.TestPropsValues {
 	public static final int SELENIUM_PORT = GetterUtil.getInteger(
 		TestPropsUtil.get("selenium.port"));
 
+	public static final boolean TEAR_DOWN_BEFORE_TEST = GetterUtil.getBoolean(
+		TestPropsUtil.get("tear.down.before.test"));
+
+	public static final boolean TEST_ASSERT_LIFERAY_ERRORS =
+		GetterUtil.getBoolean(TestPropsUtil.get("test.assert.liferay.errors"));
+
 	public static final boolean TEST_ASSSERT_JAVASCRIPT_ERRORS =
 		GetterUtil.getBoolean(
 			TestPropsUtil.get("test.assert.javascript.errors"));
 
-	public static final String TEST_BASEDIR = TestPropsUtil.get("test.basedir");
+	public static final String TEST_BASE_DIR_NAME = TestPropsUtil.get(
+		"test.basedir");
 
 	public static final boolean TEST_DATABASE_MINIMAL = GetterUtil.getBoolean(
 		TestPropsUtil.get("test.database.minimal"));
