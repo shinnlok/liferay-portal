@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,25 +28,30 @@ import com.liferay.portal.kernel.test.ExecutionTestListeners;
 import com.liferay.portal.kernel.util.IntegerWrapper;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.Team;
 import com.liferay.portal.model.impl.TeamModelImpl;
-import com.liferay.portal.service.ServiceTestUtil;
+import com.liferay.portal.service.TeamLocalServiceUtil;
 import com.liferay.portal.service.persistence.BasePersistence;
 import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
 import com.liferay.portal.test.LiferayPersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.test.persistence.TransactionalPersistenceAdvice;
+import com.liferay.portal.test.persistence.test.TransactionalPersistenceAdvice;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.portal.util.test.RandomTestUtil;
 
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -58,6 +63,15 @@ import java.util.Set;
 	PersistenceExecutionTestListener.class})
 @RunWith(LiferayPersistenceIntegrationJUnitTestRunner.class)
 public class TeamPersistenceTest {
+	@Before
+	public void setUp() {
+		_modelListeners = _persistence.getListeners();
+
+		for (ModelListener<Team> modelListener : _modelListeners) {
+			_persistence.unregisterListener(modelListener);
+		}
+	}
+
 	@After
 	public void tearDown() throws Exception {
 		Map<Serializable, BasePersistence<?>> basePersistences = _transactionalPersistenceAdvice.getBasePersistences();
@@ -79,11 +93,15 @@ public class TeamPersistenceTest {
 		}
 
 		_transactionalPersistenceAdvice.reset();
+
+		for (ModelListener<Team> modelListener : _modelListeners) {
+			_persistence.registerListener(modelListener);
+		}
 	}
 
 	@Test
 	public void testCreate() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		Team team = _persistence.create(pk);
 
@@ -110,30 +128,34 @@ public class TeamPersistenceTest {
 
 	@Test
 	public void testUpdateExisting() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		Team newTeam = _persistence.create(pk);
 
-		newTeam.setCompanyId(ServiceTestUtil.nextLong());
+		newTeam.setMvccVersion(RandomTestUtil.nextLong());
 
-		newTeam.setUserId(ServiceTestUtil.nextLong());
+		newTeam.setCompanyId(RandomTestUtil.nextLong());
 
-		newTeam.setUserName(ServiceTestUtil.randomString());
+		newTeam.setUserId(RandomTestUtil.nextLong());
 
-		newTeam.setCreateDate(ServiceTestUtil.nextDate());
+		newTeam.setUserName(RandomTestUtil.randomString());
 
-		newTeam.setModifiedDate(ServiceTestUtil.nextDate());
+		newTeam.setCreateDate(RandomTestUtil.nextDate());
 
-		newTeam.setGroupId(ServiceTestUtil.nextLong());
+		newTeam.setModifiedDate(RandomTestUtil.nextDate());
 
-		newTeam.setName(ServiceTestUtil.randomString());
+		newTeam.setGroupId(RandomTestUtil.nextLong());
 
-		newTeam.setDescription(ServiceTestUtil.randomString());
+		newTeam.setName(RandomTestUtil.randomString());
+
+		newTeam.setDescription(RandomTestUtil.randomString());
 
 		_persistence.update(newTeam);
 
 		Team existingTeam = _persistence.findByPrimaryKey(newTeam.getPrimaryKey());
 
+		Assert.assertEquals(existingTeam.getMvccVersion(),
+			newTeam.getMvccVersion());
 		Assert.assertEquals(existingTeam.getTeamId(), newTeam.getTeamId());
 		Assert.assertEquals(existingTeam.getCompanyId(), newTeam.getCompanyId());
 		Assert.assertEquals(existingTeam.getUserId(), newTeam.getUserId());
@@ -150,6 +172,32 @@ public class TeamPersistenceTest {
 	}
 
 	@Test
+	public void testCountByGroupId() {
+		try {
+			_persistence.countByGroupId(RandomTestUtil.nextLong());
+
+			_persistence.countByGroupId(0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByG_N() {
+		try {
+			_persistence.countByG_N(RandomTestUtil.nextLong(), StringPool.BLANK);
+
+			_persistence.countByG_N(0L, StringPool.NULL);
+
+			_persistence.countByG_N(0L, (String)null);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
 	public void testFindByPrimaryKeyExisting() throws Exception {
 		Team newTeam = addTeam();
 
@@ -160,7 +208,7 @@ public class TeamPersistenceTest {
 
 	@Test
 	public void testFindByPrimaryKeyMissing() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		try {
 			_persistence.findByPrimaryKey(pk);
@@ -193,11 +241,11 @@ public class TeamPersistenceTest {
 		}
 	}
 
-	protected OrderByComparator getOrderByComparator() {
-		return OrderByComparatorFactoryUtil.create("Team", "teamId", true,
-			"companyId", true, "userId", true, "userName", true, "createDate",
-			true, "modifiedDate", true, "groupId", true, "name", true,
-			"description", true);
+	protected OrderByComparator<Team> getOrderByComparator() {
+		return OrderByComparatorFactoryUtil.create("Team", "mvccVersion", true,
+			"teamId", true, "companyId", true, "userId", true, "userName",
+			true, "createDate", true, "modifiedDate", true, "groupId", true,
+			"name", true, "description", true);
 	}
 
 	@Test
@@ -211,7 +259,7 @@ public class TeamPersistenceTest {
 
 	@Test
 	public void testFetchByPrimaryKeyMissing() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		Team missingTeam = _persistence.fetchByPrimaryKey(pk);
 
@@ -219,19 +267,99 @@ public class TeamPersistenceTest {
 	}
 
 	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
+		throws Exception {
+		Team newTeam1 = addTeam();
+		Team newTeam2 = addTeam();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newTeam1.getPrimaryKey());
+		primaryKeys.add(newTeam2.getPrimaryKey());
+
+		Map<Serializable, Team> teams = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(2, teams.size());
+		Assert.assertEquals(newTeam1, teams.get(newTeam1.getPrimaryKey()));
+		Assert.assertEquals(newTeam2, teams.get(newTeam2.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
+		throws Exception {
+		long pk1 = RandomTestUtil.nextLong();
+
+		long pk2 = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(pk1);
+		primaryKeys.add(pk2);
+
+		Map<Serializable, Team> teams = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(teams.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
+		throws Exception {
+		Team newTeam = addTeam();
+
+		long pk = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newTeam.getPrimaryKey());
+		primaryKeys.add(pk);
+
+		Map<Serializable, Team> teams = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, teams.size());
+		Assert.assertEquals(newTeam, teams.get(newTeam.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
+		throws Exception {
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		Map<Serializable, Team> teams = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(teams.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithOnePrimaryKey()
+		throws Exception {
+		Team newTeam = addTeam();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newTeam.getPrimaryKey());
+
+		Map<Serializable, Team> teams = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, teams.size());
+		Assert.assertEquals(newTeam, teams.get(newTeam.getPrimaryKey()));
+	}
+
+	@Test
 	public void testActionableDynamicQuery() throws Exception {
 		final IntegerWrapper count = new IntegerWrapper();
 
-		ActionableDynamicQuery actionableDynamicQuery = new TeamActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = TeamLocalServiceUtil.getActionableDynamicQuery();
+
+		actionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod() {
 				@Override
-				protected void performAction(Object object) {
+				public void performAction(Object object) {
 					Team team = (Team)object;
 
 					Assert.assertNotNull(team);
 
 					count.increment();
 				}
-			};
+			});
 
 		actionableDynamicQuery.performActions();
 
@@ -264,7 +392,7 @@ public class TeamPersistenceTest {
 				Team.class.getClassLoader());
 
 		dynamicQuery.add(RestrictionsFactoryUtil.eq("teamId",
-				ServiceTestUtil.nextLong()));
+				RandomTestUtil.nextLong()));
 
 		List<Team> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -303,7 +431,7 @@ public class TeamPersistenceTest {
 		dynamicQuery.setProjection(ProjectionFactoryUtil.property("teamId"));
 
 		dynamicQuery.add(RestrictionsFactoryUtil.in("teamId",
-				new Object[] { ServiceTestUtil.nextLong() }));
+				new Object[] { RandomTestUtil.nextLong() }));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -329,25 +457,27 @@ public class TeamPersistenceTest {
 	}
 
 	protected Team addTeam() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		Team team = _persistence.create(pk);
 
-		team.setCompanyId(ServiceTestUtil.nextLong());
+		team.setMvccVersion(RandomTestUtil.nextLong());
 
-		team.setUserId(ServiceTestUtil.nextLong());
+		team.setCompanyId(RandomTestUtil.nextLong());
 
-		team.setUserName(ServiceTestUtil.randomString());
+		team.setUserId(RandomTestUtil.nextLong());
 
-		team.setCreateDate(ServiceTestUtil.nextDate());
+		team.setUserName(RandomTestUtil.randomString());
 
-		team.setModifiedDate(ServiceTestUtil.nextDate());
+		team.setCreateDate(RandomTestUtil.nextDate());
 
-		team.setGroupId(ServiceTestUtil.nextLong());
+		team.setModifiedDate(RandomTestUtil.nextDate());
 
-		team.setName(ServiceTestUtil.randomString());
+		team.setGroupId(RandomTestUtil.nextLong());
 
-		team.setDescription(ServiceTestUtil.randomString());
+		team.setName(RandomTestUtil.randomString());
+
+		team.setDescription(RandomTestUtil.randomString());
 
 		_persistence.update(team);
 
@@ -355,6 +485,7 @@ public class TeamPersistenceTest {
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(TeamPersistenceTest.class);
+	private ModelListener<Team>[] _modelListeners;
 	private TeamPersistence _persistence = (TeamPersistence)PortalBeanLocatorUtil.locate(TeamPersistence.class.getName());
 	private TransactionalPersistenceAdvice _transactionalPersistenceAdvice = (TransactionalPersistenceAdvice)PortalBeanLocatorUtil.locate(TransactionalPersistenceAdvice.class.getName());
 }

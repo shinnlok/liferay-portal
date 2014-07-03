@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -36,17 +36,22 @@ String eventName = ParamUtil.getString(request, "eventName", "selectStructure");
 		/>
 	</c:if>
 
-	<c:if test="<%= showToolbar %>">
-		<liferay-util:include page="/html/portlet/dynamic_data_mapping/structure_toolbar.jsp">
-			<liferay-util:param name="groupId" value="<%= String.valueOf(groupId) %>" />
-		</liferay-util:include>
-	</c:if>
-
-	<div class="separator"><!-- --></div>
-
 	<liferay-ui:search-container
 		searchContainer="<%= new StructureSearch(renderRequest, portletURL) %>"
 	>
+		<c:if test="<%= showToolbar %>">
+
+			<%
+			request.setAttribute(WebKeys.SEARCH_CONTAINER, searchContainer);
+			%>
+
+			<liferay-util:include page="/html/portlet/dynamic_data_mapping/structure_toolbar.jsp">
+				<liferay-util:param name="groupId" value="<%= String.valueOf(groupId) %>" />
+			</liferay-util:include>
+		</c:if>
+
+		<div class="separator"><!-- --></div>
+
 		<liferay-ui:search-container-results>
 			<%@ include file="/html/portlet/dynamic_data_mapping/structure_search_results.jspf" %>
 		</liferay-ui:search-container-results>
@@ -85,7 +90,7 @@ String eventName = ParamUtil.getString(request, "eventName", "selectStructure");
 
 					data.put("ddmstructureid", structure.getStructureId());
 					data.put("ddmstructurekey", structure.getStructureKey());
-					data.put("name", HtmlUtil.escapeAttribute(structure.getName(locale)));
+					data.put("name", structure.getName(locale));
 					%>
 
 					<aui:button cssClass="selector-button" data="<%= data %>" value="choose" />
@@ -98,21 +103,9 @@ String eventName = ParamUtil.getString(request, "eventName", "selectStructure");
 </aui:form>
 
 <aui:script>
-	Liferay.Util.focusFormField(document.<portlet:namespace />selectStructureFm.<portlet:namespace />toggle_id_ddm_structure_searchkeywords);
+	Liferay.Util.focusFormField(document.<portlet:namespace />selectStructureFm.<portlet:namespace />keywords);
 </aui:script>
 
 <aui:script use="aui-base">
-	var Util = Liferay.Util;
-
-	A.one('#<portlet:namespace />selectStructureFm').delegate(
-		'click',
-		function(event) {
-			var result = Util.getAttributes(event.currentTarget, 'data-');
-
-			Util.getOpener().Liferay.fire('<%= HtmlUtil.escapeJS(eventName) %>', result);
-
-			Util.getWindow().destroy();
-		},
-		'.selector-button'
-	);
+	Liferay.Util.selectEntityHandler('#<portlet:namespace />selectStructureFm', '<%= HtmlUtil.escapeJS(eventName) %>');
 </aui:script>

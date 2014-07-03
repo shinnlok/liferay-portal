@@ -1,7 +1,11 @@
 <definition>
-	<command name="assertClick">
-		<case locator-key1="VIEW_ALL_TASKS_LINK">
-			<execute function="AssertClick#assertTextClickAtAndWait" />
+	<command name="assertElementNotPresent">
+		<case locator-key1="ANNOUNCEMENTS_NAVIGATION_NEXT">
+			<execute function="AssertElementNotPresent#assertNotVisible" />
+		</case>
+
+		<case locator-key1="ANNOUNCEMENTS_NAVIGATION_PREVIOUS">
+			<execute function="AssertElementNotPresent#assertNotVisible" />
 		</case>
 	</command>
 
@@ -13,39 +17,13 @@
 		<case locator-key1="ANNOUNCEMENTS_ENTRY_CONTENT">
 			<execute function="AssertTextEquals#assertPartialText" />
 		</case>
-	</command>
 
-	<command name="click">
-		<case locator-key1="EVENTS_DISPLAY_TODAYS_EVENTS_EVENT_TITLE">
-			<execute function="Click#clickAtAndWait" />
+		<case locator-key1="ANNOUNCEMENTS_PORTLET_TITLE">
+			<execute function="AssertTextEquals#assertPartialText" />
 		</case>
 
-		<case locator-key1="NAVIGATION_CONTACTS_CENTER">
-			<execute function="Click#textClickAtAndWait" value1="Contacts Center" />
-		</case>
-
-		<case locator-key1="NAVIGATION_MESSAGES">
-			<execute function="Click#textClickAtAndWait" value1="Messages" />
-		</case>
-
-		<case locator-key1="NAVIGATION_MICROBLOGS">
-			<execute function="Click#textClickAtAndWait" value1="Microblogs" />
-		</case>
-
-		<case locator-key1="NAVIGATION_MY_DOCUMENTS">
-			<execute function="Click#textClickAtAndWait" />
-		</case>
-
-		<case locator-key1="NAVIGATION_PAGE">
-			<execute function="AssertClick#assertTextClickAtAndWait" />
-		</case>
-
-		<case locator-key1="NAVIGATION_PAGE_DELETE">
-			<execute function="AssertClick#assertTextClick" value1="X" />
-		</case>
-
-		<case locator-key1="NAVIGATION_TASKS">
-			<execute function="AssertClick#assertTextClickAtAndWait" />
+		<case locator-key1="TASK_PORTLET_TITLE">
+			<execute function="AssertTextEquals#assertPartialText" />
 		</case>
 	</command>
 

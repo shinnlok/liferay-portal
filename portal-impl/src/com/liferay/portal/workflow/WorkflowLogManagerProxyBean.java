@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -46,7 +46,7 @@ public class WorkflowLogManagerProxyBean
 	@Override
 	public List<WorkflowLog> getWorkflowLogsByWorkflowInstance(
 		long companyId, long workflowInstanceId, List<Integer> logTypes,
-		int start, int end, OrderByComparator orderByComparator) {
+		int start, int end, OrderByComparator<WorkflowLog> orderByComparator) {
 
 		throw new UnsupportedOperationException();
 	}
@@ -54,7 +54,7 @@ public class WorkflowLogManagerProxyBean
 	@Override
 	public List<WorkflowLog> getWorkflowLogsByWorkflowTask(
 		long companyId, long workflowTaskId, List<Integer> logTypes, int start,
-		int end, OrderByComparator orderByComparator) {
+		int end, OrderByComparator<WorkflowLog> orderByComparator) {
 
 		throw new UnsupportedOperationException();
 	}

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.model.Layout;
+import com.liferay.portal.model.PortletConstants;
 import com.liferay.portal.model.PortletItem;
 import com.liferay.portal.model.PortletPreferences;
 import com.liferay.portal.security.permission.ActionKeys;
@@ -43,7 +44,7 @@ public class PortletPreferencesServiceImpl
 
 	@Override
 	public void deleteArchivedPreferences(long portletItemId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		PortletItem portletItem = portletItemLocalService.getPortletItem(
 			portletItemId);
@@ -67,7 +68,7 @@ public class PortletPreferencesServiceImpl
 	public void restoreArchivedPreferences(
 			long groupId, Layout layout, String portletId, long portletItemId,
 			javax.portlet.PortletPreferences preferences)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		PortletItem portletItem = portletItemLocalService.getPortletItem(
 			portletItemId);
@@ -81,7 +82,7 @@ public class PortletPreferencesServiceImpl
 			long groupId, Layout layout, String portletId,
 			PortletItem portletItem,
 			javax.portlet.PortletPreferences preferences)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		PortletPermissionUtil.check(
 			getPermissionChecker(), groupId, layout, portletId,
@@ -94,7 +95,7 @@ public class PortletPreferencesServiceImpl
 		javax.portlet.PortletPreferences archivedPreferences =
 			portletPreferencesLocalService.getPreferences(
 				portletItem.getCompanyId(), ownerId, ownerType, plid,
-				portletId);
+				PortletConstants.getRootPortletId(portletId));
 
 		copyPreferences(archivedPreferences, preferences);
 	}
@@ -103,7 +104,7 @@ public class PortletPreferencesServiceImpl
 	public void restoreArchivedPreferences(
 			long groupId, String name, Layout layout, String portletId,
 			javax.portlet.PortletPreferences preferences)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		PortletItem portletItem = portletItemLocalService.getPortletItem(
 			groupId, name, portletId, PortletPreferences.class.getName());
@@ -116,7 +117,7 @@ public class PortletPreferencesServiceImpl
 	public void updateArchivePreferences(
 			long userId, long groupId, String name, String portletId,
 			javax.portlet.PortletPreferences preferences)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		PortletPermissionUtil.check(
 			getPermissionChecker(), groupId, 0, portletId,
@@ -139,9 +140,8 @@ public class PortletPreferencesServiceImpl
 	}
 
 	protected void copyPreferences(
-			javax.portlet.PortletPreferences sourcePreferences,
-			javax.portlet.PortletPreferences targetPreferences)
-		throws SystemException {
+		javax.portlet.PortletPreferences sourcePreferences,
+		javax.portlet.PortletPreferences targetPreferences) {
 
 		try {
 			Map<String, String[]> targetPreferencesMap =

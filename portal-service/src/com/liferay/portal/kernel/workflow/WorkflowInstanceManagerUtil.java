@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -93,7 +93,7 @@ public class WorkflowInstanceManagerUtil {
 	public static List<WorkflowInstance> getWorkflowInstances(
 			long companyId, Long userId, String assetClassName,
 			Long assetClassPK, Boolean completed, int start, int end,
-			OrderByComparator orderByComparator)
+			OrderByComparator<WorkflowInstance> orderByComparator)
 		throws WorkflowException {
 
 		return getWorkflowInstanceManager().getWorkflowInstances(
@@ -104,7 +104,7 @@ public class WorkflowInstanceManagerUtil {
 	public static List<WorkflowInstance> getWorkflowInstances(
 			long companyId, Long userId, String[] assetClassNames,
 			Boolean completed, int start, int end,
-			OrderByComparator orderByComparator)
+			OrderByComparator<WorkflowInstance> orderByComparator)
 		throws WorkflowException {
 
 		return getWorkflowInstanceManager().getWorkflowInstances(
@@ -115,7 +115,7 @@ public class WorkflowInstanceManagerUtil {
 	public static List<WorkflowInstance> getWorkflowInstances(
 			long companyId, String workflowDefinitionName,
 			Integer workflowDefinitionVersion, Boolean completed, int start,
-			int end, OrderByComparator orderByComparator)
+			int end, OrderByComparator<WorkflowInstance> orderByComparator)
 		throws WorkflowException {
 
 		return getWorkflowInstanceManager().getWorkflowInstances(

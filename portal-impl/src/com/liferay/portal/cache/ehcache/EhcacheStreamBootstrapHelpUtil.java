@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -118,7 +118,9 @@ public class EhcacheStreamBootstrapHelpUtil {
 		List<String> cacheNames = new ArrayList<String>();
 
 		for (Ehcache ehcache : ehcaches) {
-			cacheNames.add(ehcache.getName());
+			if (cacheManager == ehcache.getCacheManager()) {
+				cacheNames.add(ehcache.getName());
+			}
 		}
 
 		ClusterRequest clusterRequest = ClusterRequest.createMulticastRequest(
@@ -153,8 +155,13 @@ public class EhcacheStreamBootstrapHelpUtil {
 			return;
 		}
 
+		if (_log.isInfoEnabled()) {
+			_log.info(
+				"Load cache data from cluster node " +
+					clusterNodeResponse.getClusterNode());
+		}
+
 		Socket socket = null;
-		ObjectInputStream objectInputStream = null;
 
 		try {
 			SocketAddress remoteSocketAddress =
@@ -174,47 +181,57 @@ public class EhcacheStreamBootstrapHelpUtil {
 
 			socket.shutdownOutput();
 
-			objectInputStream = new AnnotatedObjectInputStream(
-				socket.getInputStream());
+			ObjectInputStream objectInputStream =
+				new AnnotatedObjectInputStream(socket.getInputStream());
 
 			Ehcache ehcache = null;
 
-			while (true) {
-				Object object = objectInputStream.readObject();
+			try {
+				while (true) {
+					Object object = objectInputStream.readObject();
 
-				if (object instanceof EhcacheElement) {
-					EhcacheElement ehcacheElement = (EhcacheElement)object;
+					if (object instanceof EhcacheElement) {
+						EhcacheElement ehcacheElement = (EhcacheElement)object;
 
-					Element element = ehcacheElement.toElement();
+						Element element = ehcacheElement.toElement();
 
-					ehcache.put(element, true);
+						ehcache.put(element, true);
+					}
+					else if (object instanceof String) {
+						if (_COMMAND_SOCKET_CLOSE.equals(object)) {
+							break;
+						}
+
+						EhcacheStreamBootstrapCacheLoader.setSkip();
+
+						try {
+							ehcache = cacheManager.addCacheIfAbsent(
+								(String)object);
+						}
+						finally {
+							EhcacheStreamBootstrapCacheLoader.resetSkip();
+						}
+					}
+					else {
+						throw new SystemException(
+							"Socket input stream returned invalid object " +
+								object);
+					}
 				}
-				else if (object instanceof String) {
-					if (_COMMAND_SOCKET_CLOSE.equals(object)) {
-						break;
-					}
-
-					EhcacheStreamBootstrapCacheLoader.setSkip();
-
-					try {
-						ehcache = cacheManager.addCacheIfAbsent((String)object);
-					}
-					finally {
-						EhcacheStreamBootstrapCacheLoader.resetSkip();
-					}
-				}
-				else {
-					throw new SystemException(
-						"Socket input stream returned invalid object " +
-							object);
+			}
+			finally {
+				if (objectInputStream != null) {
+					objectInputStream.close();
 				}
 			}
 		}
+		catch (Exception e) {
+			throw new Exception(
+				"Unable to load cache data from cluster node " +
+					clusterNodeResponse.getClusterNode(),
+				e);
+		}
 		finally {
-			if (objectInputStream != null) {
-				objectInputStream.close();
-			}
-
 			if (socket != null) {
 				socket.close();
 			}
@@ -285,8 +302,9 @@ public class EhcacheStreamBootstrapHelpUtil {
 
 					return;
 				}
-
-				_serverSocket.close();
+				finally {
+					_serverSocket.close();
+				}
 
 				socket.shutdownInput();
 

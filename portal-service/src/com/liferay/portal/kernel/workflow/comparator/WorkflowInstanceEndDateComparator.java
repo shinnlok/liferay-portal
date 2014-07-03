@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,7 +22,8 @@ import java.util.Date;
 /**
  * @author Shuyang Zhou
  */
-public class WorkflowInstanceEndDateComparator extends OrderByComparator {
+public class WorkflowInstanceEndDateComparator
+	extends OrderByComparator<WorkflowInstance> {
 
 	public WorkflowInstanceEndDateComparator(
 		boolean ascending, String orderByAsc, String orderByDesc,
@@ -35,9 +36,9 @@ public class WorkflowInstanceEndDateComparator extends OrderByComparator {
 	}
 
 	@Override
-	public int compare(Object obj1, Object obj2) {
-		WorkflowInstance workflowInstance1 = (WorkflowInstance)obj1;
-		WorkflowInstance workflowInstance2 = (WorkflowInstance)obj2;
+	public int compare(
+		WorkflowInstance workflowInstance1,
+		WorkflowInstance workflowInstance2) {
 
 		Date endDate1 = workflowInstance1.getEndDate();
 		Date endDate2 = workflowInstance2.getEndDate();

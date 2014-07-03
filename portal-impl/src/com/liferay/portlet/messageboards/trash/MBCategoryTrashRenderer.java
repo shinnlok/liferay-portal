@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,6 +23,9 @@ import com.liferay.portlet.messageboards.model.MBCategory;
 
 import java.util.Locale;
 
+import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
+
 /**
  * @author Eduardo Garcia
  */
@@ -45,6 +48,11 @@ public class MBCategoryTrashRenderer extends BaseTrashRenderer {
 	}
 
 	@Override
+	public String getIconCssClass() {
+		return "icon-comments";
+	}
+
+	@Override
 	public String getIconPath(ThemeDisplay themeDisplay) {
 		return themeDisplay.getPathThemeImages() + "/common/category.png";
 	}
@@ -59,7 +67,9 @@ public class MBCategoryTrashRenderer extends BaseTrashRenderer {
 	}
 
 	@Override
-	public String getSummary(Locale locale) {
+	public String getSummary(
+		PortletRequest portletRequest, PortletResponse portletResponse) {
+
 		return HtmlUtil.stripHtml(_category.getDescription());
 	}
 

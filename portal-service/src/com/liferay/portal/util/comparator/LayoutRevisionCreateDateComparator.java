@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,7 +21,8 @@ import com.liferay.portal.model.LayoutRevision;
 /**
  * @author Julio Camarero
  */
-public class LayoutRevisionCreateDateComparator extends OrderByComparator {
+public class LayoutRevisionCreateDateComparator
+	extends OrderByComparator<LayoutRevision> {
 
 	public static final String ORDER_BY_ASC = "LayoutRevision.createDate ASC";
 
@@ -38,9 +39,8 @@ public class LayoutRevisionCreateDateComparator extends OrderByComparator {
 	}
 
 	@Override
-	public int compare(Object obj1, Object obj2) {
-		LayoutRevision layoutRevision1 = (LayoutRevision)obj1;
-		LayoutRevision layoutRevision2 = (LayoutRevision)obj2;
+	public int compare(
+		LayoutRevision layoutRevision1, LayoutRevision layoutRevision2) {
 
 		int value = DateUtil.compareTo(
 			layoutRevision1.getCreateDate(), layoutRevision2.getCreateDate());

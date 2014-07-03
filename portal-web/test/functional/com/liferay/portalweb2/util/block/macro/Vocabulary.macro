@@ -1,7 +1,34 @@
 <definition>
+	<command name="addAssociatedAssetTypeViaVocabularyCP">
+		<var name="key_vocabularyName" value="${vocabularyName}" />
+
+		<execute action="CPCategories#assertTextEquals" locator-key1="VOCABULARY_ENTRY" value1="${vocabularyName}" />
+
+		<execute action="CPVocabulariesEdit#click" locator-key1="EDIT_ICON" />
+
+		<if>
+			<condition action="CPVocabulariesEdit#isElementNotPresent" locator-key1="ASSOCIATED_ASSET_TYPES_SELECT" />
+			<then>
+				<execute action="CPVocabulariesEdit#assertClick" locator-key1="ASSOCIATED_ASSET_TYPES_DROP_DOWN" value1="Associated Asset Types" />
+			</then>
+		</if>
+
+		<execute action="CPVocabulariesEdit#click" locator-key1="ASSOCIATED_ASSET_TYPES_ADD_BUTTON" />
+		<execute action="CPVocabulariesEdit#select" locator-key1="ASSOCIATED_ASSET_TYPES_SELECT_2" value1="${vocabularyAssociatedAssetType2}" />
+		<execute action="CPVocabulariesEdit#assertClick" locator-key1="SAVE_BUTTON" value1="Save" />
+		<execute action="CPCategories#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request processed successfully." />
+	</command>
+
 	<command name="addCP">
 		<execute action="CPCategories#assertClick" locator-key1="ADD_VOCABULARY_BUTTON" value1="Add Vocabulary" />
 		<execute action="CPVocabulariesAdd#type" locator-key1="NAME_FIELD" value1="${vocabularyName}" />
+
+		<if>
+			<isset var="vocabularyDescription" />
+			<then>
+				<execute action="CPVocabulariesAdd#type" locator-key1="DESCRIPTION_FIELD" value1="${localizationName}" />
+			</then>
+		</if>
 
 		<if>
 			<equals arg1="${allowMultipleCategories}" arg2="False" />
@@ -10,26 +37,26 @@
 			</then>
 		</if>
 
-		<execute action="CPVocabulariesAdd#assertClick" locator-key1="SAVE_BUTTON" value1="Save" />
-		<execute action="CPCategories#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request processed successfully." />
-
-		<var name="key_vocabularyName" value="${vocabularyName}" />
-
-		<execute action="CPCategories#assertTextEquals" locator-key1="VOCABULARY_ENTRY" value1="${vocabularyName}" />
-	</command>
-
-	<command name="addWithAssociatedAssetTypeCP">
-		<execute action="CPCategories#assertClick" locator-key1="ADD_VOCABULARY_BUTTON" value1="Add Vocabulary" />
-		<execute action="CPVocabulariesAdd#type" locator-key1="NAME_FIELD" value1="${vocabularyName}" />
-
 		<if>
-			<condition action="CPVocabulariesAdd#isElementNotPresent" locator-key1="CHOOSE_ASSET_TYPE_SELECT" />
+			<isset var="localizationNameKey" />
 			<then>
-				<execute action="CPVocabulariesAdd#assertClick" locator-key1="ASSOCIATED_ASSET_TYPES" value1="Associated Asset Types" />
+				<var name="key_localizationName" value="${localizationNameKey}" />
+
+				<execute action="CPVocabulariesAdd#click" locator-key1="LOCALIZATION_NAME" />
+				<execute action="CPVocabulariesAdd#type" locator-key1="NAME_FIELD" value1="${localizationName}" />
 			</then>
 		</if>
 
-		<execute action="CPVocabulariesAdd#select" locator-key1="CHOOSE_ASSET_TYPE_SELECT" value1="${vocabularyAssociatedAssetType}" />
+		<if>
+			<isset var="localization2NameKey" />
+			<then>
+				<var name="key_localizationName" value="${localization2NameKey}" />
+
+				<execute action="CPVocabulariesAdd#click" locator-key1="LOCALIZATION_NAME" />
+				<execute action="CPVocabulariesAdd#type" locator-key1="NAME_FIELD" value1="${localization2Name}" />
+			</then>
+		</if>
+
 		<execute action="CPVocabulariesAdd#assertClick" locator-key1="SAVE_BUTTON" value1="Save" />
 		<execute action="CPCategories#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request processed successfully." />
 
@@ -42,7 +69,7 @@
 		<execute action="CPCategories#assertClick" locator-key1="ADD_VOCABULARY_BUTTON" value1="Add Vocabulary" />
 
 		<execute action="CPVocabulariesAdd#type" locator-key1="NAME_FIELD" value1="${vocabularyName}" />
-		<execute action="CPVocabulariesAdd#select" locator-key1="CHOOSE_VIEWABLE_BY_SELECT" value1="${viewableBy}" />
+		<execute action="CPVocabulariesAdd#select" locator-key1="VIEWABLE_BY_SELECT" value1="${viewableBy}" />
 		<execute action="CPVocabulariesAdd#assertClick" locator-key1="SAVE_BUTTON" value1="Save" />
 
 		<execute action="CPCategories#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request processed successfully." />
@@ -50,6 +77,53 @@
 		<var name="key_vocabularyName" value="${vocabularyName}" />
 
 		<execute action="CPCategories#assertTextEquals" locator-key1="VOCABULARY_ENTRY" value1="${vocabularyName}" />
+	</command>
+
+	<command name="addVocabularyWithNullTitle">
+		<execute action="CPCategories#assertClick" locator-key1="ADD_VOCABULARY_BUTTON" value1="Add Vocabulary" />
+		<execute action="CPVocabulariesAdd#type" locator-key1="NAME_FIELD" value1=" " />
+
+		<execute action="CPVocabulariesAdd#assertClick" locator-key1="SAVE_BUTTON" value1="Save" />
+		<execute action="CPVocabulariesAdd#assertTextEquals" locator-key1="ERROR_MESSAGE" value1="One of your fields contains invalid characters." />
+	</command>
+
+	<command name="addWithAssociatedAssetTypeCP">
+		<execute action="CPCategories#assertClick" locator-key1="ADD_VOCABULARY_BUTTON" value1="Add Vocabulary" />
+		<execute action="CPVocabulariesAdd#type" locator-key1="NAME_FIELD" value1="${vocabularyName}" />
+
+		<if>
+			<condition action="CPVocabulariesAdd#isElementNotPresent" locator-key1="ASSOCIATED_ASSET_TYPES_SELECT" />
+			<then>
+				<execute action="CPVocabulariesAdd#assertClick" locator-key1="ASSOCIATED_ASSET_TYPES_DROP_DOWN" value1="Associated Asset Types" />
+			</then>
+		</if>
+
+		<execute action="CPVocabulariesAdd#select" locator-key1="ASSOCIATED_ASSET_TYPES_SELECT" value1="${vocabularyAssociatedAssetType}" />
+		<execute action="CPVocabulariesAdd#assertClick" locator-key1="SAVE_BUTTON" value1="Save" />
+		<execute action="CPCategories#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request processed successfully." />
+
+		<var name="key_vocabularyName" value="${vocabularyName}" />
+
+		<execute action="CPCategories#assertTextEquals" locator-key1="VOCABULARY_ENTRY" value1="${vocabularyName}" />
+	</command>
+
+	<command name="deleteAssociatedAssetTypeViaVocabularyCP">
+		<var name="key_vocabularyName" value="${vocabularyName}" />
+
+		<execute action="CPCategories#assertTextEquals" locator-key1="VOCABULARY_ENTRY" value1="${vocabularyName}" />
+
+		<execute action="CPVocabulariesEdit#click" locator-key1="EDIT_ICON" />
+
+		<if>
+			<condition action="CPVocabulariesEdit#isElementNotPresent" locator-key1="ASSOCIATED_ASSET_TYPES_SELECT" />
+			<then>
+				<execute action="CPVocabulariesEdit#assertClick" locator-key1="ASSOCIATED_ASSET_TYPES_DROP_DOWN" value1="Associated Asset Types" />
+			</then>
+		</if>
+
+		<execute action="CPVocabulariesEdit#click" locator-key1="ASSOCIATED_ASSET_TYPES_DELETE_BUTTON_2" />
+		<execute action="CPVocabulariesEdit#assertClick" locator-key1="SAVE_BUTTON" value1="Save" />
+		<execute action="CPCategories#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request processed successfully." />
 	</command>
 
 	<command name="deleteByActionsCP">
@@ -82,7 +156,8 @@
 		<var name="key_vocabularyName" value="${vocabularyName}" />
 
 		<execute action="CPCategories#assertTextEquals" locator-key1="VOCABULARY_ENTRY" value1="${vocabularyName}" />
-		<execute action="CPVocabulariesEdit#click" locator-key1="EDIT_ICON" />
+		<execute action="CPCategories#click" locator-key1="VOCABULARY_ENTRY_EDIT_ICON" />
+
 		<execute action="CPVocabulariesEdit#type" locator-key1="NAME_FIELD" value1="${vocabularyNameEdit}" />
 		<execute action="CPVocabulariesEdit#assertClick" locator-key1="SAVE_BUTTON" value1="Save" />
 		<execute action="CPCategories#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request processed successfully." />
@@ -163,12 +238,12 @@
 		<execute action="CPVocabulariesEdit#click" locator-key1="EDIT_ICON" />
 
 		<if>
-			<condition action="CPVocabulariesAdd#isElementNotPresent" locator-key1="CHOOSE_ASSET_TYPE_SELECT" />
+			<condition action="CPVocabulariesAdd#isElementNotPresent" locator-key1="ASSOCIATED_ASSET_TYPES_SELECT" />
 			<then>
-				<execute action="CPVocabulariesAdd#assertClick" locator-key1="ASSOCIATED_ASSET_TYPES" value1="Associated Asset Types" />
+				<execute action="CPVocabulariesAdd#assertClick" locator-key1="ASSOCIATED_ASSET_TYPES_DROP_DOWN" value1="Associated Asset Types" />
 			</then>
 		</if>
 
-		<execute action="CPVocabulariesAdd#assertSelectedLabel" locator-key1="CHOOSE_ASSET_TYPE_SELECT" value1="${vocabularyAssociatedAssetType}" />
+		<execute action="CPVocabulariesAdd#assertSelectedLabel" locator-key1="ASSOCIATED_ASSET_TYPES_SELECT" value1="${vocabularyAssociatedAssetType}" />
 	</command>
 </definition>

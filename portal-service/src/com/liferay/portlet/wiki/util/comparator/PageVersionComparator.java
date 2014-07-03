@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,7 +20,7 @@ import com.liferay.portlet.wiki.model.WikiPage;
 /**
  * @author Bruno Farache
  */
-public class PageVersionComparator extends OrderByComparator {
+public class PageVersionComparator extends OrderByComparator<WikiPage> {
 
 	public static final String ORDER_BY_ASC = "WikiPage.version ASC";
 
@@ -37,10 +37,7 @@ public class PageVersionComparator extends OrderByComparator {
 	}
 
 	@Override
-	public int compare(Object obj1, Object obj2) {
-		WikiPage page1 = (WikiPage)obj1;
-		WikiPage page2 = (WikiPage)obj2;
-
+	public int compare(WikiPage page1, WikiPage page2) {
 		int value = 0;
 
 		if (page1.getVersion() < page2.getVersion()) {

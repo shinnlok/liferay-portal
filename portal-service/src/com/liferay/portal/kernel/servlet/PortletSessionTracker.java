@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,18 +14,18 @@
 
 package com.liferay.portal.kernel.servlet;
 
-import com.liferay.portal.kernel.concurrent.ConcurrentHashSet;
 import com.liferay.portal.kernel.servlet.filters.compoundsessionid.CompoundSessionIdSplitterUtil;
 
-import java.util.Set;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 
 /**
  * <p>
- * See http://issues.liferay.com/browse/LEP-1466.
+ * See https://issues.liferay.com/browse/LEP-1466.
  * </p>
  *
  * @author Rudy Hilado
@@ -40,12 +40,12 @@ public class PortletSessionTracker {
 			sessionId = CompoundSessionIdSplitterUtil.parseSessionId(sessionId);
 		}
 
-		Set<HttpSession> sessions = _sessions.get(sessionId);
+		Map<String, HttpSession> sessions = _sessions.get(sessionId);
 
 		if (sessions == null) {
-			sessions = new ConcurrentHashSet<HttpSession>();
+			sessions = new ConcurrentHashMap<String, HttpSession>();
 
-			Set<HttpSession> previousSessions = _sessions.putIfAbsent(
+			Map<String, HttpSession> previousSessions = _sessions.putIfAbsent(
 				sessionId, sessions);
 
 			if (previousSessions != null) {
@@ -53,7 +53,16 @@ public class PortletSessionTracker {
 			}
 		}
 
-		sessions.add(session);
+		ServletContext servletContext = session.getServletContext();
+
+		String contextPath = servletContext.getContextPath();
+
+		// ConcurrentHashMap's read is faster than its write. This check is
+		// logically unnecessary, but is a performance improvement.
+
+		if (!sessions.containsKey(contextPath)) {
+			sessions.put(contextPath, session);
+		}
 	}
 
 	public static void invalidate(String sessionId) {
@@ -61,13 +70,13 @@ public class PortletSessionTracker {
 			sessionId = CompoundSessionIdSplitterUtil.parseSessionId(sessionId);
 		}
 
-		Set<HttpSession> sessions = _sessions.remove(sessionId);
+		Map<String, HttpSession> sessions = _sessions.remove(sessionId);
 
 		if (sessions == null) {
 			return;
 		}
 
-		for (HttpSession session : sessions) {
+		for (HttpSession session : sessions.values()) {
 			try {
 				session.invalidate();
 			}
@@ -76,7 +85,7 @@ public class PortletSessionTracker {
 		}
 	}
 
-	private static ConcurrentMap<String, Set<HttpSession>> _sessions =
-		new ConcurrentHashMap<String, Set<HttpSession>>();
+	private static ConcurrentMap<String, Map<String, HttpSession>> _sessions =
+		new ConcurrentHashMap<String, Map<String, HttpSession>>();
 
 }

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -34,14 +34,6 @@ if ((classPK > 0) && (structureClassNameId == classNameId)) {
 String title = ddmDisplay.getViewTemplatesTitle(structure, locale);
 %>
 
-<c:if test="<%= showToolbar %>">
-	<liferay-util:include page="/html/portlet/dynamic_data_mapping/template_toolbar.jsp">
-		<liferay-util:param name="redirect" value="<%= currentURL %>" />
-		<liferay-util:param name="classNameId" value="<%= String.valueOf(classNameId) %>" />
-		<liferay-util:param name="classPK" value="<%= String.valueOf(classPK) %>" />
-	</liferay-util:include>
-</c:if>
-
 <liferay-portlet:renderURL varImpl="portletURL">
 	<portlet:param name="struts_action" value="/dynamic_data_mapping/select_template" />
 	<portlet:param name="classNameId" value="<%= String.valueOf(classNameId) %>" />
@@ -57,11 +49,24 @@ String title = ddmDisplay.getViewTemplatesTitle(structure, locale);
 		/>
 	</c:if>
 
-	<div class="separator"><!-- --></div>
-
 	<liferay-ui:search-container
 		searchContainer="<%= new TemplateSearch(renderRequest, portletURL) %>"
 	>
+		<c:if test="<%= showToolbar %>">
+
+			<%
+			request.setAttribute(WebKeys.SEARCH_CONTAINER, searchContainer);
+			%>
+
+			<liferay-util:include page="/html/portlet/dynamic_data_mapping/template_toolbar.jsp">
+				<liferay-util:param name="redirect" value="<%= currentURL %>" />
+				<liferay-util:param name="classNameId" value="<%= String.valueOf(classNameId) %>" />
+				<liferay-util:param name="classPK" value="<%= String.valueOf(classPK) %>" />
+			</liferay-util:include>
+		</c:if>
+
+		<div class="separator"><!-- --></div>
+
 		<liferay-ui:search-container-results>
 			<%@ include file="/html/portlet/dynamic_data_mapping/template_search_results.jspf" %>
 		</liferay-ui:search-container-results>
@@ -100,7 +105,7 @@ String title = ddmDisplay.getViewTemplatesTitle(structure, locale);
 
 					data.put("ddmtemplateid", template.getTemplateId());
 					data.put("ddmtemplatekey", template.getTemplateKey());
-					data.put("name", HtmlUtil.escapeAttribute(template.getName(locale)));
+					data.put("name", template.getName(locale));
 					%>
 
 					<aui:button cssClass="selector-button" data="<%= data %>" value="choose" />
@@ -113,21 +118,9 @@ String title = ddmDisplay.getViewTemplatesTitle(structure, locale);
 </aui:form>
 
 <aui:script>
-	Liferay.Util.focusFormField(document.<portlet:namespace />selectTemplateFm.<portlet:namespace />toggle_id_ddm_template_searchkeywords);
+	Liferay.Util.focusFormField(document.<portlet:namespace />selectTemplateFm.<portlet:namespace />keywords);
 </aui:script>
 
 <aui:script use="aui-base">
-	var Util = Liferay.Util;
-
-	A.one('#<portlet:namespace />selectTemplateFm').delegate(
-		'click',
-		function(event) {
-			var result = Util.getAttributes(event.currentTarget, 'data-');
-
-			Util.getOpener().Liferay.fire('<%= HtmlUtil.escapeJS(eventName) %>', result);
-
-			Util.getWindow().hide();
-		},
-		'.selector-button'
-	);
+	Liferay.Util.selectEntityHandler('#<portlet:namespace />selectTemplateFm', '<%= HtmlUtil.escapeJS(eventName) %>');
 </aui:script>

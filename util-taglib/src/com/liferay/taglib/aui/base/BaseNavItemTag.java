@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -73,12 +73,20 @@ public class BaseNavItemTag extends com.liferay.taglib.util.IncludeTag {
 		return _iconCssClass;
 	}
 
+	public java.lang.String getIconSrc() {
+		return _iconSrc;
+	}
+
 	public java.lang.String getId() {
 		return _id;
 	}
 
 	public java.lang.String getLabel() {
 		return _label;
+	}
+
+	public boolean getLocalizeLabel() {
+		return _localizeLabel;
 	}
 
 	public boolean getSelected() {
@@ -95,6 +103,10 @@ public class BaseNavItemTag extends com.liferay.taglib.util.IncludeTag {
 
 	public boolean getToggle() {
 		return _toggle;
+	}
+
+	public boolean getToggleTouch() {
+		return _toggleTouch;
 	}
 
 	public boolean getUseDialog() {
@@ -165,6 +177,12 @@ public class BaseNavItemTag extends com.liferay.taglib.util.IncludeTag {
 		setScopedAttribute("iconCssClass", iconCssClass);
 	}
 
+	public void setIconSrc(java.lang.String iconSrc) {
+		_iconSrc = iconSrc;
+
+		setScopedAttribute("iconSrc", iconSrc);
+	}
+
 	public void setId(java.lang.String id) {
 		_id = id;
 
@@ -175,6 +193,12 @@ public class BaseNavItemTag extends com.liferay.taglib.util.IncludeTag {
 		_label = label;
 
 		setScopedAttribute("label", label);
+	}
+
+	public void setLocalizeLabel(boolean localizeLabel) {
+		_localizeLabel = localizeLabel;
+
+		setScopedAttribute("localizeLabel", localizeLabel);
 	}
 
 	public void setSelected(boolean selected) {
@@ -201,6 +225,12 @@ public class BaseNavItemTag extends com.liferay.taglib.util.IncludeTag {
 		setScopedAttribute("toggle", toggle);
 	}
 
+	public void setToggleTouch(boolean toggleTouch) {
+		_toggleTouch = toggleTouch;
+
+		setScopedAttribute("toggleTouch", toggleTouch);
+	}
+
 	public void setUseDialog(boolean useDialog) {
 		_useDialog = useDialog;
 
@@ -225,12 +255,15 @@ public class BaseNavItemTag extends com.liferay.taglib.util.IncludeTag {
 		_dropdown = false;
 		_href = "javascript:void(0);";
 		_iconCssClass = null;
+		_iconSrc = null;
 		_id = null;
 		_label = null;
+		_localizeLabel = true;
 		_selected = false;
 		_state = null;
 		_title = null;
 		_toggle = false;
+		_toggleTouch = true;
 		_useDialog = false;
 		_wrapDropDownMenu = true;
 	}
@@ -257,12 +290,15 @@ public class BaseNavItemTag extends com.liferay.taglib.util.IncludeTag {
 		setNamespacedAttribute(request, "dropdown", _dropdown);
 		setNamespacedAttribute(request, "href", _href);
 		setNamespacedAttribute(request, "iconCssClass", _iconCssClass);
+		setNamespacedAttribute(request, "iconSrc", _iconSrc);
 		setNamespacedAttribute(request, "id", _id);
 		setNamespacedAttribute(request, "label", _label);
+		setNamespacedAttribute(request, "localizeLabel", _localizeLabel);
 		setNamespacedAttribute(request, "selected", _selected);
 		setNamespacedAttribute(request, "state", _state);
 		setNamespacedAttribute(request, "title", _title);
 		setNamespacedAttribute(request, "toggle", _toggle);
+		setNamespacedAttribute(request, "toggleTouch", _toggleTouch);
 		setNamespacedAttribute(request, "useDialog", _useDialog);
 		setNamespacedAttribute(request, "wrapDropDownMenu", _wrapDropDownMenu);
 	}
@@ -285,12 +321,15 @@ public class BaseNavItemTag extends com.liferay.taglib.util.IncludeTag {
 	private boolean _dropdown = false;
 	private java.lang.Object _href = "javascript:void(0);";
 	private java.lang.String _iconCssClass = null;
+	private java.lang.String _iconSrc = null;
 	private java.lang.String _id = null;
 	private java.lang.String _label = null;
+	private boolean _localizeLabel = true;
 	private boolean _selected = false;
 	private java.lang.String _state = null;
 	private java.lang.String _title = null;
 	private boolean _toggle = false;
+	private boolean _toggleTouch = true;
 	private boolean _useDialog = false;
 	private boolean _wrapDropDownMenu = true;
 

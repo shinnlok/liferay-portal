@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -45,13 +45,13 @@ TrashUtil.addContainerModelBreadcrumbEntries(request, trashHandler.getContainerM
 %>
 
 <div class="alert alert-block">
-	<liferay-ui:message arguments="<%= new Object[] {trashHandler.getContainerModelName(), trashRenderer.getTitle(locale)} %>" key="the-original-x-does-not-exist-anymore" />
+	<liferay-ui:message arguments="<%= new Object[] {trashHandler.getContainerModelName(), HtmlUtil.escape(trashRenderer.getTitle(locale))} %>" key="the-original-x-does-not-exist-anymore" translateArguments="<%= false %>" />
 </div>
 
 <aui:form method="post" name="selectFolderFm">
 	<liferay-ui:header
 		showBackURL="<%= containerModel != null %>"
-		title='<%= LanguageUtil.format(pageContext, "select-x", trashHandler.getContainerModelName(), true) %>'
+		title='<%= LanguageUtil.format(request, "select-x", trashHandler.getContainerModelName()) %>'
 	/>
 
 	<liferay-ui:breadcrumb showGuestGroup="<%= false %>" showLayout="<%= false %>" showParentGroups="<%= false %>" />
@@ -66,7 +66,7 @@ TrashUtil.addContainerModelBreadcrumbEntries(request, trashHandler.getContainerM
 		data.put("containermodelid", containerModelId);
 		%>
 
-		<aui:button cssClass="selector-button" data="<%= data %>" value='<%= LanguageUtil.format(pageContext, "choose-this-x", trashHandler.getContainerModelName(), true) %>' />
+		<aui:button cssClass="selector-button" data="<%= data %>" value='<%= LanguageUtil.format(request, "choose-this-x", trashHandler.getContainerModelName()) %>' />
 	</aui:button-row>
 
 	<br />
@@ -94,7 +94,7 @@ TrashUtil.addContainerModelBreadcrumbEntries(request, trashHandler.getContainerM
 			%>
 
 			<liferay-ui:search-container-column-text
-				name="<%= LanguageUtil.get(pageContext, trashHandler.getContainerModelName()) %>"
+				name="<%= LanguageUtil.get(request, trashHandler.getContainerModelName()) %>"
 			>
 				<c:choose>
 					<c:when test="<%= curContainerModel.getContainerModelId() > 0 %>">
@@ -106,9 +106,10 @@ TrashUtil.addContainerModelBreadcrumbEntries(request, trashHandler.getContainerM
 						%>
 
 						<liferay-ui:icon
+							iconCssClass="<%= containerTrashRenderer.getIconCssClass() %>"
 							label="<%= true %>"
 							message="<%= curContainerModel.getContainerModelName() %>"
-							method="get" src="<%= containerTrashRenderer.getIconPath(renderRequest) %>"
+							method="get"
 							url="<%= containerURL.toString() %>"
 						/>
 					</c:when>
@@ -119,7 +120,7 @@ TrashUtil.addContainerModelBreadcrumbEntries(request, trashHandler.getContainerM
 			</liferay-ui:search-container-column-text>
 
 			<liferay-ui:search-container-column-text
-				name='<%= LanguageUtil.format(pageContext, "num-of-x", trashHandler.getContainerModelName(), true) %>'
+				name='<%= LanguageUtil.format(request, "num-of-x", trashHandler.getContainerModelName()) %>'
 				value="<%= String.valueOf(trashHandler.getContainerModelsCount(classPK, curContainerModel.getContainerModelId())) %>"
 			/>
 
@@ -142,17 +143,5 @@ TrashUtil.addContainerModelBreadcrumbEntries(request, trashHandler.getContainerM
 </aui:form>
 
 <aui:script use="aui-base">
-	var Util = Liferay.Util;
-
-	A.one('#<portlet:namespace />selectFolderFm').delegate(
-		'click',
-		function(event) {
-			var result = Util.getAttributes(event.currentTarget, 'data-');
-
-			Util.getOpener().Liferay.fire('<%= HtmlUtil.escapeJS(eventName) %>', result);
-
-			Util.getWindow().hide();
-		},
-		'.selector-button'
-	);
+	Liferay.Util.selectEntityHandler('#<portlet:namespace />selectFolderFm', '<%= HtmlUtil.escapeJS(eventName) %>');
 </aui:script>

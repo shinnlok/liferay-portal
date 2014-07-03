@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -87,32 +87,14 @@ if (Validator.isNotNull(target)) {
 			/>
 
 			<liferay-ui:search-container-column-text
-				buffer="buffer"
 				name="parent-organization"
-			>
-
-				<%
-				String parentOrganizationName = StringPool.BLANK;
-
-				if (organization.getParentOrganizationId() > 0) {
-					try {
-						Organization parentOrganization = OrganizationLocalServiceUtil.getOrganization(organization.getParentOrganizationId());
-
-						parentOrganizationName = parentOrganization.getName();
-					}
-					catch (Exception e) {
-					}
-				}
-
-				buffer.append(HtmlUtil.escape(parentOrganizationName));
-				%>
-
-			</liferay-ui:search-container-column-text>
+				value="<%= HtmlUtil.escape(organization.getParentOrganizationName()) %>"
+			/>
 
 			<liferay-ui:search-container-column-text
 				name="type"
 				orderable="<%= true %>"
-				value="<%= LanguageUtil.get(pageContext, organization.getType()) %>"
+				value="<%= LanguageUtil.get(request, organization.getType()) %>"
 			/>
 
 			<liferay-ui:search-container-column-text
@@ -137,12 +119,24 @@ if (Validator.isNotNull(target)) {
 					Map<String, Object> data = new HashMap<String, Object>();
 
 					data.put("groupid", organization.getGroupId());
-					data.put("name", HtmlUtil.escape(organization.getName()));
+					data.put("name", organization.getName());
 					data.put("organizationid", organization.getOrganizationId());
-					data.put("type", LanguageUtil.get(pageContext, organization.getType()));
+					data.put("type", LanguageUtil.get(request, organization.getType()));
+
+					boolean disabled = false;
+
+					if (selUser != null) {
+						for (long curOrganizationId : selUser.getOrganizationIds()) {
+							if (curOrganizationId == organization.getOrganizationId()) {
+								disabled = true;
+
+								break;
+							}
+						}
+					}
 					%>
 
-					<aui:button cssClass="selector-button" data="<%= data %>" value="choose" />
+					<aui:button cssClass="selector-button" data="<%= data %>" disabled="<%= disabled %>" value="choose" />
 				</c:if>
 			</liferay-ui:search-container-column-text>
 		</liferay-ui:search-container-row>
@@ -154,15 +148,14 @@ if (Validator.isNotNull(target)) {
 <aui:script use="aui-base">
 	var Util = Liferay.Util;
 
-	A.one('#<portlet:namespace />selectOrganizationFm').delegate(
-		'click',
-		function(event) {
-			var result = Util.getAttributes(event.currentTarget, 'data-');
+	var openingLiferay = Util.getOpener().Liferay;
 
-			Util.getOpener().Liferay.fire('<%= HtmlUtil.escapeJS(eventName) %>', result);
-
-			Util.getWindow().hide();
-		},
-		'.selector-button'
+	openingLiferay.fire(
+		'<portlet:namespace />enableRemovedOrganizations',
+		{
+			selectors: A.all('.selector-button:disabled')
+		}
 	);
+
+	Util.selectEntityHandler('#<portlet:namespace />selectOrganizationFm', '<%= HtmlUtil.escapeJS(eventName) %>', <%= selUser != null %>);
 </aui:script>

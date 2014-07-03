@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -30,6 +30,7 @@ public class TicketSoap implements Serializable {
 	public static TicketSoap toSoapModel(Ticket model) {
 		TicketSoap soapModel = new TicketSoap();
 
+		soapModel.setMvccVersion(model.getMvccVersion());
 		soapModel.setTicketId(model.getTicketId());
 		soapModel.setCompanyId(model.getCompanyId());
 		soapModel.setCreateDate(model.getCreateDate());
@@ -89,6 +90,14 @@ public class TicketSoap implements Serializable {
 
 	public void setPrimaryKey(long pk) {
 		setTicketId(pk);
+	}
+
+	public long getMvccVersion() {
+		return _mvccVersion;
+	}
+
+	public void setMvccVersion(long mvccVersion) {
+		_mvccVersion = mvccVersion;
 	}
 
 	public long getTicketId() {
@@ -163,6 +172,7 @@ public class TicketSoap implements Serializable {
 		_expirationDate = expirationDate;
 	}
 
+	private long _mvccVersion;
 	private long _ticketId;
 	private long _companyId;
 	private Date _createDate;

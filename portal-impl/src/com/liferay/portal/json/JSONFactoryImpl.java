@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,9 +25,11 @@ import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONSerializer;
 import com.liferay.portal.kernel.json.JSONTransformer;
+import com.liferay.portal.kernel.json.JSONValidator;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.pacl.DoPrivileged;
+import com.liferay.portal.kernel.util.ClassUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.lang.reflect.InvocationTargetException;
@@ -163,6 +165,13 @@ public class JSONFactoryImpl implements JSONFactory {
 	@Override
 	public JSONSerializer createJSONSerializer() {
 		return new JSONSerializerImpl();
+	}
+
+	@Override
+	public JSONValidator createJSONValidator(String jsonSchema)
+		throws JSONException {
+
+		return new JSONValidatorImpl(jsonSchema);
 	}
 
 	@Override
@@ -308,36 +317,14 @@ public class JSONFactoryImpl implements JSONFactory {
 	}
 
 	@Override
-	public String serializeException(Exception exception) {
-		JSONObject jsonObject = createJSONObject();
-
-		String message = null;
-
-		if (exception instanceof InvocationTargetException) {
-			Throwable cause = exception.getCause();
-
-			message = cause.toString();
-		}
-		else {
-			message = exception.getMessage();
-		}
-
-		if (Validator.isNull(message)) {
-			message = exception.toString();
-		}
-
-		jsonObject.put("exception", message);
-
-		return jsonObject.toString();
-	}
-
-	@Override
 	public String serializeThrowable(Throwable throwable) {
-		if (throwable instanceof Exception) {
-			return serializeException((Exception)throwable);
+		JSONObject jsonObject = createJSONObject();
+
+		if (throwable instanceof InvocationTargetException) {
+			throwable = throwable.getCause();
 		}
 
-		JSONObject jsonObject = createJSONObject();
+		jsonObject.put("exception", ClassUtil.getClassName(throwable));
 
 		String message = throwable.getMessage();
 
@@ -345,7 +332,7 @@ public class JSONFactoryImpl implements JSONFactory {
 			message = throwable.toString();
 		}
 
-		jsonObject.put("throwable", message);
+		jsonObject.put("message", message);
 
 		return jsonObject.toString();
 	}

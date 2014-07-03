@@ -1,0 +1,7 @@
+<definition>
+	<command name="click">
+		<case locator-key1="TASK_PROGRESS_BAR_PERCENT_CLICK">
+			<execute function="Click#makeVisibleClickAt" />
+		</case>
+	</command>
+</definition>

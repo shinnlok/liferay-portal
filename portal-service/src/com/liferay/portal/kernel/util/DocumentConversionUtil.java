@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,7 +28,7 @@ public class DocumentConversionUtil {
 		throws Exception {
 
 		Object returnObj = PortalClassInvoker.invoke(
-			false, _convertMethodKey, id, inputStream, sourceExtension,
+			_convertMethodKey, id, inputStream, sourceExtension,
 			targetExtension);
 
 		if (returnObj != null) {
@@ -41,7 +41,7 @@ public class DocumentConversionUtil {
 
 	public static String[] getConversions(String extension) throws Exception {
 		Object returnObj = PortalClassInvoker.invoke(
-			false, _getConversionsMethodKey, extension);
+			_getConversionsMethodKey, extension);
 
 		if (returnObj != null) {
 			return (String[])returnObj;

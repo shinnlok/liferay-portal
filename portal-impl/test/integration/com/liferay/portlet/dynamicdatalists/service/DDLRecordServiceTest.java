@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,16 +17,16 @@ package com.liferay.portlet.dynamicdatalists.service;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
-import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.service.ServiceTestUtil;
-import com.liferay.portal.test.EnvironmentExecutionTestListener;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
+import com.liferay.portal.test.MainServletExecutionTestListener;
 import com.liferay.portal.test.Sync;
 import com.liferay.portal.test.SynchronousDestinationExecutionTestListener;
-import com.liferay.portal.test.TransactionalExecutionTestListener;
 import com.liferay.portal.util.PortalUtil;
+import com.liferay.portal.util.test.SearchContextTestUtil;
+import com.liferay.portlet.dynamicdatalists.model.DDLRecord;
 import com.liferay.portlet.dynamicdatalists.model.DDLRecordSet;
+import com.liferay.portlet.dynamicdatalists.model.DDLRecordVersion;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructureConstants;
 import com.liferay.portlet.dynamicdatamapping.storage.Field;
@@ -42,13 +42,11 @@ import org.junit.runner.RunWith;
  */
 @ExecutionTestListeners(
 	listeners = {
-		EnvironmentExecutionTestListener.class,
-		SynchronousDestinationExecutionTestListener.class,
-		TransactionalExecutionTestListener.class
+		MainServletExecutionTestListener.class,
+		SynchronousDestinationExecutionTestListener.class
 	})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
 @Sync
-@Transactional
 public class DDLRecordServiceTest extends BaseDDLServiceTestCase {
 
 	@Override
@@ -61,13 +59,36 @@ public class DDLRecordServiceTest extends BaseDDLServiceTestCase {
 			StorageType.XML.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
 		recordSet = addRecordSet(ddmStructure.getStructureId());
+	}
 
-		addRecord("Joe Bloggs", "Simple description");
-		addRecord("Bloggs","Another description example");
+	@Test
+	public void testPublishRecordDraftWithoutChanges() throws Exception {
+		DDLRecord record = addRecord(
+			"Joe Bloggs", "Simple description",
+			WorkflowConstants.ACTION_SAVE_DRAFT);
+
+		Assert.assertEquals(WorkflowConstants.STATUS_DRAFT, record.getStatus());
+
+		DDLRecordVersion recordVersion = record.getRecordVersion();
+
+		Assert.assertTrue(recordVersion.isDraft());
+
+		record = updateRecord(
+			record.getRecordId(), record.getFields(),
+			WorkflowConstants.ACTION_PUBLISH);
+
+		Assert.assertEquals(
+			WorkflowConstants.STATUS_APPROVED, record.getStatus());
+
+		recordVersion = record.getRecordVersion();
+
+		Assert.assertTrue(recordVersion.isApproved());
 	}
 
 	@Test
 	public void testSearchByTextAreaField() throws Exception {
+		addSampleRecords();
+
 		SearchContext searchContext = getSearchContext("example");
 
 		Hits hits = DDLRecordLocalServiceUtil.search(searchContext);
@@ -83,6 +104,8 @@ public class DDLRecordServiceTest extends BaseDDLServiceTestCase {
 
 	@Test
 	public void testSearchByTextField() throws Exception {
+		addSampleRecords();
+
 		SearchContext searchContext = getSearchContext("\"Joe Bloggs\"");
 
 		Hits hits = DDLRecordLocalServiceUtil.search(searchContext);
@@ -93,10 +116,13 @@ public class DDLRecordServiceTest extends BaseDDLServiceTestCase {
 
 		hits = DDLRecordLocalServiceUtil.search(searchContext);
 
-		Assert.assertEquals(1, hits.getLength());
+		Assert.assertEquals(2, hits.getLength());
 	}
 
-	protected void addRecord(String name, String description) throws Exception {
+	protected DDLRecord addRecord(
+			String name, String description, int workflowAction)
+		throws Exception {
+
 		Fields fields = new Fields();
 
 		Field nameField = new Field(
@@ -109,11 +135,21 @@ public class DDLRecordServiceTest extends BaseDDLServiceTestCase {
 
 		fields.put(descriptionField);
 
-		addRecord(recordSet.getRecordSetId(), fields);
+		return addRecord(recordSet.getRecordSetId(), fields, workflowAction);
+	}
+
+	protected void addSampleRecords() throws Exception {
+		addRecord(
+			"Joe Bloggs", "Simple description",
+			WorkflowConstants.ACTION_PUBLISH);
+
+		addRecord(
+			"Bloggs","Another description example",
+			WorkflowConstants.ACTION_PUBLISH);
 	}
 
 	protected SearchContext getSearchContext(String keywords) throws Exception {
-		SearchContext searchContext = ServiceTestUtil.getSearchContext(
+		SearchContext searchContext = SearchContextTestUtil.getSearchContext(
 			group.getGroupId());
 
 		searchContext.setAttribute("recordSetId", recordSet.getRecordSetId());

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,11 @@
 
 package com.liferay.portal.kernel.search;
 
+import com.liferay.portal.kernel.search.util.SearchUtil;
+import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Locale;
 
@@ -23,6 +27,7 @@ import javax.portlet.PortletURL;
 /**
  * @author Brian Wing Shun Chan
  * @author Ryan Park
+ * @author Tibor Lipusz
  */
 public class Summary {
 
@@ -45,6 +50,14 @@ public class Summary {
 		return _content;
 	}
 
+	public String getHighlightedContent() {
+		return _escapeAndHighlight(_content);
+	}
+
+	public String getHighlightedTitle() {
+		return _escapeAndHighlight(_title);
+	}
+
 	public Locale getLocale() {
 		return _locale;
 	}
@@ -57,8 +70,16 @@ public class Summary {
 		return _portletURL;
 	}
 
+	public String[] getQueryTerms() {
+		return _queryTerms;
+	}
+
 	public String getTitle() {
 		return _title;
+	}
+
+	public boolean isHighlight() {
+		return _highlight;
 	}
 
 	public void setContent(String content) {
@@ -69,6 +90,10 @@ public class Summary {
 
 			_content = StringUtil.shorten(_content, _maxContentLength);
 		}
+	}
+
+	public void setHighlight(boolean highlight) {
+		_highlight = highlight;
 	}
 
 	public void setLocale(Locale locale) {
@@ -85,14 +110,44 @@ public class Summary {
 		_portletURL = portletURL;
 	}
 
+	public void setQueryTerms(String[] queryTerms) {
+		if (ArrayUtil.isEmpty(queryTerms)) {
+			return;
+		}
+
+		_queryTerms = queryTerms;
+	}
+
 	public void setTitle(String title) {
 		_title = title;
 	}
 
+	private String _escapeAndHighlight(String text) {
+		if (!_highlight || Validator.isNull(text) ||
+			ArrayUtil.isEmpty(_queryTerms)) {
+
+			return HtmlUtil.escape(text);
+		}
+
+		text = SearchUtil.highlight(
+			text, _queryTerms, _ESCAPE_SAFE_HIGHLIGHTS[0],
+			_ESCAPE_SAFE_HIGHLIGHTS[1]);
+
+		text = HtmlUtil.escape(text);
+
+		return StringUtil.replace(
+			text, _ESCAPE_SAFE_HIGHLIGHTS, SearchUtil.HIGHLIGHTS);
+	}
+
+	private static final String[] _ESCAPE_SAFE_HIGHLIGHTS =
+		{"[@HIGHLIGHT1@]", "[@HIGHLIGHT2@]"};
+
 	private String _content;
+	private boolean _highlight;
 	private Locale _locale;
 	private int _maxContentLength;
 	private PortletURL _portletURL;
+	private String[] _queryTerms;
 	private String _title;
 
 }

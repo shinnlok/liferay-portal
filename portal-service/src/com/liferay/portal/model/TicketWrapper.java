@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -51,6 +51,7 @@ public class TicketWrapper implements Ticket, ModelWrapper<Ticket> {
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
+		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("ticketId", getTicketId());
 		attributes.put("companyId", getCompanyId());
 		attributes.put("createDate", getCreateDate());
@@ -66,6 +67,12 @@ public class TicketWrapper implements Ticket, ModelWrapper<Ticket> {
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
+		Long mvccVersion = (Long)attributes.get("mvccVersion");
+
+		if (mvccVersion != null) {
+			setMvccVersion(mvccVersion);
+		}
+
 		Long ticketId = (Long)attributes.get("ticketId");
 
 		if (ticketId != null) {
@@ -139,6 +146,26 @@ public class TicketWrapper implements Ticket, ModelWrapper<Ticket> {
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_ticket.setPrimaryKey(primaryKey);
+	}
+
+	/**
+	* Returns the mvcc version of this ticket.
+	*
+	* @return the mvcc version of this ticket
+	*/
+	@Override
+	public long getMvccVersion() {
+		return _ticket.getMvccVersion();
+	}
+
+	/**
+	* Sets the mvcc version of this ticket.
+	*
+	* @param mvccVersion the mvcc version of this ticket
+	*/
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		_ticket.setMvccVersion(mvccVersion);
 	}
 
 	/**
@@ -435,8 +462,7 @@ public class TicketWrapper implements Ticket, ModelWrapper<Ticket> {
 	}
 
 	@Override
-	public void persist()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public void persist() {
 		_ticket.persist();
 	}
 

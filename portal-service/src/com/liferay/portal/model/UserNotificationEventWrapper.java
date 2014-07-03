@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -52,15 +52,18 @@ public class UserNotificationEventWrapper implements UserNotificationEvent,
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
+		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("uuid", getUuid());
 		attributes.put("userNotificationEventId", getUserNotificationEventId());
 		attributes.put("companyId", getCompanyId());
 		attributes.put("userId", getUserId());
 		attributes.put("type", getType());
 		attributes.put("timestamp", getTimestamp());
+		attributes.put("deliveryType", getDeliveryType());
 		attributes.put("deliverBy", getDeliverBy());
 		attributes.put("delivered", getDelivered());
 		attributes.put("payload", getPayload());
+		attributes.put("actionRequired", getActionRequired());
 		attributes.put("archived", getArchived());
 
 		return attributes;
@@ -68,6 +71,12 @@ public class UserNotificationEventWrapper implements UserNotificationEvent,
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
+		Long mvccVersion = (Long)attributes.get("mvccVersion");
+
+		if (mvccVersion != null) {
+			setMvccVersion(mvccVersion);
+		}
+
 		String uuid = (String)attributes.get("uuid");
 
 		if (uuid != null) {
@@ -105,6 +114,12 @@ public class UserNotificationEventWrapper implements UserNotificationEvent,
 			setTimestamp(timestamp);
 		}
 
+		Integer deliveryType = (Integer)attributes.get("deliveryType");
+
+		if (deliveryType != null) {
+			setDeliveryType(deliveryType);
+		}
+
 		Long deliverBy = (Long)attributes.get("deliverBy");
 
 		if (deliverBy != null) {
@@ -121,6 +136,12 @@ public class UserNotificationEventWrapper implements UserNotificationEvent,
 
 		if (payload != null) {
 			setPayload(payload);
+		}
+
+		Boolean actionRequired = (Boolean)attributes.get("actionRequired");
+
+		if (actionRequired != null) {
+			setActionRequired(actionRequired);
 		}
 
 		Boolean archived = (Boolean)attributes.get("archived");
@@ -148,6 +169,26 @@ public class UserNotificationEventWrapper implements UserNotificationEvent,
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_userNotificationEvent.setPrimaryKey(primaryKey);
+	}
+
+	/**
+	* Returns the mvcc version of this user notification event.
+	*
+	* @return the mvcc version of this user notification event
+	*/
+	@Override
+	public long getMvccVersion() {
+		return _userNotificationEvent.getMvccVersion();
+	}
+
+	/**
+	* Sets the mvcc version of this user notification event.
+	*
+	* @param mvccVersion the mvcc version of this user notification event
+	*/
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		_userNotificationEvent.setMvccVersion(mvccVersion);
 	}
 
 	/**
@@ -234,11 +275,9 @@ public class UserNotificationEventWrapper implements UserNotificationEvent,
 	* Returns the user uuid of this user notification event.
 	*
 	* @return the user uuid of this user notification event
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
-	public java.lang.String getUserUuid()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.lang.String getUserUuid() {
 		return _userNotificationEvent.getUserUuid();
 	}
 
@@ -290,6 +329,26 @@ public class UserNotificationEventWrapper implements UserNotificationEvent,
 	@Override
 	public void setTimestamp(long timestamp) {
 		_userNotificationEvent.setTimestamp(timestamp);
+	}
+
+	/**
+	* Returns the delivery type of this user notification event.
+	*
+	* @return the delivery type of this user notification event
+	*/
+	@Override
+	public int getDeliveryType() {
+		return _userNotificationEvent.getDeliveryType();
+	}
+
+	/**
+	* Sets the delivery type of this user notification event.
+	*
+	* @param deliveryType the delivery type of this user notification event
+	*/
+	@Override
+	public void setDeliveryType(int deliveryType) {
+		_userNotificationEvent.setDeliveryType(deliveryType);
 	}
 
 	/**
@@ -360,6 +419,36 @@ public class UserNotificationEventWrapper implements UserNotificationEvent,
 	@Override
 	public void setPayload(java.lang.String payload) {
 		_userNotificationEvent.setPayload(payload);
+	}
+
+	/**
+	* Returns the action required of this user notification event.
+	*
+	* @return the action required of this user notification event
+	*/
+	@Override
+	public boolean getActionRequired() {
+		return _userNotificationEvent.getActionRequired();
+	}
+
+	/**
+	* Returns <code>true</code> if this user notification event is action required.
+	*
+	* @return <code>true</code> if this user notification event is action required; <code>false</code> otherwise
+	*/
+	@Override
+	public boolean isActionRequired() {
+		return _userNotificationEvent.isActionRequired();
+	}
+
+	/**
+	* Sets whether this user notification event is action required.
+	*
+	* @param actionRequired the action required of this user notification event
+	*/
+	@Override
+	public void setActionRequired(boolean actionRequired) {
+		_userNotificationEvent.setActionRequired(actionRequired);
 	}
 
 	/**
@@ -492,8 +581,7 @@ public class UserNotificationEventWrapper implements UserNotificationEvent,
 	}
 
 	@Override
-	public void persist()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public void persist() {
 		_userNotificationEvent.persist();
 	}
 

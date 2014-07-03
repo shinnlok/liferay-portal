@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,22 +28,27 @@ import com.liferay.portal.kernel.test.ExecutionTestListeners;
 import com.liferay.portal.kernel.util.IntegerWrapper;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Time;
+import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.Website;
-import com.liferay.portal.service.ServiceTestUtil;
+import com.liferay.portal.service.WebsiteLocalServiceUtil;
 import com.liferay.portal.service.persistence.BasePersistence;
 import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
 import com.liferay.portal.test.LiferayPersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.test.persistence.TransactionalPersistenceAdvice;
+import com.liferay.portal.test.persistence.test.TransactionalPersistenceAdvice;
+import com.liferay.portal.util.test.RandomTestUtil;
 
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -55,6 +60,15 @@ import java.util.Set;
 	PersistenceExecutionTestListener.class})
 @RunWith(LiferayPersistenceIntegrationJUnitTestRunner.class)
 public class WebsitePersistenceTest {
+	@Before
+	public void setUp() {
+		_modelListeners = _persistence.getListeners();
+
+		for (ModelListener<Website> modelListener : _modelListeners) {
+			_persistence.unregisterListener(modelListener);
+		}
+	}
+
 	@After
 	public void tearDown() throws Exception {
 		Map<Serializable, BasePersistence<?>> basePersistences = _transactionalPersistenceAdvice.getBasePersistences();
@@ -76,11 +90,15 @@ public class WebsitePersistenceTest {
 		}
 
 		_transactionalPersistenceAdvice.reset();
+
+		for (ModelListener<Website> modelListener : _modelListeners) {
+			_persistence.registerListener(modelListener);
+		}
 	}
 
 	@Test
 	public void testCreate() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		Website website = _persistence.create(pk);
 
@@ -107,36 +125,40 @@ public class WebsitePersistenceTest {
 
 	@Test
 	public void testUpdateExisting() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		Website newWebsite = _persistence.create(pk);
 
-		newWebsite.setUuid(ServiceTestUtil.randomString());
+		newWebsite.setMvccVersion(RandomTestUtil.nextLong());
 
-		newWebsite.setCompanyId(ServiceTestUtil.nextLong());
+		newWebsite.setUuid(RandomTestUtil.randomString());
 
-		newWebsite.setUserId(ServiceTestUtil.nextLong());
+		newWebsite.setCompanyId(RandomTestUtil.nextLong());
 
-		newWebsite.setUserName(ServiceTestUtil.randomString());
+		newWebsite.setUserId(RandomTestUtil.nextLong());
 
-		newWebsite.setCreateDate(ServiceTestUtil.nextDate());
+		newWebsite.setUserName(RandomTestUtil.randomString());
 
-		newWebsite.setModifiedDate(ServiceTestUtil.nextDate());
+		newWebsite.setCreateDate(RandomTestUtil.nextDate());
 
-		newWebsite.setClassNameId(ServiceTestUtil.nextLong());
+		newWebsite.setModifiedDate(RandomTestUtil.nextDate());
 
-		newWebsite.setClassPK(ServiceTestUtil.nextLong());
+		newWebsite.setClassNameId(RandomTestUtil.nextLong());
 
-		newWebsite.setUrl(ServiceTestUtil.randomString());
+		newWebsite.setClassPK(RandomTestUtil.nextLong());
 
-		newWebsite.setTypeId(ServiceTestUtil.nextInt());
+		newWebsite.setUrl(RandomTestUtil.randomString());
 
-		newWebsite.setPrimary(ServiceTestUtil.randomBoolean());
+		newWebsite.setTypeId(RandomTestUtil.nextInt());
+
+		newWebsite.setPrimary(RandomTestUtil.randomBoolean());
 
 		_persistence.update(newWebsite);
 
 		Website existingWebsite = _persistence.findByPrimaryKey(newWebsite.getPrimaryKey());
 
+		Assert.assertEquals(existingWebsite.getMvccVersion(),
+			newWebsite.getMvccVersion());
 		Assert.assertEquals(existingWebsite.getUuid(), newWebsite.getUuid());
 		Assert.assertEquals(existingWebsite.getWebsiteId(),
 			newWebsite.getWebsiteId());
@@ -162,6 +184,100 @@ public class WebsitePersistenceTest {
 	}
 
 	@Test
+	public void testCountByUuid() {
+		try {
+			_persistence.countByUuid(StringPool.BLANK);
+
+			_persistence.countByUuid(StringPool.NULL);
+
+			_persistence.countByUuid((String)null);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByUuid_C() {
+		try {
+			_persistence.countByUuid_C(StringPool.BLANK,
+				RandomTestUtil.nextLong());
+
+			_persistence.countByUuid_C(StringPool.NULL, 0L);
+
+			_persistence.countByUuid_C((String)null, 0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByCompanyId() {
+		try {
+			_persistence.countByCompanyId(RandomTestUtil.nextLong());
+
+			_persistence.countByCompanyId(0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByUserId() {
+		try {
+			_persistence.countByUserId(RandomTestUtil.nextLong());
+
+			_persistence.countByUserId(0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByC_C() {
+		try {
+			_persistence.countByC_C(RandomTestUtil.nextLong(),
+				RandomTestUtil.nextLong());
+
+			_persistence.countByC_C(0L, 0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByC_C_C() {
+		try {
+			_persistence.countByC_C_C(RandomTestUtil.nextLong(),
+				RandomTestUtil.nextLong(), RandomTestUtil.nextLong());
+
+			_persistence.countByC_C_C(0L, 0L, 0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByC_C_C_P() {
+		try {
+			_persistence.countByC_C_C_P(RandomTestUtil.nextLong(),
+				RandomTestUtil.nextLong(), RandomTestUtil.nextLong(),
+				RandomTestUtil.randomBoolean());
+
+			_persistence.countByC_C_C_P(0L, 0L, 0L,
+				RandomTestUtil.randomBoolean());
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
 	public void testFindByPrimaryKeyExisting() throws Exception {
 		Website newWebsite = addWebsite();
 
@@ -172,7 +288,7 @@ public class WebsitePersistenceTest {
 
 	@Test
 	public void testFindByPrimaryKeyMissing() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		try {
 			_persistence.findByPrimaryKey(pk);
@@ -194,11 +310,12 @@ public class WebsitePersistenceTest {
 		}
 	}
 
-	protected OrderByComparator getOrderByComparator() {
-		return OrderByComparatorFactoryUtil.create("Website", "uuid", true,
-			"websiteId", true, "companyId", true, "userId", true, "userName",
-			true, "createDate", true, "modifiedDate", true, "classNameId",
-			true, "classPK", true, "url", true, "typeId", true, "primary", true);
+	protected OrderByComparator<Website> getOrderByComparator() {
+		return OrderByComparatorFactoryUtil.create("Website", "mvccVersion",
+			true, "uuid", true, "websiteId", true, "companyId", true, "userId",
+			true, "userName", true, "createDate", true, "modifiedDate", true,
+			"classNameId", true, "classPK", true, "url", true, "typeId", true,
+			"primary", true);
 	}
 
 	@Test
@@ -212,7 +329,7 @@ public class WebsitePersistenceTest {
 
 	@Test
 	public void testFetchByPrimaryKeyMissing() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		Website missingWebsite = _persistence.fetchByPrimaryKey(pk);
 
@@ -220,19 +337,101 @@ public class WebsitePersistenceTest {
 	}
 
 	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
+		throws Exception {
+		Website newWebsite1 = addWebsite();
+		Website newWebsite2 = addWebsite();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newWebsite1.getPrimaryKey());
+		primaryKeys.add(newWebsite2.getPrimaryKey());
+
+		Map<Serializable, Website> websites = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(2, websites.size());
+		Assert.assertEquals(newWebsite1,
+			websites.get(newWebsite1.getPrimaryKey()));
+		Assert.assertEquals(newWebsite2,
+			websites.get(newWebsite2.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
+		throws Exception {
+		long pk1 = RandomTestUtil.nextLong();
+
+		long pk2 = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(pk1);
+		primaryKeys.add(pk2);
+
+		Map<Serializable, Website> websites = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(websites.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
+		throws Exception {
+		Website newWebsite = addWebsite();
+
+		long pk = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newWebsite.getPrimaryKey());
+		primaryKeys.add(pk);
+
+		Map<Serializable, Website> websites = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, websites.size());
+		Assert.assertEquals(newWebsite, websites.get(newWebsite.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
+		throws Exception {
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		Map<Serializable, Website> websites = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(websites.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithOnePrimaryKey()
+		throws Exception {
+		Website newWebsite = addWebsite();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newWebsite.getPrimaryKey());
+
+		Map<Serializable, Website> websites = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, websites.size());
+		Assert.assertEquals(newWebsite, websites.get(newWebsite.getPrimaryKey()));
+	}
+
+	@Test
 	public void testActionableDynamicQuery() throws Exception {
 		final IntegerWrapper count = new IntegerWrapper();
 
-		ActionableDynamicQuery actionableDynamicQuery = new WebsiteActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = WebsiteLocalServiceUtil.getActionableDynamicQuery();
+
+		actionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod() {
 				@Override
-				protected void performAction(Object object) {
+				public void performAction(Object object) {
 					Website website = (Website)object;
 
 					Assert.assertNotNull(website);
 
 					count.increment();
 				}
-			};
+			});
 
 		actionableDynamicQuery.performActions();
 
@@ -265,7 +464,7 @@ public class WebsitePersistenceTest {
 				Website.class.getClassLoader());
 
 		dynamicQuery.add(RestrictionsFactoryUtil.eq("websiteId",
-				ServiceTestUtil.nextLong()));
+				RandomTestUtil.nextLong()));
 
 		List<Website> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -304,7 +503,7 @@ public class WebsitePersistenceTest {
 		dynamicQuery.setProjection(ProjectionFactoryUtil.property("websiteId"));
 
 		dynamicQuery.add(RestrictionsFactoryUtil.in("websiteId",
-				new Object[] { ServiceTestUtil.nextLong() }));
+				new Object[] { RandomTestUtil.nextLong() }));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -312,31 +511,33 @@ public class WebsitePersistenceTest {
 	}
 
 	protected Website addWebsite() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		Website website = _persistence.create(pk);
 
-		website.setUuid(ServiceTestUtil.randomString());
+		website.setMvccVersion(RandomTestUtil.nextLong());
 
-		website.setCompanyId(ServiceTestUtil.nextLong());
+		website.setUuid(RandomTestUtil.randomString());
 
-		website.setUserId(ServiceTestUtil.nextLong());
+		website.setCompanyId(RandomTestUtil.nextLong());
 
-		website.setUserName(ServiceTestUtil.randomString());
+		website.setUserId(RandomTestUtil.nextLong());
 
-		website.setCreateDate(ServiceTestUtil.nextDate());
+		website.setUserName(RandomTestUtil.randomString());
 
-		website.setModifiedDate(ServiceTestUtil.nextDate());
+		website.setCreateDate(RandomTestUtil.nextDate());
 
-		website.setClassNameId(ServiceTestUtil.nextLong());
+		website.setModifiedDate(RandomTestUtil.nextDate());
 
-		website.setClassPK(ServiceTestUtil.nextLong());
+		website.setClassNameId(RandomTestUtil.nextLong());
 
-		website.setUrl(ServiceTestUtil.randomString());
+		website.setClassPK(RandomTestUtil.nextLong());
 
-		website.setTypeId(ServiceTestUtil.nextInt());
+		website.setUrl(RandomTestUtil.randomString());
 
-		website.setPrimary(ServiceTestUtil.randomBoolean());
+		website.setTypeId(RandomTestUtil.nextInt());
+
+		website.setPrimary(RandomTestUtil.randomBoolean());
 
 		_persistence.update(website);
 
@@ -344,6 +545,7 @@ public class WebsitePersistenceTest {
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(WebsitePersistenceTest.class);
+	private ModelListener<Website>[] _modelListeners;
 	private WebsitePersistence _persistence = (WebsitePersistence)PortalBeanLocatorUtil.locate(WebsitePersistence.class.getName());
 	private TransactionalPersistenceAdvice _transactionalPersistenceAdvice = (TransactionalPersistenceAdvice)PortalBeanLocatorUtil.locate(TransactionalPersistenceAdvice.class.getName());
 }

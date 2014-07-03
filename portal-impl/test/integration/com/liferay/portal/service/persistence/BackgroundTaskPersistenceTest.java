@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,22 +28,27 @@ import com.liferay.portal.kernel.test.ExecutionTestListeners;
 import com.liferay.portal.kernel.util.IntegerWrapper;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.model.BackgroundTask;
-import com.liferay.portal.service.ServiceTestUtil;
+import com.liferay.portal.model.ModelListener;
+import com.liferay.portal.service.BackgroundTaskLocalServiceUtil;
 import com.liferay.portal.service.persistence.BasePersistence;
 import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
 import com.liferay.portal.test.LiferayPersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.test.persistence.TransactionalPersistenceAdvice;
+import com.liferay.portal.test.persistence.test.TransactionalPersistenceAdvice;
+import com.liferay.portal.util.test.RandomTestUtil;
 
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -55,6 +60,15 @@ import java.util.Set;
 	PersistenceExecutionTestListener.class})
 @RunWith(LiferayPersistenceIntegrationJUnitTestRunner.class)
 public class BackgroundTaskPersistenceTest {
+	@Before
+	public void setUp() {
+		_modelListeners = _persistence.getListeners();
+
+		for (ModelListener<BackgroundTask> modelListener : _modelListeners) {
+			_persistence.unregisterListener(modelListener);
+		}
+	}
+
 	@After
 	public void tearDown() throws Exception {
 		Map<Serializable, BasePersistence<?>> basePersistences = _transactionalPersistenceAdvice.getBasePersistences();
@@ -76,11 +90,15 @@ public class BackgroundTaskPersistenceTest {
 		}
 
 		_transactionalPersistenceAdvice.reset();
+
+		for (ModelListener<BackgroundTask> modelListener : _modelListeners) {
+			_persistence.registerListener(modelListener);
+		}
 	}
 
 	@Test
 	public void testCreate() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		BackgroundTask backgroundTask = _persistence.create(pk);
 
@@ -107,42 +125,46 @@ public class BackgroundTaskPersistenceTest {
 
 	@Test
 	public void testUpdateExisting() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		BackgroundTask newBackgroundTask = _persistence.create(pk);
 
-		newBackgroundTask.setGroupId(ServiceTestUtil.nextLong());
+		newBackgroundTask.setMvccVersion(RandomTestUtil.nextLong());
 
-		newBackgroundTask.setCompanyId(ServiceTestUtil.nextLong());
+		newBackgroundTask.setGroupId(RandomTestUtil.nextLong());
 
-		newBackgroundTask.setUserId(ServiceTestUtil.nextLong());
+		newBackgroundTask.setCompanyId(RandomTestUtil.nextLong());
 
-		newBackgroundTask.setUserName(ServiceTestUtil.randomString());
+		newBackgroundTask.setUserId(RandomTestUtil.nextLong());
 
-		newBackgroundTask.setCreateDate(ServiceTestUtil.nextDate());
+		newBackgroundTask.setUserName(RandomTestUtil.randomString());
 
-		newBackgroundTask.setModifiedDate(ServiceTestUtil.nextDate());
+		newBackgroundTask.setCreateDate(RandomTestUtil.nextDate());
 
-		newBackgroundTask.setName(ServiceTestUtil.randomString());
+		newBackgroundTask.setModifiedDate(RandomTestUtil.nextDate());
 
-		newBackgroundTask.setServletContextNames(ServiceTestUtil.randomString());
+		newBackgroundTask.setName(RandomTestUtil.randomString());
 
-		newBackgroundTask.setTaskExecutorClassName(ServiceTestUtil.randomString());
+		newBackgroundTask.setServletContextNames(RandomTestUtil.randomString());
 
-		newBackgroundTask.setTaskContext(ServiceTestUtil.randomString());
+		newBackgroundTask.setTaskExecutorClassName(RandomTestUtil.randomString());
 
-		newBackgroundTask.setCompleted(ServiceTestUtil.randomBoolean());
+		newBackgroundTask.setTaskContext(RandomTestUtil.randomString());
 
-		newBackgroundTask.setCompletionDate(ServiceTestUtil.nextDate());
+		newBackgroundTask.setCompleted(RandomTestUtil.randomBoolean());
 
-		newBackgroundTask.setStatus(ServiceTestUtil.nextInt());
+		newBackgroundTask.setCompletionDate(RandomTestUtil.nextDate());
 
-		newBackgroundTask.setStatusMessage(ServiceTestUtil.randomString());
+		newBackgroundTask.setStatus(RandomTestUtil.nextInt());
+
+		newBackgroundTask.setStatusMessage(RandomTestUtil.randomString());
 
 		_persistence.update(newBackgroundTask);
 
 		BackgroundTask existingBackgroundTask = _persistence.findByPrimaryKey(newBackgroundTask.getPrimaryKey());
 
+		Assert.assertEquals(existingBackgroundTask.getMvccVersion(),
+			newBackgroundTask.getMvccVersion());
 		Assert.assertEquals(existingBackgroundTask.getBackgroundTaskId(),
 			newBackgroundTask.getBackgroundTaskId());
 		Assert.assertEquals(existingBackgroundTask.getGroupId(),
@@ -179,6 +201,203 @@ public class BackgroundTaskPersistenceTest {
 	}
 
 	@Test
+	public void testCountByGroupId() {
+		try {
+			_persistence.countByGroupId(RandomTestUtil.nextLong());
+
+			_persistence.countByGroupId(0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByCompanyId() {
+		try {
+			_persistence.countByCompanyId(RandomTestUtil.nextLong());
+
+			_persistence.countByCompanyId(0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByStatus() {
+		try {
+			_persistence.countByStatus(RandomTestUtil.nextInt());
+
+			_persistence.countByStatus(0);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByG_T() {
+		try {
+			_persistence.countByG_T(RandomTestUtil.nextLong(), StringPool.BLANK);
+
+			_persistence.countByG_T(0L, StringPool.NULL);
+
+			_persistence.countByG_T(0L, (String)null);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByG_TArrayable() {
+		try {
+			_persistence.countByG_T(RandomTestUtil.nextLong(),
+				new String[] {
+					RandomTestUtil.randomString(), StringPool.BLANK,
+					StringPool.NULL, null, null
+				});
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByG_S() {
+		try {
+			_persistence.countByG_S(RandomTestUtil.nextLong(),
+				RandomTestUtil.nextInt());
+
+			_persistence.countByG_S(0L, 0);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByT_S() {
+		try {
+			_persistence.countByT_S(StringPool.BLANK, RandomTestUtil.nextInt());
+
+			_persistence.countByT_S(StringPool.NULL, 0);
+
+			_persistence.countByT_S((String)null, 0);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByT_SArrayable() {
+		try {
+			_persistence.countByT_S(new String[] {
+					RandomTestUtil.randomString(), StringPool.BLANK,
+					StringPool.NULL, null, null
+				}, RandomTestUtil.nextInt());
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByG_N_T() {
+		try {
+			_persistence.countByG_N_T(RandomTestUtil.nextLong(),
+				StringPool.BLANK, StringPool.BLANK);
+
+			_persistence.countByG_N_T(0L, StringPool.NULL, StringPool.NULL);
+
+			_persistence.countByG_N_T(0L, (String)null, (String)null);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByG_T_C() {
+		try {
+			_persistence.countByG_T_C(RandomTestUtil.nextLong(),
+				StringPool.BLANK, RandomTestUtil.randomBoolean());
+
+			_persistence.countByG_T_C(0L, StringPool.NULL,
+				RandomTestUtil.randomBoolean());
+
+			_persistence.countByG_T_C(0L, (String)null,
+				RandomTestUtil.randomBoolean());
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByG_T_CArrayable() {
+		try {
+			_persistence.countByG_T_C(RandomTestUtil.nextLong(),
+				new String[] {
+					RandomTestUtil.randomString(), StringPool.BLANK,
+					StringPool.NULL, null, null
+				}, RandomTestUtil.randomBoolean());
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByG_T_S() {
+		try {
+			_persistence.countByG_T_S(RandomTestUtil.nextLong(),
+				StringPool.BLANK, RandomTestUtil.nextInt());
+
+			_persistence.countByG_T_S(0L, StringPool.NULL, 0);
+
+			_persistence.countByG_T_S(0L, (String)null, 0);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByG_T_SArrayable() {
+		try {
+			_persistence.countByG_T_S(RandomTestUtil.nextLong(),
+				new String[] {
+					RandomTestUtil.randomString(), StringPool.BLANK,
+					StringPool.NULL, null, null
+				}, RandomTestUtil.nextInt());
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByG_N_T_C() {
+		try {
+			_persistence.countByG_N_T_C(RandomTestUtil.nextLong(),
+				StringPool.BLANK, StringPool.BLANK,
+				RandomTestUtil.randomBoolean());
+
+			_persistence.countByG_N_T_C(0L, StringPool.NULL, StringPool.NULL,
+				RandomTestUtil.randomBoolean());
+
+			_persistence.countByG_N_T_C(0L, (String)null, (String)null,
+				RandomTestUtil.randomBoolean());
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
 	public void testFindByPrimaryKeyExisting() throws Exception {
 		BackgroundTask newBackgroundTask = addBackgroundTask();
 
@@ -189,7 +408,7 @@ public class BackgroundTaskPersistenceTest {
 
 	@Test
 	public void testFindByPrimaryKeyMissing() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		try {
 			_persistence.findByPrimaryKey(pk);
@@ -212,13 +431,14 @@ public class BackgroundTaskPersistenceTest {
 		}
 	}
 
-	protected OrderByComparator getOrderByComparator() {
+	protected OrderByComparator<BackgroundTask> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create("BackgroundTask",
-			"backgroundTaskId", true, "groupId", true, "companyId", true,
-			"userId", true, "userName", true, "createDate", true,
-			"modifiedDate", true, "name", true, "servletContextNames", true,
-			"taskExecutorClassName", true, "taskContext", true, "completed",
-			true, "completionDate", true, "status", true, "statusMessage", true);
+			"mvccVersion", true, "backgroundTaskId", true, "groupId", true,
+			"companyId", true, "userId", true, "userName", true, "createDate",
+			true, "modifiedDate", true, "name", true, "servletContextNames",
+			true, "taskExecutorClassName", true, "taskContext", true,
+			"completed", true, "completionDate", true, "status", true,
+			"statusMessage", true);
 	}
 
 	@Test
@@ -232,7 +452,7 @@ public class BackgroundTaskPersistenceTest {
 
 	@Test
 	public void testFetchByPrimaryKeyMissing() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		BackgroundTask missingBackgroundTask = _persistence.fetchByPrimaryKey(pk);
 
@@ -240,19 +460,103 @@ public class BackgroundTaskPersistenceTest {
 	}
 
 	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
+		throws Exception {
+		BackgroundTask newBackgroundTask1 = addBackgroundTask();
+		BackgroundTask newBackgroundTask2 = addBackgroundTask();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newBackgroundTask1.getPrimaryKey());
+		primaryKeys.add(newBackgroundTask2.getPrimaryKey());
+
+		Map<Serializable, BackgroundTask> backgroundTasks = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(2, backgroundTasks.size());
+		Assert.assertEquals(newBackgroundTask1,
+			backgroundTasks.get(newBackgroundTask1.getPrimaryKey()));
+		Assert.assertEquals(newBackgroundTask2,
+			backgroundTasks.get(newBackgroundTask2.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
+		throws Exception {
+		long pk1 = RandomTestUtil.nextLong();
+
+		long pk2 = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(pk1);
+		primaryKeys.add(pk2);
+
+		Map<Serializable, BackgroundTask> backgroundTasks = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(backgroundTasks.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
+		throws Exception {
+		BackgroundTask newBackgroundTask = addBackgroundTask();
+
+		long pk = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newBackgroundTask.getPrimaryKey());
+		primaryKeys.add(pk);
+
+		Map<Serializable, BackgroundTask> backgroundTasks = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, backgroundTasks.size());
+		Assert.assertEquals(newBackgroundTask,
+			backgroundTasks.get(newBackgroundTask.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
+		throws Exception {
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		Map<Serializable, BackgroundTask> backgroundTasks = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(backgroundTasks.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithOnePrimaryKey()
+		throws Exception {
+		BackgroundTask newBackgroundTask = addBackgroundTask();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newBackgroundTask.getPrimaryKey());
+
+		Map<Serializable, BackgroundTask> backgroundTasks = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, backgroundTasks.size());
+		Assert.assertEquals(newBackgroundTask,
+			backgroundTasks.get(newBackgroundTask.getPrimaryKey()));
+	}
+
+	@Test
 	public void testActionableDynamicQuery() throws Exception {
 		final IntegerWrapper count = new IntegerWrapper();
 
-		ActionableDynamicQuery actionableDynamicQuery = new BackgroundTaskActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = BackgroundTaskLocalServiceUtil.getActionableDynamicQuery();
+
+		actionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod() {
 				@Override
-				protected void performAction(Object object) {
+				public void performAction(Object object) {
 					BackgroundTask backgroundTask = (BackgroundTask)object;
 
 					Assert.assertNotNull(backgroundTask);
 
 					count.increment();
 				}
-			};
+			});
 
 		actionableDynamicQuery.performActions();
 
@@ -285,7 +589,7 @@ public class BackgroundTaskPersistenceTest {
 				BackgroundTask.class.getClassLoader());
 
 		dynamicQuery.add(RestrictionsFactoryUtil.eq("backgroundTaskId",
-				ServiceTestUtil.nextLong()));
+				RandomTestUtil.nextLong()));
 
 		List<BackgroundTask> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -326,7 +630,7 @@ public class BackgroundTaskPersistenceTest {
 				"backgroundTaskId"));
 
 		dynamicQuery.add(RestrictionsFactoryUtil.in("backgroundTaskId",
-				new Object[] { ServiceTestUtil.nextLong() }));
+				new Object[] { RandomTestUtil.nextLong() }));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -334,37 +638,39 @@ public class BackgroundTaskPersistenceTest {
 	}
 
 	protected BackgroundTask addBackgroundTask() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		BackgroundTask backgroundTask = _persistence.create(pk);
 
-		backgroundTask.setGroupId(ServiceTestUtil.nextLong());
+		backgroundTask.setMvccVersion(RandomTestUtil.nextLong());
 
-		backgroundTask.setCompanyId(ServiceTestUtil.nextLong());
+		backgroundTask.setGroupId(RandomTestUtil.nextLong());
 
-		backgroundTask.setUserId(ServiceTestUtil.nextLong());
+		backgroundTask.setCompanyId(RandomTestUtil.nextLong());
 
-		backgroundTask.setUserName(ServiceTestUtil.randomString());
+		backgroundTask.setUserId(RandomTestUtil.nextLong());
 
-		backgroundTask.setCreateDate(ServiceTestUtil.nextDate());
+		backgroundTask.setUserName(RandomTestUtil.randomString());
 
-		backgroundTask.setModifiedDate(ServiceTestUtil.nextDate());
+		backgroundTask.setCreateDate(RandomTestUtil.nextDate());
 
-		backgroundTask.setName(ServiceTestUtil.randomString());
+		backgroundTask.setModifiedDate(RandomTestUtil.nextDate());
 
-		backgroundTask.setServletContextNames(ServiceTestUtil.randomString());
+		backgroundTask.setName(RandomTestUtil.randomString());
 
-		backgroundTask.setTaskExecutorClassName(ServiceTestUtil.randomString());
+		backgroundTask.setServletContextNames(RandomTestUtil.randomString());
 
-		backgroundTask.setTaskContext(ServiceTestUtil.randomString());
+		backgroundTask.setTaskExecutorClassName(RandomTestUtil.randomString());
 
-		backgroundTask.setCompleted(ServiceTestUtil.randomBoolean());
+		backgroundTask.setTaskContext(RandomTestUtil.randomString());
 
-		backgroundTask.setCompletionDate(ServiceTestUtil.nextDate());
+		backgroundTask.setCompleted(RandomTestUtil.randomBoolean());
 
-		backgroundTask.setStatus(ServiceTestUtil.nextInt());
+		backgroundTask.setCompletionDate(RandomTestUtil.nextDate());
 
-		backgroundTask.setStatusMessage(ServiceTestUtil.randomString());
+		backgroundTask.setStatus(RandomTestUtil.nextInt());
+
+		backgroundTask.setStatusMessage(RandomTestUtil.randomString());
 
 		_persistence.update(backgroundTask);
 
@@ -372,6 +678,7 @@ public class BackgroundTaskPersistenceTest {
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(BackgroundTaskPersistenceTest.class);
+	private ModelListener<BackgroundTask>[] _modelListeners;
 	private BackgroundTaskPersistence _persistence = (BackgroundTaskPersistence)PortalBeanLocatorUtil.locate(BackgroundTaskPersistence.class.getName());
 	private TransactionalPersistenceAdvice _transactionalPersistenceAdvice = (TransactionalPersistenceAdvice)PortalBeanLocatorUtil.locate(TransactionalPersistenceAdvice.class.getName());
 }

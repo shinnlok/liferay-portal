@@ -18,11 +18,11 @@ AUI.add(
 					classPK: {
 					},
 
-					doAsGroupId: {
-					},
-
 					container: {
 						setter: A.one
+					},
+
+					doAsGroupId: {
 					},
 
 					fieldsDisplayInput: {
@@ -74,23 +74,6 @@ AUI.add(
 						instance.syncFieldsTreeUI();
 					},
 
-					createFieldTree: function(fieldNode) {
-						var instance = this;
-
-						var fieldName = fieldNode.getData('fieldName');
-						var fieldNamespace = fieldNode.getData('fieldNamespace');
-
-						var tree = [fieldName + fieldNamespace];
-
-						instance.getFieldsList(null, fieldNode).each(
-							function(item, index, collection) {
-								tree = tree.concat(instance.createFieldTree(item));
-							}
-						);
-
-						return tree;
-					},
-
 					getField: function(fieldName, callback) {
 						var instance = this;
 
@@ -100,10 +83,12 @@ AUI.add(
 								data: {
 									classNameId: instance.get('classNameId'),
 									classPK: instance.get('classPK'),
+									controlPanelCategory: 'portlet',
 									doAsGroupId: instance.get('doAsGroupId'),
 									fieldName: fieldName,
 									namespace: instance.get('namespace'),
 									p_l_id: instance.get('p_l_id'),
+									p_p_id: '166',
 									p_p_isolated: true,
 									portletNamespace: instance.get('portletNamespace'),
 									readOnly: instance.get('readOnly')
@@ -119,6 +104,18 @@ AUI.add(
 						);
 					},
 
+					getFieldParentNode: function(fieldNode) {
+						var instance = this;
+
+						var parentNode = fieldNode.ancestor('.field-wrapper');
+
+						if (!parentNode) {
+							parentNode = instance.get('container');
+						}
+
+						return parentNode;
+					},
+
 					getFieldsList: function(fieldName, parentNode) {
 						var instance = this;
 
@@ -131,7 +128,7 @@ AUI.add(
 							container = instance.get('container');
 						}
 
-						var selector = ['>'];
+						var selector = [''];
 
 						selector.push(' .field-wrapper');
 
@@ -140,18 +137,6 @@ AUI.add(
 						}
 
 						return container.all(selector.join(''));
-					},
-
-					getFieldParentNode: function(fieldNode) {
-						var instance = this;
-
-						var parentNode = fieldNode.ancestor('.field-wrapper');
-
-						if (!parentNode) {
-							parentNode = instance.get('container');
-						}
-
-						return parentNode;
 					},
 
 					insertField: function(fieldNode) {
@@ -205,7 +190,7 @@ AUI.add(
 						}
 
 						instance.getFieldsList(null, fieldNode).each(
-							function(item, index, collection) {
+							function(item, index) {
 								instance.renderRepeatableUI(item);
 							}
 						);
@@ -219,10 +204,13 @@ AUI.add(
 						var fieldsDisplayInput = instance.get('fieldsDisplayInput');
 
 						instance.getFieldsList().each(
-							function(item, index, collection) {
+							function(item, index) {
 								instance.renderRepeatableUI(item);
 
-								fieldsDisplay = fieldsDisplay.concat(instance.createFieldTree(item));
+								var fieldName = item.getData('fieldName');
+								var fieldNamespace = item.getData('fieldNamespace');
+
+								fieldsDisplay.push(fieldName + fieldNamespace);
 							}
 						);
 

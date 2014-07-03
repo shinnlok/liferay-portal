@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -124,7 +124,14 @@ public class PortletURLUtil {
 		LiferayPortletRequest liferayPortletRequest,
 		LiferayPortletResponse liferayPortletResponse) {
 
-		PortletURL portletURL = liferayPortletResponse.createRenderURL();
+		PortletURL portletURL = (PortletURL)liferayPortletRequest.getAttribute(
+			WebKeys.CURRENT_PORTLET_URL);
+
+		if (portletURL != null) {
+			return portletURL;
+		}
+
+		portletURL = liferayPortletResponse.createRenderURL();
 
 		Enumeration<String> enu = liferayPortletRequest.getParameterNames();
 
@@ -148,6 +155,9 @@ public class PortletURLUtil {
 				portletURL.setParameter(param, values);
 			}
 		}
+
+		liferayPortletRequest.setAttribute(
+			WebKeys.CURRENT_PORTLET_URL, portletURL);
 
 		return portletURL;
 	}

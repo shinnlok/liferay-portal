@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,51 +18,50 @@ import com.liferay.portal.kernel.dao.orm.QueryDefinition;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
-import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.service.ServiceTestUtil;
-import com.liferay.portal.test.EnvironmentExecutionTestListener;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
-import com.liferay.portal.test.TransactionalExecutionTestListener;
-import com.liferay.portal.util.GroupTestUtil;
-import com.liferay.portal.util.TestPropsValues;
+import com.liferay.portal.test.MainServletExecutionTestListener;
+import com.liferay.portal.test.TransactionalTestRule;
+import com.liferay.portal.util.test.GroupTestUtil;
+import com.liferay.portal.util.test.ServiceContextTestUtil;
+import com.liferay.portal.util.test.TestPropsValues;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFileShortcut;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLAppServiceUtil;
-import com.liferay.portlet.documentlibrary.util.DLAppTestUtil;
+import com.liferay.portlet.documentlibrary.util.test.DLAppTestUtil;
 
 import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
  * @author Zsolt Berentey
  */
-@ExecutionTestListeners(
-	listeners = {
-		EnvironmentExecutionTestListener.class,
-		TransactionalExecutionTestListener.class
-	})
+@ExecutionTestListeners(listeners = {MainServletExecutionTestListener.class})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
-@Transactional
 public class DLFolderFinderTest {
+
+	@ClassRule
+	public static TransactionalTestRule transactionalTestRule =
+		new TransactionalTestRule();
 
 	@Before
 	public void setUp() throws Exception {
 		_group = GroupTestUtil.addGroup();
 
-		ServiceContext serviceContext = ServiceTestUtil.getServiceContext(
-			_group.getGroupId());
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
 
 		_folder = DLAppLocalServiceUtil.addFolder(
 			TestPropsValues.getUserId(), _group.getGroupId(),
@@ -82,8 +81,7 @@ public class DLFolderFinderTest {
 		DLAppServiceUtil.moveFolderToTrash(folder.getFolderId());
 
 		FileEntry fileEntry = DLAppTestUtil.addFileEntry(
-			_group.getGroupId(), _folder.getFolderId(), false, "FE1.txt",
-			"FE1.txt");
+			_group.getGroupId(), _folder.getFolderId(), "FE1.txt", "FE1.txt");
 
 		_dlFileShortcut = DLAppTestUtil.addDLFileShortcut(
 			_group.getGroupId(), fileEntry);
@@ -93,15 +91,14 @@ public class DLFolderFinderTest {
 			ContentTypes.APPLICATION_PDF, "FE2.pdf");
 
 		fileEntry = DLAppTestUtil.addFileEntry(
-			_group.getGroupId(), _folder.getFolderId(), false, "FE3.txt",
-			"FE3.txt");
+			_group.getGroupId(), _folder.getFolderId(), "FE3.txt", "FE3.txt");
 
 		DLAppServiceUtil.moveFileEntryToTrash(fileEntry.getFileEntryId());
 	}
 
 	@Test
 	public void testCountF_FE_FS_ByG_F_M_M() throws Exception {
-		QueryDefinition queryDefinition = new QueryDefinition();
+		QueryDefinition<?> queryDefinition = new QueryDefinition<Object>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_ANY);
 
@@ -156,7 +153,7 @@ public class DLFolderFinderTest {
 
 	@Test
 	public void testCountFE_ByG_F() throws Exception {
-		QueryDefinition queryDefinition = new QueryDefinition();
+		QueryDefinition<?> queryDefinition = new QueryDefinition<Object>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_ANY);
 
@@ -182,7 +179,7 @@ public class DLFolderFinderTest {
 
 	@Test
 	public void testCountFE_FS_ByG_F() throws Exception {
-		QueryDefinition queryDefinition = new QueryDefinition();
+		QueryDefinition<?> queryDefinition = new QueryDefinition<Object>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_ANY);
 
@@ -215,7 +212,7 @@ public class DLFolderFinderTest {
 
 	@Test
 	public void testCountFE_FS_ByG_F_M() throws Exception {
-		QueryDefinition queryDefinition = new QueryDefinition();
+		QueryDefinition<?> queryDefinition = new QueryDefinition<Object>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_ANY);
 
@@ -272,7 +269,7 @@ public class DLFolderFinderTest {
 
 	@Test
 	public void testFindF_FE_FS_ByG_F_M_M() throws Exception {
-		QueryDefinition queryDefinition = new QueryDefinition();
+		QueryDefinition<?> queryDefinition = new QueryDefinition<Object>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_APPROVED);
 

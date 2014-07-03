@@ -5,15 +5,15 @@
 	&.display-icon {
 		display: inline-block;
 		float: left;
+		height: 180px;
 		margin: 5px;
 		padding: 10px 0;
 		position: relative;
 		vertical-align: top;
 		width: 200px;
-		height: 160px;
 
 		@include respond-to(phone, tablet) {
-			height: 210px;
+			height: 230px;
 		}
 
 		.entry-title {
@@ -63,7 +63,7 @@
 
 		&:after {
 			clear: both;
-			content: ".";
+			content: '';
 			display: block;
 			height: 0;
 			visibility: hidden;
@@ -83,28 +83,13 @@
 		}
 	}
 
-	@include respond-to(phone, tablet) {
-		&.display-icon, &.display-descriptive {
-			border: 1px solid rgba(0, 0, 0, 0.1);
-			margin: 5px;
+	&.display-descriptive, &.display-icon {
+		border: 1px solid #E1E1E1;
+		margin: 5px;
 
-			.entry-selector, .folder-action, .entry-action {
-				&.overlay {
-					clip: rect(auto, auto, auto, auto);
-				}
-			}
-
-			.img-polaroid {
-				border-width: 0;
-
-				@include box-shadow(none);
-			}
+		img {
+			margin: 4px;
 		}
-	}
-
-	&.display-list.locked {
-		background: url(@theme_image_path@/common/lock.png) no-repeat 100% 50%;
-		padding-right: 20px;
 	}
 
 	.categories {

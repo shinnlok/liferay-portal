@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -158,17 +158,11 @@ public class ServiceBeanAopProxy implements AopProxy, InvocationHandler {
 		Object target = null;
 
 		try {
-			Class<?> targetClass = null;
-
 			target = targetSource.getTarget();
-
-			if (target != null) {
-				targetClass = target.getClass();
-			}
 
 			ServiceBeanMethodInvocation serviceBeanMethodInvocation =
 				new ServiceBeanMethodInvocation(
-					target, targetClass, method, arguments);
+					target, targetSource.getTargetClass(), method, arguments);
 
 			_setMethodInterceptors(serviceBeanMethodInvocation);
 
@@ -181,7 +175,7 @@ public class ServiceBeanAopProxy implements AopProxy, InvocationHandler {
 		}
 	}
 
-	public static interface PACL {
+	public interface PACL {
 
 		public InvocationHandler getInvocationHandler(
 			InvocationHandler invocationHandler, AdvisedSupport advisedSupport);

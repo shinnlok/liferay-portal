@@ -71,23 +71,11 @@ AUI.add(
 					_bindUI: function() {
 						var instance = this;
 
-						instance._entriesPanel.delegate(STR_CLICK, instance._addApplication, SELECTOR_ADD_CONTENT_ITEM, instance);
-
-						instance._entriesPanel.delegate(STR_KEY, instance._addApplication, STR_ENTER_DOWN, SELECTOR_CONTENT_ITEM, instance);
-
-						Liferay.on('closePortlet', instance._onPortletClose, instance);
-
-						Liferay.on('showTab', instance._onShowTab, instance);
-					},
-
-					_onShowTab: function(event) {
-						var instance = this;
-
-						if (event.namespace.indexOf(instance.get('namespace')) === 0) {
-							var index = event.selectedIndex;
-
-							Liferay.Store('liferay_addpanel_tab', event.names[index]);
-						}
+						instance._eventHandles.push(
+							instance._entriesPanel.delegate(STR_CLICK, instance._addApplication, SELECTOR_ADD_CONTENT_ITEM, instance),
+							instance._entriesPanel.delegate(STR_KEY, instance._addApplication, STR_ENTER_DOWN, SELECTOR_CONTENT_ITEM, instance),
+							Liferay.on('closePortlet', instance._onPortletClose, instance)
+						);
 					},
 
 					_onPortletClose: function(event) {
@@ -109,6 +97,6 @@ AUI.add(
 	},
 	'',
 	{
-		requires: ['key-event', 'liferay-dockbar', 'liferay-dockbar-add-base', 'liferay-dockbar-add-application-search', 'liferay-toggler-interaction']
+		requires: ['event-key', 'liferay-dockbar', 'liferay-dockbar-add-base', 'liferay-dockbar-add-application-search', 'liferay-toggler-interaction']
 	}
 );

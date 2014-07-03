@@ -17,15 +17,21 @@ AUI.add(
 
 		var STR_EXPANDED = 'expanded';
 
+		var STR_MORE_RESULTS_LABEL = 'moreResultsLabel';
+
 		var STR_PREV_EXPANDED = '_LFR_prevExpanded';
+
+		var STR_MAX_ENTRIES = 'maxEntries';
+
+		var STR_START = 'start';
 
 		var TPL_CHECKED = ' checked="checked" ';
 
 		var TPL_INPUT =
-			'<label title="{name}">' +
-				'<span class="lfr-categories-selector-category-name" title="{name}">' +
-					'<input data-categoryId="{categoryId}" data-vocabularyid="{vocabularyId}" name="{inputName}" type="{type}" value="{name}" {checked} />' +
-					'{name}' +
+			'<label title="{titleCurrentValue}">' +
+				'<span class="lfr-categories-selector-category-name" title="{titleCurrentValue}">' +
+					'<input data-categoryId="{categoryId}" data-vocabularyid="{vocabularyId}" name="{inputName}" type="{type}" value="{titleCurrentValue}" {checked} />' +
+					'{titleCurrentValue}' +
 				'</span>' +
 				'<span class="lfr-categories-selector-search-results-path" title="{path}">{path}</span>' +
 			'</label>';
@@ -37,8 +43,6 @@ AUI.add(
 		var TPL_RADIO_ID = ' id="{0}" ';
 
 		var TPL_RADIO_IMAGE = '<div class="lfr-categories-selector-radio-image category{0}"></div>';
-
-		var TPL_SEARCH_QUERY = '%{0}%';
 
 		var TPL_SEARCH_RESULTS = '<div class="lfr-categories-selector-search-results"></div>';
 
@@ -77,6 +81,7 @@ AUI.add(
 						},
 						value: ''
 					},
+
 					curEntryIds: {
 						setter: function(value) {
 							var instance = this;
@@ -89,29 +94,35 @@ AUI.add(
 						},
 						value: ''
 					},
+
 					labelNode: {
 						setter: function(value) {
 							return A.one(value) || A.Attribute.INVALID_VALUE;
 						},
 						value: null
 					},
+
 					maxEntries: {
 						validator: Lang.isNumber,
 						value: -1
 					},
+
 					moreResultsLabel: {
 						validator: '_isValidString',
 						value: Liferay.Language.get('load-more-results')
 					},
+
 					singleSelect: {
 						validator: Lang.isBoolean,
 						value: false
 					},
+
 					title: {
 						validator: '_isValidString',
 						value: Liferay.Language.get('select-categories')
 					},
-					vocabularyIds: {
+
+					vocabularyGroupIds: {
 						setter: function(value) {
 							var instance = this;
 
@@ -123,7 +134,8 @@ AUI.add(
 						},
 						value: []
 					},
-					vocabularyGroupIds: {
+
+					vocabularyIds: {
 						setter: function(value) {
 							var instance = this;
 
@@ -179,7 +191,7 @@ AUI.add(
 
 						A.each(
 							curEntryIds,
-							function(item, index, collection) {
+							function(item, index) {
 								var entry = {
 									categoryId: item
 								};
@@ -229,7 +241,7 @@ AUI.add(
 
 						A.each(
 							json,
-							function(item, index, collection) {
+							function(item, index) {
 								var checked = false;
 								var treeId = 'category' + item.categoryId;
 
@@ -245,6 +257,7 @@ AUI.add(
 									id: treeId,
 									label: Liferay.Util.escapeHTML(item.titleCurrentValue),
 									leaf: !item.hasChildren,
+									paginator: instance._getPaginatorConfig(item),
 									type: type
 								};
 
@@ -291,8 +304,7 @@ AUI.add(
 								{
 									'$vocabularies = /assetvocabulary/get-vocabularies': {
 										vocabularyIds: vocabularyIds,
-
-										'$categoriesCount = /assetcategory/get-vocabulary-categories-count': {
+										'$childrenCount = /assetcategory/get-vocabulary-root-categories-count': {
 											'@groupId': '$vocabularies.groupId',
 											'@vocabularyId': '$vocabularies.vocabularyId'
 										}
@@ -311,10 +323,9 @@ AUI.add(
 							Liferay.Service(
 								{
 									'$vocabularies = /assetvocabulary/get-groups-vocabularies': {
-										groupIds: groupIds,
 										className: className,
-
-										'$categoriesCount = /assetcategory/get-vocabulary-categories-count': {
+										groupIds: groupIds,
+										'$childrenCount = /assetcategory/get-vocabulary-root-categories-count': {
 											'groupId': '$vocabularies.groupId',
 											'@vocabularyId': '$vocabularies.vocabularyId'
 										}
@@ -323,6 +334,28 @@ AUI.add(
 								callback
 							);
 						}
+					},
+
+					_getPaginatorConfig: function(item) {
+						var instance = this;
+
+						var paginatorConfig = {
+							offsetParam: STR_START
+						};
+
+						var maxEntries = instance.get(STR_MAX_ENTRIES);
+
+						if (maxEntries > 0) {
+							paginatorConfig.limit = maxEntries;
+							paginatorConfig.moreResultsLabel = instance.get(STR_MORE_RESULTS_LABEL);
+							paginatorConfig.total = item.childrenCount;
+						}
+						else {
+							paginatorConfig.end = -1;
+							paginatorConfig.start = -1;
+						}
+
+						return paginatorConfig;
 					},
 
 					_getTreeNodeAssetId: function(treeNode) {
@@ -426,21 +459,6 @@ AUI.add(
 						instance.entries.add(entry);
 					},
 
-					_onCheckedChange: function(event) {
-						var instance = this;
-
-						if (event.newVal) {
-							if (instance.get('singleSelect')) {
-								instance._clearEntries();
-							}
-
-							instance._onCheckboxCheck(event);
-						}
-						else {
-							instance._onCheckboxUncheck(event);
-						}
-					},
-
 					_onCheckboxClick: function(event) {
 						var instance = this;
 
@@ -470,6 +488,21 @@ AUI.add(
 						instance.entries.removeKey(assetId);
 					},
 
+					_onCheckedChange: function(event) {
+						var instance = this;
+
+						if (event.newVal) {
+							if (instance.get('singleSelect')) {
+								instance._clearEntries();
+							}
+
+							instance._onCheckboxCheck(event);
+						}
+						else {
+							instance._onCheckboxUncheck(event);
+						}
+					},
+
 					_onSelectChange: function(event) {
 						var instance = this;
 
@@ -485,7 +518,9 @@ AUI.add(
 
 						buffer.length = 0;
 
-						if (results.length > 0) {
+						var categories = results.categories;
+
+						if (categories.length > 0) {
 							var inputType = 'checkbox';
 
 							if (instance.get('singleSelect')) {
@@ -495,8 +530,8 @@ AUI.add(
 							var inputName = A.guid();
 
 							A.each(
-								results,
-								function(item, index, collection) {
+								categories,
+								function(item, index) {
 									item.checked = instance.entries.findIndexBy('categoryId', item.categoryId) > -1 ? TPL_CHECKED : '';
 
 									item.inputName = inputName;
@@ -553,13 +588,17 @@ AUI.add(
 							searchResults.addClass('loading-animation');
 
 							Liferay.Service(
-								'/assetcategory/search',
 								{
-									groupIds: vocabularyGroupIds,
-									name: Lang.sub(TPL_SEARCH_QUERY, [searchValue]),
-									vocabularyIds: vocabularyIds,
-									start: -1,
-									end: -1
+									'$display = /assetcategory/search-categories-display': {
+										end: -1,
+										groupIds: vocabularyGroupIds,
+										start: -1,
+										title: searchValue,
+										vocabularyIds: vocabularyIds,
+										'categories.$path = /assetcategory/get-category-path': {
+											'@categoryId': '$display.categories.categoryId'
+										}
+									}
 								},
 								callback
 							);
@@ -571,7 +610,7 @@ AUI.add(
 
 						AObject.each(
 							treeViews,
-							function(item, index, collection) {
+							function(item, index) {
 								item.toggle(!searchValue);
 							}
 						);
@@ -599,7 +638,7 @@ AUI.add(
 
 								A.each(
 									instance.TREEVIEWS,
-									function(item, index, collection) {
+									function(item, index) {
 										item.expandAll();
 									}
 								);
@@ -613,7 +652,7 @@ AUI.add(
 						instance._bindSearchHandle = popup.searchField.once('focus', instance._initSearch, instance);
 					},
 
-					_vocabulariesIterator: function(item, index, collection) {
+					_vocabulariesIterator: function(item, index) {
 						var instance = this;
 
 						var popup = instance._popup;
@@ -626,28 +665,12 @@ AUI.add(
 
 						var treeId = 'vocabulary' + vocabularyId;
 
-						var paginatorConfig = {
-							offsetParam: 'start'
-						};
-
-						var maxEntries = instance.get('maxEntries');
-
-						if (maxEntries > 0) {
-							paginatorConfig.limit = maxEntries;
-							paginatorConfig.moreResultsLabel = instance.get('moreResultsLabel');
-							paginatorConfig.total = item.categoriesCount;
-						}
-						else {
-							paginatorConfig.end = -1;
-							paginatorConfig.start = -1;
-						}
-
 						var vocabularyRootNode = {
 							alwaysShowHitArea: true,
 							id: treeId,
 							label: vocabularyTitle,
 							leaf: false,
-							paginator: paginatorConfig,
+							paginator: instance._getPaginatorConfig(item),
 							type: 'io'
 						};
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,7 @@
 
 package com.liferay.portlet.assetpublisher.action;
 
-import com.liferay.portlet.journalcontent.action.WebContentAction;
+import com.liferay.portal.struts.PortletAction;
 
 import javax.portlet.PortletConfig;
 import javax.portlet.RenderRequest;
@@ -28,7 +28,7 @@ import org.apache.struts.action.ActionMapping;
  * @author Brian Wing Shun Chan
  * @author Raymond Augé
  */
-public class ViewAction extends WebContentAction {
+public class ViewAction extends PortletAction {
 
 	@Override
 	public ActionForward render(

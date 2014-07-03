@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -126,20 +126,16 @@ public class DefaultLDAPToPortalConverter implements LDAPToPortalConverter {
 		}
 
 		if (!autoScreenName && Validator.isNull(screenName)) {
-			throw new UserScreenNameException(
-				"Screen name cannot be null for " +
-					ContactConstants.getFullName(
-						firstName, middleName, lastName));
+			throw new UserScreenNameException.MustNotBeNull(
+				ContactConstants.getFullName(firstName, middleName, lastName));
 		}
 
 		if (Validator.isNull(emailAddress) &&
 			PrefsPropsUtil.getBoolean(
 				companyId, PropsKeys.USERS_EMAIL_ADDRESS_REQUIRED)) {
 
-			throw new UserEmailAddressException(
-				"Email address cannot be null for " +
-					ContactConstants.getFullName(
-						firstName, middleName, lastName));
+			throw new UserEmailAddressException.MustNotBeNull(
+				ContactConstants.getFullName(firstName, middleName, lastName));
 		}
 
 		LDAPUser ldapUser = new LDAPUser();

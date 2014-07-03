@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,7 +25,11 @@
 	<div class="taglib-social-bookmarks" id="<%= randomNamespace %>socialBookmarks">
 		<c:choose>
 			<c:when test='<%= displayStyle.equals("menu") %>'>
-				<liferay-ui:icon-menu direction="right" icon="../aui/share-sign" message="share">
+				<div>
+					<liferay-ui:message key="share" />
+				</div>
+
+				<span>
 
 					<%
 					for (int i = 0; i < typesArray.length; i++) {
@@ -37,7 +41,7 @@
 					}
 					%>
 
-				</liferay-ui:icon-menu>
+				</span>
 
 				<aui:script use="liferay-social-bookmarks">
 					new Liferay.SocialBookmarks(
@@ -48,7 +52,7 @@
 				</aui:script>
 			</c:when>
 			<c:otherwise>
-				<ul class="unstyled">
+				<ul class="list-unstyled">
 
 					<%
 					for (int i = 0; i < typesArray.length; i++) {

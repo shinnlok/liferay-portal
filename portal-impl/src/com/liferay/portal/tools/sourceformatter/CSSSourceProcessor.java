@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,6 +17,7 @@ package com.liferay.portal.tools.sourceformatter;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.io.File;
 
@@ -60,12 +61,29 @@ public class CSSSourceProcessor extends BaseSourceProcessor {
 		return content;
 	}
 
+	protected String fixHexColors(String content) {
+		Matcher matcher = _hexColorPattern.matcher(content);
+
+		while (matcher.find()) {
+			String hexColor = matcher.group(1);
+
+			if (Validator.isNumber(hexColor) || (hexColor.length() < 3)) {
+				continue;
+			}
+
+			content = StringUtil.replace(
+				content, hexColor, StringUtil.toUpperCase(hexColor));
+		}
+
+		return content;
+	}
+
 	@Override
 	protected void format() throws Exception {
 		String[] excludes = {
-			"**\\.sass-cache\\**", "**\\aui_deprecated.css", "**\\expected\\**",
-			"**\\js\\aui\\**", "**\\js\\editor\\**", "**\\js\\misc\\**",
-			"**\\VAADIN\\**"
+			"**\\.ivy\\**", "**\\.sass-cache\\**", "**\\aui_deprecated.css",
+			"**\\expected\\**", "**\\js\\aui\\**", "**\\js\\editor\\**",
+			"**\\js\\misc\\**", "**\\tools\\sdk\\**", "**\\VAADIN\\**"
 		};
 		String[] includes = {"**\\*.css"};
 
@@ -89,17 +107,14 @@ public class CSSSourceProcessor extends BaseSourceProcessor {
 
 		newContent = fixComments(newContent);
 
-		if (isAutoFix() && (newContent != null) &&
-			!content.equals(newContent)) {
+		newContent = fixHexColors(newContent);
 
-			fileUtil.write(file, newContent);
-
-			sourceFormatterHelper.printError(fileName, file);
-		}
+		compareAndAutoFixContent(file, fileName, content, newContent);
 
 		return newContent;
 	}
 
 	private Pattern _commentPattern = Pattern.compile("/\\* -+(.+)-+ \\*/");
+	private Pattern _hexColorPattern = Pattern.compile("#([0-9a-f]+)[\\( ;,]");
 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,7 +17,6 @@ package com.liferay.portal.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.bean.AutoEscape;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.service.ServiceContext;
 
 import com.liferay.portlet.expando.model.ExpandoBridge;
@@ -38,7 +37,7 @@ import java.io.Serializable;
  * @generated
  */
 @ProviderType
-public interface UserIdMapperModel extends BaseModel<UserIdMapper> {
+public interface UserIdMapperModel extends BaseModel<UserIdMapper>, MVCCModel {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -58,6 +57,22 @@ public interface UserIdMapperModel extends BaseModel<UserIdMapper> {
 	 * @param primaryKey the primary key of this user ID mapper
 	 */
 	public void setPrimaryKey(long primaryKey);
+
+	/**
+	 * Returns the mvcc version of this user ID mapper.
+	 *
+	 * @return the mvcc version of this user ID mapper
+	 */
+	@Override
+	public long getMvccVersion();
+
+	/**
+	 * Sets the mvcc version of this user ID mapper.
+	 *
+	 * @param mvccVersion the mvcc version of this user ID mapper
+	 */
+	@Override
+	public void setMvccVersion(long mvccVersion);
 
 	/**
 	 * Returns the user ID mapper ID of this user ID mapper.
@@ -91,9 +106,8 @@ public interface UserIdMapperModel extends BaseModel<UserIdMapper> {
 	 * Returns the user uuid of this user ID mapper.
 	 *
 	 * @return the user uuid of this user ID mapper
-	 * @throws SystemException if a system exception occurred
 	 */
-	public String getUserUuid() throws SystemException;
+	public String getUserUuid();
 
 	/**
 	 * Sets the user uuid of this user ID mapper.

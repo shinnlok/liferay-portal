@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -51,6 +51,7 @@ public class PluginSettingWrapper implements PluginSetting,
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
+		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("pluginSettingId", getPluginSettingId());
 		attributes.put("companyId", getCompanyId());
 		attributes.put("pluginId", getPluginId());
@@ -63,6 +64,12 @@ public class PluginSettingWrapper implements PluginSetting,
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
+		Long mvccVersion = (Long)attributes.get("mvccVersion");
+
+		if (mvccVersion != null) {
+			setMvccVersion(mvccVersion);
+		}
+
 		Long pluginSettingId = (Long)attributes.get("pluginSettingId");
 
 		if (pluginSettingId != null) {
@@ -118,6 +125,26 @@ public class PluginSettingWrapper implements PluginSetting,
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_pluginSetting.setPrimaryKey(primaryKey);
+	}
+
+	/**
+	* Returns the mvcc version of this plugin setting.
+	*
+	* @return the mvcc version of this plugin setting
+	*/
+	@Override
+	public long getMvccVersion() {
+		return _pluginSetting.getMvccVersion();
+	}
+
+	/**
+	* Sets the mvcc version of this plugin setting.
+	*
+	* @param mvccVersion the mvcc version of this plugin setting
+	*/
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		_pluginSetting.setMvccVersion(mvccVersion);
 	}
 
 	/**
@@ -349,8 +376,7 @@ public class PluginSettingWrapper implements PluginSetting,
 	}
 
 	@Override
-	public void persist()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public void persist() {
 		_pluginSetting.persist();
 	}
 

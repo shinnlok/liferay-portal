@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,7 +20,7 @@ import com.liferay.portal.model.Role;
 /**
  * @author Jorge Ferrer
  */
-public class RoleRoleIdComparator extends OrderByComparator {
+public class RoleRoleIdComparator extends OrderByComparator<Role> {
 
 	public static final String ORDER_BY_ASC = "Role_.roleId ASC";
 
@@ -37,10 +37,7 @@ public class RoleRoleIdComparator extends OrderByComparator {
 	}
 
 	@Override
-	public int compare(Object obj1, Object obj2) {
-		Role role1 = (Role)obj1;
-		Role role2 = (Role)obj2;
-
+	public int compare(Role role1, Role role2) {
 		int value = 0;
 
 		if (role1.getRoleId() > role2.getRoleId()) {

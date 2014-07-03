@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,15 +15,17 @@
 package com.liferay.portal.model.impl;
 
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
-import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.BrowserTracker;
 import com.liferay.portal.model.BrowserTrackerModel;
 import com.liferay.portal.model.CacheModel;
+import com.liferay.portal.model.User;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.util.PortalUtil;
+import com.liferay.portal.service.UserLocalServiceUtil;
 
 import com.liferay.portlet.expando.model.ExpandoBridge;
 import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
@@ -57,11 +59,12 @@ public class BrowserTrackerModelImpl extends BaseModelImpl<BrowserTracker>
 	 */
 	public static final String TABLE_NAME = "BrowserTracker";
 	public static final Object[][] TABLE_COLUMNS = {
+			{ "mvccVersion", Types.BIGINT },
 			{ "browserTrackerId", Types.BIGINT },
 			{ "userId", Types.BIGINT },
 			{ "browserKey", Types.BIGINT }
 		};
-	public static final String TABLE_SQL_CREATE = "create table BrowserTracker (browserTrackerId LONG not null primary key,userId LONG,browserKey LONG)";
+	public static final String TABLE_SQL_CREATE = "create table BrowserTracker (mvccVersion LONG default 0,browserTrackerId LONG not null primary key,userId LONG,browserKey LONG)";
 	public static final String TABLE_SQL_DROP = "drop table BrowserTracker";
 	public static final String ORDER_BY_JPQL = " ORDER BY browserTracker.browserTrackerId ASC";
 	public static final String ORDER_BY_SQL = " ORDER BY BrowserTracker.browserTrackerId ASC";
@@ -119,6 +122,7 @@ public class BrowserTrackerModelImpl extends BaseModelImpl<BrowserTracker>
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
+		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("browserTrackerId", getBrowserTrackerId());
 		attributes.put("userId", getUserId());
 		attributes.put("browserKey", getBrowserKey());
@@ -131,6 +135,12 @@ public class BrowserTrackerModelImpl extends BaseModelImpl<BrowserTracker>
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
+		Long mvccVersion = (Long)attributes.get("mvccVersion");
+
+		if (mvccVersion != null) {
+			setMvccVersion(mvccVersion);
+		}
+
 		Long browserTrackerId = (Long)attributes.get("browserTrackerId");
 
 		if (browserTrackerId != null) {
@@ -148,6 +158,16 @@ public class BrowserTrackerModelImpl extends BaseModelImpl<BrowserTracker>
 		if (browserKey != null) {
 			setBrowserKey(browserKey);
 		}
+	}
+
+	@Override
+	public long getMvccVersion() {
+		return _mvccVersion;
+	}
+
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		_mvccVersion = mvccVersion;
 	}
 
 	@Override
@@ -179,13 +199,19 @@ public class BrowserTrackerModelImpl extends BaseModelImpl<BrowserTracker>
 	}
 
 	@Override
-	public String getUserUuid() throws SystemException {
-		return PortalUtil.getUserValue(getUserId(), "uuid", _userUuid);
+	public String getUserUuid() {
+		try {
+			User user = UserLocalServiceUtil.getUserById(getUserId());
+
+			return user.getUuid();
+		}
+		catch (PortalException pe) {
+			return StringPool.BLANK;
+		}
 	}
 
 	@Override
 	public void setUserUuid(String userUuid) {
-		_userUuid = userUuid;
 	}
 
 	public long getOriginalUserId() {
@@ -233,6 +259,7 @@ public class BrowserTrackerModelImpl extends BaseModelImpl<BrowserTracker>
 	public Object clone() {
 		BrowserTrackerImpl browserTrackerImpl = new BrowserTrackerImpl();
 
+		browserTrackerImpl.setMvccVersion(getMvccVersion());
 		browserTrackerImpl.setBrowserTrackerId(getBrowserTrackerId());
 		browserTrackerImpl.setUserId(getUserId());
 		browserTrackerImpl.setBrowserKey(getBrowserKey());
@@ -309,6 +336,8 @@ public class BrowserTrackerModelImpl extends BaseModelImpl<BrowserTracker>
 	public CacheModel<BrowserTracker> toCacheModel() {
 		BrowserTrackerCacheModel browserTrackerCacheModel = new BrowserTrackerCacheModel();
 
+		browserTrackerCacheModel.mvccVersion = getMvccVersion();
+
 		browserTrackerCacheModel.browserTrackerId = getBrowserTrackerId();
 
 		browserTrackerCacheModel.userId = getUserId();
@@ -320,9 +349,11 @@ public class BrowserTrackerModelImpl extends BaseModelImpl<BrowserTracker>
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(7);
+		StringBundler sb = new StringBundler(9);
 
-		sb.append("{browserTrackerId=");
+		sb.append("{mvccVersion=");
+		sb.append(getMvccVersion());
+		sb.append(", browserTrackerId=");
 		sb.append(getBrowserTrackerId());
 		sb.append(", userId=");
 		sb.append(getUserId());
@@ -335,12 +366,16 @@ public class BrowserTrackerModelImpl extends BaseModelImpl<BrowserTracker>
 
 	@Override
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(13);
+		StringBundler sb = new StringBundler(16);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.portal.model.BrowserTracker");
 		sb.append("</model-name>");
 
+		sb.append(
+			"<column><column-name>mvccVersion</column-name><column-value><![CDATA[");
+		sb.append(getMvccVersion());
+		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>browserTrackerId</column-name><column-value><![CDATA[");
 		sb.append(getBrowserTrackerId());
@@ -363,9 +398,9 @@ public class BrowserTrackerModelImpl extends BaseModelImpl<BrowserTracker>
 	private static Class<?>[] _escapedModelInterfaces = new Class[] {
 			BrowserTracker.class
 		};
+	private long _mvccVersion;
 	private long _browserTrackerId;
 	private long _userId;
-	private String _userUuid;
 	private long _originalUserId;
 	private boolean _setOriginalUserId;
 	private long _browserKey;

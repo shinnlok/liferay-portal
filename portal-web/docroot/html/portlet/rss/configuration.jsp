@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -45,7 +45,7 @@ configurationRenderURL.setParameter("portletResource", portletResource);
 <aui:form action="<%= configurationURL %>" method="post" name="fm">
 	<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.UPDATE %>" />
 	<aui:input name="redirect" type="hidden" value="<%= configurationURL.toString() %>" />
-	<aui:input name="typeSelection" type="hidden" />
+	<aui:input name="typeSelection" type="hidden" value="<%= typeSelection %>" />
 	<aui:input name="articleGroupId" type="hidden" />
 	<aui:input name="articleId" type="hidden" />
 	<aui:input name="assetOrder" type="hidden" />
@@ -69,7 +69,7 @@ configurationRenderURL.setParameter("portletResource", portletResource);
 						String url = (String)enu.nextElement();
 					%>
 
-						<strong><%= url %></strong><%= (enu.hasMoreElements()) ? ", " : "." %>
+						<strong><%= HtmlUtil.escape(url) %></strong><%= (enu.hasMoreElements()) ? ", " : "." %>
 
 					<%
 					}
@@ -157,49 +157,47 @@ configurationRenderURL.setParameter("portletResource", portletResource);
 							<aui:option label="right" selected='<%= feedImageAlignment.equals("right") %>' />
 						</aui:select>
 
-						<aui:field-wrapper label="header-web-content">
-							<div class="input-append">
-								<c:choose>
-									<c:when test="<%= Validator.isNotNull(headerArticleId) %>">
+						<div class="form-group">
 
-										<%
-										JournalArticle headerArticle = JournalArticleLocalServiceUtil.getArticle(headerArticleGroupId, headerArticleId);
-										%>
+							<%
+							JournalArticle headerArticle = null;
 
-										<liferay-ui:input-resource url="<%= headerArticle.getTitle(locale) %>" />
-									</c:when>
-									<c:otherwise>
-										<liferay-ui:input-resource url="" />
-									</c:otherwise>
-								</c:choose>
+							if (Validator.isNotNull(headerArticleId)) {
+								try {
+									headerArticle = JournalArticleLocalServiceUtil.getArticle(headerArticleGroupId, headerArticleId);
+								}
+								catch (NoSuchArticleException nsae) {
+								}
+							}
+							%>
 
-								<aui:button name="selectButton" onClick='<%= renderResponse.getNamespace() + "selectionForHeader();" %>' value="select" />
+							<aui:input name="headerWebContent" type="resource" value="<%= (headerArticle != null) ? headerArticle.getTitle(locale) : StringPool.BLANK %>" />
 
-								<aui:button name="removeButton" onClick='<%= renderResponse.getNamespace() + "removeSelectionForHeader();" %>' value="remove" />
-							</div>
-						</aui:field-wrapper>
+							<aui:button name="selectButton" onClick='<%= renderResponse.getNamespace() + "selectionForHeader();" %>' value="select" />
 
-						<aui:field-wrapper label="footer-web-content">
-							<div class="input-append">
-								<c:choose>
-									<c:when test="<%= Validator.isNotNull(footerArticleId) %>">
+							<aui:button name="removeButton" onClick='<%= renderResponse.getNamespace() + "removeSelectionForHeader();" %>' value="remove" />
+						</div>
 
-										<%
-										JournalArticle footerArticle = JournalArticleLocalServiceUtil.getArticle(footerArticleGroupId, footerArticleId);
-										%>
+						<div class="form-group">
 
-										<liferay-ui:input-resource url="<%= footerArticle.getTitle(locale) %>" />
-									</c:when>
-									<c:otherwise>
-										<liferay-ui:input-resource url="" />
-									</c:otherwise>
-								</c:choose>
+							<%
+							JournalArticle footerArticle = null;
 
-								<aui:button name="selectButton" onClick='<%= renderResponse.getNamespace() + "selectionForFooter();" %>' value="select" />
+							if (Validator.isNotNull(footerArticleId)) {
+								try {
+									footerArticle = JournalArticleLocalServiceUtil.getArticle(footerArticleGroupId, footerArticleId);
+								}
+								catch (NoSuchArticleException nsae) {
+								}
+							}
+							%>
 
-								<aui:button name="removeButton" onClick='<%= renderResponse.getNamespace() + "removeSelectionForFooter();" %>' value="remove" />
-							</div>
-						</aui:field-wrapper>
+							<aui:input name="footerWebContent" type="resource" value="<%= (footerArticle != null) ? footerArticle.getTitle(locale) : StringPool.BLANK %>" />
+
+							<aui:button name="selectButton" onClick='<%= renderResponse.getNamespace() + "selectionForFooter();" %>' value="select" />
+
+							<aui:button name="removeButton" onClick='<%= renderResponse.getNamespace() + "removeSelectionForFooter();" %>' value="remove" />
+						</div>
 					</aui:fieldset>
 				</liferay-ui:panel>
 			</liferay-ui:panel-container>

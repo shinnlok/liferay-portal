@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -51,6 +51,7 @@ public class ResourceActionWrapper implements ResourceAction,
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
+		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("resourceActionId", getResourceActionId());
 		attributes.put("name", getName());
 		attributes.put("actionId", getActionId());
@@ -61,6 +62,12 @@ public class ResourceActionWrapper implements ResourceAction,
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
+		Long mvccVersion = (Long)attributes.get("mvccVersion");
+
+		if (mvccVersion != null) {
+			setMvccVersion(mvccVersion);
+		}
+
 		Long resourceActionId = (Long)attributes.get("resourceActionId");
 
 		if (resourceActionId != null) {
@@ -104,6 +111,26 @@ public class ResourceActionWrapper implements ResourceAction,
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_resourceAction.setPrimaryKey(primaryKey);
+	}
+
+	/**
+	* Returns the mvcc version of this resource action.
+	*
+	* @return the mvcc version of this resource action
+	*/
+	@Override
+	public long getMvccVersion() {
+		return _resourceAction.getMvccVersion();
+	}
+
+	/**
+	* Sets the mvcc version of this resource action.
+	*
+	* @param mvccVersion the mvcc version of this resource action
+	*/
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		_resourceAction.setMvccVersion(mvccVersion);
 	}
 
 	/**
@@ -285,8 +312,7 @@ public class ResourceActionWrapper implements ResourceAction,
 	}
 
 	@Override
-	public void persist()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public void persist() {
 		_resourceAction.persist();
 	}
 

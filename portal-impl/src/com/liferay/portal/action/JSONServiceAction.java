@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ClassUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.SetUtil;
@@ -43,6 +44,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -157,7 +159,7 @@ public class JSONServiceAction extends JSONAction {
 					e);
 			}
 
-			return JSONFactoryUtil.serializeException(e);
+			return JSONFactoryUtil.serializeThrowable(e);
 		}
 	}
 
@@ -201,6 +203,13 @@ public class JSONServiceAction extends JSONAction {
 
 			return new Short(ParamUtil.getShort(request, parameter));
 		}
+		else if (typeNameOrClassDescriptor.equals(Calendar.class.getName())) {
+			Calendar cal = Calendar.getInstance(LocaleUtil.getDefault());
+
+			cal.setTimeInMillis(ParamUtil.getLong(request, parameter));
+
+			return cal;
+		}
 		else if (typeNameOrClassDescriptor.equals(Date.class.getName())) {
 			return new Date(ParamUtil.getLong(request, parameter));
 		}
@@ -217,25 +226,31 @@ public class JSONServiceAction extends JSONAction {
 			return value;
 		}
 		else if (typeNameOrClassDescriptor.equals("[Z")) {
-			return ParamUtil.getBooleanValues(request, parameter);
+			return GetterUtil.getBooleanValues(
+				getArrayParameterValues(request, parameter));
 		}
 		else if (typeNameOrClassDescriptor.equals("[D")) {
-			return ParamUtil.getDoubleValues(request, parameter);
+			return GetterUtil.getDoubleValues(
+				getArrayParameterValues(request, parameter));
 		}
 		else if (typeNameOrClassDescriptor.equals("[F")) {
-			return ParamUtil.getFloatValues(request, parameter);
+			return GetterUtil.getFloatValues(
+				getArrayParameterValues(request, parameter));
 		}
 		else if (typeNameOrClassDescriptor.equals("[I")) {
-			return ParamUtil.getIntegerValues(request, parameter);
+			return GetterUtil.getIntegerValues(
+				getArrayParameterValues(request, parameter));
 		}
 		else if (typeNameOrClassDescriptor.equals("[J")) {
-			return ParamUtil.getLongValues(request, parameter);
+			return GetterUtil.getLongValues(
+				getArrayParameterValues(request, parameter));
 		}
 		else if (typeNameOrClassDescriptor.equals("[S")) {
-			return ParamUtil.getShortValues(request, parameter);
+			return GetterUtil.getShortValues(
+				getArrayParameterValues(request, parameter));
 		}
 		else if (typeNameOrClassDescriptor.equals("[Ljava.lang.String;")) {
-			return ParamUtil.getParameterValues(request, parameter);
+			return getArrayParameterValues(request, parameter);
 		}
 		else if (typeNameOrClassDescriptor.equals("[[Z")) {
 			String[] values = request.getParameterValues(parameter);
@@ -412,6 +427,18 @@ public class JSONServiceAction extends JSONAction {
 				return null;
 			}
 		}
+	}
+
+	protected String[] getArrayParameterValues(
+		HttpServletRequest request, String parameter) {
+
+		String[] values = ParamUtil.getParameterValues(request, parameter);
+
+		if (values.length == 1) {
+			values = StringUtil.split(values[0]);
+		}
+
+		return values;
 	}
 
 	/**

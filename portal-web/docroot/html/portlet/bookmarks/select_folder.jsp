@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,7 +23,7 @@ long folderId = BeanParamUtil.getLong(folder, request, "folderId", BookmarksFold
 
 String eventName = ParamUtil.getString(request, "eventName", liferayPortletResponse.getNamespace() + "selectFolder");
 
-String folderName = LanguageUtil.get(pageContext, "home");
+String folderName = LanguageUtil.get(request, "home");
 
 if (folder != null) {
 	folderName = folder.getName();
@@ -62,27 +62,38 @@ if (folder != null) {
 			modelVar="curFolder"
 		>
 
+			<%
+			AssetRendererFactory assetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(BookmarksFolder.class.getName());
+
+			AssetRenderer assetRenderer = assetRendererFactory.getAssetRenderer(curFolder.getFolderId());
+			%>
+
 			<portlet:renderURL var="viewFolderURL">
 				<portlet:param name="struts_action" value="/bookmarks/select_folder" />
 				<portlet:param name="folderId" value="<%= String.valueOf(curFolder.getFolderId()) %>" />
 			</portlet:renderURL>
+
+			<liferay-ui:search-container-column-text
+				name="folder"
+			>
+				<liferay-ui:icon
+					iconCssClass="<%= assetRenderer.getIconCssClass() %>"
+					label="<%= true %>"
+					message="<%= HtmlUtil.escape(curFolder.getName()) %>"
+					url="<%= viewFolderURL %>"
+				/>
+			</liferay-ui:search-container-column-text>
 
 			<%
 			List<Long> subfolderIds = new ArrayList<Long>();
 
 			subfolderIds.add(curFolder.getFolderId());
 
-			BookmarksFolderServiceUtil.getSubfolderIds(subfolderIds, scopeGroupId, curFolder.getFolderId());
+			BookmarksFolderServiceUtil.getSubfolderIds(subfolderIds, scopeGroupId, curFolder.getFolderId(), true);
 
 			int foldersCount = subfolderIds.size() - 1;
 			int entriesCount = BookmarksEntryServiceUtil.getFoldersEntriesCount(scopeGroupId, subfolderIds);
 			%>
-
-			<liferay-ui:search-container-column-text
-				href="<%= viewFolderURL %>"
-				name="folder"
-				value="<%= HtmlUtil.escape(curFolder.getName()) %>"
-			/>
 
 			<liferay-ui:search-container-column-text
 				href="<%= viewFolderURL %>"
@@ -102,7 +113,7 @@ if (folder != null) {
 				Map<String, Object> data = new HashMap<String, Object>();
 
 				data.put("folderid", curFolder.getFolderId());
-				data.put("name", HtmlUtil.escapeAttribute(curFolder.getName()));
+				data.put("name", curFolder.getName());
 				%>
 
 				<aui:button cssClass="selector-button" data="<%= data %>" value="choose" />
@@ -124,7 +135,7 @@ if (folder != null) {
 			Map<String, Object> data = new HashMap<String, Object>();
 
 			data.put("folderid", folderId);
-			data.put("name", HtmlUtil.escapeAttribute(folderName));
+			data.put("name", folderName);
 			%>
 
 			<aui:button cssClass="selector-button" data="<%= data %>" value="choose-this-folder" />
@@ -135,17 +146,5 @@ if (folder != null) {
 </aui:form>
 
 <aui:script use="aui-base">
-	var Util = Liferay.Util;
-
-	A.one('#<portlet:namespace />selectFolderFm').delegate(
-		'click',
-		function(event) {
-			var result = Util.getAttributes(event.currentTarget, 'data-');
-
-			Util.getOpener().Liferay.fire('<%= HtmlUtil.escapeJS(eventName) %>', result);
-
-			Util.getWindow().hide();
-		},
-		'.selector-button'
-	);
+	Liferay.Util.selectEntityHandler('#<portlet:namespace />selectFolderFm', '<%= HtmlUtil.escapeJS(eventName) %>');
 </aui:script>

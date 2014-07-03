@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,8 @@ import com.liferay.portal.security.permission.PermissionChecker;
 import java.util.List;
 import java.util.Locale;
 
+import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
 
 /**
@@ -42,6 +44,11 @@ public class DummyIndexer implements Indexer {
 	@Override
 	public String[] getClassNames() {
 		return new String[0];
+	}
+
+	@Override
+	public int getDatabaseCount() throws Exception {
+		return 0;
 	}
 
 	@Override
@@ -86,10 +93,23 @@ public class DummyIndexer implements Indexer {
 		return StringPool.BLANK;
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #getSummary(Document, String,
+	 *             PortletURL, PortletRequest, PortletResponse)}
+	 */
+	@Deprecated
 	@Override
 	public Summary getSummary(
 		Document document, Locale locale, String snippet,
 		PortletURL portletURL) {
+
+		return null;
+	}
+
+	@Override
+	public Summary getSummary(
+		Document document, String snippet, PortletURL portletURL,
+		PortletRequest portletRequest, PortletResponse portletResponse) {
 
 		return null;
 	}
@@ -115,6 +135,18 @@ public class DummyIndexer implements Indexer {
 	@Override
 	public boolean isStagingAware() {
 		return false;
+	}
+
+	@Override
+	public boolean isVisible(long classPK, int status) throws Exception {
+		return true;
+	}
+
+	@Override
+	public boolean isVisibleRelatedEntry(long classPK, int status)
+		throws Exception {
+
+		return true;
 	}
 
 	@Override
@@ -154,8 +186,19 @@ public class DummyIndexer implements Indexer {
 	}
 
 	@Override
+	public Hits search(
+		SearchContext searchContext, String... selectedFieldNames) {
+
+		return null;
+	}
+
+	@Override
 	public void unregisterIndexerPostProcessor(
 		IndexerPostProcessor indexerPostProcessor) {
+	}
+
+	@Override
+	public void updateFullQuery(SearchContext searchContext) {
 	}
 
 }

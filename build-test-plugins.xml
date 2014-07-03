@@ -5,22 +5,19 @@
 
 	<target name="deploy-simple-server-plugins">
 		<if>
-			<equals arg1="${app.server.type}" arg2="websphere" />
+			<equals arg1="${app.server.type}" arg2="jboss" />
 			<then>
-				<echo file="${lp.plugins.dir}/build.${user.name}.properties">app.server.type=websphere
-app.server.dir=${simple.server.dir}
-app.server.deploy.dir=${app.server.dir}/profiles/liferay/wsadmin-deploy
-app.server.lib.global.dir=${app.server.dir}/lib/ext
-app.server.portal.dir=${app.server.dir}/profiles/liferay/installedApps/liferay-cell/liferay-portal.ear/liferay-portal.war
+				<echo file="${lp.plugins.dir}/build.${user.name}.properties">app.server.parent.dir=${app.server.parent.dir}
+app.server.type=${app.server.type}
+app.server.jboss.dir=${app.server.dir}
 
 auto.deploy.dir=${liferay.home}/deploy
 
 plugins.includes=${plugins.includes}</echo>
 			</then>
 			<else>
-				<echo file="${lp.plugins.dir}/build.${user.name}.properties">app.server.dir=${simple.server.dir}
-app.server.lib.global.dir=${simple.server.lib.global.dir}
-app.server.portal.dir=${simple.server.portal.dir}
+				<echo file="${lp.plugins.dir}/build.${user.name}.properties">app.server.parent.dir=${app.server.parent.dir}
+app.server.type=${app.server.type}
 
 auto.deploy.dir=${liferay.home}/deploy
 
@@ -29,31 +26,109 @@ plugins.includes=${plugins.includes}</echo>
 		</if>
 
 		<if>
-			<isset property="plugin.portlets.properties" />
+			<equals arg1="${java.security}" arg2="true" />
 			<then>
-				<echo file="${lp.plugins.dir}/${plugin.types}/${portlet.plugins.includes}/docroot/WEB-INF/src/portlet-ext.properties">${plugin.portlets.properties}</echo>
+				<if>
+					<not>
+						<resourcecontains
+							resource="${lp.plugins.dir}/${plugin.types}/${portlet.plugins.includes}/docroot/WEB-INF/liferay-plugin-package.properties"
+							substring="security-manager-enabled=true"
+						/>
+					</not>
+					<then>
+						<echo append="true" file="${lp.plugins.dir}/${plugin.types}/${portlet.plugins.includes}/docroot/WEB-INF/liferay-plugin-package.properties">
+
+security-manager-enabled=true</echo>
+					</then>
+				</if>
 			</then>
 		</if>
+
+		<for list="${plugins.includes}" param="plugin">
+			<sequential>
+				<if>
+					<isset property="portlet.properties.@{plugin}" />
+					<then>
+						<propertycopy
+							from="portlet.properties.@{plugin}"
+							name="portlet.properties"
+							override="true"
+						/>
+
+						<echo file="${lp.plugins.dir}/${plugin.types}/@{plugin}/docroot/WEB-INF/src/portlet-ext.properties">${portlet.properties}</echo>
+					</then>
+					<else>
+						<delete file="${lp.plugins.dir}/${plugin.types}/@{plugin}/docroot/WEB-INF/src/portlet-ext.properties" />
+					</else>
+				</if>
+			</sequential>
+		</for>
 
 		<if>
 			<matches pattern="http" string="${test.build.plugins.war.zip.url}" />
 			<then>
 				<for list="${plugins.includes}" param="plugin.includes">
 					<sequential>
-						<copy todir="${liferay.home}/deploy">
-							<fileset
-								dir="plugins"
-								includes="@{plugin.includes}*.war"
-							/>
-						</copy>
+						<pathconvert pathsep="," property="plugin.war" setonempty="false">
+							<path>
+								<fileset
+									dir="plugins"
+									includes="@{plugin.includes}*.war"
+								/>
+							</path>
+						</pathconvert>
+
+						<propertyregex
+							input="${plugin.war}"
+							override="true"
+							property="plugin.war"
+							regexp=",.*"
+							replace=""
+						/>
+
+						<if>
+							<isset property="plugin.war" />
+							<then>
+								<copy file="${plugin.war}" todir="${liferay.home}/deploy" />
+
+								<var name="plugin.war" unset="true" />
+							</then>
+							<else>
+								<ant dir="${lp.plugins.dir}/${plugin.types}/@{plugin.includes}" inheritAll="false">
+									<target name="clean" />
+									<target name="deploy" />
+								</ant>
+							</else>
+						</if>
 					</sequential>
 				</for>
 			</then>
 			<else>
-				<ant dir="${lp.plugins.dir}/${plugin.types}" inheritAll="false">
-					<target name="clean" />
-					<target name="deploy" />
-				</ant>
+				<if>
+					<isset property="plugin.types" />
+					<then>
+						<ant-execute
+							ant.dir="${lp.plugins.dir}/${plugin.types}"
+							ant.target="clean"
+						/>
+
+						<ant-execute
+							ant.dir="${lp.plugins.dir}/${plugin.types}"
+							ant.target="deploy"
+						/>
+					</then>
+					<else>
+						<ant-execute
+							ant.dir="${lp.plugins.dir}"
+							ant.target="clean"
+						/>
+
+						<ant-execute
+							ant.dir="${lp.plugins.dir}"
+							ant.target="deploy"
+						/>
+					</else>
+				</if>
 			</else>
 		</if>
 

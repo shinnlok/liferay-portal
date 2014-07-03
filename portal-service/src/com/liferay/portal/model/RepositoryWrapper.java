@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -52,6 +52,7 @@ public class RepositoryWrapper implements Repository, ModelWrapper<Repository> {
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
+		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("uuid", getUuid());
 		attributes.put("repositoryId", getRepositoryId());
 		attributes.put("groupId", getGroupId());
@@ -72,6 +73,12 @@ public class RepositoryWrapper implements Repository, ModelWrapper<Repository> {
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
+		Long mvccVersion = (Long)attributes.get("mvccVersion");
+
+		if (mvccVersion != null) {
+			setMvccVersion(mvccVersion);
+		}
+
 		String uuid = (String)attributes.get("uuid");
 
 		if (uuid != null) {
@@ -178,6 +185,26 @@ public class RepositoryWrapper implements Repository, ModelWrapper<Repository> {
 	}
 
 	/**
+	* Returns the mvcc version of this repository.
+	*
+	* @return the mvcc version of this repository
+	*/
+	@Override
+	public long getMvccVersion() {
+		return _repository.getMvccVersion();
+	}
+
+	/**
+	* Sets the mvcc version of this repository.
+	*
+	* @param mvccVersion the mvcc version of this repository
+	*/
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		_repository.setMvccVersion(mvccVersion);
+	}
+
+	/**
 	* Returns the uuid of this repository.
 	*
 	* @return the uuid of this repository
@@ -281,11 +308,9 @@ public class RepositoryWrapper implements Repository, ModelWrapper<Repository> {
 	* Returns the user uuid of this repository.
 	*
 	* @return the user uuid of this repository
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
-	public java.lang.String getUserUuid()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.lang.String getUserUuid() {
 		return _repository.getUserUuid();
 	}
 
@@ -593,8 +618,7 @@ public class RepositoryWrapper implements Repository, ModelWrapper<Repository> {
 	}
 
 	@Override
-	public void persist()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public void persist() {
 		_repository.persist();
 	}
 

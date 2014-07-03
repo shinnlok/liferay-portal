@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,6 +32,7 @@ public class BaseMacro {
 	protected Map<String, String> definitionScopeVariables =
 		new HashMap<String, String>();
 	protected Map<String, String> executeScopeVariables;
+	protected Map<String, String> forScopeVariables;
 	protected LiferaySelenium liferaySelenium;
 
 }

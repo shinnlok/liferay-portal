@@ -7,7 +7,6 @@
  * @param ${finderCol.name} the ${finderCol.humanName}
 </#list>
  * @return the number of matching ${entity.humanNames}
- * @throws SystemException if a system exception occurred
  */
 @Override
 public int countBy${finder.name}(
@@ -20,7 +19,7 @@ public int countBy${finder.name}(
 	</#if>
 </#list>
 
-) throws SystemException {
+) {
 	FinderPath finderPath =
 		<#if !finder.hasCustomComparator()>
 			FINDER_PATH_COUNT_BY_${finder.name?upper_case};
@@ -54,7 +53,7 @@ public int countBy${finder.name}(
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
-			<#include "persistence_impl_finder_qpos.ftl">
+			<@finderQPos />
 
 			count = (Long)q.uniqueResult();
 
@@ -85,7 +84,6 @@ public int countBy${finder.name}(
 		</#if>
 	</#list>
 	 * @return the number of matching ${entity.humanNames}
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public int countBy${finder.name}(
@@ -102,7 +100,23 @@ public int countBy${finder.name}(
 		</#if>
 	</#list>
 
-	) throws SystemException {
+	) {
+		<#list finderColsList as finderCol>
+			<#if finderCol.hasArrayableOperator()>
+				if (${finderCol.names} == null) {
+					${finderCol.names} = new ${finderCol.type}[0];
+				}
+				else {
+					${finderCol.names} =
+						<#if finderCol.type == "String">
+							ArrayUtil.distinct(${finderCol.names}, NULL_SAFE_STRING_COMPARATOR);
+						<#else>
+							ArrayUtil.unique(${finderCol.names});
+						</#if>
+				}
+			</#if>
+		</#list>
+
 		Object[] finderArgs = new Object[] {
 			<#list finderColsList as finderCol>
 				<#if finderCol.hasArrayableOperator()>
@@ -131,9 +145,13 @@ public int countBy${finder.name}(
 
 				Query q = session.createQuery(sql);
 
-				QueryPos qPos = QueryPos.getInstance(q);
+				<#if bindParameter(finderColsList)>
+					QueryPos qPos = QueryPos.getInstance(q);
+				</#if>
 
-				<#include "persistence_impl_finder_arrayable_qpos.ftl">
+				<@finderQPos
+					_arrayable=true
+				/>
 
 				count = (Long)q.uniqueResult();
 
@@ -161,7 +179,6 @@ public int countBy${finder.name}(
 	 * @param ${finderCol.name} the ${finderCol.humanName}
 	</#list>
 	 * @return the number of matching ${entity.humanNames} that the user has permission to view
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public int filterCountBy${finder.name}(
@@ -174,7 +191,7 @@ public int countBy${finder.name}(
 		</#if>
 	</#list>
 
-	) throws SystemException {
+	) {
 		if (!InlineSQLHelperUtil.isEnabled(<#if finder.hasColumn("groupId")>groupId</#if>)) {
 			return countBy${finder.name}(
 
@@ -203,7 +220,7 @@ public int countBy${finder.name}(
 
 				QueryPos qPos = QueryPos.getInstance(q);
 
-				<#include "persistence_impl_finder_qpos.ftl">
+				<@finderQPos />
 
 				Long count = (Long)q.uniqueResult();
 
@@ -233,13 +250,13 @@ public int countBy${finder.name}(
 			try {
 				session = openSession();
 
-				SQLQuery q = session.createSQLQuery(sql);
+				SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 				q.addScalar(COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 				QueryPos qPos = QueryPos.getInstance(q);
 
-				<#include "persistence_impl_finder_qpos.ftl">
+				<@finderQPos />
 
 				Long count = (Long)q.uniqueResult();
 
@@ -266,7 +283,6 @@ public int countBy${finder.name}(
 			</#if>
 		</#list>
 		 * @return the number of matching ${entity.humanNames} that the user has permission to view
-		 * @throws SystemException if a system exception occurred
 		 */
 		@Override
 		public int filterCountBy${finder.name}(
@@ -283,7 +299,7 @@ public int countBy${finder.name}(
 			</#if>
 		</#list>
 
-		) throws SystemException {
+		) {
 			if (!InlineSQLHelperUtil.isEnabled(
 				<#if finder.hasColumn("groupId")>
 					<#if finder.getColumn("groupId").hasArrayableOperator()>
@@ -310,6 +326,22 @@ public int countBy${finder.name}(
 				);
 			}
 
+			<#list finderColsList as finderCol>
+				<#if finderCol.hasArrayableOperator()>
+					if (${finderCol.names} == null) {
+						${finderCol.names} = new ${finderCol.type}[0];
+					}
+					else {
+						${finderCol.names} =
+							<#if finderCol.type == "String">
+								ArrayUtil.distinct(${finderCol.names}, NULL_SAFE_STRING_COMPARATOR);
+							<#else>
+								ArrayUtil.unique(${finderCol.names});
+							</#if>
+					}
+				</#if>
+			</#list>
+
 			<#if entity.isPermissionedModel()>
 				<#include "persistence_impl_count_by_arrayable_query.ftl">
 
@@ -330,9 +362,13 @@ public int countBy${finder.name}(
 
 					Query q = session.createQuery(sql);
 
-					QueryPos qPos = QueryPos.getInstance(q);
+					<#if bindParameter(finderColsList)>
+						QueryPos qPos = QueryPos.getInstance(q);
+					</#if>
 
-					<#include "persistence_impl_finder_arrayable_qpos.ftl">
+					<@finderQPos
+						_arrayable=true
+					/>
 
 					Long count = (Long)q.uniqueResult();
 
@@ -370,13 +406,17 @@ public int countBy${finder.name}(
 				try {
 					session = openSession();
 
-					SQLQuery q = session.createSQLQuery(sql);
+					SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 					q.addScalar(COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
 
-					QueryPos qPos = QueryPos.getInstance(q);
+					<#if bindParameter(finderColsList)>
+						QueryPos qPos = QueryPos.getInstance(q);
+					</#if>
 
-					<#include "persistence_impl_finder_arrayable_qpos.ftl">
+					<@finderQPos
+						_arrayable=true
+					/>
 
 					Long count = (Long)q.uniqueResult();
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -52,6 +52,7 @@ public class MembershipRequestWrapper implements MembershipRequest,
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
+		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("membershipRequestId", getMembershipRequestId());
 		attributes.put("groupId", getGroupId());
 		attributes.put("companyId", getCompanyId());
@@ -68,6 +69,12 @@ public class MembershipRequestWrapper implements MembershipRequest,
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
+		Long mvccVersion = (Long)attributes.get("mvccVersion");
+
+		if (mvccVersion != null) {
+			setMvccVersion(mvccVersion);
+		}
+
 		Long membershipRequestId = (Long)attributes.get("membershipRequestId");
 
 		if (membershipRequestId != null) {
@@ -147,6 +154,26 @@ public class MembershipRequestWrapper implements MembershipRequest,
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_membershipRequest.setPrimaryKey(primaryKey);
+	}
+
+	/**
+	* Returns the mvcc version of this membership request.
+	*
+	* @return the mvcc version of this membership request
+	*/
+	@Override
+	public long getMvccVersion() {
+		return _membershipRequest.getMvccVersion();
+	}
+
+	/**
+	* Sets the mvcc version of this membership request.
+	*
+	* @param mvccVersion the mvcc version of this membership request
+	*/
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		_membershipRequest.setMvccVersion(mvccVersion);
 	}
 
 	/**
@@ -233,11 +260,9 @@ public class MembershipRequestWrapper implements MembershipRequest,
 	* Returns the user uuid of this membership request.
 	*
 	* @return the user uuid of this membership request
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
-	public java.lang.String getUserUuid()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.lang.String getUserUuid() {
 		return _membershipRequest.getUserUuid();
 	}
 
@@ -355,11 +380,9 @@ public class MembershipRequestWrapper implements MembershipRequest,
 	* Returns the replier user uuid of this membership request.
 	*
 	* @return the replier user uuid of this membership request
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
-	public java.lang.String getReplierUserUuid()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.lang.String getReplierUserUuid() {
 		return _membershipRequest.getReplierUserUuid();
 	}
 
@@ -493,8 +516,7 @@ public class MembershipRequestWrapper implements MembershipRequest,
 	}
 
 	@Override
-	public void persist()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public void persist() {
 		_membershipRequest.persist();
 	}
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -51,6 +51,7 @@ public class ReleaseWrapper implements Release, ModelWrapper<Release> {
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
+		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("releaseId", getReleaseId());
 		attributes.put("createDate", getCreateDate());
 		attributes.put("modifiedDate", getModifiedDate());
@@ -66,6 +67,12 @@ public class ReleaseWrapper implements Release, ModelWrapper<Release> {
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
+		Long mvccVersion = (Long)attributes.get("mvccVersion");
+
+		if (mvccVersion != null) {
+			setMvccVersion(mvccVersion);
+		}
+
 		Long releaseId = (Long)attributes.get("releaseId");
 
 		if (releaseId != null) {
@@ -139,6 +146,26 @@ public class ReleaseWrapper implements Release, ModelWrapper<Release> {
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_release.setPrimaryKey(primaryKey);
+	}
+
+	/**
+	* Returns the mvcc version of this release.
+	*
+	* @return the mvcc version of this release
+	*/
+	@Override
+	public long getMvccVersion() {
+		return _release.getMvccVersion();
+	}
+
+	/**
+	* Sets the mvcc version of this release.
+	*
+	* @param mvccVersion the mvcc version of this release
+	*/
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		_release.setMvccVersion(mvccVersion);
 	}
 
 	/**
@@ -430,8 +457,7 @@ public class ReleaseWrapper implements Release, ModelWrapper<Release> {
 	}
 
 	@Override
-	public void persist()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public void persist() {
 		_release.persist();
 	}
 

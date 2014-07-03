@@ -1,5 +1,6 @@
 @import "compass";
 @import "compass/css3/user-interface";
+@import "mixins";
 
 .portlet-staging-bar {
 	button.history {
@@ -24,7 +25,7 @@
 		}
 	}
 
-	.row-fluid .layout-revision-info {
+	.row .layout-revision-info {
 		float: right;
 		line-height: 16px;
 		padding-left: 5px;
@@ -85,9 +86,18 @@
 		[class^="icon-"] {
 			margin-left: 10px;
 		}
+
+		@include respond-to(phone, tablet) {
+			a.taglib-icon {
+				&, &:active, &:focus, &:hover {
+					padding-left: 5px;
+					padding-right: 5px;
+				}
+			}
+		}
 	}
 
-	.layout-revision-details.alert-error {
+	.layout-revision-details.alert-danger {
 		float: right;
 		margin: 10px 5px 0;
 		padding: 0 5px;
@@ -145,13 +155,19 @@
 		&.branching-enabled {
 			bottom: 5px;
 			position: absolute;
+
+			@include respond-to(phone, tablet) {
+				bottom: inherit;
+				display: inline-block;
+				position: static;
+			}
 		}
 
 		.publish-link {
 			@include ellipsis;
 
-			padding: 5px;
 			max-width: 95%;
+			padding: 5px;
 
 			em {
 				display: inline-block;

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,7 +20,8 @@ import com.liferay.portal.model.LayoutRevision;
 /**
  * @author Raymond Augé
  */
-public class LayoutRevisionIdComparator extends OrderByComparator {
+public class LayoutRevisionIdComparator
+	extends OrderByComparator<LayoutRevision> {
 
 	public static final String ORDER_BY_ASC =
 		"LayoutRevision.layoutRevisionId ASC";
@@ -39,9 +40,8 @@ public class LayoutRevisionIdComparator extends OrderByComparator {
 	}
 
 	@Override
-	public int compare(Object obj1, Object obj2) {
-		LayoutRevision layoutRevision1 = (LayoutRevision)obj1;
-		LayoutRevision layoutRevision2 = (LayoutRevision)obj2;
+	public int compare(
+		LayoutRevision layoutRevision1, LayoutRevision layoutRevision2) {
 
 		int value = 0;
 

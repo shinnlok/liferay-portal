@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -35,15 +35,17 @@ public class JSONWebServiceActionsManagerUtil {
 	}
 
 	public static JSONWebServiceAction getJSONWebServiceAction(
-		HttpServletRequest request) {
+			HttpServletRequest request)
+		throws NoSuchJSONWebServiceException {
 
 		return getJSONWebServiceActionsManager().getJSONWebServiceAction(
 			request);
 	}
 
 	public static JSONWebServiceAction getJSONWebServiceAction(
-		HttpServletRequest request, String path, String method,
-		Map<String, Object> parameterMap) {
+			HttpServletRequest request, String path, String method,
+			Map<String, Object> parameterMap)
+		throws NoSuchJSONWebServiceException {
 
 		return getJSONWebServiceActionsManager().getJSONWebServiceAction(
 			request, path, method, parameterMap);
@@ -75,6 +77,10 @@ public class JSONWebServiceActionsManagerUtil {
 		getJSONWebServiceActionsManager() {
 
 		return _jsonWebServiceActionsManager;
+	}
+
+	public static JSONWebServiceNaming getJSONWebServiceNaming() {
+		return getJSONWebServiceActionsManager().getJSONWebServiceNaming();
 	}
 
 	public static void registerJSONWebServiceAction(

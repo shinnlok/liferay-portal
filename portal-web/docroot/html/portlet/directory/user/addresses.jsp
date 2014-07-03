@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -39,7 +39,7 @@ for (int i = 0; i < organizations.size(); i++) {
 %>
 
 <c:if test="<%= !personalAddresses.isEmpty() || !organizationAddresses.isEmpty() %>">
-	<h3><liferay-ui:message key="address" /></h3>
+	<h3 class="icon-home"><liferay-ui:message key="address" /></h3>
 
 	<c:if test="<%= !organizationAddresses.isEmpty() %>">
 		<div>
@@ -48,19 +48,13 @@ for (int i = 0; i < organizations.size(); i++) {
 			<ul class="property-list">
 
 			<%
-			for (Address address: organizationAddresses) {
-				String street1 = address.getStreet1();
-				String street2 = address.getStreet2();
-				String street3 = address.getStreet3();
-
-				String zipCode = address.getZip();
-				String city = address.getCity();
-
-				String mailingName = LanguageUtil.get(pageContext, address.getType().getName());
+			for (Address address : organizationAddresses) {
 			%>
 
-				<li class="<%= address.isPrimary() ? "primary" : "" %>">
-					<%@ include file="/html/portlet/directory/user/addresses_address.jspf" %>
+				<li class="<%= address.isPrimary() ? "icon-star" : StringPool.BLANK %>">
+					<%@ include file="/html/portlet/directory/common/addresses_address_init.jspf" %>
+
+					<%@ include file="/html/portlet/directory/common/addresses_address.jspf" %>
 				</li>
 
 			<%
@@ -77,25 +71,19 @@ for (int i = 0; i < organizations.size(); i++) {
 
 			<ul class="property-list">
 
-			<%
-			for (Address address: personalAddresses) {
-				String street1 = address.getStreet1();
-				String street2 = address.getStreet2();
-				String street3 = address.getStreet3();
+				<%
+				for (Address address : personalAddresses) {
+				%>
 
-				String zipCode = address.getZip();
-				String city = address.getCity();
+					<li class="<%= (address.isPrimary() && !personalAddresses.isEmpty()) ? "icon-star" : StringPool.BLANK %>">
+						<%@ include file="/html/portlet/directory/common/addresses_address_init.jspf" %>
 
-				String mailingName = LanguageUtil.get(pageContext, address.getType().getName());
-			%>
+						<%@ include file="/html/portlet/directory/common/addresses_address.jspf" %>
+					</li>
 
-				<li class="<%= address.isPrimary() ? "primary" : "" %>">
-					<%@ include file="/html/portlet/directory/user/addresses_address.jspf" %>
-				</li>
-
-			<%
-			}
-			%>
+				<%
+				}
+				%>
 
 			</ul>
 		</div>

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,6 +23,9 @@ import com.liferay.portlet.wiki.model.WikiNode;
 
 import java.util.Locale;
 
+import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
+
 /**
  * @author Eudaldo Alonso
  */
@@ -45,6 +48,11 @@ public class WikiNodeTrashRenderer extends BaseTrashRenderer {
 	}
 
 	@Override
+	public String getIconCssClass() {
+		return "icon-copy";
+	}
+
+	@Override
 	public String getIconPath(ThemeDisplay themeDisplay) {
 		return themeDisplay.getPathThemeImages() + "/common/all_pages.png";
 	}
@@ -55,7 +63,9 @@ public class WikiNodeTrashRenderer extends BaseTrashRenderer {
 	}
 
 	@Override
-	public String getSummary(Locale locale) {
+	public String getSummary(
+		PortletRequest portletRequest, PortletResponse portletResponse) {
+
 		return HtmlUtil.stripHtml(_node.getDescription());
 	}
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,14 +15,16 @@
 package com.liferay.portlet.backgroundtask.util.comparator;
 
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.model.BackgroundTask;
 
 /**
  * @author Eduardo Garcia
  */
 public class BackgroundTaskComparatorFactoryUtil {
 
-	public static OrderByComparator getBackgroundTaskOrderByComparator(
-		String orderByCol, String orderByType) {
+	public static OrderByComparator<BackgroundTask>
+		getBackgroundTaskOrderByComparator(
+			String orderByCol, String orderByType) {
 
 		boolean orderByAsc = false;
 
@@ -30,7 +32,7 @@ public class BackgroundTaskComparatorFactoryUtil {
 			orderByAsc = true;
 		}
 
-		OrderByComparator orderByComparator = null;
+		OrderByComparator<BackgroundTask> orderByComparator = null;
 
 		if (orderByCol.equals("completion-date")) {
 			orderByComparator = new BackgroundTaskCompletionDateComparator(

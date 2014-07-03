@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -52,6 +52,7 @@ public class AddressWrapper implements Address, ModelWrapper<Address> {
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
+		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("uuid", getUuid());
 		attributes.put("addressId", getAddressId());
 		attributes.put("companyId", getCompanyId());
@@ -77,6 +78,12 @@ public class AddressWrapper implements Address, ModelWrapper<Address> {
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
+		Long mvccVersion = (Long)attributes.get("mvccVersion");
+
+		if (mvccVersion != null) {
+			setMvccVersion(mvccVersion);
+		}
+
 		String uuid = (String)attributes.get("uuid");
 
 		if (uuid != null) {
@@ -213,6 +220,26 @@ public class AddressWrapper implements Address, ModelWrapper<Address> {
 	}
 
 	/**
+	* Returns the mvcc version of this address.
+	*
+	* @return the mvcc version of this address
+	*/
+	@Override
+	public long getMvccVersion() {
+		return _address.getMvccVersion();
+	}
+
+	/**
+	* Sets the mvcc version of this address.
+	*
+	* @param mvccVersion the mvcc version of this address
+	*/
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		_address.setMvccVersion(mvccVersion);
+	}
+
+	/**
 	* Returns the uuid of this address.
 	*
 	* @return the uuid of this address
@@ -296,11 +323,9 @@ public class AddressWrapper implements Address, ModelWrapper<Address> {
 	* Returns the user uuid of this address.
 	*
 	* @return the user uuid of this address
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
-	public java.lang.String getUserUuid()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.lang.String getUserUuid() {
 		return _address.getUserUuid();
 	}
 
@@ -748,8 +773,7 @@ public class AddressWrapper implements Address, ModelWrapper<Address> {
 	}
 
 	@Override
-	public void persist()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public void persist() {
 		_address.persist();
 	}
 

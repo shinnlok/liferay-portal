@@ -5,6 +5,7 @@ import ${packagePath}.model.${entity.name};
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
+import com.liferay.portal.model.MVCCModel;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -12,6 +13,7 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 import java.util.Date;
+import java.util.Map;
 
 /**
  * The cache model class for representing ${entity.name} in entity cache.
@@ -20,7 +22,24 @@ import java.util.Date;
  * @see ${entity.name}
  * @generated
  */
-public class ${entity.name}CacheModel implements CacheModel<${entity.name}>, Externalizable {
+public class ${entity.name}CacheModel implements CacheModel<${entity.name}>, Externalizable
+	<#if entity.isMvccEnabled()>
+		, MVCCModel
+	</#if>
+
+	{
+
+	<#if entity.isMvccEnabled()>
+		@Override
+		public long getMvccVersion() {
+			return mvccVersion;
+		}
+
+		@Override
+		public void setMvccVersion(long mvccVersion) {
+			this.mvccVersion = mvccVersion;
+		}
+	</#if>
 
 	@Override
 	public String toString() {

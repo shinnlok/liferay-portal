@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE service-builder PUBLIC "-//Liferay//DTD Service Builder 7.0.0//EN" "http://www.liferay.com/dtd/liferay-service-builder_7_0_0.dtd">
 
-<service-builder package-path="com.liferay.portlet.dynamicdatamapping">
+<service-builder package-path="com.liferay.portlet.dynamicdatamapping" auto-import-default-references="false">
 	<namespace>DDM</namespace>
 	<entity name="DDMContent" uuid="true" local-service="true" remote-service="false">
 
@@ -35,6 +35,10 @@
 		<finder name="CompanyId" return-type="Collection">
 			<finder-column name="companyId" />
 		</finder>
+
+		<!-- References -->
+
+		<reference package-path="com.liferay.portal" entity="User" />
 	</entity>
 	<entity name="DDMStorageLink" uuid="true" local-service="true" remote-service="false">
 
@@ -82,13 +86,14 @@
 		<column name="structureKey" type="String" />
 		<column name="name" type="String" localized="true" />
 		<column name="description" type="String" localized="true" />
-		<column name="xsd" type="String" />
+		<column name="definition" type="String" />
 		<column name="storageType" type="String" />
 		<column name="type" type="int" />
 
 		<!-- Relationships -->
 
 		<column name="dlFileEntryTypes" type="Collection" entity="com.liferay.portlet.documentlibrary.DLFileEntryType" mapping-table="DLFileEntryTypes_DDMStructures" />
+		<column name="journalFolders" type="Collection" entity="com.liferay.portlet.journal.JournalFolder" mapping-table="JournalFolders_DDMStructures" />
 
 		<!-- Finder methods -->
 
@@ -129,9 +134,15 @@
 
 		<!-- References -->
 
+		<reference package-path="com.liferay.portal" entity="ClassName" />
 		<reference package-path="com.liferay.portal" entity="Group" />
+		<reference package-path="com.liferay.portal" entity="Resource" />
 		<reference package-path="com.liferay.portal" entity="SystemEvent" />
+		<reference package-path="com.liferay.portal" entity="User" />
 		<reference package-path="com.liferay.portlet.documentlibrary" entity="DLFileEntryType" />
+		<reference package-path="com.liferay.portlet.dynamicdatamapping" entity="DDMStructureLink" />
+		<reference package-path="com.liferay.portlet.dynamicdatamapping" entity="DDMTemplate" />
+		<reference package-path="com.liferay.portlet.journal" entity="JournalFolder" />
 	</entity>
 	<entity name="DDMStructureLink" local-service="true" remote-service="false">
 
@@ -220,7 +231,7 @@
 			<finder-column name="classPK" />
 		</finder>
 		<finder name="G_C_C" return-type="Collection">
-			<finder-column name="groupId" />
+			<finder-column name="groupId" arrayable-operator="OR" />
 			<finder-column name="classNameId" />
 			<finder-column name="classPK" />
 		</finder>
@@ -250,9 +261,13 @@
 
 		<!-- References -->
 
+		<reference package-path="com.liferay.portal" entity="ClassName" />
 		<reference package-path="com.liferay.portal" entity="Group" />
 		<reference package-path="com.liferay.portal" entity="Image" />
+		<reference package-path="com.liferay.portal" entity="Resource" />
 		<reference package-path="com.liferay.portal" entity="SystemEvent" />
+		<reference package-path="com.liferay.portal" entity="User" />
+		<reference package-path="com.liferay.portlet.dynamicdatamapping" entity="DDMStructure" />
 	</entity>
 	<exceptions>
 		<exception>Content</exception>
@@ -263,11 +278,11 @@
 		<exception>Storage</exception>
 		<exception>StorageFieldName</exception>
 		<exception>StorageFieldRequired</exception>
+		<exception>StructureDefinition</exception>
 		<exception>StructureDuplicateElement</exception>
 		<exception>StructureDuplicateStructureKey</exception>
 		<exception>StructureField</exception>
 		<exception>StructureName</exception>
-		<exception>StructureXsd</exception>
 		<exception>TemplateDuplicateTemplateKey</exception>
 		<exception>TemplateName</exception>
 		<exception>TemplateScript</exception>

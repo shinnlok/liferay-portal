@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -50,6 +50,7 @@ public class GroupWrapper implements Group, ModelWrapper<Group> {
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
+		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("uuid", getUuid());
 		attributes.put("groupId", getGroupId());
 		attributes.put("companyId", getCompanyId());
@@ -75,6 +76,12 @@ public class GroupWrapper implements Group, ModelWrapper<Group> {
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
+		Long mvccVersion = (Long)attributes.get("mvccVersion");
+
+		if (mvccVersion != null) {
+			setMvccVersion(mvccVersion);
+		}
+
 		String uuid = (String)attributes.get("uuid");
 
 		if (uuid != null) {
@@ -213,6 +220,26 @@ public class GroupWrapper implements Group, ModelWrapper<Group> {
 	}
 
 	/**
+	* Returns the mvcc version of this group.
+	*
+	* @return the mvcc version of this group
+	*/
+	@Override
+	public long getMvccVersion() {
+		return _group.getMvccVersion();
+	}
+
+	/**
+	* Sets the mvcc version of this group.
+	*
+	* @param mvccVersion the mvcc version of this group
+	*/
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		_group.setMvccVersion(mvccVersion);
+	}
+
+	/**
 	* Returns the uuid of this group.
 	*
 	* @return the uuid of this group
@@ -296,11 +323,9 @@ public class GroupWrapper implements Group, ModelWrapper<Group> {
 	* Returns the creator user uuid of this group.
 	*
 	* @return the creator user uuid of this group
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
-	public java.lang.String getCreatorUserUuid()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.lang.String getCreatorUserUuid() {
 		return _group.getCreatorUserUuid();
 	}
 
@@ -758,21 +783,18 @@ public class GroupWrapper implements Group, ModelWrapper<Group> {
 	}
 
 	@Override
-	public void persist()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public void persist() {
 		_group.persist();
 	}
 
 	@Override
 	public java.lang.String buildTreePath()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _group.buildTreePath();
 	}
 
 	@Override
-	public void updateTreePath(java.lang.String treePath)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public void updateTreePath(java.lang.String treePath) {
 		_group.updateTreePath(treePath);
 	}
 
@@ -783,28 +805,36 @@ public class GroupWrapper implements Group, ModelWrapper<Group> {
 
 	@Override
 	public java.util.List<com.liferay.portal.model.Group> getAncestors()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _group.getAncestors();
 	}
 
 	@Override
 	public java.util.List<com.liferay.portal.model.Group> getChildren(
-		boolean site)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		boolean site) {
 		return _group.getChildren(site);
 	}
 
+	/**
+	* @deprecated As of 7.0.0, replaced by {@link
+	#getChildrenWithLayouts(boolean, int, int, OrderByComparator}
+	*/
+	@Deprecated
 	@Override
 	public java.util.List<com.liferay.portal.model.Group> getChildrenWithLayouts(
-		boolean site, int start, int end)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		boolean site, int start, int end) {
 		return _group.getChildrenWithLayouts(site, start, end);
 	}
 
 	@Override
-	public int getChildrenWithLayoutsCount(boolean site)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.util.List<com.liferay.portal.model.Group> getChildrenWithLayouts(
+		boolean site, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.model.Group> obc) {
+		return _group.getChildrenWithLayouts(site, start, end, obc);
+	}
+
+	@Override
+	public int getChildrenWithLayoutsCount(boolean site) {
 		return _group.getChildrenWithLayoutsCount(site);
 	}
 
@@ -819,17 +849,26 @@ public class GroupWrapper implements Group, ModelWrapper<Group> {
 	}
 
 	@Override
+	public java.util.List<com.liferay.portal.model.Group> getDescendants(
+		boolean site) {
+		return _group.getDescendants(site);
+	}
+
+	@Override
 	public java.lang.String getDescriptiveName()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _group.getDescriptiveName();
 	}
 
 	@Override
 	public java.lang.String getDescriptiveName(java.util.Locale locale)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _group.getDescriptiveName(locale);
+	}
+
+	@Override
+	public java.lang.String getIconCssClass() {
+		return _group.getIconCssClass();
 	}
 
 	@Override
@@ -862,8 +901,7 @@ public class GroupWrapper implements Group, ModelWrapper<Group> {
 
 	@Override
 	public com.liferay.portal.model.Group getParentGroup()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _group.getParentGroup();
 	}
 
@@ -899,10 +937,14 @@ public class GroupWrapper implements Group, ModelWrapper<Group> {
 	}
 
 	@Override
+	public long getRemoteLiveGroupId() {
+		return _group.getRemoteLiveGroupId();
+	}
+
+	@Override
 	public java.lang.String getScopeDescriptiveName(
 		com.liferay.portal.theme.ThemeDisplay themeDisplay)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _group.getScopeDescriptiveName(themeDisplay);
 	}
 
@@ -933,6 +975,12 @@ public class GroupWrapper implements Group, ModelWrapper<Group> {
 	}
 
 	@Override
+	public java.lang.String getUnambiguousName(java.lang.String name,
+		java.util.Locale locale) {
+		return _group.getUnambiguousName(name, locale);
+	}
+
+	@Override
 	public boolean hasAncestor(long groupId) {
 		return _group.hasAncestor(groupId);
 	}
@@ -950,6 +998,11 @@ public class GroupWrapper implements Group, ModelWrapper<Group> {
 	@Override
 	public boolean hasPublicLayouts() {
 		return _group.hasPublicLayouts();
+	}
+
+	@Override
+	public boolean hasRemoteStagingGroup() {
+		return _group.hasRemoteStagingGroup();
 	}
 
 	@Override
@@ -1039,8 +1092,7 @@ public class GroupWrapper implements Group, ModelWrapper<Group> {
 	public boolean isShowSite(
 		com.liferay.portal.security.permission.PermissionChecker permissionChecker,
 		boolean privateSite)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _group.isShowSite(permissionChecker, privateSite);
 	}
 

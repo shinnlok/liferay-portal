@@ -115,6 +115,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>NOTIFICATION_MENU_NONE_MESSAGE</td>
+	<td>//div[contains(@class,'user-notification')]//li[@class='message']/a</td>
+	<td></td>
+</tr>
+<tr>
 	<td>NOTIFICATION_MENU_ENTRY</td>
 	<td>//div[contains(@class,'user-notification')]</td>
 	<td></td>
@@ -131,7 +136,7 @@
 </tr>
 <tr>
 	<td>NOTIFICATION_MENU_ENTRY_SUBCONTENT</td>
-	<td>//div[contains(@class,'user-notification')]//div[@class='body']</td>
+	<td>//div[contains(@class,'user-notification')]//div[@class='body']/div[@class='body']</td>
 	<td></td>
 </tr>
 <tr>
@@ -147,6 +152,11 @@
 <tr>
 	<td>NOTIFICATION_MENU_VIEW_ALL</td>
 	<td>//a[contains(text(),'View All Notifications')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>NOTIFICATION_MENU_MARK_ALL_AS_READ</td>
+	<td>//a[contains(text(),'Mark All as Read')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -177,12 +187,12 @@
 </tr>
 <tr>
 	<td>GO_TO_SITE_NAME</td>
-	<td>//li[contains(@class,'social-office-enabled')]//span[contains(.,'${key_siteName}')]</td>
+	<td>//ul[@class='site-list']//span[contains(.,'${key_siteName}')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>GO_TO_SITE_NAME_LINK</td>
-	<td>//li[contains(@class,'social-office-enabled')]/span[contains(.,'${key_siteName}')]/a</td>
+	<td>//ul[@class='site-list']//span/a[.='${key_siteName}']</td>
 	<td></td>
 </tr>
 <tr>
@@ -193,6 +203,11 @@
 <tr>
 	<td>GO_TO_UNFAVORITE_SITE_ICON</td>
 	<td>//li[contains(@class,'social-office-enabled')]/span[@class='action unfavorite']/a</td>
+	<td></td>
+</tr>
+<tr>
+	<td>GO_TO_VIEW_ALL</td>
+	<td>//li[@class='more']/a</td>
 	<td></td>
 </tr>
 <tr>

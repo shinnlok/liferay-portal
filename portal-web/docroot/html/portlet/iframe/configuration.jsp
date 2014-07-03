@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,8 +17,6 @@
 <%@ include file="/html/portlet/iframe/init.jsp" %>
 
 <%
-String redirect = ParamUtil.getString(request, "redirect");
-
 String htmlAttributes =
 	"alt=" + alt + "\n" +
 	"border=" + border + "\n" +
@@ -31,11 +29,13 @@ String htmlAttributes =
 	"vspace=" + vspace + "\n";
 %>
 
-<liferay-portlet:actionURL portletConfiguration="true" var="configurationURL" />
+<liferay-portlet:actionURL portletConfiguration="true" var="configurationActionURL" />
 
-<aui:form action="<%= configurationURL %>" method="post" name="fm">
+<liferay-portlet:renderURL portletConfiguration="true" var="configurationRenderURL" />
+
+<aui:form action="<%= configurationActionURL %>" method="post" name="fm">
 	<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.UPDATE %>" />
-	<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
+	<aui:input name="redirect" type="hidden" value="<%= configurationRenderURL %>" />
 
 	<liferay-ui:panel-container extended="<%= true %>" id="iframeSettingsPanelContainer" persistState="<%= true %>">
 		<liferay-ui:panel collapsible="<%= true %>" extended="<%= true %>" id="iframeGeneralPanel" persistState="<%= true %>" title="general">
@@ -62,15 +62,15 @@ String htmlAttributes =
 						</c:choose>
 					</div>
 
-					<aui:select label="authentication-type" name="preferences--authType--">
-						<aui:option label="basic" selected='<%= authType.equals("basic") %>' />
-						<aui:option label="form" selected='<%= authType.equals("form") %>' />
+					<aui:select label="authentication-type" name="preferences--authType--" value="<%= authType %>">
+						<aui:option label="basic" />
+						<aui:option label="form" />
 					</aui:select>
 
 					<div id="<portlet:namespace />formAuthOptions">
-						<aui:select name="preferences--formMethod--">
-							<aui:option label="get" selected='<%= formMethod.equals("get") %>' />
-							<aui:option label="post" selected='<%= formMethod.equals("post") %>' />
+						<aui:select name="preferences--formMethod--" value="<%= formMethod %>">
+							<aui:option label="get" />
+							<aui:option label="post" />
 						</aui:select>
 
 						<aui:field-wrapper label="user-name">
@@ -140,8 +140,8 @@ String htmlAttributes =
 </aui:form>
 
 <aui:script>
-	Liferay.Util.toggleBoxes('<portlet:namespace />authCheckbox','<portlet:namespace />authenticationOptions');
-	Liferay.Util.toggleBoxes('<portlet:namespace />resizeAutomaticallyCheckbox','<portlet:namespace />displaySettings', true);
+	Liferay.Util.toggleBoxes('<portlet:namespace />auth','<portlet:namespace />authenticationOptions');
+	Liferay.Util.toggleBoxes('<portlet:namespace />resizeAutomatically','<portlet:namespace />displaySettings', true);
 	Liferay.Util.toggleSelectBox('<portlet:namespace />authType', 'form', '<portlet:namespace />formAuthOptions');
 	Liferay.Util.toggleSelectBox('<portlet:namespace />authType', 'basic', '<portlet:namespace />basicAuthOptions');
 </aui:script>

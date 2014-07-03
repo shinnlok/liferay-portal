@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -96,10 +96,20 @@ portletURL.setParameter("eventName", eventName);
 					Map<String, Object> data = new HashMap<String, Object>();
 
 					data.put("usergroupid", userGroup.getUserGroupId());
-					data.put("usergroupname", HtmlUtil.escape(userGroup.getName()));
+					data.put("usergroupname", userGroup.getName());
+
+					boolean disabled = false;
+
+					for (long curUserGroupId : selUser.getUserGroupIds()) {
+						if (curUserGroupId == userGroup.getUserGroupId()) {
+							disabled = true;
+
+							break;
+						}
+					}
 					%>
 
-					<aui:button cssClass="selector-button" data="<%= data %>" value="choose" />
+					<aui:button cssClass="selector-button" data="<%= data %>" disabled="<%= disabled %>" value="choose" />
 				</c:if>
 			</liferay-ui:search-container-column-text>
 		</liferay-ui:search-container-row>
@@ -111,15 +121,14 @@ portletURL.setParameter("eventName", eventName);
 <aui:script use="aui-base">
 	var Util = Liferay.Util;
 
-	A.one('#<portlet:namespace />selectUserGroupFm').delegate(
-		'click',
-		function(event) {
-			var result = Util.getAttributes(event.currentTarget, 'data-');
+	var openingLiferay = Util.getOpener().Liferay;
 
-			Util.getOpener().Liferay.fire('<%= HtmlUtil.escapeJS(eventName) %>', result);
-
-			Util.getWindow().hide();
-		},
-		'.selector-button'
+	openingLiferay.fire(
+		'<portlet:namespace />enableRemovedUserGroups',
+		{
+			selectors: A.all('.selector-button:disabled')
+		}
 	);
+
+	Util.selectEntityHandler('#<portlet:namespace />selectUserGroupFm', '<%= HtmlUtil.escapeJS(eventName) %>');
 </aui:script>

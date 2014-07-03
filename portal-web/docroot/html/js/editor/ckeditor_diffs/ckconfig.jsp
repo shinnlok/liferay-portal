@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -27,181 +27,212 @@
 
 <%
 String contentsLanguageId = ParamUtil.getString(request, "contentsLanguageId");
+
+Locale contentsLocale = LocaleUtil.fromLanguageId(contentsLanguageId);
+
+contentsLanguageId = LocaleUtil.toLanguageId(contentsLocale);
+
+String colorSchemeCssClass = ParamUtil.getString(request, "colorSchemeCssClass");
 String cssPath = ParamUtil.getString(request, "cssPath");
 String cssClasses = ParamUtil.getString(request, "cssClasses");
 boolean inlineEdit = ParamUtil.getBoolean(request, "inlineEdit");
+
 String languageId = ParamUtil.getString(request, "languageId");
+
+Locale locale = LocaleUtil.fromLanguageId(languageId);
+
+languageId = LocaleUtil.toLanguageId(locale);
+
+String name = ParamUtil.getString(request, "name");
 boolean resizable = ParamUtil.getBoolean(request, "resizable");
 
 response.setContentType(ContentTypes.TEXT_JAVASCRIPT);
 %>
 
-if (!CKEDITOR.stylesSet.get('liferayStyles')) {
-	CKEDITOR.addStylesSet(
-		'liferayStyles',
-		[
+;window['<%= HtmlUtil.escapeJS(name) %>Config'] = function() {
+	var ckEditor = CKEDITOR.instances['<%= HtmlUtil.escapeJS(name) %>'];
 
-		// Block Styles
+	if (!CKEDITOR.stylesSet.get('liferayStyles')) {
+		CKEDITOR.addStylesSet(
+			'liferayStyles',
+			[
 
-		{name: 'Normal', element: 'p'},
-		{name: 'Heading 1', element: 'h1'},
-		{name: 'Heading 2', element: 'h2'},
-		{name: 'Heading 3', element: 'h3'},
-		{name: 'Heading 4', element: 'h4'},
+			// Block Styles
 
-		// Special classes
+			{name: 'Normal', element: 'p'},
+			{name: 'Heading 1', element: 'h1'},
+			{name: 'Heading 2', element: 'h2'},
+			{name: 'Heading 3', element: 'h3'},
+			{name: 'Heading 4', element: 'h4'},
 
-		{name: 'Preformatted Text', element:'pre'},
-		{name: 'Cited Work', element:'cite'},
-		{name: 'Computer Code', element:'code'},
+			// Special classes
 
-		// Custom styles
+			{name: 'Preformatted Text', element:'pre'},
+			{name: 'Cited Work', element:'cite'},
+			{name: 'Computer Code', element:'code'},
 
-		{name: 'Info Message', element: 'div', attributes: {'class': 'portlet-msg-info'}},
-		{name: 'Alert Message', element: 'div', attributes: {'class': 'portlet-msg-alert'}},
-		{name: 'Error Message', element: 'div', attributes: {'class': 'portlet-msg-error'}}
-		]
-	);
-}
+			// Custom styles
 
-CKEDITOR.config.autoParagraph = false;
+			{name: 'Info Message', element: 'div', attributes: {'class': 'portlet-msg-info'}},
+			{name: 'Alert Message', element: 'div', attributes: {'class': 'portlet-msg-alert'}},
+			{name: 'Error Message', element: 'div', attributes: {'class': 'portlet-msg-error'}}
+			]
+		);
+	}
 
-CKEDITOR.config.autoSaveTimeout = 3000;
+	var config = ckEditor.config;
 
-CKEDITOR.config.bodyClass = 'html-editor <%= HtmlUtil.escapeJS(cssClasses) %>';
+	config.allowedContent = true;
 
-CKEDITOR.config.closeNoticeTimeout = 8000;
+	config.autoParagraph = false;
 
-CKEDITOR.config.contentsCss = '<%= HtmlUtil.escapeJS(cssPath) %>/main.css';
+	config.autoSaveTimeout = 3000;
 
-<%
-Locale contentsLocale = LocaleUtil.fromLanguageId(contentsLanguageId);
+	config.bodyClass = 'html-editor <%= HtmlUtil.escapeJS(colorSchemeCssClass) %> <%= HtmlUtil.escapeJS(cssClasses) %>';
 
-String contentsLanguageDir = LanguageUtil.get(contentsLocale, "lang.dir");
-%>
+	config.closeNoticeTimeout = 8000;
 
-CKEDITOR.config.contentsLangDirection = '<%= HtmlUtil.escapeJS(contentsLanguageDir) %>';
+	config.contentsCss = ['<%= HtmlUtil.escapeJS(cssPath) %>/aui.css', '<%= HtmlUtil.escapeJS(cssPath) %>/main.css'];
 
-CKEDITOR.config.contentsLanguage = '<%= HtmlUtil.escapeJS(contentsLanguageId.replace("iw_", "he_")) %>';
+	<%
+	String contentsLanguageDir = LanguageUtil.get(contentsLocale, "lang.dir");
+	%>
 
-CKEDITOR.config.entities = false;
+	config.contentsLangDirection = '<%= HtmlUtil.escapeJS(contentsLanguageDir) %>';
 
-CKEDITOR.config.extraPlugins = 'ajaxsave,media,restore,scayt,wsc';
+	config.contentsLanguage = '<%= contentsLanguageId.replace("iw_", "he_") %>';
 
-CKEDITOR.config.height = 265;
+	config.entities = false;
 
-CKEDITOR.config.language = '<%= HtmlUtil.escapeJS(languageId.replace("iw_", "he_")) %>';
-
-CKEDITOR.config.resize_enabled = <%= resizable %>;
-
-<c:if test="<%= resizable %>">
-	CKEDITOR.config.resize_dir = 'vertical';
-</c:if>
-
-CKEDITOR.config.stylesCombo_stylesSet = 'liferayStyles';
-
-CKEDITOR.config.toolbar_editInPlace = [
-	['Styles'],
-	['Bold', 'Italic', 'Underline', 'Strike'],
-	['Subscript', 'Superscript', 'SpecialChar'],
-	['Undo', 'Redo'],
-	['SpellChecker', 'Scayt'],
-	['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent'], ['Source', 'RemoveFormat'],
-];
-
-CKEDITOR.config.toolbar_email = [
-	['FontSize', 'TextColor', 'BGColor', '-', 'Bold', 'Italic', 'Underline', 'Strike'],
-	['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'],
-	['SpellChecker', 'Scayt'],
-	'/',
-	['Undo', 'Redo', '-', 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'SelectAll', 'RemoveFormat'],
-	['Source'],
-	['Link', 'Unlink'],
-	['Image']
-];
-
-CKEDITOR.config.toolbar_liferay = [
-	['Bold', 'Italic', 'Underline', 'Strike'],
+	config.extraPlugins = 'lfrpopup,media,scayt,wsc';
 
 	<c:if test="<%= inlineEdit %>">
-		['AjaxSave', '-', 'Restore'],
+		config.extraPlugins += ',ajaxsave,restore';
 	</c:if>
 
-	['Undo', 'Redo', '-', 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', ],
-	['Styles', 'FontSize', '-', 'TextColor', 'BGColor'],
-	'/',
-	['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent'],
-	['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'],
-	['Image', 'Link', 'Unlink', 'Anchor'],
-	['Flash', <c:if test="<%= XugglerUtil.isEnabled() %>"> 'Audio', 'Video',</c:if> 'Table', '-', 'Smiley', 'SpecialChar'],
-	['Find', 'Replace', 'SpellChecker', 'Scayt'],
-	['SelectAll', 'RemoveFormat'],
-	['Subscript', 'Superscript']
+	config.filebrowserWindowFeatures = 'title=<%= LanguageUtil.get(locale, "browse") %>';
 
-	<c:if test="<%= !inlineEdit %>">
-		,['Source']
+	config.height = 265;
+
+	config.language = '<%= languageId.replace("iw_", "he_") %>';
+
+	config.pasteFromWordRemoveFontStyles = false;
+
+	config.pasteFromWordRemoveStyles = false;
+
+	config.resize_enabled = <%= resizable %>;
+
+	<c:if test="<%= resizable %>">
+		config.resize_dir = 'vertical';
 	</c:if>
-];
 
-CKEDITOR.config.toolbar_liferayArticle = [
-	['Styles', 'FontSize', '-', 'TextColor', 'BGColor'],
-	['Bold', 'Italic', 'Underline', 'Strike'],
-	['Subscript', 'Superscript'],
-	'/',
-	['Undo', 'Redo', '-', 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'SelectAll', 'RemoveFormat'],
-	['Find', 'Replace', 'SpellChecker', 'Scayt'],
-	['NumberedList','BulletedList','-','Outdent','Indent','Blockquote'],
-	['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'],
-	'/',
-	['Source'],
-	['Link', 'Unlink', 'Anchor'],
-	['Image', 'Flash', <c:if test="<%= XugglerUtil.isEnabled() %>">'Audio', 'Video',</c:if> 'Table', '-', 'Smiley', 'SpecialChar', 'LiferayPageBreak']
-];
+	config.stylesCombo_stylesSet = 'liferayStyles';
 
-CKEDITOR.config.toolbar_phone = [
-	['Bold', 'Italic', 'Underline'],
-	['NumberedList', 'BulletedList'],
-	['Image', 'Link', 'Unlink']
-];
+	config.toolbar_editInPlace = [
+		['Styles'],
+		['Bold', 'Italic', 'Underline', 'Strike'],
+		['Subscript', 'Superscript', 'SpecialChar'],
+		['Undo', 'Redo'],
+		['SpellChecker', 'Scayt'],
+		['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent'], ['Source', 'RemoveFormat']
+	];
 
-CKEDITOR.config.toolbar_simple = [
-	['Bold', 'Italic', 'Underline', 'Strike'],
-	['NumberedList', 'BulletedList'],
-	['Image', 'Link', 'Unlink', 'Table']
-];
+	config.toolbar_email = [
+		['FontSize', 'TextColor', 'BGColor', '-', 'Bold', 'Italic', 'Underline', 'Strike'],
+		['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'],
+		['SpellChecker', 'Scayt'],
+		'/',
+		['Undo', 'Redo', '-', 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'SelectAll', 'RemoveFormat'],
+		['Source'],
+		['Link', 'Unlink'],
+		['Image']
+	];
 
-CKEDITOR.config.toolbar_tablet = [
-	['Bold', 'Italic', 'Underline', 'Strike'],
-	['NumberedList', 'BulletedList'],
-	['Image', 'Link', 'Unlink'],
-	['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'],
-	['Styles', 'FontSize']
-];
+	config.toolbar_liferay = [
+		['Bold', 'Italic', 'Underline', 'Strike'],
 
-CKEDITOR.on(
-	'dialogDefinition',
-	function(event) {
-		var dialogDefinition = event.data.definition;
+		<c:if test="<%= inlineEdit %>">
+			['AjaxSave', '-', 'Restore'],
+		</c:if>
 
-		var onShow = dialogDefinition.onShow;
+		['Undo', 'Redo', '-', 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord' ],
+		['Styles', 'FontSize', '-', 'TextColor', 'BGColor'],
+		'/',
+		['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent'],
+		['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'],
+		['Image', 'Link', 'Unlink', 'Anchor'],
+		['Flash', <c:if test="<%= XugglerUtil.isEnabled() %>"> 'Audio', 'Video',</c:if> 'Table', '-', 'Smiley', 'SpecialChar'],
+		['Find', 'Replace', 'SpellChecker', 'Scayt'],
+		['SelectAll', 'RemoveFormat'],
+		['Subscript', 'Superscript']
 
-		dialogDefinition.onShow = function() {
-			if (typeof onShow === 'function') {
-				onShow.apply(this, arguments);
-			}
+		<c:if test="<%= !inlineEdit %>">
+			,['Source']
+		</c:if>
+	];
 
-			if (window.top != window.self) {
-				var editorElement = this.getParentEditor().container;
+	config.toolbar_liferayArticle = [
+		['Styles', 'FontSize', '-', 'TextColor', 'BGColor'],
+		['Bold', 'Italic', 'Underline', 'Strike'],
+		['Subscript', 'Superscript'],
+		'/',
+		['Undo', 'Redo', '-', 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'SelectAll', 'RemoveFormat'],
+		['Find', 'Replace', 'SpellChecker', 'Scayt'],
+		['NumberedList','BulletedList','-','Outdent','Indent','Blockquote'],
+		['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'],
+		'/',
+		['Source'],
+		['Link', 'Unlink', 'Anchor'],
+		['Image', 'Flash', <c:if test="<%= XugglerUtil.isEnabled() %>">'Audio', 'Video',</c:if> 'Table', '-', 'Smiley', 'SpecialChar', 'LiferayPageBreak']
+	];
 
-				var documentPosition = editorElement.getDocumentPosition();
+	config.toolbar_phone = [
+		['Bold', 'Italic', 'Underline'],
+		['NumberedList', 'BulletedList'],
+		['Image', 'Link', 'Unlink']
+	];
 
-				var dialogSize = this.getSize();
+	config.toolbar_simple = [
+		['Bold', 'Italic', 'Underline', 'Strike'],
+		['NumberedList', 'BulletedList'],
+		['Image', 'Link', 'Unlink', 'Table']
+	];
 
-				var x = documentPosition.x + ((editorElement.getSize('width', true) - dialogSize.width) / 2);
-				var y = documentPosition.y + ((editorElement.getSize('height', true) - dialogSize.height) / 2);
+	config.toolbar_tablet = [
+		['Bold', 'Italic', 'Underline', 'Strike'],
+		['NumberedList', 'BulletedList'],
+		['Image', 'Link', 'Unlink'],
+		['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'],
+		['Styles', 'FontSize']
+	];
 
-				this.move(x, y, false);
+	ckEditor.on(
+		'dialogDefinition',
+		function(event) {
+			var dialogDefinition = event.data.definition;
+
+			var onShow = dialogDefinition.onShow;
+
+			dialogDefinition.onShow = function() {
+				if (typeof onShow === 'function') {
+					onShow.apply(this, arguments);
+				}
+
+				if (window.top != window.self) {
+					var editorElement = this.getParentEditor().container;
+
+					var documentPosition = editorElement.getDocumentPosition();
+
+					var dialogSize = this.getSize();
+
+					var x = documentPosition.x + ((editorElement.getSize('width', true) - dialogSize.width) / 2);
+					var y = documentPosition.y + ((editorElement.getSize('height', true) - dialogSize.height) / 2);
+
+					this.move(x, y, false);
+				}
 			}
 		}
-	}
-);
+	);
+};
+
+window['<%= HtmlUtil.escapeJS(name) %>Config']();

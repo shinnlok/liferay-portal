@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -30,7 +30,6 @@ String format = "html";
 	editorImpl="<%= EDITOR_WYSIWYG_IMPL_KEY %>"
 	fileBrowserParams="<%= fileBrowserParams %>"
 	name="content"
-	resizable="<%= false %>"
 	width="100%"
 />
 
@@ -38,7 +37,7 @@ String format = "html";
 
 <aui:script>
 	function <portlet:namespace />initEditor() {
-		return "<%= UnicodeFormatter.toString(content) %>";
+		return '<%= UnicodeFormatter.toString(content) %>';
 	}
 </aui:script>
 

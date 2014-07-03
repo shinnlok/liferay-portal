@@ -14,6 +14,11 @@
 	<td>PGDynamicdatalists</td>
 </tr>
 <tr>
+	<td>EXTEND_ACTION_PATH</td>
+	<td>BasePortlet</td>
+	<td></td>
+</tr>
+<tr>
 	<td></td>
 	<td></td>
 	<td></td>
@@ -25,7 +30,7 @@
 </tr>
 <tr>
 	<td>ADD_RECORD_BUTTON</td>
-	<td>//section[contains(@id,'portlet_169_')]//span[contains(.,'Add')]</td>
+	<td>//section[contains(@id,'portlet_169_')]//a[@role='menuitem']/span[contains(.,'Add')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -35,12 +40,17 @@
 </tr>
 <tr>
 	<td>HEADER_TITLE</td>
-	<td>//h3[@class='header-title']</td>
+	<td>//h3[@class='header-title']/span</td>
 	<td></td>
 </tr>
 <tr>
 	<td>INFO_MESSAGE</td>
 	<td>//div[contains(@class,'alert') and contains(@class,'alert-info')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SPREADSHEET_CONTAINER</td>
+	<td>//div[@class='lfr-spreadsheet-container']</td>
 	<td></td>
 </tr>
 <tr>
@@ -118,7 +128,12 @@
 </tr>
 <tr>
 	<td>RECORD_TABLE_ACTIONS_1</td>
-	<td>xpath=(//div/a[@title='Actions'])[1]</td>
+	<td>xpath=//td[contains(@class,'entry-action last')]/div/a/i[contains(@class,'menu-arrow caret')][1]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>RECORD_TABLE_GUEST_VIEW_LINK</td>
+	<td>//a[contains(.,'View')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -138,13 +153,18 @@
 	<td></td>
 </tr>
 <tr>
+	<td>TOOLBAR_EDIT_FORM_TEMPLATE</td>
+	<td>//span[contains(@class,'lfr-icon-action-edit-template')]/a[contains(.,'Edit Form Template')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>TOOLBAR_SELECT_LIST</td>
-	<td>//span[contains(@class,'lfr-icon-action-configuration')]/a[contains(.,'Select List')]</td>
+	<td>//span[contains(@class,'lfr-icon-action')]/a[contains(.,'Select List')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>TOOLBAR_ADD_LIST</td>
-	<td>//span[contains(@class,'lfr-icon-action-add')]/a[contains(.,'Add List')]</td>
+	<td>//span[contains(@class,'lfr-icon-action')]/a[contains(.,'Add List')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -166,6 +186,27 @@
 <tr>
 	<td>RECORD_MENULIST_DELETE</td>
 	<td>//a[@role='menuitem' and contains(.,'Delete')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+<!--SPREADSHEET_EDIT_CONTROLS-->
+<tr>
+	<td>SPREADSHEET_EDIT_CONTROLS_ADD_ROWS_BUTTON</td>
+	<td>//button[contains(.,'Add')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SPREADSHEET_EDIT_CONTROLS_ADD_ROWS_SELECT_MENULIST</td>
+	<td>//label[contains(.,'More rows at bottom.')]/../select</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
 	<td></td>
 </tr>
 </tbody>

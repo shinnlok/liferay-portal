@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,7 +32,7 @@ for (int displayActivityCounterNameIndex : displayActivityCounterNameIndexes) {
 
 	List<SocialActivityCounter> activityCounters = null;
 
-	String title = LanguageUtil.get(pageContext, "site-statistics") + StringPool.SPACE;
+	String title = LanguageUtil.get(request, "site-statistics") + StringPool.SPACE;
 
 	int dataSize = 0;
 	int displayHeight = 80;
@@ -45,7 +45,7 @@ for (int displayActivityCounterNameIndex : displayActivityCounterNameIndexes) {
 			assetTags = AssetTagLocalServiceUtil.getSocialActivityCounterOffsetTags(scopeGroupId, displayActivityCounterName, -12, 0);
 		}
 
-		title = title + LanguageUtil.format(pageContext, "tag-cloud-for-x", new Object[] {LanguageUtil.get(pageContext, "group.statistics.title." + displayActivityCounterName)});
+		title = title + LanguageUtil.format(request, "tag-cloud-for-x", LanguageUtil.get(request, "group.statistics.title." + displayActivityCounterName), false);
 
 		dataSize = assetTags.size();
 	}
@@ -71,7 +71,7 @@ for (int displayActivityCounterNameIndex : displayActivityCounterNameIndexes) {
 
 		dataSize = activityCounters.size();
 
-		title = title + LanguageUtil.get(pageContext, "group.statistics.title." + displayActivityCounterName);
+		title = title + LanguageUtil.get(request, "group.statistics.title." + displayActivityCounterName);
 	}
 
 	if (dataSize == 0) {
@@ -81,7 +81,7 @@ for (int displayActivityCounterNameIndex : displayActivityCounterNameIndexes) {
 
 	<div class="group-statistics-container">
 		<liferay-ui:panel collapsible="<%= true %>" extended="<%= true %>" id='<%= "groupStatisticsPanel" + displayActivityCounterNameIndex %>' persistState="<%= true %>" title="<%= title %>">
-			<div class="group-statistics-body chart-<%= chartType %>" style="min-height: <%= displayHeight %>px;">
+			<div class="group-statistics-body chart-<%= HtmlUtil.escapeAttribute(chartType) %>" style="min-height: <%= displayHeight %>px;">
 				<c:choose>
 					<c:when test="<%= dataSize > 0 %>">
 						<c:choose>

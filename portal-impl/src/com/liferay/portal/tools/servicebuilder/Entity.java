@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -49,6 +49,16 @@ public class Entity {
 				return entity.getName();
 			}
 
+			@Override
+			public Class<String> getAttributeClass() {
+				return String.class;
+			}
+
+			@Override
+			public Class<Entity> getTypeClass() {
+				return Entity.class;
+			}
+
 		};
 
 	public static EntityColumn getColumn(
@@ -89,7 +99,7 @@ public class Entity {
 		this(
 			null, null, null, name, null, null, null, false, false, false, true,
 			null, null, null, null, null, true, false, false, false, false,
-			null, null, null, null, null, null, null, null, null);
+			false, null, null, null, null, null, null, null, null, null, null);
 	}
 
 	public Entity(
@@ -98,12 +108,13 @@ public class Entity {
 		boolean uuidAccessor, boolean localService, boolean remoteService,
 		String persistenceClass, String finderClass, String dataSource,
 		String sessionFactory, String txManager, boolean cacheEnabled,
-		boolean dynamicUpdateEnabled, boolean jsonEnabled, boolean trashEnabled,
-		boolean deprecated, List<EntityColumn> pkList,
+		boolean dynamicUpdateEnabled, boolean jsonEnabled, boolean mvccEnabled,
+		boolean trashEnabled, boolean deprecated, List<EntityColumn> pkList,
 		List<EntityColumn> regularColList, List<EntityColumn> blobList,
 		List<EntityColumn> collectionList, List<EntityColumn> columnList,
 		EntityOrder order, List<EntityFinder> finderList,
-		List<Entity> referenceList, List<String> txRequiredList) {
+		List<Entity> referenceList, List<String> unresolvedReferenceList,
+		List<String> txRequiredList) {
 
 		_packagePath = packagePath;
 		_portletName = portletName;
@@ -126,6 +137,7 @@ public class Entity {
 		_cacheEnabled = cacheEnabled;
 		_dynamicUpdateEnabled = dynamicUpdateEnabled;
 		_jsonEnabled = jsonEnabled;
+		_mvccEnabled = mvccEnabled;
 		_trashEnabled = trashEnabled;
 		_deprecated = deprecated;
 		_pkList = pkList;
@@ -136,6 +148,7 @@ public class Entity {
 		_order = order;
 		_finderList = finderList;
 		_referenceList = referenceList;
+		_unresolvedReferenceList = unresolvedReferenceList;
 		_txRequiredList = txRequiredList;
 
 		if (_finderList != null) {
@@ -172,6 +185,10 @@ public class Entity {
 				}
 			}
 		}
+	}
+
+	public void addReference(Entity reference) {
+		_referenceList.add(reference);
 	}
 
 	@Override
@@ -429,6 +446,14 @@ public class Entity {
 		return finderList;
 	}
 
+	public List<String> getUnresolvedReferenceList() {
+		if (_unresolvedReferenceList == null) {
+			return new ArrayList<String>();
+		}
+
+		return _unresolvedReferenceList;
+	}
+
 	public String getVarName() {
 		return TextFormatter.format(_name, TextFormatter.I);
 	}
@@ -471,7 +496,7 @@ public class Entity {
 	}
 
 	public boolean hasColumns() {
-		if ((_columnList == null) || (_columnList.size() == 0)) {
+		if (ListUtil.isEmpty(_columnList)) {
 			return false;
 		}
 		else {
@@ -523,16 +548,6 @@ public class Entity {
 
 		for (EntityColumn col : _blobList) {
 			if (col.isLazy()) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	public boolean hasLocalizedColumn() {
-		for (EntityColumn col : _columnList) {
-			if (col.isLocalized()) {
 				return true;
 			}
 		}
@@ -685,6 +700,20 @@ public class Entity {
 		return _jsonEnabled;
 	}
 
+	public boolean isLocalizedModel() {
+		for (EntityColumn col : _columnList) {
+			if (col.isLocalized()) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	public boolean isMvccEnabled() {
+		return _mvccEnabled;
+	}
+
 	public boolean isOrdered() {
 		if (_order != null) {
 			return true;
@@ -732,6 +761,16 @@ public class Entity {
 
 	public boolean isPortalReference() {
 		return _portalReference;
+	}
+
+	public boolean isResolved() {
+		if ((_unresolvedReferenceList != null) &&
+			_unresolvedReferenceList.isEmpty()) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	public boolean isResourcedModel() {
@@ -819,6 +858,10 @@ public class Entity {
 		_portalReference = portalReference;
 	}
 
+	public void setResolved() {
+		_unresolvedReferenceList = null;
+	}
+
 	public void setTransients(List<String> transients) {
 		_transients = transients;
 	}
@@ -847,6 +890,7 @@ public class Entity {
 	private String _humanName;
 	private boolean _jsonEnabled;
 	private boolean _localService;
+	private boolean _mvccEnabled;
 	private String _name;
 	private EntityOrder _order;
 	private String _packagePath;
@@ -865,6 +909,7 @@ public class Entity {
 	private boolean _trashEnabled;
 	private String _txManager;
 	private List<String> _txRequiredList;
+	private List<String> _unresolvedReferenceList;
 	private boolean _uuid;
 	private boolean _uuidAccessor;
 

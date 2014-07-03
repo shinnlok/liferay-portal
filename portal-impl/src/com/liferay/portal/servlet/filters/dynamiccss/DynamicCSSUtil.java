@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,20 +14,19 @@
 
 package com.liferay.portal.servlet.filters.dynamiccss;
 
-import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
-import com.liferay.portal.kernel.io.unsync.UnsyncPrintWriter;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.ContextPathUtil;
+import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.ServerDetector;
 import com.liferay.portal.kernel.util.SessionParamUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnsyncPrintWriterPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.PortletConstants;
@@ -46,8 +45,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -55,6 +52,12 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.time.StopWatch;
+
+import org.jruby.RubyArray;
+import org.jruby.RubyException;
+import org.jruby.embed.ScriptingContainer;
+import org.jruby.exceptions.RaiseException;
+import org.jruby.runtime.builtin.IRubyObject;
 
 /**
  * @author Raymond Augé
@@ -64,10 +67,16 @@ public class DynamicCSSUtil {
 
 	public static void init() {
 		try {
-			_rubyScript = StringUtil.read(
+			RubyExecutor rubyExecutor = new RubyExecutor();
+
+			_scriptingContainer = rubyExecutor.getScriptingContainer();
+
+			String rubyScript = StringUtil.read(
 				ClassLoaderUtil.getPortalClassLoader(),
 				"com/liferay/portal/servlet/filters/dynamiccss" +
 					"/dependencies/main.rb");
+
+			_scriptObject = _scriptingContainer.runScriptlet(rubyScript);
 
 			RTLCSSUtil.init();
 		}
@@ -85,13 +94,9 @@ public class DynamicCSSUtil {
 			return content;
 		}
 
-		StopWatch stopWatch = null;
+		StopWatch stopWatch = new StopWatch();
 
-		if (_log.isDebugEnabled()) {
-			stopWatch = new StopWatch();
-
-			stopWatch.start();
-		}
+		stopWatch.start();
 
 		// Request will only be null when called by StripFilterTest
 
@@ -112,6 +117,12 @@ public class DynamicCSSUtil {
 
 				if (_log.isWarnEnabled()) {
 					_log.warn("No theme found for " + currentURL);
+				}
+
+				if (PortalUtil.isRightToLeft(request) &&
+					!RTLCSSUtil.isExcludedPath(resourcePath)) {
+
+					content = RTLCSSUtil.getRtlCss(content);
 				}
 
 				return content;
@@ -139,9 +150,10 @@ public class DynamicCSSUtil {
 			cacheResourceURLConnection = cacheResourceURL.openConnection();
 		}
 
-		if (themeCssFastLoad && (cacheResourceURLConnection != null) &&
+		if ((themeCssFastLoad || !content.contains(_CSS_IMPORT_BEGIN)) &&
+			(cacheResourceURLConnection != null) &&
 			(resourceURLConnection != null) &&
-			(cacheResourceURLConnection.getLastModified() ==
+			(cacheResourceURLConnection.getLastModified() >=
 				resourceURLConnection.getLastModified())) {
 
 			parsedContent = StringUtil.read(
@@ -162,13 +174,19 @@ public class DynamicCSSUtil {
 				content = propagateQueryString(content, queryString);
 			}
 
-			parsedContent = _parseSass(
-				servletContext, request, themeDisplay, theme, resourcePath,
-				content);
+			if (!themeCssFastLoad && _isImportsOnly(content)) {
+				parsedContent = content;
+			}
+			else {
+				parsedContent = _parseSass(
+					servletContext, request, themeDisplay, theme, resourcePath,
+					content);
+			}
 
-			if (PortalUtil.isRightToLeft(request)) {
-				parsedContent = RTLCSSUtil.getRtlCss(
-					resourcePath, parsedContent);
+			if (PortalUtil.isRightToLeft(request) &&
+				!RTLCSSUtil.isExcludedPath(resourcePath)) {
+
+				parsedContent = RTLCSSUtil.getRtlCss(parsedContent);
 
 				// Append custom CSS for RTL
 
@@ -236,7 +254,9 @@ public class DynamicCSSUtil {
 
 		String suffix = StringPool.BLANK;
 
-		if (PortalUtil.isRightToLeft(request)) {
+		if (PortalUtil.isRightToLeft(request) &&
+			!RTLCSSUtil.isExcludedPath(resourcePath)) {
+
 			suffix = "_rtl";
 		}
 
@@ -384,6 +404,39 @@ public class DynamicCSSUtil {
 		return themeImagesPath;
 	}
 
+	private static boolean _isImportsOnly(String content) {
+		int pos = 0;
+
+		while (true) {
+			int importX = content.indexOf(_CSS_IMPORT_BEGIN, pos);
+			int importY = content.indexOf(
+				_CSS_IMPORT_END, importX + _CSS_IMPORT_BEGIN.length());
+
+			if ((importX == -1) || (importY == -1)) {
+				String substring = content.substring(pos);
+
+				substring = substring.trim();
+
+				if (substring.isEmpty()) {
+					return true;
+				}
+				else {
+					return false;
+				}
+			}
+
+			String substring = content.substring(pos, importX);
+
+			substring = substring.trim();
+
+			if (!substring.isEmpty()) {
+				return false;
+			}
+
+			pos = importY + _CSS_IMPORT_END.length();
+		}
+	}
+
 	private static boolean _isThemeCssFastLoad(
 		HttpServletRequest request, ThemeDisplay themeDisplay) {
 
@@ -401,41 +454,69 @@ public class DynamicCSSUtil {
 			String content)
 		throws Exception {
 
-		Map<String, Object> inputObjects = new HashMap<String, Object>();
-
 		String portalWebDir = PortalUtil.getPortalWebDir();
 
-		inputObjects.put(
-			"commonSassPath", portalWebDir.concat(_SASS_COMMON_DIR));
+		String commonSassPath = portalWebDir.concat(_SASS_COMMON_DIR);
+		String cssThemePath = _getCssThemePath(
+			servletContext, request, themeDisplay, theme);
 
-		inputObjects.put("content", content);
-		inputObjects.put("cssRealPath", resourcePath);
-		inputObjects.put(
-			"cssThemePath",
-			_getCssThemePath(servletContext, request, themeDisplay, theme));
+		if (ServerDetector.isWebLogic() && !FileUtil.exists(commonSassPath)) {
+			int pos = cssThemePath.indexOf("autodeploy/");
+
+			if (pos == -1) {
+				if (_log.isWarnEnabled()) {
+					_log.warn("Dynamic CSS compilation may not work");
+				}
+			}
+			else {
+				commonSassPath =
+					cssThemePath.substring(0, pos + 11) + "ROOT/" +
+						_SASS_COMMON_DIR;
+			}
+		}
 
 		File sassTempDir = _getSassTempDir(servletContext);
 
-		inputObjects.put("sassCachePath", sassTempDir.getCanonicalPath());
+		Object[] arguments = new Object[] {
+			content, commonSassPath, resourcePath, cssThemePath,
+			sassTempDir.getCanonicalPath(), _log.isDebugEnabled()
+		};
 
-		UnsyncByteArrayOutputStream unsyncByteArrayOutputStream =
-			new UnsyncByteArrayOutputStream();
+		try {
+			content = _scriptingContainer.callMethod(
+				_scriptObject, "process", arguments, String.class);
+		}
+		catch (Exception e) {
+			if (e instanceof RaiseException) {
+				RaiseException raiseException = (RaiseException)e;
 
-		UnsyncPrintWriter unsyncPrintWriter = UnsyncPrintWriterPool.borrow(
-			unsyncByteArrayOutputStream);
+				RubyException rubyException = raiseException.getException();
 
-		inputObjects.put("out", unsyncPrintWriter);
+				_log.error(
+					String.valueOf(rubyException.message.toJava(String.class)));
 
-		_rubyExecutor.eval(null, inputObjects, null, _rubyScript);
+				IRubyObject iRubyObject = rubyException.getBacktrace();
 
-		unsyncPrintWriter.flush();
+				RubyArray rubyArray = (RubyArray)iRubyObject.toJava(
+					RubyArray.class);
 
-		return unsyncByteArrayOutputStream.toString();
+				for (int i = 0; i < rubyArray.size(); i++) {
+					Object object = rubyArray.get(i);
+
+					_log.error(String.valueOf(object));
+				}
+			}
+			else {
+				_log.error(e, e);
+			}
+		}
+
+		return content;
 	}
 
 	/**
 	 * @see com.liferay.portal.servlet.filters.aggregate.AggregateFilter#aggregateCss(
-	 *      AggregateContext, String)
+	 *      com.liferay.portal.servlet.filters.aggregate.ServletPaths, String)
 	 */
 	private static String propagateQueryString(
 		String content, String queryString) {
@@ -483,7 +564,7 @@ public class DynamicCSSUtil {
 		"\\/([^\\/]+)-theme\\/", Pattern.CASE_INSENSITIVE);
 	private static Pattern _portalThemePattern = Pattern.compile(
 		"themes\\/([^\\/]+)\\/css", Pattern.CASE_INSENSITIVE);
-	private static RubyExecutor _rubyExecutor = new RubyExecutor();
-	private static String _rubyScript;
+	private static ScriptingContainer _scriptingContainer;
+	private static Object _scriptObject;
 
 }

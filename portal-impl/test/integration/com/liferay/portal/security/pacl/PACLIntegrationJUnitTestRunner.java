@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,9 @@
 
 package com.liferay.portal.security.pacl;
 
+import com.liferay.portal.deploy.hot.IndexerPostProcessorRegistry;
+import com.liferay.portal.deploy.hot.SchedulerEntryRegistry;
+import com.liferay.portal.deploy.hot.ServiceWrapperRegistry;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.service.ServiceTestUtil;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
@@ -67,6 +70,10 @@ public class PACLIntegrationJUnitTestRunner
 		ServiceTestUtil.initServices();
 		ServiceTestUtil.initPermissions();
 
+		new IndexerPostProcessorRegistry();
+		new SchedulerEntryRegistry();
+		new ServiceWrapperRegistry();
+
 		_initialized = true;
 	}
 
@@ -94,7 +101,7 @@ public class PACLIntegrationJUnitTestRunner
 	private static final String _PACKAGE_PATH =
 		"com.liferay.portal.security.pacl.test.";
 
-	private static boolean _initialized = false;
+	private static boolean _initialized;
 
 	private static class PACLClassLoader extends URLClassLoader {
 

@@ -39,6 +39,26 @@
 	<td></td>
 </tr>
 <tr>
+	<td>ASSIGNED_TO_ME_COLLAPSED</td>
+	<td>//div[@class='panel-heading toggler-header toggler-header-collapsed']//span[contains(.,'Assigned to Me')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ASSIGNED_TO_ME_EXPANDED</td>
+	<td>//div[@class='panel-heading toggler-header toggler-header-expanded']//span[contains(.,'Assigned to Me')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ASSIGNED_TO_MY_ROLES_COLLAPSED</td>
+	<td>//div[@class='panel-heading toggler-header toggler-header-collapsed']//span[contains(.,'Assigned to My Roles')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ASSIGNED_TO_MY_ROLES_EXPANDED</td>
+	<td>//div[@class='panel-heading toggler-header toggler-header-expanded']//span[contains(.,'Assigned to My Roles')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td></td>
 	<td></td>
 	<td></td>
@@ -206,30 +226,72 @@
 	<td></td>
 	<td></td>
 </tr>
-<!--PANEL-->
+<!--DIALOG_BOX-->
 <tr>
-	<td>PANEL_DUE_DATE</td>
-	<td>//input[@id='_153_dueDate']</td>
+	<td>DIALOG_BOX_DUE_DATE</td>
+	<td>//input[contains(@id,'_153_') and contains(@id,'_dueDate')]</td>
 	<td></td>
 </tr>
 <tr>
-	<td>PANEL_DUE_DATE_TIME</td>
-	<td>//input[@id='_153_dueDateTime']</td>
+	<td>DIALOG_BOX_DUE_DATE_TIME</td>
+	<td>//input[contains(@id,'_153_') and contains(@id,'_dueDateTime')]</td>
 	<td></td>
 </tr>
 <tr>
-	<td>PANEL_COMMENT_FIELD</td>
+	<td>DIALOG_BOX_COMMENT_FIELD</td>
 	<td>//textarea[@id='_153_comment']</td>
 	<td></td>
 </tr>
 <tr>
-	<td>PANEL_OK_BUTTON</td>
+	<td>DIALOG_BOX_OK_BUTTON</td>
 	<td>//button[.='OK']</td>
 	<td></td>
 </tr>
 <tr>
-	<td>PANEL_CANCEL_BUTTON</td>
+	<td>DIALOG_BOX_CANCEL_BUTTON</td>
 	<td>//button[.='Cancel']</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+<!--PREVIEW-->
+<tr>
+	<td>PREVIEW_ACTIVITY</td>
+	<td>//div[@class='panel-toggle' and contains(.,'Activities')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PREVIEW_ACTIVITY_ENTRY</td>
+	<td>//div[@class='panel-inner']/div/div[contains(.,'${key_workflowActivityComment}')]</td>
+	<td></td>
+</tr>
+<!--COMPLETED_TABLE-->
+<tr>
+	<td>COMPLETED_TABLE_TASK</td>
+	<td>//tr[contains(.,'${key_workflowAssetTitle}')]/td/a</td>
+	<td></td>
+</tr>
+<tr>
+	<td>COMPLETED_TABLE_ASSET_TITLE</td>
+	<td>//tr[contains(.,'${key_workflowAssetTitle}')]/td[2]/a</td>
+	<td></td>
+</tr>
+<tr>
+	<td>COMPLETED_TABLE_ASSET_TYPE</td>
+	<td>//tr[contains(.,'${key_workflowAssetTitle}')]/td[3]/a</td>
+	<td></td>
+</tr>
+<tr>
+	<td>COMPLETED_TABLE_LAST_ACTIVITY_DATE</td>
+	<td>//tr[contains(.,'${key_workflowAssetTitle}')]/td[4]/a</td>
+	<td></td>
+</tr>
+<tr>
+	<td>COMPLETED_TABLE_DUE_DATE</td>
+	<td>//tr[contains(.,'${key_workflowAssetTitle}')]/td[5]/a</td>
 	<td></td>
 </tr>
 </tbody>

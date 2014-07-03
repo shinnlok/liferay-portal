@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -29,7 +29,7 @@ public class SeleniumBuilderTest {
 
 	@Before
 	public void setUp() throws Exception {
-		_seleniumBuilderFileUtil = new SeleniumBuilderFileUtil(".");
+		_seleniumBuilderFileUtil = new SeleniumBuilderFileUtil(".", ".");
 	}
 
 	@Test
@@ -57,7 +57,7 @@ public class SeleniumBuilderTest {
 	public void testActionCaseElement1004_1() throws Exception {
 		test(
 			"ActionCaseElement1004_1.action",
-			"Error 1004: Missing (locator1|locator-key1) attribute in " +
+			"Error 1004: Missing (locator1|locator-key1|value1) attribute in " +
 				_DIR_NAME + "/ActionCaseElement1004_1.action:3");
 	}
 
@@ -65,7 +65,7 @@ public class SeleniumBuilderTest {
 	public void testActionCaseElement1004_2() throws Exception {
 		test(
 			"ActionCaseElement1004_2.action",
-			"Error 1004: Missing (locator1|locator-key1) attribute in " +
+			"Error 1004: Missing (locator1|locator-key1|value1) attribute in " +
 				_DIR_NAME + "/ActionCaseElement1004_2.action:3");
 	}
 
@@ -122,7 +122,7 @@ public class SeleniumBuilderTest {
 		test(
 			"ActionCaseElement2000.action",
 			"Error 2000: Too many child elements in the case element in " +
-				_DIR_NAME + "/ActionCaseElement2000.action:5");
+				_DIR_NAME + "/ActionCaseElement2000.action:6");
 	}
 
 	@Test
@@ -177,8 +177,8 @@ public class SeleniumBuilderTest {
 	public void testActionDefaultElement1001() throws Exception {
 		test(
 			"ActionDefaultElement1001.action",
-			"Error 1001: Missing (execute) child element in " + _DIR_NAME +
-				"/ActionDefaultElement1001.action:3");
+			"Error 1001: Missing (description|execute) child element in " +
+				_DIR_NAME + "/ActionDefaultElement1001.action:3");
 	}
 
 	@Test
@@ -210,7 +210,7 @@ public class SeleniumBuilderTest {
 		test(
 			"ActionDefaultElement2000.action",
 			"Error 2000: Too many child elements in the default element in " +
-				_DIR_NAME + "/ActionDefaultElement2000.action:5");
+				_DIR_NAME + "/ActionDefaultElement2000.action:6");
 	}
 
 	@Test
@@ -731,8 +731,9 @@ public class SeleniumBuilderTest {
 	public void testMacroAndElement1001_2() throws Exception {
 		test(
 			"MacroAndElement1001_2.macro",
-			"Error 1001: Missing (echo|execute|fail|for|if|var|while) child " +
-				"element in " + _DIR_NAME + "/MacroAndElement1001_2.macro:8");
+			"Error 1001: Missing (description|echo|execute|fail|for|if|" +
+				"take-screenshot|var|while) child element in " + _DIR_NAME +
+					"/MacroAndElement1001_2.macro:8");
 	}
 
 	@Test
@@ -741,7 +742,7 @@ public class SeleniumBuilderTest {
 			"MacroAndElement1001_3.macro",
 			"Error 1001: Missing (and|condition|contains|equals|isset|not|or)" +
 				" child element in " + _DIR_NAME +
-				"/MacroAndElement1001_3.macro:4");
+					"/MacroAndElement1001_3.macro:4");
 	}
 
 	@Test
@@ -750,7 +751,7 @@ public class SeleniumBuilderTest {
 			"MacroAndElement1001_4.macro",
 			"Error 1001: Missing (and|condition|contains|equals|isset|not|or)" +
 				" child element in " + _DIR_NAME +
-				"/MacroAndElement1001_4.macro:4");
+					"/MacroAndElement1001_4.macro:4");
 	}
 
 	@Test
@@ -781,8 +782,9 @@ public class SeleniumBuilderTest {
 	public void testMacroCommandElement1001() throws Exception {
 		test(
 			"MacroCommandElement1001.macro",
-			"Error 1001: Missing (echo|execute|fail|for|if|var|while) child " +
-				"element in " + _DIR_NAME + "/MacroCommandElement1001.macro:2");
+			"Error 1001: Missing (description|echo|execute|fail|for|if|" +
+				"take-screenshot|var|while) child element in " + _DIR_NAME +
+					"/MacroCommandElement1001.macro:2");
 	}
 
 	@Test
@@ -1045,8 +1047,9 @@ public class SeleniumBuilderTest {
 	public void testMacroElseElement1001() throws Exception {
 		test(
 			"MacroElseElement1001.macro",
-			"Error 1001: Missing (echo|execute|fail|for|if|var|while) child " +
-				"element in " + _DIR_NAME + "/MacroElseElement1001.macro:8");
+			"Error 1001: Missing (description|echo|execute|fail|for|if|" +
+				"take-screenshot|var|while) child element in " + _DIR_NAME +
+					"/MacroElseElement1001.macro:8");
 	}
 
 	@Test
@@ -1297,7 +1300,7 @@ public class SeleniumBuilderTest {
 			"MacroIfElement1001_1.macro",
 			"Error 1001: Missing (and|condition|contains|equals|isset|not|or)" +
 				" child element in " + _DIR_NAME +
-					"/MacroIfElement1001_1.macro:3");
+				"/MacroIfElement1001_1.macro:3");
 	}
 
 	@Test
@@ -1314,7 +1317,7 @@ public class SeleniumBuilderTest {
 			"MacroIfElement1001_3.macro",
 			"Error 1001: Missing (and|condition|contains|equals|isset|not|or)" +
 				" child element in " + _DIR_NAME +
-					"/MacroIfElement1001_3.macro:3");
+				"/MacroIfElement1001_3.macro:3");
 	}
 
 	@Test
@@ -1377,8 +1380,9 @@ public class SeleniumBuilderTest {
 	public void testMacroNotElement1001_2() throws Exception {
 		test(
 			"MacroNotElement1001_2.macro",
-			"Error 1001: Missing (echo|execute|fail|for|if|var|while) child " +
-				"element in " + _DIR_NAME + "/MacroNotElement1001_2.macro:7");
+			"Error 1001: Missing (description|echo|execute|fail|for|if|" +
+				"take-screenshot|var|while) child element in " + _DIR_NAME +
+					"/MacroNotElement1001_2.macro:7");
 	}
 
 	@Test
@@ -1427,8 +1431,9 @@ public class SeleniumBuilderTest {
 	public void testMacroOrElement1001_2() throws Exception {
 		test(
 			"MacroOrElement1001_2.macro",
-			"Error 1001: Missing (echo|execute|fail|for|if|var|while) child " +
-				"element in " + _DIR_NAME + "/MacroOrElement1001_2.macro:8");
+			"Error 1001: Missing (description|echo|execute|fail|for|if|" +
+				"take-screenshot|var|while) child element in " + _DIR_NAME +
+					"/MacroOrElement1001_2.macro:8");
 	}
 
 	@Test
@@ -1502,8 +1507,9 @@ public class SeleniumBuilderTest {
 	public void testMacroThenElement1001() throws Exception {
 		test(
 			"MacroThenElement1001.macro",
-			"Error 1001: Missing (echo|execute|fail|for|if|var|while) child " +
-				"element in " + _DIR_NAME + "/MacroThenElement1001.macro:5");
+			"Error 1001: Missing (description|echo|execute|fail|for|if|" +
+				"take-screenshot|var|while) child element in " + _DIR_NAME +
+					"/MacroThenElement1001.macro:5");
 	}
 
 	@Test
@@ -1638,16 +1644,8 @@ public class SeleniumBuilderTest {
 	public void testMacroVarElement1006_4() throws Exception {
 		test(
 			"MacroVarElement1006_4.macro",
-			"Error 1006: Invalid value attribute value in " + _DIR_NAME +
-				"/MacroVarElement1006_4.macro:2");
-	}
-
-	@Test
-	public void testMacroVarElement1006_5() throws Exception {
-		test(
-			"MacroVarElement1006_5.macro",
 			"Error 1006: Invalid attribute attribute value in " + _DIR_NAME +
-				"/MacroVarElement1006_5.macro:2");
+				"/MacroVarElement1006_4.macro:2");
 	}
 
 	@Test
@@ -1811,10 +1809,9 @@ public class SeleniumBuilderTest {
 	public void testTestCaseActionComplexString1001() throws Exception {
 		test(
 			"TestCaseActionComplexString1001.testcase",
-			"Error 1001: Missing " +
-			"(echo|execute|fail|for|if|property|var|while) " +
-				"child element in " + _DIR_NAME +
-				"/TestCaseActionComplexString1001.testcase:2");
+			"Error 1001: Missing (description|echo|execute|fail|for|if|" +
+				"property|take-screenshot|var|while) child element in " +
+				_DIR_NAME + "/TestCaseActionComplexString1001.testcase:4");
 	}
 
 	@Test
@@ -1822,7 +1819,7 @@ public class SeleniumBuilderTest {
 		test(
 			"TestCaseActionComplexString1004.testcase",
 			"Error 1004: Missing (value) attribute in " +
-				_DIR_NAME + "/TestCaseActionComplexString1004.testcase:3");
+				_DIR_NAME + "/TestCaseActionComplexString1004.testcase:5");
 	}
 
 	@Test
@@ -1837,10 +1834,9 @@ public class SeleniumBuilderTest {
 	public void testTestCaseCommandElement1001() throws Exception {
 		test(
 			"TestCaseCommandElement1001.testcase",
-			"Error 1001: Missing " +
-			"(echo|execute|fail|for|if|property|var|while) " +
-				"child element in " + _DIR_NAME +
-				"/TestCaseCommandElement1001.testcase:2");
+			"Error 1001: Missing (description|echo|execute|fail|for|if|" +
+				"property|take-screenshot|var|while) child element in " +
+				_DIR_NAME + "/TestCaseCommandElement1001.testcase:4");
 	}
 
 	@Test
@@ -1848,7 +1844,7 @@ public class SeleniumBuilderTest {
 		test(
 			"TestCaseCommandElement1002_1.testcase",
 			"Error 1002: Invalid execute-fail element in " + _DIR_NAME +
-				"/TestCaseCommandElement1002_1.testcase:3");
+				"/TestCaseCommandElement1002_1.testcase:5");
 	}
 
 	@Test
@@ -1856,7 +1852,7 @@ public class SeleniumBuilderTest {
 		test(
 			"TestCaseCommandElement1003_1.testcase",
 			"Error 1003: Missing name attribute in " + _DIR_NAME +
-				"/TestCaseCommandElement1003_1.testcase:2");
+				"/TestCaseCommandElement1003_1.testcase:4");
 	}
 
 	@Test
@@ -1864,7 +1860,7 @@ public class SeleniumBuilderTest {
 		test(
 			"TestCaseCommandElement1003_2.testcase",
 			"Error 1003: Missing name attribute in " + _DIR_NAME +
-				"/TestCaseCommandElement1003_2.testcase:2");
+				"/TestCaseCommandElement1003_2.testcase:4");
 	}
 
 	@Test
@@ -1872,7 +1868,7 @@ public class SeleniumBuilderTest {
 		test(
 			"TestCaseCommandElement1003_3.testcase",
 			"Error 1003: Missing priority attribute in " + _DIR_NAME +
-				"/TestCaseCommandElement1003_3.testcase:2");
+				"/TestCaseCommandElement1003_3.testcase:4");
 	}
 
 	@Test
@@ -1880,7 +1876,7 @@ public class SeleniumBuilderTest {
 		test(
 			"TestCaseCommandElement1006_1.testcase",
 			"Error 1006: Invalid name attribute value in " + _DIR_NAME +
-				"/TestCaseCommandElement1006_1.testcase:2");
+				"/TestCaseCommandElement1006_1.testcase:4");
 	}
 
 	@Test
@@ -1888,7 +1884,7 @@ public class SeleniumBuilderTest {
 		test(
 			"TestCaseCommandElement1006_2.testcase",
 			"Error 1006: Invalid priority attribute value in " + _DIR_NAME +
-				"/TestCaseCommandElement1006_2.testcase:2");
+				"/TestCaseCommandElement1006_2.testcase:4");
 	}
 
 	@Test
@@ -1896,7 +1892,7 @@ public class SeleniumBuilderTest {
 		test(
 			"TestCaseCommandElement1006_3.testcase",
 			"Error 1006: Invalid priority attribute value in " + _DIR_NAME +
-				"/TestCaseCommandElement1006_3.testcase:2");
+				"/TestCaseCommandElement1006_3.testcase:4");
 	}
 
 	@Test
@@ -1928,7 +1924,7 @@ public class SeleniumBuilderTest {
 		test(
 			"TestCaseDefinitionElement1002.testcase",
 			"Error 1002: Invalid command-fail element in " + _DIR_NAME +
-				"/TestCaseDefinitionElement1002.testcase:2");
+				"/TestCaseDefinitionElement1002.testcase:4");
 	}
 
 	@Test
@@ -1952,7 +1948,7 @@ public class SeleniumBuilderTest {
 		test(
 			"TestCaseExecuteElement1002_1.testcase",
 			"Error 1002: Invalid fail element in " + _DIR_NAME +
-				"/TestCaseExecuteElement1002_1.testcase:4");
+				"/TestCaseExecuteElement1002_1.testcase:6");
 	}
 
 	@Test
@@ -1960,7 +1956,7 @@ public class SeleniumBuilderTest {
 		test(
 			"TestCaseExecuteElement1002_2.testcase",
 			"Error 1002: Invalid fail element in " + _DIR_NAME +
-				"/TestCaseExecuteElement1002_2.testcase:4");
+				"/TestCaseExecuteElement1002_2.testcase:6");
 	}
 
 	@Test
@@ -1968,7 +1964,7 @@ public class SeleniumBuilderTest {
 		test(
 			"TestCaseExecuteElement1004_1.testcase",
 			"Error 1004: Missing (action|macro|test-case) attribute in " +
-				_DIR_NAME + "/TestCaseExecuteElement1004_1.testcase:3");
+				_DIR_NAME + "/TestCaseExecuteElement1004_1.testcase:5");
 	}
 
 	@Test
@@ -1976,7 +1972,7 @@ public class SeleniumBuilderTest {
 		test(
 			"TestCaseExecuteElement1004_2.testcase",
 			"Error 1004: Missing (action|macro|test-case) attribute in " +
-				_DIR_NAME + "/TestCaseExecuteElement1004_2.testcase:3");
+				_DIR_NAME + "/TestCaseExecuteElement1004_2.testcase:5");
 	}
 
 	@Test
@@ -1984,7 +1980,7 @@ public class SeleniumBuilderTest {
 		test(
 			"TestCaseExecuteElement1004_3.testcase",
 			"Error 1004: Missing (action|macro|test-case) attribute in " +
-				_DIR_NAME + "/TestCaseExecuteElement1004_3.testcase:3");
+				_DIR_NAME + "/TestCaseExecuteElement1004_3.testcase:5");
 	}
 
 	@Test
@@ -1992,7 +1988,7 @@ public class SeleniumBuilderTest {
 		test(
 			"TestCaseExecuteElement1005_1.testcase",
 			"Error 1005: Invalid fail attribute in " + _DIR_NAME +
-				"/TestCaseExecuteElement1005_1.testcase:3");
+				"/TestCaseExecuteElement1005_1.testcase:5");
 	}
 
 	@Test
@@ -2000,7 +1996,7 @@ public class SeleniumBuilderTest {
 		test(
 			"TestCaseExecuteElement1005_2.testcase",
 			"Error 1005: Invalid locator attribute in " + _DIR_NAME +
-				"/TestCaseExecuteElement1005_2.testcase:3");
+				"/TestCaseExecuteElement1005_2.testcase:5");
 	}
 
 	@Test
@@ -2008,7 +2004,7 @@ public class SeleniumBuilderTest {
 		test(
 			"TestCaseExecuteElement1005_3.testcase",
 			"Error 1005: Invalid value attribute in " + _DIR_NAME +
-				"/TestCaseExecuteElement1005_3.testcase:3");
+				"/TestCaseExecuteElement1005_3.testcase:5");
 	}
 
 	@Test
@@ -2016,7 +2012,7 @@ public class SeleniumBuilderTest {
 		test(
 			"TestCaseExecuteElement1005_4.testcase",
 			"Error 1005: Invalid macro attribute in " + _DIR_NAME +
-				"/TestCaseExecuteElement1005_4.testcase:3");
+				"/TestCaseExecuteElement1005_4.testcase:5");
 	}
 
 	@Test
@@ -2024,7 +2020,7 @@ public class SeleniumBuilderTest {
 		test(
 			"TestCaseExecuteElement1005_5.testcase",
 			"Error 1005: Invalid fail attribute in " + _DIR_NAME +
-				"/TestCaseExecuteElement1005_5.testcase:3");
+				"/TestCaseExecuteElement1005_5.testcase:5");
 	}
 
 	@Test
@@ -2032,7 +2028,7 @@ public class SeleniumBuilderTest {
 		test(
 			"TestCaseExecuteElement1006_1.testcase",
 			"Error 1006: Invalid action attribute value in " + _DIR_NAME +
-				"/TestCaseExecuteElement1006_1.testcase:3");
+				"/TestCaseExecuteElement1006_1.testcase:5");
 	}
 
 	@Test
@@ -2040,7 +2036,7 @@ public class SeleniumBuilderTest {
 		test(
 			"TestCaseExecuteElement1006_2.testcase",
 			"Error 1006: Invalid macro attribute value in " + _DIR_NAME +
-				"/TestCaseExecuteElement1006_2.testcase:3");
+				"/TestCaseExecuteElement1006_2.testcase:5");
 	}
 
 	@Test
@@ -2052,12 +2048,42 @@ public class SeleniumBuilderTest {
 	}
 
 	@Test
+	public void testTestCasePropertyElementInvalidAttributeName()
+		throws Exception {
+
+		test(
+			"TestCasePropertyElementInvalidAttributeName_1.testcase",
+			"Error 1005: Invalid delimiter attribute in " + _DIR_NAME +
+				"/TestCasePropertyElementInvalidAttributeName_1.testcase:2");
+
+		test(
+			"TestCasePropertyElementInvalidAttributeName_2.testcase",
+			"Error 1005: Invalid test-case attribute in " + _DIR_NAME +
+				"/TestCasePropertyElementInvalidAttributeName_2.testcase:2");
+	}
+
+	@Test
+	public void testTestCasePropertyElementInvalidAttributeValue()
+		throws Exception {
+
+		test(
+			"TestCasePropertyElementInvalidAttributeValue_1.testcase",
+			"Error 1006: Invalid delimiter attribute value in " + _DIR_NAME +
+				"/TestCasePropertyElementInvalidAttributeValue_1.testcase:2");
+
+		test(
+			"TestCasePropertyElementInvalidAttributeValue_2.testcase",
+			"Error 1006: Invalid value attribute value in " + _DIR_NAME +
+				"/TestCasePropertyElementInvalidAttributeValue_2.testcase:2");
+	}
+
+	@Test
 	public void testTestCaseSetUpElement1001() throws Exception {
 		test(
 			"TestCaseSetUpElement1001.testcase",
-			"Error 1001: Missing (echo|execute|fail|if|var|while) child " +
-				"element in " + _DIR_NAME +
-				"/TestCaseSetUpElement1001.testcase:2");
+			"Error 1001: Missing (description|echo|execute|fail|if|" +
+				"take-screenshot|var|while) child element in " + _DIR_NAME +
+					"/TestCaseSetUpElement1001.testcase:4");
 	}
 
 	@Test
@@ -2065,7 +2091,7 @@ public class SeleniumBuilderTest {
 		test(
 			"TestCaseSetUpElement1005.testcase",
 			"Error 1005: Invalid name attribute in " + _DIR_NAME +
-				"/TestCaseSetUpElement1005.testcase:2");
+				"/TestCaseSetUpElement1005.testcase:4");
 	}
 
 	@Test
@@ -2073,7 +2099,7 @@ public class SeleniumBuilderTest {
 		test(
 			"TestCaseSetUpElement1006_1.testcase",
 			"Error 1006: Invalid test-case attribute value in " + _DIR_NAME +
-				"/TestCaseSetUpElement1006_1.testcase:3");
+				"/TestCaseSetUpElement1006_1.testcase:5");
 	}
 
 	@Test
@@ -2089,7 +2115,7 @@ public class SeleniumBuilderTest {
 		test(
 			"TestCaseSetUpElement1015_1.testcase",
 			"Error 1015: Poorly formed test case command super# at " +
-				_DIR_NAME + "/TestCaseSetUpElement1015_1.testcase:3");
+				_DIR_NAME + "/TestCaseSetUpElement1015_1.testcase:5");
 	}
 
 	@Test
@@ -2097,16 +2123,16 @@ public class SeleniumBuilderTest {
 		test(
 			"TestCaseSetUpElement1015_2.testcase",
 			"Error 1015: Poorly formed test case command fail#fail at " +
-				_DIR_NAME + "/TestCaseSetUpElement1015_2.testcase:3");
+				_DIR_NAME + "/TestCaseSetUpElement1015_2.testcase:5");
 	}
 
 	@Test
 	public void testTestCaseTearDownElement1001() throws Exception {
 		test(
 			"TestCaseTearDownElement1001.testcase",
-			"Error 1001: Missing (echo|execute|fail|if|var|while) child " +
-				"element in " + _DIR_NAME +
-				"/TestCaseTearDownElement1001.testcase:6");
+			"Error 1001: Missing (description|echo|execute|fail|if|" +
+				"take-screenshot|var|while) child element in " + _DIR_NAME +
+					"/TestCaseTearDownElement1001.testcase:8");
 	}
 
 	@Test
@@ -2114,7 +2140,7 @@ public class SeleniumBuilderTest {
 		test(
 			"TestCaseTearDownElement1005.testcase",
 			"Error 1005: Invalid name attribute in " + _DIR_NAME +
-				"/TestCaseTearDownElement1005.testcase:6");
+				"/TestCaseTearDownElement1005.testcase:8");
 	}
 
 	@Test
@@ -2130,7 +2156,7 @@ public class SeleniumBuilderTest {
 		test(
 			"TestCaseVarElement1002.testcase",
 			"Error 1002: Invalid fail element in " + _DIR_NAME +
-				"/TestCaseVarElement1002.testcase:3");
+				"/TestCaseVarElement1002.testcase:5");
 	}
 
 	@Test
@@ -2138,7 +2164,7 @@ public class SeleniumBuilderTest {
 		test(
 			"TestCaseVarElement1004_1.testcase",
 			"Error 1004: Missing (name) attribute in " + _DIR_NAME +
-				"/TestCaseVarElement1004_1.testcase:2");
+				"/TestCaseVarElement1004_1.testcase:4");
 	}
 
 	@Test
@@ -2146,7 +2172,7 @@ public class SeleniumBuilderTest {
 		test(
 			"TestCaseVarElement1004_2.testcase",
 			"Error 1004: Missing (value) attribute in " + _DIR_NAME +
-				"/TestCaseVarElement1004_2.testcase:2");
+				"/TestCaseVarElement1004_2.testcase:4");
 	}
 
 	@Test
@@ -2154,7 +2180,7 @@ public class SeleniumBuilderTest {
 		test(
 			"TestCaseVarElement1004_3.testcase",
 			"Error 1004: Missing (name) attribute in " + _DIR_NAME +
-				"/TestCaseVarElement1004_3.testcase:2");
+				"/TestCaseVarElement1004_3.testcase:4");
 	}
 
 	@Test
@@ -2162,7 +2188,7 @@ public class SeleniumBuilderTest {
 		test(
 			"TestCaseVarElement1005.testcase",
 			"Error 1005: Invalid fail attribute in " + _DIR_NAME +
-				"/TestCaseVarElement1005.testcase:2");
+				"/TestCaseVarElement1005.testcase:4");
 	}
 
 	@Test
@@ -2170,7 +2196,7 @@ public class SeleniumBuilderTest {
 		test(
 			"TestCaseVarElement1006.testcase",
 			"Error 1006: Invalid name attribute value in " + _DIR_NAME +
-				"/TestCaseVarElement1006.testcase:2");
+				"/TestCaseVarElement1006.testcase:4");
 	}
 
 	@Test

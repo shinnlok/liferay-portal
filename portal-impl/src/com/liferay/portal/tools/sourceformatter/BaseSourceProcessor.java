@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -34,9 +34,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
-import java.net.URL;
-
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -88,64 +87,27 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		return _errorMessages;
 	}
 
-	protected static String formatImports(String imports, int classStartPos)
-		throws IOException {
+	@Override
+	public SourceMismatchException getFirstSourceMismatchException() {
+		return _firstSourceMismatchException;
+	}
 
-		if (imports.contains("/*") || imports.contains("*/") ||
-			imports.contains("//")) {
+	protected void checkEmptyCollection(
+		String line, String fileName, int lineCount) {
 
-			return imports + "\n";
+		// LPS-46028
+
+		Matcher matcher = emptyCollectionPattern.matcher(line);
+
+		if (matcher.find()) {
+			String collectionType = TextFormatter.format(
+				matcher.group(1), TextFormatter.J);
+
+			processErrorMessage(
+				fileName,
+				"Use Collections.empty" + collectionType + "(): " + fileName +
+					" " + lineCount);
 		}
-
-		List<ImportPackage> importPackages = new ArrayList<ImportPackage>();
-
-		UnsyncBufferedReader unsyncBufferedReader = new UnsyncBufferedReader(
-			new UnsyncStringReader(imports));
-
-		String line = null;
-
-		while ((line = unsyncBufferedReader.readLine()) != null) {
-			ImportPackage importPackage = ImportPackageFactoryUtil.create(line);
-
-			if ((importPackage != null) &&
-				!importPackages.contains(importPackage)) {
-
-				importPackages.add(importPackage);
-			}
-		}
-
-		importPackages = ListUtil.sort(importPackages);
-
-		StringBundler sb = new StringBundler(3 * importPackages.size());
-
-		String temp = null;
-
-		for (int i = 0; i < importPackages.size(); i++) {
-			ImportPackage importPackage = importPackages.get(i);
-
-			String s = importPackage.getLine();
-
-			int pos = s.indexOf(".");
-
-			pos = s.indexOf(".", pos + 1);
-
-			if (pos == -1) {
-				pos = s.indexOf(".");
-			}
-
-			String packageLevel = s.substring(classStartPos, pos);
-
-			if ((i != 0) && !packageLevel.equals(temp)) {
-				sb.append("\n");
-			}
-
-			temp = packageLevel;
-
-			sb.append(s);
-			sb.append("\n");
-		}
-
-		return sb.toString();
 	}
 
 	protected void checkIfClauseParentheses(
@@ -165,6 +127,14 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 			ifClause.contains("/*") || ifClause.contains("*/")) {
 
 			return;
+		}
+
+		if (hasRedundantParentheses(ifClause, "||", "&&") ||
+			hasRedundantParentheses(ifClause, "&&", "||")) {
+
+			processErrorMessage(
+				fileName,
+				"redundant parentheses: " + fileName + " " + lineCount);
 		}
 
 		ifClause = stripRedundantParentheses(ifClause);
@@ -240,9 +210,11 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 	}
 
 	protected void checkInefficientStringMethods(
-		String line, String fileName, int lineCount) {
+		String line, String fileName, String absolutePath, int lineCount) {
 
-		if (mainReleaseVersion.equals(MAIN_RELEASE_VERSION_6_1_0)) {
+		if (mainReleaseVersion.equals(MAIN_RELEASE_VERSION_6_1_0) ||
+			isRunsOutsidePortal(absolutePath)) {
+
 			return;
 		}
 
@@ -361,10 +333,32 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		processErrorMessage(fileName, "plus: " + fileName + " " + lineCount);
 	}
 
-	protected String fixCompatClassImports(File file, String content)
+	protected void compareAndAutoFixContent(
+			File file, String fileName, String content, String newContent)
 		throws IOException {
 
-		String absolutePath = fileUtil.getAbsolutePath(file);
+		if ((newContent == null) || content.equals(newContent)) {
+			return;
+		}
+
+		fileName = StringUtil.replace(
+			fileName, StringPool.BACK_SLASH, StringPool.SLASH);
+
+		if (_autoFix) {
+			fileUtil.write(file, newContent);
+		}
+		else if (_firstSourceMismatchException == null) {
+			_firstSourceMismatchException =
+				new SourceMismatchException(fileName, content, newContent);
+		}
+
+		if (_printErrors) {
+			sourceFormatterHelper.printError(fileName, file);
+		}
+	}
+
+	protected String fixCompatClassImports(String absolutePath, String content)
+		throws IOException {
 
 		if (portalSource ||
 			!mainReleaseVersion.equals(MAIN_RELEASE_VERSION_6_1_0) ||
@@ -401,22 +395,33 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 	}
 
 	protected String fixCopyright(
-			String content, String copyright, String oldCopyright, File file,
-			String fileName)
+			String content, String absolutePath, String fileName)
 		throws IOException {
 
-		if (fileName.endsWith(".vm")) {
+		if (_copyright == null) {
+			_copyright = getContent("copyright.txt", 4);
+		}
+
+		String copyright = _copyright;
+
+		if (fileName.endsWith(".vm") || Validator.isNull(copyright)) {
 			return content;
 		}
 
-		if ((oldCopyright != null) && content.contains(oldCopyright)) {
-			content = StringUtil.replace(content, oldCopyright, copyright);
+		if (_oldCopyright == null) {
+			_oldCopyright = getContent("old-copyright.txt", 4);
+		}
+
+		if (Validator.isNotNull(_oldCopyright) &&
+			content.contains(_oldCopyright)) {
+
+			content = StringUtil.replace(content, _oldCopyright, copyright);
 
 			processErrorMessage(fileName, "old (c): " + fileName);
 		}
 
 		if (!content.contains(copyright)) {
-			String customCopyright = getCustomCopyright(file);
+			String customCopyright = getCustomCopyright(absolutePath);
 
 			if (Validator.isNotNull(customCopyright)) {
 				copyright = customCopyright;
@@ -433,22 +438,75 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 				"<%--\n" + copyright + "\n--%>");
 		}
 
-		int x = content.indexOf("* Copyright (c) 2000-20");
+		int x = content.indexOf("* Copyright (c) 2000-");
 
 		if (x == -1) {
 			return content;
 		}
 
-		int y = copyright.indexOf("* Copyright (c) 2000-20");
+		int y = content.indexOf("Liferay", x);
 
-		if (y == -1) {
+		String contentCopyrightYear = content.substring(x, y);
+
+		x = copyright.indexOf("* Copyright (c) 2000-");
+
+		if (x == -1) {
 			return content;
 		}
 
-		String contentCopyrightYear = content.substring(x, x + 25);
-		String copyrightYear = copyright.substring(y, y + 25);
+		y = copyright.indexOf("Liferay", x);
+
+		String copyrightYear = copyright.substring(x, y);
 
 		return StringUtil.replace(content, contentCopyrightYear, copyrightYear);
+	}
+
+	protected String fixIncorrectParameterTypeForLanguageUtil(
+		String content, boolean autoFix, String fileName) {
+
+		if (portalSource) {
+			return content;
+		}
+
+		String expectedParameterType = "request";
+		String incorrectParameterType = "pageContext";
+
+		if (mainReleaseVersion.equals(MAIN_RELEASE_VERSION_6_1_0) ||
+			mainReleaseVersion.equals(MAIN_RELEASE_VERSION_6_2_0)) {
+
+			expectedParameterType = "pageContext";
+			incorrectParameterType = "request";
+		}
+
+		if (!content.contains(
+				"LanguageUtil.format(" + incorrectParameterType + ", ") &&
+			!content.contains(
+				"LanguageUtil.get(" + incorrectParameterType + ", ")) {
+
+			return content;
+		}
+
+		if (autoFix) {
+			content = StringUtil.replace(
+				content,
+				new String[] {
+					"LanguageUtil.format(" + incorrectParameterType + ", ",
+					"LanguageUtil.get(" + incorrectParameterType + ", "
+				},
+				new String[] {
+					"LanguageUtil.format(" + expectedParameterType + ", ",
+					"LanguageUtil.get(" + expectedParameterType + ", "
+				});
+		}
+		else {
+			processErrorMessage(
+				fileName,
+				"(Unicode)LanguageUtil.format/get methods require " +
+					expectedParameterType + " parameter instead of " +
+						incorrectParameterType + " " + fileName);
+		}
+
+		return content;
 	}
 
 	protected String fixSessionKey(
@@ -605,26 +663,22 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		return _compatClassNamesMap;
 	}
 
-	protected String getCopyright() throws IOException {
-		if (Validator.isNotNull(_copyright)) {
-			return _copyright;
+	protected String getContent(String fileName, int level) throws IOException {
+		for (int i = 0; i < level; i++) {
+			String content = fileUtil.read(fileName);
+
+			if (Validator.isNotNull(content)) {
+				return content;
+			}
+
+			fileName = "../" + fileName;
 		}
 
-		_copyright = fileUtil.read("copyright.txt");
-
-		if (Validator.isNull(_copyright)) {
-			_copyright = fileUtil.read("../copyright.txt");
-		}
-
-		if (Validator.isNull(_copyright)) {
-			_copyright = fileUtil.read("../../copyright.txt");
-		}
-
-		return _copyright;
+		return StringPool.BLANK;
 	}
 
-	protected String getCustomCopyright(File file) throws IOException {
-		String absolutePath = fileUtil.getAbsolutePath(file);
+	protected String getCustomCopyright(String absolutePath)
+		throws IOException {
 
 		for (int x = absolutePath.length();;) {
 			x = absolutePath.lastIndexOf(StringPool.SLASH, x);
@@ -646,69 +700,10 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		return null;
 	}
 
-	protected Properties getExclusionsProperties(String fileName)
-		throws IOException {
-
-		InputStream inputStream = null;
-
-		int level = 0;
-
-		if (portalSource) {
-			ClassLoader classLoader =
-				BaseSourceProcessor.class.getClassLoader();
-
-			String sourceFormatterExclusions = System.getProperty(
-				"source-formatter-exclusions",
-				"com/liferay/portal/tools/dependencies/" + fileName);
-
-			URL url = classLoader.getResource(sourceFormatterExclusions);
-
-			if (url == null) {
-				return null;
-			}
-
-			inputStream = url.openStream();
-		}
-		else {
-			try {
-				inputStream = new FileInputStream(fileName);
-			}
-			catch (FileNotFoundException fnfe) {
-			}
-
-			if (inputStream == null) {
-				try {
-					inputStream = new FileInputStream("../" + fileName);
-
-					level = 1;
-				}
-				catch (FileNotFoundException fnfe) {
-				}
-			}
-
-			if (inputStream == null) {
-				try {
-					inputStream = new FileInputStream("../../" + fileName);
-
-					level = 2;
-				}
-				catch (FileNotFoundException fnfe) {
-					return null;
-				}
-			}
-		}
-
-		Properties properties = new Properties();
-
-		properties.load(inputStream);
-
-		inputStream.close();
-
-		if (level > 0) {
-			properties = stripTopLevelDirectories(properties, level);
-		}
-
-		return properties;
+	protected List<String> getExclusions(String key) {
+		return ListUtil.fromString(
+			GetterUtil.getString(_properties.getProperty(key)),
+			StringPool.COMMA);
 	}
 
 	protected List<String> getFileNames(
@@ -718,18 +713,7 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 
 		directoryScanner.setBasedir(basedir);
 
-		excludes = ArrayUtil.append(
-			excludes, _excludes,
-			new String[] {
-				"**\\.git\\**", "**\\bin\\**", "**\\classes\\**",
-				"**\\test-classes\\**", "**\\test-coverage\\**",
-				"**\\test-results\\**", "**\\tmp\\**"
-			});
-
-		if (portalSource) {
-			excludes = ArrayUtil.append(
-				excludes, new String[] {"**\\webapps\\**"});
-		}
+		excludes = ArrayUtil.append(excludes, _excludes);
 
 		directoryScanner.setExcludes(excludes);
 
@@ -743,12 +727,21 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 	}
 
 	protected String[] getLanguageKeys(Matcher matcher) {
-		if (matcher.groupCount() > 0) {
+		int groupCount = matcher.groupCount();
+
+		if (groupCount == 1) {
 			String languageKey = matcher.group(1);
 
 			if (Validator.isNotNull(languageKey)) {
 				return new String[] {languageKey};
 			}
+		}
+		else if (groupCount == 2) {
+			String languageKey = matcher.group(2);
+
+			languageKey = TextFormatter.format(languageKey, TextFormatter.P);
+
+			return new String[] {languageKey};
 		}
 
 		StringBundler sb = new StringBundler();
@@ -792,7 +785,6 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 							else {
 								return new String[] {languageKey};
 							}
-
 						}
 
 						sb.append(match.charAt(i));
@@ -803,50 +795,35 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		return new String[0];
 	}
 
-	protected String getOldCopyright() throws IOException {
-		if (Validator.isNotNull(_oldCopyright)) {
-			return _oldCopyright;
-		}
-
-		_oldCopyright = fileUtil.read("old-copyright.txt");
-
-		if (Validator.isNull(_oldCopyright)) {
-			_oldCopyright = fileUtil.read("../old-copyright.txt");
-		}
-
-		if (Validator.isNull(_oldCopyright)) {
-			_oldCopyright = fileUtil.read("../../old-copyright.txt");
-		}
-
-		return _oldCopyright;
-	}
-
 	protected boolean hasMissingParentheses(String s) {
 		if (Validator.isNull(s)) {
 			return false;
 		}
 
-		boolean containsAndOrOperator = (s.contains("&&") || s.contains("||"));
+		boolean containsAndOperator = s.contains("&&");
+		boolean containsOrOperator = s.contains("||");
+
+		if (containsAndOperator && containsOrOperator) {
+			return true;
+		}
 
 		boolean containsCompareOperator =
 			(s.contains(" == ") || s.contains(" != ") || s.contains(" < ") ||
 			 s.contains(" > ") || s.contains(" =< ") || s.contains(" => ") ||
 			 s.contains(" <= ") || s.contains(" >= "));
-
 		boolean containsMathOperator =
 			(s.contains(" = ") || s.contains(" - ") || s.contains(" + ") ||
 			 s.contains(" & ") || s.contains(" % ") || s.contains(" * ") ||
 			 s.contains(" / "));
 
 		if (containsCompareOperator &&
-			(containsAndOrOperator ||
+			(containsAndOperator || containsOrOperator ||
 			 (containsMathOperator && !s.contains(StringPool.OPEN_BRACKET)))) {
 
 			return true;
 		}
-		else {
-			return false;
-		}
+
+		return false;
 	}
 
 	protected boolean hasRedundantParentheses(String s) {
@@ -877,8 +854,95 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		}
 	}
 
-	protected boolean isAutoFix() {
-		return _autoFix;
+	protected boolean hasRedundantParentheses(
+		String s, String operator1, String operator2) {
+
+		String[] parts = StringUtil.split(s, operator1);
+
+		if (parts.length < 3) {
+			return false;
+		}
+
+		for (int i = 1; i < (parts.length - 1); i++) {
+			String part = parts[i];
+
+			if (part.contains(operator2) || part.contains("!(")) {
+				continue;
+			}
+
+			int closeParenthesesCount = StringUtil.count(
+				part, StringPool.CLOSE_PARENTHESIS);
+			int openParenthesesCount = StringUtil.count(
+				part, StringPool.OPEN_PARENTHESIS);
+
+			if (Math.abs(closeParenthesesCount - openParenthesesCount) == 1) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	protected boolean isAttributName(String attributeName) {
+		if (Validator.isNull(attributeName)) {
+			return false;
+		}
+
+		Matcher matcher = attributeNamePattern.matcher(attributeName);
+
+		return matcher.matches();
+	}
+
+	protected boolean isExcluded(List<String> exclusions, String fileName) {
+		return isExcluded(exclusions, fileName, -1);
+	}
+
+	protected boolean isExcluded(
+		List<String> exclusions, String fileName, int lineCount) {
+
+		return isExcluded(exclusions, fileName, lineCount, null);
+	}
+
+	protected boolean isExcluded(
+		List<String> exclusions, String fileName, int lineCount,
+		String javaTermName) {
+
+		if (ListUtil.isEmpty(exclusions)) {
+			return false;
+		}
+
+		if (exclusions.contains(fileName)) {
+			return true;
+		}
+
+		if ((lineCount > 0) &&
+			exclusions.contains(fileName + StringPool.AT + lineCount)) {
+
+			return true;
+		}
+
+		if (Validator.isNotNull(javaTermName) &&
+			exclusions.contains(fileName + StringPool.AT + javaTermName)) {
+
+			return true;
+		}
+
+		return false;
+	}
+
+	protected boolean isRunsOutsidePortal(String absolutePath) {
+		if (_runOutsidePortalExclusions == null) {
+			_runOutsidePortalExclusions = getExclusions(
+				"run.outside.portal.excludes");
+		}
+
+		for (String runOutsidePortalExclusions : _runOutsidePortalExclusions) {
+			if (absolutePath.contains(runOutsidePortalExclusions)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	protected void processErrorMessage(String fileName, String message) {
@@ -915,27 +979,203 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		return newLine;
 	}
 
-	protected String stripQuotes(String s, char delimeter) {
-		boolean insideQuotes = false;
+	protected String sortAttributes(
+		String fileName, String line, int lineCount,
+		boolean allowApostropheDelimeter) {
+
+		String s = line;
+
+		int x = s.indexOf(StringPool.SPACE);
+
+		if (x == -1) {
+			return line;
+		}
+
+		s = s.substring(x + 1);
+
+		String previousAttribute = null;
+		String previousAttributeAndValue = null;
+
+		boolean wrongOrder = false;
+
+		for (x = 0;;) {
+			x = s.indexOf(StringPool.EQUAL);
+
+			if ((x == -1) || (s.length() <= (x + 1))) {
+				return line;
+			}
+
+			String attribute = s.substring(0, x);
+
+			if (!isAttributName(attribute)) {
+				return line;
+			}
+
+			if (Validator.isNotNull(previousAttribute) &&
+				(previousAttribute.compareTo(attribute) > 0)) {
+
+				wrongOrder = true;
+			}
+
+			s = s.substring(x + 1);
+
+			char delimeter = s.charAt(0);
+
+			if ((delimeter != CharPool.APOSTROPHE) &&
+				(delimeter != CharPool.QUOTE)) {
+
+				if (delimeter != CharPool.AMPERSAND) {
+					processErrorMessage(
+						fileName, "delimeter: " + fileName + " " + lineCount);
+				}
+
+				return line;
+			}
+
+			s = s.substring(1);
+
+			String value = null;
+
+			int y = -1;
+
+			while (true) {
+				y = s.indexOf(delimeter, y + 1);
+
+				if ((y == -1) || (s.length() <= (y + 1))) {
+					return line;
+				}
+
+				value = s.substring(0, y);
+
+				if (value.startsWith("<%")) {
+					int endJavaCodeSignCount = StringUtil.count(value, "%>");
+					int startJavaCodeSignCount = StringUtil.count(value, "<%");
+
+					if (endJavaCodeSignCount == startJavaCodeSignCount) {
+						break;
+					}
+				}
+				else {
+					int greaterThanCount = StringUtil.count(
+						value, StringPool.GREATER_THAN);
+					int lessThanCount = StringUtil.count(
+						value, StringPool.LESS_THAN);
+
+					if (greaterThanCount == lessThanCount) {
+						break;
+					}
+				}
+			}
+
+			if (delimeter == CharPool.APOSTROPHE) {
+				if (!value.contains(StringPool.QUOTE)) {
+					line = StringUtil.replace(
+						line,
+						StringPool.APOSTROPHE + value + StringPool.APOSTROPHE,
+						StringPool.QUOTE + value + StringPool.QUOTE);
+
+					return sortAttributes(
+						fileName, line, lineCount, allowApostropheDelimeter);
+				}
+				else if (!allowApostropheDelimeter) {
+					String newValue = StringUtil.replace(
+						value, StringPool.QUOTE, "&quot;");
+
+					line = StringUtil.replace(
+						line,
+						StringPool.APOSTROPHE + value + StringPool.APOSTROPHE,
+						StringPool.QUOTE + newValue + StringPool.QUOTE);
+
+					return sortAttributes(
+						fileName, line, lineCount, allowApostropheDelimeter);
+				}
+			}
+
+			StringBundler sb = new StringBundler(5);
+
+			sb.append(attribute);
+			sb.append(StringPool.EQUAL);
+			sb.append(delimeter);
+			sb.append(value);
+			sb.append(delimeter);
+
+			String currentAttributeAndValue = sb.toString();
+
+			if (wrongOrder) {
+				if ((StringUtil.count(line, currentAttributeAndValue) == 1) &&
+					(StringUtil.count(line, previousAttributeAndValue) == 1)) {
+
+					line = StringUtil.replaceFirst(
+						line, previousAttributeAndValue,
+						currentAttributeAndValue);
+
+					line = StringUtil.replaceLast(
+						line, currentAttributeAndValue,
+						previousAttributeAndValue);
+
+					return sortAttributes(
+						fileName, line, lineCount, allowApostropheDelimeter);
+				}
+
+				return line;
+			}
+
+			s = s.substring(y + 1);
+
+			if (s.startsWith(StringPool.GREATER_THAN)) {
+				x = s.indexOf(StringPool.SPACE);
+
+				if (x == -1) {
+					return line;
+				}
+
+				s = s.substring(x + 1);
+
+				previousAttribute = null;
+				previousAttributeAndValue = null;
+			}
+			else {
+				s = StringUtil.trimLeading(s);
+
+				previousAttribute = attribute;
+				previousAttributeAndValue = currentAttributeAndValue;
+			}
+		}
+	}
+
+	protected String stripLine(
+		String s, char startDelimeter, char endDelimeter) {
+
+		boolean insideDelimeters = false;
+		int level = 0;
 
 		StringBundler sb = new StringBundler();
 
 		for (int i = 0; i < s.length(); i++) {
 			char c = s.charAt(i);
 
-			if (insideQuotes) {
-				if (c == delimeter) {
-					if ((c > 1) && (s.charAt(i - 1) == CharPool.BACK_SLASH) &&
-						(s.charAt(i - 2) != CharPool.BACK_SLASH)) {
-
-						continue;
+			if (insideDelimeters) {
+				if (c == endDelimeter) {
+					if (level > 0) {
+						level -= 1;
 					}
+					else {
+						if ((c > 1) &&
+							(s.charAt(i - 1) == CharPool.BACK_SLASH) &&
+							(s.charAt(i - 2) != CharPool.BACK_SLASH)) {
 
-					insideQuotes = false;
+							continue;
+						}
+
+						insideDelimeters = false;
+					}
+				}
+				else if (c == startDelimeter) {
+					level += 1;
 				}
 			}
-			else if (c == delimeter) {
-				insideQuotes = true;
+			else if (c == startDelimeter) {
+				insideDelimeters = true;
 			}
 			else {
 				sb.append(c);
@@ -943,6 +1183,10 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		}
 
 		return sb.toString();
+	}
+
+	protected String stripQuotes(String s, char delimeter) {
+		return stripLine(s, delimeter, delimeter);
 	}
 
 	protected String stripRedundantParentheses(String s) {
@@ -971,6 +1215,10 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 			Properties properties, int level)
 		throws IOException {
 
+		if (level == 0) {
+			return properties;
+		}
+
 		File dir = new File(".");
 
 		String dirName = dir.getCanonicalPath();
@@ -989,18 +1237,23 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		Properties newProperties = new Properties();
 
 		for (Map.Entry<Object, Object> entry : properties.entrySet()) {
-			String key = (String)entry.getKey();
+			String value = (String)entry.getValue();
 
-			if (!key.startsWith(topLevelDirNames)) {
+			if (!value.startsWith(topLevelDirNames) &&
+				!value.contains(StringPool.COMMA + topLevelDirNames)) {
+
 				continue;
 			}
 
-			key = StringUtil.replaceFirst(
-				key, topLevelDirNames, StringPool.BLANK);
+			if (value.startsWith(topLevelDirNames)) {
+				value = StringUtil.replaceFirst(
+					value, topLevelDirNames, StringPool.BLANK);
+			}
 
-			String value = (String)entry.getValue();
+			value = StringUtil.replace(
+				value, StringPool.COMMA + topLevelDirNames, StringPool.COMMA);
 
-			newProperties.setProperty(key, value);
+			newProperties.setProperty((String)entry.getKey(), value);
 		}
 
 		return newProperties;
@@ -1071,12 +1324,19 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 
 	protected static final String BASEDIR = "./";
 
+	protected static final String MAIN_RELEASE_LATEST_VERSION =
+		BaseSourceProcessor.MAIN_RELEASE_VERSION_7_0_0;
+
 	protected static final String MAIN_RELEASE_VERSION_6_1_0 = "6.1.0";
 
 	protected static final String MAIN_RELEASE_VERSION_6_2_0 = "6.2.0";
 
 	protected static final String MAIN_RELEASE_VERSION_7_0_0 = "7.0.0";
 
+	protected static Pattern attributeNamePattern = Pattern.compile(
+		"[a-z]+[-_a-zA-Z0-9]*");
+	protected static Pattern emptyCollectionPattern = Pattern.compile(
+		"Collections\\.EMPTY_(LIST|MAP|SET)");
 	protected static FileImpl fileUtil = FileImpl.getInstance();
 	protected static Pattern languageKeyPattern = Pattern.compile(
 		"LanguageUtil.(?:get|format)\\([^;%]+|Liferay.Language.get\\('([^']+)");
@@ -1092,6 +1352,107 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		"<liferay-ui:error [^>]+>|<liferay-ui:success [^>]+>",
 		Pattern.MULTILINE);
 
+	private String[] _getExcludes() {
+		List<String> excludesList = ListUtil.fromString(
+			GetterUtil.getString(
+				System.getProperty("source.formatter.excludes")));
+
+		excludesList.addAll(getExclusions("source.formatter.excludes"));
+
+		DirectoryScanner directoryScanner = new DirectoryScanner();
+
+		directoryScanner.setBasedir(BASEDIR);
+
+		String[] includes = new String[] {"**\\source_formatter.ignore"};
+
+		directoryScanner.setIncludes(includes);
+
+		List<String> ignoreFileNames = sourceFormatterHelper.scanForFiles(
+			directoryScanner);
+
+		for (String ignoreFileName : ignoreFileNames) {
+			excludesList.add(
+				ignoreFileName.substring(0, ignoreFileName.length() - 23) +
+					"**");
+		}
+
+		return excludesList.toArray(new String[excludesList.size()]);
+	}
+
+	private Properties _getProperties() throws Exception {
+		String fileName = "source-formatter.properties";
+
+		Properties properties = new Properties();
+
+		if (portalSource) {
+			ClassLoader classLoader =
+				BaseSourceProcessor.class.getClassLoader();
+
+			properties.load(
+				classLoader.getResourceAsStream(
+					"com/liferay/portal/tools/dependencies/" + fileName));
+
+			return properties;
+		}
+
+		List<Properties> propertiesList = new ArrayList<Properties>();
+
+		for (int i = 0; i <= 2; i++) {
+			try {
+				InputStream inputStream = new FileInputStream(fileName);
+
+				Properties props = new Properties();
+
+				props.load(inputStream);
+
+				propertiesList.add(stripTopLevelDirectories(props, i));
+			}
+			catch (FileNotFoundException fnfe) {
+			}
+
+			fileName = "../" + fileName;
+		}
+
+		if (propertiesList.isEmpty()) {
+			return properties;
+		}
+
+		properties = propertiesList.get(0);
+
+		if (propertiesList.size() == 1) {
+			return properties;
+		}
+
+		for (int i = 1; i < propertiesList.size(); i++) {
+			Properties props = propertiesList.get(i);
+
+			Enumeration<String> enu =
+				(Enumeration<String>)props.propertyNames();
+
+			while (enu.hasMoreElements()) {
+				String key = enu.nextElement();
+
+				String value = props.getProperty(key);
+
+				if (Validator.isNull(value)) {
+					continue;
+				}
+
+				if (properties.containsKey(key)) {
+					String existingValue = properties.getProperty(key);
+
+					if (Validator.isNotNull(existingValue)) {
+						value = existingValue + StringPool.COMMA + value;
+					}
+				}
+
+				properties.put(key, value);
+			}
+		}
+
+		return properties;
+	}
+
 	private void _init(
 			boolean useProperties, boolean printErrors, boolean autoFix,
 			String mainReleaseVersion)
@@ -1103,23 +1464,17 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 
 		sourceFormatterHelper.init();
 
-		if (_initialized) {
-			return;
-		}
-
 		_autoFix = autoFix;
 
 		BaseSourceProcessor.mainReleaseVersion = mainReleaseVersion;
 
-		_excludes = StringUtil.split(
-			GetterUtil.getString(
-				System.getProperty("source.formatter.excludes")));
-
 		portalSource = _isPortalSource();
 
-		_printErrors = printErrors;
+		_properties = _getProperties();
 
-		_initialized = true;
+		_excludes = _getExcludes();
+
+		_printErrors = printErrors;
 	}
 
 	private boolean _isPortalSource() {
@@ -1131,14 +1486,16 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		}
 	}
 
-	private static boolean _autoFix;
-	private static Map<String, String> _compatClassNamesMap;
-	private static String _copyright;
-	private static List<String> _errorMessages = new ArrayList<String>();
-	private static String[] _excludes;
-	private static boolean _initialized;
-	private static String _oldCopyright;
-	private static Properties _portalLanguageKeysProperties;
-	private static boolean _printErrors;
+	private boolean _autoFix;
+	private Map<String, String> _compatClassNamesMap;
+	private String _copyright;
+	private List<String> _errorMessages = new ArrayList<String>();
+	private String[] _excludes;
+	private SourceMismatchException _firstSourceMismatchException;
+	private String _oldCopyright;
+	private Properties _portalLanguageKeysProperties;
+	private boolean _printErrors;
+	private Properties _properties;
+	private List<String> _runOutsidePortalExclusions;
 
 }

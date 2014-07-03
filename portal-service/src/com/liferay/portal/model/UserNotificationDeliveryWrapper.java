@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -52,6 +52,7 @@ public class UserNotificationDeliveryWrapper implements UserNotificationDelivery
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
+		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("userNotificationDeliveryId",
 			getUserNotificationDeliveryId());
 		attributes.put("companyId", getCompanyId());
@@ -67,6 +68,12 @@ public class UserNotificationDeliveryWrapper implements UserNotificationDelivery
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
+		Long mvccVersion = (Long)attributes.get("mvccVersion");
+
+		if (mvccVersion != null) {
+			setMvccVersion(mvccVersion);
+		}
+
 		Long userNotificationDeliveryId = (Long)attributes.get(
 				"userNotificationDeliveryId");
 
@@ -138,6 +145,26 @@ public class UserNotificationDeliveryWrapper implements UserNotificationDelivery
 	}
 
 	/**
+	* Returns the mvcc version of this user notification delivery.
+	*
+	* @return the mvcc version of this user notification delivery
+	*/
+	@Override
+	public long getMvccVersion() {
+		return _userNotificationDelivery.getMvccVersion();
+	}
+
+	/**
+	* Sets the mvcc version of this user notification delivery.
+	*
+	* @param mvccVersion the mvcc version of this user notification delivery
+	*/
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		_userNotificationDelivery.setMvccVersion(mvccVersion);
+	}
+
+	/**
 	* Returns the user notification delivery ID of this user notification delivery.
 	*
 	* @return the user notification delivery ID of this user notification delivery
@@ -201,11 +228,9 @@ public class UserNotificationDeliveryWrapper implements UserNotificationDelivery
 	* Returns the user uuid of this user notification delivery.
 	*
 	* @return the user uuid of this user notification delivery
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
-	public java.lang.String getUserUuid()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.lang.String getUserUuid() {
 		return _userNotificationDelivery.getUserUuid();
 	}
 
@@ -444,8 +469,7 @@ public class UserNotificationDeliveryWrapper implements UserNotificationDelivery
 	}
 
 	@Override
-	public void persist()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public void persist() {
 		_userNotificationDelivery.persist();
 	}
 

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,19 +21,13 @@ String tabs2 = ParamUtil.getString(request, "tabs2");
 
 String redirect = ParamUtil.getString(request, "redirect");
 
-String eventName = "_" + HtmlUtil.escapeJS(portletResource) + "_selectSite";
+String eventName = "_" + HtmlUtil.escapeJS(assetPublisherDisplayContext.getPortletResource()) + "_selectSite";
 
 List<AssetRendererFactory> classTypesAssetRendererFactories = new ArrayList<AssetRendererFactory>();
-
-String emailParam = "emailAssetEntryAdded";
-
-String currentLanguageId = LanguageUtil.getLanguageId(request);
-
-String emailSubjectParam = emailParam + "Subject_" + currentLanguageId;
-String emailBodyParam = emailParam + "Body_" + currentLanguageId;
 %>
 
 <liferay-portlet:actionURL portletConfiguration="true" var="configurationActionURL" />
+
 <liferay-portlet:renderURL portletConfiguration="true" varImpl="configurationRenderURL" />
 
 <aui:form action="<%= configurationActionURL %>" method="post" name="fm" onSubmit="event.preventDefault();">
@@ -47,13 +41,9 @@ String emailBodyParam = emailParam + "Body_" + currentLanguageId;
 	<aui:input name="assetEntryType" type="hidden" />
 	<aui:input name="scopeId" type="hidden" />
 
-	<%
-	String rootPortletId = PortletConstants.getRootPortletId(portletResource);
-	%>
-
 	<liferay-util:buffer var="selectStyle">
 		<c:choose>
-			<c:when test="<%= rootPortletId.equals(PortletKeys.HIGHEST_RATED_ASSETS) || rootPortletId.equals(PortletKeys.MOST_VIEWED_ASSETS) || rootPortletId.equals(PortletKeys.RELATED_ASSETS) %>">
+			<c:when test="<%= !assetPublisherDisplayContext.isSelectionStyleEnabled() %>">
 				<aui:input name="preferences--selectionStyle--" type="hidden" value="dynamic" />
 			</c:when>
 			<c:otherwise>
@@ -99,15 +89,15 @@ String emailBodyParam = emailParam + "Body_" + currentLanguageId;
 						name="name"
 					>
 						<liferay-ui:icon
+							iconCssClass="<%= group.getIconCssClass() %>"
 							label="<%= true %>"
 							message="<%= group.getScopeDescriptiveName(themeDisplay) %>"
-							src="<%= group.getIconURL(themeDisplay) %>"
 						/>
 					</liferay-ui:search-container-column-text>
 
 					<liferay-ui:search-container-column-text
 						name="type"
-						value="<%= LanguageUtil.get(pageContext, group.getScopeLabel(themeDisplay)) %>"
+						value="<%= LanguageUtil.get(request, group.getScopeLabel(themeDisplay)) %>"
 					/>
 
 					<liferay-ui:search-container-column-text
@@ -120,7 +110,7 @@ String emailBodyParam = emailParam + "Body_" + currentLanguageId;
 						</liferay-portlet:actionURL>
 
 						<liferay-ui:icon
-							image="delete"
+							iconCssClass="icon-remove"
 							url="<%= deleteURL %>"
 						/>
 					</liferay-ui:search-container-column-text>
@@ -130,7 +120,7 @@ String emailBodyParam = emailParam + "Body_" + currentLanguageId;
 			</liferay-ui:search-container>
 
 			<div class="select-asset-selector">
-				<liferay-ui:icon-menu cssClass="select-existing-selector" direction="right" icon='<%= themeDisplay.getPathThemeImages() + "/common/add.png" %>' message="select" showWhenSingleIcon="<%= true %>">
+				<liferay-ui:icon-menu cssClass="select-existing-selector" direction="right" icon="../aui/plus" message="select" showWhenSingleIcon="<%= true %>">
 
 					<%
 					Map<String, Object> data = new HashMap<String, Object>();
@@ -148,10 +138,10 @@ String emailBodyParam = emailParam + "Body_" + currentLanguageId;
 						</liferay-portlet:actionURL>
 
 						<liferay-ui:icon
+							iconCssClass="<%= group.getIconCssClass() %>"
 							id='<%= "scope" + group.getGroupId() %>'
 							message="<%= group.getScopeDescriptiveName(themeDisplay) %>"
 							method="post"
-							src="<%= group.getIconURL(themeDisplay) %>"
 							url="<%= addScopeURL %>"
 						/>
 
@@ -177,15 +167,15 @@ String emailBodyParam = emailParam + "Body_" + currentLanguageId;
 						data = new HashMap<String, Object>();
 
 						data.put("href", layoutSiteBrowserURLString);
-						data.put("title", LanguageUtil.get(pageContext, "pages"));
+						data.put("title", LanguageUtil.get(request, "pages"));
 						%>
 
 						<liferay-ui:icon
 							cssClass="highlited scope-selector"
 							data="<%= data %>"
+							iconCssClass="icon-plus"
 							id="selectGroup"
-							image="add"
-							message='<%= LanguageUtil.get(pageContext, "pages") + StringPool.TRIPLE_PERIOD %>'
+							message='<%= LanguageUtil.get(request, "pages") + StringPool.TRIPLE_PERIOD %>'
 							method="get"
 							url="javascript:;"
 						/>
@@ -228,15 +218,15 @@ String emailBodyParam = emailParam + "Body_" + currentLanguageId;
 						data = new HashMap<String, Object>();
 
 						data.put("href", siteBrowserURLString);
-						data.put("title", LanguageUtil.get(pageContext, "sites"));
+						data.put("title", LanguageUtil.get(request, "sites"));
 						%>
 
 						<liferay-ui:icon
 							cssClass="highlited scope-selector"
 							data="<%= data %>"
+							iconCssClass="icon-plus"
 							id="selectManageableGroup"
-							image="add"
-							message='<%= LanguageUtil.get(pageContext, "other-site") + StringPool.TRIPLE_PERIOD %>'
+							message='<%= LanguageUtil.get(request, "other-site") + StringPool.TRIPLE_PERIOD %>'
 							method="get"
 							url="javascript:;"
 						/>
@@ -249,11 +239,7 @@ String emailBodyParam = emailParam + "Body_" + currentLanguageId;
 	<%
 	request.setAttribute("configuration.jsp-classTypesAssetRendererFactories", classTypesAssetRendererFactories);
 	request.setAttribute("configuration.jsp-configurationRenderURL", configurationRenderURL);
-	request.setAttribute("configuration.jsp-emailBodyParam", emailBodyParam);
-	request.setAttribute("configuration.jsp-emailParam", emailParam);
-	request.setAttribute("configuration.jsp-emailSubjectParam", emailSubjectParam);
 	request.setAttribute("configuration.jsp-redirect", redirect);
-	request.setAttribute("configuration.jsp-rootPortletId", rootPortletId);
 	request.setAttribute("configuration.jsp-selectScope", selectScope);
 	request.setAttribute("configuration.jsp-selectStyle", selectStyle);
 	%>
@@ -280,8 +266,8 @@ String emailBodyParam = emailParam + "Body_" + currentLanguageId;
 				{
 					dialog: {
 						constrain: true,
-						modal: true,
-						width: 600
+						destroyOnHide: true,
+						modal: true
 					},
 					eventName: '<%= eventName %>',
 					id: '<%= eventName %>' + currentTarget.attr('id'),
@@ -343,7 +329,6 @@ String emailBodyParam = emailParam + "Body_" + currentLanguageId;
 			%>
 
 			document.<portlet:namespace />fm.<portlet:namespace />metadataFields.value = Liferay.Util.listSelect(document.<portlet:namespace />fm.<portlet:namespace />currentMetadataFields);
-			document.<portlet:namespace />fm.<portlet:namespace /><%= emailBodyParam %>.value = window.<portlet:namespace />editor.getHTML();
 
 			submitForm(document.<portlet:namespace />fm);
 		},

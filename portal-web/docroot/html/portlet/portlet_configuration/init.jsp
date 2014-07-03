@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,6 +24,7 @@ page import="com.liferay.portal.NoSuchResourceException" %><%@
 page import="com.liferay.portal.PortletIdException" %><%@
 page import="com.liferay.portal.PortletItemNameException" %><%@
 page import="com.liferay.portal.ResourcePrimKeyException" %><%@
+page import="com.liferay.portal.kernel.lar.ExportImportDateUtil" %><%@
 page import="com.liferay.portal.kernel.lar.ExportImportHelper" %><%@
 page import="com.liferay.portal.kernel.lar.ExportImportHelperUtil" %><%@
 page import="com.liferay.portal.kernel.lar.ManifestSummary" %><%@
@@ -36,6 +37,7 @@ page import="com.liferay.portal.kernel.lar.PortletDataHandlerControl" %><%@
 page import="com.liferay.portal.kernel.lar.PortletDataHandlerKeys" %><%@
 page import="com.liferay.portal.kernel.lar.UserIdStrategy" %><%@
 page import="com.liferay.portal.kernel.portlet.PortletModeFactory" %><%@
+page import="com.liferay.portal.kernel.settings.ArchivedSettings" %><%@
 page import="com.liferay.portal.kernel.util.DateRange" %><%@
 page import="com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil" %><%@
 page import="com.liferay.portal.lar.backgroundtask.PortletExportBackgroundTaskExecutor" %><%@

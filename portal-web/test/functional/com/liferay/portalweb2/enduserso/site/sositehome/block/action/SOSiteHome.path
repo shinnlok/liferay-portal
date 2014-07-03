@@ -40,7 +40,7 @@
 </tr>
 <tr>
 	<td>SUCCESS_MESSAGE</td>
-	<td>//div[@class='portlet-msg-success']</td>
+	<td>//div[@class='alert alert-success']</td>
 	<td></td>
 </tr>
 <tr>
@@ -56,42 +56,42 @@
 <!--NAVIGATION-->
 <tr>
 	<td>NAVIGATION_HOME</td>
-	<td>//div/ul/li[contains(.,'Home')]/a/span</td>
+	<td>//div[@id='navigation']/ul/li[contains(.,'Home')]/a/span</td>
 	<td></td>
 </tr>
 <tr>
 	<td>NAVIGATION_CALENDAR</td>
-	<td>//div/ul/li[contains(.,'Calendar')]/a/span</td>
+	<td>//div[@id='navigation']/ul/li[contains(.,'Calendar')]/a/span</td>
 	<td></td>
 </tr>
 <tr>
 	<td>NAVIGATION_DOCUMENTS</td>
-	<td>//div/ul/li/a/span[.=' Documents']</td>
+	<td>//div[@id='navigation']/ul/li[contains(.,' Documents')]/a/span</td>
 	<td></td>
 </tr>
 <tr>
 	<td>NAVIGATION_FORUMS</td>
-	<td>//div/ul/li[contains(.,'Forums')]/a/span</td>
+	<td>//div[@id='navigation']/ul/li[contains(.,'Forums')]/a/span</td>
 	<td></td>
 </tr>
 <tr>
 	<td>NAVIGATION_BLOGS</td>
-	<td>//div/ul/li[contains(.,'Blogs')]/a/span</td>
+	<td>//div[@id='navigation']/ul/li[contains(.,'Blogs')]/a/span</td>
 	<td></td>
 </tr>
 <tr>
 	<td>NAVIGATION_WIKI</td>
-	<td>//div/ul/li[contains(.,'Wiki')]/a/span</td>
+	<td>//div[@id='navigation']/ul/li[contains(.,'Wiki')]/a/span</td>
 	<td></td>
 </tr>
 <tr>
 	<td>NAVIGATION_MEMBERS</td>
-	<td>//div/ul/li[contains(.,'Members')]/a/span</td>
+	<td>//div[@id='navigation']/ul/li[contains(.,'Members')]/a/span</td>
 	<td></td>
 </tr>
 <tr>
 	<td>NAVIGATION_PAGE</td>
-	<td>//div/ul/li[contains(.,'${key_pageName}')]/a/span</td>
+	<td>//div[@id='navigation']/ul/li[contains(.,'${key_pageName}')]/a/span</td>
 	<td></td>
 </tr>
 <tr>
@@ -101,12 +101,12 @@
 </tr>
 <!--ANNOUNCEMENTS-->
 <tr>
-	<td>ANNOUNCEMENTS_OPTIONS</td>
+	<td>ANNOUNCEMENTS_PORTLET_TITLE</td>
 	<td>//header[contains(.,'Announcements')]//h1</td>
 	<td></td>
 </tr>
 <tr>
-	<td>ANNOUNCEMENTS_CLOSE</td>
+	<td>ANNOUNCEMENTS_OPTIONS</td>
 	<td>//header[contains(.,'Announcements')]//menu//a</td>
 	<td></td>
 </tr>
@@ -122,37 +122,47 @@
 </tr>
 <tr>
 	<td>ANNOUNCEMENTS_ENTRY_ACTION</td>
-	<td>//div[@class='entry-action']</td>
+	<td>//div[contains(@class,'entry') and contains(.,'${key_entryTitle}')]//div[@class='entry-action']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>ANNOUNCEMENTS_ENTRY_AUTHOR</td>
-	<td>//div[@class='entry-action']/a</td>
+	<td>//div[contains(@class,'entry') and contains(.,'${key_entryTitle}')]//div[@class='entry-action']/a</td>
 	<td></td>
 </tr>
 <tr>
 	<td>ANNOUNCEMENTS_ENTRY_TITLE</td>
-	<td>//div[@class='entry-body']/div[@class='title']/a</td>
+	<td>//div[contains(@class,'entry') and contains(.,'${key_entryTitle}')]//div[@class='entry-body']/div[@class='title']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ANNOUNCEMENTS_ENTRY_TITLE_LINK</td>
+	<td>//div[contains(@class,'entry') and contains(.,'${key_entryTitle}')]//div[@class='entry-body']/div[@class='title']/a</td>
 	<td></td>
 </tr>
 <tr>
 	<td>ANNOUNCEMENTS_ENTRY_CONTENT</td>
-	<td>//div[@class='entry-content']</td>
+	<td>//div[contains(@class,'entry') and contains(.,'${key_entryTitle}')]//div[@class='entry-content']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>ANNOUNCEMENTS_ENTRY_EDIT_LINK</td>
-	<td>//span[@class='action edit-entry']/a</td>
+	<td>//div[contains(@class,'entry') and contains(.,'${key_entryTitle}')]//span[@class='action edit-entry']/a</td>
 	<td></td>
 </tr>
 <tr>
 	<td>ANNOUNCEMENTS_ENTRY_DELETE_LINK</td>
-	<td>//span[@class='action delete-entry']</td>
+	<td>//div[contains(@class,'entry') and contains(.,'${key_entryTitle}')]//span[@class='action delete-entry']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ANNOUNCEMENTS_ENTRY_GENERIC_DELETE_LINK</td>
+	<td>//span[@class='action delete-entry']/a</td>
 	<td></td>
 </tr>
 <tr>
 	<td>ANNOUNCEMENTS_ENTRY_MARK_LINK</td>
-	<td>//span[@class='action control-entry']/a</td>
+	<td>//div[contains(@class,'entry') and contains(.,'${key_entryTitle}')]//span[@class='action control-entry']/a</td>
 	<td></td>
 </tr>
 <tr>
@@ -171,18 +181,38 @@
 	<td></td>
 </tr>
 <tr>
+	<td>ANNOUNCEMENTS_NAVIGATION_RESULTS</td>
+	<td>//div[@class='navigation']/span[contains(.,'results')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ANNOUNCEMENTS_NAVIGATION_NEXT</td>
+	<td>//div[@class='navigation']//a[contains(.,'Next')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ANNOUNCEMENTS_NAVIGATION_PREVIOUS</td>
+	<td>//div[@class='navigation']//a[contains(.,'Previous')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ANNOUNCEMENTS_ENTRY_IMAGE_LIFERAY</td>
+	<td>//img[@alt='Liferay']</td>
+	<td>Liferay</td>
+</tr>
+<tr>
 	<td></td>
 	<td></td>
 	<td></td>
 </tr>
 <!--ACTIVITIES-->
 <tr>
-	<td>ACTIVITIES_OPTIONS</td>
+	<td>ACTIVITIES_PORTLET_TITLE</td>
 	<td>//header[contains(.,'Activities')]//h1</td>
 	<td></td>
 </tr>
 <tr>
-	<td>ACTIVITIES_CLOSE</td>
+	<td>ACTIVITIES_OPTIONS</td>
 	<td>//header[contains(.,'Activities')]//menu//a</td>
 	<td></td>
 </tr>
@@ -193,12 +223,12 @@
 </tr>
 <!--WELCOME-->
 <tr>
-	<td>WELCOME_OPTIONS</td>
+	<td>WELCOME_PORTLET_TITLE</td>
 	<td>//header[contains(.,'Welcome')]//h1</td>
 	<td></td>
 </tr>
 <tr>
-	<td>WELCOME_CLOSE</td>
+	<td>WELCOME_OPTIONS</td>
 	<td>//header[contains(.,'Welcome')]//menu//a</td>
 	<td></td>
 </tr>
@@ -209,12 +239,12 @@
 </tr>
 <!--BOOKMARKS-->
 <tr>
-	<td>BOOKMARKS_OPTIONS</td>
+	<td>BOOKMARKS_PORTLET_TITLE</td>
 	<td>//header[contains(.,'Bookmarks')]//h1</td>
 	<td></td>
 </tr>
 <tr>
-	<td>BOOKMARKS_CLOSE</td>
+	<td>BOOKMARKS_OPTIONS</td>
 	<td>//header[contains(.,'Bookmarks')]//menu//a</td>
 	<td></td>
 </tr>
@@ -229,18 +259,8 @@
 	<td></td>
 </tr>
 <tr>
-	<td>BOOKMARKS_ENTRY_LINK_INCREMENT</td>
-	<td>//tr[contains(.,'${number}')]/td/a</td>
-	<td></td>
-</tr>
-<tr>
 	<td>BOOKMARKS_ENTRY_ACTIONS</td>
 	<td>//tr[contains(.,'${key_bookmarksEntryName}')]//a[@title='Actions']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>BOOKMARKS_ENTRY_ACTIONS_INCREMENT</td>
-	<td>//tr[contains(.,'${number}')]//a[@title='Actions']</td>
 	<td></td>
 </tr>
 <tr>
@@ -265,7 +285,7 @@
 	<td></td>
 </tr>
 <tr>
-	<td>ACTIONS_MENULIST_DELETE</td>
+	<td>ACTIONS_MENULIST_SUBSCRIBE</td>
 	<td>//ul[contains(@class,'dropdown-menu')]/li[3]/a[contains(.,'Subscribe')]</td>
 	<td></td>
 </tr>
@@ -322,63 +342,63 @@
 </tr>
 <!--RSS-->
 <tr>
-	<td>RSS_OPTIONS</td>
+	<td>RSS_PORTLET_TITLE</td>
 	<td>//header[contains(.,'RSS')]//h1</td>
 	<td></td>
 </tr>
 <tr>
-	<td>RSS_CLOSE</td>
+	<td>RSS_OPTIONS</td>
 	<td>//header[contains(.,'RSS')]//menu//a</td>
 	<td></td>
 </tr>
 <tr>
 	<td>RSS_FEED_TITLE</td>
-	<td>//div[contains(.,'${feedTitle}')]/div[@class='feed-title']</td>
+	<td>//div[contains(.,'${key_feedTitle}')]/div[@class='feed-title']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>RSS_FEED_PUBLISHED_DATE</td>
-	<td>//div[contains(.,'${feedTitle}')]/div[contains(@class,'feed-published-date')]</td>
+	<td>//div[contains(.,'${key_feedTitle}')]/div[contains(@class,'feed-published-date')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>RSS_FEED_DESCRIPTION</td>
-	<td>//div[contains(.,'${feedTitle}')]/div[@class='feed-description']</td>
+	<td>//div[contains(.,'${key_feedTitle}')]/div[@class='feed-description']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>RSS_FEED_IMAGE</td>
-	<td>//a[contains(@title,'${feedTitle}')]/img</td>
+	<td>//a[contains(@title,'${key_feedTitle}')]/img</td>
 	<td></td>
 </tr>
 <tr>
 	<td>RSS_FEED_ENTRY_TITLE_INCREMENT</td>
-	<td>xPath=(//div[contains(.,'${feedTitle}')]/div[@class='feed-entries']/div[@class='feed-entry']/span[@class='feed-entry-title'])[${feedEntryNumber}]</td>
+	<td>xPath=(//div[contains(.,'${key_feedTitle}')]/div[@class='feed-entries']/div[@class='feed-entry']/span[@class='feed-entry-title'])[${key_feedEntryNumber}]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>RSS_FEED_ENTRY_EXPAND_BUTTON_INCREMENT</td>
-	<td>xPath=(//div[contains(.,'${feedTitle}')]/div[@class='feed-entries']/div[@class='feed-entry']/img)[${feedEntryNumber}]</td>
+	<td>xPath=(//div[contains(.,'${key_feedTitle}')]/div[@class='feed-entries']/div[@class='feed-entry']/img)[${key_feedEntryNumber}]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>RSS_FEED_ENTRY_DATE_AND_TIME_INCREMENT</td>
-	<td>xPath=(//div[contains(.,'${feedTitle}')]/div[@class='feed-entries']/div[@class='feed-entry']/div[contains(@class,'feed-entry-content')]/div[@class='feed-date'])[${feedEntryNumber}]</td>
+	<td>xPath=(//div[contains(.,'${key_feedTitle}')]/div[@class='feed-entries']/div[@class='feed-entry']/div[contains(@class,'feed-entry-content')]/div[@class='feed-date'])[${key_feedEntryNumber}]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>RSS_FEED_ENTRY_AUTHOR_INCREMENT</td>
-	<td>xPath=(//div[contains(.,'${feedTitle}')]/div[@class='feed-entries']/div[@class='feed-entry']/div[contains(@class,'feed-entry-content')]/span[@class='feed-entry-author'])[${feedEntryNumber}]</td>
+	<td>xPath=(//div[contains(.,'${key_feedTitle}')]/div[@class='feed-entries']/div[@class='feed-entry']/div[contains(@class,'feed-entry-content')]/span[@class='feed-entry-author'])[${key_feedEntryNumber}]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>RSS_FEED_ENTRY_CONTENT_INCREMENT</td>
-	<td>xPath=(//div[contains(.,'${feedTitle}')]/div[@class='feed-entries']/div[@class='feed-entry']/div[contains(@class,'feed-entry-content')])[${feedEntryNumber}]</td>
+	<td>xPath=(//div[contains(.,'${key_feedTitle}')]/div[@class='feed-entries']/div[@class='feed-entry']/div[contains(@class,'feed-entry-content')])[${key_feedEntryNumber}]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>RSS_FEED_ENTRY_CONTENT_READ_MORE_INCREMENT</td>
-	<td>xPath=(//div[contains(.,'${feedTitle}')]/div[@class='feed-entries']/div[@class='feed-entry']/div[contains(@class,'feed-entry-content')]/a)[${feedEntryNumber}]</td>
+	<td>xPath=(//div[contains(.,'${key_feedTitle}')]/div[@class='feed-entries']/div[@class='feed-entry']/div[contains(@class,'feed-entry-content')]/a)[${key_feedEntryNumber}]</td>
 	<td></td>
 </tr>
 <tr>
@@ -388,12 +408,12 @@
 </tr>
 <!--RECENT_DOWNLOADS-->
 <tr>
-	<td>RECENT_DOWNLOADS_OPTIONS</td>
+	<td>RECENT_DOWNLOADS_PORTLET_TITLE</td>
 	<td>//header[contains(.,'Recent Downloads')]//h1</td>
 	<td></td>
 </tr>
 <tr>
-	<td>RECENT_DOWNLOADS_CLOSE</td>
+	<td>RECENT_DOWNLOADS_OPTIONS</td>
 	<td>//header[contains(.,'Recent Downloads')]//menu//a</td>
 	<td></td>
 </tr>
@@ -404,12 +424,12 @@
 </tr>
 <!--EVENTS_DISPLAY-->
 <tr>
-	<td>EVENTS_DISPLAY_OPTIONS</td>
+	<td>EVENTS_DISPLAY_PORTLET_TITLE</td>
 	<td>//header[contains(.,'Events')]//h1</td>
 	<td></td>
 </tr>
 <tr>
-	<td>EVENTS_DISPLAY_CLOSE</td>
+	<td>EVENTS_DISPLAY_OPTIONS</td>
 	<td>//header[contains(.,'Events')]//menu//a</td>
 	<td></td>
 </tr>
@@ -425,42 +445,47 @@
 </tr>
 <tr>
 	<td>EVENTS_DISPLAY_TODAYS_EVENTS_EVENT_TITLE</td>
+	<td>//div[@class='today-events']//div[@class='event' and contains(.,'${key_eventTitle}')]/span[@class='event-name']/a</td>
+	<td></td>
+</tr>
+<tr>
+	<td>EVENTS_DISPLAY_TODAYS_EVENTS_EVENT_TITLE_GENERIC</td>
 	<td>//div[@class='today-events']//span[@class='event-name']/a</td>
 	<td></td>
 </tr>
 <tr>
-	<td>EVENTS_DISPLAY_TODAYS_EVENTS_EVENT_TITLE_INCREMENT</td>
-	<td>//div[@class='today-events']//div[@class='event' and contains(.,'${number}')]/span[@class='event-name']/a</td>
-	<td></td>
-</tr>
-<tr>
 	<td>EVENTS_DISPLAY_TODAYS_EVENTS_EVENT_TIME</td>
-	<td>//div[@class='today-events']//span[@class='event-time']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>EVENTS_DISPLAY_TODAYS_EVENTS_EVENT_TIME_INCREMENT</td>
-	<td>//div[@class='today-events']//div[@class='event' and contains(.,'${number}')]/span[@class='event-time']</td>
+	<td>//div[@class='today-events']//div[@class='event' and contains(.,'${key_eventTitle}')]/span[@class='event-time']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>EVENTS_DISPLAY_UPCOMING_EVENTS_EVENT_TITLE</td>
+	<td>//div[@class='upcoming-events']//div[@class='event' and contains(.,'${key_eventTitle}')]/span[@class='event-name']/a</td>
+	<td></td>
+</tr>
+<tr>
+	<td>EVENTS_DISPLAY_UPCOMING_EVENTS_EVENT_TITLE_GENERIC</td>
 	<td>//div[@class='upcoming-events']//span[@class='event-name']/a</td>
 	<td></td>
 </tr>
 <tr>
-	<td>EVENTS_DISPLAY_UPCOMING_EVENTS_EVENT_TITLE_INCREMENT</td>
-	<td>//div[@class='upcoming-events']//div[@class='event' and contains(.,'${number}')]/span[@class='event-name']/a</td>
-	<td></td>
-</tr>
-<tr>
 	<td>EVENTS_DISPLAY_UPCOMING_EVENTS_EVENT_TIME</td>
-	<td>//div[@class='upcoming-events']//span[@class='event-time']</td>
+	<td>//div[@class='upcoming-events']//div[@class='event' and contains(.,'${key_eventTitle}')]/span[@class='event-time']</td>
 	<td></td>
 </tr>
 <tr>
-	<td>EVENTS_DISPLAY_UPCOMING_EVENTS_EVENT_TIME_INCREMENT</td>
-	<td>//div[@class='upcoming-events']//div[@class='event' and contains(.,'${number}')]/span[@class='event-time']</td>
+	<td>EVENTS_DISPLAY_NO_EVENTS_MESSAGE</td>
+	<td>//section[@id='portlet_1_WAR_eventsdisplayportlet']//div[@class='portlet-body']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>EVENTS_DISPLAY_NAVIGATION_NEXT</td>
+	<td>//section[@id='portlet_1_WAR_eventsdisplayportlet']//a[contains(.,'Next')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>EVENTS_DISPLAY_NAVIGATION_PREVIOUS</td>
+	<td>//section[@id='portlet_1_WAR_eventsdisplayportlet']//a[contains(.,'Previous')]</td>
 	<td></td>
 </tr>
 <tr>

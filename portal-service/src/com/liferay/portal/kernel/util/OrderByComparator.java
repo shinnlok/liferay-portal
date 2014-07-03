@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,11 +24,8 @@ import java.util.Comparator;
  * @author Brian Wing Shun Chan
  * @author Shuyang Zhou
  */
-@SuppressWarnings("rawtypes")
-public abstract class OrderByComparator implements Comparator, Serializable {
-
-	@Override
-	public abstract int compare(Object obj1, Object obj2);
+public abstract class OrderByComparator<T>
+	implements Comparator<T>, Serializable {
 
 	public String getOrderBy() {
 		return null;

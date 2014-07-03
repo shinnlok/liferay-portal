@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,7 +20,8 @@ import com.liferay.portal.model.Organization;
 /**
  * @author Brian Wing Shun Chan
  */
-public class OrganizationTypeComparator extends OrderByComparator {
+public class OrganizationTypeComparator
+	extends OrderByComparator<Organization> {
 
 	public static final String ORDER_BY_ASC = "orgType ASC, orgName ASC";
 
@@ -37,10 +38,7 @@ public class OrganizationTypeComparator extends OrderByComparator {
 	}
 
 	@Override
-	public int compare(Object obj1, Object obj2) {
-		Organization organization1 = (Organization)obj1;
-		Organization organization2 = (Organization)obj2;
-
+	public int compare(Organization organization1, Organization organization2) {
 		int typeOrder1 = organization1.getTypeOrder();
 		int typeOrder2 = organization2.getTypeOrder();
 

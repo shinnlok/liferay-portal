@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,8 +14,11 @@
 
 package com.liferay.portal.spring.hibernate;
 
+import com.liferay.portal.dao.orm.hibernate.event.MVCCSynchronizerPostUpdateEventListener;
+import com.liferay.portal.dao.shard.ShardSpringSessionContext;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
+import com.liferay.portal.kernel.dao.shard.ShardUtil;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -46,7 +49,11 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
 import org.hibernate.dialect.Dialect;
+import org.hibernate.event.EventListeners;
+import org.hibernate.event.PostUpdateEventListener;
 
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
 
 /**
@@ -55,7 +62,8 @@ import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
  * @author Shuyang Zhou
  * @author Tomas Polesovsky
  */
-public class PortalHibernateConfiguration extends LocalSessionFactoryBean {
+public class PortalHibernateConfiguration
+	extends LocalSessionFactoryBean implements BeanFactoryAware {
 
 	@Override
 	public SessionFactory buildSessionFactory() throws Exception {
@@ -71,10 +79,19 @@ public class PortalHibernateConfiguration extends LocalSessionFactoryBean {
 		super.destroy();
 	}
 
+	@Override
+	public void setBeanFactory(BeanFactory beanFactory) {
+		_beanFactory = beanFactory;
+	}
+
 	public void setHibernateConfigurationConverter(
 		Converter<String> hibernateConfigurationConverter) {
 
 		_hibernateConfigurationConverter = hibernateConfigurationConverter;
+	}
+
+	public void setMvccEnabled(boolean mvccEnabled) {
+		_mvccEnabled = mvccEnabled;
 	}
 
 	protected static Map<String, Class<?>> getPreloadClassLoaderClasses() {
@@ -159,6 +176,16 @@ public class PortalHibernateConfiguration extends LocalSessionFactoryBean {
 			if (dbType.equals(DB.TYPE_HYPERSONIC)) {
 				//configuration.setProperty("hibernate.jdbc.batch_size", "0");
 			}
+
+			if (_mvccEnabled) {
+				EventListeners eventListeners =
+					configuration.getEventListeners();
+
+				eventListeners.setPostUpdateEventListeners(
+					new PostUpdateEventListener[] {
+						MVCCSynchronizerPostUpdateEventListener.INSTANCE
+					});
+			}
 		}
 		catch (Exception e1) {
 			_log.error(e1, e1);
@@ -166,15 +193,17 @@ public class PortalHibernateConfiguration extends LocalSessionFactoryBean {
 
 		Properties hibernateProperties = getHibernateProperties();
 
-		if (hibernateProperties != null) {
-			for (Map.Entry<Object, Object> entry :
-					hibernateProperties.entrySet()) {
+		if (_beanFactory.containsBean(ShardUtil.class.getName())) {
+			hibernateProperties.setProperty(
+				Environment.CURRENT_SESSION_CONTEXT_CLASS,
+				ShardSpringSessionContext.class.getName());
+		}
 
-				String key = (String)entry.getKey();
-				String value = (String)entry.getValue();
+		for (Map.Entry<Object, Object> entry : hibernateProperties.entrySet()) {
+			String key = (String)entry.getKey();
+			String value = (String)entry.getValue();
 
-				configuration.setProperty(key, value);
-			}
+			configuration.setProperty(key, value);
 		}
 
 		return configuration;
@@ -297,6 +326,8 @@ public class PortalHibernateConfiguration extends LocalSessionFactoryBean {
 			};
 	}
 
+	private BeanFactory _beanFactory;
 	private Converter<String> _hibernateConfigurationConverter;
+	private boolean _mvccEnabled = true;
 
 }

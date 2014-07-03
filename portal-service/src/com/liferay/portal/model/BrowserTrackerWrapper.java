@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -51,6 +51,7 @@ public class BrowserTrackerWrapper implements BrowserTracker,
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
+		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("browserTrackerId", getBrowserTrackerId());
 		attributes.put("userId", getUserId());
 		attributes.put("browserKey", getBrowserKey());
@@ -60,6 +61,12 @@ public class BrowserTrackerWrapper implements BrowserTracker,
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
+		Long mvccVersion = (Long)attributes.get("mvccVersion");
+
+		if (mvccVersion != null) {
+			setMvccVersion(mvccVersion);
+		}
+
 		Long browserTrackerId = (Long)attributes.get("browserTrackerId");
 
 		if (browserTrackerId != null) {
@@ -97,6 +104,26 @@ public class BrowserTrackerWrapper implements BrowserTracker,
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_browserTracker.setPrimaryKey(primaryKey);
+	}
+
+	/**
+	* Returns the mvcc version of this browser tracker.
+	*
+	* @return the mvcc version of this browser tracker
+	*/
+	@Override
+	public long getMvccVersion() {
+		return _browserTracker.getMvccVersion();
+	}
+
+	/**
+	* Sets the mvcc version of this browser tracker.
+	*
+	* @param mvccVersion the mvcc version of this browser tracker
+	*/
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		_browserTracker.setMvccVersion(mvccVersion);
 	}
 
 	/**
@@ -143,11 +170,9 @@ public class BrowserTrackerWrapper implements BrowserTracker,
 	* Returns the user uuid of this browser tracker.
 	*
 	* @return the user uuid of this browser tracker
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
-	public java.lang.String getUserUuid()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.lang.String getUserUuid() {
 		return _browserTracker.getUserUuid();
 	}
 
@@ -280,8 +305,7 @@ public class BrowserTrackerWrapper implements BrowserTracker,
 	}
 
 	@Override
-	public void persist()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public void persist() {
 		_browserTracker.persist();
 	}
 

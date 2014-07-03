@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -52,6 +52,7 @@ public class PortletItemWrapper implements PortletItem,
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
+		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("portletItemId", getPortletItemId());
 		attributes.put("groupId", getGroupId());
 		attributes.put("companyId", getCompanyId());
@@ -68,6 +69,12 @@ public class PortletItemWrapper implements PortletItem,
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
+		Long mvccVersion = (Long)attributes.get("mvccVersion");
+
+		if (mvccVersion != null) {
+			setMvccVersion(mvccVersion);
+		}
+
 		Long portletItemId = (Long)attributes.get("portletItemId");
 
 		if (portletItemId != null) {
@@ -147,6 +154,26 @@ public class PortletItemWrapper implements PortletItem,
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_portletItem.setPrimaryKey(primaryKey);
+	}
+
+	/**
+	* Returns the mvcc version of this portlet item.
+	*
+	* @return the mvcc version of this portlet item
+	*/
+	@Override
+	public long getMvccVersion() {
+		return _portletItem.getMvccVersion();
+	}
+
+	/**
+	* Sets the mvcc version of this portlet item.
+	*
+	* @param mvccVersion the mvcc version of this portlet item
+	*/
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		_portletItem.setMvccVersion(mvccVersion);
 	}
 
 	/**
@@ -233,11 +260,9 @@ public class PortletItemWrapper implements PortletItem,
 	* Returns the user uuid of this portlet item.
 	*
 	* @return the user uuid of this portlet item
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
-	public java.lang.String getUserUuid()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.lang.String getUserUuid() {
 		return _portletItem.getUserUuid();
 	}
 
@@ -485,8 +510,7 @@ public class PortletItemWrapper implements PortletItem,
 	}
 
 	@Override
-	public void persist()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public void persist() {
 		_portletItem.persist();
 	}
 

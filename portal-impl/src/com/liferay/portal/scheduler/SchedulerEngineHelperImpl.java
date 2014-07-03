@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -126,14 +126,14 @@ public class SchedulerEngineHelperImpl implements SchedulerEngineHelper {
 
 		try {
 			AuditMessage auditMessage = new AuditMessage(
-				SchedulerEngine.AUDIT_ACTION, CompanyConstants.SYSTEM, 0,
+				SchedulerEngine.SCHEDULER, CompanyConstants.SYSTEM, 0,
 				StringPool.BLANK, SchedulerEngine.class.getName(), "0",
 				triggerState.toString(), new Date(),
 				JSONFactoryUtil.createJSONObject(
 					JSONFactoryUtil.serialize(message)));
 
 			auditMessage.setServerName(InetAddressUtil.getLocalHostName());
-			auditMessage.setServerPort(PortalUtil.getPortalPort(false));
+			auditMessage.setServerPort(PortalUtil.getPortalLocalPort(false));
 
 			AuditRouterUtil.route(auditMessage);
 		}
@@ -230,7 +230,7 @@ public class SchedulerEngineHelperImpl implements SchedulerEngineHelper {
 			addWeeklyDayPos(portletRequest, dayPos, Calendar.FRIDAY);
 			addWeeklyDayPos(portletRequest, dayPos, Calendar.SATURDAY);
 
-			if (dayPos.size() == 0) {
+			if (dayPos.isEmpty()) {
 				dayPos.add(new DayAndPosition(Calendar.MONDAY, 0));
 			}
 

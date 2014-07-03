@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,17 +23,22 @@ import com.liferay.portal.kernel.configuration.Filter;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.search.BaseModelSearchResult;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.QueryConfig;
 import com.liferay.portal.kernel.search.SearchContext;
+import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.search.Sort;
+import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TreeModelFinder;
@@ -41,14 +46,17 @@ import com.liferay.portal.kernel.util.TreePathUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Company;
+import com.liferay.portal.model.Country;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.GroupConstants;
 import com.liferay.portal.model.ListTypeConstants;
 import com.liferay.portal.model.Organization;
 import com.liferay.portal.model.OrganizationConstants;
+import com.liferay.portal.model.Region;
 import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.RoleConstants;
+import com.liferay.portal.model.SystemEventConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.model.UserGroupRole;
 import com.liferay.portal.model.impl.OrganizationImpl;
@@ -61,6 +69,7 @@ import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.comparator.OrganizationIdComparator;
 import com.liferay.portal.util.comparator.OrganizationNameComparator;
+import com.liferay.portlet.usersadmin.util.UsersAdminUtil;
 import com.liferay.util.dao.orm.CustomSQLUtil;
 
 import java.io.Serializable;
@@ -96,11 +105,10 @@ public class OrganizationLocalServiceImpl
 	 * @param  organizationIds the primary keys of the organizations
 	 * @throws PortalException if a group or organization with the primary key
 	 *         could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void addGroupOrganizations(long groupId, long[] organizationIds)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		groupPersistence.addOrganizations(groupId, organizationIds);
 
@@ -127,12 +135,11 @@ public class OrganizationLocalServiceImpl
 	 * @throws PortalException if a creator or parent organization with the
 	 *         primary key could not be found or if the organization's
 	 *         information was invalid
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public Organization addOrganization(
 			long userId, long parentOrganizationId, String name, boolean site)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		return addOrganization(
 			userId, parentOrganizationId, name,
@@ -172,7 +179,6 @@ public class OrganizationLocalServiceImpl
 	 * @throws     PortalException if a creator or parent organization with the
 	 *             primary key could not be found or if the organization's
 	 *             information was invalid
-	 * @throws     SystemException if a system exception occurred
 	 * @deprecated As of 6.2.0, replaced by {@link #addOrganization(long, long,
 	 *             String, String, long, long, int, String, boolean,
 	 *             ServiceContext)}
@@ -183,7 +189,7 @@ public class OrganizationLocalServiceImpl
 			long userId, long parentOrganizationId, String name, String type,
 			boolean recursable, long regionId, long countryId, int statusId,
 			String comments, boolean site, ServiceContext serviceContext)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		return addOrganization(
 			userId, parentOrganizationId, name, type, regionId, countryId,
@@ -218,14 +224,13 @@ public class OrganizationLocalServiceImpl
 	 * @throws PortalException if a creator or parent organization with the
 	 *         primary key could not be found or if the organization's
 	 *         information was invalid
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public Organization addOrganization(
 			long userId, long parentOrganizationId, String name, String type,
 			long regionId, long countryId, int statusId, String comments,
 			boolean site, ServiceContext serviceContext)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		// Organization
 
@@ -338,11 +343,10 @@ public class OrganizationLocalServiceImpl
 	 * @param  userId the primary key of the creator/owner of the organization
 	 * @param  organization the organization
 	 * @throws PortalException if a portal exception occurred
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void addOrganizationResources(long userId, Organization organization)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		String name = Organization.class.getName();
 
@@ -357,12 +361,10 @@ public class OrganizationLocalServiceImpl
 	 *
 	 * @param  passwordPolicyId the primary key of the password policy
 	 * @param  organizationIds the primary keys of the organizations
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void addPasswordPolicyOrganizations(
-			long passwordPolicyId, long[] organizationIds)
-		throws SystemException {
+		long passwordPolicyId, long[] organizationIds) {
 
 		passwordPolicyRelLocalService.addPasswordPolicyRels(
 			passwordPolicyId, Organization.class.getName(), organizationIds);
@@ -375,12 +377,9 @@ public class OrganizationLocalServiceImpl
 	 * @throws PortalException if an organization or parent organization with
 	 *         the primary key could not be found or if the organization's logo
 	 *         could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public void deleteLogo(long organizationId)
-		throws PortalException, SystemException {
-
+	public void deleteLogo(long organizationId) throws PortalException {
 		Organization organization = getOrganization(organizationId);
 
 		PortalUtil.updateImageId(organization, false, null, "logoId", 0, 0, 0);
@@ -395,16 +394,15 @@ public class OrganizationLocalServiceImpl
 	 * @throws PortalException if an organization with the primary key could not
 	 *         be found, if the organization had a workflow in approved status,
 	 *         or if the organization was a parent organization
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public Organization deleteOrganization(long organizationId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		Organization organization = organizationPersistence.findByPrimaryKey(
 			organizationId);
 
-		return deleteOrganization(organization);
+		return organizationLocalService.deleteOrganization(organization);
 	}
 
 	/**
@@ -415,11 +413,11 @@ public class OrganizationLocalServiceImpl
 	 * @return the deleted organization
 	 * @throws PortalException if the organization had a workflow in approved
 	 *         status or if the organization was a parent organization
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
+	@SystemEvent(type = SystemEventConstants.TYPE_DELETE)
 	public Organization deleteOrganization(Organization organization)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		if ((userLocalService.getOrganizationUsersCount(
 				organization.getOrganizationId(),
@@ -502,14 +500,49 @@ public class OrganizationLocalServiceImpl
 	}
 
 	@Override
-	public Organization fetchOrganization(long companyId, String name)
-		throws SystemException {
-
+	public Organization fetchOrganization(long companyId, String name) {
 		return organizationPersistence.fetchByC_N(companyId, name);
 	}
 
 	@Override
-	public List<Organization> getNoAssetOrganizations() throws SystemException {
+	public List<Organization> getGroupUserOrganizations(
+			long groupId, long userId)
+		throws PortalException {
+
+		long[] groupOrganizationIds =
+			groupPersistence.getOrganizationPrimaryKeys(groupId);
+
+		if (groupOrganizationIds.length == 0) {
+			return Collections.emptyList();
+		}
+
+		long[] userOrganizationIds = userPersistence.getOrganizationPrimaryKeys(
+			userId);
+
+		if (userOrganizationIds.length == 0) {
+			return Collections.emptyList();
+		}
+
+		Set<Long> organizationIds = SetUtil.intersect(
+			groupOrganizationIds, userOrganizationIds);
+
+		if (organizationIds.isEmpty()) {
+			return Collections.emptyList();
+		}
+
+		List<Organization> organizations = new ArrayList<Organization>(
+			organizationIds.size());
+
+		for (Long organizationId : organizationIds) {
+			organizations.add(
+				organizationPersistence.findByPrimaryKey(organizationId));
+		}
+
+		return organizations;
+	}
+
+	@Override
+	public List<Organization> getNoAssetOrganizations() {
 		return organizationFinder.findByNoAssets();
 	}
 
@@ -521,11 +554,10 @@ public class OrganizationLocalServiceImpl
 	 * @return the organization with the name
 	 * @throws PortalException if the organization with the name could not be
 	 *         found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public Organization getOrganization(long companyId, String name)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		return organizationPersistence.findByC_N(companyId, name);
 	}
@@ -537,12 +569,9 @@ public class OrganizationLocalServiceImpl
 	 * @param  name the organization's name
 	 * @return the primary key of the organization with the name, or
 	 *         <code>0</code> if the organization could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public long getOrganizationId(long companyId, String name)
-		throws SystemException {
-
+	public long getOrganizationId(long companyId, String name) {
 		Organization organization = organizationPersistence.fetchByC_N(
 			companyId, name);
 
@@ -556,8 +585,9 @@ public class OrganizationLocalServiceImpl
 
 	@Override
 	public List<Organization> getOrganizations(
-			long userId, int start, int end, OrderByComparator obc)
-		throws PortalException, SystemException {
+			long userId, int start, int end,
+			OrderByComparator<Organization> obc)
+		throws PortalException {
 
 		User user = userPersistence.findByPrimaryKey(userId);
 
@@ -594,12 +624,10 @@ public class OrganizationLocalServiceImpl
 	 * @param  parentOrganizationId the primary key of the organization's parent
 	 *         organization
 	 * @return the organizations belonging to the parent organization
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public List<Organization> getOrganizations(
-			long companyId, long parentOrganizationId)
-		throws SystemException {
+		long companyId, long parentOrganizationId) {
 
 		return getOrganizations(
 			companyId, parentOrganizationId, QueryUtil.ALL_POS,
@@ -627,14 +655,12 @@ public class OrganizationLocalServiceImpl
 	 * @param  end the upper bound of the range of organizations to return (not
 	 *         inclusive)
 	 * @return the range of organizations belonging to the parent organization
-	 * @throws SystemException if a system exception occurred
 	 * @see    com.liferay.portal.service.persistence.OrganizationPersistence#findByC_P(
 	 *         long, long, int, int)
 	 */
 	@Override
 	public List<Organization> getOrganizations(
-			long companyId, long parentOrganizationId, int start, int end)
-		throws SystemException {
+		long companyId, long parentOrganizationId, int start, int end) {
 
 		if (parentOrganizationId ==
 				OrganizationConstants.ANY_PARENT_ORGANIZATION_ID) {
@@ -655,11 +681,10 @@ public class OrganizationLocalServiceImpl
 	 * @return the organizations with the primary keys
 	 * @throws PortalException if any one of the organizations could not be
 	 *         found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public List<Organization> getOrganizations(long[] organizationIds)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		List<Organization> organizations = new ArrayList<Organization>(
 			organizationIds.length);
@@ -680,11 +705,10 @@ public class OrganizationLocalServiceImpl
 	 * @param  parentOrganizationId the primary key of the organization's parent
 	 *         organization
 	 * @return the number of organizations belonging to the parent organization
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public int getOrganizationsCount(long companyId, long parentOrganizationId)
-		throws SystemException {
+	public int getOrganizationsCount(
+		long companyId, long parentOrganizationId) {
 
 		if (parentOrganizationId ==
 				OrganizationConstants.ANY_PARENT_ORGANIZATION_ID) {
@@ -705,11 +729,10 @@ public class OrganizationLocalServiceImpl
 	 * @return the parent organizations in order by closest ancestor
 	 * @throws PortalException if an organization with the primary key could not
 	 *         be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public List<Organization> getParentOrganizations(long organizationId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		if (organizationId ==
 				OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID) {
@@ -729,12 +752,10 @@ public class OrganizationLocalServiceImpl
 	 * @param  organizations the organizations from which to get
 	 *         suborganizations
 	 * @return the suborganizations of the organizations
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public List<Organization> getSuborganizations(
-			List<Organization> organizations)
-		throws SystemException {
+		List<Organization> organizations) {
 
 		List<Organization> allSuborganizations = new ArrayList<Organization>();
 
@@ -758,12 +779,10 @@ public class OrganizationLocalServiceImpl
 	 * @param  companyId the primary key of the organization's company
 	 * @param  organizationId the primary key of the organization
 	 * @return the suborganizations of the organization
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public List<Organization> getSuborganizations(
-			long companyId, long organizationId)
-		throws SystemException {
+		long companyId, long organizationId) {
 
 		return organizationPersistence.findByC_P(companyId, organizationId);
 	}
@@ -774,12 +793,9 @@ public class OrganizationLocalServiceImpl
 	 * @param  companyId the primary key of the organization's company
 	 * @param  organizationId the primary key of the organization
 	 * @return the count of suborganizations of the organization
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public int getSuborganizationsCount(long companyId, long organizationId)
-		throws SystemException {
-
+	public int getSuborganizationsCount(long companyId, long organizationId) {
 		return organizationPersistence.countByC_P(companyId, organizationId);
 	}
 
@@ -808,6 +824,38 @@ public class OrganizationLocalServiceImpl
 		return subsetOrganizations;
 	}
 
+	@Override
+	public long[] getUserOrganizationIds(
+			long userId, boolean includeAdministrative)
+		throws PortalException {
+
+		if (!includeAdministrative) {
+			return userPersistence.getOrganizationPrimaryKeys(userId);
+		}
+
+		Set<Long> organizationIds = SetUtil.fromArray(
+			userPersistence.getOrganizationPrimaryKeys(userId));
+
+		List<UserGroupRole> userGroupRoles =
+			userGroupRoleLocalService.getUserGroupRoles(userId);
+
+		for (UserGroupRole userGroupRole : userGroupRoles) {
+			Role role = userGroupRole.getRole();
+
+			String roleName = role.getName();
+
+			if (roleName.equals(RoleConstants.ORGANIZATION_ADMINISTRATOR) ||
+				roleName.equals(RoleConstants.ORGANIZATION_OWNER)) {
+
+				Group group = userGroupRole.getGroup();
+
+				organizationIds.add(group.getOrganizationId());
+			}
+		}
+
+		return ArrayUtil.toLongArray(organizationIds);
+	}
+
 	/**
 	 * Returns all the organizations associated with the user. If
 	 * includeAdministrative is <code>true</code>, the result includes those
@@ -820,18 +868,18 @@ public class OrganizationLocalServiceImpl
 	 *         or an owner of the organization
 	 * @return the organizations associated with the user
 	 * @throws PortalException if a user with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public List<Organization> getUserOrganizations(
 			long userId, boolean includeAdministrative)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		if (!includeAdministrative) {
 			return getUserOrganizations(userId);
 		}
 
-		Set<Organization> organizations = new HashSet<Organization>();
+		Set<Organization> organizations = new HashSet<Organization>(
+			getUserOrganizations(userId));
 
 		List<UserGroupRole> userGroupRoles =
 			userGroupRoleLocalService.getUserGroupRoles(userId);
@@ -854,8 +902,6 @@ public class OrganizationLocalServiceImpl
 			}
 		}
 
-		organizations.addAll(getUserOrganizations(userId));
-
 		return new ArrayList<Organization>(organizations);
 	}
 
@@ -867,12 +913,10 @@ public class OrganizationLocalServiceImpl
 	 * @param  organizationId the primary key of the organization
 	 * @return <code>true</code> if the password policy has been assigned to the
 	 *         organization; <code>false</code> otherwise
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public boolean hasPasswordPolicyOrganization(
-			long passwordPolicyId, long organizationId)
-		throws SystemException {
+		long passwordPolicyId, long organizationId) {
 
 		return passwordPolicyRelLocalService.hasPasswordPolicyRel(
 			passwordPolicyId, Organization.class.getName(), organizationId);
@@ -924,14 +968,13 @@ public class OrganizationLocalServiceImpl
 	 *         <code>false</code> otherwise
 	 * @throws PortalException if an organization with the primary key could not
 	 *         be found
-	 * @throws SystemException if a system exception occurred
 	 * @see    com.liferay.portal.service.persistence.OrganizationFinder
 	 */
 	@Override
 	public boolean hasUserOrganization(
 			long userId, long organizationId, boolean inheritSuborganizations,
 			boolean includeSpecifiedOrganization)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		if (!inheritSuborganizations) {
 			return userPersistence.containsOrganization(userId, organizationId);
@@ -973,21 +1016,17 @@ public class OrganizationLocalServiceImpl
 	 * @param  companyId the primary key of the organization's company
 	 * @throws PortalException if an organization with the primary key could not
 	 *         be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public void rebuildTree(long companyId)
-		throws PortalException, SystemException {
-
+	public void rebuildTree(long companyId) throws PortalException {
 		TreePathUtil.rebuildTree(
 			companyId, OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID,
 			new TreeModelFinder<Organization>() {
 
 				@Override
 				public List<Organization> findTreeModels(
-						long previousId, long companyId, long parentPrimaryKey,
-						int size)
-					throws SystemException {
+					long previousId, long companyId, long parentPrimaryKey,
+					int size) {
 
 					return organizationPersistence.findByO_C_P(
 						previousId, companyId, parentPrimaryKey,
@@ -1029,14 +1068,12 @@ public class OrganizationLocalServiceImpl
 	 * @param  sort the field and direction by which to sort (optionally
 	 *         <code>null</code>)
 	 * @return the matching organizations ordered by name
-	 * @throws SystemException if a system exception occurred
 	 * @see    com.liferay.portlet.usersadmin.util.OrganizationIndexer
 	 */
 	@Override
 	public Hits search(
-			long companyId, long parentOrganizationId, String keywords,
-			LinkedHashMap<String, Object> params, int start, int end, Sort sort)
-		throws SystemException {
+		long companyId, long parentOrganizationId, String keywords,
+		LinkedHashMap<String, Object> params, int start, int end, Sort sort) {
 
 		String name = null;
 		String type = null;
@@ -1103,15 +1140,13 @@ public class OrganizationLocalServiceImpl
 	 * @param  end the upper bound of the range of organizations to return (not
 	 *         inclusive)
 	 * @return the matching organizations ordered by name
-	 * @throws SystemException if a system exception occurred
 	 * @see    com.liferay.portal.service.persistence.OrganizationFinder
 	 */
 	@Override
 	public List<Organization> search(
-			long companyId, long parentOrganizationId, String keywords,
-			String type, Long regionId, Long countryId,
-			LinkedHashMap<String, Object> params, int start, int end)
-		throws SystemException {
+		long companyId, long parentOrganizationId, String keywords, String type,
+		Long regionId, Long countryId, LinkedHashMap<String, Object> params,
+		int start, int end) {
 
 		return search(
 			companyId, parentOrganizationId, keywords, type, regionId,
@@ -1156,16 +1191,13 @@ public class OrganizationLocalServiceImpl
 	 * @param  obc the comparator to order the organizations (optionally
 	 *         <code>null</code>)
 	 * @return the matching organizations ordered by comparator <code>obc</code>
-	 * @throws SystemException if a system exception occurred
 	 * @see    com.liferay.portal.service.persistence.OrganizationFinder
 	 */
 	@Override
 	public List<Organization> search(
-			long companyId, long parentOrganizationId, String keywords,
-			String type, Long regionId, Long countryId,
-			LinkedHashMap<String, Object> params, int start, int end,
-			OrderByComparator obc)
-		throws SystemException {
+		long companyId, long parentOrganizationId, String keywords, String type,
+		Long regionId, Long countryId, LinkedHashMap<String, Object> params,
+		int start, int end, OrderByComparator<Organization> obc) {
 
 		String parentOrganizationIdComparator = StringPool.EQUAL;
 
@@ -1221,16 +1253,14 @@ public class OrganizationLocalServiceImpl
 	 * @param  end the upper bound of the range of organizations to return (not
 	 *         inclusive)
 	 * @return the matching organizations ordered by name
-	 * @throws SystemException if a system exception occurred
 	 * @see    com.liferay.portal.service.persistence.OrganizationFinder
 	 */
 	@Override
 	public List<Organization> search(
-			long companyId, long parentOrganizationId, String name, String type,
-			String street, String city, String zip, Long regionId,
-			Long countryId, LinkedHashMap<String, Object> params,
-			boolean andOperator, int start, int end)
-		throws SystemException {
+		long companyId, long parentOrganizationId, String name, String type,
+		String street, String city, String zip, Long regionId, Long countryId,
+		LinkedHashMap<String, Object> params, boolean andOperator, int start,
+		int end) {
 
 		return search(
 			companyId, parentOrganizationId, name, type, street, city, zip,
@@ -1282,16 +1312,14 @@ public class OrganizationLocalServiceImpl
 	 * @param  obc the comparator to order the organizations (optionally
 	 *         <code>null</code>)
 	 * @return the matching organizations ordered by comparator <code>obc</code>
-	 * @throws SystemException if a system exception occurred
 	 * @see    com.liferay.portal.service.persistence.OrganizationFinder
 	 */
 	@Override
 	public List<Organization> search(
-			long companyId, long parentOrganizationId, String name, String type,
-			String street, String city, String zip, Long regionId,
-			Long countryId, LinkedHashMap<String, Object> params,
-			boolean andOperator, int start, int end, OrderByComparator obc)
-		throws SystemException {
+		long companyId, long parentOrganizationId, String name, String type,
+		String street, String city, String zip, Long regionId, Long countryId,
+		LinkedHashMap<String, Object> params, boolean andOperator, int start,
+		int end, OrderByComparator<Organization> obc) {
 
 		String parentOrganizationIdComparator = StringPool.EQUAL;
 
@@ -1345,64 +1373,22 @@ public class OrganizationLocalServiceImpl
 	 * @param  sort the field and direction by which to sort (optionally
 	 *         <code>null</code>)
 	 * @return the matching organizations ordered by <code>sort</code>
-	 * @throws SystemException if a system exception occurred
 	 * @see    com.liferay.portlet.usersadmin.util.OrganizationIndexer
 	 */
 	@Override
 	public Hits search(
-			long companyId, long parentOrganizationId, String name, String type,
-			String street, String city, String zip, String region,
-			String country, LinkedHashMap<String, Object> params,
-			boolean andSearch, int start, int end, Sort sort)
-		throws SystemException {
+		long companyId, long parentOrganizationId, String name, String type,
+		String street, String city, String zip, String region, String country,
+		LinkedHashMap<String, Object> params, boolean andSearch, int start,
+		int end, Sort sort) {
 
 		try {
-			SearchContext searchContext = new SearchContext();
-
-			searchContext.setAndSearch(andSearch);
-
-			Map<String, Serializable> attributes =
-				new HashMap<String, Serializable>();
-
-			attributes.put("city", city);
-			attributes.put("country", country);
-			attributes.put("name", name);
-			attributes.put("params", params);
-			attributes.put(
-				"parentOrganizationId", String.valueOf(parentOrganizationId));
-			attributes.put("region", region);
-			attributes.put("street", street);
-			attributes.put("type", type);
-			attributes.put("zip", zip);
-
-			searchContext.setAttributes(attributes);
-
-			searchContext.setCompanyId(companyId);
-			searchContext.setEnd(end);
-
-			if (params != null) {
-				String keywords = (String)params.remove("keywords");
-
-				if (Validator.isNotNull(keywords)) {
-					searchContext.setKeywords(keywords);
-				}
-			}
-
-			QueryConfig queryConfig = new QueryConfig();
-
-			queryConfig.setHighlightEnabled(false);
-			queryConfig.setScoreEnabled(false);
-
-			searchContext.setQueryConfig(queryConfig);
-
-			if (sort != null) {
-				searchContext.setSorts(sort);
-			}
-
-			searchContext.setStart(start);
-
 			Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
 				Organization.class);
+
+			SearchContext searchContext = buildSearchContext(
+				companyId, parentOrganizationId, name, type, street, city, zip,
+				region, country, params, andSearch, start, end, sort);
 
 			return indexer.search(searchContext);
 		}
@@ -1430,27 +1416,66 @@ public class OrganizationLocalServiceImpl
 	 *         more information see {@link
 	 *         com.liferay.portal.service.persistence.OrganizationFinder}
 	 * @return the number of matching organizations
-	 * @throws SystemException if a system exception occurred
 	 * @see    com.liferay.portal.service.persistence.OrganizationFinder
 	 */
 	@Override
 	public int searchCount(
-			long companyId, long parentOrganizationId, String keywords,
-			String type, Long regionId, Long countryId,
-			LinkedHashMap<String, Object> params)
-		throws SystemException {
+		long companyId, long parentOrganizationId, String keywords, String type,
+		Long regionId, Long countryId, LinkedHashMap<String, Object> params) {
 
-		String parentOrganizationIdComparator = StringPool.EQUAL;
+		if (!PropsValues.ORGANIZATIONS_INDEXER_ENABLED ||
+			!PropsValues.ORGANIZATIONS_SEARCH_WITH_INDEX ||
+			isUseCustomSQL(params)) {
 
-		if (parentOrganizationId ==
-				OrganizationConstants.ANY_PARENT_ORGANIZATION_ID) {
+			String parentOrganizationIdComparator = StringPool.EQUAL;
 
-			parentOrganizationIdComparator = StringPool.NOT_EQUAL;
+			if (parentOrganizationId ==
+					OrganizationConstants.ANY_PARENT_ORGANIZATION_ID) {
+
+				parentOrganizationIdComparator = StringPool.NOT_EQUAL;
+			}
+
+			return organizationFinder.countByKeywords(
+				companyId, parentOrganizationId, parentOrganizationIdComparator,
+				keywords, type, regionId, countryId, params);
 		}
 
-		return organizationFinder.countByKeywords(
-			companyId, parentOrganizationId, parentOrganizationIdComparator,
-			keywords, type, regionId, countryId, params);
+		try {
+			String name = null;
+			String street = null;
+			String city = null;
+			String zip = null;
+			boolean andOperator = false;
+
+			if (Validator.isNotNull(keywords)) {
+				name = keywords;
+				street = keywords;
+				city = keywords;
+				zip = keywords;
+			}
+			else {
+				andOperator = true;
+			}
+
+			if (params != null) {
+				params.put("keywords", keywords);
+			}
+
+			Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
+				Organization.class);
+
+			SearchContext searchContext = buildSearchContext(
+				companyId, parentOrganizationId, name, type, street, city, zip,
+				regionId, countryId, params, andOperator, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS, null);
+
+			Hits hits = indexer.search(searchContext);
+
+			return hits.getLength();
+		}
+		catch (Exception e) {
+			throw new SystemException(e);
+		}
 	}
 
 	/**
@@ -1479,29 +1504,116 @@ public class OrganizationLocalServiceImpl
 	 *         'Employees' and city 'Chicago'&quot; vs &quot;organizations with
 	 *         the name 'Employees' or the city 'Chicago'&quot;.
 	 * @return the number of matching organizations
-	 * @throws SystemException if a system exception occurred
 	 * @see    com.liferay.portal.service.persistence.OrganizationFinder
 	 */
 	@Override
 	public int searchCount(
-			long companyId, long parentOrganizationId, String name, String type,
-			String street, String city, String zip, Long regionId,
-			Long countryId, LinkedHashMap<String, Object> params,
-			boolean andOperator)
-		throws SystemException {
+		long companyId, long parentOrganizationId, String name, String type,
+		String street, String city, String zip, Long regionId, Long countryId,
+		LinkedHashMap<String, Object> params, boolean andOperator) {
 
-		String parentOrganizationIdComparator = StringPool.EQUAL;
+		if (!PropsValues.ORGANIZATIONS_INDEXER_ENABLED ||
+			!PropsValues.ORGANIZATIONS_SEARCH_WITH_INDEX ||
+			isUseCustomSQL(params)) {
 
-		if (parentOrganizationId ==
-				OrganizationConstants.ANY_PARENT_ORGANIZATION_ID) {
+			String parentOrganizationIdComparator = StringPool.EQUAL;
 
-			parentOrganizationIdComparator = StringPool.NOT_EQUAL;
+			if (parentOrganizationId ==
+					OrganizationConstants.ANY_PARENT_ORGANIZATION_ID) {
+
+				parentOrganizationIdComparator = StringPool.NOT_EQUAL;
+			}
+
+			return organizationFinder.countByC_PO_N_T_S_C_Z_R_C(
+				companyId, parentOrganizationId, parentOrganizationIdComparator,
+				name, type, street, city, zip, regionId, countryId, params,
+				andOperator);
 		}
 
-		return organizationFinder.countByC_PO_N_T_S_C_Z_R_C(
-			companyId, parentOrganizationId, parentOrganizationIdComparator,
-			name, type, street, city, zip, regionId, countryId, params,
-			andOperator);
+		try {
+			Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
+				Organization.class);
+
+			SearchContext searchContext = buildSearchContext(
+				companyId, parentOrganizationId, name, type, street, city, zip,
+				regionId, countryId, params, andOperator, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS, null);
+
+			Hits hits = indexer.search(searchContext);
+
+			return hits.getLength();
+		}
+		catch (Exception e) {
+			throw new SystemException(e);
+		}
+	}
+
+	@Override
+	public BaseModelSearchResult<Organization> searchOrganizations(
+			long companyId, long parentOrganizationId, String keywords,
+			LinkedHashMap<String, Object> params, int start, int end, Sort sort)
+		throws PortalException {
+
+		String name = null;
+		String type = null;
+		String street = null;
+		String city = null;
+		String zip = null;
+		String region = null;
+		String country = null;
+		boolean andOperator = false;
+
+		if (Validator.isNotNull(keywords)) {
+			name = keywords;
+			type = keywords;
+			street = keywords;
+			city = keywords;
+			zip = keywords;
+			region = keywords;
+			country = keywords;
+		}
+		else {
+			andOperator = true;
+		}
+
+		if (params != null) {
+			params.put("keywords", keywords);
+		}
+
+		return searchOrganizations(
+			companyId, parentOrganizationId, name, type, street, city, zip,
+			region, country, params, andOperator, start, end, sort);
+	}
+
+	@Override
+	public BaseModelSearchResult<Organization> searchOrganizations(
+			long companyId, long parentOrganizationId, String name, String type,
+			String street, String city, String zip, String region,
+			String country, LinkedHashMap<String, Object> params,
+			boolean andSearch, int start, int end, Sort sort)
+		throws PortalException {
+
+		Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
+			Organization.class);
+
+		SearchContext searchContext = buildSearchContext(
+			companyId, parentOrganizationId, name, type, street, city, zip,
+			region, country, params, andSearch, start, end, sort);
+
+		for (int i = 0; i < 10; i++) {
+			Hits hits = indexer.search(searchContext);
+
+			List<Organization> organizations = UsersAdminUtil.getOrganizations(
+				hits);
+
+			if (organizations != null) {
+				return new BaseModelSearchResult<Organization>(
+					organizations, hits.getLength());
+			}
+		}
+
+		throw new SearchException(
+			"Unable to fix the search index after 10 attempts");
 	}
 
 	/**
@@ -1511,11 +1623,10 @@ public class OrganizationLocalServiceImpl
 	 * @param  groupId the primary key of the group
 	 * @param  organizationIds the primary keys of the organizations
 	 * @throws PortalException if a portal exception occurred
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void setGroupOrganizations(long groupId, long[] organizationIds)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		groupPersistence.setOrganizations(groupId, organizationIds);
 
@@ -1528,11 +1639,10 @@ public class OrganizationLocalServiceImpl
 	 * @param  groupId the primary key of the group
 	 * @param  organizationIds the primary keys of the organizations
 	 * @throws PortalException if a portal exception occurred
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void unsetGroupOrganizations(long groupId, long[] organizationIds)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		groupPersistence.removeOrganizations(groupId, organizationIds);
 
@@ -1544,12 +1654,10 @@ public class OrganizationLocalServiceImpl
 	 *
 	 * @param  passwordPolicyId the primary key of the password policy
 	 * @param  organizationIds the primary keys of the organizations
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void unsetPasswordPolicyOrganizations(
-			long passwordPolicyId, long[] organizationIds)
-		throws SystemException {
+		long passwordPolicyId, long[] organizationIds) {
 
 		passwordPolicyRelLocalService.deletePasswordPolicyRels(
 			passwordPolicyId, Organization.class.getName(), organizationIds);
@@ -1564,13 +1672,12 @@ public class OrganizationLocalServiceImpl
 	 * @param  assetCategoryIds the primary keys of the asset categories
 	 * @param  assetTagNames the asset tag names
 	 * @throws PortalException if a user with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void updateAsset(
 			long userId, Organization organization, long[] assetCategoryIds,
 			String[] assetTagNames)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		User user = userPersistence.findByPrimaryKey(userId);
 
@@ -1612,7 +1719,6 @@ public class OrganizationLocalServiceImpl
 	 * @throws     PortalException if an organization or parent organization
 	 *             with the primary key could not be found or if the new
 	 *             information was invalid
-	 * @throws     SystemException if a system exception occurred
 	 * @deprecated As of 6.2.0, replaced by {@link #updateOrganization(long,
 	 *             long, long, String, String, long, long, int, String, boolean,
 	 *             byte[], boolean, ServiceContext)}
@@ -1624,7 +1730,7 @@ public class OrganizationLocalServiceImpl
 			String name, String type, boolean recursable, long regionId,
 			long countryId, int statusId, String comments, boolean site,
 			ServiceContext serviceContext)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		return updateOrganization(
 			companyId, organizationId, parentOrganizationId, name, type,
@@ -1657,7 +1763,6 @@ public class OrganizationLocalServiceImpl
 	 * @throws PortalException if an organization or parent organization with
 	 *         the primary key could not be found or if the new information was
 	 *         invalid
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public Organization updateOrganization(
@@ -1665,7 +1770,7 @@ public class OrganizationLocalServiceImpl
 			String name, String type, long regionId, long countryId,
 			int statusId, String comments, boolean logo, byte[] logoBytes,
 			boolean site, ServiceContext serviceContext)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		// Organization
 
@@ -1795,7 +1900,6 @@ public class OrganizationLocalServiceImpl
 	 * @throws     PortalException if an organization or parent organization
 	 *             with the primary key could not be found or if the new
 	 *             information was invalid
-	 * @throws     SystemException if a system exception occurred
 	 * @deprecated As of 7.0.0, replaced by {@link #updateOrganization(long,
 	 *             long, long, String, String, long, long, int, String, boolean,
 	 *             boolean, byte[], ServiceContext)}
@@ -1807,7 +1911,7 @@ public class OrganizationLocalServiceImpl
 			String name, String type, long regionId, long countryId,
 			int statusId, String comments, boolean site,
 			ServiceContext serviceContext)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		return updateOrganization(
 			companyId, organizationId, parentOrganizationId, name, type,
@@ -1815,9 +1919,8 @@ public class OrganizationLocalServiceImpl
 	}
 
 	protected void addSuborganizations(
-			List<Organization> allSuborganizations,
-			List<Organization> organizations)
-		throws SystemException {
+		List<Organization> allSuborganizations,
+		List<Organization> organizations) {
 
 		for (Organization organization : organizations) {
 			if (!allSuborganizations.contains(organization)) {
@@ -1833,9 +1936,86 @@ public class OrganizationLocalServiceImpl
 		}
 	}
 
+	protected SearchContext buildSearchContext(
+		long companyId, long parentOrganizationId, String name, String type,
+		String street, String city, String zip, Long regionId, Long countryId,
+		LinkedHashMap<String, Object> params, boolean andSearch, int start,
+		int end, Sort sort) {
+
+		String regionCode = null;
+
+		if (regionId != null) {
+			Region region = regionService.fetchRegion(regionId);
+
+			regionCode = region.getRegionCode();
+		}
+
+		String countryName = null;
+
+		if (countryId != null) {
+			Country country = countryService.fetchCountry(countryId);
+
+			countryName = country.getName();
+		}
+
+		return buildSearchContext(
+			companyId, parentOrganizationId, name, type, street, city, zip,
+			regionCode, countryName, params, andSearch, start, end, sort);
+	}
+
+	protected SearchContext buildSearchContext(
+		long companyId, long parentOrganizationId, String name, String type,
+		String street, String city, String zip, String region, String country,
+		LinkedHashMap<String, Object> params, boolean andSearch, int start,
+		int end, Sort sort) {
+
+		SearchContext searchContext = new SearchContext();
+
+		searchContext.setAndSearch(andSearch);
+
+		Map<String, Serializable> attributes =
+			new HashMap<String, Serializable>();
+
+		attributes.put("city", city);
+		attributes.put("country", country);
+		attributes.put("name", name);
+		attributes.put("params", params);
+		attributes.put(
+			"parentOrganizationId", String.valueOf(parentOrganizationId));
+		attributes.put("region", region);
+		attributes.put("street", street);
+		attributes.put("type", type);
+		attributes.put("zip", zip);
+
+		searchContext.setAttributes(attributes);
+
+		searchContext.setCompanyId(companyId);
+		searchContext.setEnd(end);
+
+		if (params != null) {
+			String keywords = (String)params.remove("keywords");
+
+			if (Validator.isNotNull(keywords)) {
+				searchContext.setKeywords(keywords);
+			}
+		}
+
+		if (sort != null) {
+			searchContext.setSorts(sort);
+		}
+
+		searchContext.setStart(start);
+
+		QueryConfig queryConfig = searchContext.getQueryConfig();
+
+		queryConfig.setHighlightEnabled(false);
+		queryConfig.setScoreEnabled(false);
+
+		return searchContext;
+	}
+
 	protected long getParentOrganizationId(
-			long companyId, long parentOrganizationId)
-		throws SystemException {
+		long companyId, long parentOrganizationId) {
 
 		if (parentOrganizationId !=
 				OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID) {
@@ -1858,7 +2038,7 @@ public class OrganizationLocalServiceImpl
 	}
 
 	protected long[] getReindexOrganizationIds(Organization organization)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		List<Organization> organizations = organizationPersistence.findByC_T(
 			organization.getCompanyId(),
@@ -1888,9 +2068,7 @@ public class OrganizationLocalServiceImpl
 		return organizationIds;
 	}
 
-	protected boolean isOrganizationGroup(long organizationId, long groupId)
-		throws SystemException {
-
+	protected boolean isOrganizationGroup(long organizationId, long groupId) {
 		if ((organizationId ==
 				OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID) &&
 			(groupId == GroupConstants.DEFAULT_PARENT_GROUP_ID)) {
@@ -1914,7 +2092,7 @@ public class OrganizationLocalServiceImpl
 
 	protected boolean isParentOrganization(
 			long parentOrganizationId, long organizationId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		// Return true if parentOrganizationId is among the parent organizatons
 		// of organizationId
@@ -1940,10 +2118,18 @@ public class OrganizationLocalServiceImpl
 		}
 	}
 
+	protected boolean isUseCustomSQL(LinkedHashMap<String, Object> params) {
+		if (MapUtil.isEmpty(params)) {
+			return false;
+		}
+
+		return true;
+	}
+
 	protected void validate(
 			long companyId, long organizationId, long parentOrganizationId,
 			String name, String type, long countryId, int statusId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		if (!ArrayUtil.contains(PropsValues.ORGANIZATIONS_TYPES, type)) {
 			throw new OrganizationTypeException(
@@ -2033,7 +2219,7 @@ public class OrganizationLocalServiceImpl
 	protected void validate(
 			long companyId, long parentOrganizationId, String name, String type,
 			long countryId, int statusId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		validate(
 			companyId, 0, parentOrganizationId, name, type, countryId,

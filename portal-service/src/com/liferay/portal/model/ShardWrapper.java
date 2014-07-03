@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -50,6 +50,7 @@ public class ShardWrapper implements Shard, ModelWrapper<Shard> {
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
+		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("shardId", getShardId());
 		attributes.put("classNameId", getClassNameId());
 		attributes.put("classPK", getClassPK());
@@ -60,6 +61,12 @@ public class ShardWrapper implements Shard, ModelWrapper<Shard> {
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
+		Long mvccVersion = (Long)attributes.get("mvccVersion");
+
+		if (mvccVersion != null) {
+			setMvccVersion(mvccVersion);
+		}
+
 		Long shardId = (Long)attributes.get("shardId");
 
 		if (shardId != null) {
@@ -103,6 +110,26 @@ public class ShardWrapper implements Shard, ModelWrapper<Shard> {
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_shard.setPrimaryKey(primaryKey);
+	}
+
+	/**
+	* Returns the mvcc version of this shard.
+	*
+	* @return the mvcc version of this shard
+	*/
+	@Override
+	public long getMvccVersion() {
+		return _shard.getMvccVersion();
+	}
+
+	/**
+	* Sets the mvcc version of this shard.
+	*
+	* @param mvccVersion the mvcc version of this shard
+	*/
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		_shard.setMvccVersion(mvccVersion);
 	}
 
 	/**
@@ -299,8 +326,7 @@ public class ShardWrapper implements Shard, ModelWrapper<Shard> {
 	}
 
 	@Override
-	public void persist()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public void persist() {
 		_shard.persist();
 	}
 

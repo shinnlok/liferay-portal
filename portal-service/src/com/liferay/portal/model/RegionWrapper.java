@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -50,6 +50,7 @@ public class RegionWrapper implements Region, ModelWrapper<Region> {
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
+		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("regionId", getRegionId());
 		attributes.put("countryId", getCountryId());
 		attributes.put("regionCode", getRegionCode());
@@ -61,6 +62,12 @@ public class RegionWrapper implements Region, ModelWrapper<Region> {
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
+		Long mvccVersion = (Long)attributes.get("mvccVersion");
+
+		if (mvccVersion != null) {
+			setMvccVersion(mvccVersion);
+		}
+
 		Long regionId = (Long)attributes.get("regionId");
 
 		if (regionId != null) {
@@ -110,6 +117,26 @@ public class RegionWrapper implements Region, ModelWrapper<Region> {
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_region.setPrimaryKey(primaryKey);
+	}
+
+	/**
+	* Returns the mvcc version of this region.
+	*
+	* @return the mvcc version of this region
+	*/
+	@Override
+	public long getMvccVersion() {
+		return _region.getMvccVersion();
+	}
+
+	/**
+	* Sets the mvcc version of this region.
+	*
+	* @param mvccVersion the mvcc version of this region
+	*/
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		_region.setMvccVersion(mvccVersion);
 	}
 
 	/**

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -43,17 +43,11 @@ public class SHSourceProcessor extends BaseSourceProcessor {
 
 		String content = fileUtil.read(new File(fileName), true);
 
-		if (content.contains("\r")) {
-			processErrorMessage(fileName, "Invalid new line character");
+		String newContent = StringUtil.replace(content, "\r", "");
 
-			if (isAutoFix()) {
-				content = StringUtil.replace(content, "\r", "");
+		compareAndAutoFixContent(file, fileName, content, newContent);
 
-				fileUtil.write(fileName, content);
-			}
-		}
-
-		return content;
+		return newContent;
 	}
 
 }

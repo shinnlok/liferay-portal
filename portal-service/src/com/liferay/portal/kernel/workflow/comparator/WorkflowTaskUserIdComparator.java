@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,7 +20,8 @@ import com.liferay.portal.kernel.workflow.WorkflowTask;
 /**
  * @author Shuyang Zhou
  */
-public class WorkflowTaskUserIdComparator extends OrderByComparator {
+public class WorkflowTaskUserIdComparator
+	extends OrderByComparator<WorkflowTask> {
 
 	public WorkflowTaskUserIdComparator(
 		boolean ascending, String orderByAsc, String orderByDesc,
@@ -33,10 +34,7 @@ public class WorkflowTaskUserIdComparator extends OrderByComparator {
 	}
 
 	@Override
-	public int compare(Object obj1, Object obj2) {
-		WorkflowTask workflowTask1 = (WorkflowTask)obj1;
-		WorkflowTask workflowTask2 = (WorkflowTask)obj2;
-
+	public int compare(WorkflowTask workflowTask1, WorkflowTask workflowTask2) {
 		Long assigneeUserId1 = workflowTask1.getAssigneeUserId();
 		Long assigneeUserId2 = workflowTask2.getAssigneeUserId();
 

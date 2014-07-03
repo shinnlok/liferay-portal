@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -52,6 +52,7 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
+		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("uuid", getUuid());
 		attributes.put("plid", getPlid());
 		attributes.put("groupId", getGroupId());
@@ -90,6 +91,12 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
+		Long mvccVersion = (Long)attributes.get("mvccVersion");
+
+		if (mvccVersion != null) {
+			setMvccVersion(mvccVersion);
+		}
+
 		String uuid = (String)attributes.get("uuid");
 
 		if (uuid != null) {
@@ -295,6 +302,26 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	}
 
 	/**
+	* Returns the mvcc version of this layout.
+	*
+	* @return the mvcc version of this layout
+	*/
+	@Override
+	public long getMvccVersion() {
+		return _layout.getMvccVersion();
+	}
+
+	/**
+	* Sets the mvcc version of this layout.
+	*
+	* @param mvccVersion the mvcc version of this layout
+	*/
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		_layout.setMvccVersion(mvccVersion);
+	}
+
+	/**
 	* Returns the uuid of this layout.
 	*
 	* @return the uuid of this layout
@@ -398,11 +425,9 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	* Returns the user uuid of this layout.
 	*
 	* @return the user uuid of this layout
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
-	public java.lang.String getUserUuid()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.lang.String getUserUuid() {
 		return _layout.getUserUuid();
 	}
 
@@ -1674,64 +1699,61 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	}
 
 	@Override
-	public void persist()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public void persist() {
 		_layout.persist();
 	}
 
 	@Override
-	public java.util.List<com.liferay.portal.model.Layout> getAllChildren()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.util.List<com.liferay.portal.model.Layout> getAllChildren() {
 		return _layout.getAllChildren();
 	}
 
 	@Override
 	public long getAncestorLayoutId()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _layout.getAncestorLayoutId();
 	}
 
 	@Override
 	public long getAncestorPlid()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _layout.getAncestorPlid();
 	}
 
 	@Override
 	public java.util.List<com.liferay.portal.model.Layout> getAncestors()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _layout.getAncestors();
 	}
 
 	@Override
-	public java.util.List<com.liferay.portal.model.Layout> getChildren()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.util.List<com.liferay.portal.model.Layout> getChildren() {
 		return _layout.getChildren();
 	}
 
 	@Override
 	public java.util.List<com.liferay.portal.model.Layout> getChildren(
 		com.liferay.portal.security.permission.PermissionChecker permissionChecker)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _layout.getChildren(permissionChecker);
 	}
 
 	@Override
 	public com.liferay.portal.model.ColorScheme getColorScheme()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _layout.getColorScheme();
 	}
 
 	@Override
 	public java.lang.String getCssText()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _layout.getCssText();
+	}
+
+	@Override
+	public java.lang.String getDefaultThemeSetting(java.lang.String key,
+		java.lang.String device, boolean inheritLookAndFeel) {
+		return _layout.getDefaultThemeSetting(key, device, inheritLookAndFeel);
 	}
 
 	@Override
@@ -1740,21 +1762,18 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	}
 
 	@Override
-	public java.util.Map<java.util.Locale, java.lang.String> getFriendlyURLMap()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.util.Map<java.util.Locale, java.lang.String> getFriendlyURLMap() {
 		return _layout.getFriendlyURLMap();
 	}
 
 	@Override
-	public java.lang.String getFriendlyURLsXML()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.lang.String getFriendlyURLsXML() {
 		return _layout.getFriendlyURLsXML();
 	}
 
 	@Override
 	public com.liferay.portal.model.Group getGroup()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _layout.getGroup();
 	}
 
@@ -1775,8 +1794,7 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 
 	@Override
 	public com.liferay.portal.model.LayoutSet getLayoutSet()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _layout.getLayoutSet();
 	}
 
@@ -1786,40 +1804,40 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	}
 
 	@Override
+	public com.liferay.portal.model.Layout getLinkedToLayout() {
+		return _layout.getLinkedToLayout();
+	}
+
+	@Override
 	public long getParentPlid()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _layout.getParentPlid();
 	}
 
 	@Override
 	public java.lang.String getRegularURL(
 		javax.servlet.http.HttpServletRequest request)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _layout.getRegularURL(request);
 	}
 
 	@Override
 	public java.lang.String getResetLayoutURL(
 		javax.servlet.http.HttpServletRequest request)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _layout.getResetLayoutURL(request);
 	}
 
 	@Override
 	public java.lang.String getResetMaxStateURL(
 		javax.servlet.http.HttpServletRequest request)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _layout.getResetMaxStateURL(request);
 	}
 
 	@Override
 	public com.liferay.portal.model.Group getScopeGroup()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _layout.getScopeGroup();
 	}
 
@@ -1830,8 +1848,7 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 
 	@Override
 	public com.liferay.portal.model.Theme getTheme()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _layout.getTheme();
 	}
 
@@ -1839,6 +1856,12 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	public java.lang.String getThemeSetting(java.lang.String key,
 		java.lang.String device) {
 		return _layout.getThemeSetting(key, device);
+	}
+
+	@Override
+	public java.lang.String getThemeSetting(java.lang.String key,
+		java.lang.String device, boolean inheritLookAndFeel) {
+		return _layout.getThemeSetting(key, device, inheritLookAndFeel);
 	}
 
 	@Override
@@ -1859,43 +1882,37 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 
 	@Override
 	public com.liferay.portal.model.ColorScheme getWapColorScheme()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _layout.getWapColorScheme();
 	}
 
 	@Override
 	public com.liferay.portal.model.Theme getWapTheme()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _layout.getWapTheme();
 	}
 
 	@Override
 	public boolean hasAncestor(long layoutId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _layout.hasAncestor(layoutId);
 	}
 
 	@Override
-	public boolean hasChildren()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public boolean hasChildren() {
 		return _layout.hasChildren();
 	}
 
 	@Override
 	public boolean hasScopeGroup()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _layout.hasScopeGroup();
 	}
 
 	@Override
 	public boolean isChildSelected(boolean selectable,
 		com.liferay.portal.model.Layout layout)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _layout.isChildSelected(selectable, layout);
 	}
 

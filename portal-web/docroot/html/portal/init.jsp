@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,8 +16,7 @@
 
 <%@ include file="/html/common/init.jsp" %>
 
-<%@ page import="com.liferay.portal.DuplicateUserEmailAddressException" %><%@
-page import="com.liferay.portal.LayoutPermissionException" %><%@
+<%@ page import="com.liferay.portal.LayoutPermissionException" %><%@
 page import="com.liferay.portal.PortletActiveException" %><%@
 page import="com.liferay.portal.RequiredLayoutException" %><%@
 page import="com.liferay.portal.RequiredRoleException" %><%@

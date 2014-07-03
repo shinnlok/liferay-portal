@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -39,7 +39,8 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public interface UserTrackerPathModel extends BaseModel<UserTrackerPath> {
+public interface UserTrackerPathModel extends BaseModel<UserTrackerPath>,
+	MVCCModel {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -59,6 +60,22 @@ public interface UserTrackerPathModel extends BaseModel<UserTrackerPath> {
 	 * @param primaryKey the primary key of this user tracker path
 	 */
 	public void setPrimaryKey(long primaryKey);
+
+	/**
+	 * Returns the mvcc version of this user tracker path.
+	 *
+	 * @return the mvcc version of this user tracker path
+	 */
+	@Override
+	public long getMvccVersion();
+
+	/**
+	 * Sets the mvcc version of this user tracker path.
+	 *
+	 * @param mvccVersion the mvcc version of this user tracker path
+	 */
+	@Override
+	public void setMvccVersion(long mvccVersion);
 
 	/**
 	 * Returns the user tracker path ID of this user tracker path.

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,25 +28,30 @@ import com.liferay.portal.kernel.test.ExecutionTestListeners;
 import com.liferay.portal.kernel.util.IntegerWrapper;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.UserGroup;
 import com.liferay.portal.model.impl.UserGroupModelImpl;
-import com.liferay.portal.service.ServiceTestUtil;
+import com.liferay.portal.service.UserGroupLocalServiceUtil;
 import com.liferay.portal.service.persistence.BasePersistence;
 import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
 import com.liferay.portal.test.LiferayPersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.test.persistence.TransactionalPersistenceAdvice;
+import com.liferay.portal.test.persistence.test.TransactionalPersistenceAdvice;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.portal.util.test.RandomTestUtil;
 
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -58,6 +63,15 @@ import java.util.Set;
 	PersistenceExecutionTestListener.class})
 @RunWith(LiferayPersistenceIntegrationJUnitTestRunner.class)
 public class UserGroupPersistenceTest {
+	@Before
+	public void setUp() {
+		_modelListeners = _persistence.getListeners();
+
+		for (ModelListener<UserGroup> modelListener : _modelListeners) {
+			_persistence.unregisterListener(modelListener);
+		}
+	}
+
 	@After
 	public void tearDown() throws Exception {
 		Map<Serializable, BasePersistence<?>> basePersistences = _transactionalPersistenceAdvice.getBasePersistences();
@@ -79,11 +93,15 @@ public class UserGroupPersistenceTest {
 		}
 
 		_transactionalPersistenceAdvice.reset();
+
+		for (ModelListener<UserGroup> modelListener : _modelListeners) {
+			_persistence.registerListener(modelListener);
+		}
 	}
 
 	@Test
 	public void testCreate() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		UserGroup userGroup = _persistence.create(pk);
 
@@ -110,34 +128,38 @@ public class UserGroupPersistenceTest {
 
 	@Test
 	public void testUpdateExisting() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		UserGroup newUserGroup = _persistence.create(pk);
 
-		newUserGroup.setUuid(ServiceTestUtil.randomString());
+		newUserGroup.setMvccVersion(RandomTestUtil.nextLong());
 
-		newUserGroup.setCompanyId(ServiceTestUtil.nextLong());
+		newUserGroup.setUuid(RandomTestUtil.randomString());
 
-		newUserGroup.setUserId(ServiceTestUtil.nextLong());
+		newUserGroup.setCompanyId(RandomTestUtil.nextLong());
 
-		newUserGroup.setUserName(ServiceTestUtil.randomString());
+		newUserGroup.setUserId(RandomTestUtil.nextLong());
 
-		newUserGroup.setCreateDate(ServiceTestUtil.nextDate());
+		newUserGroup.setUserName(RandomTestUtil.randomString());
 
-		newUserGroup.setModifiedDate(ServiceTestUtil.nextDate());
+		newUserGroup.setCreateDate(RandomTestUtil.nextDate());
 
-		newUserGroup.setParentUserGroupId(ServiceTestUtil.nextLong());
+		newUserGroup.setModifiedDate(RandomTestUtil.nextDate());
 
-		newUserGroup.setName(ServiceTestUtil.randomString());
+		newUserGroup.setParentUserGroupId(RandomTestUtil.nextLong());
 
-		newUserGroup.setDescription(ServiceTestUtil.randomString());
+		newUserGroup.setName(RandomTestUtil.randomString());
 
-		newUserGroup.setAddedByLDAPImport(ServiceTestUtil.randomBoolean());
+		newUserGroup.setDescription(RandomTestUtil.randomString());
+
+		newUserGroup.setAddedByLDAPImport(RandomTestUtil.randomBoolean());
 
 		_persistence.update(newUserGroup);
 
 		UserGroup existingUserGroup = _persistence.findByPrimaryKey(newUserGroup.getPrimaryKey());
 
+		Assert.assertEquals(existingUserGroup.getMvccVersion(),
+			newUserGroup.getMvccVersion());
 		Assert.assertEquals(existingUserGroup.getUuid(), newUserGroup.getUuid());
 		Assert.assertEquals(existingUserGroup.getUserGroupId(),
 			newUserGroup.getUserGroupId());
@@ -163,6 +185,74 @@ public class UserGroupPersistenceTest {
 	}
 
 	@Test
+	public void testCountByUuid() {
+		try {
+			_persistence.countByUuid(StringPool.BLANK);
+
+			_persistence.countByUuid(StringPool.NULL);
+
+			_persistence.countByUuid((String)null);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByUuid_C() {
+		try {
+			_persistence.countByUuid_C(StringPool.BLANK,
+				RandomTestUtil.nextLong());
+
+			_persistence.countByUuid_C(StringPool.NULL, 0L);
+
+			_persistence.countByUuid_C((String)null, 0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByCompanyId() {
+		try {
+			_persistence.countByCompanyId(RandomTestUtil.nextLong());
+
+			_persistence.countByCompanyId(0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByC_P() {
+		try {
+			_persistence.countByC_P(RandomTestUtil.nextLong(),
+				RandomTestUtil.nextLong());
+
+			_persistence.countByC_P(0L, 0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByC_N() {
+		try {
+			_persistence.countByC_N(RandomTestUtil.nextLong(), StringPool.BLANK);
+
+			_persistence.countByC_N(0L, StringPool.NULL);
+
+			_persistence.countByC_N(0L, (String)null);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
 	public void testFindByPrimaryKeyExisting() throws Exception {
 		UserGroup newUserGroup = addUserGroup();
 
@@ -173,7 +263,7 @@ public class UserGroupPersistenceTest {
 
 	@Test
 	public void testFindByPrimaryKeyMissing() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		try {
 			_persistence.findByPrimaryKey(pk);
@@ -195,12 +285,12 @@ public class UserGroupPersistenceTest {
 		}
 	}
 
-	protected OrderByComparator getOrderByComparator() {
-		return OrderByComparatorFactoryUtil.create("UserGroup", "uuid", true,
-			"userGroupId", true, "companyId", true, "userId", true, "userName",
-			true, "createDate", true, "modifiedDate", true,
-			"parentUserGroupId", true, "name", true, "description", true,
-			"addedByLDAPImport", true);
+	protected OrderByComparator<UserGroup> getOrderByComparator() {
+		return OrderByComparatorFactoryUtil.create("UserGroup", "mvccVersion",
+			true, "uuid", true, "userGroupId", true, "companyId", true,
+			"userId", true, "userName", true, "createDate", true,
+			"modifiedDate", true, "parentUserGroupId", true, "name", true,
+			"description", true, "addedByLDAPImport", true);
 	}
 
 	@Test
@@ -214,7 +304,7 @@ public class UserGroupPersistenceTest {
 
 	@Test
 	public void testFetchByPrimaryKeyMissing() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		UserGroup missingUserGroup = _persistence.fetchByPrimaryKey(pk);
 
@@ -222,19 +312,103 @@ public class UserGroupPersistenceTest {
 	}
 
 	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
+		throws Exception {
+		UserGroup newUserGroup1 = addUserGroup();
+		UserGroup newUserGroup2 = addUserGroup();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newUserGroup1.getPrimaryKey());
+		primaryKeys.add(newUserGroup2.getPrimaryKey());
+
+		Map<Serializable, UserGroup> userGroups = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(2, userGroups.size());
+		Assert.assertEquals(newUserGroup1,
+			userGroups.get(newUserGroup1.getPrimaryKey()));
+		Assert.assertEquals(newUserGroup2,
+			userGroups.get(newUserGroup2.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
+		throws Exception {
+		long pk1 = RandomTestUtil.nextLong();
+
+		long pk2 = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(pk1);
+		primaryKeys.add(pk2);
+
+		Map<Serializable, UserGroup> userGroups = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(userGroups.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
+		throws Exception {
+		UserGroup newUserGroup = addUserGroup();
+
+		long pk = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newUserGroup.getPrimaryKey());
+		primaryKeys.add(pk);
+
+		Map<Serializable, UserGroup> userGroups = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, userGroups.size());
+		Assert.assertEquals(newUserGroup,
+			userGroups.get(newUserGroup.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
+		throws Exception {
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		Map<Serializable, UserGroup> userGroups = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(userGroups.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithOnePrimaryKey()
+		throws Exception {
+		UserGroup newUserGroup = addUserGroup();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newUserGroup.getPrimaryKey());
+
+		Map<Serializable, UserGroup> userGroups = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, userGroups.size());
+		Assert.assertEquals(newUserGroup,
+			userGroups.get(newUserGroup.getPrimaryKey()));
+	}
+
+	@Test
 	public void testActionableDynamicQuery() throws Exception {
 		final IntegerWrapper count = new IntegerWrapper();
 
-		ActionableDynamicQuery actionableDynamicQuery = new UserGroupActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = UserGroupLocalServiceUtil.getActionableDynamicQuery();
+
+		actionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod() {
 				@Override
-				protected void performAction(Object object) {
+				public void performAction(Object object) {
 					UserGroup userGroup = (UserGroup)object;
 
 					Assert.assertNotNull(userGroup);
 
 					count.increment();
 				}
-			};
+			});
 
 		actionableDynamicQuery.performActions();
 
@@ -267,7 +441,7 @@ public class UserGroupPersistenceTest {
 				UserGroup.class.getClassLoader());
 
 		dynamicQuery.add(RestrictionsFactoryUtil.eq("userGroupId",
-				ServiceTestUtil.nextLong()));
+				RandomTestUtil.nextLong()));
 
 		List<UserGroup> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -306,7 +480,7 @@ public class UserGroupPersistenceTest {
 		dynamicQuery.setProjection(ProjectionFactoryUtil.property("userGroupId"));
 
 		dynamicQuery.add(RestrictionsFactoryUtil.in("userGroupId",
-				new Object[] { ServiceTestUtil.nextLong() }));
+				new Object[] { RandomTestUtil.nextLong() }));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -333,29 +507,31 @@ public class UserGroupPersistenceTest {
 	}
 
 	protected UserGroup addUserGroup() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		UserGroup userGroup = _persistence.create(pk);
 
-		userGroup.setUuid(ServiceTestUtil.randomString());
+		userGroup.setMvccVersion(RandomTestUtil.nextLong());
 
-		userGroup.setCompanyId(ServiceTestUtil.nextLong());
+		userGroup.setUuid(RandomTestUtil.randomString());
 
-		userGroup.setUserId(ServiceTestUtil.nextLong());
+		userGroup.setCompanyId(RandomTestUtil.nextLong());
 
-		userGroup.setUserName(ServiceTestUtil.randomString());
+		userGroup.setUserId(RandomTestUtil.nextLong());
 
-		userGroup.setCreateDate(ServiceTestUtil.nextDate());
+		userGroup.setUserName(RandomTestUtil.randomString());
 
-		userGroup.setModifiedDate(ServiceTestUtil.nextDate());
+		userGroup.setCreateDate(RandomTestUtil.nextDate());
 
-		userGroup.setParentUserGroupId(ServiceTestUtil.nextLong());
+		userGroup.setModifiedDate(RandomTestUtil.nextDate());
 
-		userGroup.setName(ServiceTestUtil.randomString());
+		userGroup.setParentUserGroupId(RandomTestUtil.nextLong());
 
-		userGroup.setDescription(ServiceTestUtil.randomString());
+		userGroup.setName(RandomTestUtil.randomString());
 
-		userGroup.setAddedByLDAPImport(ServiceTestUtil.randomBoolean());
+		userGroup.setDescription(RandomTestUtil.randomString());
+
+		userGroup.setAddedByLDAPImport(RandomTestUtil.randomBoolean());
 
 		_persistence.update(userGroup);
 
@@ -363,6 +539,7 @@ public class UserGroupPersistenceTest {
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(UserGroupPersistenceTest.class);
+	private ModelListener<UserGroup>[] _modelListeners;
 	private UserGroupPersistence _persistence = (UserGroupPersistence)PortalBeanLocatorUtil.locate(UserGroupPersistence.class.getName());
 	private TransactionalPersistenceAdvice _transactionalPersistenceAdvice = (TransactionalPersistenceAdvice)PortalBeanLocatorUtil.locate(TransactionalPersistenceAdvice.class.getName());
 }

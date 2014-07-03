@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -51,6 +51,7 @@ public class ResourcePermissionWrapper implements ResourcePermission,
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
+		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("resourcePermissionId", getResourcePermissionId());
 		attributes.put("companyId", getCompanyId());
 		attributes.put("name", getName());
@@ -65,6 +66,12 @@ public class ResourcePermissionWrapper implements ResourcePermission,
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
+		Long mvccVersion = (Long)attributes.get("mvccVersion");
+
+		if (mvccVersion != null) {
+			setMvccVersion(mvccVersion);
+		}
+
 		Long resourcePermissionId = (Long)attributes.get("resourcePermissionId");
 
 		if (resourcePermissionId != null) {
@@ -132,6 +139,26 @@ public class ResourcePermissionWrapper implements ResourcePermission,
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_resourcePermission.setPrimaryKey(primaryKey);
+	}
+
+	/**
+	* Returns the mvcc version of this resource permission.
+	*
+	* @return the mvcc version of this resource permission
+	*/
+	@Override
+	public long getMvccVersion() {
+		return _resourcePermission.getMvccVersion();
+	}
+
+	/**
+	* Sets the mvcc version of this resource permission.
+	*
+	* @param mvccVersion the mvcc version of this resource permission
+	*/
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		_resourcePermission.setMvccVersion(mvccVersion);
 	}
 
 	/**
@@ -394,8 +421,7 @@ public class ResourcePermissionWrapper implements ResourcePermission,
 	}
 
 	@Override
-	public void persist()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public void persist() {
 		_resourcePermission.persist();
 	}
 

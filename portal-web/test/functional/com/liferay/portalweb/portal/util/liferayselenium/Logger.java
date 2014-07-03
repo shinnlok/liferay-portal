@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,16 +19,15 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portalweb.portal.BaseTestCase;
-import com.liferay.portalweb.portal.util.RuntimeVariables;
 import com.liferay.portalweb.portal.util.TestPropsValues;
 
 import java.io.File;
 
 import java.lang.reflect.Method;
 
-import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
+import java.util.Queue;
 import java.util.Stack;
 
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -53,8 +52,8 @@ public class Logger {
 
 		WebDriver.Window window = options.window();
 
-		window.setPosition(new Point(1000, 50));
-		window.setSize(new Dimension(850, 1250));
+		window.setPosition(new Point(1050, 45));
+		window.setSize(new Dimension(850, 950));
 
 		_javascriptExecutor = (JavascriptExecutor)_webDriver;
 
@@ -85,10 +84,6 @@ public class Logger {
 		sb.append(_actionCount);
 		sb.append("\">");
 
-		sb.append("<a href='#image");
-		sb.append(_actionCount);
-		sb.append("'>");
-
 		sb.append(getActionCommand(command, params));
 
 		sb.append("</a>");
@@ -105,17 +100,32 @@ public class Logger {
 		sb.append(_actionCount);
 		sb.append("\">");
 
-		sb.append(getActionCommand(command, params));
-
 		sb.append("</div>");
 
 		_actionCount++;
 
-		log("actionScreenShotLog", sb.toString(), "screenShot");
+		log("descriptionLog", sb.toString(), "screenShot");
 	}
 
-	public void logError(
-		Method method, Object[] arguments, Throwable throwable) {
+	public void logActionDescription(Object[] arguments) throws Exception {
+		StringBundler sb = new StringBundler();
+
+		String command = (String)arguments[0];
+
+		sb.append("&nbsp;&nbsp;&nbsp;&nbsp;");
+		sb.append("&nbsp;&nbsp;&nbsp;&nbsp;");
+		sb.append("&nbsp;&nbsp;&nbsp;&nbsp;");
+		sb.append(_actionStepCount);
+		sb.append(". ");
+		sb.append(command);
+
+		_actionStepCount++;
+
+		log("descriptionLog", sb.toString(), "descriptionLog");
+	}
+
+	public void logError(Method method, Object[] arguments, Throwable throwable)
+		throws Exception {
 
 		send("", "fail");
 
@@ -136,6 +146,8 @@ public class Logger {
 		String stackTrace = generateStackTrace(throwable);
 
 		stackTrace = StringEscapeUtils.escapeEcmaScript(stackTrace);
+		stackTrace = StringUtil.replace(stackTrace, "\\\\n", "\\n");
+		stackTrace = StringUtil.replace(stackTrace, "\\\\t", "\\t");
 
 		sb.append(stackTrace);
 		sb.append("';");
@@ -170,6 +182,39 @@ public class Logger {
 
 		log("actionCommandLog", sb.toString(), "selenium");
 
+		_liferaySelenium.saveScreenshot();
+
+		_screenshotCount++;
+
+		sb = new StringBundler();
+
+		sb.append("&nbsp;&nbsp;&nbsp;&nbsp;");
+		sb.append("&nbsp;&nbsp;&nbsp;&nbsp;");
+		sb.append("&nbsp;&nbsp;&nbsp;&nbsp;");
+		sb.append("&nbsp;&nbsp;&nbsp;&nbsp;");
+		sb.append("<img alt=\"");
+		sb.append(_screenshotCount);
+		sb.append("\" height=\"450\" src=\"screenshots/");
+		sb.append(_screenshotCount);
+		sb.append(".jpg\" width=\"630\" />");
+		sb.append("<br />");
+
+		log("descriptionLog", sb.toString(), "descriptionLog");
+
+		log("errorLog", sb.toString(), "errorLog");
+
+		WebElement webElement = _webDriver.findElement(By.id("pauseError"));
+
+		String webElementText = webElement.getText();
+
+		while (webElementText.equals("Disable Pause After Error")) {
+			webElement = _webDriver.findElement(By.id("pauseError"));
+
+			webElementText = webElement.getText();
+
+			Thread.sleep(1000);
+		}
+
 		sb = new StringBundler();
 
 		sb.append("Command failure \"");
@@ -197,41 +242,42 @@ public class Logger {
 		BaseTestCase.fail(sb.toString());
 	}
 
-	public void logScreenShots(Object[] arguments) throws Exception {
+	public void logMacroDescription(Object[] arguments) throws Exception {
 		StringBundler sb = new StringBundler();
 
-		String fileName = (String)arguments[0];
+		String command = (String)arguments[0];
 
-		if (_screenshotFileName.equals(fileName)) {
-			_screenshotCount++;
-		}
-		else {
-			_screenshotCount = 0;
+		_actionStepCount = 1;
 
-			_screenshotFileName = fileName;
-		}
+		sb.append("&nbsp;&nbsp;&nbsp;&nbsp;");
+		sb.append("<b>");
+		sb.append(_macroStepCount);
+		sb.append(". ");
+		sb.append(command);
+		sb.append("</b>");
 
-		_screenshotFileName = fileName;
+		_macroStepCount++;
 
-		String screenShotDir = _liferaySelenium.getProjectDir();
+		log("descriptionLog", sb.toString(), "descriptionLog");
+	}
 
-		screenShotDir = StringUtil.replace(screenShotDir, "\\", "/");
+	public void logScreenShots() throws Exception {
+		StringBundler sb = new StringBundler();
 
+		_screenshotCount++;
+
+		sb.append("&nbsp;&nbsp;&nbsp;&nbsp;");
+		sb.append("&nbsp;&nbsp;&nbsp;&nbsp;");
+		sb.append("&nbsp;&nbsp;&nbsp;&nbsp;");
+		sb.append("&nbsp;&nbsp;&nbsp;&nbsp;");
 		sb.append("<img alt=\"");
-		sb.append(_screenshotFileName);
 		sb.append(_screenshotCount);
-		sb.append("\" height=\"750\" src=\"file:///");
-		sb.append(screenShotDir);
-		sb.append("portal-web/test-results/functional/");
-		sb.append(_screenshotFileName);
-		sb.append("/");
-		sb.append(_screenshotFileName);
+		sb.append("\" height=\"450\" src=\"screenshots/");
 		sb.append(_screenshotCount);
-		sb.append(".jpg\" width=\"950\" />");
+		sb.append(".jpg\" width=\"630\" />");
+		sb.append("<br />");
 
-		sb.append("<hr />");
-
-		log("actionScreenShotLog", sb.toString(), "screenShot");
+		log("descriptionLog", sb.toString(), "descriptionLog");
 	}
 
 	public void logSeleniumCommand(Method method, Object[] arguments) {
@@ -259,6 +305,38 @@ public class Logger {
 		log("actionCommandLog", sb.toString(), "selenium");
 	}
 
+	public void logTestCaseCommand(Object[] arguments) throws Exception {
+		StringBundler sb = new StringBundler();
+
+		String tesCaseCommand = (String)arguments[0];
+
+		sb.append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+		sb.append(tesCaseCommand);
+
+		log("actionCommandLog", sb.toString(), "seleniumCommands");
+	}
+
+	public void logTestCaseHeader(Object[] arguments) throws Exception {
+		StringBundler sb = new StringBundler();
+
+		String tesCaseHeader = (String)arguments[0];
+
+		sb.append("<b>");
+		sb.append(tesCaseHeader);
+		sb.append("</b>");
+
+		log("actionCommandLog", sb.toString(), "seleniumCommands");
+
+		sb = new StringBundler();
+
+		sb.append("<br />");
+		sb.append("<b>");
+		sb.append(tesCaseHeader);
+		sb.append("</b>");
+
+		log("descriptionLog", sb.toString(), "descriptionLog");
+	}
+
 	public void pauseLoggerCheck() throws Exception {
 		WebElement webElement = _webDriver.findElement(By.id("pause"));
 
@@ -276,35 +354,26 @@ public class Logger {
 	public void send(Object[] arguments) {
 		String id = (String)arguments[0];
 		String status = (String)arguments[1];
-		Map<String, String> context = new HashMap<String, String>();
 
-		if (arguments.length > 2) {
-			context = (HashMap<String, String>)arguments[2];
-		}
-
-		send(id, status, context);
+		send(id, status);
 	}
 
 	public void send(String id, String status) {
-		send(id, status, new HashMap<String, String>());
-	}
-
-	public void send(String id, String status, Map<String, String> context) {
 		if (status.equals("pending")) {
-			_xpathIdStack.push(id);
+			_xPathIdStack.push(id);
 		}
 		else if (status.equals("start")) {
-			_xpathIdStack = new Stack<String>();
+			_xPathIdStack = new Stack<String>();
 
 			return;
 		}
 
-		String xpath = generateXpath(_xpathIdStack);
+		String xPath = generateXPath(_xPathIdStack);
 
-		List<WebElement> webElements = _webDriver.findElements(By.xpath(xpath));
+		List<WebElement> webElements = _webDriver.findElements(By.xpath(xPath));
 
 		if (status.equals("pass")) {
-			_xpathIdStack.pop();
+			_xPathIdStack.pop();
 		}
 
 		StringBundler sb = new StringBundler();
@@ -317,33 +386,6 @@ public class Logger {
 		for (WebElement webElement : webElements) {
 			_javascriptExecutor.executeScript(sb.toString(), webElement);
 		}
-
-		webElements = _webDriver.findElements(
-			By.xpath(xpath + "//span[@class='quote']"));
-
-		sb = new StringBundler();
-
-		sb.append("var element = arguments[0];");
-		sb.append("return element.innerHTML;");
-
-		String innerHTMLJavascript = sb.toString();
-
-		for (WebElement webElement : webElements) {
-			String value = (String)_javascriptExecutor.executeScript(
-				innerHTMLJavascript, webElement);
-
-			value = RuntimeVariables.evaluateVariable(value, context);
-			value = StringEscapeUtils.escapeEcmaScript(value);
-
-			sb = new StringBundler();
-
-			sb.append("var element = arguments[0];");
-			sb.append("element.title = \"");
-			sb.append(value);
-			sb.append("\";");
-
-			_javascriptExecutor.executeScript(sb.toString(), webElement);
-		}
 	}
 
 	public void start() {
@@ -351,7 +393,7 @@ public class Logger {
 			_liferaySelenium.getPrimaryTestSuiteName();
 
 		String htmlFileName =
-			_TEST_BASEDIR + "/test/functional-generated/" +
+			_TEST_BASE_DIR_NAME + "/test/functional-generated/" +
 				StringUtil.replace(primaryTestSuiteName, ".", "/") + ".html";
 
 		if (_loggerStarted) {
@@ -363,9 +405,9 @@ public class Logger {
 		}
 		else {
 			_webDriver.get(
-				"file:///" + _TEST_BASEDIR + "/test/functional/com/liferay/" +
-					"portalweb/portal/util/liferayselenium/dependencies/" +
-						"Logger.html");
+				"file:///" + _TEST_BASE_DIR_NAME + "/test/functional/com/" +
+					"liferay/portalweb/portal/util/liferayselenium/" +
+						"dependencies/Logger.html");
 		}
 
 		_loggerStarted = true;
@@ -381,7 +423,7 @@ public class Logger {
 					"outerHTML;");
 
 			String fileName =
-				_TEST_BASEDIR + "/test-results/functional/report.html";
+				_TEST_BASE_DIR_NAME + "/test-results/functional/report.html";
 
 			File file = new File(fileName);
 
@@ -396,72 +438,79 @@ public class Logger {
 	}
 
 	protected String generateStackTrace(Throwable throwable) {
-		Stack<String> ids = (Stack<String>)_xpathIdStack.clone();
-
-		String currentCommand = null;
-		String currentLine = null;
-		String parentCommand = null;
-		String parentLine = null;
-		String testCaseCommand = null;
+		Stack<String> xPathIdStack = (Stack<String>)_xPathIdStack.clone();
 
 		StringBundler sb = new StringBundler();
 
 		sb.append("<p>");
 
-		while (ids.size() > 1) {
-			String xpath = generateXpath(ids);
+		Queue<String> xPathQueue = new LinkedList<String>();
+
+		while (xPathIdStack.size() > 1) {
+			String xPath = generateXPath(xPathIdStack);
+
+			xPathIdStack.pop();
+
+			String commandTag = getLogElementText(
+				xPath + "/div/span[@class='tag'][1]");
+
+			if (!commandTag.equals("echo") && !commandTag.equals("execute") &&
+				!commandTag.equals("fail")) {
+
+				continue;
+			}
+
+			xPathQueue.add(xPath);
+		}
+
+		while (xPathQueue.peek() != null) {
+			String xPath = xPathQueue.poll();
 
 			String command = getLogElementText(
-				xpath + "/div/span[@class='quote'][1]");
+				xPath + "/div/span[@class='quote'][1]");
 
 			command = StringUtil.replace(command, "\"", "");
 
-			String line = getLogElementText(
-				xpath + "/div/div[@class='line-number']");
+			String commandType = getLogElementText(
+				xPath + "/div/span[@class='attribute'][1]");
 
-			if ((parentCommand == null) || (parentLine == null)) {
-				parentCommand = command;
-				parentLine = line;
-			}
-			else {
-				currentCommand = parentCommand;
-				currentLine = parentLine;
+			sb.append("Failed Line: ");
 
-				parentCommand = command;
-				parentLine = line;
+			sb.append(commandType);
+			sb.append(": <b>");
+			sb.append(command);
+			sb.append("</b> ");
 
-				String parentFileName = "";
+			if (xPathQueue.peek() != null) {
+				String parentXPath = xPathQueue.peek();
 
-				if (ids.size() > 2) {
-					int x = parentCommand.indexOf("#");
+				String parentCommand = getLogElementText(
+					parentXPath + "/div/span[@class='quote'][1]");
 
-					parentFileName = parentCommand.substring(0, x) + ".macro";
-				}
-				else {
-					ids.pop();
+				parentCommand = StringUtil.replace(parentCommand, "\"", "");
 
-					String testCaseXpath = generateXpath(ids);
+				String parentCommandType = getLogElementText(
+					parentXPath + "/div/span[@class='attribute'][1]");
 
-					testCaseCommand = getLogElementText(
-						testCaseXpath + "/div/h3");
+				int pos = parentCommand.indexOf("#");
 
-					int x = testCaseCommand.lastIndexOf("#");
-
-					parentFileName =
-						testCaseCommand.substring(0, x) + ".testcase";
-				}
-
-				sb.append("Failed Line: <b>");
-				sb.append(currentCommand);
-				sb.append("</b> (");
-				sb.append(parentFileName);
-				sb.append(":");
-				sb.append(currentLine);
-				sb.append(")<br />");
+				sb.append("(from ");
+				sb.append(parentCommand.substring(0, pos));
+				sb.append(".");
+				sb.append(parentCommandType);
+				sb.append(") ");
 			}
 
-			ids.pop();
+			String lineNumber = getLogElementText(
+				xPath + "/div/div[@class='line-number']");
+
+			sb.append("at line ");
+			sb.append(lineNumber);
+			sb.append("<br />");
 		}
+
+		String testCaseCommand = getLogElementText(
+			generateXPath(xPathIdStack) + "/div/h3");
 
 		sb.append("in test case command <b>");
 		sb.append(testCaseCommand.trim());
@@ -475,7 +524,7 @@ public class Logger {
 			String className = stackTraceElement.getClassName();
 
 			if (className.startsWith("com.liferay")) {
-				sb.append("\\n\\t");
+				sb.append("&#10;&#9;");
 				sb.append(stackTraceElement.toString());
 			}
 		}
@@ -486,7 +535,7 @@ public class Logger {
 		return sb.toString();
 	}
 
-	protected String generateXpath(Stack<String> ids) {
+	protected String generateXPath(Stack<String> ids) {
 		StringBundler sb = new StringBundler();
 
 		sb.append("/");
@@ -505,9 +554,6 @@ public class Logger {
 	protected String getActionCommand(String command, String[] params) {
 		StringBundler sb = new StringBundler();
 
-		sb.append("[");
-		sb.append(_actionCount);
-		sb.append("] ");
 		sb.append("Running <b>");
 		sb.append(command);
 		sb.append("</b>");
@@ -543,9 +589,9 @@ public class Logger {
 		return sb.toString();
 	}
 
-	protected String getLogElementText(String xpath) {
+	protected String getLogElementText(String xPath) {
 		try {
-			WebElement webElement = _webDriver.findElement(By.xpath(xpath));
+			WebElement webElement = _webDriver.findElement(By.xpath(xPath));
 
 			return (String)_javascriptExecutor.executeScript(
 				"var element = arguments[0]; return element.innerHTML;",
@@ -564,7 +610,7 @@ public class Logger {
 		sb.append("');");
 
 		if (type.equals("selenium")) {
-			if (_actionCount == _seleniumCount) {
+			if (_actionCount >= _seleniumCount) {
 				_seleniumCount++;
 
 				sb.append(
@@ -597,17 +643,19 @@ public class Logger {
 		_javascriptExecutor.executeScript(sb.toString());
 	}
 
-	private static final String _TEST_BASEDIR = TestPropsValues.TEST_BASEDIR;
+	private static final String _TEST_BASE_DIR_NAME =
+		TestPropsValues.TEST_BASE_DIR_NAME;
 
 	private int _actionCount;
+	private int _actionStepCount = 1;
 	private int _errorCount;
 	private JavascriptExecutor _javascriptExecutor;
 	private LiferaySelenium _liferaySelenium;
 	private boolean _loggerStarted;
+	private int _macroStepCount = 1;
 	private int _screenshotCount;
-	private String _screenshotFileName = "";
 	private int _seleniumCount = 1;
 	private WebDriver _webDriver = new FirefoxDriver();
-	private Stack<String> _xpathIdStack = new Stack<String>();
+	private Stack<String> _xPathIdStack = new Stack<String>();
 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,18 +20,25 @@ import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.lar.ExportImportHelperUtil;
+import com.liferay.portal.kernel.lar.ManifestSummary;
+import com.liferay.portal.kernel.lar.PortletDataContext;
+import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
+import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.model.PersistedModel;
 import com.liferay.portal.service.BaseLocalServiceImpl;
 import com.liferay.portal.service.PersistedModelLocalServiceRegistry;
-import com.liferay.portal.service.persistence.ClassNamePersistence;
 import com.liferay.portal.service.persistence.UserFinder;
 import com.liferay.portal.service.persistence.UserPersistence;
 import com.liferay.portal.util.PortalUtil;
@@ -40,7 +47,6 @@ import com.liferay.portlet.polls.model.PollsChoice;
 import com.liferay.portlet.polls.service.PollsChoiceLocalService;
 import com.liferay.portlet.polls.service.persistence.PollsChoicePersistence;
 import com.liferay.portlet.polls.service.persistence.PollsQuestionPersistence;
-import com.liferay.portlet.polls.service.persistence.PollsVotePersistence;
 
 import java.io.Serializable;
 
@@ -74,12 +80,10 @@ public abstract class PollsChoiceLocalServiceBaseImpl
 	 *
 	 * @param pollsChoice the polls choice
 	 * @return the polls choice that was added
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
-	public PollsChoice addPollsChoice(PollsChoice pollsChoice)
-		throws SystemException {
+	public PollsChoice addPollsChoice(PollsChoice pollsChoice) {
 		pollsChoice.setNew(true);
 
 		return pollsChoicePersistence.update(pollsChoice);
@@ -102,12 +106,11 @@ public abstract class PollsChoiceLocalServiceBaseImpl
 	 * @param choiceId the primary key of the polls choice
 	 * @return the polls choice that was removed
 	 * @throws PortalException if a polls choice with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public PollsChoice deletePollsChoice(long choiceId)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return pollsChoicePersistence.remove(choiceId);
 	}
 
@@ -116,12 +119,10 @@ public abstract class PollsChoiceLocalServiceBaseImpl
 	 *
 	 * @param pollsChoice the polls choice
 	 * @return the polls choice that was removed
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
-	public PollsChoice deletePollsChoice(PollsChoice pollsChoice)
-		throws SystemException {
+	public PollsChoice deletePollsChoice(PollsChoice pollsChoice) {
 		return pollsChoicePersistence.remove(pollsChoice);
 	}
 
@@ -138,12 +139,9 @@ public abstract class PollsChoiceLocalServiceBaseImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery) {
 		return pollsChoicePersistence.findWithDynamicQuery(dynamicQuery);
 	}
 
@@ -158,12 +156,10 @@ public abstract class PollsChoiceLocalServiceBaseImpl
 	 * @param start the lower bound of the range of model instances
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @return the range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end)
-		throws SystemException {
+	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
+		int end) {
 		return pollsChoicePersistence.findWithDynamicQuery(dynamicQuery, start,
 			end);
 	}
@@ -180,12 +176,10 @@ public abstract class PollsChoiceLocalServiceBaseImpl
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end,
-		OrderByComparator orderByComparator) throws SystemException {
+	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
+		int end, OrderByComparator<T> orderByComparator) {
 		return pollsChoicePersistence.findWithDynamicQuery(dynamicQuery, start,
 			end, orderByComparator);
 	}
@@ -195,11 +189,9 @@ public abstract class PollsChoiceLocalServiceBaseImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public long dynamicQueryCount(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
 		return pollsChoicePersistence.countWithDynamicQuery(dynamicQuery);
 	}
 
@@ -209,18 +201,16 @@ public abstract class PollsChoiceLocalServiceBaseImpl
 	 * @param dynamicQuery the dynamic query
 	 * @param projection the projection to apply to the query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery,
-		Projection projection) throws SystemException {
+		Projection projection) {
 		return pollsChoicePersistence.countWithDynamicQuery(dynamicQuery,
 			projection);
 	}
 
 	@Override
-	public PollsChoice fetchPollsChoice(long choiceId)
-		throws SystemException {
+	public PollsChoice fetchPollsChoice(long choiceId) {
 		return pollsChoicePersistence.fetchByPrimaryKey(choiceId);
 	}
 
@@ -230,11 +220,10 @@ public abstract class PollsChoiceLocalServiceBaseImpl
 	 * @param uuid the polls choice's UUID
 	 * @param  companyId the primary key of the company
 	 * @return the matching polls choice, or <code>null</code> if a matching polls choice could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public PollsChoice fetchPollsChoiceByUuidAndCompanyId(String uuid,
-		long companyId) throws SystemException {
+		long companyId) {
 		return pollsChoicePersistence.fetchByUuid_C_First(uuid, companyId, null);
 	}
 
@@ -244,11 +233,10 @@ public abstract class PollsChoiceLocalServiceBaseImpl
 	 * @param uuid the polls choice's UUID
 	 * @param groupId the primary key of the group
 	 * @return the matching polls choice, or <code>null</code> if a matching polls choice could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public PollsChoice fetchPollsChoiceByUuidAndGroupId(String uuid,
-		long groupId) throws SystemException {
+		long groupId) {
 		return pollsChoicePersistence.fetchByUUID_G(uuid, groupId);
 	}
 
@@ -258,17 +246,101 @@ public abstract class PollsChoiceLocalServiceBaseImpl
 	 * @param choiceId the primary key of the polls choice
 	 * @return the polls choice
 	 * @throws PortalException if a polls choice with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public PollsChoice getPollsChoice(long choiceId)
-		throws PortalException, SystemException {
+	public PollsChoice getPollsChoice(long choiceId) throws PortalException {
 		return pollsChoicePersistence.findByPrimaryKey(choiceId);
 	}
 
 	@Override
+	public ActionableDynamicQuery getActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
+
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.polls.service.PollsChoiceLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(PollsChoice.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("choiceId");
+
+		return actionableDynamicQuery;
+	}
+
+	protected void initActionableDynamicQuery(
+		ActionableDynamicQuery actionableDynamicQuery) {
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.polls.service.PollsChoiceLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(PollsChoice.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("choiceId");
+	}
+
+	@Override
+	public ExportActionableDynamicQuery getExportActionableDynamicQuery(
+		final PortletDataContext portletDataContext) {
+		final ExportActionableDynamicQuery exportActionableDynamicQuery = new ExportActionableDynamicQuery() {
+				@Override
+				public long performCount() throws PortalException {
+					ManifestSummary manifestSummary = portletDataContext.getManifestSummary();
+
+					StagedModelType stagedModelType = getStagedModelType();
+
+					long modelAdditionCount = super.performCount();
+
+					manifestSummary.addModelAdditionCount(stagedModelType.toString(),
+						modelAdditionCount);
+
+					long modelDeletionCount = ExportImportHelperUtil.getModelDeletionCount(portletDataContext,
+							stagedModelType);
+
+					manifestSummary.addModelDeletionCount(stagedModelType.toString(),
+						modelDeletionCount);
+
+					return modelAdditionCount;
+				}
+			};
+
+		initActionableDynamicQuery(exportActionableDynamicQuery);
+
+		exportActionableDynamicQuery.setAddCriteriaMethod(new ActionableDynamicQuery.AddCriteriaMethod() {
+				@Override
+				public void addCriteria(DynamicQuery dynamicQuery) {
+					portletDataContext.addDateRangeCriteria(dynamicQuery,
+						"modifiedDate");
+				}
+			});
+
+		exportActionableDynamicQuery.setCompanyId(portletDataContext.getCompanyId());
+
+		exportActionableDynamicQuery.setGroupId(portletDataContext.getScopeGroupId());
+
+		exportActionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod() {
+				@Override
+				public void performAction(Object object)
+					throws PortalException {
+					PollsChoice stagedModel = (PollsChoice)object;
+
+					StagedModelDataHandlerUtil.exportStagedModel(portletDataContext,
+						stagedModel);
+				}
+			});
+		exportActionableDynamicQuery.setStagedModelType(new StagedModelType(
+				PortalUtil.getClassNameId(PollsChoice.class.getName())));
+
+		return exportActionableDynamicQuery;
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
+		throws PortalException {
+		return pollsChoiceLocalService.deletePollsChoice((PollsChoice)persistedModel);
+	}
+
+	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return pollsChoicePersistence.findByPrimaryKey(primaryKeyObj);
 	}
 
@@ -279,11 +351,10 @@ public abstract class PollsChoiceLocalServiceBaseImpl
 	 * @param  companyId the primary key of the company
 	 * @return the matching polls choice
 	 * @throws PortalException if a matching polls choice could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public PollsChoice getPollsChoiceByUuidAndCompanyId(String uuid,
-		long companyId) throws PortalException, SystemException {
+		long companyId) throws PortalException {
 		return pollsChoicePersistence.findByUuid_C_First(uuid, companyId, null);
 	}
 
@@ -294,11 +365,10 @@ public abstract class PollsChoiceLocalServiceBaseImpl
 	 * @param groupId the primary key of the group
 	 * @return the matching polls choice
 	 * @throws PortalException if a matching polls choice could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public PollsChoice getPollsChoiceByUuidAndGroupId(String uuid, long groupId)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return pollsChoicePersistence.findByUUID_G(uuid, groupId);
 	}
 
@@ -312,11 +382,9 @@ public abstract class PollsChoiceLocalServiceBaseImpl
 	 * @param start the lower bound of the range of polls choices
 	 * @param end the upper bound of the range of polls choices (not inclusive)
 	 * @return the range of polls choices
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public List<PollsChoice> getPollsChoices(int start, int end)
-		throws SystemException {
+	public List<PollsChoice> getPollsChoices(int start, int end) {
 		return pollsChoicePersistence.findAll(start, end);
 	}
 
@@ -324,10 +392,9 @@ public abstract class PollsChoiceLocalServiceBaseImpl
 	 * Returns the number of polls choices.
 	 *
 	 * @return the number of polls choices
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public int getPollsChoicesCount() throws SystemException {
+	public int getPollsChoicesCount() {
 		return pollsChoicePersistence.countAll();
 	}
 
@@ -336,12 +403,10 @@ public abstract class PollsChoiceLocalServiceBaseImpl
 	 *
 	 * @param pollsChoice the polls choice
 	 * @return the polls choice that was updated
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
-	public PollsChoice updatePollsChoice(PollsChoice pollsChoice)
-		throws SystemException {
+	public PollsChoice updatePollsChoice(PollsChoice pollsChoice) {
 		return pollsChoicePersistence.update(pollsChoice);
 	}
 
@@ -403,120 +468,6 @@ public abstract class PollsChoiceLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the polls question local service.
-	 *
-	 * @return the polls question local service
-	 */
-	public com.liferay.portlet.polls.service.PollsQuestionLocalService getPollsQuestionLocalService() {
-		return pollsQuestionLocalService;
-	}
-
-	/**
-	 * Sets the polls question local service.
-	 *
-	 * @param pollsQuestionLocalService the polls question local service
-	 */
-	public void setPollsQuestionLocalService(
-		com.liferay.portlet.polls.service.PollsQuestionLocalService pollsQuestionLocalService) {
-		this.pollsQuestionLocalService = pollsQuestionLocalService;
-	}
-
-	/**
-	 * Returns the polls question remote service.
-	 *
-	 * @return the polls question remote service
-	 */
-	public com.liferay.portlet.polls.service.PollsQuestionService getPollsQuestionService() {
-		return pollsQuestionService;
-	}
-
-	/**
-	 * Sets the polls question remote service.
-	 *
-	 * @param pollsQuestionService the polls question remote service
-	 */
-	public void setPollsQuestionService(
-		com.liferay.portlet.polls.service.PollsQuestionService pollsQuestionService) {
-		this.pollsQuestionService = pollsQuestionService;
-	}
-
-	/**
-	 * Returns the polls question persistence.
-	 *
-	 * @return the polls question persistence
-	 */
-	public PollsQuestionPersistence getPollsQuestionPersistence() {
-		return pollsQuestionPersistence;
-	}
-
-	/**
-	 * Sets the polls question persistence.
-	 *
-	 * @param pollsQuestionPersistence the polls question persistence
-	 */
-	public void setPollsQuestionPersistence(
-		PollsQuestionPersistence pollsQuestionPersistence) {
-		this.pollsQuestionPersistence = pollsQuestionPersistence;
-	}
-
-	/**
-	 * Returns the polls vote local service.
-	 *
-	 * @return the polls vote local service
-	 */
-	public com.liferay.portlet.polls.service.PollsVoteLocalService getPollsVoteLocalService() {
-		return pollsVoteLocalService;
-	}
-
-	/**
-	 * Sets the polls vote local service.
-	 *
-	 * @param pollsVoteLocalService the polls vote local service
-	 */
-	public void setPollsVoteLocalService(
-		com.liferay.portlet.polls.service.PollsVoteLocalService pollsVoteLocalService) {
-		this.pollsVoteLocalService = pollsVoteLocalService;
-	}
-
-	/**
-	 * Returns the polls vote remote service.
-	 *
-	 * @return the polls vote remote service
-	 */
-	public com.liferay.portlet.polls.service.PollsVoteService getPollsVoteService() {
-		return pollsVoteService;
-	}
-
-	/**
-	 * Sets the polls vote remote service.
-	 *
-	 * @param pollsVoteService the polls vote remote service
-	 */
-	public void setPollsVoteService(
-		com.liferay.portlet.polls.service.PollsVoteService pollsVoteService) {
-		this.pollsVoteService = pollsVoteService;
-	}
-
-	/**
-	 * Returns the polls vote persistence.
-	 *
-	 * @return the polls vote persistence
-	 */
-	public PollsVotePersistence getPollsVotePersistence() {
-		return pollsVotePersistence;
-	}
-
-	/**
-	 * Sets the polls vote persistence.
-	 *
-	 * @param pollsVotePersistence the polls vote persistence
-	 */
-	public void setPollsVotePersistence(
-		PollsVotePersistence pollsVotePersistence) {
-		this.pollsVotePersistence = pollsVotePersistence;
-	}
-
-	/**
 	 * Returns the counter local service.
 	 *
 	 * @return the counter local service
@@ -533,82 +484,6 @@ public abstract class PollsChoiceLocalServiceBaseImpl
 	public void setCounterLocalService(
 		com.liferay.counter.service.CounterLocalService counterLocalService) {
 		this.counterLocalService = counterLocalService;
-	}
-
-	/**
-	 * Returns the class name local service.
-	 *
-	 * @return the class name local service
-	 */
-	public com.liferay.portal.service.ClassNameLocalService getClassNameLocalService() {
-		return classNameLocalService;
-	}
-
-	/**
-	 * Sets the class name local service.
-	 *
-	 * @param classNameLocalService the class name local service
-	 */
-	public void setClassNameLocalService(
-		com.liferay.portal.service.ClassNameLocalService classNameLocalService) {
-		this.classNameLocalService = classNameLocalService;
-	}
-
-	/**
-	 * Returns the class name remote service.
-	 *
-	 * @return the class name remote service
-	 */
-	public com.liferay.portal.service.ClassNameService getClassNameService() {
-		return classNameService;
-	}
-
-	/**
-	 * Sets the class name remote service.
-	 *
-	 * @param classNameService the class name remote service
-	 */
-	public void setClassNameService(
-		com.liferay.portal.service.ClassNameService classNameService) {
-		this.classNameService = classNameService;
-	}
-
-	/**
-	 * Returns the class name persistence.
-	 *
-	 * @return the class name persistence
-	 */
-	public ClassNamePersistence getClassNamePersistence() {
-		return classNamePersistence;
-	}
-
-	/**
-	 * Sets the class name persistence.
-	 *
-	 * @param classNamePersistence the class name persistence
-	 */
-	public void setClassNamePersistence(
-		ClassNamePersistence classNamePersistence) {
-		this.classNamePersistence = classNamePersistence;
-	}
-
-	/**
-	 * Returns the resource local service.
-	 *
-	 * @return the resource local service
-	 */
-	public com.liferay.portal.service.ResourceLocalService getResourceLocalService() {
-		return resourceLocalService;
-	}
-
-	/**
-	 * Sets the resource local service.
-	 *
-	 * @param resourceLocalService the resource local service
-	 */
-	public void setResourceLocalService(
-		com.liferay.portal.service.ResourceLocalService resourceLocalService) {
-		this.resourceLocalService = resourceLocalService;
 	}
 
 	/**
@@ -685,6 +560,63 @@ public abstract class PollsChoiceLocalServiceBaseImpl
 		this.userFinder = userFinder;
 	}
 
+	/**
+	 * Returns the polls question local service.
+	 *
+	 * @return the polls question local service
+	 */
+	public com.liferay.portlet.polls.service.PollsQuestionLocalService getPollsQuestionLocalService() {
+		return pollsQuestionLocalService;
+	}
+
+	/**
+	 * Sets the polls question local service.
+	 *
+	 * @param pollsQuestionLocalService the polls question local service
+	 */
+	public void setPollsQuestionLocalService(
+		com.liferay.portlet.polls.service.PollsQuestionLocalService pollsQuestionLocalService) {
+		this.pollsQuestionLocalService = pollsQuestionLocalService;
+	}
+
+	/**
+	 * Returns the polls question remote service.
+	 *
+	 * @return the polls question remote service
+	 */
+	public com.liferay.portlet.polls.service.PollsQuestionService getPollsQuestionService() {
+		return pollsQuestionService;
+	}
+
+	/**
+	 * Sets the polls question remote service.
+	 *
+	 * @param pollsQuestionService the polls question remote service
+	 */
+	public void setPollsQuestionService(
+		com.liferay.portlet.polls.service.PollsQuestionService pollsQuestionService) {
+		this.pollsQuestionService = pollsQuestionService;
+	}
+
+	/**
+	 * Returns the polls question persistence.
+	 *
+	 * @return the polls question persistence
+	 */
+	public PollsQuestionPersistence getPollsQuestionPersistence() {
+		return pollsQuestionPersistence;
+	}
+
+	/**
+	 * Sets the polls question persistence.
+	 *
+	 * @param pollsQuestionPersistence the polls question persistence
+	 */
+	public void setPollsQuestionPersistence(
+		PollsQuestionPersistence pollsQuestionPersistence) {
+		this.pollsQuestionPersistence = pollsQuestionPersistence;
+	}
+
 	public void afterPropertiesSet() {
 		persistedModelLocalServiceRegistry.register("com.liferay.portlet.polls.model.PollsChoice",
 			pollsChoiceLocalService);
@@ -728,7 +660,7 @@ public abstract class PollsChoiceLocalServiceBaseImpl
 	 *
 	 * @param sql the sql query
 	 */
-	protected void runSQL(String sql) throws SystemException {
+	protected void runSQL(String sql) {
 		try {
 			DataSource dataSource = pollsChoicePersistence.getDataSource();
 
@@ -753,28 +685,8 @@ public abstract class PollsChoiceLocalServiceBaseImpl
 	protected com.liferay.portlet.polls.service.PollsChoiceService pollsChoiceService;
 	@BeanReference(type = PollsChoicePersistence.class)
 	protected PollsChoicePersistence pollsChoicePersistence;
-	@BeanReference(type = com.liferay.portlet.polls.service.PollsQuestionLocalService.class)
-	protected com.liferay.portlet.polls.service.PollsQuestionLocalService pollsQuestionLocalService;
-	@BeanReference(type = com.liferay.portlet.polls.service.PollsQuestionService.class)
-	protected com.liferay.portlet.polls.service.PollsQuestionService pollsQuestionService;
-	@BeanReference(type = PollsQuestionPersistence.class)
-	protected PollsQuestionPersistence pollsQuestionPersistence;
-	@BeanReference(type = com.liferay.portlet.polls.service.PollsVoteLocalService.class)
-	protected com.liferay.portlet.polls.service.PollsVoteLocalService pollsVoteLocalService;
-	@BeanReference(type = com.liferay.portlet.polls.service.PollsVoteService.class)
-	protected com.liferay.portlet.polls.service.PollsVoteService pollsVoteService;
-	@BeanReference(type = PollsVotePersistence.class)
-	protected PollsVotePersistence pollsVotePersistence;
 	@BeanReference(type = com.liferay.counter.service.CounterLocalService.class)
 	protected com.liferay.counter.service.CounterLocalService counterLocalService;
-	@BeanReference(type = com.liferay.portal.service.ClassNameLocalService.class)
-	protected com.liferay.portal.service.ClassNameLocalService classNameLocalService;
-	@BeanReference(type = com.liferay.portal.service.ClassNameService.class)
-	protected com.liferay.portal.service.ClassNameService classNameService;
-	@BeanReference(type = ClassNamePersistence.class)
-	protected ClassNamePersistence classNamePersistence;
-	@BeanReference(type = com.liferay.portal.service.ResourceLocalService.class)
-	protected com.liferay.portal.service.ResourceLocalService resourceLocalService;
 	@BeanReference(type = com.liferay.portal.service.UserLocalService.class)
 	protected com.liferay.portal.service.UserLocalService userLocalService;
 	@BeanReference(type = com.liferay.portal.service.UserService.class)
@@ -783,6 +695,12 @@ public abstract class PollsChoiceLocalServiceBaseImpl
 	protected UserPersistence userPersistence;
 	@BeanReference(type = UserFinder.class)
 	protected UserFinder userFinder;
+	@BeanReference(type = com.liferay.portlet.polls.service.PollsQuestionLocalService.class)
+	protected com.liferay.portlet.polls.service.PollsQuestionLocalService pollsQuestionLocalService;
+	@BeanReference(type = com.liferay.portlet.polls.service.PollsQuestionService.class)
+	protected com.liferay.portlet.polls.service.PollsQuestionService pollsQuestionService;
+	@BeanReference(type = PollsQuestionPersistence.class)
+	protected PollsQuestionPersistence pollsQuestionPersistence;
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry;
 	private String _beanIdentifier;

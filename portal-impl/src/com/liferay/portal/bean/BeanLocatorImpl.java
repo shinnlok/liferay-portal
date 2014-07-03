@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.AbstractApplicationContext;
 
 /**
  * @author Brian Wing Shun Chan
@@ -46,6 +47,18 @@ public class BeanLocatorImpl implements BeanLocator {
 
 		_classLoader = classLoader;
 		_applicationContext = applicationContext;
+	}
+
+	@Override
+	public void destroy() {
+		if (_applicationContext instanceof AbstractApplicationContext) {
+			AbstractApplicationContext abstractApplicationContext =
+				(AbstractApplicationContext)_applicationContext;
+
+			abstractApplicationContext.destroy();
+		}
+
+		_applicationContext = null;
 	}
 
 	public ApplicationContext getApplicationContext() {
@@ -127,7 +140,7 @@ public class BeanLocatorImpl implements BeanLocator {
 		_paclServletContextName = paclServletContextName;
 	}
 
-	public static interface PACL {
+	public interface PACL {
 
 		public Object getBean(Object bean, ClassLoader classLoader);
 

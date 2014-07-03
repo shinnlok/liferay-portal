@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -33,16 +33,59 @@ public class PropertiesSourceProcessor extends BaseSourceProcessor {
 
 	@Override
 	protected void format() throws Exception {
-		formatPortalProperties();
+		String portalPortalPropertiesContent = formatPortalPortalProperties();
+
+		String[] includes = null;
+
+		if (portalSource) {
+			includes = new String[] {
+				"**\\portal-ext.properties", "**\\portal-legacy-*.properties"
+			};
+		}
+		else {
+			includes = new String[] {
+				"**\\portal.properties", "**\\portal-ext.properties",
+				"**\\portlet.properties"
+			};
+		}
+
+		List<String> fileNames = getFileNames(new String[0], includes);
+
+		for (String fileName : fileNames) {
+			File file = new File(BASEDIR + fileName);
+
+			fileName = StringUtil.replace(
+				fileName, StringPool.BACK_SLASH, StringPool.SLASH);
+
+			String content = fileUtil.read(file);
+
+			if (!portalSource && fileName.endsWith("portlet.properties")) {
+				String newContent = formatPortletProperties(content);
+
+				compareAndAutoFixContent(file, fileName, content, newContent);
+			}
+			else {
+				formatPortalProperties(
+					fileName, content, portalPortalPropertiesContent);
+			}
+		}
 	}
 
-	protected void formatPortalPortalProperties(File file, String fileName)
-		throws Exception {
+	protected String formatPortalPortalProperties() throws Exception {
+		if (!portalSource) {
+			return ContentUtil.get("portal.properties");
+		}
+
+		String fileName = "portal-impl/src/portal.properties";
+
+		File file = new File(BASEDIR + fileName);
+
+		String content = fileUtil.read(file);
 
 		StringBundler sb = new StringBundler();
 
 		UnsyncBufferedReader unsyncBufferedReader = new UnsyncBufferedReader(
-			new UnsyncStringReader(_portalPortalProperties));
+			new UnsyncStringReader(content));
 
 		String line = null;
 
@@ -66,63 +109,14 @@ public class PropertiesSourceProcessor extends BaseSourceProcessor {
 			newContent = newContent.substring(0, newContent.length() - 1);
 		}
 
-		if (isAutoFix() && (newContent != null) &&
-			!_portalPortalProperties.equals(newContent)) {
+		compareAndAutoFixContent(file, fileName, content, newContent);
 
-			fileUtil.write(file, newContent);
-
-			sourceFormatterHelper.printError(fileName, file);
-		}
+		return newContent;
 	}
 
-	protected void formatPortalProperties() throws Exception {
-		if (portalSource) {
-			String portalPortalPropertiesfileName =
-				"portal-impl/src/portal.properties";
-
-			File portalPortalPropertiesFile = new File(
-				BASEDIR + portalPortalPropertiesfileName);
-
-			_portalPortalProperties = fileUtil.read(portalPortalPropertiesFile);
-
-			formatPortalPortalProperties(
-				portalPortalPropertiesFile, portalPortalPropertiesfileName);
-		}
-		else {
-			_portalPortalProperties = ContentUtil.get("portal.properties");
-		}
-
-		String[] excludes = null;
-		String[] includes = null;
-
-		if (portalSource) {
-			excludes = new String[] {"**\\bin\\**", "**\\classes\\**"};
-			includes = new String[] {
-				"**\\portal-ext.properties", "**\\portal-legacy-*.properties"
-			};
-		}
-		else {
-			excludes = new String[0];
-			includes = new String[] {
-				"**\\portal.properties", "**\\portal-ext.properties"
-			};
-		}
-
-		List<String> fileNames = getFileNames(excludes, includes);
-
-		for (String fileName : fileNames) {
-			File file = new File(BASEDIR + fileName);
-
-			fileName = StringUtil.replace(
-				fileName, StringPool.BACK_SLASH, StringPool.SLASH);
-
-			String content = fileUtil.read(file);
-
-			formatPortalProperties(fileName, content);
-		}
-	}
-
-	protected void formatPortalProperties(String fileName, String content)
+	protected void formatPortalProperties(
+			String fileName, String content,
+			String portalPortalPropertiesContent)
 		throws IOException {
 
 		UnsyncBufferedReader unsyncBufferedReader = new UnsyncBufferedReader(
@@ -147,7 +141,7 @@ public class PropertiesSourceProcessor extends BaseSourceProcessor {
 
 			property = property.trim();
 
-			pos = _portalPortalProperties.indexOf(
+			pos = portalPortalPropertiesContent.indexOf(
 				StringPool.FOUR_SPACES + property);
 
 			if (pos == -1) {
@@ -163,6 +157,14 @@ public class PropertiesSourceProcessor extends BaseSourceProcessor {
 		}
 	}
 
-	private String _portalPortalProperties;
+	protected String formatPortletProperties(String content) {
+		if (!content.contains("include-and-override=portlet-ext.properties")) {
+			content =
+				"include-and-override=portlet-ext.properties" + "\n\n" +
+					content;
+		}
+
+		return content;
+	}
 
 }

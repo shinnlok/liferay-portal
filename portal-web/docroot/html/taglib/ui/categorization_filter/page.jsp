@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -57,7 +57,7 @@ if (assetCategoryId != 0) {
 			</portlet:renderURL>
 
 			<a href="<%= viewURLWithoutCategory %>" title="<liferay-ui:message key="remove" />">
-				<span class="icon icon-close textboxlistentry-close"></span>
+				<span class="icon icon-remove textboxlistentry-remove"></span>
 			</a>
 		</span>
 	</c:if>
@@ -73,7 +73,7 @@ if (assetCategoryId != 0) {
 			</liferay-portlet:renderURL>
 
 			<a href="<%= viewURLWithoutTag %>" title="<liferay-ui:message key="remove" />">
-				<span class="icon icon-close textboxlistentry-close"></span>
+				<span class="icon icon-remove textboxlistentry-remove"></span>
 			</a>
 		</span>
 	</c:if>
@@ -92,7 +92,7 @@ if (assetCategoryId != 0) {
 		%>
 
 		<h2 class="taglib-categorization-filter entry-title">
-			<liferay-ui:message arguments="<%= new String[] {assetVocabularyTitle, removeCategory, removeTag} %>" key='<%= assetType.concat("-with-x-x-and-tag-x") %>' />
+			<liferay-ui:message arguments="<%= new String[] {assetVocabularyTitle, removeCategory, removeTag} %>" key='<%= assetType.concat("-with-x-x-and-tag-x") %>' translateArguments="<%= false %>" />
 		</h2>
 	</c:when>
 	<c:when test="<%= assetCategoryId != 0 %>">
@@ -104,7 +104,7 @@ if (assetCategoryId != 0) {
 		%>
 
 		<h2 class="taglib-categorization-filter entry-title">
-			<liferay-ui:message arguments="<%= new String[] {assetVocabularyTitle, removeCategory} %>" key='<%= assetType.concat("-with-x-x") %>' />
+			<liferay-ui:message arguments="<%= new String[] {assetVocabularyTitle, removeCategory} %>" key='<%= assetType.concat("-with-x-x") %>' translateArguments="<%= false %>" />
 		</h2>
 	</c:when>
 	<c:when test="<%= Validator.isNotNull(assetTagName) %>">
@@ -116,7 +116,7 @@ if (assetCategoryId != 0) {
 		%>
 
 		<h2 class="taglib-categorization-filter entry-title">
-			<liferay-ui:message arguments="<%= removeTag %>" key='<%= assetType.concat("-with-tag-x") %>' />
+			<liferay-ui:message arguments="<%= removeTag %>" key='<%= assetType.concat("-with-tag-x") %>' translateArguments="<%= false %>" />
 		</h2>
 	</c:when>
 </c:choose>
