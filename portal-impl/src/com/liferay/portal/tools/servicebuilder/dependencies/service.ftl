@@ -104,7 +104,7 @@ public interface ${entity.name}${sessionTypeName}Service
 
 			<#list method.annotations as annotation>
 				<#if annotation != "@java.lang.Override()">
-					${annotation}
+					${serviceBuilder.annotationToString(annotation)}
 				</#if>
 			</#list>
 

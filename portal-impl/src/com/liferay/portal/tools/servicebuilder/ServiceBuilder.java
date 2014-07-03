@@ -2735,6 +2735,53 @@ public class ServiceBuilder {
 		}
 	}
 
+	public String annotationToString(Annotation annotation) {
+		StringBundler sb = new StringBundler();
+        sb.append('@');
+		
+		Type type = annotation.getType();
+		
+        sb.append(type.getValue());
+		
+		Map<String, Object> namedParameters =
+			annotation.getNamedParameterMap();
+
+        if(!namedParameters.isEmpty()) {
+			sb.append('(');
+			for (Map.Entry<String, Object> entry : namedParameters.entrySet()) {
+				sb.append(entry.getKey());
+				sb.append("=");
+				
+				Object value = entry.getValue();
+				
+				if (!(value instanceof List)) {
+					sb.append(value);
+					
+					continue;
+				}
+
+				List<String> values = (List<String>)entry.getValue();
+				
+				sb.append("{");
+				
+				for (String stringValue : values) {
+					sb.append(stringValue);
+					sb.append(",");
+				}
+				
+				if (!values.isEmpty()) {
+					sb.setIndex(sb.index() - 1);
+				}
+				
+				sb.append("}");
+			}
+			
+			sb.append(')');
+        }
+
+        return sb.toString();
+	}
+
 	private void _createService(Entity entity, int sessionType)
 		throws Exception {
 
@@ -4193,9 +4240,11 @@ public class ServiceBuilder {
 	private String _getMethodKey(JavaMethod method) {
 		StringBundler sb = new StringBundler();
 
-		sb.append("isDuplicateMethod ");
-		sb.append(getTypeGenericsName(method.getReturns()));
-		sb.append(StringPool.SPACE);
+		if (!method.isConstructor()) {
+			sb.append(getTypeGenericsName(method.getReturns()));
+			sb.append(StringPool.SPACE);
+		}
+
 		sb.append(method.getName());
 		sb.append(StringPool.OPEN_PARENTHESIS);
 
@@ -4405,19 +4454,14 @@ public class ServiceBuilder {
 	private Annotation[] _mergeAnnotations(
 		Annotation[] annotations1, Annotation[] annotations2) {
 
-		Map<String, Annotation> annotationsMap = new HashMap<String, Annotation>();
+		Map<Type, Annotation> annotationsMap = new HashMap<Type, Annotation>();
 
 		for (Annotation annotation : annotations2) {
-			Type type = annotation.getType();
-//			AnnotationValue property = annotation.getProperty("a");
-//			property.
-			annotationsMap.put(type.getValue(), annotation);
+			annotationsMap.put(annotation.getType(), annotation);
 		}
 
 		for (Annotation annotation : annotations1) {
-			Type type = annotation.getType();
-
-			annotationsMap.put(type.getValue(), annotation);
+			annotationsMap.put(annotation.getType(), annotation);
 		}
 
 		Collection<Annotation> annotations = annotationsMap.values();
@@ -4429,43 +4473,35 @@ public class ServiceBuilder {
 		JavaMethod[] methods1, JavaMethod[] methods2,
 		boolean mergeAnnotations) {
 
-		List<JavaMethod> methodsList = new ArrayList<JavaMethod>();
-
-		Map<String, JavaMethod> methodsMap =
-			new LinkedHashMap<String, JavaMethod>();
-
-		for (JavaMethod method : methods2) {
-			if (method.isConstructor()) {
-				continue;
-			}
-
-			String key = _getMethodKey(method);
-
-			methodsMap.put(key, method);
+		
+		Map<String, JavaMethod> javaMethodMap =
+			new HashMap<String, JavaMethod>();
+		
+		for (JavaMethod javaMethod : methods2) {
+			javaMethodMap.put(_getMethodKey(javaMethod), javaMethod);
 		}
+		
+		for (JavaMethod javaMethod : methods1) {
+			String javaMethodKey = _getMethodKey(javaMethod);
 
-		for (JavaMethod method : methods1) {
-			if (methodsMap.containsValue(method)) {
-				String key = _getMethodKey(method);
-
-				if (mergeAnnotations) {
-					JavaMethod method2 = methodsMap.get(key);
-
-					Annotation[] annotations = _mergeAnnotations(
-						method.getAnnotations(), method2.getAnnotations());
-
-					method.setAnnotations(annotations);
-				}
-
-				methodsMap.remove(key);
+			JavaMethod previousJavaMethod = javaMethodMap.get(javaMethodKey);
+			
+			if (previousJavaMethod == null) {
+				javaMethodMap.put(javaMethodKey, javaMethod);
 			}
+			else if (mergeAnnotations) {
+				Annotation[] annotations = _mergeAnnotations(
+					javaMethod.getAnnotations(),
+					previousJavaMethod.getAnnotations());
 
-			methodsList.add(method);
+				previousJavaMethod.setAnnotations(annotations);
+			}
 		}
-
-		methodsList.addAll(ListUtil.fromMapValues(methodsMap));
-
-		return methodsList.toArray(new JavaMethod[methodsList.size()]);
+		
+		List<JavaMethod> javaMethods = new ArrayList<JavaMethod>(
+			javaMethodMap.values());
+		
+		return javaMethods.toArray(new JavaMethod[javaMethods.size()]);
 	}
 
 	private List<Entity> _mergeReferenceList(Entity entity) {
