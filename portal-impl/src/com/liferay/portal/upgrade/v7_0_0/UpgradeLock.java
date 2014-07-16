@@ -25,9 +25,9 @@ import java.sql.SQLException;
 public class UpgradeLock extends UpgradeProcess {
 
 	@Override
-	public void doUpgrade() throws Exception {
+	protected void doUpgrade() throws Exception {
 		try {
-			runSQL("alter_column_type Lock_ owner varchar(1024) null");
+			runSQL("alter_column_type Lock_ owner VARCHAR(1024) null");
 		}
 		catch (SQLException sqle) {
 			upgradeTable(
