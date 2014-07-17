@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -31,9 +31,7 @@ page import="com.liferay.portal.RemoteOptionsException" %><%@
 page import="com.liferay.portal.RequiredGroupException" %><%@
 page import="com.liferay.portal.TeamNameException" %><%@
 page import="com.liferay.portal.kernel.backgroundtask.BackgroundTaskConstants" %><%@
-page import="com.liferay.portal.kernel.lar.PortletDataHandler" %><%@
 page import="com.liferay.portal.kernel.staging.StagingConstants" %><%@
-page import="com.liferay.portal.kernel.staging.StagingUtil" %><%@
 page import="com.liferay.portal.lar.LayoutExporter" %><%@
 page import="com.liferay.portal.lar.backgroundtask.LayoutStagingBackgroundTaskExecutor" %><%@
 page import="com.liferay.portal.liveusers.LiveUsers" %><%@
@@ -60,7 +58,8 @@ page import="com.liferay.portlet.sitesadmin.search.UserGroupTeamChecker" %><%@
 page import="com.liferay.portlet.sitesadmin.search.UserTeamChecker" %><%@
 page import="com.liferay.portlet.usergroupsadmin.search.UserGroupChecker" %><%@
 page import="com.liferay.portlet.usergroupsadmin.search.UserGroupGroupChecker" %><%@
-page import="com.liferay.portlet.usersadmin.search.OrganizationGroupChecker" %>
+page import="com.liferay.portlet.usersadmin.search.OrganizationGroupChecker" %><%@
+page import="com.liferay.portlet.usersadmin.util.UsersAdmin" %>
 
 <%
 boolean filterManageableGroups = true;
@@ -74,8 +73,6 @@ if (GroupPermissionUtil.contains(permissionChecker, ActionKeys.VIEW)) {
 }
 
 long[] classNameIds = new long[] {PortalUtil.getClassNameId(Company.class), PortalUtil.getClassNameId(Group.class), PortalUtil.getClassNameId(Organization.class)};
-
-Format dateFormatDate = FastDateFormatFactoryUtil.getDate(locale, timeZone);
 %>
 
 <%@ include file="/html/portlet/sites_admin/init-ext.jsp" %>

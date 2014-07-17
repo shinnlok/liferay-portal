@@ -11,24 +11,54 @@
 		<div class="expand-line">
 			<h3 class="testCaseCommand">${testCaseName}#${testCaseCommand}
 				<#if testCaseCommandElement.attributeValue("depends")??>
-					[depends ~ ${testCaseCommandElement.attributeValue("depends")}]
+					[depends: ${testCaseCommandElement.attributeValue("depends")}]
+				</#if>
+
+				<#if testCaseCommandElement.attributeValue("known-issues")??>
+					<#assign knownIssues = testCaseCommandElement.attributeValue("known-issues")>
+
+					[Known Issues:
+						<#list knownIssues?split(",") as knownIssue>
+							<a href="https://issues.liferay.com/browse/${knownIssue}">${knownIssue}</a>
+
+							<#if knownIssue_has_next>
+								,
+							</#if>
+						</#list>
+					]
 				</#if>
 			</h3>
 		</div>
 	</div>
 
 	<ul id="collapseToggle${lineFolds}" class="collapse">
-		<#assign testCaseVarElements = testCaseRootElement.elements("var")>
+		<#if testCaseRootElement.elements("property")??>
+			<#assign testCasePropertyElements = testCaseRootElement.elements("property")>
 
-		<#list testCaseVarElements as testCaseVarElement>
-			<#assign lineNumber = testCaseVarElement.attributeValue("line-number")>
+			<#list testCasePropertyElements as testCasePropertyElement>
+				<#assign lineNumber = testCasePropertyElement.attributeValue("line-number")>
 
-			<li id="${testCaseName?uncap_first}TestCase${lineNumber}">
-				<#assign displayElement = testCaseVarElement>
+				<li id="${testCaseName?uncap_first}TestCase${lineNumber}">
+					<#assign displayElement = testCasePropertyElement>
 
-				<#include "element_whole_html.ftl">
-			</li>
-		</#list>
+					<#include "element_whole_html.ftl">
+				</li>
+			</#list>
+		</#if>
+
+		<#if testCaseRootElement.elements("var")??>
+			<#assign testCaseVarElements = testCaseRootElement.elements("var")>
+
+			<#list testCaseVarElements as testCaseVarElement>
+				<#assign lineNumber = testCaseVarElement.attributeValue("line-number")>
+
+				<li id="${testCaseName?uncap_first}TestCase${lineNumber}">
+					<#assign displayElement = testCaseVarElement>
+
+					<#include "element_whole_html.ftl">
+				</li>
+			</#list>
+		</#if>
 
 		<#if testCaseRootElement.element("set-up")??>
 			<#assign testCaseSetupElement = testCaseRootElement.element("set-up")>

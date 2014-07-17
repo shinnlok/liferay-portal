@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -30,6 +30,11 @@ public class QuartzLocalServiceWrapper implements QuartzLocalService,
 		_quartzLocalService = quartzLocalService;
 	}
 
+	@Override
+	public void checkQuartzTables() {
+		_quartzLocalService.checkQuartzTables();
+	}
+
 	/**
 	* Returns the Spring bean ID for this bean.
 	*
@@ -48,12 +53,6 @@ public class QuartzLocalServiceWrapper implements QuartzLocalService,
 	@Override
 	public void setBeanIdentifier(java.lang.String beanIdentifier) {
 		_quartzLocalService.setBeanIdentifier(beanIdentifier);
-	}
-
-	@Override
-	public void checkQuartzTables()
-		throws com.liferay.portal.kernel.exception.SystemException {
-		_quartzLocalService.checkQuartzTables();
 	}
 
 	/**

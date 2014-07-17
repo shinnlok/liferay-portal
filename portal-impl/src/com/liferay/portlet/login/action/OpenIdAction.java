@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,7 @@
 
 package com.liferay.portlet.login.action;
 
-import com.liferay.portal.DuplicateUserEmailAddressException;
+import com.liferay.portal.UserEmailAddressException;
 import com.liferay.portal.kernel.configuration.Filter;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -123,15 +123,17 @@ public class OpenIdAction extends PortletAction {
 			}
 		}
 		catch (Exception e) {
-			if (e instanceof DuplicateUserEmailAddressException) {
-				SessionErrors.add(actionRequest, e.getClass());
-			}
-			else if (e instanceof OpenIDException) {
+			if (e instanceof OpenIDException) {
 				if (_log.isInfoEnabled()) {
 					_log.info(
 						"Error communicating with OpenID provider: " +
 							e.getMessage());
 				}
+
+				SessionErrors.add(actionRequest, e.getClass());
+			}
+			else if (e instanceof
+						UserEmailAddressException.MustNotBeDuplicate) {
 
 				SessionErrors.add(actionRequest, e.getClass());
 			}
@@ -446,7 +448,8 @@ public class OpenIdAction extends PortletAction {
 				openIdAXType,
 				PropsUtil.get(
 					_OPEN_ID_AX_TYPE.concat(openIdAXType),
-					new Filter(openIdProvider)), true);
+					new Filter(openIdProvider)),
+				true);
 		}
 
 		authRequest.addExtension(fetchRequest);

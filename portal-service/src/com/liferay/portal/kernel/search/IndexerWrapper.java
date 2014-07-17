@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,6 +19,8 @@ import com.liferay.portal.security.permission.PermissionChecker;
 import java.util.List;
 import java.util.Locale;
 
+import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
 
 /**
@@ -50,6 +52,11 @@ public class IndexerWrapper implements Indexer {
 	@Override
 	public String[] getClassNames() {
 		return _indexer.getClassNames();
+	}
+
+	@Override
+	public int getDatabaseCount() throws Exception {
+		return _indexer.getDatabaseCount();
 	}
 
 	@Override
@@ -97,6 +104,11 @@ public class IndexerWrapper implements Indexer {
 		return _indexer.getSortField(orderByCol, sortType);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #getSummary(Document, String,
+	 *             PortletURL, PortletRequest, PortletResponse)}
+	 */
+	@Deprecated
 	@Override
 	public Summary getSummary(
 			Document document, Locale locale, String snippet,
@@ -104,6 +116,16 @@ public class IndexerWrapper implements Indexer {
 		throws SearchException {
 
 		return _indexer.getSummary(document, locale, snippet, portletURL);
+	}
+
+	@Override
+	public Summary getSummary(
+			Document document, String snippet, PortletURL portletURL,
+			PortletRequest portletRequest, PortletResponse portletResponse)
+		throws SearchException {
+
+		return _indexer.getSummary(
+			document, snippet, portletURL, portletRequest, portletResponse);
 	}
 
 	@Override
@@ -129,6 +151,18 @@ public class IndexerWrapper implements Indexer {
 	@Override
 	public boolean isStagingAware() {
 		return _indexer.isStagingAware();
+	}
+
+	@Override
+	public boolean isVisible(long classPK, int status) throws Exception {
+		return _indexer.isVisible(classPK, status);
+	}
+
+	@Override
+	public boolean isVisibleRelatedEntry(long classPK, int status)
+		throws Exception {
+
+		return _indexer.isVisibleRelatedEntry(classPK, status);
 	}
 
 	@Override
@@ -182,10 +216,23 @@ public class IndexerWrapper implements Indexer {
 	}
 
 	@Override
+	public Hits search(
+			SearchContext searchContext, String... selectedFieldNames)
+		throws SearchException {
+
+		return _indexer.search(searchContext, selectedFieldNames);
+	}
+
+	@Override
 	public void unregisterIndexerPostProcessor(
 		IndexerPostProcessor indexerPostProcessor) {
 
 		_indexer.unregisterIndexerPostProcessor(indexerPostProcessor);
+	}
+
+	@Override
+	public void updateFullQuery(SearchContext searchContext) {
+		_indexer.updateFullQuery(searchContext);
 	}
 
 	private Indexer _indexer;

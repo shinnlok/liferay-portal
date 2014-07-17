@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,8 +15,10 @@
 package com.liferay.portlet.journalcontent.action;
 
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.portlet.PortletRequestModel;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.PrefsParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.theme.ThemeDisplay;
@@ -25,7 +27,6 @@ import com.liferay.portlet.journal.model.JournalArticle;
 import com.liferay.portlet.journal.model.JournalArticleDisplay;
 import com.liferay.portlet.journal.service.JournalArticleLocalServiceUtil;
 import com.liferay.portlet.journalcontent.util.JournalContentUtil;
-import com.liferay.util.portlet.PortletRequestUtil;
 
 import javax.portlet.PortletConfig;
 import javax.portlet.PortletPreferences;
@@ -63,27 +64,19 @@ public class ViewAction extends WebContentAction {
 					"groupId", String.valueOf(themeDisplay.getScopeGroupId())));
 		}
 
-		String articleId = ParamUtil.getString(renderRequest, "articleId");
-		String ddmTemplateKey = ParamUtil.getString(
-			renderRequest, "ddmTemplateKey");
-
-		if (Validator.isNull(articleId)) {
-			articleId = GetterUtil.getString(
-				portletPreferences.getValue("articleId", null));
-			ddmTemplateKey = GetterUtil.getString(
-				portletPreferences.getValue("ddmTemplateKey", null));
-		}
-
-		String viewMode = ParamUtil.getString(renderRequest, "viewMode");
-		String languageId = LanguageUtil.getLanguageId(renderRequest);
-		int page = ParamUtil.getInteger(renderRequest, "page", 1);
-		String xmlRequest = PortletRequestUtil.toXML(
-			renderRequest, renderResponse);
+		String articleId = PrefsParamUtil.getString(
+			portletPreferences, renderRequest, "articleId");
+		String ddmTemplateKey = PrefsParamUtil.getString(
+			portletPreferences, renderRequest, "ddmTemplateKey");
 
 		JournalArticle article = null;
 		JournalArticleDisplay articleDisplay = null;
 
 		if ((articleGroupId > 0) && Validator.isNotNull(articleId)) {
+			String viewMode = ParamUtil.getString(renderRequest, "viewMode");
+			String languageId = LanguageUtil.getLanguageId(renderRequest);
+			int page = ParamUtil.getInteger(renderRequest, "page", 1);
+
 			article = JournalArticleLocalServiceUtil.fetchLatestArticle(
 				articleGroupId, articleId, WorkflowConstants.STATUS_APPROVED);
 
@@ -98,14 +91,18 @@ public class ViewAction extends WebContentAction {
 
 				articleDisplay = JournalContentUtil.getDisplay(
 					articleGroupId, articleId, version, ddmTemplateKey,
-					viewMode, languageId, themeDisplay, page, xmlRequest);
+					viewMode, languageId, page,
+					new PortletRequestModel(renderRequest, renderResponse),
+					themeDisplay);
 			}
 			catch (Exception e) {
 				renderRequest.removeAttribute(WebKeys.JOURNAL_ARTICLE);
 
 				articleDisplay = JournalContentUtil.getDisplay(
 					articleGroupId, articleId, ddmTemplateKey, viewMode,
-					languageId, themeDisplay, page, xmlRequest);
+					languageId, page,
+					new PortletRequestModel(renderRequest, renderResponse),
+					themeDisplay);
 			}
 		}
 

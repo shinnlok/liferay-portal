@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,9 +14,9 @@
 
 package com.liferay.portal.tools.sourceformatter;
 
-import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Tuple;
 
 import java.io.File;
@@ -26,6 +26,8 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Before;
+
+import org.apache.commons.io.FileUtils;
 
 /**
  * @author Hugo Huijser
@@ -80,7 +82,7 @@ public class BaseSourceProcessorTestCase {
 
 		if (!errorMessages.isEmpty() || (expectedErrorMessages.length > 0)) {
 			Assert.assertEquals(
-				errorMessages.size(), expectedErrorMessages.length);
+				expectedErrorMessages.length, errorMessages.size());
 
 			for (int i = 0; i < errorMessages.size(); i++) {
 				String actualErrorMessage = errorMessages.get(i);
@@ -106,7 +108,12 @@ public class BaseSourceProcessorTestCase {
 			try {
 				File file = new File(_DIR_NAME + "/expected/" + fileName);
 
-				String expectedFormattedContent = FileUtil.read(file.getPath());
+				String expectedFormattedContent = FileUtils.readFileToString(
+					file, StringPool.UTF8);
+
+				expectedFormattedContent = StringUtil.replace(
+					expectedFormattedContent, StringPool.RETURN_NEW_LINE,
+					StringPool.NEW_LINE);
 
 				Assert.assertEquals(
 					expectedFormattedContent, actualFormattedContent);

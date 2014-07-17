@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,12 +15,13 @@
 package com.liferay.portal.kernel.notifications;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.UserNotificationDelivery;
+import com.liferay.portal.model.UserNotificationDeliveryConstants;
 import com.liferay.portal.model.UserNotificationEvent;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.UserNotificationDeliveryLocalServiceUtil;
@@ -53,6 +54,7 @@ public abstract class BaseUserNotificationHandler
 				userNotificationEvent, serviceContext);
 
 			if (userNotificationFeedEntry != null) {
+				userNotificationFeedEntry.setOpenDialog(isOpenDialog());
 				userNotificationFeedEntry.setPortletId(getPortletId());
 			}
 
@@ -69,15 +71,27 @@ public abstract class BaseUserNotificationHandler
 	public boolean isDeliver(
 			long userId, long classNameId, int notificationType,
 			int deliveryType, ServiceContext serviceContext)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		UserNotificationDefinition userNotificationDefinition =
 			UserNotificationManagerUtil.fetchUserNotificationDefinition(
 				_portletId, classNameId, notificationType);
 
+		if (userNotificationDefinition == null) {
+			if (deliveryType == UserNotificationDeliveryConstants.TYPE_EMAIL) {
+				return true;
+			}
+
+			return false;
+		}
+
 		UserNotificationDeliveryType userNotificationDeliveryType =
 			userNotificationDefinition.getUserNotificationDeliveryType(
 				deliveryType);
+
+		if (userNotificationDeliveryType == null) {
+			return false;
+		}
 
 		UserNotificationDelivery userNotificationDelivery =
 			UserNotificationDeliveryLocalServiceUtil.
@@ -86,6 +100,11 @@ public abstract class BaseUserNotificationHandler
 					deliveryType, userNotificationDeliveryType.isDefault());
 
 		return userNotificationDelivery.isDeliver();
+	}
+
+	@Override
+	public boolean isOpenDialog() {
+		return _openDialog;
 	}
 
 	protected UserNotificationFeedEntry doInterpret(
@@ -112,12 +131,42 @@ public abstract class BaseUserNotificationHandler
 		return StringPool.BLANK;
 	}
 
+	protected String getBodyTemplate() throws Exception {
+		if (isActionable()) {
+			StringBundler sb = new StringBundler(5);
+
+			sb.append("<div class=\"title\">[$TITLE$]</div><div ");
+			sb.append("class=\"body\"><a class=\"btn btn-action ");
+			sb.append("btn-success\" href=\"[$CONFIRM_URL$]\">[$CONFIRM$]</a>");
+			sb.append("<a class=\"btn btn-action btn-warning\" href=\"");
+			sb.append("[$IGNORE_URL$]\">[$IGNORE$]</a></div>");
+
+			return sb.toString();
+		}
+		else {
+			return "<div class=\"title\">[$TITLE$]</div><div class=\"body\">" +
+				"[$BODY$]</div>";
+		}
+	}
+
 	protected String getLink(
 			UserNotificationEvent userNotificationEvent,
 			ServiceContext serviceContext)
 		throws Exception {
 
 		return StringPool.BLANK;
+	}
+
+	protected boolean isActionable() {
+		return _actionable;
+	}
+
+	protected void setActionable(boolean actionable) {
+		_actionable = actionable;
+	}
+
+	protected void setOpenDialog(boolean openDialog) {
+		_openDialog = openDialog;
 	}
 
 	protected void setPortletId(String portletId) {
@@ -131,6 +180,8 @@ public abstract class BaseUserNotificationHandler
 	private static Log _log = LogFactoryUtil.getLog(
 		BaseUserNotificationHandler.class);
 
+	private boolean _actionable;
+	private boolean _openDialog;
 	private String _portletId;
 	private String _selector = StringPool.BLANK;
 

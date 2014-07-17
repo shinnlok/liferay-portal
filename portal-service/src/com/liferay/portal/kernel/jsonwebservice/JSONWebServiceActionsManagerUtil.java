@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -30,20 +30,22 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class JSONWebServiceActionsManagerUtil {
 
-	public static Set<String> getContextPaths() {
-		return _jsonWebServiceActionsManager. getContextPaths();
+	public static Set<String> getContextNames() {
+		return _jsonWebServiceActionsManager.getContextNames();
 	}
 
 	public static JSONWebServiceAction getJSONWebServiceAction(
-		HttpServletRequest request) {
+			HttpServletRequest request)
+		throws NoSuchJSONWebServiceException {
 
 		return getJSONWebServiceActionsManager().getJSONWebServiceAction(
 			request);
 	}
 
 	public static JSONWebServiceAction getJSONWebServiceAction(
-		HttpServletRequest request, String path, String method,
-		Map<String, Object> parameterMap) {
+			HttpServletRequest request, String path, String method,
+			Map<String, Object> parameterMap)
+		throws NoSuchJSONWebServiceException {
 
 		return getJSONWebServiceActionsManager().getJSONWebServiceAction(
 			request, path, method, parameterMap);
@@ -57,18 +59,18 @@ public class JSONWebServiceActionsManagerUtil {
 	}
 
 	public static List<JSONWebServiceActionMapping>
-		getJSONWebServiceActionMappings(String contextPath) {
+		getJSONWebServiceActionMappings(String contextName) {
 
 		PortalRuntimePermission.checkGetBeanProperty(
 			JSONWebServiceActionsManagerUtil.class);
 
 		return _jsonWebServiceActionsManager.getJSONWebServiceActionMappings(
-			contextPath);
+			contextName);
 	}
 
-	public static int getJSONWebServiceActionsCount(String contextPath) {
+	public static int getJSONWebServiceActionsCount(String contextName) {
 		return getJSONWebServiceActionsManager().getJSONWebServiceActionsCount(
-			contextPath);
+			contextName);
 	}
 
 	public static JSONWebServiceActionsManager
@@ -77,30 +79,30 @@ public class JSONWebServiceActionsManagerUtil {
 		return _jsonWebServiceActionsManager;
 	}
 
-	public static void registerJSONWebServiceAction(
-		String contextPath, Class<?> actionClass, Method actionMethod,
-		String path, String method) {
-
-		getJSONWebServiceActionsManager().registerJSONWebServiceAction(
-			contextPath, actionClass, actionMethod, path, method);
+	public static JSONWebServiceNaming getJSONWebServiceNaming() {
+		return getJSONWebServiceActionsManager().getJSONWebServiceNaming();
 	}
 
 	public static void registerJSONWebServiceAction(
-		String contextPath, Object actionObject, Class<?> actionClass,
+		String contextName, String contextPath, Class<?> actionClass,
 		Method actionMethod, String path, String method) {
 
 		getJSONWebServiceActionsManager().registerJSONWebServiceAction(
-			contextPath, actionObject, actionClass, actionMethod, path, method);
+			contextName, contextPath, actionClass, actionMethod, path, method);
+	}
+
+	public static void registerJSONWebServiceAction(
+		String contextName, String contextPath, Object actionObject,
+		Class<?> actionClass, Method actionMethod, String path, String method) {
+
+		getJSONWebServiceActionsManager().registerJSONWebServiceAction(
+			contextName, contextPath, actionObject, actionClass, actionMethod,
+			path, method);
 	}
 
 	public static int registerServletContext(ServletContext servletContext) {
 		return getJSONWebServiceActionsManager().registerServletContext(
 			servletContext);
-	}
-
-	public static int registerServletContext(String contextPath) {
-		return getJSONWebServiceActionsManager().registerServletContext(
-			contextPath);
 	}
 
 	public static int unregisterJSONWebServiceActions(Object actionObject) {

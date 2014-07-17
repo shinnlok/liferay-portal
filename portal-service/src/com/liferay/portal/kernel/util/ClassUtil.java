@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -282,6 +282,12 @@ public class ClassUtil {
 			}
 			else {
 				StringBundler sb = new StringBundler();
+
+				int pos = s.indexOf('{');
+
+				if (pos != -1) {
+					sb.append(s.substring(pos + 1));
+				}
 
 				while (st.nextToken() != StreamTokenizer.TT_EOF) {
 					if (st.ttype == StreamTokenizer.TT_WORD) {

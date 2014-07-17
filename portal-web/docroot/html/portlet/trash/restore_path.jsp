@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -39,19 +39,19 @@
 					String restoreClassName = restoreClassNames.get(i);
 
 					if (Validator.isNotNull(restoreClassName)) {
-						type = ResourceActionsUtil.getModelResource(pageContext, restoreClassName);
+						type = ResourceActionsUtil.getModelResource(request, restoreClassName);
 					}
 				%>
 
 					<liferay-util:buffer var="entityLink">
-						<em class="restore-entry-title"><aui:a href="<%= restoreEntryLinks.get(i) %>" label="<%= restoreEntryMessages.get(i) %>" /></em>
+						<em class="restore-entry-title"><aui:a href="<%= restoreEntryLinks.get(i) %>" label="<%= HtmlUtil.escape(restoreEntryMessages.get(i)) %>" /></em>
 					</liferay-util:buffer>
 
 					<liferay-util:buffer var="link">
-						<em class="restore-entry-title"><aui:a href="<%= restoreLinks.get(i) %>" label="<%= restoreMessages.get(i) %>" /></em>
+						<em class="restore-entry-title"><aui:a href="<%= restoreLinks.get(i) %>" label="<%= HtmlUtil.escape(restoreMessages.get(i)) %>" /></em>
 					</liferay-util:buffer>
 
-					<liferay-ui:message arguments="<%= new Object[] {type, entityLink.trim(), link.trim()} %>" key="the-x-x-was-restored-to-x" />
+					<liferay-ui:message arguments="<%= new Object[] {type, entityLink.trim(), link.trim()} %>" key="the-x-x-was-restored-to-x" translateArguments="<%= false %>" />
 
 				<%
 				}
@@ -83,11 +83,9 @@
 	A.getBody().delegate(
 		'click',
 		function(event) {
-			var link = event.currentTarget.one('a');
-
-			<portlet:namespace />restoreDialog(link.attr('data-uri'));
+			<portlet:namespace />restoreDialog(event.currentTarget.attr('data-uri'));
 		},
-		'.trash-restore-link'
+		'.trash-restore-link a, button.trash-restore-link'
 	);
 
 	Liferay.provide(
@@ -102,8 +100,8 @@
 						modal: true,
 						width: 1024
 					},
-					eventName: '<portlet:namespace />selectFolder',
-					id: '<portlet:namespace />selectFolder',
+					eventName: '<portlet:namespace />selectContainer',
+					id: '<portlet:namespace />selectContainer',
 					title: '<liferay-ui:message key="warning" />',
 					uri: uri
 				},
@@ -111,6 +109,7 @@
 					document.<portlet:namespace />selectContainerForm.<portlet:namespace />className.value = event.classname;
 					document.<portlet:namespace />selectContainerForm.<portlet:namespace />classPK.value = event.classpk;
 					document.<portlet:namespace />selectContainerForm.<portlet:namespace />containerModelId.value = event.containermodelid;
+					document.<portlet:namespace />selectContainerForm.<portlet:namespace />redirect.value = event.redirect;
 
 					submitForm(document.<portlet:namespace />selectContainerForm);
 				}

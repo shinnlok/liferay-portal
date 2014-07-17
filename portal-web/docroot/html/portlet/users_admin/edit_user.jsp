@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -131,13 +131,32 @@ else if (selUser != null) {
 	}
 }
 
+List<UserGroupGroupRole> inheritedSiteRoles = Collections.emptyList();
+
+if (selUser != null) {
+	inheritedSiteRoles = UserGroupGroupRoleLocalServiceUtil.getUserGroupGroupRolesByUser(selUser.getUserId());
+}
+
+List<Group> inheritedSites = GroupLocalServiceUtil.getUserGroupsRelatedGroups(userGroups);
+List<Group> organizationsRelatedGroups = Collections.emptyList();
+
+if (!organizations.isEmpty()) {
+	organizationsRelatedGroups = GroupLocalServiceUtil.getOrganizationsRelatedGroups(organizations);
+
+	for (Group group : organizationsRelatedGroups) {
+		if (!inheritedSites.contains(group)) {
+			inheritedSites.add(group);
+		}
+	}
+}
+
 List<Group> allGroups = new ArrayList<Group>();
 
 allGroups.addAll(groups);
+allGroups.addAll(inheritedSites);
+allGroups.addAll(organizationsRelatedGroups);
 allGroups.addAll(GroupLocalServiceUtil.getOrganizationsGroups(organizations));
-allGroups.addAll(GroupLocalServiceUtil.getOrganizationsRelatedGroups(organizations));
 allGroups.addAll(GroupLocalServiceUtil.getUserGroupsGroups(userGroups));
-allGroups.addAll(GroupLocalServiceUtil.getUserGroupsRelatedGroups(userGroups));
 
 String[] mainSections = PropsValues.USERS_FORM_ADD_MAIN;
 String[] identificationSections = PropsValues.USERS_FORM_ADD_IDENTIFICATION;
@@ -179,14 +198,14 @@ if (selUser != null) {
 	</aui:nav-bar>
 
 	<div id="breadcrumb">
-		<liferay-ui:breadcrumb showCurrentGroup="<%= false %>" showCurrentPortlet="<%= false %>" showGuestGroup="<%= false %>" showLayout="<%= false %>" showPortletBreadcrumb="<%= true %>" />
+		<liferay-ui:breadcrumb showCurrentGroup="<%= false %>" showGuestGroup="<%= false %>" showLayout="<%= false %>" showPortletBreadcrumb="<%= true %>" />
 	</div>
 
 	<liferay-ui:header
 		backURL="<%= backURL %>"
 		escapeXml="<%= false %>"
 		localizeTitle="<%= (selUser == null) %>"
-		title='<%= (selUser == null) ? "add-user" : LanguageUtil.format(pageContext, "edit-user-x", HtmlUtil.escape(selUser.getFullName())) %>'
+		title='<%= (selUser == null) ? "add-user" : LanguageUtil.format(request, "edit-user-x", HtmlUtil.escape(selUser.getFullName()), false) %>'
 	/>
 </c:if>
 
@@ -210,10 +229,12 @@ if (selUser != null) {
 	request.setAttribute("user.selContact", selContact);
 	request.setAttribute("user.passwordPolicy", passwordPolicy);
 	request.setAttribute("user.groups", groups);
+	request.setAttribute("user.inheritedSites", inheritedSites);
 	request.setAttribute("user.organizations", organizations);
 	request.setAttribute("user.roles", roles);
 	request.setAttribute("user.organizationRoles", organizationRoles);
 	request.setAttribute("user.siteRoles", siteRoles);
+	request.setAttribute("user.inheritedSiteRoles", inheritedSiteRoles);
 	request.setAttribute("user.userGroups", userGroups);
 	request.setAttribute("user.allGroups", allGroups);
 
@@ -240,7 +261,7 @@ if (selUser != null) {
 		<c:if test="<%= selUser != null %>">
 			<div class="user-info">
 				<div class="float-container">
-					<img alt="<%= HtmlUtil.escape(selUser.getFullName()) %>" class="user-logo" src="<%= selUser.getPortraitURL(themeDisplay) %>" />
+					<img alt="<%= HtmlUtil.escapeAttribute(selUser.getFullName()) %>" class="user-logo" src="<%= selUser.getPortraitURL(themeDisplay) %>" />
 
 					<span class="user-name"><%= HtmlUtil.escape(selUser.getFullName()) %></span>
 				</div>

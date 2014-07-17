@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -165,7 +165,7 @@ portletURL.setParameter("target", target);
 
 			<liferay-ui:search-container-column-text
 				name="type"
-				value="<%= LanguageUtil.get(pageContext, group.getTypeLabel()) %>"
+				value="<%= LanguageUtil.get(request, group.getTypeLabel()) %>"
 			/>
 
 			<liferay-ui:search-container-column-text>
@@ -174,13 +174,25 @@ portletURL.setParameter("target", target);
 					<%
 					Map<String, Object> data = new HashMap<String, Object>();
 
-					data.put("groupdescriptivename", HtmlUtil.escape(group.getDescriptiveName(locale)));
+					data.put("groupdescriptivename", group.getDescriptiveName(locale));
 					data.put("groupid", group.getGroupId());
 					data.put("grouptarget", target);
-					data.put("grouptype", LanguageUtil.get(pageContext, group.getTypeLabel()));
+					data.put("grouptype", LanguageUtil.get(request, group.getTypeLabel()));
+
+					boolean disabled = false;
+
+					if (selUser != null) {
+						for (long curGroupId : selUser.getGroupIds()) {
+							if (curGroupId == group.getGroupId()) {
+								disabled = true;
+
+								break;
+							}
+						}
+					}
 					%>
 
-					<aui:button cssClass="selector-button" data="<%= data %>" value="choose" />
+					<aui:button cssClass="selector-button" data="<%= data %>" disabled="<%= disabled %>" value="choose" />
 				</c:if>
 			</liferay-ui:search-container-column-text>
 		</liferay-ui:search-container-row>
@@ -192,15 +204,14 @@ portletURL.setParameter("target", target);
 <aui:script use="aui-base">
 	var Util = Liferay.Util;
 
-	A.one('#<portlet:namespace />selectGroupFm').delegate(
-		'click',
-		function(event) {
-			var result = Util.getAttributes(event.currentTarget, 'data-');
+	var openingLiferay = Util.getOpener().Liferay;
 
-			Util.getOpener().Liferay.fire('<%= HtmlUtil.escapeJS(eventName) %>', result);
-
-			Util.getWindow().hide();
-		},
-		'.selector-button'
+	openingLiferay.fire(
+		'<portlet:namespace />enableRemovedSites',
+		{
+			selectors: A.all('.selector-button:disabled')
+		}
 	);
+
+	Util.selectEntityHandler('#<portlet:namespace />selectGroupFm', '<%= HtmlUtil.escapeJS(eventName) %>', <%= selUser != null %>);
 </aui:script>

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,7 +20,7 @@ import com.liferay.portal.model.Group;
 /**
  * @author Shinn Lok
  */
-public class GroupIdComparator extends OrderByComparator {
+public class GroupIdComparator extends OrderByComparator<Group> {
 
 	public static final String ORDER_BY_ASC = "Group_.groupId ASC";
 
@@ -37,10 +37,7 @@ public class GroupIdComparator extends OrderByComparator {
 	}
 
 	@Override
-	public int compare(Object obj1, Object obj2) {
-		Group group1 = (Group)obj1;
-		Group group2 = (Group)obj2;
-
+	public int compare(Group group1, Group group2) {
 		long groupId1 = group1.getGroupId();
 		long groupId2 = group2.getGroupId();
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -35,6 +35,9 @@ import java.util.concurrent.TimeoutException;
  * @author Shuyang Zhou
  */
 public class ProcessUtil {
+
+	public static final CollectorOutputProcessor COLLECTOR_OUTPUT_PROCESSOR =
+		new CollectorOutputProcessor();
 
 	public static final ConsumerOutputProcessor CONSUMER_OUTPUT_PROCESSOR =
 		new ConsumerOutputProcessor();
@@ -185,9 +188,9 @@ public class ProcessUtil {
 			return _stdOutFuture.isDone();
 		}
 
+		private final Process _process;
 		private final Future<E> _stdErrFuture;
 		private final Future<O> _stdOutFuture;
-		private final Process _process;
 
 	}
 
@@ -230,8 +233,7 @@ public class ProcessUtil {
 					int exitCode = _process.waitFor();
 
 					if (exitCode != 0) {
-						throw new ProcessException(
-							"Subprocess terminated with exit code " + exitCode);
+						throw new TerminationProcessException(exitCode);
 					}
 				}
 				catch (InterruptedException ie) {

@@ -86,7 +86,6 @@ that may or may not be enforced with a unique index at the database level. Case
 	 * @param ${finderCol.name} the ${finderCol.humanName}
 	</#list>
 	 * @return the matching ${entity.humanNames}
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public List<${entity.name}> findBy${finder.name}(
@@ -99,7 +98,7 @@ that may or may not be enforced with a unique index at the database level. Case
 		</#if>
 	</#list>
 
-	) throws SystemException {
+	) {
 		return findBy${finder.name}(
 
 		<#list finderColsList as finderCol>
@@ -122,7 +121,6 @@ that may or may not be enforced with a unique index at the database level. Case
 	 * @param start the lower bound of the range of ${entity.humanNames}
 	 * @param end the upper bound of the range of ${entity.humanNames} (not inclusive)
 	 * @return the range of matching ${entity.humanNames}
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public List<${entity.name}> findBy${finder.name}(
@@ -131,7 +129,7 @@ that may or may not be enforced with a unique index at the database level. Case
 		${finderCol.type} ${finderCol.name},
 	</#list>
 
-	int start, int end) throws SystemException {
+	int start, int end) {
 		return findBy${finder.name}(
 
 		<#list finderColsList as finderCol>
@@ -155,7 +153,6 @@ that may or may not be enforced with a unique index at the database level. Case
 	 * @param end the upper bound of the range of ${entity.humanNames} (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching ${entity.humanNames}
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public List<${entity.name}> findBy${finder.name}(
@@ -164,7 +161,7 @@ that may or may not be enforced with a unique index at the database level. Case
 		${finderCol.type} ${finderCol.name},
 	</#list>
 
-	int start, int end, OrderByComparator orderByComparator) throws SystemException {
+	int start, int end, OrderByComparator<${entity.name}> orderByComparator) {
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
@@ -280,14 +277,14 @@ that may or may not be enforced with a unique index at the database level. Case
 
 				QueryPos qPos = QueryPos.getInstance(q);
 
-				<#include "persistence_impl_finder_qpos.ftl">
+				<@finderQPos />
 
 				if (!pagination) {
 					list = (List<${entity.name}>)QueryUtil.list(q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
-					list = new UnmodifiableList<${entity.name}>(list);
+					list = Collections.unmodifiableList(list);
 				}
 				else {
 					list = (List<${entity.name}>)QueryUtil.list(q, getDialect(), start, end);
@@ -319,7 +316,6 @@ that may or may not be enforced with a unique index at the database level. Case
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching ${entity.humanName}
 	 * @throws ${packagePath}.${noSuchEntity}Exception if a matching ${entity.humanName} could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public ${entity.name} findBy${finder.name}_First(
@@ -328,7 +324,7 @@ that may or may not be enforced with a unique index at the database level. Case
 		${finderCol.type} ${finderCol.name},
 	</#list>
 
-	OrderByComparator orderByComparator) throws ${noSuchEntity}Exception, SystemException {
+	OrderByComparator<${entity.name}> orderByComparator) throws ${noSuchEntity}Exception {
 		${entity.name} ${entity.varName} = fetchBy${finder.name}_First(
 
 		<#list finderColsList as finderCol>
@@ -365,7 +361,6 @@ that may or may not be enforced with a unique index at the database level. Case
 	</#list>
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching ${entity.humanName}, or <code>null</code> if a matching ${entity.humanName} could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public ${entity.name} fetchBy${finder.name}_First(
@@ -374,7 +369,7 @@ that may or may not be enforced with a unique index at the database level. Case
 		${finderCol.type} ${finderCol.name},
 	</#list>
 
-	OrderByComparator orderByComparator) throws SystemException {
+	OrderByComparator<${entity.name}> orderByComparator) {
 		List<${entity.name}> list = findBy${finder.name}(
 
 		<#list finderColsList as finderCol>
@@ -399,7 +394,6 @@ that may or may not be enforced with a unique index at the database level. Case
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching ${entity.humanName}
 	 * @throws ${packagePath}.${noSuchEntity}Exception if a matching ${entity.humanName} could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public ${entity.name} findBy${finder.name}_Last(
@@ -408,7 +402,7 @@ that may or may not be enforced with a unique index at the database level. Case
 		${finderCol.type} ${finderCol.name},
 	</#list>
 
-	OrderByComparator orderByComparator) throws ${noSuchEntity}Exception, SystemException {
+	OrderByComparator<${entity.name}> orderByComparator) throws ${noSuchEntity}Exception {
 		${entity.name} ${entity.varName} = fetchBy${finder.name}_Last(
 
 		<#list finderColsList as finderCol>
@@ -445,7 +439,6 @@ that may or may not be enforced with a unique index at the database level. Case
 	</#list>
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching ${entity.humanName}, or <code>null</code> if a matching ${entity.humanName} could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public ${entity.name} fetchBy${finder.name}_Last(
@@ -454,7 +447,7 @@ that may or may not be enforced with a unique index at the database level. Case
 		${finderCol.type} ${finderCol.name},
 	</#list>
 
-	OrderByComparator orderByComparator) throws SystemException {
+	OrderByComparator<${entity.name}> orderByComparator) {
 		int count = countBy${finder.name}(
 
 		<#list finderColsList as finderCol>
@@ -497,7 +490,6 @@ that may or may not be enforced with a unique index at the database level. Case
 		 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 		 * @return the previous, current, and next ${entity.humanName}
 		 * @throws ${packagePath}.${noSuchEntity}Exception if a ${entity.humanName} with the primary key could not be found
-		 * @throws SystemException if a system exception occurred
 		 */
 		@Override
 		public ${entity.name}[] findBy${finder.name}_PrevAndNext(${entity.PKClassName} ${entity.PKVarName},
@@ -506,7 +498,7 @@ that may or may not be enforced with a unique index at the database level. Case
 			${finderCol.type} ${finderCol.name},
 		</#list>
 
-		OrderByComparator orderByComparator) throws ${noSuchEntity}Exception, SystemException {
+		OrderByComparator<${entity.name}> orderByComparator) throws ${noSuchEntity}Exception {
 			${entity.name} ${entity.varName} = findByPrimaryKey(${entity.PKVarName});
 
 			Session session = null;
@@ -555,7 +547,7 @@ that may or may not be enforced with a unique index at the database level. Case
 				${finderCol.type} ${finderCol.name},
 			</#list>
 
-			OrderByComparator orderByComparator, boolean previous) {
+			OrderByComparator<${entity.name}> orderByComparator, boolean previous) {
 
 			<#include "persistence_impl_get_by_prev_and_next_query.ftl">
 
@@ -568,7 +560,7 @@ that may or may not be enforced with a unique index at the database level. Case
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
-			<#include "persistence_impl_finder_qpos.ftl">
+			<@finderQPos />
 
 			if (orderByComparator != null) {
 				Object[] values = orderByComparator.getOrderByConditionValues(${entity.varName});
@@ -597,7 +589,6 @@ that may or may not be enforced with a unique index at the database level. Case
 		 * @param ${finderCol.name} the ${finderCol.humanName}
 		</#list>
 		 * @return the matching ${entity.humanNames} that the user has permission to view
-		 * @throws SystemException if a system exception occurred
 		 */
 		@Override
 		public List<${entity.name}> filterFindBy${finder.name}(
@@ -610,7 +601,7 @@ that may or may not be enforced with a unique index at the database level. Case
 			</#if>
 		</#list>
 
-		) throws SystemException {
+		) {
 			return filterFindBy${finder.name}(
 
 			<#list finderColsList as finderCol>
@@ -633,7 +624,6 @@ that may or may not be enforced with a unique index at the database level. Case
 		 * @param start the lower bound of the range of ${entity.humanNames}
 		 * @param end the upper bound of the range of ${entity.humanNames} (not inclusive)
 		 * @return the range of matching ${entity.humanNames} that the user has permission to view
-		 * @throws SystemException if a system exception occurred
 		 */
 		@Override
 		public List<${entity.name}> filterFindBy${finder.name}(
@@ -642,7 +632,7 @@ that may or may not be enforced with a unique index at the database level. Case
 			${finderCol.type} ${finderCol.name},
 		</#list>
 
-		int start, int end) throws SystemException {
+		int start, int end) {
 			return filterFindBy${finder.name}(
 
 			<#list finderColsList as finderCol>
@@ -666,7 +656,6 @@ that may or may not be enforced with a unique index at the database level. Case
 		 * @param end the upper bound of the range of ${entity.humanNames} (not inclusive)
 		 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 		 * @return the ordered range of matching ${entity.humanNames} that the user has permission to view
-		 * @throws SystemException if a system exception occurred
 		 */
 		@Override
 		public List<${entity.name}> filterFindBy${finder.name}(
@@ -675,7 +664,7 @@ that may or may not be enforced with a unique index at the database level. Case
 			${finderCol.type} ${finderCol.name},
 		</#list>
 
-		int start, int end, OrderByComparator orderByComparator) throws SystemException {
+		int start, int end, OrderByComparator<${entity.name}> orderByComparator) {
 			if (!InlineSQLHelperUtil.isEnabled(<#if finder.hasColumn("groupId")>groupId</#if>)) {
 				return findBy${finder.name}(
 
@@ -700,7 +689,7 @@ that may or may not be enforced with a unique index at the database level. Case
 
 					QueryPos qPos = QueryPos.getInstance(q);
 
-					<#include "persistence_impl_finder_qpos.ftl">
+					<@finderQPos />
 
 					return (List<${entity.name}>)QueryUtil.list(q, getDialect(), start, end);
 				}
@@ -761,7 +750,7 @@ that may or may not be enforced with a unique index at the database level. Case
 				try {
 					session = openSession();
 
-					SQLQuery q = session.createSQLQuery(sql);
+					SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 					if (getDB().isSupportsInlineDistinct()) {
 						q.addEntity(_FILTER_ENTITY_ALIAS, ${entity.name}Impl.class);
@@ -772,7 +761,7 @@ that may or may not be enforced with a unique index at the database level. Case
 
 					QueryPos qPos = QueryPos.getInstance(q);
 
-					<#include "persistence_impl_finder_qpos.ftl">
+					<@finderQPos />
 
 					return (List<${entity.name}>)QueryUtil.list(q, getDialect(), start, end);
 				}
@@ -796,7 +785,6 @@ that may or may not be enforced with a unique index at the database level. Case
 			 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 			 * @return the previous, current, and next ${entity.humanName}
 			 * @throws ${packagePath}.${noSuchEntity}Exception if a ${entity.humanName} with the primary key could not be found
-			 * @throws SystemException if a system exception occurred
 			 */
 			@Override
 			public ${entity.name}[] filterFindBy${finder.name}_PrevAndNext(${entity.PKClassName} ${entity.PKVarName},
@@ -805,7 +793,7 @@ that may or may not be enforced with a unique index at the database level. Case
 				${finderCol.type} ${finderCol.name},
 			</#list>
 
-			OrderByComparator orderByComparator) throws ${noSuchEntity}Exception, SystemException {
+			OrderByComparator<${entity.name}> orderByComparator) throws ${noSuchEntity}Exception {
 				if (!InlineSQLHelperUtil.isEnabled(<#if finder.hasColumn("groupId")>groupId</#if>)) {
 					return findBy${finder.name}_PrevAndNext(${entity.PKVarName},
 
@@ -864,7 +852,7 @@ that may or may not be enforced with a unique index at the database level. Case
 					${finderCol.type} ${finderCol.name},
 				</#list>
 
-				OrderByComparator orderByComparator, boolean previous) {
+				OrderByComparator<${entity.name}> orderByComparator, boolean previous) {
 
 				<#if entity.isPermissionedModel()>
 					<#include "persistence_impl_get_by_prev_and_next_query.ftl">
@@ -878,7 +866,7 @@ that may or may not be enforced with a unique index at the database level. Case
 
 					QueryPos qPos = QueryPos.getInstance(q);
 
-					<#include "persistence_impl_finder_qpos.ftl">
+					<@finderQPos />
 
 					if (orderByComparator != null) {
 						Object[] values = orderByComparator.getOrderByConditionValues(${entity.varName});
@@ -1001,7 +989,7 @@ that may or may not be enforced with a unique index at the database level. Case
 
 					String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(), ${entity.name}.class.getName(), _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN<#if finder.hasColumn("groupId")>, groupId</#if>);
 
-					SQLQuery q = session.createSQLQuery(sql);
+					SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 					q.setFirstResult(0);
 					q.setMaxResults(2);
@@ -1015,7 +1003,7 @@ that may or may not be enforced with a unique index at the database level. Case
 
 					QueryPos qPos = QueryPos.getInstance(q);
 
-					<#include "persistence_impl_finder_qpos.ftl">
+					<@finderQPos />
 
 					if (orderByComparator != null) {
 						Object[] values = orderByComparator.getOrderByConditionValues(${entity.varName});
@@ -1049,7 +1037,6 @@ that may or may not be enforced with a unique index at the database level. Case
 				</#if>
 			</#list>
 			 * @return the matching ${entity.humanNames} that the user has permission to view
-			 * @throws SystemException if a system exception occurred
 			 */
 			@Override
 			public List<${entity.name}> filterFindBy${finder.name}(
@@ -1066,7 +1053,7 @@ that may or may not be enforced with a unique index at the database level. Case
 				</#if>
 			</#list>
 
-			) throws SystemException {
+			) {
 				return filterFindBy${finder.name}(
 
 				<#list finderColsList as finderCol>
@@ -1097,7 +1084,6 @@ that may or may not be enforced with a unique index at the database level. Case
 			 * @param start the lower bound of the range of ${entity.humanNames}
 			 * @param end the upper bound of the range of ${entity.humanNames} (not inclusive)
 			 * @return the range of matching ${entity.humanNames} that the user has permission to view
-			 * @throws SystemException if a system exception occurred
 			 */
 			@Override
 			public List<${entity.name}> filterFindBy${finder.name}(
@@ -1110,7 +1096,7 @@ that may or may not be enforced with a unique index at the database level. Case
 				</#if>
 			</#list>
 
-			int start, int end) throws SystemException {
+			int start, int end) {
 				return filterFindBy${finder.name}(
 
 				<#list finderColsList as finderCol>
@@ -1142,7 +1128,6 @@ that may or may not be enforced with a unique index at the database level. Case
 			 * @param end the upper bound of the range of ${entity.humanNames} (not inclusive)
 			 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 			 * @return the ordered range of matching ${entity.humanNames} that the user has permission to view
-			 * @throws SystemException if a system exception occurred
 			 */
 			@Override
 			public List<${entity.name}> filterFindBy${finder.name}(
@@ -1155,7 +1140,7 @@ that may or may not be enforced with a unique index at the database level. Case
 				</#if>
 			</#list>
 
-			int start, int end, OrderByComparator orderByComparator) throws SystemException {
+			int start, int end, OrderByComparator<${entity.name}> orderByComparator) {
 				if (!InlineSQLHelperUtil.isEnabled(
 					<#if finder.hasColumn("groupId")>
 						<#if finder.getColumn("groupId").hasArrayableOperator()>
@@ -1178,6 +1163,22 @@ that may or may not be enforced with a unique index at the database level. Case
 					start, end, orderByComparator);
 				}
 
+				<#list finderColsList as finderCol>
+					<#if finderCol.hasArrayableOperator()>
+						if (${finderCol.names} == null) {
+							${finderCol.names} = new ${finderCol.type}[0];
+						}
+						else {
+							${finderCol.names} =
+								<#if finderCol.type == "String">
+									ArrayUtil.distinct(${finderCol.names}, NULL_SAFE_STRING_COMPARATOR);
+								<#else>
+									ArrayUtil.unique(${finderCol.names});
+								</#if>
+						}
+					</#if>
+				</#list>
+
 				<#if entity.isPermissionedModel()>
 					<#include "persistence_impl_find_by_arrayable_query.ftl">
 
@@ -1198,9 +1199,13 @@ that may or may not be enforced with a unique index at the database level. Case
 
 						Query q = session.createQuery(sql);
 
-						QueryPos qPos = QueryPos.getInstance(q);
+						<#if bindParameter(finderColsList)>
+							QueryPos qPos = QueryPos.getInstance(q);
+						</#if>
 
-						<#include "persistence_impl_finder_arrayable_qpos.ftl">
+						<@finderQPos
+							_arrayable=true
+						/>
 
 						return (List<${entity.name}>)QueryUtil.list(q, getDialect(), start, end);
 					}
@@ -1262,7 +1267,7 @@ that may or may not be enforced with a unique index at the database level. Case
 					try {
 						session = openSession();
 
-						SQLQuery q = session.createSQLQuery(sql);
+						SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 						if (getDB().isSupportsInlineDistinct()) {
 							q.addEntity(_FILTER_ENTITY_ALIAS, ${entity.name}Impl.class);
@@ -1271,9 +1276,13 @@ that may or may not be enforced with a unique index at the database level. Case
 							q.addEntity(_FILTER_ENTITY_TABLE, ${entity.name}Impl.class);
 						}
 
-						QueryPos qPos = QueryPos.getInstance(q);
+						<#if bindParameter(finderColsList)>
+							QueryPos qPos = QueryPos.getInstance(q);
+						</#if>
 
-						<#include "persistence_impl_finder_arrayable_qpos.ftl">
+						<@finderQPos
+							_arrayable=true
+						/>
 
 						return (List<${entity.name}>)QueryUtil.list(q, getDialect(), start, end);
 					}
@@ -1323,7 +1332,6 @@ that may or may not be enforced with a unique index at the database level. Case
 			</#if>
 		</#list>
 		 * @return the matching ${entity.humanNames}
-		 * @throws SystemException if a system exception occurred
 		 */
 		@Override
 		public List<${entity.name}> findBy${finder.name}(
@@ -1340,7 +1348,7 @@ that may or may not be enforced with a unique index at the database level. Case
 			</#if>
 		</#list>
 
-		) throws SystemException {
+		) {
 			return findBy${finder.name}(
 
 			<#list finderColsList as finderCol>
@@ -1371,7 +1379,6 @@ that may or may not be enforced with a unique index at the database level. Case
 		 * @param start the lower bound of the range of ${entity.humanNames}
 		 * @param end the upper bound of the range of ${entity.humanNames} (not inclusive)
 		 * @return the range of matching ${entity.humanNames}
-		 * @throws SystemException if a system exception occurred
 		 */
 		@Override
 		public List<${entity.name}> findBy${finder.name}(
@@ -1384,7 +1391,7 @@ that may or may not be enforced with a unique index at the database level. Case
 			</#if>
 		</#list>
 
-		int start, int end) throws SystemException {
+		int start, int end) {
 			return findBy${finder.name}(
 
 			<#list finderColsList as finderCol>
@@ -1416,7 +1423,6 @@ that may or may not be enforced with a unique index at the database level. Case
 		 * @param end the upper bound of the range of ${entity.humanNames} (not inclusive)
 		 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 		 * @return the ordered range of matching ${entity.humanNames}
-		 * @throws SystemException if a system exception occurred
 		 */
 		@Override
 		public List<${entity.name}> findBy${finder.name}(
@@ -1429,7 +1435,23 @@ that may or may not be enforced with a unique index at the database level. Case
 			</#if>
 		</#list>
 
-		int start, int end, OrderByComparator orderByComparator) throws SystemException {
+		int start, int end, OrderByComparator<${entity.name}> orderByComparator) {
+			<#list finderColsList as finderCol>
+				<#if finderCol.hasArrayableOperator()>
+					if (${finderCol.names} == null) {
+						${finderCol.names} = new ${finderCol.type}[0];
+					}
+					else {
+						${finderCol.names} =
+							<#if finderCol.type == "String">
+								ArrayUtil.distinct(${finderCol.names}, NULL_SAFE_STRING_COMPARATOR);
+							<#else>
+								ArrayUtil.unique(${finderCol.names});
+							</#if>
+					}
+				</#if>
+			</#list>
+
 			if (
 			<#assign firstCol = true>
 			<#list finderColsList as finderCol>
@@ -1440,7 +1462,7 @@ that may or may not be enforced with a unique index at the database level. Case
 						&&
 					</#if>
 
-					(${finderCol.names} != null) && (${finderCol.names}.length == 1)
+					${finderCol.names}.length == 1
 				</#if>
 			</#list>
 			) {
@@ -1559,16 +1581,20 @@ that may or may not be enforced with a unique index at the database level. Case
 
 					Query q = session.createQuery(sql);
 
-					QueryPos qPos = QueryPos.getInstance(q);
+					<#if bindParameter(finderColsList)>
+						QueryPos qPos = QueryPos.getInstance(q);
+					</#if>
 
-					<#include "persistence_impl_finder_arrayable_qpos.ftl">
+					<@finderQPos
+						_arrayable=true
+					/>
 
 					if (!pagination) {
 						list = (List<${entity.name}>)QueryUtil.list(q, getDialect(), start, end, false);
 
 						Collections.sort(list);
 
-						list = new UnmodifiableList<${entity.name}>(list);
+						list = Collections.unmodifiableList(list);
 					}
 					else {
 						list = (List<${entity.name}>)QueryUtil.list(q, getDialect(), start, end);
@@ -1609,7 +1635,6 @@ that may or may not be enforced with a unique index at the database level. Case
 	</#list>
 	 * @return the matching ${entity.humanName}
 	 * @throws ${packagePath}.${noSuchEntity}Exception if a matching ${entity.humanName} could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public ${entity.name} findBy${finder.name}(
@@ -1622,7 +1647,7 @@ that may or may not be enforced with a unique index at the database level. Case
 		</#if>
 	</#list>
 
-	) throws ${noSuchEntity}Exception, SystemException {
+	) throws ${noSuchEntity}Exception {
 		${entity.name} ${entity.varName} = fetchBy${finder.name}(
 
 		<#list finderColsList as finderCol>
@@ -1666,7 +1691,6 @@ that may or may not be enforced with a unique index at the database level. Case
 	 * @param ${finderCol.name} the ${finderCol.humanName}
 	</#list>
 	 * @return the matching ${entity.humanName}, or <code>null</code> if a matching ${entity.humanName} could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public ${entity.name} fetchBy${finder.name}(
@@ -1679,7 +1703,7 @@ that may or may not be enforced with a unique index at the database level. Case
 		</#if>
 	</#list>
 
-	) throws SystemException {
+	) {
 		return fetchBy${finder.name}(
 
 		<#list finderColsList as finderCol>
@@ -1697,7 +1721,6 @@ that may or may not be enforced with a unique index at the database level. Case
 	</#list>
 	 * @param retrieveFromCache whether to use the finder cache
 	 * @return the matching ${entity.humanName}, or <code>null</code> if a matching ${entity.humanName} could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public ${entity.name} fetchBy${finder.name}(
@@ -1708,7 +1731,7 @@ that may or may not be enforced with a unique index at the database level. Case
 		,
 	</#list>
 
-	boolean retrieveFromCache) throws SystemException {
+	boolean retrieveFromCache) {
 		Object[] finderArgs = new Object[] {
 			<#list finderColsList as finderCol>
 				${finderCol.name}
@@ -1763,7 +1786,7 @@ that may or may not be enforced with a unique index at the database level. Case
 
 				QueryPos qPos = QueryPos.getInstance(q);
 
-				<#include "persistence_impl_finder_qpos.ftl">
+				<@finderQPos />
 
 				List<${entity.name}> list = q.list();
 

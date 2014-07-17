@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,7 +23,6 @@ import com.liferay.portal.LocaleException;
 import com.liferay.portal.MissingReferenceException;
 import com.liferay.portal.NoSuchGroupException;
 import com.liferay.portal.NoSuchLayoutBranchException;
-import com.liferay.portal.NoSuchLayoutException;
 import com.liferay.portal.NoSuchLayoutRevisionException;
 import com.liferay.portal.PortletIdException;
 import com.liferay.portal.RemoteExportException;
@@ -34,6 +33,7 @@ import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.lar.ExportImportDateUtil;
 import com.liferay.portal.kernel.lar.ExportImportHelperUtil;
 import com.liferay.portal.kernel.lar.MissingReference;
 import com.liferay.portal.kernel.lar.MissingReferences;
@@ -43,11 +43,11 @@ import com.liferay.portal.kernel.lar.PortletDataHandlerKeys;
 import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.lar.UserIdStrategy;
+import com.liferay.portal.kernel.lar.exportimportconfiguration.ExportImportConfigurationConstants;
+import com.liferay.portal.kernel.lar.exportimportconfiguration.ExportImportConfigurationSettingsMapFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.DestinationNames;
-import com.liferay.portal.kernel.messaging.MessageBusUtil;
-import com.liferay.portal.kernel.messaging.MessageStatus;
 import com.liferay.portal.kernel.scheduler.SchedulerEngineHelperUtil;
 import com.liferay.portal.kernel.security.pacl.DoPrivileged;
 import com.liferay.portal.kernel.servlet.ServletResponseConstants;
@@ -64,6 +64,7 @@ import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.TextFormatter;
 import com.liferay.portal.kernel.util.Tuple;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
@@ -75,16 +76,13 @@ import com.liferay.portal.lar.backgroundtask.BackgroundTaskContextMapFactory;
 import com.liferay.portal.lar.backgroundtask.LayoutRemoteStagingBackgroundTaskExecutor;
 import com.liferay.portal.lar.backgroundtask.LayoutStagingBackgroundTaskExecutor;
 import com.liferay.portal.lar.backgroundtask.PortletStagingBackgroundTaskExecutor;
-import com.liferay.portal.messaging.LayoutsLocalPublisherRequest;
-import com.liferay.portal.messaging.LayoutsRemotePublisherRequest;
+import com.liferay.portal.model.ExportImportConfiguration;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.GroupConstants;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.LayoutBranch;
 import com.liferay.portal.model.LayoutRevision;
 import com.liferay.portal.model.LayoutSet;
-import com.liferay.portal.model.LayoutSetBranch;
-import com.liferay.portal.model.LayoutSetBranchConstants;
 import com.liferay.portal.model.Lock;
 import com.liferay.portal.model.Portlet;
 import com.liferay.portal.model.StagedModel;
@@ -98,22 +96,24 @@ import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.security.permission.PermissionThreadLocal;
 import com.liferay.portal.security.permission.ResourceActionsUtil;
 import com.liferay.portal.service.BackgroundTaskLocalServiceUtil;
+import com.liferay.portal.service.ExportImportConfigurationLocalServiceUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutBranchLocalServiceUtil;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.LayoutRevisionLocalServiceUtil;
 import com.liferay.portal.service.LayoutServiceUtil;
-import com.liferay.portal.service.LayoutSetBranchLocalServiceUtil;
 import com.liferay.portal.service.LayoutSetLocalServiceUtil;
 import com.liferay.portal.service.LockLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextThreadLocal;
 import com.liferay.portal.service.StagingLocalServiceUtil;
+import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.service.WorkflowInstanceLinkLocalServiceUtil;
 import com.liferay.portal.service.http.GroupServiceHttp;
 import com.liferay.portal.service.permission.GroupPermissionUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
+import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.SessionClicks;
@@ -206,65 +206,28 @@ public class StagingImpl implements Staging {
 			GroupConstants.DEFAULT_LIVE_GROUP_ID, false);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link StagingLocalServiceUtil#
+	 *             checkDefaultLayoutSetBranches(long, Group, boolean, boolean,
+	 *             boolean, ServiceContext))}
+	 */
+	@Deprecated
 	@Override
 	public void checkDefaultLayoutSetBranches(
 			long userId, Group liveGroup, boolean branchingPublic,
 			boolean branchingPrivate, boolean remote,
 			ServiceContext serviceContext)
-		throws PortalException, SystemException {
+		throws PortalException {
 
-		long targetGroupId = 0;
-
-		if (remote) {
-			targetGroupId = liveGroup.getGroupId();
-		}
-		else {
-			Group stagingGroup = liveGroup.getStagingGroup();
-
-			if (stagingGroup == null) {
-				return;
-			}
-
-			targetGroupId = stagingGroup.getGroupId();
-		}
-
-		if (branchingPublic) {
-			LayoutSetBranch layoutSetBranch =
-				LayoutSetBranchLocalServiceUtil.fetchLayoutSetBranch(
-					targetGroupId, false,
-					LayoutSetBranchConstants.MASTER_BRANCH_NAME);
-
-			if (layoutSetBranch == null) {
-				addDefaultLayoutSetBranch(
-					userId, targetGroupId, liveGroup.getDescriptiveName(),
-					false, serviceContext);
-			}
-		}
-		else {
-			LayoutSetBranchLocalServiceUtil.deleteLayoutSetBranches(
-				targetGroupId, false, true);
-		}
-
-		if (branchingPrivate) {
-			LayoutSetBranch layoutSetBranch =
-				LayoutSetBranchLocalServiceUtil.fetchLayoutSetBranch(
-					targetGroupId, true,
-					LayoutSetBranchConstants.MASTER_BRANCH_NAME);
-
-			if (layoutSetBranch == null) {
-				addDefaultLayoutSetBranch(
-					userId, targetGroupId, liveGroup.getDescriptiveName(), true,
-					serviceContext);
-			}
-		}
-		else {
-			LayoutSetBranchLocalServiceUtil.deleteLayoutSetBranches(
-				targetGroupId, true, true);
-		}
+		StagingLocalServiceUtil.checkDefaultLayoutSetBranches(
+			userId, liveGroup, branchingPublic, branchingPrivate, remote,
+			serviceContext);
 	}
 
 	@Override
-	public void copyFromLive(PortletRequest portletRequest) throws Exception {
+	public void copyFromLive(PortletRequest portletRequest)
+		throws PortalException {
+
 		long stagingGroupId = ParamUtil.getLong(
 			portletRequest, "stagingGroupId");
 
@@ -281,7 +244,7 @@ public class StagingImpl implements Staging {
 
 	@Override
 	public void copyFromLive(PortletRequest portletRequest, Portlet portlet)
-		throws Exception {
+		throws PortalException {
 
 		long plid = ParamUtil.getLong(portletRequest, "plid");
 
@@ -305,21 +268,21 @@ public class StagingImpl implements Staging {
 			PortletRequest portletRequest, long sourceGroupId,
 			long targetGroupId, long sourcePlid, long targetPlid,
 			String portletId)
-		throws Exception {
+		throws PortalException {
 
 		long userId = PortalUtil.getUserId(portletRequest);
 
 		Map<String, String[]> parameterMap = getStagingParameters(
 			portletRequest);
 
-		DateRange dateRange = ExportImportHelperUtil.getDateRange(
+		DateRange dateRange = ExportImportDateUtil.getDateRange(
 			portletRequest, sourceGroupId, false, sourcePlid, portletId,
-			"fromLastPublishDate");
+			ExportImportDateUtil.RANGE_FROM_LAST_PUBLISH_DATE);
 
 		Map<String, Serializable> taskContextMap =
 			BackgroundTaskContextMapFactory.buildTaskContextMap(
 				userId, sourceGroupId, false, null, parameterMap,
-				Constants.PUBLISH, dateRange.getStartDate(),
+				Constants.PUBLISH_TO_LIVE, dateRange.getStartDate(),
 				dateRange.getEndDate(), StringPool.BLANK);
 
 		taskContextMap.put("sourceGroupId", sourceGroupId);
@@ -336,92 +299,87 @@ public class StagingImpl implements Staging {
 
 	@Override
 	public void copyRemoteLayouts(
+			ExportImportConfiguration exportImportConfiguration)
+		throws PortalException {
+
+		Map<String, Serializable> settingsMap =
+			exportImportConfiguration.getSettingsMap();
+
+		long remoteGroupId = MapUtil.getLong(settingsMap, "remoteGroupId");
+		String remoteAddress = MapUtil.getString(settingsMap, "remoteAddress");
+		int remotePort = MapUtil.getInteger(settingsMap, "remotePort");
+		String remotePathContext = MapUtil.getString(
+			settingsMap, "remotePathContext");
+		boolean secureConnection = MapUtil.getBoolean(
+			settingsMap, "secureConnection");
+
+		validateRemoteGroup(
+			exportImportConfiguration.getGroupId(), remoteGroupId,
+			remoteAddress, remotePort, remotePathContext, secureConnection);
+
+		boolean remotePrivateLayout = MapUtil.getBoolean(
+			settingsMap, "remotePrivateLayout");
+
+		doCopyRemoteLayouts(
+			exportImportConfiguration, remoteAddress, remotePort,
+			remotePathContext, secureConnection, remotePrivateLayout);
+	}
+
+	@Override
+	public void copyRemoteLayouts(long exportImportConfigurationId)
+		throws PortalException {
+
+		ExportImportConfiguration exportImportConfiguration =
+			ExportImportConfigurationLocalServiceUtil.
+				getExportImportConfiguration(exportImportConfigurationId);
+
+		copyRemoteLayouts(exportImportConfiguration);
+	}
+
+	@Override
+	public void copyRemoteLayouts(
 			long sourceGroupId, boolean privateLayout,
 			Map<Long, Boolean> layoutIdMap, Map<String, String[]> parameterMap,
 			String remoteAddress, int remotePort, String remotePathContext,
 			boolean secureConnection, long remoteGroupId,
 			boolean remotePrivateLayout, Date startDate, Date endDate)
-		throws Exception {
+		throws PortalException {
+
+		validateRemoteGroup(
+			sourceGroupId, remoteGroupId, remoteAddress, remotePort,
+			remotePathContext, secureConnection);
 
 		PermissionChecker permissionChecker =
 			PermissionThreadLocal.getPermissionChecker();
 
 		User user = permissionChecker.getUser();
 
-		StringBundler sb = new StringBundler(4);
+		Map<String, Serializable> settingsMap =
+			ExportImportConfigurationSettingsMapFactory.buildSettingsMap(
+				user.getUserId(), sourceGroupId, privateLayout, layoutIdMap,
+				parameterMap, remoteAddress, remotePort, remotePathContext,
+				secureConnection, remoteGroupId, remotePrivateLayout, startDate,
+				endDate, user.getLocale(), user.getTimeZone());
 
-		if (secureConnection) {
-			sb.append(Http.HTTPS_WITH_SLASH);
-		}
-		else {
-			sb.append(Http.HTTP_WITH_SLASH);
-		}
+		ServiceContext serviceContext = new ServiceContext();
 
-		sb.append(remoteAddress);
-		sb.append(StringPool.COLON);
-		sb.append(remotePort);
-		sb.append(remotePathContext);
+		ExportImportConfiguration exportImportConfiguration =
+			ExportImportConfigurationLocalServiceUtil.
+				addExportImportConfiguration(
+					user.getUserId(), sourceGroupId, StringPool.BLANK,
+					StringPool.BLANK, ExportImportConfigurationConstants.
+						TYPE_PUBLISH_LAYOUT_REMOTE,
+					settingsMap, WorkflowConstants.STATUS_DRAFT,
+					serviceContext);
 
-		String url = sb.toString();
-
-		HttpPrincipal httpPrincipal = new HttpPrincipal(
-			url, user.getEmailAddress(), user.getPassword(),
-			user.getPasswordEncrypted());
-
-		// Ping remote host and verify that the group exists in the same company
-		// as the remote user
-
-		try {
-			GroupServiceHttp.checkRemoteStagingGroup(
-				httpPrincipal, remoteGroupId);
-		}
-		catch (NoSuchGroupException nsge) {
-			RemoteExportException ree = new RemoteExportException(
-				RemoteExportException.NO_GROUP);
-
-			ree.setGroupId(remoteGroupId);
-
-			throw ree;
-		}
-		catch (RemoteAuthException rae) {
-			rae.setURL(url);
-
-			throw rae;
-		}
-		catch (SystemException se) {
-			RemoteExportException ree = new RemoteExportException(
-				RemoteExportException.BAD_CONNECTION);
-
-			ree.setURL(url);
-
-			throw ree;
-		}
-
-		Map<String, Serializable> taskContextMap =
-			BackgroundTaskContextMapFactory.buildTaskContextMap(
-				user.getUserId(), sourceGroupId, privateLayout, null,
-				parameterMap, Constants.PUBLISH, startDate, endDate, null);
-
-		taskContextMap.put("httpPrincipal", httpPrincipal);
-
-		if (layoutIdMap != null) {
-			HashMap<Long, Boolean> serializableLayoutIdMap =
-				new HashMap<Long, Boolean>(layoutIdMap);
-
-			taskContextMap.put("layoutIdMap", serializableLayoutIdMap);
-		}
-
-		taskContextMap.put("remoteGroupId", remoteGroupId);
-
-		BackgroundTaskLocalServiceUtil.addBackgroundTask(
-			user.getUserId(), sourceGroupId, StringPool.BLANK, null,
-			LayoutRemoteStagingBackgroundTaskExecutor.class, taskContextMap,
-			new ServiceContext());
+		doCopyRemoteLayouts(
+			exportImportConfiguration, remoteAddress, remotePort,
+			remotePathContext, secureConnection, remotePrivateLayout);
 	}
 
 	@Override
 	public void deleteLastImportSettings(Group liveGroup, boolean privateLayout)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		List<Layout> layouts = LayoutLocalServiceUtil.getLayouts(
 			liveGroup.getGroupId(), privateLayout);
@@ -454,8 +412,7 @@ public class StagingImpl implements Staging {
 
 	@Override
 	public void deleteRecentLayoutRevisionId(
-			HttpServletRequest request, long layoutSetBranchId, long plid)
-		throws SystemException {
+		HttpServletRequest request, long layoutSetBranchId, long plid) {
 
 		PortalPreferences portalPreferences =
 			PortletPreferencesFactoryUtil.getPortalPreferences(request);
@@ -466,8 +423,7 @@ public class StagingImpl implements Staging {
 
 	@Override
 	public void deleteRecentLayoutRevisionId(
-			User user, long layoutSetBranchId, long plid)
-		throws SystemException {
+		User user, long layoutSetBranchId, long plid) {
 
 		PortalPreferences portalPreferences = getPortalPreferences(user);
 
@@ -597,7 +553,7 @@ public class StagingImpl implements Staging {
 						locale,
 						"the-referenced-theme-x-is-not-deployed-in-the-" +
 							"current-environment",
-						missingReference.getClassPK()));
+						missingReference.getClassPK(), false));
 			}
 			else if (referrers.size() == 1) {
 				Set<Map.Entry<String, String>> referrerDisplayNames =
@@ -624,17 +580,29 @@ public class StagingImpl implements Staging {
 							ResourceActionsUtil.getModelResource(
 								locale, referrerClassName),
 							referrerDisplayName
-						}
-					));
+						}, false));
 			}
 			else {
 				errorMessageJSONObject.put(
 					"info",
 					LanguageUtil.format(
-						locale, "referenced-by-x-elements", referrers.size()));
+						locale, "referenced-by-x-elements", referrers.size(),
+						true));
 			}
 
 			errorMessageJSONObject.put("name", missingReferenceDisplayName);
+
+			Group group = GroupLocalServiceUtil.fetchGroup(
+				missingReference.getGroupId());
+
+			if (group != null) {
+				errorMessageJSONObject.put(
+					"site",
+					LanguageUtil.format(
+						locale, "in-site-x", missingReference.getGroupId(),
+						false));
+			}
+
 			errorMessageJSONObject.put(
 				"type",
 				ResourceActionsUtil.getModelResource(
@@ -649,6 +617,12 @@ public class StagingImpl implements Staging {
 	@Override
 	public JSONObject getExceptionMessagesJSONObject(
 		Locale locale, Exception e, Map<String, Serializable> contextMap) {
+
+		String cmd = null;
+
+		if (contextMap != null) {
+			cmd = (String)contextMap.get(Constants.CMD);
+		}
 
 		JSONObject exceptionMessagesJSONObject =
 			JSONFactoryUtil.createJSONObject();
@@ -667,7 +641,7 @@ public class StagingImpl implements Staging {
 			errorMessage = LanguageUtil.format(
 				locale,
 				"document-names-must-end-with-one-of-the-following-extensions",
-				".lar");
+				".lar", false);
 			errorType = ServletResponseConstants.SC_FILE_EXTENSION_EXCEPTION;
 		}
 		else if (e instanceof FileNameException) {
@@ -689,13 +663,27 @@ public class StagingImpl implements Staging {
 						PropsKeys.UPLOAD_SERVLET_REQUEST_IMPL_MAX_SIZE);
 				}
 			}
-			catch (Exception ex) {
+			catch (Exception e1) {
 			}
 
-			errorMessage = LanguageUtil.format(
-				locale,
-				"please-enter-a-file-with-a-valid-file-size-no-larger-than-x",
-				fileMaxSize/1024);
+			if (Validator.equals(cmd, Constants.PUBLISH_TO_LIVE) ||
+				Validator.equals(cmd, Constants.PUBLISH_TO_REMOTE)) {
+
+				errorMessage = LanguageUtil.get(
+					locale,
+					"file-size-limit-exceeded.-please-ensure-that-the-file-" +
+						"does-not-exceed-the-file-size-limit-in-both-the-" +
+							"live-environment-and-the-staging-environment");
+			}
+			else {
+				errorMessage = LanguageUtil.format(
+					locale,
+					"please-enter-a-file-with-a-valid-file-size-no-larger-" +
+						"than-x",
+					TextFormatter.formatStorageSize(fileMaxSize, locale),
+					false);
+			}
+
 			errorType = ServletResponseConstants.SC_FILE_SIZE_EXCEPTION;
 		}
 		else if (e instanceof LARTypeException) {
@@ -770,31 +758,26 @@ public class StagingImpl implements Staging {
 					StringUtil.merge(
 						le.getTargetAvailableLocales(),
 						StringPool.COMMA_AND_SPACE)
-				});
+				}, false);
+
 			errorType = ServletResponseConstants.SC_FILE_CUSTOM_EXCEPTION;
 		}
 		else if (e instanceof MissingReferenceException) {
 			MissingReferenceException mre = (MissingReferenceException)e;
 
-			String cmd = null;
+			if (Validator.equals(cmd, Constants.PUBLISH_TO_LIVE) ||
+				Validator.equals(cmd, Constants.PUBLISH_TO_REMOTE)) {
 
-			if (contextMap != null) {
-				cmd = (String)contextMap.get(Constants.CMD);
-			}
-
-			if (Validator.equals(cmd, Constants.PUBLISH)) {
 				errorMessage = LanguageUtil.get(
 					locale,
 					"there-are-missing-references-that-could-not-be-found-in-" +
-						"the-live-environment.-please-publish-again-to-live-" +
-							"ensuring-the-following-elements-are-published");
+						"the-live-environment");
 			}
 			else {
 				errorMessage = LanguageUtil.get(
 					locale,
 					"there-are-missing-references-that-could-not-be-found-in-" +
-						"the-current-site.-please-import-another-lar-file-" +
-							"containing-the-following-elements");
+						"the-current-site");
 			}
 
 			MissingReferences missingReferences = mre.getMissingReferences();
@@ -833,8 +816,7 @@ public class StagingImpl implements Staging {
 						ResourceActionsUtil.getModelResource(
 							locale, referrerClassName),
 						referrerDisplayName
-					}
-				);
+					}, false);
 			}
 			else if (pde.getType() == PortletDataException.MISSING_DEPENDENCY) {
 				errorMessage = LanguageUtil.format(
@@ -845,8 +827,7 @@ public class StagingImpl implements Staging {
 						ResourceActionsUtil.getModelResource(
 							locale, referrerClassName),
 						referrerDisplayName
-					}
-				);
+					}, false);
 			}
 			else if (pde.getType() == PortletDataException.STATUS_IN_TRASH) {
 				errorMessage = LanguageUtil.format(
@@ -857,8 +838,7 @@ public class StagingImpl implements Staging {
 						ResourceActionsUtil.getModelResource(
 							locale, referrerClassName),
 						referrerDisplayName
-					}
-				);
+					}, false);
 			}
 			else if (pde.getType() == PortletDataException.STATUS_UNAVAILABLE) {
 				errorMessage = LanguageUtil.format(
@@ -869,8 +849,7 @@ public class StagingImpl implements Staging {
 						ResourceActionsUtil.getModelResource(
 							locale, referrerClassName),
 						referrerDisplayName
-					}
-				);
+					}, false);
 			}
 			else {
 				errorMessage = e.getLocalizedMessage();
@@ -920,9 +899,7 @@ public class StagingImpl implements Staging {
 	}
 
 	@Override
-	public Group getLiveGroup(long groupId)
-		throws PortalException, SystemException {
-
+	public Group getLiveGroup(long groupId) throws PortalException {
 		if (groupId == 0) {
 			return null;
 		}
@@ -942,9 +919,7 @@ public class StagingImpl implements Staging {
 	}
 
 	@Override
-	public long getLiveGroupId(long groupId)
-		throws PortalException, SystemException {
-
+	public long getLiveGroupId(long groupId) throws PortalException {
 		if (groupId == 0) {
 			return groupId;
 		}
@@ -955,46 +930,22 @@ public class StagingImpl implements Staging {
 	}
 
 	/**
-	 * @see LayoutRemoteStagingBackgroundTaskExecutor#getMissingRemoteParentLayouts(
-	 *      HttpPrincipal, Layout, long)
+	 * @deprecated As of 7.0.0, moved to {@link
+	 *             ExportImportHelperUtil#getMissingParentLayouts(Layout, long)}
 	 */
+	@Deprecated
 	@Override
 	public List<Layout> getMissingParentLayouts(Layout layout, long liveGroupId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
-		List<Layout> missingParentLayouts = new ArrayList<Layout>();
-
-		long parentLayoutId = layout.getParentLayoutId();
-
-		Layout parentLayout = null;
-
-		while (parentLayoutId > 0) {
-			parentLayout = LayoutLocalServiceUtil.getLayout(
-				layout.getGroupId(), layout.isPrivateLayout(), parentLayoutId);
-
-			try {
-				LayoutLocalServiceUtil.getLayoutByUuidAndGroupId(
-					parentLayout.getUuid(), liveGroupId,
-					parentLayout.isPrivateLayout());
-
-				// If one parent is found all others are assumed to exist
-
-				break;
-			}
-			catch (NoSuchLayoutException nsle) {
-				missingParentLayouts.add(parentLayout);
-
-				parentLayoutId = parentLayout.getParentLayoutId();
-			}
-		}
-
-		return missingParentLayouts;
+		return ExportImportHelperUtil.getMissingParentLayouts(
+			layout, liveGroupId);
 	}
 
 	@Override
 	public long getRecentLayoutRevisionId(
 			HttpServletRequest request, long layoutSetBranchId, long plid)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		PortalPreferences portalPreferences =
 			PortletPreferencesFactoryUtil.getPortalPreferences(request);
@@ -1006,7 +957,7 @@ public class StagingImpl implements Staging {
 	@Override
 	public long getRecentLayoutRevisionId(
 			User user, long layoutSetBranchId, long plid)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		PortalPreferences portalPreferences = getPortalPreferences(user);
 
@@ -1025,9 +976,7 @@ public class StagingImpl implements Staging {
 	}
 
 	@Override
-	public long getRecentLayoutSetBranchId(User user, long layoutSetId)
-		throws SystemException {
-
+	public long getRecentLayoutSetBranchId(User user, long layoutSetId) {
 		PortalPreferences portalPreferences = getPortalPreferences(user);
 
 		return GetterUtil.getLong(
@@ -1058,9 +1007,6 @@ public class StagingImpl implements Staging {
 		Map<String, String[]> parameterMap =
 			new LinkedHashMap<String, String[]>();
 
-		parameterMap.put(
-			PortletDataHandlerKeys.CATEGORIES,
-			new String[] {Boolean.TRUE.toString()});
 		parameterMap.put(
 			PortletDataHandlerKeys.DATA_STRATEGY,
 			new String[] {
@@ -1094,6 +1040,10 @@ public class StagingImpl implements Staging {
 			new String[] {Boolean.TRUE.toString()});
 		parameterMap.put(
 			PortletDataHandlerKeys.PORTLET_DATA,
+			new String[] {Boolean.TRUE.toString()});
+		parameterMap.put(
+			PortletDataHandlerKeys.PORTLET_DATA + StringPool.UNDERLINE +
+				PortletKeys.ASSET_CATEGORIES_ADMIN,
 			new String[] {Boolean.TRUE.toString()});
 		parameterMap.put(
 			PortletDataHandlerKeys.PORTLET_DATA_ALL,
@@ -1240,7 +1190,8 @@ public class StagingImpl implements Staging {
 						"the-original-x-does-not-exist-in-the-current-" +
 							"environment",
 						ResourceActionsUtil.getModelResource(
-							locale, missingReference.getClassName())));
+							locale, missingReference.getClassName()),
+						false));
 			}
 
 			errorMessageJSONObject.put("size", referrers.size());
@@ -1258,7 +1209,7 @@ public class StagingImpl implements Staging {
 	@Override
 	public WorkflowTask getWorkflowTask(
 			long userId, LayoutRevision layoutRevision)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		WorkflowInstanceLink workflowInstanceLink =
 			WorkflowInstanceLinkLocalServiceUtil.fetchWorkflowInstanceLink(
@@ -1285,7 +1236,7 @@ public class StagingImpl implements Staging {
 
 	@Override
 	public boolean hasWorkflowTask(long userId, LayoutRevision layoutRevision)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		WorkflowTask workflowTask = getWorkflowTask(userId, layoutRevision);
 
@@ -1331,7 +1282,7 @@ public class StagingImpl implements Staging {
 	}
 
 	@Override
-	public void lockGroup(long userId, long groupId) throws Exception {
+	public void lockGroup(long userId, long groupId) throws PortalException {
 		if (!PropsValues.STAGING_LOCK_ENABLED) {
 			return;
 		}
@@ -1352,7 +1303,7 @@ public class StagingImpl implements Staging {
 	@Override
 	public void publishLayout(
 			long userId, long plid, long liveGroupId, boolean includeChildren)
-		throws Exception {
+		throws PortalException {
 
 		Map<String, String[]> parameterMap = getStagingParameters();
 
@@ -1366,7 +1317,10 @@ public class StagingImpl implements Staging {
 
 		layouts.add(layout);
 
-		layouts.addAll(getMissingParentLayouts(layout, liveGroupId));
+		List<Layout> parentLayouts =
+			ExportImportHelperUtil.getMissingParentLayouts(layout, liveGroupId);
+
+		layouts.addAll(parentLayouts);
 
 		if (includeChildren) {
 			layouts.addAll(layout.getAllChildren());
@@ -1381,70 +1335,80 @@ public class StagingImpl implements Staging {
 
 	@Override
 	public void publishLayouts(
-			long userId, long sourceGroupId, long targetGroupId,
-			boolean privateLayout, long[] layoutIds,
-			Map<String, String[]> parameterMap, Date startDate, Date endDate)
-		throws PortalException, SystemException {
-
-		parameterMap.put(
-			PortletDataHandlerKeys.PERFORM_DIRECT_BINARY_IMPORT,
-			new String[] {Boolean.TRUE.toString()});
+			long userId, ExportImportConfiguration exportImportConfiguration)
+		throws PortalException {
 
 		Map<String, Serializable> taskContextMap =
-			BackgroundTaskContextMapFactory.buildTaskContextMap(
-				userId, sourceGroupId, privateLayout, layoutIds, parameterMap,
-				Constants.PUBLISH, startDate, endDate, StringPool.BLANK);
+			new HashMap<String, Serializable>();
 
-		taskContextMap.put("sourceGroupId", sourceGroupId);
-		taskContextMap.put("targetGroupId", targetGroupId);
+		taskContextMap.put(Constants.CMD, Constants.PUBLISH_TO_LIVE);
+		taskContextMap.put(
+			"exportImportConfigurationId",
+			exportImportConfiguration.getExportImportConfigurationId());
 
 		BackgroundTaskLocalServiceUtil.addBackgroundTask(
-			userId, sourceGroupId, StringPool.BLANK, null,
-			LayoutStagingBackgroundTaskExecutor.class, taskContextMap,
+			userId, exportImportConfiguration.getGroupId(), StringPool.BLANK,
+			null, LayoutStagingBackgroundTaskExecutor.class, taskContextMap,
 			new ServiceContext());
+	}
+
+	@Override
+	public void publishLayouts(long userId, long exportImportConfigurationId)
+		throws PortalException {
+
+		ExportImportConfiguration exportImportConfiguration =
+			ExportImportConfigurationLocalServiceUtil.
+				getExportImportConfiguration(exportImportConfigurationId);
+
+		publishLayouts(userId, exportImportConfiguration);
 	}
 
 	@Override
 	public void publishLayouts(
 			long userId, long sourceGroupId, long targetGroupId,
+			boolean privateLayout, long[] layoutIds,
+			Map<String, String[]> parameterMap, Date startDate, Date endDate)
+		throws PortalException {
+
+		parameterMap.put(
+			PortletDataHandlerKeys.PERFORM_DIRECT_BINARY_IMPORT,
+			new String[] {Boolean.TRUE.toString()});
+
+		User user = UserLocalServiceUtil.getUser(userId);
+
+		Map<String, Serializable> settingsMap =
+			ExportImportConfigurationSettingsMapFactory.buildSettingsMap(
+				userId, sourceGroupId, targetGroupId, privateLayout, layoutIds,
+				parameterMap, startDate, endDate, user.getLocale(),
+				user.getTimeZone());
+
+		ExportImportConfiguration exportImportConfiguration =
+			ExportImportConfigurationLocalServiceUtil.
+				addExportImportConfiguration(
+					userId, sourceGroupId, StringPool.BLANK, StringPool.BLANK,
+					ExportImportConfigurationConstants.
+						TYPE_PUBLISH_LAYOUT_LOCAL,
+					settingsMap, WorkflowConstants.STATUS_DRAFT,
+					new ServiceContext());
+
+		publishLayouts(userId, exportImportConfiguration);
+	}
+
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #publishLayouts(long, long,
+	 *             long, boolean, long[], Map, Date, Date)}
+	 */
+	@Deprecated
+	@Override
+	public void publishLayouts(
+			long userId, long sourceGroupId, long targetGroupId,
 			boolean privateLayout, Map<Long, Boolean> layoutIdMap,
 			Map<String, String[]> parameterMap, Date startDate, Date endDate)
-		throws PortalException, SystemException {
-
-		List<Layout> layouts = new ArrayList<Layout>();
-
-		for (Map.Entry<Long, Boolean> entry : layoutIdMap.entrySet()) {
-			long plid = GetterUtil.getLong(String.valueOf(entry.getKey()));
-			boolean includeChildren = entry.getValue();
-
-			Layout layout = LayoutLocalServiceUtil.getLayout(plid);
-
-			if (!layouts.contains(layout)) {
-				layouts.add(layout);
-			}
-
-			List<Layout> parentLayouts = getMissingParentLayouts(
-				layout, targetGroupId);
-
-			for (Layout parentLayout : parentLayouts) {
-				if (!layouts.contains(parentLayout)) {
-					layouts.add(parentLayout);
-				}
-			}
-
-			if (includeChildren) {
-				for (Layout childLayout : layout.getAllChildren()) {
-					if (!layouts.contains(childLayout)) {
-						layouts.add(childLayout);
-					}
-				}
-			}
-		}
-
-		long[] layoutIds = ExportImportHelperUtil.getLayoutIds(layouts);
+		throws PortalException {
 
 		publishLayouts(
-			userId, sourceGroupId, targetGroupId, privateLayout, layoutIds,
+			userId, sourceGroupId, targetGroupId, privateLayout,
+			ExportImportHelperUtil.getLayoutIds(layoutIdMap, targetGroupId),
 			parameterMap, startDate, endDate);
 	}
 
@@ -1453,7 +1417,7 @@ public class StagingImpl implements Staging {
 			long userId, long sourceGroupId, long targetGroupId,
 			boolean privateLayout, Map<String, String[]> parameterMap,
 			Date startDate, Date endDate)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		publishLayouts(
 			userId, sourceGroupId, targetGroupId, privateLayout, (long[])null,
@@ -1461,7 +1425,9 @@ public class StagingImpl implements Staging {
 	}
 
 	@Override
-	public void publishToLive(PortletRequest portletRequest) throws Exception {
+	public void publishToLive(PortletRequest portletRequest)
+		throws PortalException {
+
 		long groupId = ParamUtil.getLong(portletRequest, "groupId");
 
 		Group liveGroup = GroupLocalServiceUtil.getGroup(groupId);
@@ -1485,7 +1451,7 @@ public class StagingImpl implements Staging {
 
 	@Override
 	public void publishToLive(PortletRequest portletRequest, Portlet portlet)
-		throws Exception {
+		throws PortalException {
 
 		long plid = ParamUtil.getLong(portletRequest, "plid");
 
@@ -1530,14 +1496,14 @@ public class StagingImpl implements Staging {
 
 	@Override
 	public void publishToRemote(PortletRequest portletRequest)
-		throws Exception {
+		throws PortalException {
 
 		publishToRemote(portletRequest, false);
 	}
 
 	@Override
 	public void scheduleCopyFromLive(PortletRequest portletRequest)
-		throws Exception {
+		throws PortalException {
 
 		long stagingGroupId = ParamUtil.getLong(
 			portletRequest, "stagingGroupId");
@@ -1555,7 +1521,7 @@ public class StagingImpl implements Staging {
 
 	@Override
 	public void schedulePublishToLive(PortletRequest portletRequest)
-		throws Exception {
+		throws PortalException {
 
 		long stagingGroupId = ParamUtil.getLong(
 			portletRequest, "stagingGroupId");
@@ -1573,16 +1539,15 @@ public class StagingImpl implements Staging {
 
 	@Override
 	public void schedulePublishToRemote(PortletRequest portletRequest)
-		throws Exception {
+		throws PortalException {
 
 		publishToRemote(portletRequest, true);
 	}
 
 	@Override
 	public void setRecentLayoutBranchId(
-			HttpServletRequest request, long layoutSetBranchId, long plid,
-			long layoutBranchId)
-		throws SystemException {
+		HttpServletRequest request, long layoutSetBranchId, long plid,
+		long layoutBranchId) {
 
 		PortalPreferences portalPreferences =
 			PortletPreferencesFactoryUtil.getPortalPreferences(request);
@@ -1593,8 +1558,7 @@ public class StagingImpl implements Staging {
 
 	@Override
 	public void setRecentLayoutBranchId(
-			User user, long layoutSetBranchId, long plid, long layoutBranchId)
-		throws SystemException {
+		User user, long layoutSetBranchId, long plid, long layoutBranchId) {
 
 		PortalPreferences portalPreferences = getPortalPreferences(user);
 
@@ -1604,9 +1568,8 @@ public class StagingImpl implements Staging {
 
 	@Override
 	public void setRecentLayoutRevisionId(
-			HttpServletRequest request, long layoutSetBranchId, long plid,
-			long layoutRevisionId)
-		throws SystemException {
+		HttpServletRequest request, long layoutSetBranchId, long plid,
+		long layoutRevisionId) {
 
 		PortalPreferences portalPreferences =
 			PortletPreferencesFactoryUtil.getPortalPreferences(request);
@@ -1617,8 +1580,7 @@ public class StagingImpl implements Staging {
 
 	@Override
 	public void setRecentLayoutRevisionId(
-			User user, long layoutSetBranchId, long plid, long layoutRevisionId)
-		throws SystemException {
+		User user, long layoutSetBranchId, long plid, long layoutRevisionId) {
 
 		PortalPreferences portalPreferences = getPortalPreferences(user);
 
@@ -1638,8 +1600,7 @@ public class StagingImpl implements Staging {
 
 	@Override
 	public void setRecentLayoutSetBranchId(
-			User user, long layoutSetId, long layoutSetBranchId)
-		throws SystemException {
+		User user, long layoutSetId, long layoutSetBranchId) {
 
 		PortalPreferences portalPreferences = getPortalPreferences(user);
 
@@ -1649,7 +1610,21 @@ public class StagingImpl implements Staging {
 	}
 
 	@Override
-	public void unlockGroup(long groupId) throws SystemException {
+	public String stripProtocolFromRemoteAddress(String remoteAddress) {
+		if (remoteAddress.startsWith(Http.HTTP_WITH_SLASH)) {
+			remoteAddress = remoteAddress.substring(
+				Http.HTTP_WITH_SLASH.length());
+		}
+		else if (remoteAddress.startsWith(Http.HTTPS_WITH_SLASH)) {
+			remoteAddress = remoteAddress.substring(
+				Http.HTTPS_WITH_SLASH.length());
+		}
+
+		return remoteAddress;
+	}
+
+	@Override
+	public void unlockGroup(long groupId) {
 		if (!PropsValues.STAGING_LOCK_ENABLED) {
 			return;
 		}
@@ -1659,7 +1634,7 @@ public class StagingImpl implements Staging {
 
 	@Override
 	public void unscheduleCopyFromLive(PortletRequest portletRequest)
-		throws Exception {
+		throws PortalException {
 
 		long stagingGroupId = ParamUtil.getLong(
 			portletRequest, "stagingGroupId");
@@ -1674,7 +1649,7 @@ public class StagingImpl implements Staging {
 
 	@Override
 	public void unschedulePublishToLive(PortletRequest portletRequest)
-		throws Exception {
+		throws PortalException {
 
 		long stagingGroupId = ParamUtil.getLong(
 			portletRequest, "stagingGroupId");
@@ -1693,7 +1668,7 @@ public class StagingImpl implements Staging {
 
 	@Override
 	public void unschedulePublishToRemote(PortletRequest portletRequest)
-		throws Exception {
+		throws PortalException {
 
 		long groupId = ParamUtil.getLong(portletRequest, "groupId");
 
@@ -1707,16 +1682,15 @@ public class StagingImpl implements Staging {
 
 	@Override
 	public void updateLastImportSettings(
-			Element layoutElement, Layout layout,
-			PortletDataContext portletDataContext)
-		throws Exception {
+		Element layoutElement, Layout layout,
+		PortletDataContext portletDataContext) {
 
 		Map<String, String[]> parameterMap =
 			portletDataContext.getParameterMap();
 
 		String cmd = MapUtil.getString(parameterMap, Constants.CMD);
 
-		if (!cmd.equals("publish_to_live")) {
+		if (!cmd.equals(Constants.PUBLISH_TO_LIVE)) {
 			return;
 		}
 
@@ -1774,7 +1748,7 @@ public class StagingImpl implements Staging {
 	@Override
 	public void updateLastPublishDate(
 			long groupId, boolean privateLayout, Date lastPublishDate)
-		throws Exception {
+		throws PortalException {
 
 		if (lastPublishDate == null) {
 			lastPublishDate = new Date();
@@ -1796,9 +1770,8 @@ public class StagingImpl implements Staging {
 
 	@Override
 	public void updateLastPublishDate(
-			String portletId, PortletPreferences portletPreferences,
-			Date lastPublishDate)
-		throws Exception {
+		String portletId, PortletPreferences portletPreferences,
+		Date lastPublishDate) {
 
 		if (lastPublishDate == null) {
 			lastPublishDate = new Date();
@@ -1825,7 +1798,7 @@ public class StagingImpl implements Staging {
 
 	@Override
 	public void updateStaging(PortletRequest portletRequest, Group liveGroup)
-		throws Exception {
+		throws PortalException {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
@@ -1886,8 +1859,9 @@ public class StagingImpl implements Staging {
 
 	@Override
 	public void validateRemote(
-			String remoteAddress, int remotePort, String remotePathContext,
-			boolean secureConnection, long remoteGroupId)
+			long groupId, String remoteAddress, int remotePort,
+			String remotePathContext, boolean secureConnection,
+			long remoteGroupId)
 		throws PortalException {
 
 		RemoteOptionsException roe = null;
@@ -1924,109 +1898,20 @@ public class StagingImpl implements Staging {
 			throw roe;
 		}
 
-		if (remoteGroupId <= 0) {
-			roe = new RemoteOptionsException(
-				RemoteOptionsException.REMOTE_GROUP_ID);
-
-			roe.setRemoteGroupId(remoteGroupId);
-
-			throw roe;
-		}
-
-		PermissionChecker permissionChecker =
-			PermissionThreadLocal.getPermissionChecker();
-
-		User user = permissionChecker.getUser();
-
-		String remoteURL = buildRemoteURL(
-			remoteAddress, remotePort, remotePathContext, secureConnection,
-			GroupConstants.DEFAULT_LIVE_GROUP_ID, false);
-
-		HttpPrincipal httpPrincipal = new HttpPrincipal(
-			remoteURL, user.getEmailAddress(), user.getPassword(),
-			user.getPasswordEncrypted());
-
-		// Ping remote host and verify that the group exists in the same company
-		// as the remote user
-
-		try {
-			GroupServiceHttp.checkRemoteStagingGroup(
-				httpPrincipal, remoteGroupId);
-		}
-		catch (NoSuchGroupException nsge) {
-			RemoteExportException ree = new RemoteExportException(
-				RemoteExportException.NO_GROUP);
-
-			ree.setGroupId(remoteGroupId);
-
-			throw ree;
-		}
-		catch (PrincipalException pe) {
-			RemoteExportException ree = new RemoteExportException(
-				RemoteExportException.NO_PERMISSIONS);
-
-			ree.setGroupId(remoteGroupId);
-
-			throw ree;
-		}
-		catch (RemoteAuthException rae) {
-			rae.setURL(remoteURL);
-
-			throw rae;
-		}
-		catch (SystemException se) {
-			RemoteExportException ree = new RemoteExportException(
-				RemoteExportException.BAD_CONNECTION, se.getMessage());
-
-			ree.setURL(remoteURL);
-
-			throw ree;
-		}
+		validateRemoteGroup(
+			groupId, remoteGroupId, remoteAddress, remotePort,
+			remotePathContext, secureConnection);
 	}
 
-	protected void addDefaultLayoutSetBranch(
-			long userId, long groupId, String groupName, boolean privateLayout,
-			ServiceContext serviceContext)
-		throws PortalException, SystemException {
-
-		String masterBranchDescription =
-			LayoutSetBranchConstants.MASTER_BRANCH_DESCRIPTION_PUBLIC;
-
-		if (privateLayout) {
-			masterBranchDescription =
-				LayoutSetBranchConstants.MASTER_BRANCH_DESCRIPTION_PRIVATE;
-		}
-
-		String description = LanguageUtil.format(
-			PortalUtil.getSiteDefaultLocale(groupId), masterBranchDescription,
-			groupName);
-
-		try {
-			LayoutSetBranch layoutSetBranch =
-				LayoutSetBranchLocalServiceUtil.addLayoutSetBranch(
-					userId, groupId, privateLayout,
-					LayoutSetBranchConstants.MASTER_BRANCH_NAME, description,
-					true, LayoutSetBranchConstants.ALL_BRANCHES,
-					serviceContext);
-
-			List<LayoutRevision> layoutRevisions =
-				LayoutRevisionLocalServiceUtil.getLayoutRevisions(
-					layoutSetBranch.getLayoutSetBranchId(), false);
-
-			for (LayoutRevision layoutRevision : layoutRevisions) {
-				LayoutRevisionLocalServiceUtil.updateStatus(
-					userId, layoutRevision.getLayoutRevisionId(),
-					WorkflowConstants.STATUS_APPROVED, serviceContext);
-			}
-		}
-		catch (PortalException pe) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(
-					"Unable to create master branch for " +
-						(privateLayout ? "private" : "public") + " layouts",
-					pe);
-			}
-		}
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #validateRemote(long, String,
+	 *             int, String, boolean, long)}
+	 */
+	@Deprecated
+	@Override
+	public void validateRemote(
+		String remoteAddress, int remotePort, String remotePathContext,
+		boolean secureConnection, long remoteGroupId) {
 	}
 
 	protected void deleteRecentLayoutRevisionId(
@@ -2036,6 +1921,42 @@ public class StagingImpl implements Staging {
 		portalPreferences.setValue(
 			Staging.class.getName(),
 			getRecentLayoutRevisionIdKey(layoutSetBranchId, plid), null);
+	}
+
+	protected void doCopyRemoteLayouts(
+			ExportImportConfiguration exportImportConfiguration,
+			String remoteAddress, int remotePort, String remotePathContext,
+			boolean secureConnection, boolean remotePrivateLayout)
+		throws PortalException {
+
+		Map<String, Serializable> taskContextMap =
+			new HashMap<String, Serializable>();
+
+		taskContextMap.put(Constants.CMD, Constants.PUBLISH_TO_REMOTE);
+		taskContextMap.put(
+			"exportImportConfigurationId",
+			exportImportConfiguration.getExportImportConfigurationId());
+
+		String remoteURL = buildRemoteURL(
+			remoteAddress, remotePort, remotePathContext, secureConnection,
+			GroupConstants.DEFAULT_LIVE_GROUP_ID, remotePrivateLayout);
+
+		PermissionChecker permissionChecker =
+			PermissionThreadLocal.getPermissionChecker();
+
+		User user = permissionChecker.getUser();
+
+		HttpPrincipal httpPrincipal = new HttpPrincipal(
+			remoteURL, user.getEmailAddress(), user.getPassword(),
+			user.getPasswordEncrypted());
+
+		taskContextMap.put("httpPrincipal", httpPrincipal);
+
+		BackgroundTaskLocalServiceUtil.addBackgroundTask(
+			user.getUserId(), exportImportConfiguration.getGroupId(),
+			StringPool.BLANK, null,
+			LayoutRemoteStagingBackgroundTaskExecutor.class, taskContextMap,
+			new ServiceContext());
 	}
 
 	protected boolean getBoolean(
@@ -2062,9 +1983,7 @@ public class StagingImpl implements Staging {
 			GetterUtil.getLong(group.getTypeSettingsProperty(param)));
 	}
 
-	protected PortalPreferences getPortalPreferences(User user)
-		throws SystemException {
-
+	protected PortalPreferences getPortalPreferences(User user) {
 		boolean signedIn = !user.isDefaultUser();
 
 		PortalPreferences portalPreferences =
@@ -2100,7 +2019,7 @@ public class StagingImpl implements Staging {
 	protected long getRecentLayoutRevisionId(
 			PortalPreferences portalPreferences, long layoutSetBranchId,
 			long plid)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		long layoutRevisionId = GetterUtil.getLong(
 			portalPreferences.getValue(
@@ -2193,7 +2112,7 @@ public class StagingImpl implements Staging {
 			PortletRequest portletRequest, long sourceGroupId,
 			long targetGroupId, Map<String, String[]> parameterMap,
 			boolean schedule)
-		throws Exception {
+		throws PortalException {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
@@ -2208,15 +2127,12 @@ public class StagingImpl implements Staging {
 
 		String scope = ParamUtil.getString(portletRequest, "scope");
 
-		Map<Long, Boolean> layoutIdMap = new LinkedHashMap<Long, Boolean>();
+		long[] layoutIds = null;
 
 		if (scope.equals("selected-pages")) {
-			layoutIdMap = ExportImportHelperUtil.getLayoutIdMap(portletRequest);
+			layoutIds = ExportImportHelperUtil.getLayoutIds(
+				portletRequest, targetGroupId);
 		}
-
-		DateRange dateRange = ExportImportHelperUtil.getDateRange(
-			portletRequest, sourceGroupId, privateLayout, 0, null,
-			"fromLastPublishDate");
 
 		if (schedule) {
 			String groupName = getSchedulerGroupName(
@@ -2225,7 +2141,7 @@ public class StagingImpl implements Staging {
 			int recurrenceType = ParamUtil.getInteger(
 				portletRequest, "recurrenceType");
 
-			Calendar startCalendar = ExportImportHelperUtil.getCalendar(
+			Calendar startCalendar = ExportImportDateUtil.getCalendar(
 				portletRequest, "schedulerStartDate", true);
 
 			String cronText = SchedulerEngineHelperUtil.getCronText(
@@ -2237,7 +2153,7 @@ public class StagingImpl implements Staging {
 				portletRequest, "endDateType");
 
 			if (endDateType == 1) {
-				Calendar endCalendar = ExportImportHelperUtil.getCalendar(
+				Calendar endCalendar = ExportImportDateUtil.getCalendar(
 					portletRequest, "schedulerEndDate", true);
 
 				schedulerEndDate = endCalendar.getTime();
@@ -2247,63 +2163,27 @@ public class StagingImpl implements Staging {
 				portletRequest, "description");
 
 			LayoutServiceUtil.schedulePublishToLive(
-				sourceGroupId, targetGroupId, privateLayout, layoutIdMap,
-				parameterMap, scope, dateRange.getStartDate(),
-				dateRange.getEndDate(), groupName, cronText,
+				sourceGroupId, targetGroupId, privateLayout, layoutIds,
+				parameterMap, scope, null, null, groupName, cronText,
 				startCalendar.getTime(), schedulerEndDate, description);
 		}
 		else {
-			MessageStatus messageStatus = new MessageStatus();
-
-			messageStatus.startTimer();
-
-			String command =
-				LayoutsLocalPublisherRequest.COMMAND_SELECTED_PAGES;
-
-			try {
-				if (scope.equals("all-pages")) {
-					command = LayoutsLocalPublisherRequest.COMMAND_ALL_PAGES;
-
-					publishLayouts(
-						themeDisplay.getUserId(), sourceGroupId, targetGroupId,
-						privateLayout, parameterMap, dateRange.getStartDate(),
-						dateRange.getEndDate());
-				}
-				else {
-					publishLayouts(
-						themeDisplay.getUserId(), sourceGroupId, targetGroupId,
-						privateLayout, layoutIdMap, parameterMap,
-						dateRange.getStartDate(), dateRange.getEndDate());
-				}
+			if (scope.equals("all-pages")) {
+				publishLayouts(
+					themeDisplay.getUserId(), sourceGroupId, targetGroupId,
+					privateLayout, parameterMap, null, null);
 			}
-			catch (Exception e) {
-				messageStatus.setException(e);
-
-				throw e;
-			}
-			finally {
-				messageStatus.stopTimer();
-
-				LayoutsLocalPublisherRequest publisherRequest =
-					new LayoutsLocalPublisherRequest(
-						command, themeDisplay.getUserId(), sourceGroupId,
-						targetGroupId, privateLayout, layoutIdMap, parameterMap,
-						dateRange.getStartDate(), dateRange.getEndDate());
-
-				messageStatus.setPayload(publisherRequest);
-
-				MessageBusUtil.sendMessage(
-					DestinationNames.MESSAGE_BUS_MESSAGE_STATUS, messageStatus);
+			else {
+				publishLayouts(
+					themeDisplay.getUserId(), sourceGroupId, targetGroupId,
+					privateLayout, layoutIds, parameterMap, null, null);
 			}
 		}
 	}
 
 	protected void publishToRemote(
 			PortletRequest portletRequest, boolean schedule)
-		throws Exception {
-
-		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		throws PortalException {
 
 		String tabs1 = ParamUtil.getString(portletRequest, "tabs1");
 
@@ -2329,10 +2209,6 @@ public class StagingImpl implements Staging {
 
 		Map<String, String[]> parameterMap = getStagingParameters(
 			portletRequest);
-
-		parameterMap.put(
-			PortletDataHandlerKeys.PUBLISH_TO_REMOTE,
-			new String[] {Boolean.TRUE.toString()});
 
 		Group group = GroupLocalServiceUtil.getGroup(groupId);
 
@@ -2364,12 +2240,8 @@ public class StagingImpl implements Staging {
 			portletRequest, "remotePrivateLayout");
 
 		validateRemote(
-			remoteAddress, remotePort, remotePathContext, secureConnection,
-			remoteGroupId);
-
-		DateRange dateRange = ExportImportHelperUtil.getDateRange(
-			portletRequest, groupId, privateLayout, 0, null,
-			"fromLastPublishDate");
+			groupId, remoteAddress, remotePort, remotePathContext,
+			secureConnection, remoteGroupId);
 
 		if (schedule) {
 			String groupName = getSchedulerGroupName(
@@ -2378,7 +2250,7 @@ public class StagingImpl implements Staging {
 			int recurrenceType = ParamUtil.getInteger(
 				portletRequest, "recurrenceType");
 
-			Calendar startCalendar = ExportImportHelperUtil.getCalendar(
+			Calendar startCalendar = ExportImportDateUtil.getCalendar(
 				portletRequest, "schedulerStartDate", true);
 
 			String cronText = SchedulerEngineHelperUtil.getCronText(
@@ -2390,7 +2262,7 @@ public class StagingImpl implements Staging {
 				portletRequest, "endDateType");
 
 			if (endDateType == 1) {
-				Calendar endCalendar = ExportImportHelperUtil.getCalendar(
+				Calendar endCalendar = ExportImportDateUtil.getCalendar(
 					portletRequest, "schedulerEndDate", true);
 
 				schedulerEndDate = endCalendar.getTime();
@@ -2402,43 +2274,15 @@ public class StagingImpl implements Staging {
 			LayoutServiceUtil.schedulePublishToRemote(
 				groupId, privateLayout, layoutIdMap, parameterMap,
 				remoteAddress, remotePort, remotePathContext, secureConnection,
-				remoteGroupId, remotePrivateLayout, dateRange.getStartDate(),
-				dateRange.getEndDate(), groupName, cronText,
-				startCalendar.getTime(), schedulerEndDate, description);
+				remoteGroupId, remotePrivateLayout, null, null, groupName,
+				cronText, startCalendar.getTime(), schedulerEndDate,
+				description);
 		}
 		else {
-			MessageStatus messageStatus = new MessageStatus();
-
-			messageStatus.startTimer();
-
-			try {
-				copyRemoteLayouts(
-					groupId, privateLayout, layoutIdMap, parameterMap,
-					remoteAddress, remotePort, remotePathContext,
-					secureConnection, remoteGroupId, remotePrivateLayout,
-					dateRange.getStartDate(), dateRange.getEndDate());
-			}
-			catch (Exception e) {
-				messageStatus.setException(e);
-
-				throw e;
-			}
-			finally {
-				messageStatus.stopTimer();
-
-				LayoutsRemotePublisherRequest publisherRequest =
-					new LayoutsRemotePublisherRequest(
-						themeDisplay.getUserId(), groupId, privateLayout,
-						layoutIdMap, parameterMap, remoteAddress, remotePort,
-						remotePathContext, secureConnection, remoteGroupId,
-						remotePrivateLayout, dateRange.getStartDate(),
-						dateRange.getEndDate());
-
-				messageStatus.setPayload(publisherRequest);
-
-				MessageBusUtil.sendMessage(
-					DestinationNames.MESSAGE_BUS_MESSAGE_STATUS, messageStatus);
-			}
+			copyRemoteLayouts(
+				groupId, privateLayout, layoutIdMap, parameterMap,
+				remoteAddress, remotePort, remotePathContext, secureConnection,
+				remoteGroupId, remotePrivateLayout, null, null);
 		}
 	}
 
@@ -2453,9 +2297,8 @@ public class StagingImpl implements Staging {
 	}
 
 	protected void setRecentLayoutRevisionId(
-			PortalPreferences portalPreferences, long layoutSetBranchId,
-			long plid, long layoutRevisionId)
-		throws SystemException {
+		PortalPreferences portalPreferences, long layoutSetBranchId, long plid,
+		long layoutRevisionId) {
 
 		long layoutBranchId = 0;
 
@@ -2493,41 +2336,92 @@ public class StagingImpl implements Staging {
 			String.valueOf(layoutBranchId));
 	}
 
-	protected String stripProtocolFromRemoteAddress(String remoteAddress) {
-		if (remoteAddress.startsWith(Http.HTTP_WITH_SLASH)) {
-			remoteAddress = remoteAddress.substring(
-				Http.HTTP_WITH_SLASH.length());
+	protected void validateRemoteGroup(
+			long groupId, long remoteGroupId, String remoteAddress,
+			int remotePort, String remotePathContext, boolean secureConnection)
+		throws PortalException {
+
+		if (remoteGroupId <= 0) {
+			RemoteOptionsException roe = new RemoteOptionsException(
+				RemoteOptionsException.REMOTE_GROUP_ID);
+
+			roe.setRemoteGroupId(remoteGroupId);
+
+			throw roe;
 		}
-		else if (remoteAddress.startsWith(Http.HTTPS_WITH_SLASH)) {
-			remoteAddress = remoteAddress.substring(
-				Http.HTTPS_WITH_SLASH.length());
+
+		PermissionChecker permissionChecker =
+			PermissionThreadLocal.getPermissionChecker();
+
+		User user = permissionChecker.getUser();
+
+		String remoteURL = buildRemoteURL(
+			remoteAddress, remotePort, remotePathContext, secureConnection,
+			GroupConstants.DEFAULT_LIVE_GROUP_ID, false);
+
+		HttpPrincipal httpPrincipal = new HttpPrincipal(
+			remoteURL, user.getEmailAddress(), user.getPassword(),
+			user.getPasswordEncrypted());
+
+		try {
+
+			// Ping the remote host and verify that the remote group exists in
+			// the same company as the remote user
+
+			GroupServiceHttp.checkRemoteStagingGroup(
+				httpPrincipal, remoteGroupId);
+
+			// Ensure that the local group and the remote group are not the same
+			// group and that they are either both company groups or both not
+			// company groups
+
+			Group group = GroupLocalServiceUtil.getGroup(groupId);
+
+			String groupUuid = group.getUuid();
+
+			Group remoteGroup = GroupServiceHttp.getGroup(
+				httpPrincipal, remoteGroupId);
+
+			if ((group.isCompany() ^ remoteGroup.isCompany()) ||
+				groupUuid.equals(remoteGroup.getUuid())) {
+
+				RemoteExportException ree = new RemoteExportException(
+					RemoteExportException.INVALID_GROUP);
+
+				ree.setGroupId(remoteGroupId);
+
+				throw ree;
+			}
 		}
+		catch (NoSuchGroupException nsge) {
+			RemoteExportException ree = new RemoteExportException(
+				RemoteExportException.NO_GROUP);
 
-		return remoteAddress;
-	}
+			ree.setGroupId(remoteGroupId);
 
-	protected void updateGroupTypeSettingsProperties(
-			Group group, String remoteAddress, int remotePort,
-			String remotePathContext, boolean secureConnection,
-			long remoteGroupId)
-		throws Exception {
+			throw ree;
+		}
+		catch (PrincipalException pe) {
+			RemoteExportException ree = new RemoteExportException(
+				RemoteExportException.NO_PERMISSIONS);
 
-		UnicodeProperties typeSettingsProperties =
-			group.getTypeSettingsProperties();
+			ree.setGroupId(remoteGroupId);
 
-		typeSettingsProperties.setProperty("remoteAddress", remoteAddress);
-		typeSettingsProperties.setProperty(
-			"remoteGroupId", String.valueOf(remoteGroupId));
-		typeSettingsProperties.setProperty(
-			"remotePathContext", remotePathContext);
-		typeSettingsProperties.setProperty(
-			"remotePort", String.valueOf(remotePort));
-		typeSettingsProperties.setProperty(
-			"secureConnection", String.valueOf(secureConnection));
+			throw ree;
+		}
+		catch (RemoteAuthException rae) {
+			rae.setURL(remoteURL);
 
-		group.setTypeSettingsProperties(typeSettingsProperties);
+			throw rae;
+		}
+		catch (SystemException se) {
+			RemoteExportException ree = new RemoteExportException(
+				RemoteExportException.BAD_CONNECTION, se.getMessage());
 
-		GroupLocalServiceUtil.updateGroup(group);
+			ree.setURL(remoteURL);
+
+			throw ree;
+		}
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(StagingImpl.class);

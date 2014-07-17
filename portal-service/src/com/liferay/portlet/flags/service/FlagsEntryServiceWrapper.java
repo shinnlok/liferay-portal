@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,6 +32,16 @@ public class FlagsEntryServiceWrapper implements FlagsEntryService,
 		_flagsEntryService = flagsEntryService;
 	}
 
+	@Override
+	public void addEntry(java.lang.String className, long classPK,
+		java.lang.String reporterEmailAddress, long reportedUserId,
+		java.lang.String contentTitle, java.lang.String contentURL,
+		java.lang.String reason,
+		com.liferay.portal.service.ServiceContext serviceContext) {
+		_flagsEntryService.addEntry(className, classPK, reporterEmailAddress,
+			reportedUserId, contentTitle, contentURL, reason, serviceContext);
+	}
+
 	/**
 	* Returns the Spring bean ID for this bean.
 	*
@@ -50,16 +60,6 @@ public class FlagsEntryServiceWrapper implements FlagsEntryService,
 	@Override
 	public void setBeanIdentifier(java.lang.String beanIdentifier) {
 		_flagsEntryService.setBeanIdentifier(beanIdentifier);
-	}
-
-	@Override
-	public void addEntry(java.lang.String className, long classPK,
-		java.lang.String reporterEmailAddress, long reportedUserId,
-		java.lang.String contentTitle, java.lang.String contentURL,
-		java.lang.String reason,
-		com.liferay.portal.service.ServiceContext serviceContext) {
-		_flagsEntryService.addEntry(className, classPK, reporterEmailAddress,
-			reportedUserId, contentTitle, contentURL, reason, serviceContext);
 	}
 
 	/**

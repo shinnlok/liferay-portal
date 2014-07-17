@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,12 +19,11 @@
 <%
 int cur = ParamUtil.getInteger(request, SearchContainer.DEFAULT_CUR_PARAM);
 
-String redirect = ParamUtil.getString(request, "redirect");
-
 groupId = ParamUtil.getLong(request, "groupId", groupId);
 %>
 
 <liferay-portlet:actionURL portletConfiguration="true" var="configurationActionURL" />
+
 <liferay-portlet:renderURL portletConfiguration="true" var="configurationRenderURL" />
 
 <aui:form action="<%= configurationActionURL %>" method="post" name="fm1">
@@ -47,7 +46,7 @@ groupId = ParamUtil.getLong(request, "groupId", groupId);
 						String groupDescriptiveName = HtmlUtil.escape(group.getDescriptiveName(locale));
 
 						if (group.isUser()) {
-							groupDescriptiveName = LanguageUtil.get(pageContext, "my-site");
+							groupDescriptiveName = LanguageUtil.get(request, "my-site");
 						}
 					%>
 
@@ -74,43 +73,40 @@ groupId = ParamUtil.getLong(request, "groupId", groupId);
 
 				</aui:select>
 
-				<aui:field-wrapper label="structure">
+				<%
+				String ddmStructureName = StringPool.BLANK;
+				String ddmStructureDescription = StringPool.BLANK;
 
-					<%
-					String ddmStructureName = StringPool.BLANK;
-					String ddmStructureDescription = StringPool.BLANK;
+				if (ddmStructure != null) {
+					ddmStructureName = HtmlUtil.escape(ddmStructure.getName(locale));
+					ddmStructureDescription = HtmlUtil.escape(ddmStructure.getDescription(locale));
+				}
+				else {
+					ddmStructureName = LanguageUtil.get(request, "any");
+				}
 
-					if (ddmStructure != null) {
-						ddmStructureName = HtmlUtil.escape(ddmStructure.getName(locale));
-						ddmStructureDescription = HtmlUtil.escape(ddmStructure.getDescription(locale));
-					}
-					else {
-						ddmStructureName = LanguageUtil.get(pageContext, "any");
-					}
+				if (Validator.isNotNull(ddmStructureDescription)) {
+					ddmStructureName = ddmStructureName + " (" + ddmStructureDescription+ ")";
+				}
+				%>
 
-					if (Validator.isNotNull(ddmStructureDescription)) {
-						ddmStructureName = ddmStructureName + " (" + ddmStructureDescription+ ")";
-					}
-					%>
+				<div class="form-group">
+					<aui:input name="structure" type="resource" value="<%= ddmStructureName %>" />
 
-					<div class="input-append">
-						<liferay-ui:input-resource id="structure" url="<%= ddmStructureName %>" />
+					<aui:button onClick='<%= renderResponse.getNamespace() + "openStructureSelector();" %>' value="select" />
 
-						<aui:button onClick='<%= renderResponse.getNamespace() + "openStructureSelector();" %>' value="select" />
-
-						<aui:button name="removeStructureButton" onClick='<%= renderResponse.getNamespace() + "removeStructure();" %>' value="remove" />
-					</div>
-				</aui:field-wrapper>
+					<aui:button name="removeStructureButton" onClick='<%= renderResponse.getNamespace() + "removeStructure();" %>' value="remove" />
+				</div>
 			</aui:fieldset>
 		</liferay-ui:panel>
 
 		<liferay-ui:panel collapsible="<%= true %>" extended="<%= true %>" id="journalArticlesDisplaySettings" persistState="<%= true %>" title="display-settings">
 			<aui:fieldset>
-				<aui:select label="display-url" name="preferences--pageUrl--">
-					<aui:option label="maximized" selected='<%= pageUrl.equals("maximized") %>' />
-					<aui:option label="normal" selected='<%= pageUrl.equals("normal") %>' />
-					<aui:option label="pop-up" selected='<%= pageUrl.equals("popUp") %>' value="popUp" />
-					<aui:option label="view-in-context" selected='<%= pageUrl.equals("viewInContext") %>' value="viewInContext" />
+				<aui:select label="display-url" name="preferences--pageUrl--" value="<%= pageUrl %>">
+					<aui:option label="maximized" />
+					<aui:option label="normal" />
+					<aui:option label="pop-up" />
+					<aui:option label="view-in-context" value="viewInContext" />
 				</aui:select>
 
 				<aui:select label="display-per-page" name="preferences--pageDelta--">
@@ -128,17 +124,17 @@ groupId = ParamUtil.getLong(request, "groupId", groupId);
 				</aui:select>
 
 				<aui:field-wrapper label="order-by-column">
-					<aui:select inlineField="<%= true %>" label="" name="preferences--orderByCol--">
-						<aui:option label="display-date" selected='<%= orderByCol.equals("display-date") %>' />
-						<aui:option label="create-date" selected='<%= orderByCol.equals("create-date") %>' />
-						<aui:option label="modified-date" selected='<%= orderByCol.equals("modified-date") %>' />
-						<aui:option label="title" selected='<%= orderByCol.equals("title") %>' />
-						<aui:option label="id" selected='<%= orderByCol.equals("id") %>' />
+					<aui:select inlineField="<%= true %>" label="" name="preferences--orderByCol--" title="order-by-column" value="<%= orderByCol %>">
+						<aui:option label="display-date" />
+						<aui:option label="create-date" />
+						<aui:option label="modified-date" />
+						<aui:option label="title" />
+						<aui:option label="id" />
 					</aui:select>
 
-					<aui:select label="" name="preferences--orderByType--">
-						<aui:option label="ascending" selected='<%= orderByType.equals("asc") %>' value="asc" />
-						<aui:option label="descending" selected='<%= orderByType.equals("desc") %>' value="desc" />
+					<aui:select label="" name="preferences--orderByType--" title="order-by-type" value="<%= orderByType %>">
+						<aui:option label="ascending" value="asc" />
+						<aui:option label="descending" value="desc" />
 					</aui:select>
 				</aui:field-wrapper>
 			</aui:fieldset>
@@ -162,9 +158,9 @@ groupId = ParamUtil.getLong(request, "groupId", groupId);
 				eventName: '<portlet:namespace />selectStructure',
 				groupId: <%= groupId %>,
 				refererPortletName: '<%= PortletKeys.JOURNAL %>',
-				showGlobalScope: true,
+				showAncestorScopes: true,
 				struts_action: '/dynamic_data_mapping/select_structure',
-				title: '<%= UnicodeLanguageUtil.get(pageContext, "structures") %>'
+				title: '<%= UnicodeLanguageUtil.get(request, "structures") %>'
 			},
 			function(event) {
 				var A = AUI();
@@ -182,9 +178,9 @@ groupId = ParamUtil.getLong(request, "groupId", groupId);
 		function() {
 			var A = AUI();
 
-			document.<portlet:namespace />fm1.<portlet:namespace />ddmStructureKey.value = "";
+			document.<portlet:namespace />fm1.<portlet:namespace />ddmStructureKey.value = '';
 
-			A.one('#<portlet:namespace />structure').val('<%= UnicodeLanguageUtil.get(pageContext, "any") %>');
+			A.one('#<portlet:namespace />structure').val('<%= UnicodeLanguageUtil.get(request, "any") %>');
 		},
 		['aui-base']
 	);

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.asset.service.impl;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portlet.asset.model.AssetCategoryProperty;
 import com.liferay.portlet.asset.service.base.AssetCategoryPropertyServiceBaseImpl;
@@ -33,7 +32,7 @@ public class AssetCategoryPropertyServiceImpl
 	@Override
 	public AssetCategoryProperty addCategoryProperty(
 			long entryId, String key, String value)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		AssetCategoryPermission.check(
 			getPermissionChecker(), entryId, ActionKeys.UPDATE);
@@ -44,7 +43,7 @@ public class AssetCategoryPropertyServiceImpl
 
 	@Override
 	public void deleteCategoryProperty(long categoryPropertyId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		AssetCategoryProperty assetCategoryProperty =
 			assetCategoryPropertyLocalService.getAssetCategoryProperty(
@@ -59,16 +58,13 @@ public class AssetCategoryPropertyServiceImpl
 	}
 
 	@Override
-	public List<AssetCategoryProperty> getCategoryProperties(long entryId)
-		throws SystemException {
-
+	public List<AssetCategoryProperty> getCategoryProperties(long entryId) {
 		return assetCategoryPropertyLocalService.getCategoryProperties(entryId);
 	}
 
 	@Override
 	public List<AssetCategoryProperty> getCategoryPropertyValues(
-			long companyId, String key)
-		throws SystemException {
+		long companyId, String key) {
 
 		return assetCategoryPropertyLocalService.getCategoryPropertyValues(
 			companyId, key);
@@ -76,8 +72,8 @@ public class AssetCategoryPropertyServiceImpl
 
 	@Override
 	public AssetCategoryProperty updateCategoryProperty(
-			long categoryPropertyId, String key, String value)
-		throws PortalException, SystemException {
+			long userId, long categoryPropertyId, String key, String value)
+		throws PortalException {
 
 		AssetCategoryProperty assetCategoryProperty =
 			assetCategoryPropertyLocalService.getAssetCategoryProperty(
@@ -88,7 +84,15 @@ public class AssetCategoryPropertyServiceImpl
 			ActionKeys.UPDATE);
 
 		return assetCategoryPropertyLocalService.updateCategoryProperty(
-			categoryPropertyId, key, value);
+			userId, categoryPropertyId, key, value);
+	}
+
+	@Override
+	public AssetCategoryProperty updateCategoryProperty(
+			long categoryPropertyId, String key, String value)
+		throws PortalException {
+
+		return updateCategoryProperty(0, categoryPropertyId, key, value);
 	}
 
 }

@@ -7,6 +7,8 @@ AUI.add(
 
 		var Util = Liferay.Util;
 
+		var ADD_PANEL_COMPONENTS = ['addApplication', 'addContent', 'addPage'];
+
 		var BODY = A.getBody();
 
 		var CSS_ADD_CONTENT = 'lfr-has-add-content';
@@ -19,13 +21,19 @@ AUI.add(
 
 		var EVENT_CLICK = 'click';
 
+		var EVENT_MOUSEDOWN_OUTSIDE = 'mousedownoutside';
+
 		var SELECTOR_NAV_ACCOUNT_CONTROLS = '.nav-account-controls';
 
 		var SELECTOR_NAV_ADD_CONTROLS = '.nav-add-controls';
 
+		var STR_ACTIVE = 'active';
+
 		var STR_ADD_PANEL = 'addPanel';
 
 		var STR_EDIT_LAYOUT_PANEL = 'editLayoutPanel';
+
+		var STR_OPEN = 'open';
 
 		var STR_PREVIEW_PANEL = 'previewPanel';
 
@@ -46,7 +54,9 @@ AUI.add(
 				if (dockBar) {
 					instance.dockBar = dockBar;
 
-					instance._namespace = dockBar.attr('data-namespace');
+					var namespace = dockBar.attr('data-namespace');
+
+					instance._namespace = namespace;
 
 					Liferay.once('initDockbar', instance._init, instance);
 
@@ -60,11 +70,27 @@ AUI.add(
 
 							eventHandle.detach();
 
-							if (themeDisplay.isSignedIn() && !A.UA.touch) {
+							if (!A.UA.touch) {
 								instance._initInteraction(target, type);
 							}
 						}
 					);
+
+					var btnNavigation = A.one('#' + namespace + 'navSiteNavigation');
+
+					var navigation = A.one(Liferay.Data.NAV_SELECTOR);
+
+					if (btnNavigation && navigation) {
+						btnNavigation.setData('menuItem', navigation);
+
+						new Liferay.MenuToggle(
+							{
+								content: [btnNavigation, navigation],
+								toggleTouch: false,
+								trigger: btnNavigation
+							}
+						);
+					}
 
 					BODY.addClass('dockbar-ready');
 
@@ -96,7 +122,7 @@ AUI.add(
 
 							BODY.prepend(panelNode);
 
-							panelNode.set('id', panelSidebarId);
+							panelNode.attr('id', panelSidebarId);
 
 							panel.node = panelNode;
 						}
@@ -104,12 +130,6 @@ AUI.add(
 				}
 
 				return panelNode;
-			},
-
-			togglePreviewPanel: function() {
-				var instance = this;
-
-				Dockbar._togglePanel(STR_PREVIEW_PANEL);
 			},
 
 			toggleAddPanel: function() {
@@ -124,6 +144,12 @@ AUI.add(
 				Dockbar._togglePanel(STR_EDIT_LAYOUT_PANEL);
 			},
 
+			togglePreviewPanel: function() {
+				var instance = this;
+
+				Dockbar._togglePanel(STR_PREVIEW_PANEL);
+			},
+
 			_registerPanels: function() {
 				var instance = this;
 
@@ -131,18 +157,23 @@ AUI.add(
 
 				AObject.each(
 					DOCKBAR_PANELS,
-					function(item, index, collection) {
+					function(item, index) {
 						var panelId = item.id;
 
 						var panelTrigger = A.one('#' + namespace + panelId);
 
 						if (panelTrigger) {
 							panelTrigger.on(
-								EVENT_CLICK,
+								'gesturemovestart',
 								function(event) {
-									event.halt();
+									event.currentTarget.once(
+										'gesturemoveend',
+										function(event) {
+											event.halt();
 
-									instance._togglePanel(panelId);
+											instance._togglePanel(panelId);
+										}
+									);
 								}
 							);
 						}
@@ -178,11 +209,15 @@ AUI.add(
 
 					var navAccountControls = A.one('#' + namespace + 'navAccountControls');
 
-					navAccountControls.toggleClass('nav-account-controls-notice', force);
+					if (navAccountControls) {
+						navAccountControls.toggleClass('nav-account-controls-notice', force);
+					}
 
 					var navAddControls = A.one('#' + namespace + 'navAddControls');
 
-					navAddControls.toggleClass('nav-add-controls-notice', force);
+					if (navAddControls) {
+						navAddControls.toggleClass('nav-add-controls-notice', force);
+					}
 				}
 			},
 
@@ -191,7 +226,7 @@ AUI.add(
 
 				AObject.each(
 					DOCKBAR_PANELS,
-					function(item, index, collection) {
+					function(item, index) {
 						if (item.id !== panelId) {
 							BODY.removeClass(item.css);
 
@@ -205,6 +240,8 @@ AUI.add(
 				);
 
 				var panel = DOCKBAR_PANELS[panelId];
+
+				var namespace = instance._namespace;
 
 				if (panel) {
 					var panelNode = panel.node;
@@ -231,7 +268,7 @@ AUI.add(
 									instance._togglePanel(panelId);
 								}
 
-								var navAddControls = A.one('#' + instance._namespace + 'navAddControls');
+								var navAddControls = A.one('#' + namespace + 'navAddControls');
 
 								if (navAddControls) {
 									var layoutControl;
@@ -273,6 +310,21 @@ AUI.add(
 
 					if (!panelVisible) {
 						BODY.detach('layoutControlsEsc|key');
+
+						if (panelId === STR_ADD_PANEL) {
+							A.Array.each(
+								ADD_PANEL_COMPONENTS,
+								function(item, index) {
+									var componentName = Liferay.Util.ns(namespace, item);
+
+									var component = Liferay.component(componentName);
+
+									if (component) {
+										component.destroy();
+									}
+								}
+							);
+						}
 					}
 
 					panelNode.toggle(panelVisible);
@@ -287,7 +339,6 @@ AUI.add(
 				var instance = this;
 
 				var dockBar = instance.dockBar;
-				var namespace = instance._namespace;
 
 				Liferay.Util.toggleControls(dockBar);
 
@@ -297,20 +348,6 @@ AUI.add(
 				Liferay.fire('initNavigation');
 
 				instance._registerPanels();
-
-				var btnNavigation = A.oneNS(namespace, '#navSiteNavigationNavbarBtn');
-
-				var navigation = A.one(Liferay.Data.NAV_SELECTOR);
-
-				if (btnNavigation && navigation) {
-					btnNavigation.on(
-						EVENT_CLICK,
-						function(event) {
-							btnNavigation.toggleClass('open');
-							navigation.toggleClass('open');
-						}
-					);
-				}
 
 				Liferay.fire('dockbarLoaded');
 			},
@@ -339,16 +376,14 @@ AUI.add(
 				}
 
 				if (BODY.hasClass('dockbar-split')) {
-					if (navAccountControls) {
-						navAccountControls.plug(Liferay.DockbarKeyboardInteraction);
-					}
+					dockBar.plug(Liferay.DockbarKeyboardInteraction);
 
-					if (navAddControls) {
+					if (themeDisplay.isSignedIn() && navAddControls) {
 						navAddControls.plug(
 							A.Plugin.NodeFocusManager,
 							{
 								circular: true,
-								descendants: 'li a',
+								descendants: '.dropdown-menu li:visible a',
 								keys: {
 									next: 'down:39,40',
 									previous: 'down:37,38'
@@ -368,8 +403,8 @@ AUI.add(
 						);
 					}
 				}
-				else if (navAddControls) {
-					var brand = dockBar.one('.brand');
+				else if (themeDisplay.isSignedIn() && navAddControls) {
+					var brand = dockBar.one('.navbar-brand');
 
 					if (brand) {
 						brand.all('a').get('parentNode').addClass(CSS_DOCKBAR_ITEM);
@@ -464,6 +499,6 @@ AUI.add(
 	},
 	'',
 	{
-		requires: ['aui-node', 'aui-overlay-mask-deprecated', 'event-touch']
+		requires: ['aui-node', 'aui-overlay-mask-deprecated', 'event-move', 'event-touch', 'liferay-menu-toggle']
 	}
 );

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -52,7 +52,8 @@ public class WorkflowLogManagerUtil {
 
 	public static List<WorkflowLog> getWorkflowLogsByWorkflowInstance(
 			long companyId, long workflowInstanceId, List<Integer> logTypes,
-			int start, int end, OrderByComparator orderByComparator)
+			int start, int end,
+			OrderByComparator<WorkflowLog> orderByComparator)
 		throws WorkflowException {
 
 		return getWorkflowLogManager().getWorkflowLogsByWorkflowInstance(
@@ -62,7 +63,8 @@ public class WorkflowLogManagerUtil {
 
 	public static List<WorkflowLog> getWorkflowLogsByWorkflowTask(
 			long companyId, long workflowTaskId, List<Integer> logTypes,
-			int start, int end, OrderByComparator orderByComparator)
+			int start, int end,
+			OrderByComparator<WorkflowLog> orderByComparator)
 		throws WorkflowException {
 
 		return getWorkflowLogManager().getWorkflowLogsByWorkflowTask(

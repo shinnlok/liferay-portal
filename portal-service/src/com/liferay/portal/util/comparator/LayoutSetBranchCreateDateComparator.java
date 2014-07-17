@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,7 +21,8 @@ import com.liferay.portal.model.LayoutSetBranch;
 /**
  * @author Miguel Pastor
  */
-public class LayoutSetBranchCreateDateComparator extends OrderByComparator {
+public class LayoutSetBranchCreateDateComparator
+	extends OrderByComparator<LayoutSetBranch> {
 
 	public static final String ORDER_BY_ASC = "createDate ASC";
 
@@ -38,9 +39,8 @@ public class LayoutSetBranchCreateDateComparator extends OrderByComparator {
 	}
 
 	@Override
-	public int compare(Object obj1, Object obj2) {
-		LayoutSetBranch layoutSetBranch1 = (LayoutSetBranch)obj1;
-		LayoutSetBranch layoutSetBranch2 = (LayoutSetBranch)obj2;
+	public int compare(
+		LayoutSetBranch layoutSetBranch1, LayoutSetBranch layoutSetBranch2) {
 
 		int value = DateUtil.compareTo(
 			layoutSetBranch1.getCreateDate(), layoutSetBranch2.getCreateDate());

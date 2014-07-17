@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -40,6 +40,27 @@ public class ContactServiceWrapper implements ContactService,
 		return _contactService.getBeanIdentifier();
 	}
 
+	@Override
+	public com.liferay.portal.model.Contact getContact(long contactId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _contactService.getContact(contactId);
+	}
+
+	@Override
+	public java.util.List<com.liferay.portal.model.Contact> getContacts(
+		long classNameId, long classPK, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.model.Contact> orderByComparator)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _contactService.getContacts(classNameId, classPK, start, end,
+			orderByComparator);
+	}
+
+	@Override
+	public int getContactsCount(long classNameId, long classPK)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _contactService.getContactsCount(classNameId, classPK);
+	}
+
 	/**
 	* Sets the Spring bean ID for this bean.
 	*
@@ -48,30 +69,6 @@ public class ContactServiceWrapper implements ContactService,
 	@Override
 	public void setBeanIdentifier(java.lang.String beanIdentifier) {
 		_contactService.setBeanIdentifier(beanIdentifier);
-	}
-
-	@Override
-	public com.liferay.portal.model.Contact getContact(long contactId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		return _contactService.getContact(contactId);
-	}
-
-	@Override
-	public java.util.List<com.liferay.portal.model.Contact> getContacts(
-		long classNameId, long classPK, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		return _contactService.getContacts(classNameId, classPK, start, end,
-			orderByComparator);
-	}
-
-	@Override
-	public int getContactsCount(long classNameId, long classPK)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		return _contactService.getContactsCount(classNameId, classPK);
 	}
 
 	/**

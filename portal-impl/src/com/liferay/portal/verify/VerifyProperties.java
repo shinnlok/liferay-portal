@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -265,13 +265,32 @@ public class VerifyProperties extends VerifyProcess {
 		"cluster.executor.heartbeat.interval",
 		"com.liferay.filters.doubleclick.DoubleClickFilter",
 		"com.liferay.portal.servlet.filters.doubleclick.DoubleClickFilter",
+		"com.liferay.portal.servlet.filters.validhtml.ValidHtmlFilter",
 		"commons.pool.enabled", "dl.file.entry.read.count.enabled",
 		"dynamic.data.lists.template.language.parser[ftl]",
 		"dynamic.data.lists.template.language.parser[vm]",
 		"dynamic.data.lists.template.language.parser[xsl]",
 		"dynamic.data.mapping.template.language.types",
-		"ehcache.statistics.enabled", "javax.persistence.validation.mode",
-		"jbi.workflow.url", "journal.template.language.parser[css]",
+		"editor.wysiwyg.portal-web.docroot.html.portlet.asset_publisher." +
+			"configuration.jsp",
+		"editor.wysiwyg.portal-web.docroot.html.portlet.blogs.configuration." +
+			"jsp",
+		"editor.wysiwyg.portal-web.docroot.html.portlet.bookmarks." +
+			"configuration.jsp",
+		"editor.wysiwyg.portal-web.docroot.html.portlet.document_library." +
+		"editor.wysiwyg.portal-web.docroot.html.portlet.invitation." +
+			"configuration.jsp",
+		"editor.wysiwyg.portal-web.docroot.html.portlet.journal." +
+			"configuration.jsp",
+		"editor.wysiwyg.portal-web.docroot.html.portlet.login.configuration." +
+			"jsp",
+		"editor.wysiwyg.portal-web.docroot.html.portlet.message_boards." +
+			"configuration.jsp",
+		"editor.wysiwyg.portal-web.docroot.html.portlet.portal_settings." +
+			"email_notifications.jsp",
+		"ehcache.statistics.enabled", "index.filter.search.limit",
+		"javax.persistence.validation.mode", "jbi.workflow.url",
+		"journal.template.language.parser[css]",
 		"journal.template.language.parser[ftl]",
 		"journal.template.language.parser[vm]",
 		"journal.template.language.parser[xsl]",
@@ -289,13 +308,18 @@ public class VerifyProperties extends VerifyProcess {
 		"lucene.store.jdbc.dialect.mysql", "lucene.store.jdbc.dialect.oracle",
 		"lucene.store.jdbc.dialect.postgresql",
 		"memory.cluster.scheduler.lock.cache.enabled",
+		"message.boards.email.message.added.signature",
+		"message.boards.email.message.updated.signature",
 		"message.boards.thread.locking.enabled", "portal.ctx",
-		"portal.security.manager.enable", "permissions.user.check.algorithm",
-		"persistence.provider", "scheduler.classes", "schema.run.minimal",
-		"shard.available.names", "velocity.engine.resource.manager",
+		"portal.security.manager.enable", "permissions.list.filter",
+		"permissions.user.check.algorithm", "persistence.provider",
+		"scheduler.classes", "schema.run.minimal", "shard.available.names",
+		"velocity.engine.resource.manager",
 		"velocity.engine.resource.manager.cache.enabled",
 		"webdav.storage.class", "webdav.storage.show.edit.url",
-		"webdav.storage.show.view.url", "webdav.storage.tokens", "xss.allow"
+		"webdav.storage.show.view.url", "webdav.storage.tokens",
+		"wiki.email.page.added.signature", "wiki.email.page.updated.signature",
+		"xss.allow"
 	};
 
 	private static final String[] _OBSOLETE_SYSTEM_KEYS = new String[] {
@@ -432,6 +456,9 @@ public class VerifyProperties extends VerifyProcess {
 			"field.editable.user.types"
 		},
 		new String[] {
+			"icon.menu.max.display.items", "menu.max.display.items"
+		},
+		new String[] {
 			"journal.error.template.freemarker", "journal.error.template[ftl]"
 		},
 		new String[] {
@@ -447,6 +474,14 @@ public class VerifyProperties extends VerifyProcess {
 		new String[] {
 			"journal.template.velocity.restricted.variables",
 			"velocity.engine.restricted.variables"
+		},
+		new String[] {
+			"portal.instance.http.port",
+			"portal.instance.http.inet.socket.address"
+		},
+		new String[] {
+			"portal.instance.https.port",
+			"portal.instance.https.inet.socket.address"
 		},
 		new String[] {
 			"referer.url.domains.allowed", "redirect.url.domains.allowed"

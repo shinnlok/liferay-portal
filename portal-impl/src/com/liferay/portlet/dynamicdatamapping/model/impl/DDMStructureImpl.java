@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,47 +15,43 @@
 package com.liferay.portlet.dynamicdatamapping.model.impl;
 
 import com.liferay.portal.LocaleException;
+import com.liferay.portal.kernel.bean.BeanPropertiesUtil;
 import com.liferay.portal.kernel.configuration.Filter;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.HtmlUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.PredicateFilter;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
+import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.xml.Attribute;
-import com.liferay.portal.kernel.xml.Document;
-import com.liferay.portal.kernel.xml.Element;
-import com.liferay.portal.kernel.xml.Node;
-import com.liferay.portal.kernel.xml.SAXReaderUtil;
-import com.liferay.portal.kernel.xml.XPath;
 import com.liferay.portal.model.CacheField;
 import com.liferay.portal.model.Group;
+import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.dynamicdatamapping.StructureFieldException;
+import com.liferay.portlet.dynamicdatamapping.io.DDMFormXSDDeserializerUtil;
+import com.liferay.portlet.dynamicdatamapping.io.DDMFormXSDSerializerUtil;
+import com.liferay.portlet.dynamicdatamapping.model.DDMForm;
+import com.liferay.portlet.dynamicdatamapping.model.DDMFormField;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.model.DDMTemplate;
+import com.liferay.portlet.dynamicdatamapping.model.LocalizedValue;
 import com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalServiceUtil;
 import com.liferay.portlet.dynamicdatamapping.service.DDMTemplateLocalServiceUtil;
 import com.liferay.portlet.dynamicdatamapping.util.DDMXMLUtil;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Brian Wing Shun Chan
@@ -64,306 +60,243 @@ public class DDMStructureImpl extends DDMStructureBaseImpl {
 
 	@Override
 	public String[] getAvailableLanguageIds() {
-		Document document = getDocument();
+		DDMForm ddmForm = getDDMForm();
 
-		Element rootElement = document.getRootElement();
+		List<Locale> availableLocales = ddmForm.getAvailableLocales();
 
-		String availableLocales = rootElement.attributeValue(
-			"available-locales");
+		String[] availableLanguageIds = new String[availableLocales.size()];
 
-		return StringUtil.split(availableLocales);
+		for (int i = 0; i < availableLocales.size(); i++) {
+			availableLanguageIds[i] = LocaleUtil.toLanguageId(
+				availableLocales.get(i));
+		}
+
+		return availableLanguageIds;
 	}
 
 	@Override
 	public List<String> getChildrenFieldNames(String fieldName)
-		throws PortalException, SystemException {
+		throws PortalException {
 
-		List<String> fieldNames = new ArrayList<String>();
+		DDMFormField ddmFormField = getDDMFormField(fieldName);
 
-		Map<String, Map<String, String>> fieldsMap = getFieldsMap();
-
-		for (Map<String, String> field : fieldsMap.values()) {
-			String parentNameKey = _getPrivateAttributeKey("parentName");
-
-			String parentName = field.get(parentNameKey);
-
-			if (fieldName.equals(parentName)) {
-				fieldNames.add(field.get("name"));
-			}
-		}
-
-		return fieldNames;
+		return getDDMFormFieldNames(ddmFormField.getNestedDDMFormFields());
 	}
 
 	@Override
-	public String getCompleteXsd() throws PortalException, SystemException {
-		if (getParentStructureId() == 0) {
-			return getXsd();
-		}
-
-		DDMStructure parentStructure =
-			DDMStructureLocalServiceUtil.getStructure(getParentStructureId());
-
-		return _mergeXsds(getXsd(), parentStructure.getCompleteXsd());
-	}
-
-	@Override
-	public String getDefaultLanguageId() {
-		Document document = getDocument();
-
-		if (document == null) {
-			Locale locale = LocaleUtil.getSiteDefault();
-
-			return locale.toString();
-		}
-
-		Element rootElement = document.getRootElement();
-
-		return rootElement.attributeValue("default-locale");
-	}
-
-	@Override
-	public Document getDocument() {
-		if (_document == null) {
+	public DDMForm getDDMForm() {
+		if (_ddmForm == null) {
 			try {
-				_document = SAXReaderUtil.read(getXsd());
+				_ddmForm = DDMFormXSDDeserializerUtil.deserialize(
+					getDefinition());
+
+				addDDMFormPrivateDDMFormFields();
 			}
 			catch (Exception e) {
-				StackTraceElement[] stackTraceElements = e.getStackTrace();
-
-				for (StackTraceElement stackTraceElement : stackTraceElements) {
-					String className = stackTraceElement.getClassName();
-
-					if (className.endsWith("DDMStructurePersistenceTest")) {
-						return null;
-					}
-				}
-
 				_log.error(e, e);
 			}
 		}
 
-		return _document;
+		return _ddmForm;
 	}
 
 	@Override
-	public String getFieldDataType(String fieldName)
-		throws PortalException, SystemException {
+	public DDMFormField getDDMFormField(String fieldName)
+		throws PortalException {
 
-		return getFieldProperty(fieldName, "dataType");
+		Map<String, DDMFormField> ddmFormFieldsMap =
+			getFullHierarchyDDMFormFieldsMap(true);
+
+		DDMFormField ddmFormField = ddmFormFieldsMap.get(fieldName);
+
+		if (ddmFormField == null) {
+			throw new StructureFieldException();
+		}
+
+		return ddmFormField;
+	}
+
+	@Override
+	public List<DDMFormField> getDDMFormFields(boolean includeTransientFields)
+		throws PortalException {
+
+		Map<String, DDMFormField> ddmFormFieldsMap =
+			getFullHierarchyDDMFormFieldsMap(true);
+
+		List<DDMFormField> ddmFormFields = new ArrayList<DDMFormField>(
+			ddmFormFieldsMap.values());
+
+		if (includeTransientFields) {
+			return ddmFormFields;
+		}
+
+		return filterTransientDDMFormFields(ddmFormFields);
+	}
+
+	@Override
+	public String getDefaultLanguageId() {
+		DDMForm ddmForm = getDDMForm();
+
+		return LocaleUtil.toLanguageId(ddmForm.getDefaultLocale());
+	}
+
+	@Override
+	public String getFieldDataType(String fieldName) throws PortalException {
+		DDMFormField ddmFormField = getDDMFormField(fieldName);
+
+		return ddmFormField.getDataType();
 	}
 
 	@Override
 	public String getFieldLabel(String fieldName, Locale locale)
-		throws PortalException, SystemException {
+		throws PortalException {
 
-		return getFieldLabel(fieldName, LocaleUtil.toLanguageId(locale));
+		DDMFormField ddmFormField = getDDMFormField(fieldName);
+
+		LocalizedValue label = ddmFormField.getLabel();
+
+		return label.getValue(locale);
 	}
 
 	@Override
 	public String getFieldLabel(String fieldName, String locale)
-		throws PortalException, SystemException {
+		throws PortalException {
 
-		return GetterUtil.getString(
-			getFieldProperty(fieldName, "label", locale), fieldName);
+		return getFieldLabel(fieldName, LocaleUtil.fromLanguageId(locale));
 	}
 
 	@Override
-	public Set<String> getFieldNames() throws PortalException, SystemException {
-		Map<String, Map<String, String>> fieldsMap = getFieldsMap();
+	public Set<String> getFieldNames() throws PortalException {
+		List<DDMFormField> ddmFormFields = getDDMFormFields(false);
 
-		return fieldsMap.keySet();
+		List<String> ddmFormFieldNames = getDDMFormFieldNames(ddmFormFields);
+
+		return SetUtil.fromList(ddmFormFieldNames);
 	}
 
 	@Override
 	public String getFieldProperty(String fieldName, String property)
-		throws PortalException, SystemException {
+		throws PortalException {
 
-		return getFieldProperty(fieldName, property, getDefaultLanguageId());
+		DDMFormField ddmFormField = getDDMFormField(fieldName);
+
+		return BeanPropertiesUtil.getString(ddmFormField, property);
 	}
 
 	@Override
-	public String getFieldProperty(
-			String fieldName, String property, String locale)
-		throws PortalException, SystemException {
+	public boolean getFieldRepeatable(String fieldName) throws PortalException {
+		DDMFormField ddmFormField = getDDMFormField(fieldName);
 
-		if (!hasField(fieldName)) {
-			throw new StructureFieldException();
-		}
-
-		Map<String, Map<String, String>> fieldsMap = getFieldsMap(locale);
-
-		Map<String, String> field = fieldsMap.get(fieldName);
-
-		return field.get(property);
+		return ddmFormField.isRepeatable();
 	}
 
 	@Override
-	public boolean getFieldRepeatable(String fieldName)
-		throws PortalException, SystemException {
+	public boolean getFieldRequired(String fieldName) throws PortalException {
+		DDMFormField ddmFormField = getDDMFormField(fieldName);
 
-		return GetterUtil.getBoolean(getFieldProperty(fieldName, "repeatable"));
-	}
-
-	@Override
-	public boolean getFieldRequired(String fieldName)
-		throws PortalException, SystemException {
-
-		return GetterUtil.getBoolean(getFieldProperty(fieldName, "required"));
-	}
-
-	@Override
-	public Map<String, String> getFields(
-		String fieldName, String attributeName, String attributeValue) {
-
-		return getFields(
-			fieldName, attributeName, attributeValue, getDefaultLanguageId());
-	}
-
-	@Override
-	public Map<String, String> getFields(
-		String fieldName, String attributeName, String attributeValue,
-		String locale) {
-
-		try {
-			if ((attributeName == null) || (attributeValue == null)) {
-				return null;
-			}
-
-			Map<String, Map<String, String>> fieldsMap = getTransientFieldsMap(
-				locale);
-
-			for (Map<String, String> fields : fieldsMap.values()) {
-				String parentName = fields.get(
-					_getPrivateAttributeKey("parentName"));
-
-				if (!fieldName.equals(parentName)) {
-					continue;
-				}
-
-				if (attributeValue.equals(fields.get(attributeName))) {
-					return fields;
-				}
-			}
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-		}
-
-		return null;
-	}
-
-	@Override
-	public Map<String, Map<String, String>> getFieldsMap()
-		throws PortalException, SystemException {
-
-		return getFieldsMap(getDefaultLanguageId());
-	}
-
-	@Override
-	public Map<String, Map<String, String>> getFieldsMap(String locale)
-		throws PortalException, SystemException {
-
-		_indexFieldsMap(locale);
-
-		Map<String, Map<String, Map<String, String>>> localizedFieldsMap =
-			getLocalizedFieldsMap();
-
-		Map<String, Map<String, String>> fieldsMap = localizedFieldsMap.get(
-			locale);
-
-		return fieldsMap;
+		return ddmFormField.isRequired();
 	}
 
 	@Override
 	public String getFieldTip(String fieldName, Locale locale)
-		throws PortalException, SystemException {
+		throws PortalException {
 
-		return getFieldTip(fieldName, LocaleUtil.toLanguageId(locale));
+		DDMFormField ddmFormField = getDDMFormField(fieldName);
+
+		LocalizedValue tip = ddmFormField.getTip();
+
+		return tip.getValue(locale);
 	}
 
 	@Override
 	public String getFieldTip(String fieldName, String locale)
-		throws PortalException, SystemException {
+		throws PortalException {
 
-		return GetterUtil.getString(
-			getFieldProperty(fieldName, "tip", locale), fieldName);
+		return getFieldTip(fieldName, LocaleUtil.fromLanguageId(locale));
 	}
 
 	@Override
-	public String getFieldType(String fieldName)
-		throws PortalException, SystemException {
+	public String getFieldType(String fieldName) throws PortalException {
+		DDMFormField ddmFormField = getDDMFormField(fieldName);
 
-		return getFieldProperty(fieldName, "type");
+		return ddmFormField.getType();
 	}
 
 	@Override
-	public Map<String, Map<String, Map<String, String>>>
-		getLocalizedFieldsMap() {
+	public DDMForm getFullHierarchyDDMForm() throws PortalException {
+		DDMForm ddmForm = getDDMForm();
 
-		if (_localizedFieldsMap == null) {
-			_localizedFieldsMap =
-				new ConcurrentHashMap
-					<String, Map<String, Map<String, String>>>();
+		DDMStructure parentDDMStructure = getParentDDMStructure();
+
+		if (parentDDMStructure != null) {
+			DDMForm ancestorsDDMForm =
+				parentDDMStructure.getFullHierarchyDDMForm();
+
+			List<DDMFormField> ddmFormFields = ddmForm.getDDMFormFields();
+
+			ddmFormFields.addAll(ancestorsDDMForm.getDDMFormFields());
 		}
 
-		return _localizedFieldsMap;
+		return ddmForm;
 	}
 
 	@Override
-	public Map<String, Map<String, Map<String, String>>>
-		getLocalizedTransientFieldsMap() {
+	public Map<String, DDMFormField> getFullHierarchyDDMFormFieldsMap(
+			boolean includeNestedDDMFormFields)
+		throws PortalException {
 
-		if (_localizedTransientFieldsMap == null) {
-			_localizedTransientFieldsMap =
-				new ConcurrentHashMap
-					<String, Map<String, Map<String, String>>>();
-		}
+		DDMForm ddmForm = getFullHierarchyDDMForm();
 
-		return _localizedTransientFieldsMap;
+		return ddmForm.getDDMFormFieldsMap(includeNestedDDMFormFields);
 	}
 
 	@Override
-	public List<String> getRootFieldNames()
-		throws PortalException, SystemException {
+	public List<String> getRootFieldNames() throws PortalException {
+		DDMForm ddmForm = getFullHierarchyDDMForm();
 
-		List<String> fieldNames = new ArrayList<String>();
-
-		Map<String, Map<String, String>> fieldsMap = getFieldsMap();
-
-		for (Map.Entry<String, Map<String, String>> entry :
-				fieldsMap.entrySet()) {
-
-			Map<String, String> field = entry.getValue();
-
-			String parentNameKey = _getPrivateAttributeKey("parentName");
-
-			if (!field.containsKey(parentNameKey)) {
-				fieldNames.add(entry.getKey());
-			}
-		}
-
-		return fieldNames;
+		return getDDMFormFieldNames(ddmForm.getDDMFormFields());
 	}
 
 	@Override
-	public List<DDMTemplate> getTemplates() throws SystemException {
+	public List<DDMTemplate> getTemplates() {
 		return DDMTemplateLocalServiceUtil.getTemplates(getStructureId());
 	}
 
 	@Override
-	public Map<String, Map<String, String>> getTransientFieldsMap(String locale)
-		throws PortalException, SystemException {
+	public String getUnambiguousName(
+			List<DDMStructure> structures, long groupId, final Locale locale)
+		throws PortalException {
 
-		_indexFieldsMap(locale);
+		if (getGroupId() == groupId ) {
+			return getName(locale);
+		}
 
-		Map<String, Map<String, Map<String, String>>>
-			localizedTransientFieldsMap = getLocalizedTransientFieldsMap();
+		boolean hasAmbiguousName = ListUtil.exists(
+			structures,
+			new PredicateFilter<DDMStructure>() {
 
-		Map<String, Map<String, String>> fieldsMap =
-			localizedTransientFieldsMap.get(locale);
+				@Override
+				public boolean filter(DDMStructure structure) {
+					String name = structure.getName(locale);
 
-		return fieldsMap;
+					if (name.equals(getName(locale)) &&
+						(structure.getStructureId() != getStructureId())) {
+
+						return true;
+					}
+
+					return false;
+				}
+
+			});
+
+		if (hasAmbiguousName) {
+			Group group = GroupLocalServiceUtil.getGroup(getGroupId());
+
+			return group.getUnambiguousName(getName(locale), locale);
+		}
+
+		return getName(locale);
 	}
 
 	/**
@@ -411,36 +344,38 @@ public class DDMStructureImpl extends DDMStructureBaseImpl {
 	}
 
 	@Override
-	public boolean hasField(String fieldName)
-		throws PortalException, SystemException {
+	public boolean hasField(String fieldName) throws PortalException {
+		Map<String, DDMFormField> ddmFormFieldsMap =
+			getFullHierarchyDDMFormFieldsMap(true);
 
-		Map<String, Map<String, String>> fieldsMap = getFieldsMap();
+		return ddmFormFieldsMap.containsKey(fieldName);
+	}
 
-		boolean hasField = fieldsMap.containsKey(fieldName);
-
-		while (!hasField && (getParentStructureId() > 0)) {
-			DDMStructure parentStructure =
-				DDMStructureLocalServiceUtil.getStructure(
-					getParentStructureId());
-
-			hasField = parentStructure.hasField(fieldName);
+	@Override
+	public boolean isFieldPrivate(String fieldName) {
+		if (fieldName.startsWith(StringPool.UNDERLINE)) {
+			return true;
 		}
 
-		return hasField;
+		return false;
 	}
 
 	@Override
-	public boolean isFieldPrivate(String fieldName)
-		throws PortalException, SystemException {
+	public boolean isFieldRepeatable(String fieldName) throws PortalException {
+		DDMFormField ddmFormField = getDDMFormField(fieldName);
 
-		return GetterUtil.getBoolean(getFieldProperty(fieldName, "private"));
+		return ddmFormField.isRepeatable();
 	}
 
 	@Override
-	public boolean isFieldRepeatable(String fieldName)
-		throws PortalException, SystemException {
+	public boolean isFieldTransient(String fieldName) throws PortalException {
+		DDMFormField ddmFormField = getDDMFormField(fieldName);
 
-		return GetterUtil.getBoolean(getFieldProperty(fieldName, "repeatable"));
+		if (Validator.isNull(ddmFormField.getDataType())) {
+			return true;
+		}
+
+		return false;
 	}
 
 	@Override
@@ -453,9 +388,10 @@ public class DDMStructureImpl extends DDMStructureBaseImpl {
 			getDefaultLanguageId());
 
 		try {
-			setXsd(
+			setDefinition(
 				DDMXMLUtil.updateXMLDefaultLocale(
-					getXsd(), ddmStructureDefaultLocale, defaultImportLocale));
+					getDefinition(), ddmStructureDefaultLocale,
+					defaultImportLocale));
 		}
 		catch (Exception e) {
 			throw new LocaleException(LocaleException.TYPE_EXPORT_IMPORT, e);
@@ -463,205 +399,100 @@ public class DDMStructureImpl extends DDMStructureBaseImpl {
 	}
 
 	@Override
-	public void setDocument(Document document) {
-		_document = document;
+	public void setDDMForm(DDMForm ddmForm) {
+		_ddmForm = ddmForm;
 	}
 
 	@Override
-	public void setLocalizedFieldsMap(
-		Map<String, Map<String, Map<String, String>>> localizedFieldsMap) {
+	public void setDefinition(String definition) {
+		super.setDefinition(definition);
 
-		_localizedFieldsMap = localizedFieldsMap;
+		_ddmForm = null;
 	}
 
 	@Override
-	public void setLocalizedTransientFieldsMap(
-		Map<String, Map<String, Map<String, String>>>
-			localizedTransientFieldsMap) {
-
-		_localizedTransientFieldsMap = localizedTransientFieldsMap;
+	public void updateDDMForm(DDMForm ddmForm) {
+		setDefinition(DDMFormXSDSerializerUtil.serialize(ddmForm));
 	}
 
-	@Override
-	public void setXsd(String xsd) {
-		super.setXsd(xsd);
-
-		_document = null;
-		_localizedFieldsMap = null;
-		_localizedTransientFieldsMap = null;
-	}
-
-	private Map<String, String> _getField(Element element, String locale) {
-		Map<String, String> field = new HashMap<String, String>();
-
-		String[] availableLanguageIds = getAvailableLanguageIds();
-
-		if ((locale != null) &&
-			!ArrayUtil.contains(availableLanguageIds, locale)) {
-
-			locale = getDefaultLanguageId();
-		}
-
-		locale = HtmlUtil.escapeXPathAttribute(locale);
-
-		String xPathExpression =
-			"meta-data[@locale=".concat(locale).concat("]");
-
-		XPath xPathSelector = SAXReaderUtil.createXPath(xPathExpression);
-
-		Node node = xPathSelector.selectSingleNode(element);
-
-		Element metaDataElement = (Element)node.asXPathResult(node.getParent());
-
-		if (metaDataElement != null) {
-			List<Element> childMetaDataElements = metaDataElement.elements();
-
-			for (Element childMetaDataElement : childMetaDataElements) {
-				String name = childMetaDataElement.attributeValue("name");
-				String value = childMetaDataElement.getText();
-
-				field.put(name, value);
-			}
-		}
-
-		for (Attribute attribute : element.attributes()) {
-			field.put(attribute.getName(), attribute.getValue());
-		}
-
-		Element parentElement = element.getParent();
-
-		if (parentElement != null) {
-			String parentName = parentElement.attributeValue("name");
-
-			if (Validator.isNotNull(parentName)) {
-				field.put(_getPrivateAttributeKey("parentName"), parentName);
-			}
-		}
-
-		return field;
-	}
-
-	private String _getPrivateAttributeKey(String attributeName) {
-		return StringPool.UNDERLINE.concat(attributeName).concat(
-			StringPool.UNDERLINE);
-	}
-
-	private Map<String, String> _getPrivateField(String privateFieldName) {
-		Map<String, String> privateField = new HashMap<String, String>();
-
-		String dataType = PropsUtil.get(
-			PropsKeys.DYNAMIC_DATA_MAPPING_STRUCTURE_PRIVATE_FIELD_DATATYPE,
-			new Filter(privateFieldName));
-
-		privateField.put("dataType", dataType);
-
-		privateField.put("name", privateFieldName);
-		privateField.put("private", Boolean.TRUE.toString());
-
-		String repeatable = PropsUtil.get(
-			PropsKeys.DYNAMIC_DATA_MAPPING_STRUCTURE_PRIVATE_FIELD_REPEATABLE,
-			new Filter(privateFieldName));
-
-		privateField.put("repeatable", repeatable);
-
-		return privateField;
-	}
-
-	private void _indexFieldsMap(String locale)
-		throws PortalException, SystemException {
-
-		Map<String, Map<String, Map<String, String>>> localizedFieldsMap =
-			getLocalizedFieldsMap();
-
-		Map<String, Map<String, String>> fieldsMap = localizedFieldsMap.get(
-			locale);
-
-		Map<String, Map<String, Map<String, String>>>
-			localizedTransientFieldsMap = getLocalizedTransientFieldsMap();
-
-		Map<String, Map<String, String>> transientFieldsMap =
-			localizedTransientFieldsMap.get(locale);
-
-		if (fieldsMap != null) {
-			return;
-		}
-
-		if (getParentStructureId() > 0) {
-			DDMStructure parentStructure =
-				DDMStructureLocalServiceUtil.getStructure(
-					getParentStructureId());
-
-			fieldsMap = parentStructure.getFieldsMap(locale);
-			transientFieldsMap = parentStructure.getTransientFieldsMap(locale);
-		}
-		else {
-			fieldsMap = new LinkedHashMap<String, Map<String, String>>();
-			transientFieldsMap =
-				new LinkedHashMap<String, Map<String, String>>();
-		}
-
-		XPath xPathSelector = SAXReaderUtil.createXPath("//dynamic-element");
-
-		List<Node> nodes = xPathSelector.selectNodes(getDocument());
-
-		for (Node node : nodes) {
-			Element element = (Element)node;
-
-			String name = element.attributeValue("name");
-
-			if (Validator.isNotNull(element.attributeValue("dataType"))) {
-				fieldsMap.put(name, _getField(element, locale));
-			}
-			else {
-				transientFieldsMap.put(name, _getField(element, locale));
-			}
-		}
+	protected void addDDMFormPrivateDDMFormFields() {
+		List<DDMFormField> ddmFormFields = _ddmForm.getDDMFormFields();
 
 		String[] privateFieldNames =
 			PropsValues.DYNAMIC_DATA_MAPPING_STRUCTURE_PRIVATE_FIELD_NAMES;
 
 		for (String privateFieldName : privateFieldNames) {
-			Map<String, String> privateField = _getPrivateField(
+			DDMFormField privateDDMFormField = createPrivateDDMFormField(
 				privateFieldName);
 
-			fieldsMap.put(privateFieldName, privateField);
+			ddmFormFields.add(privateDDMFormField);
 		}
-
-		localizedFieldsMap.put(locale, fieldsMap);
-		localizedTransientFieldsMap.put(locale, transientFieldsMap);
 	}
 
-	private String _mergeXsds(String xsd1, String xsd2) throws SystemException {
-		try {
-			Document document1 = SAXReaderUtil.read(xsd1);
-			Document document2 = SAXReaderUtil.read(xsd2);
+	protected DDMFormField createPrivateDDMFormField(String privateFieldName) {
+		DDMFormField privateDDMFormField = new DDMFormField(
+			privateFieldName, "text");
 
-			Element rootElement1 = document1.getRootElement();
-			Element rootElement2 = document2.getRootElement();
+		String dataType = PropsUtil.get(
+			PropsKeys.DYNAMIC_DATA_MAPPING_STRUCTURE_PRIVATE_FIELD_DATATYPE,
+			new Filter(privateFieldName));
 
-			for (Element element : rootElement1.elements()) {
-				rootElement1.remove(element);
+		privateDDMFormField.setDataType(dataType);
 
-				rootElement2.add(element);
-			}
+		String repeatable = PropsUtil.get(
+			PropsKeys.DYNAMIC_DATA_MAPPING_STRUCTURE_PRIVATE_FIELD_REPEATABLE,
+			new Filter(privateFieldName));
 
-			return rootElement2.formattedString();
+		privateDDMFormField.setRepeatable(Boolean.valueOf(repeatable));
+
+		return privateDDMFormField;
+	}
+
+	protected List<DDMFormField> filterTransientDDMFormFields(
+		List<DDMFormField> ddmFormFields) {
+
+		PredicateFilter<DDMFormField> predicateFilter =
+			new PredicateFilter<DDMFormField>() {
+
+				@Override
+				public boolean filter(DDMFormField ddmFormField) {
+					if (Validator.isNull(ddmFormField.getDataType())) {
+						return false;
+					}
+
+					return true;
+				}
+			};
+
+		return ListUtil.filter(ddmFormFields, predicateFilter);
+	}
+
+	protected List<String> getDDMFormFieldNames(
+		List<DDMFormField> ddmFormFields) {
+
+		List<String> fieldNames = new ArrayList<String>();
+
+		for (DDMFormField ddmFormField : ddmFormFields) {
+			fieldNames.add(ddmFormField.getName());
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+
+		return fieldNames;
+	}
+
+	protected DDMStructure getParentDDMStructure() throws PortalException {
+		if (getParentStructureId() == 0) {
+			return null;
 		}
+
+		DDMStructure parentStructure =
+			DDMStructureLocalServiceUtil.getStructure(getParentStructureId());
+
+		return parentStructure;
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(DDMStructureImpl.class);
 
-	@CacheField
-	private Document _document;
-
-	@CacheField
-	private Map<String, Map<String, Map<String, String>>> _localizedFieldsMap;
-
-	@CacheField
-	private Map<String, Map<String, Map<String, String>>>
-		_localizedTransientFieldsMap;
+	@CacheField(methodName = "DDMForm")
+	private DDMForm _ddmForm;
 
 }

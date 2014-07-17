@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.journal.lar;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.lar.BaseStagedModelDataHandler;
 import com.liferay.portal.kernel.lar.ExportImportPathUtil;
 import com.liferay.portal.kernel.lar.PortletDataContext;
@@ -41,11 +40,9 @@ public class JournalFolderStagedModelDataHandler
 	@Override
 	public void deleteStagedModel(
 			String uuid, long groupId, String className, String extraData)
-		throws PortalException, SystemException {
+		throws PortalException {
 
-		JournalFolder folder =
-			JournalFolderLocalServiceUtil.fetchJournalFolderByUuidAndGroupId(
-				uuid, groupId);
+		JournalFolder folder = fetchExistingStagedModel(uuid, groupId);
 
 		if (folder != null) {
 			JournalFolderLocalServiceUtil.deleteFolder(folder);
@@ -82,6 +79,14 @@ public class JournalFolderStagedModelDataHandler
 	}
 
 	@Override
+	protected JournalFolder doFetchExistingStagedModel(
+		String uuid, long groupId) {
+
+		return JournalFolderLocalServiceUtil.fetchJournalFolderByUuidAndGroupId(
+			uuid, groupId);
+	}
+
+	@Override
 	protected void doImportStagedModel(
 			PortletDataContext portletDataContext, JournalFolder folder)
 		throws Exception {
@@ -111,10 +116,8 @@ public class JournalFolderStagedModelDataHandler
 		long groupId = portletDataContext.getScopeGroupId();
 
 		if (portletDataContext.isDataStrategyMirror()) {
-			JournalFolder existingFolder =
-				JournalFolderLocalServiceUtil.
-					fetchJournalFolderByUuidAndGroupId(
-						folder.getUuid(), groupId);
+			JournalFolder existingFolder = fetchExistingStagedModel(
+				folder.getUuid(), groupId);
 
 			if (existingFolder == null) {
 				serviceContext.setUuid(folder.getUuid());
@@ -146,9 +149,8 @@ public class JournalFolderStagedModelDataHandler
 
 		long userId = portletDataContext.getUserId(folder.getUserUuid());
 
-		JournalFolder existingFolder =
-			JournalFolderLocalServiceUtil.fetchJournalFolderByUuidAndGroupId(
-				folder.getUuid(), portletDataContext.getScopeGroupId());
+		JournalFolder existingFolder = fetchExistingStagedModel(
+			folder.getUuid(), portletDataContext.getScopeGroupId());
 
 		if ((existingFolder == null) || !existingFolder.isInTrash()) {
 			return;

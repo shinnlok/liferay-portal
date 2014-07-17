@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,12 +15,12 @@
 package com.liferay.portlet.asset.util;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
+import com.liferay.portal.kernel.search.BaseModelSearchResult;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Hits;
@@ -37,6 +37,7 @@ import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.PredicateFilter;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
@@ -60,6 +61,9 @@ import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetRendererFactory;
 import com.liferay.portlet.asset.model.AssetTag;
 import com.liferay.portlet.asset.model.AssetTagProperty;
+import com.liferay.portlet.asset.model.AssetVocabulary;
+import com.liferay.portlet.asset.model.ClassType;
+import com.liferay.portlet.asset.model.ClassTypeReader;
 import com.liferay.portlet.asset.service.AssetCategoryLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetCategoryPropertyLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
@@ -67,6 +71,7 @@ import com.liferay.portlet.asset.service.AssetTagLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetTagPropertyLocalServiceUtil;
 import com.liferay.portlet.asset.service.permission.AssetCategoryPermission;
 import com.liferay.portlet.asset.service.permission.AssetTagPermission;
+import com.liferay.portlet.asset.service.permission.AssetVocabularyPermission;
 import com.liferay.portlet.asset.service.persistence.AssetEntryQuery;
 import com.liferay.portlet.assetpublisher.util.AssetSearcher;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
@@ -180,7 +185,7 @@ public class AssetUtil {
 
 	public static long[] filterCategoryIds(
 			PermissionChecker permissionChecker, long[] categoryIds)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		List<Long> viewableCategoryIds = new ArrayList<Long>();
 
@@ -202,7 +207,7 @@ public class AssetUtil {
 
 	public static long[] filterTagIds(
 			PermissionChecker permissionChecker, long[] tagIds)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		List<Long> viewableTagIds = new ArrayList<Long>();
 
@@ -220,7 +225,7 @@ public class AssetUtil {
 
 	public static long[][] filterTagIdsArray(
 			PermissionChecker permissionChecker, long[][] tagIdsArray)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		List<long[]> viewableTagIdsArray = new ArrayList<long[]>();
 
@@ -246,10 +251,50 @@ public class AssetUtil {
 			new long[viewableTagIdsArray.size()][]);
 	}
 
+	public static List<AssetVocabulary> filterVocabularies(
+		List<AssetVocabulary> vocabularies, String className,
+		final long classTypePK) {
+
+		final long classNameId = PortalUtil.getClassNameId(className);
+
+		PredicateFilter<AssetVocabulary> predicateFilter =
+			new PredicateFilter<AssetVocabulary>() {
+
+				@Override
+				public boolean filter(AssetVocabulary assetVocabulary) {
+					return
+						assetVocabulary.isAssociatedToClassNameIdAndClassTypePK(
+							classNameId, classTypePK);
+				}
+
+			};
+
+		return ListUtil.filter(vocabularies, predicateFilter);
+	}
+
+	public static long[] filterVocabularyIds(
+			PermissionChecker permissionChecker, long[] vocabularyIds)
+		throws PortalException {
+
+		List<Long> viewableVocabularyIds = new ArrayList<Long>();
+
+		for (long vocabularyId : vocabularyIds) {
+			if (AssetVocabularyPermission.contains(
+					permissionChecker, vocabularyId, ActionKeys.VIEW)) {
+
+				viewableVocabularyIds.add(vocabularyId);
+			}
+		}
+
+		return ArrayUtil.toArray(
+			viewableVocabularyIds.toArray(
+				new Long[viewableVocabularyIds.size()]));
+	}
+
 	public static PortletURL getAddPortletURL(
 			LiferayPortletRequest liferayPortletRequest,
-			LiferayPortletResponse liferayPortletResponse, String className,
-			long classTypeId, long[] allAssetCategoryIds,
+			LiferayPortletResponse liferayPortletResponse, long groupId,
+			String className, long classTypeId, long[] allAssetCategoryIds,
 			String[] allAssetTagNames, String redirect)
 		throws Exception {
 
@@ -261,12 +306,12 @@ public class AssetUtil {
 			AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(
 				className);
 
-		if (assetRendererFactory == null) {
+		if ((assetRendererFactory == null) ||
+			!assetRendererFactory.hasAddPermission(
+				themeDisplay.getPermissionChecker(), groupId, classTypeId)) {
+
 			return null;
 		}
-
-		liferayPortletRequest.setAttribute(
-			WebKeys.ASSET_RENDERER_FACTORY_CLASS_TYPE_ID, classTypeId);
 
 		PortletURL addPortletURL = assetRendererFactory.getURLAdd(
 			liferayPortletRequest, liferayPortletResponse);
@@ -371,11 +416,36 @@ public class AssetUtil {
 		return addPortletURL;
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             #getAddPortletURL(LiferayPortletRequest,
+	 *             LiferayPortletResponse, long, String, long, long[], String[],
+	 *             String))}
+	 */
+	@Deprecated
+	public static PortletURL getAddPortletURL(
+			LiferayPortletRequest liferayPortletRequest,
+			LiferayPortletResponse liferayPortletResponse, String className,
+			long classTypeId, long[] allAssetCategoryIds,
+			String[] allAssetTagNames, String redirect)
+		throws Exception {
+
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)liferayPortletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+		return getAddPortletURL(
+			liferayPortletRequest, liferayPortletResponse,
+			themeDisplay.getScopeGroupId(), className, classTypeId,
+			allAssetCategoryIds, allAssetTagNames, redirect);
+	}
+
 	public static Map<String, PortletURL> getAddPortletURLs(
 			LiferayPortletRequest liferayPortletRequest,
-			LiferayPortletResponse liferayPortletResponse, long[] classNameIds,
-			long[] classTypeIds, long[] allAssetCategoryIds,
-			String[] allAssetTagNames, String redirect)
+			LiferayPortletResponse liferayPortletResponse, long groupId,
+			long[] classNameIds, long[] classTypeIds,
+			long[] allAssetCategoryIds, String[] allAssetTagNames,
+			String redirect)
 		throws Exception {
 
 		ThemeDisplay themeDisplay =
@@ -417,36 +487,41 @@ public class AssetUtil {
 				continue;
 			}
 
-			Map<Long, String> classTypes = assetRendererFactory.getClassTypes(
-				new long[] {
-					themeDisplay.getCompanyGroupId(),
-					themeDisplay.getScopeGroupId()
-				},
-				themeDisplay.getLocale());
+			ClassTypeReader classTypeReader =
+				assetRendererFactory.getClassTypeReader();
+
+			List<ClassType> classTypes =
+				classTypeReader.getAvailableClassTypes(
+					PortalUtil.getCurrentAndAncestorSiteGroupIds(
+						themeDisplay.getScopeGroupId()),
+					themeDisplay.getLocale());
 
 			if ((classTypeIds.length == 0) || classTypes.isEmpty()) {
 				PortletURL addPortletURL = getAddPortletURL(
-					liferayPortletRequest, liferayPortletResponse, className, 0,
-					allAssetCategoryIds, allAssetTagNames, redirect);
+					liferayPortletRequest, liferayPortletResponse, groupId,
+					className, 0, allAssetCategoryIds, allAssetTagNames,
+					redirect);
 
 				if (addPortletURL != null) {
 					addPortletURLs.put(className, addPortletURL);
 				}
 			}
 
-			for (long classTypeId : classTypes.keySet()) {
+			for (ClassType classType : classTypes) {
+				long classTypeId = classType.getClassTypeId();
+
 				if (ArrayUtil.contains(classTypeIds, classTypeId) ||
 					(classTypeIds.length == 0)) {
 
 					PortletURL addPortletURL = getAddPortletURL(
-						liferayPortletRequest, liferayPortletResponse,
+						liferayPortletRequest, liferayPortletResponse, groupId,
 						className, classTypeId, allAssetCategoryIds,
 						allAssetTagNames, redirect);
 
 					if (addPortletURL != null) {
 						String mesage =
 							className + CLASSNAME_SEPARATOR +
-								classTypes.get(classTypeId);
+								classType.getName();
 
 						addPortletURLs.put(mesage, addPortletURL);
 					}
@@ -455,6 +530,30 @@ public class AssetUtil {
 		}
 
 		return addPortletURLs;
+	}
+
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             #getAddPortletURLs(LiferayPortletRequest,
+	 *             LiferayPortletResponse, long, long[], long[], long[],
+	 *             String[], String)}
+	 */
+	@Deprecated
+	public static Map<String, PortletURL> getAddPortletURLs(
+			LiferayPortletRequest liferayPortletRequest,
+			LiferayPortletResponse liferayPortletResponse, long[] classNameIds,
+			long[] classTypeIds, long[] allAssetCategoryIds,
+			String[] allAssetTagNames, String redirect)
+		throws Exception {
+
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)liferayPortletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+		return getAddPortletURLs(
+			liferayPortletRequest, liferayPortletResponse,
+			themeDisplay.getScopeGroupId(), classNameIds, classTypeIds,
+			allAssetCategoryIds, allAssetTagNames, redirect);
 	}
 
 	public static List<AssetEntry> getAssetEntries(Hits hits) {
@@ -479,9 +578,7 @@ public class AssetUtil {
 		return assetEntries;
 	}
 
-	public static String getAssetKeywords(String className, long classPK)
-		throws SystemException {
-
+	public static String getAssetKeywords(String className, long classPK) {
 		List<AssetTag> tags = AssetTagLocalServiceUtil.getTags(
 			className, classPK);
 		List<AssetCategory> categories =
@@ -592,59 +689,40 @@ public class AssetUtil {
 			int start, int end)
 		throws Exception {
 
-		Indexer searcher = AssetSearcher.getInstance();
-
-		AssetSearcher assetSearcher = (AssetSearcher)searcher;
-
-		assetSearcher.setAssetEntryQuery(assetEntryQuery);
-
-		Layout layout = assetEntryQuery.getLayout();
-
-		if (layout != null) {
-			searchContext.setAttribute(Field.LAYOUT_UUID, layout.getUuid());
-		}
-
-		String ddmStructureFieldName = (String)assetEntryQuery.getAttribute(
-			"ddmStructureFieldName");
-		Serializable ddmStructureFieldValue = assetEntryQuery.getAttribute(
-			"ddmStructureFieldValue");
-
-		if (Validator.isNotNull(ddmStructureFieldName) &&
-			Validator.isNotNull(ddmStructureFieldValue)) {
-
-			searchContext.setAttribute(
-				"ddmStructureFieldName", ddmStructureFieldName);
-			searchContext.setAttribute(
-				"ddmStructureFieldValue", ddmStructureFieldValue);
-		}
-
-		String paginationType = GetterUtil.getString(
-			assetEntryQuery.getPaginationType(), "more");
-
-		if (!paginationType.equals("none") &&
-			!paginationType.equals("simple")) {
-
-			searchContext.setAttribute("paginationType", paginationType);
-		}
-
-		searchContext.setClassTypeIds(assetEntryQuery.getClassTypeIds());
-		searchContext.setEnd(end);
-		searchContext.setGroupIds(assetEntryQuery.getGroupIds());
-
-		if (Validator.isNotNull(assetEntryQuery.getKeywords())) {
-			searchContext.setLike(true);
-		}
-
-		searchContext.setSorts(
-			getSorts(assetEntryQuery, searchContext.getLocale()));
-		searchContext.setStart(start);
+		AssetSearcher assetSearcher = getAssetSearcher(
+			searchContext, assetEntryQuery, start, end);
 
 		return assetSearcher.search(searchContext);
 	}
 
+	public static BaseModelSearchResult<AssetEntry> searchAssetEntries(
+			HttpServletRequest request, AssetEntryQuery assetEntryQuery,
+			int start, int end)
+		throws Exception {
+
+		SearchContext searchContext = SearchContextFactory.getInstance(request);
+
+		return searchAssetEntries(searchContext, assetEntryQuery, start, end);
+	}
+
+	public static BaseModelSearchResult<AssetEntry> searchAssetEntries(
+			SearchContext searchContext, AssetEntryQuery assetEntryQuery,
+			int start, int end)
+		throws Exception {
+
+		AssetSearcher assetSearcher = getAssetSearcher(
+			searchContext, assetEntryQuery, start, end);
+
+		Hits hits = assetSearcher.search(searchContext);
+
+		List<AssetEntry> assetEntries = getAssetEntries(hits);
+
+		return new BaseModelSearchResult<AssetEntry>(
+			assetEntries, hits.getLength());
+	}
+
 	public static String substituteCategoryPropertyVariables(
-			long groupId, long categoryId, String s)
-		throws SystemException {
+		long groupId, long categoryId, String s) {
 
 		String result = s;
 
@@ -671,7 +749,7 @@ public class AssetUtil {
 
 	public static String substituteTagPropertyVariables(
 			long groupId, String tagName, String s)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		String result = s;
 
@@ -720,6 +798,61 @@ public class AssetUtil {
 		}
 
 		return new String(textCharArray);
+	}
+
+	protected static AssetSearcher getAssetSearcher(
+			SearchContext searchContext, AssetEntryQuery assetEntryQuery,
+			int start, int end)
+		throws Exception {
+
+		Indexer searcher = AssetSearcher.getInstance();
+
+		AssetSearcher assetSearcher = (AssetSearcher)searcher;
+
+		assetSearcher.setAssetEntryQuery(assetEntryQuery);
+
+		Layout layout = assetEntryQuery.getLayout();
+
+		if (layout != null) {
+			searchContext.setAttribute(Field.LAYOUT_UUID, layout.getUuid());
+		}
+
+		String ddmStructureFieldName = (String)assetEntryQuery.getAttribute(
+			"ddmStructureFieldName");
+		Serializable ddmStructureFieldValue = assetEntryQuery.getAttribute(
+			"ddmStructureFieldValue");
+
+		if (Validator.isNotNull(ddmStructureFieldName) &&
+			Validator.isNotNull(ddmStructureFieldValue)) {
+
+			searchContext.setAttribute(
+				"ddmStructureFieldName", ddmStructureFieldName);
+			searchContext.setAttribute(
+				"ddmStructureFieldValue", ddmStructureFieldValue);
+		}
+
+		String paginationType = GetterUtil.getString(
+			assetEntryQuery.getPaginationType(), "more");
+
+		if (!paginationType.equals("none") &&
+			!paginationType.equals("simple")) {
+
+			searchContext.setAttribute("paginationType", paginationType);
+		}
+
+		searchContext.setClassTypeIds(assetEntryQuery.getClassTypeIds());
+		searchContext.setEnd(end);
+		searchContext.setGroupIds(assetEntryQuery.getGroupIds());
+
+		if (Validator.isNotNull(assetEntryQuery.getKeywords())) {
+			searchContext.setLike(true);
+		}
+
+		searchContext.setSorts(
+			getSorts(assetEntryQuery, searchContext.getLocale()));
+		searchContext.setStart(start);
+
+		return assetSearcher;
 	}
 
 	protected static Sort getSort(

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -29,18 +29,18 @@ long[] groupIdsArray = (long[])objArray[7];
 List groupNames = (List)objArray[8];
 %>
 
-<aui:input name='<%= "groupIds" + target %>' type="hidden" value="<%= StringUtil.merge(groupIdsArray) %>" />
-<aui:input name='<%= "groupNames" + target %>' type="hidden" value='<%= StringUtil.merge(groupNames, "@@") %>' />
+<aui:input name='<%= "groupIds" + HtmlUtil.escapeAttribute(target) %>' type="hidden" value="<%= StringUtil.merge(groupIdsArray) %>" />
+<aui:input name='<%= "groupNames" + HtmlUtil.escapeAttribute(target) %>' type="hidden" value='<%= StringUtil.merge(groupNames, "@@") %>' />
 
-<div id="<portlet:namespace />groupDiv<%= target %>">
-	<span class="permission-scopes" id="<portlet:namespace />groupHTML<%= target %>">
+<div id="<portlet:namespace />groupDiv<%= HtmlUtil.escapeAttribute(target) %>">
+	<span class="permission-scopes" id="<portlet:namespace />groupHTML<%= HtmlUtil.escapeAttribute(target) %>">
 
 		<%
 		if (supportsFilterByGroup && !groups.isEmpty()) {
 			for (int i = 0; i < groups.size(); i++) {
 				Group group = (Group)groups.get(i);
 
-				String taglibHREF = "javascript:" + liferayPortletResponse.getNamespace() + "removeGroup(" + i + ", '" + target + "');";
+				String taglibHREF = "javascript:" + liferayPortletResponse.getNamespace() + "removeGroup(" + i + ", '" + HtmlUtil.escapeJS(target) + "');";
 		%>
 
 				<span class="lfr-token">
@@ -55,7 +55,7 @@ List groupNames = (List)objArray[8];
 		else if (role.getType() == RoleConstants.TYPE_REGULAR) {
 		%>
 
-			<%= LanguageUtil.get(pageContext, "all-sites") %>
+			<%= LanguageUtil.get(request, "all-sites") %>
 
 		<%
 		}
@@ -68,23 +68,16 @@ List groupNames = (List)objArray[8];
 	%>
 
 	<c:if test="<%= supportsFilterByGroup %>">
-		<portlet:renderURL var="selectCommunityURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
-			<portlet:param name="struts_action" value="/roles_admin/select_site" />
-			<portlet:param name="includeCompany" value="<%= Boolean.TRUE.toString() %>" />
-			<portlet:param name="includeUserPersonalSite" value="<%= Boolean.TRUE.toString() %>" />
-			<portlet:param name="target" value="<%= target %>" />
-		</portlet:renderURL>
-
 		<liferay-ui:icon
-			id="<%= targetId %>"
-			image="configuration"
+			iconCssClass="icon-cog"
+			id="<%= HtmlUtil.escapeAttribute(targetId) %>"
 			label="<%= true %>"
 			message="change"
 			url="javascript:;"
 		/>
 
 		<aui:script use="aui-base">
-			A.one('#<portlet:namespace /><%= targetId %>').on(
+			A.one('#<portlet:namespace /><%= HtmlUtil.escapeJS(targetId) %>').on(
 				'click',
 				function(event) {
 					Liferay.Util.selectEntity(
@@ -94,8 +87,16 @@ List groupNames = (List)objArray[8];
 								modal: true,
 								width: 600
 							},
-							id: '<portlet:namespace />selectGroup<%= targetId %>',
+							id: '<portlet:namespace />selectGroup<%= HtmlUtil.escapeJS(targetId) %>',
 							title: '<liferay-ui:message arguments="site" key="select-x" />',
+
+							<portlet:renderURL var="selectCommunityURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
+								<portlet:param name="struts_action" value="/roles_admin/select_site" />
+								<portlet:param name="includeCompany" value="<%= Boolean.TRUE.toString() %>" />
+								<portlet:param name="includeUserPersonalSite" value="<%= Boolean.TRUE.toString() %>" />
+								<portlet:param name="target" value="<%= target %>" />
+							</portlet:renderURL>
+
 							uri: '<%= selectCommunityURL.toString() %>'
 						}
 					);

@@ -55,11 +55,19 @@
 		padding: 2px;
 	}
 
+	&.panel-default .panel-heading {
+		border-bottom-width: 0;
+	}
+
 	.lfr-panel-content .undo-queue {
 		border-left-width: 0;
 		border-right-width: 0;
 		border-top-width: 0;
 		margin: -0.5em 0 10px;
+	}
+
+	.toggler-header {
+		cursor: pointer;
 	}
 }
 
@@ -112,7 +120,7 @@
 }
 
 .lfr-panel-container, .lfr-floating-container {
-	background: #fff;
+	background: #FFF;
 }
 
 .lfr-panel-titlebar {
@@ -144,13 +152,13 @@
 	}
 
 	&.lfr-extended .lfr-panel-titlebar {
-		background: #d6d6d6 url(@theme_image_path@/application/panel_header.png) repeat-x 0 0;
-		border-bottom-color: #cdcdcd;
+		background: #D6D6D6 url(@theme_image_path@/application/panel_header.png) repeat-x 0 0;
+		border-bottom-color: #CDCDCD;
 	}
 }
 
 .lfr-panel-container .lfr-extended.lfr-collapsible .lfr-panel-titlebar {
-	border-top-color: #cecece;
+	border-top-color: #CECECE;
 }
 
 .js {

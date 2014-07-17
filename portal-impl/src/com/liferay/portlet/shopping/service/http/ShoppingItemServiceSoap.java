@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -135,7 +135,7 @@ public class ShoppingItemServiceSoap {
 
 	public static com.liferay.portlet.shopping.model.ShoppingItemSoap[] getItems(
 		long groupId, long categoryId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc)
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.shopping.model.ShoppingItem> obc)
 		throws RemoteException {
 		try {
 			java.util.List<com.liferay.portlet.shopping.model.ShoppingItem> returnValue =
@@ -167,7 +167,8 @@ public class ShoppingItemServiceSoap {
 	}
 
 	public static com.liferay.portlet.shopping.model.ShoppingItemSoap[] getItemsPrevAndNext(
-		long itemId, com.liferay.portal.kernel.util.OrderByComparator obc)
+		long itemId,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.shopping.model.ShoppingItem> obc)
 		throws RemoteException {
 		try {
 			com.liferay.portlet.shopping.model.ShoppingItem[] returnValue = ShoppingItemServiceUtil.getItemsPrevAndNext(itemId,

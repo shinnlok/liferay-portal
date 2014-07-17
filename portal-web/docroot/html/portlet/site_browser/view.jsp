@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -63,7 +63,7 @@ portletURL.setParameter("target", target);
 		<c:if test='<%= !type.equals("parent-sites") || (types.length > 1) %>'>
 			<aui:nav-bar>
 				<c:if test="<%= types.length > 1 %>">
-					<aui:nav>
+					<aui:nav cssClass="navbar-nav" searchContainer="<%= searchContainer %>">
 
 						<%
 						for (String curType : types) {
@@ -80,7 +80,7 @@ portletURL.setParameter("target", target);
 				</c:if>
 
 				<c:if test='<%= !type.equals("parent-sites") %>'>
-					<aui:nav-bar-search cssClass="pull-right" file="/html/portlet/users_admin/group_search.jsp" searchContainer="<%= searchContainer %>" />
+					<aui:nav-bar-search cssClass="navbar-search-advanced" file="/html/portlet/users_admin/group_search.jsp" searchContainer="<%= searchContainer %>" />
 				</c:if>
 			</aui:nav-bar>
 		</c:if>
@@ -203,7 +203,7 @@ portletURL.setParameter("target", target);
 
 			<liferay-ui:search-container-column-text
 				name="type"
-				value="<%= LanguageUtil.get(pageContext, group.getScopeLabel(themeDisplay)) %>"
+				value="<%= LanguageUtil.get(request, group.getScopeLabel(themeDisplay)) %>"
 			/>
 
 			<liferay-ui:search-container-column-text>
@@ -211,9 +211,9 @@ portletURL.setParameter("target", target);
 				<%
 				Map<String, Object> data = new HashMap<String, Object>();
 
-				data.put("groupdescriptivename", HtmlUtil.escape(group.getDescriptiveName(locale)));
+				data.put("groupdescriptivename", group.getDescriptiveName(locale));
 				data.put("groupid", group.getGroupId());
-				data.put("scopeid", HtmlUtil.escape(AssetPublisherUtil.getScopeId(group, scopeGroupId)));
+				data.put("scopeid", AssetPublisherUtil.getScopeId(group, scopeGroupId));
 				data.put("target", target);
 				%>
 
@@ -241,17 +241,5 @@ private List<Group> _filterGroups(List<Group> groups, String filter) throws Exce
 %>
 
 <aui:script use="aui-base">
-	var Util = Liferay.Util;
-
-	A.one('#<portlet:namespace />selectSiteFm').delegate(
-		'click',
-		function(event) {
-			var result = Util.getAttributes(event.currentTarget, 'data-');
-
-			Util.getOpener().Liferay.fire('<%= HtmlUtil.escapeJS(eventName) %>', result);
-
-			Util.getWindow().hide();
-		},
-		'.selector-button'
-	);
+	Liferay.Util.selectEntityHandler('#<portlet:namespace />selectSiteFm', '<%= HtmlUtil.escapeJS(eventName) %>');
 </aui:script>

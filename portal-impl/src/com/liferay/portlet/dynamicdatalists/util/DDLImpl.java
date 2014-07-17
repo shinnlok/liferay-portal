@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,19 +28,16 @@ import com.liferay.portal.kernel.security.pacl.DoPrivileged;
 import com.liferay.portal.kernel.template.TemplateConstants;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.model.Group;
-import com.liferay.portal.model.PortletConstants;
-import com.liferay.portal.service.GroupLocalServiceUtil;
-import com.liferay.portal.service.PortletPreferencesLocalServiceUtil;
+import com.liferay.portal.service.LayoutServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.templateparser.Transformer;
 import com.liferay.portal.theme.ThemeDisplay;
-import com.liferay.portal.util.PortletKeys;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.dynamicdatalists.NoSuchRecordException;
 import com.liferay.portlet.dynamicdatalists.model.DDLRecord;
@@ -50,11 +47,12 @@ import com.liferay.portlet.dynamicdatalists.model.DDLRecordVersion;
 import com.liferay.portlet.dynamicdatalists.service.DDLRecordLocalServiceUtil;
 import com.liferay.portlet.dynamicdatalists.service.DDLRecordServiceUtil;
 import com.liferay.portlet.dynamicdatalists.service.DDLRecordSetLocalServiceUtil;
+import com.liferay.portlet.dynamicdatamapping.model.DDMFormField;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.model.DDMTemplate;
+import com.liferay.portlet.dynamicdatamapping.model.LocalizedValue;
 import com.liferay.portlet.dynamicdatamapping.service.DDMTemplateLocalServiceUtil;
 import com.liferay.portlet.dynamicdatamapping.storage.Field;
-import com.liferay.portlet.dynamicdatamapping.storage.FieldConstants;
 import com.liferay.portlet.dynamicdatamapping.storage.Fields;
 import com.liferay.portlet.dynamicdatamapping.storage.StorageEngineUtil;
 import com.liferay.portlet.dynamicdatamapping.util.DDMImpl;
@@ -64,6 +62,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.portlet.PortletPreferences;
@@ -134,6 +133,27 @@ public class DDLImpl implements DDL {
 
 				jsonObject.put(fieldName, fieldValueJSONObject.toString());
 			}
+			else if (fieldType.equals(DDMImpl.TYPE_DDM_LINK_TO_PAGE) &&
+					 Validator.isNotNull(fieldValue)) {
+
+				JSONObject fieldValueJSONObject =
+					JSONFactoryUtil.createJSONObject(
+						String.valueOf(fieldValue));
+
+				long groupId = fieldValueJSONObject.getLong("groupId");
+				boolean privateLayout = fieldValueJSONObject.getBoolean(
+					"privateLayout");
+				long layoutId = fieldValueJSONObject.getLong("layoutId");
+				Locale locale = LocaleThreadLocal.getThemeDisplayLocale();
+
+				String layoutName = getLayoutName(
+					groupId, privateLayout, layoutId,
+					LanguageUtil.getLanguageId(locale));
+
+				fieldValueJSONObject.put("name", layoutName);
+
+				jsonObject.put(fieldName, fieldValueJSONObject.toString());
+			}
 			else if ((fieldType.equals(DDMImpl.TYPE_RADIO) ||
 					  fieldType.equals(DDMImpl.TYPE_SELECT)) &&
 					 Validator.isNotNull(fieldValue)) {
@@ -198,11 +218,13 @@ public class DDLImpl implements DDL {
 
 		DDMStructure ddmStructure = recordSet.getDDMStructure();
 
-		Map<String, Map<String, String>> fieldsMap =
-			ddmStructure.getFieldsMap();
+		Locale locale = LocaleUtil.fromLanguageId(
+			ddmStructure.getDefaultLanguageId());
 
-		for (Map<String, String> fields : fieldsMap.values()) {
-			String name = fields.get(FieldConstants.NAME);
+		List<DDMFormField> ddmFormFields = ddmStructure.getDDMFormFields(false);
+
+		for (DDMFormField ddmFormField : ddmFormFields) {
+			String name = ddmFormField.getName();
 
 			if (ddmStructure.isFieldPrivate(name)) {
 				continue;
@@ -210,32 +232,27 @@ public class DDLImpl implements DDL {
 
 			JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
-			String dataType = fields.get(FieldConstants.DATA_TYPE);
+			String dataType = ddmFormField.getDataType();
 
 			jsonObject.put("dataType", dataType);
 
-			boolean editable = GetterUtil.getBoolean(
-				fields.get(FieldConstants.EDITABLE), true);
+			boolean readOnly = ddmFormField.isReadOnly();
 
-			jsonObject.put("editable", editable);
+			jsonObject.put("editable", !readOnly);
 
-			String label = fields.get(FieldConstants.LABEL);
+			LocalizedValue label = ddmFormField.getLabel();
 
-			jsonObject.put("label", label);
+			jsonObject.put("label", label.getValue(locale));
 
 			jsonObject.put("name", name);
 
-			boolean required = GetterUtil.getBoolean(
-				fields.get(FieldConstants.REQUIRED));
+			boolean required = ddmFormField.isRequired();
 
 			jsonObject.put("required", required);
 
-			boolean sortable = GetterUtil.getBoolean(
-				fields.get(FieldConstants.SORTABLE), true);
+			jsonObject.put("sortable", true);
 
-			jsonObject.put("sortable", sortable);
-
-			String type = fields.get(FieldConstants.TYPE);
+			String type = ddmFormField.getType();
 
 			jsonObject.put("type", type);
 
@@ -324,25 +341,28 @@ public class DDLImpl implements DDL {
 			ddmTemplate.getLanguage());
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	@Override
 	public boolean isEditable(
 			HttpServletRequest request, String portletId, long groupId)
 		throws Exception {
 
-		boolean defaultValue = ParamUtil.getBoolean(request, "editable", true);
-
-		return isEditable(portletId, groupId, defaultValue);
+		return true;
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	@Override
 	public boolean isEditable(
 			PortletPreferences preferences, String portletId, long groupId)
 		throws Exception {
 
-		boolean defaultValue = GetterUtil.getBoolean(
-			preferences.getValue("editable", null), true);
-
-		return isEditable(portletId, groupId, defaultValue);
+		return true;
 	}
 
 	@Override
@@ -352,17 +372,6 @@ public class DDLImpl implements DDL {
 		throws Exception {
 
 		DDLRecord record = DDLRecordLocalServiceUtil.fetchRecord(recordId);
-
-		PortletPreferences preferences =
-			PortletPreferencesLocalServiceUtil.getPreferences(
-				serviceContext.getPortletPreferencesIds());
-
-		if (!isEditable(
-				preferences, serviceContext.getPortletId(),
-				serviceContext.getScopeGroupId())) {
-
-			return record;
-		}
 
 		boolean majorVersion = ParamUtil.getBoolean(
 			serviceContext, "majorVersion");
@@ -433,23 +442,18 @@ public class DDLImpl implements DDL {
 		}
 	}
 
-	protected boolean isEditable(
-			String portletId, long groupId, boolean defaultValue)
-		throws Exception {
+	protected String getLayoutName(
+		long groupId, boolean privateLayout, long layoutId, String languageId) {
 
-		String rootPortletId = PortletConstants.getRootPortletId(portletId);
-
-		if (rootPortletId.equals(PortletKeys.DYNAMIC_DATA_LISTS)) {
-			return true;
+		try {
+			return LayoutServiceUtil.getLayoutName(
+				groupId, privateLayout, layoutId, languageId);
 		}
-
-		Group group = GroupLocalServiceUtil.fetchGroup(groupId);
-
-		if ((group == null) || group.isInStagingPortlet(portletId)) {
-			return false;
+		catch (Exception e) {
+			return LanguageUtil.format(
+				LocaleUtil.getSiteDefault(), "is-temporarily-unavailable",
+				"content");
 		}
-
-		return defaultValue;
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(DDLImpl.class);

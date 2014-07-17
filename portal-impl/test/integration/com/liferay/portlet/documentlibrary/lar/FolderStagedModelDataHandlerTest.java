@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,47 +17,46 @@ package com.liferay.portlet.documentlibrary.lar;
 import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
-import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.lar.BaseStagedModelDataHandlerTestCase;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.StagedModel;
 import com.liferay.portal.service.CompanyLocalServiceUtil;
-import com.liferay.portal.service.ServiceTestUtil;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.test.MainServletExecutionTestListener;
-import com.liferay.portal.test.TransactionalExecutionTestListener;
+import com.liferay.portal.test.TransactionalTestRule;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryType;
+import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryTypeLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFolderLocalServiceUtil;
-import com.liferay.portlet.documentlibrary.util.DLAppTestUtil;
+import com.liferay.portlet.documentlibrary.util.test.DLAppTestUtil;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalServiceUtil;
-import com.liferay.portlet.dynamicdatamapping.util.DDMStructureTestUtil;
+import com.liferay.portlet.dynamicdatamapping.util.test.DDMStructureTestUtil;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
  * @author Mate Thurzo
  */
-@ExecutionTestListeners(
-	listeners = {
-		MainServletExecutionTestListener.class,
-		TransactionalExecutionTestListener.class
-	})
+@ExecutionTestListeners(listeners = {MainServletExecutionTestListener.class})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
 public class FolderStagedModelDataHandlerTest
 	extends BaseStagedModelDataHandlerTestCase {
 
+	@ClassRule
+	public static TransactionalTestRule transactionalTestRule =
+		new TransactionalTestRule();
+
 	@Test
-	@Transactional
 	public void testCompanyScopeDependencies() throws Exception {
 		initExport();
 
@@ -107,10 +106,10 @@ public class FolderStagedModelDataHandlerTest
 
 		Folder folder = DLAppTestUtil.addFolder(
 			stagingGroup.getGroupId(),
-			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
-			ServiceTestUtil.randomString());
+			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
 
-		addDependentStagedModel(dependentStagedModelsMap, Folder.class, folder);
+		addDependentStagedModel(
+			dependentStagedModelsMap, DLFolder.class, folder);
 
 		return dependentStagedModelsMap;
 	}
@@ -136,10 +135,10 @@ public class FolderStagedModelDataHandlerTest
 			dependentStagedModelsMap, DLFileEntryType.class, dlFileEntryType);
 
 		Folder folder = DLAppTestUtil.addFolder(
-			group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
-			ServiceTestUtil.randomString());
+			group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
 
-		addDependentStagedModel(dependentStagedModelsMap, Folder.class, folder);
+		addDependentStagedModel(
+			dependentStagedModelsMap, DLFolder.class, folder);
 
 		return dependentStagedModelsMap;
 	}
@@ -151,7 +150,7 @@ public class FolderStagedModelDataHandlerTest
 		throws Exception {
 
 		List<StagedModel> folderDependentStagedModels =
-			dependentStagedModelsMap.get(Folder.class.getSimpleName());
+			dependentStagedModelsMap.get(DLFolder.class.getSimpleName());
 
 		Folder folder = (Folder)folderDependentStagedModels.get(0);
 
@@ -162,8 +161,7 @@ public class FolderStagedModelDataHandlerTest
 			(DLFileEntryType)fileEntryTypeDependentStagedModels.get(0);
 
 		folder = DLAppTestUtil.addFolder(
-			group.getGroupId(), folder.getFolderId(),
-			ServiceTestUtil.randomString());
+			group.getGroupId(), folder.getFolderId());
 
 		DLAppTestUtil.updateFolderFileEntryType(
 			folder, dlFileEntryType.getFileEntryTypeId());
@@ -184,7 +182,7 @@ public class FolderStagedModelDataHandlerTest
 
 	@Override
 	protected Class<? extends StagedModel> getStagedModelClass() {
-		return Folder.class;
+		return DLFolder.class;
 	}
 
 	protected void validateCompanyDependenciesImport(
@@ -249,7 +247,7 @@ public class FolderStagedModelDataHandlerTest
 			dlFileEntryType.getUuid(), group.getGroupId());
 
 		List<StagedModel> folderDependentStagedModels =
-			dependentStagedModelsMap.get(Folder.class.getSimpleName());
+			dependentStagedModelsMap.get(DLFolder.class.getSimpleName());
 
 		Assert.assertEquals(1, folderDependentStagedModels.size());
 

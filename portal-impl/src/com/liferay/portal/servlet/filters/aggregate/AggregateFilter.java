@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -35,11 +35,11 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.minifier.MinifierUtil;
 import com.liferay.portal.servlet.filters.IgnoreModuleRequestFilter;
 import com.liferay.portal.servlet.filters.dynamiccss.DynamicCSSUtil;
 import com.liferay.portal.util.AggregateUtil;
 import com.liferay.portal.util.JavaScriptBundleUtil;
-import com.liferay.portal.util.MinifierUtil;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
 
@@ -68,8 +68,7 @@ public class AggregateFilter extends IgnoreModuleRequestFilter {
 	/**
 	 * @see DynamicCSSUtil#propagateQueryString(String, String)
 	 */
-	public static String aggregateCss(
-			AggregateContext aggregateContext, String content)
+	public static String aggregateCss(ServletPaths servletPaths, String content)
 		throws IOException {
 
 		StringBundler sb = new StringBundler();
@@ -125,46 +124,60 @@ public class AggregateFilter extends IgnoreModuleRequestFilter {
 						importX + _CSS_IMPORT_BEGIN.length(), importY);
 				}
 
-				String importContent = aggregateContext.getContent(
-					importFileName);
+				String importContent = null;
 
-				if (importContent == null) {
-					if (_log.isWarnEnabled()) {
-						_log.warn(
-							"File " +
-								aggregateContext.getFullPath(importFileName) +
-									" does not exist");
+				if (Validator.isUrl(importFileName)) {
+					URL url = new URL(importFileName);
+
+					URLConnection urlConnection = url.openConnection();
+
+					importContent = StringUtil.read(
+						urlConnection.getInputStream());
+				}
+				else {
+					ServletPaths importFileServletPaths = servletPaths.down(
+						importFileName);
+
+					importContent = importFileServletPaths.getContent();
+
+					if (importContent == null) {
+						if (_log.isWarnEnabled()) {
+							_log.warn(
+								"File " +
+									importFileServletPaths.getResourcePath() +
+										" does not exist");
+						}
+
+						importContent = StringPool.BLANK;
 					}
 
-					importContent = StringPool.BLANK;
+					String importDirName = StringPool.BLANK;
+
+					int slashPos = importFileName.lastIndexOf(CharPool.SLASH);
+
+					if (slashPos != -1) {
+						importDirName = importFileName.substring(
+							0, slashPos + 1);
+					}
+
+					ServletPaths importDirServletPaths = servletPaths.down(
+						importDirName);
+
+					importContent = aggregateCss(
+						importDirServletPaths, importContent);
+
+					// LEP-7540
+
+					String baseURL = _BASE_URL.concat(
+						importDirServletPaths.getResourcePath());
+
+					if (!baseURL.endsWith(StringPool.SLASH)) {
+						baseURL += StringPool.SLASH;
+					}
+
+					importContent = AggregateUtil.updateRelativeURLs(
+						importContent, baseURL);
 				}
-
-				String importDirName = StringPool.BLANK;
-
-				int slashPos = importFileName.lastIndexOf(CharPool.SLASH);
-
-				if (slashPos != -1) {
-					importDirName = importFileName.substring(0, slashPos + 1);
-				}
-
-				aggregateContext.pushPath(importDirName);
-
-				importContent = aggregateCss(aggregateContext, importContent);
-
-				if (Validator.isNotNull(importDirName)) {
-					aggregateContext.popPath();
-				}
-
-				// LEP-7540
-
-				String baseURL = _BASE_URL;
-
-				baseURL = baseURL.concat(
-					aggregateContext.getResourcePath(StringPool.BLANK));
-				baseURL = baseURL.concat(importDirName);
-
-				importContent = AggregateUtil.updateRelativeURLs(
-					importContent, baseURL);
 
 				if (Validator.isNotNull(mediaQuery)) {
 					sb.append(_CSS_MEDIA_QUERY);
@@ -188,12 +201,14 @@ public class AggregateFilter extends IgnoreModuleRequestFilter {
 	}
 
 	public static String aggregateJavaScript(
-		AggregateContext aggregateContext, String[] fileNames) {
+		ServletPaths servletPaths, String[] fileNames) {
 
 		StringBundler sb = new StringBundler(fileNames.length * 2);
 
 		for (String fileName : fileNames) {
-			String content = aggregateContext.getContent(fileName);
+			ServletPaths fileServletPaths = servletPaths.down(fileName);
+
+			String content = fileServletPaths.getContent();
 
 			if (Validator.isNull(content)) {
 				continue;
@@ -203,7 +218,8 @@ public class AggregateFilter extends IgnoreModuleRequestFilter {
 			sb.append(StringPool.NEW_LINE);
 		}
 
-		return getJavaScriptContent(sb.toString());
+		return getJavaScriptContent(
+			StringUtil.merge(fileNames, "+"), sb.toString());
 	}
 
 	@Override
@@ -220,8 +236,10 @@ public class AggregateFilter extends IgnoreModuleRequestFilter {
 		_tempDir.mkdirs();
 	}
 
-	protected static String getJavaScriptContent(String content) {
-		return MinifierUtil.minifyJavaScript(content);
+	protected static String getJavaScriptContent(
+		String resourceName, String content) {
+
+		return MinifierUtil.minifyJavaScript(resourceName, content);
 	}
 
 	protected Object getBundleContent(
@@ -294,12 +312,8 @@ public class AggregateFilter extends IgnoreModuleRequestFilter {
 			content = StringPool.BLANK;
 		}
 		else {
-			AggregateContext aggregateContext = new ServletAggregateContext(
-				_servletContext, StringPool.SLASH);
-
-			aggregateContext.pushPath(bundleDirName);
-
-			content = aggregateJavaScript(aggregateContext, fileNames);
+			content = aggregateJavaScript(
+				new ServletPaths(_servletContext, bundleDirName), fileNames);
 		}
 
 		response.setContentType(ContentTypes.TEXT_JAVASCRIPT);
@@ -428,7 +442,7 @@ public class AggregateFilter extends IgnoreModuleRequestFilter {
 					request, response, resourcePath, content);
 			}
 			else if (minifierType.equals("js")) {
-				content = getJavaScriptContent(content);
+				content = getJavaScriptContent(resourcePath, content);
 			}
 
 			FileUtil.write(
@@ -485,7 +499,8 @@ public class AggregateFilter extends IgnoreModuleRequestFilter {
 		String content = StringUtil.read(urlConnection.getInputStream());
 
 		content = aggregateCss(
-			new ServletAggregateContext(_servletContext, resourcePath),
+			new ServletPaths(
+				_servletContext, ServletPaths.getParentPath(resourcePath)),
 			content);
 
 		return getCssContent(request, response, resourcePath, content);
@@ -496,7 +511,7 @@ public class AggregateFilter extends IgnoreModuleRequestFilter {
 
 		String content = StringUtil.read(urlConnection.getInputStream());
 
-		return getJavaScriptContent(content);
+		return getJavaScriptContent(resourceURL.toString(), content);
 	}
 
 	@Override

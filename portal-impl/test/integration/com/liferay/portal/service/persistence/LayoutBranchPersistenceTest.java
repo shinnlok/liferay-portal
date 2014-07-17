@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,30 +22,36 @@ import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.test.ExecutionTestListeners;
+import com.liferay.portal.kernel.template.TemplateException;
+import com.liferay.portal.kernel.template.TemplateManagerUtil;
 import com.liferay.portal.kernel.util.IntegerWrapper;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.LayoutBranch;
+import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.impl.LayoutBranchModelImpl;
-import com.liferay.portal.service.ServiceTestUtil;
-import com.liferay.portal.service.persistence.BasePersistence;
-import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
+import com.liferay.portal.service.LayoutBranchLocalServiceUtil;
 import com.liferay.portal.test.LiferayPersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.test.persistence.TransactionalPersistenceAdvice;
+import com.liferay.portal.test.TransactionalTestRule;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.portal.util.test.RandomTestUtil;
 
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 
 import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -53,36 +59,49 @@ import java.util.Set;
 /**
  * @author Brian Wing Shun Chan
  */
-@ExecutionTestListeners(listeners =  {
-	PersistenceExecutionTestListener.class})
 @RunWith(LiferayPersistenceIntegrationJUnitTestRunner.class)
 public class LayoutBranchPersistenceTest {
+	@BeforeClass
+	public static void setupClass() throws TemplateException {
+		TemplateManagerUtil.init();
+
+		PropsValues.SPRING_HIBERNATE_SESSION_DELEGATED = false;
+	}
+
+	public static void tearDownClass() {
+		PropsValues.SPRING_HIBERNATE_SESSION_DELEGATED = true;
+	}
+
+	@ClassRule
+	public static TransactionalTestRule transactionalTestRule = new TransactionalTestRule();
+
+	@Before
+	public void setUp() {
+		_modelListeners = _persistence.getListeners();
+
+		for (ModelListener<LayoutBranch> modelListener : _modelListeners) {
+			_persistence.unregisterListener(modelListener);
+		}
+	}
+
 	@After
 	public void tearDown() throws Exception {
-		Map<Serializable, BasePersistence<?>> basePersistences = _transactionalPersistenceAdvice.getBasePersistences();
+		Iterator<LayoutBranch> iterator = _layoutBranchs.iterator();
 
-		Set<Serializable> primaryKeys = basePersistences.keySet();
+		while (iterator.hasNext()) {
+			_persistence.remove(iterator.next());
 
-		for (Serializable primaryKey : primaryKeys) {
-			BasePersistence<?> basePersistence = basePersistences.get(primaryKey);
-
-			try {
-				basePersistence.remove(primaryKey);
-			}
-			catch (Exception e) {
-				if (_log.isDebugEnabled()) {
-					_log.debug("The model with primary key " + primaryKey +
-						" was already deleted");
-				}
-			}
+			iterator.remove();
 		}
 
-		_transactionalPersistenceAdvice.reset();
+		for (ModelListener<LayoutBranch> modelListener : _modelListeners) {
+			_persistence.registerListener(modelListener);
+		}
 	}
 
 	@Test
 	public void testCreate() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		LayoutBranch layoutBranch = _persistence.create(pk);
 
@@ -109,32 +128,36 @@ public class LayoutBranchPersistenceTest {
 
 	@Test
 	public void testUpdateExisting() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		LayoutBranch newLayoutBranch = _persistence.create(pk);
 
-		newLayoutBranch.setGroupId(ServiceTestUtil.nextLong());
+		newLayoutBranch.setMvccVersion(RandomTestUtil.nextLong());
 
-		newLayoutBranch.setCompanyId(ServiceTestUtil.nextLong());
+		newLayoutBranch.setGroupId(RandomTestUtil.nextLong());
 
-		newLayoutBranch.setUserId(ServiceTestUtil.nextLong());
+		newLayoutBranch.setCompanyId(RandomTestUtil.nextLong());
 
-		newLayoutBranch.setUserName(ServiceTestUtil.randomString());
+		newLayoutBranch.setUserId(RandomTestUtil.nextLong());
 
-		newLayoutBranch.setLayoutSetBranchId(ServiceTestUtil.nextLong());
+		newLayoutBranch.setUserName(RandomTestUtil.randomString());
 
-		newLayoutBranch.setPlid(ServiceTestUtil.nextLong());
+		newLayoutBranch.setLayoutSetBranchId(RandomTestUtil.nextLong());
 
-		newLayoutBranch.setName(ServiceTestUtil.randomString());
+		newLayoutBranch.setPlid(RandomTestUtil.nextLong());
 
-		newLayoutBranch.setDescription(ServiceTestUtil.randomString());
+		newLayoutBranch.setName(RandomTestUtil.randomString());
 
-		newLayoutBranch.setMaster(ServiceTestUtil.randomBoolean());
+		newLayoutBranch.setDescription(RandomTestUtil.randomString());
 
-		_persistence.update(newLayoutBranch);
+		newLayoutBranch.setMaster(RandomTestUtil.randomBoolean());
+
+		_layoutBranchs.add(_persistence.update(newLayoutBranch));
 
 		LayoutBranch existingLayoutBranch = _persistence.findByPrimaryKey(newLayoutBranch.getPrimaryKey());
 
+		Assert.assertEquals(existingLayoutBranch.getMvccVersion(),
+			newLayoutBranch.getMvccVersion());
 		Assert.assertEquals(existingLayoutBranch.getLayoutBranchId(),
 			newLayoutBranch.getLayoutBranchId());
 		Assert.assertEquals(existingLayoutBranch.getGroupId(),
@@ -158,6 +181,59 @@ public class LayoutBranchPersistenceTest {
 	}
 
 	@Test
+	public void testCountByLayoutSetBranchId() {
+		try {
+			_persistence.countByLayoutSetBranchId(RandomTestUtil.nextLong());
+
+			_persistence.countByLayoutSetBranchId(0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByL_P() {
+		try {
+			_persistence.countByL_P(RandomTestUtil.nextLong(),
+				RandomTestUtil.nextLong());
+
+			_persistence.countByL_P(0L, 0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByL_P_N() {
+		try {
+			_persistence.countByL_P_N(RandomTestUtil.nextLong(),
+				RandomTestUtil.nextLong(), StringPool.BLANK);
+
+			_persistence.countByL_P_N(0L, 0L, StringPool.NULL);
+
+			_persistence.countByL_P_N(0L, 0L, (String)null);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByL_P_M() {
+		try {
+			_persistence.countByL_P_M(RandomTestUtil.nextLong(),
+				RandomTestUtil.nextLong(), RandomTestUtil.randomBoolean());
+
+			_persistence.countByL_P_M(0L, 0L, RandomTestUtil.randomBoolean());
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
 	public void testFindByPrimaryKeyExisting() throws Exception {
 		LayoutBranch newLayoutBranch = addLayoutBranch();
 
@@ -168,7 +244,7 @@ public class LayoutBranchPersistenceTest {
 
 	@Test
 	public void testFindByPrimaryKeyMissing() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		try {
 			_persistence.findByPrimaryKey(pk);
@@ -191,11 +267,12 @@ public class LayoutBranchPersistenceTest {
 		}
 	}
 
-	protected OrderByComparator getOrderByComparator() {
+	protected OrderByComparator<LayoutBranch> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create("LayoutBranch",
-			"LayoutBranchId", true, "groupId", true, "companyId", true,
-			"userId", true, "userName", true, "layoutSetBranchId", true,
-			"plid", true, "name", true, "description", true, "master", true);
+			"mvccVersion", true, "LayoutBranchId", true, "groupId", true,
+			"companyId", true, "userId", true, "userName", true,
+			"layoutSetBranchId", true, "plid", true, "name", true,
+			"description", true, "master", true);
 	}
 
 	@Test
@@ -209,7 +286,7 @@ public class LayoutBranchPersistenceTest {
 
 	@Test
 	public void testFetchByPrimaryKeyMissing() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		LayoutBranch missingLayoutBranch = _persistence.fetchByPrimaryKey(pk);
 
@@ -217,19 +294,103 @@ public class LayoutBranchPersistenceTest {
 	}
 
 	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
+		throws Exception {
+		LayoutBranch newLayoutBranch1 = addLayoutBranch();
+		LayoutBranch newLayoutBranch2 = addLayoutBranch();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newLayoutBranch1.getPrimaryKey());
+		primaryKeys.add(newLayoutBranch2.getPrimaryKey());
+
+		Map<Serializable, LayoutBranch> layoutBranchs = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(2, layoutBranchs.size());
+		Assert.assertEquals(newLayoutBranch1,
+			layoutBranchs.get(newLayoutBranch1.getPrimaryKey()));
+		Assert.assertEquals(newLayoutBranch2,
+			layoutBranchs.get(newLayoutBranch2.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
+		throws Exception {
+		long pk1 = RandomTestUtil.nextLong();
+
+		long pk2 = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(pk1);
+		primaryKeys.add(pk2);
+
+		Map<Serializable, LayoutBranch> layoutBranchs = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(layoutBranchs.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
+		throws Exception {
+		LayoutBranch newLayoutBranch = addLayoutBranch();
+
+		long pk = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newLayoutBranch.getPrimaryKey());
+		primaryKeys.add(pk);
+
+		Map<Serializable, LayoutBranch> layoutBranchs = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, layoutBranchs.size());
+		Assert.assertEquals(newLayoutBranch,
+			layoutBranchs.get(newLayoutBranch.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
+		throws Exception {
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		Map<Serializable, LayoutBranch> layoutBranchs = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(layoutBranchs.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithOnePrimaryKey()
+		throws Exception {
+		LayoutBranch newLayoutBranch = addLayoutBranch();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newLayoutBranch.getPrimaryKey());
+
+		Map<Serializable, LayoutBranch> layoutBranchs = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, layoutBranchs.size());
+		Assert.assertEquals(newLayoutBranch,
+			layoutBranchs.get(newLayoutBranch.getPrimaryKey()));
+	}
+
+	@Test
 	public void testActionableDynamicQuery() throws Exception {
 		final IntegerWrapper count = new IntegerWrapper();
 
-		ActionableDynamicQuery actionableDynamicQuery = new LayoutBranchActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = LayoutBranchLocalServiceUtil.getActionableDynamicQuery();
+
+		actionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod() {
 				@Override
-				protected void performAction(Object object) {
+				public void performAction(Object object) {
 					LayoutBranch layoutBranch = (LayoutBranch)object;
 
 					Assert.assertNotNull(layoutBranch);
 
 					count.increment();
 				}
-			};
+			});
 
 		actionableDynamicQuery.performActions();
 
@@ -262,7 +423,7 @@ public class LayoutBranchPersistenceTest {
 				LayoutBranch.class.getClassLoader());
 
 		dynamicQuery.add(RestrictionsFactoryUtil.eq("LayoutBranchId",
-				ServiceTestUtil.nextLong()));
+				RandomTestUtil.nextLong()));
 
 		List<LayoutBranch> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -303,7 +464,7 @@ public class LayoutBranchPersistenceTest {
 				"LayoutBranchId"));
 
 		dynamicQuery.add(RestrictionsFactoryUtil.in("LayoutBranchId",
-				new Object[] { ServiceTestUtil.nextLong() }));
+				new Object[] { RandomTestUtil.nextLong() }));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -332,34 +493,36 @@ public class LayoutBranchPersistenceTest {
 	}
 
 	protected LayoutBranch addLayoutBranch() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		LayoutBranch layoutBranch = _persistence.create(pk);
 
-		layoutBranch.setGroupId(ServiceTestUtil.nextLong());
+		layoutBranch.setMvccVersion(RandomTestUtil.nextLong());
 
-		layoutBranch.setCompanyId(ServiceTestUtil.nextLong());
+		layoutBranch.setGroupId(RandomTestUtil.nextLong());
 
-		layoutBranch.setUserId(ServiceTestUtil.nextLong());
+		layoutBranch.setCompanyId(RandomTestUtil.nextLong());
 
-		layoutBranch.setUserName(ServiceTestUtil.randomString());
+		layoutBranch.setUserId(RandomTestUtil.nextLong());
 
-		layoutBranch.setLayoutSetBranchId(ServiceTestUtil.nextLong());
+		layoutBranch.setUserName(RandomTestUtil.randomString());
 
-		layoutBranch.setPlid(ServiceTestUtil.nextLong());
+		layoutBranch.setLayoutSetBranchId(RandomTestUtil.nextLong());
 
-		layoutBranch.setName(ServiceTestUtil.randomString());
+		layoutBranch.setPlid(RandomTestUtil.nextLong());
 
-		layoutBranch.setDescription(ServiceTestUtil.randomString());
+		layoutBranch.setName(RandomTestUtil.randomString());
 
-		layoutBranch.setMaster(ServiceTestUtil.randomBoolean());
+		layoutBranch.setDescription(RandomTestUtil.randomString());
 
-		_persistence.update(layoutBranch);
+		layoutBranch.setMaster(RandomTestUtil.randomBoolean());
+
+		_layoutBranchs.add(_persistence.update(layoutBranch));
 
 		return layoutBranch;
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(LayoutBranchPersistenceTest.class);
+	private List<LayoutBranch> _layoutBranchs = new ArrayList<LayoutBranch>();
+	private ModelListener<LayoutBranch>[] _modelListeners;
 	private LayoutBranchPersistence _persistence = (LayoutBranchPersistence)PortalBeanLocatorUtil.locate(LayoutBranchPersistence.class.getName());
-	private TransactionalPersistenceAdvice _transactionalPersistenceAdvice = (TransactionalPersistenceAdvice)PortalBeanLocatorUtil.locate(TransactionalPersistenceAdvice.class.getName());
 }

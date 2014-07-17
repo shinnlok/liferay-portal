@@ -1,4 +1,6 @@
-<definition>
+<definition component-name="portal-permissions">
+	<property name="testray.main.component.name" value="Permissions" />
+
 	<set-up>
 		<execute macro="User#firstLoginPG" />
 	</set-up>
@@ -24,10 +26,8 @@
 	<command name="AddDMDocumentRegRole" priority="5">
 		<var name="dmDocumentFile" value="Document_1.doc" />
 		<var name="pageName" value="Documents and Media Page" />
-		<var name="permissionDefinitionKey" value="SITE_ADMIN_CONTENT_DOCUMENTS_AND_MEDIA_DOCUMENTS_ADD_DOCUMENT" />
+		<var name="permissionDefinitionKey" value="SITE_ADMIN_CONTENT_DOCUMENTS_AND_MEDIA_RESOURCE_PERMISSIONS_DOCUMENTS_ADD_DOCUMENT_CHECKBOX" />
 		<var name="permissionDefinitionValue" value="Add Document" />
-		<var name="permissionNavigationKey" value="SITE_ADMIN_CONTENT_DOCUMENTS_AND_MEDIA" />
-		<var name="permissionNavigationValue" value="Documents and Media" />
 		<var name="portletName" value="Documents and Media" />
 		<var name="roleName" value="Regrole Name" />
 		<var name="userEmailAddress" value="userea@liferay.com" />
@@ -56,8 +56,6 @@
 		<execute macro="Permissions#definePermissionLoginUserCP">
 			<var name="permissionDefinitionKey" value="${permissionDefinitionKey}" />
 			<var name="permissionDefinitionValue" value="${permissionDefinitionValue}" />
-			<var name="permissionNavigationKey" value="${permissionNavigationKey}" />
-			<var name="permissionNavigationValue" value="${permissionNavigationValue}" />
 			<var name="roleName" value="${roleName}" />
 			<var name="userLoginEmailAddress" value="${userEmailAddress}" />
 			<var name="userLoginFullName" value="${userFirstName} ${userLastName}" />
@@ -75,8 +73,6 @@
 		<execute macro="Permissions#removePermissionLoginUserCP">
 			<var name="permissionDefinitionKey" value="${permissionDefinitionKey}" />
 			<var name="permissionDefinitionValue" value="${permissionDefinitionValue}" />
-			<var name="permissionNavigationKey" value="${permissionNavigationKey}" />
-			<var name="permissionNavigationValue" value="${permissionNavigationValue}" />
 			<var name="roleName" value="${roleName}" />
 			<var name="userLoginEmailAddress" value="${userEmailAddress}" />
 			<var name="userLoginFullName" value="${userFirstName} ${userLastName}" />
@@ -96,7 +92,7 @@
 		<var name="portletName" value="Documents and Media" />
 		<var name="roleName" value="Site Member" />
 		<var name="siteName" value="Site Name" />
-		<var name="sitePageType" value="Public" />
+		<var name="sitePagePrivacy" value="Public" />
 		<var name="siteURLTemp" value="true" />
 		<var name="userEmailAddress" value="userea@liferay.com" />
 		<var name="userFirstName" value="userfn" />
@@ -108,7 +104,7 @@
 			<var name="portletName" value="${portletName}" />
 			<var name="siteName" value="${siteName}" />
 			<var name="sitePageName" value="${pageName}" />
-			<var name="sitePageType" value="${sitePageType}" />
+			<var name="sitePagePrivacy" value="${sitePagePrivacy}" />
 			<var name="siteURLTemp" value="${siteURLTemp}" />
 			<var name="userEmailAddress" value="${userEmailAddress}" />
 			<var name="userFirstName" value="${userFirstName}" />
@@ -146,8 +142,8 @@
 		</execute>
 
 		<execute macro="Role#removePermissionPG">
-			<var name="roleName" value="${roleName}" />
 			<var name="permissionDefinitionKey" value="${permissionDefinitionKey}" />
+			<var name="roleName" value="${roleName}" />
 		</execute>
 
 		<execute macro="User#logoutAndLoginPG">
@@ -176,8 +172,8 @@
 		</execute>
 
 		<execute macro="Role#definePermissionPG">
-			<var name="roleName" value="${roleName}" />
 			<var name="permissionDefinitionKey" value="${permissionDefinitionKey}" />
+			<var name="roleName" value="${roleName}" />
 		</execute>
 
 		<execute macro="User#logoutAndLoginPG">
@@ -200,15 +196,13 @@
 	<command name="AddDMDocumentSiteRole" priority="5">
 		<var name="dmDocumentFile" value="Document_1.doc" />
 		<var name="pageName" value="Documents and Media Page" />
-		<var name="permissionDefinitionKey" value="SITE_ADMIN_CONTENT_DOCUMENTS_AND_MEDIA_DOCUMENTS_ADD_DOCUMENT" />
+		<var name="permissionDefinitionKey" value="SITE_ADMIN_CONTENT_DOCUMENTS_AND_MEDIA_RESOURCE_PERMISSIONS_DOCUMENTS_ADD_DOCUMENT_CHECKBOX" />
 		<var name="permissionDefinitionValue" value="Add Document" />
-		<var name="permissionNavigationKey" value="SITE_ADMIN_CONTENT_DOCUMENTS_AND_MEDIA" />
-		<var name="permissionNavigationValue" value="Documents and Media" />
 		<var name="portletName" value="Documents and Media" />
 		<var name="roleName" value="Roles Siterole Name" />
 		<var name="roleType" value="Site" />
 		<var name="siteName" value="Site Name" />
-		<var name="sitePageType" value="Public" />
+		<var name="sitePagePrivacy" value="Public" />
 		<var name="siteURLTemp" value="true" />
 		<var name="userEmailAddress" value="userea@liferay.com" />
 		<var name="userFirstName" value="userfn" />
@@ -222,7 +216,7 @@
 			<var name="roleType" value="${roleType}" />
 			<var name="siteName" value="${siteName}" />
 			<var name="sitePageName" value="${pageName}" />
-			<var name="sitePageType" value="${sitePageType}" />
+			<var name="sitePagePrivacy" value="${sitePagePrivacy}" />
 			<var name="userEmailAddress" value="${userEmailAddress}" />
 			<var name="userFirstName" value="${userFirstName}" />
 			<var name="userLastName" value="${userLastName}" />
@@ -238,8 +232,8 @@
 		</execute>
 
 		<execute macro="Role#removePermissionPG">
-			<var name="roleName" value="Site Member" />
 			<var name="permissionDefinitionKey" value="INLINE_PERMISSIONS_ADD_DOCUMENT_CHECKBOX" />
+			<var name="roleName" value="Site Member" />
 		</execute>
 
 		<execute macro="User#logoutAndLoginPG">
@@ -259,8 +253,6 @@
 		<execute macro="Permissions#definePermissionLoginUserCP">
 			<var name="permissionDefinitionKey" value="${permissionDefinitionKey}" />
 			<var name="permissionDefinitionValue" value="${permissionDefinitionValue}" />
-			<var name="permissionNavigationKey" value="${permissionNavigationKey}" />
-			<var name="permissionNavigationValue" value="${permissionNavigationValue}" />
 			<var name="roleName" value="${roleName}" />
 			<var name="userLoginEmailAddress" value="${userEmailAddress}" />
 			<var name="userLoginFullName" value="${userFirstName} ${userLastName}" />
@@ -280,8 +272,6 @@
 		<execute macro="Permissions#removePermissionLoginUserCP">
 			<var name="permissionDefinitionKey" value="${permissionDefinitionKey}" />
 			<var name="permissionDefinitionValue" value="${permissionDefinitionValue}" />
-			<var name="permissionNavigationKey" value="${permissionNavigationKey}" />
-			<var name="permissionNavigationValue" value="${permissionNavigationValue}" />
 			<var name="roleName" value="${roleName}" />
 			<var name="userLoginEmailAddress" value="${userEmailAddress}" />
 			<var name="userLoginFullName" value="${userFirstName} ${userLastName}" />
@@ -295,6 +285,115 @@
 
 		<execute action="PGDocumentsandmedia#assertClick" locator-key1="TOOLBAR_ADD" value1="Add" />
 		<execute action="PGDocumentsandmedia#assertElementNotPresent" locator-key1="ADD_MENULIST_BASIC_DOCUMENT" value1="Basic Document" />
+	</command>
+
+	<command name="DeleteDMFolderRegRoleInline" priority="5">
+		<var name="dmFolderDescription" value="DM Folder Description" />
+		<var name="dmFolderName" value="DM Folder Name" />
+		<var name="pageName" value="Documents and Media Page" />
+		<var name="permissionDefinitionKey" value="CONTENT_PERMISSIONS_DELETE_CHECKBOX" />
+		<var name="portletName" value="Documents and Media" />
+		<var name="roleName" value="Regrole Name" />
+		<var name="userEmailAddress" value="userea@liferay.com" />
+		<var name="userFirstName" value="userfn" />
+		<var name="userLastName" value="userln" />
+		<var name="userScreenName" value="usersn" />
+
+		<execute macro="Permissions#setUpRegRoleLoginUserPG">
+			<var name="pageName" value="${pageName}" />
+			<var name="portletName" value="${portletName}" />
+			<var name="roleName" value="${roleName}" />
+			<var name="userEmailAddress" value="${userEmailAddress}" />
+			<var name="userFirstName" value="${userFirstName}" />
+			<var name="userLastName" value="${userLastName}" />
+			<var name="userLoginEmailAddress" value="test@liferay.com" />
+			<var name="userLoginFullName" value="Test Test" />
+			<var name="userScreenName" value="${userScreenName}" />
+		</execute>
+
+		<execute macro="Permissions#addDMFolderLoginUserPG">
+			<var name="dmFolderDescription" value="${dmFolderDescription}" />
+			<var name="dmFolderName" value="${dmFolderName}" />
+			<var name="pageName" value="${pageName}" />
+			<var name="userLoginEmailAddress" value="${userEmailAddress}" />
+			<var name="userLoginFullName" value="${userFirstName} ${userLastName}" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<var name="key_dmFolderName" value="${dmFolderName}" />
+
+		<execute action="PGDocumentsandmedia#click" locator-key1="ENTRY_ICON_FOLDER_ACTIONS" />
+		<execute action="PGDocumentsandmedia#assertElementNotPresent" locator-key1="FOLDER_MENULIST_DELETE" value1="Delete" />
+
+		<execute macro="User#logoutAndLoginPG">
+			<var name="userLoginEmailAddress" value="test@liferay.com" />
+			<var name="userLoginFullName" value="Test Test" />
+		</execute>
+
+		<execute macro="PermissionsInline#gotoDMFolderPG">
+			<var name="dmFolderName" value="${dmFolderName}" />
+			<var name="entryTitle" value="${entryTitle}" />
+			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute macro="Role#definePermissionPG">
+			<var name="permissionDefinitionKey" value="${permissionDefinitionKey}" />
+			<var name="roleName" value="${roleName}" />
+		</execute>
+
+		<execute macro="User#logoutAndLoginPG">
+			<var name="userLoginEmailAddress" value="${userEmailAddress}" />
+			<var name="userLoginFullName" value="${userFirstName} ${userLastName}" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute macro="DMFolder#deletePG">
+			<var name="dmFolderName" value="${dmFolderName}" />
+		</execute>
+
+		<execute macro="User#logoutAndLoginPG">
+			<var name="userLoginEmailAddress" value="test@liferay.com" />
+			<var name="userLoginFullName" value="Test Test" />
+		</execute>
+
+		<execute macro="Permissions#addDMFolderLoginUserPG">
+			<var name="dmFolderDescription" value="${dmFolderDescription}" />
+			<var name="dmFolderName" value="${dmFolderName}" />
+			<var name="pageName" value="${pageName}" />
+			<var name="userLoginEmailAddress" value="test@liferay.com" />
+			<var name="userLoginFullName" value="Test Test" />
+		</execute>
+
+		<execute macro="PermissionsInline#gotoDMFolderPG">
+			<var name="dmFolderName" value="${dmFolderName}" />
+			<var name="entryTitle" value="${entryTitle}" />
+			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute macro="Role#removePermissionPG">
+			<var name="permissionDefinitionKey" value="${permissionDefinitionKey}" />
+			<var name="roleName" value="${roleName}" />
+		</execute>
+
+		<execute macro="User#logoutAndLoginPG">
+			<var name="userLoginEmailAddress" value="${userEmailAddress}" />
+			<var name="userLoginFullName" value="${userFirstName} ${userLastName}" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<var name="key_dmFolderName" value="${dmFolderName}" />
+
+		<execute action="PGDocumentsandmedia#click" locator-key1="ENTRY_ICON_FOLDER_ACTIONS" />
+		<execute action="PGDocumentsandmedia#assertElementNotPresent" locator-key1="FOLDER_MENULIST_DELETE" value1="Delete" />
 	</command>
 
 	<command name="ViewDMFolderGuestInline" priority="5">
@@ -334,23 +433,24 @@
 
 		<var name="key_dmFolderName" value="${dmFolderName}" />
 
-		<execute action="PGDocumentsandmedia#assertClick" locator-key1="ENTRIES_FOLDER_NAME" value1="${dmFolderName}" />
+		<execute action="PGDocumentsandmedia#assertClick" locator-key1="ENTRY_ICON_FOLDER_TITLE" value1="${dmFolderName}" />
 
 		<execute action="PGDocumentsandmediaFolder#assertTextEquals" locator-key1="BREADCRUMB_FOLDER" value1="${dmFolderName}" />
 
 		<execute macro="User#loginPG">
-			<var name="userEmailAddress" value="test@liferay.com" />
 			<var name="password" value="test" />
+			<var name="userEmailAddress" value="test@liferay.com" />
 		</execute>
 
 		<execute macro="PermissionsInline#gotoDMFolderPG">
+			<var name="dmFolderName" value="${dmFolderName}" />
 			<var name="entryTitle" value="${entryTitle}" />
 			<var name="pageName" value="${pageName}" />
 		</execute>
 
 		<execute macro="Role#removePermissionPG">
-			<var name="roleName" value="${roleName}" />
 			<var name="permissionDefinitionKey" value="${permissionDefinitionKey}" />
+			<var name="roleName" value="${roleName}" />
 		</execute>
 
 		<execute macro="User#logoutPG" />
@@ -362,18 +462,19 @@
 		<execute macro="DMPortlet#viewDefaultPG" />
 
 		<execute macro="User#loginPG">
-			<var name="userEmailAddress" value="test@liferay.com" />
 			<var name="password" value="test" />
+			<var name="userEmailAddress" value="test@liferay.com" />
 		</execute>
 
 		<execute macro="PermissionsInline#gotoDMFolderPG">
+			<var name="dmFolderName" value="${dmFolderName}" />
 			<var name="entryTitle" value="${entryTitle}" />
 			<var name="pageName" value="${pageName}" />
 		</execute>
 
 		<execute macro="Role#definePermissionPG">
-			<var name="roleName" value="${roleName}" />
 			<var name="permissionDefinitionKey" value="${permissionDefinitionKey}" />
+			<var name="roleName" value="${roleName}" />
 		</execute>
 
 		<execute macro="User#logoutPG" />
@@ -384,111 +485,8 @@
 
 		<var name="key_dmFolderName" value="${dmFolderName}" />
 
-		<execute action="PGDocumentsandmedia#assertClick" locator-key1="ENTRIES_FOLDER_NAME" value1="${dmFolderName}" />
+		<execute action="PGDocumentsandmedia#assertClick" locator-key1="ENTRY_ICON_FOLDER_TITLE" value1="${dmFolderName}" />
 
 		<execute action="PGDocumentsandmediaFolder#assertTextEquals" locator-key1="BREADCRUMB_FOLDER" value1="${dmFolderName}" />
-	</command>
-
-	<command name="DeleteDMFolderRegRoleInline" priority="5">
-		<var name="dmFolderDescription" value="DM Folder Description" />
-		<var name="dmFolderName" value="DM Folder Name" />
-		<var name="pageName" value="Documents and Media Page" />
-		<var name="permissionDefinitionKey" value="CONTENT_PERMISSIONS_DELETE_CHECKBOX" />
-		<var name="portletName" value="Documents and Media" />
-		<var name="roleName" value="Regrole Name" />
-		<var name="userEmailAddress" value="userea@liferay.com" />
-		<var name="userFirstName" value="userfn" />
-		<var name="userLastName" value="userln" />
-		<var name="userScreenName" value="usersn" />
-
-		<execute macro="Permissions#setUpRegRoleLoginUserPG">
-			<var name="pageName" value="${pageName}" />
-			<var name="portletName" value="${portletName}" />
-			<var name="roleName" value="${roleName}" />
-			<var name="userEmailAddress" value="${userEmailAddress}" />
-			<var name="userFirstName" value="${userFirstName}" />
-			<var name="userLastName" value="${userLastName}" />
-			<var name="userLoginEmailAddress" value="test@liferay.com" />
-			<var name="userLoginFullName" value="Test Test" />
-			<var name="userScreenName" value="${userScreenName}" />
-		</execute>
-
-		<execute macro="Permissions#addDMFolderLoginUserPG">
-			<var name="dmFolderDescription" value="${dmFolderDescription}" />
-			<var name="dmFolderName" value="${dmFolderName}" />
-			<var name="pageName" value="${pageName}" />
-			<var name="userLoginEmailAddress" value="${userEmailAddress}" />
-			<var name="userLoginFullName" value="${userFirstName} ${userLastName}" />
-		</execute>
-
-		<execute macro="Page#gotoPG">
-			<var name="pageName" value="${pageName}" />
-		</execute>
-
-		<execute action="PGDocumentsandmedia#click" locator-key1="ENTRIES_FOLDER_ACTIONS" />
-		<execute action="PGDocumentsandmedia#assertElementNotPresent" locator-key1="FOLDER_MENULIST_DELETE" value1="Delete" />
-
-		<execute macro="User#logoutAndLoginPG">
-			<var name="userLoginEmailAddress" value="test@liferay.com" />
-			<var name="userLoginFullName" value="Test Test" />
-		</execute>
-
-		<execute macro="PermissionsInline#gotoDMFolderPG">
-			<var name="entryTitle" value="${entryTitle}" />
-			<var name="pageName" value="${pageName}" />
-		</execute>
-
-		<execute macro="Role#definePermissionPG">
-			<var name="roleName" value="${roleName}" />
-			<var name="permissionDefinitionKey" value="${permissionDefinitionKey}" />
-		</execute>
-
-		<execute macro="User#logoutAndLoginPG">
-			<var name="userLoginEmailAddress" value="${userEmailAddress}" />
-			<var name="userLoginFullName" value="${userFirstName} ${userLastName}" />
-		</execute>
-
-		<execute macro="Page#gotoPG">
-			<var name="pageName" value="${pageName}" />
-		</execute>
-
-		<execute macro="DMFolder#deletePG">
-			<var name="dmFolderName" value="${dmFolderName}" />
-		</execute>
-
-		<execute macro="User#logoutAndLoginPG">
-			<var name="userLoginEmailAddress" value="test@liferay.com" />
-			<var name="userLoginFullName" value="Test Test" />
-		</execute>
-
-		<execute macro="Permissions#addDMFolderLoginUserPG">
-			<var name="dmFolderDescription" value="${dmFolderDescription}" />
-			<var name="dmFolderName" value="${dmFolderName}" />
-			<var name="pageName" value="${pageName}" />
-			<var name="userLoginEmailAddress" value="test@liferay.com" />
-			<var name="userLoginFullName" value="Test Test" />
-		</execute>
-
-		<execute macro="PermissionsInline#gotoDMFolderPG">
-			<var name="entryTitle" value="${entryTitle}" />
-			<var name="pageName" value="${pageName}" />
-		</execute>
-
-		<execute macro="Role#removePermissionPG">
-			<var name="roleName" value="${roleName}" />
-			<var name="permissionDefinitionKey" value="${permissionDefinitionKey}" />
-		</execute>
-
-		<execute macro="User#logoutAndLoginPG">
-			<var name="userLoginEmailAddress" value="${userEmailAddress}" />
-			<var name="userLoginFullName" value="${userFirstName} ${userLastName}" />
-		</execute>
-
-		<execute macro="Page#gotoPG">
-			<var name="pageName" value="${pageName}" />
-		</execute>
-
-		<execute action="PGDocumentsandmedia#click" locator-key1="ENTRIES_FOLDER_ACTIONS" />
-		<execute action="PGDocumentsandmedia#assertElementNotPresent" locator-key1="FOLDER_MENULIST_DELETE" value1="Delete" />
 	</command>
 </definition>

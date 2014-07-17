@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -80,14 +80,6 @@ public class NonceUtil {
 		}
 
 		@Override
-		public long getDelay(TimeUnit timeUnit) {
-			long leftDelayTime =
-				_NONCE_EXPIRATION + _createTime - System.currentTimeMillis();
-
-			return timeUnit.convert(leftDelayTime, TimeUnit.MILLISECONDS);
-		}
-
-		@Override
 		public int compareTo(Delayed delayed) {
 			NonceDelayed nonceDelayed = (NonceDelayed)delayed;
 
@@ -113,6 +105,14 @@ public class NonceUtil {
 			}
 
 			return false;
+		}
+
+		@Override
+		public long getDelay(TimeUnit timeUnit) {
+			long leftDelayTime =
+				_NONCE_EXPIRATION + _createTime - System.currentTimeMillis();
+
+			return timeUnit.convert(leftDelayTime, TimeUnit.MILLISECONDS);
 		}
 
 		@Override

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,28 +22,34 @@ import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.test.ExecutionTestListeners;
+import com.liferay.portal.kernel.template.TemplateException;
+import com.liferay.portal.kernel.template.TemplateManagerUtil;
 import com.liferay.portal.kernel.util.IntegerWrapper;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.model.Account;
-import com.liferay.portal.service.ServiceTestUtil;
-import com.liferay.portal.service.persistence.BasePersistence;
-import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
+import com.liferay.portal.model.ModelListener;
+import com.liferay.portal.service.AccountLocalServiceUtil;
 import com.liferay.portal.test.LiferayPersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.test.persistence.TransactionalPersistenceAdvice;
+import com.liferay.portal.test.TransactionalTestRule;
+import com.liferay.portal.util.PropsValues;
+import com.liferay.portal.util.test.RandomTestUtil;
 
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 
 import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -51,36 +57,49 @@ import java.util.Set;
 /**
  * @author Brian Wing Shun Chan
  */
-@ExecutionTestListeners(listeners =  {
-	PersistenceExecutionTestListener.class})
 @RunWith(LiferayPersistenceIntegrationJUnitTestRunner.class)
 public class AccountPersistenceTest {
+	@BeforeClass
+	public static void setupClass() throws TemplateException {
+		TemplateManagerUtil.init();
+
+		PropsValues.SPRING_HIBERNATE_SESSION_DELEGATED = false;
+	}
+
+	public static void tearDownClass() {
+		PropsValues.SPRING_HIBERNATE_SESSION_DELEGATED = true;
+	}
+
+	@ClassRule
+	public static TransactionalTestRule transactionalTestRule = new TransactionalTestRule();
+
+	@Before
+	public void setUp() {
+		_modelListeners = _persistence.getListeners();
+
+		for (ModelListener<Account> modelListener : _modelListeners) {
+			_persistence.unregisterListener(modelListener);
+		}
+	}
+
 	@After
 	public void tearDown() throws Exception {
-		Map<Serializable, BasePersistence<?>> basePersistences = _transactionalPersistenceAdvice.getBasePersistences();
+		Iterator<Account> iterator = _accounts.iterator();
 
-		Set<Serializable> primaryKeys = basePersistences.keySet();
+		while (iterator.hasNext()) {
+			_persistence.remove(iterator.next());
 
-		for (Serializable primaryKey : primaryKeys) {
-			BasePersistence<?> basePersistence = basePersistences.get(primaryKey);
-
-			try {
-				basePersistence.remove(primaryKey);
-			}
-			catch (Exception e) {
-				if (_log.isDebugEnabled()) {
-					_log.debug("The model with primary key " + primaryKey +
-						" was already deleted");
-				}
-			}
+			iterator.remove();
 		}
 
-		_transactionalPersistenceAdvice.reset();
+		for (ModelListener<Account> modelListener : _modelListeners) {
+			_persistence.registerListener(modelListener);
+		}
 	}
 
 	@Test
 	public void testCreate() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		Account account = _persistence.create(pk);
 
@@ -107,44 +126,48 @@ public class AccountPersistenceTest {
 
 	@Test
 	public void testUpdateExisting() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		Account newAccount = _persistence.create(pk);
 
-		newAccount.setCompanyId(ServiceTestUtil.nextLong());
+		newAccount.setMvccVersion(RandomTestUtil.nextLong());
 
-		newAccount.setUserId(ServiceTestUtil.nextLong());
+		newAccount.setCompanyId(RandomTestUtil.nextLong());
 
-		newAccount.setUserName(ServiceTestUtil.randomString());
+		newAccount.setUserId(RandomTestUtil.nextLong());
 
-		newAccount.setCreateDate(ServiceTestUtil.nextDate());
+		newAccount.setUserName(RandomTestUtil.randomString());
 
-		newAccount.setModifiedDate(ServiceTestUtil.nextDate());
+		newAccount.setCreateDate(RandomTestUtil.nextDate());
 
-		newAccount.setParentAccountId(ServiceTestUtil.nextLong());
+		newAccount.setModifiedDate(RandomTestUtil.nextDate());
 
-		newAccount.setName(ServiceTestUtil.randomString());
+		newAccount.setParentAccountId(RandomTestUtil.nextLong());
 
-		newAccount.setLegalName(ServiceTestUtil.randomString());
+		newAccount.setName(RandomTestUtil.randomString());
 
-		newAccount.setLegalId(ServiceTestUtil.randomString());
+		newAccount.setLegalName(RandomTestUtil.randomString());
 
-		newAccount.setLegalType(ServiceTestUtil.randomString());
+		newAccount.setLegalId(RandomTestUtil.randomString());
 
-		newAccount.setSicCode(ServiceTestUtil.randomString());
+		newAccount.setLegalType(RandomTestUtil.randomString());
 
-		newAccount.setTickerSymbol(ServiceTestUtil.randomString());
+		newAccount.setSicCode(RandomTestUtil.randomString());
 
-		newAccount.setIndustry(ServiceTestUtil.randomString());
+		newAccount.setTickerSymbol(RandomTestUtil.randomString());
 
-		newAccount.setType(ServiceTestUtil.randomString());
+		newAccount.setIndustry(RandomTestUtil.randomString());
 
-		newAccount.setSize(ServiceTestUtil.randomString());
+		newAccount.setType(RandomTestUtil.randomString());
 
-		_persistence.update(newAccount);
+		newAccount.setSize(RandomTestUtil.randomString());
+
+		_accounts.add(_persistence.update(newAccount));
 
 		Account existingAccount = _persistence.findByPrimaryKey(newAccount.getPrimaryKey());
 
+		Assert.assertEquals(existingAccount.getMvccVersion(),
+			newAccount.getMvccVersion());
 		Assert.assertEquals(existingAccount.getAccountId(),
 			newAccount.getAccountId());
 		Assert.assertEquals(existingAccount.getCompanyId(),
@@ -188,7 +211,7 @@ public class AccountPersistenceTest {
 
 	@Test
 	public void testFindByPrimaryKeyMissing() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		try {
 			_persistence.findByPrimaryKey(pk);
@@ -210,13 +233,13 @@ public class AccountPersistenceTest {
 		}
 	}
 
-	protected OrderByComparator getOrderByComparator() {
-		return OrderByComparatorFactoryUtil.create("Account_", "accountId",
-			true, "companyId", true, "userId", true, "userName", true,
-			"createDate", true, "modifiedDate", true, "parentAccountId", true,
-			"name", true, "legalName", true, "legalId", true, "legalType",
-			true, "sicCode", true, "tickerSymbol", true, "industry", true,
-			"type", true, "size", true);
+	protected OrderByComparator<Account> getOrderByComparator() {
+		return OrderByComparatorFactoryUtil.create("Account_", "mvccVersion",
+			true, "accountId", true, "companyId", true, "userId", true,
+			"userName", true, "createDate", true, "modifiedDate", true,
+			"parentAccountId", true, "name", true, "legalName", true,
+			"legalId", true, "legalType", true, "sicCode", true,
+			"tickerSymbol", true, "industry", true, "type", true, "size", true);
 	}
 
 	@Test
@@ -230,7 +253,7 @@ public class AccountPersistenceTest {
 
 	@Test
 	public void testFetchByPrimaryKeyMissing() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		Account missingAccount = _persistence.fetchByPrimaryKey(pk);
 
@@ -238,19 +261,101 @@ public class AccountPersistenceTest {
 	}
 
 	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
+		throws Exception {
+		Account newAccount1 = addAccount();
+		Account newAccount2 = addAccount();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newAccount1.getPrimaryKey());
+		primaryKeys.add(newAccount2.getPrimaryKey());
+
+		Map<Serializable, Account> accounts = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(2, accounts.size());
+		Assert.assertEquals(newAccount1,
+			accounts.get(newAccount1.getPrimaryKey()));
+		Assert.assertEquals(newAccount2,
+			accounts.get(newAccount2.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
+		throws Exception {
+		long pk1 = RandomTestUtil.nextLong();
+
+		long pk2 = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(pk1);
+		primaryKeys.add(pk2);
+
+		Map<Serializable, Account> accounts = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(accounts.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
+		throws Exception {
+		Account newAccount = addAccount();
+
+		long pk = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newAccount.getPrimaryKey());
+		primaryKeys.add(pk);
+
+		Map<Serializable, Account> accounts = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, accounts.size());
+		Assert.assertEquals(newAccount, accounts.get(newAccount.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
+		throws Exception {
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		Map<Serializable, Account> accounts = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(accounts.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithOnePrimaryKey()
+		throws Exception {
+		Account newAccount = addAccount();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newAccount.getPrimaryKey());
+
+		Map<Serializable, Account> accounts = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, accounts.size());
+		Assert.assertEquals(newAccount, accounts.get(newAccount.getPrimaryKey()));
+	}
+
+	@Test
 	public void testActionableDynamicQuery() throws Exception {
 		final IntegerWrapper count = new IntegerWrapper();
 
-		ActionableDynamicQuery actionableDynamicQuery = new AccountActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = AccountLocalServiceUtil.getActionableDynamicQuery();
+
+		actionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod() {
 				@Override
-				protected void performAction(Object object) {
+				public void performAction(Object object) {
 					Account account = (Account)object;
 
 					Assert.assertNotNull(account);
 
 					count.increment();
 				}
-			};
+			});
 
 		actionableDynamicQuery.performActions();
 
@@ -283,7 +388,7 @@ public class AccountPersistenceTest {
 				Account.class.getClassLoader());
 
 		dynamicQuery.add(RestrictionsFactoryUtil.eq("accountId",
-				ServiceTestUtil.nextLong()));
+				RandomTestUtil.nextLong()));
 
 		List<Account> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -322,7 +427,7 @@ public class AccountPersistenceTest {
 		dynamicQuery.setProjection(ProjectionFactoryUtil.property("accountId"));
 
 		dynamicQuery.add(RestrictionsFactoryUtil.in("accountId",
-				new Object[] { ServiceTestUtil.nextLong() }));
+				new Object[] { RandomTestUtil.nextLong() }));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -330,46 +435,48 @@ public class AccountPersistenceTest {
 	}
 
 	protected Account addAccount() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		Account account = _persistence.create(pk);
 
-		account.setCompanyId(ServiceTestUtil.nextLong());
+		account.setMvccVersion(RandomTestUtil.nextLong());
 
-		account.setUserId(ServiceTestUtil.nextLong());
+		account.setCompanyId(RandomTestUtil.nextLong());
 
-		account.setUserName(ServiceTestUtil.randomString());
+		account.setUserId(RandomTestUtil.nextLong());
 
-		account.setCreateDate(ServiceTestUtil.nextDate());
+		account.setUserName(RandomTestUtil.randomString());
 
-		account.setModifiedDate(ServiceTestUtil.nextDate());
+		account.setCreateDate(RandomTestUtil.nextDate());
 
-		account.setParentAccountId(ServiceTestUtil.nextLong());
+		account.setModifiedDate(RandomTestUtil.nextDate());
 
-		account.setName(ServiceTestUtil.randomString());
+		account.setParentAccountId(RandomTestUtil.nextLong());
 
-		account.setLegalName(ServiceTestUtil.randomString());
+		account.setName(RandomTestUtil.randomString());
 
-		account.setLegalId(ServiceTestUtil.randomString());
+		account.setLegalName(RandomTestUtil.randomString());
 
-		account.setLegalType(ServiceTestUtil.randomString());
+		account.setLegalId(RandomTestUtil.randomString());
 
-		account.setSicCode(ServiceTestUtil.randomString());
+		account.setLegalType(RandomTestUtil.randomString());
 
-		account.setTickerSymbol(ServiceTestUtil.randomString());
+		account.setSicCode(RandomTestUtil.randomString());
 
-		account.setIndustry(ServiceTestUtil.randomString());
+		account.setTickerSymbol(RandomTestUtil.randomString());
 
-		account.setType(ServiceTestUtil.randomString());
+		account.setIndustry(RandomTestUtil.randomString());
 
-		account.setSize(ServiceTestUtil.randomString());
+		account.setType(RandomTestUtil.randomString());
 
-		_persistence.update(account);
+		account.setSize(RandomTestUtil.randomString());
+
+		_accounts.add(_persistence.update(account));
 
 		return account;
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(AccountPersistenceTest.class);
+	private List<Account> _accounts = new ArrayList<Account>();
+	private ModelListener<Account>[] _modelListeners;
 	private AccountPersistence _persistence = (AccountPersistence)PortalBeanLocatorUtil.locate(AccountPersistence.class.getName());
-	private TransactionalPersistenceAdvice _transactionalPersistenceAdvice = (TransactionalPersistenceAdvice)PortalBeanLocatorUtil.locate(TransactionalPersistenceAdvice.class.getName());
 }

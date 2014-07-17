@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,7 +20,7 @@
 
 <div id="<portlet:namespace />editLayoutContainer">
 	<c:choose>
-		<c:when test='<%= SessionMessages.contains(renderRequest, "requestProcessed") || ((selPlid == 0) && Validator.isNotNull(closeRedirect)) %>'>
+		<c:when test='<%= MultiSessionMessages.contains(renderRequest, "requestProcessed") || ((selPlid == 0) && Validator.isNotNull(closeRedirect)) %>'>
 
 			<%
 			String refreshURL = null;
@@ -29,7 +29,7 @@
 				refreshURL = closeRedirect;
 			}
 			else {
-				refreshURL = (String)SessionMessages.get(renderRequest, portletDisplay.getId() + SessionMessages.KEY_SUFFIX_CLOSE_REDIRECT);
+				refreshURL = (String)MultiSessionMessages.get(renderRequest, portletDisplay.getId() + SessionMessages.KEY_SUFFIX_CLOSE_REDIRECT);
 			}
 
 			if (Validator.isNull(refreshURL)) {
@@ -104,7 +104,7 @@
 							A.io.request(
 								form.attr('action'),
 								{
-									dataType: 'json',
+									dataType: 'JSON',
 									form: {
 										id: form.attr('id')
 									},

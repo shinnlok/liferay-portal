@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -42,20 +42,21 @@ if (showEditURL && assetRenderer.hasEditPermission(permissionChecker)) {
 	redirectURL.setWindowState(LiferayWindowState.POP_UP);
 
 	editPortletURL = assetRenderer.getURLEdit(liferayPortletRequest, liferayPortletResponse, LiferayWindowState.POP_UP, redirectURL);
+
+	editPortletURL.setParameter("showHeader", Boolean.FALSE.toString());
 }
 %>
 
 <c:if test="<%= editPortletURL != null %>">
-	<div class="lfr-meta-actions asset-actions">
+	<div class="asset-actions lfr-meta-actions">
 
 		<%
-		String taglibEditURL = "javascript:Liferay.Util.openWindow({id: '" + renderResponse.getNamespace() + "editAsset', title: '" + LanguageUtil.format(pageContext, "edit-x", HtmlUtil.escape(assetRenderer.getTitle(locale))) + "', uri:'" + HtmlUtil.escapeURL(editPortletURL.toString()) + "'});";
+		String taglibEditURL = "javascript:Liferay.Util.openWindow({id: '" + renderResponse.getNamespace() + "editAsset', title: '" + HtmlUtil.escapeJS(LanguageUtil.format(request, "edit-x", HtmlUtil.escape(assetRenderer.getTitle(locale)), false)) + "', uri:'" + HtmlUtil.escapeJS(editPortletURL.toString()) + "'});";
 		%>
 
 		<liferay-ui:icon
-			image="edit"
-			label="<%= showIconLabel %>"
-			message='<%= showIconLabel ? LanguageUtil.format(pageContext, "edit-x-x", new Object[] {"hide-accessible", HtmlUtil.escape(assetRenderer.getTitle(locale))}) : LanguageUtil.format(pageContext, "edit-x", HtmlUtil.escape(assetRenderer.getTitle(locale))) %>'
+			iconCssClass="icon-edit-sign"
+			message='<%= showIconLabel ? LanguageUtil.format(request, "edit-x-x", new Object[] {"hide-accessible", HtmlUtil.escape(assetRenderer.getTitle(locale))}, false) : LanguageUtil.format(request, "edit-x", HtmlUtil.escape(assetRenderer.getTitle(locale)), false) %>'
 			url="<%= taglibEditURL %>"
 		/>
 	</div>

@@ -1,4 +1,6 @@
-<definition>
+<definition component-name="portal-administration">
+	<property name="testray.main.component.name" value="Administration" />
+
 	<set-up>
 		<execute macro="User#firstLoginPG" />
 	</set-up>
@@ -11,14 +13,6 @@
 		<execute macro="Page#gotoMyAccount">
 			<var name="portletName" value="Account Settings" />
 		</execute>
-
-		<execute macro="MyAccount#view" />
-	</command>
-
-	<command name="ViewMyAccountViaSignInPortlet" priority="5">
-		<execute action="PGSignin#assertClick" locator-key1="PORTLET_CONTENT_USER_NAME" value1="Test Test" />
-
-		<execute action="Myaccount#selectFrame" locator-key1="MY_ACCOUNT_IFRAME" />
 
 		<execute macro="MyAccount#view" />
 	</command>
@@ -65,5 +59,11 @@
 			<var name="userLoginEmailAddress" value="test@liferay.com" />
 			<var name="userLoginFullName" value="Test Test" />
 		</execute>
+	</command>
+
+	<command name="ViewMyAccountViaSignInPortlet" priority="5">
+		<execute action="PGSignin#assertClick" locator-key1="PORTLET_CONTENT_USER_NAME" value1="Test Test" />
+
+		<execute macro="MyAccount#view" />
 	</command>
 </definition>

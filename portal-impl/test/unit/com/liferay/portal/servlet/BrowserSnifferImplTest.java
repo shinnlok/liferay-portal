@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -80,6 +80,53 @@ public class BrowserSnifferImplTest {
 
 		Assert.assertFalse(
 			_browserSnifferImpl.isAndroid(mockHttpServletRequest));
+	}
+
+	@Test
+	public void testIsIe() throws IOException {
+		UnsyncBufferedReader unsyncBufferedReader =
+			getResourceAsUnsyncBufferedReader("dependencies/user_agents.csv");
+
+		boolean ie = false;
+		String line = null;
+
+		while ((line = unsyncBufferedReader.readLine()) != null) {
+			line = line.trim();
+
+			if (line.isEmpty()) {
+				continue;
+			}
+
+			if (line.contains("## IE")) {
+				ie = true;
+
+				continue;
+			}
+
+			if (ie && (line.charAt(0) == CharPool.POUND)) {
+				break;
+			}
+
+			if (ie) {
+				MockHttpServletRequest mockHttpServletRequest =
+					new MockHttpServletRequest();
+
+				mockHttpServletRequest.addHeader(HttpHeaders.USER_AGENT, line);
+
+				Assert.assertTrue(
+					_browserSnifferImpl.isIe(mockHttpServletRequest));
+			}
+		}
+
+		MockHttpServletRequest mockHttpServletRequest =
+			new MockHttpServletRequest();
+
+		mockHttpServletRequest.addHeader(
+			HttpHeaders.USER_AGENT,
+			"Opera 12 var1, 12.14, 9.80, opera/9.80 (windows nt 6.0)" +
+				" presto/2.12.388 version/12.14");
+
+		Assert.assertFalse(_browserSnifferImpl.isIe(mockHttpServletRequest));
 	}
 
 	@Test

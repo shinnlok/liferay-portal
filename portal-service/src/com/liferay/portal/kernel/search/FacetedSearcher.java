@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,23 +19,18 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.security.permission.PermissionChecker;
-import com.liferay.portal.security.permission.PermissionThreadLocal;
 import com.liferay.portlet.expando.model.ExpandoBridge;
 import com.liferay.portlet.expando.model.ExpandoColumnConstants;
 import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
 import com.liferay.portlet.expando.util.ExpandoBridgeIndexerUtil;
 
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-
-import javax.portlet.PortletURL;
 
 /**
  * @author Raymond Augé
  */
-public class FacetedSearcher extends BaseIndexer {
+public class FacetedSearcher extends BaseSearcher {
 
 	public static Indexer getInstance() {
 		return new FacetedSearcher();
@@ -44,78 +39,6 @@ public class FacetedSearcher extends BaseIndexer {
 	@Override
 	public String[] getClassNames() {
 		return null;
-	}
-
-	@Override
-	public IndexerPostProcessor[] getIndexerPostProcessors() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public String getPortletId() {
-		return null;
-	}
-
-	@Override
-	public void registerIndexerPostProcessor(
-		IndexerPostProcessor indexerPostProcessor) {
-
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public Hits search(SearchContext searchContext) throws SearchException {
-		try {
-			searchContext.setSearchEngineId(getSearchEngineId());
-
-			BooleanQuery contextQuery = BooleanQueryFactoryUtil.create(
-				searchContext);
-
-			contextQuery.addRequiredTerm(
-				Field.COMPANY_ID, searchContext.getCompanyId());
-
-			BooleanQuery fullQuery = createFullQuery(
-				contextQuery, searchContext);
-
-			fullQuery.setQueryConfig(searchContext.getQueryConfig());
-
-			PermissionChecker permissionChecker =
-				PermissionThreadLocal.getPermissionChecker();
-
-			int end = searchContext.getEnd();
-			int start = searchContext.getStart();
-
-			if (isFilterSearch(searchContext) && (permissionChecker != null)) {
-				searchContext.setEnd(end + INDEX_FILTER_SEARCH_LIMIT);
-				searchContext.setStart(0);
-			}
-
-			Hits hits = SearchEngineUtil.search(searchContext, fullQuery);
-
-			searchContext.setEnd(end);
-			searchContext.setStart(start);
-
-			if (isFilterSearch(searchContext) && (permissionChecker != null)) {
-				hits = filterSearch(hits, permissionChecker, searchContext);
-			}
-
-			processHits(searchContext, hits);
-
-			return hits;
-		}
-		catch (SearchException se) {
-			throw se;
-		}
-		catch (Exception e) {
-			throw new SearchException(e);
-		}
-	}
-
-	@Override
-	public void unregisterIndexerPostProcessor(
-		IndexerPostProcessor indexerPostProcessor) {
-
-		throw new UnsupportedOperationException();
 	}
 
 	protected void addSearchExpandoKeywords(
@@ -165,6 +88,16 @@ public class FacetedSearcher extends BaseIndexer {
 				searchQuery, searchContext, Field.ASSET_CATEGORY_TITLES, false);
 
 			searchQuery.addExactTerm(Field.ASSET_TAG_NAMES, keywords);
+
+			int groupId = GetterUtil.getInteger(
+				searchContext.getAttribute(Field.GROUP_ID));
+
+			if (groupId == 0) {
+				searchQuery.addTerm(
+					Field.STAGING_GROUP, "true", false,
+					BooleanClauseOccur.MUST_NOT);
+			}
+
 			searchQuery.addTerms(Field.KEYWORDS, keywords);
 		}
 
@@ -251,45 +184,36 @@ public class FacetedSearcher extends BaseIndexer {
 	}
 
 	@Override
-	protected void doDelete(Object obj) throws Exception {
-		throw new UnsupportedOperationException();
+	protected Hits doSearch(SearchContext searchContext)
+		throws SearchException {
+
+		try {
+			searchContext.setSearchEngineId(getSearchEngineId());
+
+			BooleanQuery contextQuery = BooleanQueryFactoryUtil.create(
+				searchContext);
+
+			contextQuery.addRequiredTerm(
+				Field.COMPANY_ID, searchContext.getCompanyId());
+
+			BooleanQuery fullQuery = createFullQuery(
+				contextQuery, searchContext);
+
+			QueryConfig queryConfig = searchContext.getQueryConfig();
+
+			fullQuery.setQueryConfig(queryConfig);
+
+			return SearchEngineUtil.search(searchContext, fullQuery);
+		}
+		catch (Exception e) {
+			throw new SearchException(e);
+		}
 	}
 
 	@Override
-	protected Document doGetDocument(Object obj) throws Exception {
-		throw new UnsupportedOperationException();
-	}
+	protected boolean isUseSearchResultPermissionFilter(
+		SearchContext searchContext) {
 
-	@Override
-	protected Summary doGetSummary(
-			Document document, Locale locale, String snippet,
-			PortletURL portletURL)
-		throws Exception {
-
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	protected void doReindex(Object obj) throws Exception {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	protected void doReindex(String className, long classPK) throws Exception {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	protected void doReindex(String[] ids) throws Exception {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	protected String getPortletId(SearchContext searchContext) {
-		return null;
-	}
-
-	protected boolean isFilterSearch(SearchContext searchContext) {
 		if (searchContext.getEntryClassNames() == null) {
 			return super.isFilterSearch();
 		}
