@@ -101,7 +101,7 @@ public class VerifyLayout extends VerifyProcess {
 		StringBundler sb = new StringBundler(3);
 
 		sb.append("update Layout set layoutPrototypeLinkEnabled = 0 where ");
-		sb.append("type_ = 'link_to_layout' AND ");
+		sb.append("type_ = 'link_to_layout' and ");
 		sb.append("layoutPrototypeLinkEnabled = 1");
 
 		runSQL(sb.toString());
