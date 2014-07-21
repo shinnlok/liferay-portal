@@ -22,22 +22,13 @@
 		display: block;
 	}
 
-	.edit-actions {
-		margin: 1.5em 0;
-	}
-
-	.entry {
-		clear: both;
-	}
-
 	.entry-author {
-		background: url(@theme_image_path@/portlet/edit_guest.png) no-repeat 0 50%;
 		border-right: 1px solid #999;
 		color: #999;
 		float: left;
 		font-weight: bold;
+		line-height: 20px;
 		margin-right: 10px;
-		padding-left: 25px;
 		padding-right: 10px;
 	}
 
@@ -46,14 +37,12 @@
 	}
 
 	.entry-date {
-		background: url(@theme_image_path@/common/date.png) no-repeat 0 50%;
 		color: #999;
-		padding-left: 25px;
 	}
 
 	.entry-footer:after {
 		clear: both;
-		content: ".";
+		content: '';
 		display: block;
 		height: 0;
 		visibility: hidden;
@@ -71,53 +60,34 @@
 	}
 
 	.entry.draft, .entry.pending, .entry.scheduled {
-		background: #eee;
-		border: 1px solid #ccc;
+		background: #EEE;
+		border: 1px solid #CCC;
 		color: #555;
 		padding: 5px;
 
 		h3 {
-			background: url(@theme_image_path@/common/page.png) no-repeat 0 50%;
 			margin-top: 0;
-			padding-left: 20px;
 		}
 	}
 
 	.entry-navigation {
-		background: #eee;
-		border-top: 1px solid #ccc;
+		background: #EEE;
+		border-top: 1px solid #CCC;
 		margin: 15px 0 0;
 		overflow: hidden;
 		padding: 5px;
 
-		a, span {
-			background: url() no-repeat;
-		}
-
 		.previous {
-			background-image: url(@theme_image_path@/arrows/paging_previous.png);
 			float: left;
-			padding-left: 15px;
-		}
-
-		span.previous {
-			background-position: 0 100%;
 		}
 
 		.next {
-			background-image: url(@theme_image_path@/arrows/paging_next.png);
-			background-position: 100% 0;
 			float: right;
-			padding-right: 15px;
-		}
-
-		span.next {
-			background-position: 100% 100%;
 		}
 	}
 
 	.preview {
-		background: #ffc;
+		background: #FFC;
 		border: 1px dotted gray;
 		padding: 3px;
 	}
@@ -139,6 +109,7 @@
 
 	.subscribe {
 		margin-bottom: 1.5em;
+		text-align: right;
 	}
 
 	.taglib-flags {
@@ -150,7 +121,6 @@
 
 	.taglib-ratings.stars {
 		float: left;
-		margin-top: 0.5em;
 	}
 
 	.taglib-social-bookmarks {
@@ -159,7 +129,7 @@
 
 	.form-search:after {
 		clear: both;
-		content: ".";
+		content: '';
 		display: block;
 		height: 0;
 		visibility: hidden;

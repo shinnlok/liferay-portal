@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -13,9 +13,6 @@
  */
 
 package com.liferay.portal.tools.sourceformatter;
-
-import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.File;
 
@@ -49,16 +46,7 @@ public class FTLSourceProcessor extends BaseSourceProcessor {
 
 		String newContent = trimContent(content, false);
 
-		if (isAutoFix() && (newContent != null) &&
-			!content.equals(newContent)) {
-
-			fileUtil.write(file, newContent);
-
-			fileName = StringUtil.replace(
-				fileName, StringPool.BACK_SLASH, StringPool.SLASH);
-
-			sourceFormatterHelper.printError(fileName, file);
-		}
+		compareAndAutoFixContent(file, fileName, content, newContent);
 
 		return newContent;
 	}

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,15 +22,15 @@ import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portlet.dynamicdatalists.model.DDLRecord;
 import com.liferay.portlet.dynamicdatalists.model.DDLRecordVersion;
 import com.liferay.portlet.dynamicdatalists.service.DDLRecordLocalServiceUtil;
+import com.liferay.portlet.dynamicdatamapping.model.DDMFormField;
+import com.liferay.portlet.dynamicdatamapping.model.LocalizedValue;
 import com.liferay.portlet.dynamicdatamapping.storage.Field;
-import com.liferay.portlet.dynamicdatamapping.storage.FieldConstants;
 import com.liferay.portlet.dynamicdatamapping.storage.Fields;
 import com.liferay.portlet.dynamicdatamapping.storage.StorageEngineUtil;
 
 import java.io.Serializable;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Marcellus Tavares
@@ -55,10 +55,10 @@ public class DDLXMLExporter extends BaseDDLExporter {
 	@Override
 	protected byte[] doExport(
 			long recordSetId, int status, int start, int end,
-			OrderByComparator orderByComparator)
+			OrderByComparator<DDLRecord> orderByComparator)
 		throws Exception {
 
-		Map<String, Map<String, String>> fieldsMap = getFieldsMap(recordSetId);
+		List<DDMFormField> ddmFormFields = getDDMFormFields(recordSetId);
 
 		Document document = SAXReaderUtil.createDocument();
 
@@ -75,9 +75,10 @@ public class DDLXMLExporter extends BaseDDLExporter {
 			Fields fields = StorageEngineUtil.getFields(
 				recordVersion.getDDMStorageId());
 
-			for (Map<String, String> fieldMap : fieldsMap.values()) {
-				String label = fieldMap.get(FieldConstants.LABEL);
-				String name = fieldMap.get(FieldConstants.NAME);
+			for (DDMFormField ddmFormField : ddmFormFields) {
+				LocalizedValue label = ddmFormField.getLabel();
+
+				String name = ddmFormField.getName();
 
 				String value = StringPool.BLANK;
 
@@ -87,7 +88,8 @@ public class DDLXMLExporter extends BaseDDLExporter {
 					value = field.getRenderedValue(getLocale());
 				}
 
-				addFieldElement(fieldsElement, label, value);
+				addFieldElement(
+					fieldsElement, label.getValue(getLocale()), value);
 			}
 		}
 

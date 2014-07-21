@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,19 +15,22 @@
 package com.liferay.portlet.bookmarks.service;
 
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
+import com.liferay.portal.model.Group;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.service.ServiceTestUtil;
-import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
-import com.liferay.portal.test.MainServletExecutionTestListener;
-import com.liferay.portal.util.TestPropsValues;
+import com.liferay.portal.test.DeleteAfterTestRun;
+import com.liferay.portal.test.listeners.MainServletExecutionTestListener;
+import com.liferay.portal.test.runners.LiferayIntegrationJUnitTestRunner;
+import com.liferay.portal.util.test.GroupTestUtil;
+import com.liferay.portal.util.test.ServiceContextTestUtil;
+import com.liferay.portal.util.test.TestPropsValues;
 import com.liferay.portlet.bookmarks.model.BookmarksEntry;
 import com.liferay.portlet.bookmarks.model.BookmarksFolder;
-import com.liferay.portlet.bookmarks.util.BookmarksTestUtil;
+import com.liferay.portlet.bookmarks.util.test.BookmarksTestUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -40,14 +43,9 @@ import org.testng.Assert;
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
 public class BookmarksEntryLocalServiceTreeTest {
 
-	@After
-	public void tearDown() throws Exception {
-		for (int i = _entries.size() - 1; i >= 0; i--) {
-			BookmarksEntryLocalServiceUtil.deleteBookmarksEntry(
-				_entries.get(i));
-		}
-
-		BookmarksFolderLocalServiceUtil.deleteBookmarksFolder(_folder);
+	@Before
+	public void setUp() throws Exception {
+		_group = GroupTestUtil.addGroup();
 	}
 
 	@Test
@@ -71,14 +69,15 @@ public class BookmarksEntryLocalServiceTreeTest {
 	}
 
 	protected void createTree() throws Exception {
-		BookmarksEntry entryA = BookmarksTestUtil.addEntry(true);
+		BookmarksEntry entryA = BookmarksTestUtil.addEntry(
+			_group.getGroupId(), true);
 
 		_entries.add(entryA);
 
-		_folder = BookmarksTestUtil.addFolder("Folder A");
+		_folder = BookmarksTestUtil.addFolder(_group.getGroupId(), "Folder A");
 
-		ServiceContext serviceContext = ServiceTestUtil.getServiceContext(
-			TestPropsValues.getGroupId());
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
 
 		BookmarksEntry entryAA = BookmarksTestUtil.addEntry(
 			_folder.getFolderId(), true, serviceContext);
@@ -88,5 +87,8 @@ public class BookmarksEntryLocalServiceTreeTest {
 
 	private List<BookmarksEntry> _entries = new ArrayList<BookmarksEntry>();
 	private BookmarksFolder _folder;
+
+	@DeleteAfterTestRun
+	private Group _group;
 
 }

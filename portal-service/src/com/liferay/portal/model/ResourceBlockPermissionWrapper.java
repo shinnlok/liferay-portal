@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -52,6 +52,7 @@ public class ResourceBlockPermissionWrapper implements ResourceBlockPermission,
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
+		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("resourceBlockPermissionId",
 			getResourceBlockPermissionId());
 		attributes.put("resourceBlockId", getResourceBlockId());
@@ -63,6 +64,12 @@ public class ResourceBlockPermissionWrapper implements ResourceBlockPermission,
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
+		Long mvccVersion = (Long)attributes.get("mvccVersion");
+
+		if (mvccVersion != null) {
+			setMvccVersion(mvccVersion);
+		}
+
 		Long resourceBlockPermissionId = (Long)attributes.get(
 				"resourceBlockPermissionId");
 
@@ -89,6 +96,42 @@ public class ResourceBlockPermissionWrapper implements ResourceBlockPermission,
 		}
 	}
 
+	@Override
+	public java.lang.Object clone() {
+		return new ResourceBlockPermissionWrapper((ResourceBlockPermission)_resourceBlockPermission.clone());
+	}
+
+	@Override
+	public int compareTo(
+		com.liferay.portal.model.ResourceBlockPermission resourceBlockPermission) {
+		return _resourceBlockPermission.compareTo(resourceBlockPermission);
+	}
+
+	/**
+	* Returns the action IDs of this resource block permission.
+	*
+	* @return the action IDs of this resource block permission
+	*/
+	@Override
+	public long getActionIds() {
+		return _resourceBlockPermission.getActionIds();
+	}
+
+	@Override
+	public com.liferay.portlet.expando.model.ExpandoBridge getExpandoBridge() {
+		return _resourceBlockPermission.getExpandoBridge();
+	}
+
+	/**
+	* Returns the mvcc version of this resource block permission.
+	*
+	* @return the mvcc version of this resource block permission
+	*/
+	@Override
+	public long getMvccVersion() {
+		return _resourceBlockPermission.getMvccVersion();
+	}
+
 	/**
 	* Returns the primary key of this resource block permission.
 	*
@@ -99,34 +142,9 @@ public class ResourceBlockPermissionWrapper implements ResourceBlockPermission,
 		return _resourceBlockPermission.getPrimaryKey();
 	}
 
-	/**
-	* Sets the primary key of this resource block permission.
-	*
-	* @param primaryKey the primary key of this resource block permission
-	*/
 	@Override
-	public void setPrimaryKey(long primaryKey) {
-		_resourceBlockPermission.setPrimaryKey(primaryKey);
-	}
-
-	/**
-	* Returns the resource block permission ID of this resource block permission.
-	*
-	* @return the resource block permission ID of this resource block permission
-	*/
-	@Override
-	public long getResourceBlockPermissionId() {
-		return _resourceBlockPermission.getResourceBlockPermissionId();
-	}
-
-	/**
-	* Sets the resource block permission ID of this resource block permission.
-	*
-	* @param resourceBlockPermissionId the resource block permission ID of this resource block permission
-	*/
-	@Override
-	public void setResourceBlockPermissionId(long resourceBlockPermissionId) {
-		_resourceBlockPermission.setResourceBlockPermissionId(resourceBlockPermissionId);
+	public java.io.Serializable getPrimaryKeyObj() {
+		return _resourceBlockPermission.getPrimaryKeyObj();
 	}
 
 	/**
@@ -140,13 +158,13 @@ public class ResourceBlockPermissionWrapper implements ResourceBlockPermission,
 	}
 
 	/**
-	* Sets the resource block ID of this resource block permission.
+	* Returns the resource block permission ID of this resource block permission.
 	*
-	* @param resourceBlockId the resource block ID of this resource block permission
+	* @return the resource block permission ID of this resource block permission
 	*/
 	@Override
-	public void setResourceBlockId(long resourceBlockId) {
-		_resourceBlockPermission.setResourceBlockId(resourceBlockId);
+	public long getResourceBlockPermissionId() {
+		return _resourceBlockPermission.getResourceBlockPermissionId();
 	}
 
 	/**
@@ -159,24 +177,29 @@ public class ResourceBlockPermissionWrapper implements ResourceBlockPermission,
 		return _resourceBlockPermission.getRoleId();
 	}
 
-	/**
-	* Sets the role ID of this resource block permission.
-	*
-	* @param roleId the role ID of this resource block permission
-	*/
 	@Override
-	public void setRoleId(long roleId) {
-		_resourceBlockPermission.setRoleId(roleId);
+	public int hashCode() {
+		return _resourceBlockPermission.hashCode();
 	}
 
-	/**
-	* Returns the action IDs of this resource block permission.
-	*
-	* @return the action IDs of this resource block permission
-	*/
 	@Override
-	public long getActionIds() {
-		return _resourceBlockPermission.getActionIds();
+	public boolean isCachedModel() {
+		return _resourceBlockPermission.isCachedModel();
+	}
+
+	@Override
+	public boolean isEscapedModel() {
+		return _resourceBlockPermission.isEscapedModel();
+	}
+
+	@Override
+	public boolean isNew() {
+		return _resourceBlockPermission.isNew();
+	}
+
+	@Override
+	public void persist() {
+		_resourceBlockPermission.persist();
 	}
 
 	/**
@@ -190,43 +213,8 @@ public class ResourceBlockPermissionWrapper implements ResourceBlockPermission,
 	}
 
 	@Override
-	public boolean isNew() {
-		return _resourceBlockPermission.isNew();
-	}
-
-	@Override
-	public void setNew(boolean n) {
-		_resourceBlockPermission.setNew(n);
-	}
-
-	@Override
-	public boolean isCachedModel() {
-		return _resourceBlockPermission.isCachedModel();
-	}
-
-	@Override
 	public void setCachedModel(boolean cachedModel) {
 		_resourceBlockPermission.setCachedModel(cachedModel);
-	}
-
-	@Override
-	public boolean isEscapedModel() {
-		return _resourceBlockPermission.isEscapedModel();
-	}
-
-	@Override
-	public java.io.Serializable getPrimaryKeyObj() {
-		return _resourceBlockPermission.getPrimaryKeyObj();
-	}
-
-	@Override
-	public void setPrimaryKeyObj(java.io.Serializable primaryKeyObj) {
-		_resourceBlockPermission.setPrimaryKeyObj(primaryKeyObj);
-	}
-
-	@Override
-	public com.liferay.portlet.expando.model.ExpandoBridge getExpandoBridge() {
-		return _resourceBlockPermission.getExpandoBridge();
 	}
 
 	@Override
@@ -247,20 +235,64 @@ public class ResourceBlockPermissionWrapper implements ResourceBlockPermission,
 		_resourceBlockPermission.setExpandoBridgeAttributes(serviceContext);
 	}
 
+	/**
+	* Sets the mvcc version of this resource block permission.
+	*
+	* @param mvccVersion the mvcc version of this resource block permission
+	*/
 	@Override
-	public java.lang.Object clone() {
-		return new ResourceBlockPermissionWrapper((ResourceBlockPermission)_resourceBlockPermission.clone());
+	public void setMvccVersion(long mvccVersion) {
+		_resourceBlockPermission.setMvccVersion(mvccVersion);
 	}
 
 	@Override
-	public int compareTo(
-		com.liferay.portal.model.ResourceBlockPermission resourceBlockPermission) {
-		return _resourceBlockPermission.compareTo(resourceBlockPermission);
+	public void setNew(boolean n) {
+		_resourceBlockPermission.setNew(n);
+	}
+
+	/**
+	* Sets the primary key of this resource block permission.
+	*
+	* @param primaryKey the primary key of this resource block permission
+	*/
+	@Override
+	public void setPrimaryKey(long primaryKey) {
+		_resourceBlockPermission.setPrimaryKey(primaryKey);
 	}
 
 	@Override
-	public int hashCode() {
-		return _resourceBlockPermission.hashCode();
+	public void setPrimaryKeyObj(java.io.Serializable primaryKeyObj) {
+		_resourceBlockPermission.setPrimaryKeyObj(primaryKeyObj);
+	}
+
+	/**
+	* Sets the resource block ID of this resource block permission.
+	*
+	* @param resourceBlockId the resource block ID of this resource block permission
+	*/
+	@Override
+	public void setResourceBlockId(long resourceBlockId) {
+		_resourceBlockPermission.setResourceBlockId(resourceBlockId);
+	}
+
+	/**
+	* Sets the resource block permission ID of this resource block permission.
+	*
+	* @param resourceBlockPermissionId the resource block permission ID of this resource block permission
+	*/
+	@Override
+	public void setResourceBlockPermissionId(long resourceBlockPermissionId) {
+		_resourceBlockPermission.setResourceBlockPermissionId(resourceBlockPermissionId);
+	}
+
+	/**
+	* Sets the role ID of this resource block permission.
+	*
+	* @param roleId the role ID of this resource block permission
+	*/
+	@Override
+	public void setRoleId(long roleId) {
+		_resourceBlockPermission.setRoleId(roleId);
 	}
 
 	@Override
@@ -274,24 +306,18 @@ public class ResourceBlockPermissionWrapper implements ResourceBlockPermission,
 	}
 
 	@Override
-	public com.liferay.portal.model.ResourceBlockPermission toUnescapedModel() {
-		return new ResourceBlockPermissionWrapper(_resourceBlockPermission.toUnescapedModel());
-	}
-
-	@Override
 	public java.lang.String toString() {
 		return _resourceBlockPermission.toString();
 	}
 
 	@Override
-	public java.lang.String toXmlString() {
-		return _resourceBlockPermission.toXmlString();
+	public com.liferay.portal.model.ResourceBlockPermission toUnescapedModel() {
+		return new ResourceBlockPermissionWrapper(_resourceBlockPermission.toUnescapedModel());
 	}
 
 	@Override
-	public void persist()
-		throws com.liferay.portal.kernel.exception.SystemException {
-		_resourceBlockPermission.persist();
+	public java.lang.String toXmlString() {
+		return _resourceBlockPermission.toXmlString();
 	}
 
 	@Override

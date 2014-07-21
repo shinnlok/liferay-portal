@@ -13,7 +13,11 @@
 	<td></td>
 	<td>CPWebcontentTemplatesAddtemplate</td>
 </tr>
-<!---->
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
 <tr>
 	<td>TEMPLATES_IFRAME</td>
 	<td>//div[contains(@class,'dialog-iframe-bd')]/iframe[contains(@src,'scopeTitle=Templates')]</td>
@@ -30,13 +34,18 @@
 	<td></td>
 </tr>
 <tr>
+	<td>LOCALIZATION_NAME</td>
+	<td>//td[@data-value='${key_localizationName}']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>NAME_FIELD_REQUIRED</td>
 	<td>//span[@id='_166_nameBoundingBox']/div/div[@class='required']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>DETAILS</td>
-	<td>//div[@class='accordion-toggle']</td>
+	<td>//div[@class='panel-toggle']</td>
 	<td></td>
 </tr>
 <tr>
@@ -46,7 +55,7 @@
 </tr>
 <tr>
 	<td>STRUCTURE</td>
-	<td>//div[contains(@class,'control-group') and contains(@class,'field-wrapper')]/input</td>
+	<td>//input[@id='_166_structure']</td>
 	<td></td>
 </tr>
 <tr>
@@ -71,19 +80,39 @@
 </tr>
 <tr>
 	<td>CANCEL_BUTTON</td>
-	<td>//button[contains(., 'Cancel')]</td>
+	<td>//a[contains(@class,'btn-cancel')]</td>
 	<td></td>
 </tr>
-<!---->
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+<!--PALETTE-->
+<tr>
+	<td>PALETTE_FIELD</td>
+	<td>//div[contains(@class,'palette-section') and contains(.,'Fields')]//ul/li/span[contains(.,'${key_fieldName}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
 <!--SCRIPT-->
 <tr>
 	<td>SCRIPT_CONTENT_FIELD</td>
-	<td>//div[@id='_166_richEditor']/div/div[@class='ace_content']</td>
+	<td>//textarea[@class='ace_text-input']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>SCRIPT_FIELDS_1</td>
 	<td>//div[@id='_166_paletteData']/div[2]/ul/li/span</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SCRIPT_FIELD</td>
+	<td>//div[@class='palette-section' and contains(.,'Fields')]/ul/li/span[contains(.,'${key_fieldName}')]</td>
 	<td></td>
 </tr>
 <tr>

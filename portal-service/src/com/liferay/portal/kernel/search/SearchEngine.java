@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,6 +22,9 @@ import com.liferay.portal.kernel.cluster.Priority;
  */
 public interface SearchEngine {
 
+	public String backup(long companyId, String backupName)
+		throws SearchException;
+
 	public BooleanClauseFactory getBooleanClauseFactory();
 
 	public BooleanQueryFactory getBooleanQueryFactory();
@@ -38,8 +41,18 @@ public interface SearchEngine {
 
 	public String getVendor();
 
+	public void initialize(long companyId);
+
 	public boolean isClusteredWrite();
 
 	public boolean isLuceneBased();
+
+	public void removeBackup(long companyId, String backupName)
+		throws SearchException;
+
+	public void removeCompany(long companyId);
+
+	public void restore(long companyId, String backupName)
+		throws SearchException;
 
 }

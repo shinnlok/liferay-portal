@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.blogs.asset;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.LiferayPortletURL;
@@ -23,7 +22,6 @@ import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortletKeys;
-import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.asset.model.AssetRenderer;
 import com.liferay.portlet.asset.model.BaseAssetRendererFactory;
 import com.liferay.portlet.blogs.model.BlogsEntry;
@@ -47,9 +45,13 @@ public class BlogsEntryAssetRendererFactory extends BaseAssetRendererFactory {
 
 	public static final String TYPE = "blog";
 
+	public BlogsEntryAssetRendererFactory() {
+		setLinkable(true);
+	}
+
 	@Override
 	public AssetRenderer getAssetRenderer(long classPK, int type)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		BlogsEntry entry = BlogsEntryLocalServiceUtil.getEntry(classPK);
 
@@ -63,7 +65,7 @@ public class BlogsEntryAssetRendererFactory extends BaseAssetRendererFactory {
 
 	@Override
 	public AssetRenderer getAssetRenderer(long groupId, String urlTitle)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		BlogsEntry entry = BlogsEntryServiceUtil.getEntry(groupId, urlTitle);
 
@@ -76,6 +78,11 @@ public class BlogsEntryAssetRendererFactory extends BaseAssetRendererFactory {
 	}
 
 	@Override
+	public String getIconCssClass() {
+		return "icon-edit";
+	}
+
+	@Override
 	public String getType() {
 		return TYPE;
 	}
@@ -84,17 +91,6 @@ public class BlogsEntryAssetRendererFactory extends BaseAssetRendererFactory {
 	public PortletURL getURLAdd(
 		LiferayPortletRequest liferayPortletRequest,
 		LiferayPortletResponse liferayPortletResponse) {
-
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)liferayPortletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
-
-		if (!BlogsPermission.contains(
-				themeDisplay.getPermissionChecker(),
-				themeDisplay.getScopeGroupId(), ActionKeys.ADD_ENTRY)) {
-
-			return null;
-		}
 
 		PortletURL portletURL = liferayPortletResponse.createRenderURL(
 			PortletKeys.BLOGS);
@@ -123,6 +119,15 @@ public class BlogsEntryAssetRendererFactory extends BaseAssetRendererFactory {
 	}
 
 	@Override
+	public boolean hasAddPermission(
+			PermissionChecker permissionChecker, long groupId, long classTypeId)
+		throws Exception {
+
+		return BlogsPermission.contains(
+			permissionChecker, groupId, ActionKeys.ADD_ENTRY);
+	}
+
+	@Override
 	public boolean hasPermission(
 			PermissionChecker permissionChecker, long classPK, String actionId)
 		throws Exception {
@@ -132,15 +137,8 @@ public class BlogsEntryAssetRendererFactory extends BaseAssetRendererFactory {
 	}
 
 	@Override
-	public boolean isLinkable() {
-		return _LINKABLE;
-	}
-
-	@Override
 	protected String getIconPath(ThemeDisplay themeDisplay) {
 		return themeDisplay.getPathThemeImages() + "/blogs/blogs.png";
 	}
-
-	private static final boolean _LINKABLE = true;
 
 }

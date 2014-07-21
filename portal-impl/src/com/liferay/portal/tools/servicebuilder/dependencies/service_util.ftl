@@ -7,6 +7,10 @@ import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 import com.liferay.portal.service.Invokable${sessionTypeName}Service;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.util.tracker.ServiceTracker;
+
 <#if sessionTypeName == "Local">
 /**
  * Provides the local service utility for ${entity.name}. This utility wraps
@@ -68,12 +72,13 @@ public class ${entity.name}${sessionTypeName}ServiceUtil {
 			<#if serviceBuilder.hasAnnotation(method, "Deprecated")>
 				@Deprecated
 			</#if>
+			public static
 
-			<#if method.name = "dynamicQuery" && (method.parameters?size != 0)>
-				@SuppressWarnings("rawtypes")
+			<#if method.name = "dynamicQuery" && (serviceBuilder.getTypeGenericsName(method.returns) == "java.util.List<T>")>
+				<T>
 			</#if>
 
-			public static ${serviceBuilder.getTypeGenericsName(method.returns)} ${method.name}(
+			${serviceBuilder.getTypeGenericsName(method.returns)} ${method.name}(
 
 			<#list method.parameters as parameter>
 				${serviceBuilder.getTypeGenericsName(parameter.type)} ${parameter.name}
@@ -124,24 +129,28 @@ public class ${entity.name}${sessionTypeName}ServiceUtil {
 	</#if>
 
 	public static ${entity.name}${sessionTypeName}Service getService() {
-		if (_service == null) {
-			<#if pluginName != "">
-				Invokable${sessionTypeName}Service invokable${sessionTypeName}Service = (Invokable${sessionTypeName}Service)PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), ${entity.name}${sessionTypeName}Service.class.getName());
+		<#if osgiModule>
+			return _serviceTracker.getService();
+		<#else>
+			if (_service == null) {
+				<#if pluginName != "">
+					Invokable${sessionTypeName}Service invokable${sessionTypeName}Service = (Invokable${sessionTypeName}Service)PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), ${entity.name}${sessionTypeName}Service.class.getName());
 
-				if (invokable${sessionTypeName}Service instanceof ${entity.name}${sessionTypeName}Service) {
-					_service = (${entity.name}${sessionTypeName}Service)invokable${sessionTypeName}Service;
-				}
-				else {
-					_service = new ${entity.name}${sessionTypeName}ServiceClp(invokable${sessionTypeName}Service);
-				}
-			<#else>
-				_service = (${entity.name}${sessionTypeName}Service)PortalBeanLocatorUtil.locate(${entity.name}${sessionTypeName}Service.class.getName());
-			</#if>
+					if (invokable${sessionTypeName}Service instanceof ${entity.name}${sessionTypeName}Service) {
+						_service = (${entity.name}${sessionTypeName}Service)invokable${sessionTypeName}Service;
+					}
+					else {
+						_service = new ${entity.name}${sessionTypeName}ServiceClp(invokable${sessionTypeName}Service);
+					}
+				<#else>
+					_service = (${entity.name}${sessionTypeName}Service)PortalBeanLocatorUtil.locate(${entity.name}${sessionTypeName}Service.class.getName());
+				</#if>
 
-			ReferenceRegistry.registerReference(${entity.name}${sessionTypeName}ServiceUtil.class, "_service");
-		}
+				ReferenceRegistry.registerReference(${entity.name}${sessionTypeName}ServiceUtil.class, "_service");
+			}
 
-		return _service;
+			return _service;
+		</#if>
 	}
 
 	/**
@@ -151,6 +160,18 @@ public class ${entity.name}${sessionTypeName}ServiceUtil {
 	public void setService(${entity.name}${sessionTypeName}Service service) {
 	}
 
-	private static ${entity.name}${sessionTypeName}Service _service;
+	<#if osgiModule>
+		private static ServiceTracker<${entity.name}${sessionTypeName}Service, ${entity.name}${sessionTypeName}Service> _serviceTracker;
+
+		static {
+			Bundle bundle = FrameworkUtil.getBundle(${entity.name}${sessionTypeName}ServiceUtil.class);
+
+			_serviceTracker = new ServiceTracker<${entity.name}${sessionTypeName}Service, ${entity.name}${sessionTypeName}Service>(bundle.getBundleContext(), ${entity.name}${sessionTypeName}Service.class, null);
+
+			_serviceTracker.open();
+		}
+	<#else>
+		private static ${entity.name}${sessionTypeName}Service _service;
+	</#if>
 
 }

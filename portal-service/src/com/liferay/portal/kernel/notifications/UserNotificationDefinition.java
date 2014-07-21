@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,6 +21,10 @@ import java.util.Map;
  * @author Jonathan Lee
  */
 public class UserNotificationDefinition {
+
+	public static final int NOTIFICATION_TYPE_ADD_ENTRY = 0;
+
+	public static final int NOTIFICATION_TYPE_UPDATE_ENTRY = 1;
 
 	public UserNotificationDefinition(
 		String portletId, long classNameId, int notificationType,

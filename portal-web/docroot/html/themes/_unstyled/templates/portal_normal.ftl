@@ -14,7 +14,7 @@
 
 <body class="${css_class}">
 
-<a href="#main-content" id="skip-to-content"><@liferay.language key="skip-to-content" /></a>
+<@liferay.quick_access content_id="#main-content" />
 
 ${theme.include(body_top_include)}
 
@@ -31,19 +31,15 @@ ${theme.include(body_top_include)}
 				</a>
 
 				<#if show_site_name>
-					<span class="site-name" title="<@liferay.language_format objects="${site_name}" key="go-to-x" />">
+					<span class="site-name" title="<@liferay.language_format arguments="${site_name}" key="go-to-x" />">
 						${site_name}
 					</span>
 				</#if>
 			</h1>
-
-			<h2 class="page-title">
-				<span>${the_title}</span>
-			</h2>
 		</div>
 
 		<#if !is_signed_in>
-			<a href="${sign_in_url}" data-redirect="${is_login_redirect_required?string}" id="sign-in" rel="nofollow">${sign_in_text}</a>
+			<a data-redirect="${is_login_redirect_required?string}" href="${sign_in_url}" id="sign-in" rel="nofollow">${sign_in_text}</a>
 		</#if>
 
 		<#if has_navigation || is_signed_in>
@@ -51,8 +47,12 @@ ${theme.include(body_top_include)}
 		</#if>
 	</header>
 
-	<div id="content">
-		<nav id="breadcrumbs"><@liferay.breadcrumbs /></nav>
+	<section id="content">
+		<h1 class="hide-accessible">${the_title}</h1>
+
+		<nav id="breadcrumbs">
+			<@liferay.breadcrumbs />
+		</nav>
 
 		<#if selectable>
 			${theme.include(content_include)}
@@ -63,7 +63,7 @@ ${theme.include(body_top_include)}
 
 			${theme.wrapPortlet("portlet.ftl", content_include)}
 		</#if>
-	</div>
+	</section>
 
 	<footer id="footer" role="contentinfo">
 		<p class="powered-by">

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -53,6 +53,7 @@ public class LayoutSetPrototypeWrapper implements LayoutSetPrototype,
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
+		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("uuid", getUuid());
 		attributes.put("layoutSetPrototypeId", getLayoutSetPrototypeId());
 		attributes.put("companyId", getCompanyId());
@@ -70,6 +71,12 @@ public class LayoutSetPrototypeWrapper implements LayoutSetPrototype,
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
+		Long mvccVersion = (Long)attributes.get("mvccVersion");
+
+		if (mvccVersion != null) {
+			setMvccVersion(mvccVersion);
+		}
+
 		String uuid = (String)attributes.get("uuid");
 
 		if (uuid != null) {
@@ -137,64 +144,30 @@ public class LayoutSetPrototypeWrapper implements LayoutSetPrototype,
 		}
 	}
 
-	/**
-	* Returns the primary key of this layout set prototype.
-	*
-	* @return the primary key of this layout set prototype
-	*/
 	@Override
-	public long getPrimaryKey() {
-		return _layoutSetPrototype.getPrimaryKey();
+	public java.lang.Object clone() {
+		return new LayoutSetPrototypeWrapper((LayoutSetPrototype)_layoutSetPrototype.clone());
+	}
+
+	@Override
+	public int compareTo(
+		com.liferay.portal.model.LayoutSetPrototype layoutSetPrototype) {
+		return _layoutSetPrototype.compareTo(layoutSetPrototype);
 	}
 
 	/**
-	* Sets the primary key of this layout set prototype.
+	* Returns the active of this layout set prototype.
 	*
-	* @param primaryKey the primary key of this layout set prototype
+	* @return the active of this layout set prototype
 	*/
 	@Override
-	public void setPrimaryKey(long primaryKey) {
-		_layoutSetPrototype.setPrimaryKey(primaryKey);
+	public boolean getActive() {
+		return _layoutSetPrototype.getActive();
 	}
 
-	/**
-	* Returns the uuid of this layout set prototype.
-	*
-	* @return the uuid of this layout set prototype
-	*/
 	@Override
-	public java.lang.String getUuid() {
-		return _layoutSetPrototype.getUuid();
-	}
-
-	/**
-	* Sets the uuid of this layout set prototype.
-	*
-	* @param uuid the uuid of this layout set prototype
-	*/
-	@Override
-	public void setUuid(java.lang.String uuid) {
-		_layoutSetPrototype.setUuid(uuid);
-	}
-
-	/**
-	* Returns the layout set prototype ID of this layout set prototype.
-	*
-	* @return the layout set prototype ID of this layout set prototype
-	*/
-	@Override
-	public long getLayoutSetPrototypeId() {
-		return _layoutSetPrototype.getLayoutSetPrototypeId();
-	}
-
-	/**
-	* Sets the layout set prototype ID of this layout set prototype.
-	*
-	* @param layoutSetPrototypeId the layout set prototype ID of this layout set prototype
-	*/
-	@Override
-	public void setLayoutSetPrototypeId(long layoutSetPrototypeId) {
-		_layoutSetPrototype.setLayoutSetPrototypeId(layoutSetPrototypeId);
+	public java.lang.String[] getAvailableLanguageIds() {
+		return _layoutSetPrototype.getAvailableLanguageIds();
 	}
 
 	/**
@@ -208,78 +181,6 @@ public class LayoutSetPrototypeWrapper implements LayoutSetPrototype,
 	}
 
 	/**
-	* Sets the company ID of this layout set prototype.
-	*
-	* @param companyId the company ID of this layout set prototype
-	*/
-	@Override
-	public void setCompanyId(long companyId) {
-		_layoutSetPrototype.setCompanyId(companyId);
-	}
-
-	/**
-	* Returns the user ID of this layout set prototype.
-	*
-	* @return the user ID of this layout set prototype
-	*/
-	@Override
-	public long getUserId() {
-		return _layoutSetPrototype.getUserId();
-	}
-
-	/**
-	* Sets the user ID of this layout set prototype.
-	*
-	* @param userId the user ID of this layout set prototype
-	*/
-	@Override
-	public void setUserId(long userId) {
-		_layoutSetPrototype.setUserId(userId);
-	}
-
-	/**
-	* Returns the user uuid of this layout set prototype.
-	*
-	* @return the user uuid of this layout set prototype
-	* @throws SystemException if a system exception occurred
-	*/
-	@Override
-	public java.lang.String getUserUuid()
-		throws com.liferay.portal.kernel.exception.SystemException {
-		return _layoutSetPrototype.getUserUuid();
-	}
-
-	/**
-	* Sets the user uuid of this layout set prototype.
-	*
-	* @param userUuid the user uuid of this layout set prototype
-	*/
-	@Override
-	public void setUserUuid(java.lang.String userUuid) {
-		_layoutSetPrototype.setUserUuid(userUuid);
-	}
-
-	/**
-	* Returns the user name of this layout set prototype.
-	*
-	* @return the user name of this layout set prototype
-	*/
-	@Override
-	public java.lang.String getUserName() {
-		return _layoutSetPrototype.getUserName();
-	}
-
-	/**
-	* Sets the user name of this layout set prototype.
-	*
-	* @param userName the user name of this layout set prototype
-	*/
-	@Override
-	public void setUserName(java.lang.String userName) {
-		_layoutSetPrototype.setUserName(userName);
-	}
-
-	/**
 	* Returns the create date of this layout set prototype.
 	*
 	* @return the create date of this layout set prototype
@@ -289,14 +190,120 @@ public class LayoutSetPrototypeWrapper implements LayoutSetPrototype,
 		return _layoutSetPrototype.getCreateDate();
 	}
 
+	@Override
+	public java.lang.String getDefaultLanguageId() {
+		return _layoutSetPrototype.getDefaultLanguageId();
+	}
+
 	/**
-	* Sets the create date of this layout set prototype.
+	* Returns the description of this layout set prototype.
 	*
-	* @param createDate the create date of this layout set prototype
+	* @return the description of this layout set prototype
 	*/
 	@Override
-	public void setCreateDate(java.util.Date createDate) {
-		_layoutSetPrototype.setCreateDate(createDate);
+	public java.lang.String getDescription() {
+		return _layoutSetPrototype.getDescription();
+	}
+
+	/**
+	* Returns the localized description of this layout set prototype in the language. Uses the default language if no localization exists for the requested language.
+	*
+	* @param languageId the ID of the language
+	* @return the localized description of this layout set prototype
+	*/
+	@Override
+	public java.lang.String getDescription(java.lang.String languageId) {
+		return _layoutSetPrototype.getDescription(languageId);
+	}
+
+	/**
+	* Returns the localized description of this layout set prototype in the language, optionally using the default language if no localization exists for the requested language.
+	*
+	* @param languageId the ID of the language
+	* @param useDefault whether to use the default language if no localization exists for the requested language
+	* @return the localized description of this layout set prototype
+	*/
+	@Override
+	public java.lang.String getDescription(java.lang.String languageId,
+		boolean useDefault) {
+		return _layoutSetPrototype.getDescription(languageId, useDefault);
+	}
+
+	/**
+	* Returns the localized description of this layout set prototype in the language. Uses the default language if no localization exists for the requested language.
+	*
+	* @param locale the locale of the language
+	* @return the localized description of this layout set prototype
+	*/
+	@Override
+	public java.lang.String getDescription(java.util.Locale locale) {
+		return _layoutSetPrototype.getDescription(locale);
+	}
+
+	/**
+	* Returns the localized description of this layout set prototype in the language, optionally using the default language if no localization exists for the requested language.
+	*
+	* @param locale the local of the language
+	* @param useDefault whether to use the default language if no localization exists for the requested language
+	* @return the localized description of this layout set prototype. If <code>useDefault</code> is <code>false</code> and no localization exists for the requested language, an empty string will be returned.
+	*/
+	@Override
+	public java.lang.String getDescription(java.util.Locale locale,
+		boolean useDefault) {
+		return _layoutSetPrototype.getDescription(locale, useDefault);
+	}
+
+	@Override
+	public java.lang.String getDescriptionCurrentLanguageId() {
+		return _layoutSetPrototype.getDescriptionCurrentLanguageId();
+	}
+
+	@Override
+	public java.lang.String getDescriptionCurrentValue() {
+		return _layoutSetPrototype.getDescriptionCurrentValue();
+	}
+
+	/**
+	* Returns a map of the locales and localized descriptions of this layout set prototype.
+	*
+	* @return the locales and localized descriptions of this layout set prototype
+	*/
+	@Override
+	public java.util.Map<java.util.Locale, java.lang.String> getDescriptionMap() {
+		return _layoutSetPrototype.getDescriptionMap();
+	}
+
+	@Override
+	public com.liferay.portlet.expando.model.ExpandoBridge getExpandoBridge() {
+		return _layoutSetPrototype.getExpandoBridge();
+	}
+
+	@Override
+	public com.liferay.portal.model.Group getGroup()
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _layoutSetPrototype.getGroup();
+	}
+
+	@Override
+	public long getGroupId()
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _layoutSetPrototype.getGroupId();
+	}
+
+	@Override
+	public com.liferay.portal.model.LayoutSet getLayoutSet()
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _layoutSetPrototype.getLayoutSet();
+	}
+
+	/**
+	* Returns the layout set prototype ID of this layout set prototype.
+	*
+	* @return the layout set prototype ID of this layout set prototype
+	*/
+	@Override
+	public long getLayoutSetPrototypeId() {
+		return _layoutSetPrototype.getLayoutSetPrototypeId();
 	}
 
 	/**
@@ -310,13 +317,13 @@ public class LayoutSetPrototypeWrapper implements LayoutSetPrototype,
 	}
 
 	/**
-	* Sets the modified date of this layout set prototype.
+	* Returns the mvcc version of this layout set prototype.
 	*
-	* @param modifiedDate the modified date of this layout set prototype
+	* @return the mvcc version of this layout set prototype
 	*/
 	@Override
-	public void setModifiedDate(java.util.Date modifiedDate) {
-		_layoutSetPrototype.setModifiedDate(modifiedDate);
+	public long getMvccVersion() {
+		return _layoutSetPrototype.getMvccVersion();
 	}
 
 	/**
@@ -327,29 +334,6 @@ public class LayoutSetPrototypeWrapper implements LayoutSetPrototype,
 	@Override
 	public java.lang.String getName() {
 		return _layoutSetPrototype.getName();
-	}
-
-	/**
-	* Returns the localized name of this layout set prototype in the language. Uses the default language if no localization exists for the requested language.
-	*
-	* @param locale the locale of the language
-	* @return the localized name of this layout set prototype
-	*/
-	@Override
-	public java.lang.String getName(java.util.Locale locale) {
-		return _layoutSetPrototype.getName(locale);
-	}
-
-	/**
-	* Returns the localized name of this layout set prototype in the language, optionally using the default language if no localization exists for the requested language.
-	*
-	* @param locale the local of the language
-	* @param useDefault whether to use the default language if no localization exists for the requested language
-	* @return the localized name of this layout set prototype. If <code>useDefault</code> is <code>false</code> and no localization exists for the requested language, an empty string will be returned.
-	*/
-	@Override
-	public java.lang.String getName(java.util.Locale locale, boolean useDefault) {
-		return _layoutSetPrototype.getName(locale, useDefault);
 	}
 
 	/**
@@ -376,6 +360,29 @@ public class LayoutSetPrototypeWrapper implements LayoutSetPrototype,
 		return _layoutSetPrototype.getName(languageId, useDefault);
 	}
 
+	/**
+	* Returns the localized name of this layout set prototype in the language. Uses the default language if no localization exists for the requested language.
+	*
+	* @param locale the locale of the language
+	* @return the localized name of this layout set prototype
+	*/
+	@Override
+	public java.lang.String getName(java.util.Locale locale) {
+		return _layoutSetPrototype.getName(locale);
+	}
+
+	/**
+	* Returns the localized name of this layout set prototype in the language, optionally using the default language if no localization exists for the requested language.
+	*
+	* @param locale the local of the language
+	* @param useDefault whether to use the default language if no localization exists for the requested language
+	* @return the localized name of this layout set prototype. If <code>useDefault</code> is <code>false</code> and no localization exists for the requested language, an empty string will be returned.
+	*/
+	@Override
+	public java.lang.String getName(java.util.Locale locale, boolean useDefault) {
+		return _layoutSetPrototype.getName(locale, useDefault);
+	}
+
 	@Override
 	public java.lang.String getNameCurrentLanguageId() {
 		return _layoutSetPrototype.getNameCurrentLanguageId();
@@ -394,6 +401,276 @@ public class LayoutSetPrototypeWrapper implements LayoutSetPrototype,
 	@Override
 	public java.util.Map<java.util.Locale, java.lang.String> getNameMap() {
 		return _layoutSetPrototype.getNameMap();
+	}
+
+	/**
+	* Returns the primary key of this layout set prototype.
+	*
+	* @return the primary key of this layout set prototype
+	*/
+	@Override
+	public long getPrimaryKey() {
+		return _layoutSetPrototype.getPrimaryKey();
+	}
+
+	@Override
+	public java.io.Serializable getPrimaryKeyObj() {
+		return _layoutSetPrototype.getPrimaryKeyObj();
+	}
+
+	/**
+	* Returns the settings of this layout set prototype.
+	*
+	* @return the settings of this layout set prototype
+	*/
+	@Override
+	public java.lang.String getSettings() {
+		return _layoutSetPrototype.getSettings();
+	}
+
+	@Override
+	public com.liferay.portal.kernel.util.UnicodeProperties getSettingsProperties() {
+		return _layoutSetPrototype.getSettingsProperties();
+	}
+
+	@Override
+	public java.lang.String getSettingsProperty(java.lang.String key) {
+		return _layoutSetPrototype.getSettingsProperty(key);
+	}
+
+	/**
+	* Returns the user ID of this layout set prototype.
+	*
+	* @return the user ID of this layout set prototype
+	*/
+	@Override
+	public long getUserId() {
+		return _layoutSetPrototype.getUserId();
+	}
+
+	/**
+	* Returns the user name of this layout set prototype.
+	*
+	* @return the user name of this layout set prototype
+	*/
+	@Override
+	public java.lang.String getUserName() {
+		return _layoutSetPrototype.getUserName();
+	}
+
+	/**
+	* Returns the user uuid of this layout set prototype.
+	*
+	* @return the user uuid of this layout set prototype
+	*/
+	@Override
+	public java.lang.String getUserUuid() {
+		return _layoutSetPrototype.getUserUuid();
+	}
+
+	/**
+	* Returns the uuid of this layout set prototype.
+	*
+	* @return the uuid of this layout set prototype
+	*/
+	@Override
+	public java.lang.String getUuid() {
+		return _layoutSetPrototype.getUuid();
+	}
+
+	@Override
+	public int hashCode() {
+		return _layoutSetPrototype.hashCode();
+	}
+
+	/**
+	* Returns <code>true</code> if this layout set prototype is active.
+	*
+	* @return <code>true</code> if this layout set prototype is active; <code>false</code> otherwise
+	*/
+	@Override
+	public boolean isActive() {
+		return _layoutSetPrototype.isActive();
+	}
+
+	@Override
+	public boolean isCachedModel() {
+		return _layoutSetPrototype.isCachedModel();
+	}
+
+	@Override
+	public boolean isEscapedModel() {
+		return _layoutSetPrototype.isEscapedModel();
+	}
+
+	@Override
+	public boolean isNew() {
+		return _layoutSetPrototype.isNew();
+	}
+
+	@Override
+	public void persist() {
+		_layoutSetPrototype.persist();
+	}
+
+	@Override
+	public void prepareLocalizedFieldsForImport()
+		throws com.liferay.portal.LocaleException {
+		_layoutSetPrototype.prepareLocalizedFieldsForImport();
+	}
+
+	@Override
+	public void prepareLocalizedFieldsForImport(
+		java.util.Locale defaultImportLocale)
+		throws com.liferay.portal.LocaleException {
+		_layoutSetPrototype.prepareLocalizedFieldsForImport(defaultImportLocale);
+	}
+
+	/**
+	* Sets whether this layout set prototype is active.
+	*
+	* @param active the active of this layout set prototype
+	*/
+	@Override
+	public void setActive(boolean active) {
+		_layoutSetPrototype.setActive(active);
+	}
+
+	@Override
+	public void setCachedModel(boolean cachedModel) {
+		_layoutSetPrototype.setCachedModel(cachedModel);
+	}
+
+	/**
+	* Sets the company ID of this layout set prototype.
+	*
+	* @param companyId the company ID of this layout set prototype
+	*/
+	@Override
+	public void setCompanyId(long companyId) {
+		_layoutSetPrototype.setCompanyId(companyId);
+	}
+
+	/**
+	* Sets the create date of this layout set prototype.
+	*
+	* @param createDate the create date of this layout set prototype
+	*/
+	@Override
+	public void setCreateDate(java.util.Date createDate) {
+		_layoutSetPrototype.setCreateDate(createDate);
+	}
+
+	/**
+	* Sets the description of this layout set prototype.
+	*
+	* @param description the description of this layout set prototype
+	*/
+	@Override
+	public void setDescription(java.lang.String description) {
+		_layoutSetPrototype.setDescription(description);
+	}
+
+	/**
+	* Sets the localized description of this layout set prototype in the language.
+	*
+	* @param description the localized description of this layout set prototype
+	* @param locale the locale of the language
+	*/
+	@Override
+	public void setDescription(java.lang.String description,
+		java.util.Locale locale) {
+		_layoutSetPrototype.setDescription(description, locale);
+	}
+
+	/**
+	* Sets the localized description of this layout set prototype in the language, and sets the default locale.
+	*
+	* @param description the localized description of this layout set prototype
+	* @param locale the locale of the language
+	* @param defaultLocale the default locale
+	*/
+	@Override
+	public void setDescription(java.lang.String description,
+		java.util.Locale locale, java.util.Locale defaultLocale) {
+		_layoutSetPrototype.setDescription(description, locale, defaultLocale);
+	}
+
+	@Override
+	public void setDescriptionCurrentLanguageId(java.lang.String languageId) {
+		_layoutSetPrototype.setDescriptionCurrentLanguageId(languageId);
+	}
+
+	/**
+	* Sets the localized descriptions of this layout set prototype from the map of locales and localized descriptions.
+	*
+	* @param descriptionMap the locales and localized descriptions of this layout set prototype
+	*/
+	@Override
+	public void setDescriptionMap(
+		java.util.Map<java.util.Locale, java.lang.String> descriptionMap) {
+		_layoutSetPrototype.setDescriptionMap(descriptionMap);
+	}
+
+	/**
+	* Sets the localized descriptions of this layout set prototype from the map of locales and localized descriptions, and sets the default locale.
+	*
+	* @param descriptionMap the locales and localized descriptions of this layout set prototype
+	* @param defaultLocale the default locale
+	*/
+	@Override
+	public void setDescriptionMap(
+		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
+		java.util.Locale defaultLocale) {
+		_layoutSetPrototype.setDescriptionMap(descriptionMap, defaultLocale);
+	}
+
+	@Override
+	public void setExpandoBridgeAttributes(
+		com.liferay.portal.model.BaseModel<?> baseModel) {
+		_layoutSetPrototype.setExpandoBridgeAttributes(baseModel);
+	}
+
+	@Override
+	public void setExpandoBridgeAttributes(
+		com.liferay.portlet.expando.model.ExpandoBridge expandoBridge) {
+		_layoutSetPrototype.setExpandoBridgeAttributes(expandoBridge);
+	}
+
+	@Override
+	public void setExpandoBridgeAttributes(
+		com.liferay.portal.service.ServiceContext serviceContext) {
+		_layoutSetPrototype.setExpandoBridgeAttributes(serviceContext);
+	}
+
+	/**
+	* Sets the layout set prototype ID of this layout set prototype.
+	*
+	* @param layoutSetPrototypeId the layout set prototype ID of this layout set prototype
+	*/
+	@Override
+	public void setLayoutSetPrototypeId(long layoutSetPrototypeId) {
+		_layoutSetPrototype.setLayoutSetPrototypeId(layoutSetPrototypeId);
+	}
+
+	/**
+	* Sets the modified date of this layout set prototype.
+	*
+	* @param modifiedDate the modified date of this layout set prototype
+	*/
+	@Override
+	public void setModifiedDate(java.util.Date modifiedDate) {
+		_layoutSetPrototype.setModifiedDate(modifiedDate);
+	}
+
+	/**
+	* Sets the mvcc version of this layout set prototype.
+	*
+	* @param mvccVersion the mvcc version of this layout set prototype
+	*/
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		_layoutSetPrototype.setMvccVersion(mvccVersion);
 	}
 
 	/**
@@ -459,34 +736,24 @@ public class LayoutSetPrototypeWrapper implements LayoutSetPrototype,
 		_layoutSetPrototype.setNameMap(nameMap, defaultLocale);
 	}
 
-	/**
-	* Returns the description of this layout set prototype.
-	*
-	* @return the description of this layout set prototype
-	*/
 	@Override
-	public java.lang.String getDescription() {
-		return _layoutSetPrototype.getDescription();
+	public void setNew(boolean n) {
+		_layoutSetPrototype.setNew(n);
 	}
 
 	/**
-	* Sets the description of this layout set prototype.
+	* Sets the primary key of this layout set prototype.
 	*
-	* @param description the description of this layout set prototype
+	* @param primaryKey the primary key of this layout set prototype
 	*/
 	@Override
-	public void setDescription(java.lang.String description) {
-		_layoutSetPrototype.setDescription(description);
+	public void setPrimaryKey(long primaryKey) {
+		_layoutSetPrototype.setPrimaryKey(primaryKey);
 	}
 
-	/**
-	* Returns the settings of this layout set prototype.
-	*
-	* @return the settings of this layout set prototype
-	*/
 	@Override
-	public java.lang.String getSettings() {
-		return _layoutSetPrototype.getSettings();
+	public void setPrimaryKeyObj(java.io.Serializable primaryKeyObj) {
+		_layoutSetPrototype.setPrimaryKeyObj(primaryKeyObj);
 	}
 
 	/**
@@ -499,131 +766,50 @@ public class LayoutSetPrototypeWrapper implements LayoutSetPrototype,
 		_layoutSetPrototype.setSettings(settings);
 	}
 
-	/**
-	* Returns the active of this layout set prototype.
-	*
-	* @return the active of this layout set prototype
-	*/
 	@Override
-	public boolean getActive() {
-		return _layoutSetPrototype.getActive();
+	public void setSettingsProperties(
+		com.liferay.portal.kernel.util.UnicodeProperties settingsProperties) {
+		_layoutSetPrototype.setSettingsProperties(settingsProperties);
 	}
 
 	/**
-	* Returns <code>true</code> if this layout set prototype is active.
+	* Sets the user ID of this layout set prototype.
 	*
-	* @return <code>true</code> if this layout set prototype is active; <code>false</code> otherwise
+	* @param userId the user ID of this layout set prototype
 	*/
 	@Override
-	public boolean isActive() {
-		return _layoutSetPrototype.isActive();
+	public void setUserId(long userId) {
+		_layoutSetPrototype.setUserId(userId);
 	}
 
 	/**
-	* Sets whether this layout set prototype is active.
+	* Sets the user name of this layout set prototype.
 	*
-	* @param active the active of this layout set prototype
+	* @param userName the user name of this layout set prototype
 	*/
 	@Override
-	public void setActive(boolean active) {
-		_layoutSetPrototype.setActive(active);
+	public void setUserName(java.lang.String userName) {
+		_layoutSetPrototype.setUserName(userName);
 	}
 
+	/**
+	* Sets the user uuid of this layout set prototype.
+	*
+	* @param userUuid the user uuid of this layout set prototype
+	*/
 	@Override
-	public boolean isNew() {
-		return _layoutSetPrototype.isNew();
+	public void setUserUuid(java.lang.String userUuid) {
+		_layoutSetPrototype.setUserUuid(userUuid);
 	}
 
+	/**
+	* Sets the uuid of this layout set prototype.
+	*
+	* @param uuid the uuid of this layout set prototype
+	*/
 	@Override
-	public void setNew(boolean n) {
-		_layoutSetPrototype.setNew(n);
-	}
-
-	@Override
-	public boolean isCachedModel() {
-		return _layoutSetPrototype.isCachedModel();
-	}
-
-	@Override
-	public void setCachedModel(boolean cachedModel) {
-		_layoutSetPrototype.setCachedModel(cachedModel);
-	}
-
-	@Override
-	public boolean isEscapedModel() {
-		return _layoutSetPrototype.isEscapedModel();
-	}
-
-	@Override
-	public java.io.Serializable getPrimaryKeyObj() {
-		return _layoutSetPrototype.getPrimaryKeyObj();
-	}
-
-	@Override
-	public void setPrimaryKeyObj(java.io.Serializable primaryKeyObj) {
-		_layoutSetPrototype.setPrimaryKeyObj(primaryKeyObj);
-	}
-
-	@Override
-	public com.liferay.portlet.expando.model.ExpandoBridge getExpandoBridge() {
-		return _layoutSetPrototype.getExpandoBridge();
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.model.BaseModel<?> baseModel) {
-		_layoutSetPrototype.setExpandoBridgeAttributes(baseModel);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portlet.expando.model.ExpandoBridge expandoBridge) {
-		_layoutSetPrototype.setExpandoBridgeAttributes(expandoBridge);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.service.ServiceContext serviceContext) {
-		_layoutSetPrototype.setExpandoBridgeAttributes(serviceContext);
-	}
-
-	@Override
-	public java.lang.String[] getAvailableLanguageIds() {
-		return _layoutSetPrototype.getAvailableLanguageIds();
-	}
-
-	@Override
-	public java.lang.String getDefaultLanguageId() {
-		return _layoutSetPrototype.getDefaultLanguageId();
-	}
-
-	@Override
-	public void prepareLocalizedFieldsForImport()
-		throws com.liferay.portal.LocaleException {
-		_layoutSetPrototype.prepareLocalizedFieldsForImport();
-	}
-
-	@Override
-	public void prepareLocalizedFieldsForImport(
-		java.util.Locale defaultImportLocale)
-		throws com.liferay.portal.LocaleException {
-		_layoutSetPrototype.prepareLocalizedFieldsForImport(defaultImportLocale);
-	}
-
-	@Override
-	public java.lang.Object clone() {
-		return new LayoutSetPrototypeWrapper((LayoutSetPrototype)_layoutSetPrototype.clone());
-	}
-
-	@Override
-	public int compareTo(
-		com.liferay.portal.model.LayoutSetPrototype layoutSetPrototype) {
-		return _layoutSetPrototype.compareTo(layoutSetPrototype);
-	}
-
-	@Override
-	public int hashCode() {
-		return _layoutSetPrototype.hashCode();
+	public void setUuid(java.lang.String uuid) {
+		_layoutSetPrototype.setUuid(uuid);
 	}
 
 	@Override
@@ -637,61 +823,18 @@ public class LayoutSetPrototypeWrapper implements LayoutSetPrototype,
 	}
 
 	@Override
-	public com.liferay.portal.model.LayoutSetPrototype toUnescapedModel() {
-		return new LayoutSetPrototypeWrapper(_layoutSetPrototype.toUnescapedModel());
-	}
-
-	@Override
 	public java.lang.String toString() {
 		return _layoutSetPrototype.toString();
 	}
 
 	@Override
+	public com.liferay.portal.model.LayoutSetPrototype toUnescapedModel() {
+		return new LayoutSetPrototypeWrapper(_layoutSetPrototype.toUnescapedModel());
+	}
+
+	@Override
 	public java.lang.String toXmlString() {
 		return _layoutSetPrototype.toXmlString();
-	}
-
-	@Override
-	public void persist()
-		throws com.liferay.portal.kernel.exception.SystemException {
-		_layoutSetPrototype.persist();
-	}
-
-	@Override
-	public com.liferay.portal.model.Group getGroup()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		return _layoutSetPrototype.getGroup();
-	}
-
-	@Override
-	public long getGroupId()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		return _layoutSetPrototype.getGroupId();
-	}
-
-	@Override
-	public com.liferay.portal.model.LayoutSet getLayoutSet()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		return _layoutSetPrototype.getLayoutSet();
-	}
-
-	@Override
-	public com.liferay.portal.kernel.util.UnicodeProperties getSettingsProperties() {
-		return _layoutSetPrototype.getSettingsProperties();
-	}
-
-	@Override
-	public java.lang.String getSettingsProperty(java.lang.String key) {
-		return _layoutSetPrototype.getSettingsProperty(key);
-	}
-
-	@Override
-	public void setSettingsProperties(
-		com.liferay.portal.kernel.util.UnicodeProperties settingsProperties) {
-		_layoutSetPrototype.setSettingsProperties(settingsProperties);
 	}
 
 	@Override

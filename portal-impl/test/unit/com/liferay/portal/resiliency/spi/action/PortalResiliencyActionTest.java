@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,9 +17,9 @@ package com.liferay.portal.resiliency.spi.action;
 import com.liferay.portal.kernel.portlet.PortletContainerUtil;
 import com.liferay.portal.kernel.resiliency.spi.agent.SPIAgent;
 import com.liferay.portal.kernel.test.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.util.CentralizedThreadLocal;
 import com.liferay.portal.kernel.util.PropsUtil;
-import com.liferay.portal.kernel.util.ReflectionUtil;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.Portlet;
 import com.liferay.portal.model.impl.LayoutImpl;
@@ -28,7 +28,7 @@ import com.liferay.portal.resiliency.spi.agent.SPIAgentRequest;
 import com.liferay.portal.resiliency.spi.agent.SPIAgentResponse;
 import com.liferay.portal.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.test.AdviseWith;
-import com.liferay.portal.test.AspectJMockingNewClassLoaderJUnitTestRunner;
+import com.liferay.portal.test.runners.AspectJMockingNewClassLoaderJUnitTestRunner;
 import com.liferay.portal.util.PropsImpl;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.EventImpl;
@@ -304,7 +304,7 @@ public class PortalResiliencyActionTest {
 
 			int ordinal = newLifecycles.length - 1;
 
-			newLifecycles[ordinal] = ReflectionUtil.newEnumElement(
+			newLifecycles[ordinal] = ReflectionTestUtil.newEnumElement(
 				SPIAgent.Lifecycle.class, new Class<?>[] {String.class},
 					"UNKNOWN", ordinal, "UNKNOWN");
 

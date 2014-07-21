@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -84,7 +84,7 @@ public class IngresDB extends BaseDB {
 			if (TEMPLATE[i].equals("##") ||
 				TEMPLATE[i].equals("'01/01/1970'")) {
 
-				template = template.replaceAll(TEMPLATE[i], actual[i]);
+				template = StringUtil.replace(template, TEMPLATE[i], actual[i]);
 			}
 			else if (TEMPLATE[i].equals("COMMIT_TRANSACTION")) {
 				template = StringUtil.replace(

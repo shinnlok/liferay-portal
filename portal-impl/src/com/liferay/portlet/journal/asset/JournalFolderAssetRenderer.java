@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,11 +15,9 @@
 package com.liferay.portlet.journal.asset;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.trash.TrashRenderer;
-import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
@@ -38,6 +36,7 @@ import java.util.Date;
 import java.util.Locale;
 
 import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
@@ -76,6 +75,17 @@ public class JournalFolderAssetRenderer
 	}
 
 	@Override
+	public String getIconCssClass() throws PortalException {
+		if (JournalFolderServiceUtil.getFoldersAndArticlesCount(
+				_folder.getGroupId(), _folder.getFolderId()) > 0) {
+
+			return "icon-folder-close";
+		}
+
+		return super.getIconCssClass();
+	}
+
+	@Override
 	public String getIconPath(ThemeDisplay themeDisplay) {
 		try {
 			if (JournalFolderServiceUtil.getFoldersAndArticlesCount(
@@ -100,8 +110,10 @@ public class JournalFolderAssetRenderer
 	}
 
 	@Override
-	public String getSummary(Locale locale) {
-		return HtmlUtil.stripHtml(_folder.getDescription());
+	public String getSummary(
+		PortletRequest portletRequest, PortletResponse portletResponse) {
+
+		return _folder.getDescription();
 	}
 
 	@Override
@@ -198,8 +210,16 @@ public class JournalFolderAssetRenderer
 	}
 
 	@Override
+	public boolean hasEditPermission(PermissionChecker permissionChecker)
+		throws PortalException {
+
+		return JournalFolderPermission.contains(
+			permissionChecker, _folder, ActionKeys.UPDATE);
+	}
+
+	@Override
 	public boolean hasViewPermission(PermissionChecker permissionChecker)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		return JournalFolderPermission.contains(
 			permissionChecker, _folder, ActionKeys.VIEW);

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portal.service.persistence;
 
 import com.liferay.portal.NoSuchEmailAddressException;
-import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
@@ -24,63 +23,87 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.test.ExecutionTestListeners;
+import com.liferay.portal.kernel.template.TemplateException;
+import com.liferay.portal.kernel.template.TemplateManagerUtil;
+import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.util.IntegerWrapper;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.model.EmailAddress;
-import com.liferay.portal.service.ServiceTestUtil;
-import com.liferay.portal.service.persistence.BasePersistence;
-import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
-import com.liferay.portal.test.LiferayPersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.test.persistence.TransactionalPersistenceAdvice;
+import com.liferay.portal.model.ModelListener;
+import com.liferay.portal.service.EmailAddressLocalServiceUtil;
+import com.liferay.portal.test.TransactionalTestRule;
+import com.liferay.portal.test.runners.LiferayIntegrationJUnitTestRunner;
+import com.liferay.portal.tools.DBUpgrader;
+import com.liferay.portal.util.test.RandomTestUtil;
 
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 
 import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 /**
- * @author Brian Wing Shun Chan
+ * @generated
  */
-@ExecutionTestListeners(listeners =  {
-	PersistenceExecutionTestListener.class})
-@RunWith(LiferayPersistenceIntegrationJUnitTestRunner.class)
+@RunWith(LiferayIntegrationJUnitTestRunner.class)
 public class EmailAddressPersistenceTest {
-	@After
-	public void tearDown() throws Exception {
-		Map<Serializable, BasePersistence<?>> basePersistences = _transactionalPersistenceAdvice.getBasePersistences();
+	@ClassRule
+	public static TransactionalTestRule transactionalTestRule = new TransactionalTestRule(Propagation.REQUIRED);
 
-		Set<Serializable> primaryKeys = basePersistences.keySet();
-
-		for (Serializable primaryKey : primaryKeys) {
-			BasePersistence<?> basePersistence = basePersistences.get(primaryKey);
-
-			try {
-				basePersistence.remove(primaryKey);
-			}
-			catch (Exception e) {
-				if (_log.isDebugEnabled()) {
-					_log.debug("The model with primary key " + primaryKey +
-						" was already deleted");
-				}
-			}
+	@BeforeClass
+	public static void setupClass() throws TemplateException {
+		try {
+			DBUpgrader.upgrade();
+		}
+		catch (Exception e) {
+			_log.error(e, e);
 		}
 
-		_transactionalPersistenceAdvice.reset();
+		TemplateManagerUtil.init();
+	}
+
+	@Before
+	public void setUp() {
+		_modelListeners = _persistence.getListeners();
+
+		for (ModelListener<EmailAddress> modelListener : _modelListeners) {
+			_persistence.unregisterListener(modelListener);
+		}
+	}
+
+	@After
+	public void tearDown() throws Exception {
+		Iterator<EmailAddress> iterator = _emailAddresses.iterator();
+
+		while (iterator.hasNext()) {
+			_persistence.remove(iterator.next());
+
+			iterator.remove();
+		}
+
+		for (ModelListener<EmailAddress> modelListener : _modelListeners) {
+			_persistence.registerListener(modelListener);
+		}
 	}
 
 	@Test
 	public void testCreate() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		EmailAddress emailAddress = _persistence.create(pk);
 
@@ -107,36 +130,40 @@ public class EmailAddressPersistenceTest {
 
 	@Test
 	public void testUpdateExisting() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		EmailAddress newEmailAddress = _persistence.create(pk);
 
-		newEmailAddress.setUuid(ServiceTestUtil.randomString());
+		newEmailAddress.setMvccVersion(RandomTestUtil.nextLong());
 
-		newEmailAddress.setCompanyId(ServiceTestUtil.nextLong());
+		newEmailAddress.setUuid(RandomTestUtil.randomString());
 
-		newEmailAddress.setUserId(ServiceTestUtil.nextLong());
+		newEmailAddress.setCompanyId(RandomTestUtil.nextLong());
 
-		newEmailAddress.setUserName(ServiceTestUtil.randomString());
+		newEmailAddress.setUserId(RandomTestUtil.nextLong());
 
-		newEmailAddress.setCreateDate(ServiceTestUtil.nextDate());
+		newEmailAddress.setUserName(RandomTestUtil.randomString());
 
-		newEmailAddress.setModifiedDate(ServiceTestUtil.nextDate());
+		newEmailAddress.setCreateDate(RandomTestUtil.nextDate());
 
-		newEmailAddress.setClassNameId(ServiceTestUtil.nextLong());
+		newEmailAddress.setModifiedDate(RandomTestUtil.nextDate());
 
-		newEmailAddress.setClassPK(ServiceTestUtil.nextLong());
+		newEmailAddress.setClassNameId(RandomTestUtil.nextLong());
 
-		newEmailAddress.setAddress(ServiceTestUtil.randomString());
+		newEmailAddress.setClassPK(RandomTestUtil.nextLong());
 
-		newEmailAddress.setTypeId(ServiceTestUtil.nextInt());
+		newEmailAddress.setAddress(RandomTestUtil.randomString());
 
-		newEmailAddress.setPrimary(ServiceTestUtil.randomBoolean());
+		newEmailAddress.setTypeId(RandomTestUtil.nextInt());
 
-		_persistence.update(newEmailAddress);
+		newEmailAddress.setPrimary(RandomTestUtil.randomBoolean());
+
+		_emailAddresses.add(_persistence.update(newEmailAddress));
 
 		EmailAddress existingEmailAddress = _persistence.findByPrimaryKey(newEmailAddress.getPrimaryKey());
 
+		Assert.assertEquals(existingEmailAddress.getMvccVersion(),
+			newEmailAddress.getMvccVersion());
 		Assert.assertEquals(existingEmailAddress.getUuid(),
 			newEmailAddress.getUuid());
 		Assert.assertEquals(existingEmailAddress.getEmailAddressId(),
@@ -166,6 +193,100 @@ public class EmailAddressPersistenceTest {
 	}
 
 	@Test
+	public void testCountByUuid() {
+		try {
+			_persistence.countByUuid(StringPool.BLANK);
+
+			_persistence.countByUuid(StringPool.NULL);
+
+			_persistence.countByUuid((String)null);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByUuid_C() {
+		try {
+			_persistence.countByUuid_C(StringPool.BLANK,
+				RandomTestUtil.nextLong());
+
+			_persistence.countByUuid_C(StringPool.NULL, 0L);
+
+			_persistence.countByUuid_C((String)null, 0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByCompanyId() {
+		try {
+			_persistence.countByCompanyId(RandomTestUtil.nextLong());
+
+			_persistence.countByCompanyId(0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByUserId() {
+		try {
+			_persistence.countByUserId(RandomTestUtil.nextLong());
+
+			_persistence.countByUserId(0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByC_C() {
+		try {
+			_persistence.countByC_C(RandomTestUtil.nextLong(),
+				RandomTestUtil.nextLong());
+
+			_persistence.countByC_C(0L, 0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByC_C_C() {
+		try {
+			_persistence.countByC_C_C(RandomTestUtil.nextLong(),
+				RandomTestUtil.nextLong(), RandomTestUtil.nextLong());
+
+			_persistence.countByC_C_C(0L, 0L, 0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByC_C_C_P() {
+		try {
+			_persistence.countByC_C_C_P(RandomTestUtil.nextLong(),
+				RandomTestUtil.nextLong(), RandomTestUtil.nextLong(),
+				RandomTestUtil.randomBoolean());
+
+			_persistence.countByC_C_C_P(0L, 0L, 0L,
+				RandomTestUtil.randomBoolean());
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
 	public void testFindByPrimaryKeyExisting() throws Exception {
 		EmailAddress newEmailAddress = addEmailAddress();
 
@@ -176,7 +297,7 @@ public class EmailAddressPersistenceTest {
 
 	@Test
 	public void testFindByPrimaryKeyMissing() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		try {
 			_persistence.findByPrimaryKey(pk);
@@ -199,12 +320,12 @@ public class EmailAddressPersistenceTest {
 		}
 	}
 
-	protected OrderByComparator getOrderByComparator() {
-		return OrderByComparatorFactoryUtil.create("EmailAddress", "uuid",
-			true, "emailAddressId", true, "companyId", true, "userId", true,
-			"userName", true, "createDate", true, "modifiedDate", true,
-			"classNameId", true, "classPK", true, "address", true, "typeId",
-			true, "primary", true);
+	protected OrderByComparator<EmailAddress> getOrderByComparator() {
+		return OrderByComparatorFactoryUtil.create("EmailAddress",
+			"mvccVersion", true, "uuid", true, "emailAddressId", true,
+			"companyId", true, "userId", true, "userName", true, "createDate",
+			true, "modifiedDate", true, "classNameId", true, "classPK", true,
+			"address", true, "typeId", true, "primary", true);
 	}
 
 	@Test
@@ -218,7 +339,7 @@ public class EmailAddressPersistenceTest {
 
 	@Test
 	public void testFetchByPrimaryKeyMissing() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		EmailAddress missingEmailAddress = _persistence.fetchByPrimaryKey(pk);
 
@@ -226,19 +347,103 @@ public class EmailAddressPersistenceTest {
 	}
 
 	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
+		throws Exception {
+		EmailAddress newEmailAddress1 = addEmailAddress();
+		EmailAddress newEmailAddress2 = addEmailAddress();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newEmailAddress1.getPrimaryKey());
+		primaryKeys.add(newEmailAddress2.getPrimaryKey());
+
+		Map<Serializable, EmailAddress> emailAddresses = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(2, emailAddresses.size());
+		Assert.assertEquals(newEmailAddress1,
+			emailAddresses.get(newEmailAddress1.getPrimaryKey()));
+		Assert.assertEquals(newEmailAddress2,
+			emailAddresses.get(newEmailAddress2.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
+		throws Exception {
+		long pk1 = RandomTestUtil.nextLong();
+
+		long pk2 = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(pk1);
+		primaryKeys.add(pk2);
+
+		Map<Serializable, EmailAddress> emailAddresses = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(emailAddresses.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
+		throws Exception {
+		EmailAddress newEmailAddress = addEmailAddress();
+
+		long pk = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newEmailAddress.getPrimaryKey());
+		primaryKeys.add(pk);
+
+		Map<Serializable, EmailAddress> emailAddresses = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, emailAddresses.size());
+		Assert.assertEquals(newEmailAddress,
+			emailAddresses.get(newEmailAddress.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
+		throws Exception {
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		Map<Serializable, EmailAddress> emailAddresses = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(emailAddresses.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithOnePrimaryKey()
+		throws Exception {
+		EmailAddress newEmailAddress = addEmailAddress();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newEmailAddress.getPrimaryKey());
+
+		Map<Serializable, EmailAddress> emailAddresses = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, emailAddresses.size());
+		Assert.assertEquals(newEmailAddress,
+			emailAddresses.get(newEmailAddress.getPrimaryKey()));
+	}
+
+	@Test
 	public void testActionableDynamicQuery() throws Exception {
 		final IntegerWrapper count = new IntegerWrapper();
 
-		ActionableDynamicQuery actionableDynamicQuery = new EmailAddressActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = EmailAddressLocalServiceUtil.getActionableDynamicQuery();
+
+		actionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod() {
 				@Override
-				protected void performAction(Object object) {
+				public void performAction(Object object) {
 					EmailAddress emailAddress = (EmailAddress)object;
 
 					Assert.assertNotNull(emailAddress);
 
 					count.increment();
 				}
-			};
+			});
 
 		actionableDynamicQuery.performActions();
 
@@ -271,7 +476,7 @@ public class EmailAddressPersistenceTest {
 				EmailAddress.class.getClassLoader());
 
 		dynamicQuery.add(RestrictionsFactoryUtil.eq("emailAddressId",
-				ServiceTestUtil.nextLong()));
+				RandomTestUtil.nextLong()));
 
 		List<EmailAddress> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -312,7 +517,7 @@ public class EmailAddressPersistenceTest {
 				"emailAddressId"));
 
 		dynamicQuery.add(RestrictionsFactoryUtil.in("emailAddressId",
-				new Object[] { ServiceTestUtil.nextLong() }));
+				new Object[] { RandomTestUtil.nextLong() }));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -320,38 +525,41 @@ public class EmailAddressPersistenceTest {
 	}
 
 	protected EmailAddress addEmailAddress() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		EmailAddress emailAddress = _persistence.create(pk);
 
-		emailAddress.setUuid(ServiceTestUtil.randomString());
+		emailAddress.setMvccVersion(RandomTestUtil.nextLong());
 
-		emailAddress.setCompanyId(ServiceTestUtil.nextLong());
+		emailAddress.setUuid(RandomTestUtil.randomString());
 
-		emailAddress.setUserId(ServiceTestUtil.nextLong());
+		emailAddress.setCompanyId(RandomTestUtil.nextLong());
 
-		emailAddress.setUserName(ServiceTestUtil.randomString());
+		emailAddress.setUserId(RandomTestUtil.nextLong());
 
-		emailAddress.setCreateDate(ServiceTestUtil.nextDate());
+		emailAddress.setUserName(RandomTestUtil.randomString());
 
-		emailAddress.setModifiedDate(ServiceTestUtil.nextDate());
+		emailAddress.setCreateDate(RandomTestUtil.nextDate());
 
-		emailAddress.setClassNameId(ServiceTestUtil.nextLong());
+		emailAddress.setModifiedDate(RandomTestUtil.nextDate());
 
-		emailAddress.setClassPK(ServiceTestUtil.nextLong());
+		emailAddress.setClassNameId(RandomTestUtil.nextLong());
 
-		emailAddress.setAddress(ServiceTestUtil.randomString());
+		emailAddress.setClassPK(RandomTestUtil.nextLong());
 
-		emailAddress.setTypeId(ServiceTestUtil.nextInt());
+		emailAddress.setAddress(RandomTestUtil.randomString());
 
-		emailAddress.setPrimary(ServiceTestUtil.randomBoolean());
+		emailAddress.setTypeId(RandomTestUtil.nextInt());
 
-		_persistence.update(emailAddress);
+		emailAddress.setPrimary(RandomTestUtil.randomBoolean());
+
+		_emailAddresses.add(_persistence.update(emailAddress));
 
 		return emailAddress;
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(EmailAddressPersistenceTest.class);
-	private EmailAddressPersistence _persistence = (EmailAddressPersistence)PortalBeanLocatorUtil.locate(EmailAddressPersistence.class.getName());
-	private TransactionalPersistenceAdvice _transactionalPersistenceAdvice = (TransactionalPersistenceAdvice)PortalBeanLocatorUtil.locate(TransactionalPersistenceAdvice.class.getName());
+	private List<EmailAddress> _emailAddresses = new ArrayList<EmailAddress>();
+	private ModelListener<EmailAddress>[] _modelListeners;
+	private EmailAddressPersistence _persistence = EmailAddressUtil.getPersistence();
 }

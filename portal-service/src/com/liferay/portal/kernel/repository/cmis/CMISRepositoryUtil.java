@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -35,7 +35,7 @@ public class CMISRepositoryUtil {
 
 		try {
 			PortalClassInvoker.invoke(
-				false, _checkRepositoryMethodKey, repositoryId, parameters,
+				_checkRepositoryMethodKey, repositoryId, parameters,
 				typeSettingsProperties, typeSettingsKey);
 		}
 		catch (Exception e) {
@@ -50,7 +50,7 @@ public class CMISRepositoryUtil {
 
 		try {
 			Object returnObj = PortalClassInvoker.invoke(
-				false, _createSessionMethodKey, parameters);
+				_createSessionMethodKey, parameters);
 
 			if (returnObj != null) {
 				session = (Session)returnObj;
@@ -73,7 +73,7 @@ public class CMISRepositoryUtil {
 
 		try {
 			Object returnObj = PortalClassInvoker.invoke(
-				false, _getTypeSettingsValueMethodKey, typeSettingsProperties,
+				_getTypeSettingsValueMethodKey, typeSettingsProperties,
 				typeSettingsKey);
 
 			if (returnObj != null) {

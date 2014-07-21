@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -211,6 +211,12 @@ public class FileUtil {
 
 	public static String getAbsolutePath(File file) {
 		return getFile().getAbsolutePath(file);
+	}
+
+	public static byte[] getBytes(Class<?> clazz, String fileName)
+		throws Exception {
+
+		return getFile().getBytes(clazz, fileName);
 	}
 
 	public static byte[] getBytes(File file) throws IOException {

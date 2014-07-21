@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,8 +19,14 @@
 <%@ page import="com.liferay.portal.kernel.monitoring.RequestStatus" %><%@
 page import="com.liferay.portal.kernel.monitoring.statistics.DataSample" %><%@
 page import="com.liferay.portal.kernel.monitoring.statistics.DataSampleThreadLocal" %><%@
+page import="com.liferay.portal.kernel.util.PredicateFilter" %><%@
+page import="com.liferay.portal.model.Portlet" %><%@
 page import="com.liferay.portal.monitoring.statistics.portal.PortalRequestDataSample" %><%@
 page import="com.liferay.portal.security.ldap.LDAPSettingsUtil" %><%@
+page import="com.liferay.portal.servlet.ComboServletStaticURLGenerator" %><%@
+page import="com.liferay.portlet.JavaScriptPortletResourcePredicateFilter" %><%@
+page import="com.liferay.portlet.PortletResourceAccessor" %><%@
+page import="com.liferay.portlet.PortletResourceStaticURLGenerator" %><%@
 page import="com.liferay.taglib.aui.ScriptTag" %>
 
 <%@ page import="org.apache.struts.taglib.tiles.ComponentConstants" %><%@

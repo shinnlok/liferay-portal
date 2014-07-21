@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -42,12 +42,52 @@ public class PhoneServiceUtil {
 	 */
 
 	/**
+	* @deprecated As of 6.2.0, replaced by {@link #addPhone(String, long,
+	String, String, int, boolean, ServiceContext)}
+	*/
+	@Deprecated
+	public static com.liferay.portal.model.Phone addPhone(
+		java.lang.String className, long classPK, java.lang.String number,
+		java.lang.String extension, int typeId, boolean primary)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService()
+				   .addPhone(className, classPK, number, extension, typeId,
+			primary);
+	}
+
+	public static com.liferay.portal.model.Phone addPhone(
+		java.lang.String className, long classPK, java.lang.String number,
+		java.lang.String extension, int typeId, boolean primary,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService()
+				   .addPhone(className, classPK, number, extension, typeId,
+			primary, serviceContext);
+	}
+
+	public static void deletePhone(long phoneId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		getService().deletePhone(phoneId);
+	}
+
+	/**
 	* Returns the Spring bean ID for this bean.
 	*
 	* @return the Spring bean ID for this bean
 	*/
 	public static java.lang.String getBeanIdentifier() {
 		return getService().getBeanIdentifier();
+	}
+
+	public static com.liferay.portal.model.Phone getPhone(long phoneId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().getPhone(phoneId);
+	}
+
+	public static java.util.List<com.liferay.portal.model.Phone> getPhones(
+		java.lang.String className, long classPK)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().getPhones(className, classPK);
 	}
 
 	/**
@@ -59,56 +99,10 @@ public class PhoneServiceUtil {
 		getService().setBeanIdentifier(beanIdentifier);
 	}
 
-	/**
-	* @deprecated As of 6.2.0, replaced by {@link #addPhone( String, long,
-	String, String, int, boolean, ServiceContext)}
-	*/
-	@Deprecated
-	public static com.liferay.portal.model.Phone addPhone(
-		java.lang.String className, long classPK, java.lang.String number,
-		java.lang.String extension, int typeId, boolean primary)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		return getService()
-				   .addPhone(className, classPK, number, extension, typeId,
-			primary);
-	}
-
-	public static com.liferay.portal.model.Phone addPhone(
-		java.lang.String className, long classPK, java.lang.String number,
-		java.lang.String extension, int typeId, boolean primary,
-		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		return getService()
-				   .addPhone(className, classPK, number, extension, typeId,
-			primary, serviceContext);
-	}
-
-	public static void deletePhone(long phoneId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		getService().deletePhone(phoneId);
-	}
-
-	public static com.liferay.portal.model.Phone getPhone(long phoneId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		return getService().getPhone(phoneId);
-	}
-
-	public static java.util.List<com.liferay.portal.model.Phone> getPhones(
-		java.lang.String className, long classPK)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		return getService().getPhones(className, classPK);
-	}
-
 	public static com.liferay.portal.model.Phone updatePhone(long phoneId,
 		java.lang.String number, java.lang.String extension, int typeId,
 		boolean primary)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
 				   .updatePhone(phoneId, number, extension, typeId, primary);
 	}

@@ -45,8 +45,6 @@
 
 	var NEW_LINE = '\n';
 
-	var NEW_THREAD_URL = CKEDITOR.config.newThreadURL;
-
 	var REGEX_COLOR_RGB = /^rgb\s*\(\s*([01]?\d\d?|2[0-4]\d|25[0-5])\,\s*([01]?\d\d?|2[0-4]\d|25[0-5])\,\s*([01]?\d\d?|2[0-4]\d|25[0-5])\s*\)$/;
 
 	var REGEX_EM = /em$/i;
@@ -95,36 +93,20 @@
 
 	var TAG_TD = 'td';
 
-	var TEMPLATE_IMAGE = '<img src="{image}">';
+	var tplImage = new CKEDITOR.template('<img src="{image}" />');
 
-	CKEDITOR.plugins.add(
-		'bbcode_data_processor',
-		{
-			requires: ['htmlwriter'],
+	var tplImageOpenTag = new CKEDITOR.template('[img={width}x{height}]');
 
-			init: function(editor) {
-				editor.dataProcessor = new CKEDITOR.htmlDataProcessor(editor);
+	var emoticonImages;
+	var emoticonPath;
+	var emoticonSymbols;
+	var newThreadURL;
 
-				editor.on(
-					'paste',
-					function(event) {
-						var data = event.data;
+	var BBCodeDataProcessor = function() {};
 
-						var htmlData = data.dataValue;
+	BBCodeDataProcessor.prototype = {
+		constructor: BBCodeDataProcessor,
 
-						htmlData = CKEDITOR.htmlDataProcessor.prototype.toDataFormat(htmlData);
-
-						data.dataValue = htmlData;
-					},
-					editor.element.$
-				);
-
-				editor.fire('customDataProcessorLoaded');
-			}
-		}
-	);
-
-	CKEDITOR.htmlDataProcessor.prototype = {
 		toDataFormat: function(html, fixForBody ) {
 			var instance = this;
 
@@ -144,14 +126,14 @@
 
 			data = instance._bbcodeConverter.convert(data);
 
-			var emoticonImages = CKEDITOR.config.smiley_images;
-			var emoticonSymbols = CKEDITOR.config.smiley_symbols;
-			var imagePath = CKEDITOR.config.smiley_path;
-
 			var length = emoticonSymbols.length;
 
 			for (var i = 0; i < length; i++) {
-				var image = TEMPLATE_IMAGE.replace('{image}', imagePath + emoticonImages[i]);
+				var image = tplImage.output(
+					{
+						image: emoticonPath + emoticonImages[i]
+					}
+				);
 
 				var escapedSymbol = emoticonSymbols[i].replace(REGEX_ESCAPE_REGEX, '\\$&');
 
@@ -253,10 +235,10 @@
 			if (imagePath) {
 				var image = imagePath.substring(imagePath.lastIndexOf('/') + 1);
 
-				var imageIndex = instance._getImageIndex(CKEDITOR.config.smiley_images, image);
+				var imageIndex = instance._getImageIndex(emoticonImages, image);
 
 				if (imageIndex >= 0) {
-					emoticonSymbol = CKEDITOR.config.smiley_symbols[imageIndex];
+					emoticonSymbol = emoticonSymbols[imageIndex];
 				}
 			}
 
@@ -339,14 +321,6 @@
 			}
 
 			return index;
-		},
-
-		_isLastItemNewLine: function() {
-			var instance = this;
-
-			var endResult = instance._endResult;
-
-			return (endResult && REGEX_LASTCHAR_NEWLINE_WHITESPACE.test(endResult.slice(-1)));
 		},
 
 		_handle: function(node) {
@@ -521,28 +495,51 @@
 			else {
 				var attrSrc = element.getAttribute('src');
 
-				listTagsIn.push('[img]');
+				var domElement = new CKEDITOR.dom.element(element);
 
+				var height = domElement.getStyle('height').replace('px', '') || 'auto';
+				var width = domElement.getStyle('width').replace('px', '') || 'auto';
+
+				var openTag = '[img]';
+
+				if ((height !== 'auto') || (width !== 'auto')) {
+					openTag = tplImageOpenTag.output(
+						{
+							height: height,
+							width: width
+						}
+					);
+				}
+
+				listTagsIn.push(openTag);
 				listTagsIn.push(attrSrc);
 
 				listTagsOut.push('[/img]');
 			}
 		},
 
+		_handleLineThrough: function(element, listTagsIn, listTagsOut) {
+			listTagsIn.push('[s]');
+
+			listTagsOut.push('[/s]');
+		},
+
 		_handleLink: function(element, listTagsIn, listTagsOut) {
 			var hrefAttribute = element.getAttribute('href');
 
-			var decodedLink = decodeURIComponent(hrefAttribute);
+			if (hrefAttribute) {
+				var decodedLink = decodeURIComponent(hrefAttribute);
 
-			if (decodedLink.indexOf(NEW_THREAD_URL) >= 0) {
-				hrefAttribute = NEW_THREAD_URL;
+				if (decodedLink.indexOf(newThreadURL) >= 0) {
+					hrefAttribute = newThreadURL;
+				}
+
+				var linkHandler = MAP_LINK_HANDLERS[hrefAttribute.indexOf(STR_MAILTO)] || 'url';
+
+				listTagsIn.push('[' + linkHandler + '=', hrefAttribute, ']');
+
+				listTagsOut.push('[/' + linkHandler + ']');
 			}
-
-			var linkHandler = MAP_LINK_HANDLERS[hrefAttribute.indexOf(STR_MAILTO)] || 'url';
-
-			listTagsIn.push('[' + linkHandler + '=', hrefAttribute, ']');
-
-			listTagsOut.push('[/' + linkHandler + ']');
 		},
 
 		_handleListItem: function(element, listTagsIn, listTagsOut) {
@@ -553,12 +550,6 @@
 			}
 
 			listTagsIn.push('[*]');
-		},
-
-		_handleLineThrough: function(element, listTagsIn, listTagsOut) {
-			listTagsIn.push('[s]');
-
-			listTagsOut.push('[/s]');
 		},
 
 		_handleOrderedList: function(element, listTagsIn, listTagsOut) {
@@ -818,6 +809,14 @@
 			listTagsOut.push('[/list]');
 		},
 
+		_isLastItemNewLine: function() {
+			var instance = this;
+
+			var endResult = instance._endResult;
+
+			return (endResult && REGEX_LASTCHAR_NEWLINE_WHITESPACE.test(endResult.slice(-1)));
+		},
+
 		_pushTagList: function(tagsList) {
 			var instance = this;
 
@@ -836,4 +835,38 @@
 
 		_inPRE: false
 	};
+
+	CKEDITOR.plugins.add(
+		'bbcode_data_processor',
+		{
+			requires: ['htmlwriter'],
+
+			init: function(editor) {
+				var editorConfig = editor.config;
+
+				emoticonImages = editorConfig.smiley_images;
+				emoticonPath = editorConfig.smiley_path;
+				emoticonSymbols = editorConfig.smiley_symbols;
+				newThreadURL = editorConfig.newThreadURL;
+
+				editor.dataProcessor = new BBCodeDataProcessor(editor);
+
+				editor.on(
+					'paste',
+					function(event) {
+						var data = event.data;
+
+						var htmlData = data.dataValue;
+
+						htmlData = editor.dataProcessor.toDataFormat(htmlData);
+
+						data.dataValue = htmlData;
+					},
+					editor.element.$
+				);
+
+				editor.fire('customDataProcessorLoaded');
+			}
+		}
+	);
 })();

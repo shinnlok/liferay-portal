@@ -4,7 +4,7 @@
 	<#if (ddlRecordSetCount = 1)>
 		<#assign ddmStructureModel = dataFactory.newDDLDDMStructureModel(groupId)>
 
-		insert into DDMStructure values ('${ddmStructureModel.uuid}', ${ddmStructureModel.structureId}, ${ddmStructureModel.groupId}, ${ddmStructureModel.companyId}, ${ddmStructureModel.userId}, '${ddmStructureModel.userName}', '${dataFactory.getDateString(ddmStructureModel.createDate)}', '${dataFactory.getDateString(ddmStructureModel.modifiedDate)}', ${ddmStructureModel.parentStructureId}, ${ddmStructureModel.classNameId}, '${ddmStructureModel.structureKey}', '${ddmStructureModel.name}', '${ddmStructureModel.description}', '${ddmStructureModel.xsd}', '${ddmStructureModel.storageType}', ${ddmStructureModel.type});
+		insert into DDMStructure values ('${ddmStructureModel.uuid}', ${ddmStructureModel.structureId}, ${ddmStructureModel.groupId}, ${ddmStructureModel.companyId}, ${ddmStructureModel.userId}, '${ddmStructureModel.userName}', '${dataFactory.getDateString(ddmStructureModel.createDate)}', '${dataFactory.getDateString(ddmStructureModel.modifiedDate)}', ${ddmStructureModel.parentStructureId}, ${ddmStructureModel.classNameId}, '${ddmStructureModel.structureKey}', '${ddmStructureModel.name}', '${ddmStructureModel.description}', '${ddmStructureModel.definition}', '${ddmStructureModel.storageType}', ${ddmStructureModel.type});
 
 		<@insertResourcePermissions
 			_entry = ddmStructureModel
@@ -59,7 +59,7 @@
 		_portletPreferencesModel = portletPreferencesModel
 	/>
 
-	<#assign portletPreferencesModels = dataFactory.newPortletPreferencesModels(layoutModel.plid)>
+	<#assign portletPreferencesModels = dataFactory.newDDLPortletPreferencesModels(layoutModel.plid)>
 
 	<#list portletPreferencesModels as portletPreferencesModel>
 		<@insertPortletPreferences

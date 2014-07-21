@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -87,52 +87,53 @@ public interface WorkflowTaskManager {
 
 	public List<WorkflowTask> getWorkflowTasks(
 			long companyId, Boolean completed, int start, int end,
-			OrderByComparator orderByComparator)
+			OrderByComparator<WorkflowTask> orderByComparator)
 		throws WorkflowException;
 
 	public List<WorkflowTask> getWorkflowTasksByRole(
 			long companyId, long roleId, Boolean completed, int start, int end,
-			OrderByComparator orderByComparator)
+			OrderByComparator<WorkflowTask> orderByComparator)
 		throws WorkflowException;
 
 	public List<WorkflowTask> getWorkflowTasksBySubmittingUser(
 			long companyId, long userId, Boolean completed, int start, int end,
-			OrderByComparator orderByComparator)
+			OrderByComparator<WorkflowTask> orderByComparator)
 		throws WorkflowException;
 
 	public List<WorkflowTask> getWorkflowTasksByUser(
 			long companyId, long userId, Boolean completed, int start, int end,
-			OrderByComparator orderByComparator)
+			OrderByComparator<WorkflowTask> orderByComparator)
 		throws WorkflowException;
 
 	public List<WorkflowTask> getWorkflowTasksByUserRoles(
 			long companyId, long userId, Boolean completed, int start, int end,
-			OrderByComparator orderByComparator)
+			OrderByComparator<WorkflowTask> orderByComparator)
 		throws WorkflowException;
 
 	public List<WorkflowTask> getWorkflowTasksByWorkflowInstance(
 			long companyId, Long userId, long workflowInstanceId,
 			Boolean completed, int start, int end,
-			OrderByComparator orderByComparator)
+			OrderByComparator<WorkflowTask> orderByComparator)
 		throws WorkflowException;
 
 	public List<WorkflowTask> search(
 			long companyId, long userId, String keywords, Boolean completed,
 			Boolean searchByUserRoles, int start, int end,
-			OrderByComparator orderByComparator)
+			OrderByComparator<WorkflowTask> orderByComparator)
 		throws WorkflowException;
 
 	public List<WorkflowTask> search(
 			long companyId, long userId, String taskName, String assetType,
 			Long[] assetPrimaryKey, Date dueDateGT, Date dueDateLT,
 			Boolean completed, Boolean searchByUserRoles, boolean andOperator,
-			int start, int end, OrderByComparator orderByComparator)
+			int start, int end,
+			OrderByComparator<WorkflowTask> orderByComparator)
 		throws WorkflowException;
 
 	public List<WorkflowTask> search(
 			long companyId, long userId, String keywords, String[] assetTypes,
 			Boolean completed, Boolean searchByUserRoles, int start, int end,
-			OrderByComparator orderByComparator)
+			OrderByComparator<WorkflowTask> orderByComparator)
 		throws WorkflowException;
 
 	public int searchCount(

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portal.monitoring.statistics.service;
 
-import com.liferay.portal.kernel.monitoring.MonitoringProcessor;
 import com.liferay.portal.kernel.monitoring.RequestStatus;
 import com.liferay.portal.kernel.monitoring.statistics.DataSampleThreadLocal;
 import com.liferay.portal.kernel.util.AutoResetThreadLocal;
@@ -92,18 +91,6 @@ public class ServiceMonitorAdvice extends ChainableMethodAdvice {
 			return null;
 		}
 
-		Object thisObject = methodInvocation.getThis();
-
-		Class<?> clazz = thisObject.getClass();
-
-		Class<?>[] interfaces = clazz.getInterfaces();
-
-		for (int i = 0; i < interfaces.length; i++) {
-			if (interfaces[i].isAssignableFrom(MonitoringProcessor.class)) {
-				return null;
-			}
-		}
-
 		if (!_permissiveMode && !isMonitored(methodInvocation)) {
 			return null;
 		}
@@ -114,6 +101,8 @@ public class ServiceMonitorAdvice extends ChainableMethodAdvice {
 		serviceRequestDataSample.prepare();
 
 		_serviceRequestDataSampleThreadLocal.set(serviceRequestDataSample);
+
+		DataSampleThreadLocal.initialize();
 
 		return null;
 	}

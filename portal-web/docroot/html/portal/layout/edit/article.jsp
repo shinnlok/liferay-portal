@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,9 +17,11 @@
 <%@ include file="/html/portal/layout/edit/init.jsp" %>
 
 <%
-UnicodeProperties typeSettingsProperties = selLayout.getTypeSettingsProperties();
+String articleId = StringPool.BLANK;
 
-String articleId = typeSettingsProperties.getProperty("article-id", StringPool.BLANK);
+if (selLayout != null) {
+	articleId = selLayout.getTypeSettingsProperty("article-id", StringPool.BLANK);
+}
 %>
 
 <aui:input cssClass="lfr-input-text-container" label="web-content-id" name="TypeSettingsProperties--article-id--" type="text" value="<%= articleId %>" />

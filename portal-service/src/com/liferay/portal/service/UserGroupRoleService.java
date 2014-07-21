@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -45,6 +45,17 @@ public interface UserGroupRoleService extends BaseService {
 	 *
 	 * Never modify or reference this interface directly. Always use {@link UserGroupRoleServiceUtil} to access the user group role remote service. Add custom service methods to {@link com.liferay.portal.service.impl.UserGroupRoleServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
+	public void addUserGroupRoles(long userId, long groupId, long[] roleIds)
+		throws com.liferay.portal.kernel.exception.PortalException;
+
+	public void addUserGroupRoles(long[] userIds, long groupId, long roleId)
+		throws com.liferay.portal.kernel.exception.PortalException;
+
+	public void deleteUserGroupRoles(long userId, long groupId, long[] roleIds)
+		throws com.liferay.portal.kernel.exception.PortalException;
+
+	public void deleteUserGroupRoles(long[] userIds, long groupId, long roleId)
+		throws com.liferay.portal.kernel.exception.PortalException;
 
 	/**
 	* Returns the Spring bean ID for this bean.
@@ -59,20 +70,4 @@ public interface UserGroupRoleService extends BaseService {
 	* @param beanIdentifier the Spring bean ID for this bean
 	*/
 	public void setBeanIdentifier(java.lang.String beanIdentifier);
-
-	public void addUserGroupRoles(long userId, long groupId, long[] roleIds)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
-
-	public void addUserGroupRoles(long[] userIds, long groupId, long roleId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
-
-	public void deleteUserGroupRoles(long userId, long groupId, long[] roleIds)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
-
-	public void deleteUserGroupRoles(long[] userIds, long groupId, long roleId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
 }

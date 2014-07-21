@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,6 +32,12 @@ public class RatingsEntryServiceWrapper implements RatingsEntryService,
 		_ratingsEntryService = ratingsEntryService;
 	}
 
+	@Override
+	public void deleteEntry(java.lang.String className, long classPK)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		_ratingsEntryService.deleteEntry(className, classPK);
+	}
+
 	/**
 	* Returns the Spring bean ID for this bean.
 	*
@@ -53,17 +59,9 @@ public class RatingsEntryServiceWrapper implements RatingsEntryService,
 	}
 
 	@Override
-	public void deleteEntry(java.lang.String className, long classPK)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		_ratingsEntryService.deleteEntry(className, classPK);
-	}
-
-	@Override
 	public com.liferay.portlet.ratings.model.RatingsEntry updateEntry(
 		java.lang.String className, long classPK, double score)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _ratingsEntryService.updateEntry(className, classPK, score);
 	}
 

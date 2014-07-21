@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,7 @@
 
 package com.liferay.portal.tools.sourceformatter;
 
-import com.liferay.portal.kernel.util.NumericalStringComparator;
+import com.liferay.portal.kernel.util.NaturalOrderStringComparator;
 import com.liferay.portal.kernel.util.StringUtil;
 
 import java.util.Comparator;
@@ -37,12 +37,14 @@ public class JavaTermComparator implements Comparator<JavaTerm> {
 		String name1 = javaTerm1.getName();
 		String name2 = javaTerm2.getName();
 
-		if (type1 == JavaSourceProcessor.TYPE_VARIABLE_PRIVATE_STATIC) {
-			if (name2.equals("_log")) {
+		if (type1 == JavaClass.TYPE_VARIABLE_PRIVATE_STATIC) {
+			if (name2.equals("_log") || name2.equals("_logger")) {
 				return 1;
 			}
 
-			if (name1.equals("_instance") || name1.equals("_log")) {
+			if (name1.equals("_instance") || name1.equals("_log") ||
+				name1.equals("_logger")) {
+
 				return -1;
 			}
 
@@ -51,9 +53,7 @@ public class JavaTermComparator implements Comparator<JavaTerm> {
 			}
 		}
 
-		if (JavaSourceProcessor.isInJavaTermTypeGroup(
-				type1, JavaSourceProcessor.TYPE_VARIABLE)) {
-
+		if (JavaClass.isInJavaTermTypeGroup(type1, JavaClass.TYPE_VARIABLE)) {
 			if (StringUtil.isUpperCase(name1) &&
 				!StringUtil.isLowerCase(name1) &&
 				!StringUtil.isUpperCase(name2)) {
@@ -70,17 +70,17 @@ public class JavaTermComparator implements Comparator<JavaTerm> {
 		}
 
 		if (name1.compareToIgnoreCase(name2) != 0) {
-			NumericalStringComparator numericalStringComparator =
-				new NumericalStringComparator(true, false);
+			NaturalOrderStringComparator naturalOrderStringComparator =
+				new NaturalOrderStringComparator(true, false);
 
-			return numericalStringComparator.compare(name1, name2);
+			return naturalOrderStringComparator.compare(name1, name2);
 		}
 
 		if (name1.compareTo(name2) != 0) {
-			NumericalStringComparator numericalStringComparator =
-				new NumericalStringComparator(true, true);
+			NaturalOrderStringComparator naturalOrderStringComparator =
+				new NaturalOrderStringComparator(true, true);
 
-			return -numericalStringComparator.compare(name1, name2);
+			return -naturalOrderStringComparator.compare(name1, name2);
 		}
 
 		return _compareParameterTypes(javaTerm1, javaTerm2);

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -41,7 +41,7 @@ if (Validator.isNull(lastImportLayoutSetBranchName)) {
 }
 
 if (Validator.isNull(lastImportLayoutSetBranchName)) {
-	lastImportLayoutSetBranchName = LanguageUtil.get(pageContext, "staging");
+	lastImportLayoutSetBranchName = LanguageUtil.get(request, "staging");
 }
 
 String lastImportLayoutBranchName = null;
@@ -89,7 +89,7 @@ if (Validator.isNull(publisherName)) {
 	<c:when test="<%= lastImportDate > 0 %>">
 		<c:if test="<%= Validator.isNotNull(lastImportLayoutSetBranchName) && Validator.isNotNull(publisherName) %>">
 			<span class="last-publication-branch">
-				<liferay-ui:message arguments='<%= new String[] {"<strong>" + HtmlUtil.escape(layout.getName(locale)) + "</strong>", "<em>" + LanguageUtil.get(pageContext, HtmlUtil.escape(lastImportLayoutSetBranchName)) + "</em>"} %>' key='<%= (group.isStagingGroup() || group.isStagedRemotely()) ? "page-x-was-last-published-to-live" : "page-x-was-last-published-from-x" %>' />
+				<liferay-ui:message arguments='<%= new String[] {"<strong>" + HtmlUtil.escape(layout.getName(locale)) + "</strong>", "<em>" + LanguageUtil.get(request, HtmlUtil.escape(lastImportLayoutSetBranchName)) + "</em>"} %>' key='<%= (group.isStagingGroup() || group.isStagedRemotely()) ? "page-x-was-last-published-to-live" : "page-x-was-last-published-from-x" %>' translateArguments="<%= false %>" />
 
 				<c:if test="<%= (Validator.isNotNull(lastImportLayoutBranchName) && (layoutRevisions.size() > 1)) || Validator.isNotNull(lastImportLayoutRevisionId) %>">
 					<span class="last-publication-variation-details">(
@@ -109,17 +109,17 @@ if (Validator.isNull(publisherName)) {
 			</span>
 
 			<span class="last-publication-user">
-				<liferay-ui:message arguments="<%= new String[] {LanguageUtil.getTimeDescription(pageContext, (System.currentTimeMillis() - lastImportDate), true), publisherName} %>" key="x-ago-by-x" />
+				<liferay-ui:message arguments="<%= new String[] {LanguageUtil.getTimeDescription(request, (System.currentTimeMillis() - lastImportDate), true), HtmlUtil.escape(publisherName)} %>" key="x-ago-by-x" translateArguments="<%= false %>" />
 			</span>
 		</c:if>
 	</c:when>
 	<c:otherwise>
 		<span class="staging-live-group-name">
-			<liferay-ui:message arguments="<%= HtmlUtil.escape(liveGroup.getDescriptiveName(locale)) %>" key="x-is-staged" />
+			<liferay-ui:message arguments="<%= HtmlUtil.escape(liveGroup.getDescriptiveName(locale)) %>" key="x-is-staged" translateArguments="<%= false %>" />
 		</span>
 
 		<span class="staging-live-help">
-			<liferay-ui:message arguments="<%= HtmlUtil.escape(liveGroup.getDescriptiveName(locale)) %>" key='<%= (group.isStagingGroup() || group.isStagedRemotely()) ? "staging-staging-help-x" : "staging-live-help-x" %>' />
+			<liferay-ui:message arguments="<%= HtmlUtil.escape(liveGroup.getDescriptiveName(locale)) %>" key='<%= (group.isStagingGroup() || group.isStagedRemotely()) ? "staging-staging-help-x" : "staging-live-help-x" %>' translateArguments="<%= false %>" />
 		</span>
 	</c:otherwise>
 </c:choose>

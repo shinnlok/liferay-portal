@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -39,11 +39,15 @@ import com.liferay.portal.model.ModelHintsUtil;
 import com.liferay.portal.model.ServiceComponent;
 import com.liferay.portal.service.base.ServiceComponentLocalServiceBaseImpl;
 import com.liferay.portal.tools.servicebuilder.Entity;
+import com.liferay.portal.util.PropsValues;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 import java.lang.reflect.Field;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import java.security.PrivilegedExceptionAction;
 
@@ -60,8 +64,7 @@ public class ServiceComponentLocalServiceImpl
 
 	@Override
 	public void destroyServiceComponent(
-			ServletContext servletContext, ClassLoader classLoader)
-		throws SystemException {
+		ServletContext servletContext, ClassLoader classLoader) {
 
 		try {
 			clearCacheRegistry(servletContext);
@@ -76,7 +79,7 @@ public class ServiceComponentLocalServiceImpl
 			ServletContext servletContext, ClassLoader classLoader,
 			String buildNamespace, long buildNumber, long buildDate,
 			boolean buildAutoUpgrade)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		try {
 			ModelHintsUtil.read(
@@ -145,7 +148,7 @@ public class ServiceComponentLocalServiceImpl
 			Element tablesSQLElement = dataElement.addElement("tables-sql");
 
 			String tablesSQL = HttpUtil.URLtoString(
-				servletContext.getResource("/WEB-INF/sql/tables.sql"));
+				getResource(servletContext, "sql/tables.sql"));
 
 			tablesSQLElement.addCDATA(tablesSQL);
 
@@ -153,14 +156,14 @@ public class ServiceComponentLocalServiceImpl
 				"sequences-sql");
 
 			String sequencesSQL = HttpUtil.URLtoString(
-				servletContext.getResource("/WEB-INF/sql/sequences.sql"));
+				getResource(servletContext, "sql/sequences.sql"));
 
 			sequencesSQLElement.addCDATA(sequencesSQL);
 
 			Element indexesSQLElement = dataElement.addElement("indexes-sql");
 
 			String indexesSQL = HttpUtil.URLtoString(
-				servletContext.getResource("/WEB-INF/sql/indexes.sql"));
+				getResource(servletContext, "sql/indexes.sql"));
 
 			indexesSQLElement.addCDATA(indexesSQL);
 
@@ -199,7 +202,7 @@ public class ServiceComponentLocalServiceImpl
 	}
 
 	@Override
-	public void verifyDB() throws SystemException {
+	public void verifyDB() {
 		List<ServiceComponent> serviceComponents =
 			serviceComponentPersistence.findAll();
 
@@ -218,15 +221,6 @@ public class ServiceComponentLocalServiceImpl
 				_log.error(e, e);
 			}
 		}
-	}
-
-	public static interface PACL {
-
-		public void doUpgradeDB(
-				DoUpgradeDBPrivilegedExceptionAction
-					doUpgradeDBPrivilegedExceptionAction)
-			throws Exception;
-
 	}
 
 	public class DoUpgradeDBPrivilegedExceptionAction
@@ -272,11 +266,20 @@ public class ServiceComponentLocalServiceImpl
 
 	}
 
+	public interface PACL {
+
+		public void doUpgradeDB(
+				DoUpgradeDBPrivilegedExceptionAction
+					doUpgradeDBPrivilegedExceptionAction)
+			throws Exception;
+
+	}
+
 	protected void clearCacheRegistry(ServletContext servletContext)
 		throws DocumentException {
 
-		InputStream inputStream = servletContext.getResourceAsStream(
-			"/WEB-INF/classes/META-INF/portlet-hbm.xml");
+		InputStream inputStream = getResourceAsStream(
+			servletContext, "classes/META-INF/portlet-hbm.xml");
 
 		if (inputStream == null) {
 			return;
@@ -296,8 +299,10 @@ public class ServiceComponentLocalServiceImpl
 
 		CacheRegistryUtil.clear();
 
-		EntityCacheUtil.clearCache();
-		FinderCacheUtil.clearCache();
+		if (PropsValues.CACHE_CLEAR_ON_PLUGIN_UNDEPLOY) {
+			EntityCacheUtil.clearCache();
+			FinderCacheUtil.clearCache();
+		}
 	}
 
 	protected void doUpgradeDB(
@@ -401,6 +406,32 @@ public class ServiceComponentLocalServiceImpl
 		return models;
 	}
 
+	protected URL getResource(ServletContext servletContext, String path)
+		throws MalformedURLException {
+
+		URL url = servletContext.getResource("/META-INF/" + path);
+
+		if (url == null) {
+			url = servletContext.getResource("/WEB-INF/" + path);
+		}
+
+		return url;
+	}
+
+	protected InputStream getResourceAsStream(
+		ServletContext servletContext, String path) {
+
+		InputStream inputStream = servletContext.getResourceAsStream(
+			"/META-INF/" + path);
+
+		if (inputStream == null) {
+			inputStream = servletContext.getResourceAsStream(
+				"/WEB-INF/" + path);
+		}
+
+		return inputStream;
+	}
+
 	protected UpgradeTableListener getUpgradeTableListener(
 		ClassLoader classLoader, Class<?> modelClass) {
 
@@ -434,9 +465,7 @@ public class ServiceComponentLocalServiceImpl
 		}
 	}
 
-	protected void removeOldServiceComponents(String buildNamespace)
-		throws SystemException {
-
+	protected void removeOldServiceComponents(String buildNamespace) {
 		int serviceComponentsCount =
 			serviceComponentPersistence.countByBuildNamespace(buildNamespace);
 

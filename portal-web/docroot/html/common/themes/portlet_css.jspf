@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -304,17 +304,13 @@ JSONObject advancedData = jsonObject.getJSONObject("advancedData");
 
 String customCSS = advancedData.getString("customCSS");
 
-customCSS = StringUtil.replace(
-	customCSS,
-	new String[] {"<", ">", "expression("},
-	new String[] {"&lt;", "&gt;", ""}
-);
-
 // Portlet data
 
 JSONObject portletData = jsonObject.getJSONObject("portletData");
 
-boolean showBorders = portletData.getBoolean("showBorders", PropsValues.THEME_PORTLET_DECORATE_DEFAULT);
+boolean portletDecorate = GetterUtil.getBoolean(themeDisplay.getThemeSetting("portlet-setup-show-borders-default"), PropsValues.THEME_PORTLET_DECORATE_DEFAULT);
+
+boolean showBorders = portletData.getBoolean("showBorders", portletDecorate);
 
 // Generated CSS
 
@@ -333,14 +329,14 @@ String[] finalCSSArray = (String[])finalCSS.toArray(new String[0]);
 
 String finalCSSString = StringUtil.merge(finalCSSArray, ";\n");
 
-out.print(finalCSSString);
+out.print(_escapeCssBlock(finalCSSString));
 
 out.print("\n}\n");
 
 // Advanced CSS
 
 if (Validator.isNotNull(customCSS)) {
-	out.print(customCSS);
+	out.print(_escapeCssBlock(customCSS));
 }
 %>
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,6 +17,7 @@ package com.liferay.portal.security.auth;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
+import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.servlet.filters.secure.NonceUtil;
@@ -32,6 +33,9 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * @author Tomas Polesovsky
  */
+@OSGiBeanProperties(
+	portalPropertyPrefix = "auth.verifier.DigestAuthenticationAuthVerifier."
+)
 public class DigestAuthenticationAuthVerifier implements AuthVerifier {
 
 	@Override

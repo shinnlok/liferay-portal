@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,7 +25,7 @@ import com.liferay.portlet.documentlibrary.model.DLFolder;
  * @author Brian Wing Shun Chan
  * @author Alexander Chow
  */
-public class RepositoryModelNameComparator extends OrderByComparator {
+public class RepositoryModelNameComparator<T> extends OrderByComparator<T> {
 
 	public static final String ORDER_BY_ASC = "title ASC";
 
@@ -42,9 +42,9 @@ public class RepositoryModelNameComparator extends OrderByComparator {
 	}
 
 	@Override
-	public int compare(Object obj1, Object obj2) {
-		String name1 = getName(obj1);
-		String name2 = getName(obj2);
+	public int compare(T t1, T t2) {
+		String name1 = getName(t1);
+		String name2 = getName(t2);
 
 		int value = name1.compareToIgnoreCase(name2);
 

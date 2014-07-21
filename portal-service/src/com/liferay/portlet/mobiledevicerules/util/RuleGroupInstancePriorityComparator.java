@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,7 +20,8 @@ import com.liferay.portlet.mobiledevicerules.model.MDRRuleGroupInstance;
 /**
  * @author Edward Han
  */
-public class RuleGroupInstancePriorityComparator extends OrderByComparator {
+public class RuleGroupInstancePriorityComparator
+	extends OrderByComparator<MDRRuleGroupInstance> {
 
 	public static final String ORDER_BY_ASC =
 		"MDRRuleGroupInstance.priority ASC";
@@ -39,9 +40,9 @@ public class RuleGroupInstancePriorityComparator extends OrderByComparator {
 	}
 
 	@Override
-	public int compare(Object obj1, Object obj2) {
-		MDRRuleGroupInstance ruleGroupInstance1 = (MDRRuleGroupInstance)obj1;
-		MDRRuleGroupInstance ruleGroupInstance2 = (MDRRuleGroupInstance)obj2;
+	public int compare(
+		MDRRuleGroupInstance ruleGroupInstance1,
+		MDRRuleGroupInstance ruleGroupInstance2) {
 
 		int value =
 			ruleGroupInstance2.getPriority() - ruleGroupInstance1.getPriority();

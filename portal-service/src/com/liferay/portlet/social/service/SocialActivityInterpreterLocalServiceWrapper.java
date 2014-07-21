@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,26 +32,6 @@ public class SocialActivityInterpreterLocalServiceWrapper
 	public SocialActivityInterpreterLocalServiceWrapper(
 		SocialActivityInterpreterLocalService socialActivityInterpreterLocalService) {
 		_socialActivityInterpreterLocalService = socialActivityInterpreterLocalService;
-	}
-
-	/**
-	* Returns the Spring bean ID for this bean.
-	*
-	* @return the Spring bean ID for this bean
-	*/
-	@Override
-	public java.lang.String getBeanIdentifier() {
-		return _socialActivityInterpreterLocalService.getBeanIdentifier();
-	}
-
-	/**
-	* Sets the Spring bean ID for this bean.
-	*
-	* @param beanIdentifier the Spring bean ID for this bean
-	*/
-	@Override
-	public void setBeanIdentifier(java.lang.String beanIdentifier) {
-		_socialActivityInterpreterLocalService.setBeanIdentifier(beanIdentifier);
 	}
 
 	/**
@@ -88,6 +68,16 @@ public class SocialActivityInterpreterLocalServiceWrapper
 	}
 
 	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	@Override
+	public java.lang.String getBeanIdentifier() {
+		return _socialActivityInterpreterLocalService.getBeanIdentifier();
+	}
+
+	/**
 	* @deprecated As of 6.2.0, replaced by {@link #interpret(String,
 	SocialActivity, ServiceContext)}
 	*/
@@ -110,7 +100,9 @@ public class SocialActivityInterpreterLocalServiceWrapper
 	* asset type of the activity.
 	* </p>
 	*
+	* @param selector the context in which the activity interpreter is used
 	* @param activity the activity to be translated to human readable form
+	* @param serviceContext the service context to be applied
 	* @return the activity feed that is a human readable form of the activity
 	record or <code>null</code> if a compatible interpreter is not
 	found
@@ -133,10 +125,19 @@ public class SocialActivityInterpreterLocalServiceWrapper
 			activitySet, serviceContext);
 	}
 
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	@Override
+	public void setBeanIdentifier(java.lang.String beanIdentifier) {
+		_socialActivityInterpreterLocalService.setBeanIdentifier(beanIdentifier);
+	}
+
 	@Override
 	public void updateActivitySet(long activityId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		_socialActivityInterpreterLocalService.updateActivitySet(activityId);
 	}
 

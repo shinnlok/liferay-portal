@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -93,6 +93,10 @@ public class BaseSelectTag extends com.liferay.taglib.util.IncludeTag {
 		return _listTypeFieldName;
 	}
 
+	public boolean getLocalizeLabel() {
+		return _localizeLabel;
+	}
+
 	public boolean getMultiple() {
 		return _multiple;
 	}
@@ -135,6 +139,14 @@ public class BaseSelectTag extends com.liferay.taglib.util.IncludeTag {
 
 	public boolean getUseNamespace() {
 		return _useNamespace;
+	}
+
+	public java.lang.Object getValue() {
+		return _value;
+	}
+
+	public java.lang.String getWrapperCssClass() {
+		return _wrapperCssClass;
 	}
 
 	public void setBean(java.lang.Object bean) {
@@ -227,6 +239,12 @@ public class BaseSelectTag extends com.liferay.taglib.util.IncludeTag {
 		setScopedAttribute("listTypeFieldName", listTypeFieldName);
 	}
 
+	public void setLocalizeLabel(boolean localizeLabel) {
+		_localizeLabel = localizeLabel;
+
+		setScopedAttribute("localizeLabel", localizeLabel);
+	}
+
 	public void setMultiple(boolean multiple) {
 		_multiple = multiple;
 
@@ -293,6 +311,18 @@ public class BaseSelectTag extends com.liferay.taglib.util.IncludeTag {
 		setScopedAttribute("useNamespace", useNamespace);
 	}
 
+	public void setValue(java.lang.Object value) {
+		_value = value;
+
+		setScopedAttribute("value", value);
+	}
+
+	public void setWrapperCssClass(java.lang.String wrapperCssClass) {
+		_wrapperCssClass = wrapperCssClass;
+
+		setScopedAttribute("wrapperCssClass", wrapperCssClass);
+	}
+
 	@Override
 	protected void cleanUp() {
 		_bean = null;
@@ -310,6 +340,7 @@ public class BaseSelectTag extends com.liferay.taglib.util.IncludeTag {
 		_last = false;
 		_listType = null;
 		_listTypeFieldName = null;
+		_localizeLabel = true;
 		_multiple = false;
 		_name = null;
 		_onChange = null;
@@ -321,6 +352,8 @@ public class BaseSelectTag extends com.liferay.taglib.util.IncludeTag {
 		_suffix = null;
 		_title = null;
 		_useNamespace = true;
+		_value = null;
+		_wrapperCssClass = null;
 	}
 
 	@Override
@@ -350,6 +383,7 @@ public class BaseSelectTag extends com.liferay.taglib.util.IncludeTag {
 		setNamespacedAttribute(request, "last", _last);
 		setNamespacedAttribute(request, "listType", _listType);
 		setNamespacedAttribute(request, "listTypeFieldName", _listTypeFieldName);
+		setNamespacedAttribute(request, "localizeLabel", _localizeLabel);
 		setNamespacedAttribute(request, "multiple", _multiple);
 		setNamespacedAttribute(request, "name", _name);
 		setNamespacedAttribute(request, "onChange", _onChange);
@@ -361,6 +395,8 @@ public class BaseSelectTag extends com.liferay.taglib.util.IncludeTag {
 		setNamespacedAttribute(request, "suffix", _suffix);
 		setNamespacedAttribute(request, "title", _title);
 		setNamespacedAttribute(request, "useNamespace", _useNamespace);
+		setNamespacedAttribute(request, "value", _value);
+		setNamespacedAttribute(request, "wrapperCssClass", _wrapperCssClass);
 	}
 
 	protected static final String _ATTRIBUTE_NAMESPACE = "aui:select:";
@@ -386,6 +422,7 @@ public class BaseSelectTag extends com.liferay.taglib.util.IncludeTag {
 	private boolean _last = false;
 	private java.lang.String _listType = null;
 	private java.lang.String _listTypeFieldName = null;
+	private boolean _localizeLabel = true;
 	private boolean _multiple = false;
 	private java.lang.String _name = null;
 	private java.lang.String _onChange = null;
@@ -397,5 +434,7 @@ public class BaseSelectTag extends com.liferay.taglib.util.IncludeTag {
 	private java.lang.String _suffix = null;
 	private java.lang.String _title = null;
 	private boolean _useNamespace = true;
+	private java.lang.Object _value = null;
+	private java.lang.String _wrapperCssClass = null;
 
 }

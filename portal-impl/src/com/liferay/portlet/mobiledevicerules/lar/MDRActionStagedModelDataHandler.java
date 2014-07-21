@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portlet.mobiledevicerules.lar;
 
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.lar.BaseStagedModelDataHandler;
 import com.liferay.portal.kernel.lar.ExportImportPathUtil;
 import com.liferay.portal.kernel.lar.PortletDataContext;
@@ -48,12 +47,9 @@ public class MDRActionStagedModelDataHandler
 
 	@Override
 	public void deleteStagedModel(
-			String uuid, long groupId, String className, String extraData)
-		throws SystemException {
+		String uuid, long groupId, String className, String extraData) {
 
-		MDRAction action =
-			MDRActionLocalServiceUtil.fetchMDRActionByUuidAndGroupId(
-				uuid, groupId);
+		MDRAction action = fetchExistingStagedModel(uuid, groupId);
 
 		if (action != null) {
 			MDRActionLocalServiceUtil.deleteAction(action);
@@ -114,6 +110,12 @@ public class MDRActionStagedModelDataHandler
 	}
 
 	@Override
+	protected MDRAction doFetchExistingStagedModel(String uuid, long groupId) {
+		return MDRActionLocalServiceUtil.fetchMDRActionByUuidAndGroupId(
+			uuid, groupId);
+	}
+
+	@Override
 	protected void doImportStagedModel(
 			PortletDataContext portletDataContext, MDRAction action)
 		throws Exception {
@@ -144,9 +146,8 @@ public class MDRActionStagedModelDataHandler
 		MDRAction importedAction = null;
 
 		if (portletDataContext.isDataStrategyMirror()) {
-			MDRAction existingAction =
-				MDRActionLocalServiceUtil.fetchMDRActionByUuidAndGroupId(
-					action.getUuid(), portletDataContext.getScopeGroupId());
+			MDRAction existingAction = fetchExistingStagedModel(
+				action.getUuid(), portletDataContext.getScopeGroupId());
 
 			if (existingAction == null) {
 				serviceContext.setUuid(action.getUuid());

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portlet.documentlibrary.service.persistence;
 
-import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
@@ -23,68 +22,92 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.test.ExecutionTestListeners;
+import com.liferay.portal.kernel.template.TemplateException;
+import com.liferay.portal.kernel.template.TemplateManagerUtil;
+import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.util.IntegerWrapper;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.service.ServiceTestUtil;
-import com.liferay.portal.service.persistence.BasePersistence;
-import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
-import com.liferay.portal.test.LiferayPersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.test.persistence.TransactionalPersistenceAdvice;
+import com.liferay.portal.model.ModelListener;
+import com.liferay.portal.test.TransactionalTestRule;
+import com.liferay.portal.test.runners.LiferayIntegrationJUnitTestRunner;
+import com.liferay.portal.tools.DBUpgrader;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.portal.util.test.RandomTestUtil;
 
 import com.liferay.portlet.documentlibrary.NoSuchFolderException;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.model.impl.DLFolderModelImpl;
+import com.liferay.portlet.documentlibrary.service.DLFolderLocalServiceUtil;
 
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 
 import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 /**
- * @author Brian Wing Shun Chan
+ * @generated
  */
-@ExecutionTestListeners(listeners =  {
-	PersistenceExecutionTestListener.class})
-@RunWith(LiferayPersistenceIntegrationJUnitTestRunner.class)
+@RunWith(LiferayIntegrationJUnitTestRunner.class)
 public class DLFolderPersistenceTest {
-	@After
-	public void tearDown() throws Exception {
-		Map<Serializable, BasePersistence<?>> basePersistences = _transactionalPersistenceAdvice.getBasePersistences();
+	@ClassRule
+	public static TransactionalTestRule transactionalTestRule = new TransactionalTestRule(Propagation.REQUIRED);
 
-		Set<Serializable> primaryKeys = basePersistences.keySet();
-
-		for (Serializable primaryKey : primaryKeys) {
-			BasePersistence<?> basePersistence = basePersistences.get(primaryKey);
-
-			try {
-				basePersistence.remove(primaryKey);
-			}
-			catch (Exception e) {
-				if (_log.isDebugEnabled()) {
-					_log.debug("The model with primary key " + primaryKey +
-						" was already deleted");
-				}
-			}
+	@BeforeClass
+	public static void setupClass() throws TemplateException {
+		try {
+			DBUpgrader.upgrade();
+		}
+		catch (Exception e) {
+			_log.error(e, e);
 		}
 
-		_transactionalPersistenceAdvice.reset();
+		TemplateManagerUtil.init();
+	}
+
+	@Before
+	public void setUp() {
+		_modelListeners = _persistence.getListeners();
+
+		for (ModelListener<DLFolder> modelListener : _modelListeners) {
+			_persistence.unregisterListener(modelListener);
+		}
+	}
+
+	@After
+	public void tearDown() throws Exception {
+		Iterator<DLFolder> iterator = _dlFolders.iterator();
+
+		while (iterator.hasNext()) {
+			_persistence.remove(iterator.next());
+
+			iterator.remove();
+		}
+
+		for (ModelListener<DLFolder> modelListener : _modelListeners) {
+			_persistence.registerListener(modelListener);
+		}
 	}
 
 	@Test
 	public void testCreate() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		DLFolder dlFolder = _persistence.create(pk);
 
@@ -111,53 +134,53 @@ public class DLFolderPersistenceTest {
 
 	@Test
 	public void testUpdateExisting() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		DLFolder newDLFolder = _persistence.create(pk);
 
-		newDLFolder.setUuid(ServiceTestUtil.randomString());
+		newDLFolder.setUuid(RandomTestUtil.randomString());
 
-		newDLFolder.setGroupId(ServiceTestUtil.nextLong());
+		newDLFolder.setGroupId(RandomTestUtil.nextLong());
 
-		newDLFolder.setCompanyId(ServiceTestUtil.nextLong());
+		newDLFolder.setCompanyId(RandomTestUtil.nextLong());
 
-		newDLFolder.setUserId(ServiceTestUtil.nextLong());
+		newDLFolder.setUserId(RandomTestUtil.nextLong());
 
-		newDLFolder.setUserName(ServiceTestUtil.randomString());
+		newDLFolder.setUserName(RandomTestUtil.randomString());
 
-		newDLFolder.setCreateDate(ServiceTestUtil.nextDate());
+		newDLFolder.setCreateDate(RandomTestUtil.nextDate());
 
-		newDLFolder.setModifiedDate(ServiceTestUtil.nextDate());
+		newDLFolder.setModifiedDate(RandomTestUtil.nextDate());
 
-		newDLFolder.setRepositoryId(ServiceTestUtil.nextLong());
+		newDLFolder.setRepositoryId(RandomTestUtil.nextLong());
 
-		newDLFolder.setMountPoint(ServiceTestUtil.randomBoolean());
+		newDLFolder.setMountPoint(RandomTestUtil.randomBoolean());
 
-		newDLFolder.setParentFolderId(ServiceTestUtil.nextLong());
+		newDLFolder.setParentFolderId(RandomTestUtil.nextLong());
 
-		newDLFolder.setTreePath(ServiceTestUtil.randomString());
+		newDLFolder.setTreePath(RandomTestUtil.randomString());
 
-		newDLFolder.setName(ServiceTestUtil.randomString());
+		newDLFolder.setName(RandomTestUtil.randomString());
 
-		newDLFolder.setDescription(ServiceTestUtil.randomString());
+		newDLFolder.setDescription(RandomTestUtil.randomString());
 
-		newDLFolder.setLastPostDate(ServiceTestUtil.nextDate());
+		newDLFolder.setLastPostDate(RandomTestUtil.nextDate());
 
-		newDLFolder.setDefaultFileEntryTypeId(ServiceTestUtil.nextLong());
+		newDLFolder.setDefaultFileEntryTypeId(RandomTestUtil.nextLong());
 
-		newDLFolder.setHidden(ServiceTestUtil.randomBoolean());
+		newDLFolder.setHidden(RandomTestUtil.randomBoolean());
 
-		newDLFolder.setOverrideFileEntryTypes(ServiceTestUtil.randomBoolean());
+		newDLFolder.setOverrideFileEntryTypes(RandomTestUtil.randomBoolean());
 
-		newDLFolder.setStatus(ServiceTestUtil.nextInt());
+		newDLFolder.setStatus(RandomTestUtil.nextInt());
 
-		newDLFolder.setStatusByUserId(ServiceTestUtil.nextLong());
+		newDLFolder.setStatusByUserId(RandomTestUtil.nextLong());
 
-		newDLFolder.setStatusByUserName(ServiceTestUtil.randomString());
+		newDLFolder.setStatusByUserName(RandomTestUtil.randomString());
 
-		newDLFolder.setStatusDate(ServiceTestUtil.nextDate());
+		newDLFolder.setStatusDate(RandomTestUtil.nextDate());
 
-		_persistence.update(newDLFolder);
+		_dlFolders.add(_persistence.update(newDLFolder));
 
 		DLFolder existingDLFolder = _persistence.findByPrimaryKey(newDLFolder.getPrimaryKey());
 
@@ -210,6 +233,200 @@ public class DLFolderPersistenceTest {
 	}
 
 	@Test
+	public void testCountByUuid() {
+		try {
+			_persistence.countByUuid(StringPool.BLANK);
+
+			_persistence.countByUuid(StringPool.NULL);
+
+			_persistence.countByUuid((String)null);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByUUID_G() {
+		try {
+			_persistence.countByUUID_G(StringPool.BLANK,
+				RandomTestUtil.nextLong());
+
+			_persistence.countByUUID_G(StringPool.NULL, 0L);
+
+			_persistence.countByUUID_G((String)null, 0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByUuid_C() {
+		try {
+			_persistence.countByUuid_C(StringPool.BLANK,
+				RandomTestUtil.nextLong());
+
+			_persistence.countByUuid_C(StringPool.NULL, 0L);
+
+			_persistence.countByUuid_C((String)null, 0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByGroupId() {
+		try {
+			_persistence.countByGroupId(RandomTestUtil.nextLong());
+
+			_persistence.countByGroupId(0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByCompanyId() {
+		try {
+			_persistence.countByCompanyId(RandomTestUtil.nextLong());
+
+			_persistence.countByCompanyId(0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByRepositoryId() {
+		try {
+			_persistence.countByRepositoryId(RandomTestUtil.nextLong());
+
+			_persistence.countByRepositoryId(0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByG_P() {
+		try {
+			_persistence.countByG_P(RandomTestUtil.nextLong(),
+				RandomTestUtil.nextLong());
+
+			_persistence.countByG_P(0L, 0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByC_NotS() {
+		try {
+			_persistence.countByC_NotS(RandomTestUtil.nextLong(),
+				RandomTestUtil.nextInt());
+
+			_persistence.countByC_NotS(0L, 0);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByP_N() {
+		try {
+			_persistence.countByP_N(RandomTestUtil.nextLong(), StringPool.BLANK);
+
+			_persistence.countByP_N(0L, StringPool.NULL);
+
+			_persistence.countByP_N(0L, (String)null);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByF_C_P_NotS() {
+		try {
+			_persistence.countByF_C_P_NotS(RandomTestUtil.nextLong(),
+				RandomTestUtil.nextLong(), RandomTestUtil.nextLong(),
+				RandomTestUtil.nextInt());
+
+			_persistence.countByF_C_P_NotS(0L, 0L, 0L, 0);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByG_P_N() {
+		try {
+			_persistence.countByG_P_N(RandomTestUtil.nextLong(),
+				RandomTestUtil.nextLong(), StringPool.BLANK);
+
+			_persistence.countByG_P_N(0L, 0L, StringPool.NULL);
+
+			_persistence.countByG_P_N(0L, 0L, (String)null);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByG_M_P_H() {
+		try {
+			_persistence.countByG_M_P_H(RandomTestUtil.nextLong(),
+				RandomTestUtil.randomBoolean(), RandomTestUtil.nextLong(),
+				RandomTestUtil.randomBoolean());
+
+			_persistence.countByG_M_P_H(0L, RandomTestUtil.randomBoolean(), 0L,
+				RandomTestUtil.randomBoolean());
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByG_P_H_S() {
+		try {
+			_persistence.countByG_P_H_S(RandomTestUtil.nextLong(),
+				RandomTestUtil.nextLong(), RandomTestUtil.randomBoolean(),
+				RandomTestUtil.nextInt());
+
+			_persistence.countByG_P_H_S(0L, 0L, RandomTestUtil.randomBoolean(),
+				0);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByG_M_P_H_S() {
+		try {
+			_persistence.countByG_M_P_H_S(RandomTestUtil.nextLong(),
+				RandomTestUtil.randomBoolean(), RandomTestUtil.nextLong(),
+				RandomTestUtil.randomBoolean(), RandomTestUtil.nextInt());
+
+			_persistence.countByG_M_P_H_S(0L, RandomTestUtil.randomBoolean(),
+				0L, RandomTestUtil.randomBoolean(), 0);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
 	public void testFindByPrimaryKeyExisting() throws Exception {
 		DLFolder newDLFolder = addDLFolder();
 
@@ -220,7 +437,7 @@ public class DLFolderPersistenceTest {
 
 	@Test
 	public void testFindByPrimaryKeyMissing() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		try {
 			_persistence.findByPrimaryKey(pk);
@@ -253,7 +470,7 @@ public class DLFolderPersistenceTest {
 		}
 	}
 
-	protected OrderByComparator getOrderByComparator() {
+	protected OrderByComparator<DLFolder> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create("DLFolder", "uuid", true,
 			"folderId", true, "groupId", true, "companyId", true, "userId",
 			true, "userName", true, "createDate", true, "modifiedDate", true,
@@ -275,7 +492,7 @@ public class DLFolderPersistenceTest {
 
 	@Test
 	public void testFetchByPrimaryKeyMissing() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		DLFolder missingDLFolder = _persistence.fetchByPrimaryKey(pk);
 
@@ -283,19 +500,103 @@ public class DLFolderPersistenceTest {
 	}
 
 	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
+		throws Exception {
+		DLFolder newDLFolder1 = addDLFolder();
+		DLFolder newDLFolder2 = addDLFolder();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newDLFolder1.getPrimaryKey());
+		primaryKeys.add(newDLFolder2.getPrimaryKey());
+
+		Map<Serializable, DLFolder> dlFolders = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(2, dlFolders.size());
+		Assert.assertEquals(newDLFolder1,
+			dlFolders.get(newDLFolder1.getPrimaryKey()));
+		Assert.assertEquals(newDLFolder2,
+			dlFolders.get(newDLFolder2.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
+		throws Exception {
+		long pk1 = RandomTestUtil.nextLong();
+
+		long pk2 = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(pk1);
+		primaryKeys.add(pk2);
+
+		Map<Serializable, DLFolder> dlFolders = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(dlFolders.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
+		throws Exception {
+		DLFolder newDLFolder = addDLFolder();
+
+		long pk = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newDLFolder.getPrimaryKey());
+		primaryKeys.add(pk);
+
+		Map<Serializable, DLFolder> dlFolders = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, dlFolders.size());
+		Assert.assertEquals(newDLFolder,
+			dlFolders.get(newDLFolder.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
+		throws Exception {
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		Map<Serializable, DLFolder> dlFolders = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(dlFolders.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithOnePrimaryKey()
+		throws Exception {
+		DLFolder newDLFolder = addDLFolder();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newDLFolder.getPrimaryKey());
+
+		Map<Serializable, DLFolder> dlFolders = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, dlFolders.size());
+		Assert.assertEquals(newDLFolder,
+			dlFolders.get(newDLFolder.getPrimaryKey()));
+	}
+
+	@Test
 	public void testActionableDynamicQuery() throws Exception {
 		final IntegerWrapper count = new IntegerWrapper();
 
-		ActionableDynamicQuery actionableDynamicQuery = new DLFolderActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = DLFolderLocalServiceUtil.getActionableDynamicQuery();
+
+		actionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod() {
 				@Override
-				protected void performAction(Object object) {
+				public void performAction(Object object) {
 					DLFolder dlFolder = (DLFolder)object;
 
 					Assert.assertNotNull(dlFolder);
 
 					count.increment();
 				}
-			};
+			});
 
 		actionableDynamicQuery.performActions();
 
@@ -328,7 +629,7 @@ public class DLFolderPersistenceTest {
 				DLFolder.class.getClassLoader());
 
 		dynamicQuery.add(RestrictionsFactoryUtil.eq("folderId",
-				ServiceTestUtil.nextLong()));
+				RandomTestUtil.nextLong()));
 
 		List<DLFolder> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -367,7 +668,7 @@ public class DLFolderPersistenceTest {
 		dynamicQuery.setProjection(ProjectionFactoryUtil.property("folderId"));
 
 		dynamicQuery.add(RestrictionsFactoryUtil.in("folderId",
-				new Object[] { ServiceTestUtil.nextLong() }));
+				new Object[] { RandomTestUtil.nextLong() }));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -405,58 +706,59 @@ public class DLFolderPersistenceTest {
 	}
 
 	protected DLFolder addDLFolder() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		DLFolder dlFolder = _persistence.create(pk);
 
-		dlFolder.setUuid(ServiceTestUtil.randomString());
+		dlFolder.setUuid(RandomTestUtil.randomString());
 
-		dlFolder.setGroupId(ServiceTestUtil.nextLong());
+		dlFolder.setGroupId(RandomTestUtil.nextLong());
 
-		dlFolder.setCompanyId(ServiceTestUtil.nextLong());
+		dlFolder.setCompanyId(RandomTestUtil.nextLong());
 
-		dlFolder.setUserId(ServiceTestUtil.nextLong());
+		dlFolder.setUserId(RandomTestUtil.nextLong());
 
-		dlFolder.setUserName(ServiceTestUtil.randomString());
+		dlFolder.setUserName(RandomTestUtil.randomString());
 
-		dlFolder.setCreateDate(ServiceTestUtil.nextDate());
+		dlFolder.setCreateDate(RandomTestUtil.nextDate());
 
-		dlFolder.setModifiedDate(ServiceTestUtil.nextDate());
+		dlFolder.setModifiedDate(RandomTestUtil.nextDate());
 
-		dlFolder.setRepositoryId(ServiceTestUtil.nextLong());
+		dlFolder.setRepositoryId(RandomTestUtil.nextLong());
 
-		dlFolder.setMountPoint(ServiceTestUtil.randomBoolean());
+		dlFolder.setMountPoint(RandomTestUtil.randomBoolean());
 
-		dlFolder.setParentFolderId(ServiceTestUtil.nextLong());
+		dlFolder.setParentFolderId(RandomTestUtil.nextLong());
 
-		dlFolder.setTreePath(ServiceTestUtil.randomString());
+		dlFolder.setTreePath(RandomTestUtil.randomString());
 
-		dlFolder.setName(ServiceTestUtil.randomString());
+		dlFolder.setName(RandomTestUtil.randomString());
 
-		dlFolder.setDescription(ServiceTestUtil.randomString());
+		dlFolder.setDescription(RandomTestUtil.randomString());
 
-		dlFolder.setLastPostDate(ServiceTestUtil.nextDate());
+		dlFolder.setLastPostDate(RandomTestUtil.nextDate());
 
-		dlFolder.setDefaultFileEntryTypeId(ServiceTestUtil.nextLong());
+		dlFolder.setDefaultFileEntryTypeId(RandomTestUtil.nextLong());
 
-		dlFolder.setHidden(ServiceTestUtil.randomBoolean());
+		dlFolder.setHidden(RandomTestUtil.randomBoolean());
 
-		dlFolder.setOverrideFileEntryTypes(ServiceTestUtil.randomBoolean());
+		dlFolder.setOverrideFileEntryTypes(RandomTestUtil.randomBoolean());
 
-		dlFolder.setStatus(ServiceTestUtil.nextInt());
+		dlFolder.setStatus(RandomTestUtil.nextInt());
 
-		dlFolder.setStatusByUserId(ServiceTestUtil.nextLong());
+		dlFolder.setStatusByUserId(RandomTestUtil.nextLong());
 
-		dlFolder.setStatusByUserName(ServiceTestUtil.randomString());
+		dlFolder.setStatusByUserName(RandomTestUtil.randomString());
 
-		dlFolder.setStatusDate(ServiceTestUtil.nextDate());
+		dlFolder.setStatusDate(RandomTestUtil.nextDate());
 
-		_persistence.update(dlFolder);
+		_dlFolders.add(_persistence.update(dlFolder));
 
 		return dlFolder;
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(DLFolderPersistenceTest.class);
-	private DLFolderPersistence _persistence = (DLFolderPersistence)PortalBeanLocatorUtil.locate(DLFolderPersistence.class.getName());
-	private TransactionalPersistenceAdvice _transactionalPersistenceAdvice = (TransactionalPersistenceAdvice)PortalBeanLocatorUtil.locate(TransactionalPersistenceAdvice.class.getName());
+	private List<DLFolder> _dlFolders = new ArrayList<DLFolder>();
+	private ModelListener<DLFolder>[] _modelListeners;
+	private DLFolderPersistence _persistence = DLFolderUtil.getPersistence();
 }

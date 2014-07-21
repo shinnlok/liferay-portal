@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -30,6 +30,22 @@ public class ClassNameServiceWrapper implements ClassNameService,
 		_classNameService = classNameService;
 	}
 
+	@Override
+	public com.liferay.portal.model.ClassName fetchClassName(
+		java.lang.String value) {
+		return _classNameService.fetchClassName(value);
+	}
+
+	@Override
+	public long fetchClassNameId(java.lang.Class<?> clazz) {
+		return _classNameService.fetchClassNameId(clazz);
+	}
+
+	@Override
+	public long fetchClassNameId(java.lang.String value) {
+		return _classNameService.fetchClassNameId(value);
+	}
+
 	/**
 	* Returns the Spring bean ID for this bean.
 	*
@@ -48,23 +64,6 @@ public class ClassNameServiceWrapper implements ClassNameService,
 	@Override
 	public void setBeanIdentifier(java.lang.String beanIdentifier) {
 		_classNameService.setBeanIdentifier(beanIdentifier);
-	}
-
-	@Override
-	public com.liferay.portal.model.ClassName fetchClassName(
-		java.lang.String value)
-		throws com.liferay.portal.kernel.exception.SystemException {
-		return _classNameService.fetchClassName(value);
-	}
-
-	@Override
-	public long fetchClassNameId(java.lang.Class<?> clazz) {
-		return _classNameService.fetchClassNameId(clazz);
-	}
-
-	@Override
-	public long fetchClassNameId(java.lang.String value) {
-		return _classNameService.fetchClassNameId(value);
 	}
 
 	/**

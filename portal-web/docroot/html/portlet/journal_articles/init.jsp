@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,8 +16,7 @@
 
 <%@ include file="/html/portlet/init.jsp" %>
 
-<%@ page import="com.liferay.portlet.journal.NoSuchArticleException" %><%@
-page import="com.liferay.portlet.journal.util.JournalUtil" %>
+<%@ page import="com.liferay.portlet.journal.util.JournalUtil" %>
 
 <%
 long groupId = GetterUtil.getLong(portletPreferences.getValue("groupId", String.valueOf(themeDisplay.getScopeGroupId())));
@@ -28,7 +27,7 @@ int pageDelta = GetterUtil.getInteger(portletPreferences.getValue("pageDelta", S
 String orderByCol = portletPreferences.getValue("orderByCol", StringPool.BLANK);
 String orderByType = portletPreferences.getValue("orderByType", StringPool.BLANK);
 
-OrderByComparator orderByComparator = JournalUtil.getArticleOrderByComparator(orderByCol, orderByType);
+OrderByComparator<JournalArticle> orderByComparator = JournalUtil.getArticleOrderByComparator(orderByCol, orderByType);
 
 DDMStructure ddmStructure = null;
 

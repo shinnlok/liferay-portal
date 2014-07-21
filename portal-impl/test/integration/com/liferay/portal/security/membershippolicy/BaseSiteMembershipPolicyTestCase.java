@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,17 +15,26 @@
 package com.liferay.portal.security.membershippolicy;
 
 import com.liferay.portal.model.Group;
-import com.liferay.portal.service.ServiceTestUtil;
-import com.liferay.portal.util.GroupTestUtil;
-import com.liferay.portal.util.RoleTestUtil;
+import com.liferay.portal.security.membershippolicy.samples.TestSiteMembershipPolicy;
+import com.liferay.portal.util.test.GroupTestUtil;
+import com.liferay.portal.util.test.RandomTestUtil;
+import com.liferay.portal.util.test.RoleTestUtil;
+import com.liferay.registry.Registry;
+import com.liferay.registry.RegistryUtil;
+import com.liferay.registry.ServiceRegistration;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.After;
+import org.junit.Before;
 
 /**
  * @author Roberto Díaz
+ * @author Raymond Augé
  */
 public abstract class BaseSiteMembershipPolicyTestCase
-	extends BaseMembersipPolicyTestCase {
+	extends BaseMembershipPolicyTestCase {
 
 	public static long[] getForbiddenGroupIds() {
 		return _forbiddenGroupIds;
@@ -51,6 +60,24 @@ public abstract class BaseSiteMembershipPolicyTestCase
 		return _standardRoleIds;
 	}
 
+	@Before
+	@Override
+	public void setUp() throws Exception {
+		super.setUp();
+
+		Registry registry = RegistryUtil.getRegistry();
+
+		Map<String, Object> properties = new HashMap<String, Object>();
+
+		properties.put("service.ranking", 1);
+
+		ServiceRegistration<?> serviceRegistration = registry.registerService(
+			SiteMembershipPolicy.class, new TestSiteMembershipPolicy(),
+			properties);
+
+		serviceRegistrations.add(serviceRegistration);
+	}
+
 	@After
 	@Override
 	public void tearDown() throws Exception {
@@ -66,12 +93,12 @@ public abstract class BaseSiteMembershipPolicyTestCase
 
 	protected long[] addForbiddenGroups() throws Exception {
 		Group forbiddenGroup1 = GroupTestUtil.addGroup(
-			ServiceTestUtil.randomString());
+			RandomTestUtil.randomString());
 
 		_forbiddenGroupIds[0] = forbiddenGroup1.getGroupId();
 
 		Group forbiddenGroup2 = GroupTestUtil.addGroup(
-			ServiceTestUtil.randomString());
+			RandomTestUtil.randomString());
 
 		_forbiddenGroupIds[1] = forbiddenGroup2.getGroupId();
 
@@ -87,12 +114,12 @@ public abstract class BaseSiteMembershipPolicyTestCase
 
 	protected long[] addRequiredGroups() throws Exception {
 		Group requiredGroup1 = GroupTestUtil.addGroup(
-			ServiceTestUtil.randomString());
+			RandomTestUtil.randomString());
 
 		_requiredGroupIds[0] = requiredGroup1.getGroupId();
 
 		Group requiredGroup2 = GroupTestUtil.addGroup(
-			ServiceTestUtil.randomString());
+			RandomTestUtil.randomString());
 
 		_requiredGroupIds[1] = requiredGroup2.getGroupId();
 
@@ -108,12 +135,12 @@ public abstract class BaseSiteMembershipPolicyTestCase
 
 	protected long[] addStandardGroups() throws Exception {
 		Group standardGroup1 = GroupTestUtil.addGroup(
-			ServiceTestUtil.randomString());
+			RandomTestUtil.randomString());
 
 		_standardGroupIds[0] = standardGroup1.getGroupId();
 
 		Group standardGroup2 = GroupTestUtil.addGroup(
-			ServiceTestUtil.randomString());
+			RandomTestUtil.randomString());
 
 		_standardGroupIds[1] = standardGroup2.getGroupId();
 

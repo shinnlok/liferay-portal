@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.bookmarks.lar;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.lar.BaseStagedModelDataHandler;
 import com.liferay.portal.kernel.lar.ExportImportPathUtil;
 import com.liferay.portal.kernel.lar.PortletDataContext;
@@ -43,11 +42,9 @@ public class BookmarksEntryStagedModelDataHandler
 	@Override
 	public void deleteStagedModel(
 			String uuid, long groupId, String className, String extraData)
-		throws PortalException, SystemException {
+		throws PortalException {
 
-		BookmarksEntry entry =
-			BookmarksEntryLocalServiceUtil.fetchBookmarksEntryByUuidAndGroupId(
-				uuid, groupId);
+		BookmarksEntry entry = fetchExistingStagedModel(uuid, groupId);
 
 		if (entry != null) {
 			BookmarksEntryLocalServiceUtil.deleteEntry(entry);
@@ -84,6 +81,14 @@ public class BookmarksEntryStagedModelDataHandler
 	}
 
 	@Override
+	protected BookmarksEntry doFetchExistingStagedModel(
+		String uuid, long groupId) {
+
+		return BookmarksEntryLocalServiceUtil.
+			fetchBookmarksEntryByUuidAndGroupId(uuid, groupId);
+	}
+
+	@Override
 	protected void doImportStagedModel(
 			PortletDataContext portletDataContext, BookmarksEntry entry)
 		throws Exception {
@@ -111,10 +116,8 @@ public class BookmarksEntryStagedModelDataHandler
 		BookmarksEntry importedEntry = null;
 
 		if (portletDataContext.isDataStrategyMirror()) {
-			BookmarksEntry existingEntry =
-				BookmarksEntryLocalServiceUtil.
-					fetchBookmarksEntryByUuidAndGroupId(
-						entry.getUuid(), portletDataContext.getScopeGroupId());
+			BookmarksEntry existingEntry = fetchExistingStagedModel(
+				entry.getUuid(), portletDataContext.getScopeGroupId());
 
 			if (existingEntry == null) {
 				serviceContext.setUuid(entry.getUuid());
@@ -149,9 +152,8 @@ public class BookmarksEntryStagedModelDataHandler
 
 		long userId = portletDataContext.getUserId(entry.getUserUuid());
 
-		BookmarksEntry existingEntry =
-			BookmarksEntryLocalServiceUtil.fetchBookmarksEntryByUuidAndGroupId(
-				entry.getUuid(), portletDataContext.getScopeGroupId());
+		BookmarksEntry existingEntry = fetchExistingStagedModel(
+			entry.getUuid(), portletDataContext.getScopeGroupId());
 
 		if ((existingEntry == null) || !existingEntry.isInTrash()) {
 			return;

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -51,6 +51,7 @@ public class ResourceActionWrapper implements ResourceAction,
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
+		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("resourceActionId", getResourceActionId());
 		attributes.put("name", getName());
 		attributes.put("actionId", getActionId());
@@ -61,6 +62,12 @@ public class ResourceActionWrapper implements ResourceAction,
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
+		Long mvccVersion = (Long)attributes.get("mvccVersion");
+
+		if (mvccVersion != null) {
+			setMvccVersion(mvccVersion);
+		}
+
 		Long resourceActionId = (Long)attributes.get("resourceActionId");
 
 		if (resourceActionId != null) {
@@ -86,64 +93,14 @@ public class ResourceActionWrapper implements ResourceAction,
 		}
 	}
 
-	/**
-	* Returns the primary key of this resource action.
-	*
-	* @return the primary key of this resource action
-	*/
 	@Override
-	public long getPrimaryKey() {
-		return _resourceAction.getPrimaryKey();
+	public java.lang.Object clone() {
+		return new ResourceActionWrapper((ResourceAction)_resourceAction.clone());
 	}
 
-	/**
-	* Sets the primary key of this resource action.
-	*
-	* @param primaryKey the primary key of this resource action
-	*/
 	@Override
-	public void setPrimaryKey(long primaryKey) {
-		_resourceAction.setPrimaryKey(primaryKey);
-	}
-
-	/**
-	* Returns the resource action ID of this resource action.
-	*
-	* @return the resource action ID of this resource action
-	*/
-	@Override
-	public long getResourceActionId() {
-		return _resourceAction.getResourceActionId();
-	}
-
-	/**
-	* Sets the resource action ID of this resource action.
-	*
-	* @param resourceActionId the resource action ID of this resource action
-	*/
-	@Override
-	public void setResourceActionId(long resourceActionId) {
-		_resourceAction.setResourceActionId(resourceActionId);
-	}
-
-	/**
-	* Returns the name of this resource action.
-	*
-	* @return the name of this resource action
-	*/
-	@Override
-	public java.lang.String getName() {
-		return _resourceAction.getName();
-	}
-
-	/**
-	* Sets the name of this resource action.
-	*
-	* @param name the name of this resource action
-	*/
-	@Override
-	public void setName(java.lang.String name) {
-		_resourceAction.setName(name);
+	public int compareTo(com.liferay.portal.model.ResourceAction resourceAction) {
+		return _resourceAction.compareTo(resourceAction);
 	}
 
 	/**
@@ -157,16 +114,6 @@ public class ResourceActionWrapper implements ResourceAction,
 	}
 
 	/**
-	* Sets the action ID of this resource action.
-	*
-	* @param actionId the action ID of this resource action
-	*/
-	@Override
-	public void setActionId(java.lang.String actionId) {
-		_resourceAction.setActionId(actionId);
-	}
-
-	/**
 	* Returns the bitwise value of this resource action.
 	*
 	* @return the bitwise value of this resource action
@@ -174,6 +121,91 @@ public class ResourceActionWrapper implements ResourceAction,
 	@Override
 	public long getBitwiseValue() {
 		return _resourceAction.getBitwiseValue();
+	}
+
+	@Override
+	public com.liferay.portlet.expando.model.ExpandoBridge getExpandoBridge() {
+		return _resourceAction.getExpandoBridge();
+	}
+
+	/**
+	* Returns the mvcc version of this resource action.
+	*
+	* @return the mvcc version of this resource action
+	*/
+	@Override
+	public long getMvccVersion() {
+		return _resourceAction.getMvccVersion();
+	}
+
+	/**
+	* Returns the name of this resource action.
+	*
+	* @return the name of this resource action
+	*/
+	@Override
+	public java.lang.String getName() {
+		return _resourceAction.getName();
+	}
+
+	/**
+	* Returns the primary key of this resource action.
+	*
+	* @return the primary key of this resource action
+	*/
+	@Override
+	public long getPrimaryKey() {
+		return _resourceAction.getPrimaryKey();
+	}
+
+	@Override
+	public java.io.Serializable getPrimaryKeyObj() {
+		return _resourceAction.getPrimaryKeyObj();
+	}
+
+	/**
+	* Returns the resource action ID of this resource action.
+	*
+	* @return the resource action ID of this resource action
+	*/
+	@Override
+	public long getResourceActionId() {
+		return _resourceAction.getResourceActionId();
+	}
+
+	@Override
+	public int hashCode() {
+		return _resourceAction.hashCode();
+	}
+
+	@Override
+	public boolean isCachedModel() {
+		return _resourceAction.isCachedModel();
+	}
+
+	@Override
+	public boolean isEscapedModel() {
+		return _resourceAction.isEscapedModel();
+	}
+
+	@Override
+	public boolean isNew() {
+		return _resourceAction.isNew();
+	}
+
+	@Override
+	public void persist() {
+		_resourceAction.persist();
+	}
+
+	/**
+	* Sets the action ID of this resource action.
+	*
+	* @param actionId the action ID of this resource action
+	*/
+	@Override
+	public void setActionId(java.lang.String actionId) {
+		_resourceAction.setActionId(actionId);
 	}
 
 	/**
@@ -187,43 +219,8 @@ public class ResourceActionWrapper implements ResourceAction,
 	}
 
 	@Override
-	public boolean isNew() {
-		return _resourceAction.isNew();
-	}
-
-	@Override
-	public void setNew(boolean n) {
-		_resourceAction.setNew(n);
-	}
-
-	@Override
-	public boolean isCachedModel() {
-		return _resourceAction.isCachedModel();
-	}
-
-	@Override
 	public void setCachedModel(boolean cachedModel) {
 		_resourceAction.setCachedModel(cachedModel);
-	}
-
-	@Override
-	public boolean isEscapedModel() {
-		return _resourceAction.isEscapedModel();
-	}
-
-	@Override
-	public java.io.Serializable getPrimaryKeyObj() {
-		return _resourceAction.getPrimaryKeyObj();
-	}
-
-	@Override
-	public void setPrimaryKeyObj(java.io.Serializable primaryKeyObj) {
-		_resourceAction.setPrimaryKeyObj(primaryKeyObj);
-	}
-
-	@Override
-	public com.liferay.portlet.expando.model.ExpandoBridge getExpandoBridge() {
-		return _resourceAction.getExpandoBridge();
 	}
 
 	@Override
@@ -244,19 +241,54 @@ public class ResourceActionWrapper implements ResourceAction,
 		_resourceAction.setExpandoBridgeAttributes(serviceContext);
 	}
 
+	/**
+	* Sets the mvcc version of this resource action.
+	*
+	* @param mvccVersion the mvcc version of this resource action
+	*/
 	@Override
-	public java.lang.Object clone() {
-		return new ResourceActionWrapper((ResourceAction)_resourceAction.clone());
+	public void setMvccVersion(long mvccVersion) {
+		_resourceAction.setMvccVersion(mvccVersion);
+	}
+
+	/**
+	* Sets the name of this resource action.
+	*
+	* @param name the name of this resource action
+	*/
+	@Override
+	public void setName(java.lang.String name) {
+		_resourceAction.setName(name);
 	}
 
 	@Override
-	public int compareTo(com.liferay.portal.model.ResourceAction resourceAction) {
-		return _resourceAction.compareTo(resourceAction);
+	public void setNew(boolean n) {
+		_resourceAction.setNew(n);
+	}
+
+	/**
+	* Sets the primary key of this resource action.
+	*
+	* @param primaryKey the primary key of this resource action
+	*/
+	@Override
+	public void setPrimaryKey(long primaryKey) {
+		_resourceAction.setPrimaryKey(primaryKey);
 	}
 
 	@Override
-	public int hashCode() {
-		return _resourceAction.hashCode();
+	public void setPrimaryKeyObj(java.io.Serializable primaryKeyObj) {
+		_resourceAction.setPrimaryKeyObj(primaryKeyObj);
+	}
+
+	/**
+	* Sets the resource action ID of this resource action.
+	*
+	* @param resourceActionId the resource action ID of this resource action
+	*/
+	@Override
+	public void setResourceActionId(long resourceActionId) {
+		_resourceAction.setResourceActionId(resourceActionId);
 	}
 
 	@Override
@@ -270,24 +302,18 @@ public class ResourceActionWrapper implements ResourceAction,
 	}
 
 	@Override
-	public com.liferay.portal.model.ResourceAction toUnescapedModel() {
-		return new ResourceActionWrapper(_resourceAction.toUnescapedModel());
-	}
-
-	@Override
 	public java.lang.String toString() {
 		return _resourceAction.toString();
 	}
 
 	@Override
-	public java.lang.String toXmlString() {
-		return _resourceAction.toXmlString();
+	public com.liferay.portal.model.ResourceAction toUnescapedModel() {
+		return new ResourceActionWrapper(_resourceAction.toUnescapedModel());
 	}
 
 	@Override
-	public void persist()
-		throws com.liferay.portal.kernel.exception.SystemException {
-		_resourceAction.persist();
+	public java.lang.String toXmlString() {
+		return _resourceAction.toXmlString();
 	}
 
 	@Override

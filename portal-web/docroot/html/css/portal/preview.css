@@ -25,8 +25,6 @@
 }
 
 .lfr-preview-file-image-current-column, .lfr-preview-file-video-current-column {
-	@include box-sizing(border-box);
-
 	padding: 20px;
 	position: relative;
 }
@@ -234,12 +232,12 @@
 }
 
 .lfr-preview-file-image-selected img, .lfr-preview-file-image:hover img {
-	border-color: #00a2ea;
+	border-color: #00A2EA;
 }
 
 .lfr-preview-file-loading-indicator {
 	background: #333;
-	color: #fff;
+	color: #FFF;
 }
 
 .lfr-preview-file-image-overlay-content {

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,8 +17,7 @@
 <%@ include file="/html/portlet/layouts_admin/init.jsp" %>
 
 <%
-Group group = (Group)request.getAttribute("edit_pages.jsp-group");
-Layout selLayout = (Layout)request.getAttribute("edit_pages.jsp-selLayout");
+Layout selLayout = layoutsAdminDisplayContext.getSelLayout();
 
 UnicodeProperties layoutTypeSettings = selLayout.getTypeSettingsProperties();
 %>
@@ -32,6 +31,11 @@ UnicodeProperties layoutTypeSettings = selLayout.getTypeSettingsProperties();
 <liferay-ui:error exception="<%= ImageTypeException.class %>" message="please-enter-a-file-with-a-valid-file-type" />
 
 <aui:fieldset cssClass="lfr-portrait-editor">
+
+	<%
+	Group group = layoutsAdminDisplayContext.getGroup();
+	%>
+
 	<c:if test="<%= !group.isLayoutPrototype() %>">
 
 		<%
@@ -49,7 +53,7 @@ UnicodeProperties layoutTypeSettings = selLayout.getTypeSettingsProperties();
 
 	<aui:field-wrapper helpMessage="this-icon-will-be-shown-in-the-navigation-menu" label="icon" name="iconFileName">
 		<liferay-ui:logo-selector
-			currentLogoURL='<%= themeDisplay.getPathImage() + ((selLayout.getIconImageId() == 0) ? "/spacer.png" : "/logo?img_id=" + selLayout.getIconImageId() + "&t=" + WebServerServletTokenUtil.getToken(selLayout.getIconImageId())) %>'
+			currentLogoURL='<%= (selLayout.getIconImageId() == 0) ? themeDisplay.getPathThemeImages() + "/spacer.png" : themeDisplay.getPathImage() + "/logo?img_id=" + selLayout.getIconImageId() + "&t=" + WebServerServletTokenUtil.getToken(selLayout.getIconImageId()) %>'
 			defaultLogo="<%= selLayout.getIconImageId() == 0 %>"
 			defaultLogoURL='<%= themeDisplay.getPathThemeImages() + "/spacer.png" %>'
 			editLogoFn='<%= liferayPortletResponse.getNamespace() + "editLayoutLogo" %>'
@@ -71,7 +75,7 @@ UnicodeProperties layoutTypeSettings = selLayout.getTypeSettingsProperties();
 			if (!layoutLogo) {
 				var layoutNavItem = A.one('#layout_<%= selLayout.getLayoutId() %> span');
 
-				layoutLogo = A.Node.create('<img class="layout-logo-<%= selLayout.getPlid() %>" src="' + logoURL + '" />');
+				layoutLogo = A.Node.create('<img alt="<liferay-ui:message escapeAttribute="<%= true %>" key="logo" />" class="layout-logo-<%= selLayout.getPlid() %>" src="' + logoURL + '" />');
 
 				if (layoutNavItem) {
 					layoutNavItem.prepend(layoutLogo);

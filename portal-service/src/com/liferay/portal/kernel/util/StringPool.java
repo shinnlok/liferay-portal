@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -120,6 +120,8 @@ public class StringPool {
 
 	public static final String LAQUO = "&laquo;";
 
+	public static final String LAQUO_CHAR = "\u00AB";
+
 	public static final String LESS_THAN = "<";
 
 	public static final String LESS_THAN_OR_EQUAL = "<=";
@@ -165,6 +167,8 @@ public class StringPool {
 	public static final String QUOTE = "\"";
 
 	public static final String RAQUO = "&raquo;";
+
+	public static final String RAQUO_CHAR = "\u00BB";
 
 	public static final String RETURN = "\r";
 

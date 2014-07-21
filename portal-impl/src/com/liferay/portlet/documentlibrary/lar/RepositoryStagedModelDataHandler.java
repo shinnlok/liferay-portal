@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.documentlibrary.lar;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.lar.BaseStagedModelDataHandler;
 import com.liferay.portal.kernel.lar.ExportImportPathUtil;
 import com.liferay.portal.kernel.lar.PortletDataContext;
@@ -49,11 +48,9 @@ public class RepositoryStagedModelDataHandler
 	@Override
 	public void deleteStagedModel(
 			String uuid, long groupId, String className, String extraData)
-		throws PortalException, SystemException {
+		throws PortalException {
 
-		Repository repository =
-			RepositoryLocalServiceUtil.fetchRepositoryByUuidAndGroupId(
-				uuid, groupId);
+		Repository repository = fetchExistingStagedModel(uuid, groupId);
 
 		if (repository != null) {
 			RepositoryLocalServiceUtil.deleteRepository(
@@ -105,6 +102,12 @@ public class RepositoryStagedModelDataHandler
 	}
 
 	@Override
+	protected Repository doFetchExistingStagedModel(String uuid, long groupId) {
+		return RepositoryLocalServiceUtil.fetchRepositoryByUuidAndGroupId(
+			uuid, groupId);
+	}
+
+	@Override
 	protected void doImportStagedModel(
 			PortletDataContext portletDataContext, Repository repository)
 		throws Exception {
@@ -124,10 +127,8 @@ public class RepositoryStagedModelDataHandler
 				repositoryElement.attributeValue("hidden"));
 
 			if (portletDataContext.isDataStrategyMirror()) {
-				Repository existingRepository =
-					RepositoryLocalServiceUtil.fetchRepositoryByUuidAndGroupId(
-						repository.getUuid(),
-						portletDataContext.getScopeGroupId());
+				Repository existingRepository = fetchExistingStagedModel(
+					repository.getUuid(), portletDataContext.getScopeGroupId());
 
 				if (existingRepository == null) {
 					existingRepository =

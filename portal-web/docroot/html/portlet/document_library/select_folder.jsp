@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,7 +24,7 @@ long folderId = BeanParamUtil.getLong(folder, request, "folderId", DLFolderConst
 String eventName = ParamUtil.getString(request, "eventName", liferayPortletResponse.getNamespace() + "selectFolder");
 
 long repositoryId = scopeGroupId;
-String folderName = LanguageUtil.get(pageContext, "home");
+String folderName = LanguageUtil.get(request, "home");
 
 if (folder != null) {
 	repositoryId = folder.getRepositoryId();
@@ -32,6 +32,8 @@ if (folder != null) {
 
 	DLUtil.addPortletBreadcrumbEntries(folder, request, renderResponse);
 }
+
+DLActionsDisplayContext dlActionsDisplayContext = new DLActionsDisplayContext(request, dlPortletInstanceSettings);
 %>
 
 <aui:form method="post" name="selectFolderFm">
@@ -42,7 +44,7 @@ if (folder != null) {
 	<liferay-ui:breadcrumb showGuestGroup="<%= false %>" showLayout="<%= false %>" showParentGroups="<%= false %>" />
 
 	<aui:button-row>
-		<c:if test="<%= showAddFolderButton && DLFolderPermission.contains(permissionChecker, repositoryId, folderId, ActionKeys.ADD_FOLDER) %>">
+		<c:if test="<%= dlActionsDisplayContext.isAddFolderButtonVisible() && DLFolderPermission.contains(permissionChecker, repositoryId, folderId, ActionKeys.ADD_FOLDER) %>">
 			<portlet:renderURL var="editFolderURL">
 				<portlet:param name="struts_action" value="/document_library/edit_folder" />
 				<portlet:param name="redirect" value="<%= currentURL %>" />
@@ -59,7 +61,7 @@ if (folder != null) {
 		data.put("folderid", folderId);
 		data.put("folderissupportsmetadata", ((folder != null) ? folder.isSupportsMetadata() : Boolean.TRUE.toString()));
 		data.put("folderissupportssocial", ((folder != null) ? folder.isSupportsSocial() : Boolean.TRUE.toString()));
-		data.put("foldername", HtmlUtil.escapeAttribute(folderName));
+		data.put("foldername", folderName);
 		%>
 
 		<aui:button cssClass="selector-button" data="<%= data %>" value="choose-this-folder" />
@@ -93,6 +95,10 @@ if (folder != null) {
 			</liferay-portlet:renderURL>
 
 			<%
+			AssetRendererFactory assetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(DLFolder.class.getName());
+
+			AssetRenderer assetRenderer = assetRendererFactory.getAssetRenderer(curFolder.getFolderId());
+
 			int foldersCount = 0;
 			int fileEntriesCount = 0;
 
@@ -112,31 +118,17 @@ if (folder != null) {
 			catch (com.liferay.portal.security.auth.PrincipalException pe) {
 				rowURL = null;
 			}
-
-			String image = null;
-
-			if (curFolder.isMountPoint()) {
-				if (rowURL != null) {
-					image = "drive";
-				}
-				else {
-					image = "drive_error";
-				}
-			}
-			else {
-				if ((foldersCount + fileEntriesCount) > 0) {
-					image = "folder_full_document";
-				}
-				else {
-					image = "folder_empty";
-				}
-			}
 			%>
 
 			<liferay-ui:search-container-column-text
 				name="folder"
 			>
-				<liferay-ui:icon image="<%= image %>" label="<%= true %>" message="<%= HtmlUtil.escape(curFolder.getName()) %>" url="<%= (rowURL != null) ? rowURL.toString() : StringPool.BLANK %>" />
+				<liferay-ui:icon
+					iconCssClass="<%= assetRenderer.getIconCssClass() %>"
+					label="<%= true %>"
+					message="<%= HtmlUtil.escape(curFolder.getName()) %>"
+					url="<%= (rowURL != null) ? rowURL.toString() : StringPool.BLANK %>"
+				/>
 			</liferay-ui:search-container-column-text>
 
 			<liferay-ui:search-container-column-text
@@ -160,7 +152,7 @@ if (folder != null) {
 					data.put("folderid", curFolder.getFolderId());
 					data.put("folderissupportsmetadata", curFolder.isSupportsMetadata());
 					data.put("folderissupportssocial", curFolder.isSupportsSocial());
-					data.put("foldername", HtmlUtil.escapeAttribute(curFolder.getName()));
+					data.put("foldername", curFolder.getName());
 					%>
 
 					<aui:button cssClass="selector-button" data="<%= data %>" value="choose" />
@@ -173,17 +165,5 @@ if (folder != null) {
 </aui:form>
 
 <aui:script use="aui-base">
-	var Util = Liferay.Util;
-
-	A.one('#<portlet:namespace />selectFolderFm').delegate(
-		'click',
-		function(event) {
-			var result = Util.getAttributes(event.currentTarget, 'data-');
-
-			Util.getOpener().Liferay.fire('<%= HtmlUtil.escapeJS(eventName) %>', result);
-
-			Util.getWindow().hide();
-		},
-		'.selector-button'
-	);
+	Liferay.Util.selectEntityHandler('#<portlet:namespace />selectFolderFm', '<%= HtmlUtil.escapeJS(eventName) %>');
 </aui:script>

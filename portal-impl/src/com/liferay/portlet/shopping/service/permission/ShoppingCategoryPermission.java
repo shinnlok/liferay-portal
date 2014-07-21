@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,9 +15,9 @@
 package com.liferay.portlet.shopping.service.permission;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.security.permission.ActionKeys;
+import com.liferay.portal.security.permission.BaseModelPermissionChecker;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.shopping.model.ShoppingCategory;
@@ -27,12 +27,12 @@ import com.liferay.portlet.shopping.service.ShoppingCategoryLocalServiceUtil;
 /**
  * @author Brian Wing Shun Chan
  */
-public class ShoppingCategoryPermission {
+public class ShoppingCategoryPermission implements BaseModelPermissionChecker {
 
 	public static void check(
 			PermissionChecker permissionChecker, long groupId, long categoryId,
 			String actionId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		if (!contains(permissionChecker, groupId, categoryId, actionId)) {
 			throw new PrincipalException();
@@ -42,7 +42,7 @@ public class ShoppingCategoryPermission {
 	public static void check(
 			PermissionChecker permissionChecker, ShoppingCategory category,
 			String actionId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		if (!contains(permissionChecker, category, actionId)) {
 			throw new PrincipalException();
@@ -52,7 +52,7 @@ public class ShoppingCategoryPermission {
 	public static boolean contains(
 			PermissionChecker permissionChecker, long groupId, long categoryId,
 			String actionId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		if (categoryId ==
 				ShoppingCategoryConstants.DEFAULT_PARENT_CATEGORY_ID) {
@@ -71,7 +71,7 @@ public class ShoppingCategoryPermission {
 	public static boolean contains(
 			PermissionChecker permissionChecker, ShoppingCategory category,
 			String actionId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		if (actionId.equals(ActionKeys.ADD_CATEGORY)) {
 			actionId = ActionKeys.ADD_SUBCATEGORY;
@@ -100,6 +100,15 @@ public class ShoppingCategoryPermission {
 		}
 
 		return _hasPermission(permissionChecker, category, actionId);
+	}
+
+	@Override
+	public void checkBaseModel(
+			PermissionChecker permissionChecker, long groupId, long primaryKey,
+			String actionId)
+		throws PortalException {
+
+		check(permissionChecker, groupId, primaryKey, actionId);
 	}
 
 	private static boolean _hasPermission(

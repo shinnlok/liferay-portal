@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -72,6 +72,19 @@ public class MergeLayoutPrototypesThreadLocal {
 		}
 
 		@Override
+		public boolean equals(Object obj) {
+			MethodKey methodKey = (MethodKey)obj;
+
+			if (Validator.equals(_method, methodKey._method) &&
+				Arrays.equals(_arguments, methodKey._arguments)) {
+
+				return true;
+			}
+
+			return false;
+		}
+
+		@Override
 		public int hashCode() {
 			int hashCode = _method.hashCode();
 
@@ -87,19 +100,6 @@ public class MergeLayoutPrototypesThreadLocal {
 			}
 
 			return hashCode;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			MethodKey methodKey = (MethodKey)obj;
-
-			if (Validator.equals(_method, methodKey._method) &&
-				Arrays.equals(_arguments, methodKey._arguments)) {
-
-				return true;
-			}
-
-			return false;
 		}
 
 		private final Object[] _arguments;
