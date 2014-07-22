@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -76,13 +76,11 @@ public class ShardUtil {
 	}
 
 	public static boolean isEnabled() {
-		Shard shard = getShard();
-
-		if (shard != null) {
-			return shard.isEnabled();
+		if (_shard == null) {
+			return false;
 		}
 
-		return false;
+		return _shard.isEnabled();
 	}
 
 	public static String popCompanyService() {

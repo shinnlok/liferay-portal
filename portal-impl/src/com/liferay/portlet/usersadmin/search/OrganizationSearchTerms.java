@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,10 +18,10 @@ import com.liferay.portal.NoSuchCountryException;
 import com.liferay.portal.NoSuchRegionException;
 import com.liferay.portal.kernel.dao.search.DAOParamUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Country;
@@ -60,7 +60,7 @@ public class OrganizationSearchTerms extends OrganizationDisplayTerms {
 		}
 	}
 
-	public String getCountryName() throws PortalException, SystemException {
+	public String getCountryName() throws PortalException {
 		String countryName = null;
 
 		if (countryId != 0) {
@@ -68,6 +68,8 @@ public class OrganizationSearchTerms extends OrganizationDisplayTerms {
 				Country country = CountryServiceUtil.getCountry(countryId);
 
 				countryName = StringUtil.toLowerCase(country.getName());
+
+				countryName = StringUtil.quote(countryName, StringPool.QUOTE);
 			}
 			catch (NoSuchCountryException nsce) {
 				if (_log.isWarnEnabled()) {
@@ -88,7 +90,7 @@ public class OrganizationSearchTerms extends OrganizationDisplayTerms {
 		}
 	}
 
-	public String getRegionName() throws PortalException, SystemException {
+	public String getRegionName() throws PortalException {
 		String regionName = null;
 
 		if (regionId != 0) {
@@ -96,6 +98,8 @@ public class OrganizationSearchTerms extends OrganizationDisplayTerms {
 				Region region = RegionServiceUtil.getRegion(regionId);
 
 				regionName = StringUtil.toLowerCase(region.getName());
+
+				regionName = StringUtil.quote(regionName, StringPool.QUOTE);
 			}
 			catch (NoSuchRegionException nsre) {
 				if (_log.isWarnEnabled()) {

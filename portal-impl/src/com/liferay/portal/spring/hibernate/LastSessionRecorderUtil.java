@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,6 +15,9 @@
 package com.liferay.portal.spring.hibernate;
 
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.transaction.TransactionAttribute;
+import com.liferay.portal.kernel.transaction.TransactionLifecycleListener;
+import com.liferay.portal.kernel.transaction.TransactionStatus;
 import com.liferay.portal.kernel.util.AutoResetThreadLocal;
 
 import org.hibernate.Session;
@@ -24,7 +27,32 @@ import org.hibernate.Session;
  */
 public class LastSessionRecorderUtil {
 
-	public static void syncLastSessionState() throws SystemException {
+	public static final TransactionLifecycleListener
+		TRANSACTION_LIFECYCLE_LISTENER = new TransactionLifecycleListener() {
+
+		@Override
+		public void committed(
+			TransactionAttribute transactionAttribute,
+			TransactionStatus transactionStatus) {
+		}
+
+		@Override
+		public void created(
+			TransactionAttribute transactionAttribute,
+			TransactionStatus transactionStatus) {
+
+			syncLastSessionState();
+		}
+
+		@Override
+		public void rollbacked(
+			TransactionAttribute transactionAttribute,
+			TransactionStatus transactionStatus, Throwable throwable) {
+		}
+
+	};
+
+	public static void syncLastSessionState() {
 		Session session = _lastSessionThreadLocal.get();
 
 		if ((session != null) && session.isOpen()) {

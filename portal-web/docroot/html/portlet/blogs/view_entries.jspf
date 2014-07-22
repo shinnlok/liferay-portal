@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,14 +17,14 @@
 <%
 boolean showAddEntryButton = BlogsPermission.contains(permissionChecker, scopeGroupId, ActionKeys.ADD_ENTRY);
 boolean showPermissionsButton = BlogsPermission.contains(permissionChecker, scopeGroupId, ActionKeys.PERMISSIONS);
-boolean showSubscribeButton = BlogsPermission.contains(permissionChecker, scopeGroupId, ActionKeys.SUBSCRIBE) && (BlogsUtil.getEmailEntryAddedEnabled(portletPreferences) || BlogsUtil.getEmailEntryUpdatedEnabled(portletPreferences));
+boolean showSubscribeButton = BlogsPermission.contains(permissionChecker, scopeGroupId, ActionKeys.SUBSCRIBE) && (blogsSettings.isEmailEntryAddedEnabled() || blogsSettings.isEmailEntryUpdatedEnabled());
 showSearch = showSearch && !results.isEmpty();
 %>
 
 <c:if test="<%= showAddEntryButton || showPermissionsButton || showSearch %>">
 	<aui:nav-bar>
 		<c:if test="<%= showAddEntryButton || showPermissionsButton %>">
-			<aui:nav>
+			<aui:nav cssClass="navbar-nav">
 				<c:if test="<%= showAddEntryButton %>">
 					<portlet:renderURL var="editEntryURL">
 						<portlet:param name="struts_action" value="/blogs/edit_entry" />
@@ -50,8 +50,8 @@ showSearch = showSearch && !results.isEmpty();
 		</c:if>
 
 		<c:if test="<%= showSearch %>">
-			<aui:nav-bar-search cssClass="pull-right">
-				<div class="form-search">
+			<aui:nav-bar-search>
+				<div class="col-xs-12 form-search">
 					<liferay-ui:input-search autoFocus="<%= windowState.equals(WindowState.MAXIMIZED) %>" id="keywords1" name="keywords" placeholder='<%= LanguageUtil.get(locale, "keywords") %>' />
 				</div>
 			</aui:nav-bar-search>
@@ -59,18 +59,68 @@ showSearch = showSearch && !results.isEmpty();
 	</aui:nav-bar>
 </c:if>
 
+<div class="subscribe">
+	<c:if test="<%= blogsPortletInstanceSettings.isEnableRSS() %>">
+		<liferay-portlet:resourceURL varImpl="rssURL">
+			<portlet:param name="struts_action" value="/blogs/rss" />
+		</liferay-portlet:resourceURL>
+
+		<liferay-ui:rss
+			delta="<%= blogsPortletInstanceSettings.getRssDelta() %>"
+			displayStyle="<%= blogsPortletInstanceSettings.getRssDisplayStyle() %>"
+			feedType="<%= blogsPortletInstanceSettings.getRssFeedType() %>"
+			resourceURL="<%= rssURL %>"
+		/>
+	</c:if>
+
+	<c:if test="<%= showSubscribeButton %>">
+		<c:choose>
+			<c:when test="<%= SubscriptionLocalServiceUtil.isSubscribed(company.getCompanyId(), user.getUserId(), BlogsEntry.class.getName(), scopeGroupId) %>">
+				<portlet:actionURL var="unsubscribeURL">
+					<portlet:param name="struts_action" value="/blogs/edit_entry" />
+					<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.UNSUBSCRIBE %>" />
+					<portlet:param name="redirect" value="<%= currentURL %>" />
+				</portlet:actionURL>
+
+				<liferay-ui:icon
+					iconCssClass="icon-remove-sign"
+					label="<%= true %>"
+					message="unsubscribe"
+					url="<%= unsubscribeURL %>"
+				/>
+			</c:when>
+			<c:otherwise>
+				<portlet:actionURL var="subscribeURL">
+					<portlet:param name="struts_action" value="/blogs/edit_entry" />
+					<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.SUBSCRIBE %>" />
+					<portlet:param name="redirect" value="<%= currentURL %>" />
+				</portlet:actionURL>
+
+				<liferay-ui:icon
+					iconCssClass="icon-ok-sign"
+					label="<%= true %>"
+					message="subscribe"
+					url="<%= subscribeURL %>"
+				/>
+			</c:otherwise>
+		</c:choose>
+	</c:if>
+</div>
+
 <liferay-ui:categorization-filter
 	assetType="entries"
 	portletURL="<%= portletURL %>"
 />
 
 <%
-long portletDisplayDDMTemplateId = PortletDisplayTemplateUtil.getPortletDisplayTemplateDDMTemplateId(displayStyleGroupId, displayStyle);
+long portletDisplayDDMTemplateId = PortletDisplayTemplateUtil.getPortletDisplayTemplateDDMTemplateId(blogsPortletInstanceSettings.getDisplayStyleGroupId(themeDisplay.getScopeGroupId()), blogsPortletInstanceSettings.getDisplayStyle());
 
 if (portletDisplayDDMTemplateId > 0) {
 %>
 
-	<%= PortletDisplayTemplateUtil.renderDDMTemplate(pageContext, portletDisplayDDMTemplateId, _convertToBlogEntries(results)) %>
+	<div class="entry-body">
+		<%= PortletDisplayTemplateUtil.renderDDMTemplate(request, response, portletDisplayDDMTemplateId, _convertToBlogEntries(results)) %>
+	</div>
 
 <%
 }
@@ -110,52 +160,6 @@ else {
 	}
 }
 %>
-
-<div class="subscribe">
-	<c:if test="<%= enableRSS %>">
-		<liferay-portlet:resourceURL varImpl="rssURL">
-			<portlet:param name="struts_action" value="/blogs/rss" />
-		</liferay-portlet:resourceURL>
-
-		<liferay-ui:rss
-			delta="<%= rssDelta %>"
-			displayStyle="<%= rssDisplayStyle %>"
-			feedType="<%= rssFeedType %>"
-			resourceURL="<%= rssURL %>"
-		/>
-	</c:if>
-
-	<c:if test="<%= showSubscribeButton %>">
-		<c:choose>
-			<c:when test="<%= SubscriptionLocalServiceUtil.isSubscribed(company.getCompanyId(), user.getUserId(), BlogsEntry.class.getName(), scopeGroupId) %>">
-				<portlet:actionURL var="unsubscribeURL">
-					<portlet:param name="struts_action" value="/blogs/edit_entry" />
-					<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.UNSUBSCRIBE %>" />
-					<portlet:param name="redirect" value="<%= currentURL %>" />
-				</portlet:actionURL>
-
-				<liferay-ui:icon
-					image="unsubscribe"
-					label="<%= true %>"
-					url="<%= unsubscribeURL %>"
-				/>
-			</c:when>
-			<c:otherwise>
-				<portlet:actionURL var="subscribeURL">
-					<portlet:param name="struts_action" value="/blogs/edit_entry" />
-					<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.SUBSCRIBE %>" />
-					<portlet:param name="redirect" value="<%= currentURL %>" />
-				</portlet:actionURL>
-
-				<liferay-ui:icon
-					image="subscribe"
-					label="<%= true %>"
-					url="<%= subscribeURL %>"
-				/>
-			</c:otherwise>
-		</c:choose>
-	</c:if>
-</div>
 
 <liferay-ui:search-paginator searchContainer="<%= searchContainer %>" />
 

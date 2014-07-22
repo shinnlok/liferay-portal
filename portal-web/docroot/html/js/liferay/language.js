@@ -18,7 +18,7 @@
 						if (typeof extraParams == 'string') {
 							url += extraParams;
 						}
-						else if (Liferay.Util.isArray(extraParams)) {
+						else if (A.Lang.isArray(extraParams)) {
 							url += extraParams.join('/');
 						}
 					}
@@ -30,6 +30,8 @@
 					if (authToken) {
 						authUrl = Liferay.Util.addParams('p_auth=' + authToken, url);
 					}
+
+					var value = '';
 
 					A.io(
 						authUrl,

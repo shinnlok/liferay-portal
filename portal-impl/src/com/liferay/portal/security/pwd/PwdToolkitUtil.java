@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,9 +16,11 @@ package com.liferay.portal.security.pwd;
 
 import com.liferay.portal.UserPasswordException;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.PasswordPolicy;
 import com.liferay.portal.security.ldap.LDAPSettingsUtil;
+import com.liferay.registry.Registry;
+import com.liferay.registry.RegistryUtil;
+import com.liferay.registry.ServiceTracker;
 
 /**
  * @author Brian Wing Shun Chan
@@ -26,17 +28,19 @@ import com.liferay.portal.security.ldap.LDAPSettingsUtil;
 public class PwdToolkitUtil {
 
 	public static String generate(PasswordPolicy passwordPolicy) {
-		return _toolkit.generate(passwordPolicy);
+		Toolkit toolkit = getToolkit();
+
+		return toolkit.generate(passwordPolicy);
 	}
 
 	public static Toolkit getToolkit() {
-		return _toolkit;
+		return _instance._serviceTracker.getService();
 	}
 
 	public static void validate(
 			long companyId, long userId, String password1, String password2,
 			PasswordPolicy passwordPolicy)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		if (!password1.equals(password2)) {
 			throw new UserPasswordException(
@@ -46,14 +50,22 @@ public class PwdToolkitUtil {
 		if (!LDAPSettingsUtil.isPasswordPolicyEnabled(companyId) &&
 			PwdToolkitUtilThreadLocal.isValidate()) {
 
-			_toolkit.validate(userId, password1, password2, passwordPolicy);
+			Toolkit toolkit = getToolkit();
+
+			toolkit.validate(userId, password1, password2, passwordPolicy);
 		}
 	}
 
-	public void setToolkit(Toolkit toolkit) {
-		_toolkit = toolkit;
+	private PwdToolkitUtil() {
+		Registry registry = RegistryUtil.getRegistry();
+
+		_serviceTracker = registry.trackServices(Toolkit.class);
+
+		_serviceTracker.open();
 	}
 
-	private static Toolkit _toolkit;
+	private static PwdToolkitUtil _instance = new PwdToolkitUtil();
+
+	private ServiceTracker<Toolkit, Toolkit> _serviceTracker;
 
 }

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -96,14 +96,14 @@ List<DiffResult> targetResults = diffResults[1];
 		</table>
 	</c:when>
 	<c:otherwise>
-		<%= LanguageUtil.format(pageContext, "there-are-no-differences-between-x-and-x", new Object[] {sourceName, targetName}) %>
+		<%= LanguageUtil.format(request, "there-are-no-differences-between-x-and-x", new Object[] {sourceName, targetName}, false) %>
 	</c:otherwise>
 </c:choose>
 
 <%!
 private static String _processColumn(String changedLine) {
-	changedLine = changedLine.replaceAll(" ", "&nbsp;");
-	changedLine = changedLine.replaceAll("\t", "&nbsp;&nbsp;&nbsp;");
+	changedLine = StringUtil.replace(changedLine, " ", "&nbsp;");
+	changedLine = StringUtil.replace(changedLine, "\t", "&nbsp;&nbsp;&nbsp;");
 
 	String column = "<td>" + changedLine + "</td>";
 

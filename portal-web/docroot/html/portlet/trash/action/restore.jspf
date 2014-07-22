@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,7 +32,7 @@ TrashHandler trashHandler = TrashHandlerRegistryUtil.getTrashHandler(entry.getCl
 		%>
 
 		<liferay-ui:icon
-			image="undo"
+			iconCssClass="icon-undo"
 			message="restore"
 			onClick="<%= taglibOnClick %>"
 			url="javascript:;"
@@ -41,6 +41,7 @@ TrashHandler trashHandler = TrashHandlerRegistryUtil.getTrashHandler(entry.getCl
 	<c:when test="<%= !trashHandler.isRestorable(entry.getClassPK()) && trashHandler.isMovable() %>">
 		<portlet:renderURL var="moveURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
 			<portlet:param name="struts_action" value="/trash/view_container_model" />
+			<portlet:param name="redirect" value="<%= redirect %>" />
 			<portlet:param name="className" value="<%= entry.getClassName() %>" />
 			<portlet:param name="classPK" value="<%= String.valueOf(entry.getClassPK()) %>" />
 			<portlet:param name="containerModelClassName" value="<%= trashHandler.getContainerModelClassName() %>" />
@@ -55,7 +56,7 @@ TrashHandler trashHandler = TrashHandlerRegistryUtil.getTrashHandler(entry.getCl
 		<liferay-ui:icon
 			cssClass="trash-restore-link"
 			data="<%= data %>"
-			image="undo"
+			iconCssClass="icon-undo"
 			message="restore"
 			url="javascript:;"
 		/>

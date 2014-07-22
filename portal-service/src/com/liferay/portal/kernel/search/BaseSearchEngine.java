@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,6 +28,16 @@ import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
  */
 @DoPrivileged
 public class BaseSearchEngine implements SearchEngine {
+
+	/**
+	 * @throws SearchException
+	 */
+	@Override
+	public String backup(long companyId, String backupName)
+		throws SearchException {
+
+		return null;
+	}
 
 	@Override
 	public BooleanClauseFactory getBooleanClauseFactory() {
@@ -157,6 +167,10 @@ public class BaseSearchEngine implements SearchEngine {
 	}
 
 	@Override
+	public void initialize(long companyId) {
+	}
+
+	@Override
 	public boolean isClusteredWrite() {
 		return _clusteredWrite;
 	}
@@ -164,6 +178,26 @@ public class BaseSearchEngine implements SearchEngine {
 	@Override
 	public boolean isLuceneBased() {
 		return _luceneBased;
+	}
+
+	/**
+	 * @throws SearchException
+	 */
+	@Override
+	public void removeBackup(long companyId, String backupName)
+		throws SearchException {
+	}
+
+	@Override
+	public void removeCompany(long companyId) {
+	}
+
+	/**
+	 * @throws SearchException
+	 */
+	@Override
+	public void restore(long companyId, String backupName)
+		throws SearchException {
 	}
 
 	public void setBooleanClauseFactory(

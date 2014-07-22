@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,16 +15,17 @@
 package com.liferay.portal.model.impl;
 
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
-import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
+import com.liferay.portal.model.User;
 import com.liferay.portal.model.UserTracker;
 import com.liferay.portal.model.UserTrackerModel;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.util.PortalUtil;
+import com.liferay.portal.service.UserLocalServiceUtil;
 
 import com.liferay.portlet.expando.model.ExpandoBridge;
 import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
@@ -59,6 +60,7 @@ public class UserTrackerModelImpl extends BaseModelImpl<UserTracker>
 	 */
 	public static final String TABLE_NAME = "UserTracker";
 	public static final Object[][] TABLE_COLUMNS = {
+			{ "mvccVersion", Types.BIGINT },
 			{ "userTrackerId", Types.BIGINT },
 			{ "companyId", Types.BIGINT },
 			{ "userId", Types.BIGINT },
@@ -68,7 +70,7 @@ public class UserTrackerModelImpl extends BaseModelImpl<UserTracker>
 			{ "remoteHost", Types.VARCHAR },
 			{ "userAgent", Types.VARCHAR }
 		};
-	public static final String TABLE_SQL_CREATE = "create table UserTracker (userTrackerId LONG not null primary key,companyId LONG,userId LONG,modifiedDate DATE null,sessionId VARCHAR(200) null,remoteAddr VARCHAR(75) null,remoteHost VARCHAR(75) null,userAgent VARCHAR(200) null)";
+	public static final String TABLE_SQL_CREATE = "create table UserTracker (mvccVersion LONG default 0,userTrackerId LONG not null primary key,companyId LONG,userId LONG,modifiedDate DATE null,sessionId VARCHAR(200) null,remoteAddr VARCHAR(75) null,remoteHost VARCHAR(75) null,userAgent VARCHAR(200) null)";
 	public static final String TABLE_SQL_DROP = "drop table UserTracker";
 	public static final String ORDER_BY_JPQL = " ORDER BY userTracker.userTrackerId ASC";
 	public static final String ORDER_BY_SQL = " ORDER BY UserTracker.userTrackerId ASC";
@@ -128,6 +130,7 @@ public class UserTrackerModelImpl extends BaseModelImpl<UserTracker>
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
+		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("userTrackerId", getUserTrackerId());
 		attributes.put("companyId", getCompanyId());
 		attributes.put("userId", getUserId());
@@ -145,6 +148,12 @@ public class UserTrackerModelImpl extends BaseModelImpl<UserTracker>
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
+		Long mvccVersion = (Long)attributes.get("mvccVersion");
+
+		if (mvccVersion != null) {
+			setMvccVersion(mvccVersion);
+		}
+
 		Long userTrackerId = (Long)attributes.get("userTrackerId");
 
 		if (userTrackerId != null) {
@@ -192,6 +201,16 @@ public class UserTrackerModelImpl extends BaseModelImpl<UserTracker>
 		if (userAgent != null) {
 			setUserAgent(userAgent);
 		}
+	}
+
+	@Override
+	public long getMvccVersion() {
+		return _mvccVersion;
+	}
+
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		_mvccVersion = mvccVersion;
 	}
 
 	@Override
@@ -245,13 +264,19 @@ public class UserTrackerModelImpl extends BaseModelImpl<UserTracker>
 	}
 
 	@Override
-	public String getUserUuid() throws SystemException {
-		return PortalUtil.getUserValue(getUserId(), "uuid", _userUuid);
+	public String getUserUuid() {
+		try {
+			User user = UserLocalServiceUtil.getUserById(getUserId());
+
+			return user.getUuid();
+		}
+		catch (PortalException pe) {
+			return StringPool.BLANK;
+		}
 	}
 
 	@Override
 	public void setUserUuid(String userUuid) {
-		_userUuid = userUuid;
 	}
 
 	public long getOriginalUserId() {
@@ -369,6 +394,7 @@ public class UserTrackerModelImpl extends BaseModelImpl<UserTracker>
 	public Object clone() {
 		UserTrackerImpl userTrackerImpl = new UserTrackerImpl();
 
+		userTrackerImpl.setMvccVersion(getMvccVersion());
 		userTrackerImpl.setUserTrackerId(getUserTrackerId());
 		userTrackerImpl.setCompanyId(getCompanyId());
 		userTrackerImpl.setUserId(getUserId());
@@ -456,6 +482,8 @@ public class UserTrackerModelImpl extends BaseModelImpl<UserTracker>
 	public CacheModel<UserTracker> toCacheModel() {
 		UserTrackerCacheModel userTrackerCacheModel = new UserTrackerCacheModel();
 
+		userTrackerCacheModel.mvccVersion = getMvccVersion();
+
 		userTrackerCacheModel.userTrackerId = getUserTrackerId();
 
 		userTrackerCacheModel.companyId = getCompanyId();
@@ -508,9 +536,11 @@ public class UserTrackerModelImpl extends BaseModelImpl<UserTracker>
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(17);
+		StringBundler sb = new StringBundler(19);
 
-		sb.append("{userTrackerId=");
+		sb.append("{mvccVersion=");
+		sb.append(getMvccVersion());
+		sb.append(", userTrackerId=");
 		sb.append(getUserTrackerId());
 		sb.append(", companyId=");
 		sb.append(getCompanyId());
@@ -533,12 +563,16 @@ public class UserTrackerModelImpl extends BaseModelImpl<UserTracker>
 
 	@Override
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(28);
+		StringBundler sb = new StringBundler(31);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.portal.model.UserTracker");
 		sb.append("</model-name>");
 
+		sb.append(
+			"<column><column-name>mvccVersion</column-name><column-value><![CDATA[");
+		sb.append(getMvccVersion());
+		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>userTrackerId</column-name><column-value><![CDATA[");
 		sb.append(getUserTrackerId());
@@ -581,12 +615,12 @@ public class UserTrackerModelImpl extends BaseModelImpl<UserTracker>
 	private static Class<?>[] _escapedModelInterfaces = new Class[] {
 			UserTracker.class
 		};
+	private long _mvccVersion;
 	private long _userTrackerId;
 	private long _companyId;
 	private long _originalCompanyId;
 	private boolean _setOriginalCompanyId;
 	private long _userId;
-	private String _userUuid;
 	private long _originalUserId;
 	private boolean _setOriginalUserId;
 	private Date _modifiedDate;

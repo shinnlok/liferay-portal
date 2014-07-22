@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,7 +21,7 @@ import com.liferay.portlet.messageboards.model.MBMessage;
 /**
  * @author Brian Wing Shun Chan
  */
-public class MessageCreateDateComparator extends OrderByComparator {
+public class MessageCreateDateComparator extends OrderByComparator<MBMessage> {
 
 	public static final String ORDER_BY_ASC = "MBMessage.createDate ASC";
 
@@ -34,10 +34,7 @@ public class MessageCreateDateComparator extends OrderByComparator {
 	}
 
 	@Override
-	public int compare(Object obj1, Object obj2) {
-		MBMessage message1 = (MBMessage)obj1;
-		MBMessage message2 = (MBMessage)obj2;
-
+	public int compare(MBMessage message1, MBMessage message2) {
 		int value = DateUtil.compareTo(
 			message1.getCreateDate(), message2.getCreateDate());
 

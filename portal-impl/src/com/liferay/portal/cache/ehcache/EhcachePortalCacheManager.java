@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,8 +16,10 @@ package com.liferay.portal.cache.ehcache;
 
 import com.liferay.portal.cache.transactional.TransactionalPortalCache;
 import com.liferay.portal.kernel.cache.BlockingPortalCache;
+import com.liferay.portal.kernel.cache.CacheManagerListener;
 import com.liferay.portal.kernel.cache.PortalCache;
 import com.liferay.portal.kernel.cache.PortalCacheManager;
+import com.liferay.portal.kernel.cache.PortalCacheWrapper;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.resiliency.spi.SPIUtil;
@@ -35,15 +37,18 @@ import java.lang.reflect.Field;
 import java.net.URL;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.management.MBeanServer;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.config.CacheConfiguration;
 import net.sf.ehcache.config.Configuration;
+import net.sf.ehcache.event.CacheManagerEventListener;
+import net.sf.ehcache.event.CacheManagerEventListenerRegistry;
 import net.sf.ehcache.management.ManagementService;
 import net.sf.ehcache.util.FailSafeTimer;
 
@@ -105,9 +110,9 @@ public class EhcachePortalCacheManager<K extends Serializable, V>
 		_cacheManager.clearAll();
 	}
 
-	public void destroy() throws Exception {
+	@Override
+	public void destroy() {
 		try {
-			_ehcachePortalCaches.clear();
 			_portalCaches.clear();
 
 			_cacheManager.shutdown();
@@ -133,7 +138,13 @@ public class EhcachePortalCacheManager<K extends Serializable, V>
 				portalCache = _portalCaches.get(name);
 
 				if (portalCache == null) {
-					portalCache = addCache(name, null);
+					if (!_cacheManager.cacheExists(name)) {
+						_cacheManager.addCache(name);
+					}
+
+					Cache cache = _cacheManager.getCache(name);
+
+					portalCache = new EhcachePortalCache<K, V>(cache);
 
 					if (PropsValues.TRANSACTIONAL_CACHE_ENABLED &&
 						isTransactionalPortalCache(name)) {
@@ -157,6 +168,36 @@ public class EhcachePortalCacheManager<K extends Serializable, V>
 		return portalCache;
 	}
 
+	@Override
+	public Set<CacheManagerListener> getCacheManagerListeners() {
+		Set<CacheManagerListener> cacheManagerListeners =
+			new HashSet<CacheManagerListener>();
+
+		CacheManagerEventListenerRegistry cacheManagerEventListenerRegistry =
+			_cacheManager.getCacheManagerEventListenerRegistry();
+
+		Set<CacheManagerEventListener> cacheManagerEventListeners =
+			cacheManagerEventListenerRegistry.getRegisteredListeners();
+
+		for (CacheManagerEventListener cacheManagerEventListener :
+				cacheManagerEventListeners) {
+
+			if (!(cacheManagerEventListener instanceof
+					PortalCacheManagerEventListener)) {
+
+				continue;
+			}
+
+			PortalCacheManagerEventListener portalCacheManagerEventListener =
+				(PortalCacheManagerEventListener)cacheManagerEventListener;
+
+			cacheManagerListeners.add(
+				portalCacheManagerEventListener.getCacheManagerListener());
+		}
+
+		return cacheManagerListeners;
+	}
+
 	public CacheManager getEhcacheManager() {
 		return _cacheManager;
 	}
@@ -172,21 +213,24 @@ public class EhcachePortalCacheManager<K extends Serializable, V>
 		for (CacheConfiguration cacheConfiguration :
 				cacheConfigurations.values()) {
 
-			Cache cache = new Cache(cacheConfiguration);
-
-			PortalCache<K, V> portalCache = addCache(cache.getName(), cache);
-
-			if (portalCache == null) {
-				_log.error(
-					"Failed to override cache " + cacheConfiguration.getName());
-			}
+			replaceCache(new Cache(cacheConfiguration));
 		}
+	}
+
+	@Override
+	public boolean registerCacheManagerListener(
+		CacheManagerListener cacheManagerListener) {
+
+		CacheManagerEventListenerRegistry cacheManagerEventListenerRegistry =
+			_cacheManager.getCacheManagerEventListenerRegistry();
+
+		return cacheManagerEventListenerRegistry.registerListener(
+			new PortalCacheManagerEventListener(cacheManagerListener));
 	}
 
 	@Override
 	public void removeCache(String name) {
 		_cacheManager.removeCache(name);
-		_ehcachePortalCaches.remove(name);
 		_portalCaches.remove(name);
 	}
 
@@ -224,46 +268,37 @@ public class EhcachePortalCacheManager<K extends Serializable, V>
 		_registerCacheStatistics = registerCacheStatistics;
 	}
 
-	protected PortalCache<K, V> addCache(String name, Cache cache) {
-		EhcachePortalCache<K, V> ehcachePortalCache = null;
+	@Override
+	public boolean unregisterCacheManagerListener(
+		CacheManagerListener cacheManagerListener) {
 
-		synchronized (_cacheManager) {
-			if ((cache != null) && _cacheManager.cacheExists(name)) {
-				if (_log.isInfoEnabled()) {
-					_log.info("Overriding existing cache " + name);
-				}
+		CacheManagerEventListenerRegistry cacheManagerEventListenerRegistry =
+			_cacheManager.getCacheManagerEventListenerRegistry();
 
-				_cacheManager.removeCache(name);
+		return cacheManagerEventListenerRegistry.unregisterListener(
+			new PortalCacheManagerEventListener(cacheManagerListener));
+	}
+
+	@Override
+	public void unregisterCacheManagerListeners() {
+		CacheManagerEventListenerRegistry cacheManagerEventListenerRegistry =
+			_cacheManager.getCacheManagerEventListenerRegistry();
+
+		Set<CacheManagerEventListener> cacheManagerEventListeners =
+			cacheManagerEventListenerRegistry.getRegisteredListeners();
+
+		for (CacheManagerEventListener cacheManagerEventListener :
+				cacheManagerEventListeners) {
+
+			if (!(cacheManagerEventListener instanceof
+					PortalCacheManagerEventListener)) {
+
+				continue;
 			}
 
-			if (cache == null) {
-				if (!_cacheManager.cacheExists(name)) {
-					_cacheManager.addCache(name);
-				}
-			}
-			else {
-				_cacheManager.addCache(cache);
-			}
-
-			Ehcache ehcache = _cacheManager.getEhcache(name);
-
-			if (ehcache == null) {
-				return null;
-			}
-
-			ehcachePortalCache = _ehcachePortalCaches.get(name);
-
-			if (ehcachePortalCache == null) {
-				ehcachePortalCache = new EhcachePortalCache<K, V>(ehcache);
-
-				_ehcachePortalCaches.put(name, ehcachePortalCache);
-			}
-			else {
-				ehcachePortalCache.setEhcache(ehcache);
-			}
+			cacheManagerEventListenerRegistry.unregisterListener(
+				cacheManagerEventListener);
 		}
-
-		return ehcachePortalCache;
 	}
 
 	protected boolean isTransactionalPortalCache(String name) {
@@ -279,6 +314,46 @@ public class EhcachePortalCacheManager<K extends Serializable, V>
 		return false;
 	}
 
+	protected void replaceCache(Cache cache) {
+		String name = cache.getName();
+
+		synchronized (_cacheManager) {
+			if (_cacheManager.cacheExists(name)) {
+				if (_log.isInfoEnabled()) {
+					_log.info("Overriding existing cache " + name);
+				}
+
+				_cacheManager.removeCache(name);
+			}
+
+			_cacheManager.addCache(cache);
+
+			EhcachePortalCache<K, V> ehcachePortalCache = getEhcachePortalCache(
+				_portalCaches.get(name));
+
+			if (ehcachePortalCache != null) {
+				ehcachePortalCache.setEhcache(cache);
+			}
+		}
+	}
+
+	private EhcachePortalCache<K, V> getEhcachePortalCache(
+		PortalCache<K, V> portalCache) {
+
+		while (portalCache instanceof PortalCacheWrapper) {
+			PortalCacheWrapper<K, V> portalCacheWrapper =
+				(PortalCacheWrapper<K, V>)portalCache;
+
+			portalCache = portalCacheWrapper.getWrappedPortalCache();
+		}
+
+		if (portalCache instanceof EhcachePortalCache) {
+			return (EhcachePortalCache<K, V>)portalCache;
+		}
+
+		return null;
+	}
+
 	private static final String _DEFAULT_CLUSTERED_EHCACHE_CONFIG_FILE =
 		"/ehcache/liferay-multi-vm-clustered.xml";
 
@@ -288,8 +363,6 @@ public class EhcachePortalCacheManager<K extends Serializable, V>
 	private CacheManager _cacheManager;
 	private boolean _clusterAware;
 	private String _configPropertyKey;
-	private Map<String, EhcachePortalCache<K, V>> _ehcachePortalCaches =
-		new HashMap<String, EhcachePortalCache<K, V>>();
 	private ManagementService _managementService;
 	private MBeanServer _mBeanServer;
 	private boolean _mpiOnly;

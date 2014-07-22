@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,6 +17,7 @@ package com.liferay.portal.cache.ehcache;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Properties;
@@ -27,7 +28,7 @@ import net.sf.ehcache.distribution.CacheManagerPeerProviderFactory;
 
 /**
  * <p>
- * See http://issues.liferay.com/browse/LPS-11061.
+ * See https://issues.liferay.com/browse/LPS-11061.
  * </p>
  *
  * @author Tina Tian
@@ -56,8 +57,8 @@ public class JGroupsCacheManagerPeerProviderFactory
 		String channelProperties = properties.getProperty("channelProperties");
 
 		if (channelProperties != null) {
-			channelProperties = channelProperties.replaceAll(
-				StringPool.SPACE, StringPool.BLANK);
+			channelProperties = StringUtil.replace(
+				channelProperties, StringPool.SPACE, StringPool.BLANK);
 
 			if (Validator.isNull(channelProperties)) {
 				channelProperties = null;

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -42,7 +42,11 @@ public class PollsVoteStagedModelDataHandler
 	public void deleteStagedModel(
 		String uuid, long groupId, String className, String extraData) {
 
-		throw new UnsupportedOperationException();
+		PollsVote vote = fetchExistingStagedModel(uuid, groupId);
+
+		if (vote != null) {
+			PollsVoteLocalServiceUtil.deletePollsVote(vote);
+		}
 	}
 
 	@Override
@@ -66,13 +70,18 @@ public class PollsVoteStagedModelDataHandler
 	}
 
 	@Override
-	protected void doImportCompanyStagedModel(
-			PortletDataContext portletDataContext, String uuid, long voteId)
+	protected PollsVote doFetchExistingStagedModel(String uuid, long groupId) {
+		return PollsVoteLocalServiceUtil.fetchPollsVoteByUuidAndGroupId(
+			uuid, groupId);
+	}
+
+	@Override
+	protected void doImportMissingReference(
+			PortletDataContext portletDataContext, String uuid, long groupId,
+			long voteId)
 		throws Exception {
 
-		PollsVote existingVote =
-			PollsVoteLocalServiceUtil.fetchPollsVoteByUuidAndGroupId(
-				uuid, portletDataContext.getCompanyGroupId());
+		PollsVote existingVote = fetchExistingStagedModel(uuid, groupId);
 
 		Map<Long, Long> voteIds =
 			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
@@ -109,9 +118,8 @@ public class PollsVoteStagedModelDataHandler
 		serviceContext.setCreateDate(vote.getVoteDate());
 
 		if (portletDataContext.isDataStrategyMirror()) {
-			PollsVote existingVote =
-				PollsVoteLocalServiceUtil.fetchPollsVoteByUuidAndGroupId(
-					vote.getUuid(), portletDataContext.getScopeGroupId());
+			PollsVote existingVote = fetchExistingStagedModel(
+				vote.getUuid(), portletDataContext.getScopeGroupId());
 
 			if (existingVote == null) {
 				serviceContext.setUuid(vote.getUuid());
@@ -124,22 +132,6 @@ public class PollsVoteStagedModelDataHandler
 		}
 		catch (DuplicateVoteException dve) {
 		}
-	}
-
-	@Override
-	protected boolean validateMissingReference(
-			String uuid, long companyId, long groupId)
-		throws Exception {
-
-		PollsVote vote =
-			PollsVoteLocalServiceUtil.fetchPollsVoteByUuidAndGroupId(
-				uuid, groupId);
-
-		if (vote == null) {
-			return false;
-		}
-
-		return true;
 	}
 
 }

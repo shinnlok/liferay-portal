@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,7 @@
 package com.liferay.portal.model.impl;
 
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
-import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
@@ -25,8 +25,9 @@ import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.LayoutSetBranch;
 import com.liferay.portal.model.LayoutSetBranchModel;
 import com.liferay.portal.model.LayoutSetBranchSoap;
+import com.liferay.portal.model.User;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.util.PortalUtil;
+import com.liferay.portal.service.UserLocalServiceUtil;
 
 import com.liferay.portlet.expando.model.ExpandoBridge;
 import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
@@ -64,6 +65,7 @@ public class LayoutSetBranchModelImpl extends BaseModelImpl<LayoutSetBranch>
 	 */
 	public static final String TABLE_NAME = "LayoutSetBranch";
 	public static final Object[][] TABLE_COLUMNS = {
+			{ "mvccVersion", Types.BIGINT },
 			{ "layoutSetBranchId", Types.BIGINT },
 			{ "groupId", Types.BIGINT },
 			{ "companyId", Types.BIGINT },
@@ -85,7 +87,7 @@ public class LayoutSetBranchModelImpl extends BaseModelImpl<LayoutSetBranch>
 			{ "layoutSetPrototypeUuid", Types.VARCHAR },
 			{ "layoutSetPrototypeLinkEnabled", Types.BOOLEAN }
 		};
-	public static final String TABLE_SQL_CREATE = "create table LayoutSetBranch (layoutSetBranchId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,privateLayout BOOLEAN,name VARCHAR(75) null,description STRING null,master BOOLEAN,logoId LONG,themeId VARCHAR(75) null,colorSchemeId VARCHAR(75) null,wapThemeId VARCHAR(75) null,wapColorSchemeId VARCHAR(75) null,css TEXT null,settings_ TEXT null,layoutSetPrototypeUuid VARCHAR(75) null,layoutSetPrototypeLinkEnabled BOOLEAN)";
+	public static final String TABLE_SQL_CREATE = "create table LayoutSetBranch (mvccVersion LONG default 0,layoutSetBranchId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,privateLayout BOOLEAN,name VARCHAR(75) null,description STRING null,master BOOLEAN,logoId LONG,themeId VARCHAR(75) null,colorSchemeId VARCHAR(75) null,wapThemeId VARCHAR(75) null,wapColorSchemeId VARCHAR(75) null,css TEXT null,settings_ TEXT null,layoutSetPrototypeUuid VARCHAR(75) null,layoutSetPrototypeLinkEnabled BOOLEAN)";
 	public static final String TABLE_SQL_DROP = "drop table LayoutSetBranch";
 	public static final String ORDER_BY_JPQL = " ORDER BY layoutSetBranch.name ASC";
 	public static final String ORDER_BY_SQL = " ORDER BY LayoutSetBranch.name ASC";
@@ -119,6 +121,7 @@ public class LayoutSetBranchModelImpl extends BaseModelImpl<LayoutSetBranch>
 
 		LayoutSetBranch model = new LayoutSetBranchImpl();
 
+		model.setMvccVersion(soapModel.getMvccVersion());
 		model.setLayoutSetBranchId(soapModel.getLayoutSetBranchId());
 		model.setGroupId(soapModel.getGroupId());
 		model.setCompanyId(soapModel.getCompanyId());
@@ -204,6 +207,7 @@ public class LayoutSetBranchModelImpl extends BaseModelImpl<LayoutSetBranch>
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
+		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("layoutSetBranchId", getLayoutSetBranchId());
 		attributes.put("groupId", getGroupId());
 		attributes.put("companyId", getCompanyId());
@@ -234,6 +238,12 @@ public class LayoutSetBranchModelImpl extends BaseModelImpl<LayoutSetBranch>
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
+		Long mvccVersion = (Long)attributes.get("mvccVersion");
+
+		if (mvccVersion != null) {
+			setMvccVersion(mvccVersion);
+		}
+
 		Long layoutSetBranchId = (Long)attributes.get("layoutSetBranchId");
 
 		if (layoutSetBranchId != null) {
@@ -359,6 +369,17 @@ public class LayoutSetBranchModelImpl extends BaseModelImpl<LayoutSetBranch>
 
 	@JSON
 	@Override
+	public long getMvccVersion() {
+		return _mvccVersion;
+	}
+
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		_mvccVersion = mvccVersion;
+	}
+
+	@JSON
+	@Override
 	public long getLayoutSetBranchId() {
 		return _layoutSetBranchId;
 	}
@@ -414,13 +435,19 @@ public class LayoutSetBranchModelImpl extends BaseModelImpl<LayoutSetBranch>
 	}
 
 	@Override
-	public String getUserUuid() throws SystemException {
-		return PortalUtil.getUserValue(getUserId(), "uuid", _userUuid);
+	public String getUserUuid() {
+		try {
+			User user = UserLocalServiceUtil.getUserById(getUserId());
+
+			return user.getUuid();
+		}
+		catch (PortalException pe) {
+			return StringPool.BLANK;
+		}
 	}
 
 	@Override
 	public void setUserUuid(String userUuid) {
-		_userUuid = userUuid;
 	}
 
 	@JSON
@@ -730,6 +757,7 @@ public class LayoutSetBranchModelImpl extends BaseModelImpl<LayoutSetBranch>
 	public Object clone() {
 		LayoutSetBranchImpl layoutSetBranchImpl = new LayoutSetBranchImpl();
 
+		layoutSetBranchImpl.setMvccVersion(getMvccVersion());
 		layoutSetBranchImpl.setLayoutSetBranchId(getLayoutSetBranchId());
 		layoutSetBranchImpl.setGroupId(getGroupId());
 		layoutSetBranchImpl.setCompanyId(getCompanyId());
@@ -830,6 +858,8 @@ public class LayoutSetBranchModelImpl extends BaseModelImpl<LayoutSetBranch>
 	@Override
 	public CacheModel<LayoutSetBranch> toCacheModel() {
 		LayoutSetBranchCacheModel layoutSetBranchCacheModel = new LayoutSetBranchCacheModel();
+
+		layoutSetBranchCacheModel.mvccVersion = getMvccVersion();
 
 		layoutSetBranchCacheModel.layoutSetBranchId = getLayoutSetBranchId();
 
@@ -951,9 +981,11 @@ public class LayoutSetBranchModelImpl extends BaseModelImpl<LayoutSetBranch>
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(41);
+		StringBundler sb = new StringBundler(43);
 
-		sb.append("{layoutSetBranchId=");
+		sb.append("{mvccVersion=");
+		sb.append(getMvccVersion());
+		sb.append(", layoutSetBranchId=");
 		sb.append(getLayoutSetBranchId());
 		sb.append(", groupId=");
 		sb.append(getGroupId());
@@ -1000,12 +1032,16 @@ public class LayoutSetBranchModelImpl extends BaseModelImpl<LayoutSetBranch>
 
 	@Override
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(64);
+		StringBundler sb = new StringBundler(67);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.portal.model.LayoutSetBranch");
 		sb.append("</model-name>");
 
+		sb.append(
+			"<column><column-name>mvccVersion</column-name><column-value><![CDATA[");
+		sb.append(getMvccVersion());
+		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>layoutSetBranchId</column-name><column-value><![CDATA[");
 		sb.append(getLayoutSetBranchId());
@@ -1096,13 +1132,13 @@ public class LayoutSetBranchModelImpl extends BaseModelImpl<LayoutSetBranch>
 	private static Class<?>[] _escapedModelInterfaces = new Class[] {
 			LayoutSetBranch.class
 		};
+	private long _mvccVersion;
 	private long _layoutSetBranchId;
 	private long _groupId;
 	private long _originalGroupId;
 	private boolean _setOriginalGroupId;
 	private long _companyId;
 	private long _userId;
-	private String _userUuid;
 	private String _userName;
 	private Date _createDate;
 	private Date _modifiedDate;

@@ -10,8 +10,12 @@
 	</command>
 
 	<command name="assertTextEquals">
-		<case comparator="startsWith" locator-key1="COMMENT">
+		<case locator-key1="COMMENTS">
 			<execute function="AssertTextEquals#assertTextWaitForInlineCKEditor" />
+		</case>
+
+		<case locator-key1="COMMENTS_TRACKBACK_URL">
+			<execute function="AssertTextEquals#assertValue" />
 		</case>
 	</command>
 
@@ -21,7 +25,7 @@
 		</case>
 
 		<case comparator="startsWith" locator-key1="YOUR_RATING_STAR_EMPTY_">
-			<execute function="Click#clickWaitForInlineCKEditor" />
+			<execute function="Click#clickWaitForInlineCKEditorNoMouseOver" />
 		</case>
 	</command>
 </definition>

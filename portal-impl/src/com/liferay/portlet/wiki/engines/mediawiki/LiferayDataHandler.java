@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,9 @@ import com.liferay.portlet.wiki.model.WikiPage;
 import com.liferay.portlet.wiki.service.WikiPageLocalServiceUtil;
 
 import java.sql.Connection;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.jamwiki.model.Namespace;
 import org.jamwiki.model.Topic;
@@ -78,12 +81,17 @@ public class LiferayDataHandler extends DummyDataHandler {
 	}
 
 	protected long getNodeId(String virtualWiki) {
-		String nodeId = virtualWiki.replaceAll("Special:Node:(\\d+)", "$1");
+		Matcher matcher = _pattern.matcher(virtualWiki);
 
-		return GetterUtil.getLong(nodeId);
+		if (matcher.find()) {
+			return GetterUtil.getLong(matcher.group(1));
+		}
+
+		return 0;
 	}
 
 	private Namespace _fileNamespace = Namespace.DEFAULT_NAMESPACES.get(
 		Namespace.FILE_ID);
+	private Pattern _pattern = Pattern.compile("Special:Node:(\\d+)");
 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,7 @@
 
 package com.liferay.portlet.layoutsadmin.action;
 
+import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.struts.JSONAction;
 import com.liferay.portlet.layoutsadmin.util.LayoutsTreeUtil;
@@ -33,6 +34,29 @@ public class GetLayoutsAction extends JSONAction {
 	public String getJSON(
 			ActionMapping actionMapping, ActionForm actionForm,
 			HttpServletRequest request, HttpServletResponse response)
+		throws Exception {
+
+		String cmd = ParamUtil.getString(request, Constants.CMD);
+
+		if (cmd.equals("get")) {
+			return getLayoutsJSON(request);
+		}
+		else if (cmd.equals("getAll")) {
+			return getAllLayoutsJSON(request);
+		}
+
+		return null;
+	}
+
+	protected String getAllLayoutsJSON(HttpServletRequest request)
+		throws Exception {
+
+		long groupId = ParamUtil.getLong(request, "groupId");
+
+		return LayoutsTreeUtil.getLayoutsJSON(request, groupId);
+	}
+
+	protected String getLayoutsJSON(HttpServletRequest request)
 		throws Exception {
 
 		long groupId = ParamUtil.getLong(request, "groupId");

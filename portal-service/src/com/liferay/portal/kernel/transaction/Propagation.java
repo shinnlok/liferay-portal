@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,8 +14,13 @@
 
 package com.liferay.portal.kernel.transaction;
 
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author Michael Young
+ * @author Shuyang Zhou
  */
 public enum Propagation {
 
@@ -27,12 +32,25 @@ public enum Propagation {
 	REQUIRES_NEW(TransactionDefinition.PROPAGATION_REQUIRES_NEW),
 	SUPPORTS(TransactionDefinition.PROPAGATION_SUPPORTS);
 
+	public static Propagation getPropagation(int value) {
+		return _propagations.get(value);
+	}
+
 	Propagation(int value) {
 		_value = value;
 	}
 
 	public int value() {
 		return _value;
+	}
+
+	private static Map<Integer, Propagation> _propagations =
+		new HashMap<Integer, Propagation>();
+
+	static {
+		for (Propagation propagation : EnumSet.allOf(Propagation.class)) {
+			_propagations.put(propagation._value, propagation);
+		}
 	}
 
 	private int _value;

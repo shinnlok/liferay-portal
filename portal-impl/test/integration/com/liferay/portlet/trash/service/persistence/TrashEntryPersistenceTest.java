@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portlet.trash.service.persistence;
 
-import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
@@ -23,67 +22,90 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.test.ExecutionTestListeners;
+import com.liferay.portal.kernel.template.TemplateException;
+import com.liferay.portal.kernel.template.TemplateManagerUtil;
+import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.util.IntegerWrapper;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
 import com.liferay.portal.kernel.util.Time;
-import com.liferay.portal.service.ServiceTestUtil;
-import com.liferay.portal.service.persistence.BasePersistence;
-import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
-import com.liferay.portal.test.LiferayPersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.test.persistence.TransactionalPersistenceAdvice;
+import com.liferay.portal.model.ModelListener;
+import com.liferay.portal.test.TransactionalTestRule;
+import com.liferay.portal.test.runners.LiferayIntegrationJUnitTestRunner;
+import com.liferay.portal.tools.DBUpgrader;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.portal.util.test.RandomTestUtil;
 
 import com.liferay.portlet.trash.NoSuchEntryException;
 import com.liferay.portlet.trash.model.TrashEntry;
 import com.liferay.portlet.trash.model.impl.TrashEntryModelImpl;
+import com.liferay.portlet.trash.service.TrashEntryLocalServiceUtil;
 
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 
 import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 /**
- * @author Brian Wing Shun Chan
+ * @generated
  */
-@ExecutionTestListeners(listeners =  {
-	PersistenceExecutionTestListener.class})
-@RunWith(LiferayPersistenceIntegrationJUnitTestRunner.class)
+@RunWith(LiferayIntegrationJUnitTestRunner.class)
 public class TrashEntryPersistenceTest {
-	@After
-	public void tearDown() throws Exception {
-		Map<Serializable, BasePersistence<?>> basePersistences = _transactionalPersistenceAdvice.getBasePersistences();
+	@ClassRule
+	public static TransactionalTestRule transactionalTestRule = new TransactionalTestRule(Propagation.REQUIRED);
 
-		Set<Serializable> primaryKeys = basePersistences.keySet();
-
-		for (Serializable primaryKey : primaryKeys) {
-			BasePersistence<?> basePersistence = basePersistences.get(primaryKey);
-
-			try {
-				basePersistence.remove(primaryKey);
-			}
-			catch (Exception e) {
-				if (_log.isDebugEnabled()) {
-					_log.debug("The model with primary key " + primaryKey +
-						" was already deleted");
-				}
-			}
+	@BeforeClass
+	public static void setupClass() throws TemplateException {
+		try {
+			DBUpgrader.upgrade();
+		}
+		catch (Exception e) {
+			_log.error(e, e);
 		}
 
-		_transactionalPersistenceAdvice.reset();
+		TemplateManagerUtil.init();
+	}
+
+	@Before
+	public void setUp() {
+		_modelListeners = _persistence.getListeners();
+
+		for (ModelListener<TrashEntry> modelListener : _modelListeners) {
+			_persistence.unregisterListener(modelListener);
+		}
+	}
+
+	@After
+	public void tearDown() throws Exception {
+		Iterator<TrashEntry> iterator = _trashEntries.iterator();
+
+		while (iterator.hasNext()) {
+			_persistence.remove(iterator.next());
+
+			iterator.remove();
+		}
+
+		for (ModelListener<TrashEntry> modelListener : _modelListeners) {
+			_persistence.registerListener(modelListener);
+		}
 	}
 
 	@Test
 	public void testCreate() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		TrashEntry trashEntry = _persistence.create(pk);
 
@@ -110,31 +132,31 @@ public class TrashEntryPersistenceTest {
 
 	@Test
 	public void testUpdateExisting() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		TrashEntry newTrashEntry = _persistence.create(pk);
 
-		newTrashEntry.setGroupId(ServiceTestUtil.nextLong());
+		newTrashEntry.setGroupId(RandomTestUtil.nextLong());
 
-		newTrashEntry.setCompanyId(ServiceTestUtil.nextLong());
+		newTrashEntry.setCompanyId(RandomTestUtil.nextLong());
 
-		newTrashEntry.setUserId(ServiceTestUtil.nextLong());
+		newTrashEntry.setUserId(RandomTestUtil.nextLong());
 
-		newTrashEntry.setUserName(ServiceTestUtil.randomString());
+		newTrashEntry.setUserName(RandomTestUtil.randomString());
 
-		newTrashEntry.setCreateDate(ServiceTestUtil.nextDate());
+		newTrashEntry.setCreateDate(RandomTestUtil.nextDate());
 
-		newTrashEntry.setClassNameId(ServiceTestUtil.nextLong());
+		newTrashEntry.setClassNameId(RandomTestUtil.nextLong());
 
-		newTrashEntry.setClassPK(ServiceTestUtil.nextLong());
+		newTrashEntry.setClassPK(RandomTestUtil.nextLong());
 
-		newTrashEntry.setSystemEventSetKey(ServiceTestUtil.nextLong());
+		newTrashEntry.setSystemEventSetKey(RandomTestUtil.nextLong());
 
-		newTrashEntry.setTypeSettings(ServiceTestUtil.randomString());
+		newTrashEntry.setTypeSettings(RandomTestUtil.randomString());
 
-		newTrashEntry.setStatus(ServiceTestUtil.nextInt());
+		newTrashEntry.setStatus(RandomTestUtil.nextInt());
 
-		_persistence.update(newTrashEntry);
+		_trashEntries.add(_persistence.update(newTrashEntry));
 
 		TrashEntry existingTrashEntry = _persistence.findByPrimaryKey(newTrashEntry.getPrimaryKey());
 
@@ -164,6 +186,69 @@ public class TrashEntryPersistenceTest {
 	}
 
 	@Test
+	public void testCountByGroupId() {
+		try {
+			_persistence.countByGroupId(RandomTestUtil.nextLong());
+
+			_persistence.countByGroupId(0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByCompanyId() {
+		try {
+			_persistence.countByCompanyId(RandomTestUtil.nextLong());
+
+			_persistence.countByCompanyId(0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByG_LtCD() {
+		try {
+			_persistence.countByG_LtCD(RandomTestUtil.nextLong(),
+				RandomTestUtil.nextDate());
+
+			_persistence.countByG_LtCD(0L, RandomTestUtil.nextDate());
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByG_C() {
+		try {
+			_persistence.countByG_C(RandomTestUtil.nextLong(),
+				RandomTestUtil.nextLong());
+
+			_persistence.countByG_C(0L, 0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByC_C() {
+		try {
+			_persistence.countByC_C(RandomTestUtil.nextLong(),
+				RandomTestUtil.nextLong());
+
+			_persistence.countByC_C(0L, 0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
 	public void testFindByPrimaryKeyExisting() throws Exception {
 		TrashEntry newTrashEntry = addTrashEntry();
 
@@ -174,7 +259,7 @@ public class TrashEntryPersistenceTest {
 
 	@Test
 	public void testFindByPrimaryKeyMissing() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		try {
 			_persistence.findByPrimaryKey(pk);
@@ -196,7 +281,7 @@ public class TrashEntryPersistenceTest {
 		}
 	}
 
-	protected OrderByComparator getOrderByComparator() {
+	protected OrderByComparator<TrashEntry> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create("TrashEntry", "entryId",
 			true, "groupId", true, "companyId", true, "userId", true,
 			"userName", true, "createDate", true, "classNameId", true,
@@ -215,7 +300,7 @@ public class TrashEntryPersistenceTest {
 
 	@Test
 	public void testFetchByPrimaryKeyMissing() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		TrashEntry missingTrashEntry = _persistence.fetchByPrimaryKey(pk);
 
@@ -223,19 +308,103 @@ public class TrashEntryPersistenceTest {
 	}
 
 	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
+		throws Exception {
+		TrashEntry newTrashEntry1 = addTrashEntry();
+		TrashEntry newTrashEntry2 = addTrashEntry();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newTrashEntry1.getPrimaryKey());
+		primaryKeys.add(newTrashEntry2.getPrimaryKey());
+
+		Map<Serializable, TrashEntry> trashEntries = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(2, trashEntries.size());
+		Assert.assertEquals(newTrashEntry1,
+			trashEntries.get(newTrashEntry1.getPrimaryKey()));
+		Assert.assertEquals(newTrashEntry2,
+			trashEntries.get(newTrashEntry2.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
+		throws Exception {
+		long pk1 = RandomTestUtil.nextLong();
+
+		long pk2 = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(pk1);
+		primaryKeys.add(pk2);
+
+		Map<Serializable, TrashEntry> trashEntries = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(trashEntries.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
+		throws Exception {
+		TrashEntry newTrashEntry = addTrashEntry();
+
+		long pk = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newTrashEntry.getPrimaryKey());
+		primaryKeys.add(pk);
+
+		Map<Serializable, TrashEntry> trashEntries = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, trashEntries.size());
+		Assert.assertEquals(newTrashEntry,
+			trashEntries.get(newTrashEntry.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
+		throws Exception {
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		Map<Serializable, TrashEntry> trashEntries = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(trashEntries.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithOnePrimaryKey()
+		throws Exception {
+		TrashEntry newTrashEntry = addTrashEntry();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newTrashEntry.getPrimaryKey());
+
+		Map<Serializable, TrashEntry> trashEntries = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, trashEntries.size());
+		Assert.assertEquals(newTrashEntry,
+			trashEntries.get(newTrashEntry.getPrimaryKey()));
+	}
+
+	@Test
 	public void testActionableDynamicQuery() throws Exception {
 		final IntegerWrapper count = new IntegerWrapper();
 
-		ActionableDynamicQuery actionableDynamicQuery = new TrashEntryActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = TrashEntryLocalServiceUtil.getActionableDynamicQuery();
+
+		actionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod() {
 				@Override
-				protected void performAction(Object object) {
+				public void performAction(Object object) {
 					TrashEntry trashEntry = (TrashEntry)object;
 
 					Assert.assertNotNull(trashEntry);
 
 					count.increment();
 				}
-			};
+			});
 
 		actionableDynamicQuery.performActions();
 
@@ -268,7 +437,7 @@ public class TrashEntryPersistenceTest {
 				TrashEntry.class.getClassLoader());
 
 		dynamicQuery.add(RestrictionsFactoryUtil.eq("entryId",
-				ServiceTestUtil.nextLong()));
+				RandomTestUtil.nextLong()));
 
 		List<TrashEntry> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -307,7 +476,7 @@ public class TrashEntryPersistenceTest {
 		dynamicQuery.setProjection(ProjectionFactoryUtil.property("entryId"));
 
 		dynamicQuery.add(RestrictionsFactoryUtil.in("entryId",
-				new Object[] { ServiceTestUtil.nextLong() }));
+				new Object[] { RandomTestUtil.nextLong() }));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -333,36 +502,37 @@ public class TrashEntryPersistenceTest {
 	}
 
 	protected TrashEntry addTrashEntry() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		TrashEntry trashEntry = _persistence.create(pk);
 
-		trashEntry.setGroupId(ServiceTestUtil.nextLong());
+		trashEntry.setGroupId(RandomTestUtil.nextLong());
 
-		trashEntry.setCompanyId(ServiceTestUtil.nextLong());
+		trashEntry.setCompanyId(RandomTestUtil.nextLong());
 
-		trashEntry.setUserId(ServiceTestUtil.nextLong());
+		trashEntry.setUserId(RandomTestUtil.nextLong());
 
-		trashEntry.setUserName(ServiceTestUtil.randomString());
+		trashEntry.setUserName(RandomTestUtil.randomString());
 
-		trashEntry.setCreateDate(ServiceTestUtil.nextDate());
+		trashEntry.setCreateDate(RandomTestUtil.nextDate());
 
-		trashEntry.setClassNameId(ServiceTestUtil.nextLong());
+		trashEntry.setClassNameId(RandomTestUtil.nextLong());
 
-		trashEntry.setClassPK(ServiceTestUtil.nextLong());
+		trashEntry.setClassPK(RandomTestUtil.nextLong());
 
-		trashEntry.setSystemEventSetKey(ServiceTestUtil.nextLong());
+		trashEntry.setSystemEventSetKey(RandomTestUtil.nextLong());
 
-		trashEntry.setTypeSettings(ServiceTestUtil.randomString());
+		trashEntry.setTypeSettings(RandomTestUtil.randomString());
 
-		trashEntry.setStatus(ServiceTestUtil.nextInt());
+		trashEntry.setStatus(RandomTestUtil.nextInt());
 
-		_persistence.update(trashEntry);
+		_trashEntries.add(_persistence.update(trashEntry));
 
 		return trashEntry;
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(TrashEntryPersistenceTest.class);
-	private TrashEntryPersistence _persistence = (TrashEntryPersistence)PortalBeanLocatorUtil.locate(TrashEntryPersistence.class.getName());
-	private TransactionalPersistenceAdvice _transactionalPersistenceAdvice = (TransactionalPersistenceAdvice)PortalBeanLocatorUtil.locate(TransactionalPersistenceAdvice.class.getName());
+	private List<TrashEntry> _trashEntries = new ArrayList<TrashEntry>();
+	private ModelListener<TrashEntry>[] _modelListeners;
+	private TrashEntryPersistence _persistence = TrashEntryUtil.getPersistence();
 }

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,54 +16,16 @@
 
 <%@ include file="/html/taglib/aui/nav_bar/init.jsp" %>
 
-<div class="navbar <%= cssClass %>" id="<%= id %>" <%= InlineUtil.buildDynamicAttributes(dynamicAttributes) %>>
-	<div class="navbar-inner">
-		<div class="container">
-			<%= responsiveButtons %>
+<c:if test="<%= Validator.isContent(bodyContentString) %>">
+	<div class="navbar navbar-default <%= cssClass %>" id="<%= id %>" <%= InlineUtil.buildDynamicAttributes(dynamicAttributes) %>>
+		<div class="container-fluid">
+			<c:if test="<%= Validator.isNotNull(responsiveButtons) %>">
+				<div class="navbar-header">
+					<%= responsiveButtons %>
+				</div>
+			</c:if>
 
 			<%= bodyContentString %>
-
-			<aui:script use="aui-base,event-outside">
-				A.one('#<%= id %>').delegate(
-					'click',
-					function(event) {
-						var btnNavbar = event.currentTarget;
-
-						var navId = btnNavbar.attr('data-navId');
-
-						var navbarCollapse = A.one('#' + navId + 'NavbarCollapse');
-
-						if (navbarCollapse) {
-							var handle = Liferay.Data['<%= id %>Handle'];
-
-							if (navbarCollapse.hasClass('open') && handle) {
-								handle.detach();
-
-								handle = null;
-							}
-							else {
-								handle = navbarCollapse.on(
-									'mousedownoutside',
-									function(event) {
-										if (!btnNavbar.contains(event.target)) {
-											Liferay.Data['<%= id %>Handle'] = null;
-
-											handle.detach();
-
-											navbarCollapse.removeClass('open');
-										}
-									}
-								);
-							}
-
-							navbarCollapse.toggleClass('open');
-
-							Liferay.Data['<%= id %>Handle'] = handle;
-						}
-					},
-					'.btn-navbar'
-				);
-			</aui:script>
 		</div>
 	</div>
-</div>
+</c:if>

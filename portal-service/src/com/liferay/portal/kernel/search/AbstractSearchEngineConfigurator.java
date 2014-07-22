@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -35,8 +35,10 @@ import java.util.Set;
 /**
  * @author Michael C. Han
  */
-public abstract class AbstractSearchEngineConfigurator {
+public abstract class AbstractSearchEngineConfigurator
+	implements SearchEngineConfigurator {
 
+	@Override
 	public void afterPropertiesSet() {
 		Set<Entry<String, SearchEngine>> entrySet = _searchEngines.entrySet();
 
@@ -56,6 +58,7 @@ public abstract class AbstractSearchEngineConfigurator {
 		_searchEngines.clear();
 	}
 
+	@Override
 	public void destroy() {
 		for (SearchEngineRegistration searchEngineRegistration :
 				_searchEngineRegistrations) {
@@ -72,6 +75,7 @@ public abstract class AbstractSearchEngineConfigurator {
 		}
 	}
 
+	@Override
 	public void setSearchEngines(Map<String, SearchEngine> searchEngines) {
 		_searchEngines = searchEngines;
 	}
@@ -98,6 +102,27 @@ public abstract class AbstractSearchEngineConfigurator {
 
 			searchWriterDestination.register(clusterBridgeMessageListener);
 		}
+	}
+
+	protected Destination createSearchReaderDestination(
+		String searchReaderDestinationName) {
+
+		SynchronousDestination synchronousDestination =
+			new SynchronousDestination();
+
+		synchronousDestination.setName(searchReaderDestinationName);
+
+		return synchronousDestination;
+	}
+
+	protected Destination createSearchWriterDestination(
+		String searchWriterDestinationName) {
+
+		ParallelDestination parallelDestination = new ParallelDestination();
+
+		parallelDestination.setName(searchWriterDestinationName);
+
+		return parallelDestination;
 	}
 
 	protected void destroySearchEngine(
@@ -170,14 +195,10 @@ public abstract class AbstractSearchEngineConfigurator {
 			searchReaderDestinationName);
 
 		if (searchReaderDestination == null) {
-			SynchronousDestination synchronousDestination =
-				new SynchronousDestination();
+			searchReaderDestination = createSearchReaderDestination(
+				searchReaderDestinationName);
 
-			synchronousDestination.setName(searchReaderDestinationName);
-
-			synchronousDestination.open();
-
-			searchReaderDestination = synchronousDestination;
+			searchReaderDestination.open();
 
 			messageBus.addDestination(searchReaderDestination);
 		}
@@ -196,13 +217,10 @@ public abstract class AbstractSearchEngineConfigurator {
 			searchWriterDestinationName);
 
 		if (searchWriterDestination == null) {
-			ParallelDestination parallelDestination = new ParallelDestination();
+			searchWriterDestination = createSearchWriterDestination(
+				searchWriterDestinationName);
 
-			parallelDestination.setName(searchWriterDestinationName);
-
-			parallelDestination.open();
-
-			searchWriterDestination = parallelDestination;
+			searchWriterDestination.open();
 
 			messageBus.addDestination(searchWriterDestination);
 		}
@@ -335,10 +353,6 @@ public abstract class AbstractSearchEngineConfigurator {
 
 	private class SearchEngineRegistration {
 
-		private SearchEngineRegistration(String searchEngineId) {
-			_searchEngineId = searchEngineId;
-		}
-
 		public void addOriginalSearchReaderMessageListener(
 			InvokerMessageListener messageListener) {
 
@@ -403,6 +417,10 @@ public abstract class AbstractSearchEngineConfigurator {
 			String searchWriterDestinationName) {
 
 			_searchWriterDestinationName = searchWriterDestinationName;
+		}
+
+		private SearchEngineRegistration(String searchEngineId) {
+			_searchEngineId = searchEngineId;
 		}
 
 		private SearchEngineProxyWrapper _originalSearchEngineProxyWrapper;

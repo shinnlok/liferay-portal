@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portlet.expando.service.persistence;
 
-import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
@@ -23,66 +22,90 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.test.ExecutionTestListeners;
+import com.liferay.portal.kernel.template.TemplateException;
+import com.liferay.portal.kernel.template.TemplateManagerUtil;
+import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.util.IntegerWrapper;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
-import com.liferay.portal.service.ServiceTestUtil;
-import com.liferay.portal.service.persistence.BasePersistence;
-import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
-import com.liferay.portal.test.LiferayPersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.test.persistence.TransactionalPersistenceAdvice;
+import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.model.ModelListener;
+import com.liferay.portal.test.TransactionalTestRule;
+import com.liferay.portal.test.runners.LiferayIntegrationJUnitTestRunner;
+import com.liferay.portal.tools.DBUpgrader;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.portal.util.test.RandomTestUtil;
 
 import com.liferay.portlet.expando.NoSuchValueException;
 import com.liferay.portlet.expando.model.ExpandoValue;
 import com.liferay.portlet.expando.model.impl.ExpandoValueModelImpl;
+import com.liferay.portlet.expando.service.ExpandoValueLocalServiceUtil;
 
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 
 import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 /**
- * @author Brian Wing Shun Chan
+ * @generated
  */
-@ExecutionTestListeners(listeners =  {
-	PersistenceExecutionTestListener.class})
-@RunWith(LiferayPersistenceIntegrationJUnitTestRunner.class)
+@RunWith(LiferayIntegrationJUnitTestRunner.class)
 public class ExpandoValuePersistenceTest {
-	@After
-	public void tearDown() throws Exception {
-		Map<Serializable, BasePersistence<?>> basePersistences = _transactionalPersistenceAdvice.getBasePersistences();
+	@ClassRule
+	public static TransactionalTestRule transactionalTestRule = new TransactionalTestRule(Propagation.REQUIRED);
 
-		Set<Serializable> primaryKeys = basePersistences.keySet();
-
-		for (Serializable primaryKey : primaryKeys) {
-			BasePersistence<?> basePersistence = basePersistences.get(primaryKey);
-
-			try {
-				basePersistence.remove(primaryKey);
-			}
-			catch (Exception e) {
-				if (_log.isDebugEnabled()) {
-					_log.debug("The model with primary key " + primaryKey +
-						" was already deleted");
-				}
-			}
+	@BeforeClass
+	public static void setupClass() throws TemplateException {
+		try {
+			DBUpgrader.upgrade();
+		}
+		catch (Exception e) {
+			_log.error(e, e);
 		}
 
-		_transactionalPersistenceAdvice.reset();
+		TemplateManagerUtil.init();
+	}
+
+	@Before
+	public void setUp() {
+		_modelListeners = _persistence.getListeners();
+
+		for (ModelListener<ExpandoValue> modelListener : _modelListeners) {
+			_persistence.unregisterListener(modelListener);
+		}
+	}
+
+	@After
+	public void tearDown() throws Exception {
+		Iterator<ExpandoValue> iterator = _expandoValues.iterator();
+
+		while (iterator.hasNext()) {
+			_persistence.remove(iterator.next());
+
+			iterator.remove();
+		}
+
+		for (ModelListener<ExpandoValue> modelListener : _modelListeners) {
+			_persistence.registerListener(modelListener);
+		}
 	}
 
 	@Test
 	public void testCreate() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		ExpandoValue expandoValue = _persistence.create(pk);
 
@@ -109,25 +132,25 @@ public class ExpandoValuePersistenceTest {
 
 	@Test
 	public void testUpdateExisting() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		ExpandoValue newExpandoValue = _persistence.create(pk);
 
-		newExpandoValue.setCompanyId(ServiceTestUtil.nextLong());
+		newExpandoValue.setCompanyId(RandomTestUtil.nextLong());
 
-		newExpandoValue.setTableId(ServiceTestUtil.nextLong());
+		newExpandoValue.setTableId(RandomTestUtil.nextLong());
 
-		newExpandoValue.setColumnId(ServiceTestUtil.nextLong());
+		newExpandoValue.setColumnId(RandomTestUtil.nextLong());
 
-		newExpandoValue.setRowId(ServiceTestUtil.nextLong());
+		newExpandoValue.setRowId(RandomTestUtil.nextLong());
 
-		newExpandoValue.setClassNameId(ServiceTestUtil.nextLong());
+		newExpandoValue.setClassNameId(RandomTestUtil.nextLong());
 
-		newExpandoValue.setClassPK(ServiceTestUtil.nextLong());
+		newExpandoValue.setClassPK(RandomTestUtil.nextLong());
 
-		newExpandoValue.setData(ServiceTestUtil.randomString());
+		newExpandoValue.setData(RandomTestUtil.randomString());
 
-		_persistence.update(newExpandoValue);
+		_expandoValues.add(_persistence.update(newExpandoValue));
 
 		ExpandoValue existingExpandoValue = _persistence.findByPrimaryKey(newExpandoValue.getPrimaryKey());
 
@@ -150,6 +173,135 @@ public class ExpandoValuePersistenceTest {
 	}
 
 	@Test
+	public void testCountByTableId() {
+		try {
+			_persistence.countByTableId(RandomTestUtil.nextLong());
+
+			_persistence.countByTableId(0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByColumnId() {
+		try {
+			_persistence.countByColumnId(RandomTestUtil.nextLong());
+
+			_persistence.countByColumnId(0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByRowId() {
+		try {
+			_persistence.countByRowId(RandomTestUtil.nextLong());
+
+			_persistence.countByRowId(0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByT_C() {
+		try {
+			_persistence.countByT_C(RandomTestUtil.nextLong(),
+				RandomTestUtil.nextLong());
+
+			_persistence.countByT_C(0L, 0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByT_CPK() {
+		try {
+			_persistence.countByT_CPK(RandomTestUtil.nextLong(),
+				RandomTestUtil.nextLong());
+
+			_persistence.countByT_CPK(0L, 0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByT_R() {
+		try {
+			_persistence.countByT_R(RandomTestUtil.nextLong(),
+				RandomTestUtil.nextLong());
+
+			_persistence.countByT_R(0L, 0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByC_R() {
+		try {
+			_persistence.countByC_R(RandomTestUtil.nextLong(),
+				RandomTestUtil.nextLong());
+
+			_persistence.countByC_R(0L, 0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByC_C() {
+		try {
+			_persistence.countByC_C(RandomTestUtil.nextLong(),
+				RandomTestUtil.nextLong());
+
+			_persistence.countByC_C(0L, 0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByT_C_C() {
+		try {
+			_persistence.countByT_C_C(RandomTestUtil.nextLong(),
+				RandomTestUtil.nextLong(), RandomTestUtil.nextLong());
+
+			_persistence.countByT_C_C(0L, 0L, 0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByT_C_D() {
+		try {
+			_persistence.countByT_C_D(RandomTestUtil.nextLong(),
+				RandomTestUtil.nextLong(), StringPool.BLANK);
+
+			_persistence.countByT_C_D(0L, 0L, StringPool.NULL);
+
+			_persistence.countByT_C_D(0L, 0L, (String)null);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
 	public void testFindByPrimaryKeyExisting() throws Exception {
 		ExpandoValue newExpandoValue = addExpandoValue();
 
@@ -160,7 +312,7 @@ public class ExpandoValuePersistenceTest {
 
 	@Test
 	public void testFindByPrimaryKeyMissing() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		try {
 			_persistence.findByPrimaryKey(pk);
@@ -182,7 +334,7 @@ public class ExpandoValuePersistenceTest {
 		}
 	}
 
-	protected OrderByComparator getOrderByComparator() {
+	protected OrderByComparator<ExpandoValue> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create("ExpandoValue", "valueId",
 			true, "companyId", true, "tableId", true, "columnId", true,
 			"rowId", true, "classNameId", true, "classPK", true, "data", true);
@@ -199,7 +351,7 @@ public class ExpandoValuePersistenceTest {
 
 	@Test
 	public void testFetchByPrimaryKeyMissing() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		ExpandoValue missingExpandoValue = _persistence.fetchByPrimaryKey(pk);
 
@@ -207,19 +359,103 @@ public class ExpandoValuePersistenceTest {
 	}
 
 	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
+		throws Exception {
+		ExpandoValue newExpandoValue1 = addExpandoValue();
+		ExpandoValue newExpandoValue2 = addExpandoValue();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newExpandoValue1.getPrimaryKey());
+		primaryKeys.add(newExpandoValue2.getPrimaryKey());
+
+		Map<Serializable, ExpandoValue> expandoValues = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(2, expandoValues.size());
+		Assert.assertEquals(newExpandoValue1,
+			expandoValues.get(newExpandoValue1.getPrimaryKey()));
+		Assert.assertEquals(newExpandoValue2,
+			expandoValues.get(newExpandoValue2.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
+		throws Exception {
+		long pk1 = RandomTestUtil.nextLong();
+
+		long pk2 = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(pk1);
+		primaryKeys.add(pk2);
+
+		Map<Serializable, ExpandoValue> expandoValues = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(expandoValues.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
+		throws Exception {
+		ExpandoValue newExpandoValue = addExpandoValue();
+
+		long pk = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newExpandoValue.getPrimaryKey());
+		primaryKeys.add(pk);
+
+		Map<Serializable, ExpandoValue> expandoValues = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, expandoValues.size());
+		Assert.assertEquals(newExpandoValue,
+			expandoValues.get(newExpandoValue.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
+		throws Exception {
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		Map<Serializable, ExpandoValue> expandoValues = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(expandoValues.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithOnePrimaryKey()
+		throws Exception {
+		ExpandoValue newExpandoValue = addExpandoValue();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newExpandoValue.getPrimaryKey());
+
+		Map<Serializable, ExpandoValue> expandoValues = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, expandoValues.size());
+		Assert.assertEquals(newExpandoValue,
+			expandoValues.get(newExpandoValue.getPrimaryKey()));
+	}
+
+	@Test
 	public void testActionableDynamicQuery() throws Exception {
 		final IntegerWrapper count = new IntegerWrapper();
 
-		ActionableDynamicQuery actionableDynamicQuery = new ExpandoValueActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = ExpandoValueLocalServiceUtil.getActionableDynamicQuery();
+
+		actionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod() {
 				@Override
-				protected void performAction(Object object) {
+				public void performAction(Object object) {
 					ExpandoValue expandoValue = (ExpandoValue)object;
 
 					Assert.assertNotNull(expandoValue);
 
 					count.increment();
 				}
-			};
+			});
 
 		actionableDynamicQuery.performActions();
 
@@ -252,7 +488,7 @@ public class ExpandoValuePersistenceTest {
 				ExpandoValue.class.getClassLoader());
 
 		dynamicQuery.add(RestrictionsFactoryUtil.eq("valueId",
-				ServiceTestUtil.nextLong()));
+				RandomTestUtil.nextLong()));
 
 		List<ExpandoValue> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -291,7 +527,7 @@ public class ExpandoValuePersistenceTest {
 		dynamicQuery.setProjection(ProjectionFactoryUtil.property("valueId"));
 
 		dynamicQuery.add(RestrictionsFactoryUtil.in("valueId",
-				new Object[] { ServiceTestUtil.nextLong() }));
+				new Object[] { RandomTestUtil.nextLong() }));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -324,30 +560,31 @@ public class ExpandoValuePersistenceTest {
 	}
 
 	protected ExpandoValue addExpandoValue() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		ExpandoValue expandoValue = _persistence.create(pk);
 
-		expandoValue.setCompanyId(ServiceTestUtil.nextLong());
+		expandoValue.setCompanyId(RandomTestUtil.nextLong());
 
-		expandoValue.setTableId(ServiceTestUtil.nextLong());
+		expandoValue.setTableId(RandomTestUtil.nextLong());
 
-		expandoValue.setColumnId(ServiceTestUtil.nextLong());
+		expandoValue.setColumnId(RandomTestUtil.nextLong());
 
-		expandoValue.setRowId(ServiceTestUtil.nextLong());
+		expandoValue.setRowId(RandomTestUtil.nextLong());
 
-		expandoValue.setClassNameId(ServiceTestUtil.nextLong());
+		expandoValue.setClassNameId(RandomTestUtil.nextLong());
 
-		expandoValue.setClassPK(ServiceTestUtil.nextLong());
+		expandoValue.setClassPK(RandomTestUtil.nextLong());
 
-		expandoValue.setData(ServiceTestUtil.randomString());
+		expandoValue.setData(RandomTestUtil.randomString());
 
-		_persistence.update(expandoValue);
+		_expandoValues.add(_persistence.update(expandoValue));
 
 		return expandoValue;
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(ExpandoValuePersistenceTest.class);
-	private ExpandoValuePersistence _persistence = (ExpandoValuePersistence)PortalBeanLocatorUtil.locate(ExpandoValuePersistence.class.getName());
-	private TransactionalPersistenceAdvice _transactionalPersistenceAdvice = (TransactionalPersistenceAdvice)PortalBeanLocatorUtil.locate(TransactionalPersistenceAdvice.class.getName());
+	private List<ExpandoValue> _expandoValues = new ArrayList<ExpandoValue>();
+	private ModelListener<ExpandoValue>[] _modelListeners;
+	private ExpandoValuePersistence _persistence = ExpandoValueUtil.getPersistence();
 }

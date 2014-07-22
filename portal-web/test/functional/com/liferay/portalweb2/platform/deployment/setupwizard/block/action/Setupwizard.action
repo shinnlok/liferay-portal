@@ -56,14 +56,4 @@
 			<execute function="AssertTextEquals#assertValue" />
 		</case>
 	</command>
-
-	<command name="assertClick">
-		<case locator-key1="DATABASE_CHANGE_LINK">
-			<execute function="AssertClick#assertTextClickAtAndWait" />
-		</case>
-
-		<case locator-key1="FINISH_CONFIGURATION_BUTTON">
-			<execute function="AssertClick#assertTextClickAtAndWait" />
-		</case>
-	</command>
 </definition>

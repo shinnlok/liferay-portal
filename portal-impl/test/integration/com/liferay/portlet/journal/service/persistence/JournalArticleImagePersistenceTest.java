@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portlet.journal.service.persistence;
 
-import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
@@ -23,68 +22,92 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.template.TemplateException;
+import com.liferay.portal.kernel.template.TemplateManagerUtil;
 import com.liferay.portal.kernel.test.AssertUtils;
-import com.liferay.portal.kernel.test.ExecutionTestListeners;
+import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.util.IntegerWrapper;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.service.ServiceTestUtil;
-import com.liferay.portal.service.persistence.BasePersistence;
-import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
-import com.liferay.portal.test.LiferayPersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.test.persistence.TransactionalPersistenceAdvice;
+import com.liferay.portal.model.ModelListener;
+import com.liferay.portal.test.TransactionalTestRule;
+import com.liferay.portal.test.runners.LiferayIntegrationJUnitTestRunner;
+import com.liferay.portal.tools.DBUpgrader;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.portal.util.test.RandomTestUtil;
 
 import com.liferay.portlet.journal.NoSuchArticleImageException;
 import com.liferay.portlet.journal.model.JournalArticleImage;
 import com.liferay.portlet.journal.model.impl.JournalArticleImageModelImpl;
+import com.liferay.portlet.journal.service.JournalArticleImageLocalServiceUtil;
 
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 
 import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 /**
- * @author Brian Wing Shun Chan
+ * @generated
  */
-@ExecutionTestListeners(listeners =  {
-	PersistenceExecutionTestListener.class})
-@RunWith(LiferayPersistenceIntegrationJUnitTestRunner.class)
+@RunWith(LiferayIntegrationJUnitTestRunner.class)
 public class JournalArticleImagePersistenceTest {
-	@After
-	public void tearDown() throws Exception {
-		Map<Serializable, BasePersistence<?>> basePersistences = _transactionalPersistenceAdvice.getBasePersistences();
+	@ClassRule
+	public static TransactionalTestRule transactionalTestRule = new TransactionalTestRule(Propagation.REQUIRED);
 
-		Set<Serializable> primaryKeys = basePersistences.keySet();
-
-		for (Serializable primaryKey : primaryKeys) {
-			BasePersistence<?> basePersistence = basePersistences.get(primaryKey);
-
-			try {
-				basePersistence.remove(primaryKey);
-			}
-			catch (Exception e) {
-				if (_log.isDebugEnabled()) {
-					_log.debug("The model with primary key " + primaryKey +
-						" was already deleted");
-				}
-			}
+	@BeforeClass
+	public static void setupClass() throws TemplateException {
+		try {
+			DBUpgrader.upgrade();
+		}
+		catch (Exception e) {
+			_log.error(e, e);
 		}
 
-		_transactionalPersistenceAdvice.reset();
+		TemplateManagerUtil.init();
+	}
+
+	@Before
+	public void setUp() {
+		_modelListeners = _persistence.getListeners();
+
+		for (ModelListener<JournalArticleImage> modelListener : _modelListeners) {
+			_persistence.unregisterListener(modelListener);
+		}
+	}
+
+	@After
+	public void tearDown() throws Exception {
+		Iterator<JournalArticleImage> iterator = _journalArticleImages.iterator();
+
+		while (iterator.hasNext()) {
+			_persistence.remove(iterator.next());
+
+			iterator.remove();
+		}
+
+		for (ModelListener<JournalArticleImage> modelListener : _modelListeners) {
+			_persistence.registerListener(modelListener);
+		}
 	}
 
 	@Test
 	public void testCreate() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		JournalArticleImage journalArticleImage = _persistence.create(pk);
 
@@ -111,25 +134,25 @@ public class JournalArticleImagePersistenceTest {
 
 	@Test
 	public void testUpdateExisting() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		JournalArticleImage newJournalArticleImage = _persistence.create(pk);
 
-		newJournalArticleImage.setGroupId(ServiceTestUtil.nextLong());
+		newJournalArticleImage.setGroupId(RandomTestUtil.nextLong());
 
-		newJournalArticleImage.setArticleId(ServiceTestUtil.randomString());
+		newJournalArticleImage.setArticleId(RandomTestUtil.randomString());
 
-		newJournalArticleImage.setVersion(ServiceTestUtil.nextDouble());
+		newJournalArticleImage.setVersion(RandomTestUtil.nextDouble());
 
-		newJournalArticleImage.setElInstanceId(ServiceTestUtil.randomString());
+		newJournalArticleImage.setElInstanceId(RandomTestUtil.randomString());
 
-		newJournalArticleImage.setElName(ServiceTestUtil.randomString());
+		newJournalArticleImage.setElName(RandomTestUtil.randomString());
 
-		newJournalArticleImage.setLanguageId(ServiceTestUtil.randomString());
+		newJournalArticleImage.setLanguageId(RandomTestUtil.randomString());
 
-		newJournalArticleImage.setTempImage(ServiceTestUtil.randomBoolean());
+		newJournalArticleImage.setTempImage(RandomTestUtil.randomBoolean());
 
-		_persistence.update(newJournalArticleImage);
+		_journalArticleImages.add(_persistence.update(newJournalArticleImage));
 
 		JournalArticleImage existingJournalArticleImage = _persistence.findByPrimaryKey(newJournalArticleImage.getPrimaryKey());
 
@@ -152,6 +175,63 @@ public class JournalArticleImagePersistenceTest {
 	}
 
 	@Test
+	public void testCountByGroupId() {
+		try {
+			_persistence.countByGroupId(RandomTestUtil.nextLong());
+
+			_persistence.countByGroupId(0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByTempImage() {
+		try {
+			_persistence.countByTempImage(RandomTestUtil.randomBoolean());
+
+			_persistence.countByTempImage(RandomTestUtil.randomBoolean());
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByG_A_V() {
+		try {
+			_persistence.countByG_A_V(RandomTestUtil.nextLong(),
+				StringPool.BLANK, RandomTestUtil.nextDouble());
+
+			_persistence.countByG_A_V(0L, StringPool.NULL, 0D);
+
+			_persistence.countByG_A_V(0L, (String)null, 0D);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByG_A_V_E_E_L() {
+		try {
+			_persistence.countByG_A_V_E_E_L(RandomTestUtil.nextLong(),
+				StringPool.BLANK, RandomTestUtil.nextDouble(),
+				StringPool.BLANK, StringPool.BLANK, StringPool.BLANK);
+
+			_persistence.countByG_A_V_E_E_L(0L, StringPool.NULL, 0D,
+				StringPool.NULL, StringPool.NULL, StringPool.NULL);
+
+			_persistence.countByG_A_V_E_E_L(0L, (String)null, 0D, (String)null,
+				(String)null, (String)null);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
 	public void testFindByPrimaryKeyExisting() throws Exception {
 		JournalArticleImage newJournalArticleImage = addJournalArticleImage();
 
@@ -162,7 +242,7 @@ public class JournalArticleImagePersistenceTest {
 
 	@Test
 	public void testFindByPrimaryKeyMissing() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		try {
 			_persistence.findByPrimaryKey(pk);
@@ -185,7 +265,7 @@ public class JournalArticleImagePersistenceTest {
 		}
 	}
 
-	protected OrderByComparator getOrderByComparator() {
+	protected OrderByComparator<JournalArticleImage> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create("JournalArticleImage",
 			"articleImageId", true, "groupId", true, "articleId", true,
 			"version", true, "elInstanceId", true, "elName", true,
@@ -203,7 +283,7 @@ public class JournalArticleImagePersistenceTest {
 
 	@Test
 	public void testFetchByPrimaryKeyMissing() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		JournalArticleImage missingJournalArticleImage = _persistence.fetchByPrimaryKey(pk);
 
@@ -211,19 +291,103 @@ public class JournalArticleImagePersistenceTest {
 	}
 
 	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
+		throws Exception {
+		JournalArticleImage newJournalArticleImage1 = addJournalArticleImage();
+		JournalArticleImage newJournalArticleImage2 = addJournalArticleImage();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newJournalArticleImage1.getPrimaryKey());
+		primaryKeys.add(newJournalArticleImage2.getPrimaryKey());
+
+		Map<Serializable, JournalArticleImage> journalArticleImages = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(2, journalArticleImages.size());
+		Assert.assertEquals(newJournalArticleImage1,
+			journalArticleImages.get(newJournalArticleImage1.getPrimaryKey()));
+		Assert.assertEquals(newJournalArticleImage2,
+			journalArticleImages.get(newJournalArticleImage2.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
+		throws Exception {
+		long pk1 = RandomTestUtil.nextLong();
+
+		long pk2 = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(pk1);
+		primaryKeys.add(pk2);
+
+		Map<Serializable, JournalArticleImage> journalArticleImages = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(journalArticleImages.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
+		throws Exception {
+		JournalArticleImage newJournalArticleImage = addJournalArticleImage();
+
+		long pk = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newJournalArticleImage.getPrimaryKey());
+		primaryKeys.add(pk);
+
+		Map<Serializable, JournalArticleImage> journalArticleImages = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, journalArticleImages.size());
+		Assert.assertEquals(newJournalArticleImage,
+			journalArticleImages.get(newJournalArticleImage.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
+		throws Exception {
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		Map<Serializable, JournalArticleImage> journalArticleImages = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(journalArticleImages.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithOnePrimaryKey()
+		throws Exception {
+		JournalArticleImage newJournalArticleImage = addJournalArticleImage();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newJournalArticleImage.getPrimaryKey());
+
+		Map<Serializable, JournalArticleImage> journalArticleImages = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, journalArticleImages.size());
+		Assert.assertEquals(newJournalArticleImage,
+			journalArticleImages.get(newJournalArticleImage.getPrimaryKey()));
+	}
+
+	@Test
 	public void testActionableDynamicQuery() throws Exception {
 		final IntegerWrapper count = new IntegerWrapper();
 
-		ActionableDynamicQuery actionableDynamicQuery = new JournalArticleImageActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = JournalArticleImageLocalServiceUtil.getActionableDynamicQuery();
+
+		actionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod() {
 				@Override
-				protected void performAction(Object object) {
+				public void performAction(Object object) {
 					JournalArticleImage journalArticleImage = (JournalArticleImage)object;
 
 					Assert.assertNotNull(journalArticleImage);
 
 					count.increment();
 				}
-			};
+			});
 
 		actionableDynamicQuery.performActions();
 
@@ -256,7 +420,7 @@ public class JournalArticleImagePersistenceTest {
 				JournalArticleImage.class.getClassLoader());
 
 		dynamicQuery.add(RestrictionsFactoryUtil.eq("articleImageId",
-				ServiceTestUtil.nextLong()));
+				RandomTestUtil.nextLong()));
 
 		List<JournalArticleImage> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -297,7 +461,7 @@ public class JournalArticleImagePersistenceTest {
 				"articleImageId"));
 
 		dynamicQuery.add(RestrictionsFactoryUtil.in("articleImageId",
-				new Object[] { ServiceTestUtil.nextLong() }));
+				new Object[] { RandomTestUtil.nextLong() }));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -336,30 +500,31 @@ public class JournalArticleImagePersistenceTest {
 
 	protected JournalArticleImage addJournalArticleImage()
 		throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		JournalArticleImage journalArticleImage = _persistence.create(pk);
 
-		journalArticleImage.setGroupId(ServiceTestUtil.nextLong());
+		journalArticleImage.setGroupId(RandomTestUtil.nextLong());
 
-		journalArticleImage.setArticleId(ServiceTestUtil.randomString());
+		journalArticleImage.setArticleId(RandomTestUtil.randomString());
 
-		journalArticleImage.setVersion(ServiceTestUtil.nextDouble());
+		journalArticleImage.setVersion(RandomTestUtil.nextDouble());
 
-		journalArticleImage.setElInstanceId(ServiceTestUtil.randomString());
+		journalArticleImage.setElInstanceId(RandomTestUtil.randomString());
 
-		journalArticleImage.setElName(ServiceTestUtil.randomString());
+		journalArticleImage.setElName(RandomTestUtil.randomString());
 
-		journalArticleImage.setLanguageId(ServiceTestUtil.randomString());
+		journalArticleImage.setLanguageId(RandomTestUtil.randomString());
 
-		journalArticleImage.setTempImage(ServiceTestUtil.randomBoolean());
+		journalArticleImage.setTempImage(RandomTestUtil.randomBoolean());
 
-		_persistence.update(journalArticleImage);
+		_journalArticleImages.add(_persistence.update(journalArticleImage));
 
 		return journalArticleImage;
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(JournalArticleImagePersistenceTest.class);
-	private JournalArticleImagePersistence _persistence = (JournalArticleImagePersistence)PortalBeanLocatorUtil.locate(JournalArticleImagePersistence.class.getName());
-	private TransactionalPersistenceAdvice _transactionalPersistenceAdvice = (TransactionalPersistenceAdvice)PortalBeanLocatorUtil.locate(TransactionalPersistenceAdvice.class.getName());
+	private List<JournalArticleImage> _journalArticleImages = new ArrayList<JournalArticleImage>();
+	private ModelListener<JournalArticleImage>[] _modelListeners;
+	private JournalArticleImagePersistence _persistence = JournalArticleImageUtil.getPersistence();
 }

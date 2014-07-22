@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,7 +28,6 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.ProgressTracker;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.Tuple;
 import com.liferay.portal.model.User;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
@@ -216,9 +215,7 @@ public class ExportUsersAction extends PortletAction {
 					QueryUtil.ALL_POS, (Sort)null);
 			}
 
-			Tuple tuple = UsersAdminUtil.getUsers(hits);
-
-			return (List<User>)tuple.getObject(0);
+			return UsersAdminUtil.getUsers(hits);
 		}
 
 		if (searchTerms.isAdvancedSearch()) {
@@ -227,13 +224,14 @@ public class ExportUsersAction extends PortletAction {
 				searchTerms.getMiddleName(), searchTerms.getLastName(),
 				searchTerms.getScreenName(), searchTerms.getEmailAddress(),
 				searchTerms.getStatus(), params, searchTerms.isAndOperator(),
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS, (OrderByComparator)null);
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+				(OrderByComparator<User>)null);
 		}
 		else {
 			return UserLocalServiceUtil.search(
 				themeDisplay.getCompanyId(), searchTerms.getKeywords(),
 				searchTerms.getStatus(), params, QueryUtil.ALL_POS,
-				QueryUtil.ALL_POS, (OrderByComparator)null);
+				QueryUtil.ALL_POS, (OrderByComparator<User>)null);
 		}
 	}
 

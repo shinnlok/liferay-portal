@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portal.service.persistence;
 
 import com.liferay.portal.NoSuchUserNotificationDeliveryException;
-import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
@@ -24,65 +23,89 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.test.ExecutionTestListeners;
+import com.liferay.portal.kernel.template.TemplateException;
+import com.liferay.portal.kernel.template.TemplateManagerUtil;
+import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.util.IntegerWrapper;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.UserNotificationDelivery;
 import com.liferay.portal.model.impl.UserNotificationDeliveryModelImpl;
-import com.liferay.portal.service.ServiceTestUtil;
-import com.liferay.portal.service.persistence.BasePersistence;
-import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
-import com.liferay.portal.test.LiferayPersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.test.persistence.TransactionalPersistenceAdvice;
+import com.liferay.portal.service.UserNotificationDeliveryLocalServiceUtil;
+import com.liferay.portal.test.TransactionalTestRule;
+import com.liferay.portal.test.runners.LiferayIntegrationJUnitTestRunner;
+import com.liferay.portal.tools.DBUpgrader;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.portal.util.test.RandomTestUtil;
 
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 
 import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 /**
- * @author Brian Wing Shun Chan
+ * @generated
  */
-@ExecutionTestListeners(listeners =  {
-	PersistenceExecutionTestListener.class})
-@RunWith(LiferayPersistenceIntegrationJUnitTestRunner.class)
+@RunWith(LiferayIntegrationJUnitTestRunner.class)
 public class UserNotificationDeliveryPersistenceTest {
-	@After
-	public void tearDown() throws Exception {
-		Map<Serializable, BasePersistence<?>> basePersistences = _transactionalPersistenceAdvice.getBasePersistences();
+	@ClassRule
+	public static TransactionalTestRule transactionalTestRule = new TransactionalTestRule(Propagation.REQUIRED);
 
-		Set<Serializable> primaryKeys = basePersistences.keySet();
-
-		for (Serializable primaryKey : primaryKeys) {
-			BasePersistence<?> basePersistence = basePersistences.get(primaryKey);
-
-			try {
-				basePersistence.remove(primaryKey);
-			}
-			catch (Exception e) {
-				if (_log.isDebugEnabled()) {
-					_log.debug("The model with primary key " + primaryKey +
-						" was already deleted");
-				}
-			}
+	@BeforeClass
+	public static void setupClass() throws TemplateException {
+		try {
+			DBUpgrader.upgrade();
+		}
+		catch (Exception e) {
+			_log.error(e, e);
 		}
 
-		_transactionalPersistenceAdvice.reset();
+		TemplateManagerUtil.init();
+	}
+
+	@Before
+	public void setUp() {
+		_modelListeners = _persistence.getListeners();
+
+		for (ModelListener<UserNotificationDelivery> modelListener : _modelListeners) {
+			_persistence.unregisterListener(modelListener);
+		}
+	}
+
+	@After
+	public void tearDown() throws Exception {
+		Iterator<UserNotificationDelivery> iterator = _userNotificationDeliveries.iterator();
+
+		while (iterator.hasNext()) {
+			_persistence.remove(iterator.next());
+
+			iterator.remove();
+		}
+
+		for (ModelListener<UserNotificationDelivery> modelListener : _modelListeners) {
+			_persistence.registerListener(modelListener);
+		}
 	}
 
 	@Test
 	public void testCreate() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		UserNotificationDelivery userNotificationDelivery = _persistence.create(pk);
 
@@ -109,28 +132,33 @@ public class UserNotificationDeliveryPersistenceTest {
 
 	@Test
 	public void testUpdateExisting() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		UserNotificationDelivery newUserNotificationDelivery = _persistence.create(pk);
 
-		newUserNotificationDelivery.setCompanyId(ServiceTestUtil.nextLong());
+		newUserNotificationDelivery.setMvccVersion(RandomTestUtil.nextLong());
 
-		newUserNotificationDelivery.setUserId(ServiceTestUtil.nextLong());
+		newUserNotificationDelivery.setCompanyId(RandomTestUtil.nextLong());
 
-		newUserNotificationDelivery.setPortletId(ServiceTestUtil.randomString());
+		newUserNotificationDelivery.setUserId(RandomTestUtil.nextLong());
 
-		newUserNotificationDelivery.setClassNameId(ServiceTestUtil.nextLong());
+		newUserNotificationDelivery.setPortletId(RandomTestUtil.randomString());
 
-		newUserNotificationDelivery.setNotificationType(ServiceTestUtil.nextInt());
+		newUserNotificationDelivery.setClassNameId(RandomTestUtil.nextLong());
 
-		newUserNotificationDelivery.setDeliveryType(ServiceTestUtil.nextInt());
+		newUserNotificationDelivery.setNotificationType(RandomTestUtil.nextInt());
 
-		newUserNotificationDelivery.setDeliver(ServiceTestUtil.randomBoolean());
+		newUserNotificationDelivery.setDeliveryType(RandomTestUtil.nextInt());
 
-		_persistence.update(newUserNotificationDelivery);
+		newUserNotificationDelivery.setDeliver(RandomTestUtil.randomBoolean());
+
+		_userNotificationDeliveries.add(_persistence.update(
+				newUserNotificationDelivery));
 
 		UserNotificationDelivery existingUserNotificationDelivery = _persistence.findByPrimaryKey(newUserNotificationDelivery.getPrimaryKey());
 
+		Assert.assertEquals(existingUserNotificationDelivery.getMvccVersion(),
+			newUserNotificationDelivery.getMvccVersion());
 		Assert.assertEquals(existingUserNotificationDelivery.getUserNotificationDeliveryId(),
 			newUserNotificationDelivery.getUserNotificationDeliveryId());
 		Assert.assertEquals(existingUserNotificationDelivery.getCompanyId(),
@@ -150,6 +178,34 @@ public class UserNotificationDeliveryPersistenceTest {
 	}
 
 	@Test
+	public void testCountByUserId() {
+		try {
+			_persistence.countByUserId(RandomTestUtil.nextLong());
+
+			_persistence.countByUserId(0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByU_P_C_N_D() {
+		try {
+			_persistence.countByU_P_C_N_D(RandomTestUtil.nextLong(),
+				StringPool.BLANK, RandomTestUtil.nextLong(),
+				RandomTestUtil.nextInt(), RandomTestUtil.nextInt());
+
+			_persistence.countByU_P_C_N_D(0L, StringPool.NULL, 0L, 0, 0);
+
+			_persistence.countByU_P_C_N_D(0L, (String)null, 0L, 0, 0);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
 	public void testFindByPrimaryKeyExisting() throws Exception {
 		UserNotificationDelivery newUserNotificationDelivery = addUserNotificationDelivery();
 
@@ -161,7 +217,7 @@ public class UserNotificationDeliveryPersistenceTest {
 
 	@Test
 	public void testFindByPrimaryKeyMissing() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		try {
 			_persistence.findByPrimaryKey(pk);
@@ -184,11 +240,12 @@ public class UserNotificationDeliveryPersistenceTest {
 		}
 	}
 
-	protected OrderByComparator getOrderByComparator() {
+	protected OrderByComparator<UserNotificationDelivery> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create("UserNotificationDelivery",
-			"userNotificationDeliveryId", true, "companyId", true, "userId",
-			true, "portletId", true, "classNameId", true, "notificationType",
-			true, "deliveryType", true, "deliver", true);
+			"mvccVersion", true, "userNotificationDeliveryId", true,
+			"companyId", true, "userId", true, "portletId", true,
+			"classNameId", true, "notificationType", true, "deliveryType",
+			true, "deliver", true);
 	}
 
 	@Test
@@ -203,7 +260,7 @@ public class UserNotificationDeliveryPersistenceTest {
 
 	@Test
 	public void testFetchByPrimaryKeyMissing() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		UserNotificationDelivery missingUserNotificationDelivery = _persistence.fetchByPrimaryKey(pk);
 
@@ -211,19 +268,107 @@ public class UserNotificationDeliveryPersistenceTest {
 	}
 
 	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
+		throws Exception {
+		UserNotificationDelivery newUserNotificationDelivery1 = addUserNotificationDelivery();
+		UserNotificationDelivery newUserNotificationDelivery2 = addUserNotificationDelivery();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newUserNotificationDelivery1.getPrimaryKey());
+		primaryKeys.add(newUserNotificationDelivery2.getPrimaryKey());
+
+		Map<Serializable, UserNotificationDelivery> userNotificationDeliveries = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(2, userNotificationDeliveries.size());
+		Assert.assertEquals(newUserNotificationDelivery1,
+			userNotificationDeliveries.get(
+				newUserNotificationDelivery1.getPrimaryKey()));
+		Assert.assertEquals(newUserNotificationDelivery2,
+			userNotificationDeliveries.get(
+				newUserNotificationDelivery2.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
+		throws Exception {
+		long pk1 = RandomTestUtil.nextLong();
+
+		long pk2 = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(pk1);
+		primaryKeys.add(pk2);
+
+		Map<Serializable, UserNotificationDelivery> userNotificationDeliveries = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(userNotificationDeliveries.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
+		throws Exception {
+		UserNotificationDelivery newUserNotificationDelivery = addUserNotificationDelivery();
+
+		long pk = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newUserNotificationDelivery.getPrimaryKey());
+		primaryKeys.add(pk);
+
+		Map<Serializable, UserNotificationDelivery> userNotificationDeliveries = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, userNotificationDeliveries.size());
+		Assert.assertEquals(newUserNotificationDelivery,
+			userNotificationDeliveries.get(
+				newUserNotificationDelivery.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
+		throws Exception {
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		Map<Serializable, UserNotificationDelivery> userNotificationDeliveries = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(userNotificationDeliveries.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithOnePrimaryKey()
+		throws Exception {
+		UserNotificationDelivery newUserNotificationDelivery = addUserNotificationDelivery();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newUserNotificationDelivery.getPrimaryKey());
+
+		Map<Serializable, UserNotificationDelivery> userNotificationDeliveries = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, userNotificationDeliveries.size());
+		Assert.assertEquals(newUserNotificationDelivery,
+			userNotificationDeliveries.get(
+				newUserNotificationDelivery.getPrimaryKey()));
+	}
+
+	@Test
 	public void testActionableDynamicQuery() throws Exception {
 		final IntegerWrapper count = new IntegerWrapper();
 
-		ActionableDynamicQuery actionableDynamicQuery = new UserNotificationDeliveryActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = UserNotificationDeliveryLocalServiceUtil.getActionableDynamicQuery();
+
+		actionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod() {
 				@Override
-				protected void performAction(Object object) {
+				public void performAction(Object object) {
 					UserNotificationDelivery userNotificationDelivery = (UserNotificationDelivery)object;
 
 					Assert.assertNotNull(userNotificationDelivery);
 
 					count.increment();
 				}
-			};
+			});
 
 		actionableDynamicQuery.performActions();
 
@@ -258,7 +403,7 @@ public class UserNotificationDeliveryPersistenceTest {
 				UserNotificationDelivery.class.getClassLoader());
 
 		dynamicQuery.add(RestrictionsFactoryUtil.eq(
-				"userNotificationDeliveryId", ServiceTestUtil.nextLong()));
+				"userNotificationDeliveryId", RandomTestUtil.nextLong()));
 
 		List<UserNotificationDelivery> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -302,7 +447,7 @@ public class UserNotificationDeliveryPersistenceTest {
 
 		dynamicQuery.add(RestrictionsFactoryUtil.in(
 				"userNotificationDeliveryId",
-				new Object[] { ServiceTestUtil.nextLong() }));
+				new Object[] { RandomTestUtil.nextLong() }));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -337,30 +482,34 @@ public class UserNotificationDeliveryPersistenceTest {
 
 	protected UserNotificationDelivery addUserNotificationDelivery()
 		throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		UserNotificationDelivery userNotificationDelivery = _persistence.create(pk);
 
-		userNotificationDelivery.setCompanyId(ServiceTestUtil.nextLong());
+		userNotificationDelivery.setMvccVersion(RandomTestUtil.nextLong());
 
-		userNotificationDelivery.setUserId(ServiceTestUtil.nextLong());
+		userNotificationDelivery.setCompanyId(RandomTestUtil.nextLong());
 
-		userNotificationDelivery.setPortletId(ServiceTestUtil.randomString());
+		userNotificationDelivery.setUserId(RandomTestUtil.nextLong());
 
-		userNotificationDelivery.setClassNameId(ServiceTestUtil.nextLong());
+		userNotificationDelivery.setPortletId(RandomTestUtil.randomString());
 
-		userNotificationDelivery.setNotificationType(ServiceTestUtil.nextInt());
+		userNotificationDelivery.setClassNameId(RandomTestUtil.nextLong());
 
-		userNotificationDelivery.setDeliveryType(ServiceTestUtil.nextInt());
+		userNotificationDelivery.setNotificationType(RandomTestUtil.nextInt());
 
-		userNotificationDelivery.setDeliver(ServiceTestUtil.randomBoolean());
+		userNotificationDelivery.setDeliveryType(RandomTestUtil.nextInt());
 
-		_persistence.update(userNotificationDelivery);
+		userNotificationDelivery.setDeliver(RandomTestUtil.randomBoolean());
+
+		_userNotificationDeliveries.add(_persistence.update(
+				userNotificationDelivery));
 
 		return userNotificationDelivery;
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(UserNotificationDeliveryPersistenceTest.class);
-	private UserNotificationDeliveryPersistence _persistence = (UserNotificationDeliveryPersistence)PortalBeanLocatorUtil.locate(UserNotificationDeliveryPersistence.class.getName());
-	private TransactionalPersistenceAdvice _transactionalPersistenceAdvice = (TransactionalPersistenceAdvice)PortalBeanLocatorUtil.locate(TransactionalPersistenceAdvice.class.getName());
+	private List<UserNotificationDelivery> _userNotificationDeliveries = new ArrayList<UserNotificationDelivery>();
+	private ModelListener<UserNotificationDelivery>[] _modelListeners;
+	private UserNotificationDeliveryPersistence _persistence = UserNotificationDeliveryUtil.getPersistence();
 }

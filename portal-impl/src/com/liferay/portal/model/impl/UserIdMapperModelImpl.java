@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,16 +15,17 @@
 package com.liferay.portal.model.impl;
 
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
-import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
+import com.liferay.portal.model.User;
 import com.liferay.portal.model.UserIdMapper;
 import com.liferay.portal.model.UserIdMapperModel;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.util.PortalUtil;
+import com.liferay.portal.service.UserLocalServiceUtil;
 
 import com.liferay.portlet.expando.model.ExpandoBridge;
 import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
@@ -58,13 +59,14 @@ public class UserIdMapperModelImpl extends BaseModelImpl<UserIdMapper>
 	 */
 	public static final String TABLE_NAME = "UserIdMapper";
 	public static final Object[][] TABLE_COLUMNS = {
+			{ "mvccVersion", Types.BIGINT },
 			{ "userIdMapperId", Types.BIGINT },
 			{ "userId", Types.BIGINT },
 			{ "type_", Types.VARCHAR },
 			{ "description", Types.VARCHAR },
 			{ "externalUserId", Types.VARCHAR }
 		};
-	public static final String TABLE_SQL_CREATE = "create table UserIdMapper (userIdMapperId LONG not null primary key,userId LONG,type_ VARCHAR(75) null,description VARCHAR(75) null,externalUserId VARCHAR(75) null)";
+	public static final String TABLE_SQL_CREATE = "create table UserIdMapper (mvccVersion LONG default 0,userIdMapperId LONG not null primary key,userId LONG,type_ VARCHAR(75) null,description VARCHAR(75) null,externalUserId VARCHAR(75) null)";
 	public static final String TABLE_SQL_DROP = "drop table UserIdMapper";
 	public static final String ORDER_BY_JPQL = " ORDER BY userIdMapper.userIdMapperId ASC";
 	public static final String ORDER_BY_SQL = " ORDER BY UserIdMapper.userIdMapperId ASC";
@@ -124,6 +126,7 @@ public class UserIdMapperModelImpl extends BaseModelImpl<UserIdMapper>
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
+		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("userIdMapperId", getUserIdMapperId());
 		attributes.put("userId", getUserId());
 		attributes.put("type", getType());
@@ -138,6 +141,12 @@ public class UserIdMapperModelImpl extends BaseModelImpl<UserIdMapper>
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
+		Long mvccVersion = (Long)attributes.get("mvccVersion");
+
+		if (mvccVersion != null) {
+			setMvccVersion(mvccVersion);
+		}
+
 		Long userIdMapperId = (Long)attributes.get("userIdMapperId");
 
 		if (userIdMapperId != null) {
@@ -170,6 +179,16 @@ public class UserIdMapperModelImpl extends BaseModelImpl<UserIdMapper>
 	}
 
 	@Override
+	public long getMvccVersion() {
+		return _mvccVersion;
+	}
+
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		_mvccVersion = mvccVersion;
+	}
+
+	@Override
 	public long getUserIdMapperId() {
 		return _userIdMapperId;
 	}
@@ -198,13 +217,19 @@ public class UserIdMapperModelImpl extends BaseModelImpl<UserIdMapper>
 	}
 
 	@Override
-	public String getUserUuid() throws SystemException {
-		return PortalUtil.getUserValue(getUserId(), "uuid", _userUuid);
+	public String getUserUuid() {
+		try {
+			User user = UserLocalServiceUtil.getUserById(getUserId());
+
+			return user.getUuid();
+		}
+		catch (PortalException pe) {
+			return StringPool.BLANK;
+		}
 	}
 
 	@Override
 	public void setUserUuid(String userUuid) {
-		_userUuid = userUuid;
 	}
 
 	public long getOriginalUserId() {
@@ -307,6 +332,7 @@ public class UserIdMapperModelImpl extends BaseModelImpl<UserIdMapper>
 	public Object clone() {
 		UserIdMapperImpl userIdMapperImpl = new UserIdMapperImpl();
 
+		userIdMapperImpl.setMvccVersion(getMvccVersion());
 		userIdMapperImpl.setUserIdMapperId(getUserIdMapperId());
 		userIdMapperImpl.setUserId(getUserId());
 		userIdMapperImpl.setType(getType());
@@ -389,6 +415,8 @@ public class UserIdMapperModelImpl extends BaseModelImpl<UserIdMapper>
 	public CacheModel<UserIdMapper> toCacheModel() {
 		UserIdMapperCacheModel userIdMapperCacheModel = new UserIdMapperCacheModel();
 
+		userIdMapperCacheModel.mvccVersion = getMvccVersion();
+
 		userIdMapperCacheModel.userIdMapperId = getUserIdMapperId();
 
 		userIdMapperCacheModel.userId = getUserId();
@@ -422,9 +450,11 @@ public class UserIdMapperModelImpl extends BaseModelImpl<UserIdMapper>
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(11);
+		StringBundler sb = new StringBundler(13);
 
-		sb.append("{userIdMapperId=");
+		sb.append("{mvccVersion=");
+		sb.append(getMvccVersion());
+		sb.append(", userIdMapperId=");
 		sb.append(getUserIdMapperId());
 		sb.append(", userId=");
 		sb.append(getUserId());
@@ -441,12 +471,16 @@ public class UserIdMapperModelImpl extends BaseModelImpl<UserIdMapper>
 
 	@Override
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(19);
+		StringBundler sb = new StringBundler(22);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.portal.model.UserIdMapper");
 		sb.append("</model-name>");
 
+		sb.append(
+			"<column><column-name>mvccVersion</column-name><column-value><![CDATA[");
+		sb.append(getMvccVersion());
+		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>userIdMapperId</column-name><column-value><![CDATA[");
 		sb.append(getUserIdMapperId());
@@ -477,9 +511,9 @@ public class UserIdMapperModelImpl extends BaseModelImpl<UserIdMapper>
 	private static Class<?>[] _escapedModelInterfaces = new Class[] {
 			UserIdMapper.class
 		};
+	private long _mvccVersion;
 	private long _userIdMapperId;
 	private long _userId;
-	private String _userUuid;
 	private long _originalUserId;
 	private boolean _setOriginalUserId;
 	private String _type;

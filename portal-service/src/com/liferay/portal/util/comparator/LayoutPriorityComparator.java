@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,7 +21,7 @@ import com.liferay.portal.model.Layout;
  * @author Brian Wing Shun Chan
  * @author Daniel Reuther
  */
-public class LayoutPriorityComparator extends OrderByComparator {
+public class LayoutPriorityComparator extends OrderByComparator<Layout> {
 
 	public static final String ORDER_BY_ASC = "Layout.priority ASC";
 
@@ -45,14 +45,20 @@ public class LayoutPriorityComparator extends OrderByComparator {
 	}
 
 	@Override
-	public int compare(Object obj1, Object obj2) {
-		Layout layout1 = (Layout)obj1;
-		Layout layout2 = (Layout)obj2;
-
+	public int compare(Layout layout1, Layout layout2) {
 		int value = 0;
 
-		int priority1 = layout1.getPriority();
-		int priority2 = layout2.getPriority();
+		int priority1 = -1;
+
+		if (layout1 != null) {
+			priority1 = layout1.getPriority();
+		}
+
+		int priority2 = -1;
+
+		if (layout2 != null) {
+			priority2 = layout2.getPriority();
+		}
 
 		if (priority1 > priority2) {
 			value = 1;

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -37,7 +37,7 @@ import java.io.Serializable;
  * @generated
  */
 @ProviderType
-public interface ShardModel extends AttachedModel, BaseModel<Shard> {
+public interface ShardModel extends AttachedModel, BaseModel<Shard>, MVCCModel {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -57,6 +57,22 @@ public interface ShardModel extends AttachedModel, BaseModel<Shard> {
 	 * @param primaryKey the primary key of this shard
 	 */
 	public void setPrimaryKey(long primaryKey);
+
+	/**
+	 * Returns the mvcc version of this shard.
+	 *
+	 * @return the mvcc version of this shard
+	 */
+	@Override
+	public long getMvccVersion();
+
+	/**
+	 * Sets the mvcc version of this shard.
+	 *
+	 * @param mvccVersion the mvcc version of this shard
+	 */
+	@Override
+	public void setMvccVersion(long mvccVersion);
 
 	/**
 	 * Returns the shard ID of this shard.

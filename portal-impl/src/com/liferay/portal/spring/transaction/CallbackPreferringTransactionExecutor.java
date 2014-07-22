@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -13,11 +13,6 @@
  */
 
 package com.liferay.portal.spring.transaction;
-
-import com.liferay.portal.cache.transactional.TransactionalPortalCacheHelper;
-import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
-import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
-import com.liferay.portal.spring.hibernate.LastSessionRecorderUtil;
 
 import org.aopalliance.intercept.MethodInvocation;
 
@@ -99,42 +94,26 @@ public class CallbackPreferringTransactionExecutor
 	private class CallbackPreferringTransactionCallback
 		implements TransactionCallback<Object> {
 
-		private CallbackPreferringTransactionCallback(
-			TransactionAttribute transactionAttribute,
-			MethodInvocation methodInvocation) {
-
-			_transactionAttribute = transactionAttribute;
-			_methodInvocation = methodInvocation;
-		}
-
 		@Override
 		public Object doInTransaction(TransactionStatus transactionStatus) {
 			boolean newTransaction = transactionStatus.isNewTransaction();
 
 			if (newTransaction) {
-				TransactionalPortalCacheHelper.begin();
-
-				TransactionCommitCallbackUtil.pushCallbackList();
+				fireTransactionCreatedEvent(
+					_transactionAttribute, transactionStatus);
 			}
 
 			boolean rollback = false;
 
 			try {
-				if (newTransaction) {
-					LastSessionRecorderUtil.syncLastSessionState();
-				}
-
 				return _methodInvocation.proceed();
 			}
 			catch (Throwable throwable) {
 				if (_transactionAttribute.rollbackOn(throwable)) {
 					if (newTransaction) {
-						TransactionalPortalCacheHelper.rollback();
-
-						TransactionCommitCallbackUtil.popCallbackList();
-
-						EntityCacheUtil.clearLocalCache();
-						FinderCacheUtil.clearLocalCache();
+						fireTransactionRollbackedEvent(
+							_transactionAttribute, transactionStatus,
+							throwable);
 
 						rollback = true;
 					}
@@ -152,11 +131,18 @@ public class CallbackPreferringTransactionExecutor
 			}
 			finally {
 				if (newTransaction && !rollback) {
-					TransactionalPortalCacheHelper.commit();
-
-					invokeCallbacks();
+					fireTransactionCommittedEvent(
+						_transactionAttribute, transactionStatus);
 				}
 			}
+		}
+
+		private CallbackPreferringTransactionCallback(
+			TransactionAttribute transactionAttribute,
+			MethodInvocation methodInvocation) {
+
+			_transactionAttribute = transactionAttribute;
+			_methodInvocation = methodInvocation;
 		}
 
 		private MethodInvocation _methodInvocation;

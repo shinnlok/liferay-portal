@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -93,15 +93,15 @@ if (organization != null) {
 	<aui:nav-bar>
 		<liferay-util:include page="/html/portlet/users_admin/toolbar.jsp" />
 
-		<aui:nav-bar-search cssClass="pull-right">
-			<div class="form-search">
+		<aui:nav-bar-search>
+			<div class="col-xs-12 form-search">
 				<liferay-ui:input-search autoFocus="<%= windowState.equals(WindowState.MAXIMIZED) %>" />
 			</div>
 		</aui:nav-bar-search>
 	</aui:nav-bar>
 
 	<div id="breadcrumb">
-		<liferay-ui:breadcrumb showCurrentGroup="<%= false %>" showCurrentPortlet="<%= false %>" showGuestGroup="<%= false %>" showLayout="<%= false %>" showPortletBreadcrumb="<%= true %>" />
+		<liferay-ui:breadcrumb showCurrentGroup="<%= false %>" showGuestGroup="<%= false %>" showLayout="<%= false %>" showPortletBreadcrumb="<%= true %>" />
 	</div>
 </c:if>
 
@@ -116,7 +116,7 @@ if (organization != null) {
 
 			<%
 			long parentOrganizationId = OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID;
-			String parentOrganizationName = LanguageUtil.get(pageContext, "users-and-organizations-home");
+			String parentOrganizationName = LanguageUtil.get(request, "users-and-organizations-home");
 
 			if (!organization.isRoot()) {
 				Organization parentOrganization = organization.getParentOrganization();
@@ -129,13 +129,14 @@ if (organization != null) {
 			%>
 
 			<portlet:renderURL var="headerBackURL">
-				<portlet:param name="struts_action" value="/organization/view" />
+				<portlet:param name="struts_action" value="/users_admin/view" />
+				<portlet:param name="toolbarItem" value="<%= toolbarItem %>" />
 				<portlet:param name="organizationId" value="<%= String.valueOf(parentOrganizationId) %>" />
 			</portlet:renderURL>
 
 			<liferay-ui:header
 				backLabel="<%= parentOrganizationName %>"
-				backURL="<%= headerBackURL.toString() %>"
+				backURL="<%= Validator.isNotNull(backURL) ? backURL : headerBackURL.toString() %>"
 				localizeTitle="<%= false %>"
 				title="<%= organization.getName() %>"
 			/>
@@ -177,23 +178,23 @@ if (organization != null) {
 						%>
 
 						<div class="organization-information">
-							<div class="section entity-email-addresses">
+							<div class="section">
 								<liferay-util:include page="/html/portlet/directory/common/additional_email_addresses.jsp" />
 							</div>
 
-							<div class="section entity-websites">
+							<div class="section">
 								<liferay-util:include page="/html/portlet/directory/common/websites.jsp" />
 							</div>
 
-							<div class="section entity-addresses">
+							<div class="section">
 								<liferay-util:include page="/html/portlet/directory/organization/addresses.jsp" />
 							</div>
 
-							<div class="section entity-phones">
+							<div class="section">
 								<liferay-util:include page="/html/portlet/directory/organization/phone_numbers.jsp" />
 							</div>
 
-							<div class="section entity-comments">
+							<div class="section">
 								<liferay-util:include page="/html/portlet/directory/organization/comments.jsp" />
 							</div>
 						</div>
@@ -248,16 +249,16 @@ if (organization != null) {
 							String organizationsTitle = null;
 
 							if (Validator.isNotNull(keywords)) {
-								organizationsTitle = LanguageUtil.get(pageContext, "organizations");
+								organizationsTitle = LanguageUtil.get(request, "organizations");
 							}
 							else if (organization == null) {
-								organizationsTitle = LanguageUtil.get(pageContext, filterManageableOrganizations ? "my-organizations" : "top-level-organizations");
+								organizationsTitle = LanguageUtil.get(request, filterManageableOrganizations ? "my-organizations" : "top-level-organizations");
 							}
 							else if (organizationsCount == 1) {
-								organizationsTitle = LanguageUtil.format(pageContext, "x-suborganization", String.valueOf(organizationsCount));
+								organizationsTitle = LanguageUtil.format(request, "x-suborganization", String.valueOf(organizationsCount), false);
 							}
 							else {
-								organizationsTitle = LanguageUtil.format(pageContext, "x-suborganizations", String.valueOf(organizationsCount));
+								organizationsTitle = LanguageUtil.format(request, "x-suborganizations", String.valueOf(organizationsCount), false);
 							}
 							%>
 
@@ -270,7 +271,11 @@ if (organization != null) {
 							<%
 							SearchContainer searchContainer = new OrganizationSearch(renderRequest, "cur1", currentURLObj);
 
-							searchContainer.setRowChecker(new RowChecker(renderResponse));
+							RowChecker rowChecker = new RowChecker(renderResponse);
+
+							rowChecker.setRowIds("rowIdsOrganization");
+
+							searchContainer.setRowChecker(rowChecker);
 							%>
 
 							<liferay-ui:search-container
@@ -354,6 +359,7 @@ if (organization != null) {
 								>
 									<liferay-portlet:renderURL varImpl="rowURL">
 										<portlet:param name="struts_action" value="/users_admin/view" />
+										<portlet:param name="toolbarItem" value="<%= toolbarItem %>" />
 										<portlet:param name="organizationId" value="<%= String.valueOf(curOrganization.getOrganizationId()) %>" />
 										<portlet:param name="usersListView" value="<%= UserConstants.LIST_VIEW_TREE %>" />
 									</liferay-portlet:renderURL>
@@ -385,20 +391,20 @@ if (organization != null) {
 							String usersTitle = null;
 
 							if (Validator.isNotNull(keywords) || ((organization == null) && (organizationsCount == 0))) {
-								usersTitle = LanguageUtil.get(pageContext, (active ? "users" : "inactive-users"));
+								usersTitle = LanguageUtil.get(request, (active ? "users" : "inactive-users"));
 							}
 							else if (organization == null) {
-								usersTitle = LanguageUtil.get(pageContext, (active ? "users-without-an-organization" : "inactive-users-without-an-organization"));
+								usersTitle = LanguageUtil.get(request, (active ? "users-without-an-organization" : "inactive-users-without-an-organization"));
 							}
 							else if ((usersCount == 0) && (inactiveUsersCount == 0)) {
 								usersTitle = StringPool.BLANK;
 							}
 							else {
 								if ((active && (usersCount == 1)) || (!active && (inactiveUsersCount == 1))) {
-									usersTitle = LanguageUtil.format(pageContext, (active ? "x-user" : "x-inactive-user"), String.valueOf((active ? usersCount : inactiveUsersCount)));
+									usersTitle = LanguageUtil.format(request, (active ? "x-user" : "x-inactive-user"), String.valueOf((active ? usersCount : inactiveUsersCount)), false);
 								}
 								else {
-									usersTitle = LanguageUtil.format(pageContext, (active ? "x-users" : "x-inactive-users"), String.valueOf((active ? usersCount : inactiveUsersCount)));
+									usersTitle = LanguageUtil.format(request, (active ? "x-users" : "x-inactive-users"), String.valueOf((active ? usersCount : inactiveUsersCount)), false);
 								}
 							}
 							%>
@@ -423,7 +429,7 @@ if (organization != null) {
 			<c:if test="<%= organization != null %>">
 				<aui:col cssClass="lfr-asset-column lfr-asset-column-actions" last="<%= true %>" width="<%= 25 %>">
 					<div class="lfr-asset-summary">
-						<img alt="<%= HtmlUtil.escape(organization.getName()) %>" class="avatar" src='<%= (organization != null) ? themeDisplay.getPathImage() + "/organization_logo?img_id=" + organization.getLogoId() + "&t=" + WebServerServletTokenUtil.getToken(organization.getLogoId()) : "" %>' />
+						<img alt="<%= HtmlUtil.escapeAttribute(organization.getName()) %>" class="avatar" src='<%= (organization != null) ? themeDisplay.getPathImage() + "/organization_logo?img_id=" + organization.getLogoId() + "&t=" + WebServerServletTokenUtil.getToken(organization.getLogoId()) : "" %>' />
 
 						<div class="lfr-asset-name">
 							<h4><%= HtmlUtil.escape(organization.getName()) %></h4>

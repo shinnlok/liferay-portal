@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -40,6 +40,15 @@ public class FlagsEntryServiceUtil {
 	 *
 	 * Never modify this class directly. Add custom service methods to {@link com.liferay.portlet.flags.service.impl.FlagsEntryServiceImpl} and rerun ServiceBuilder to regenerate this class.
 	 */
+	public static void addEntry(java.lang.String className, long classPK,
+		java.lang.String reporterEmailAddress, long reportedUserId,
+		java.lang.String contentTitle, java.lang.String contentURL,
+		java.lang.String reason,
+		com.liferay.portal.service.ServiceContext serviceContext) {
+		getService()
+			.addEntry(className, classPK, reporterEmailAddress, reportedUserId,
+			contentTitle, contentURL, reason, serviceContext);
+	}
 
 	/**
 	* Returns the Spring bean ID for this bean.
@@ -57,16 +66,6 @@ public class FlagsEntryServiceUtil {
 	*/
 	public static void setBeanIdentifier(java.lang.String beanIdentifier) {
 		getService().setBeanIdentifier(beanIdentifier);
-	}
-
-	public static void addEntry(java.lang.String className, long classPK,
-		java.lang.String reporterEmailAddress, long reportedUserId,
-		java.lang.String contentTitle, java.lang.String contentURL,
-		java.lang.String reason,
-		com.liferay.portal.service.ServiceContext serviceContext) {
-		getService()
-			.addEntry(className, classPK, reporterEmailAddress, reportedUserId,
-			contentTitle, contentURL, reason, serviceContext);
 	}
 
 	public static FlagsEntryService getService() {

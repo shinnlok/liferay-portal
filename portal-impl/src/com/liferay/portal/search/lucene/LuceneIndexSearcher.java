@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -57,6 +57,7 @@ import com.liferay.portal.kernel.search.facet.collector.FacetCollector;
 import com.liferay.portal.kernel.search.facet.config.FacetConfiguration;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ReflectionUtil;
+import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -67,20 +68,21 @@ import com.liferay.portal.util.PropsValues;
 import java.io.IOException;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.lucene.document.FieldSelector;
 import org.apache.lucene.document.NumericField;
+import org.apache.lucene.document.SetBasedFieldSelector;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.SortField;
-import org.apache.lucene.search.TopFieldDocs;
 import org.apache.lucene.search.highlight.Formatter;
 import org.apache.lucene.search.highlight.TokenGroup;
 
@@ -105,8 +107,8 @@ public class LuceneIndexSearcher extends BaseIndexSearcher {
 		BrowseRequest browseRequest = null;
 
 		try {
-			indexSearcher = LuceneHelperUtil.getSearcher(
-				searchContext.getCompanyId(), true);
+			indexSearcher = LuceneHelperUtil.getIndexSearcher(
+				searchContext.getCompanyId());
 
 			List<FacetHandler<?>> facetHandlers =
 				new ArrayList<FacetHandler<?>>();
@@ -217,7 +219,15 @@ public class LuceneIndexSearcher extends BaseIndexSearcher {
 				browseRequest.setFacetSpec(facet.getFieldName(), facetSpec);
 			}
 
-			browseRequest.setCount(PropsValues.INDEX_SEARCH_LIMIT);
+			int end = searchContext.getEnd();
+
+			if ((end == QueryUtil.ALL_POS) ||
+				(end > PropsValues.INDEX_SEARCH_LIMIT)) {
+
+				end = PropsValues.INDEX_SEARCH_LIMIT;
+			}
+
+			browseRequest.setCount(end);
 			browseRequest.setOffset(0);
 			browseRequest.setQuery(
 				(org.apache.lucene.search.Query)QueryTranslatorUtil.translate(
@@ -230,15 +240,13 @@ public class LuceneIndexSearcher extends BaseIndexSearcher {
 
 			BrowseResult browseResult = boboBrowser.browse(browseRequest);
 
-			BrowseHit[] browseHits = browseResult.getHits();
-
 			long endTime = System.currentTimeMillis();
 
 			float searchTime = (float)(endTime - startTime) / Time.SECOND;
 
 			hits = toHits(
-				indexSearcher, new HitDocs(browseHits), query, startTime,
-				searchTime, searchContext.getStart(), searchContext.getEnd());
+				indexSearcher, browseResult, query, startTime, searchTime,
+				searchContext.getStart(), searchContext.getEnd());
 
 			Map<String, FacetAccessible> facetMap = browseResult.getFacetMap();
 
@@ -265,16 +273,13 @@ public class LuceneIndexSearcher extends BaseIndexSearcher {
 
 				BrowseResult browseResult = boboBrowser.browse(browseRequest);
 
-				BrowseHit[] browseHits = browseResult.getHits();
-
 				long endTime = System.currentTimeMillis();
 
 				float searchTime = (float)(endTime - startTime) / Time.SECOND;
 
 				hits = toHits(
-					indexSearcher, new HitDocs(browseHits), query, startTime,
-					searchTime, searchContext.getStart(),
-					searchContext.getEnd());
+					indexSearcher, browseResult, query, startTime, searchTime,
+					searchContext.getStart(), searchContext.getEnd());
 
 				Map<String, FacetAccessible> facetMap =
 					browseResult.getFacetMap();
@@ -310,105 +315,13 @@ public class LuceneIndexSearcher extends BaseIndexSearcher {
 		finally {
 			cleanUp(boboBrowser);
 
-			LuceneHelperUtil.cleanUp(indexSearcher);
-		}
-
-		if (_log.isDebugEnabled()) {
-			_log.debug(
-				"Search found " + hits.getLength() + " results in " +
-					hits.getSearchTime() + "ms");
-		}
-
-		return hits;
-	}
-
-	@Override
-	public Hits search(
-			String searchEngineId, long companyId, Query query, Sort[] sorts,
-			int start, int end)
-		throws SearchException {
-
-		if (_log.isDebugEnabled()) {
-			_log.debug("Query " + query);
-		}
-
-		Hits hits = null;
-
-		IndexSearcher indexSearcher = null;
-		org.apache.lucene.search.Sort luceneSort = null;
-
-		try {
-			indexSearcher = LuceneHelperUtil.getSearcher(companyId, true);
-
-			if (sorts != null) {
-				SortField[] sortFields = new SortField[sorts.length];
-
-				for (int i = 0; i < sorts.length; i++) {
-					Sort sort = sorts[i];
-
-					sortFields[i] = new SortField(
-						sort.getFieldName(), sort.getType(), sort.isReverse());
-				}
-
-				luceneSort = new org.apache.lucene.search.Sort(sortFields);
-			}
-			else {
-				luceneSort = new org.apache.lucene.search.Sort();
-			}
-
-			long startTime = System.currentTimeMillis();
-
-			TopFieldDocs topFieldDocs = indexSearcher.search(
-				(org.apache.lucene.search.Query)QueryTranslatorUtil.translate(
-					query),
-				null, PropsValues.INDEX_SEARCH_LIMIT, luceneSort);
-
-			long endTime = System.currentTimeMillis();
-
-			float searchTime = (float)(endTime - startTime) / Time.SECOND;
-
-			hits = toHits(
-				indexSearcher, new HitDocs(topFieldDocs), query, startTime,
-				searchTime, start, end);
-		}
-		catch (BooleanQuery.TooManyClauses tmc) {
-			int maxClauseCount = BooleanQuery.getMaxClauseCount();
-
-			BooleanQuery.setMaxClauseCount(Integer.MAX_VALUE);
-
 			try {
-				long startTime = System.currentTimeMillis();
-
-				TopFieldDocs topFieldDocs = indexSearcher.search(
-					(org.apache.lucene.search.Query)
-						QueryTranslatorUtil.translate(query),
-					null, PropsValues.INDEX_SEARCH_LIMIT, luceneSort);
-
-				long endTime = System.currentTimeMillis();
-
-				float searchTime = (float)(endTime - startTime) / Time.SECOND;
-
-				hits = toHits(
-					indexSearcher, new HitDocs(topFieldDocs), query, startTime,
-					searchTime, start, end);
+				LuceneHelperUtil.releaseIndexSearcher(
+					searchContext.getCompanyId(), indexSearcher);
 			}
-			catch (Exception e) {
-				throw new SearchException(e);
+			catch (IOException ioe) {
+				_log.error("Unable to release searcher", ioe);
 			}
-			finally {
-				BooleanQuery.setMaxClauseCount(maxClauseCount);
-			}
-		}
-		catch (ParseException pe) {
-			_log.error("Query " + query, pe);
-
-			return new HitsImpl();
-		}
-		catch (Exception e) {
-			throw new SearchException(e);
-		}
-		finally {
-			LuceneHelperUtil.cleanUp(indexSearcher);
 		}
 
 		if (_log.isDebugEnabled()) {
@@ -579,11 +492,13 @@ public class LuceneIndexSearcher extends BaseIndexSearcher {
 	}
 
 	protected Hits toHits(
-			IndexSearcher indexSearcher, HitDocs hitDocs, Query query,
+			IndexSearcher indexSearcher, BrowseResult browseResult, Query query,
 			long startTime, float searchTime, int start, int end)
 		throws IOException, ParseException {
 
-		int total = hitDocs.getTotalHits();
+		int total = browseResult.getNumHits();
+
+		BrowseHit[] browseHits = browseResult.getHits();
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS)) {
 			start = 0;
@@ -625,13 +540,25 @@ public class LuceneIndexSearcher extends BaseIndexSearcher {
 		List<Document> subsetDocs = new ArrayList<Document>(subsetTotal);
 		List<Float> subsetScores = new ArrayList<Float>(subsetTotal);
 
+		FieldSelector fieldSelector = null;
+
 		QueryConfig queryConfig = query.getQueryConfig();
 
+		String[] selectedFieldNames = queryConfig.getSelectedFieldNames();
+
+		if (ArrayUtil.isNotEmpty(selectedFieldNames) &&
+			!selectedFieldNames[0].equals(Field.ANY)) {
+
+			fieldSelector = new SetBasedFieldSelector(
+				SetUtil.fromArray(selectedFieldNames),
+				Collections.<String>emptySet());
+		}
+
 		for (int i = start; i < start + subsetTotal; i++) {
-			int docId = hitDocs.getDocId(i);
+			int docId = browseHits[i].getDocid();
 
 			org.apache.lucene.document.Document document = indexSearcher.doc(
-				docId);
+				docId, fieldSelector);
 
 			Document subsetDocument = getDocument(document);
 
@@ -651,7 +578,7 @@ public class LuceneIndexSearcher extends BaseIndexSearcher {
 
 			subsetDocs.add(subsetDocument);
 
-			Float subsetScore = hitDocs.getScore(i);
+			Float subsetScore = browseHits[i].getScore();
 
 			if (scoredFieldNamesCount > 0) {
 				subsetScore = subsetScore / scoredFieldNamesCount;
@@ -701,58 +628,6 @@ public class LuceneIndexSearcher extends BaseIndexSearcher {
 		catch (Exception e) {
 			throw new ExceptionInInitializerError(e);
 		}
-	}
-
-	private class HitDocs {
-
-		public HitDocs(BrowseHit[] browseHits) {
-			_browseHits = browseHits;
-		}
-
-		public HitDocs(TopFieldDocs topFieldDocs) {
-			_topFieldDocs = topFieldDocs;
-		}
-
-		public int getDocId(int i) {
-			if (_topFieldDocs != null) {
-				ScoreDoc scoreDoc = _topFieldDocs.scoreDocs[i];
-
-				return scoreDoc.doc;
-			}
-			else if (_browseHits != null) {
-				return _browseHits[i].getDocid();
-			}
-
-			throw new IllegalStateException();
-		}
-
-		public float getScore(int i) {
-			if (_topFieldDocs != null) {
-				ScoreDoc scoreDoc = _topFieldDocs.scoreDocs[i];
-
-				return scoreDoc.score;
-			}
-			else if (_browseHits != null) {
-				return _browseHits[i].getScore();
-			}
-
-			throw new IllegalStateException();
-		}
-
-		public int getTotalHits() {
-			if (_topFieldDocs != null) {
-				return _topFieldDocs.totalHits;
-			}
-			else if (_browseHits != null) {
-				return _browseHits.length;
-			}
-
-			throw new IllegalStateException();
-		}
-
-		private BrowseHit[] _browseHits;
-		private TopFieldDocs _topFieldDocs;
-
 	}
 
 	private class TermCollectingFormatter implements Formatter {

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.polls.lar;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.lar.BaseStagedModelDataHandler;
 import com.liferay.portal.kernel.lar.ExportImportPathUtil;
 import com.liferay.portal.kernel.lar.PortletDataContext;
@@ -41,11 +40,9 @@ public class PollsQuestionStagedModelDataHandler
 	@Override
 	public void deleteStagedModel(
 			String uuid, long groupId, String className, String extraData)
-		throws PortalException, SystemException {
+		throws PortalException {
 
-		PollsQuestion question =
-			PollsQuestionLocalServiceUtil.fetchPollsQuestionByUuidAndGroupId(
-				uuid, groupId);
+		PollsQuestion question = fetchExistingStagedModel(uuid, groupId);
 
 		if (question != null) {
 			PollsQuestionLocalServiceUtil.deleteQuestion(question);
@@ -76,13 +73,21 @@ public class PollsQuestionStagedModelDataHandler
 	}
 
 	@Override
-	protected void doImportCompanyStagedModel(
-			PortletDataContext portletDataContext, String uuid, long questionId)
+	protected PollsQuestion doFetchExistingStagedModel(
+		String uuid, long groupId) {
+
+		return PollsQuestionLocalServiceUtil.fetchPollsQuestionByUuidAndGroupId(
+			uuid, groupId);
+	}
+
+	@Override
+	protected void doImportMissingReference(
+			PortletDataContext portletDataContext, String uuid, long groupId,
+			long questionId)
 		throws Exception {
 
-		PollsQuestion existingQuestion =
-			PollsQuestionLocalServiceUtil.fetchPollsQuestionByUuidAndGroupId(
-				uuid, portletDataContext.getCompanyGroupId());
+		PollsQuestion existingQuestion = fetchExistingStagedModel(
+			uuid, groupId);
 
 		Map<Long, Long> questionIds =
 			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
@@ -130,11 +135,8 @@ public class PollsQuestionStagedModelDataHandler
 		PollsQuestion importedQuestion = null;
 
 		if (portletDataContext.isDataStrategyMirror()) {
-			PollsQuestion existingQuestion =
-				PollsQuestionLocalServiceUtil.
-					fetchPollsQuestionByUuidAndGroupId(
-						question.getUuid(),
-						portletDataContext.getScopeGroupId());
+			PollsQuestion existingQuestion = fetchExistingStagedModel(
+				question.getUuid(), portletDataContext.getScopeGroupId());
 
 			if (existingQuestion == null) {
 				serviceContext.setUuid(question.getUuid());
@@ -162,22 +164,6 @@ public class PollsQuestionStagedModelDataHandler
 		}
 
 		portletDataContext.importClassedModel(question, importedQuestion);
-	}
-
-	@Override
-	protected boolean validateMissingReference(
-			String uuid, long companyId, long groupId)
-		throws Exception {
-
-		PollsQuestion question =
-			PollsQuestionLocalServiceUtil.fetchPollsQuestionByUuidAndGroupId(
-				uuid, groupId);
-
-		if (question == null) {
-			return false;
-		}
-
-		return true;
 	}
 
 }

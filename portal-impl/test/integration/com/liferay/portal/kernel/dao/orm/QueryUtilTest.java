@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,25 +17,28 @@ package com.liferay.portal.kernel.dao.orm;
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
-import com.liferay.portal.kernel.test.ExecutionTestListeners;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
-import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
+import com.liferay.portal.test.TransactionalTestRule;
+import com.liferay.portal.test.runners.LiferayIntegrationJUnitTestRunner;
 
 import java.util.List;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
  * @author Sampsa Sohlman
  */
-@ExecutionTestListeners(listeners = { PersistenceExecutionTestListener.class })
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
 public class QueryUtilTest {
+
+	@ClassRule
+	public static TransactionalTestRule transactionalTestRule =
+		new TransactionalTestRule();
 
 	@BeforeClass
 	public static void setUpClass() throws Exception {
@@ -226,7 +229,7 @@ public class QueryUtilTest {
 		try {
 			session = _sessionFactory.openSession();
 
-			SQLQuery q = session.createSQLQuery(_SQL_SELECT);
+			SQLQuery q = session.createSynchronizedSQLQuery(_SQL_SELECT);
 
 			List<Object[]> result = (List<Object[]>)QueryUtil.list(
 				q, _sessionFactory.getDialect(), start, end, unmodifiable);
@@ -273,7 +276,7 @@ public class QueryUtilTest {
 		try {
 			session = _sessionFactory.openSession();
 
-			SQLQuery sqlQuery = session.createSQLQuery(
+			SQLQuery sqlQuery = session.createSynchronizedSQLQuery(
 				"SELECT id FROM QueryUtilTest ORDER BY value ".concat(order));
 
 			sqlQuery.addScalar("id", Type.INTEGER);
@@ -310,7 +313,7 @@ public class QueryUtilTest {
 				sql += " ORDER BY type ".concat(order);
 			}
 
-			SQLQuery q = session.createSQLQuery(sql);
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			List<Object[]> result = (List<Object[]>)QueryUtil.list(
 				q, _sessionFactory.getDialect(), start, end, true);

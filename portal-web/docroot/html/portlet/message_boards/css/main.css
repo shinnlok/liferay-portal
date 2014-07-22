@@ -20,7 +20,7 @@
 	.quote {
 		background: #FFF url(@theme_image_path@/message_boards/quoteleft.png) left top no-repeat;
 		border: 1px solid #777;
-		padding: 5px 0px 0px 5px;
+		padding: 5px 0 0 5px;
 	}
 
 	.quote-content {
@@ -30,7 +30,7 @@
 
 	.quote-title {
 		font-weight: bold;
-		padding: 5px 0px 5px 0px;
+		padding: 5px 0 5px 0;
 	}
 
 	.title {
@@ -136,6 +136,10 @@
 	.message-container .user-info {
 		border-right: 1px solid #CCC;
 		padding: 5px;
+
+		.user-name {
+			@include hyphenation;
+		}
 	}
 
 	.clear {
@@ -170,8 +174,8 @@
 	}
 
 	.views {
-		color: #999;
 		clear: both;
+		color: #999;
 		float: left;
 		padding: 5px 0;
 		text-align: center;
@@ -290,14 +294,18 @@
 		}
 	}
 
-	.category-title {
-		@include ellipsis;
-
-		font-weight: bold;
+	.category-description, .category-title {
+		display: block;
 	}
 
 	.category-description {
 		@include hyphenation;
+	}
+
+	.category-title {
+		@include ellipsis;
+
+		font-weight: bold;
 	}
 
 	.subcategories {
@@ -306,7 +314,7 @@
 
 	.taglib-flags {
 		float: left;
-		margin-left: 20px;
+		margin: 10px 0 0 20px;
 	}
 
 	.threads-panel {

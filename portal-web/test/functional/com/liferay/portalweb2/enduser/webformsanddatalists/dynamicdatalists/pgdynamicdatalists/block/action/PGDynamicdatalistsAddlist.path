@@ -39,13 +39,18 @@
 	<td></td>
 </tr>
 <tr>
+	<td>WORKFLOW_SELECT</td>
+	<td>//div/select[@id='_167_workflowDefinition']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>SAVE_BUTTON</td>
 	<td>//button[@id='_167_saveButton']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>CANCEL_BUTTON</td>
-	<td>//button[@id='_167_cancelButton']</td>
+	<td>//a[contains(@class,'btn-cancel')]</td>
 	<td></td>
 </tr>
 </tbody>

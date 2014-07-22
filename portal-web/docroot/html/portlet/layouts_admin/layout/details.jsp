@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,9 +17,8 @@
 <%@ include file="/html/portlet/layouts_admin/init.jsp" %>
 
 <%
-Group group = (Group)request.getAttribute("edit_pages.jsp-group");
-boolean privateLayout = ((Boolean)request.getAttribute("edit_pages.jsp-privateLayout")).booleanValue();
-Layout selLayout = (Layout)request.getAttribute("edit_pages.jsp-selLayout");
+Group group = layoutsAdminDisplayContext.getGroup();
+Layout selLayout = layoutsAdminDisplayContext.getSelLayout();
 
 LayoutTypePortletImpl selLayoutTypePortlet = new LayoutTypePortletImpl(selLayout);
 
@@ -47,7 +46,7 @@ StringBuilder friendlyURLBase = new StringBuilder();
 	String virtualHostname = layoutSet.getVirtualHostname();
 
 	if (Validator.isNull(virtualHostname) || (friendlyURLBase.indexOf(virtualHostname) == -1)) {
-		friendlyURLBase.append(group.getPathFriendlyURL(privateLayout, themeDisplay));
+		friendlyURLBase.append(group.getPathFriendlyURL(layoutsAdminDisplayContext.isPrivateLayout(), themeDisplay));
 		friendlyURLBase.append(group.getFriendlyURL());
 	}
 	%>
@@ -90,16 +89,16 @@ StringBuilder friendlyURLBase = new StringBuilder();
 		<c:when test="<%= !group.isLayoutPrototype() %>">
 			<aui:input name="name" />
 
-			<div class="control-group">
+			<div class="form-group">
 				<aui:input helpMessage="if-checked-this-page-wont-show-up-in-the-navigation-menu" label="hide-from-navigation-menu" name="hidden" />
 			</div>
 
 			<c:choose>
 				<c:when test="<%= PortalUtil.isLayoutFriendliable(selLayout) %>">
-					<aui:field-wrapper cssClass="input-append input-flex-add-on input-prepend" helpMessage='<%= LanguageUtil.format(pageContext, "for-example-x", "<em>/news</em>") %>' label="friendly-url" name="friendlyURL">
-						<span class="add-on" id="<portlet:namespace />urlBase"><liferay-ui:message key="<%= StringUtil.shorten(friendlyURLBase.toString(), 40) %>" /></span>
+					<aui:field-wrapper cssClass="input-flex-add-on" helpMessage='<%= LanguageUtil.format(request, "for-example-x", "<em>/news</em>", false) %>' label="friendly-url" name="friendlyURL">
+						<span class="input-group-addon" id="<portlet:namespace />urlBase"><liferay-ui:message key="<%= StringUtil.shorten(friendlyURLBase.toString(), 40) %>" /></span>
 
-						<liferay-ui:input-localized availableLocales="<%= LanguageUtil.getAvailableLocales(themeDisplay.getSiteGroupId()) %>" cssClass="input-medium" defaultLanguageId="<%= LocaleUtil.toLanguageId(themeDisplay.getSiteDefaultLocale()) %>" name="friendlyURL" xml="<%= selLayout.getFriendlyURLsXML() %>" />
+						<liferay-ui:input-localized availableLocales="<%= LanguageUtil.getAvailableLocales(themeDisplay.getSiteGroupId()) %>" cssClass="form-control" defaultLanguageId="<%= LocaleUtil.toLanguageId(themeDisplay.getSiteDefaultLocale()) %>" name="friendlyURL" xml="<%= selLayout.getFriendlyURLsXML() %>" />
 					</aui:field-wrapper>
 				</c:when>
 				<c:otherwise>
@@ -116,7 +115,7 @@ StringBuilder friendlyURLBase = new StringBuilder();
 				boolean layoutUpdateable = GetterUtil.getBoolean(selLayoutTypePortlet.getTypeSettingsProperty("layoutUpdateable"), true);
 				%>
 
-				<aui:input disabled="<%= !layoutSetPrototypeUpdateable %>" helpMessage="allow-site-administrators-to-modify-this-page-for-their-site-help" label="allow-site-administrators-to-modify-this-page-for-their-site" name="layoutUpdateable" type="checkbox" value="<%= layoutUpdateable %>" />
+				<aui:input disabled="<%= !layoutSetPrototypeUpdateable %>" helpMessage="allow-site-administrators-to-modify-this-page-for-their-site-help" label="allow-site-administrators-to-modify-this-page-for-their-site" name="TypeSettingsProperties--layoutUpdateable--" type="checkbox" value="<%= layoutUpdateable %>" />
 			</c:if>
 		</c:when>
 		<c:otherwise>
@@ -133,7 +132,7 @@ StringBuilder friendlyURLBase = new StringBuilder();
 
 		<aui:input name="layoutPrototypeUuid" type="hidden" value="<%= selLayout.getLayoutPrototypeUuid() %>" />
 
-		<aui:input label='<%= LanguageUtil.format(pageContext, "automatically-apply-changes-done-to-the-page-template-x", HtmlUtil.escape(layoutPrototype.getName(user.getLocale()))) %>' name="layoutPrototypeLinkEnabled" type="checkbox" value="<%= selLayout.isLayoutPrototypeLinkEnabled() %>" />
+		<aui:input label='<%= LanguageUtil.format(request, "automatically-apply-changes-done-to-the-page-template-x", HtmlUtil.escape(layoutPrototype.getName(user.getLocale())), false) %>' name="layoutPrototypeLinkEnabled" type="checkbox" value="<%= selLayout.isLayoutPrototypeLinkEnabled() %>" />
 
 		<div class='<%= selLayout.isLayoutPrototypeLinkEnabled() ? "" : "hide" %>' id="<portlet:namespace/>layoutPrototypeMergeAlert">
 
@@ -196,8 +195,8 @@ StringBuilder friendlyURLBase = new StringBuilder();
 </aui:fieldset>
 
 <aui:script>
-	Liferay.Util.toggleBoxes('<portlet:namespace />layoutPrototypeLinkEnabledCheckbox','<portlet:namespace />layoutPrototypeMergeAlert');
-	Liferay.Util.toggleBoxes('<portlet:namespace />layoutPrototypeLinkEnabledCheckbox','<portlet:namespace />typeOptions', true);
+	Liferay.Util.toggleBoxes('<portlet:namespace />layoutPrototypeLinkEnabled','<portlet:namespace />layoutPrototypeMergeAlert');
+	Liferay.Util.toggleBoxes('<portlet:namespace />layoutPrototypeLinkEnabled','<portlet:namespace />typeOptions', true);
 </aui:script>
 
 <aui:script use="aui-base">
@@ -216,7 +215,7 @@ StringBuilder friendlyURLBase = new StringBuilder();
 
 				item.toggle(visible);
 
-				item.all('input, select, textarea').set('disabled', disabled);
+				item.all('input, select, textarea').attr('disabled', disabled);
 			}
 		);
 
@@ -225,7 +224,7 @@ StringBuilder friendlyURLBase = new StringBuilder();
 		}
 	}
 
-	toggleLayoutTypeFields('<%= selLayout.getType() %>');
+	toggleLayoutTypeFields('<%= HtmlUtil.escapeJS(selLayout.getType()) %>');
 
 	var typeSelector = A.one('#<portlet:namespace />type');
 

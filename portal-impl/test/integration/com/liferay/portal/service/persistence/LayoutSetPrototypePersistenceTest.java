@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portal.service.persistence;
 
 import com.liferay.portal.NoSuchLayoutSetPrototypeException;
-import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
@@ -24,63 +23,87 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.test.ExecutionTestListeners;
+import com.liferay.portal.kernel.template.TemplateException;
+import com.liferay.portal.kernel.template.TemplateManagerUtil;
+import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.util.IntegerWrapper;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.model.LayoutSetPrototype;
-import com.liferay.portal.service.ServiceTestUtil;
-import com.liferay.portal.service.persistence.BasePersistence;
-import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
-import com.liferay.portal.test.LiferayPersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.test.persistence.TransactionalPersistenceAdvice;
+import com.liferay.portal.model.ModelListener;
+import com.liferay.portal.service.LayoutSetPrototypeLocalServiceUtil;
+import com.liferay.portal.test.TransactionalTestRule;
+import com.liferay.portal.test.runners.LiferayIntegrationJUnitTestRunner;
+import com.liferay.portal.tools.DBUpgrader;
+import com.liferay.portal.util.test.RandomTestUtil;
 
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 
 import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 /**
- * @author Brian Wing Shun Chan
+ * @generated
  */
-@ExecutionTestListeners(listeners =  {
-	PersistenceExecutionTestListener.class})
-@RunWith(LiferayPersistenceIntegrationJUnitTestRunner.class)
+@RunWith(LiferayIntegrationJUnitTestRunner.class)
 public class LayoutSetPrototypePersistenceTest {
-	@After
-	public void tearDown() throws Exception {
-		Map<Serializable, BasePersistence<?>> basePersistences = _transactionalPersistenceAdvice.getBasePersistences();
+	@ClassRule
+	public static TransactionalTestRule transactionalTestRule = new TransactionalTestRule(Propagation.REQUIRED);
 
-		Set<Serializable> primaryKeys = basePersistences.keySet();
-
-		for (Serializable primaryKey : primaryKeys) {
-			BasePersistence<?> basePersistence = basePersistences.get(primaryKey);
-
-			try {
-				basePersistence.remove(primaryKey);
-			}
-			catch (Exception e) {
-				if (_log.isDebugEnabled()) {
-					_log.debug("The model with primary key " + primaryKey +
-						" was already deleted");
-				}
-			}
+	@BeforeClass
+	public static void setupClass() throws TemplateException {
+		try {
+			DBUpgrader.upgrade();
+		}
+		catch (Exception e) {
+			_log.error(e, e);
 		}
 
-		_transactionalPersistenceAdvice.reset();
+		TemplateManagerUtil.init();
+	}
+
+	@Before
+	public void setUp() {
+		_modelListeners = _persistence.getListeners();
+
+		for (ModelListener<LayoutSetPrototype> modelListener : _modelListeners) {
+			_persistence.unregisterListener(modelListener);
+		}
+	}
+
+	@After
+	public void tearDown() throws Exception {
+		Iterator<LayoutSetPrototype> iterator = _layoutSetPrototypes.iterator();
+
+		while (iterator.hasNext()) {
+			_persistence.remove(iterator.next());
+
+			iterator.remove();
+		}
+
+		for (ModelListener<LayoutSetPrototype> modelListener : _modelListeners) {
+			_persistence.registerListener(modelListener);
+		}
 	}
 
 	@Test
 	public void testCreate() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		LayoutSetPrototype layoutSetPrototype = _persistence.create(pk);
 
@@ -107,34 +130,38 @@ public class LayoutSetPrototypePersistenceTest {
 
 	@Test
 	public void testUpdateExisting() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		LayoutSetPrototype newLayoutSetPrototype = _persistence.create(pk);
 
-		newLayoutSetPrototype.setUuid(ServiceTestUtil.randomString());
+		newLayoutSetPrototype.setMvccVersion(RandomTestUtil.nextLong());
 
-		newLayoutSetPrototype.setCompanyId(ServiceTestUtil.nextLong());
+		newLayoutSetPrototype.setUuid(RandomTestUtil.randomString());
 
-		newLayoutSetPrototype.setUserId(ServiceTestUtil.nextLong());
+		newLayoutSetPrototype.setCompanyId(RandomTestUtil.nextLong());
 
-		newLayoutSetPrototype.setUserName(ServiceTestUtil.randomString());
+		newLayoutSetPrototype.setUserId(RandomTestUtil.nextLong());
 
-		newLayoutSetPrototype.setCreateDate(ServiceTestUtil.nextDate());
+		newLayoutSetPrototype.setUserName(RandomTestUtil.randomString());
 
-		newLayoutSetPrototype.setModifiedDate(ServiceTestUtil.nextDate());
+		newLayoutSetPrototype.setCreateDate(RandomTestUtil.nextDate());
 
-		newLayoutSetPrototype.setName(ServiceTestUtil.randomString());
+		newLayoutSetPrototype.setModifiedDate(RandomTestUtil.nextDate());
 
-		newLayoutSetPrototype.setDescription(ServiceTestUtil.randomString());
+		newLayoutSetPrototype.setName(RandomTestUtil.randomString());
 
-		newLayoutSetPrototype.setSettings(ServiceTestUtil.randomString());
+		newLayoutSetPrototype.setDescription(RandomTestUtil.randomString());
 
-		newLayoutSetPrototype.setActive(ServiceTestUtil.randomBoolean());
+		newLayoutSetPrototype.setSettings(RandomTestUtil.randomString());
 
-		_persistence.update(newLayoutSetPrototype);
+		newLayoutSetPrototype.setActive(RandomTestUtil.randomBoolean());
+
+		_layoutSetPrototypes.add(_persistence.update(newLayoutSetPrototype));
 
 		LayoutSetPrototype existingLayoutSetPrototype = _persistence.findByPrimaryKey(newLayoutSetPrototype.getPrimaryKey());
 
+		Assert.assertEquals(existingLayoutSetPrototype.getMvccVersion(),
+			newLayoutSetPrototype.getMvccVersion());
 		Assert.assertEquals(existingLayoutSetPrototype.getUuid(),
 			newLayoutSetPrototype.getUuid());
 		Assert.assertEquals(existingLayoutSetPrototype.getLayoutSetPrototypeId(),
@@ -162,6 +189,60 @@ public class LayoutSetPrototypePersistenceTest {
 	}
 
 	@Test
+	public void testCountByUuid() {
+		try {
+			_persistence.countByUuid(StringPool.BLANK);
+
+			_persistence.countByUuid(StringPool.NULL);
+
+			_persistence.countByUuid((String)null);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByUuid_C() {
+		try {
+			_persistence.countByUuid_C(StringPool.BLANK,
+				RandomTestUtil.nextLong());
+
+			_persistence.countByUuid_C(StringPool.NULL, 0L);
+
+			_persistence.countByUuid_C((String)null, 0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByCompanyId() {
+		try {
+			_persistence.countByCompanyId(RandomTestUtil.nextLong());
+
+			_persistence.countByCompanyId(0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByC_A() {
+		try {
+			_persistence.countByC_A(RandomTestUtil.nextLong(),
+				RandomTestUtil.randomBoolean());
+
+			_persistence.countByC_A(0L, RandomTestUtil.randomBoolean());
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
 	public void testFindByPrimaryKeyExisting() throws Exception {
 		LayoutSetPrototype newLayoutSetPrototype = addLayoutSetPrototype();
 
@@ -172,7 +253,7 @@ public class LayoutSetPrototypePersistenceTest {
 
 	@Test
 	public void testFindByPrimaryKeyMissing() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		try {
 			_persistence.findByPrimaryKey(pk);
@@ -195,11 +276,11 @@ public class LayoutSetPrototypePersistenceTest {
 		}
 	}
 
-	protected OrderByComparator getOrderByComparator() {
+	protected OrderByComparator<LayoutSetPrototype> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create("LayoutSetPrototype",
-			"uuid", true, "layoutSetPrototypeId", true, "companyId", true,
-			"userId", true, "userName", true, "createDate", true,
-			"modifiedDate", true, "name", true, "description", true,
+			"mvccVersion", true, "uuid", true, "layoutSetPrototypeId", true,
+			"companyId", true, "userId", true, "userName", true, "createDate",
+			true, "modifiedDate", true, "name", true, "description", true,
 			"settings", true, "active", true);
 	}
 
@@ -214,7 +295,7 @@ public class LayoutSetPrototypePersistenceTest {
 
 	@Test
 	public void testFetchByPrimaryKeyMissing() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		LayoutSetPrototype missingLayoutSetPrototype = _persistence.fetchByPrimaryKey(pk);
 
@@ -222,19 +303,103 @@ public class LayoutSetPrototypePersistenceTest {
 	}
 
 	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
+		throws Exception {
+		LayoutSetPrototype newLayoutSetPrototype1 = addLayoutSetPrototype();
+		LayoutSetPrototype newLayoutSetPrototype2 = addLayoutSetPrototype();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newLayoutSetPrototype1.getPrimaryKey());
+		primaryKeys.add(newLayoutSetPrototype2.getPrimaryKey());
+
+		Map<Serializable, LayoutSetPrototype> layoutSetPrototypes = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(2, layoutSetPrototypes.size());
+		Assert.assertEquals(newLayoutSetPrototype1,
+			layoutSetPrototypes.get(newLayoutSetPrototype1.getPrimaryKey()));
+		Assert.assertEquals(newLayoutSetPrototype2,
+			layoutSetPrototypes.get(newLayoutSetPrototype2.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
+		throws Exception {
+		long pk1 = RandomTestUtil.nextLong();
+
+		long pk2 = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(pk1);
+		primaryKeys.add(pk2);
+
+		Map<Serializable, LayoutSetPrototype> layoutSetPrototypes = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(layoutSetPrototypes.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
+		throws Exception {
+		LayoutSetPrototype newLayoutSetPrototype = addLayoutSetPrototype();
+
+		long pk = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newLayoutSetPrototype.getPrimaryKey());
+		primaryKeys.add(pk);
+
+		Map<Serializable, LayoutSetPrototype> layoutSetPrototypes = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, layoutSetPrototypes.size());
+		Assert.assertEquals(newLayoutSetPrototype,
+			layoutSetPrototypes.get(newLayoutSetPrototype.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
+		throws Exception {
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		Map<Serializable, LayoutSetPrototype> layoutSetPrototypes = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(layoutSetPrototypes.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithOnePrimaryKey()
+		throws Exception {
+		LayoutSetPrototype newLayoutSetPrototype = addLayoutSetPrototype();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newLayoutSetPrototype.getPrimaryKey());
+
+		Map<Serializable, LayoutSetPrototype> layoutSetPrototypes = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, layoutSetPrototypes.size());
+		Assert.assertEquals(newLayoutSetPrototype,
+			layoutSetPrototypes.get(newLayoutSetPrototype.getPrimaryKey()));
+	}
+
+	@Test
 	public void testActionableDynamicQuery() throws Exception {
 		final IntegerWrapper count = new IntegerWrapper();
 
-		ActionableDynamicQuery actionableDynamicQuery = new LayoutSetPrototypeActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = LayoutSetPrototypeLocalServiceUtil.getActionableDynamicQuery();
+
+		actionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod() {
 				@Override
-				protected void performAction(Object object) {
+				public void performAction(Object object) {
 					LayoutSetPrototype layoutSetPrototype = (LayoutSetPrototype)object;
 
 					Assert.assertNotNull(layoutSetPrototype);
 
 					count.increment();
 				}
-			};
+			});
 
 		actionableDynamicQuery.performActions();
 
@@ -267,7 +432,7 @@ public class LayoutSetPrototypePersistenceTest {
 				LayoutSetPrototype.class.getClassLoader());
 
 		dynamicQuery.add(RestrictionsFactoryUtil.eq("layoutSetPrototypeId",
-				ServiceTestUtil.nextLong()));
+				RandomTestUtil.nextLong()));
 
 		List<LayoutSetPrototype> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -309,7 +474,7 @@ public class LayoutSetPrototypePersistenceTest {
 				"layoutSetPrototypeId"));
 
 		dynamicQuery.add(RestrictionsFactoryUtil.in("layoutSetPrototypeId",
-				new Object[] { ServiceTestUtil.nextLong() }));
+				new Object[] { RandomTestUtil.nextLong() }));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -318,36 +483,39 @@ public class LayoutSetPrototypePersistenceTest {
 
 	protected LayoutSetPrototype addLayoutSetPrototype()
 		throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		LayoutSetPrototype layoutSetPrototype = _persistence.create(pk);
 
-		layoutSetPrototype.setUuid(ServiceTestUtil.randomString());
+		layoutSetPrototype.setMvccVersion(RandomTestUtil.nextLong());
 
-		layoutSetPrototype.setCompanyId(ServiceTestUtil.nextLong());
+		layoutSetPrototype.setUuid(RandomTestUtil.randomString());
 
-		layoutSetPrototype.setUserId(ServiceTestUtil.nextLong());
+		layoutSetPrototype.setCompanyId(RandomTestUtil.nextLong());
 
-		layoutSetPrototype.setUserName(ServiceTestUtil.randomString());
+		layoutSetPrototype.setUserId(RandomTestUtil.nextLong());
 
-		layoutSetPrototype.setCreateDate(ServiceTestUtil.nextDate());
+		layoutSetPrototype.setUserName(RandomTestUtil.randomString());
 
-		layoutSetPrototype.setModifiedDate(ServiceTestUtil.nextDate());
+		layoutSetPrototype.setCreateDate(RandomTestUtil.nextDate());
 
-		layoutSetPrototype.setName(ServiceTestUtil.randomString());
+		layoutSetPrototype.setModifiedDate(RandomTestUtil.nextDate());
 
-		layoutSetPrototype.setDescription(ServiceTestUtil.randomString());
+		layoutSetPrototype.setName(RandomTestUtil.randomString());
 
-		layoutSetPrototype.setSettings(ServiceTestUtil.randomString());
+		layoutSetPrototype.setDescription(RandomTestUtil.randomString());
 
-		layoutSetPrototype.setActive(ServiceTestUtil.randomBoolean());
+		layoutSetPrototype.setSettings(RandomTestUtil.randomString());
 
-		_persistence.update(layoutSetPrototype);
+		layoutSetPrototype.setActive(RandomTestUtil.randomBoolean());
+
+		_layoutSetPrototypes.add(_persistence.update(layoutSetPrototype));
 
 		return layoutSetPrototype;
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(LayoutSetPrototypePersistenceTest.class);
-	private LayoutSetPrototypePersistence _persistence = (LayoutSetPrototypePersistence)PortalBeanLocatorUtil.locate(LayoutSetPrototypePersistence.class.getName());
-	private TransactionalPersistenceAdvice _transactionalPersistenceAdvice = (TransactionalPersistenceAdvice)PortalBeanLocatorUtil.locate(TransactionalPersistenceAdvice.class.getName());
+	private List<LayoutSetPrototype> _layoutSetPrototypes = new ArrayList<LayoutSetPrototype>();
+	private ModelListener<LayoutSetPrototype>[] _modelListeners;
+	private LayoutSetPrototypePersistence _persistence = LayoutSetPrototypeUtil.getPersistence();
 }

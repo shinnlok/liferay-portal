@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portlet.journal.service.persistence;
 
-import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
@@ -23,69 +22,93 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.template.TemplateException;
+import com.liferay.portal.kernel.template.TemplateManagerUtil;
 import com.liferay.portal.kernel.test.AssertUtils;
-import com.liferay.portal.kernel.test.ExecutionTestListeners;
+import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.util.IntegerWrapper;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.service.ServiceTestUtil;
-import com.liferay.portal.service.persistence.BasePersistence;
-import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
-import com.liferay.portal.test.LiferayPersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.test.persistence.TransactionalPersistenceAdvice;
+import com.liferay.portal.model.ModelListener;
+import com.liferay.portal.test.TransactionalTestRule;
+import com.liferay.portal.test.runners.LiferayIntegrationJUnitTestRunner;
+import com.liferay.portal.tools.DBUpgrader;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.portal.util.test.RandomTestUtil;
 
 import com.liferay.portlet.journal.NoSuchFeedException;
 import com.liferay.portlet.journal.model.JournalFeed;
 import com.liferay.portlet.journal.model.impl.JournalFeedModelImpl;
+import com.liferay.portlet.journal.service.JournalFeedLocalServiceUtil;
 
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 
 import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 /**
- * @author Brian Wing Shun Chan
+ * @generated
  */
-@ExecutionTestListeners(listeners =  {
-	PersistenceExecutionTestListener.class})
-@RunWith(LiferayPersistenceIntegrationJUnitTestRunner.class)
+@RunWith(LiferayIntegrationJUnitTestRunner.class)
 public class JournalFeedPersistenceTest {
-	@After
-	public void tearDown() throws Exception {
-		Map<Serializable, BasePersistence<?>> basePersistences = _transactionalPersistenceAdvice.getBasePersistences();
+	@ClassRule
+	public static TransactionalTestRule transactionalTestRule = new TransactionalTestRule(Propagation.REQUIRED);
 
-		Set<Serializable> primaryKeys = basePersistences.keySet();
-
-		for (Serializable primaryKey : primaryKeys) {
-			BasePersistence<?> basePersistence = basePersistences.get(primaryKey);
-
-			try {
-				basePersistence.remove(primaryKey);
-			}
-			catch (Exception e) {
-				if (_log.isDebugEnabled()) {
-					_log.debug("The model with primary key " + primaryKey +
-						" was already deleted");
-				}
-			}
+	@BeforeClass
+	public static void setupClass() throws TemplateException {
+		try {
+			DBUpgrader.upgrade();
+		}
+		catch (Exception e) {
+			_log.error(e, e);
 		}
 
-		_transactionalPersistenceAdvice.reset();
+		TemplateManagerUtil.init();
+	}
+
+	@Before
+	public void setUp() {
+		_modelListeners = _persistence.getListeners();
+
+		for (ModelListener<JournalFeed> modelListener : _modelListeners) {
+			_persistence.unregisterListener(modelListener);
+		}
+	}
+
+	@After
+	public void tearDown() throws Exception {
+		Iterator<JournalFeed> iterator = _journalFeeds.iterator();
+
+		while (iterator.hasNext()) {
+			_persistence.remove(iterator.next());
+
+			iterator.remove();
+		}
+
+		for (ModelListener<JournalFeed> modelListener : _modelListeners) {
+			_persistence.registerListener(modelListener);
+		}
 	}
 
 	@Test
 	public void testCreate() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		JournalFeed journalFeed = _persistence.create(pk);
 
@@ -112,55 +135,55 @@ public class JournalFeedPersistenceTest {
 
 	@Test
 	public void testUpdateExisting() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		JournalFeed newJournalFeed = _persistence.create(pk);
 
-		newJournalFeed.setUuid(ServiceTestUtil.randomString());
+		newJournalFeed.setUuid(RandomTestUtil.randomString());
 
-		newJournalFeed.setGroupId(ServiceTestUtil.nextLong());
+		newJournalFeed.setGroupId(RandomTestUtil.nextLong());
 
-		newJournalFeed.setCompanyId(ServiceTestUtil.nextLong());
+		newJournalFeed.setCompanyId(RandomTestUtil.nextLong());
 
-		newJournalFeed.setUserId(ServiceTestUtil.nextLong());
+		newJournalFeed.setUserId(RandomTestUtil.nextLong());
 
-		newJournalFeed.setUserName(ServiceTestUtil.randomString());
+		newJournalFeed.setUserName(RandomTestUtil.randomString());
 
-		newJournalFeed.setCreateDate(ServiceTestUtil.nextDate());
+		newJournalFeed.setCreateDate(RandomTestUtil.nextDate());
 
-		newJournalFeed.setModifiedDate(ServiceTestUtil.nextDate());
+		newJournalFeed.setModifiedDate(RandomTestUtil.nextDate());
 
-		newJournalFeed.setFeedId(ServiceTestUtil.randomString());
+		newJournalFeed.setFeedId(RandomTestUtil.randomString());
 
-		newJournalFeed.setName(ServiceTestUtil.randomString());
+		newJournalFeed.setName(RandomTestUtil.randomString());
 
-		newJournalFeed.setDescription(ServiceTestUtil.randomString());
+		newJournalFeed.setDescription(RandomTestUtil.randomString());
 
-		newJournalFeed.setType(ServiceTestUtil.randomString());
+		newJournalFeed.setType(RandomTestUtil.randomString());
 
-		newJournalFeed.setStructureId(ServiceTestUtil.randomString());
+		newJournalFeed.setStructureId(RandomTestUtil.randomString());
 
-		newJournalFeed.setTemplateId(ServiceTestUtil.randomString());
+		newJournalFeed.setTemplateId(RandomTestUtil.randomString());
 
-		newJournalFeed.setRendererTemplateId(ServiceTestUtil.randomString());
+		newJournalFeed.setRendererTemplateId(RandomTestUtil.randomString());
 
-		newJournalFeed.setDelta(ServiceTestUtil.nextInt());
+		newJournalFeed.setDelta(RandomTestUtil.nextInt());
 
-		newJournalFeed.setOrderByCol(ServiceTestUtil.randomString());
+		newJournalFeed.setOrderByCol(RandomTestUtil.randomString());
 
-		newJournalFeed.setOrderByType(ServiceTestUtil.randomString());
+		newJournalFeed.setOrderByType(RandomTestUtil.randomString());
 
-		newJournalFeed.setTargetLayoutFriendlyUrl(ServiceTestUtil.randomString());
+		newJournalFeed.setTargetLayoutFriendlyUrl(RandomTestUtil.randomString());
 
-		newJournalFeed.setTargetPortletId(ServiceTestUtil.randomString());
+		newJournalFeed.setTargetPortletId(RandomTestUtil.randomString());
 
-		newJournalFeed.setContentField(ServiceTestUtil.randomString());
+		newJournalFeed.setContentField(RandomTestUtil.randomString());
 
-		newJournalFeed.setFeedFormat(ServiceTestUtil.randomString());
+		newJournalFeed.setFeedFormat(RandomTestUtil.randomString());
 
-		newJournalFeed.setFeedVersion(ServiceTestUtil.nextDouble());
+		newJournalFeed.setFeedVersion(RandomTestUtil.nextDouble());
 
-		_persistence.update(newJournalFeed);
+		_journalFeeds.add(_persistence.update(newJournalFeed));
 
 		JournalFeed existingJournalFeed = _persistence.findByPrimaryKey(newJournalFeed.getPrimaryKey());
 
@@ -214,6 +237,76 @@ public class JournalFeedPersistenceTest {
 	}
 
 	@Test
+	public void testCountByUuid() {
+		try {
+			_persistence.countByUuid(StringPool.BLANK);
+
+			_persistence.countByUuid(StringPool.NULL);
+
+			_persistence.countByUuid((String)null);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByUUID_G() {
+		try {
+			_persistence.countByUUID_G(StringPool.BLANK,
+				RandomTestUtil.nextLong());
+
+			_persistence.countByUUID_G(StringPool.NULL, 0L);
+
+			_persistence.countByUUID_G((String)null, 0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByUuid_C() {
+		try {
+			_persistence.countByUuid_C(StringPool.BLANK,
+				RandomTestUtil.nextLong());
+
+			_persistence.countByUuid_C(StringPool.NULL, 0L);
+
+			_persistence.countByUuid_C((String)null, 0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByGroupId() {
+		try {
+			_persistence.countByGroupId(RandomTestUtil.nextLong());
+
+			_persistence.countByGroupId(0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByG_F() {
+		try {
+			_persistence.countByG_F(RandomTestUtil.nextLong(), StringPool.BLANK);
+
+			_persistence.countByG_F(0L, StringPool.NULL);
+
+			_persistence.countByG_F(0L, (String)null);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
 	public void testFindByPrimaryKeyExisting() throws Exception {
 		JournalFeed newJournalFeed = addJournalFeed();
 
@@ -224,7 +317,7 @@ public class JournalFeedPersistenceTest {
 
 	@Test
 	public void testFindByPrimaryKeyMissing() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		try {
 			_persistence.findByPrimaryKey(pk);
@@ -257,7 +350,7 @@ public class JournalFeedPersistenceTest {
 		}
 	}
 
-	protected OrderByComparator getOrderByComparator() {
+	protected OrderByComparator<JournalFeed> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create("JournalFeed", "uuid", true,
 			"id", true, "groupId", true, "companyId", true, "userId", true,
 			"userName", true, "createDate", true, "modifiedDate", true,
@@ -279,7 +372,7 @@ public class JournalFeedPersistenceTest {
 
 	@Test
 	public void testFetchByPrimaryKeyMissing() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		JournalFeed missingJournalFeed = _persistence.fetchByPrimaryKey(pk);
 
@@ -287,19 +380,103 @@ public class JournalFeedPersistenceTest {
 	}
 
 	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
+		throws Exception {
+		JournalFeed newJournalFeed1 = addJournalFeed();
+		JournalFeed newJournalFeed2 = addJournalFeed();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newJournalFeed1.getPrimaryKey());
+		primaryKeys.add(newJournalFeed2.getPrimaryKey());
+
+		Map<Serializable, JournalFeed> journalFeeds = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(2, journalFeeds.size());
+		Assert.assertEquals(newJournalFeed1,
+			journalFeeds.get(newJournalFeed1.getPrimaryKey()));
+		Assert.assertEquals(newJournalFeed2,
+			journalFeeds.get(newJournalFeed2.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
+		throws Exception {
+		long pk1 = RandomTestUtil.nextLong();
+
+		long pk2 = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(pk1);
+		primaryKeys.add(pk2);
+
+		Map<Serializable, JournalFeed> journalFeeds = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(journalFeeds.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
+		throws Exception {
+		JournalFeed newJournalFeed = addJournalFeed();
+
+		long pk = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newJournalFeed.getPrimaryKey());
+		primaryKeys.add(pk);
+
+		Map<Serializable, JournalFeed> journalFeeds = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, journalFeeds.size());
+		Assert.assertEquals(newJournalFeed,
+			journalFeeds.get(newJournalFeed.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
+		throws Exception {
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		Map<Serializable, JournalFeed> journalFeeds = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(journalFeeds.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithOnePrimaryKey()
+		throws Exception {
+		JournalFeed newJournalFeed = addJournalFeed();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newJournalFeed.getPrimaryKey());
+
+		Map<Serializable, JournalFeed> journalFeeds = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, journalFeeds.size());
+		Assert.assertEquals(newJournalFeed,
+			journalFeeds.get(newJournalFeed.getPrimaryKey()));
+	}
+
+	@Test
 	public void testActionableDynamicQuery() throws Exception {
 		final IntegerWrapper count = new IntegerWrapper();
 
-		ActionableDynamicQuery actionableDynamicQuery = new JournalFeedActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = JournalFeedLocalServiceUtil.getActionableDynamicQuery();
+
+		actionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod() {
 				@Override
-				protected void performAction(Object object) {
+				public void performAction(Object object) {
 					JournalFeed journalFeed = (JournalFeed)object;
 
 					Assert.assertNotNull(journalFeed);
 
 					count.increment();
 				}
-			};
+			});
 
 		actionableDynamicQuery.performActions();
 
@@ -331,7 +508,7 @@ public class JournalFeedPersistenceTest {
 				JournalFeed.class.getClassLoader());
 
 		dynamicQuery.add(RestrictionsFactoryUtil.eq("id",
-				ServiceTestUtil.nextLong()));
+				RandomTestUtil.nextLong()));
 
 		List<JournalFeed> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -369,7 +546,7 @@ public class JournalFeedPersistenceTest {
 		dynamicQuery.setProjection(ProjectionFactoryUtil.property("id"));
 
 		dynamicQuery.add(RestrictionsFactoryUtil.in("id",
-				new Object[] { ServiceTestUtil.nextLong() }));
+				new Object[] { RandomTestUtil.nextLong() }));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -402,60 +579,61 @@ public class JournalFeedPersistenceTest {
 	}
 
 	protected JournalFeed addJournalFeed() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		JournalFeed journalFeed = _persistence.create(pk);
 
-		journalFeed.setUuid(ServiceTestUtil.randomString());
+		journalFeed.setUuid(RandomTestUtil.randomString());
 
-		journalFeed.setGroupId(ServiceTestUtil.nextLong());
+		journalFeed.setGroupId(RandomTestUtil.nextLong());
 
-		journalFeed.setCompanyId(ServiceTestUtil.nextLong());
+		journalFeed.setCompanyId(RandomTestUtil.nextLong());
 
-		journalFeed.setUserId(ServiceTestUtil.nextLong());
+		journalFeed.setUserId(RandomTestUtil.nextLong());
 
-		journalFeed.setUserName(ServiceTestUtil.randomString());
+		journalFeed.setUserName(RandomTestUtil.randomString());
 
-		journalFeed.setCreateDate(ServiceTestUtil.nextDate());
+		journalFeed.setCreateDate(RandomTestUtil.nextDate());
 
-		journalFeed.setModifiedDate(ServiceTestUtil.nextDate());
+		journalFeed.setModifiedDate(RandomTestUtil.nextDate());
 
-		journalFeed.setFeedId(ServiceTestUtil.randomString());
+		journalFeed.setFeedId(RandomTestUtil.randomString());
 
-		journalFeed.setName(ServiceTestUtil.randomString());
+		journalFeed.setName(RandomTestUtil.randomString());
 
-		journalFeed.setDescription(ServiceTestUtil.randomString());
+		journalFeed.setDescription(RandomTestUtil.randomString());
 
-		journalFeed.setType(ServiceTestUtil.randomString());
+		journalFeed.setType(RandomTestUtil.randomString());
 
-		journalFeed.setStructureId(ServiceTestUtil.randomString());
+		journalFeed.setStructureId(RandomTestUtil.randomString());
 
-		journalFeed.setTemplateId(ServiceTestUtil.randomString());
+		journalFeed.setTemplateId(RandomTestUtil.randomString());
 
-		journalFeed.setRendererTemplateId(ServiceTestUtil.randomString());
+		journalFeed.setRendererTemplateId(RandomTestUtil.randomString());
 
-		journalFeed.setDelta(ServiceTestUtil.nextInt());
+		journalFeed.setDelta(RandomTestUtil.nextInt());
 
-		journalFeed.setOrderByCol(ServiceTestUtil.randomString());
+		journalFeed.setOrderByCol(RandomTestUtil.randomString());
 
-		journalFeed.setOrderByType(ServiceTestUtil.randomString());
+		journalFeed.setOrderByType(RandomTestUtil.randomString());
 
-		journalFeed.setTargetLayoutFriendlyUrl(ServiceTestUtil.randomString());
+		journalFeed.setTargetLayoutFriendlyUrl(RandomTestUtil.randomString());
 
-		journalFeed.setTargetPortletId(ServiceTestUtil.randomString());
+		journalFeed.setTargetPortletId(RandomTestUtil.randomString());
 
-		journalFeed.setContentField(ServiceTestUtil.randomString());
+		journalFeed.setContentField(RandomTestUtil.randomString());
 
-		journalFeed.setFeedFormat(ServiceTestUtil.randomString());
+		journalFeed.setFeedFormat(RandomTestUtil.randomString());
 
-		journalFeed.setFeedVersion(ServiceTestUtil.nextDouble());
+		journalFeed.setFeedVersion(RandomTestUtil.nextDouble());
 
-		_persistence.update(journalFeed);
+		_journalFeeds.add(_persistence.update(journalFeed));
 
 		return journalFeed;
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(JournalFeedPersistenceTest.class);
-	private JournalFeedPersistence _persistence = (JournalFeedPersistence)PortalBeanLocatorUtil.locate(JournalFeedPersistence.class.getName());
-	private TransactionalPersistenceAdvice _transactionalPersistenceAdvice = (TransactionalPersistenceAdvice)PortalBeanLocatorUtil.locate(TransactionalPersistenceAdvice.class.getName());
+	private List<JournalFeed> _journalFeeds = new ArrayList<JournalFeed>();
+	private ModelListener<JournalFeed>[] _modelListeners;
+	private JournalFeedPersistence _persistence = JournalFeedUtil.getPersistence();
 }

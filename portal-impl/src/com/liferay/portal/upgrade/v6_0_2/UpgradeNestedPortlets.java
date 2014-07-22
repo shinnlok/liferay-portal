@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -64,11 +64,12 @@ public class UpgradeNestedPortlets extends UpgradeProcess {
 						nestedColumnIds, StringPool.UNDERLINE);
 
 					if (underlineCount == _UNDERLINE_COUNT) {
-						String newNestedColumnIds = nestedColumnIds.replaceAll(
-							_pattern.pattern(), "_$1_$2");
+						String newNestedColumnIds =
+							"_" + matcher.group(1) + "_" + matcher.group(2);
 
-						newTypeSettings = newTypeSettings.replaceAll(
-							nestedColumnIds, newNestedColumnIds);
+						newTypeSettings = StringUtil.replace(
+							newTypeSettings, nestedColumnIds,
+							newNestedColumnIds);
 					}
 				}
 

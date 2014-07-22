@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portal.service.persistence;
 
 import com.liferay.portal.NoSuchWorkflowInstanceLinkException;
-import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
@@ -24,63 +23,86 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.test.ExecutionTestListeners;
+import com.liferay.portal.kernel.template.TemplateException;
+import com.liferay.portal.kernel.template.TemplateManagerUtil;
+import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.util.IntegerWrapper;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
 import com.liferay.portal.kernel.util.Time;
+import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.WorkflowInstanceLink;
-import com.liferay.portal.service.ServiceTestUtil;
-import com.liferay.portal.service.persistence.BasePersistence;
-import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
-import com.liferay.portal.test.LiferayPersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.test.persistence.TransactionalPersistenceAdvice;
+import com.liferay.portal.service.WorkflowInstanceLinkLocalServiceUtil;
+import com.liferay.portal.test.TransactionalTestRule;
+import com.liferay.portal.test.runners.LiferayIntegrationJUnitTestRunner;
+import com.liferay.portal.tools.DBUpgrader;
+import com.liferay.portal.util.test.RandomTestUtil;
 
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 
 import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 /**
- * @author Brian Wing Shun Chan
+ * @generated
  */
-@ExecutionTestListeners(listeners =  {
-	PersistenceExecutionTestListener.class})
-@RunWith(LiferayPersistenceIntegrationJUnitTestRunner.class)
+@RunWith(LiferayIntegrationJUnitTestRunner.class)
 public class WorkflowInstanceLinkPersistenceTest {
-	@After
-	public void tearDown() throws Exception {
-		Map<Serializable, BasePersistence<?>> basePersistences = _transactionalPersistenceAdvice.getBasePersistences();
+	@ClassRule
+	public static TransactionalTestRule transactionalTestRule = new TransactionalTestRule(Propagation.REQUIRED);
 
-		Set<Serializable> primaryKeys = basePersistences.keySet();
-
-		for (Serializable primaryKey : primaryKeys) {
-			BasePersistence<?> basePersistence = basePersistences.get(primaryKey);
-
-			try {
-				basePersistence.remove(primaryKey);
-			}
-			catch (Exception e) {
-				if (_log.isDebugEnabled()) {
-					_log.debug("The model with primary key " + primaryKey +
-						" was already deleted");
-				}
-			}
+	@BeforeClass
+	public static void setupClass() throws TemplateException {
+		try {
+			DBUpgrader.upgrade();
+		}
+		catch (Exception e) {
+			_log.error(e, e);
 		}
 
-		_transactionalPersistenceAdvice.reset();
+		TemplateManagerUtil.init();
+	}
+
+	@Before
+	public void setUp() {
+		_modelListeners = _persistence.getListeners();
+
+		for (ModelListener<WorkflowInstanceLink> modelListener : _modelListeners) {
+			_persistence.unregisterListener(modelListener);
+		}
+	}
+
+	@After
+	public void tearDown() throws Exception {
+		Iterator<WorkflowInstanceLink> iterator = _workflowInstanceLinks.iterator();
+
+		while (iterator.hasNext()) {
+			_persistence.remove(iterator.next());
+
+			iterator.remove();
+		}
+
+		for (ModelListener<WorkflowInstanceLink> modelListener : _modelListeners) {
+			_persistence.registerListener(modelListener);
+		}
 	}
 
 	@Test
 	public void testCreate() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		WorkflowInstanceLink workflowInstanceLink = _persistence.create(pk);
 
@@ -107,32 +129,36 @@ public class WorkflowInstanceLinkPersistenceTest {
 
 	@Test
 	public void testUpdateExisting() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		WorkflowInstanceLink newWorkflowInstanceLink = _persistence.create(pk);
 
-		newWorkflowInstanceLink.setGroupId(ServiceTestUtil.nextLong());
+		newWorkflowInstanceLink.setMvccVersion(RandomTestUtil.nextLong());
 
-		newWorkflowInstanceLink.setCompanyId(ServiceTestUtil.nextLong());
+		newWorkflowInstanceLink.setGroupId(RandomTestUtil.nextLong());
 
-		newWorkflowInstanceLink.setUserId(ServiceTestUtil.nextLong());
+		newWorkflowInstanceLink.setCompanyId(RandomTestUtil.nextLong());
 
-		newWorkflowInstanceLink.setUserName(ServiceTestUtil.randomString());
+		newWorkflowInstanceLink.setUserId(RandomTestUtil.nextLong());
 
-		newWorkflowInstanceLink.setCreateDate(ServiceTestUtil.nextDate());
+		newWorkflowInstanceLink.setUserName(RandomTestUtil.randomString());
 
-		newWorkflowInstanceLink.setModifiedDate(ServiceTestUtil.nextDate());
+		newWorkflowInstanceLink.setCreateDate(RandomTestUtil.nextDate());
 
-		newWorkflowInstanceLink.setClassNameId(ServiceTestUtil.nextLong());
+		newWorkflowInstanceLink.setModifiedDate(RandomTestUtil.nextDate());
 
-		newWorkflowInstanceLink.setClassPK(ServiceTestUtil.nextLong());
+		newWorkflowInstanceLink.setClassNameId(RandomTestUtil.nextLong());
 
-		newWorkflowInstanceLink.setWorkflowInstanceId(ServiceTestUtil.nextLong());
+		newWorkflowInstanceLink.setClassPK(RandomTestUtil.nextLong());
 
-		_persistence.update(newWorkflowInstanceLink);
+		newWorkflowInstanceLink.setWorkflowInstanceId(RandomTestUtil.nextLong());
+
+		_workflowInstanceLinks.add(_persistence.update(newWorkflowInstanceLink));
 
 		WorkflowInstanceLink existingWorkflowInstanceLink = _persistence.findByPrimaryKey(newWorkflowInstanceLink.getPrimaryKey());
 
+		Assert.assertEquals(existingWorkflowInstanceLink.getMvccVersion(),
+			newWorkflowInstanceLink.getMvccVersion());
 		Assert.assertEquals(existingWorkflowInstanceLink.getWorkflowInstanceLinkId(),
 			newWorkflowInstanceLink.getWorkflowInstanceLinkId());
 		Assert.assertEquals(existingWorkflowInstanceLink.getGroupId(),
@@ -158,6 +184,20 @@ public class WorkflowInstanceLinkPersistenceTest {
 	}
 
 	@Test
+	public void testCountByG_C_C_C() {
+		try {
+			_persistence.countByG_C_C_C(RandomTestUtil.nextLong(),
+				RandomTestUtil.nextLong(), RandomTestUtil.nextLong(),
+				RandomTestUtil.nextLong());
+
+			_persistence.countByG_C_C_C(0L, 0L, 0L, 0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
 	public void testFindByPrimaryKeyExisting() throws Exception {
 		WorkflowInstanceLink newWorkflowInstanceLink = addWorkflowInstanceLink();
 
@@ -169,7 +209,7 @@ public class WorkflowInstanceLinkPersistenceTest {
 
 	@Test
 	public void testFindByPrimaryKeyMissing() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		try {
 			_persistence.findByPrimaryKey(pk);
@@ -192,12 +232,12 @@ public class WorkflowInstanceLinkPersistenceTest {
 		}
 	}
 
-	protected OrderByComparator getOrderByComparator() {
+	protected OrderByComparator<WorkflowInstanceLink> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create("WorkflowInstanceLink",
-			"workflowInstanceLinkId", true, "groupId", true, "companyId", true,
-			"userId", true, "userName", true, "createDate", true,
-			"modifiedDate", true, "classNameId", true, "classPK", true,
-			"workflowInstanceId", true);
+			"mvccVersion", true, "workflowInstanceLinkId", true, "groupId",
+			true, "companyId", true, "userId", true, "userName", true,
+			"createDate", true, "modifiedDate", true, "classNameId", true,
+			"classPK", true, "workflowInstanceId", true);
 	}
 
 	@Test
@@ -212,7 +252,7 @@ public class WorkflowInstanceLinkPersistenceTest {
 
 	@Test
 	public void testFetchByPrimaryKeyMissing() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		WorkflowInstanceLink missingWorkflowInstanceLink = _persistence.fetchByPrimaryKey(pk);
 
@@ -220,19 +260,103 @@ public class WorkflowInstanceLinkPersistenceTest {
 	}
 
 	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
+		throws Exception {
+		WorkflowInstanceLink newWorkflowInstanceLink1 = addWorkflowInstanceLink();
+		WorkflowInstanceLink newWorkflowInstanceLink2 = addWorkflowInstanceLink();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newWorkflowInstanceLink1.getPrimaryKey());
+		primaryKeys.add(newWorkflowInstanceLink2.getPrimaryKey());
+
+		Map<Serializable, WorkflowInstanceLink> workflowInstanceLinks = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(2, workflowInstanceLinks.size());
+		Assert.assertEquals(newWorkflowInstanceLink1,
+			workflowInstanceLinks.get(newWorkflowInstanceLink1.getPrimaryKey()));
+		Assert.assertEquals(newWorkflowInstanceLink2,
+			workflowInstanceLinks.get(newWorkflowInstanceLink2.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
+		throws Exception {
+		long pk1 = RandomTestUtil.nextLong();
+
+		long pk2 = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(pk1);
+		primaryKeys.add(pk2);
+
+		Map<Serializable, WorkflowInstanceLink> workflowInstanceLinks = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(workflowInstanceLinks.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
+		throws Exception {
+		WorkflowInstanceLink newWorkflowInstanceLink = addWorkflowInstanceLink();
+
+		long pk = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newWorkflowInstanceLink.getPrimaryKey());
+		primaryKeys.add(pk);
+
+		Map<Serializable, WorkflowInstanceLink> workflowInstanceLinks = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, workflowInstanceLinks.size());
+		Assert.assertEquals(newWorkflowInstanceLink,
+			workflowInstanceLinks.get(newWorkflowInstanceLink.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
+		throws Exception {
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		Map<Serializable, WorkflowInstanceLink> workflowInstanceLinks = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(workflowInstanceLinks.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithOnePrimaryKey()
+		throws Exception {
+		WorkflowInstanceLink newWorkflowInstanceLink = addWorkflowInstanceLink();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newWorkflowInstanceLink.getPrimaryKey());
+
+		Map<Serializable, WorkflowInstanceLink> workflowInstanceLinks = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, workflowInstanceLinks.size());
+		Assert.assertEquals(newWorkflowInstanceLink,
+			workflowInstanceLinks.get(newWorkflowInstanceLink.getPrimaryKey()));
+	}
+
+	@Test
 	public void testActionableDynamicQuery() throws Exception {
 		final IntegerWrapper count = new IntegerWrapper();
 
-		ActionableDynamicQuery actionableDynamicQuery = new WorkflowInstanceLinkActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = WorkflowInstanceLinkLocalServiceUtil.getActionableDynamicQuery();
+
+		actionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod() {
 				@Override
-				protected void performAction(Object object) {
+				public void performAction(Object object) {
 					WorkflowInstanceLink workflowInstanceLink = (WorkflowInstanceLink)object;
 
 					Assert.assertNotNull(workflowInstanceLink);
 
 					count.increment();
 				}
-			};
+			});
 
 		actionableDynamicQuery.performActions();
 
@@ -266,7 +390,7 @@ public class WorkflowInstanceLinkPersistenceTest {
 				WorkflowInstanceLink.class.getClassLoader());
 
 		dynamicQuery.add(RestrictionsFactoryUtil.eq("workflowInstanceLinkId",
-				ServiceTestUtil.nextLong()));
+				RandomTestUtil.nextLong()));
 
 		List<WorkflowInstanceLink> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -308,7 +432,7 @@ public class WorkflowInstanceLinkPersistenceTest {
 				"workflowInstanceLinkId"));
 
 		dynamicQuery.add(RestrictionsFactoryUtil.in("workflowInstanceLinkId",
-				new Object[] { ServiceTestUtil.nextLong() }));
+				new Object[] { RandomTestUtil.nextLong() }));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -317,34 +441,37 @@ public class WorkflowInstanceLinkPersistenceTest {
 
 	protected WorkflowInstanceLink addWorkflowInstanceLink()
 		throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		WorkflowInstanceLink workflowInstanceLink = _persistence.create(pk);
 
-		workflowInstanceLink.setGroupId(ServiceTestUtil.nextLong());
+		workflowInstanceLink.setMvccVersion(RandomTestUtil.nextLong());
 
-		workflowInstanceLink.setCompanyId(ServiceTestUtil.nextLong());
+		workflowInstanceLink.setGroupId(RandomTestUtil.nextLong());
 
-		workflowInstanceLink.setUserId(ServiceTestUtil.nextLong());
+		workflowInstanceLink.setCompanyId(RandomTestUtil.nextLong());
 
-		workflowInstanceLink.setUserName(ServiceTestUtil.randomString());
+		workflowInstanceLink.setUserId(RandomTestUtil.nextLong());
 
-		workflowInstanceLink.setCreateDate(ServiceTestUtil.nextDate());
+		workflowInstanceLink.setUserName(RandomTestUtil.randomString());
 
-		workflowInstanceLink.setModifiedDate(ServiceTestUtil.nextDate());
+		workflowInstanceLink.setCreateDate(RandomTestUtil.nextDate());
 
-		workflowInstanceLink.setClassNameId(ServiceTestUtil.nextLong());
+		workflowInstanceLink.setModifiedDate(RandomTestUtil.nextDate());
 
-		workflowInstanceLink.setClassPK(ServiceTestUtil.nextLong());
+		workflowInstanceLink.setClassNameId(RandomTestUtil.nextLong());
 
-		workflowInstanceLink.setWorkflowInstanceId(ServiceTestUtil.nextLong());
+		workflowInstanceLink.setClassPK(RandomTestUtil.nextLong());
 
-		_persistence.update(workflowInstanceLink);
+		workflowInstanceLink.setWorkflowInstanceId(RandomTestUtil.nextLong());
+
+		_workflowInstanceLinks.add(_persistence.update(workflowInstanceLink));
 
 		return workflowInstanceLink;
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(WorkflowInstanceLinkPersistenceTest.class);
-	private WorkflowInstanceLinkPersistence _persistence = (WorkflowInstanceLinkPersistence)PortalBeanLocatorUtil.locate(WorkflowInstanceLinkPersistence.class.getName());
-	private TransactionalPersistenceAdvice _transactionalPersistenceAdvice = (TransactionalPersistenceAdvice)PortalBeanLocatorUtil.locate(TransactionalPersistenceAdvice.class.getName());
+	private List<WorkflowInstanceLink> _workflowInstanceLinks = new ArrayList<WorkflowInstanceLink>();
+	private ModelListener<WorkflowInstanceLink>[] _modelListeners;
+	private WorkflowInstanceLinkPersistence _persistence = WorkflowInstanceLinkUtil.getPersistence();
 }

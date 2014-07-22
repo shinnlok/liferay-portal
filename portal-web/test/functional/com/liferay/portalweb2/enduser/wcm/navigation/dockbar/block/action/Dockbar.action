@@ -1,39 +1,7 @@
 <definition>
 	<command name="assertClick">
-		<case locator-key1="ADD">
-			<execute function="AssertClick#assertTextClickAtClickSidebar" />
-		</case>
-
-		<case locator-key1="ADD_APPLICATION_LINK">
-			<execute function="AssertClick#assertTextClickAtAddApplication" />
-		</case>
-
-		<case locator-key1="ADD_CONTENT_LINK">
-			<execute function="AssertClick#assertTextClickAtAddApplication" />
-		</case>
-
-		<case locator-key1="ADD_PAGE_LINK">
-			<execute function="AssertClick#assertTextClickAtAddApplication" />
-		</case>
-
 		<case locator-key1="ADMIN">
 			<execute function="AssertClick#assertTextClickAtClickDockbar" />
-		</case>
-
-		<case locator-key1="USER_MY_DASHBOARD">
-			<execute function="AssertClick#assertTextClickAtAndWait" />
-		</case>
-
-		<case locator-key1="USER_MY_ACCOUNT">
-			<execute function="AssertClick#assertTextClickAtAndWait" />
-		</case>
-
-		<case locator-key1="USER_NAME">
-			<execute function="AssertClick#assertTextClickAtAndWait" />
-		</case>
-
-		<case comparator="startsWith" locator-key1="ADMIN_SITE_ADMINISTRATION">
-			<execute function="AssertClick#assertTextClickAtAndWait" />
 		</case>
 
 		<case comparator="contains" locator1="//span[@data-title=">
@@ -47,13 +15,37 @@
 		</case>
 	</command>
 
+	<command name="assertElementPresent">
+		<case comparator="contains" locator1="//div[@id='_145_embeddedPortletsContent']">
+			<execute function="AssertElementPresent#pauseAssertVisible" />
+		</case>
+	</command>
+
+	<command name="assertNotVisible">
+		<case comparator="startsWith" locator1="//span[@data-title='">
+			<execute function="AssertVisible#pauseAssertVisible" />
+		</case>
+	</command>
+
+	<command name="assertTextEquals">
+		<case locator-key1="PAGE_INFO_MESSAGE">
+			<execute function="AssertTextEquals#assertPartialText" />
+		</case>
+	</command>
+
+	<command name="assertVisible">
+		<case comparator="startsWith" locator1="//span[@data-title='">
+			<execute function="AssertVisible#pauseAssertVisible" />
+		</case>
+	</command>
+
 	<command name="click">
 		<case locator-key1="ADD">
-			<execute function="Click#clickAtSidebarClickAt" />
+			<execute function="Click#clickAtSidebarClickAtWaitForScript" />
 		</case>
 
 		<case locator-key1="ADMIN">
-			<execute function="Click#textClickAtClickDockbar" value1="Admin" />
+			<execute function="Click#textClickAtClickDockbar" />
 		</case>
 
 		<case locator-key1="EDIT">
@@ -61,11 +53,11 @@
 		</case>
 
 		<case locator-key1="MY_SITES">
-			<execute function="Click#textClickAtClickDockbar" value1="My Sites" />
+			<execute function="Click#textClickAtClickDockbar" />
 		</case>
 
-		<case locator-key1="USER_SIGN_OUT">
-			<execute function="Click#textClickAtAndWait" value1="Sign Out" />
+		<case locator-key1="PREVIEW">
+			<execute function="Click#clickAtSidebarClickAt" />
 		</case>
 
 		<case comparator="startsWith" locator1="//span[@data-title='">
@@ -76,12 +68,6 @@
 	<command name="isElementNotPresent">
 		<case comparator="startsWith" locator1="//div[@id='_145_">
 			<execute function="IsElementNotPresent#isNotVisible" />
-		</case>
-	</command>
-
-	<command name="type">
-		<case locator-key1="ADD_APPLICATION_SEARCH_FIELD">
-			<execute function="Type#sendKeysApplicationSearch" />
 		</case>
 	</command>
 </definition>

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portal.service.persistence;
 
 import com.liferay.portal.NoSuchCountryException;
-import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
@@ -23,64 +22,87 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.test.ExecutionTestListeners;
+import com.liferay.portal.kernel.template.TemplateException;
+import com.liferay.portal.kernel.template.TemplateManagerUtil;
+import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Country;
+import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.impl.CountryModelImpl;
-import com.liferay.portal.service.ServiceTestUtil;
-import com.liferay.portal.service.persistence.BasePersistence;
-import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
-import com.liferay.portal.test.LiferayPersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.test.persistence.TransactionalPersistenceAdvice;
+import com.liferay.portal.test.TransactionalTestRule;
+import com.liferay.portal.test.runners.LiferayIntegrationJUnitTestRunner;
+import com.liferay.portal.tools.DBUpgrader;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.portal.util.test.RandomTestUtil;
 
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 
 import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 /**
- * @author Brian Wing Shun Chan
+ * @generated
  */
-@ExecutionTestListeners(listeners =  {
-	PersistenceExecutionTestListener.class})
-@RunWith(LiferayPersistenceIntegrationJUnitTestRunner.class)
+@RunWith(LiferayIntegrationJUnitTestRunner.class)
 public class CountryPersistenceTest {
-	@After
-	public void tearDown() throws Exception {
-		Map<Serializable, BasePersistence<?>> basePersistences = _transactionalPersistenceAdvice.getBasePersistences();
+	@ClassRule
+	public static TransactionalTestRule transactionalTestRule = new TransactionalTestRule(Propagation.REQUIRED);
 
-		Set<Serializable> primaryKeys = basePersistences.keySet();
-
-		for (Serializable primaryKey : primaryKeys) {
-			BasePersistence<?> basePersistence = basePersistences.get(primaryKey);
-
-			try {
-				basePersistence.remove(primaryKey);
-			}
-			catch (Exception e) {
-				if (_log.isDebugEnabled()) {
-					_log.debug("The model with primary key " + primaryKey +
-						" was already deleted");
-				}
-			}
+	@BeforeClass
+	public static void setupClass() throws TemplateException {
+		try {
+			DBUpgrader.upgrade();
+		}
+		catch (Exception e) {
+			_log.error(e, e);
 		}
 
-		_transactionalPersistenceAdvice.reset();
+		TemplateManagerUtil.init();
+	}
+
+	@Before
+	public void setUp() {
+		_modelListeners = _persistence.getListeners();
+
+		for (ModelListener<Country> modelListener : _modelListeners) {
+			_persistence.unregisterListener(modelListener);
+		}
+	}
+
+	@After
+	public void tearDown() throws Exception {
+		Iterator<Country> iterator = _countries.iterator();
+
+		while (iterator.hasNext()) {
+			_persistence.remove(iterator.next());
+
+			iterator.remove();
+		}
+
+		for (ModelListener<Country> modelListener : _modelListeners) {
+			_persistence.registerListener(modelListener);
+		}
 	}
 
 	@Test
 	public void testCreate() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		Country country = _persistence.create(pk);
 
@@ -107,28 +129,32 @@ public class CountryPersistenceTest {
 
 	@Test
 	public void testUpdateExisting() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		Country newCountry = _persistence.create(pk);
 
-		newCountry.setName(ServiceTestUtil.randomString());
+		newCountry.setMvccVersion(RandomTestUtil.nextLong());
 
-		newCountry.setA2(ServiceTestUtil.randomString());
+		newCountry.setName(RandomTestUtil.randomString());
 
-		newCountry.setA3(ServiceTestUtil.randomString());
+		newCountry.setA2(RandomTestUtil.randomString());
 
-		newCountry.setNumber(ServiceTestUtil.randomString());
+		newCountry.setA3(RandomTestUtil.randomString());
 
-		newCountry.setIdd(ServiceTestUtil.randomString());
+		newCountry.setNumber(RandomTestUtil.randomString());
 
-		newCountry.setZipRequired(ServiceTestUtil.randomBoolean());
+		newCountry.setIdd(RandomTestUtil.randomString());
 
-		newCountry.setActive(ServiceTestUtil.randomBoolean());
+		newCountry.setZipRequired(RandomTestUtil.randomBoolean());
 
-		_persistence.update(newCountry);
+		newCountry.setActive(RandomTestUtil.randomBoolean());
+
+		_countries.add(_persistence.update(newCountry));
 
 		Country existingCountry = _persistence.findByPrimaryKey(newCountry.getPrimaryKey());
 
+		Assert.assertEquals(existingCountry.getMvccVersion(),
+			newCountry.getMvccVersion());
 		Assert.assertEquals(existingCountry.getCountryId(),
 			newCountry.getCountryId());
 		Assert.assertEquals(existingCountry.getName(), newCountry.getName());
@@ -142,6 +168,60 @@ public class CountryPersistenceTest {
 	}
 
 	@Test
+	public void testCountByName() {
+		try {
+			_persistence.countByName(StringPool.BLANK);
+
+			_persistence.countByName(StringPool.NULL);
+
+			_persistence.countByName((String)null);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByA2() {
+		try {
+			_persistence.countByA2(StringPool.BLANK);
+
+			_persistence.countByA2(StringPool.NULL);
+
+			_persistence.countByA2((String)null);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByA3() {
+		try {
+			_persistence.countByA3(StringPool.BLANK);
+
+			_persistence.countByA3(StringPool.NULL);
+
+			_persistence.countByA3((String)null);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByActive() {
+		try {
+			_persistence.countByActive(RandomTestUtil.randomBoolean());
+
+			_persistence.countByActive(RandomTestUtil.randomBoolean());
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
 	public void testFindByPrimaryKeyExisting() throws Exception {
 		Country newCountry = addCountry();
 
@@ -152,7 +232,7 @@ public class CountryPersistenceTest {
 
 	@Test
 	public void testFindByPrimaryKeyMissing() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		try {
 			_persistence.findByPrimaryKey(pk);
@@ -174,10 +254,10 @@ public class CountryPersistenceTest {
 		}
 	}
 
-	protected OrderByComparator getOrderByComparator() {
-		return OrderByComparatorFactoryUtil.create("Country", "countryId",
-			true, "name", true, "a2", true, "a3", true, "number", true, "idd",
-			true, "zipRequired", true, "active", true);
+	protected OrderByComparator<Country> getOrderByComparator() {
+		return OrderByComparatorFactoryUtil.create("Country", "mvccVersion",
+			true, "countryId", true, "name", true, "a2", true, "a3", true,
+			"number", true, "idd", true, "zipRequired", true, "active", true);
 	}
 
 	@Test
@@ -191,11 +271,93 @@ public class CountryPersistenceTest {
 
 	@Test
 	public void testFetchByPrimaryKeyMissing() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		Country missingCountry = _persistence.fetchByPrimaryKey(pk);
 
 		Assert.assertNull(missingCountry);
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
+		throws Exception {
+		Country newCountry1 = addCountry();
+		Country newCountry2 = addCountry();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newCountry1.getPrimaryKey());
+		primaryKeys.add(newCountry2.getPrimaryKey());
+
+		Map<Serializable, Country> countries = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(2, countries.size());
+		Assert.assertEquals(newCountry1,
+			countries.get(newCountry1.getPrimaryKey()));
+		Assert.assertEquals(newCountry2,
+			countries.get(newCountry2.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
+		throws Exception {
+		long pk1 = RandomTestUtil.nextLong();
+
+		long pk2 = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(pk1);
+		primaryKeys.add(pk2);
+
+		Map<Serializable, Country> countries = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(countries.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
+		throws Exception {
+		Country newCountry = addCountry();
+
+		long pk = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newCountry.getPrimaryKey());
+		primaryKeys.add(pk);
+
+		Map<Serializable, Country> countries = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, countries.size());
+		Assert.assertEquals(newCountry,
+			countries.get(newCountry.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
+		throws Exception {
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		Map<Serializable, Country> countries = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(countries.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithOnePrimaryKey()
+		throws Exception {
+		Country newCountry = addCountry();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newCountry.getPrimaryKey());
+
+		Map<Serializable, Country> countries = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, countries.size());
+		Assert.assertEquals(newCountry,
+			countries.get(newCountry.getPrimaryKey()));
 	}
 
 	@Test
@@ -224,7 +386,7 @@ public class CountryPersistenceTest {
 				Country.class.getClassLoader());
 
 		dynamicQuery.add(RestrictionsFactoryUtil.eq("countryId",
-				ServiceTestUtil.nextLong()));
+				RandomTestUtil.nextLong()));
 
 		List<Country> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -263,7 +425,7 @@ public class CountryPersistenceTest {
 		dynamicQuery.setProjection(ProjectionFactoryUtil.property("countryId"));
 
 		dynamicQuery.add(RestrictionsFactoryUtil.in("countryId",
-				new Object[] { ServiceTestUtil.nextLong() }));
+				new Object[] { RandomTestUtil.nextLong() }));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -293,30 +455,33 @@ public class CountryPersistenceTest {
 	}
 
 	protected Country addCountry() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		Country country = _persistence.create(pk);
 
-		country.setName(ServiceTestUtil.randomString());
+		country.setMvccVersion(RandomTestUtil.nextLong());
 
-		country.setA2(ServiceTestUtil.randomString());
+		country.setName(RandomTestUtil.randomString());
 
-		country.setA3(ServiceTestUtil.randomString());
+		country.setA2(RandomTestUtil.randomString());
 
-		country.setNumber(ServiceTestUtil.randomString());
+		country.setA3(RandomTestUtil.randomString());
 
-		country.setIdd(ServiceTestUtil.randomString());
+		country.setNumber(RandomTestUtil.randomString());
 
-		country.setZipRequired(ServiceTestUtil.randomBoolean());
+		country.setIdd(RandomTestUtil.randomString());
 
-		country.setActive(ServiceTestUtil.randomBoolean());
+		country.setZipRequired(RandomTestUtil.randomBoolean());
 
-		_persistence.update(country);
+		country.setActive(RandomTestUtil.randomBoolean());
+
+		_countries.add(_persistence.update(country));
 
 		return country;
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(CountryPersistenceTest.class);
-	private CountryPersistence _persistence = (CountryPersistence)PortalBeanLocatorUtil.locate(CountryPersistence.class.getName());
-	private TransactionalPersistenceAdvice _transactionalPersistenceAdvice = (TransactionalPersistenceAdvice)PortalBeanLocatorUtil.locate(TransactionalPersistenceAdvice.class.getName());
+	private List<Country> _countries = new ArrayList<Country>();
+	private ModelListener<Country>[] _modelListeners;
+	private CountryPersistence _persistence = CountryUtil.getPersistence();
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -57,23 +57,6 @@ public class DictionaryReader {
 	private class DictionaryIterator implements Iterator<DictionaryEntry> {
 
 		@Override
-		public DictionaryEntry next() {
-			if (!_calledHasNext) {
-				hasNext();
-			}
-
-			_calledHasNext = false;
-
-			if (StringPool.UTF8.equals(_encoding) &&
-				(_line.charAt(0) == _UNICODE_BYTE_ORDER_MARK)) {
-
-				_line = _line.substring(1);
-			}
-
-			return new DictionaryEntry(_line);
-		}
-
-		@Override
 		public boolean hasNext() {
 			if (!_calledHasNext) {
 				try {
@@ -91,6 +74,23 @@ public class DictionaryReader {
 			}
 
 			return false;
+		}
+
+		@Override
+		public DictionaryEntry next() {
+			if (!_calledHasNext) {
+				hasNext();
+			}
+
+			_calledHasNext = false;
+
+			if (StringPool.UTF8.equals(_encoding) &&
+				(_line.charAt(0) == _UNICODE_BYTE_ORDER_MARK)) {
+
+				_line = _line.substring(1);
+			}
+
+			return new DictionaryEntry(_line);
 		}
 
 		@Override

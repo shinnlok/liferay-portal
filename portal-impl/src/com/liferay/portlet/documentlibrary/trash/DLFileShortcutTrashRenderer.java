@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.documentlibrary.trash;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.trash.BaseTrashRenderer;
@@ -26,9 +25,12 @@ import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.asset.model.AssetRenderer;
 import com.liferay.portlet.documentlibrary.model.DLFileShortcut;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
+import com.liferay.portlet.documentlibrary.util.DLUtil;
 
 import java.util.Locale;
 
+import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
@@ -40,7 +42,7 @@ public class DLFileShortcutTrashRenderer extends BaseTrashRenderer {
 	public static final String TYPE = "shortcut";
 
 	public DLFileShortcutTrashRenderer(DLFileShortcut fileShortcut)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		_fileShortcut = fileShortcut;
 
@@ -59,6 +61,11 @@ public class DLFileShortcutTrashRenderer extends BaseTrashRenderer {
 	}
 
 	@Override
+	public String getIconCssClass() {
+		return DLUtil.getFileIconCssClass(_fileEntry.getExtension());
+	}
+
+	@Override
 	public String getIconPath(ThemeDisplay themeDisplay) {
 		return themeDisplay.getPathThemeImages() + "/file_system/small/" +
 			_fileEntry.getIcon() + ".png";
@@ -70,14 +77,16 @@ public class DLFileShortcutTrashRenderer extends BaseTrashRenderer {
 	}
 
 	@Override
-	public String getSummary(Locale locale) {
+	public String getSummary(
+		PortletRequest portletRequest, PortletResponse portletResponse) {
+
 		return HtmlUtil.stripHtml(_fileEntry.getDescription());
 	}
 
 	@Override
 	public String getTitle(Locale locale) {
 		return LanguageUtil.format(
-			locale, "shortcut-to-x", _fileShortcut.getToTitle());
+			locale, "shortcut-to-x", _fileShortcut.getToTitle(), false);
 	}
 
 	@Override

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,8 +25,7 @@
 		</style>
 
 		<%
-		String defaultKeywords = LanguageUtil.get(pageContext, "search") + StringPool.TRIPLE_PERIOD;
-		String unicodeDefaultKeywords = UnicodeFormatter.toString(defaultKeywords);
+		String defaultKeywords = LanguageUtil.get(request, "search") + StringPool.TRIPLE_PERIOD;
 
 		String keywords = ParamUtil.getString(request, "keywords", defaultKeywords);
 		%>
@@ -53,7 +52,7 @@
 			headerNames.add("name");
 			headerNames.add("content");
 
-			SearchContainer searchContainer = new SearchContainer(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM, SearchContainer.DEFAULT_DELTA, portletURL, headerNames, LanguageUtil.format(pageContext, "no-pages-were-found-that-matched-the-keywords-x", "<strong>" + HtmlUtil.escape(keywords) + "</strong>"));
+			SearchContainer searchContainer = new SearchContainer(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM, SearchContainer.DEFAULT_DELTA, portletURL, headerNames, LanguageUtil.format(request, "no-pages-were-found-that-matched-the-keywords-x", "<strong>" + HtmlUtil.escape(keywords) + "</strong>", false));
 
 			try {
 				Indexer indexer = IndexerRegistryUtil.getIndexer(JournalArticle.class);
@@ -63,12 +62,6 @@
 				searchContext.setAttribute("articleType", type);
 				searchContext.setGroupIds(null);
 				searchContext.setKeywords(keywords);
-
-				QueryConfig queryConfig = new QueryConfig();
-
-				queryConfig.setHighlightEnabled(true);
-
-				searchContext.setQueryConfig(queryConfig);
 
 				Hits hits = indexer.search(searchContext);
 
@@ -93,9 +86,12 @@
 
 					PortletURL summaryURL = PortletURLUtil.clone(portletURL, renderResponse);
 
-					Summary summary = indexer.getSummary(doc, locale, StringPool.BLANK, summaryURL);
+					Summary summary = indexer.getSummary(doc, StringPool.BLANK, summaryURL, renderRequest, renderResponse);
 
-					ResultRow row = new ResultRow(new Object[] {queryTerms, doc, summary}, i, i);
+					summary.setHighlight(PropsValues.INDEX_SEARCH_HIGHLIGHT_ENABLED);
+					summary.setQueryTerms(queryTerms);
+
+					ResultRow row = new ResultRow(new Object[] {doc, summary}, i, i);
 
 					// Position
 
@@ -105,9 +101,7 @@
 
 					// Title
 
-					String title = HtmlUtil.escape(summary.getTitle());
-
-					title = StringUtil.highlight(title, queryTerms);
+					String title = summary.getHighlightedTitle();
 
 					row.addText(title);
 
@@ -121,14 +115,9 @@
 				}
 			%>
 
-			<%
-			String taglibOnBlur = "if (this.value == '') { this.value = '" + unicodeDefaultKeywords + "'; }";
-			String taglibOnFocus = "if (this.value == '" + unicodeDefaultKeywords + "') { this.value = ''; }";
-			%>
-
-			<aui:input autoFocus="<%= windowState.equals(WindowState.MAXIMIZED) %>" cssClass="lfr-search-keywords" inlineField="<%= true %>" label="" name="keywords" onBlur="<%= taglibOnBlur %>" onFocus="<%= taglibOnFocus %>" size="30" title="search-web-content" type="text" value="<%= HtmlUtil.escape(keywords) %>" />
-
-			<aui:input align="absmiddle" alt='<%= LanguageUtil.get(pageContext, "search") %>' border="0" cssClass="lfr-search-button" inlineField="<%= true %>" label="" name="search" src='<%= themeDisplay.getPathThemeImages() + "/common/search.png" %>' title="search" type="image" />
+			<div class="form-search">
+				<liferay-ui:input-search name="keywords" placeholder='<%= LanguageUtil.get(locale, "keywords") %>' />
+			</div>
 
 			<div class="search-results">
 				<liferay-ui:search-speed hits="<%= hits %>" searchContainer="<%= searchContainer %>" />

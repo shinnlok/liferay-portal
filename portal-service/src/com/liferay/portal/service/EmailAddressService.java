@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -48,11 +48,40 @@ public interface EmailAddressService extends BaseService {
 	 */
 
 	/**
+	* @deprecated As of 6.2.0, replaced by {@link #addEmailAddress(String,
+	long, String, int, boolean, ServiceContext)}
+	*/
+	@java.lang.Deprecated
+	public com.liferay.portal.model.EmailAddress addEmailAddress(
+		java.lang.String className, long classPK, java.lang.String address,
+		int typeId, boolean primary)
+		throws com.liferay.portal.kernel.exception.PortalException;
+
+	public com.liferay.portal.model.EmailAddress addEmailAddress(
+		java.lang.String className, long classPK, java.lang.String address,
+		int typeId, boolean primary,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException;
+
+	public void deleteEmailAddress(long emailAddressId)
+		throws com.liferay.portal.kernel.exception.PortalException;
+
+	/**
 	* Returns the Spring bean ID for this bean.
 	*
 	* @return the Spring bean ID for this bean
 	*/
 	public java.lang.String getBeanIdentifier();
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portal.model.EmailAddress getEmailAddress(
+		long emailAddressId)
+		throws com.liferay.portal.kernel.exception.PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.portal.model.EmailAddress> getEmailAddresses(
+		java.lang.String className, long classPK)
+		throws com.liferay.portal.kernel.exception.PortalException;
 
 	/**
 	* Sets the Spring bean ID for this bean.
@@ -61,43 +90,8 @@ public interface EmailAddressService extends BaseService {
 	*/
 	public void setBeanIdentifier(java.lang.String beanIdentifier);
 
-	/**
-	* @deprecated As of 6.2.0, replaced by {@link #addEmailAddress( String,
-	long, String, int, boolean, ServiceContext)}
-	*/
-	@Deprecated
-	public com.liferay.portal.model.EmailAddress addEmailAddress(
-		java.lang.String className, long classPK, java.lang.String address,
-		int typeId, boolean primary)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
-
-	public com.liferay.portal.model.EmailAddress addEmailAddress(
-		java.lang.String className, long classPK, java.lang.String address,
-		int typeId, boolean primary,
-		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
-
-	public void deleteEmailAddress(long emailAddressId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portal.model.EmailAddress getEmailAddress(
-		long emailAddressId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.portal.model.EmailAddress> getEmailAddresses(
-		java.lang.String className, long classPK)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
-
 	public com.liferay.portal.model.EmailAddress updateEmailAddress(
 		long emailAddressId, java.lang.String address, int typeId,
 		boolean primary)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
+		throws com.liferay.portal.kernel.exception.PortalException;
 }
