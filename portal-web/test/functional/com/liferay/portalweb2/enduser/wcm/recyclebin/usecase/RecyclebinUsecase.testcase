@@ -920,6 +920,8 @@
 			<var name="wikiNodeName" value="Wiki Node Name" />
 		</execute>
 
+		<execute macro="WikiPage#gotoAllPagesCP" />
+
 		<execute macro="WikiPage#addCP">
 			<var name="wikiPageContent" value="Wiki Page Content" />
 			<var name="wikiPageTitle" value="Wiki Page Title" />
@@ -928,6 +930,10 @@
 		<execute macro="Page#gotoContentCP">
 			<var name="portletName" value="Wiki" />
 			<var name="siteScopeName" value="Site Name" />
+		</execute>
+
+		<execute macro="WikiNode#gotoCP">
+			<var name="wikiNodeName" value="${wikiNodeName}" />
 		</execute>
 
 		<execute macro="WikiPage#deleteCP">

@@ -78,6 +78,8 @@ public interface Portal {
 
 	public static final String FRIENDLY_URL_SEPARATOR = "/-/";
 
+	public static final String JSESSIONID = ";jsessionid=";
+
 	public static final String PATH_IMAGE = "/image";
 
 	public static final String PATH_MAIN = "/c";
@@ -1217,6 +1219,8 @@ public interface Portal {
 	 */
 	@Deprecated
 	public String getUserValue(long userId, String param, String defaultValue);
+
+	public String getValidPortalDomain(long companyId, String domain);
 
 	public long getValidUserId(long companyId, long userId)
 		throws PortalException;

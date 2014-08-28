@@ -19,7 +19,6 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portalweb.portal.BaseTestCase;
@@ -38,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -675,7 +675,7 @@ public class WebDriverToSeleniumBridge
 
 	@Override
 	public String getLocation() {
-		return getCurrentUrl();
+		return WebDriverHelper.getLocation(this);
 	}
 
 	@Override
@@ -831,7 +831,7 @@ public class WebDriverToSeleniumBridge
 	}
 
 	@Override
-	public Number getXpathCount(String xpath) {
+	public Number getXpathCount(String xPath) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -1301,38 +1301,7 @@ public class WebDriverToSeleniumBridge
 
 	@Override
 	public void open(String url) {
-		String targetURL = "";
-
-		if (url.startsWith("/")) {
-			targetURL = TestPropsValues.PORTAL_URL + url;
-		}
-		else {
-			targetURL = url;
-		}
-
-		for (int second = 0;; second++) {
-			if (second >= TestPropsValues.TIMEOUT_IMPLICIT_WAIT) {
-				break;
-			}
-
-			try {
-				get(targetURL);
-
-				if (TestPropsValues.BROWSER_TYPE.equals("*iehta") ||
-					TestPropsValues.BROWSER_TYPE.equals("*iexplore")) {
-
-					refresh();
-				}
-
-				if (targetURL.equals(getLocation())) {
-					break;
-				}
-
-				Thread.sleep(1000);
-			}
-			catch (Exception e) {
-			}
-		}
+		WebDriverHelper.open(this, url);
 	}
 
 	@Override
@@ -1347,9 +1316,7 @@ public class WebDriverToSeleniumBridge
 
 	@Override
 	public void refresh() {
-		WebDriver.Navigation navigation = navigate();
-
-		navigation.refresh();
+		WebDriverHelper.refresh(this);
 	}
 
 	@Override
@@ -1665,54 +1632,37 @@ public class WebDriverToSeleniumBridge
 
 	@Override
 	public void typeKeys(String locator, String value) {
-		typeKeys(locator, value, false);
-	}
-
-	public void typeKeys(String locator, String value, boolean typeAceEditor) {
 		WebElement webElement = getWebElement(locator);
 
 		if (!webElement.isEnabled()) {
 			return;
 		}
 
-		StringBundler sb = new StringBundler();
-
-		sb.append(".*[");
-
-		Set<String> keysSpecialCharsSet = _keysSpecialChars.keySet();
-
-		for (String specialChar : keysSpecialCharsSet) {
-			sb.append("\\");
-			sb.append(specialChar);
+		if (value.contains("line-number=")) {
+			value = value.replaceAll("line-number=\"\\d+\"", "");
 		}
 
-		sb.append("]*.*");
+		int i = 0;
 
-		if (value.matches(sb.toString()) || typeAceEditor) {
-			char[] chars = value.toCharArray();
+		Set<Integer> specialCharIndexes = getSpecialCharIndexes(value);
 
-			for (char c : chars) {
-				String s = String.valueOf(c);
+		for (int specialCharIndex : specialCharIndexes) {
+			webElement.sendKeys(value.substring(i, specialCharIndex));
 
-				if (keysSpecialCharsSet.contains(s)) {
-					webElement.sendKeys(Keys.SHIFT, _keysSpecialChars.get(s));
-				}
-				else {
-					webElement.sendKeys(s);
-				}
+			String specialChar = String.valueOf(value.charAt(specialCharIndex));
 
-				if (typeAceEditor) {
-					if (s.equals("(") || s.equals("\"")) {
-						keyPress(locator, "\\46");
-					}
-
-					keyPress(locator, "\\27");
-				}
+			if (specialChar.equals("-")) {
+				webElement.sendKeys(Keys.SUBTRACT);
 			}
+			else {
+				webElement.sendKeys(
+					Keys.SHIFT, _keysSpecialChars.get(specialChar));
+			}
+
+			i = specialCharIndex + 1;
 		}
-		else {
-			webElement.sendKeys(value);
-		}
+
+		webElement.sendKeys(value.substring(i, value.length()));
 	}
 
 	@Override
@@ -1816,6 +1766,28 @@ public class WebDriverToSeleniumBridge
 		Alert alert = targetLocator.alert();
 
 		alert.accept();
+	}
+
+	protected Set<Integer> getSpecialCharIndexes(String value) {
+		Set<Integer> specialCharIndexes = new TreeSet<Integer>();
+
+		while (value.contains("-")) {
+			specialCharIndexes.add(value.indexOf("-"));
+
+			value = StringUtil.replaceFirst(value, "-", " ");
+		}
+
+		for (String specialChar : _keysSpecialChars.keySet()) {
+			specialChar = "\\" + specialChar;
+
+			while (value.contains(specialChar)) {
+				specialCharIndexes.add(value.indexOf(specialChar));
+
+				value = StringUtil.replaceFirst(value, specialChar, " ");
+			}
+		}
+
+		return specialCharIndexes;
 	}
 
 	protected WebElement getWebElement(String locator) {

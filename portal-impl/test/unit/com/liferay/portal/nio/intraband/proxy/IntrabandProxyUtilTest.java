@@ -726,8 +726,7 @@ public class IntrabandProxyUtilTest {
 			@Override
 			protected void doDispatch(
 					RegistrationReference registrationReference,
-					Datagram datagram, Deserializer deserializer)
-				throws Exception {
+					Datagram datagram, Deserializer deserializer) {
 
 				int i = deserializer.readInt();
 
@@ -837,7 +836,7 @@ public class IntrabandProxyUtilTest {
 	}
 
 	@Test
-	public void testTemplateStub() throws Exception {
+	public void testTemplateStub() throws SecurityException {
 		try {
 			new TemplateStub(null, null, null);
 
@@ -2727,10 +2726,10 @@ public class IntrabandProxyUtilTest {
 	private static class TestValidateClass {
 
 		@SuppressWarnings("unused")
-		private static Log _log;
+		private static String[] PROXY_METHOD_SIGNATURES;
 
 		@SuppressWarnings("unused")
-		private static String[] PROXY_METHOD_SIGNATURES;
+		private static Log _log;
 
 		@SuppressWarnings("unused")
 		private static String _proxyMethodsMapping;

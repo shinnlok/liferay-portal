@@ -18,12 +18,14 @@ import com.liferay.counter.model.Counter;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.process.ClassPathUtil;
 import com.liferay.portal.kernel.process.ProcessCallable;
+import com.liferay.portal.kernel.process.ProcessChannel;
 import com.liferay.portal.kernel.process.ProcessConfig;
 import com.liferay.portal.kernel.process.ProcessConfig.Builder;
 import com.liferay.portal.kernel.process.ProcessException;
-import com.liferay.portal.kernel.process.ProcessExecutor;
+import com.liferay.portal.kernel.process.ProcessExecutorUtil;
 import com.liferay.portal.kernel.scheduler.SchedulerEngineHelperUtil;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
+import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.test.listeners.MainServletExecutionTestListener;
 import com.liferay.portal.test.runners.LiferayIntegrationJUnitTestRunner;
@@ -75,6 +77,7 @@ public class CounterLocalServiceTest {
 		builder.setArguments(
 			Arrays.asList("-Xmx1024m", "-XX:MaxPermSize=200m"));
 		builder.setBootstrapClassPath(classPath);
+		builder.setReactClassLoader(PortalClassLoaderUtil.getClassLoader());
 		builder.setRuntimeClassPath(classPath);
 
 		ProcessConfig processConfig = builder.build();
@@ -86,8 +89,11 @@ public class CounterLocalServiceTest {
 				new IncrementProcessCallable(
 					"Increment Process-" + i, _COUNTER_NAME, _INCREMENT_COUNT);
 
-			Future<Long[]> futures = ProcessExecutor.execute(
+			ProcessChannel<Long[]> processChannel = ProcessExecutorUtil.execute(
 				processConfig, processCallable);
+
+			Future<Long[]> futures =
+				processChannel.getProcessNoticeableFuture();
 
 			futuresList.add(futures);
 		}

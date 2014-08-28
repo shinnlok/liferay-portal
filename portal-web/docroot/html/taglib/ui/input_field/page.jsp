@@ -42,10 +42,6 @@ Map<String, String> hints = ModelHintsUtil.getHints(model, field);
 if (hints != null) {
 	type = GetterUtil.getString(hints.get("type"), type);
 }
-
-if (type.equals("String")) {
-	cssClass += " form-control";
-}
 %>
 
 <c:if test="<%= type != null %>">
@@ -203,6 +199,8 @@ if (type.equals("String")) {
 				}
 			}
 
+			cssClass += " form-group form-group-inline";
+
 			boolean showTime = true;
 
 			if (hints != null) {
@@ -351,7 +349,6 @@ if (type.equals("String")) {
 
 			boolean checkTab = false;
 			String displayHeight = ModelHintsConstants.TEXT_DISPLAY_HEIGHT;
-			String displayWidth = ModelHintsConstants.TEXT_DISPLAY_WIDTH;
 			boolean editor = false;
 			String maxLength = ModelHintsConstants.TEXT_MAX_LENGTH;
 			boolean secret = false;
@@ -361,7 +358,6 @@ if (type.equals("String")) {
 				autoSize = GetterUtil.getBoolean(hints.get("autoSize"), autoSize);
 				checkTab = GetterUtil.getBoolean(hints.get("check-tab"), checkTab);
 				displayHeight = GetterUtil.getString(hints.get("display-height"), displayHeight);
-				displayWidth = GetterUtil.getString(hints.get("display-width"), displayWidth);
 				editor = GetterUtil.getBoolean(hints.get("editor"), editor);
 				maxLength = GetterUtil.getString(hints.get("max-length"), maxLength);
 				secret = GetterUtil.getBoolean(hints.get("secret"), secret);
@@ -372,30 +368,10 @@ if (type.equals("String")) {
 				displayHeight = "auto";
 			}
 
-			if (Validator.isDigit(displayWidth)) {
-				int displayWidthInt = GetterUtil.getInteger(displayWidth);
+			cssClass += " form-control";
 
-				if (displayWidthInt <= 60) {
-					cssClass += " input-mini";
-				}
-				else if ((displayWidthInt > 60) && (displayWidthInt <= 90)) {
-					cssClass += " input-small";
-				}
-				else if ((displayWidthInt > 90) && (displayWidthInt <= 150)) {
-					cssClass += " input-medium";
-				}
-				else if ((displayWidthInt > 210) && (displayWidthInt <= 270)) {
-					cssClass += " input-xlarge";
-				}
-				else if (displayWidthInt > 270) {
-					cssClass += " input-xxlarge";
-				}
-				else if (editor) {
-					cssClass += " lfr-input-editor";
-				}
-				else {
-					cssClass += " input-large";
-				}
+			if (editor) {
+				cssClass += " lfr-input-editor";
 			}
 
 			boolean localized = ModelHintsUtil.isLocalized(model, field);
@@ -516,7 +492,7 @@ if (type.equals("String")) {
 							/>
 						</c:when>
 						<c:otherwise>
-							<textarea class="<%= cssClass + " lfr-textarea" %>" <%= disabled ? "disabled=\"disabled\"" : "" %> id="<%= namespace %><%= id %>" name="<%= namespace %><%= fieldParam %>" <%= Validator.isNotNull(placeholder) ? "placeholder=\"" + LanguageUtil.get(request, placeholder) + "\"" : StringPool.BLANK %> style="<%= !autoSize ? "height: " + displayHeight + (Validator.isDigit(displayHeight) ? "px" : StringPool.BLANK) + ";" : StringPool.BLANK %>" wrap="soft" onKeyDown="<%= checkTab ? "Liferay.Util.checkTab(this); " : "" %> Liferay.Util.disableEsc();"><%= autoEscape ? HtmlUtil.escape(value) : value %></textarea>
+							<textarea class="<%= cssClass + " lfr-textarea" %>" <%= disabled ? "disabled=\"disabled\"" : "" %> id="<%= namespace %><%= id %>" name="<%= namespace %><%= fieldParam %>" <%= Validator.isNotNull(placeholder) ? "placeholder=\"" + LanguageUtil.get(request, placeholder) + "\"" : StringPool.BLANK %> style="<%= !autoSize ? "height: " + displayHeight + (Validator.isDigit(displayHeight) ? "px" : StringPool.BLANK) + ";" : StringPool.BLANK %>" onKeyDown="<%= checkTab ? "Liferay.Util.checkTab(this); " : "" %> Liferay.Util.disableEsc();" wrap="soft"><%= autoEscape ? HtmlUtil.escape(value) : value %></textarea>
 						</c:otherwise>
 					</c:choose>
 

@@ -697,6 +697,11 @@ public class ShoppingItemWrapper implements ShoppingItem,
 	}
 
 	@Override
+	public boolean hasInfiniteStock() {
+		return _shoppingItem.hasInfiniteStock();
+	}
+
+	@Override
 	public int hashCode() {
 		return _shoppingItem.hashCode();
 	}
@@ -1282,5 +1287,5 @@ public class ShoppingItemWrapper implements ShoppingItem,
 		_shoppingItem.resetOriginalValues();
 	}
 
-	private ShoppingItem _shoppingItem;
+	private final ShoppingItem _shoppingItem;
 }

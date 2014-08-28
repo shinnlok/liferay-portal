@@ -14,6 +14,8 @@
 
 package com.liferay.portal.kernel.process;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -47,6 +49,7 @@ import javax.servlet.ServletException;
 /**
  * @author Shuyang Zhou
  */
+@ProviderType
 public class ClassPathUtil {
 
 	public static Set<URL> getClassPathURLs(ClassLoader classLoader) {
@@ -145,6 +148,7 @@ public class ClassPathUtil {
 		Builder builder = new Builder();
 
 		builder.setBootstrapClassPath(_globalClassPath);
+		builder.setReactClassLoader(PortalClassLoaderUtil.getClassLoader());
 		builder.setRuntimeClassPath(_portalClassPath);
 
 		_portalProcessConfig = builder.build();

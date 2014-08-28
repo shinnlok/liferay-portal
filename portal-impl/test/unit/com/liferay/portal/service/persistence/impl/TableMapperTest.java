@@ -15,6 +15,7 @@
 package com.liferay.portal.service.persistence.impl;
 
 import com.liferay.portal.NoSuchModelException;
+import com.liferay.portal.cache.MockPortalCacheManager;
 import com.liferay.portal.cache.memory.MemoryPortalCache;
 import com.liferay.portal.kernel.cache.MultiVMPool;
 import com.liferay.portal.kernel.cache.MultiVMPoolUtil;
@@ -36,6 +37,7 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.model.BaseModel;
 import com.liferay.portal.model.BaseModelListener;
+import com.liferay.portal.model.ModelListener;
 
 import java.io.Serializable;
 
@@ -787,12 +789,12 @@ public class TableMapperTest {
 	}
 
 	@Test
-	public void testDestroy() throws Exception {
+	public void testDestroy() {
 		testDestroy(_tableMapperImpl);
 	}
 
 	@Test
-	public void testDestroyReverse() throws Exception {
+	public void testDestroyReverse() {
 		testDestroy(new ReverseTableMapper<Right, Left>(_tableMapperImpl));
 	}
 
@@ -1309,7 +1311,7 @@ public class TableMapperTest {
 		Assert.assertTrue(tableMappers.isEmpty());
 	}
 
-	protected void testDestroy(TableMapper<?, ?> tableMapper) throws Exception {
+	protected void testDestroy(TableMapper<?, ?> tableMapper) {
 		MockMultiVMPool mockMultiVMPool =
 			(MockMultiVMPool)MultiVMPoolUtil.getMultiVMPool();
 
@@ -1464,10 +1466,27 @@ public class TableMapperTest {
 				new GetPrimaryKeyObjInvocationHandler(primaryKey));
 		}
 
+		@Override
+		public ModelListener<T>[] getListeners() {
+			return _listeners.toArray(new ModelListener[_listeners.size()]);
+		}
+
+		@Override
+		public void registerListener(ModelListener<T> listener) {
+			_listeners.add(listener);
+		}
+
 		public void setNoSuchModelException(boolean noSuchModelException) {
 			_noSuchModelException = noSuchModelException;
 		}
 
+		@Override
+		public void unregisterListener(ModelListener<T> listener) {
+			_listeners.remove(listener);
+		}
+
+		private List<ModelListener<T>> _listeners =
+			new ArrayList<ModelListener<T>>();
 		private boolean _noSuchModelException;
 
 	}
@@ -1759,7 +1778,8 @@ public class TableMapperTest {
 			PortalCache<?, ?> portalCache = _portalCaches.get(name);
 
 			if (portalCache == null) {
-				portalCache = new MemoryPortalCache<Long, long[]>(name, 16);
+				portalCache = new MemoryPortalCache<Long, long[]>(
+					new MockPortalCacheManager<Long, long[]>(name), name, 16);
 
 				_portalCaches.put(name, portalCache);
 			}

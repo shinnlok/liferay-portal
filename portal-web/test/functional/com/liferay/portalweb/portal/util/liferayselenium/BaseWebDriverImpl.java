@@ -686,6 +686,17 @@ public abstract class BaseWebDriverImpl
 	}
 
 	@Override
+	public void saveScreenshotBeforeAction(boolean actionFailed)
+		throws Exception {
+
+		if (!TestPropsValues.SAVE_SCREENSHOT) {
+			return;
+		}
+
+		LiferaySeleniumHelper.saveScreenshotBeforeAction(this, actionFailed);
+	}
+
+	@Override
 	public void scrollWebElementIntoView(String locator) throws Exception {
 		WebElement webElement = getWebElement(locator);
 
@@ -717,6 +728,15 @@ public abstract class BaseWebDriverImpl
 	@Override
 	public void sendKeys(String locator, String value) {
 		typeKeys(locator, value);
+	}
+
+	@Override
+	public void sendKeysAceEditor(String locator, String value) {
+		WebElement webElement = getWebElement(locator);
+
+		webElement.sendKeys(Keys.chord(Keys.CONTROL, Keys.END));
+
+		LiferaySeleniumHelper.typeAceEditor(this, locator, value);
 	}
 
 	@Override
@@ -852,6 +872,10 @@ public abstract class BaseWebDriverImpl
 		webElement.sendKeys(Keys.chord(Keys.CONTROL, "a"));
 
 		LiferaySeleniumHelper.typeAceEditor(this, locator, value);
+
+		webElement.sendKeys(Keys.chord(Keys.CONTROL, Keys.SHIFT, Keys.END));
+
+		webElement.sendKeys(Keys.DELETE);
 	}
 
 	@Override
