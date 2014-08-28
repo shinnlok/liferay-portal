@@ -57,8 +57,8 @@
 	</path>
 
 	<path id="test.classpath">
-		<pathelement path="${classpath}" />
 		<pathelement path="test-classes/${test.type}" />
+		<pathelement path="${classpath}" />
 		<pathelement path="${test.additional.classpath}" />
 		<fileset dir="${project.dir}/lib/development" includes="*.jar" excludes="jalopy.jar,jetty*.jar,tomcat*.jar" />
 		<fileset dir="${project.dir}/lib/global" includes="*.jar" />
@@ -875,6 +875,16 @@ Please set the environment variable ANT_OPTS to the recommended value of
 		</sequential>
 	</macrodef>
 
+	<macrodef name="remake-dir">
+		<attribute name="dir" />
+
+		<sequential>
+			<delete dir="@{dir}" />
+
+			<mkdir dir="@{dir}" />
+		</sequential>
+	</macrodef>
+
 	<macrodef name="set-test-type">
 		<sequential>
 			<if>
@@ -1433,6 +1443,7 @@ rerun your task.
 							<jvmarg value="-Djava.net.preferIPv4Stack=true" />
 							<jvmarg value="-Djava.security.manager" />
 							<jvmarg value="-Djava.security.policy=${basedir}/test-classes/${test.type}/com/liferay/portal/security/pacl/security.policy" />
+							<jvmarg value="-Dliferay.lib.portal.dir=${project.dir}/lib/portal" />
 							<jvmarg value="-Dliferay.mode=test" />
 							<jvmarg value="-Duser.timezone=GMT" />
 							<classpath location="test-coverage" />
@@ -1484,6 +1495,7 @@ rerun your task.
 							<jvmarg value="-Dfile.encoding=UTF-8" />
 							<jvmarg value="-Dfixed.issues=${fixed.issues}" />
 							<jvmarg value="-Djava.net.preferIPv4Stack=true" />
+							<jvmarg value="-Dliferay.lib.portal.dir=${project.dir}/lib/portal" />
 							<jvmarg value="-Dliferay.mode=test" />
 							<jvmarg value="-Duser.timezone=GMT" />
 							<classpath location="test-coverage" />

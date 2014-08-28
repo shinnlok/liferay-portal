@@ -15,7 +15,7 @@ $editLayoutPanelWidth: 460px;
 			position: absolute;
 			right: 0;
 			top: 0;
-			z-index: 301;
+			z-index: 400;
 
 			&.open {
 				display: block;
@@ -55,6 +55,11 @@ $editLayoutPanelWidth: 460px;
 		right: 0;
 		top: 0;
 		z-index: 400;
+
+		&.navbar {
+			border-bottom-width: 0;
+			min-height: 0;
+		}
 
 		&.navbar-static-top {
 			position: relative;
@@ -412,12 +417,18 @@ $editLayoutPanelWidth: 460px;
 			}
 
 			> li.staging-toggle {
-				&.active a, > a {
-					color: #555;
-				}
+				&.active {
+					> a {
+						background-color: inherit;
+					}
 
-				> a {
-					padding: 4px 10px;
+					a, > a {
+						color: #555;
+
+						&:hover {
+							text-decoration: none;
+						}
+					}
 				}
 			}
 
@@ -485,10 +496,12 @@ $editLayoutPanelWidth: 460px;
 		}
 
 		.staging-bar {
-			margin: 6px 0 0;
-
 			&, li.staging-toggle {
 				position: static;
+			}
+
+			.layout-revision-info {
+				max-width: 50%
 			}
 		}
 
@@ -537,9 +550,6 @@ $editLayoutPanelWidth: 460px;
 
 	.dockbar-split {
 		.dockbar {
-			height: 0;
-			position: absolute;
-
 			@include respond-to(phone, tablet) {
 				height: auto;
 				position: relative;
@@ -594,11 +604,18 @@ $editLayoutPanelWidth: 460px;
 
 			.staging-controls {
 				.staging-bar {
+					margin: 6px 0;
+
 					li.dropdown .dropdown-menu {
 						left: 0;
 						margin-left: 0;
 						width: 100%;
 					}
+				}
+
+				.staging-toggle.active > a {
+					background-color: #555;
+					color: #FFF;
 				}
 			}
 
@@ -638,6 +655,10 @@ $editLayoutPanelWidth: 460px;
 							position: static;
 							right: auto;
 						}
+					}
+
+					&.nav-account-controls-notice {
+						top: 50px;
 					}
 
 					&.nav-add-controls {
@@ -1371,26 +1392,20 @@ $editLayoutPanelWidth: 460px;
 			a.taglib-icon {
 				padding: 9px 15px;
 			}
-
-			[class^="icon-"] {
-				margin-left: 0;
-			}
 		}
 
 		.dockbar .staging-controls {
 			padding: 0;
+
+			.nav li.staging-toggle > a {
+				color: inherit;
+			}
 
 			.staging-bar li.dropdown .dropdown-menu {
 				background-color: #FFF;
 				margin: 0;
 				padding: 10px;
 			}
-		}
-	}
-
-	@include respond-to(phone) {
-		.portlet-staging-bar .layout-revision-actions a.taglib-icon {
-			margin-left: -5px;
 		}
 	}
 }

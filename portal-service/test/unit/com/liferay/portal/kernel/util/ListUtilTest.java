@@ -373,6 +373,62 @@ public class ListUtilTest {
 	}
 
 	@Test
+	public void testToArray() {
+		List<Integer> list = Arrays.asList(1, 2, 3, 4);
+
+		String[] array = ListUtil.toArray(
+			list,
+			new Accessor<Integer, String>() {
+
+				@Override
+				public String get(Integer integer) {
+					return String.valueOf(integer);
+				}
+
+				@Override
+				public Class<String> getAttributeClass() {
+					return String.class;
+				}
+
+				@Override
+				public Class<Integer> getTypeClass() {
+					return Integer.class;
+				}
+
+			});
+
+		Assert.assertArrayEquals(new String[] {"1", "2", "3", "4"}, array);
+	}
+
+	@Test
+	public void testToArrayEmpty() {
+		List<Integer> list = Collections.emptyList();
+
+		String[] array = ListUtil.toArray(
+			list,
+			new Accessor<Integer, String>() {
+
+				@Override
+				public String get(Integer integer) {
+					return String.valueOf(integer);
+				}
+
+				@Override
+				public Class<String> getAttributeClass() {
+					return String.class;
+				}
+
+				@Override
+				public Class<Integer> getTypeClass() {
+					return Integer.class;
+				}
+
+			});
+
+		Assert.assertArrayEquals(new String[0], array);
+	}
+
+	@Test
 	public void testToList() throws Exception {
 		List<String> list = new ArrayList<String>();
 
@@ -385,6 +441,62 @@ public class ListUtilTest {
 		Assert.assertArrayEquals(
 			new Object[] {"aaa", "bbb", "ccc"},
 			list2.toArray());
+	}
+
+	@Test
+	public void testToLongArray() {
+		List<String> list = Arrays.asList("1", "2", "3", "4");
+
+		long[] array = ListUtil.toLongArray(
+			list,
+			new Accessor<String, Long>() {
+
+				@Override
+				public Long get(String string) {
+					return Long.parseLong(string);
+				}
+
+				@Override
+				public Class<Long> getAttributeClass() {
+					return Long.class;
+				}
+
+				@Override
+				public Class<String> getTypeClass() {
+					return String.class;
+				}
+
+			});
+
+		Assert.assertArrayEquals(new long[] {1, 2, 3, 4}, array);
+	}
+
+	@Test
+	public void testToLongArrayEmpty() {
+		List<String> list = Collections.emptyList();
+
+		long[] array = ListUtil.toLongArray(
+			list,
+			new Accessor<String, Long>() {
+
+				@Override
+				public Long get(String string) {
+					return Long.parseLong(string);
+				}
+
+				@Override
+				public Class<Long> getAttributeClass() {
+					return Long.class;
+				}
+
+				@Override
+				public Class<String> getTypeClass() {
+					return String.class;
+				}
+
+			});
+
+		Assert.assertArrayEquals(new long[0], array);
 	}
 
 	@Test

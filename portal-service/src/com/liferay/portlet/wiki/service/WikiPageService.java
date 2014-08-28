@@ -36,9 +36,9 @@ import com.liferay.portal.service.BaseService;
  * @see com.liferay.portlet.wiki.service.impl.WikiPageServiceImpl
  * @generated
  */
-@ProviderType
 @AccessControlled
 @JSONWebService
+@ProviderType
 @Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
 	PortalException.class, SystemException.class})
 public interface WikiPageService extends BaseService {
@@ -76,6 +76,10 @@ public interface WikiPageService extends BaseService {
 	public void addTempPageAttachment(long nodeId, java.lang.String fileName,
 		java.lang.String tempFolderName, java.io.InputStream inputStream,
 		java.lang.String mimeType)
+		throws com.liferay.portal.kernel.exception.PortalException;
+
+	public void changeNode(long nodeId, java.lang.String title, long newNodeId,
+		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException;
 
 	public void changeParent(long nodeId, java.lang.String title,
@@ -236,6 +240,11 @@ public interface WikiPageService extends BaseService {
 		java.lang.String tempFolderName)
 		throws com.liferay.portal.kernel.exception.PortalException;
 
+	/**
+	* @deprecated As of 6.2.0, replaced by {@link #renamePage(long, String,
+	String, ServiceContext)}
+	*
+	*/
 	public void movePage(long nodeId, java.lang.String title,
 		java.lang.String newTitle,
 		com.liferay.portal.service.ServiceContext serviceContext)
@@ -251,6 +260,11 @@ public interface WikiPageService extends BaseService {
 
 	public com.liferay.portlet.wiki.model.WikiPage movePageToTrash(
 		long nodeId, java.lang.String title, double version)
+		throws com.liferay.portal.kernel.exception.PortalException;
+
+	public void renamePage(long nodeId, java.lang.String title,
+		java.lang.String newTitle,
+		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException;
 
 	public void restorePageAttachmentFromTrash(long nodeId,

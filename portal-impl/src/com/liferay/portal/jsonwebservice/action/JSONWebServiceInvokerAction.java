@@ -42,8 +42,10 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
-import jodd.bean.BeanCopy;
 import jodd.bean.BeanUtil;
+
+import jodd.introspector.ClassDescriptor;
+import jodd.introspector.ClassIntrospector;
 
 import jodd.servlet.ServletUtil;
 
@@ -360,15 +362,53 @@ public class JSONWebServiceInvokerAction implements JSONWebServiceAction {
 
 		HashMap<Object, Object> destinationMap = new HashMap<Object, Object>();
 
-		BeanCopy beanCopy = BeanCopy.beans(object, destinationMap);
+		String[] excludes = JSONIncludesManagerUtil.lookupExcludes(clazz);
+		String[] includes = JSONIncludesManagerUtil.lookupIncludes(clazz);
 
-		beanCopy.exclude(JSONIncludesManagerUtil.lookupExcludes(clazz));
+		ClassDescriptor classDescriptor = ClassIntrospector.lookup(
+			object.getClass());
 
-		beanCopy.copy();
+		String[] properties = classDescriptor.getAllBeanGetterNames(false);
+
+		for (String property : properties) {
+			boolean includeProperty = true;
+
+			for (String exclude : excludes) {
+				if (exclude.equals(StringPool.STAR)) {
+					includeProperty = false;
+
+					break;
+				}
+
+				if (property.equals(exclude)) {
+					includeProperty = false;
+
+					break;
+				}
+			}
+
+			for (String include : includes) {
+				if (include.equals(StringPool.STAR)) {
+					includeProperty = true;
+
+					break;
+				}
+
+				if (property.equals(include)) {
+					includeProperty = true;
+
+					break;
+				}
+			}
+
+			if (includeProperty) {
+				Object value = BeanUtil.getProperty(object, property);
+
+				destinationMap.put(property, value);
+			}
+		}
 
 		object = destinationMap;
-
-		String[] includes = JSONIncludesManagerUtil.lookupIncludes(clazz);
 
 		for (String include : includes) {
 			if (Validator.isNotNull(prefix)) {

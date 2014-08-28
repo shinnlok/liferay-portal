@@ -17,12 +17,18 @@ package com.liferay.portal.search.elasticsearch;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.BaseSearchEngine;
+import com.liferay.portal.kernel.search.IndexSearcher;
+import com.liferay.portal.kernel.search.IndexWriter;
+import com.liferay.portal.kernel.search.SearchEngine;
 import com.liferay.portal.kernel.search.SearchException;
+import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.SystemProperties;
 import com.liferay.portal.search.elasticsearch.connection.ElasticsearchConnectionManager;
 import com.liferay.portal.search.elasticsearch.index.IndexFactory;
 import com.liferay.portal.search.elasticsearch.util.LogUtil;
 
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
@@ -37,14 +43,31 @@ import org.elasticsearch.action.admin.cluster.snapshots.delete.DeleteSnapshotReq
 import org.elasticsearch.action.admin.cluster.snapshots.delete.DeleteSnapshotResponse;
 import org.elasticsearch.action.admin.cluster.snapshots.restore.RestoreSnapshotRequestBuilder;
 import org.elasticsearch.action.admin.cluster.snapshots.restore.RestoreSnapshotResponse;
+import org.elasticsearch.action.admin.indices.close.CloseIndexRequestBuilder;
+import org.elasticsearch.action.admin.indices.close.CloseIndexResponse;
+import org.elasticsearch.client.AdminClient;
 import org.elasticsearch.client.ClusterAdminClient;
+import org.elasticsearch.client.IndicesAdminClient;
 import org.elasticsearch.cluster.metadata.RepositoryMetaData;
 import org.elasticsearch.common.collect.ImmutableList;
 import org.elasticsearch.common.settings.ImmutableSettings;
+import org.elasticsearch.repositories.RepositoryMissingException;
+
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Michael C. Han
  */
+@Component(
+	immediate = true,
+	property = {
+		"clusteredWrite=false", "luceneBased=true",
+		"search.engine.id=SYSTEM_ENGINE", "vendor=Elasticsearch"
+	},
+	service = {ElasticsearchSearchEngine.class, SearchEngine.class}
+)
 public class ElasticsearchSearchEngine extends BaseSearchEngine {
 
 	@Override
@@ -142,6 +165,26 @@ public class ElasticsearchSearchEngine extends BaseSearchEngine {
 	public synchronized void restore(long companyId, String backupName)
 		throws SearchException {
 
+		AdminClient adminClient =
+			_elasticsearchConnectionManager.getAdminClient();
+
+		IndicesAdminClient indicesAdminClient = adminClient.indices();
+
+		CloseIndexRequestBuilder closeIndexRequestBuilder =
+			indicesAdminClient.prepareClose(String.valueOf(companyId));
+
+		try {
+			Future<CloseIndexResponse> future =
+				closeIndexRequestBuilder.execute();
+
+			CloseIndexResponse closeIndexResponse = future.get();
+
+			LogUtil.logActionResponse(_log, closeIndexResponse);
+		}
+		catch (Exception e) {
+			throw new SearchException(e);
+		}
+
 		ClusterAdminClient clusterAdminClient =
 			_elasticsearchConnectionManager.getClusterAdminClient();
 
@@ -171,14 +214,45 @@ public class ElasticsearchSearchEngine extends BaseSearchEngine {
 		}
 	}
 
+	@Reference
 	public void setElasticsearchConnectionManager(
 		ElasticsearchConnectionManager elasticsearchConnectionManager) {
 
 		_elasticsearchConnectionManager = elasticsearchConnectionManager;
 	}
 
+	@Reference
 	public void setIndexFactory(IndexFactory indexFactory) {
 		_indexFactory = indexFactory;
+	}
+
+	@Override
+	@Reference
+	public void setIndexSearcher(IndexSearcher indexSearcher) {
+		super.setIndexSearcher(indexSearcher);
+	}
+
+	@Override
+	@Reference
+	public void setIndexWriter(IndexWriter indexWriter) {
+		super.setIndexWriter(indexWriter);
+	}
+
+	public void unsetElasticsearchConnectionManager(
+		ElasticsearchConnectionManager elasticsearchConnectionManager) {
+
+		_elasticsearchConnectionManager = null;
+	}
+
+	public void unsetIndexFactory(IndexFactory indexFactory) {
+		_indexFactory = null;
+	}
+
+	@Activate
+	protected void activate(Map<String, Object> properties) {
+		setClusteredWrite(MapUtil.getBoolean(properties, "clusteredWrite"));
+		setLuceneBased(MapUtil.getBoolean(properties, "luceneBased"));
+		setVendor(MapUtil.getString(properties, "vendor"));
 	}
 
 	protected void createBackupRepository(ClusterAdminClient clusterAdminClient)
@@ -187,17 +261,29 @@ public class ElasticsearchSearchEngine extends BaseSearchEngine {
 		GetRepositoriesRequestBuilder getRepositoriesRequestBuilder =
 			clusterAdminClient.prepareGetRepositories(_BACKUP_REPOSITORY_NAME);
 
-		Future<GetRepositoriesResponse> getRepositoriesResponseFuture =
-			getRepositoriesRequestBuilder.execute();
+		try {
+			Future<GetRepositoriesResponse> getRepositoriesResponseFuture =
+				getRepositoriesRequestBuilder.execute();
 
-		GetRepositoriesResponse getRepositoriesResponse =
-			getRepositoriesResponseFuture.get();
+			GetRepositoriesResponse getRepositoriesResponse =
+				getRepositoriesResponseFuture.get();
 
-		ImmutableList<RepositoryMetaData> repositoryMetaDatas =
-			getRepositoriesResponse.repositories();
+			ImmutableList<RepositoryMetaData> repositoryMetaDatas =
+				getRepositoriesResponse.repositories();
 
-		if (!repositoryMetaDatas.isEmpty()) {
-			return;
+			if (!repositoryMetaDatas.isEmpty()) {
+				return;
+			}
+		}
+		catch (ExecutionException ee) {
+			if (ee.getCause() instanceof RepositoryMissingException) {
+				if (_log.isInfoEnabled()) {
+					_log.info("Creating a new backup repository", ee);
+				}
+			}
+			else {
+				throw ee;
+			}
 		}
 
 		PutRepositoryRequestBuilder putRepositoryRequestBuilder =

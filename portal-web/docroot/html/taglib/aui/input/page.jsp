@@ -149,6 +149,12 @@
 		if (dynamicAttributes.get("displayStyle") != null) {
 			displayStyle = GetterUtil.getInteger((String)dynamicAttributes.get("displayStyle"));
 		}
+
+		if (Validator.isNull(value)) {
+			TimeZone defaultTimeZone = TimeZoneUtil.getDefault();
+
+			value = BeanPropertiesUtil.getStringSilent(bean, field, defaultTimeZone.getID());
+		}
 		%>
 
 		<liferay-ui:input-time-zone

@@ -255,8 +255,6 @@
 	<classpathentry kind="lib" path="lib/portal/poi-scratchpad.jar"/>
 	<classpathentry kind="lib" path="lib/portal/portal-client.jar"/>
 	<classpathentry kind="lib" path="lib/portal/portals-bridges.jar"/>
-	<classpathentry kind="lib" path="lib/portal/portletbridge-core.jar"/>
-	<classpathentry kind="lib" path="lib/portal/portletbridge-portlet.jar"/>
 	<classpathentry kind="lib" path="lib/portal/quartz.jar"/>
 	<classpathentry kind="lib" path="lib/portal/rdffilter.jar"/>
 	<classpathentry kind="lib" path="lib/portal/rhino.jar"/>
@@ -273,7 +271,6 @@
 	<classpathentry kind="lib" path="lib/portal/slf4j-api.jar"/>
 	<classpathentry kind="lib" path="lib/portal/soap.jar"/>
 	<classpathentry kind="lib" path="lib/portal/spring-aop.jar"/>
-	<classpathentry kind="lib" path="lib/portal/spring-asm.jar"/>
 	<classpathentry kind="lib" path="lib/portal/spring-aspects.jar"/>
 	<classpathentry kind="lib" path="lib/portal/spring-beans.jar"/>
 	<classpathentry kind="lib" path="lib/portal/spring-context.jar"/>
@@ -286,6 +283,7 @@
 	<classpathentry kind="lib" path="lib/portal/spring-oxm.jar"/>
 	<classpathentry kind="lib" path="lib/portal/spring-transaction.jar"/>
 	<classpathentry kind="lib" path="lib/portal/spring-web.jar"/>
+	<classpathentry kind="lib" path="lib/portal/spring-web-mvc.jar"/>
 	<classpathentry kind="lib" path="lib/portal/spring-web-portlet.jar"/>
 	<classpathentry kind="lib" path="lib/portal/spring-web-servlet.jar"/>
 	<classpathentry kind="lib" path="lib/portal/spring-web-struts.jar"/>
