@@ -50,7 +50,7 @@ import java.util.Map;
 public class LiferayFileEntry extends LiferayModel implements FileEntry {
 
 	public LiferayFileEntry(DLFileEntry dlFileEntry) {
-		_dlFileEntry = dlFileEntry;
+		this(dlFileEntry, false);
 	}
 
 	public LiferayFileEntry(DLFileEntry fileEntry, boolean escapedModel) {
@@ -193,6 +193,11 @@ public class LiferayFileEntry extends LiferayModel implements FileEntry {
 	@Override
 	public long getFileEntryId() {
 		return _dlFileEntry.getFileEntryId();
+	}
+
+	@Override
+	public String getFileName() {
+		return _dlFileEntry.getFileName();
 	}
 
 	@Override
@@ -574,8 +579,8 @@ public class LiferayFileEntry extends LiferayModel implements FileEntry {
 
 	private static Log _log = LogFactoryUtil.getLog(LiferayFileEntry.class);
 
-	private DLFileEntry _dlFileEntry;
+	private final DLFileEntry _dlFileEntry;
 	private DLFileVersion _dlFileVersion;
-	private boolean _escapedModel;
+	private final boolean _escapedModel;
 
 }

@@ -70,8 +70,8 @@
 		<override org="org.slf4j" module="slf4j-simple" matcher="exact" rev="1.6.1"/>
 		<override org="org.codehaus.plexus" module="plexus-compiler-test" matcher="exact" rev="2.1"/>
 		<override org="org.codehaus.plexus" module="plexus-classworlds" matcher="exact" rev="2.4"/>
-		<override org="javax.inject" module="javax.inject" matcher="exact" rev="1"/>
 		<override org="org.slf4j" module="slf4j-api" matcher="exact" rev="1.6.1"/>
+		<override org="javax.inject" module="javax.inject" matcher="exact" rev="1"/>
 		<override org="org.codehaus.plexus" module="plexus-compiler-api" matcher="exact" rev="2.1"/>
 		<override org="junit" module="junit" matcher="exact" rev="3.8.2"/>
 		<override org="org.slf4j" module="jul-to-slf4j" matcher="exact" rev="1.6.1"/>

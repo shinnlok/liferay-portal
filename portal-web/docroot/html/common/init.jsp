@@ -17,10 +17,6 @@
 <%@ taglib uri="http://displaytag.sf.net" prefix="display" %>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/sql" prefix="sql" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/xml" prefix="x" %>
 
 <%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
 
@@ -33,13 +29,7 @@
 <%@ taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
 <%@ taglib uri="http://liferay.com/tld/util" prefix="liferay-util" %>
 
-<%@ taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
-<%@ taglib uri="http://struts.apache.org/tags-bean-el" prefix="bean-el" %>
 <%@ taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
-<%@ taglib uri="http://struts.apache.org/tags-html-el" prefix="html-el" %>
-<%@ taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
-<%@ taglib uri="http://struts.apache.org/tags-logic-el" prefix="logic-el" %>
-<%@ taglib uri="http://struts.apache.org/tags-nested" prefix="nested" %>
 
 <%@ page contentType="text/html; charset=UTF-8" %>
 
@@ -69,7 +59,11 @@ page import="com.liferay.portal.kernel.json.JSONObject" %><%@
 page import="com.liferay.portal.kernel.language.LanguageUtil" %><%@
 page import="com.liferay.portal.kernel.language.LanguageWrapper" %><%@
 page import="com.liferay.portal.kernel.language.UnicodeLanguageUtil" %><%@
+page import="com.liferay.portal.kernel.lar.ManifestSummary" %><%@
 page import="com.liferay.portal.kernel.lar.PortletDataHandler" %><%@
+page import="com.liferay.portal.kernel.lar.PortletDataHandlerBoolean" %><%@
+page import="com.liferay.portal.kernel.lar.PortletDataHandlerControl" %><%@
+page import="com.liferay.portal.kernel.lar.PortletDataHandlerKeys" %><%@
 page import="com.liferay.portal.kernel.log.Log" %><%@
 page import="com.liferay.portal.kernel.log.LogFactoryUtil" %><%@
 page import="com.liferay.portal.kernel.log.LogUtil" %><%@
@@ -105,7 +99,6 @@ page import="com.liferay.portal.kernel.servlet.ServletContextPool" %><%@
 page import="com.liferay.portal.kernel.servlet.ServletContextUtil" %><%@
 page import="com.liferay.portal.kernel.servlet.SessionErrors" %><%@
 page import="com.liferay.portal.kernel.servlet.SessionMessages" %><%@
-page import="com.liferay.portal.kernel.settings.Settings" %><%@
 page import="com.liferay.portal.kernel.settings.SettingsFactoryUtil" %><%@
 page import="com.liferay.portal.kernel.staging.LayoutStagingUtil" %><%@
 page import="com.liferay.portal.kernel.staging.StagingUtil" %><%@
@@ -150,7 +143,6 @@ page import="com.liferay.portal.kernel.util.ServerDetector" %><%@
 page import="com.liferay.portal.kernel.util.SetUtil" %><%@
 page import="com.liferay.portal.kernel.util.SortedArrayList" %><%@
 page import="com.liferay.portal.kernel.util.StringBundler" %><%@
-page import="com.liferay.portal.kernel.util.StringComparator" %><%@
 page import="com.liferay.portal.kernel.util.StringPool" %><%@
 page import="com.liferay.portal.kernel.util.StringUtil" %><%@
 page import="com.liferay.portal.kernel.util.TextFormatter" %><%@
@@ -173,7 +165,6 @@ page import="com.liferay.portal.portletfilerepository.PortletFileRepositoryUtil"
 page import="com.liferay.portal.security.auth.AuthTokenUtil" %><%@
 page import="com.liferay.portal.security.auth.PrincipalException" %><%@
 page import="com.liferay.portal.security.permission.ActionKeys" %><%@
-page import="com.liferay.portal.security.permission.PermissionChecker" %><%@
 page import="com.liferay.portal.security.permission.ResourceActionsUtil" %><%@
 page import="com.liferay.portal.service.*" %><%@
 page import="com.liferay.portal.service.permission.GroupPermissionUtil" %><%@
@@ -235,6 +226,7 @@ page import="com.liferay.portlet.asset.service.AssetTagLocalServiceUtil" %><%@
 page import="com.liferay.portlet.asset.service.AssetTagServiceUtil" %><%@
 page import="com.liferay.portlet.asset.service.AssetVocabularyLocalServiceUtil" %><%@
 page import="com.liferay.portlet.asset.service.AssetVocabularyServiceUtil" %><%@
+page import="com.liferay.portlet.asset.service.permission.AssetCategoryPermission" %><%@
 page import="com.liferay.portlet.asset.service.persistence.AssetEntryQuery" %><%@
 page import="com.liferay.portlet.asset.util.AssetUtil" %><%@
 page import="com.liferay.portlet.blogs.model.BlogsEntry" %><%@
@@ -297,7 +289,6 @@ page import="com.liferay.taglib.util.OutputTag" %><%@
 page import="com.liferay.util.ContentUtil" %><%@
 page import="com.liferay.util.CreditCard" %><%@
 page import="com.liferay.util.Encryptor" %><%@
-page import="com.liferay.util.JS" %><%@
 page import="com.liferay.util.PKParser" %><%@
 page import="com.liferay.util.PwdGenerator" %><%@
 page import="com.liferay.util.State" %><%@

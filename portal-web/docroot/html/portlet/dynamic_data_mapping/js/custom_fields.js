@@ -10,14 +10,16 @@ AUI.add(
 
 		var Lang = A.Lang;
 
+		var LString = Lang.String;
+
 		var booleanParse = A.DataType.Boolean.parse;
-		var camelize = Liferay.Util.camelize;
+		var camelize = Lang.String.camelize;
 		var instanceOf = A.instanceOf;
 		var isObject = Lang.isObject;
 		var isUndefined = Lang.isUndefined;
 		var isNull = Lang.isNull;
 		var isValue = Lang.isValue;
-		var trim = A.Lang.trim;
+		var trim = Lang.trim;
 
 		var STR_BLANK = '';
 
@@ -206,7 +208,7 @@ AUI.add(
 						}
 
 						linkNode.setAttribute('href', url);
-						linkNode.setContent(Liferay.Util.escapeHTML(title));
+						linkNode.setContent(LString.escapeHTML(title));
 					},
 
 					_uiSetValue: function(val) {
@@ -311,7 +313,7 @@ AUI.add(
 								var values = {
 									id: A.guid(),
 									label: index,
-									value: Liferay.Util.escapeHTML(JSON.stringify(item))
+									value: LString.escapeHTML(JSON.stringify(item))
 								};
 
 								var optionsArray = publicOptions;
@@ -423,7 +425,7 @@ AUI.add(
 				valueFn: function() {
 					var instance = this;
 
-					var name = instance.get('label');
+					var name = LiferayFormBuilderUtil.normalizeKey(instance.get('label'));
 
 					while (UNIQUE_FIELD_NAMES_MAP.has(name)) {
 						name = A.FormBuilderField.buildFieldName(name);
@@ -442,15 +444,7 @@ AUI.add(
 		LiferayFieldSupport.prototype.initializer = function() {
 			var instance = this;
 
-			instance.after('destroy', instance._afterDestroy);
 			instance.after('nameChange', instance._afterNameChange);
-			instance.after('render', instance._afterRender);
-		};
-
-		LiferayFieldSupport.prototype._afterDestroy = function(event) {
-			var instance = this;
-
-			UNIQUE_FIELD_NAMES_MAP.remove(instance.get('name'));
 		};
 
 		LiferayFieldSupport.prototype._afterNameChange = function(event) {
@@ -458,12 +452,6 @@ AUI.add(
 
 			UNIQUE_FIELD_NAMES_MAP.remove(event.prevVal);
 			UNIQUE_FIELD_NAMES_MAP.put(event.newVal, instance);
-		};
-
-		LiferayFieldSupport.prototype._afterRender = function(event) {
-			var instance = this;
-
-			UNIQUE_FIELD_NAMES_MAP.put(instance.get('name'), instance);
 		};
 
 		var LocalizableFieldSupport = function() {

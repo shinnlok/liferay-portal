@@ -476,8 +476,13 @@ $dockbarOpenGradientStart: #0EA6F9;
 
 	.portlet-topper-toolbar {
 		position: absolute;
-		right: 21px;
+		right: 8px;
 		top: 20px;
+	}
+
+	.portlet-topper-titleless .portlet-topper-toolbar {
+		bottom: 30px;
+		top: auto;
 	}
 
 	.lfr-control-panel-help-content.alert {
@@ -486,8 +491,10 @@ $dockbarOpenGradientStart: #0EA6F9;
 	}
 
 	.portlet-title {
+		display: inline-block;
 		font-size: 25px;
 		font-weight: 100;
+		width: 85%;
 
 		.taglib-icon-help {
 			margin-left: -7px;
@@ -539,6 +546,7 @@ $dockbarOpenGradientStart: #0EA6F9;
 			}
 
 			.panel-group {
+				border-left: 1px solid #D3D3D3;
 				border-right-width: 0;
 				margin-bottom: 0;
 
@@ -583,6 +591,10 @@ $dockbarOpenGradientStart: #0EA6F9;
 				.toggler-header {
 					border: solid #D3D3D3;
 					border-width: 0 0 1px;
+
+					.panel-toggle {
+						padding-left: 0;
+					}
 				}
 			}
 		}
@@ -688,7 +700,7 @@ $dockbarOpenGradientStart: #0EA6F9;
 
 			.control-panel-tools {
 				cursor: pointer;
-				padding: 12px 0 13px;
+				padding: 14px;
 
 				&:hover {
 					background-color: #DDD;
@@ -901,10 +913,6 @@ $dockbarOpenGradientStart: #0EA6F9;
 		vertical-align: middle;
 	}
 
-	.site-group.selected {
-		display: none;
-	}
-
 	.lfr-ctrl-panel {
 		li.publish-link-container a:before {
 			padding-left: 0;
@@ -945,6 +953,16 @@ $dockbarOpenGradientStart: #0EA6F9;
 				background: #F4F4F4;
 				color: #333;
 			}
+		}
+	}
+
+	.dialog-iframe-popup {
+		.panel-manage-frontpage .control-panel-bar-secondary {
+			padding: 15px 5px;
+		}
+
+		.taglib-portal-message {
+			display: none;
 		}
 	}
 
@@ -1085,6 +1103,8 @@ $dockbarOpenGradientStart: #0EA6F9;
 		}
 
 		.panel-page-menu {
+			padding-left: 15px;
+
 			.minimize-panels a {
 				display: block;
 				opacity: 1;
@@ -1207,11 +1227,6 @@ $dockbarOpenGradientStart: #0EA6F9;
 					border-left: 1px solid #D3D3D3;
 				}
 			}
-		}
-
-		.portlet-title {
-			display: inline-block;
-			width: 85%;
 		}
 
 		.portlet-journal {

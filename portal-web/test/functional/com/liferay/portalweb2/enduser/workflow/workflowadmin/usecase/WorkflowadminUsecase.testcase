@@ -25,6 +25,10 @@
 
 		<execute macro="Workflow#tearDownSiteWorkflow" />
 
+		<execute macro="Workflow#tearDownWorkflowDefinition">
+			<var name="workflowDefinitionTitle" value="Single Approver Edited" />
+		</execute>
+
 		<execute macro="Workflow#tearDownUploadedWorkflowDefinition" />
 
 		<execute macro="Page#tearDownPG" />
@@ -102,6 +106,8 @@
 			<var name="pageName" value="${pageName}" />
 		</execute>
 
+		<execute macro="WikiPage#gotoAllPagesPG" />
+
 		<execute macro="WikiPage#addPageWithWorkflowPG">
 			<var name="wikiPageContent" value="${wikiPageContent}" />
 			<var name="wikiPageTitle" value="${wikiPageTitle}" />
@@ -111,6 +117,8 @@
 		<execute macro="Page#gotoPG">
 			<var name="pageName" value="${pageName}" />
 		</execute>
+
+		<execute macro="WikiPage#gotoDraftPagesPG" />
 
 		<execute macro="WikiPage#viewPageWithWorkflowPG">
 			<var name="wikiPageStatus" value="Pending" />
@@ -155,6 +163,8 @@
 		<execute macro="Page#gotoPG">
 			<var name="pageName" value="${pageName}" />
 		</execute>
+
+		<execute macro="WikiPage#gotoDraftPagesPG" />
 
 		<execute macro="WikiPage#viewPageWithWorkflowPG">
 			<var name="wikiPageStatus" value="Pending" />
@@ -225,6 +235,7 @@
 		<execute macro="Workflow#viewDefinition">
 			<var name="workflowDefinitionName" value="Uploaded Definition" />
 			<var name="workflowDefinitionTitle" value="New Uploaded Definition" />
+			<var name="workflowDefinitionVersionNumber" value="1" />
 		</execute>
 
 		<execute macro="Workflow#deactivateUploadedWorkflowDefinition" />
@@ -251,6 +262,7 @@
 		<execute macro="Workflow#viewDefinition">
 			<var name="workflowDefinitionName" value="Uploaded Definition" />
 			<var name="workflowDefinitionTitle" value="New Uploaded Definition" />
+			<var name="workflowDefinitionVersionNumber" value="1" />
 		</execute>
 
 		<execute macro="Workflow#deactivateUploadedWorkflowDefinition" />
@@ -271,6 +283,7 @@
 		<execute macro="Workflow#viewDefinition">
 			<var name="workflowDefinitionName" value="Uploaded Definition" />
 			<var name="workflowDefinitionTitle" value="New Uploaded Definition" />
+			<var name="workflowDefinitionVersionNumber" value="1" />
 		</execute>
 	</command>
 
@@ -477,6 +490,7 @@
 			<var name="webContentContent"><![CDATA[<script>alert("web content article")</script>]]></var>
 			<var name="webContentTitle" value="WC WebContent Title" />
 			<var name="workflowStatus" value="Pending" />
+			<var name="workflowTask" value="Review" />
 		</execute>
 
 		<execute macro="Page#gotoMyAccount">

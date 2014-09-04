@@ -31,9 +31,8 @@ import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.test.TransactionalTestRule;
-import com.liferay.portal.test.runners.LiferayIntegrationJUnitTestRunner;
+import com.liferay.portal.test.runners.PersistenceIntegrationJUnitTestRunner;
 import com.liferay.portal.tools.DBUpgrader;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.test.RandomTestUtil;
@@ -45,7 +44,6 @@ import com.liferay.portlet.documentlibrary.service.DLFileEntryLocalServiceUtil;
 
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -64,7 +62,7 @@ import java.util.Set;
 /**
  * @generated
  */
-@RunWith(LiferayIntegrationJUnitTestRunner.class)
+@RunWith(PersistenceIntegrationJUnitTestRunner.class)
 public class DLFileEntryPersistenceTest {
 	@ClassRule
 	public static TransactionalTestRule transactionalTestRule = new TransactionalTestRule(Propagation.REQUIRED);
@@ -81,15 +79,6 @@ public class DLFileEntryPersistenceTest {
 		TemplateManagerUtil.init();
 	}
 
-	@Before
-	public void setUp() {
-		_modelListeners = _persistence.getListeners();
-
-		for (ModelListener<DLFileEntry> modelListener : _modelListeners) {
-			_persistence.unregisterListener(modelListener);
-		}
-	}
-
 	@After
 	public void tearDown() throws Exception {
 		Iterator<DLFileEntry> iterator = _dlFileEntries.iterator();
@@ -98,10 +87,6 @@ public class DLFileEntryPersistenceTest {
 			_persistence.remove(iterator.next());
 
 			iterator.remove();
-		}
-
-		for (ModelListener<DLFileEntry> modelListener : _modelListeners) {
-			_persistence.registerListener(modelListener);
 		}
 	}
 
@@ -163,6 +148,8 @@ public class DLFileEntryPersistenceTest {
 		newDLFileEntry.setTreePath(RandomTestUtil.randomString());
 
 		newDLFileEntry.setName(RandomTestUtil.randomString());
+
+		newDLFileEntry.setFileName(RandomTestUtil.randomString());
 
 		newDLFileEntry.setExtension(RandomTestUtil.randomString());
 
@@ -226,6 +213,8 @@ public class DLFileEntryPersistenceTest {
 			newDLFileEntry.getTreePath());
 		Assert.assertEquals(existingDLFileEntry.getName(),
 			newDLFileEntry.getName());
+		Assert.assertEquals(existingDLFileEntry.getFileName(),
+			newDLFileEntry.getFileName());
 		Assert.assertEquals(existingDLFileEntry.getExtension(),
 			newDLFileEntry.getExtension());
 		Assert.assertEquals(existingDLFileEntry.getMimeType(),
@@ -442,6 +431,21 @@ public class DLFileEntryPersistenceTest {
 	}
 
 	@Test
+	public void testCountByG_F_FN() {
+		try {
+			_persistence.countByG_F_FN(RandomTestUtil.nextLong(),
+				RandomTestUtil.nextLong(), StringPool.BLANK);
+
+			_persistence.countByG_F_FN(0L, 0L, StringPool.NULL);
+
+			_persistence.countByG_F_FN(0L, 0L, (String)null);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
 	public void testCountByG_F_T() {
 		try {
 			_persistence.countByG_F_T(RandomTestUtil.nextLong(),
@@ -530,10 +534,10 @@ public class DLFileEntryPersistenceTest {
 			"fileEntryId", true, "groupId", true, "companyId", true, "userId",
 			true, "userName", true, "createDate", true, "modifiedDate", true,
 			"classNameId", true, "classPK", true, "repositoryId", true,
-			"folderId", true, "treePath", true, "name", true, "extension",
-			true, "mimeType", true, "title", true, "description", true,
-			"extraSettings", true, "fileEntryTypeId", true, "version", true,
-			"size", true, "readCount", true, "smallImageId", true,
+			"folderId", true, "treePath", true, "name", true, "fileName", true,
+			"extension", true, "mimeType", true, "title", true, "description",
+			true, "extraSettings", true, "fileEntryTypeId", true, "version",
+			true, "size", true, "readCount", true, "smallImageId", true,
 			"largeImageId", true, "custom1ImageId", true, "custom2ImageId",
 			true, "manualCheckInRequired", true);
 	}
@@ -763,6 +767,14 @@ public class DLFileEntryPersistenceTest {
 		Assert.assertEquals(existingDLFileEntryModelImpl.getFolderId(),
 			existingDLFileEntryModelImpl.getOriginalFolderId());
 		Assert.assertTrue(Validator.equals(
+				existingDLFileEntryModelImpl.getFileName(),
+				existingDLFileEntryModelImpl.getOriginalFileName()));
+
+		Assert.assertEquals(existingDLFileEntryModelImpl.getGroupId(),
+			existingDLFileEntryModelImpl.getOriginalGroupId());
+		Assert.assertEquals(existingDLFileEntryModelImpl.getFolderId(),
+			existingDLFileEntryModelImpl.getOriginalFolderId());
+		Assert.assertTrue(Validator.equals(
 				existingDLFileEntryModelImpl.getTitle(),
 				existingDLFileEntryModelImpl.getOriginalTitle()));
 	}
@@ -797,6 +809,8 @@ public class DLFileEntryPersistenceTest {
 		dlFileEntry.setTreePath(RandomTestUtil.randomString());
 
 		dlFileEntry.setName(RandomTestUtil.randomString());
+
+		dlFileEntry.setFileName(RandomTestUtil.randomString());
 
 		dlFileEntry.setExtension(RandomTestUtil.randomString());
 
@@ -833,6 +847,5 @@ public class DLFileEntryPersistenceTest {
 
 	private static Log _log = LogFactoryUtil.getLog(DLFileEntryPersistenceTest.class);
 	private List<DLFileEntry> _dlFileEntries = new ArrayList<DLFileEntry>();
-	private ModelListener<DLFileEntry>[] _modelListeners;
 	private DLFileEntryPersistence _persistence = DLFileEntryUtil.getPersistence();
 }

@@ -163,7 +163,9 @@ public class PluginsEnvironmentBuilder {
 			dirName = ivyDirName + "/cache/" + dependencyName + "/jars";
 
 			if (!_fileUtil.exists(dirName)) {
-				throw new RuntimeException("Unable to find jars in " + dirName);
+				System.out.println("Unable to find jars in " + dirName);
+
+				return;
 			}
 		}
 
@@ -284,6 +286,10 @@ public class PluginsEnvironmentBuilder {
 		File projectDir = new File(buildFile.getParent());
 
 		File libDir = new File(projectDir, "lib");
+
+		if (!libDir.exists()) {
+			libDir = new File(projectDir, "docroot/WEB-INF/lib");
+		}
 
 		writeEclipseFiles(libDir, projectDir, dependencyJars);
 
@@ -429,6 +435,7 @@ public class PluginsEnvironmentBuilder {
 			globalJars.add("portlet.jar");
 
 			portalJars.addAll(dependencyJars);
+			portalJars.add("bnd.jar");
 			portalJars.add("commons-logging.jar");
 			portalJars.add("log4j.jar");
 

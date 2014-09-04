@@ -53,6 +53,7 @@ public class Reflection extends SecurityManager {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	private Class<?> _getCallerClass(int depth) {
 		if (_useOldReflection) {
 

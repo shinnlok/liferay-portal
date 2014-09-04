@@ -103,7 +103,7 @@
 					<isset property="test.fix.pack.zip.name" />
 				</and>
 				<then>
-					<property name="test.build.fix.pack.zip.url" value="${test.fix.pack.base.url}${test.fix.pack.zip.name}" />
+					<property name="test.build.fix.pack.zip.url" value="${test.fix.pack.base.url}/${test.fix.pack.zip.name}" />
 				</then>
 			</if>
 
@@ -122,6 +122,12 @@
 					<property name="app.server.dir" refid="app.server.dir" />
 
 					<delete dir="${app.server.dir}/patching-tool" />
+
+					<loadresource property="patching.tool.version">
+						<url url="${test.fix.pack.base.url}/patching-tool/LATEST.txt" />
+					</loadresource>
+
+					<property name="test.build.patching.tool.zip.url" value="${test.fix.pack.base.url}/patching-tool/patching-tool-${patching.tool.version}.zip" />
 
 					<get
 						dest="${basedir}"
@@ -194,36 +200,42 @@
 			<if>
 				<isset property="app.server.bundle.count" />
 				<then>
-					<var name="bundle.count" value="1" />
+					<var name="app.server.bundle.number" value="1" />
 
 					<antelope:repeat count="${app.server.bundle.count}">
+						<set-app-server-properties
+							app.server.bundle.number="${app.server.bundle.number}"
+						/>
+
 						<replaceregexp
-							file="${app.server.parent.dir}-${bundle.count}/tomcat-${app.server.tomcat.version}/conf/server.xml"
+							file="${test.app.server.dir}/conf/server.xml"
 							flags="g"
 							match="=&quot;8(\d\d\d)&quot;"
-							replace="=&quot;${bundle.count}\1&quot;"
+							replace="=&quot;${test.app.server.leading.port.number}\1&quot;"
 						/>
 
 						<replace
-							file="${app.server.parent.dir}-${bundle.count}/tomcat-${app.server.tomcat.version}/conf/server.xml"
+							file="${test.app.server.dir}/conf/server.xml"
 							token="&lt;Engine name=&quot;Catalina&quot; defaultHost=&quot;localhost&quot;&gt;"
-							value="&lt;Engine name=&quot;Catalina&quot; defaultHost=&quot;localhost&quot; jvmRoute=&quot;${bundle.count}&quot;&gt;"
+							value="&lt;Engine name=&quot;Catalina&quot; defaultHost=&quot;localhost&quot; jvmRoute=&quot;${test.app.server.leading.port.number}&quot;&gt;"
 						/>
 
 						<replace
-							file="${app.server.parent.dir}-${bundle.count}/tomcat-${app.server.tomcat.version}/webapps/ROOT/WEB-INF/classes/portal-ext.properties"
+							file="${test.app.server.classes.portal.dir}/portal-ext.properties"
 							token="liferay.home=${liferay.home}"
-							value="liferay.home=${app.server.parent.dir}-${bundle.count}"
+							value="liferay.home=${test.app.server.parent.dir}"
 						/>
 
 						<math
 							datatype="int"
-							operand1="${bundle.count}"
+							operand1="${app.server.bundle.number}"
 							operand2="1"
 							operation="+"
-							result="bundle.count"
+							result="app.server.bundle.number"
 						/>
 					</antelope:repeat>
+
+					<var name="app.server.bundle.number" unset="true" />
 				</then>
 			</if>
 		</sequential>
@@ -381,57 +393,142 @@
 		</sequential>
 	</macrodef>
 
-	<macrodef name="start-additional-app-servers">
+	<macrodef name="record-testray-project-name">
 		<sequential>
+			<propertyregex
+				input="${testray.product.version}"
+				override="true"
+				property="testray.product.major.version"
+				regexp="(\d+\.?\d+?).*"
+				replace="\1"
+			/>
+
+			<propertyregex
+				defaultValue="${testray.product.major.version}"
+				global="true"
+				input="${testray.product.major.version}"
+				override="true"
+				property="testray.product.major.version.build"
+				regexp="\."
+				replace=""
+			/>
+
+			<propertycopy
+				from="testray.project.${testray.product.type}${testray.product.major.version.build}.name"
+				name="testray.project.name"
+				override="true"
+			/>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="set-app-server-properties">
+		<attribute default="${app.server.bin.dir}" name="app.server.bin.dir" />
+		<attribute default="0" name="app.server.bundle.number" />
+
+		<sequential>
+			<var name="test.app.server.bin.dir" unset="true" />
+			<var name="test.app.server.classes.portal.dir" unset="true" />
+			<var name="test.app.server.deploy.dir" unset="true" />
+			<var name="test.app.server.dir" unset="true" />
+			<var name="test.app.server.leading.port.number" unset="true" />
+			<var name="test.app.server.parent.dir" unset="true" />
+
+			<math
+				datatype="int"
+				operand1="@{app.server.bundle.number}"
+				operand2="8"
+				operation="+"
+				result="test.app.server.leading.port.number"
+			/>
+
 			<if>
-				<isset property="app.server.bundle.count" />
-				<then>
-					<var name="bundle.count" value="1" />
+				 <equals arg1="@{app.server.bundle.number}" arg2="0" />
+				 <then>
+					<var name="test.app.server.bin.dir" value="@{app.server.bin.dir}" />
+					<var name="test.app.server.classes.portal.dir" value="${app.server.classes.portal.dir}" />
+					<var name="test.app.server.deploy.dir" value="${app.server.deploy.dir}" />
+					<var name="test.app.server.dir" value="${app.server.dir}" />
+					<var name="test.app.server.parent.dir" value="${app.server.parent.dir}" />
+				 </then>
+				 <else>
+					<antelope:stringutil property="test.app.server.bin.dir" string="@{app.server.bin.dir}">
+						<antelope:replace regex="(${app.server.parent.dir})(.*)" replacement="$1-@{app.server.bundle.number}$2" />
+					</antelope:stringutil>
 
-					<antelope:repeat count="${app.server.bundle.count}">
-						<start-app-server
-							app.server.bin.dir="${app.server.parent.dir}-${bundle.count}/${app.server.type}-${app.server.version}/bin"
-							app.server.http.url="http://localhost:${bundle.count}080/web/guest"
-							liferay.home="${app.server.parent.dir}-${bundle.count}"
-						/>
+					<antelope:stringutil property="test.app.server.classes.portal.dir" string="${app.server.classes.portal.dir}">
+						<antelope:replace regex="(${app.server.parent.dir})(.*)" replacement="$1-@{app.server.bundle.number}$2" />
+					</antelope:stringutil>
 
-						<math
-							datatype="int"
-							operand1="${bundle.count}"
-							operand2="1"
-							operation="+"
-							result="bundle.count"
-						/>
-					</antelope:repeat>
-				</then>
+					<antelope:stringutil property="test.app.server.deploy.dir" string="${app.server.deploy.dir}">
+						<antelope:replace regex="(${app.server.parent.dir})(.*)" replacement="$1-@{app.server.bundle.number}$2" />
+					</antelope:stringutil>
+
+					<antelope:stringutil property="test.app.server.dir" string="${app.server.dir}">
+						<antelope:replace regex="(${app.server.parent.dir})(.*)" replacement="$1-@{app.server.bundle.number}$2" />
+					</antelope:stringutil>
+
+					<antelope:stringutil property="test.app.server.parent.dir" string="${app.server.parent.dir}">
+						<antelope:replace regex="(${app.server.parent.dir})(.*)" replacement="$1-@{app.server.bundle.number}$2" />
+					</antelope:stringutil>
+				 </else>
 			</if>
 		</sequential>
 	</macrodef>
 
 	<macrodef name="start-app-server">
-		<attribute default="${app.server.bin.dir}" name="app.server.bin.dir" />
-		<attribute default="${liferay.home}" name="liferay.home" />
-		<attribute default="http://localhost:8080/web/guest" name="app.server.http.url" />
+		<attribute default="0" name="app.server.bundle.number" />
 
 		<sequential>
 			<if>
+				<equals arg1="${tcat.enabled}" arg2="true" />
+				<then>
+					<start-app-server-cmd
+						app.server.bin.dir="${app.server.tcat.admin.bin.dir}"
+						app.server.bundle.number="@{app.server.bundle.number}"
+					/>
+
+					<start-app-server-cmd
+						app.server.bin.dir="${app.server.tcat.agent.bin.dir}"
+						app.server.bundle.number="@{app.server.bundle.number}"
+					/>
+				</then>
+				<else>
+					<start-app-server-cmd
+						app.server.bundle.number="@{app.server.bundle.number}"
+					/>
+				</else>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="start-app-server-cmd">
+		<attribute default="${app.server.bin.dir}" name="app.server.bin.dir" />
+		<attribute default="0" name="app.server.bundle.number" />
+
+		<sequential>
+			<set-app-server-properties
+				app.server.bin.dir="@{app.server.bin.dir}"
+				app.server.bundle.number="@{app.server.bundle.number}"
+			/>
+
+			<if>
 				<equals arg1="${app.server.type}" arg2="jboss" />
 				<then>
-					<echo file="${app.server.deploy.dir}/ROOT.war.dodeploy"></echo>
+					<echo file="${test.app.server.deploy.dir}/ROOT.war.dodeploy"></echo>
 				</then>
 			</if>
 
 			<if>
 				<equals arg1="${test.ant.launched.by.selenium}" arg2="true" />
 				<then>
-					<exec dir="${app.server.bin.dir}" executable="${app.server.start.executable}" resolveexecutable="true">
+					<exec dir="${test.app.server.bin.dir}" executable="${app.server.start.executable}" resolveexecutable="true">
 						<arg line="${app.server.start.executable.arg.line}" />
 					</exec>
 				</then>
 				<else>
 					<parallel>
 						<daemons>
-							<exec dir="@{app.server.bin.dir}" executable="${app.server.start.executable}" resolveexecutable="true">
+							<exec dir="${test.app.server.bin.dir}" executable="${app.server.start.executable}" resolveexecutable="true">
 								<arg line="${app.server.start.executable.arg.line}" />
 							</exec>
 						</daemons>
@@ -443,22 +540,22 @@
 				<equals arg1="@{app.server.bin.dir}" arg2="${app.server.tcat.admin.bin.dir}" />
 				<then>
 					<waitfor maxwait="5" maxwaitunit="minute">
-						<http url="http://localhost:8180/console" />
+						<http url="http://localhost:${test.app.server.leading.port.number}180/console" />
 					</waitfor>
 				</then>
 				<elseif>
 					<equals arg1="@{app.server.bin.dir}" arg2="${app.server.tcat.agent.bin.dir}" />
 					<then>
 						<waitfor maxwait="1" maxwaitunit="minute">
-							<http url="http://localhost:8080" />
+							<http url="http://localhost:${test.app.server.leading.port.number}080" />
 						</waitfor>
 					</then>
 				</elseif>
 				<else>
 					<waitfor maxwait="5" maxwaitunit="minute">
 						<and>
-							<available file="@{liferay.home}/logs" />
-							<http url="@{app.server.http.url}" />
+							<available file="${test.app.server.parent.dir}/logs" />
+							<http url="http://localhost:${test.app.server.leading.port.number}080/web/guest" />
 						</and>
 					</waitfor>
 				</else>
@@ -466,38 +563,77 @@
 		</sequential>
 	</macrodef>
 
-	<macrodef name="stop-additional-app-servers">
+	<macrodef name="stop-app-server">
+		<attribute default="0" name="app.server.bundle.number" />
+
 		<sequential>
 			<if>
-				<isset property="app.server.bundle.count" />
+				<equals arg1="${tcat.enabled}" arg2="true" />
 				<then>
-					<var name="bundle.count" value="1" />
+					<stop-app-server-cmd
+						app.server.bin.dir="${app.server.tcat.admin.bin.dir}"
+						app.server.bundle.number="@{app.server.bundle.number}"
+					/>
 
-					<antelope:repeat count="${app.server.bundle.count}">
-						<stop-app-server
-							app.server.bin.dir="${app.server.parent.dir}-${bundle.count}/${app.server.type}-${app.server.version}/bin"
-						/>
-
-						<math
-							datatype="int"
-							operand1="${bundle.count}"
-							operand2="1"
-							operation="+"
-							result="bundle.count"
-						/>
-					</antelope:repeat>
+					<stop-app-server-cmd
+						app.server.bin.dir="${app.server.tcat.agent.bin.dir}"
+						app.server.bundle.number="@{app.server.bundle.number}"
+					/>
 				</then>
+				<else>
+					<stop-app-server-cmd
+						app.server.bundle.number="@{app.server.bundle.number}"
+					/>
+				</else>
 			</if>
 		</sequential>
 	</macrodef>
 
-	<macrodef name="stop-app-server">
+	<macrodef name="stop-app-server-cmd">
 		<attribute default="${app.server.bin.dir}" name="app.server.bin.dir" />
+		<attribute default="0" name="app.server.bundle.number" />
 
 		<sequential>
-			<exec dir="@{app.server.bin.dir}" executable="${app.server.stop.executable}" resolveexecutable="true">
+			<set-app-server-properties
+				app.server.bin.dir="@{app.server.bin.dir}"
+				app.server.bundle.number="@{app.server.bundle.number}"
+			/>
+
+			<antcall target="clean-up-logs" />
+
+			<record action="start" name="log" />
+
+			<exec dir="${test.app.server.bin.dir}" executable="${app.server.stop.executable}" resolveexecutable="true">
 				<arg line="${app.server.stop.executable.arg.line}" />
 			</exec>
+
+			<if>
+				<equals arg1="@{app.server.bin.dir}" arg2="${app.server.tcat.admin.bin.dir}" />
+				<then>
+					<waitfor maxwait="1" maxwaitunit="minute">
+						<not>
+							<http url="http://localhost:${test.app.server.leading.port.number}180/console" />
+						</not>
+					</waitfor>
+				</then>
+				<elseif>
+					<equals arg1="@{app.server.bin.dir}" arg2="${app.server.tcat.agent.bin.dir}" />
+					<then>
+						<waitfor maxwait="1" maxwaitunit="minute">
+							<not>
+								<http url="http://localhost:${test.app.server.leading.port.number}080" />
+							</not>
+						</waitfor>
+					</then>
+				</elseif>
+				<else>
+					<waitfor maxwait="1" maxwaitunit="minute">
+						<not>
+							<http url="http://localhost:${test.app.server.leading.port.number}080/web/guest" />
+						</not>
+					</waitfor>
+				</else>
+			</if>
 		</sequential>
 	</macrodef>
 
@@ -650,6 +786,7 @@ create database lportal2 character set utf8;</echo>
 		<record-env-liferay-portal />
 		<record-env-operating-system />
 		<record-testray-components />
+		<record-testray-project-name />
 
 		<property name="test.case.properties">
 			<![CDATA[
@@ -889,8 +1026,9 @@ create database lportal2 character set utf8;</echo>
 	</target>
 
 	<target name="clean-up-logs">
-		<delete file="log" />
-		<delete file="portal-web/test-ant-scripts/log" />
+		<delete failonerror="false" file="log" />
+
+		<delete failonerror="false" file="portal-web/test-ant-scripts/log" />
 	</target>
 
 	<target name="clean-up-sikuli-temp-files">
@@ -1406,6 +1544,15 @@ create database lportal2 character set utf8;</echo>
 	</target>
 
 	<target name="merge-jenkins-test-results">
+		<if>
+			<isset property="jenkins.shared.results.dir" />
+			<then>
+				<copy todir="${env.JENKINS_HOME}/userContent/jobs">
+					<fileset dir="${jenkins.shared.results.dir}/${env.BUILD_FLOW_JOB_NAME}_${env.BUILD_NUMBER}" />
+				</copy>
+			</then>
+		</if>
+
 		<property name="jenkins.test.results.dir" value="${env.JENKINS_HOME}/userContent/jobs/${env.BUILD_FLOW_JOB_NAME}/builds/${env.BUILD_FLOW_BUILD_NUMBER}/test-results" />
 
 		<property name="jenkins.results.xml.suite.file" value="${jenkins.test.results.dir}/test-suite/TESTS-${env.BUILD_FLOW_JOB_NAME}_${env.BUILD_FLOW_BUILD_NUMBER}.xml" />
@@ -1468,6 +1615,8 @@ create database lportal2 character set utf8;</echo>
 		</for>
 
 		<echo append="true" file="${jenkins.results.xml.suite.file}">&lt;/testsuite&gt;</echo>
+
+		<copy file="${jenkins.results.xml.suite.file}" tofile="${env.WORKSPACE}/TEST-ConsolidatedResults.xml" />
 
 		<if>
 			<isset property="jenkins.testray.results.dir" />
@@ -1575,8 +1724,6 @@ index.on.startup=true
 setup.wizard.enabled=false
 
 mail.session.jndi.name=
-
-virtual.hosts.valid.hosts=localhost,127.0.0.1,${ip.address}
 
 axis.servlet.hosts.allowed=
 
@@ -1722,6 +1869,15 @@ ${custom.properties}</echo>
 				<echo file="portal-impl/src/portal-ext.properties" append="true">
 
 portal.security.manager.strategy=liferay</echo>
+			</then>
+		</if>
+
+		<if>
+			<equals arg1="${mobile.device.enabled}" arg2="true" />
+			<then>
+				<echo file="portal-impl/src/portal-ext.properties" append="true">
+
+virtual.hosts.valid.hosts=localhost,127.0.0.1,${ip.address}</echo>
 			</then>
 		</if>
 
@@ -2048,6 +2204,24 @@ tck.url=true</echo>
 		</if>
 
 		<if>
+			<isset property="email.address.3" />
+			<then>
+				<echo file="portal-web/test/test-portal-web-ext.properties" append="true">
+					email.address.3=${email.address.3}
+				</echo>
+			</then>
+		</if>
+
+		<if>
+			<isset property="email.address.4" />
+			<then>
+				<echo file="portal-web/test/test-portal-web-ext.properties" append="true">
+					email.address.4=${email.address.4}
+				</echo>
+			</then>
+		</if>
+
+		<if>
 			<isset property="email.password.1" />
 			<then>
 				<echo file="portal-web/test/test-portal-web-ext.properties" append="true">
@@ -2061,6 +2235,24 @@ tck.url=true</echo>
 			<then>
 				<echo file="portal-web/test/test-portal-web-ext.properties" append="true">
 					email.password.2=${email.password.2}
+				</echo>
+			</then>
+		</if>
+
+		<if>
+			<isset property="email.password.3" />
+			<then>
+				<echo file="portal-web/test/test-portal-web-ext.properties" append="true">
+					email.password.3=${email.password.3}
+				</echo>
+			</then>
+		</if>
+
+		<if>
+			<isset property="email.password.4" />
+			<then>
+				<echo file="portal-web/test/test-portal-web-ext.properties" append="true">
+					email.password.4=${email.password.4}
 				</echo>
 			</then>
 		</if>
@@ -2126,9 +2318,7 @@ tck.url=true</echo>
 				<isset property="skip.delete-selenium-output" />
 			</not>
 			<then>
-				<delete dir="${selenium.output.dir}" />
-
-				<mkdir dir="${selenium.output.dir}" />
+				<remake-dir dir="${selenium.output.dir}" />
 			</then>
 		</if>
 
@@ -2284,6 +2474,15 @@ tck.url=true</echo>
 	</target>
 
 	<target name="prepare-so-plugins">
+		<if>
+			<equals arg1="${liferay.portal.bundle}" arg2="6.1.20" />
+			<then>
+				<echo file="${lp.plugins.dir}/build.${user.name}.properties" append="true">
+
+app.server.tomcat.dir=${app.server.parent.dir}/tomcat-7.0.27</echo>
+			</then>
+		</if>
+
 		<property file="${lp.plugins.dir}/portlets/so-portlet/docroot/WEB-INF/liferay-releng.properties" />
 
 		<property name="plugins.includes" value="so-portlet,${dependent-apps}" />
@@ -2635,15 +2834,6 @@ plugins.includes=marketplace-portlet</echo>
 				</then>
 			</elseif>
 			<else>
-				<if>
-					<equals arg1="${liferay.portal.bundle}" arg2="6.1.20" />
-					<then>
-						<echo file="app.server.${user.name}.properties" append="true">
-							app.server.tomcat.version=7.0.27
-						</echo>
-					</then>
-				</if>
-
 				<mkdir dir="${app.server.parent.dir}" />
 
 				<tstamp>
@@ -2670,6 +2860,22 @@ plugins.includes=marketplace-portlet</echo>
 				</unzip>
 
 				<delete file="${tstamp.value}.zip" />
+
+				<if>
+					<and>
+						<equals arg1="${app.server.type}" arg2="tomcat" />
+						<equals arg1="${liferay.portal.bundle}" arg2="6.1.20" />
+					</and>
+					<then>
+						<echo file="app.server.${user.name}.properties" append="true">
+							app.server.tomcat.version=7.0.27
+						</echo>
+
+						<var name="test.app.server.bin.dir" unset="true" />
+
+						<var name="test.app.server.bin.dir" value="${app.server.parent.dir}/tomcat-7.0.27/bin" />
+					</then>
+				</if>
 
 				<chmod perm="a+x">
 					<fileset dir="${test.app.server.bin.dir}">
@@ -3080,6 +3286,16 @@ if (ppstate.equals("normal")) {
 		</if>
 
 		<if>
+			<isset property="jenkins.shared.results.dir" />
+			<then>
+				<var name="jenkins.shared.results.base.dir" value="${jenkins.shared.results.dir}/${env.BUILD_FLOW_JOB_NAME}_${env.BUILD_NUMBER}" />
+			</then>
+			<else>
+				<var name="jenkins.shared.results.base.dir" value="." />
+			</else>
+		</if>
+
+		<if>
 			<isset property="env.JENKINS_HOME" />
 			<then>
 				<antelope:stringutil property="job.name" string="${env.JOB_NAME}">
@@ -3092,7 +3308,7 @@ if (ppstate.equals("normal")) {
 						<equals arg1="${test.save.screenshot}" arg2="true" />
 					</and>
 					<then>
-						<copy todir="${job.name}/builds/${env.BUILD_NUMBER}/screenshots">
+						<copy todir="${jenkins.shared.results.base.dir}/${job.name}/builds/${env.BUILD_NUMBER}/screenshots">
 							<fileset
 								dir="portal-web/test-results/functional/screenshots"
 							/>
@@ -3108,7 +3324,7 @@ if (ppstate.equals("normal")) {
 					<then>
 						<copy
 							file="portal-web/test-results/functional/report.html"
-							tofile="${job.name}/builds/${env.BUILD_NUMBER}/report.html"
+							tofile="${jenkins.shared.results.base.dir}/${job.name}/builds/${env.BUILD_NUMBER}/report.html"
 						/>
 					</then>
 				</if>
@@ -3135,7 +3351,7 @@ if (ppstate.equals("normal")) {
 
 						<copy
 							file="${jenkins.results.xml.file}"
-							tofile="${env.BUILD_FLOW_JOB_NAME}/builds/${env.BUILD_FLOW_BUILD_NUMBER}/test-results/TEST-${env.BUILD_FLOW_JOB_NAME}_${env.BUILD_FLOW_BUILD_NUMBER}_${test.class}.xml"
+							tofile="${jenkins.shared.results.base.dir}/${env.BUILD_FLOW_JOB_NAME}/builds/${env.BUILD_FLOW_BUILD_NUMBER}/test-results/TEST-${env.BUILD_FLOW_JOB_NAME}_${env.BUILD_FLOW_BUILD_NUMBER}_${test.class}.xml"
 						/>
 					</then>
 				</if>
@@ -3299,27 +3515,36 @@ if (ppstate.equals("normal")) {
 
 		<antcall target="copy-sikuli-temp-files" />
 
+		<start-app-server />
+
 		<if>
-			<equals arg1="${tcat.enabled}" arg2="true" />
+			<equals arg1="${cluster.enabled}" arg2="true" />
 			<then>
-				<start-app-server
-					app.server.bin.dir="${app.server.tcat.admin.bin.dir}"
-				/>
+				<var name="app.server.bundle.number" value="1" />
 
-				<start-app-server
-					app.server.bin.dir="${app.server.tcat.agent.bin.dir}"
-				/>
+				<antelope:repeat count="${app.server.bundle.count}">
+					<start-app-server
+						app.server.bundle.number="${app.server.bundle.number}"
+					/>
+
+					<math
+						datatype="int"
+						operand1="${app.server.bundle.number}"
+						operand2="1"
+						operation="+"
+						result="app.server.bundle.number"
+					/>
+				</antelope:repeat>
+
+				<var name="app.server.bundle.number" unset="true" />
 			</then>
-			<else>
-				<start-app-server />
+		</if>
 
-				<if>
-					<equals arg1="${cluster.enabled}" arg2="true" />
-					<then>
-						<start-additional-app-servers />
-					</then>
-				</if>
-
+		<if>
+			<not>
+				<equals arg1="${tcat.enabled}" arg2="true" />
+			</not>
+			<then>
 				<for param="log.file">
 					<path>
 						<fileset dir="${liferay.home}/logs">
@@ -3376,7 +3601,7 @@ if (ppstate.equals("normal")) {
 						}
 					]]>
 				</script>
-			</else>
+			</then>
 		</if>
 
 		<if>
@@ -3395,26 +3620,28 @@ if (ppstate.equals("normal")) {
 
 		<antcall target="run-selenium-test" />
 
-		<if>
-			<equals arg1="${tcat.enabled}" arg2="true" />
-			<then>
-				<stop-app-server
-					app.server.bin.dir="${app.server.tcat.admin.bin.dir}"
-				/>
-
-				<stop-app-server
-					app.server.bin.dir="${app.server.tcat.agent.bin.dir}"
-				/>
-			</then>
-			<else>
-				<stop-app-server />
-			</else>
-		</if>
+		<stop-app-server />
 
 		<if>
 			<equals arg1="${cluster.enabled}" arg2="true" />
 			<then>
-				<stop-additional-app-servers />
+				<var name="app.server.bundle.number" value="1" />
+
+				<antelope:repeat count="${app.server.bundle.count}">
+					<stop-app-server
+						app.server.bundle.number="${app.server.bundle.number}"
+					/>
+
+					<math
+						datatype="int"
+						operand1="${app.server.bundle.number}"
+						operand2="1"
+						operation="+"
+						result="app.server.bundle.number"
+					/>
+				</antelope:repeat>
+
+				<var name="app.server.bundle.number" unset="true" />
 			</then>
 		</if>
 
@@ -3479,7 +3706,16 @@ if (ppstate.equals("normal")) {
 	</target>
 
 	<target name="start-app-server">
-		<start-app-server />
+		<if>
+			<not>
+				<isset property="app.server.bundle.number" />
+			</not>
+			<then>
+				<var name="app.server.bundle.number" value="0" />
+			</then>
+		</if>
+
+		<start-app-server  app.server.bundle.number="${app.server.bundle.number}" />
 	</target>
 
 	<target name="start-chrome-driver">
@@ -3589,7 +3825,16 @@ Please set "ie.driver.zip" in test.properties to point to "IEDriverServer_x64_2.
 	</target>
 
 	<target name="stop-app-server">
-		<stop-app-server />
+		<if>
+			<not>
+				<isset property="app.server.bundle.number" />
+			</not>
+			<then>
+				<var name="app.server.bundle.number" value="0" />
+			</then>
+		</if>
+
+		<stop-app-server app.server.bundle.number="${app.server.bundle.number}" />
 	</target>
 
 	<target name="stop-chrome-driver">

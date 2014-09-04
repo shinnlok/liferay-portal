@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.ReflectionUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -53,6 +54,17 @@ import org.apache.tools.ant.DirectoryScanner;
  */
 public abstract class BaseSourceProcessor implements SourceProcessor {
 
+	public BaseSourceProcessor() {
+		portalSource = _isPortalSource();
+
+		try {
+			_properties = _getProperties();
+		}
+		catch (Exception e) {
+			ReflectionUtil.throwException(e);
+		}
+	}
+
 	@Override
 	public void format(
 			boolean useProperties, boolean printErrors, boolean autoFix,
@@ -84,7 +96,15 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 
 	@Override
 	public List<String> getErrorMessages() {
-		return _errorMessages;
+		List<String> errorMessages = new ArrayList<String>();
+
+		for (Map.Entry<String, List<String>> entry :
+				_errorMessagesMap.entrySet()) {
+
+			errorMessages.addAll(entry.getValue());
+		}
+
+		return errorMessages;
 	}
 
 	@Override
@@ -93,50 +113,63 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 	}
 
 	protected static boolean isExcluded(
-		List<String> exclusions, String fileName) {
+		List<String> exclusions, String absolutePath) {
 
-		return isExcluded(exclusions, fileName, -1);
+		return isExcluded(exclusions, absolutePath, -1);
 	}
 
 	protected static boolean isExcluded(
-		List<String> exclusions, String fileName, int lineCount) {
+		List<String> exclusions, String absolutePath, int lineCount) {
 
-		return isExcluded(exclusions, fileName, lineCount, null);
+		return isExcluded(exclusions, absolutePath, lineCount, null);
 	}
 
 	protected static boolean isExcluded(
-		List<String> exclusions, String fileName, int lineCount,
+		List<String> exclusions, String absolutePath, int lineCount,
 		String javaTermName) {
 
 		if (ListUtil.isEmpty(exclusions)) {
 			return false;
 		}
 
-		if (exclusions.contains(fileName)) {
-			return true;
+		String absolutePathWithJavaTermName = null;
+
+		if (Validator.isNotNull(javaTermName)) {
+			absolutePathWithJavaTermName =
+				absolutePath + StringPool.AT + javaTermName;
 		}
 
-		if ((lineCount > 0) &&
-			exclusions.contains(fileName + StringPool.AT + lineCount)) {
+		String absolutePathWithLineCount = null;
 
-			return true;
+		if (lineCount > 0) {
+			absolutePathWithLineCount =
+				absolutePath + StringPool.AT + lineCount;
 		}
 
-		if (Validator.isNotNull(javaTermName) &&
-			exclusions.contains(fileName + StringPool.AT + javaTermName)) {
+		for (String exclusion : exclusions) {
+			if (absolutePath.endsWith(exclusion) ||
+				((absolutePathWithJavaTermName != null) &&
+				 absolutePathWithJavaTermName.endsWith(exclusion)) ||
+				((absolutePathWithLineCount != null) &&
+				 absolutePathWithLineCount.endsWith(exclusion))) {
 
-			return true;
+				return true;
+			}
 		}
 
 		return false;
 	}
 
 	protected static void processErrorMessage(String fileName, String message) {
-		_errorMessages.add(message);
+		List<String> errorMessages = _errorMessagesMap.get(fileName);
 
-		if (_printErrors) {
-			sourceFormatterHelper.printError(fileName, message);
+		if (errorMessages == null) {
+			errorMessages = new ArrayList<String>();
 		}
+
+		errorMessages.add(message);
+
+		_errorMessagesMap.put(fileName, errorMessages);
 	}
 
 	protected void checkEmptyCollection(
@@ -380,29 +413,9 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		processErrorMessage(fileName, "plus: " + fileName + " " + lineCount);
 	}
 
-	protected void compareAndAutoFixContent(
-			File file, String fileName, String content, String newContent)
-		throws IOException {
-
-		if ((newContent == null) || content.equals(newContent)) {
-			return;
-		}
-
-		fileName = StringUtil.replace(
-			fileName, StringPool.BACK_SLASH, StringPool.SLASH);
-
-		if (_autoFix) {
-			fileUtil.write(file, newContent);
-		}
-		else if (_firstSourceMismatchException == null) {
-			_firstSourceMismatchException =
-				new SourceMismatchException(fileName, content, newContent);
-		}
-
-		if (_printErrors) {
-			sourceFormatterHelper.printError(fileName, file);
-		}
-	}
+	protected abstract String doFormat(
+			File file, String fileName, String absolutePath, String content)
+		throws Exception;
 
 	protected String fixCompatClassImports(String absolutePath, String content)
 		throws IOException {
@@ -650,18 +663,49 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 
 	protected abstract void format() throws Exception;
 
+	protected String format(
+			File file, String fileName, String absolutePath, String content)
+		throws Exception {
+
+		_errorMessagesMap.remove(fileName);
+
+		String newContent = doFormat(file, fileName, absolutePath, content);
+
+		newContent = StringUtil.replace(
+			newContent, StringPool.RETURN, StringPool.BLANK);
+
+		if (content.equals(newContent)) {
+			return content;
+		}
+
+		return format(file, fileName, absolutePath, newContent);
+	}
+
 	protected String format(String fileName) throws Exception {
-		return null;
+		File file = new File(BASEDIR + fileName);
+
+		fileName = StringUtil.replace(
+			fileName, StringPool.BACK_SLASH, StringPool.SLASH);
+
+		String absolutePath = getAbsolutePath(file);
+
+		String content = fileUtil.read(file);
+
+		String newContent = format(file, fileName, absolutePath, content);
+
+		processFormattedFile(file, fileName, content, newContent);
+
+		return newContent;
 	}
 
 	protected String formatJavaTerms(
-			String fileName, String content, String javaClassContent,
-			List<String> javaTermSortExclusions,
+			String fileName, String absolutePath, String content,
+			String javaClassContent, List<String> javaTermSortExclusions,
 			List<String> testAnnotationsExclusions)
 		throws Exception {
 
 		JavaClass javaClass = new JavaClass(
-			fileName, javaClassContent, StringPool.TAB);
+			fileName, absolutePath, javaClassContent, StringPool.TAB);
 
 		String newJavaClassContent = javaClass.formatJavaTerms(
 			javaTermSortExclusions, testAnnotationsExclusions);
@@ -672,6 +716,12 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		}
 
 		return content;
+	}
+
+	protected String getAbsolutePath(File file) {
+		String absolutePath = fileUtil.getAbsolutePath(file);
+
+		return StringUtil.replace(absolutePath, "/./", StringPool.SLASH);
 	}
 
 	protected Map<String, String> getCompatClassNamesMap() throws IOException {
@@ -767,12 +817,6 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		return null;
 	}
 
-	protected List<String> getExclusions(String key) {
-		return ListUtil.fromString(
-			GetterUtil.getString(_properties.getProperty(key)),
-			StringPool.COMMA);
-	}
-
 	protected File getFile(String fileName, int level) {
 		for (int i = 0; i < level; i++) {
 			if (fileUtil.exists(fileName)) {
@@ -792,7 +836,9 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 
 		directoryScanner.setBasedir(basedir);
 
-		excludes = ArrayUtil.append(excludes, _excludes);
+		if (_excludes != null) {
+			excludes = ArrayUtil.append(excludes, _excludes);
+		}
 
 		directoryScanner.setExcludes(excludes);
 
@@ -872,6 +918,12 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		}
 
 		return new String[0];
+	}
+
+	protected List<String> getPropertyList(String key) {
+		return ListUtil.fromString(
+			GetterUtil.getString(_properties.getProperty(key)),
+			StringPool.COMMA);
 	}
 
 	protected boolean hasMissingParentheses(String s) {
@@ -974,7 +1026,7 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 
 	protected boolean isRunsOutsidePortal(String absolutePath) {
 		if (_runOutsidePortalExclusions == null) {
-			_runOutsidePortalExclusions = getExclusions(
+			_runOutsidePortalExclusions = getPropertyList(
 				"run.outside.portal.excludes");
 		}
 
@@ -985,6 +1037,37 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		}
 
 		return false;
+	}
+
+	protected void processFormattedFile(
+			File file, String fileName, String content, String newContent)
+		throws IOException {
+
+		if (_printErrors) {
+			List<String> errorMessages = _errorMessagesMap.get(fileName);
+
+			if (errorMessages != null) {
+				for (String errorMessage : errorMessages) {
+					sourceFormatterHelper.printError(fileName, errorMessage);
+				}
+			}
+		}
+
+		if (content.equals(newContent)) {
+			return;
+		}
+
+		if (_autoFix) {
+			fileUtil.write(file, newContent);
+		}
+		else if (_firstSourceMismatchException == null) {
+			_firstSourceMismatchException = new SourceMismatchException(
+				fileName, content, newContent);
+		}
+
+		if (_printErrors) {
+			sourceFormatterHelper.printError(fileName, file);
+		}
 	}
 
 	protected String replacePrimitiveWrapperInstantiation(
@@ -1391,18 +1474,11 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 			GetterUtil.getString(
 				System.getProperty("source.formatter.excludes")));
 
-		excludesList.addAll(getExclusions("source.formatter.excludes"));
-
-		DirectoryScanner directoryScanner = new DirectoryScanner();
-
-		directoryScanner.setBasedir(BASEDIR);
+		excludesList.addAll(getPropertyList("source.formatter.excludes"));
 
 		String[] includes = new String[] {"**\\source_formatter.ignore"};
 
-		directoryScanner.setIncludes(includes);
-
-		List<String> ignoreFileNames = sourceFormatterHelper.scanForFiles(
-			directoryScanner);
+		List<String> ignoreFileNames = getFileNames(new String[0], includes);
 
 		for (String ignoreFileName : ignoreFileNames) {
 			excludesList.add(
@@ -1492,7 +1568,7 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 			String mainReleaseVersion)
 		throws Exception {
 
-		_errorMessages = new ArrayList<String>();
+		_errorMessagesMap = new HashMap<String, List<String>>();
 
 		sourceFormatterHelper = new SourceFormatterHelper(useProperties);
 
@@ -1501,10 +1577,6 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		_autoFix = autoFix;
 
 		BaseSourceProcessor.mainReleaseVersion = mainReleaseVersion;
-
-		portalSource = _isPortalSource();
-
-		_properties = _getProperties();
 
 		_excludes = _getExcludes();
 
@@ -1520,7 +1592,8 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		}
 	}
 
-	private static List<String> _errorMessages = new ArrayList<String>();
+	private static Map<String, List<String>> _errorMessagesMap =
+		new HashMap<String, List<String>>();
 	private static boolean _printErrors;
 
 	private boolean _autoFix;

@@ -463,7 +463,8 @@ public class BookmarksEntryLocalServiceWrapper
 	}
 
 	@Override
-	public void rebuildTree(long companyId) {
+	public void rebuildTree(long companyId)
+		throws com.liferay.portal.kernel.exception.PortalException {
 		_bookmarksEntryLocalService.rebuildTree(companyId);
 	}
 
@@ -490,6 +491,13 @@ public class BookmarksEntryLocalServiceWrapper
 	@Override
 	public void setBeanIdentifier(java.lang.String beanIdentifier) {
 		_bookmarksEntryLocalService.setBeanIdentifier(beanIdentifier);
+	}
+
+	@Override
+	public void setTreePaths(long folderId, java.lang.String treePath,
+		boolean reindex)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		_bookmarksEntryLocalService.setTreePaths(folderId, treePath, reindex);
 	}
 
 	@Override

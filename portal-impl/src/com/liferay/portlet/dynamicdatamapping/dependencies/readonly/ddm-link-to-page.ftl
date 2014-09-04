@@ -1,15 +1,17 @@
 <#include "../init.ftl">
 
 <div class="field-wrapper-content lfr-forms-field-wrapper">
-	<#if !disabled>
-		<@aui.input name=namespacedFieldName type="hidden" value=fieldValue />
+	<#if hasFieldValue || showEmptyFieldLabel>
+		<label>
+			<@liferay_ui.message key=escape(label) />
+		</label>
 	</#if>
 
-	<label>
-		<@liferay_ui.message key=escape(label) />
-	</label>
+	<#if hasFieldValue>
+		<#if !disabled>
+			<@aui.input name=namespacedFieldName type="hidden" value=fieldValue />
+		</#if>
 
-	<#if (fieldRawValue?? && fieldRawValue != "")>
 		<#assign fieldLayoutJSONObject = jsonFactoryUtil.createJSONObject(fieldRawValue)>
 
 		<#assign layoutLocalService = serviceLocator.findService("com.liferay.portal.service.LayoutLocalService")>

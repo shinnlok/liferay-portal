@@ -1938,6 +1938,10 @@ public class PortletDataContextImpl implements PortletDataContext {
 
 		ExpandoBridge expandoBridge = classedModel.getExpandoBridge();
 
+		if (expandoBridge == null) {
+			return;
+		}
+
 		Map<String, Serializable> expandoBridgeAttributes =
 			expandoBridge.getAttributes();
 
@@ -2398,7 +2402,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 		}
 
 		Set<XStreamConverter> xStreamConverters =
-			XStreamConverterRegistryUtil.getConverters();
+			XStreamConverterRegistryUtil.getXStreamConverters();
 
 		for (XStreamConverter xStreamConverter : xStreamConverters) {
 			_xStream.registerConverter(

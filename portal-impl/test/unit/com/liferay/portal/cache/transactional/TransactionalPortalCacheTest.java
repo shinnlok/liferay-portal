@@ -14,6 +14,7 @@
 
 package com.liferay.portal.cache.transactional;
 
+import com.liferay.portal.cache.MockPortalCacheManager;
 import com.liferay.portal.cache.TestCacheListener;
 import com.liferay.portal.cache.memory.MemoryPortalCache;
 import com.liferay.portal.kernel.cache.PortalCache;
@@ -57,7 +58,10 @@ public class TransactionalPortalCacheTest {
 
 	@Before
 	public void setUp() {
-		_portalCache = new MemoryPortalCache<String, String>(_CACHE_NAME, 16);
+		_portalCache = new MemoryPortalCache<String, String>(
+			new MockPortalCacheManager<String, String>(
+				_PORTAL_CACHE_MANAGER_NAME),
+			_PORTAL_CACHE_NAME, 16);
 		_transactionalPortalCache =
 			new TransactionalPortalCache<String, String>(_portalCache);
 
@@ -108,7 +112,7 @@ public class TransactionalPortalCacheTest {
 		_transactionalPortalCache.put(_KEY_1, _VALUE_2, 10);
 
 		_testCacheListener.assertActionsCount(1);
-		_testCacheListener.assertUpdated(_KEY_1, _VALUE_2);
+		_testCacheListener.assertUpdated(_KEY_1, _VALUE_2, 10);
 
 		_testCacheListener.reset();
 
@@ -465,7 +469,14 @@ public class TransactionalPortalCacheTest {
 		TransactionalPortalCacheHelper.commit();
 
 		_testCacheListener.assertActionsCount(2);
-		_testCacheListener.assertPut(_KEY_2, _VALUE_1);
+
+		if (ttl) {
+			_testCacheListener.assertPut(_KEY_2, _VALUE_1, 10);
+		}
+		else {
+			_testCacheListener.assertPut(_KEY_2, _VALUE_1);
+		}
+
 		_testCacheListener.assertRemoved(_KEY_1, _VALUE_1);
 
 		_testCacheListener.reset();
@@ -517,11 +528,14 @@ public class TransactionalPortalCacheTest {
 		_testCacheListener.assertActionsCount(0);
 	}
 
-	private static final String _CACHE_NAME = "CACHE_NAME";
-
 	private static final String _KEY_1 = "KEY_1";
 
 	private static final String _KEY_2 = "KEY_2";
+
+	private static final String _PORTAL_CACHE_MANAGER_NAME =
+		"PORTAL_CACHE_MANAGER_NAME";
+
+	private static final String _PORTAL_CACHE_NAME = "PORTAL_CACHE_NAME";
 
 	private static final String _VALUE_1 = "VALUE_1";
 

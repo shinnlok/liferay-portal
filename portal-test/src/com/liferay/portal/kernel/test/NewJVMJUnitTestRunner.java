@@ -16,11 +16,13 @@ package com.liferay.portal.kernel.test;
 
 import com.liferay.portal.kernel.process.ClassPathUtil;
 import com.liferay.portal.kernel.process.ProcessCallable;
+import com.liferay.portal.kernel.process.ProcessChannel;
 import com.liferay.portal.kernel.process.ProcessConfig;
 import com.liferay.portal.kernel.process.ProcessConfig.Builder;
 import com.liferay.portal.kernel.process.ProcessException;
 import com.liferay.portal.kernel.process.ProcessExecutor;
-import com.liferay.portal.kernel.process.ProcessLauncher;
+import com.liferay.portal.kernel.process.local.LocalProcessExecutor;
+import com.liferay.portal.kernel.process.local.LocalProcessLauncher;
 import com.liferay.portal.kernel.util.MethodKey;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -61,9 +63,9 @@ public class NewJVMJUnitTestRunner extends BlockJUnit4ClassRunner {
 
 	protected static void attachProcess(String message) {
 		if (!Boolean.getBoolean("attached")) {
-			ProcessLauncher.ProcessContext.attach(
+			LocalProcessLauncher.ProcessContext.attach(
 				message, 1000,
-				new ProcessLauncher.ShutdownHook() {
+				new LocalProcessLauncher.ShutdownHook() {
 
 					@Override
 					public boolean shutdown(
@@ -167,6 +169,9 @@ public class NewJVMJUnitTestRunner extends BlockJUnit4ClassRunner {
 
 	private static final String _JPDA_OPTIONS =
 		"-agentlib:jdwp=transport=dt_socket,address=8001,server=y,suspend=y";
+
+	private static ProcessExecutor _processExecutor =
+		new LocalProcessExecutor();
 
 	private String _classPath;
 
@@ -292,8 +297,11 @@ public class NewJVMJUnitTestRunner extends BlockJUnit4ClassRunner {
 			processCallable = processProcessCallable(
 				processCallable, _testMethodKey);
 
-			Future<String> future = ProcessExecutor.execute(
-				_processConfig, processCallable);
+			ProcessChannel<Serializable> processChannel =
+				_processExecutor.execute(_processConfig, processCallable);
+
+			Future<Serializable> future =
+				processChannel.getProcessNoticeableFuture();
 
 			try {
 				future.get();
