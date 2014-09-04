@@ -437,17 +437,14 @@ public class VerifyDocumentLibrary extends VerifyProcess {
 
 	protected void updateClassNameId() {
 		try {
-			StringBuilder sb = new StringBuilder(2);
-
-			sb.append("update DLFileEntry set classNameId = 0 ");
-			sb.append("where classNameId is null");
-
-			runSQL(sb.toString());
+			runSQL(
+				"update DLFileEntry set classNameId = 0 where classNameId " +
+					"is null");
 		}
 		catch (Exception e) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(
-					"unable to update classNameId column for file entries " +
+			if (_log.isWarnEnabled()) {
+				_log.warn(
+					"Unable to update classNameId column for file entries " +
 						"where classNameId is null", e);
 			}
 
@@ -455,7 +452,7 @@ public class VerifyDocumentLibrary extends VerifyProcess {
 		}
 
 		if (_log.isDebugEnabled()) {
-			_log.debug("classNameId column verified for file entries");
+			_log.debug("ClassNameId column verified for file entries");
 		}
 	}
 
