@@ -221,8 +221,6 @@ public class LiferaySeleniumHelper {
 					continue;
 				}
 
-				FileUtil.write(fileName, "");
-
 				Element throwableElement = eventElement.element("throwable");
 
 				if (throwableElement != null) {
@@ -425,6 +423,22 @@ public class LiferaySeleniumHelper {
 			throw new Exception(
 				"Element is not visible at \"" + locator + "\"");
 		}
+	}
+
+	public static void captureScreen(String fileName) throws Exception {
+		File file = new File(fileName);
+
+		file.mkdirs();
+
+		Robot robot = new Robot();
+
+		Toolkit toolkit = Toolkit.getDefaultToolkit();
+
+		Rectangle rectangle = new Rectangle(toolkit.getScreenSize());
+
+		BufferedImage bufferedImage = robot.createScreenCapture(rectangle);
+
+		ImageIO.write(bufferedImage, "jpg", file);
 	}
 
 	public static void connectToEmailAccount(
@@ -690,6 +704,115 @@ public class LiferaySeleniumHelper {
 			return true;
 		}
 
+		// LPS-46161
+
+		if (line.matches(
+				".*The web application \\[\\] created a ThreadLocal with key " +
+					"of type.*")) {
+
+			if (line.contains(
+					"[com.google.javascript.jscomp.Tracer.ThreadTrace]")) {
+
+				return true;
+			}
+		}
+
+		// LPS-49204
+
+		if (line.matches(
+				".*The web application \\[\\] appears to have started a " +
+					"thread named \\[elasticsearch\\[.*")) {
+
+			return true;
+		}
+
+		if (line.matches(
+				".*The web application \\[\\] created a ThreadLocal with key " +
+					"of type.*")) {
+
+			if (line.contains("[org.elasticsearch.common.inject]")) {
+				return true;
+			}
+
+			if (line.contains("[org.elasticsearch.index.mapper]")) {
+				return true;
+			}
+		}
+
+		// LPS-49228
+
+		if (line.matches(
+				".*The web application \\[/sharepoint-hook\\] created a " +
+					"ThreadLocal with key of type.*")) {
+
+			if (line.contains(
+					"[org.apache.axis.utils.XMLUtils." +
+						"ThreadLocalDocumentBuilder]")) {
+
+				return true;
+			}
+		}
+
+		// LPS-49229
+
+		if (line.matches(
+				".*The web application \\[\\] created a ThreadLocal with key " +
+					"of type.*")) {
+
+			if (line.contains(
+					"[org.apache.xmlbeans.impl.schema." +
+						"SchemaTypeLoaderImpl$1]")) {
+
+				return true;
+			}
+		}
+
+		// LPS-49505
+
+		if (line.matches(
+				".*The web application \\[\\] created a ThreadLocal with key " +
+					"of type.*")) {
+
+			if (line.contains("[org.jruby.RubyEncoding$2]")) {
+				return true;
+			}
+		}
+
+		// LPS-49506
+
+		if (line.matches(
+				".*The web application \\[\\] created a ThreadLocal with key " +
+					"of type.*")) {
+
+			if (line.contains("[org.joni.StackMachine$1]")) {
+				return true;
+			}
+		}
+
+		// LPS-49628
+
+		if (line.matches(
+				".*The web application \\[\\] created a ThreadLocal with key " +
+					"of type.*")) {
+
+			if (line.contains(
+					"[org.apache.poi.extractor.ExtractorFactory$1]")) {
+
+				return true;
+			}
+		}
+
+		// LPS-49629
+
+		if (line.matches(
+				".*The web application \\[\\] created a ThreadLocal with key " +
+					"of type.*")) {
+
+			if (line.contains("[org.apache.xmlbeans.XmlBeans$1]")) {
+				return true;
+			}
+		}
+
 		if (Validator.equals(
 				TestPropsValues.LIFERAY_PORTAL_BUNDLE, "6.2.10.1") ||
 			Validator.equals(
@@ -803,21 +926,24 @@ public class LiferaySeleniumHelper {
 
 		_screenshotCount++;
 
-		File file = new File(
-			liferaySelenium.getProjectDirName() + "portal-web/test-results/" +
-				"functional/screenshots/" + _screenshotCount + ".jpg");
+		captureScreen(
+			liferaySelenium.getProjectDirName() +
+				"portal-web/test-results/functional/screenshots/" +
+					_screenshotCount + ".jpg");
+	}
 
-		file.mkdirs();
+	public static void saveScreenshotBeforeAction(
+			LiferaySelenium liferaySelenium, boolean actionFailed)
+		throws Exception {
 
-		Robot robot = new Robot();
+		if (actionFailed) {
+			_screenshotErrorCount++;
+		}
 
-		Toolkit toolkit = Toolkit.getDefaultToolkit();
-
-		Rectangle rectangle = new Rectangle(toolkit.getScreenSize());
-
-		BufferedImage bufferedImage = robot.createScreenCapture(rectangle);
-
-		ImageIO.write(bufferedImage, "jpg", file);
+		captureScreen(
+			liferaySelenium.getProjectDirName() +
+				"portal-web/test-results/functional/screenshots/" +
+					"ScreenshotBeforeAction" + _screenshotErrorCount + ".jpg");
 	}
 
 	public static void sendEmail(
@@ -990,7 +1116,24 @@ public class LiferaySeleniumHelper {
 
 		liferaySelenium.pause("1000");
 
-		_screen.type(value);
+		if (value.contains("${line.separator}")) {
+			String[] tokens = StringUtil.split(value, "${line.separator}");
+
+			for (int i = 0; i < tokens.length; i++) {
+				_screen.type(tokens[i]);
+
+				if ((i + 1) < tokens.length) {
+					_screen.type(Key.ENTER);
+				}
+			}
+
+			if (value.endsWith("${line.separator}")) {
+				_screen.type(Key.ENTER);
+			}
+		}
+		else {
+			_screen.type(value);
+		}
 	}
 
 	public static void sikuliUploadCommonFile(
@@ -1050,7 +1193,7 @@ public class LiferaySeleniumHelper {
 			line = value.substring(x, y);
 		}
 
-		liferaySelenium.typeKeys(locator, line.trim(), true);
+		liferaySelenium.typeKeys(locator, line.trim());
 
 		liferaySelenium.keyPress(locator, "\\13");
 
@@ -1065,7 +1208,7 @@ public class LiferaySeleniumHelper {
 				line = value.substring(x, value.length());
 			}
 
-			liferaySelenium.typeKeys(locator, line.trim(), true);
+			liferaySelenium.typeKeys(locator, line.trim());
 
 			liferaySelenium.keyPress(locator, "\\13");
 		}
@@ -1415,5 +1558,6 @@ public class LiferaySeleniumHelper {
 
 	private static Screen _screen = new Screen();
 	private static int _screenshotCount = 0;
+	private static int _screenshotErrorCount = 0;
 
 }

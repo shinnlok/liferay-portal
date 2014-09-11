@@ -87,6 +87,10 @@ public class TextFormatter {
 
 	public static final int P = 15;
 
+	// FORMATId --> format-id
+
+	public static final int Q = 16;
+
 	public static String format(String s, int style) {
 		if (Validator.isNull(s)) {
 			return null;
@@ -141,6 +145,9 @@ public class TextFormatter {
 		}
 		else if (style == P) {
 			return _formatP(s);
+		}
+		else if (style == Q) {
+			return _formatQ(s);
 		}
 		else {
 			return s;
@@ -425,11 +432,32 @@ public class TextFormatter {
 		return sb.toString();
 	}
 
+	private static String _formatQ(String s) {
+		StringBuilder sb = new StringBuilder(StringUtil.toLowerCase(s));
+
+		for (int i = 0; i < s.length(); i++) {
+			char c = s.charAt(i);
+
+			if (Character.isUpperCase(c) && (i > 0) && ((i + 1) < s.length())) {
+				int delta = sb.length() - s.length();
+
+				if (Character.isLowerCase(s.charAt(i + 1))) {
+					sb.insert(i + delta, CharPool.DASH);
+				}
+				else if (Character.isLowerCase(s.charAt(i - 1))) {
+					sb.insert(i + delta, CharPool.DASH);
+				}
+			}
+		}
+
+		return sb.toString();
+	}
+
 	private static final double _STORAGE_SIZE_DENOMINATOR = 1024.0;
 
 	private static final String _STORAGE_SIZE_SUFFIX_GB = "GB";
 
-	private static final String _STORAGE_SIZE_SUFFIX_KB = "k";
+	private static final String _STORAGE_SIZE_SUFFIX_KB = "KB";
 
 	private static final String _STORAGE_SIZE_SUFFIX_MB = "MB";
 

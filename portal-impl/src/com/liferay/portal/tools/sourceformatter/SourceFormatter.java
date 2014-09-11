@@ -14,7 +14,6 @@
 
 package com.liferay.portal.tools.sourceformatter;
 
-import com.liferay.portal.kernel.util.ReleaseInfo;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Tuple;
 
@@ -49,8 +48,6 @@ public class SourceFormatter {
 		_throwException = throwException;
 		_printErrors = printErrors;
 		_autoFix = autoFix;
-
-		_setVersion();
 	}
 
 	public void format() throws Exception {
@@ -67,7 +64,7 @@ public class SourceFormatter {
 					sourceProcessors.add(
 						FTLSourceProcessor.class.newInstance());
 					sourceProcessors.add(
-						JavaSourceProcessor.class.newInstance());
+						JSPSourceProcessor.class.newInstance());
 					sourceProcessors.add(JSSourceProcessor.class.newInstance());
 					sourceProcessors.add(
 						PropertiesSourceProcessor.class.newInstance());
@@ -76,8 +73,6 @@ public class SourceFormatter {
 						SQLSourceProcessor.class.newInstance());
 					sourceProcessors.add(
 						TLDSourceProcessor.class.newInstance());
-					sourceProcessors.add(
-						XMLSourceProcessor.class.newInstance());
 
 					for (SourceProcessor sourceProcessor : sourceProcessors) {
 						_runSourceProcessor(sourceProcessor);
@@ -95,10 +90,17 @@ public class SourceFormatter {
 			@Override
 			public void run() {
 				try {
-					SourceProcessor sourceProcessor =
-						JSPSourceProcessor.class.newInstance();
+					List<SourceProcessor> sourceProcessors =
+						new ArrayList<SourceProcessor>();
 
-					_runSourceProcessor(sourceProcessor);
+					sourceProcessors.add(
+						JavaSourceProcessor.class.newInstance());
+					sourceProcessors.add(
+						XMLSourceProcessor.class.newInstance());
+
+					for (SourceProcessor sourceProcessor : sourceProcessors) {
+						_runSourceProcessor(sourceProcessor);
+					}
 				}
 				catch (Exception e) {
 					e.printStackTrace();
@@ -130,27 +132,24 @@ public class SourceFormatter {
 		if (fileName.endsWith(".testjava")) {
 			sourceProcessor = JavaSourceProcessor.class.newInstance();
 		}
+		else if (fileName.endsWith(".testxml")) {
+			sourceProcessor = XMLSourceProcessor.class.newInstance();
+		}
 
 		if (sourceProcessor == null) {
 			return null;
 		}
 
 		String newContent = sourceProcessor.format(
-			fileName, _useProperties, _printErrors, _autoFix,
-			_mainReleaseVersion);
+			fileName, _useProperties, _printErrors, _autoFix);
 
 		return new Tuple(newContent, sourceProcessor.getErrorMessages());
-	}
-
-	public String getMainReleaseVersion() {
-		return _mainReleaseVersion;
 	}
 
 	private void _runSourceProcessor(SourceProcessor sourceProcessor)
 		throws Exception {
 
-		sourceProcessor.format(
-			_useProperties, _printErrors, _autoFix, _mainReleaseVersion);
+		sourceProcessor.format(_useProperties, _printErrors, _autoFix);
 
 		_errorMessages.addAll(sourceProcessor.getErrorMessages());
 
@@ -160,31 +159,9 @@ public class SourceFormatter {
 		}
 	}
 
-	private void _setVersion() throws Exception {
-		String releaseInfoVersion = ReleaseInfo.getVersion();
-
-		if (releaseInfoVersion.startsWith("6.1")) {
-			_mainReleaseVersion =
-				BaseSourceProcessor.MAIN_RELEASE_VERSION_6_1_0;
-		}
-		else if (releaseInfoVersion.startsWith("6.2")) {
-			_mainReleaseVersion =
-				BaseSourceProcessor.MAIN_RELEASE_VERSION_6_2_0;
-		}
-		else if (releaseInfoVersion.startsWith("7.0")) {
-			_mainReleaseVersion =
-				BaseSourceProcessor.MAIN_RELEASE_VERSION_7_0_0;
-		}
-		else {
-			throw new Exception(
-				"Invalid release information: " + ReleaseInfo.getVersion());
-		}
-	}
-
 	private boolean _autoFix;
 	private Set<String> _errorMessages = new LinkedHashSet<String>();
 	private SourceMismatchException _firstSourceMismatchException;
-	private String _mainReleaseVersion;
 	private boolean _printErrors;
 	private boolean _throwException;
 	private boolean _useProperties;

@@ -58,6 +58,7 @@ import com.liferay.portal.util.PropsValues;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -364,8 +365,6 @@ public class IntrabandProxyUtilTest {
 		RegistrationReference registrationReference =
 			new MockRegistrationReference(autoReplyMockIntraband);
 
-		ExceptionHandler exceptionHandler = new WarnLogExceptionHandler();
-
 		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
 			stubClass.getName(), Level.INFO);
 
@@ -375,7 +374,8 @@ public class IntrabandProxyUtilTest {
 			List<LogRecord> logRecords = captureHandler.getLogRecords();
 
 			stubObject = constructor.newInstance(
-				testId, registrationReference, exceptionHandler);
+				testId, registrationReference,
+				WarnLogExceptionHandler.INSTANCE);
 
 			Assert.assertEquals(2, logRecords.size());
 
@@ -398,7 +398,7 @@ public class IntrabandProxyUtilTest {
 			ReflectionTestUtil.getFieldValue(
 				stubObject, "_registrationReference"));
 		Assert.assertSame(
-			exceptionHandler,
+			WarnLogExceptionHandler.INSTANCE,
 			ReflectionTestUtil.getFieldValue(stubObject, "_exceptionHandler"));
 		Assert.assertSame(
 			autoReplyMockIntraband,
@@ -413,7 +413,7 @@ public class IntrabandProxyUtilTest {
 			String.class, RegistrationReference.class, ExceptionHandler.class);
 
 		stubObject = constructor.newInstance(
-			testId, registrationReference, exceptionHandler);
+			testId, registrationReference, WarnLogExceptionHandler.INSTANCE);
 
 		for (Method idMethod : _getIdMethods(TestGenerateStubFunction2.class)) {
 			Assert.assertEquals(
@@ -577,11 +577,11 @@ public class IntrabandProxyUtilTest {
 
 		IntrabandProxyUtil.newStubInstance(
 			stubClass, "id", new MockRegistrationReference(null),
-			new WarnLogExceptionHandler());
+			WarnLogExceptionHandler.INSTANCE);
 
 		try {
 			IntrabandProxyUtil.newStubInstance(
-				stubClass, "id", null, new WarnLogExceptionHandler());
+				stubClass, "id", null, WarnLogExceptionHandler.INSTANCE);
 
 			Assert.fail();
 		}
@@ -600,7 +600,7 @@ public class IntrabandProxyUtilTest {
 
 		try {
 			IntrabandProxyUtil.newStubInstance(
-				stubClass, "id", null, new WarnLogExceptionHandler());
+				stubClass, "id", null, WarnLogExceptionHandler.INSTANCE);
 
 			Assert.fail();
 		}
@@ -616,7 +616,7 @@ public class IntrabandProxyUtilTest {
 
 		IntrabandProxyUtil.newStubInstance(
 			stubClass, "id", new MockRegistrationReference(null),
-			new WarnLogExceptionHandler());
+			WarnLogExceptionHandler.INSTANCE);
 	}
 
 	@Test
@@ -716,7 +716,7 @@ public class IntrabandProxyUtilTest {
 	}
 
 	@Test
-	public void testTemplateSkeleton() throws Exception {
+	public void testTemplateSkeleton() throws ClassNotFoundException {
 		class TestTemplateSkeleton extends TemplateSkeleton {
 
 			TestTemplateSkeleton(TargetLocator targetLocator) {
@@ -726,8 +726,7 @@ public class IntrabandProxyUtilTest {
 			@Override
 			protected void doDispatch(
 					RegistrationReference registrationReference,
-					Datagram datagram, Deserializer deserializer)
-				throws Exception {
+					Datagram datagram, Deserializer deserializer) {
 
 				int i = deserializer.readInt();
 
@@ -837,7 +836,7 @@ public class IntrabandProxyUtilTest {
 	}
 
 	@Test
-	public void testTemplateStub() throws Exception {
+	public void testTemplateStub() {
 		try {
 			new TemplateStub(null, null, null);
 
@@ -893,10 +892,8 @@ public class IntrabandProxyUtilTest {
 			mockIntraband,
 			ReflectionTestUtil.getFieldValue(templateStub, "_intraband"));
 
-		ExceptionHandler exceptionHandler = new WarnLogExceptionHandler();
-
 		templateStub = new TemplateStub(
-			"id", mockRegistrationReference, exceptionHandler);
+			"id", mockRegistrationReference, WarnLogExceptionHandler.INSTANCE);
 
 		Assert.assertEquals(
 			"id",
@@ -906,7 +903,7 @@ public class IntrabandProxyUtilTest {
 			ReflectionTestUtil.getFieldValue(
 				templateStub, "_registrationReference"));
 		Assert.assertSame(
-			exceptionHandler,
+			WarnLogExceptionHandler.INSTANCE,
 			ReflectionTestUtil.getFieldValue(
 				templateStub, "_exceptionHandler"));
 		Assert.assertSame(
@@ -986,13 +983,17 @@ public class IntrabandProxyUtilTest {
 
 	@AdviseWith(adviceClasses = {DisableProxyClassesDump.class})
 	@Test
-	public void testToClassProxyClassesDumpDisabled() throws Exception {
+	public void testToClassProxyClassesDumpDisabled()
+		throws FileNotFoundException {
+
 		_doTestToClass(false, false);
 	}
 
 	@AdviseWith(adviceClasses = {EnableProxyClassesDump.class})
 	@Test
-	public void testToClassProxyClassesDumpEnabled() throws Exception {
+	public void testToClassProxyClassesDumpEnabled()
+		throws FileNotFoundException {
+
 		_doTestToClass(true, true);
 		_doTestToClass(true, false);
 	}
@@ -1977,7 +1978,7 @@ public class IntrabandProxyUtilTest {
 
 	private void _doTestToClass(
 			boolean proxyClassesDumpEnabled, boolean logEnabled)
-		throws Exception {
+		throws FileNotFoundException {
 
 		class TestClass {
 		}
@@ -2727,10 +2728,10 @@ public class IntrabandProxyUtilTest {
 	private static class TestValidateClass {
 
 		@SuppressWarnings("unused")
-		private static Log _log;
+		private static String[] PROXY_METHOD_SIGNATURES;
 
 		@SuppressWarnings("unused")
-		private static String[] PROXY_METHOD_SIGNATURES;
+		private static Log _log;
 
 		@SuppressWarnings("unused")
 		private static String _proxyMethodsMapping;

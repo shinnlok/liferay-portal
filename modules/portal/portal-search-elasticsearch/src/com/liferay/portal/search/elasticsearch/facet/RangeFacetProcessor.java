@@ -17,27 +17,31 @@ package com.liferay.portal.search.elasticsearch.facet;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.search.facet.Facet;
-import com.liferay.portal.kernel.search.facet.RangeFacet;
 import com.liferay.portal.kernel.search.facet.config.FacetConfiguration;
 import com.liferay.portal.kernel.util.StringPool;
 
 import org.elasticsearch.action.search.SearchRequestBuilder;
-import org.elasticsearch.search.facet.range.RangeFacetBuilder;
+
+import org.osgi.service.component.annotations.Component;
 
 /**
  * @author Michael C. Han
  * @author Milen Dyankov
  */
-public class RangeFacetProcessor implements FacetProcessor {
+@Component(
+	immediate = true,
+	property = {
+		"class.name=com.liferay.portal.kernel.search.facet.RangeFacet"
+	}
+)
+public class RangeFacetProcessor
+	implements FacetProcessor<SearchRequestBuilder> {
 
 	@Override
 	public void processFacet(
 		SearchRequestBuilder searchRequestBuilder, Facet facet) {
 
-		RangeFacet rangeFacet = (RangeFacet)facet;
-
-		FacetConfiguration facetConfiguration =
-			rangeFacet.getFacetConfiguration();
+		FacetConfiguration facetConfiguration = facet.getFacetConfiguration();
 
 		JSONObject jsonObject = facetConfiguration.getData();
 
@@ -47,10 +51,10 @@ public class RangeFacetProcessor implements FacetProcessor {
 			return;
 		}
 
-		RangeFacetBuilder rangeFacetBuilder = new RangeFacetBuilder(
+		DefaultRangeBuilder defaultRangeBuilder = new DefaultRangeBuilder(
 			facetConfiguration.getFieldName());
 
-		rangeFacetBuilder.field(facetConfiguration.getFieldName());
+		defaultRangeBuilder.field(facetConfiguration.getFieldName());
 
 		for (int i = 0; i < jsonArray.length(); i++) {
 			JSONObject rangeJSONObject = jsonArray.getJSONObject(i);
@@ -62,10 +66,10 @@ public class RangeFacetProcessor implements FacetProcessor {
 
 			String[] rangeParts = range.split(StringPool.SPACE);
 
-			rangeFacetBuilder.addRange(rangeParts[0], rangeParts[2]);
+			defaultRangeBuilder.addRange(rangeParts[0], rangeParts[2]);
 		}
 
-		searchRequestBuilder.addFacet(rangeFacetBuilder);
+		searchRequestBuilder.addAggregation(defaultRangeBuilder);
 	}
 
 }

@@ -15,12 +15,12 @@
 package com.liferay.portal.dao.shard;
 
 import com.liferay.portal.kernel.dao.shard.ShardUtil;
-import com.liferay.portal.tools.javadocformatter.SinceJava;
 
 import java.io.PrintWriter;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
 
 import java.util.logging.Logger;
 
@@ -57,9 +57,9 @@ public class ShardDataSource implements DataSource {
 		return getDataSource().getLogWriter();
 	}
 
-	@SinceJava(1.7)
-	public Logger getParentLogger() {
-		throw new UnsupportedOperationException();
+	@Override
+	public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+		return getDataSource().getParentLogger();
 	}
 
 	@Override

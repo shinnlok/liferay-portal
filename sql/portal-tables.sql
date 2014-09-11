@@ -584,6 +584,7 @@ create table DLFileEntry (
 	folderId LONG,
 	treePath STRING null,
 	name VARCHAR(255) null,
+	fileName VARCHAR(500) null,
 	extension VARCHAR(75) null,
 	mimeType VARCHAR(75) null,
 	title VARCHAR(255) null,
@@ -679,6 +680,7 @@ create table DLFileVersion (
 	folderId LONG,
 	fileEntryId LONG,
 	treePath STRING null,
+	fileName VARCHAR(500) null,
 	extension VARCHAR(75) null,
 	mimeType VARCHAR(75) null,
 	title VARCHAR(255) null,
@@ -1515,49 +1517,6 @@ create table PluginSetting (
 	pluginType VARCHAR(75) null,
 	roles STRING null,
 	active_ BOOLEAN
-);
-
-create table PollsChoice (
-	uuid_ VARCHAR(75) null,
-	choiceId LONG not null primary key,
-	groupId LONG,
-	companyId LONG,
-	userId LONG,
-	userName VARCHAR(75) null,
-	createDate DATE null,
-	modifiedDate DATE null,
-	questionId LONG,
-	name VARCHAR(75) null,
-	description STRING null
-);
-
-create table PollsQuestion (
-	uuid_ VARCHAR(75) null,
-	questionId LONG not null primary key,
-	groupId LONG,
-	companyId LONG,
-	userId LONG,
-	userName VARCHAR(75) null,
-	createDate DATE null,
-	modifiedDate DATE null,
-	title STRING null,
-	description STRING null,
-	expirationDate DATE null,
-	lastVoteDate DATE null
-);
-
-create table PollsVote (
-	uuid_ VARCHAR(75) null,
-	voteId LONG not null primary key,
-	groupId LONG,
-	companyId LONG,
-	userId LONG,
-	userName VARCHAR(75) null,
-	createDate DATE null,
-	modifiedDate DATE null,
-	questionId LONG,
-	choiceId LONG,
-	voteDate DATE null
 );
 
 create table PortalPreferences (

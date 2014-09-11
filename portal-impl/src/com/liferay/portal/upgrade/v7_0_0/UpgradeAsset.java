@@ -20,11 +20,14 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.upgrade.v7_0_0.util.AssetEntryTable;
+import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.asset.model.AssetCategoryConstants;
 import com.liferay.portlet.asset.util.AssetVocabularySettingsHelper;
+import com.liferay.portlet.journal.model.JournalArticle;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -51,7 +54,71 @@ public class UpgradeAsset extends UpgradeProcess {
 				AssetEntryTable.TABLE_SQL_ADD_INDEXES);
 		}
 
+		updateAssetClassTypeId();
 		updateAssetVocabularies();
+	}
+
+	protected long getDDMStructureId(String structureId) throws Exception {
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+			con = DataAccess.getUpgradeOptimizedConnection();
+
+			ps = con.prepareStatement(
+				"select structureId from DDMStructure where structureKey = ?");
+
+			ps.setString(1, structureId);
+
+			rs = ps.executeQuery();
+
+			if (rs.next()) {
+				return rs.getLong("structureId");
+			}
+
+			return 0;
+		}
+		finally {
+			DataAccess.cleanUp(con, ps, rs);
+		}
+	}
+
+	protected void updateAssetClassTypeId() throws Exception {
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+			con = DataAccess.getUpgradeOptimizedConnection();
+
+			ps = con.prepareStatement(
+				"select resourcePrimKey, structureId from JournalArticle " +
+					"where structureId != ''");
+
+			rs = ps.executeQuery();
+
+			long classNameId = PortalUtil.getClassNameId(JournalArticle.class);
+
+			while (rs.next()) {
+				long resourcePrimKey = rs.getLong("resourcePrimKey");
+				String structureId = rs.getString("structureId");
+
+				StringBundler sb = new StringBundler(6);
+
+				sb.append("update AssetEntry set classTypeId = ");
+				sb.append(getDDMStructureId(structureId));
+				sb.append(" where classNameId = ");
+				sb.append(classNameId);
+				sb.append(" and classPK = ");
+				sb.append(resourcePrimKey);
+
+				runSQL(sb.toString());
+			}
+		}
+		finally {
+			DataAccess.cleanUp(con, ps, rs);
+		}
 	}
 
 	protected void updateAssetVocabularies() throws Exception {

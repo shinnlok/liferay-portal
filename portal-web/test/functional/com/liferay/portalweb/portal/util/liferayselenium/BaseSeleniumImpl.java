@@ -535,6 +535,17 @@ public abstract class BaseSeleniumImpl
 	}
 
 	@Override
+	public void saveScreenshotBeforeAction(boolean actionFailed)
+		throws Exception {
+
+		if (!TestPropsValues.SAVE_SCREENSHOT) {
+			return;
+		}
+
+		LiferaySeleniumHelper.saveScreenshotBeforeAction(this, actionFailed);
+	}
+
+	@Override
 	public void scrollWebElementIntoView(String locator) throws Exception {
 	}
 
@@ -563,6 +574,11 @@ public abstract class BaseSeleniumImpl
 	@Override
 	public void sendKeys(String locator, String value) {
 		_commandProcessor.doCommand("sendKeys", new String[] {locator, value});
+	}
+
+	@Override
+	public void sendKeysAceEditor(String locator, String value) {
+		LiferaySeleniumHelper.typeAceEditor(this, locator, value);
 	}
 
 	@Override
@@ -705,11 +721,6 @@ public abstract class BaseSeleniumImpl
 
 	@Override
 	public void typeKeys(String locator, String value) {
-		typeKeys(locator, value, false);
-	}
-
-	@Override
-	public void typeKeys(String locator, String value, boolean typeAceEditor) {
 		sendKeys(locator, value);
 	}
 

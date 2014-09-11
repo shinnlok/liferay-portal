@@ -24,10 +24,10 @@ String referringPortletResource = ParamUtil.getString(request, "referringPortlet
 
 BlogsEntry entry = (BlogsEntry)request.getAttribute(WebKeys.BLOGS_ENTRY);
 
-long groupId = BeanParamUtil.getLong(entry, request, "groupId", scopeGroupId);
-
 long entryId = BeanParamUtil.getLong(entry, request, "entryId");
 
+String title = BeanParamUtil.getString(entry, request, "title");
+String subtitle = BeanParamUtil.getString(entry, request, "subtitle");
 String content = BeanParamUtil.getString(entry, request, "content");
 boolean allowPingbacks = PropsValues.BLOGS_PINGBACK_ENABLED && BeanParamUtil.getBoolean(entry, request, "allowPingbacks", true);
 boolean allowTrackbacks = PropsValues.BLOGS_TRACKBACK_ENABLED && BeanParamUtil.getBoolean(entry, request, "allowTrackbacks", true);
@@ -54,7 +54,6 @@ boolean showHeader = ParamUtil.getBoolean(request, "showHeader", true);
 	<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 	<aui:input name="backURL" type="hidden" value="<%= backURL %>" />
 	<aui:input name="referringPortletResource" type="hidden" value="<%= referringPortletResource %>" />
-	<aui:input name="groupId" type="hidden" value="<%= groupId %>" />
 	<aui:input name="entryId" type="hidden" value="<%= entryId %>" />
 	<aui:input name="preview" type="hidden" value="<%= false %>" />
 	<aui:input name="workflowAction" type="hidden" value="<%= WorkflowConstants.ACTION_PUBLISH %>" />
@@ -93,86 +92,30 @@ boolean showHeader = ParamUtil.getBoolean(request, "showHeader", true);
 		<aui:workflow-status id="<%= String.valueOf(entry.getEntryId()) %>" showIcon="<%= false %>" showLabel="<%= false %>" status="<%= entry.getStatus() %>" />
 	</c:if>
 
-	<aui:fieldset>
-		<aui:input autoFocus="<%= windowState.equals(WindowState.MAXIMIZED) || windowState.equals(LiferayWindowState.POP_UP) %>" name="title" />
-
-		<aui:input name="subtitle" />
-
-		<aui:input name="displayDate" />
-
-		<c:if test="<%= preview %>">
-
-			<%
-			if (entry == null) {
-				entry = new BlogsEntryImpl();
-			}
-
-			entry.setContent(content);
-			%>
-
-			<liferay-ui:message key="preview" />:
-
-			<div class="preview">
-				<%= entry.getContent() %>
+	<liferay-ui:tabs
+		names="details,settings"
+		refresh="<%= false %>"
+		type="pills"
+	>
+		<liferay-ui:section>
+			<div class="entry-title">
+				<h2><liferay-ui:input-editor contents="<%= title %>" editorImpl="<%= EDITOR_TEXT_IMPL_KEY %>" name="title" placeholder="title" /></h2>
 			</div>
 
-			<br />
-		</c:if>
+			<aui:input name="title" type="hidden" />
 
-		<aui:field-wrapper label="content">
-			<liferay-ui:input-editor editorImpl="<%= EDITOR_WYSIWYG_IMPL_KEY %>" />
+			<div class="entry-subtitle">
+				<liferay-ui:input-editor contents="<%= subtitle %>" editorImpl="<%= EDITOR_TEXT_IMPL_KEY %>" name="subtitle" placeholder="subtitle" />
+			</div>
+
+			<aui:input name="subtitle" type="hidden" />
+
+			<div class="entry-content">
+				<liferay-ui:input-editor contents="<%= content %>" editorImpl="<%= EDITOR_HTML_IMPL_KEY %>" name="content" placeholder="content" />
+			</div>
 
 			<aui:input name="content" type="hidden" />
-		</aui:field-wrapper>
 
-		<liferay-ui:custom-attributes-available className="<%= BlogsEntry.class.getName() %>">
-			<liferay-ui:custom-attribute-list
-				className="<%= BlogsEntry.class.getName() %>"
-				classPK="<%= entryId %>"
-				editable="<%= true %>"
-				label="<%= true %>"
-			/>
-		</liferay-ui:custom-attributes-available>
-
-		<c:if test="<%= PropsValues.BLOGS_PINGBACK_ENABLED %>">
-			<aui:input helpMessage="to-allow-pingbacks,-please-also-ensure-the-entry's-guest-view-permission-is-enabled" name="allowPingbacks" value="<%= allowPingbacks %>" />
-		</c:if>
-
-		<c:if test="<%= PropsValues.BLOGS_TRACKBACK_ENABLED %>">
-			<aui:input helpMessage="to-allow-trackbacks,-please-also-ensure-the-entry's-guest-view-permission-is-enabled" name="allowTrackbacks" value="<%= allowTrackbacks %>" />
-
-			<aui:input label="trackbacks-to-send" name="trackbacks" />
-
-			<c:if test="<%= (entry != null) && Validator.isNotNull(entry.getTrackbacks()) %>">
-				<aui:fieldset label="trackbacks-already-sent">
-
-					<%
-					int i = 0;
-
-					for (String trackback : StringUtil.split(entry.getTrackbacks())) {
-					%>
-
-						<aui:input label="" name='<%= "trackback" + (i++) %>' title="" type="resource" value="<%= trackback %>" />
-
-					<%
-					}
-					%>
-
-				</aui:fieldset>
-			</c:if>
-		</c:if>
-
-		<c:if test="<%= (entry == null) || (entry.getStatus() == WorkflowConstants.STATUS_DRAFT) %>">
-			<aui:field-wrapper label="permissions">
-				<liferay-ui:input-permissions
-					modelName="<%= BlogsEntry.class.getName() %>"
-				/>
-			</aui:field-wrapper>
-		</c:if>
-
-		<br />
-
-		<liferay-ui:panel defaultState="closed" extended="<%= false %>" id="blogsEntryAbstractPanel" persistState="<%= true %>" title="abstract">
 			<liferay-ui:error exception="<%= EntrySmallImageNameException.class %>">
 
 				<%
@@ -224,24 +167,94 @@ boolean showHeader = ParamUtil.getBoolean(request, "showHeader", true);
 					</div>
 				</div>
 			</aui:fieldset>
-		</liferay-ui:panel>
+		</liferay-ui:section>
 
-		<liferay-ui:panel defaultState="closed" extended="<%= false %>" id="blogsEntryCategorizationPanel" persistState="<%= true %>" title="categorization">
-			<aui:fieldset>
-				<aui:input name="categories" type="assetCategories" />
+		<liferay-ui:section>
+			<aui:input name="displayDate" />
 
-				<aui:input name="tags" type="assetTags" />
-			</aui:fieldset>
-		</liferay-ui:panel>
-
-		<liferay-ui:panel defaultState="closed" extended="<%= false %>" id="blogsEntryAssetLinksPanel" persistState="<%= true %>" title="related-assets">
-			<aui:fieldset>
-				<liferay-ui:input-asset-links
+			<liferay-ui:custom-attributes-available className="<%= BlogsEntry.class.getName() %>">
+				<liferay-ui:custom-attribute-list
 					className="<%= BlogsEntry.class.getName() %>"
 					classPK="<%= entryId %>"
+					editable="<%= true %>"
+					label="<%= true %>"
 				/>
-			</aui:fieldset>
-		</liferay-ui:panel>
+			</liferay-ui:custom-attributes-available>
+
+			<c:if test="<%= PropsValues.BLOGS_PINGBACK_ENABLED %>">
+				<aui:input helpMessage="to-allow-pingbacks,-please-also-ensure-the-entry's-guest-view-permission-is-enabled" name="allowPingbacks" value="<%= allowPingbacks %>" />
+			</c:if>
+
+			<c:if test="<%= PropsValues.BLOGS_TRACKBACK_ENABLED %>">
+				<aui:input helpMessage="to-allow-trackbacks,-please-also-ensure-the-entry's-guest-view-permission-is-enabled" name="allowTrackbacks" value="<%= allowTrackbacks %>" />
+
+				<aui:input label="trackbacks-to-send" name="trackbacks" />
+
+				<c:if test="<%= (entry != null) && Validator.isNotNull(entry.getTrackbacks()) %>">
+					<aui:fieldset label="trackbacks-already-sent">
+
+						<%
+						int i = 0;
+
+						for (String trackback : StringUtil.split(entry.getTrackbacks())) {
+						%>
+
+							<aui:input label="" name='<%= "trackback" + (i++) %>' title="" type="resource" value="<%= trackback %>" />
+
+						<%
+						}
+						%>
+
+					</aui:fieldset>
+				</c:if>
+			</c:if>
+
+			<c:if test="<%= (entry == null) || (entry.getStatus() == WorkflowConstants.STATUS_DRAFT) %>">
+				<aui:field-wrapper label="permissions">
+					<liferay-ui:input-permissions
+						modelName="<%= BlogsEntry.class.getName() %>"
+					/>
+				</aui:field-wrapper>
+			</c:if>
+
+			<liferay-ui:panel defaultState="closed" extended="<%= false %>" id="blogsEntryCategorizationPanel" persistState="<%= true %>" title="categorization">
+				<aui:fieldset>
+					<aui:input name="categories" type="assetCategories" />
+
+					<aui:input name="tags" type="assetTags" />
+				</aui:fieldset>
+			</liferay-ui:panel>
+
+			<liferay-ui:panel defaultState="closed" extended="<%= false %>" id="blogsEntryAssetLinksPanel" persistState="<%= true %>" title="related-assets">
+				<aui:fieldset>
+					<liferay-ui:input-asset-links
+						className="<%= BlogsEntry.class.getName() %>"
+						classPK="<%= entryId %>"
+					/>
+				</aui:fieldset>
+			</liferay-ui:panel>
+		</liferay-ui:section>
+	</liferay-ui:tabs>
+
+	<aui:fieldset>
+		<c:if test="<%= preview %>">
+
+			<%
+			if (entry == null) {
+				entry = new BlogsEntryImpl();
+			}
+
+			entry.setContent(content);
+			%>
+
+			<liferay-ui:message key="preview" />:
+
+			<div class="preview">
+				<%= entry.getContent() %>
+			</div>
+
+			<br />
+		</c:if>
 
 		<%
 		boolean pending = false;
@@ -279,13 +292,13 @@ boolean showHeader = ParamUtil.getBoolean(request, "showHeader", true);
 				</div>
 			</c:if>
 
+			<aui:button disabled="<%= pending %>" name="publishButton" onClick='<%= renderResponse.getNamespace() + "saveEntry(false, false);" %>' type="submit" value="<%= publishButtonLabel %>" />
+
 			<aui:button name="saveButton" onClick='<%= renderResponse.getNamespace() + "saveEntry(true, false);" %>' primary="<%= false %>" type="submit" value="<%= saveButtonLabel %>" />
 
 			<c:if test="<%= (entry == null) || entry.isDraft() || preview %>">
 				<aui:button name="previewButton" onClick='<%= renderResponse.getNamespace() + "previewEntry();" %>' value="preview" />
 			</c:if>
-
-			<aui:button disabled="<%= pending %>" name="publishButton" onClick='<%= renderResponse.getNamespace() + "saveEntry(false, false);" %>' type="submit" value="<%= publishButtonLabel %>" />
 
 			<aui:button href="<%= redirect %>" name="cancelButton" type="cancel" />
 		</aui:button-row>
@@ -295,6 +308,7 @@ boolean showHeader = ParamUtil.getBoolean(request, "showHeader", true);
 <aui:script>
 	var <portlet:namespace />saveDraftIntervalId = null;
 	var <portlet:namespace />oldTitle = null;
+	var <portlet:namespace />oldSubtitle = null;
 	var <portlet:namespace />oldContent = null;
 
 	function <portlet:namespace />clearSaveDraftIntervalId() {
@@ -305,10 +319,6 @@ boolean showHeader = ParamUtil.getBoolean(request, "showHeader", true);
 
 	function <portlet:namespace />getSuggestionsContent() {
 		return document.<portlet:namespace />fm.<portlet:namespace />title.value + ' ' + window.<portlet:namespace />editor.getHTML();
-	}
-
-	function <portlet:namespace />initEditor() {
-		return '<%= UnicodeFormatter.toString(content) %>';
 	}
 
 	function <portlet:namespace />previewEntry() {
@@ -329,8 +339,9 @@ boolean showHeader = ParamUtil.getBoolean(request, "showHeader", true);
 		function(draft, ajax) {
 			var A = AUI();
 
-			var title = document.<portlet:namespace />fm.<portlet:namespace />title.value;
-			var content = window.<portlet:namespace />editor.getHTML();
+			var title = window['<portlet:namespace />title'].getHTML();
+			var subtitle = window['<portlet:namespace />subtitle'].getHTML();
+			var content = window['<portlet:namespace />content'].getHTML();
 
 			var publishButton = A.one('#<portlet:namespace />publishButton');
 			var cancelButton = A.one('#<portlet:namespace />cancelButton');
@@ -344,6 +355,7 @@ boolean showHeader = ParamUtil.getBoolean(request, "showHeader", true);
 				}
 
 				if ((<portlet:namespace />oldTitle == title) &&
+					(<portlet:namespace />oldSubtitle == subtitle) &&
 					(<portlet:namespace />oldContent == content)) {
 
 					return;
@@ -367,6 +379,7 @@ boolean showHeader = ParamUtil.getBoolean(request, "showHeader", true);
 					<portlet:namespace />entryId: document.<portlet:namespace />fm.<portlet:namespace />entryId.value,
 					<portlet:namespace />redirect: document.<portlet:namespace />fm.<portlet:namespace />redirect.value,
 					<portlet:namespace />referringPortletResource: document.<portlet:namespace />fm.<portlet:namespace />referringPortletResource.value,
+					<portlet:namespace />subtitle: subtitle,
 					<portlet:namespace />title: title,
 					<portlet:namespace />workflowAction: <%= WorkflowConstants.ACTION_SAVE_DRAFT %>
 				};
@@ -446,6 +459,8 @@ boolean showHeader = ParamUtil.getBoolean(request, "showHeader", true);
 				<portlet:namespace />clearSaveDraftIntervalId();
 
 				document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = '<%= (entry == null) ? Constants.ADD : Constants.UPDATE %>';
+				document.<portlet:namespace />fm.<portlet:namespace />title.value = title;
+				document.<portlet:namespace />fm.<portlet:namespace />subtitle.value = subtitle;
 				document.<portlet:namespace />fm.<portlet:namespace />content.value = content;
 
 				if (draft) {
@@ -489,7 +504,7 @@ boolean showHeader = ParamUtil.getBoolean(request, "showHeader", true);
 	<c:if test="<%= (entry == null) || ((entry.getUserId() == user.getUserId()) && (entry.getStatus() == WorkflowConstants.STATUS_DRAFT)) %>">
 		<portlet:namespace />saveDraftIntervalId = setInterval('<portlet:namespace />saveEntry(true, true)', 30000);
 		<portlet:namespace />oldTitle = document.<portlet:namespace />fm.<portlet:namespace />title.value;
-		<portlet:namespace />oldContent = <portlet:namespace />initEditor();
+		<portlet:namespace />oldContent = '<%= UnicodeFormatter.toString(content) %>';
 	</c:if>
 </aui:script>
 
@@ -569,5 +584,7 @@ else {
 %>
 
 <%!
-public static final String EDITOR_WYSIWYG_IMPL_KEY = "editor.wysiwyg.portal-web.docroot.html.portlet.blogs.edit_entry.jsp";
+public static final String EDITOR_HTML_IMPL_KEY = "editor.wysiwyg.portal-web.docroot.html.portlet.blogs.edit_entry.html.jsp";
+
+public static final String EDITOR_TEXT_IMPL_KEY = "editor.wysiwyg.portal-web.docroot.html.portlet.blogs.edit_entry.text.jsp";
 %>

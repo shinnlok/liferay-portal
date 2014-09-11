@@ -124,10 +124,6 @@ public interface DLAppHelperLocalService extends BaseLocalService {
 		long trashEntryId)
 		throws com.liferay.portal.kernel.exception.PortalException;
 
-	public void moveFileEntry(
-		com.liferay.portal.kernel.repository.model.FileEntry fileEntry)
-		throws com.liferay.portal.kernel.exception.PortalException;
-
 	public com.liferay.portal.kernel.repository.model.FileEntry moveFileEntryFromTrash(
 		long userId,
 		com.liferay.portal.kernel.repository.model.FileEntry fileEntry,
@@ -168,9 +164,6 @@ public interface DLAppHelperLocalService extends BaseLocalService {
 		com.liferay.portlet.documentlibrary.model.DLFileShortcut dlFileShortcut)
 		throws com.liferay.portal.kernel.exception.PortalException;
 
-	public void moveFolder(
-		com.liferay.portal.kernel.repository.model.Folder folder);
-
 	public com.liferay.portal.kernel.repository.model.Folder moveFolderFromTrash(
 		long userId, com.liferay.portal.kernel.repository.model.Folder folder,
 		long parentFolderId,
@@ -188,13 +181,6 @@ public interface DLAppHelperLocalService extends BaseLocalService {
 	public com.liferay.portal.kernel.repository.model.Folder moveFolderToTrash(
 		long userId, com.liferay.portal.kernel.repository.model.Folder folder)
 		throws com.liferay.portal.kernel.exception.PortalException;
-
-	public void registerDLSyncEventCallback(java.lang.String event,
-		com.liferay.portal.kernel.repository.model.FileEntry fileEntry)
-		throws com.liferay.portal.kernel.exception.PortalException;
-
-	public void registerDLSyncEventCallback(java.lang.String event,
-		com.liferay.portal.kernel.repository.model.Folder folder);
 
 	public void restoreDependentsFromTrash(
 		java.util.List<java.lang.Object> dlFileEntriesAndDLFolders,

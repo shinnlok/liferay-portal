@@ -19,7 +19,7 @@ AUI.add(
 
 			DEFAULT: ['readOnly'],
 
-			separator: ['readOnly', 'required', 'predefinedValue', 'indexType']
+			separator: ['indexType', 'localizable', 'predefinedValue', 'readOnly', 'required']
 		};
 
 		var SETTINGS_TAB_INDEX = 1;
@@ -222,6 +222,14 @@ AUI.add(
 						var instance = this;
 
 						return window[instance.get('portletNamespace') + 'getContentValue']();
+					},
+
+					plotField: function(field, container) {
+						var instance = this;
+
+						LiferayFormBuilder.UNIQUE_FIELD_NAMES_MAP.put(field.get('name'), field);
+
+						return LiferayFormBuilder.superclass.plotField.apply(instance, arguments);
 					},
 
 					_afterEditingLocaleChange: function(event) {

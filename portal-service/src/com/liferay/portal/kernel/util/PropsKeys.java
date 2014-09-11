@@ -55,6 +55,8 @@ public interface PropsKeys {
 
 	public static final String ADMIN_MAIL_HOST_NAMES = "admin.mail.host.names";
 
+	public static final String ADMIN_OBFUSCATED_PROPERTIES = "admin.obfuscated.properties";
+
 	public static final String ADMIN_RESERVED_EMAIL_ADDRESSES = "admin.reserved.email.addresses";
 
 	public static final String ADMIN_RESERVED_SCREEN_NAMES = "admin.reserved.screen.names";
@@ -64,12 +66,6 @@ public interface PropsKeys {
 	public static final String AIM_LOGIN = "aim.login";
 
 	public static final String AIM_PASSWORD = "aim.password";
-
-	public static final String AMAZON_ACCESS_KEY_ID = "amazon.access.key.id";
-
-	public static final String AMAZON_ASSOCIATE_TAG = "amazon.associate.tag";
-
-	public static final String AMAZON_SECRET_ACCESS_KEY = "amazon.secret.access.key";
 
 	public static final String ANNOUNCEMENTS_EMAIL_BODY = "announcements.email.body";
 
@@ -817,6 +813,8 @@ public interface PropsKeys {
 
 	public static final String DL_SHOW_LIFERAY_SYNC_MESSAGE = "dl.show.liferay.sync.message";
 
+	public static final String DL_STORE_ADVANCED_FILE_SYSTEM_ROOT_DIR = "dl.store.advanced.file.system.root.dir";
+
 	public static final String DL_STORE_ANTIVIRUS_ENABLED = "dl.store.antivirus.enabled";
 
 	public static final String DL_STORE_ANTIVIRUS_IMPL = "dl.store.antivirus.impl";
@@ -1287,8 +1285,6 @@ public interface PropsKeys {
 
 	public static final String JOURNAL_TRANSFORMER_LISTENER = "journal.transformer.listener";
 
-	public static final String JSON_DESERIALIZER_STRICT_MODE = "json.deserializer.strict.mode";
-
 	public static final String JSON_SERVICE_AUTH_TOKEN_ENABLED = "json.service.auth.token.enabled";
 
 	public static final String JSON_SERVICE_AUTH_TOKEN_HOSTS_ALLOWED = "json.service.auth.token.hosts.allowed";
@@ -1384,6 +1380,8 @@ public interface PropsKeys {
 	public static final String LAYOUT_SET_PROTOTYPE_MERGE_FAIL_THRESHOLD = "layout.set.prototype.merge.fail.threshold";
 
 	public static final String LAYOUT_SET_PROTOTYPE_MERGE_LOCK_MAX_TIME = "layout.set.prototype.merge.lock.max.time";
+
+	public static final String LAYOUT_SET_PROTOTYPE_PROPAGATE_LOGO = "layout.set.prototype.propagate.logo";
 
 	public static final String LAYOUT_SHOW_HTTP_STATUS = "layout.show.http.status";
 
@@ -2068,8 +2066,6 @@ public interface PropsKeys {
 	public static final String POLLER_NOTIFICATIONS_TIMEOUT = "poller.notifications.timeout";
 
 	public static final String POLLER_REQUEST_TIMEOUT = "poller.request.timeout";
-
-	public static final String POLLS_PUBLISH_TO_LIVE_BY_DEFAULT = "polls.publish.to.live.by.default";
 
 	public static final String POP_SERVER_NOTIFICATIONS_ENABLED = "pop.server.notifications.enabled";
 

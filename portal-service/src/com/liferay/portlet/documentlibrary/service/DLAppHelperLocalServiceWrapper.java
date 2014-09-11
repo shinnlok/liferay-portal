@@ -162,13 +162,6 @@ public class DLAppHelperLocalServiceWrapper implements DLAppHelperLocalService,
 	}
 
 	@Override
-	public void moveFileEntry(
-		com.liferay.portal.kernel.repository.model.FileEntry fileEntry)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		_dlAppHelperLocalService.moveFileEntry(fileEntry);
-	}
-
-	@Override
 	public com.liferay.portal.kernel.repository.model.FileEntry moveFileEntryFromTrash(
 		long userId,
 		com.liferay.portal.kernel.repository.model.FileEntry fileEntry,
@@ -224,12 +217,6 @@ public class DLAppHelperLocalServiceWrapper implements DLAppHelperLocalService,
 	}
 
 	@Override
-	public void moveFolder(
-		com.liferay.portal.kernel.repository.model.Folder folder) {
-		_dlAppHelperLocalService.moveFolder(folder);
-	}
-
-	@Override
 	public com.liferay.portal.kernel.repository.model.Folder moveFolderFromTrash(
 		long userId, com.liferay.portal.kernel.repository.model.Folder folder,
 		long parentFolderId,
@@ -252,19 +239,6 @@ public class DLAppHelperLocalServiceWrapper implements DLAppHelperLocalService,
 		long userId, com.liferay.portal.kernel.repository.model.Folder folder)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _dlAppHelperLocalService.moveFolderToTrash(userId, folder);
-	}
-
-	@Override
-	public void registerDLSyncEventCallback(java.lang.String event,
-		com.liferay.portal.kernel.repository.model.FileEntry fileEntry)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		_dlAppHelperLocalService.registerDLSyncEventCallback(event, fileEntry);
-	}
-
-	@Override
-	public void registerDLSyncEventCallback(java.lang.String event,
-		com.liferay.portal.kernel.repository.model.Folder folder) {
-		_dlAppHelperLocalService.registerDLSyncEventCallback(event, folder);
 	}
 
 	@Override

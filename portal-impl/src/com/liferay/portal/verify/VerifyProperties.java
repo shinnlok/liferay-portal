@@ -259,6 +259,8 @@ public class VerifyProperties extends VerifyProcess {
 	};
 
 	private static final String[] _OBSOLETE_PORTAL_KEYS = new String[] {
+		"amazon.access.key.id", "amazon.associate.tag",
+		"amazon.secret.access.key",
 		"asset.entry.increment.view.counter.enabled", "auth.max.failures.limit",
 		"buffered.increment.parallel.queue.size",
 		"buffered.increment.serial.queue.size", "cas.validate.url",
@@ -290,6 +292,7 @@ public class VerifyProperties extends VerifyProcess {
 			"email_notifications.jsp",
 		"ehcache.statistics.enabled", "index.filter.search.limit",
 		"javax.persistence.validation.mode", "jbi.workflow.url",
+		"json.deserializer.strict.mode",
 		"journal.template.language.parser[css]",
 		"journal.template.language.parser[ftl]",
 		"journal.template.language.parser[vm]",

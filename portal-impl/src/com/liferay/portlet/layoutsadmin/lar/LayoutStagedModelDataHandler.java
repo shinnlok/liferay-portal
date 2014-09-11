@@ -17,6 +17,7 @@ package com.liferay.portlet.layoutsadmin.lar;
 import com.liferay.counter.service.CounterLocalServiceUtil;
 import com.liferay.portal.NoSuchLayoutException;
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -26,6 +27,7 @@ import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.lar.PortletDataException;
 import com.liferay.portal.kernel.lar.PortletDataHandlerKeys;
 import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
+import com.liferay.portal.kernel.lar.StagedModelModifiedDateComparator;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.staging.LayoutStagingUtil;
@@ -34,6 +36,7 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -77,6 +80,7 @@ import com.liferay.portlet.sites.util.SitesUtil;
 
 import java.io.IOException;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -100,12 +104,29 @@ public class LayoutStagedModelDataHandler
 
 		boolean privateLayout = extraDataJSONObject.getBoolean("privateLayout");
 
-		Layout layout = fetchExistingLayout(uuid, groupId, privateLayout);
+		Layout layout = LayoutLocalServiceUtil.fetchLayoutByUuidAndGroupId(
+			uuid, groupId, privateLayout);
 
 		if (layout != null) {
 			LayoutLocalServiceUtil.deleteLayout(
 				layout, true, new ServiceContext());
 		}
+	}
+
+	@Override
+	public Layout fetchStagedModelByUuidAndCompanyId(
+		String uuid, long companyId) {
+
+		List<Layout> layouts =
+			LayoutLocalServiceUtil.getLayoutsByUuidAndCompanyId(
+				uuid, companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+				new StagedModelModifiedDateComparator<Layout>());
+
+		if (ListUtil.isEmpty(layouts)) {
+			return null;
+		}
+
+		return layouts.get(0);
 	}
 
 	@Override
@@ -155,7 +176,8 @@ public class LayoutStagedModelDataHandler
 
 		Layout existingLayout = null;
 
-		existingLayout = fetchExistingLayout(uuid, liveGroupId, privateLayout);
+		existingLayout = fetchMissingReference(
+			uuid, liveGroupId, privateLayout);
 
 		Map<Long, Layout> layouts =
 			(Map<Long, Layout>)portletDataContext.getNewPrimaryKeysMap(
@@ -196,7 +218,7 @@ public class LayoutStagedModelDataHandler
 		boolean privateLayout = GetterUtil.getBoolean(
 			referenceElement.attributeValue("private-layout"));
 
-		Layout existingLayout = fetchExistingLayout(
+		Layout existingLayout = fetchMissingReference(
 			uuid, liveGroupId, privateLayout);
 
 		if (existingLayout == null) {
@@ -310,8 +332,9 @@ public class LayoutStagedModelDataHandler
 		String action = layoutElement.attributeValue(Constants.ACTION);
 
 		if (action.equals(Constants.DELETE)) {
-			Layout deletingLayout = fetchExistingLayout(
-				layoutUuid, groupId, privateLayout);
+			Layout deletingLayout =
+				LayoutLocalServiceUtil.fetchLayoutByUuidAndGroupId(
+					layoutUuid, groupId, privateLayout);
 
 			LayoutLocalServiceUtil.deleteLayout(
 				deletingLayout, false,
@@ -371,7 +394,7 @@ public class LayoutStagedModelDataHandler
 					PortletDataHandlerKeys.
 						LAYOUTS_IMPORT_MODE_CREATED_FROM_PROTOTYPE)) {
 
-			existingLayout = fetchExistingLayout(
+			existingLayout = LayoutLocalServiceUtil.fetchLayoutByUuidAndGroupId(
 				layout.getUuid(), groupId, privateLayout);
 
 			if (SitesUtil.isLayoutModifiedSinceLastMerge(existingLayout)) {
@@ -400,7 +423,7 @@ public class LayoutStagedModelDataHandler
 			// The default behaviour of import mode is
 			// PortletDataHandlerKeys.LAYOUTS_IMPORT_MODE_MERGE_BY_LAYOUT_UUID
 
-			existingLayout = fetchExistingLayout(
+			existingLayout = LayoutLocalServiceUtil.fetchLayoutByUuidAndGroupId(
 				layout.getUuid(), groupId, privateLayout);
 
 			if (existingLayout == null) {
@@ -516,6 +539,11 @@ public class LayoutStagedModelDataHandler
 		}
 
 		importedLayout.setCompanyId(portletDataContext.getCompanyId());
+
+		if (layout.getLayoutPrototypeUuid() != null) {
+			importedLayout.setModifiedDate(new Date());
+		}
+
 		importedLayout.setParentLayoutId(parentLayoutId);
 		importedLayout.setName(layout.getName());
 		importedLayout.setTitle(layout.getTitle());
@@ -770,10 +798,10 @@ public class LayoutStagedModelDataHandler
 		return new Object[] {url.substring(x, y), url, x, y};
 	}
 
-	protected Layout fetchExistingLayout(
+	protected Layout fetchMissingReference(
 		String uuid, long groupId, boolean privateLayout) {
 
-		// Try to fetch it from the actual group
+		// Try to fetch the existing layout from the importing group
 
 		Layout layout = LayoutLocalServiceUtil.fetchLayoutByUuidAndGroupId(
 			uuid, groupId, privateLayout);
@@ -784,17 +812,26 @@ public class LayoutStagedModelDataHandler
 
 		try {
 
-			// Try to fetch it from the parent sites
+			// Try to fetch the existing layout from the parent sites
 
-			Group group = GroupLocalServiceUtil.getGroup(groupId);
+			Group originalGroup = GroupLocalServiceUtil.getGroup(groupId);
 
-			while ((group = group.getParentGroup()) != null) {
+			Group group = originalGroup.getParentGroup();
+
+			while (group != null) {
 				layout = LayoutLocalServiceUtil.fetchLayoutByUuidAndGroupId(
 					uuid, group.getGroupId(), privateLayout);
 
 				if (layout != null) {
 					break;
 				}
+
+				group = group.getParentGroup();
+			}
+
+			if (layout == null) {
+				layout = fetchStagedModelByUuidAndCompanyId(
+					uuid, originalGroup.getCompanyId());
 			}
 
 			return layout;
@@ -804,7 +841,9 @@ public class LayoutStagedModelDataHandler
 				_log.debug(e, e);
 			}
 			else if (_log.isWarnEnabled()) {
-				_log.warn("Unable to fetch layout from group " + groupId);
+				_log.warn(
+					"Unable to fetch missing reference layout from group " +
+						groupId);
 			}
 
 			return null;
@@ -1051,6 +1090,11 @@ public class LayoutStagedModelDataHandler
 		}
 
 		updateTypeSettings(importedLayout, layout);
+	}
+
+	@Override
+	protected void importReferenceStagedModels(
+		PortletDataContext portletDataContext, Layout layout) {
 	}
 
 	protected void importTheme(

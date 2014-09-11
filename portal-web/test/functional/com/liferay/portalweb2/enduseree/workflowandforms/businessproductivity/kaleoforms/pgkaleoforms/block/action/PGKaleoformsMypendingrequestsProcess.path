@@ -29,6 +29,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>WITHDRAW_SUBMISSION</td>
+	<td>//a/span[contains(.,'Withdraw Submission')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td></td>
 	<td></td>
 	<td></td>
@@ -36,7 +41,7 @@
 <!--CURRENT_ENTRY-->
 <tr>
 	<td>CURRENT_ENTRY_FIELD</td>
-	<td>//label[contains(.,'${key_fieldName}')]/../../div[contains(.,'${key_fieldName}') and contains(.,'${key_ddlRecordFieldData}')]</td>
+	<td>//label[contains(.,'${key_fieldName}')]/../../div[contains(.,'${key_fieldName}') and contains(.,'${key_kfProcessFieldData}')]</td>
 	<td></td>
 </tr>
 <tr>
