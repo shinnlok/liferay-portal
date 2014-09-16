@@ -134,12 +134,10 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 		String previousReferenceEntity = StringPool.BLANK;
 		String previousReferencePackagePath = StringPool.BLANK;
 
-		List<Element> referenceElements = entityElement.elements(
-			"reference");
+		List<Element> referenceElements = entityElement.elements("reference");
 
 		for (Element referenceElement : referenceElements) {
-			String referenceEntity = referenceElement.attributeValue(
-				"entity");
+			String referenceEntity = referenceElement.attributeValue("entity");
 			String referencePackagePath = referenceElement.attributeValue(
 				"package-path");
 
@@ -161,6 +159,66 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 			previousReferenceEntity = referenceEntity;
 			previousReferencePackagePath = referencePackagePath;
 		}
+	}
+
+	@Override
+	protected String doFormat(
+			File file, String fileName, String absolutePath, String content)
+		throws Exception {
+
+		if (isExcluded(_xmlExclusions, absolutePath)) {
+			return content;
+		}
+
+		String newContent = content;
+
+		if (!fileName.contains("/build")) {
+			newContent = trimContent(newContent, false);
+		}
+
+		if (fileName.contains("/build") && !fileName.contains("/tools/")) {
+			newContent = formatAntXML(fileName, newContent);
+		}
+		else if (fileName.endsWith("structures.xml")) {
+			newContent = formatDDLStructuresXML(newContent);
+		}
+		else if (fileName.endsWith("routes.xml")) {
+			newContent = formatFriendlyURLRoutesXML(absolutePath, newContent);
+		}
+		else if (fileName.endsWith("/liferay-portlet.xml") ||
+				 (portalSource &&
+				  fileName.endsWith("/portlet-custom.xml")) ||
+				 (!portalSource && fileName.endsWith("/portlet.xml"))) {
+
+			newContent = formatPortletXML(fileName, absolutePath, newContent);
+		}
+		else if (portalSource &&
+				 (fileName.endsWith(".action") ||
+				  fileName.endsWith(".function") ||
+				  fileName.endsWith(".macro") ||
+				  fileName.endsWith(".testcase") ||
+				  fileName.endsWith(".testxml"))) {
+
+			newContent = formatPoshiXML(fileName, newContent);
+		}
+		else if (fileName.endsWith("/service.xml")) {
+			formatServiceXML(fileName, newContent);
+		}
+		else if (portalSource && fileName.endsWith("/struts-config.xml")) {
+			formatStrutsConfigXML(fileName, newContent);
+		}
+		else if (portalSource && fileName.endsWith("/tiles-defs.xml")) {
+			formatTilesDefsXML(fileName, newContent);
+		}
+		else if ((portalSource &&
+				  fileName.endsWith(
+					  "portal-web/docroot/WEB-INF/web.xml")) ||
+				 (!portalSource && fileName.endsWith("/web.xml"))) {
+
+			newContent = formatWebXML(fileName, newContent);
+		}
+
+		return formatXML(newContent);
 	}
 
 	protected String fixAntXMLProjectName(String fileName, String content) {
@@ -362,11 +420,15 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 
 				sb.append(StringPool.LESS_THAN);
 
-				String newStatement = StringUtil.replace(
-					statement, matcher.group(1), sb.toString());
+				String replacement = sb.toString();
 
-				content = StringUtil.replaceFirst(
-					content, statement, newStatement, matcher.start());
+				if (!replacement.equals(matcher.group(1))) {
+					String newStatement = StringUtil.replace(
+						statement, matcher.group(1), replacement);
+
+					return StringUtil.replaceFirst(
+						content, statement, newStatement, matcher.start());
+				}
 			}
 
 			if (openingTagMatcher.find() && !closingTagMatcher.find() &&
@@ -396,77 +458,16 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 			"**\\*.xml"
 		};
 
-		List<String> exclusions = getExclusions("xml.excludes");
-
-		_friendlyUrlRoutesSortExclusions = getExclusions(
+		_friendlyUrlRoutesSortExclusions = getPropertyList(
 			"friendly.url.routes.sort.excludes");
-		_numericalPortletNameElementExclusions = getExclusions(
+		_numericalPortletNameElementExclusions = getPropertyList(
 			"numerical.portlet.name.element.excludes");
+		_xmlExclusions = getPropertyList("xml.excludes");
 
 		List<String> fileNames = getFileNames(excludes, includes);
 
 		for (String fileName : fileNames) {
-			File file = new File(BASEDIR + fileName);
-
-			fileName = StringUtil.replace(
-				fileName, StringPool.BACK_SLASH, StringPool.SLASH);
-
-			if (isExcluded(exclusions, fileName)) {
-				continue;
-			}
-
-			String content = fileUtil.read(file);
-
-			String newContent = content;
-
-			if (!fileName.contains("/build")) {
-				newContent = trimContent(newContent, false);
-			}
-
-			if (fileName.contains("/build") && !fileName.contains("/tools/")) {
-				newContent = formatAntXML(fileName, newContent);
-			}
-			else if (fileName.endsWith("structures.xml")) {
-				newContent = formatDDLStructuresXML(newContent);
-			}
-			else if (fileName.endsWith("routes.xml")) {
-				newContent = formatFriendlyURLRoutesXML(fileName, newContent);
-			}
-			else if (fileName.endsWith("/liferay-portlet.xml") ||
-					 (portalSource &&
-					  fileName.endsWith("/portlet-custom.xml")) ||
-					 (!portalSource && fileName.endsWith("/portlet.xml"))) {
-
-				newContent = formatPortletXML(fileName, newContent);
-			}
-			else if (portalSource &&
-					 (fileName.endsWith(".action") ||
-					  fileName.endsWith(".function") ||
-					  fileName.endsWith(".macro") ||
-					  fileName.endsWith(".testcase"))) {
-
-				newContent = formatPoshiXML(fileName, newContent);
-			}
-			else if (fileName.endsWith("/service.xml")) {
-				formatServiceXML(fileName, newContent);
-			}
-			else if (portalSource && fileName.endsWith("/struts-config.xml")) {
-				formatStrutsConfigXML(fileName, newContent);
-			}
-			else if (portalSource && fileName.endsWith("/tiles-defs.xml")) {
-				formatTilesDefsXML(fileName, newContent);
-			}
-			else if ((portalSource &&
-					  fileName.endsWith(
-						  "portal-web/docroot/WEB-INF/web.xml")) ||
-					 (!portalSource && fileName.endsWith("/web.xml"))) {
-
-				newContent = formatWebXML(fileName, newContent);
-			}
-
-			newContent = formatXML(newContent);
-
-			compareAndAutoFixContent(file, fileName, content, newContent);
+			format(fileName);
 		}
 	}
 
@@ -536,10 +537,11 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 		return document.formattedString();
 	}
 
-	protected String formatFriendlyURLRoutesXML(String fileName, String content)
+	protected String formatFriendlyURLRoutesXML(
+			String absolutePath, String content)
 		throws Exception {
 
-		if (isExcluded(_friendlyUrlRoutesSortExclusions, fileName)) {
+		if (isExcluded(_friendlyUrlRoutesSortExclusions, absolutePath)) {
 			return content;
 		}
 
@@ -594,6 +596,8 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 		}
 
 		Collections.sort(comparableRoutes);
+
+		String mainReleaseVersion = getMainReleaseVersion();
 
 		StringBundler sb = new StringBundler();
 
@@ -670,7 +674,8 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 		return sb.toString();
 	}
 
-	protected String formatPortletXML(String fileName, String content)
+	protected String formatPortletXML(
+			String fileName, String absolutePath, String content)
 		throws Exception {
 
 		Document document = saxReaderUtil.read(content);
@@ -680,7 +685,7 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 		rootElement.sortAttributes(true);
 
 		boolean checkNumericalPortletNameElement = !isExcluded(
-			_numericalPortletNameElementExclusions, fileName);
+			_numericalPortletNameElementExclusions, absolutePath);
 
 		List<Element> portletElements = rootElement.elements("portlet");
 
@@ -955,7 +960,7 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 
 		int pos = fileName.lastIndexOf(StringPool.SLASH);
 
-		return getContent(fileName.substring(0, pos)  + "/sql/tables.sql", 1);
+		return getContent(fileName.substring(0, pos) + "/sql/tables.sql", 1);
 	}
 
 	protected String sortPoshiAttributes(String fileName, String content)
@@ -1180,6 +1185,7 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 			"(?:(?:\\n){1,}+|\\</execute\\>)");
 	private Pattern _poshiWholeTagPattern = Pattern.compile("<[^\\>^/]*\\/>");
 	private String _tablesContent;
+	private List<String> _xmlExclusions;
 
 	private class FinderElementComparator implements Comparator<Element> {
 

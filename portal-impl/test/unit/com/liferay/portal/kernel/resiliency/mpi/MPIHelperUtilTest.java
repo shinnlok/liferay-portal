@@ -209,7 +209,7 @@ public class MPIHelperUtilTest {
 
 	@AdviseWith(adviceClasses = {PropsUtilAdvice.class})
 	@Test
-	public void testShutdownFailWithLog() throws Exception {
+	public void testShutdownFailWithLog() throws NoSuchObjectException {
 		UnicastRemoteObject.unexportObject(_getMPIImpl(), true);
 
 		final IOException ioException = new IOException();
@@ -260,7 +260,7 @@ public class MPIHelperUtilTest {
 
 	@AdviseWith(adviceClasses = {PropsUtilAdvice.class})
 	@Test
-	public void testShutdownFailWithoutLog() throws Exception {
+	public void testShutdownFailWithoutLog() throws NoSuchObjectException {
 		UnicastRemoteObject.unexportObject(_getMPIImpl(), true);
 
 		final IOException ioException = new IOException();
@@ -293,7 +293,7 @@ public class MPIHelperUtilTest {
 
 	@AdviseWith(adviceClasses = {PropsUtilAdvice.class})
 	@Test
-	public void testShutdownSuccess() throws Exception {
+	public void testShutdownSuccess() {
 		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
 			MPIHelperUtil.class.getName(), Level.ALL);
 
@@ -311,7 +311,7 @@ public class MPIHelperUtilTest {
 
 	@AdviseWith(adviceClasses = {PropsUtilAdvice.class})
 	@Test
-	public void testSPIProviderRegistration() throws Exception {
+	public void testSPIProviderRegistration() throws RemoteException {
 
 		// Register SPI provider, null name
 
@@ -471,7 +471,7 @@ public class MPIHelperUtilTest {
 			logRecords = captureHandler.resetLogLevel(Level.INFO);
 
 			ConcurrentMap<String, Object> oldSPIProviderContainers =
-				(ConcurrentMap<String, Object>)ReflectionTestUtil.getFieldValue(
+				ReflectionTestUtil.getFieldValue(
 					MPIHelperUtil.class, "_spiProviderContainers");
 
 			try {
@@ -508,9 +508,8 @@ public class MPIHelperUtilTest {
 
 			logRecords = captureHandler.resetLogLevel(Level.OFF);
 
-			oldSPIProviderContainers =
-				(ConcurrentMap<String, Object>)ReflectionTestUtil.getFieldValue(
-					MPIHelperUtil.class, "_spiProviderContainers");
+			oldSPIProviderContainers = ReflectionTestUtil.getFieldValue(
+				MPIHelperUtil.class, "_spiProviderContainers");
 
 			try {
 				ReflectionTestUtil.setFieldValue(
@@ -728,7 +727,7 @@ public class MPIHelperUtilTest {
 
 	@AdviseWith(adviceClasses = {PropsUtilAdvice.class})
 	@Test
-	public void testSPIRegistration() throws Exception {
+	public void testSPIRegistration() {
 		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
 			MPIHelperUtil.class.getName(), Level.WARNING);
 
@@ -978,7 +977,7 @@ public class MPIHelperUtilTest {
 				null, null, 0, null, null, new String[0], null);
 
 			ThreadLocal<SPI> unregisteringSPIThreadLocal =
-				(ThreadLocal<SPI>)ReflectionTestUtil.getFieldValue(
+				ReflectionTestUtil.getFieldValue(
 					MPIHelperUtil.class, "_unregisteringSPIThreadLocal");
 
 			unregisteringSPIThreadLocal.set(mockSPI1);
@@ -1123,8 +1122,8 @@ public class MPIHelperUtilTest {
 		}
 	}
 
-	private static MPI _getMPIImpl() throws Exception {
-		MPI mpiImpl = (MPI)ReflectionTestUtil.getFieldValue(
+	private static MPI _getMPIImpl() {
+		MPI mpiImpl = ReflectionTestUtil.getFieldValue(
 			MPIHelperUtil.class, "_mpiImpl");
 
 		Assert.assertNotNull(mpiImpl);

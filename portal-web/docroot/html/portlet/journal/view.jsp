@@ -129,7 +129,7 @@ request.setAttribute("view.jsp-folderId", String.valueOf(folderId));
 <aui:script use="liferay-journal-navigation">
 	<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" varImpl="mainURL" />
 
-	new Liferay.Portlet.JournalNavigation(
+	var journalNavigation = new Liferay.Portlet.JournalNavigation(
 		{
 			advancedSearch: '<%= DisplayTerms.ADVANCED_SEARCH %>',
 			displayStyle: '<%= HtmlUtil.escapeJS(JournalUtil.getDisplayStyle(liferayPortletRequest, displayViews)) %>',
@@ -142,7 +142,7 @@ request.setAttribute("view.jsp-folderId", String.valueOf(folderId));
 					method: 'POST',
 					node: A.one(document.<portlet:namespace />fm)
 				},
-				moveEntryRenderUrl: '<portlet:renderURL><portlet:param name="struts_action" value="/journal/move_entry" /></portlet:renderURL>',
+				moveEntryRenderUrl: '<portlet:renderURL><portlet:param name="struts_action" value="/journal/move_entry" /><portlet:param name="redirect" value="<%= currentURL %>" /></portlet:renderURL>',
 				trashLinkId: '<%= TrashUtil.isTrashEnabled(scopeGroupId) ? "_" + PortletKeys.CONTROL_PANEL_MENU + "_portlet_" + PortletKeys.TRASH : StringPool.BLANK %>',
 				updateable: true
 			},
@@ -163,4 +163,14 @@ request.setAttribute("view.jsp-folderId", String.valueOf(folderId));
 			}
 		}
 	);
+
+	var clearJournalNavigationHandles = function(event) {
+		if (event.portletId === '<%= portletDisplay.getRootPortletId() %>') {
+			journalNavigation.destroy();
+
+			Liferay.detach('destroyPortlet', clearJournalNavigationHandles);
+		}
+	};
+
+	Liferay.on('destroyPortlet', clearJournalNavigationHandles);
 </aui:script>

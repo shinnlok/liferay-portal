@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.blogs.model.impl;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -34,11 +36,12 @@ import java.util.Date;
  * @see BlogsEntry
  * @generated
  */
+@ProviderType
 public class BlogsEntryCacheModel implements CacheModel<BlogsEntry>,
 	Externalizable {
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(49);
+		StringBundler sb = new StringBundler(51);
 
 		sb.append("{uuid=");
 		sb.append(uuid);
@@ -76,6 +79,8 @@ public class BlogsEntryCacheModel implements CacheModel<BlogsEntry>,
 		sb.append(trackbacks);
 		sb.append(", smallImage=");
 		sb.append(smallImage);
+		sb.append(", smallImageFileEntryId=");
+		sb.append(smallImageFileEntryId);
 		sb.append(", smallImageId=");
 		sb.append(smallImageId);
 		sb.append(", smallImageURL=");
@@ -183,6 +188,7 @@ public class BlogsEntryCacheModel implements CacheModel<BlogsEntry>,
 		}
 
 		blogsEntryImpl.setSmallImage(smallImage);
+		blogsEntryImpl.setSmallImageFileEntryId(smallImageFileEntryId);
 		blogsEntryImpl.setSmallImageId(smallImageId);
 
 		if (smallImageURL == null) {
@@ -234,6 +240,7 @@ public class BlogsEntryCacheModel implements CacheModel<BlogsEntry>,
 		allowTrackbacks = objectInput.readBoolean();
 		trackbacks = objectInput.readUTF();
 		smallImage = objectInput.readBoolean();
+		smallImageFileEntryId = objectInput.readLong();
 		smallImageId = objectInput.readLong();
 		smallImageURL = objectInput.readUTF();
 		status = objectInput.readInt();
@@ -314,6 +321,7 @@ public class BlogsEntryCacheModel implements CacheModel<BlogsEntry>,
 		}
 
 		objectOutput.writeBoolean(smallImage);
+		objectOutput.writeLong(smallImageFileEntryId);
 		objectOutput.writeLong(smallImageId);
 
 		if (smallImageURL == null) {
@@ -354,6 +362,7 @@ public class BlogsEntryCacheModel implements CacheModel<BlogsEntry>,
 	public boolean allowTrackbacks;
 	public String trackbacks;
 	public boolean smallImage;
+	public long smallImageFileEntryId;
 	public long smallImageId;
 	public String smallImageURL;
 	public int status;

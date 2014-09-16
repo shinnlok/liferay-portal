@@ -59,7 +59,9 @@ import com.liferay.portal.kernel.servlet.filters.invoker.InvokerFilterConfig;
 import com.liferay.portal.kernel.servlet.filters.invoker.InvokerFilterHelper;
 import com.liferay.portal.kernel.struts.StrutsAction;
 import com.liferay.portal.kernel.struts.StrutsPortletAction;
-import com.liferay.portal.kernel.upgrade.UpgradeException;
+import com.liferay.portal.kernel.struts.path.AuthPublicPath;
+import com.liferay.portal.kernel.struts.path.DefaultAuthPublicPath;
+import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.upgrade.util.UpgradeProcessUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.CharPool;
@@ -82,10 +84,9 @@ import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.language.LanguageResources;
 import com.liferay.portal.model.LayoutConstants;
 import com.liferay.portal.model.ModelListener;
-import com.liferay.portal.model.Release;
+import com.liferay.portal.repository.registry.RepositoryClassDefinitionCatalogUtil;
 import com.liferay.portal.repository.util.ExternalRepositoryFactory;
 import com.liferay.portal.repository.util.ExternalRepositoryFactoryImpl;
-import com.liferay.portal.repository.util.ExternalRepositoryFactoryUtil;
 import com.liferay.portal.security.auth.AuthFailure;
 import com.liferay.portal.security.auth.AuthToken;
 import com.liferay.portal.security.auth.AuthTokenWhitelistUtil;
@@ -112,7 +113,6 @@ import com.liferay.portal.service.ServiceWrapper;
 import com.liferay.portal.service.persistence.BasePersistence;
 import com.liferay.portal.servlet.filters.cache.CacheUtil;
 import com.liferay.portal.spring.aop.ServiceBeanAopProxy;
-import com.liferay.portal.struts.AuthPublicPathRegistry;
 import com.liferay.portal.util.CustomJspRegistryUtil;
 import com.liferay.portal.util.JavaScriptBundleUtil;
 import com.liferay.portal.util.LayoutSettings;
@@ -130,6 +130,7 @@ import com.liferay.portlet.documentlibrary.store.Store;
 import com.liferay.portlet.documentlibrary.store.StoreFactory;
 import com.liferay.portlet.documentlibrary.util.DLProcessor;
 import com.liferay.portlet.documentlibrary.util.DLProcessorRegistryUtil;
+import com.liferay.portlet.dynamicdatamapping.render.DDMFormFieldRenderer;
 import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
 import com.liferay.registry.ServiceRegistration;
@@ -560,6 +561,9 @@ public class HookHotDeployListener
 			servletContext, servletContextName, portletClassLoader,
 			hotDeployEvent.getPluginPackage(), rootElement);
 
+		initDynamicDataMappingFormFieldRenderers(
+			servletContextName, portletClassLoader, rootElement);
+
 		initIndexerPostProcessors(
 			servletContextName, portletClassLoader, rootElement);
 
@@ -621,13 +625,6 @@ public class HookHotDeployListener
 
 		if (!_servletContextNames.remove(servletContextName)) {
 			return;
-		}
-
-		AuthPublicPathsContainer authPublicPathsContainer =
-			_authPublicPathsContainerMap.remove(servletContextName);
-
-		if (authPublicPathsContainer != null) {
-			authPublicPathsContainer.unregisterPaths();
 		}
 
 		CustomJspBag customJspBag = _customJspBagsMap.remove(
@@ -854,16 +851,17 @@ public class HookHotDeployListener
 			String servletContextName, Properties portalProperties)
 		throws Exception {
 
-		AuthPublicPathsContainer authPublicPathsContainer =
-			new AuthPublicPathsContainer();
-
-		_authPublicPathsContainerMap.put(
-			servletContextName, authPublicPathsContainer);
-
 		String[] publicPaths = StringUtil.split(
 			portalProperties.getProperty(AUTH_PUBLIC_PATHS));
 
-		authPublicPathsContainer.registerPaths(publicPaths);
+		for (String publicPath : publicPaths) {
+			AuthPublicPath authPublicPath = new DefaultAuthPublicPath(
+				publicPath);
+
+			registerService(
+				servletContextName, AUTH_PUBLIC_PATHS + publicPath,
+				AuthPublicPath.class, authPublicPath);
+		}
 	}
 
 	protected void initAuthVerifiers(
@@ -1031,6 +1029,34 @@ public class HookHotDeployListener
 
 		initCustomJspBag(
 			servletContextName, pluginPackage.getName(), customJspBag);
+	}
+
+	protected void initDynamicDataMappingFormFieldRenderers(
+		String servletContextName, ClassLoader portletClassLoader,
+		Element parentElement) throws Exception {
+
+		List<Element> ddmFormFieldRenderersElements = parentElement.elements(
+			"dynamic-data-mapping-form-field-renderer");
+
+		if (ddmFormFieldRenderersElements.isEmpty()) {
+			return;
+		}
+
+		for (Element ddmFormFieldRendererElement :
+				ddmFormFieldRenderersElements) {
+
+			String ddmFormFieldRendererClassName =
+				ddmFormFieldRendererElement.getText();
+
+			DDMFormFieldRenderer ddmFormFieldRenderer =
+				(DDMFormFieldRenderer)newInstance(
+					portletClassLoader, DDMFormFieldRenderer.class,
+					ddmFormFieldRendererClassName);
+
+			registerService(
+				servletContextName, ddmFormFieldRendererClassName,
+				DDMFormFieldRenderer.class, ddmFormFieldRenderer);
+		}
 	}
 
 	protected void initEvent(
@@ -1831,8 +1857,16 @@ public class HookHotDeployListener
 			unfilteredPortalProperties.containsKey(
 				PropsKeys.UPGRADE_PROCESSES)) {
 
-			updateRelease(
-				servletContextName, portletClassLoader,
+			String[] upgradeProcessClassNames = StringUtil.split(
+				unfilteredPortalProperties.getProperty(
+					PropsKeys.UPGRADE_PROCESSES));
+
+			List<UpgradeProcess> upgradeProcesses =
+				UpgradeProcessUtil.initUpgradeProcesses(
+					portletClassLoader, upgradeProcessClassNames);
+
+			ReleaseLocalServiceUtil.updateRelease(
+				servletContextName, upgradeProcesses,
 				unfilteredPortalProperties);
 		}
 	}
@@ -2364,67 +2398,6 @@ public class HookHotDeployListener
 		}
 	}
 
-	protected void updateRelease(
-			String servletContextName, ClassLoader portletClassLoader,
-			Properties unfilteredPortalProperties)
-		throws Exception {
-
-		int buildNumber = GetterUtil.getInteger(
-			unfilteredPortalProperties.getProperty(
-				PropsKeys.RELEASE_INFO_BUILD_NUMBER));
-
-		if (buildNumber <= 0) {
-			_log.error(
-				"Skipping upgrade processes for " + servletContextName +
-					" because \"release.info.build.number\" is not specified");
-
-			return;
-		}
-
-		Release release = ReleaseLocalServiceUtil.fetchRelease(
-			servletContextName);
-
-		if (release == null) {
-			int previousBuildNumber = GetterUtil.getInteger(
-				unfilteredPortalProperties.getProperty(
-					PropsKeys.RELEASE_INFO_PREVIOUS_BUILD_NUMBER),
-				buildNumber);
-
-			release = ReleaseLocalServiceUtil.addRelease(
-				servletContextName, previousBuildNumber);
-		}
-
-		if (buildNumber == release.getBuildNumber()) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(
-					"Skipping upgrade processes for " + servletContextName +
-						" because it is already up to date");
-			}
-		}
-		else if (buildNumber < release.getBuildNumber()) {
-			throw new UpgradeException(
-				"Skipping upgrade processes for " + servletContextName +
-					" because you are trying to upgrade with an older version");
-		}
-		else {
-			String[] upgradeProcessClassNames = StringUtil.split(
-				unfilteredPortalProperties.getProperty(
-					PropsKeys.UPGRADE_PROCESSES));
-
-			boolean indexOnUpgrade = GetterUtil.getBoolean(
-				unfilteredPortalProperties.getProperty(
-					PropsKeys.INDEX_ON_UPGRADE),
-				PropsValues.INDEX_ON_UPGRADE);
-
-			UpgradeProcessUtil.upgradeProcess(
-				release.getBuildNumber(), upgradeProcessClassNames,
-				portletClassLoader, indexOnUpgrade);
-		}
-
-		ReleaseLocalServiceUtil.updateRelease(
-			release.getReleaseId(), buildNumber, null, true);
-	}
-
 	private static final String[] _PROPS_KEYS_EVENTS = {
 		LOGIN_EVENTS_POST, LOGIN_EVENTS_PRE, LOGOUT_EVENTS_POST,
 		LOGOUT_EVENTS_PRE, SERVLET_SERVICE_EVENTS_POST,
@@ -2526,8 +2499,6 @@ public class HookHotDeployListener
 	private static Log _log = LogFactoryUtil.getLog(
 		HookHotDeployListener.class);
 
-	private Map<String, AuthPublicPathsContainer> _authPublicPathsContainerMap =
-		new HashMap<String, AuthPublicPathsContainer>();
 	private Map<String, CustomJspBag> _customJspBagsMap =
 		new HashMap<String, CustomJspBag>();
 	private Map<String, DLFileEntryProcessorContainer>
@@ -2556,28 +2527,6 @@ public class HookHotDeployListener
 	private Set<String> _servletContextNames = new HashSet<String>();
 	private Map<String, ServletFiltersContainer> _servletFiltersContainerMap =
 		new HashMap<String, ServletFiltersContainer>();
-
-	private class AuthPublicPathsContainer {
-
-		public void registerPaths(String[] paths) {
-			for (String path : paths) {
-				_paths.add(path);
-			}
-
-			AuthPublicPathRegistry.register(paths);
-		}
-
-		public void unregisterPaths() {
-			for (String path : _paths) {
-				AuthPublicPathRegistry.unregister(path);
-			}
-
-			_paths.clear();
-		}
-
-		private Set<String> _paths = new HashSet<String>();
-
-	}
 
 	private class CustomJspBag {
 
@@ -2634,16 +2583,17 @@ public class HookHotDeployListener
 			String className,
 			ExternalRepositoryFactory externalRepositoryFactory) {
 
-			ExternalRepositoryFactoryUtil.registerExternalRepositoryFactory(
-				className, externalRepositoryFactory);
+			RepositoryClassDefinitionCatalogUtil.
+				registerLegacyExternalRepositoryFactory(
+					className, externalRepositoryFactory);
 
 			_classNames.add(className);
 		}
 
 		public void unregisterRepositoryFactories() {
 			for (String className : _classNames) {
-				ExternalRepositoryFactoryUtil.
-					unregisterExternalRepositoryFactory(className);
+				RepositoryClassDefinitionCatalogUtil.
+					unregisterLegacyExternalRepositoryFactory(className);
 			}
 
 			_classNames.clear();

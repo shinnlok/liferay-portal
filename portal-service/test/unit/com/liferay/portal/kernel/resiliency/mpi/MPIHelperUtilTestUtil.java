@@ -17,6 +17,8 @@ package com.liferay.portal.kernel.resiliency.mpi;
 import com.liferay.portal.kernel.resiliency.spi.SPI;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 
+import java.rmi.RemoteException;
+
 import java.util.Map;
 
 /**
@@ -25,18 +27,17 @@ import java.util.Map;
 public class MPIHelperUtilTestUtil {
 
 	public static void directResigterSPI(String spiId, SPI spi)
-		throws Exception {
+		throws RemoteException {
 
 		Map<String, Object> spiProviderContainers =
-			(Map<String, Object>)ReflectionTestUtil.getFieldValue(
+			ReflectionTestUtil.getFieldValue(
 				MPIHelperUtil.class, "_spiProviderContainers");
 
 		Object spiProviderContainer = spiProviderContainers.get(
 			spi.getSPIProviderName());
 
-		Map<String, SPI> spis =
-			(Map<String, SPI>)ReflectionTestUtil.getFieldValue(
-				spiProviderContainer, "_spis");
+		Map<String, SPI> spis = ReflectionTestUtil.getFieldValue(
+			spiProviderContainer, "_spis");
 
 		spis.put(spiId, spi);
 	}

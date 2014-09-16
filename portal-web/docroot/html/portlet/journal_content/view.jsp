@@ -23,10 +23,6 @@ JournalArticleDisplay articleDisplay = (JournalArticleDisplay)request.getAttribu
 boolean print = ParamUtil.getString(request, "viewMode").equals(Constants.PRINT);
 
 boolean hasViewPermission = true;
-
-String title = StringPool.BLANK;
-boolean approved = false;
-boolean expired = true;
 %>
 
 <c:choose>
@@ -69,9 +65,9 @@ boolean expired = true;
 			<c:otherwise>
 
 				<%
-				title = article.getTitle(locale);
-				approved = article.isApproved();
-				expired = article.isExpired();
+				String title = article.getTitle(locale);
+				boolean approved = article.isApproved();
+				boolean expired = article.isExpired();
 
 				if (!expired) {
 					Date expirationDate = article.getExpirationDate();
@@ -220,7 +216,7 @@ boolean expired = true;
 								if (expired) {
 								%>
 
-									<div class="alert alert-block">
+									<div class="alert alert-warning">
 										<%= LanguageUtil.format(request, "x-is-expired", HtmlUtil.escape(title)) %>
 									</div>
 
@@ -240,14 +236,14 @@ boolean expired = true;
 												<portlet:param name="version" value="<%= String.valueOf(article.getVersion()) %>" />
 											</liferay-portlet:renderURL>
 
-											<div class="alert alert-block">
+											<div class="alert alert-warning">
 												<a href="<%= editURL %>">
 													<%= LanguageUtil.format(request, "x-is-not-approved", HtmlUtil.escape(title)) %>
 												</a>
 											</div>
 										</c:when>
 										<c:otherwise>
-											<div class="alert alert-block">
+											<div class="alert alert-warning">
 												<%= LanguageUtil.format(request, "x-is-not-approved", HtmlUtil.escape(title)) %>
 											</div>
 										</c:otherwise>
@@ -269,12 +265,8 @@ boolean expired = true;
 <%
 JournalArticle latestArticle = null;
 
-try {
-	if (articleDisplay != null) {
-		latestArticle = JournalArticleLocalServiceUtil.getLatestArticle(articleDisplay.getGroupId(), articleDisplay.getArticleId(), WorkflowConstants.STATUS_ANY);
-	}
-}
-catch (NoSuchArticleException nsae) {
+if (articleDisplay != null) {
+	latestArticle = JournalArticleLocalServiceUtil.fetchLatestArticle(articleDisplay.getGroupId(), articleDisplay.getArticleId(), WorkflowConstants.STATUS_ANY);
 }
 
 DDMTemplate ddmTemplate = null;
@@ -361,6 +353,7 @@ boolean showIconsActions = themeDisplay.isSignedIn() && !layout.isLayoutPrototyp
 				<liferay-ui:icon-menu
 					cssClass="lfr-icon-action lfr-icon-action-add"
 					direction="down"
+					extended="<%= false %>"
 					icon="../aui/plus"
 					message="add"
 					showArrow="<%= false %>"

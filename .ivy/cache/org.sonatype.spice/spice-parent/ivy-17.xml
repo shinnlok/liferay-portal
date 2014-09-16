@@ -19,8 +19,8 @@
 		<m:dependency.management__org.slf4j__slf4j-api__scope>compile</m:dependency.management__org.slf4j__slf4j-api__scope>
 		<m:dependency.management__org.slf4j__jcl-over-slf4j__scope>runtime</m:dependency.management__org.slf4j__jcl-over-slf4j__scope>
 		<m:properties__forgeSnapshotId>forge-snapshots</m:properties__forgeSnapshotId>
-		<m:dependency.management__org.slf4j__slf4j-api__version>1.6.1</m:dependency.management__org.slf4j__slf4j-api__version>
 		<m:dependency.management__org.slf4j__jcl-over-slf4j__version>1.6.1</m:dependency.management__org.slf4j__jcl-over-slf4j__version>
+		<m:dependency.management__org.slf4j__slf4j-api__version>1.6.1</m:dependency.management__org.slf4j__slf4j-api__version>
 		<m:dependency.management__org.sonatype.sisu__sisu-inject-plexus__scope>compile</m:dependency.management__org.sonatype.sisu__sisu-inject-plexus__scope>
 		<m:dependency.management__junit__junit__version>4.8.2</m:dependency.management__junit__junit__version>
 		<m:dependency.management__org.slf4j__slf4j-simple__scope>test</m:dependency.management__org.slf4j__slf4j-simple__scope>

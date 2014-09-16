@@ -58,6 +58,7 @@ public class PluginPackageIndexer extends BaseIndexer {
 	public static final String PORTLET_ID = "PluginPackageIndexer";
 
 	public PluginPackageIndexer() {
+		setCommitImmediately(true);
 		setDefaultSelectedFieldNames(
 			Field.COMPANY_ID, Field.CONTENT, Field.ENTRY_CLASS_NAME,
 			Field.ENTRY_CLASS_PK, Field.TITLE, Field.UID);
@@ -139,8 +140,7 @@ public class PluginPackageIndexer extends BaseIndexer {
 
 		document.addKeyword(
 			"license",
-			StringUtil.split(
-				ListUtil.toString(licenses, License.NAME_ACCESSOR)));
+			ListUtil.toArray(licenses, License.NAME_ACCESSOR));
 
 		document.addText("longDescription", longDescription);
 		document.addKeyword("moduleId", pluginPackage.getModuleId());
@@ -206,7 +206,8 @@ public class PluginPackageIndexer extends BaseIndexer {
 		Document document = getDocument(pluginPackage);
 
 		SearchEngineUtil.updateDocument(
-			getSearchEngineId(), CompanyConstants.SYSTEM, document);
+			getSearchEngineId(), CompanyConstants.SYSTEM, document,
+			isCommitImmediately());
 	}
 
 	@Override
@@ -216,7 +217,8 @@ public class PluginPackageIndexer extends BaseIndexer {
 	@Override
 	protected void doReindex(String[] ids) throws Exception {
 		SearchEngineUtil.deletePortletDocuments(
-			getSearchEngineId(), CompanyConstants.SYSTEM, PORTLET_ID);
+			getSearchEngineId(), CompanyConstants.SYSTEM, PORTLET_ID,
+			isCommitImmediately());
 
 		Collection<Document> documents = new ArrayList<Document>();
 
@@ -229,7 +231,8 @@ public class PluginPackageIndexer extends BaseIndexer {
 		}
 
 		SearchEngineUtil.updateDocuments(
-			getSearchEngineId(), CompanyConstants.SYSTEM, documents);
+			getSearchEngineId(), CompanyConstants.SYSTEM, documents,
+			isCommitImmediately());
 	}
 
 	@Override

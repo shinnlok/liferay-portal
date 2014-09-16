@@ -123,10 +123,9 @@ public class WabProcessor {
 
 		File outputFile = new File(file, "output.zip");
 
-		JarOutputStream jarOutputStream = new JarOutputStream(
-			new FileOutputStream(outputFile));
+		try (JarOutputStream jarOutputStream = new JarOutputStream(
+				new FileOutputStream(outputFile))) {
 
-		try {
 			writeJarPath(
 				jarOutputStream, _ignoredResources, "META-INF/MANIFEST.MF",
 				getManifestFile());
@@ -134,9 +133,6 @@ public class WabProcessor {
 			writeJarPaths(
 				jarOutputStream, _ignoredResources, _pluginDir,
 				_pluginDir.toURI());
-		}
-		finally {
-			jarOutputStream.close();
 		}
 
 		if (PropsValues.MODULE_FRAMEWORK_WEB_GENERATOR_GENERATED_WABS_STORE) {
@@ -242,10 +238,9 @@ public class WabProcessor {
 
 		URI webInfClasesURI = uri.resolve("WEB-INF/classes");
 
-		ZipInputStream zipInputStream = new ZipInputStream(
-			new FileInputStream(zipFile));
+		try (ZipInputStream zipInputStream = new ZipInputStream(
+				new FileInputStream(zipFile))) {
 
-		try {
 			for (ZipEntry zipEntry;
 				(zipEntry = zipInputStream.getNextEntry()) != null;
 					zipInputStream.closeEntry()) {
@@ -266,18 +261,10 @@ public class WabProcessor {
 
 				parentFile.mkdirs();
 
-				OutputStream outputStream = new FileOutputStream(file);
-
-				try {
-					StreamUtil.transfer(zipInputStream, outputStream, false);
-				}
-				finally {
-					outputStream.close();
-				}
+				StreamUtil.transfer(
+					StreamUtil.uncloseable(zipInputStream),
+					new FileOutputStream(file));
 			}
-		}
-		finally {
-			zipInputStream.close();
 		}
 	}
 
@@ -301,13 +288,8 @@ public class WabProcessor {
 
 		Manifest manifest = new Manifest();
 
-		InputStream inputStream = new FileInputStream(manifestFile);
-
-		try {
+		try (InputStream inputStream = new FileInputStream(manifestFile)) {
 			manifest.read(inputStream);
-		}
-		finally {
-			inputStream.close();
 		}
 
 		return manifest;
@@ -891,9 +873,9 @@ public class WabProcessor {
 			_servicePackageName = rootElement.attributeValue("package-path");
 
 			String[] partialPackageNames = {
-				"", ".model", ".model.impl", ".persistence",
-				".persistence.impl", ".service", ".service.base",
-				".service.impl", ".service.http"
+				"", ".model", ".model.impl", ".service", ".service.base",
+				".service.http", ".service.impl", ".service.persistence",
+				".service.persistence.impl"
 			};
 
 			for (String partialPackageName : partialPackageNames) {
@@ -1145,22 +1127,6 @@ public class WabProcessor {
 			File file)
 		throws FileNotFoundException {
 
-		InputStream inputStream = null;
-
-		try {
-			inputStream = new FileInputStream(file);
-
-			writeJarPath(jarOutputStream, paths, path, inputStream);
-		}
-		finally {
-			StreamUtil.cleanUp(inputStream);
-		}
-	}
-
-	protected void writeJarPath(
-		JarOutputStream jarOutputStream, Set<String> paths, String path,
-		InputStream inputStream) {
-
 		if (paths.contains(path)) {
 			return;
 		}
@@ -1170,7 +1136,9 @@ public class WabProcessor {
 		try {
 			jarOutputStream.putNextEntry(new JarEntry(path));
 
-			StreamUtil.transfer(inputStream, jarOutputStream, false);
+			StreamUtil.transfer(
+				new FileInputStream(file),
+				StreamUtil.uncloseable(jarOutputStream));
 
 			jarOutputStream.closeEntry();
 		}
@@ -1220,13 +1188,8 @@ public class WabProcessor {
 	protected void writeManifest(Manifest manifest) throws IOException {
 		File file = getManifestFile();
 
-		OutputStream outputStream = new FileOutputStream(file);
-
-		try {
+		try (OutputStream outputStream = new FileOutputStream(file)) {
 			manifest.write(outputStream);
-		}
-		finally {
-			outputStream.close();
 		}
 	}
 

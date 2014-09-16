@@ -17,7 +17,8 @@ package com.liferay.portal.repository.capabilities;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.repository.LocalRepository;
 import com.liferay.portal.kernel.repository.capabilities.Capability;
-import com.liferay.portal.kernel.repository.capabilities.TrashCapability;
+import com.liferay.portal.kernel.repository.event.RepositoryEventTrigger;
+import com.liferay.portal.kernel.repository.event.RepositoryEventType;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.repository.model.Folder;
@@ -41,10 +42,13 @@ public class CapabilityLocalRepository
 	public CapabilityLocalRepository(
 		LocalRepository localRepository,
 		Map<Class<? extends Capability>, Capability> supportedCapabilities,
-		Set<Class<? extends Capability>> exportedCapabilityClasses) {
+		Set<Class<? extends Capability>> exportedCapabilityClasses,
+		RepositoryEventTrigger repositoryEventTrigger) {
 
 		super(
 			localRepository, supportedCapabilities, exportedCapabilityClasses);
+
+		_repositoryEventTrigger = repositoryEventTrigger;
 	}
 
 	@Override
@@ -54,9 +58,16 @@ public class CapabilityLocalRepository
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		return getRepository().addFileEntry(
+		LocalRepository localRepository = getRepository();
+
+		FileEntry fileEntry = localRepository.addFileEntry(
 			userId, folderId, sourceFileName, mimeType, title, description,
 			changeLog, file, serviceContext);
+
+		_repositoryEventTrigger.trigger(
+			RepositoryEventType.Add.class, FileEntry.class, fileEntry);
+
+		return fileEntry;
 	}
 
 	@Override
@@ -66,9 +77,16 @@ public class CapabilityLocalRepository
 			long size, ServiceContext serviceContext)
 		throws PortalException {
 
-		return getRepository().addFileEntry(
+		LocalRepository localRepository = getRepository();
+
+		FileEntry fileEntry = localRepository.addFileEntry(
 			userId, folderId, sourceFileName, mimeType, title, description,
 			changeLog, is, size, serviceContext);
+
+		_repositoryEventTrigger.trigger(
+			RepositoryEventType.Add.class, FileEntry.class, fileEntry);
+
+		return fileEntry;
 	}
 
 	@Override
@@ -77,27 +95,36 @@ public class CapabilityLocalRepository
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		return getRepository().addFolder(
+		LocalRepository localRepository = getRepository();
+
+		Folder folder = localRepository.addFolder(
 			userId, parentFolderId, title, description, serviceContext);
+
+		_repositoryEventTrigger.trigger(
+			RepositoryEventType.Add.class, Folder.class, folder);
+
+		return folder;
 	}
 
 	@Override
 	public void deleteAll() throws PortalException {
-		getRepository().deleteAll();
+		LocalRepository localRepository = getRepository();
+
+		_repositoryEventTrigger.trigger(
+			RepositoryEventType.Delete.class, LocalRepository.class,
+			localRepository);
+
+		localRepository.deleteAll();
 	}
 
 	@Override
 	public void deleteFileEntry(long fileEntryId) throws PortalException {
 		LocalRepository localRepository = getRepository();
 
-		if (isCapabilityProvided(TrashCapability.class)) {
-			TrashCapability trashCapability = getCapability(
-				TrashCapability.class);
+		FileEntry fileEntry = localRepository.getFileEntry(fileEntryId);
 
-			FileEntry fileEntry = localRepository.getFileEntry(fileEntryId);
-
-			trashCapability.deleteTrashEntry(fileEntry);
-		}
+		_repositoryEventTrigger.trigger(
+			RepositoryEventType.Delete.class, FileEntry.class, fileEntry);
 
 		localRepository.deleteFileEntry(fileEntryId);
 	}
@@ -106,14 +133,10 @@ public class CapabilityLocalRepository
 	public void deleteFolder(long folderId) throws PortalException {
 		LocalRepository localRepository = getRepository();
 
-		if (isCapabilityProvided(TrashCapability.class)) {
-			TrashCapability trashCapability = getCapability(
-				TrashCapability.class);
+		Folder folder = localRepository.getFolder(folderId);
 
-			Folder folder = localRepository.getFolder(folderId);
-
-			trashCapability.deleteTrashEntry(folder);
-		}
+		_repositoryEventTrigger.trigger(
+			RepositoryEventType.Delete.class, Folder.class, folder);
 
 		localRepository.deleteFolder(folderId);
 	}
@@ -175,8 +198,15 @@ public class CapabilityLocalRepository
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		return getRepository().moveFileEntry(
+		LocalRepository localRepository = getRepository();
+
+		FileEntry fileEntry = localRepository.moveFileEntry(
 			userId, fileEntryId, newFolderId, serviceContext);
+
+		_repositoryEventTrigger.trigger(
+			RepositoryEventType.Move.class, FileEntry.class, fileEntry);
+
+		return fileEntry;
 	}
 
 	@Override
@@ -185,8 +215,15 @@ public class CapabilityLocalRepository
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		return getRepository().moveFolder(
+		LocalRepository localRepository = getRepository();
+
+		Folder folder = localRepository.moveFolder(
 			userId, folderId, parentFolderId, serviceContext);
+
+		_repositoryEventTrigger.trigger(
+			RepositoryEventType.Move.class, Folder.class, folder);
+
+		return folder;
 	}
 
 	@Override
@@ -208,9 +245,16 @@ public class CapabilityLocalRepository
 			boolean majorVersion, File file, ServiceContext serviceContext)
 		throws PortalException {
 
-		return getRepository().updateFileEntry(
+		LocalRepository localRepository = getRepository();
+
+		FileEntry fileEntry = localRepository.updateFileEntry(
 			userId, fileEntryId, sourceFileName, mimeType, title, description,
 			changeLog, majorVersion, file, serviceContext);
+
+		_repositoryEventTrigger.trigger(
+			RepositoryEventType.Update.class, FileEntry.class, fileEntry);
+
+		return fileEntry;
 	}
 
 	@Override
@@ -221,9 +265,16 @@ public class CapabilityLocalRepository
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		return getRepository().updateFileEntry(
+		LocalRepository localRepository = getRepository();
+
+		FileEntry fileEntry = localRepository.updateFileEntry(
 			userId, fileEntryId, sourceFileName, mimeType, title, description,
 			changeLog, majorVersion, is, size, serviceContext);
+
+		_repositoryEventTrigger.trigger(
+			RepositoryEventType.Update.class, FileEntry.class, fileEntry);
+
+		return fileEntry;
 	}
 
 	@Override
@@ -232,8 +283,17 @@ public class CapabilityLocalRepository
 			String description, ServiceContext serviceContext)
 		throws PortalException {
 
-		return getRepository().updateFolder(
+		LocalRepository localRepository = getRepository();
+
+		Folder folder = localRepository.updateFolder(
 			folderId, parentFolderId, title, description, serviceContext);
+
+		_repositoryEventTrigger.trigger(
+			RepositoryEventType.Update.class, Folder.class, folder);
+
+		return folder;
 	}
+
+	private RepositoryEventTrigger _repositoryEventTrigger;
 
 }

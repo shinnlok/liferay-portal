@@ -103,10 +103,8 @@ public class ClusterSchedulerEngineTest {
 		ReflectionTestUtil.setFieldValue(
 			LockLocalServiceUtil.class, "_service", new MockLockLocalService());
 
-		_threadLocalContext =
-			(ThreadLocal<HashMap<String, Serializable>>)
-				ReflectionTestUtil.getFieldValue(
-					ClusterableContextThreadLocal.class, "_contextThreadLocal");
+		_threadLocalContext = ReflectionTestUtil.getFieldValue(
+			ClusterableContextThreadLocal.class, "_contextThreadLocal");
 
 		Method method = ClusterSchedulerEngine.class.getDeclaredMethod(
 			"delete", String.class);
@@ -268,7 +266,7 @@ public class ClusterSchedulerEngineTest {
 	}
 
 	@Test
-	public void testMasterToSlave1() throws Exception {
+	public void testMasterToSlave1() throws SchedulerException {
 		_clusterSchedulerEngine = _getClusterSchedulerEngine(true, 2, 2);
 
 		Assert.assertTrue(_isMaster(_clusterSchedulerEngine));
@@ -293,7 +291,7 @@ public class ClusterSchedulerEngineTest {
 	}
 
 	@Test
-	public void testMasterToSlave2() throws Exception {
+	public void testMasterToSlave2() throws SchedulerException {
 		_clusterSchedulerEngine = _getClusterSchedulerEngine(true, 2, 2);
 
 		Assert.assertTrue(_isMaster(_clusterSchedulerEngine));
@@ -493,7 +491,7 @@ public class ClusterSchedulerEngineTest {
 	}
 
 	@Test
-	public void testSchedule2() throws Exception {
+	public void testSchedule2() throws SchedulerException {
 		_clusterSchedulerEngine = _getClusterSchedulerEngine(false, 1, 0);
 
 		Map<String, SchedulerResponse> schedulerResponses =
@@ -607,7 +605,7 @@ public class ClusterSchedulerEngineTest {
 	}
 
 	@Test
-	public void testSlaveToMaster() throws Exception {
+	public void testSlaveToMaster() throws SchedulerException {
 		_clusterSchedulerEngine = _getClusterSchedulerEngine(false, 2, 0);
 
 		Assert.assertFalse(_isMaster(_clusterSchedulerEngine));
@@ -849,7 +847,9 @@ public class ClusterSchedulerEngineTest {
 	}
 
 	@Test
-	public void testUpdateMemorySchedulerClusterMaster() throws Exception {
+	public void testUpdateMemorySchedulerClusterMaster()
+		throws SchedulerException {
+
 		_clusterSchedulerEngine = _getClusterSchedulerEngine(false, 2, 0);
 
 		Assert.assertFalse(_isMaster(_clusterSchedulerEngine));
@@ -907,7 +907,7 @@ public class ClusterSchedulerEngineTest {
 
 	private ClusterSchedulerEngine _getClusterSchedulerEngine(
 			boolean master, int memoryClusterJobs, int persistentJobs)
-		throws Exception {
+		throws SchedulerException {
 
 		MockSchedulerEngine mockSchedulerEngine = new MockSchedulerEngine(
 			memoryClusterJobs, persistentJobs);
@@ -957,9 +957,8 @@ public class ClusterSchedulerEngineTest {
 	}
 
 	private SchedulerResponse _getMemoryClusteredJob(
-			ClusterSchedulerEngine clusterSchedulerEngine, String jobName,
-			String groupName)
-		throws Exception {
+		ClusterSchedulerEngine clusterSchedulerEngine, String jobName,
+		String groupName) {
 
 		Map<String, SchedulerResponse> allJobs = _getMemoryClusteredJobs(
 			clusterSchedulerEngine);
@@ -970,14 +969,11 @@ public class ClusterSchedulerEngineTest {
 	}
 
 	private Map<String, SchedulerResponse> _getMemoryClusteredJobs(
-			ClusterSchedulerEngine clusterSchedulerEngine)
-		throws Exception {
+		ClusterSchedulerEngine clusterSchedulerEngine) {
 
 		Map<String, ObjectValuePair<SchedulerResponse, TriggerState>>
-			memoryJobs =
-				(Map<String, ObjectValuePair<SchedulerResponse, TriggerState>>)
-					ReflectionTestUtil.getFieldValue(
-						clusterSchedulerEngine, "_memoryClusteredJobs");
+			memoryJobs = ReflectionTestUtil.getFieldValue(
+				clusterSchedulerEngine, "_memoryClusteredJobs");
 
 		if (memoryJobs.isEmpty()) {
 			return Collections.emptyMap();
@@ -1005,8 +1001,7 @@ public class ClusterSchedulerEngineTest {
 	}
 
 	private List<SchedulerResponse> _getMemoryClusteredJobs(
-			ClusterSchedulerEngine clusterSchedulerEngine, String groupName)
-		throws Exception {
+		ClusterSchedulerEngine clusterSchedulerEngine, String groupName) {
 
 		List<SchedulerResponse> schedulerResponses =
 			new ArrayList<SchedulerResponse>();
@@ -1023,12 +1018,9 @@ public class ClusterSchedulerEngineTest {
 		return schedulerResponses;
 	}
 
-	private boolean _isMaster(ClusterSchedulerEngine clusterSchedulerEngine)
-		throws Exception {
-
-		String localClusterNodeAddress =
-			(String)ReflectionTestUtil.getFieldValue(
-				clusterSchedulerEngine, "_localClusterNodeAddress");
+	private boolean _isMaster(ClusterSchedulerEngine clusterSchedulerEngine) {
+		String localClusterNodeAddress = ReflectionTestUtil.getFieldValue(
+			clusterSchedulerEngine, "_localClusterNodeAddress");
 
 		Lock lock = MockLockLocalService.getLock();
 

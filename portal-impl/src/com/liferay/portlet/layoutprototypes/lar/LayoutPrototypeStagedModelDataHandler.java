@@ -47,15 +47,21 @@ public class LayoutPrototypeStagedModelDataHandler
 
 		Group group = GroupLocalServiceUtil.getGroup(groupId);
 
-		LayoutPrototype layoutPrototype =
-			LayoutPrototypeLocalServiceUtil.
-				fetchLayoutPrototypeByUuidAndCompanyId(
-					uuid, group.getCompanyId());
+		LayoutPrototype layoutPrototype = fetchStagedModelByUuidAndCompanyId(
+			uuid, group.getCompanyId());
 
 		if (layoutPrototype != null) {
 			LayoutPrototypeLocalServiceUtil.deleteLayoutPrototype(
 				layoutPrototype);
 		}
+	}
+
+	@Override
+	public LayoutPrototype fetchStagedModelByUuidAndCompanyId(
+		String uuid, long companyId) {
+
+		return LayoutPrototypeLocalServiceUtil.
+			fetchLayoutPrototypeByUuidAndCompanyId(uuid, companyId);
 	}
 
 	@Override
@@ -103,10 +109,9 @@ public class LayoutPrototypeStagedModelDataHandler
 
 		if (portletDataContext.isDataStrategyMirror()) {
 			LayoutPrototype existingLayoutPrototype =
-				LayoutPrototypeLocalServiceUtil.
-					fetchLayoutPrototypeByUuidAndCompanyId(
-						layoutPrototype.getUuid(),
-						portletDataContext.getCompanyId());
+				fetchStagedModelByUuidAndCompanyId(
+					layoutPrototype.getUuid(),
+					portletDataContext.getCompanyId());
 
 			if (existingLayoutPrototype == null) {
 				serviceContext.setUuid(layoutPrototype.getUuid());
@@ -200,18 +205,9 @@ public class LayoutPrototypeStagedModelDataHandler
 	}
 
 	@Override
-	protected boolean validateMissingReference(
-		String uuid, long companyId, long groupId) {
-
-		LayoutPrototype layoutPrototype =
-			LayoutPrototypeLocalServiceUtil.
-				fetchLayoutPrototypeByUuidAndCompanyId(uuid, companyId);
-
-		if (layoutPrototype == null) {
-			return false;
-		}
-
-		return true;
+	protected void importReferenceStagedModels(
+		PortletDataContext portletDataContext,
+		LayoutPrototype layoutPrototype) {
 	}
 
 }

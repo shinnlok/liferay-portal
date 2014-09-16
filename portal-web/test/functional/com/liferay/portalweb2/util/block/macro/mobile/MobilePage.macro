@@ -10,7 +10,9 @@
 		<execute action="MobiledockbarAddpanelcontent#assertClick" locator-key1="NAVIGATION_PAGE" value1="Page" />
 
 		<execute action="MobiledockbarAddpanelpage#type" locator-key1="NAME_FIELD" value1="${pageName}" />
+		<execute action="MobiledockbarAddpanelpage#pause" locator1="2000" />
 		<execute action="MobiledockbarAddpanelpage#assertClick" locator-key1="ADD_PAGE_BUTTON" value1="Add Page" />
+		<execute action="MobiledockbarAddpanelpage#pause" locator1="2000" />
 	</command>
 
 	<command name="gotoCmdCP">
@@ -51,6 +53,24 @@
 		</execute>
 	</command>
 
+	<command name="gotoCP">
+		<description message="Navigate to Control Panel > ${portletName}." />
+
+		<execute macro="Page#openURL" />
+
+		<execute action="Mobiledockbar#click" locator-key1="COG_ICON" />
+		<execute action="Mobiledockbar#assertClick" locator-key1="ADMIN_CONTROL_PANEL" value1="Control Panel" />
+
+		<if>
+			<isset var="portletName" />
+			<then>
+				<var name="key_portletName" value="${portletName}" />
+
+				<execute action="Home#click" locator-key1="CONTROL_PANEL_NAVIGATION" />
+			</then>
+		</if>
+	</command>
+
 	<command name="gotoPagesCP">
 		<description message="Navigate to Site Administration > Content > ${portletName}." />
 
@@ -88,7 +108,7 @@
 			<then>
 				<execute action="MobileCPSitepages#click" locator-key1="PAGE_TREE_PAGE_LINK_2" />
 				<execute action="MobileCPSitepages#click" locator-key1="REORDER_ICON" />
-				<execute action="MobileCPSitepages#assertClick" locator-key1="TOOLBAR_DELETE" value1="Delete" />
+				<execute action="MobileCPSitepages#assertClickNoError" locator-key1="TOOLBAR_DELETE" value1="Delete" />
 				<execute action="MobileCPSitepages#confirm" locator-key1="CONFIRMATION" value1="Are you sure you want to delete the selected page?" />
 				<execute action="MobileCPSitepages#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request completed successfully." />
 			</then>

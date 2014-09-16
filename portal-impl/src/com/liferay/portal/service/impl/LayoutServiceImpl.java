@@ -879,14 +879,19 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 
 	@Override
 	public List<Layout> getLayouts(
-			long groupId, boolean privateLayout, long parentLayoutId,
-			boolean incomplete, int start, int end)
-		throws PortalException {
+		long groupId, boolean privateLayout, long parentLayoutId,
+		boolean incomplete, int start, int end) {
 
-		List<Layout> layouts = layoutLocalService.getLayouts(
-			groupId, privateLayout, parentLayoutId, incomplete, start, end);
+		return layoutPersistence.filterFindByG_P_P(
+			groupId, privateLayout, parentLayoutId, start, end);
+	}
 
-		return filterLayouts(layouts);
+	@Override
+	public int getLayoutsCount(
+		long groupId, boolean privateLayout, long parentLayoutId) {
+
+		return layoutPersistence.filterCountByG_P_P(
+			groupId, privateLayout, parentLayoutId);
 	}
 
 	@Override
@@ -1718,6 +1723,24 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 			getPermissionChecker(), plid, ActionKeys.UPDATE);
 
 		return layoutLocalService.updateParentLayoutId(plid, parentPlid);
+	}
+
+	/**
+	 * Updates the parent layout ID and priority of the layout.
+	 *
+	 * @param  plid the primary key of the layout
+	 * @param  parentPlid the primary key of the parent layout
+	 * @param  priority the layout's new priority
+	 * @return the layout matching the primary key
+	 * @throws PortalException if a portal exception occurred
+	 */
+	@Override
+	public Layout updateParentLayoutIdAndPriority(
+			long plid, long parentPlid, int priority)
+		throws PortalException {
+
+		return layoutLocalService.updateParentLayoutIdAndPriority(
+			plid, parentPlid, priority);
 	}
 
 	/**

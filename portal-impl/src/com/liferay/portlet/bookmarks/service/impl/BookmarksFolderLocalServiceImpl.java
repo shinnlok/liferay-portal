@@ -25,12 +25,14 @@ import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.ContentTypes;
-import com.liferay.portal.kernel.util.TreeModelFinder;
+import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.TreeModelTasksAdapter;
 import com.liferay.portal.kernel.util.TreePathUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.SystemEventConstants;
+import com.liferay.portal.model.TreeModel;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portlet.asset.model.AssetEntry;
@@ -337,6 +339,9 @@ public class BookmarksFolderLocalServiceImpl
 
 		bookmarksFolderPersistence.update(folder);
 
+		rebuildTree(
+			folder.getCompanyId(), folderId, folder.getTreePath(), true);
+
 		return folder;
 	}
 
@@ -355,12 +360,8 @@ public class BookmarksFolderLocalServiceImpl
 
 			// Folder
 
-			TrashEntry trashEntry = folder.getTrashEntry();
-
-			TrashVersion trashVersion =
-				trashVersionLocalService.fetchVersion(
-					trashEntry.getEntryId(), BookmarksFolder.class.getName(),
-					folderId);
+			TrashVersion trashVersion = trashVersionLocalService.fetchVersion(
+				BookmarksFolder.class.getName(), folderId);
 
 			int status = WorkflowConstants.STATUS_APPROVED;
 
@@ -383,8 +384,7 @@ public class BookmarksFolderLocalServiceImpl
 					folder.getGroupId(), folder.getFolderId(),
 					WorkflowConstants.STATUS_IN_TRASH);
 
-			restoreDependentsFromTrash(
-				foldersAndEntries, trashEntry.getEntryId());
+			restoreDependentsFromTrash(foldersAndEntries);
 		}
 
 		return bookmarksFolderLocalService.moveFolder(folderId, parentFolderId);
@@ -435,10 +435,21 @@ public class BookmarksFolderLocalServiceImpl
 	}
 
 	@Override
-	public void rebuildTree(long companyId) {
-		TreePathUtil.rebuildTree(
+	public void rebuildTree(long companyId) throws PortalException {
+		rebuildTree(
 			companyId, BookmarksFolderConstants.DEFAULT_PARENT_FOLDER_ID,
-			new TreeModelFinder<BookmarksFolder>() {
+			StringPool.SLASH, false);
+	}
+
+	@Override
+	public void rebuildTree(
+			long companyId, long parentFolderId, String parentTreePath,
+			final boolean reindex)
+		throws PortalException {
+
+		TreePathUtil.rebuildTree(
+			companyId, parentFolderId, parentTreePath,
+			new TreeModelTasksAdapter<BookmarksFolder>() {
 
 				@Override
 				public List<BookmarksFolder> findTreeModels(
@@ -449,6 +460,31 @@ public class BookmarksFolderLocalServiceImpl
 						previousId, companyId, parentPrimaryKey,
 						WorkflowConstants.STATUS_IN_TRASH, QueryUtil.ALL_POS,
 						size, new FolderIdComparator(true));
+				}
+
+				@Override
+				public void rebuildDependentModelsTreePaths(
+						long parentPrimaryKey, String treePath)
+					throws PortalException {
+
+					bookmarksEntryLocalService.setTreePaths(
+						parentPrimaryKey, treePath, false);
+				}
+
+				@Override
+				public void reindexTreeModels(List<TreeModel> treeModels)
+					throws PortalException {
+
+					if (!reindex) {
+						return;
+					}
+
+					Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
+						BookmarksFolder.class);
+
+					for (TreeModel treeModel : treeModels) {
+						indexer.reindex(treeModel);
+					}
 				}
 
 			}
@@ -477,7 +513,7 @@ public class BookmarksFolderLocalServiceImpl
 				folder.getGroupId(), folder.getFolderId(),
 				WorkflowConstants.STATUS_IN_TRASH);
 
-		restoreDependentsFromTrash(foldersAndEntries, trashEntry.getEntryId());
+		restoreDependentsFromTrash(foldersAndEntries);
 
 		// Trash
 
@@ -793,8 +829,7 @@ public class BookmarksFolderLocalServiceImpl
 		}
 	}
 
-	protected void restoreDependentsFromTrash(
-			List<Object> foldersAndEntries, long trashEntryId)
+	protected void restoreDependentsFromTrash(List<Object> foldersAndEntries)
 		throws PortalException {
 
 		for (Object object : foldersAndEntries) {
@@ -810,8 +845,7 @@ public class BookmarksFolderLocalServiceImpl
 
 				TrashVersion trashVersion =
 					trashVersionLocalService.fetchVersion(
-						trashEntryId, BookmarksEntry.class.getName(),
-						entry.getEntryId());
+						BookmarksEntry.class.getName(), entry.getEntryId());
 
 				int oldStatus = WorkflowConstants.STATUS_APPROVED;
 
@@ -856,8 +890,7 @@ public class BookmarksFolderLocalServiceImpl
 
 				TrashVersion trashVersion =
 					trashVersionLocalService.fetchVersion(
-						trashEntryId, BookmarksFolder.class.getName(),
-						folder.getFolderId());
+						BookmarksFolder.class.getName(), folder.getFolderId());
 
 				int oldStatus = WorkflowConstants.STATUS_APPROVED;
 
@@ -875,7 +908,7 @@ public class BookmarksFolderLocalServiceImpl
 					folder.getGroupId(), folder.getFolderId(),
 					WorkflowConstants.STATUS_IN_TRASH);
 
-				restoreDependentsFromTrash(curFoldersAndEntries, trashEntryId);
+				restoreDependentsFromTrash(curFoldersAndEntries);
 
 				// Trash
 

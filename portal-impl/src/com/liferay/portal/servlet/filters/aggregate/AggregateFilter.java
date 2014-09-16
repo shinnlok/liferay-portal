@@ -546,6 +546,8 @@ public class AggregateFilter extends IgnoreModuleRequestFilter {
 			new String[] {StringPool.UNDERLINE, StringPool.UNDERLINE});
 	}
 
+	private static String _BASE_URL = "@base_url@";
+
 	private static final String _CSS_COMMENT_BEGIN = "/*";
 
 	private static final String _CSS_COMMENT_END = "*/";
@@ -565,8 +567,6 @@ public class AggregateFilter extends IgnoreModuleRequestFilter {
 	private static final String _TEMP_DIR = "aggregate";
 
 	private static Log _log = LogFactoryUtil.getLog(AggregateFilter.class);
-
-	private static String _BASE_URL = "@base_url@";
 
 	private static Pattern _pattern = Pattern.compile(
 		"^(\\.ie|\\.js\\.ie)([^}]*)}", Pattern.MULTILINE);

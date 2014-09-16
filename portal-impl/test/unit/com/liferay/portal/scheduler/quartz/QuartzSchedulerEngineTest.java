@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.scheduler.JobState;
 import com.liferay.portal.kernel.scheduler.JobStateSerializeUtil;
 import com.liferay.portal.kernel.scheduler.SchedulerEngine;
 import com.liferay.portal.kernel.scheduler.SchedulerEngineHelperUtil;
+import com.liferay.portal.kernel.scheduler.SchedulerException;
 import com.liferay.portal.kernel.scheduler.StorageType;
 import com.liferay.portal.kernel.scheduler.Trigger;
 import com.liferay.portal.kernel.scheduler.TriggerState;
@@ -91,7 +92,7 @@ import org.quartz.spi.JobFactory;
 public class QuartzSchedulerEngineTest {
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() throws SchedulerException {
 		JSONFactoryUtil jsonFactoryUtil = new JSONFactoryUtil();
 
 		jsonFactoryUtil.setJSONFactory(new JSONFactoryImpl());
@@ -252,7 +253,7 @@ public class QuartzSchedulerEngineTest {
 
 	@AdviseWith(adviceClasses = {EnableSchedulerAdvice.class})
 	@Test
-	public void testGetQuartzTrigger3() throws Exception {
+	public void testGetQuartzTrigger3() throws SchedulerException {
 		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
 			QuartzSchedulerEngine.class.getName(), Level.FINE);
 
@@ -313,9 +314,8 @@ public class QuartzSchedulerEngineTest {
 
 		Assert.assertEquals(_DEFAULT_JOB_NUMBER, schedulerResponses.size());
 
-		MockScheduler mockScheduler =
-			(MockScheduler)ReflectionTestUtil.getFieldValue(
-				_quartzSchedulerEngine, "_persistedScheduler");
+		MockScheduler mockScheduler = ReflectionTestUtil.getFieldValue(
+			_quartzSchedulerEngine, "_persistedScheduler");
 
 		mockScheduler.addJob(
 			_TEST_JOB_NAME_PREFIX + "persisted", _TEST_GROUP_NAME,
@@ -653,10 +653,9 @@ public class QuartzSchedulerEngineTest {
 
 	@AdviseWith(adviceClasses = {EnableSchedulerAdvice.class})
 	@Test
-	public void testUpdate3() throws Exception {
-		MockScheduler mockScheduler =
-			(MockScheduler)ReflectionTestUtil.getFieldValue(
-				_quartzSchedulerEngine, "_memoryScheduler");
+	public void testUpdate3() throws SchedulerException {
+		MockScheduler mockScheduler = ReflectionTestUtil.getFieldValue(
+			_quartzSchedulerEngine, "_memoryScheduler");
 
 		String jobName = _TEST_JOB_NAME_PREFIX + "memory";
 

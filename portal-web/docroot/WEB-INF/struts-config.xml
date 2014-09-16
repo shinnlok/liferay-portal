@@ -37,6 +37,8 @@
 
 		<action path="/portal/flash" forward="/portal/flash.jsp" />
 
+		<action path="/portal/image_selector" type="com.liferay.portal.action.ImageSelectorAction" />
+
 		<action path="/portal/j_login" forward="/portal/j_login.jsp" />
 
 		<action path="/portal/j_login_error" forward="portal.j_login_error" />
@@ -116,12 +118,6 @@
 		<action path="/portal/verify_email_address" type="com.liferay.portal.action.VerifyEmailAddressAction">
 			<forward name="portal.verify_email_address" path="portal.verify_email_address" />
 		</action>
-
-		<!-- Activities -->
-
-		<action path="/activities/rss" type="com.liferay.portlet.activities.action.RSSAction" />
-
-		<action path="/activities/view" forward="portlet.activities.view" />
 
 		<!-- Admin -->
 
@@ -203,10 +199,6 @@
 		<action path="/alerts/view" type="com.liferay.portlet.announcements.action.ViewAction">
 			<forward name="portlet.announcements.view" path="portlet.announcements.view" />
 		</action>
-
-		<!-- Amazon Rankings -->
-
-		<action path="/amazon_rankings/view" forward="portlet.amazon_rankings.view" />
 
 		<!-- Announcements -->
 
@@ -427,14 +419,6 @@
 		<!-- Control Panel Menu -->
 
 		<action path="/control_panel_menu/view" forward="portlet.control_panel_menu.view" />
-
-		<!-- Currency Converter -->
-
-		<action path="/currency_converter/edit" type="com.liferay.portlet.currencyconverter.action.EditPreferencesAction">
-			<forward name="portlet.currency_converter.edit" path="portlet.currency_converter.edit" />
-		</action>
-
-		<action path="/currency_converter/view" forward="portlet.currency_converter.view" />
 
 		<!-- Directory -->
 
@@ -726,6 +710,11 @@
 
 		<!-- Group Pages -->
 
+		<action path="/group_pages/confirmation" type="com.liferay.portlet.layoutsadmin.action.ConfirmationExportImportConfigurationAction">
+			<forward name="portlet.layouts_admin.confirmation" path="portlet.layouts_admin.confirmation" />
+			<forward name="portlet.layouts_admin.error" path="portlet.layouts_admin.error" />
+		</action>
+
 		<action path="/group_pages/delete_background_task" type="com.liferay.portlet.backgroundtask.action.DeleteBackgroundTaskAction" />
 
 		<action path="/group_pages/edit_export_configuration" type="com.liferay.portlet.layoutsadmin.action.EditExportConfigurationAction">
@@ -790,14 +779,6 @@
 		<action path="/group_pages/view_layout_branches" forward="portlet.staging_bar.view_layout_branches" />
 
 		<action path="/group_pages/view_layout_set_branches" forward="portlet.staging_bar.view_layout_set_branches" />
-
-		<!-- IFrame -->
-
-		<action path="/iframe/proxy" forward="/portlet/iframe/proxy.jsp" />
-
-		<action path="/iframe/view" type="com.liferay.portlet.iframe.action.ViewAction">
-			<forward name="portlet.iframe.view" path="portlet.iframe.view" />
-		</action>
 
 		<!-- Image Gallery Display -->
 
@@ -1050,6 +1031,11 @@
 		<action path="/layout_set_prototypes/view" forward="portlet.layout_set_prototypes.view" />
 
 		<!-- Layouts Admin -->
+
+		<action path="/layouts_admin/confirmation" type="com.liferay.portlet.layoutsadmin.action.ConfirmationExportImportConfigurationAction">
+			<forward name="portlet.layouts_admin.confirmation" path="portlet.layouts_admin.confirmation" />
+			<forward name="portlet.layouts_admin.error" path="portlet.layouts_admin.error" />
+		</action>
 
 		<action path="/layouts_admin/delete_background_task" type="com.liferay.portlet.backgroundtask.action.DeleteBackgroundTaskAction" />
 
@@ -1532,37 +1518,6 @@
 
 		<action path="/plugins_admin/view" forward="portlet.plugins_admin.view" />
 
-		<!-- Polls -->
-
-		<action path="/polls/edit_question" type="com.liferay.portlet.polls.action.EditQuestionAction">
-			<forward name="portlet.polls.edit_question" path="portlet.polls.edit_question" />
-			<forward name="portlet.polls.error" path="portlet.polls.error" />
-		</action>
-
-		<action path="/polls/view" forward="portlet.polls.view" />
-
-		<action path="/polls/view_chart" type="com.liferay.portlet.polls.action.ViewChartAction" />
-
-		<action path="/polls/view_question" type="com.liferay.portlet.polls.action.ViewQuestionAction">
-			<forward name="portlet.polls.edit_question" path="portlet.polls.view_question" />
-			<forward name="portlet.polls.error" path="portlet.polls.error" />
-		</action>
-
-		<!-- Polls Display -->
-
-		<action path="/polls_display/add_question_redirect" forward="portlet.polls_display.add_question_redirect" />
-
-		<action path="/polls_display/view" type="com.liferay.portlet.pollsdisplay.action.ViewAction">
-			<forward name="portlet.polls_display.error" path="portlet.polls_display.error" />
-			<forward name="portlet.polls_display.view" path="portlet.polls_display.view" />
-		</action>
-
-		<action path="/polls_display/vote_question" type="com.liferay.portlet.polls.action.ViewQuestionAction" >
-			<forward name="portlet.polls.edit_question" path="portlet.polls_display.view" />
-			<forward name="portlet.polls.error" path="portlet.polls_display.error" />
-			<forward name="portlet.polls_display.view" path="portlet.polls_display.view" />
-		</action>
-
 		<!-- Portal Settings -->
 
 		<action path="/portal_settings/edit_company" type="com.liferay.portlet.portalsettings.action.EditCompanyAction">
@@ -1673,11 +1628,11 @@
 
 		<!-- Related Assets -->
 
-		<action path="/related_assets/view" type="com.liferay.portlet.relatedassets.action.ViewAction">
+		<action path="/related_assets/view" type="com.liferay.portlet.assetpublisher.action.ViewAction">
 			<forward name="portlet.asset_publisher.view" path="portlet.asset_publisher.view" />
 		</action>
 
-		<action path="/related_assets/view_content" type="com.liferay.portlet.relatedassets.action.ViewContentAction">
+		<action path="/related_assets/view_content" type="com.liferay.portlet.assetpublisher.action.ViewContentAction">
 			<forward name="portlet.asset_publisher.view_content" path="portlet.asset_publisher.view_content" />
 		</action>
 
@@ -1744,11 +1699,6 @@
 		<action path="/search/view" forward="portlet.search.view" />
 
 		<!-- Shopping -->
-
-		<action path="/shopping/add_book_items" type="com.liferay.portlet.shopping.action.AddBookItemsAction">
-			<forward name="portlet.shopping.add_book_items" path="portlet.shopping.add_book_items" />
-			<forward name="portlet.shopping.error" path="portlet.shopping.error" />
-		</action>
 
 		<action path="/shopping/cart" type="com.liferay.portlet.shopping.action.CartAction">
 			<forward name="portlet.shopping.cart" path="portlet.shopping.cart" />
@@ -2614,12 +2564,6 @@
 		<action path="/workflow_tasks/view" forward="portlet.workflow_tasks.view" />
 
 		<action path="/workflow_tasks/view_content" forward="portlet.asset_publisher.view_content" />
-
-		<!-- XSL Content -->
-
-		<action path="/xsl_content/view" type="com.liferay.portlet.xslcontent.action.ViewAction">
-			<forward name="portlet.xsl_content.view" path="portlet.xsl_content.view" />
-		</action>
 	</action-mappings>
 
 	<!-- Custom Request Processor -->

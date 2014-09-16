@@ -64,13 +64,20 @@ public class OrganizationStagedModelDataHandler
 
 		Group group = GroupLocalServiceUtil.getGroup(groupId);
 
-		Organization organization =
-			OrganizationLocalServiceUtil.fetchOrganizationByUuidAndCompanyId(
-				uuid, group.getCompanyId());
+		Organization organization = fetchStagedModelByUuidAndCompanyId(
+			uuid, group.getCompanyId());
 
 		if (organization != null) {
 			OrganizationLocalServiceUtil.deleteOrganization(organization);
 		}
+	}
+
+	@Override
+	public Organization fetchStagedModelByUuidAndCompanyId(
+		String uuid, long companyId) {
+
+		return OrganizationLocalServiceUtil.fetchOrganizationByUuidAndCompanyId(
+			uuid, companyId);
 	}
 
 	@Override
@@ -151,9 +158,8 @@ public class OrganizationStagedModelDataHandler
 
 		serviceContext.setUserId(userId);
 
-		Organization existingOrganization =
-			OrganizationLocalServiceUtil.fetchOrganizationByUuidAndCompanyId(
-				organization.getUuid(), portletDataContext.getCompanyId());
+		Organization existingOrganization = fetchStagedModelByUuidAndCompanyId(
+			organization.getUuid(), portletDataContext.getGroupId());
 
 		if (existingOrganization == null) {
 			existingOrganization =
@@ -467,6 +473,11 @@ public class OrganizationStagedModelDataHandler
 			importedOrganization.getOrganizationId(), phones);
 	}
 
+	@Override
+	protected void importReferenceStagedModels(
+		PortletDataContext portletDataContext, Organization organization) {
+	}
+
 	protected void importWebsites(
 			PortletDataContext portletDataContext, Organization organization,
 			Organization importedOrganization)
@@ -503,21 +514,6 @@ public class OrganizationStagedModelDataHandler
 		UsersAdminUtil.updateWebsites(
 			Organization.class.getName(),
 			importedOrganization.getOrganizationId(), websites);
-	}
-
-	@Override
-	protected boolean validateMissingReference(
-		String uuid, long companyId, long groupId) {
-
-		Organization organization =
-			OrganizationLocalServiceUtil.fetchOrganizationByUuidAndCompanyId(
-				uuid, companyId);
-
-		if (organization == null) {
-			return false;
-		}
-
-		return true;
 	}
 
 }

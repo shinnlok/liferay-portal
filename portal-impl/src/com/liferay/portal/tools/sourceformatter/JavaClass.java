@@ -39,28 +39,28 @@ public class JavaClass {
 		JavaClass.TYPE_CLASS_PUBLIC, JavaClass.TYPE_CLASS_PUBLIC_STATIC
 	};
 
-	public static final int TYPE_CLASS_PRIVATE = 24;
+	public static final int TYPE_CLASS_PRIVATE = 21;
 
-	public static final int TYPE_CLASS_PRIVATE_STATIC = 23;
+	public static final int TYPE_CLASS_PRIVATE_STATIC = 20;
 
-	public static final int TYPE_CLASS_PROTECTED = 16;
+	public static final int TYPE_CLASS_PROTECTED = 14;
 
-	public static final int TYPE_CLASS_PROTECTED_STATIC = 15;
+	public static final int TYPE_CLASS_PROTECTED_STATIC = 13;
 
-	public static final int TYPE_CLASS_PUBLIC = 8;
+	public static final int TYPE_CLASS_PUBLIC = 7;
 
-	public static final int TYPE_CLASS_PUBLIC_STATIC = 7;
+	public static final int TYPE_CLASS_PUBLIC_STATIC = 6;
 
 	public static final int[] TYPE_CONSTRUCTOR = {
 		JavaClass.TYPE_CONSTRUCTOR_PRIVATE,
 		JavaClass.TYPE_CONSTRUCTOR_PROTECTED, JavaClass.TYPE_CONSTRUCTOR_PUBLIC
 	};
 
-	public static final int TYPE_CONSTRUCTOR_PRIVATE = 18;
+	public static final int TYPE_CONSTRUCTOR_PRIVATE = 16;
 
-	public static final int TYPE_CONSTRUCTOR_PROTECTED = 10;
+	public static final int TYPE_CONSTRUCTOR_PROTECTED = 9;
 
-	public static final int TYPE_CONSTRUCTOR_PUBLIC = 4;
+	public static final int TYPE_CONSTRUCTOR_PUBLIC = 3;
 
 	public static final int[] TYPE_METHOD = {
 		JavaClass.TYPE_METHOD_PRIVATE, JavaClass.TYPE_METHOD_PRIVATE_STATIC,
@@ -68,50 +68,43 @@ public class JavaClass {
 		JavaClass.TYPE_METHOD_PUBLIC, JavaClass.TYPE_METHOD_PUBLIC_STATIC
 	};
 
-	public static final int TYPE_METHOD_PRIVATE = 19;
+	public static final int TYPE_METHOD_PRIVATE = 17;
 
-	public static final int TYPE_METHOD_PRIVATE_STATIC = 17;
+	public static final int TYPE_METHOD_PRIVATE_STATIC = 15;
 
-	public static final int TYPE_METHOD_PROTECTED = 11;
+	public static final int TYPE_METHOD_PROTECTED = 10;
 
-	public static final int TYPE_METHOD_PROTECTED_STATIC = 9;
+	public static final int TYPE_METHOD_PROTECTED_STATIC = 8;
 
-	public static final int TYPE_METHOD_PUBLIC = 5;
+	public static final int TYPE_METHOD_PUBLIC = 4;
 
-	public static final int TYPE_METHOD_PUBLIC_STATIC = 3;
+	public static final int TYPE_METHOD_PUBLIC_STATIC = 2;
 
 	public static final int[] TYPE_VARIABLE = {
 		JavaClass.TYPE_VARIABLE_PRIVATE, JavaClass.TYPE_VARIABLE_PRIVATE_STATIC,
-		JavaClass.TYPE_VARIABLE_PRIVATE_STATIC_FINAL,
 		JavaClass.TYPE_VARIABLE_PROTECTED,
 		JavaClass.TYPE_VARIABLE_PROTECTED_STATIC,
-		JavaClass.TYPE_VARIABLE_PROTECTED_STATIC_FINAL,
-		JavaClass.TYPE_VARIABLE_PUBLIC, JavaClass.TYPE_VARIABLE_PUBLIC_STATIC,
-		JavaClass.TYPE_VARIABLE_PUBLIC_STATIC_FINAL
+		JavaClass.TYPE_VARIABLE_PUBLIC, JavaClass.TYPE_VARIABLE_PUBLIC_STATIC
 	};
 
-	public static final int TYPE_VARIABLE_PRIVATE = 22;
+	public static final int TYPE_VARIABLE_PRIVATE = 19;
 
-	public static final int TYPE_VARIABLE_PRIVATE_STATIC = 21;
+	public static final int TYPE_VARIABLE_PRIVATE_STATIC = 18;
 
-	public static final int TYPE_VARIABLE_PRIVATE_STATIC_FINAL = 20;
+	public static final int TYPE_VARIABLE_PROTECTED = 12;
 
-	public static final int TYPE_VARIABLE_PROTECTED = 14;
+	public static final int TYPE_VARIABLE_PROTECTED_STATIC = 11;
 
-	public static final int TYPE_VARIABLE_PROTECTED_STATIC = 13;
+	public static final int TYPE_VARIABLE_PUBLIC = 5;
 
-	public static final int TYPE_VARIABLE_PROTECTED_STATIC_FINAL = 12;
+	public static final int TYPE_VARIABLE_PUBLIC_STATIC = 1;
 
-	public static final int TYPE_VARIABLE_PUBLIC = 6;
-
-	public static final int TYPE_VARIABLE_PUBLIC_STATIC = 2;
-
-	public static final int TYPE_VARIABLE_PUBLIC_STATIC_FINAL = 1;
-
-	public JavaClass(String fileName, String content, String indent)
+	public JavaClass(
+			String fileName, String absolutePath, String content, String indent)
 		throws Exception {
 
 		_fileName = fileName;
+		_absolutePath = absolutePath;
 		_content = content;
 		_indent = indent;
 	}
@@ -146,7 +139,8 @@ public class JavaClass {
 				}
 
 				JavaClass innerClass = new JavaClass(
-					_fileName, javaTermContent, _indent + StringPool.TAB);
+					_fileName, _absolutePath, javaTermContent,
+					_indent + StringPool.TAB);
 
 				String newJavaTermContent = innerClass.formatJavaTerms(
 					javaTermSortExclusions, testAnnotationsExclusions);
@@ -289,8 +283,8 @@ public class JavaClass {
 			String javaTermName = javaTerm.getName();
 
 			if (BaseSourceProcessor.isExcluded(
-					javaTermSortExclusions, _fileName, javaTerm.getLineCount(),
-					javaTermName)) {
+					javaTermSortExclusions, _absolutePath,
+					javaTerm.getLineCount(), javaTermName)) {
 
 				previousJavaTerm = javaTerm;
 
@@ -496,7 +490,7 @@ public class JavaClass {
 
 		if ((_indent.length() == 1) && _fileName.contains("/test/") &&
 			!BaseSourceProcessor.isExcluded(
-				testAnnotationsExclusions, _fileName) &&
+				testAnnotationsExclusions, _absolutePath) &&
 			!_fileName.endsWith("TestCase.java")) {
 
 			checkTestAnnotations(javaTerm);
@@ -657,14 +651,7 @@ public class JavaClass {
 
 		int pos = line.indexOf(StringPool.OPEN_PARENTHESIS);
 
-		if (line.startsWith(_indent + "public static final ") &&
-			(line.contains(StringPool.EQUAL) ||
-			 (line.endsWith(StringPool.SEMICOLON) && (pos == -1)))) {
-
-			return new Tuple(
-				getVariableName(line), TYPE_VARIABLE_PUBLIC_STATIC_FINAL);
-		}
-		else if (line.startsWith(_indent + "public static ")) {
+		if (line.startsWith(_indent + "public static ")) {
 			if (line.contains(" class ") || line.contains(" enum ")) {
 				return new Tuple(getClassName(line), TYPE_CLASS_PUBLIC_STATIC);
 			}
@@ -712,13 +699,6 @@ public class JavaClass {
 				}
 			}
 		}
-		else if (line.startsWith(_indent + "protected static final ") &&
-				 (line.contains(StringPool.EQUAL) ||
-				  (line.endsWith(StringPool.SEMICOLON) && (pos == -1)))) {
-
-			return new Tuple(
-				getVariableName(line), TYPE_VARIABLE_PROTECTED_STATIC_FINAL);
-		}
 		else if (line.startsWith(_indent + "protected static ")) {
 			if (line.contains(" class ") || line.contains(" enum ")) {
 				return new Tuple(
@@ -765,13 +745,6 @@ public class JavaClass {
 			}
 
 			return new Tuple(getVariableName(line), TYPE_VARIABLE_PROTECTED);
-		}
-		else if (line.startsWith(_indent + "private static final ") &&
-				 (line.contains(StringPool.EQUAL) ||
-				  (line.endsWith(StringPool.SEMICOLON) && (pos == -1)))) {
-
-			return new Tuple(
-				getVariableName(line), TYPE_VARIABLE_PRIVATE_STATIC_FINAL);
 		}
 		else if (line.startsWith(_indent + "private static ")) {
 			if (line.contains(" class ") || line.contains(" enum ")) {
@@ -922,7 +895,7 @@ public class JavaClass {
 		String javaTermName = javaTerm.getName();
 
 		if (BaseSourceProcessor.isExcluded(
-				javaTermSortExclusions, _fileName, -1, javaTermName)) {
+				javaTermSortExclusions, _absolutePath, -1, javaTermName)) {
 
 			return;
 		}
@@ -963,6 +936,7 @@ public class JavaClass {
 		}
 	}
 
+	private String _absolutePath;
 	private String _content;
 	private String _fileName;
 	private String _indent;

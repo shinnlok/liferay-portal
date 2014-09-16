@@ -25,6 +25,8 @@ long itemId = BeanParamUtil.getLong(item, request, "itemId");
 
 long categoryId = BeanParamUtil.getLong(item, request, "categoryId", ShoppingCategoryConstants.DEFAULT_PARENT_CATEGORY_ID);
 
+boolean hasInfiniteStock = BeanParamUtil.getBoolean(item, request, "hasInfiniteStock");
+
 // Fields
 
 ShoppingItemField[] itemFields = null;
@@ -151,7 +153,9 @@ int priceId = ParamUtil.getInteger(request, "priceId", -1);
 
 		<aui:input bean="<%= item %>" model="<%= ShoppingItem.class %>" name="featured" />
 
-		<c:if test="<%= fieldsCount == 0 %>">
+		<aui:input checked="<%= hasInfiniteStock %>" helpMessage="disable-stock-checking-help" label="disable-stock-checking" name="hasInfiniteStock" onChange='<%= renderResponse.getNamespace() + "toggleInfiniteStock(this);" %>' type="checkbox" />
+
+		<c:if test="<%= (fieldsCount == 0) && !hasInfiniteStock %>">
 			<aui:input bean="<%= item %>" model="<%= ShoppingItem.class %>" name="stockQuantity" />
 		</c:if>
 
@@ -177,6 +181,15 @@ int priceId = ParamUtil.getInteger(request, "priceId", -1);
 			<liferay-ui:message key="fields-are-added-if-you-need-to-distinguish-items-based-on-criteria-chosen-by-the-user" />
 
 			<br /><br />
+
+			<liferay-ui:error exception="<%= DuplicateItemFieldNameException.class %>">
+
+				<%
+				DuplicateItemFieldNameException difne = (DuplicateItemFieldNameException)errorException;
+				%>
+
+				<liferay-ui:message key="field-names-must-be-unique.-the-following-field-names-are-duplicates" /> <%= difne.getMessage() %>.
+			</liferay-ui:error>
 
 			<table class="lfr-table">
 
@@ -215,7 +228,7 @@ int priceId = ParamUtil.getInteger(request, "priceId", -1);
 
 				<tr>
 					<td>
-						<aui:input cssClass="lfr-input-text-container" label="name" name='<%= "fieldName" + i %>' style="width: 100px;" type="text" value="<%= fieldName %>" />
+						<aui:input cssClass="lfr-input-text-container" label="name" maxlength="<%= ModelHintsConstants.TEXT_MAX_LENGTH %>" name='<%= "fieldName" + i %>' style="width: 100px;" type="text" value="<%= fieldName %>" />
 					</td>
 					<td>
 						<aui:input cssClass="lfr-input-text-container" label="values" name='<%= "fieldValues" + i %>' style="width: 100px;" type="text" value='<%= StringUtil.merge(fieldValues, ", ") %>' />
@@ -237,13 +250,13 @@ int priceId = ParamUtil.getInteger(request, "priceId", -1);
 
 			</table>
 
-			<c:if test="<%= fieldsCount > 0 %>">
+			<c:if test="<%= (fieldsCount > 0) && !hasInfiniteStock %>">
 				<br />
 			</c:if>
 
 			<aui:button onClick='<%= renderResponse.getNamespace() + "addField();" %>' value="add-field" />
 
-			<c:if test="<%= fieldsCount > 0 %>">
+			<c:if test="<%= (fieldsCount > 0) && !hasInfiniteStock %>">
 				<aui:button onClick='<%= renderResponse.getNamespace() + "editItemQuantities();" %>' value="edit-stock-quantity" />
 			</c:if>
 
@@ -578,5 +591,9 @@ int priceId = ParamUtil.getInteger(request, "priceId", -1);
 		document.<portlet:namespace />fm.<portlet:namespace />categoryId.value = categoryId;
 
 		document.getElementById('<portlet:namespace />categoryName').value = categoryName;
+	}
+
+	function <portlet:namespace />toggleInfiniteStock(checkbox) {
+		submitForm(document.<portlet:namespace />fm);
 	}
 </aui:script>

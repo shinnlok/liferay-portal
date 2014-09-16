@@ -18,30 +18,46 @@ import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HtmlUtil;
+import com.liferay.portal.kernel.util.HttpUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.kernel.xml.Document;
+import com.liferay.portal.kernel.xml.Element;
+import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.service.ResourceLocalServiceUtil;
 import com.liferay.portal.util.PortalInstances;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
+import com.liferay.portlet.documentlibrary.NoSuchFileEntryException;
+import com.liferay.portlet.documentlibrary.model.DLFileEntry;
+import com.liferay.portlet.documentlibrary.service.DLFileEntryLocalServiceUtil;
 import com.liferay.portlet.dynamicdatamapping.NoSuchStructureException;
 import com.liferay.portlet.journal.model.JournalArticle;
 import com.liferay.portlet.journal.model.JournalArticleConstants;
+import com.liferay.portlet.journal.model.JournalArticleResource;
 import com.liferay.portlet.journal.model.JournalContentSearch;
 import com.liferay.portlet.journal.model.JournalFolder;
 import com.liferay.portlet.journal.service.JournalArticleLocalServiceUtil;
+import com.liferay.portlet.journal.service.JournalArticleResourceLocalServiceUtil;
 import com.liferay.portlet.journal.service.JournalContentSearchLocalServiceUtil;
 import com.liferay.portlet.journal.service.JournalFolderLocalServiceUtil;
+import com.liferay.portlet.journal.util.comparator.ArticleVersionComparator;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -59,6 +75,8 @@ public class VerifyJournal extends VerifyProcess {
 
 	@Override
 	protected void doVerify() throws Exception {
+		verifyContent();
+		verifyCreateDate();
 		updateFolderAssets();
 		verifyOracleNewLine();
 		verifyPermissionsAndAssets();
@@ -128,6 +146,108 @@ public class VerifyJournal extends VerifyProcess {
 		}
 	}
 
+	protected void verifyContent() throws Exception {
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+			con = DataAccess.getUpgradeOptimizedConnection();
+
+			ps = con.prepareStatement(
+				"select id_ from JournalArticle where structureId != ''");
+
+			rs = ps.executeQuery();
+
+			while (rs.next()) {
+				long id = rs.getLong("id_");
+
+				JournalArticle article =
+					JournalArticleLocalServiceUtil.getArticle(id);
+
+				String xml = article.getContent();
+
+				Document document = SAXReaderUtil.read(xml);
+
+				Element rootElement = document.getRootElement();
+
+				List<Element> elements = rootElement.elements();
+
+				for (Element element : elements) {
+					String type = element.attributeValue("type");
+
+					if (!type.equals("document_library")) {
+						continue;
+					}
+
+					Element dynamicContentElement = element.element(
+						"dynamic-content");
+
+					String path = (String)dynamicContentElement.getData();
+
+					String[] pathElements = StringUtil.split(
+						path, StringPool.SLASH);
+
+					if (pathElements.length != 5) {
+						continue;
+					}
+
+					String title = HttpUtil.decodeURL(
+						HtmlUtil.escape(pathElements[4]));
+
+					if (title.contains(StringPool.SLASH)) {
+						title = StringUtil.replace(
+							title, StringPool.SLASH, StringPool.BLANK);
+
+						StringBundler sb = new StringBundler(9);
+
+						for (int i = 0; i < 4; i++) {
+							sb.append(pathElements[i]);
+							sb.append(StringPool.SLASH);
+						}
+
+						sb.append(title);
+
+						path = sb.toString();
+					}
+
+					try {
+						long folderId = GetterUtil.getLong(pathElements[3]);
+						long groupId = GetterUtil.getLong(pathElements[2]);
+
+						DLFileEntry dlFileEntry =
+							DLFileEntryLocalServiceUtil.getFileEntryByTitle(
+								groupId, folderId, title);
+
+						String uuid = dlFileEntry.getUuid();
+
+						dynamicContentElement.setText(
+							path + StringPool.SLASH + uuid);
+					}
+					catch (NoSuchFileEntryException nsfee) {
+						if (_log.isWarnEnabled()) {
+							StringBundler sb = new StringBundler(4);
+
+							sb.append("No document exists with title ");
+							sb.append(title);
+							sb.append(" for dynamic content in article ");
+							sb.append(article.getTitle());
+
+							_log.warn(sb.toString());
+						}
+					}
+				}
+
+				article.setContent(document.asXML());
+
+				JournalArticleLocalServiceUtil.updateJournalArticle(article);
+			}
+		}
+		finally {
+			DataAccess.cleanUp(con, ps, rs);
+		}
+	}
+
 	protected void verifyContentSearch(long groupId, String portletId)
 		throws Exception {
 
@@ -175,6 +295,54 @@ public class VerifyJournal extends VerifyProcess {
 		}
 		finally {
 			DataAccess.cleanUp(con, ps, rs);
+		}
+	}
+
+	protected void verifyCreateDate() throws Exception {
+		ActionableDynamicQuery actionableDynamicQuery =
+			JournalArticleResourceLocalServiceUtil.getActionableDynamicQuery();
+
+		actionableDynamicQuery.setPerformActionMethod(
+			new ActionableDynamicQuery.PerformActionMethod() {
+
+				@Override
+				public void performAction(Object object) {
+					JournalArticleResource articleResource =
+						(JournalArticleResource)object;
+
+					verifyCreateDate(articleResource);
+				}
+
+			});
+
+		actionableDynamicQuery.performActions();
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("Create dates verified for articles");
+		}
+	}
+
+	protected void verifyCreateDate(JournalArticleResource articleResource) {
+		List<JournalArticle> articles =
+			JournalArticleLocalServiceUtil.getArticles(
+				articleResource.getGroupId(), articleResource.getArticleId(),
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+				new ArticleVersionComparator(true));
+
+		if (articles.size() <= 1) {
+			return;
+		}
+
+		JournalArticle firstArticle = articles.get(0);
+
+		Date createDate = firstArticle.getCreateDate();
+
+		for (JournalArticle article : articles) {
+			if (!createDate.equals(article.getCreateDate())) {
+				article.setCreateDate(createDate);
+
+				JournalArticleLocalServiceUtil.updateJournalArticle(article);
+			}
 		}
 	}
 
@@ -358,7 +526,6 @@ public class VerifyJournal extends VerifyProcess {
 		long[] companyIds = PortalInstances.getCompanyIdsBySQL();
 
 		for (long companyId : companyIds) {
-			JournalArticleLocalServiceUtil.rebuildTree(companyId);
 			JournalFolderLocalServiceUtil.rebuildTree(companyId);
 		}
 	}
@@ -380,7 +547,8 @@ public class VerifyJournal extends VerifyProcess {
 			while (rs.next()) {
 				long groupId = rs.getLong("groupId");
 				String articleId = rs.getString("articleId");
-				String urlTitle = rs.getString("urlTitle");
+				String urlTitle = GetterUtil.getString(
+					rs.getString("urlTitle"));
 
 				updateURLTitle(groupId, articleId, urlTitle);
 			}

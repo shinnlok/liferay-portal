@@ -827,13 +827,13 @@ public class DLImpl implements DL {
 		sb.append(fileEntry.getFolderId());
 		sb.append(StringPool.SLASH);
 
-		String title = fileEntry.getTitle();
+		String fileName = fileEntry.getFileName();
 
 		if (fileEntry.isInTrash()) {
-			title = TrashUtil.getOriginalTitle(fileEntry.getTitle());
+			fileName = TrashUtil.getOriginalTitle(fileEntry.getFileName());
 		}
 
-		sb.append(HttpUtil.encodeURL(HtmlUtil.unescape(title)));
+		sb.append(HttpUtil.encodeURL(HtmlUtil.unescape(fileName)));
 
 		sb.append(StringPool.SLASH);
 		sb.append(HttpUtil.encodeURL(fileEntry.getUuid()));
@@ -915,6 +915,32 @@ public class DLImpl implements DL {
 		}
 
 		return orderByComparator;
+	}
+
+	@Override
+	public String getSanitizedFileName(String title, String extension) {
+		String fileName = StringUtil.replace(
+			title, StringPool.SLASH, StringPool.UNDERLINE);
+
+		if (Validator.isNotNull(extension) &&
+			!fileName.endsWith(StringPool.PERIOD + extension)) {
+
+			fileName += StringPool.PERIOD + extension;
+		}
+
+		if (fileName.length() > 255) {
+			int x = fileName.length() - 1;
+
+			if (Validator.isNotNull(extension)) {
+				x = fileName.lastIndexOf(StringPool.PERIOD + extension);
+			}
+
+			int y = x - (fileName.length() - 255);
+
+			fileName = fileName.substring(0, y) + fileName.substring(x);
+		}
+
+		return fileName;
 	}
 
 	@Override
@@ -1076,22 +1102,12 @@ public class DLImpl implements DL {
 			webDavURL.append(MANUAL_CHECK_IN_REQUIRED_PATH);
 		}
 
-		String fileEntryTitle = null;
+		String fileEntryFileName = null;
 
 		Group group = null;
 
 		if (fileEntry != null) {
-			String extension = fileEntry.getExtension();
-
-			fileEntryTitle = HtmlUtil.unescape(fileEntry.getTitle());
-
-			if (openDocumentUrl && isOfficeExtension(extension) &&
-				!fileEntryTitle.endsWith(StringPool.PERIOD + extension)) {
-
-				webDavURL.append(OFFICE_EXTENSION_PATH);
-
-				fileEntryTitle += StringPool.PERIOD + extension;
-			}
+			fileEntryFileName = HtmlUtil.unescape(fileEntry.getFileName());
 
 			group = GroupLocalServiceUtil.getGroup(fileEntry.getGroupId());
 		}
@@ -1127,7 +1143,7 @@ public class DLImpl implements DL {
 
 		if (fileEntry != null) {
 			sb.append(StringPool.SLASH);
-			sb.append(HttpUtil.encodeURL(fileEntryTitle, true));
+			sb.append(HttpUtil.encodeURL(fileEntryFileName, true));
 		}
 
 		webDavURL.append(sb.toString());

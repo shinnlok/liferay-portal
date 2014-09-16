@@ -54,10 +54,31 @@
 			<var name="wikiPageContent" value="${wikiPageContent}" />
 		</execute>
 
+		<execute macro="WikiPage#gotoPG">
+			<var name="wikiPageTitle" value="${wikiPageTitle}" />
+		</execute>
+
 		<execute macro="WikiPage#addChildPagePG">
 			<var name="wikiChildPageContent" value="${wikiChildPageContent}" />
 			<var name="wikiChildPageTitle" value="${wikiChildPageTitle}" />
 			<var name="wikiPageTitle" value="${wikiPageTitle}" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute macro="WikiPage#gotoPG">
+			<var name="wikiPageTitle" value="${wikiPageTitle}" />
+		</execute>
+
+		<execute macro="WikiPage#gotoChildPagePG">
+			<var name="wikiChildPageTitle" value="${wikiChildPageTitle}" />
+		</execute>
+
+		<execute macro="WikiPage#viewChildPagePG">
+			<var name="wikiChildPageContent" value="${wikiChildPageContent}" />
+			<var name="wikiChildPageTitle" value="${wikiChildPageTitle}" />
 		</execute>
 	</command>
 
@@ -80,6 +101,10 @@
 			<var name="wikiPageContent" value="${wikiPageContent}" />
 		</execute>
 
+		<execute macro="WikiPage#gotoPG">
+			<var name="wikiPageTitle" value="${wikiPageTitle}" />
+		</execute>
+
 		<execute macro="WikiPage#addFrontPageChildPageFormatHTML">
 			<var name="wikiChildPageHTMLContent" value="${wikiChildPageHTMLContent}" />
 			<var name="wikiChildPageTitle" value="${wikiChildPageTitle}" />
@@ -98,40 +123,46 @@
 	</command>
 
 	<command name="AddWikiFrontPageChildPages" priority="5">
-		<var name="wikiChildPage1Content" value="Wiki FrontPage Child Page1 Content" />
-		<var name="wikiChildPage1Title" value="Wiki FrontPage Child Page1 Title" />
-		<var name="wikiChildPage2Content" value="Wiki FrontPage Child Page2 Content" />
-		<var name="wikiChildPage2Title" value="Wiki FrontPage Child Page2 Title" />
-		<var name="wikiChildPage3Content" value="Wiki FrontPage Child Page3 Content" />
-		<var name="wikiChildPage3Title" value="Wiki FrontPage Child Page3 Title" />
-		<var name="wikiPageContent" value="Wiki FrontPage Content" />
-		<var name="wikiPageTitle" value="FrontPage" />
+		<var name="wikiChildPageCounterList" value="1,2,3" />
 
 		<execute macro="Page#gotoPG">
 			<var name="pageName" value="${pageName}" />
 		</execute>
 
 		<execute macro="WikiPage#addFrontPagePG">
-			<var name="wikiPageContent" value="${wikiPageContent}" />
+			<var name="wikiPageContent" value="Wiki FrontPage Content" />
 		</execute>
 
-		<execute macro="WikiPage#addChildPagePG">
-			<var name="wikiChildPageContent" value="${wikiChildPage1Content}" />
-			<var name="wikiChildPageTitle" value="${wikiChildPage1Title}" />
-			<var name="wikiPageTitle" value="${wikiPageTitle}" />
+		<execute macro="WikiPage#gotoPG">
+			<var name="wikiPageTitle" value="FrontPage" />
 		</execute>
 
-		<execute macro="WikiPage#addChildPagePG">
-			<var name="wikiChildPageContent" value="${wikiChildPage2Content}" />
-			<var name="wikiChildPageTitle" value="${wikiChildPage2Title}" />
-			<var name="wikiPageTitle" value="${wikiPageTitle}" />
+		<for list="${wikiChildPageCounterList}" param="childPageCount" >
+			<execute macro="WikiPage#addChildPagePG">
+				<var name="wikiChildPageContent" value="Wiki FrontPage Child Page${childPageCount} Content" />
+				<var name="wikiChildPageTitle" value="Wiki FrontPage Child Page${childPageCount} Title" />
+				<var name="wikiPageTitle" value="FrontPage" />
+			</execute>
+		</for>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
 		</execute>
 
-		<execute macro="WikiPage#addChildPagePG">
-			<var name="wikiChildPageContent" value="${wikiChildPage3Content}" />
-			<var name="wikiChildPageTitle" value="${wikiChildPage3Title}" />
-			<var name="wikiPageTitle" value="${wikiPageTitle}" />
-		</execute>
+		<for list="${wikiChildPageCounterList}" param="childPageCount" >
+			<execute macro="WikiPage#gotoPG">
+				<var name="wikiPageTitle" value="FrontPage" />
+			</execute>
+
+			<execute macro="WikiPage#gotoChildPagePG">
+				<var name="wikiChildPageTitle" value="Wiki FrontPage Child Page${childPageCount} Title" />
+			</execute>
+
+			<execute macro="WikiPage#viewChildPagePG">
+				<var name="wikiChildPageContent" value="Wiki FrontPage Child Page${childPageCount} Content" />
+				<var name="wikiChildPageTitle" value="Wiki FrontPage Child Page${childPageCount} Title" />
+			</execute>
+		</for>
 	</command>
 
 	<command name="AddWikiFrontPageChildPageWithInvalidTitle" priority="5">
@@ -160,6 +191,10 @@
 			<var name="pageName" value="${pageName}" />
 		</execute>
 
+		<execute macro="WikiPage#gotoPG">
+			<var name="wikiPageTitle" value="${wikiPageTitle}" />
+		</execute>
+
 		<execute macro="WikiPage#addFrontPageChildPageInvalidTitle">
 			<var name="wikiChildPageInvalidTitle" value="true" />
 			<var name="wikiChildPageTitle" value="${invalidTitleBackslash}" />
@@ -167,6 +202,10 @@
 
 		<execute macro="Page#gotoPG">
 			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute macro="WikiPage#gotoPG">
+			<var name="wikiPageTitle" value="${wikiPageTitle}" />
 		</execute>
 
 		<execute macro="WikiPage#addFrontPageChildPageInvalidTitle">
@@ -178,6 +217,10 @@
 			<var name="pageName" value="${pageName}" />
 		</execute>
 
+		<execute macro="WikiPage#gotoPG">
+			<var name="wikiPageTitle" value="${wikiPageTitle}" />
+		</execute>
+
 		<execute macro="WikiPage#addFrontPageChildPageInvalidTitle">
 			<var name="wikiChildPageInvalidTitle" value="true" />
 			<var name="wikiChildPageTitle" value="${invalidTitleLeftBracket}" />
@@ -185,6 +228,10 @@
 
 		<execute macro="Page#gotoPG">
 			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute macro="WikiPage#gotoPG">
+			<var name="wikiPageTitle" value="${wikiPageTitle}" />
 		</execute>
 
 		<execute macro="WikiPage#addFrontPageChildPageInvalidTitle">
@@ -196,6 +243,10 @@
 			<var name="pageName" value="${pageName}" />
 		</execute>
 
+		<execute macro="WikiPage#gotoPG">
+			<var name="wikiPageTitle" value="${wikiPageTitle}" />
+		</execute>
+
 		<execute macro="WikiPage#addFrontPageChildPageInvalidTitle">
 			<var name="wikiChildPageInvalidTitle" value="true" />
 			<var name="wikiChildPageTitle" value="${invalidTitleColon}" />
@@ -203,6 +254,10 @@
 
 		<execute macro="Page#gotoPG">
 			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute macro="WikiPage#gotoPG">
+			<var name="wikiPageTitle" value="${wikiPageTitle}" />
 		</execute>
 
 		<execute macro="WikiPage#addFrontPageChildPageInvalidTitle">
@@ -214,6 +269,10 @@
 			<var name="pageName" value="${pageName}" />
 		</execute>
 
+		<execute macro="WikiPage#gotoPG">
+			<var name="wikiPageTitle" value="${wikiPageTitle}" />
+		</execute>
+
 		<execute macro="WikiPage#addFrontPageChildPageInvalidTitle">
 			<var name="wikiChildPageInvalidTitle" value="true" />
 			<var name="wikiChildPageTitle" value="${invalidTitleLessthan}" />
@@ -221,6 +280,10 @@
 
 		<execute macro="Page#gotoPG">
 			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute macro="WikiPage#gotoPG">
+			<var name="wikiPageTitle" value="${wikiPageTitle}" />
 		</execute>
 
 		<execute macro="WikiPage#addFrontPageChildPageInvalidTitle">
@@ -248,7 +311,9 @@
 			<var name="pageName" value="${pageName}" />
 		</execute>
 
-		<execute macro="WikiPage#viewNoChildPagePG">
+		<execute macro="WikiPage#gotoAllPagesPG" />
+
+		<execute macro="WikiPage#viewNoChildPagePGViaAllPages">
 			<var name="wikiChildPageTitle" value="${wikiChildPageTitle}" />
 			<var name="wikiPageTitle" value="${wikiPageTitle}" />
 			<var name="wikiPageUsername" value="${wikiPageUsername}" />
@@ -280,27 +345,23 @@
 			<var name="pageName" value="${pageName}" />
 		</execute>
 
+		<execute macro="WikiPage#gotoFrontPagePG" />
+
 		<execute macro="WikiPage#viewFrontPagePG">
 			<var name="wikiPageContent" value="${wikiPageText}" />
 			<var name="wikiPageTitle" value="${wikiPageTitle}" />
 		</execute>
 	</command>
 
-	<command name="AddWikiFrontPageCreoleBold" priority="5">
-		<var name="wikiPageContent" value="**Wiki FrontPage Content**" />
-		<var name="wikiPageRevision" value="1.1" />
-		<var name="wikiPageText" value="Wiki FrontPage Content" />
-		<var name="wikiPageTitle" value="FrontPage" />
-		<var name="wikiPageUsername" value="Test Test" />
-
+	<command name="AddWikiFrontPageFormatCreole" priority="5">
 		<execute macro="Page#gotoPG">
 			<var name="pageName" value="${pageName}" />
 		</execute>
 
 		<execute macro="WikiPage#addFrontPagePG">
 			<var name="creoleSource" value="true" />
-			<var name="wikiPageContent" value="${wikiPageContent}" />
-			<var name="wikiPageText" value="${wikiPageText}" />
+			<var name="wikiPageContent" value="**Wiki FrontPage Content**" />
+			<var name="wikiPageText" value="Wiki FrontPage Content" />
 		</execute>
 
 		<execute macro="Page#gotoPG">
@@ -308,15 +369,44 @@
 		</execute>
 
 		<execute macro="WikiPage#gotoPG">
-			<var name="wikiPageContent" value="${wikiPageText}" />
-			<var name="wikiPageRevision" value="${wikiPageRevision}" />
-			<var name="wikiPageTitle" value="${wikiPageTitle}" />
-			<var name="wikiPageUsername" value="${wikiPageUsername}" />
+			<var name="wikiPageContent" value="Wiki FrontPage Content" />
+			<var name="wikiPageRevision" value="1.1" />
+			<var name="wikiPageTitle" value="FrontPage" />
+			<var name="wikiPageUsername" value="Test Test" />
 		</execute>
 
 		<execute macro="WikiPage#viewPG">
-			<var name="wikiPageContent" value="${wikiPageText}" />
-			<var name="wikiPageTitle" value="${wikiPageTitle}" />
+			<var name="wikiPageContent" value="Wiki FrontPage Content" />
+			<var name="wikiPageTitle" value="FrontPage" />
+		</execute>
+	</command>
+
+	<command name="AddWikiFrontPageFormatHTML" priority="3">
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute macro="WikiPage#addFrontPagePG">
+			<var name="htmlSource" value="true" />
+			<var name="wikiPageContent"><![CDATA[<a href="/">Home</a>]]></var>
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute macro="WikiPage#gotoPG">
+			<var name="isOrphanPage" value="true" />
+			<var name="wikiPageTitle" value="FrontPage" />
+		</execute>
+
+		<execute macro="WikiPage#viewPG">
+			<var name="isOrphanPage" value="true" />
+			<var name="wikiPageContent" value="Home" />
+			<var name="wikiPageContentLink" value="true" />
+			<var name="wikiPageRevision" value="1.1" />
+			<var name="wikiPageTitle" value="FrontPage" />
+			<var name="wikiPageUsername" value="Test Test" />
 		</execute>
 	</command>
 
@@ -327,6 +417,8 @@
 		<execute macro="Page#gotoPG">
 			<var name="pageName" value="${pageName}" />
 		</execute>
+
+		<execute macro="WikiPage#gotoAllPagesPG" />
 
 		<execute macro="WikiPage#addPG">
 			<var name="wikiPageContent" value="${wikiPageContent}" />
@@ -360,6 +452,8 @@
 			<var name="pageName" value="${pageName}" />
 		</execute>
 
+		<execute macro="WikiPage#gotoAllPagesPG" />
+
 		<execute macro="WikiPage#addPG">
 			<var name="wikiPageContent" value="${wikiPageContent}" />
 			<var name="wikiPageTitle" value="${wikiPageTitle}" />
@@ -369,10 +463,31 @@
 			<var name="pageName" value="${pageName}" />
 		</execute>
 
+		<execute macro="WikiPage#gotoPG">
+			<var name="wikiPageTitle" value="${wikiPageTitle}" />
+		</execute>
+
 		<execute macro="WikiPage#addChildPagePG">
 			<var name="wikiChildPageContent" value="${wikiChildPageContent}" />
 			<var name="wikiChildPageTitle" value="${wikiChildPageTitle}" />
 			<var name="wikiPageTitle" value="${wikiPageTitle}" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute macro="WikiPage#gotoPG">
+			<var name="wikiPageTitle" value="${wikiPageTitle}" />
+		</execute>
+
+		<execute macro="WikiPage#gotoChildPagePG">
+			<var name="wikiChildPageTitle" value="${wikiChildPageTitle}" />
+		</execute>
+
+		<execute macro="WikiPage#viewChildPagePG">
+			<var name="wikiChildPageContent" value="${wikiChildPageContent}" />
+			<var name="wikiChildPageTitle" value="${wikiChildPageTitle}" />
 		</execute>
 	</command>
 
@@ -388,6 +503,8 @@
 		<execute macro="Page#gotoPG">
 			<var name="pageName" value="${pageName}" />
 		</execute>
+
+		<execute macro="WikiPage#gotoAllPagesPG" />
 
 		<execute macro="WikiPage#addPG">
 			<var name="htmlSource" value="true" />
@@ -489,6 +606,10 @@
 			<var name="pageName" value="${pageName}" />
 		</execute>
 
+		<execute macro="WikiPage#gotoPG">
+			<var name="wikiPageTitle" value="${wikiPageTitle}" />
+		</execute>
+
 		<execute macro="WikiPage#compareVersionsPG">
 			<var name="wikiPageContentEdit" value="${wikiPageContentEdit}" />
 			<var name="wikiPageTitle" value="${wikiPageTitle}" />
@@ -514,6 +635,8 @@
 			<var name="pageName" value="${pageName}" />
 		</execute>
 
+		<execute macro="WikiPage#gotoAllPagesPG" />
+
 		<execute macro="WikiPage#deletePG">
 			<var name="wikiPageTitle" value="${wikiPageTitle}" />
 		</execute>
@@ -527,6 +650,8 @@
 			<var name="pageName" value="${pageName}" />
 		</execute>
 
+		<execute macro="WikiPage#gotoAllPagesPG" />
+
 		<execute macro="WikiPage#addPG">
 			<var name="wikiPageContent" value="${wikiPageContent}" />
 			<var name="wikiPageTitle" value="${wikiPageTitle}" />
@@ -536,6 +661,8 @@
 			<var name="pageName" value="${pageName}" />
 		</execute>
 
+		<execute macro="WikiPage#gotoAllPagesPG" />
+
 		<execute macro="WikiPage#deletePG">
 			<var name="wikiPageTitle" value="${wikiPageTitle}" />
 		</execute>
@@ -543,6 +670,8 @@
 		<execute macro="Page#gotoPG">
 			<var name="pageName" value="${pageName}" />
 		</execute>
+
+		<execute macro="WikiPage#gotoAllPagesPG" />
 
 		<execute macro="WikiPage#viewNoPagePG">
 			<var name="wikiPageTitle" value="${wikiPageTitle}" />
@@ -600,6 +729,8 @@
 			<var name="pageName" value="${pageName}" />
 		</execute>
 
+		<execute macro="WikiPage#gotoAllPagesPG" />
+
 		<execute macro="WikiPage#addPG">
 			<var name="wikiPageContent" value="${wikiPage1Content}" />
 			<var name="wikiPageTitle" value="${wikiPage1Title}" />
@@ -608,6 +739,8 @@
 		<execute macro="Page#gotoPG">
 			<var name="pageName" value="${pageName}" />
 		</execute>
+
+		<execute macro="WikiPage#gotoAllPagesPG" />
 
 		<execute macro="WikiPage#addPG">
 			<var name="wikiPageContent" value="${wikiPage2Content}" />
@@ -618,12 +751,33 @@
 			<var name="pageName" value="${pageName}" />
 		</execute>
 
+		<execute macro="WikiPage#gotoPG">
+			<var name="wikiPageTitle" value="${wikiPage1Title}" />
+		</execute>
+
 		<execute macro="WikiPage#linkPG">
 			<var name="wikiPage1Content" value="${wikiPage1Content}" />
 			<var name="wikiPage1Title" value="${wikiPage1Title}" />
 			<var name="wikiPage2Content" value="${wikiPage2Content}" />
 			<var name="wikiPage2Link" value="${wikiPage2Link}" />
 			<var name="wikiPage2Title" value="${wikiPage2Title}" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute macro="WikiPage#gotoPG">
+			<var name="wikiPageTitle" value="${wikiPage1Title}" />
+		</execute>
+
+		<execute macro="WikiPage#gotoBodyLinkPG">
+			<var name="wikiPageContent" value="${wikiPageContent}" />
+		</execute>
+
+		<execute macro="WikiPage#viewPG">
+			<var name="wikiPageContent" value="${wikiPage2Content}" />
+			<var name="wikiPageTitle" value="${wikiPage2Title}" />
 		</execute>
 	</command>
 
@@ -639,6 +793,8 @@
 			<var name="pageName" value="${pageName}" />
 		</execute>
 
+		<execute macro="WikiPage#gotoAllPagesPG" />
+
 		<execute macro="WikiPage#addPG">
 			<var name="wikiPageContent" value="${wikiPageContent}" />
 			<var name="wikiPageTitle" value="${wikiPageTitle}" />
@@ -646,6 +802,10 @@
 
 		<execute macro="Page#gotoPG">
 			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute macro="WikiPage#gotoPG">
+			<var name="wikiPageTitle" value="${wikiPageTitle}" />
 		</execute>
 
 		<execute macro="WikiPage#renameWikiPagePG">
@@ -659,11 +819,20 @@
 			<var name="pageName" value="${pageName}" />
 		</execute>
 
+		<execute macro="WikiPage#gotoPG">
+			<var name="wikiPageTitle" value="${wikiPageTitle}" />
+		</execute>
+
 		<execute macro="WikiPage#removeRedirectWikiPagePG">
 			<var name="wikiPage2Content" value="${wikiPage2Content}" />
 			<var name="wikiPageRedirectLink" value="${wikiPageRedirectLink}" />
 			<var name="wikiPageTitle" value="${wikiPageTitle}" />
 			<var name="wikiPageTitleRename" value="${wikiPageTitleRename}" />
+		</execute>
+
+		<execute macro="WikiPage#viewRenamedPG">
+			<var name="wikiPageRedirectLink" value="${wikiPageRedirectLink}" />
+			<var name="wikiPageTitle" value="${wikiPageTitle}" />
 		</execute>
 
 		<execute macro="Page#gotoPG">
@@ -710,6 +879,8 @@
 			<var name="pageName" value="${pageName}" />
 		</execute>
 
+		<execute macro="WikiPage#gotoAllPagesPG" />
+
 		<execute macro="WikiPage#addPG">
 			<var name="wikiPageContent" value="${wikiPage1Content}" />
 			<var name="wikiPageTitle" value="${wikiPage1Title}" />
@@ -718,6 +889,8 @@
 		<execute macro="Page#gotoPG">
 			<var name="pageName" value="${pageName}" />
 		</execute>
+
+		<execute macro="WikiPage#gotoAllPagesPG" />
 
 		<execute macro="WikiPage#addPG">
 			<var name="wikiPageContent" value="${wikiPage2Content}" />
@@ -728,6 +901,10 @@
 			<var name="pageName" value="${pageName}" />
 		</execute>
 
+		<execute macro="WikiPage#gotoPG">
+			<var name="wikiPageTitle" value="${wikiPage2Title}" />
+		</execute>
+
 		<execute macro="WikiPage#changeParentWikipagetoWikipagePG">
 			<var name="wikiPage1Title" value="${wikiPage1Title}" />
 			<var name="wikiPage2Title" value="${wikiPage2Title}" />
@@ -736,6 +913,10 @@
 
 		<execute macro="Page#gotoPG">
 			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute macro="WikiPage#gotoPG">
+			<var name="wikiPageTitle" value="${wikiPage2Title}" />
 		</execute>
 
 		<execute macro="WikiPage#revertChangeParentWikipagetoWikipagePG">
@@ -823,6 +1004,10 @@
 
 		<execute macro="Page#gotoPG">
 			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute macro="WikiPage#gotoPG">
+			<var name="wikiPageTitle" value="${wikiPageTitle}" />
 		</execute>
 
 		<execute macro="WikiPage#revertEditPG">

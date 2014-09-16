@@ -43,7 +43,7 @@
 						windowState="<%= LiferayWindowState.POP_UP.toString() %>"
 					/>
 
-					<aui:nav-item data-url="<%= permissionsURL %>" id="tagsPermissionsButton" label="permissions" />
+					<aui:nav-item href="<%= permissionsURL %>" iconCssClass="icon-lock" id="tagsPermissionsButton" label="permissions" useDialog="<%= true %>" />
 				</c:if>
 
 				<aui:nav-item cssClass="hide" dropdown="<%= true %>" id="tagsActionsButton" label="actions">
@@ -53,7 +53,7 @@
 				</aui:nav-item>
 			</aui:nav>
 
-			<aui:nav-bar-search cssClass="pull-right">
+			<aui:nav-bar-search>
 				<div class="form-search">
 					<liferay-ui:input-search />
 				</div>

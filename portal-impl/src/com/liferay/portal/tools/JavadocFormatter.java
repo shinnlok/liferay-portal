@@ -1539,10 +1539,11 @@ public class JavadocFormatter {
 			String javaClassName = javaClass.getFullyQualifiedName();
 
 			if (javaClassName.equals(SinceJava.class.getName())) {
-				AnnotationValue value = annotation.getProperty("value");
+				AnnotationValue annotationValue = annotation.getProperty(
+					"value");
 
 				double sinceJava = GetterUtil.getDouble(
-					value.getParameterValue());
+					annotationValue.getParameterValue());
 
 				if (sinceJava > _LOWEST_SUPPORTED_JAVA_VERSION) {
 					return true;
@@ -1971,7 +1972,7 @@ public class JavadocFormatter {
 		return text;
 	}
 
-	private static final double _LOWEST_SUPPORTED_JAVA_VERSION = 1.6;
+	private static final double _LOWEST_SUPPORTED_JAVA_VERSION = 1.7;
 
 	private static FileImpl _fileUtil = FileImpl.getInstance();
 	private static SAXReaderImpl _saxReaderUtil = SAXReaderImpl.getInstance();

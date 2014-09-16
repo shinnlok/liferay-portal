@@ -15,6 +15,7 @@
 package com.liferay.portal.service.permission;
 
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portal.kernel.staging.permission.StagingPermissionUtil;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
@@ -45,8 +46,24 @@ import java.util.List;
  * @author Brian Wing Shun Chan
  * @author Raymond Augé
  */
+@OSGiBeanProperties(
+	property = {"model.class.name=com.liferay.portal.model.Layout"}
+)
 public class LayoutPermissionImpl
 	implements BaseModelPermissionChecker, LayoutPermission {
+
+	@Override
+	public void check(
+			PermissionChecker permissionChecker, Layout layout,
+			boolean checkViewableGroup, String actionId)
+		throws PortalException {
+
+		if (!contains(
+				permissionChecker, layout, checkViewableGroup, actionId)) {
+
+			throw new PrincipalException();
+		}
+	}
 
 	@Override
 	public void check(
@@ -215,6 +232,13 @@ public class LayoutPermissionImpl
 			layout = virtualLayout.getWrappedModel();
 		}
 
+		if (actionId.equals(ActionKeys.ADD_LAYOUT) &&
+			(!PortalUtil.isLayoutParentable(layout.getType()) ||
+			 !SitesUtil.isLayoutSortable(layout))) {
+
+			return false;
+		}
+
 		if (actionId.equals(ActionKeys.DELETE) &&
 			!SitesUtil.isLayoutDeleteable(layout)) {
 
@@ -257,18 +281,11 @@ public class LayoutPermissionImpl
 			}
 		}
 
-		if (actionId.equals(ActionKeys.ADD_LAYOUT)) {
-			if (!PortalUtil.isLayoutParentable(layout.getType()) ||
-				!SitesUtil.isLayoutSortable(layout)) {
+		if (actionId.equals(ActionKeys.ADD_LAYOUT) &&
+			GroupPermissionUtil.contains(
+				permissionChecker, group, ActionKeys.ADD_LAYOUT)) {
 
-				return false;
-			}
-
-			if (GroupPermissionUtil.contains(
-					permissionChecker, group, ActionKeys.ADD_LAYOUT)) {
-
-				return true;
-			}
+			return true;
 		}
 
 		if (GroupPermissionUtil.contains(

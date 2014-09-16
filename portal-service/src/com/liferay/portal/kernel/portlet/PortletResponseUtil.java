@@ -251,9 +251,7 @@ public class PortletResponseUtil {
 
 		FileInputStream fileInputStream = new FileInputStream(file);
 
-		FileChannel fileChannel = fileInputStream.getChannel();
-
-		try {
+		try (FileChannel fileChannel = fileInputStream.getChannel()) {
 			int contentLength = (int)fileChannel.size();
 
 			if (mimeResponse instanceof ResourceResponse) {
@@ -266,9 +264,6 @@ public class PortletResponseUtil {
 			fileChannel.transferTo(
 				0, contentLength,
 				Channels.newChannel(mimeResponse.getPortletOutputStream()));
-		}
-		finally {
-			fileChannel.close();
 		}
 	}
 
@@ -283,28 +278,22 @@ public class PortletResponseUtil {
 			int contentLength)
 		throws IOException {
 
-		OutputStream outputStream = null;
+		if (mimeResponse.isCommitted()) {
+			StreamUtil.cleanUp(inputStream);
 
-		try {
-			if (mimeResponse.isCommitted()) {
-				return;
-			}
-
-			if (contentLength > 0) {
-				if (mimeResponse instanceof ResourceResponse) {
-					ResourceResponse resourceResponse =
-						(ResourceResponse)mimeResponse;
-
-					resourceResponse.setContentLength(contentLength);
-				}
-			}
-
-			StreamUtil.transfer(
-				inputStream, mimeResponse.getPortletOutputStream(), false);
+			return;
 		}
-		finally {
-			StreamUtil.cleanUp(inputStream, outputStream);
+
+		if (contentLength > 0) {
+			if (mimeResponse instanceof ResourceResponse) {
+				ResourceResponse resourceResponse =
+					(ResourceResponse)mimeResponse;
+
+				resourceResponse.setContentLength(contentLength);
+			}
 		}
+
+		StreamUtil.transfer(inputStream, mimeResponse.getPortletOutputStream());
 	}
 
 	public static void write(MimeResponse mimeResponse, String s)

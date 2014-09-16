@@ -69,6 +69,16 @@
 
 		<var name="key_messageReplyBody" value="${messageReplyBody}" />
 
+		<if>
+			<isset var="pageNumber" />
+			<then>
+				<var name="key_pageNumber" value="${pageNumber}" />
+
+				<execute action="SOMessagesMessage#click" locator-key1="PAGE_NUMBER_DROPDOWN_BUTTON" />
+				<execute action="SOMessagesMessage#click" locator-key1="PAGE_NUMBER_DROPDOWN_MENU_ITEM" />
+			</then>
+		</if>
+
 		<execute action="SOMessagesMessage#assertElementPresent" locator-key1="PRIVATE_MESSAGE_REPLY_SENDER" />
 		<execute action="SOMessagesMessage#assertElementPresent" locator-key1="PRIVATE_MESSAGE_REPLY_BODY" />
 	</command>
@@ -84,7 +94,7 @@
 			<condition action="SOMessages#isElementNotPresent" locator-key1="INFO_MESSAGE" />
 			<then>
 				<execute action="SOMessages#check" locator-key1="SELECT_ALL_CHECKBOX" />
-				<execute action="SOMessages#click" locator-key1="DELETE_BUTTON" />
+				<execute action="SOMessages#clickNoError" locator-key1="DELETE_BUTTON" />
 				<execute action="SOMessages#confirm" locator-key1="CONFIRMATION" value1="Are you sure you want to delete the selected messages?" />
 				<execute action="SOMessages#assertTextEquals" locator-key1="INFO_MESSAGE" value1="No messages found." />
 			</then>
@@ -254,9 +264,9 @@
 		</if>
 
 		<execute action="SOUserBar#click" locator-key1="NOTIFICATION" />
-		<execute action="SOUserBar#assertTextEquals" locator-key1="NOTIFICATION_MENU_ENTRY_CONTENT" value1="${senderName} sent you a message." />
-		<execute action="SOUserBar#assertTextEquals" locator-key1="NOTIFICATION_MENU_ENTRY_SUBCONTENT" value1="${messageBody}" />
-		<execute action="SOUserBar#assertClick" locator-key1="NOTIFICATION_MENU_ENTRY_CONTENT" value1="${senderName} sent you a message." />
+		<execute action="SOUserBar#assertTextEquals" locator-key1="NOTIFICATION_MENU_NOTIFICATION_ENTRY_CONTENT" value1="${senderName} sent you a message." />
+		<execute action="SOUserBar#assertTextEquals" locator-key1="NOTIFICATION_MENU_NOTIFICATION_ENTRY_SUBCONTENT" value1="${messageBody}" />
+		<execute action="SOUserBar#assertClick" locator-key1="NOTIFICATION_MENU_NOTIFICATION_ENTRY_CONTENT" value1="${senderName} sent you a message." />
 
 		<if>
 			<isset var="numberOfNotifications" />
@@ -299,6 +309,16 @@
 			<then>
 				<execute action="SOMessagesMessage#assertElementPresent" locator-key1="PRIVATE_MESSAGE_ATTACHMENT" />
 				<execute action="SOMessagesMessage#assertTextEquals" locator-key1="PRIVATE_MESSAGE_ATTACHMENT_LINK" value1="${messageAttachmentFile}" />
+			</then>
+		</if>
+
+		<if>
+			<isset var="pageNumber" />
+			<then>
+				<var name="key_pageNumber" value="${pageNumber}" />
+
+				<execute action="SOMessagesMessage#click" locator-key1="PAGE_NUMBER_DROPDOWN_BUTTON" />
+				<execute action="SOMessagesMessage#click" locator-key1="PAGE_NUMBER_DROPDOWN_MENU_ITEM" />
 			</then>
 		</if>
 

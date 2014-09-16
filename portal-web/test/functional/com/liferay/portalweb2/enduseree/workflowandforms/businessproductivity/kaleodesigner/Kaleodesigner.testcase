@@ -1,0 +1,139 @@
+<definition component-name="portal-business-productivity-ee">
+	<property name="portlet.plugins.includes" value="kaleo-designer-portlet,kaleo-forms-portlet" />
+	<property name="web.plugins.includes" value="kaleo-web" />
+	<property name="testray.main.component.name" value="Business Productivity" />
+
+	<set-up>
+		<execute macro="User#firstLoginPG" />
+	</set-up>
+
+	<tear-down>
+		<execute macro="Workflow#tearDownWorkflowDefinition">
+			<var name="workflowDefinitionTitle" value="Single Approver Edited" />
+		</execute>
+
+		<execute macro="Workflow#tearDownUploadedWorkflowDefinition" />
+	</tear-down>
+
+	<command name="EditDefinitionDeleteTaskNode" priority="5">
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Workflow" />
+		</execute>
+
+		<execute macro="Workflow#editWorkflowDefinitionViaWorkflowCP">
+			<var name="workflowDefinitionTitle" value="Single Approver" />
+		</execute>
+
+		<execute macro="Workflow#editWorkflowDefinitionTitleViaWorkflowCP">
+			<var name="workflowDefinitionTitle" value="Single Approver Edited" />
+		</execute>
+
+		<execute macro="Workflow#editWorkflowDefinitionDeleteNode">
+			<var name="nodeNodeLabel" value="update" />
+		</execute>
+
+		<execute macro="Workflow#publishWorkflowDefinitionViaWorkflowCP" />
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Workflow" />
+		</execute>
+
+		<execute macro="Workflow#viewDefinition">
+			<var name="workflowDefinitionName" value="Single Approver" />
+			<var name="workflowDefinitionTitle" value="Single Approver Edited" />
+			<var name="workflowDefinitionVersionNumber" value="2" />
+		</execute>
+
+		<execute macro="Workflow#editWorkflowDefinitionViaWorkflowCP">
+			<var name="workflowDefinitionTitle" value="Single Approver Edited" />
+		</execute>
+
+		<execute macro="Workflow#assertNodeNotPresent">
+			<var name="nodeNodeLabel" value="update" />
+		</execute>
+	</command>
+
+	<command name="ViewDefinitionTemplateCDATARemainsWhenViewingSourceTab" priority="5">
+		<description message="This is a use case for LPS-45514." />
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Workflow" />
+		</execute>
+
+		<execute macro="Workflow#uploadDefinition">
+			<var name="workflowDefinitionFile" value="workflow_definition_2.xml" />
+			<var name="workflowDefinitionTitle" value="Uploaded Definition" />
+		</execute>
+
+		<execute macro="Workflow#viewDefinition">
+			<var name="workflowDefinitionName" value="Send Content For Posting" />
+			<var name="workflowDefinitionTitle" value="Uploaded Definition" />
+			<var name="workflowDefinitionVersionNumber" value="1" />
+		</execute>
+
+		<execute macro="Workflow#editWorkflowDefinitionViaWorkflowCP">
+			<var name="workflowDefinitionTitle" value="Uploaded Definition" />
+		</execute>
+
+		<execute macro="KaleoDesigner#viewSourceXML">
+			<var name="kdsourceXML" ><![CDATA[<![CDATA[The file sent by ${userName} on the ${siteName} website has been submitted.]]></var>
+			<var name="line" value="16" />
+		</execute>
+	</command>
+
+	<command name="ViewNewUploadedDefinitionDoesNotContainDataFromDeletedDefinition" priority="5">
+		<description message="This is a use case for LPS-45676." />
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Workflow" />
+		</execute>
+
+		<execute macro="Workflow#uploadDefinition">
+			<var name="workflowDefinitionFile" value="workflow_definition_1.xml" />
+			<var name="workflowDefinitionTitle" value="Uploaded Definition" />
+		</execute>
+
+		<execute macro="Workflow#viewDefinition">
+			<var name="workflowDefinitionName" value="Uploaded Definition" />
+			<var name="workflowDefinitionTitle" value="Uploaded Definition" />
+			<var name="workflowDefinitionVersionNumber" value="1" />
+		</execute>
+
+		<execute macro="Workflow#editWorkflowDefinitionViaWorkflowCP">
+			<var name="workflowDefinitionTitle" value="Uploaded Definition" />
+		</execute>
+
+		<execute macro="KaleoDesigner#viewSourceXML">
+			<var name="kdsourceXML" ><![CDATA[<![CDATA[A file has been submitted.]]></var>
+			<var name="line" value="15" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Workflow" />
+		</execute>
+
+		<execute macro="Workflow#deactivateUploadedWorkflowDefinition" />
+
+		<execute macro="Workflow#deleteWorkflowDefinition" />
+
+		<execute macro="Workflow#uploadDefinition">
+			<var name="workflowDefinitionFile" value="workflow_definition_2.xml" />
+			<var name="workflowDefinitionTitle" value="Uploaded Definition" />
+		</execute>
+
+		<execute macro="Workflow#viewDefinition">
+			<var name="workflowDefinitionName" value="Send Content For Posting" />
+			<var name="workflowDefinitionTitle" value="Uploaded Definition" />
+			<var name="workflowDefinitionVersionNumber" value="1" />
+		</execute>
+
+		<execute macro="Workflow#editWorkflowDefinitionViaWorkflowCP">
+			<var name="workflowDefinitionTitle" value="Uploaded Definition" />
+		</execute>
+
+		<execute macro="KaleoDesigner#viewSourceXML">
+			<var name="kdsourceXML" ><![CDATA[<![CDATA[The file sent by ${userName} on the ${siteName} website has been submitted.]]></var>
+			<var name="line" value="16" />
+		</execute>
+	</command>
+</definition>

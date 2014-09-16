@@ -71,6 +71,7 @@ public class BlogsEntryWrapper implements BlogsEntry, ModelWrapper<BlogsEntry> {
 		attributes.put("allowTrackbacks", getAllowTrackbacks());
 		attributes.put("trackbacks", getTrackbacks());
 		attributes.put("smallImage", getSmallImage());
+		attributes.put("smallImageFileEntryId", getSmallImageFileEntryId());
 		attributes.put("smallImageId", getSmallImageId());
 		attributes.put("smallImageURL", getSmallImageURL());
 		attributes.put("status", getStatus());
@@ -189,6 +190,13 @@ public class BlogsEntryWrapper implements BlogsEntry, ModelWrapper<BlogsEntry> {
 
 		if (smallImage != null) {
 			setSmallImage(smallImage);
+		}
+
+		Long smallImageFileEntryId = (Long)attributes.get(
+				"smallImageFileEntryId");
+
+		if (smallImageFileEntryId != null) {
+			setSmallImageFileEntryId(smallImageFileEntryId);
 		}
 
 		Long smallImageId = (Long)attributes.get("smallImageId");
@@ -381,6 +389,21 @@ public class BlogsEntryWrapper implements BlogsEntry, ModelWrapper<BlogsEntry> {
 	@Override
 	public boolean getSmallImage() {
 		return _blogsEntry.getSmallImage();
+	}
+
+	/**
+	* Returns the small image file entry ID of this blogs entry.
+	*
+	* @return the small image file entry ID of this blogs entry
+	*/
+	@Override
+	public long getSmallImageFileEntryId() {
+		return _blogsEntry.getSmallImageFileEntryId();
+	}
+
+	@Override
+	public long getSmallImageFolderId() {
+		return _blogsEntry.getSmallImageFolderId();
 	}
 
 	/**
@@ -894,6 +917,16 @@ public class BlogsEntryWrapper implements BlogsEntry, ModelWrapper<BlogsEntry> {
 	}
 
 	/**
+	* Sets the small image file entry ID of this blogs entry.
+	*
+	* @param smallImageFileEntryId the small image file entry ID of this blogs entry
+	*/
+	@Override
+	public void setSmallImageFileEntryId(long smallImageFileEntryId) {
+		_blogsEntry.setSmallImageFileEntryId(smallImageFileEntryId);
+	}
+
+	/**
 	* Sets the small image ID of this blogs entry.
 	*
 	* @param smallImageId the small image ID of this blogs entry
@@ -1125,5 +1158,5 @@ public class BlogsEntryWrapper implements BlogsEntry, ModelWrapper<BlogsEntry> {
 		_blogsEntry.resetOriginalValues();
 	}
 
-	private BlogsEntry _blogsEntry;
+	private final BlogsEntry _blogsEntry;
 }

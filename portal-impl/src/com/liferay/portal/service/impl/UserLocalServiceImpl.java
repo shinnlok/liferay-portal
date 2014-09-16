@@ -469,8 +469,8 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 * Assigns the password policy to the users, removing any other currently
 	 * assigned password policies.
 	 *
-	 * @param  passwordPolicyId the primary key of the password policy
-	 * @param  userIds the primary keys of the users
+	 * @param passwordPolicyId the primary key of the password policy
+	 * @param userIds the primary keys of the users
 	 */
 	@Override
 	public void addPasswordPolicyUsers(long passwordPolicyId, long[] userIds) {
@@ -807,7 +807,11 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		user.setEmailAddress(emailAddress);
 		user.setFacebookId(facebookId);
 
-		Long ldapServerId = (Long)serviceContext.getAttribute("ldapServerId");
+		Long ldapServerId = null;
+
+		if (serviceContext != null) {
+			ldapServerId = (Long)serviceContext.getAttribute("ldapServerId");
+		}
 
 		if (ldapServerId != null) {
 			user.setLdapServerId(ldapServerId);
@@ -999,7 +1003,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 				@Override
 				public void onSynchronize(
 					Map<? extends Serializable, ? extends Serializable> map,
-					Serializable key, Serializable value) {
+					Serializable key, Serializable value, int timeToLive) {
 
 					if (!(value instanceof UserCacheModel)) {
 						return;
@@ -1025,7 +1029,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 * @param  headerMap the header map from the authentication request
 	 * @param  parameterMap the parameter map from the authentication request
 	 * @param  resultsMap the map of authentication results (may be nil). After
-	 *         a succesful authentication the user's primary key will be placed
+	 *         a successful authentication the user's primary key will be placed
 	 *         under the key <code>userId</code>.
 	 * @return the authentication status. This can be {@link
 	 *         com.liferay.portal.security.auth.Authenticator#FAILURE}
@@ -1060,7 +1064,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 * @param  headerMap the header map from the authentication request
 	 * @param  parameterMap the parameter map from the authentication request
 	 * @param  resultsMap the map of authentication results (may be nil). After
-	 *         a succesful authentication the user's primary key will be placed
+	 *         a successful authentication the user's primary key will be placed
 	 *         under the key <code>userId</code>.
 	 * @return the authentication status. This can be {@link
 	 *         com.liferay.portal.security.auth.Authenticator#FAILURE}
@@ -1095,7 +1099,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 * @param  headerMap the header map from the authentication request
 	 * @param  parameterMap the parameter map from the authentication request
 	 * @param  resultsMap the map of authentication results (may be nil). After
-	 *         a succesful authentication the user's primary key will be placed
+	 *         a successful authentication the user's primary key will be placed
 	 *         under the key <code>userId</code>.
 	 * @return the authentication status. This can be {@link
 	 *         com.liferay.portal.security.auth.Authenticator#FAILURE}
@@ -1150,13 +1154,8 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 * @param  login either the user's email address, screen name, or primary
 	 *         key depending on the value of <code>authType</code>
 	 * @param  password the user's password
-	 * @return the authentication status. This can be {@link
-	 *         com.liferay.portal.security.auth.Authenticator#FAILURE}
-	 *         indicating that the user's credentials are invalid, {@link
-	 *         com.liferay.portal.security.auth.Authenticator#SUCCESS}
-	 *         indicating a successful login, or {@link
-	 *         com.liferay.portal.security.auth.Authenticator#DNE} indicating
-	 *         that a user with that login does not exist.
+	 * @return the user's primary key if authentication is successful;
+	 *         <code>0</code> otherwise
 	 * @throws PortalException if a portal exception occurred
 	 */
 	@Override
@@ -1237,7 +1236,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 * @param  method the request method
 	 * @param  uri the request URI
 	 * @param  response the authentication response hash
-	 * @return the user's primary key if authentication is succesful;
+	 * @return the user's primary key if authentication is successful;
 	 *         <code>0</code> otherwise
 	 * @throws PortalException if a portal exception occurred
 	 */
@@ -1457,7 +1456,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 * Adds a failed login attempt to the user and updates the user's last
 	 * failed login date.
 	 *
-	 * @param  user the user
+	 * @param user the user
 	 */
 	@Override
 	public void checkLoginFailure(User user) {
@@ -1573,7 +1572,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	/**
 	 * Removes all the users from the organization.
 	 *
-	 * @param  organizationId the primary key of the organization
+	 * @param organizationId the primary key of the organization
 	 */
 	@Override
 	public void clearOrganizationUsers(long organizationId) {
@@ -1585,7 +1584,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	/**
 	 * Removes all the users from the user group.
 	 *
-	 * @param  userGroupId the primary key of the user group
+	 * @param userGroupId the primary key of the user group
 	 */
 	@Override
 	public void clearUserGroupUsers(long userGroupId) {
@@ -1965,6 +1964,18 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		catch (EncryptorException ee) {
 			throw new SystemException(ee);
 		}
+	}
+
+	/**
+	 * Returns the user with the contact ID.
+	 *
+	 * @param  contactId the user's contact ID
+	 * @return the user with the contact ID, or <code>null</code> if a user with
+	 *         the contact ID could not be found
+	 */
+	@Override
+	public User fetchUserByContactId(long contactId) {
+		return userPersistence.fetchByContactId(contactId);
 	}
 
 	/**
@@ -3571,9 +3582,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		subscriptionSender.setHtmlFormat(true);
 		subscriptionSender.setLocalizedBodyMap(localizedBodyMap);
 		subscriptionSender.setLocalizedSubjectMap(localizedSubjectMap);
-		subscriptionSender.setMailId(
-			"user", user.getUserId(), System.currentTimeMillis(),
-			PwdGenerator.getPassword());
+		subscriptionSender.setMailId("user", user.getUserId());
 		subscriptionSender.setServiceContext(serviceContext);
 		subscriptionSender.setUserId(user.getUserId());
 
@@ -3718,25 +3727,29 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		Map<Locale, String> localizedSubjectMap = null;
 		Map<Locale, String> localizedBodyMap = null;
 
+		String bodyProperty = null;
 		String prefix = null;
+		String subjectProperty = null;
 
 		if (company.isSendPasswordResetLink()) {
+			bodyProperty = PropsKeys.ADMIN_EMAIL_PASSWORD_RESET_BODY;
 			prefix = "adminEmailPasswordReset";
+			subjectProperty = PropsKeys.ADMIN_EMAIL_PASSWORD_RESET_SUBJECT;
 		}
 		else {
+			bodyProperty = PropsKeys.ADMIN_EMAIL_PASSWORD_SENT_BODY;
 			prefix = "adminEmailPasswordSent";
-		}
-
-		if (Validator.isNull(subject)) {
-			localizedSubjectMap = LocalizationUtil.getLocalizationMap(
-				companyPortletPreferences, prefix + "Subject",
-				PropsKeys.ADMIN_EMAIL_PASSWORD_RESET_SUBJECT);
+			subjectProperty = PropsKeys.ADMIN_EMAIL_PASSWORD_SENT_SUBJECT;
 		}
 
 		if (Validator.isNull(body)) {
 			localizedBodyMap = LocalizationUtil.getLocalizationMap(
-				companyPortletPreferences, prefix + "Body",
-				PropsKeys.ADMIN_EMAIL_PASSWORD_RESET_BODY);
+				companyPortletPreferences, prefix + "Body", bodyProperty);
+		}
+
+		if (Validator.isNull(subject)) {
+			localizedSubjectMap = LocalizationUtil.getLocalizationMap(
+				companyPortletPreferences, prefix + "Subject", subjectProperty);
 		}
 
 		SubscriptionSender subscriptionSender = new SubscriptionSender();
@@ -3752,9 +3765,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		subscriptionSender.setHtmlFormat(true);
 		subscriptionSender.setLocalizedBodyMap(localizedBodyMap);
 		subscriptionSender.setLocalizedSubjectMap(localizedSubjectMap);
-		subscriptionSender.setMailId(
-			"user", user.getUserId(), System.currentTimeMillis(),
-			PwdGenerator.getPassword());
+		subscriptionSender.setMailId("user", user.getUserId());
 		subscriptionSender.setServiceContext(serviceContext);
 		subscriptionSender.setUserId(user.getUserId());
 
@@ -3930,7 +3941,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		final Group group = organization.getGroup();
 
 		userGroupRoleLocalService.deleteUserGroupRoles(
-			userIds, group.getGroupId(), RoleConstants.TYPE_ORGANIZATION);
+			userIds, group.getGroupId());
 
 		organizationPersistence.removeUsers(organizationId, userIds);
 
@@ -3963,8 +3974,8 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	/**
 	 * Removes the users from the password policy.
 	 *
-	 * @param  passwordPolicyId the primary key of the password policy
-	 * @param  userIds the primary keys of the users
+	 * @param passwordPolicyId the primary key of the password policy
+	 * @param userIds the primary keys of the users
 	 */
 	@Override
 	public void unsetPasswordPolicyUsers(
@@ -4295,9 +4306,13 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 			long userId, long[] newGroupIds, ServiceContext serviceContext)
 		throws PortalException {
 
-		updateGroups(
-			userId, newGroupIds, serviceContext,
-			serviceContext.isIndexingEnabled());
+		boolean indexingEnabled = true;
+
+		if (serviceContext != null) {
+			indexingEnabled = serviceContext.isIndexingEnabled();
+		}
+
+		updateGroups(userId, newGroupIds, serviceContext, indexingEnabled);
 	}
 
 	/**
@@ -5602,7 +5617,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 * @param  headerMap the header map from the authentication request
 	 * @param  parameterMap the parameter map from the authentication request
 	 * @param  resultsMap the map of authentication results (may be nil). After
-	 *         a succesful authentication the user's primary key will be placed
+	 *         a successful authentication the user's primary key will be placed
 	 *         under the key <code>userId</code>.
 	 * @return the authentication status. This can be {@link
 	 *         com.liferay.portal.security.auth.Authenticator#FAILURE}
@@ -6010,9 +6025,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		subscriptionSender.setHtmlFormat(true);
 		subscriptionSender.setLocalizedBodyMap(localizedBodyMap);
 		subscriptionSender.setLocalizedSubjectMap(localizedSubjectMap);
-		subscriptionSender.setMailId(
-			"user", user.getUserId(), System.currentTimeMillis(),
-			PwdGenerator.getPassword());
+		subscriptionSender.setMailId("user", user.getUserId());
 		subscriptionSender.setServiceContext(serviceContext);
 		subscriptionSender.setUserId(user.getUserId());
 

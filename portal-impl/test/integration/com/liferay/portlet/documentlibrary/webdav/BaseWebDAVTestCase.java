@@ -154,7 +154,7 @@ public class BaseWebDAVTestCase {
 
 			for (String name : mockHttpServletResponse.getHeaderNames()) {
 				responseHeaders.put(
-					name, (String)mockHttpServletResponse.getHeader(name));
+					name, mockHttpServletResponse.getHeader(name));
 			}
 
 			return new Tuple(statusCode, responseBody, responseHeaders);

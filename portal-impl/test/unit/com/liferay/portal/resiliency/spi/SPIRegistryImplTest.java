@@ -31,6 +31,8 @@ import com.liferay.portal.test.runners.AspectJMockingNewClassLoaderJUnitTestRunn
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
+import java.rmi.RemoteException;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -60,7 +62,7 @@ public class SPIRegistryImplTest {
 		new CodeCoverageAssertor();
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() {
 		_spiRegistryImpl = new SPIRegistryImpl();
 
 		_spiRegistryImpl.setErrorSPI(new ErrorSPI());
@@ -69,11 +71,11 @@ public class SPIRegistryImplTest {
 
 		spiRegistryUtil.setSPIRegistry(_spiRegistryImpl);
 
-		_excludedPortletIds = (Set<String>)ReflectionTestUtil.getFieldValue(
+		_excludedPortletIds = ReflectionTestUtil.getFieldValue(
 			_spiRegistryImpl, "_excludedPortletIds");
-		_portletIds = (Map<SPI, String[]>)ReflectionTestUtil.getFieldValue(
+		_portletIds = ReflectionTestUtil.getFieldValue(
 			_spiRegistryImpl, "_portletIds");
-		_portletSPIs = (Map<String, SPI>)ReflectionTestUtil.getFieldValue(
+		_portletSPIs = ReflectionTestUtil.getFieldValue(
 			_spiRegistryImpl, "_portletSPIs");
 	}
 
@@ -115,7 +117,7 @@ public class SPIRegistryImplTest {
 
 	@AdviseWith(adviceClasses = {PortletLocalServiceUtilAdvice.class})
 	@Test
-	public void testRegistration() throws Exception {
+	public void testRegistration() throws RemoteException {
 		PortletLocalServiceUtilAdvice._portletIds = Arrays.asList(
 			"portlet3", "portlet4");
 

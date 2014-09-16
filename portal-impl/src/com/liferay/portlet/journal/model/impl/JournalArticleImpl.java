@@ -45,6 +45,7 @@ import com.liferay.portlet.dynamicdatamapping.service.DDMTemplateLocalServiceUti
 import com.liferay.portlet.journal.model.JournalArticle;
 import com.liferay.portlet.journal.model.JournalArticleResource;
 import com.liferay.portlet.journal.model.JournalFolder;
+import com.liferay.portlet.journal.model.JournalFolderConstants;
 import com.liferay.portlet.journal.service.JournalArticleImageLocalServiceUtil;
 import com.liferay.portlet.journal.service.JournalArticleLocalServiceUtil;
 import com.liferay.portlet.journal.service.JournalArticleResourceLocalServiceUtil;
@@ -75,8 +76,8 @@ public class JournalArticleImpl extends JournalArticleBaseImpl {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, replaced by {@link #getContentByLocale(String,
-	 *             String}
+	 * @deprecated As of 7.0.0, replaced by {@link #getContentByLocale(Document,
+	 *             String)}
 	 */
 	@Deprecated
 	public static String getContentByLocale(
@@ -99,6 +100,10 @@ public class JournalArticleImpl extends JournalArticleBaseImpl {
 
 	@Override
 	public String buildTreePath() throws PortalException {
+		if (getFolderId() == JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
+			return StringPool.SLASH;
+		}
+
 		JournalFolder folder = getFolder();
 
 		return folder.buildTreePath();

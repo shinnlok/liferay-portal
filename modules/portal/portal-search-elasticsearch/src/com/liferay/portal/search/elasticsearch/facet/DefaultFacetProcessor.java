@@ -18,13 +18,17 @@ import com.liferay.portal.kernel.search.facet.Facet;
 import com.liferay.portal.kernel.search.facet.config.FacetConfiguration;
 
 import org.elasticsearch.action.search.SearchRequestBuilder;
-import org.elasticsearch.search.facet.terms.TermsFacetBuilder;
+import org.elasticsearch.search.aggregations.bucket.terms.TermsBuilder;
+
+import org.osgi.service.component.annotations.Component;
 
 /**
  * @author Michael C. Han
  * @author Milen Dyankov
  */
-public class DefaultFacetProcessor implements FacetProcessor {
+@Component(immediate = true, property = {"class.name=DEFAULT"})
+public class DefaultFacetProcessor
+	implements FacetProcessor<SearchRequestBuilder> {
 
 	@Override
 	public void processFacet(
@@ -34,11 +38,11 @@ public class DefaultFacetProcessor implements FacetProcessor {
 
 		String fieldName = facetConfiguration.getFieldName();
 
-		TermsFacetBuilder termsFacetBuilder = new TermsFacetBuilder(fieldName);
+		TermsBuilder termsBuilder = new TermsBuilder(fieldName);
 
-		termsFacetBuilder.field(fieldName);
+		termsBuilder.field(fieldName);
 
-		searchRequestBuilder.addFacet(termsFacetBuilder);
+		searchRequestBuilder.addAggregation(termsBuilder);
 	}
 
 }

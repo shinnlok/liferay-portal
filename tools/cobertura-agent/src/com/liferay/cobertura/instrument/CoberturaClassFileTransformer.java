@@ -90,6 +90,10 @@ public class CoberturaClassFileTransformer implements ClassFileTransformer {
 	}
 
 	public boolean matches(String className) {
+		if (className == null) {
+			return false;
+		}
+
 		if (_excludePatterns.length != 0) {
 			for (Pattern excludePattern : _excludePatterns) {
 				Matcher matcher = excludePattern.matcher(className);
@@ -161,7 +165,8 @@ public class CoberturaClassFileTransformer implements ClassFileTransformer {
 			// redirecting ProjectData#initialize to
 			// InstrumentationAgent#initialize
 
-			if (className.equals(
+			if ((className != null) &&
+				className.equals(
 					"net/sourceforge/cobertura/coveragedata/TouchCollector")) {
 
 				ClassWriter classWriter = new ContextAwareClassWriter(
@@ -216,32 +221,14 @@ public class CoberturaClassFileTransformer implements ClassFileTransformer {
 
 		File classFile = new File(dumpDir, className + ".class");
 
-		OutputStream outputStream = null;
-
-		try {
-			outputStream = new FileOutputStream(classFile);
-
+		try (OutputStream outputStream = new FileOutputStream(classFile)) {
 			outputStream.write(data);
 		}
-		finally {
-			if (outputStream != null) {
-				outputStream.close();
-			}
-		}
 
-		FileWriter fileWriter = null;
-
-		try {
-			fileWriter = new FileWriter(logFile, true);
-
+		try (FileWriter fileWriter = new FileWriter(logFile, true)) {
 			fileWriter.write(
 				"Instrumented " + className + " from " + classLoader +
 					" and dumped to " + classFile.getAbsolutePath() + "\n");
-		}
-		finally {
-			if (fileWriter != null) {
-				fileWriter.close();
-			}
 		}
 	}
 

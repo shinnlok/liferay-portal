@@ -205,6 +205,18 @@ public class ReflectionUtil {
 		return false;
 	}
 
+	public static <T> T throwException(Throwable throwable) {
+		return ReflectionUtil.<T, RuntimeException>_doThrowException(throwable);
+	}
+
+	@SuppressWarnings("unchecked")
+	private static <T, E extends Throwable> T _doThrowException(
+			Throwable throwable)
+		throws E {
+
+		throw (E)throwable;
+	}
+
 	private static void _getInterfaces(
 		Set<Class<?>> interfaceClasses, Class<?> clazz,
 		ClassLoader classLoader) {

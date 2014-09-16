@@ -174,7 +174,7 @@ portletURL.setParameter("type", type);
 			</aui:nav-item>
 		</aui:nav>
 
-		<aui:nav-bar-search cssClass="pull-right"
+		<aui:nav-bar-search
 			file="/html/portlet/document_selector/search.jsp"
 			searchContainer="<%= fileEntrySearchContainer %>"
 		/>
@@ -368,6 +368,7 @@ portletURL.setParameter("type", type);
 				Map<String, Object> data = new HashMap<String, Object>();
 
 				data.put("ckeditorfuncnum", ckEditorFuncNum);
+				data.put("fileEntryId", fileEntry.getFileEntryId());
 				data.put("groupid", fileEntry.getGroupId());
 				data.put("title", fileEntry.getTitle());
 				data.put("url", DLUtil.getPreviewURL(fileEntry, fileEntry.getFileVersion(), themeDisplay, StringPool.BLANK, false, false));
