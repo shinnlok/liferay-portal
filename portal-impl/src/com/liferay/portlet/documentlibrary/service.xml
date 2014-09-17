@@ -132,6 +132,7 @@
 		<column name="folderId" type="long" />
 		<column name="treePath" type="String" />
 		<column name="name" type="String" />
+		<column name="fileName" type="String" />
 		<column name="extension" type="String" />
 		<column name="mimeType" type="String" />
 		<column name="title" type="String" />
@@ -189,6 +190,11 @@
 			<finder-column name="groupId" />
 			<finder-column name="folderId" />
 			<finder-column name="name" />
+		</finder>
+		<finder name="G_F_FN" return-type="DLFileEntry" unique="true">
+			<finder-column name="groupId" />
+			<finder-column name="folderId" />
+			<finder-column name="fileName" />
 		</finder>
 		<finder name="G_F_T" return-type="DLFileEntry" unique="true">
 			<finder-column name="groupId" />
@@ -466,6 +472,7 @@
 		<column name="folderId" type="long" />
 		<column name="fileEntryId" type="long" />
 		<column name="treePath" type="String" />
+		<column name="fileName" type="String" />
 		<column name="extension" type="String" />
 		<column name="mimeType" type="String" />
 		<column name="title" type="String" />
@@ -597,6 +604,11 @@
 			<finder-column name="parentFolderId" />
 			<finder-column name="name" />
 		</finder>
+		<finder name="G_M_P" return-type="Collection">
+			<finder-column name="groupId" />
+			<finder-column name="mountPoint" />
+			<finder-column name="parentFolderId" />
+		</finder>
 		<finder name="G_P_N" return-type="DLFolder" unique="true">
 			<finder-column name="groupId" />
 			<finder-column name="parentFolderId" />
@@ -632,6 +644,7 @@
 
 		<reference package-path="com.liferay.portal" entity="Group" />
 		<reference package-path="com.liferay.portal" entity="Lock" />
+		<reference package-path="com.liferay.portal" entity="Repository" />
 		<reference package-path="com.liferay.portal" entity="Resource" />
 		<reference package-path="com.liferay.portal" entity="User" />
 		<reference package-path="com.liferay.portal" entity="WebDAVProps" />
@@ -642,6 +655,7 @@
 		<reference package-path="com.liferay.portlet.documentlibrary" entity="DLFileEntry" />
 		<reference package-path="com.liferay.portlet.documentlibrary" entity="DLFileEntryType" />
 		<reference package-path="com.liferay.portlet.documentlibrary" entity="DLFileShortcut" />
+		<reference package-path="com.liferay.portlet.documentlibrary" entity="DLFileVersion" />
 		<reference package-path="com.liferay.portlet.expando" entity="ExpandoRow" />
 		<reference package-path="com.liferay.portlet.trash" entity="TrashEntry" />
 	</entity>
@@ -692,6 +706,7 @@
 		<exception>ImageSize</exception>
 		<exception>InvalidFileEntryType</exception>
 		<exception>InvalidFileVersion</exception>
+		<exception>InvalidFolder</exception>
 		<exception>NoSuchDirectory</exception>
 		<exception>NoSuchFile</exception>
 		<exception>NoSuchMetadataSet</exception>

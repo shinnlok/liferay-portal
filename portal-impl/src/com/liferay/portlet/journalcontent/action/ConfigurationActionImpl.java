@@ -48,10 +48,12 @@ import javax.portlet.PortletRequest;
 public class ConfigurationActionImpl extends DefaultConfigurationAction {
 
 	public ConfigurationActionImpl() {
+		Method doProcessActionMethod = null;
+
 		try {
 			Class<?> clazz = getClass();
 
-			_doProcessActionMethod = clazz.getDeclaredMethod(
+			doProcessActionMethod = clazz.getDeclaredMethod(
 				"doProcessAction",
 				new Class<?>[] {
 					PortletConfig.class, ActionRequest.class,
@@ -61,6 +63,8 @@ public class ConfigurationActionImpl extends DefaultConfigurationAction {
 		catch (Exception e) {
 			_log.error(e, e);
 		}
+
+		_doProcessActionMethod = doProcessActionMethod;
 	}
 
 	@Override
@@ -91,10 +95,6 @@ public class ConfigurationActionImpl extends DefaultConfigurationAction {
 			PortletConfig portletConfig, ActionRequest actionRequest,
 			ActionResponse actionResponse)
 		throws Exception {
-
-		String[] extensions = actionRequest.getParameterValues("extensions");
-
-		setPreference(actionRequest, "extensions", extensions);
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
@@ -149,6 +149,6 @@ public class ConfigurationActionImpl extends DefaultConfigurationAction {
 	private static Log _log = LogFactoryUtil.getLog(
 		ConfigurationActionImpl.class);
 
-	private Method _doProcessActionMethod;
+	private final Method _doProcessActionMethod;
 
 }

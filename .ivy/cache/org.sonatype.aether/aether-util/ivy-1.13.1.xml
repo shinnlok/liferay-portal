@@ -20,8 +20,8 @@
 		<m:dependency.management__org.sonatype.aether__aether-connector-asynchttpclient__version>1.13.1</m:dependency.management__org.sonatype.aether__aether-connector-asynchttpclient__version>
 		<m:dependency.management__org.sonatype.aether__aether-test-util__scope>test</m:dependency.management__org.sonatype.aether__aether-test-util__scope>
 		<m:properties__forgeSnapshotId>forge-snapshots</m:properties__forgeSnapshotId>
-		<m:properties__project.build.sourceEncoding>UTF-8</m:properties__project.build.sourceEncoding>
 		<m:dependency.management__org.sonatype.aether__aether-connector-file__version>1.13.1</m:dependency.management__org.sonatype.aether__aether-connector-file__version>
+		<m:properties__project.build.sourceEncoding>UTF-8</m:properties__project.build.sourceEncoding>
 		<m:dependency.management__org.sonatype.aether__aether-impl__version>1.13.1</m:dependency.management__org.sonatype.aether__aether-impl__version>
 		<m:properties__forgeReleaseId>forge-releases</m:properties__forgeReleaseId>
 		<m:dependency.management__org.codehaus.plexus__plexus-component-annotations__scope>provided</m:dependency.management__org.codehaus.plexus__plexus-component-annotations__scope>

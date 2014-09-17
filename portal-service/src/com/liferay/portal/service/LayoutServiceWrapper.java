@@ -604,10 +604,16 @@ public class LayoutServiceWrapper implements LayoutService,
 	@Override
 	public java.util.List<com.liferay.portal.model.Layout> getLayouts(
 		long groupId, boolean privateLayout, long parentLayoutId,
-		boolean incomplete, int start, int end)
-		throws com.liferay.portal.kernel.exception.PortalException {
+		boolean incomplete, int start, int end) {
 		return _layoutService.getLayouts(groupId, privateLayout,
 			parentLayoutId, incomplete, start, end);
+	}
+
+	@Override
+	public int getLayoutsCount(long groupId, boolean privateLayout,
+		long parentLayoutId) {
+		return _layoutService.getLayoutsCount(groupId, privateLayout,
+			parentLayoutId);
 	}
 
 	@Override
@@ -1268,6 +1274,23 @@ public class LayoutServiceWrapper implements LayoutService,
 		long parentPlid)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _layoutService.updateParentLayoutId(plid, parentPlid);
+	}
+
+	/**
+	* Updates the parent layout ID and priority of the layout.
+	*
+	* @param plid the primary key of the layout
+	* @param parentPlid the primary key of the parent layout
+	* @param priority the layout's new priority
+	* @return the layout matching the primary key
+	* @throws PortalException if a portal exception occurred
+	*/
+	@Override
+	public com.liferay.portal.model.Layout updateParentLayoutIdAndPriority(
+		long plid, long parentPlid, int priority)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _layoutService.updateParentLayoutIdAndPriority(plid, parentPlid,
+			priority);
 	}
 
 	/**

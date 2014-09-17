@@ -26,10 +26,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
-import net.jsourcerer.webdriver.jserrorcollector.JavaScriptError;
-
 import org.openqa.selenium.Dimension;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -149,84 +146,7 @@ public abstract class BaseWebDriverImpl
 	public void assertJavaScriptErrors(String ignoreJavaScriptError)
 		throws Exception {
 
-		if (!TestPropsValues.TEST_ASSSERT_JAVASCRIPT_ERRORS) {
-			return;
-		}
-
-		String location = getLocation();
-
-		if (!location.contains("localhost")) {
-			return;
-		}
-
-		String pageSource = null;
-
-		try {
-			pageSource = getPageSource();
-		}
-		catch (Exception e) {
-			WebDriver.TargetLocator targetLocator = switchTo();
-
-			targetLocator.window(defaultWindowHandle);
-
-			pageSource = getPageSource();
-		}
-
-		if (pageSource.contains(
-				"html id=\"feedHandler\" xmlns=" +
-					"\"http://www.w3.org/1999/xhtml\"")) {
-
-			return;
-		}
-
-		WebElement webElement = getWebElement("//body");
-
-		WrapsDriver wrapsDriver = (WrapsDriver)webElement;
-
-		WebDriver webDriver = wrapsDriver.getWrappedDriver();
-
-		List<JavaScriptError> javaScriptErrors = JavaScriptError.readErrors(
-			webDriver);
-
-		if (!javaScriptErrors.isEmpty()) {
-			for (JavaScriptError javaScriptError : javaScriptErrors) {
-				String javaScriptErrorValue = javaScriptError.toString();
-
-				System.out.println("JS_ERROR: " + javaScriptErrorValue);
-
-				if (Validator.isNotNull(ignoreJavaScriptError) &&
-					javaScriptErrorValue.contains(ignoreJavaScriptError)) {
-
-					continue;
-				}
-
-				// LPS-41634
-
-				if (javaScriptErrorValue.contains(
-						"TypeError: d.config.doc.defaultView is null")) {
-
-					continue;
-				}
-
-				// LPS-41634
-
-				if (javaScriptErrorValue.contains(
-						"NS_ERROR_NOT_INITIALIZED:")) {
-
-					continue;
-				}
-
-				// LPS-42469
-
-				if (javaScriptErrorValue.contains(
-						"Permission denied to access property 'type'")) {
-
-					continue;
-				}
-
-				throw new Exception(javaScriptErrorValue);
-			}
-		}
+		WebDriverHelper.assertJavaScriptErrors(this, ignoreJavaScriptError);
 	}
 
 	@Override
@@ -607,27 +527,7 @@ public abstract class BaseWebDriverImpl
 
 	@Override
 	public void makeVisible(String locator) {
-		WebElement bodyWebElement = getWebElement("//body");
-
-		WrapsDriver wrapsDriver = (WrapsDriver)bodyWebElement;
-
-		WebDriver webDriver = wrapsDriver.getWrappedDriver();
-
-		JavascriptExecutor javascriptExecutor = (JavascriptExecutor)webDriver;
-
-		StringBundler sb = new StringBundler(4);
-
-		sb.append("var element = arguments[0];");
-		sb.append("element.style.cssText = 'display:inline !important';");
-		sb.append("element.style.overflow = 'visible';");
-		sb.append("element.style.minHeight = '1px';");
-		sb.append("element.style.minWidth = '1px';");
-		sb.append("element.style.opacity = '1';");
-		sb.append("element.style.visibility = 'visible';");
-
-		WebElement locatorWebElement = getWebElement(locator);
-
-		javascriptExecutor.executeScript(sb.toString(), locatorWebElement);
+		WebDriverHelper.makeVisible(this, locator);
 	}
 
 	@Override
@@ -686,6 +586,17 @@ public abstract class BaseWebDriverImpl
 	}
 
 	@Override
+	public void saveScreenshotBeforeAction(boolean actionFailed)
+		throws Exception {
+
+		if (!TestPropsValues.SAVE_SCREENSHOT) {
+			return;
+		}
+
+		LiferaySeleniumHelper.saveScreenshotBeforeAction(this, actionFailed);
+	}
+
+	@Override
 	public void scrollWebElementIntoView(String locator) throws Exception {
 		WebElement webElement = getWebElement(locator);
 
@@ -717,6 +628,15 @@ public abstract class BaseWebDriverImpl
 	@Override
 	public void sendKeys(String locator, String value) {
 		typeKeys(locator, value);
+	}
+
+	@Override
+	public void sendKeysAceEditor(String locator, String value) {
+		WebElement webElement = getWebElement(locator);
+
+		webElement.sendKeys(Keys.chord(Keys.CONTROL, Keys.END));
+
+		LiferaySeleniumHelper.typeAceEditor(this, locator, value);
 	}
 
 	@Override
@@ -852,6 +772,10 @@ public abstract class BaseWebDriverImpl
 		webElement.sendKeys(Keys.chord(Keys.CONTROL, "a"));
 
 		LiferaySeleniumHelper.typeAceEditor(this, locator, value);
+
+		webElement.sendKeys(Keys.chord(Keys.CONTROL, Keys.SHIFT, Keys.END));
+
+		webElement.sendKeys(Keys.DELETE);
 	}
 
 	@Override

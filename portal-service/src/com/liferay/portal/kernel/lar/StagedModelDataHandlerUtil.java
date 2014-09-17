@@ -28,6 +28,7 @@ import com.liferay.portal.model.TypedModel;
 import com.liferay.portal.service.PortletLocalServiceUtil;
 import com.liferay.portal.util.PortalUtil;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -169,6 +170,10 @@ public class StagedModelDataHandlerUtil {
 		StagedModelDataHandler<StagedModel> stagedModelDataHandler =
 			_getStagedModelDataHandler(stagedModel);
 
+		if (stagedModelDataHandler == null) {
+			return Collections.emptyMap();
+		}
+
 		return stagedModelDataHandler.getReferenceAttributes(
 			portletDataContext, stagedModel);
 	}
@@ -178,8 +183,18 @@ public class StagedModelDataHandlerUtil {
 			Class<?> stagedModelClass, long classPK)
 		throws PortletDataException {
 
+		importReferenceStagedModel(
+			portletDataContext, referrerStagedModel, stagedModelClass.getName(),
+			classPK);
+	}
+
+	public static <T extends StagedModel> void importReferenceStagedModel(
+			PortletDataContext portletDataContext, T referrerStagedModel,
+			String stagedModelClassName, long classPK)
+		throws PortletDataException {
+
 		Element referenceElement = portletDataContext.getReferenceElement(
-			referrerStagedModel, stagedModelClass, classPK);
+			referrerStagedModel, stagedModelClassName, classPK);
 
 		if (referenceElement == null) {
 			return;
@@ -191,7 +206,7 @@ public class StagedModelDataHandlerUtil {
 		if (missing) {
 			StagedModelDataHandler<?> stagedModelDataHandler =
 				StagedModelDataHandlerRegistryUtil.getStagedModelDataHandler(
-					stagedModelClass.getName());
+					stagedModelClassName);
 
 			stagedModelDataHandler.importMissingReference(
 				portletDataContext, referenceElement);

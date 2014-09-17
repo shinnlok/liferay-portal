@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.shopping.model.impl;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSON;
@@ -57,6 +59,7 @@ import java.util.Map;
  * @generated
  */
 @JSON(strict = true)
+@ProviderType
 public class ShoppingCategoryModelImpl extends BaseModelImpl<ShoppingCategory>
 	implements ShoppingCategoryModel {
 	/*
@@ -93,9 +96,9 @@ public class ShoppingCategoryModelImpl extends BaseModelImpl<ShoppingCategory>
 	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.column.bitmask.enabled.com.liferay.portlet.shopping.model.ShoppingCategory"),
 			true);
-	public static long GROUPID_COLUMN_BITMASK = 1L;
-	public static long PARENTCATEGORYID_COLUMN_BITMASK = 2L;
-	public static long NAME_COLUMN_BITMASK = 4L;
+	public static final long GROUPID_COLUMN_BITMASK = 1L;
+	public static final long NAME_COLUMN_BITMASK = 2L;
+	public static final long PARENTCATEGORYID_COLUMN_BITMASK = 4L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -413,7 +416,15 @@ public class ShoppingCategoryModelImpl extends BaseModelImpl<ShoppingCategory>
 	public void setName(String name) {
 		_columnBitmask = -1L;
 
+		if (_originalName == null) {
+			_originalName = _name;
+		}
+
 		_name = name;
+	}
+
+	public String getOriginalName() {
+		return GetterUtil.getString(_originalName);
 	}
 
 	@JSON
@@ -554,6 +565,8 @@ public class ShoppingCategoryModelImpl extends BaseModelImpl<ShoppingCategory>
 		shoppingCategoryModelImpl._originalParentCategoryId = shoppingCategoryModelImpl._parentCategoryId;
 
 		shoppingCategoryModelImpl._setOriginalParentCategoryId = false;
+
+		shoppingCategoryModelImpl._originalName = shoppingCategoryModelImpl._name;
 
 		shoppingCategoryModelImpl._columnBitmask = 0;
 	}
@@ -700,8 +713,8 @@ public class ShoppingCategoryModelImpl extends BaseModelImpl<ShoppingCategory>
 		return sb.toString();
 	}
 
-	private static ClassLoader _classLoader = ShoppingCategory.class.getClassLoader();
-	private static Class<?>[] _escapedModelInterfaces = new Class[] {
+	private static final ClassLoader _classLoader = ShoppingCategory.class.getClassLoader();
+	private static final Class<?>[] _escapedModelInterfaces = new Class[] {
 			ShoppingCategory.class
 		};
 	private long _categoryId;
@@ -717,6 +730,7 @@ public class ShoppingCategoryModelImpl extends BaseModelImpl<ShoppingCategory>
 	private long _originalParentCategoryId;
 	private boolean _setOriginalParentCategoryId;
 	private String _name;
+	private String _originalName;
 	private String _description;
 	private long _columnBitmask;
 	private ShoppingCategory _escapedModel;

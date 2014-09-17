@@ -14,6 +14,7 @@
 
 package com.liferay.portal.search.lucene;
 
+import com.liferay.portal.kernel.exception.LoggedExceptionInInitializerError;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.ParseException;
@@ -100,7 +101,7 @@ public class QueryTranslatorImpl implements QueryTranslator {
 					text = StringPool.QUOTE.concat(text).concat(
 						StringPool.QUOTE);
 
-					_textField.set(term, text);
+					_TEXT_FIELD.set(term, text);
 				}
 			}
 			catch (Exception e) {
@@ -118,7 +119,7 @@ public class QueryTranslatorImpl implements QueryTranslator {
 				if (text.matches("^\\s*\\*.*(?m)")) {
 					text = text.replaceFirst("\\*", StringPool.BLANK);
 
-					_textField.set(term, text);
+					_TEXT_FIELD.set(term, text);
 				}
 			}
 			catch (Exception e) {
@@ -127,18 +128,18 @@ public class QueryTranslatorImpl implements QueryTranslator {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(QueryTranslatorImpl.class);
+	private static final Field _TEXT_FIELD;
 
-	private static Field _textField = null;
+	private static Log _log = LogFactoryUtil.getLog(QueryTranslatorImpl.class);
 
 	static {
 		try {
-			_textField = Term.class.getDeclaredField("text");
+			_TEXT_FIELD = Term.class.getDeclaredField("text");
 
-			_textField.setAccessible(true);
+			_TEXT_FIELD.setAccessible(true);
 		}
 		catch (Exception e) {
-			_log.error(e, e);
+			throw new LoggedExceptionInInitializerError(e);
 		}
 	}
 

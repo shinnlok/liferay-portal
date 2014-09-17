@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.template.TemplateConstants;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.upgrade.util.UpgradeProcessUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
@@ -98,21 +99,43 @@ public class UpgradeJournal extends UpgradeProcess {
 			return name;
 		}
 
-		long ddmStructureId = addDDMStructure(
-			increment(), groupId, companyId, name, localizedName,
-			localizedDescription, xsd);
+		String ddmStructureUUID = PortalUUIDUtil.generate();
 
-		String templateFileName = structureElement.elementText("template");
+		long ddmStructureId = addDDMStructure(
+			ddmStructureUUID, increment(), groupId, companyId, name,
+			localizedName, localizedDescription, xsd);
+
+		String ddmTemplateUUID = PortalUUIDUtil.generate();
+
+		Element templateElement = structureElement.element("template");
+
+		String fileName = templateElement.elementText("file-name");
+		boolean cacheable = GetterUtil.getBoolean(
+			templateElement.elementText("cacheable"));
 
 		addDDMTemplate(
-			increment(), groupId, companyId, ddmStructureId, name,
-			localizedName, localizedDescription, getContent(templateFileName));
+			ddmTemplateUUID, increment(), groupId, companyId, ddmStructureId,
+			name, localizedName, localizedDescription, getContent(fileName),
+			cacheable);
+
+		long stagingGroupId = getStagingGroupId(groupId);
+
+		if (stagingGroupId > 0) {
+			ddmStructureId = addDDMStructure(
+				ddmStructureUUID, increment(), stagingGroupId, companyId, name,
+				localizedName, localizedDescription, xsd);
+
+			addDDMTemplate(
+				ddmTemplateUUID, increment(), stagingGroupId, companyId,
+				ddmStructureId, name, localizedName, localizedDescription,
+				getContent(fileName), cacheable);
+		}
 
 		return name;
 	}
 
 	protected long addDDMStructure(
-			long ddmStructureId, long groupId, long companyId,
+			String uuid, long ddmStructureId, long groupId, long companyId,
 			String ddmStructureKey, String localizedName,
 			String localizedDescription, String xsd)
 		throws Exception {
@@ -138,7 +161,7 @@ public class UpgradeJournal extends UpgradeProcess {
 
 			ps = con.prepareStatement(sql);
 
-			ps.setString(1, PortalUUIDUtil.generate());
+			ps.setString(1, uuid);
 			ps.setLong(2, ddmStructureId);
 			ps.setLong(3, groupId);
 			ps.setLong(4, companyId);
@@ -186,9 +209,9 @@ public class UpgradeJournal extends UpgradeProcess {
 	}
 
 	protected long addDDMTemplate(
-			long ddmTemplateId, long groupId, long companyId,
+			String uuid, long ddmTemplateId, long groupId, long companyId,
 			long ddmStructureId, String templateKey, String localizedName,
-			String localizedDescription, String script)
+			String localizedDescription, String script, boolean cacheable)
 		throws Exception {
 
 		Timestamp now = new Timestamp(System.currentTimeMillis());
@@ -212,7 +235,7 @@ public class UpgradeJournal extends UpgradeProcess {
 
 			ps = con.prepareStatement(sql);
 
-			ps.setString(1, PortalUUIDUtil.generate());
+			ps.setString(1, uuid);
 			ps.setLong(2, ddmTemplateId);
 			ps.setLong(3, groupId);
 			ps.setLong(4, companyId);
@@ -229,7 +252,7 @@ public class UpgradeJournal extends UpgradeProcess {
 			ps.setString(15, DDMTemplateConstants.TEMPLATE_MODE_CREATE);
 			ps.setString(16, TemplateConstants.LANG_TYPE_FTL);
 			ps.setString(17, script);
-			ps.setBoolean(18, false);
+			ps.setBoolean(18, cacheable);
 			ps.setBoolean(19, false);
 			ps.setLong(20, 0);
 			ps.setString(21, StringPool.BLANK);
@@ -548,6 +571,32 @@ public class UpgradeJournal extends UpgradeProcess {
 			_roleIds.put(roleIdsKey, roleId);
 
 			return roleId;
+		}
+		finally {
+			DataAccess.cleanUp(con, ps, rs);
+		}
+	}
+
+	protected long getStagingGroupId(long groupId) throws Exception {
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+			con = DataAccess.getUpgradeOptimizedConnection();
+
+			ps = con.prepareStatement(
+				"select groupId from Group_ where liveGroupId = ?");
+
+			ps.setLong(1, groupId);
+
+			rs = ps.executeQuery();
+
+			if (rs.next()) {
+				return rs.getLong("groupId");
+			}
+
+			return 0;
 		}
 		finally {
 			DataAccess.cleanUp(con, ps, rs);

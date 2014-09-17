@@ -440,7 +440,7 @@
 		<execute action="CPSites#assertClick" locator-key1="BASIC_SEARCH_BUTTON" value1="Search" />
 		<execute action="CPSites#assertTextEquals" locator-key1="SITE_TABLE_NAME" value1="${siteName}" />
 		<execute action="CPSites#click" locator-key1="SITE_TABLE_ACTIONS" />
-		<execute action="CPSites#assertClick" locator-key1="SITE_MENULIST_DEACTIVATE" value1="Deactivate" />
+		<execute action="CPSites#assertClickNoError" locator-key1="SITE_MENULIST_DEACTIVATE" value1="Deactivate" />
 		<execute action="CPSites#confirm" locator-key1="CONFIRMATION" value1="Are you sure you want to deactivate this?" />
 
 		<if>
@@ -462,7 +462,7 @@
 		<execute action="CPSites#assertClick" locator-key1="BASIC_SEARCH_BUTTON" value1="Search" />
 		<execute action="CPSites#assertTextEquals" locator-key1="SITE_TABLE_NAME" value1="${siteName}" />
 		<execute action="CPSites#click" locator-key1="SITE_TABLE_ACTIONS" />
-		<execute action="CPSites#assertClick" locator-key1="SITE_MENULIST_DELETE" value1="Delete" />
+		<execute action="CPSites#assertClickNoError" locator-key1="SITE_MENULIST_DELETE" value1="Delete" />ed immediately." />
 		<execute action="CPSites#confirm" locator-key1="CONFIRMATION" value1="Are you sure you want to delete this? It will be deleted immediately." />
 
 		<execute action="CPSites#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request completed successfully." />
@@ -497,6 +497,15 @@
 				<execute action="CPSitesettingsSiteURL#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request completed successfully." />
 			</else>
 		</if>
+	</command>
+
+	<command name="editGoogleAnalyticsIDCP">
+		<execute action="CPSitesettings#assertClick" locator-key1="MENU_ADVANCED_ANALYTICS" value1="Analytics" />
+
+		<execute action="CPSitesettingsAnalytics#type" locator-key1="GOOGLE_ANALYTICS_ID_FIELD" value1="${googleAnalyticsID}" />
+
+		<execute action="CPSitesettingsAnalytics#assertClick" locator-key1="SAVE_BUTTON" value1="Save" />
+		<execute action="CPSitesettingsAnalytics#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request completed successfully." />
 	</command>
 
 	<command name="exportSite">
@@ -790,8 +799,8 @@
 		<while>
 			<condition action="CPSites#isElementPresent" locator-key1="SITE_TABLE_ACTIONS_GENERIC" />
 			<then>
-				<execute action="CPSites#click" locator-key1="SITE_TABLE_ACTIONS_GENERIC" />
-				<execute action="CPSites#assertClick" locator-key1="SITE_MENULIST_DELETE" value1="Delete" />
+				<execute action="CPSites#click" locator-key1="SITE_TABLE_ACTIONS" />
+				<execute action="CPSites#assertClickNoError" locator-key1="SITE_MENULIST_DELETE" value1="Delete" />
 				<execute action="CPSites#confirm" locator-key1="CONFIRMATION" value1="Are you sure you want to delete this? It will be deleted immediately." />
 				<execute action="CPSites#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request completed successfully." />
 			</then>
@@ -927,6 +936,11 @@
 				<execute action="CPSitesettingsDisplaysettings#select" locator-key1="DEFAULT_LANGUAGE_SELECT" value1="${defaultSiteLanguage}" />
 			</then>
 		</if>
+	</command>
+
+	<command name="viewDefaultThemePG">
+		<execute action="Home#assertElementNotPresent" locator-key1="DARK_THEME" />
+		<execute action="Home#assertElementPresent" locator-key1="DEFAULT_THEME" />
 	</command>
 
 	<command name="viewGlobalLandingDefault">

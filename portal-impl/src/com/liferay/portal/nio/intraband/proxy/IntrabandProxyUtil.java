@@ -108,8 +108,10 @@ public class IntrabandProxyUtil {
 
 			validate(classLoader, clazz, false);
 
-			return generateStubClass(classLoader, clazz, skeletonId);
+			stubClass = generateStubClass(classLoader, clazz, skeletonId);
 		}
+
+		return stubClass;
 	}
 
 	public static <T> T newStubInstance(
@@ -599,8 +601,10 @@ public class IntrabandProxyUtil {
 
 			validate(classLoader, clazz, true);
 
-			return generateSkeletonClass(classLoader, clazz);
+			skeletonClass = generateSkeletonClass(classLoader, clazz);
 		}
+
+		return skeletonClass;
 	}
 
 	protected static Class<?> loadClass(
@@ -1031,8 +1035,9 @@ public class IntrabandProxyUtil {
 	private static Set<String> _annotationDescriptors = new HashSet<String>(
 		Arrays.asList(
 			Type.getDescriptor(Id.class), Type.getDescriptor(Proxy.class)));
-
 	private static Method _defineClassMethod;
+	private static Comparator<Method> _methodComparator =
+		new MethodComparator();
 
 	static {
 		try {
@@ -1044,9 +1049,6 @@ public class IntrabandProxyUtil {
 			throw new ExceptionInInitializerError(e);
 		}
 	}
-
-	private static Comparator<Method> _methodComparator =
-		new MethodComparator();
 
 	private static class SkeletonDispatchTableSwitchGenerator
 		implements TableSwitchGenerator {

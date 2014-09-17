@@ -95,7 +95,7 @@ public class RestrictedByteBufferCacheServletResponseTest {
 	}
 
 	@Test
-	public void testGetByteBuffer() throws Exception {
+	public void testGetByteBuffer() throws IOException {
 		StubHttpServletResponse stubHttpServletResponse =
 			new StubHttpServletResponse() {
 
@@ -117,9 +117,8 @@ public class RestrictedByteBufferCacheServletResponseTest {
 				new RestrictedByteBufferCacheServletResponse(
 					stubHttpServletResponse, 1024);
 
-		ByteBuffer emptyByteBuffer =
-			(ByteBuffer)ReflectionTestUtil.getFieldValue(
-				restrictedByteBufferCacheServletResponse, "_emptyByteBuffer");
+		ByteBuffer emptyByteBuffer = ReflectionTestUtil.getFieldValue(
+			restrictedByteBufferCacheServletResponse, "_emptyByteBuffer");
 
 		Assert.assertSame(
 			emptyByteBuffer,

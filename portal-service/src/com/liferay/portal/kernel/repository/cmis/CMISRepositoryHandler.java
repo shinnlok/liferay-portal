@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.repository.BaseRepository;
 import com.liferay.portal.kernel.repository.BaseRepositoryImpl;
 import com.liferay.portal.kernel.repository.RepositoryException;
+import com.liferay.portal.kernel.repository.capabilities.Capability;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.repository.model.Folder;
@@ -44,7 +45,8 @@ import java.util.Map;
 /**
  * @author Alexander Chow
  */
-public abstract class CMISRepositoryHandler extends BaseRepositoryImpl {
+public abstract class CMISRepositoryHandler
+	extends BaseRepositoryImpl implements Capability {
 
 	@Override
 	public FileEntry addFileEntry(
@@ -60,12 +62,12 @@ public abstract class CMISRepositoryHandler extends BaseRepositoryImpl {
 
 	@Override
 	public Folder addFolder(
-			long parentFolderId, String title, String description,
+			long parentFolderId, String name, String description,
 			ServiceContext serviceContext)
 		throws PortalException {
 
 		return _baseCmisRepository.addFolder(
-			parentFolderId, title, description, serviceContext);
+			parentFolderId, name, description, serviceContext);
 	}
 
 	@Override
@@ -213,10 +215,10 @@ public abstract class CMISRepositoryHandler extends BaseRepositoryImpl {
 	}
 
 	@Override
-	public Folder getFolder(long parentFolderId, String title)
+	public Folder getFolder(long parentFolderId, String name)
 		throws PortalException {
 
-		return _baseCmisRepository.getFolder(parentFolderId, title);
+		return _baseCmisRepository.getFolder(parentFolderId, name);
 	}
 
 	@Override
@@ -527,12 +529,12 @@ public abstract class CMISRepositoryHandler extends BaseRepositoryImpl {
 
 	@Override
 	public Folder updateFolder(
-			long folderId, String title, String description,
+			long folderId, String name, String description,
 			ServiceContext serviceContext)
 		throws PortalException {
 
 		return _baseCmisRepository.updateFolder(
-			folderId, title, description, serviceContext);
+			folderId, name, description, serviceContext);
 	}
 
 	@Override

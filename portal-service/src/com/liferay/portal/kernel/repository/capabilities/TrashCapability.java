@@ -28,9 +28,7 @@ public interface TrashCapability extends Capability {
 
 	public void deleteFolder(Folder folder) throws PortalException;
 
-	public void deleteTrashEntry(FileEntry fileEntry) throws PortalException;
-
-	public void deleteTrashEntry(Folder folder) throws PortalException;
+	public boolean isInTrash(Folder folder) throws PortalException;
 
 	public FileEntry moveFileEntryFromTrash(
 			long userId, FileEntry fileEntry, Folder destinationFolder,

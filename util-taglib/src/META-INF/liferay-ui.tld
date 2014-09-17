@@ -1612,6 +1612,26 @@
 		</attribute>
 	</tag>
 	<tag>
+		<name>image-selector</name>
+		<tag-class>com.liferay.taglib.ui.ImageSelectorTag</tag-class>
+		<body-content>JSP</body-content>
+		<attribute>
+			<name>fileEntryId</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>paramName</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>validExtensions</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+	<tag>
 		<name>input-asset-links</name>
 		<tag-class>com.liferay.taglib.ui.InputAssetLinksTag</tag-class>
 		<body-content>JSP</body-content>
@@ -1766,6 +1786,11 @@
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 		<attribute>
+			<name>contents</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
 			<name>contentsLanguageId</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
@@ -1801,6 +1826,7 @@
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 		<attribute>
+			<description>Deprecated as of 7.0.0, replaced by liferay-ui:input-editor#contents</description>
 			<name>initMethod</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
@@ -1822,6 +1848,11 @@
 		</attribute>
 		<attribute>
 			<name>onFocusMethod</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>placeholder</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
@@ -2604,6 +2635,16 @@
 		<attribute>
 			<name>tempImageFileName</name>
 			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+	<tag>
+		<name>menu-item</name>
+		<tag-class>com.liferay.taglib.ui.MenuItemTag</tag-class>
+		<body-content>JSP</body-content>
+		<attribute>
+			<name>menuItem</name>
+			<required>true</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 	</tag>

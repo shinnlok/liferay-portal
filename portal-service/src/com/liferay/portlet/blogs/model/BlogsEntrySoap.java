@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.blogs.model;
 
+import aQute.bnd.annotation.ProviderType;
+
 import java.io.Serializable;
 
 import java.util.ArrayList;
@@ -27,6 +29,7 @@ import java.util.List;
  * @see com.liferay.portlet.blogs.service.http.BlogsEntryServiceSoap
  * @generated
  */
+@ProviderType
 public class BlogsEntrySoap implements Serializable {
 	public static BlogsEntrySoap toSoapModel(BlogsEntry model) {
 		BlogsEntrySoap soapModel = new BlogsEntrySoap();
@@ -49,6 +52,7 @@ public class BlogsEntrySoap implements Serializable {
 		soapModel.setAllowTrackbacks(model.getAllowTrackbacks());
 		soapModel.setTrackbacks(model.getTrackbacks());
 		soapModel.setSmallImage(model.getSmallImage());
+		soapModel.setSmallImageFileEntryId(model.getSmallImageFileEntryId());
 		soapModel.setSmallImageId(model.getSmallImageId());
 		soapModel.setSmallImageURL(model.getSmallImageURL());
 		soapModel.setStatus(model.getStatus());
@@ -263,6 +267,14 @@ public class BlogsEntrySoap implements Serializable {
 		_smallImage = smallImage;
 	}
 
+	public long getSmallImageFileEntryId() {
+		return _smallImageFileEntryId;
+	}
+
+	public void setSmallImageFileEntryId(long smallImageFileEntryId) {
+		_smallImageFileEntryId = smallImageFileEntryId;
+	}
+
 	public long getSmallImageId() {
 		return _smallImageId;
 	}
@@ -329,6 +341,7 @@ public class BlogsEntrySoap implements Serializable {
 	private boolean _allowTrackbacks;
 	private String _trackbacks;
 	private boolean _smallImage;
+	private long _smallImageFileEntryId;
 	private long _smallImageId;
 	private String _smallImageURL;
 	private int _status;

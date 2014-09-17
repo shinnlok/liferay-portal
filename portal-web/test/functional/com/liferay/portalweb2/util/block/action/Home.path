@@ -164,6 +164,21 @@
 	<td></td>
 </tr>
 <tr>
+	<td>DARK_THEME</td>
+	<td>//body[contains(@class,'dark')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DEFAULT_THEME</td>
+	<td>//body[contains(@class,'default')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>LIGHT_THEME</td>
+	<td>//body[contains(@class,'light')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td></td>
 	<td></td>
 	<td></td>
@@ -198,7 +213,7 @@
 <!--PAGE-->
 <tr>
 	<td>PAGE</td>
-	<td>//li[contains(@class,'add-page')]/a[contains(.,&apos;${key_pageName}&apos;)] | //li[contains(@class,'lfr-nav-item')]/a[contains(.,&apos;${key_pageName}&apos;)]</td>
+	<td>//li[contains(@class,'add-page')]/a[contains(.,'${key_pageName}')] | //li[contains(@class,'lfr-nav-item')]/a[contains(.,'${key_pageName}')]</td>
 	<td>Page</td>
 </tr>
 <tr>
@@ -551,17 +566,17 @@
 </tr>
 <tr>
 	<td>SITE_ADMINISTRATION_USERS_SITE_MEMBERSHIPS</td>
-	<td>//ul[@class='category-portlets']/li[contains(.,'Site Memberships')]/span/a/span</td>
+	<td>//ul[contains(@class,'category-portlets')]/li[contains(.,'Site Memberships')]/span/a/span</td>
 	<td></td>
 </tr>
 <tr>
 	<td>SITE_ADMINISTRATION_CONFIGURATION_SITE_SETTINGS</td>
-	<td>//ul[@class='category-portlets']/li[contains(.,'Site Settings')]/span/a/span</td>
+	<td>//ul[contains(@class,'category-portlets')]/li[contains(.,'Site Settings')]/span/a/span</td>
 	<td></td>
 </tr>
 <tr>
 	<td>SITE_ADMINISTRATION_USERS_SITE_TEAMS</td>
-	<td>//ul[@class='category-portlets']/li[contains(.,'Site Teams')]/span/a/span</td>
+	<td>//ul[contains(@class,'category-portlets')]/li[contains(.,'Site Teams')]/span/a/span</td>
 	<td></td>
 </tr>
 <tr>

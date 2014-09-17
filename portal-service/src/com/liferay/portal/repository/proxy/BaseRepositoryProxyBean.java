@@ -14,6 +14,8 @@
 
 package com.liferay.portal.repository.proxy;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.repository.BaseRepository;
 import com.liferay.portal.kernel.repository.LocalRepository;
@@ -43,6 +45,7 @@ import java.util.List;
 /**
  * @author Mika Koivisto
  */
+@ProviderType
 public class BaseRepositoryProxyBean
 	extends RepositoryModelProxyBean implements BaseRepository {
 
@@ -84,12 +87,12 @@ public class BaseRepositoryProxyBean
 
 	@Override
 	public Folder addFolder(
-			long parentFolderId, String title, String description,
+			long parentFolderId, String name, String description,
 			ServiceContext serviceContext)
 		throws PortalException {
 
 		Folder folder = _baseRepository.addFolder(
-			parentFolderId, title, description, serviceContext);
+			parentFolderId, name, description, serviceContext);
 
 		return newFolderProxyBean(folder);
 	}
@@ -187,10 +190,10 @@ public class BaseRepositoryProxyBean
 	}
 
 	@Override
-	public void deleteFolder(long parentFolderId, String title)
+	public void deleteFolder(long parentFolderId, String name)
 		throws PortalException {
 
-		_baseRepository.deleteFolder(parentFolderId, title);
+		_baseRepository.deleteFolder(parentFolderId, name);
 	}
 
 	@Override
@@ -320,10 +323,10 @@ public class BaseRepositoryProxyBean
 	}
 
 	@Override
-	public Folder getFolder(long parentFolderId, String title)
+	public Folder getFolder(long parentFolderId, String name)
 		throws PortalException {
 
-		Folder folder = _baseRepository.getFolder(parentFolderId, title);
+		Folder folder = _baseRepository.getFolder(parentFolderId, name);
 
 		return newFolderProxyBean(folder);
 	}
@@ -728,10 +731,10 @@ public class BaseRepositoryProxyBean
 	}
 
 	@Override
-	public void unlockFolder(long parentFolderId, String title, String lockUuid)
+	public void unlockFolder(long parentFolderId, String name, String lockUuid)
 		throws PortalException {
 
-		_baseRepository.unlockFolder(parentFolderId, title, lockUuid);
+		_baseRepository.unlockFolder(parentFolderId, name, lockUuid);
 	}
 
 	@Override
@@ -765,12 +768,12 @@ public class BaseRepositoryProxyBean
 
 	@Override
 	public Folder updateFolder(
-			long folderId, String title, String description,
+			long folderId, String name, String description,
 			ServiceContext serviceContext)
 		throws PortalException {
 
 		Folder folder = _baseRepository.updateFolder(
-			folderId, title, description, serviceContext);
+			folderId, name, description, serviceContext);
 
 		return newFolderProxyBean(folder);
 	}

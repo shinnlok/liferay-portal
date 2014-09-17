@@ -14,8 +14,7 @@
 
 package com.liferay.portal.kernel.util;
 
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.exception.LoggedExceptionInInitializerError;
 import com.liferay.portal.kernel.memory.EqualityWeakReference;
 
 import java.io.IOException;
@@ -316,16 +315,10 @@ public class AggregateClassLoader extends ClassLoader {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(AggregateClassLoader.class);
-
 	private static Method _findClassMethod;
 	private static Method _getResourceMethod;
 	private static Method _getResourcesMethod;
 	private static Method _loadClassMethod;
-
-	private List<EqualityWeakReference<ClassLoader>> _classLoaderReferences =
-		new ArrayList<EqualityWeakReference<ClassLoader>>();
-	private WeakReference<ClassLoader> _parentClassLoaderReference;
 
 	static {
 		try {
@@ -339,10 +332,12 @@ public class AggregateClassLoader extends ClassLoader {
 				ClassLoader.class, "loadClass", String.class, boolean.class);
 		}
 		catch (Exception e) {
-			if (_log.isErrorEnabled()) {
-				_log.error("Unable to locate required methods", e);
-			}
+			throw new LoggedExceptionInInitializerError(e);
 		}
 	}
+
+	private List<EqualityWeakReference<ClassLoader>> _classLoaderReferences =
+		new ArrayList<EqualityWeakReference<ClassLoader>>();
+	private WeakReference<ClassLoader> _parentClassLoaderReference;
 
 }

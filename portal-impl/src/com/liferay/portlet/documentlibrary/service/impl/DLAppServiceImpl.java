@@ -53,7 +53,6 @@ import com.liferay.portlet.documentlibrary.NoSuchFileVersionException;
 import com.liferay.portlet.documentlibrary.NoSuchFolderException;
 import com.liferay.portlet.documentlibrary.model.DLFileShortcut;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
-import com.liferay.portlet.documentlibrary.model.DLSyncConstants;
 import com.liferay.portlet.documentlibrary.service.base.DLAppServiceBaseImpl;
 import com.liferay.portlet.documentlibrary.service.permission.DLFileEntryPermission;
 import com.liferay.portlet.documentlibrary.service.permission.DLFileShortcutPermission;
@@ -763,11 +762,6 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 		Repository repository = getFileEntryRepository(fileEntryId);
 
 		repository.deleteFileVersion(fileEntryId, version);
-
-		FileEntry fileEntry = repository.getFileEntry(fileEntryId);
-
-		dlAppHelperLocalService.registerDLSyncEventCallback(
-			DLSyncConstants.EVENT_UPDATE, fileEntry);
 	}
 
 	/**
@@ -781,14 +775,25 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 	public void deleteFolder(long folderId) throws PortalException {
 		Repository repository = getFolderRepository(folderId);
 
+		Folder folder = repository.getFolder(folderId);
+
+		if (repository.isCapabilityProvided(TrashCapability.class)) {
+			TrashCapability trashCapability = repository.getCapability(
+				TrashCapability.class);
+
+			if (trashCapability.isInTrash(folder)) {
+				trashCapability.deleteFolder(folder);
+
+				return;
+			}
+		}
+
 		List<FileEntry> fileEntries = repository.getRepositoryFileEntries(
 			0, folderId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 
 		for (FileEntry fileEntry : fileEntries) {
 			dlAppHelperLocalService.deleteFileEntry(fileEntry);
 		}
-
-		Folder folder = repository.getFolder(folderId);
 
 		repository.deleteFolder(folderId);
 
@@ -810,6 +815,19 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 		throws PortalException {
 
 		Repository repository = getRepository(repositoryId);
+
+		Folder folder = repository.getFolder(parentFolderId, name);
+
+		if (repository.isCapabilityProvided(TrashCapability.class)) {
+			TrashCapability trashCapability = repository.getCapability(
+				TrashCapability.class);
+
+			if (trashCapability.isInTrash(folder)) {
+				trashCapability.deleteFolder(folder);
+
+				return;
+			}
+		}
 
 		repository.deleteFolder(parentFolderId, name);
 	}
@@ -1230,6 +1248,22 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 		throws PortalException {
 
 		return dlFileShortcutService.getFileShortcut(fileShortcutId);
+	}
+
+	/**
+	 * Returns the file version with the primary key.
+	 *
+	 * @param  fileVersionId the primary key of the file version
+	 * @return the file version with the primary key
+	 * @throws PortalException if the file version could not be found
+	 */
+	@Override
+	public FileVersion getFileVersion(long fileVersionId)
+		throws PortalException {
+
+		Repository repository = getFileVersionRepository(fileVersionId);
+
+		return repository.getFileVersion(fileVersionId);
 	}
 
 	/**
@@ -2191,8 +2225,6 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 			FileEntry fileEntry = fromRepository.moveFileEntry(
 				fileEntryId, newFolderId, serviceContext);
 
-			dlAppHelperLocalService.moveFileEntry(fileEntry);
-
 			return fileEntry;
 		}
 
@@ -2359,8 +2391,6 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 				folderId, parentFolderId, fromRepository, toRepository,
 				serviceContext);
 		}
-
-		dlAppHelperLocalService.moveFolder(folder);
 
 		return folder;
 	}
