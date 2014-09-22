@@ -44,18 +44,6 @@
 				base: PATH_JAVASCRIPT + '/liferay/',
 				combine: COMBINE,
 				modules: {
-					'liferay-app-view-folders': {
-						path: 'app_view_folders.js',
-						requires: [
-							'aui-base',
-							'aui-parse-content',
-							'liferay-app-view-move',
-							'liferay-history-manager',
-							'liferay-list-view',
-							'liferay-node',
-							'liferay-portlet-base'
-						]
-					},
 					'liferay-app-view-move': {
 						path: 'app_view_move.js',
 						plugins: {
@@ -83,15 +71,6 @@
 						path: 'app_view_move_touch.js',
 						requires: [
 							'aui-base'
-						]
-					},
-					'liferay-app-view-paginator': {
-						path: 'app_view_paginator.js',
-						requires: [
-							'aui-parse-content',
-							'liferay-history-manager',
-							'liferay-pagination',
-							'liferay-portlet-base'
 						]
 					},
 					'liferay-app-view-select': {
@@ -237,19 +216,13 @@
 						path: 'dockbar_add_application.js',
 						requires: [
 							'aui-io-request',
+							'event-key',
 							'event-mouseenter',
 							'liferay-dockbar',
-							'liferay-dockbar-add-application-search',
 							'liferay-dockbar-add-base',
-							'liferay-portlet-base'
-						]
-					},
-					'liferay-dockbar-add-application-search': {
-						path: 'dockbar_add_application_search.js',
-						requires: [
-							'aui-base',
-							'liferay-dockbar',
-							'liferay-dockbar-add-search'
+							'liferay-panel-search',
+							'liferay-portlet-base',
+							'liferay-toggler-interaction'
 						]
 					},
 					'liferay-dockbar-add-base': {
@@ -286,12 +259,13 @@
 						requires: [
 							'aui-base',
 							'liferay-dockbar',
-							'liferay-dockbar-add-search'
+							'liferay-search-filter'
 						]
 					},
 					'liferay-dockbar-add-page': {
 						path: 'dockbar_add_page.js',
 						requires: [
+							'aui-loading-mask-deprecated',
 							'aui-parse-content',
 							'aui-toggler-delegate',
 							'liferay-dockbar',
@@ -306,16 +280,7 @@
 						requires: [
 							'aui-base',
 							'liferay-dockbar',
-							'liferay-dockbar-add-search'
-						]
-					},
-					'liferay-dockbar-add-search': {
-						path: 'dockbar_add_search.js',
-						requires: [
-							'aui-base',
-							'autocomplete-base',
-							'autocomplete-filters',
-							'liferay-dockbar'
+							'liferay-search-filter'
 						]
 					},
 					'liferay-dockbar-device-preview': {
@@ -430,6 +395,14 @@
 							'aui-base'
 						]
 					},
+					'liferay-image-selector': {
+						path: 'image_selector.js',
+						requires: [
+							'aui-base',
+							'liferay-portlet-base',
+							'uploader'
+						]
+					},
 					'liferay-inline-editor-base': {
 						path: 'inline_editor_base.js',
 						requires: [
@@ -514,10 +487,16 @@
 							'aui-base'
 						]
 					},
+					'liferay-layouts-tree-node-task': {
+						path: 'layouts_tree_node_task.js',
+						requires: [
+							'aui-tree-node'
+						]
+					},
 					'liferay-layouts-tree-selectable': {
 						path: 'layouts_tree_selectable.js',
 						requires: [
-							'aui-base'
+							'liferay-layouts-tree-node-task'
 						]
 					},
 					'liferay-layouts-tree-state': {
@@ -658,6 +637,13 @@
 							'aui-pagination'
 						]
 					},
+					'liferay-panel-search': {
+						path: 'panel_search.js',
+						requires: [
+							'aui-base',
+							'liferay-search-filter'
+						]
+					},
 					'liferay-poller': {
 						path: 'poller.js',
 						requires: [
@@ -727,6 +713,14 @@
 							'aui-base',
 							'aui-datatable-core',
 							'event-mouseenter'
+						]
+					},
+					'liferay-search-filter': {
+						path: 'search_filter.js',
+						requires: [
+							'aui-base',
+							'autocomplete-base',
+							'autocomplete-filters'
 						]
 					},
 					'liferay-service-datasource': {

@@ -20,8 +20,8 @@
 		<m:dependency.management__org.sonatype.sisu__sisu-guice__scope>runtime</m:dependency.management__org.sonatype.sisu__sisu-guice__scope>
 		<m:dependency.management__org.slf4j__jcl-over-slf4j__scope>runtime</m:dependency.management__org.slf4j__jcl-over-slf4j__scope>
 		<m:properties__forgeSnapshotId>forge-snapshots</m:properties__forgeSnapshotId>
-		<m:dependency.management__org.slf4j__slf4j-api__version>1.6.1</m:dependency.management__org.slf4j__slf4j-api__version>
 		<m:dependency.management__org.slf4j__jcl-over-slf4j__version>1.6.1</m:dependency.management__org.slf4j__jcl-over-slf4j__version>
+		<m:dependency.management__org.slf4j__slf4j-api__version>1.6.1</m:dependency.management__org.slf4j__slf4j-api__version>
 		<m:dependency.management__org.codehaus.plexus__plexus-compiler-test__version>2.1</m:dependency.management__org.codehaus.plexus__plexus-compiler-test__version>
 		<m:dependency.management__org.sonatype.sisu__sisu-inject-plexus__scope>compile</m:dependency.management__org.sonatype.sisu__sisu-inject-plexus__scope>
 		<m:dependency.management__junit__junit__version>3.8.2</m:dependency.management__junit__junit__version>
@@ -65,19 +65,19 @@
 		<dependency org="org.codehaus.plexus" name="plexus-container-default" rev="1.0-alpha-9-stable-1" force="true" conf="provided->compile(*),provided(*),runtime(*),master(*)"/>
 		<dependency org="junit" name="junit" rev="3.8.2" force="true" conf="test->runtime(*),master(*)"/>
 		<dependency org="junit" name="junit" rev="3.8.2" force="true" conf="test->runtime(*),master(*)"/>
-		<override org="org.sonatype.sisu" module="sisu-inject-bean" matcher="exact" rev="2.1.1"/>
-		<override org="org.slf4j" module="slf4j-simple" matcher="exact" rev="1.6.1"/>
-		<override org="org.codehaus.plexus" module="plexus-classworlds" matcher="exact" rev="2.4"/>
-		<override org="javax.inject" module="javax.inject" matcher="exact" rev="1"/>
-		<override org="org.slf4j" module="slf4j-api" matcher="exact" rev="1.6.1"/>
-		<override org="junit" module="junit" matcher="exact" rev="3.8.2"/>
 		<override org="org.slf4j" module="jul-to-slf4j" matcher="exact" rev="1.6.1"/>
 		<override org="org.sonatype.sisu" module="sisu-guice" matcher="exact" rev="2.9.4"/>
+		<override org="org.sonatype.sisu" module="sisu-inject-bean" matcher="exact" rev="2.1.1"/>
+		<override org="org.slf4j" module="slf4j-simple" matcher="exact" rev="1.6.1"/>
 		<override org="org.slf4j" module="jcl-over-slf4j" matcher="exact" rev="1.6.1"/>
 		<override org="org.sonatype.sisu" module="sisu-inject-plexus" matcher="exact" rev="2.1.1"/>
 		<override org="org.codehaus.plexus" module="plexus-container-default" matcher="exact" rev="1.0-alpha-9-stable-1"/>
+		<override org="org.codehaus.plexus" module="plexus-classworlds" matcher="exact" rev="2.4"/>
 		<override org="org.codehaus.plexus" module="plexus-utils" matcher="exact" rev="3.0.8"/>
+		<override org="org.slf4j" module="slf4j-api" matcher="exact" rev="1.6.1"/>
+		<override org="javax.inject" module="javax.inject" matcher="exact" rev="1"/>
 		<override org="org.codehaus.plexus" module="plexus-component-annotations" matcher="exact" rev="1.5.5"/>
+		<override org="junit" module="junit" matcher="exact" rev="3.8.2"/>
 		<override org="org.codehaus.plexus" module="plexus-compiler-api" matcher="exact" rev="2.1"/>
 		<override org="org.codehaus.plexus" module="plexus-compiler-test" matcher="exact" rev="2.1"/>
 	</dependencies>

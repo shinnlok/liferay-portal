@@ -3,6 +3,7 @@
 <project name="build-common"
 	xmlns:antelope="antlib:ise.antelope.tasks"
 	xmlns:artifact="antlib:org.apache.maven.artifact.ant"
+	xmlns:ivy="antlib:org.apache.ivy.ant"
 	xmlns:sonar="antlib:org.sonar.ant"
 >
 	<dirname file="${ant.file.build-common}" property="project.dir.native" />
@@ -57,8 +58,8 @@
 	</path>
 
 	<path id="test.classpath">
-		<pathelement path="${classpath}" />
 		<pathelement path="test-classes/${test.type}" />
+		<pathelement path="${classpath}" />
 		<pathelement path="${test.additional.classpath}" />
 		<fileset dir="${project.dir}/lib/development" includes="*.jar" excludes="jalopy.jar,jetty*.jar,tomcat*.jar" />
 		<fileset dir="${project.dir}/lib/global" includes="*.jar" />
@@ -84,6 +85,8 @@
 	<taskdef classname="com.liferay.ant.bnd.BaselineJarTask" classpathref="lib.classpath" name="baseline-jar" />
 	<taskdef classname="com.tonicsystems.jarjar.JarJarTask" classpath="${project.dir}/lib/development/jarjar.jar" name="jarjar" />
 	<taskdef classname="com.oopsconsultancy.xmltask.ant.XmlTask" classpath="${project.dir}/lib/development/xmltask.jar" name="xmltask" />
+
+	<import file="build-common-ivy.xml" />
 
 	<property location="${project.dir}" name="project.location.absolute.native" />
 
@@ -875,6 +878,16 @@ Please set the environment variable ANT_OPTS to the recommended value of
 		</sequential>
 	</macrodef>
 
+	<macrodef name="remake-dir">
+		<attribute name="dir" />
+
+		<sequential>
+			<delete dir="@{dir}" />
+
+			<mkdir dir="@{dir}" />
+		</sequential>
+	</macrodef>
+
 	<macrodef name="set-test-type">
 		<sequential>
 			<if>
@@ -1084,7 +1097,7 @@ rerun your task.
 				</copy>
 
 				<javac
-					classpathref="project.classpath"
+					classpathref="test.classpath"
 					compiler="${javac.compiler}"
 					debug="${javac.debug}"
 					deprecation="${javac.deprecation}"
@@ -1433,6 +1446,7 @@ rerun your task.
 							<jvmarg value="-Djava.net.preferIPv4Stack=true" />
 							<jvmarg value="-Djava.security.manager" />
 							<jvmarg value="-Djava.security.policy=${basedir}/test-classes/${test.type}/com/liferay/portal/security/pacl/security.policy" />
+							<jvmarg value="-Dliferay.lib.portal.dir=${project.dir}/lib/portal" />
 							<jvmarg value="-Dliferay.mode=test" />
 							<jvmarg value="-Duser.timezone=GMT" />
 							<classpath location="test-coverage" />
@@ -1484,6 +1498,7 @@ rerun your task.
 							<jvmarg value="-Dfile.encoding=UTF-8" />
 							<jvmarg value="-Dfixed.issues=${fixed.issues}" />
 							<jvmarg value="-Djava.net.preferIPv4Stack=true" />
+							<jvmarg value="-Dliferay.lib.portal.dir=${project.dir}/lib/portal" />
 							<jvmarg value="-Dliferay.mode=test" />
 							<jvmarg value="-Duser.timezone=GMT" />
 							<classpath location="test-coverage" />
@@ -1715,6 +1730,29 @@ rerun your task.
 				</if>
 			</then>
 		</if>
+	</target>
+
+	<target name="test-package-group">
+		<if>
+			<not>
+				<isset property="test.package.group.index" />
+			</not>
+			<then>
+				<fail>Use "ant test-package-group -Dtest.package.group.index=0".</fail>
+			</then>
+		</if>
+
+		<property file="${project.dir}/test.package.names.properties" />
+
+		<propertycopy from="TEST_PACKAGE_GROUP_${test.package.group.index}" name="test.packages" />
+
+		<for list="${test.packages}" param="test.package">
+			<sequential>
+				<antcall target="test-package">
+					<param name="test.package" value="@{test.package}" />
+				</antcall>
+			</sequential>
+		</for>
 	</target>
 
 	<target name="test-unit" depends="compile,compile-test-unit">

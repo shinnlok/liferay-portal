@@ -39,6 +39,13 @@ public class StagedGroupStagedModelDataHandler
 	}
 
 	@Override
+	public StagedGroup fetchStagedModelByUuidAndCompanyId(
+		String uuid, long companyId) {
+
+		return null;
+	}
+
+	@Override
 	public String[] getClassNames() {
 		return CLASS_NAMES;
 	}
@@ -144,6 +151,10 @@ public class StagedGroupStagedModelDataHandler
 		else if (groupId == portletDataContext.getSourceGroupId()) {
 			existingGroupId = portletDataContext.getGroupId();
 		}
+
+		// During remote staging, valid mappings are found when the reference's
+		// group is properly staged. During local staging, valid mappings are
+		// found when the references do not change between staging and live.
 
 		return GroupLocalServiceUtil.fetchGroup(existingGroupId);
 	}

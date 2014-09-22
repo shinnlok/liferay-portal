@@ -66,6 +66,7 @@ public class DLFileVersionWrapper implements DLFileVersion,
 		attributes.put("folderId", getFolderId());
 		attributes.put("fileEntryId", getFileEntryId());
 		attributes.put("treePath", getTreePath());
+		attributes.put("fileName", getFileName());
 		attributes.put("extension", getExtension());
 		attributes.put("mimeType", getMimeType());
 		attributes.put("title", getTitle());
@@ -156,6 +157,12 @@ public class DLFileVersionWrapper implements DLFileVersion,
 
 		if (treePath != null) {
 			setTreePath(treePath);
+		}
+
+		String fileName = (String)attributes.get("fileName");
+
+		if (fileName != null) {
+			setFileName(fileName);
 		}
 
 		String extension = (String)attributes.get("extension");
@@ -315,6 +322,18 @@ public class DLFileVersionWrapper implements DLFileVersion,
 		return _dlFileVersion.getCreateDate();
 	}
 
+	@Override
+	public java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMStructure> getDDMStructures()
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _dlFileVersion.getDDMStructures();
+	}
+
+	@Override
+	public com.liferay.portlet.documentlibrary.model.DLFileEntryType getDLFileEntryType()
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _dlFileVersion.getDLFileEntryType();
+	}
+
 	/**
 	* Returns the description of this document library file version.
 	*
@@ -379,6 +398,16 @@ public class DLFileVersionWrapper implements DLFileVersion,
 	@Override
 	public long getFileEntryTypeId() {
 		return _dlFileVersion.getFileEntryTypeId();
+	}
+
+	/**
+	* Returns the file name of this document library file version.
+	*
+	* @return the file name of this document library file version
+	*/
+	@Override
+	public java.lang.String getFileName() {
+		return _dlFileVersion.getFileName();
 	}
 
 	/**
@@ -822,6 +851,16 @@ public class DLFileVersionWrapper implements DLFileVersion,
 	}
 
 	/**
+	* Sets the file name of this document library file version.
+	*
+	* @param fileName the file name of this document library file version
+	*/
+	@Override
+	public void setFileName(java.lang.String fileName) {
+		_dlFileVersion.setFileName(fileName);
+	}
+
+	/**
 	* Sets the file version ID of this document library file version.
 	*
 	* @param fileVersionId the file version ID of this document library file version
@@ -1113,5 +1152,5 @@ public class DLFileVersionWrapper implements DLFileVersion,
 		_dlFileVersion.resetOriginalValues();
 	}
 
-	private DLFileVersion _dlFileVersion;
+	private final DLFileVersion _dlFileVersion;
 }

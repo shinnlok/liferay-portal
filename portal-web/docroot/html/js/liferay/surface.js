@@ -8,17 +8,23 @@ AUI.add(
 		var Surface = {
 			app: null,
 
-			blacklist: {},
+			blacklist: {
+				cache: {},
+				route: {},
+				surface: {}
+			},
 
-			getAllowedPortletIds: function() {
+			clearCache: function() {
 				var instance = this;
 
-				return AArray.filter(
-					Liferay.Portlet.list,
-					function(portletId) {
-						return instance.isAllowedPortletId(portletId);
-					}
-				);
+				if (instance.app) {
+					A.each(
+						instance.app.screens,
+						function(item, index) {
+							item.clearCache();
+						}
+					);
+				}
 			},
 
 			getBasePath: function() {
@@ -47,13 +53,13 @@ AUI.add(
 				var instance = this;
 
 				if (!themeDisplay.isControlPanel()) {
-					var isFriendlyURLMaximized = (url.indexOf('/maximized') > -1);
+					var friendlyURLMaximized = (url.indexOf('/maximized') > -1);
 
-					if (themeDisplay.isStateMaximized() && !isFriendlyURLMaximized) {
+					if (themeDisplay.isStateMaximized() && !friendlyURLMaximized) {
 						return null;
 					}
 
-					if (!themeDisplay.isStateMaximized() && isFriendlyURLMaximized) {
+					if (!themeDisplay.isStateMaximized() && friendlyURLMaximized) {
 						return null;
 					}
 				}
@@ -64,7 +70,7 @@ AUI.add(
 			getPatternPortletURL: function(lifecycle) {
 				var instance = this;
 
-				var allowedPortlets = instance.getAllowedPortletIds();
+				var routeablePortletIds = instance.getRouteablePortletIds();
 
 				var windowState = 'NORMAL';
 
@@ -78,7 +84,7 @@ AUI.add(
 					windowState = 'MAXIMIZED';
 				}
 
-				return new RegExp('p_p_id=(' + allowedPortlets.join('|') + ')&p_p_lifecycle=' + lifecycle + '&p_p_state=' + windowState.toLowerCase());
+				return new RegExp('p_p_id=(' + routeablePortletIds.join('|') + ')&p_p_lifecycle=' + lifecycle + '&p_p_state=' + windowState.toLowerCase());
 			},
 
 			getPortletBoundaryId: function(portletId) {
@@ -106,15 +112,37 @@ AUI.add(
 				return url.getParameter(namespace + 'redirect');
 			},
 
+			getRouteablePortletIds: function() {
+				var instance = this;
+
+				return AArray.filter(
+					Liferay.Portlet.list,
+					function(portletId) {
+						return instance.isPortletRouteable(portletId);
+					}
+				);
+			},
+
 			getSurfaceIds: function() {
 				var instance = this;
 
-				var surfaces = instance.getPortletBoundaryIds(Liferay.Portlet.list);
+				var surfaces = instance.getPortletBoundaryIds(instance.getSurfacePortletIds());
 
 				surfaces.push('bottomJS');
 				surfaces.push('breadcrumbs');
 
 				return surfaces;
+			},
+
+			getSurfacePortletIds: function() {
+				var instance = this;
+
+				return AArray.filter(
+					Liferay.Portlet.list,
+					function(portletId) {
+						return instance.isPortletSurface(portletId);
+					}
+				);
 			},
 
 			isActionURL: function(url) {
@@ -125,18 +153,6 @@ AUI.add(
 				}
 
 				return false;
-			},
-
-			isAllowedPortletId: function(portletId) {
-				var instance = this;
-
-				var lastIndexOf = portletId.lastIndexOf('_INSTANCE_');
-
-				if (lastIndexOf > 0) {
-					portletId = portletId.substr(0, lastIndexOf);
-				}
-
-				return !instance.blacklist[portletId];
 			},
 
 			isolatePortletURLRedirect: function(portletURL) {
@@ -153,6 +169,34 @@ AUI.add(
 				url.setParameter(namespace + 'redirect', redirect.toString());
 
 				return url.toString();
+			},
+
+			isPortletCacheable: function(portletId) {
+				var instance = this;
+
+				return !instance.blacklist.cache[instance.maybeExtractPortletId(portletId)];
+			},
+
+			isPortletRouteable: function(portletId) {
+				var instance = this;
+
+				return !instance.blacklist.route[instance.maybeExtractPortletId(portletId)];
+			},
+
+			isPortletSurface: function(portletId) {
+				var instance = this;
+
+				return !instance.blacklist.surface[instance.maybeExtractPortletId(portletId)];
+			},
+
+			maybeExtractPortletId: function(portletId) {
+				var lastIndexOf = String(portletId).lastIndexOf('_INSTANCE_');
+
+				if (lastIndexOf > 0) {
+					portletId = portletId.substr(0, lastIndexOf);
+				}
+
+				return portletId;
 			},
 
 			resetAllPortlets: function() {
@@ -263,8 +307,16 @@ AUI.add(
 						);
 					},
 
-					load: function() {
+					load: function(path) {
 						var instance = this;
+
+						var url = new A.Url(path);
+
+						var portletId = url.getParameter('p_p_id');
+
+						if (!Surface.isPortletCacheable(portletId)) {
+							instance.clearCache();
+						}
 
 						return Surface.EventScreen.superclass.load.apply(instance, arguments).then(
 							function(data) {
@@ -332,6 +384,6 @@ AUI.add(
 	},
 	'',
 	{
-		requires: ['aui-surface-app', 'aui-surface-base', 'aui-surface-screen-html', 'liferay-portlet-url', 'json']
+		requires: ['aui-surface-app', 'aui-surface-base', 'aui-surface-screen-html', 'json', 'liferay-portlet-url']
 	}
 );

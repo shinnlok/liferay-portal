@@ -19,8 +19,8 @@
 		<m:dependency.management__org.jboss.shrinkwrap.resolver__shrinkwrap-resolver-api-maven__version>2.0.0</m:dependency.management__org.jboss.shrinkwrap.resolver__shrinkwrap-resolver-api-maven__version>
 		<m:dependency.management__org.jboss.arquillian.config__arquillian-config-api__version>1.1.2.Final</m:dependency.management__org.jboss.arquillian.config__arquillian-config-api__version>
 		<m:properties__version.jdepend.plugin>2.0-beta-2</m:properties__version.jdepend.plugin>
-		<m:properties__version.jboss.osgi.spi>4.0.0.Final</m:properties__version.jboss.osgi.spi>
 		<m:dependency.management__org.jboss.shrinkwrap.resolver__shrinkwrap-resolver-impl-maven__version>2.0.0</m:dependency.management__org.jboss.shrinkwrap.resolver__shrinkwrap-resolver-impl-maven__version>
+		<m:properties__version.jboss.osgi.spi>4.0.0.Final</m:properties__version.jboss.osgi.spi>
 		<m:dependency.management__org.jboss.arquillian.testenricher__arquillian-testenricher-cdi__version>1.1.2.Final</m:dependency.management__org.jboss.arquillian.testenricher__arquillian-testenricher-cdi__version>
 		<m:dependency.management__org.jboss.arquillian.testng__arquillian-testng-container__version>1.1.2.Final</m:dependency.management__org.jboss.arquillian.testng__arquillian-testng-container__version>
 		<m:properties__version.javancss.plugin>2.0</m:properties__version.javancss.plugin>
@@ -30,9 +30,9 @@
 		<m:properties__version.idea.plugin>2.2</m:properties__version.idea.plugin>
 		<m:dependency.management__org.jboss.shrinkwrap__shrinkwrap-api-nio2__version>1.1.2</m:dependency.management__org.jboss.shrinkwrap__shrinkwrap-api-nio2__version>
 		<m:properties__version.apt.plugin>1.0-alpha-4</m:properties__version.apt.plugin>
+		<m:dependency.management__org.jboss.logmanager__jboss-logmanager__version>1.4.1.Final</m:dependency.management__org.jboss.logmanager__jboss-logmanager__version>
 		<m:dependency.management__org.jboss.shrinkwrap.descriptors__shrinkwrap-descriptors-api-javaee__version>2.0.0-alpha-3</m:dependency.management__org.jboss.shrinkwrap.descriptors__shrinkwrap-descriptors-api-javaee__version>
 		<m:properties__version.clean.plugin>2.4.1</m:properties__version.clean.plugin>
-		<m:dependency.management__org.jboss.logmanager__jboss-logmanager__version>1.4.1.Final</m:dependency.management__org.jboss.logmanager__jboss-logmanager__version>
 		<m:properties__version.buildnumber.plugin>1.0</m:properties__version.buildnumber.plugin>
 		<m:properties__maven.compiler.argument.target>${maven.compiler.target}</m:properties__maven.compiler.argument.target>
 		<m:dependency.management__org.jboss.shrinkwrap.descriptors__shrinkwrap-descriptors-impl-javaee__version>2.0.0-alpha-3</m:dependency.management__org.jboss.shrinkwrap.descriptors__shrinkwrap-descriptors-impl-javaee__version>
@@ -101,14 +101,14 @@
 		<m:properties__version.site.plugin>3.0-beta-3</m:properties__version.site.plugin>
 		<m:properties__version.mockito>1.8.4</m:properties__version.mockito>
 		<m:properties__version.jboss.shrinkwrap>1.1.2</m:properties__version.jboss.shrinkwrap>
-		<m:properties__version.rar.plugin>2.2</m:properties__version.rar.plugin>
 		<m:properties__version.plugin.plugin>2.9</m:properties__version.plugin.plugin>
 		<m:properties__version.jboss.logmanager>1.4.1.Final</m:properties__version.jboss.logmanager>
+		<m:properties__version.rar.plugin>2.2</m:properties__version.rar.plugin>
 		<m:dependency.management__org.jboss.shrinkwrap.descriptors__shrinkwrap-descriptors-spi__version>2.0.0-alpha-3</m:dependency.management__org.jboss.shrinkwrap.descriptors__shrinkwrap-descriptors-spi__version>
 		<m:dependency.management__org.apache.felix__org.apache.felix.main__version>4.2.1</m:dependency.management__org.apache.felix__org.apache.felix.main__version>
 		<m:dependency.management__org.jboss.arquillian.junit__arquillian-junit-standalone__version>1.1.2.Final</m:dependency.management__org.jboss.arquillian.junit__arquillian-junit-standalone__version>
-		<m:properties__version.gpg.plugin>1.4</m:properties__version.gpg.plugin>
 		<m:properties__version.ejb.plugin>2.2.1</m:properties__version.ejb.plugin>
+		<m:properties__version.gpg.plugin>1.4</m:properties__version.gpg.plugin>
 		<m:properties__version.dependency.plugin>2.3</m:properties__version.dependency.plugin>
 		<m:properties__version.apache.felix.framework>4.2.1</m:properties__version.apache.felix.framework>
 		<m:dependency.management__org.jboss.arquillian.testenricher__arquillian-testenricher-resource__version>1.1.2.Final</m:dependency.management__org.jboss.arquillian.testenricher__arquillian-testenricher-resource__version>
@@ -181,8 +181,8 @@
 		<override org="org.jboss.arquillian.testng" module="arquillian-testng-container" matcher="exact" rev="1.1.2.Final"/>
 		<override org="org.apache.karaf" module="org.apache.karaf.main" matcher="exact" rev="2.3.3"/>
 		<override org="org.jboss.shrinkwrap" module="shrinkwrap-api-nio2" matcher="exact" rev="1.1.2"/>
-		<override org="org.jboss.logmanager" module="jboss-logmanager" matcher="exact" rev="1.4.1.Final"/>
 		<override org="org.jboss.shrinkwrap.descriptors" module="shrinkwrap-descriptors-api-javaee" matcher="exact" rev="2.0.0-alpha-3"/>
+		<override org="org.jboss.logmanager" module="jboss-logmanager" matcher="exact" rev="1.4.1.Final"/>
 		<override org="org.jboss.shrinkwrap.descriptors" module="shrinkwrap-descriptors-impl-javaee" matcher="exact" rev="2.0.0-alpha-3"/>
 		<override org="org.jboss.osgi.metadata" module="jbosgi-metadata" matcher="exact" rev="4.0.0.CR1"/>
 		<override org="org.jboss.shrinkwrap.resolver" module="shrinkwrap-resolver-api" matcher="exact" rev="2.0.0"/>

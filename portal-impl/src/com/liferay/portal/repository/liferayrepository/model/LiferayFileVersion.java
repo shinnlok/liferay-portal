@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
+import com.liferay.portal.kernel.repository.model.RepositoryModelOperation;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.security.auth.PrincipalThreadLocal;
 import com.liferay.portlet.documentlibrary.model.DLFileVersion;
@@ -40,7 +41,7 @@ import java.util.Map;
 public class LiferayFileVersion extends LiferayModel implements FileVersion {
 
 	public LiferayFileVersion(DLFileVersion dlFileVersion) {
-		_dlFileVersion = dlFileVersion;
+		this(dlFileVersion, false);
 	}
 
 	public LiferayFileVersion(
@@ -92,6 +93,13 @@ public class LiferayFileVersion extends LiferayModel implements FileVersion {
 		}
 
 		return false;
+	}
+
+	@Override
+	public void execute(RepositoryModelOperation repositoryModelOperation)
+		throws PortalException {
+
+		repositoryModelOperation.execute(this);
 	}
 
 	@Override
@@ -169,6 +177,11 @@ public class LiferayFileVersion extends LiferayModel implements FileVersion {
 	@Override
 	public long getFileEntryId() {
 		return _dlFileVersion.getFileEntryId();
+	}
+
+	@Override
+	public String getFileName() {
+		return _dlFileVersion.getFileName();
 	}
 
 	@Override
@@ -401,9 +414,9 @@ public class LiferayFileVersion extends LiferayModel implements FileVersion {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
-		LiferayFileVersion.class); private boolean _escapedModel;
+	private static Log _log = LogFactoryUtil.getLog(LiferayFileVersion.class);
 
-	private DLFileVersion _dlFileVersion;
+	private final DLFileVersion _dlFileVersion;
+	private final boolean _escapedModel;
 
 }

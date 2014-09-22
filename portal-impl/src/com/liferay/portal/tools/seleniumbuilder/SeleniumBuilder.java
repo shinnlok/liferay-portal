@@ -14,6 +14,7 @@
 
 package com.liferay.portal.tools.seleniumbuilder;
 
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -221,6 +222,42 @@ public class SeleniumBuilder {
 		return testCaseCount;
 	}
 
+	private boolean _isCommandNameOverridden(
+		Element rootElement, String commandName) {
+
+		List<Element> commandElements =
+			_seleniumBuilderFileUtil.getAllChildElements(
+				rootElement, "command");
+
+		for (Element commandElement : commandElements) {
+			if (commandName.equals(commandElement.attributeValue("name"))) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private boolean _isIgnoreCommandName(
+		Element rootElement, String commandName) {
+
+		String ignoreCommandNamesString = rootElement.attributeValue(
+			"ignore-command-names");
+
+		if (ignoreCommandNamesString == null) {
+			return false;
+		}
+
+		String[] ignoreCommandNames = StringUtil.split(
+			ignoreCommandNamesString);
+
+		ignoreCommandNamesString = StringUtil.replace(
+			ignoreCommandNamesString, new String[] {" ", "\n", "\t"},
+			new String[] {"", "", ""});
+
+		return ArrayUtil.contains(ignoreCommandNames, commandName);
+	}
+
 	/**
 	 * Writes lists of all test case method names, aggregated by component, to a
 	 * properties file named <code>test.case.method.names.properties</code>.
@@ -249,8 +286,6 @@ public class SeleniumBuilder {
 	private void _writeTestCaseMethodNamesFile() throws Exception {
 		Map<String, Set<String>> testCaseMethodNameMap =
 			new TreeMap<String, Set<String>>();
-
-		Set<String> testCaseMethodNames = new TreeSet<String>();
 
 		Set<String> testCaseNames = _seleniumBuilderContext.getTestCaseNames();
 
@@ -283,13 +318,20 @@ public class SeleniumBuilder {
 						extendsRootElement, "command");
 
 				for (Element commandElement : commandElements) {
+					String commandName = commandElement.attributeValue("name");
+
+					if (_isCommandNameOverridden(rootElement, commandName)) {
+						continue;
+					}
+
+					if (_isIgnoreCommandName(rootElement, commandName)) {
+						continue;
+					}
+
 					String testCaseMethodName =
-						testCaseName + "TestCase#test" +
-							commandElement.attributeValue("name");
+						testCaseName + "TestCase#test" + commandName;
 
 					compontentTestCaseMethodNames.add(testCaseMethodName);
-
-					testCaseMethodNames.add(testCaseMethodName);
 				}
 			}
 
@@ -333,8 +375,6 @@ public class SeleniumBuilder {
 				else {
 					compontentTestCaseMethodNames.add(testCaseMethodName);
 				}
-
-				testCaseMethodNames.add(testCaseMethodName);
 			}
 
 			if (!compontentTestCaseMethodNames.isEmpty()) {
@@ -411,14 +451,6 @@ public class SeleniumBuilder {
 				sb.append("PortalSmokeTestCase#testSmoke\n");
 			}
 		}
-
-		sb.append("\nTEST_CASE_METHOD_NAMES=");
-
-		String testCaseMethodNamesString = StringUtil.merge(
-			testCaseMethodNames.toArray(new String[testCaseMethodNames.size()]),
-			StringPool.SPACE);
-
-		sb.append(testCaseMethodNamesString);
 
 		_seleniumBuilderFileUtil.writeFile(
 			"../../../test.case.method.names.properties", sb.toString(), false);

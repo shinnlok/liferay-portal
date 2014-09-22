@@ -66,12 +66,11 @@ public class MessageRoutingBagTest {
 		UnsyncByteArrayOutputStream unsyncByteArrayOutputStream =
 			new UnsyncByteArrayOutputStream();
 
-		ObjectOutputStream objectOutputStream = new ObjectOutputStream(
-			unsyncByteArrayOutputStream);
+		try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(
+				unsyncByteArrayOutputStream)) {
 
-		objectOutputStream.writeObject(messageRoutingBag);
-
-		objectOutputStream.close();
+			objectOutputStream.writeObject(messageRoutingBag);
+		}
 
 		byte[] bytes = unsyncByteArrayOutputStream.toByteArray();
 
@@ -89,9 +88,8 @@ public class MessageRoutingBagTest {
 		Assert.assertEquals(
 			routingDowncast, newMessageRoutingBag.isRoutingDowncast());
 
-		List<String> routingTrace =
-			(List<String>)ReflectionTestUtil.getFieldValue(
-				newMessageRoutingBag, "_routingTrace");
+		List<String> routingTrace = ReflectionTestUtil.getFieldValue(
+			newMessageRoutingBag, "_routingTrace");
 
 		Assert.assertEquals(2, routingTrace.size());
 		Assert.assertEquals(routingId1, routingTrace.get(0));
@@ -113,7 +111,7 @@ public class MessageRoutingBagTest {
 	}
 
 	@Test
-	public void testManualSerialization() throws Exception {
+	public void testManualSerialization() throws ClassNotFoundException {
 		Message message = new Message();
 
 		String destinationName = "destinationName";
@@ -150,9 +148,8 @@ public class MessageRoutingBagTest {
 		Assert.assertEquals(
 			routingDowncast, newMessageRoutingBag.isRoutingDowncast());
 
-		List<String> routingTrace =
-			(List<String>)ReflectionTestUtil.getFieldValue(
-				newMessageRoutingBag, "_routingTrace");
+		List<String> routingTrace = ReflectionTestUtil.getFieldValue(
+			newMessageRoutingBag, "_routingTrace");
 
 		Assert.assertEquals(2, routingTrace.size());
 		Assert.assertEquals(routingId1, routingTrace.get(0));
@@ -174,7 +171,7 @@ public class MessageRoutingBagTest {
 	}
 
 	@Test
-	public void testMessageAssociation() throws Exception {
+	public void testMessageAssociation() {
 		Message message = new Message();
 
 		MessageRoutingBag messageRoutingBag = new MessageRoutingBag(

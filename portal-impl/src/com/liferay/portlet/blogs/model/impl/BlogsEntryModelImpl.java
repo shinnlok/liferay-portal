@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.blogs.model.impl;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.NoSuchModelException;
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -69,6 +71,7 @@ import java.util.Map;
  * @generated
  */
 @JSON(strict = true)
+@ProviderType
 public class BlogsEntryModelImpl extends BaseModelImpl<BlogsEntry>
 	implements BlogsEntryModel {
 	/*
@@ -96,6 +99,7 @@ public class BlogsEntryModelImpl extends BaseModelImpl<BlogsEntry>
 			{ "allowTrackbacks", Types.BOOLEAN },
 			{ "trackbacks", Types.CLOB },
 			{ "smallImage", Types.BOOLEAN },
+			{ "smallImageFileEntryId", Types.BIGINT },
 			{ "smallImageId", Types.BIGINT },
 			{ "smallImageURL", Types.VARCHAR },
 			{ "status", Types.INTEGER },
@@ -103,7 +107,7 @@ public class BlogsEntryModelImpl extends BaseModelImpl<BlogsEntry>
 			{ "statusByUserName", Types.VARCHAR },
 			{ "statusDate", Types.TIMESTAMP }
 		};
-	public static final String TABLE_SQL_CREATE = "create table BlogsEntry (uuid_ VARCHAR(75) null,entryId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,title VARCHAR(150) null,subtitle STRING null,urlTitle VARCHAR(150) null,description STRING null,content TEXT null,displayDate DATE null,allowPingbacks BOOLEAN,allowTrackbacks BOOLEAN,trackbacks TEXT null,smallImage BOOLEAN,smallImageId LONG,smallImageURL STRING null,status INTEGER,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null)";
+	public static final String TABLE_SQL_CREATE = "create table BlogsEntry (uuid_ VARCHAR(75) null,entryId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,title VARCHAR(150) null,subtitle STRING null,urlTitle VARCHAR(150) null,description STRING null,content TEXT null,displayDate DATE null,allowPingbacks BOOLEAN,allowTrackbacks BOOLEAN,trackbacks TEXT null,smallImage BOOLEAN,smallImageFileEntryId LONG,smallImageId LONG,smallImageURL STRING null,status INTEGER,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null)";
 	public static final String TABLE_SQL_DROP = "drop table BlogsEntry";
 	public static final String ORDER_BY_JPQL = " ORDER BY blogsEntry.displayDate DESC, blogsEntry.createDate DESC";
 	public static final String ORDER_BY_SQL = " ORDER BY BlogsEntry.displayDate DESC, BlogsEntry.createDate DESC";
@@ -119,14 +123,14 @@ public class BlogsEntryModelImpl extends BaseModelImpl<BlogsEntry>
 	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
 				"value.object.column.bitmask.enabled.com.liferay.portlet.blogs.model.BlogsEntry"),
 			true);
-	public static long COMPANYID_COLUMN_BITMASK = 1L;
-	public static long DISPLAYDATE_COLUMN_BITMASK = 2L;
-	public static long GROUPID_COLUMN_BITMASK = 4L;
-	public static long STATUS_COLUMN_BITMASK = 8L;
-	public static long URLTITLE_COLUMN_BITMASK = 16L;
-	public static long USERID_COLUMN_BITMASK = 32L;
-	public static long UUID_COLUMN_BITMASK = 64L;
-	public static long CREATEDATE_COLUMN_BITMASK = 128L;
+	public static final long COMPANYID_COLUMN_BITMASK = 1L;
+	public static final long DISPLAYDATE_COLUMN_BITMASK = 2L;
+	public static final long GROUPID_COLUMN_BITMASK = 4L;
+	public static final long STATUS_COLUMN_BITMASK = 8L;
+	public static final long URLTITLE_COLUMN_BITMASK = 16L;
+	public static final long USERID_COLUMN_BITMASK = 32L;
+	public static final long UUID_COLUMN_BITMASK = 64L;
+	public static final long CREATEDATE_COLUMN_BITMASK = 128L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -159,6 +163,7 @@ public class BlogsEntryModelImpl extends BaseModelImpl<BlogsEntry>
 		model.setAllowTrackbacks(soapModel.getAllowTrackbacks());
 		model.setTrackbacks(soapModel.getTrackbacks());
 		model.setSmallImage(soapModel.getSmallImage());
+		model.setSmallImageFileEntryId(soapModel.getSmallImageFileEntryId());
 		model.setSmallImageId(soapModel.getSmallImageId());
 		model.setSmallImageURL(soapModel.getSmallImageURL());
 		model.setStatus(soapModel.getStatus());
@@ -247,6 +252,7 @@ public class BlogsEntryModelImpl extends BaseModelImpl<BlogsEntry>
 		attributes.put("allowTrackbacks", getAllowTrackbacks());
 		attributes.put("trackbacks", getTrackbacks());
 		attributes.put("smallImage", getSmallImage());
+		attributes.put("smallImageFileEntryId", getSmallImageFileEntryId());
 		attributes.put("smallImageId", getSmallImageId());
 		attributes.put("smallImageURL", getSmallImageURL());
 		attributes.put("status", getStatus());
@@ -368,6 +374,13 @@ public class BlogsEntryModelImpl extends BaseModelImpl<BlogsEntry>
 
 		if (smallImage != null) {
 			setSmallImage(smallImage);
+		}
+
+		Long smallImageFileEntryId = (Long)attributes.get(
+				"smallImageFileEntryId");
+
+		if (smallImageFileEntryId != null) {
+			setSmallImageFileEntryId(smallImageFileEntryId);
 		}
 
 		Long smallImageId = (Long)attributes.get("smallImageId");
@@ -744,6 +757,17 @@ public class BlogsEntryModelImpl extends BaseModelImpl<BlogsEntry>
 
 	@JSON
 	@Override
+	public long getSmallImageFileEntryId() {
+		return _smallImageFileEntryId;
+	}
+
+	@Override
+	public void setSmallImageFileEntryId(long smallImageFileEntryId) {
+		_smallImageFileEntryId = smallImageFileEntryId;
+	}
+
+	@JSON
+	@Override
 	public long getSmallImageId() {
 		return _smallImageId;
 	}
@@ -1116,6 +1140,7 @@ public class BlogsEntryModelImpl extends BaseModelImpl<BlogsEntry>
 		blogsEntryImpl.setAllowTrackbacks(getAllowTrackbacks());
 		blogsEntryImpl.setTrackbacks(getTrackbacks());
 		blogsEntryImpl.setSmallImage(getSmallImage());
+		blogsEntryImpl.setSmallImageFileEntryId(getSmallImageFileEntryId());
 		blogsEntryImpl.setSmallImageId(getSmallImageId());
 		blogsEntryImpl.setSmallImageURL(getSmallImageURL());
 		blogsEntryImpl.setStatus(getStatus());
@@ -1326,6 +1351,8 @@ public class BlogsEntryModelImpl extends BaseModelImpl<BlogsEntry>
 
 		blogsEntryCacheModel.smallImage = getSmallImage();
 
+		blogsEntryCacheModel.smallImageFileEntryId = getSmallImageFileEntryId();
+
 		blogsEntryCacheModel.smallImageId = getSmallImageId();
 
 		blogsEntryCacheModel.smallImageURL = getSmallImageURL();
@@ -1362,7 +1389,7 @@ public class BlogsEntryModelImpl extends BaseModelImpl<BlogsEntry>
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(49);
+		StringBundler sb = new StringBundler(51);
 
 		sb.append("{uuid=");
 		sb.append(getUuid());
@@ -1400,6 +1427,8 @@ public class BlogsEntryModelImpl extends BaseModelImpl<BlogsEntry>
 		sb.append(getTrackbacks());
 		sb.append(", smallImage=");
 		sb.append(getSmallImage());
+		sb.append(", smallImageFileEntryId=");
+		sb.append(getSmallImageFileEntryId());
 		sb.append(", smallImageId=");
 		sb.append(getSmallImageId());
 		sb.append(", smallImageURL=");
@@ -1419,7 +1448,7 @@ public class BlogsEntryModelImpl extends BaseModelImpl<BlogsEntry>
 
 	@Override
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(76);
+		StringBundler sb = new StringBundler(79);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.portlet.blogs.model.BlogsEntry");
@@ -1498,6 +1527,10 @@ public class BlogsEntryModelImpl extends BaseModelImpl<BlogsEntry>
 		sb.append(getSmallImage());
 		sb.append("]]></column-value></column>");
 		sb.append(
+			"<column><column-name>smallImageFileEntryId</column-name><column-value><![CDATA[");
+		sb.append(getSmallImageFileEntryId());
+		sb.append("]]></column-value></column>");
+		sb.append(
 			"<column><column-name>smallImageId</column-name><column-value><![CDATA[");
 		sb.append(getSmallImageId());
 		sb.append("]]></column-value></column>");
@@ -1527,8 +1560,8 @@ public class BlogsEntryModelImpl extends BaseModelImpl<BlogsEntry>
 		return sb.toString();
 	}
 
-	private static ClassLoader _classLoader = BlogsEntry.class.getClassLoader();
-	private static Class<?>[] _escapedModelInterfaces = new Class[] {
+	private static final ClassLoader _classLoader = BlogsEntry.class.getClassLoader();
+	private static final Class<?>[] _escapedModelInterfaces = new Class[] {
 			BlogsEntry.class
 		};
 	private String _uuid;
@@ -1558,6 +1591,7 @@ public class BlogsEntryModelImpl extends BaseModelImpl<BlogsEntry>
 	private boolean _allowTrackbacks;
 	private String _trackbacks;
 	private boolean _smallImage;
+	private long _smallImageFileEntryId;
 	private long _smallImageId;
 	private String _smallImageURL;
 	private int _status;

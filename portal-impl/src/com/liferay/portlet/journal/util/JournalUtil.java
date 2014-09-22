@@ -704,12 +704,7 @@ public class JournalUtil {
 				PropsValues.JOURNAL_DEFAULT_DISPLAY_VIEW);
 		}
 		else {
-			boolean saveDisplayStyle = ParamUtil.getBoolean(
-				liferayPortletRequest, "saveDisplayStyle");
-
-			if (saveDisplayStyle &&
-				ArrayUtil.contains(displayViews, displayStyle)) {
-
+			if (ArrayUtil.contains(displayViews, displayStyle)) {
 				portalPreferences.setValue(
 					PortletKeys.JOURNAL, "display-style", displayStyle);
 			}
@@ -858,8 +853,9 @@ public class JournalUtil {
 		}
 	}
 
-	public static Map<Locale, String> getEmailArticleApprovalRequestedSubjectMap(
-		PortletPreferences preferences) {
+	public static Map<Locale, String>
+		getEmailArticleApprovalRequestedSubjectMap(
+			PortletPreferences preferences) {
 
 		return LocalizationUtil.getLocalizationMap(
 			preferences, "emailArticleApprovalRequestedSubject",

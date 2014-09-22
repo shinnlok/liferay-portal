@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.repository.model.RepositoryModelOperation;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
@@ -38,7 +39,7 @@ import java.util.Map;
 public class LiferayFolder extends LiferayModel implements Folder {
 
 	public LiferayFolder(DLFolder dlFolder) {
-		_dlFolder = dlFolder;
+		this(dlFolder, false);
 	}
 
 	public LiferayFolder(DLFolder dlFolder, boolean escapedModel) {
@@ -96,6 +97,13 @@ public class LiferayFolder extends LiferayModel implements Folder {
 		}
 
 		return false;
+	}
+
+	@Override
+	public void execute(RepositoryModelOperation repositoryModelOperation)
+		throws PortalException {
+
+		repositoryModelOperation.execute(this);
 	}
 
 	@Override
@@ -411,7 +419,7 @@ public class LiferayFolder extends LiferayModel implements Folder {
 		}
 	}
 
-	private DLFolder _dlFolder;
-	private boolean _escapedModel;
+	private final DLFolder _dlFolder;
+	private final boolean _escapedModel;
 
 }

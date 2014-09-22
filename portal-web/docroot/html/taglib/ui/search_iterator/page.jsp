@@ -290,10 +290,10 @@ JSONArray primaryKeysJSONArray = JSONFactoryUtil.createJSONArray();
 				}
 			%>
 
-				<td class="table-cell <%= columnClassName %>">
+				<td class="table-cell <%= columnClassName %> text-<%= entry.getAlign() %> text-<%= entry.getValign() %>" colspan="<%= entry.getColspan() %>">
 
 					<%
-					entry.print(pageContext);
+					entry.print(pageContext.getOut(), request, response);
 					%>
 
 				</td>
@@ -305,6 +305,9 @@ JSONArray primaryKeysJSONArray = JSONFactoryUtil.createJSONArray();
 			</tr>
 
 		<%
+			request.removeAttribute(WebKeys.SEARCH_CONTAINER_RESULT_ROW);
+			request.removeAttribute(WebKeys.SEARCH_CONTAINER_RESULT_ROW_ENTRY);
+
 			request.removeAttribute("liferay-ui:search-container-row:rowId");
 		}
 		%>

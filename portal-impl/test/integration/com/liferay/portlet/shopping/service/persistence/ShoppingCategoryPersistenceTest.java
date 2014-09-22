@@ -28,20 +28,22 @@ import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.util.IntegerWrapper;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Time;
-import com.liferay.portal.model.ModelListener;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.test.TransactionalTestRule;
-import com.liferay.portal.test.runners.LiferayIntegrationJUnitTestRunner;
+import com.liferay.portal.test.runners.PersistenceIntegrationJUnitTestRunner;
 import com.liferay.portal.tools.DBUpgrader;
+import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.test.RandomTestUtil;
 
 import com.liferay.portlet.shopping.NoSuchCategoryException;
 import com.liferay.portlet.shopping.model.ShoppingCategory;
+import com.liferay.portlet.shopping.model.impl.ShoppingCategoryModelImpl;
 import com.liferay.portlet.shopping.service.ShoppingCategoryLocalServiceUtil;
 
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -60,7 +62,7 @@ import java.util.Set;
 /**
  * @generated
  */
-@RunWith(LiferayIntegrationJUnitTestRunner.class)
+@RunWith(PersistenceIntegrationJUnitTestRunner.class)
 public class ShoppingCategoryPersistenceTest {
 	@ClassRule
 	public static TransactionalTestRule transactionalTestRule = new TransactionalTestRule(Propagation.REQUIRED);
@@ -77,15 +79,6 @@ public class ShoppingCategoryPersistenceTest {
 		TemplateManagerUtil.init();
 	}
 
-	@Before
-	public void setUp() {
-		_modelListeners = _persistence.getListeners();
-
-		for (ModelListener<ShoppingCategory> modelListener : _modelListeners) {
-			_persistence.unregisterListener(modelListener);
-		}
-	}
-
 	@After
 	public void tearDown() throws Exception {
 		Iterator<ShoppingCategory> iterator = _shoppingCategories.iterator();
@@ -94,10 +87,6 @@ public class ShoppingCategoryPersistenceTest {
 			_persistence.remove(iterator.next());
 
 			iterator.remove();
-		}
-
-		for (ModelListener<ShoppingCategory> modelListener : _modelListeners) {
-			_persistence.registerListener(modelListener);
 		}
 	}
 
@@ -199,6 +188,20 @@ public class ShoppingCategoryPersistenceTest {
 				RandomTestUtil.nextLong());
 
 			_persistence.countByG_P(0L, 0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByG_N() {
+		try {
+			_persistence.countByG_N(RandomTestUtil.nextLong(), StringPool.BLANK);
+
+			_persistence.countByG_N(0L, StringPool.NULL);
+
+			_persistence.countByG_N(0L, (String)null);
 		}
 		catch (Exception e) {
 			Assert.fail(e.getMessage());
@@ -450,6 +453,25 @@ public class ShoppingCategoryPersistenceTest {
 		Assert.assertEquals(0, result.size());
 	}
 
+	@Test
+	public void testResetOriginalValues() throws Exception {
+		if (!PropsValues.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE) {
+			return;
+		}
+
+		ShoppingCategory newShoppingCategory = addShoppingCategory();
+
+		_persistence.clearCache();
+
+		ShoppingCategoryModelImpl existingShoppingCategoryModelImpl = (ShoppingCategoryModelImpl)_persistence.findByPrimaryKey(newShoppingCategory.getPrimaryKey());
+
+		Assert.assertEquals(existingShoppingCategoryModelImpl.getGroupId(),
+			existingShoppingCategoryModelImpl.getOriginalGroupId());
+		Assert.assertTrue(Validator.equals(
+				existingShoppingCategoryModelImpl.getName(),
+				existingShoppingCategoryModelImpl.getOriginalName()));
+	}
+
 	protected ShoppingCategory addShoppingCategory() throws Exception {
 		long pk = RandomTestUtil.nextLong();
 
@@ -480,6 +502,5 @@ public class ShoppingCategoryPersistenceTest {
 
 	private static Log _log = LogFactoryUtil.getLog(ShoppingCategoryPersistenceTest.class);
 	private List<ShoppingCategory> _shoppingCategories = new ArrayList<ShoppingCategory>();
-	private ModelListener<ShoppingCategory>[] _modelListeners;
 	private ShoppingCategoryPersistence _persistence = ShoppingCategoryUtil.getPersistence();
 }

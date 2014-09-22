@@ -56,18 +56,17 @@ public class WriterOutputStreamTest {
 
 		};
 
-		WriterOutputStream writerOutputStream = new WriterOutputStream(
-			dummyWriter);
+		try (WriterOutputStream writerOutputStream = new WriterOutputStream(
+				dummyWriter)) {
 
-		Assert.assertFalse(closeAtomicBoolean.get());
-
-		writerOutputStream.close();
+			Assert.assertFalse(closeAtomicBoolean.get());
+		}
 
 		Assert.assertTrue(closeAtomicBoolean.get());
 	}
 
 	@Test
-	public void testConstructor() throws Exception {
+	public void testConstructor() {
 		DummyWriter dummyWriter = new DummyWriter();
 
 		WriterOutputStream writerOutputStream = new WriterOutputStream(
@@ -240,29 +239,29 @@ public class WriterOutputStreamTest {
 	public void testWriteBlockUnaligned() throws IOException {
 		CharArrayWriter charArrayWriter = new CharArrayWriter();
 
-		WriterOutputStream writerOutputStream = new WriterOutputStream(
-			charArrayWriter, StringPool.UTF8, true);
-
 		String unalignedOutput = "非对齐测试中文输出";
-		byte[] unalignedInput = unalignedOutput.getBytes(StringPool.UTF8);
 
-		writerOutputStream.write(unalignedInput[0]);
-		writerOutputStream.write(unalignedInput, 1, unalignedInput.length - 2);
-		writerOutputStream.write(unalignedInput[unalignedInput.length - 1]);
+		try (WriterOutputStream writerOutputStream = new WriterOutputStream(
+				charArrayWriter, StringPool.UTF8, true)) {
 
-		writerOutputStream.close();
+			byte[] unalignedInput = unalignedOutput.getBytes(StringPool.UTF8);
+
+			writerOutputStream.write(unalignedInput[0]);
+			writerOutputStream.write(
+				unalignedInput, 1, unalignedInput.length - 2);
+			writerOutputStream.write(unalignedInput[unalignedInput.length - 1]);
+		}
 
 		Assert.assertEquals(unalignedOutput, charArrayWriter.toString());
 	}
 
 	@Test
-	public void testWriteError() throws Exception {
+	public void testWriteError() {
 		WriterOutputStream writerOutputStream = new WriterOutputStream(
 			new DummyWriter(), "US-ASCII");
 
-		CharsetDecoder charsetDecoder =
-			(CharsetDecoder)ReflectionTestUtil.getFieldValue(
-				writerOutputStream, "_charsetDecoder");
+		CharsetDecoder charsetDecoder = ReflectionTestUtil.getFieldValue(
+			writerOutputStream, "_charsetDecoder");
 
 		charsetDecoder.onMalformedInput(CodingErrorAction.REPORT);
 
@@ -277,41 +276,31 @@ public class WriterOutputStreamTest {
 		}
 	}
 
-	private int _getDefaultOutputBufferSize() throws Exception {
-		return (Integer)ReflectionTestUtil.getFieldValue(
+	private int _getDefaultOutputBufferSize() {
+		return ReflectionTestUtil.getFieldValue(
 			WriterOutputStream.class, "_DEFAULT_OUTPUT_BUFFER_SIZE");
 	}
 
-	private int _getInputBufferSize(WriterOutputStream writerOutputStream)
-		throws Exception {
-
-		ByteBuffer inputByteBuffer =
-			(ByteBuffer)ReflectionTestUtil.getFieldValue(
-				writerOutputStream, "_inputByteBuffer");
+	private int _getInputBufferSize(WriterOutputStream writerOutputStream) {
+		ByteBuffer inputByteBuffer = ReflectionTestUtil.getFieldValue(
+			writerOutputStream, "_inputByteBuffer");
 
 		return inputByteBuffer.capacity();
 	}
 
-	private int _getOutputBufferSize(WriterOutputStream writerOutputStream)
-		throws Exception {
-
-		CharBuffer outputBuffer = (CharBuffer)ReflectionTestUtil.getFieldValue(
+	private int _getOutputBufferSize(WriterOutputStream writerOutputStream) {
+		CharBuffer outputBuffer = ReflectionTestUtil.getFieldValue(
 			writerOutputStream, "_outputCharBuffer");
 
 		return outputBuffer.capacity();
 	}
 
-	private Writer _getWriter(WriterOutputStream writerOutputStream)
-		throws Exception {
-
-		return (Writer)ReflectionTestUtil.getFieldValue(
-			writerOutputStream, "_writer");
+	private Writer _getWriter(WriterOutputStream writerOutputStream) {
+		return ReflectionTestUtil.getFieldValue(writerOutputStream, "_writer");
 	}
 
-	private boolean _isAutoFlush(WriterOutputStream writerOutputStream)
-		throws Exception {
-
-		return (Boolean)ReflectionTestUtil.getFieldValue(
+	private boolean _isAutoFlush(WriterOutputStream writerOutputStream) {
+		return ReflectionTestUtil.getFieldValue(
 			writerOutputStream, "_autoFlush");
 	}
 

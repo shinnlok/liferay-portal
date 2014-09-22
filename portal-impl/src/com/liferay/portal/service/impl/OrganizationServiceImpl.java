@@ -219,9 +219,13 @@ public class OrganizationServiceImpl extends OrganizationServiceBaseImpl {
 			List<Website> websites, ServiceContext serviceContext)
 		throws PortalException {
 
-		boolean indexingEnabled = serviceContext.isIndexingEnabled();
+		boolean indexingEnabled = true;
 
-		serviceContext.setIndexingEnabled(false);
+		if (serviceContext != null) {
+			indexingEnabled = serviceContext.isIndexingEnabled();
+
+			serviceContext.setIndexingEnabled(false);
+		}
 
 		try {
 			Organization organization = addOrganization(
@@ -257,7 +261,9 @@ public class OrganizationServiceImpl extends OrganizationServiceBaseImpl {
 			return organization;
 		}
 		finally {
-			serviceContext.setIndexingEnabled(indexingEnabled);
+			if (serviceContext != null) {
+				serviceContext.setIndexingEnabled(indexingEnabled);
+			}
 		}
 	}
 
@@ -484,6 +490,12 @@ public class OrganizationServiceImpl extends OrganizationServiceBaseImpl {
 	public List<Organization> getOrganizations(
 		long companyId, long parentOrganizationId) {
 
+		if (parentOrganizationId ==
+				OrganizationConstants.ANY_PARENT_ORGANIZATION_ID) {
+
+			return organizationPersistence.filterFindByCompanyId(companyId);
+		}
+
 		return organizationPersistence.filterFindByC_P(
 			companyId, parentOrganizationId);
 	}
@@ -514,6 +526,13 @@ public class OrganizationServiceImpl extends OrganizationServiceBaseImpl {
 	public List<Organization> getOrganizations(
 		long companyId, long parentOrganizationId, int start, int end) {
 
+		if (parentOrganizationId ==
+				OrganizationConstants.ANY_PARENT_ORGANIZATION_ID) {
+
+			return organizationPersistence.filterFindByCompanyId(
+				companyId, start, end);
+		}
+
 		return organizationPersistence.filterFindByC_P(
 			companyId, parentOrganizationId, start, end);
 	}
@@ -529,6 +548,12 @@ public class OrganizationServiceImpl extends OrganizationServiceBaseImpl {
 	@Override
 	public int getOrganizationsCount(
 		long companyId, long parentOrganizationId) {
+
+		if (parentOrganizationId ==
+				OrganizationConstants.ANY_PARENT_ORGANIZATION_ID) {
+
+			return organizationPersistence.filterCountByCompanyId(companyId);
+		}
 
 		return organizationPersistence.filterCountByC_P(
 			companyId, parentOrganizationId);

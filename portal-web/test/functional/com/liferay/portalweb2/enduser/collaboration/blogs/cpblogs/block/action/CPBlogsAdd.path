@@ -50,7 +50,37 @@
 </tr>
 <tr>
 	<td>TITLE_FIELD</td>
-	<td>//input[@id='_161_title']</td>
+	<td>//input[contains(@id,'title')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SUBTITLE_FIELD</td>
+	<td>//textarea[contains(@id,'subtitle')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SUBTITLE_FIELD_LABEL</td>
+	<td>//label[contains(@for,'subtitle')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DISPLAY_DATE</td>
+	<td>//input[@id='__161__displayDate']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DISPLAY_DATE_DAY</td>
+	<td>//input[@id='__161__displayDateDay']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DISPLAY_DATE_MONTH</td>
+	<td>//input[@id='__161__displayDateMonth']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DISPLAY_DATE_YEAR</td>
+	<td>//input[@id='__161__displayDateYear']</td>
 	<td></td>
 </tr>
 <tr>
@@ -60,17 +90,17 @@
 </tr>
 <tr>
 	<td>PUBLISH_BUTTON</td>
-	<td>//button[@id='_161_publishButton']</td>
+	<td>//button[contains(@id,'publishButton')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>SAVE_AS_DRAFT_BUTTON</td>
-	<td>//button[@id='_161_saveButton']</td>
+	<td>//button[contains(@id,'saveButton')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>SUBMIT_FOR_PUBLICATION_BUTTON</td>
-	<td>//button[@id='_161_publishButton']</td>
+	<td>//button[contains(@id,'publishButton')]</td>
 	<td></td>
 </tr>
 </tbody>

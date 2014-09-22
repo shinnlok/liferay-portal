@@ -18,7 +18,6 @@ import com.liferay.portal.kernel.io.unsync.UnsyncBufferedReader;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringReader;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.util.ContentUtil;
 
 import java.io.File;
@@ -32,8 +31,22 @@ import java.util.List;
 public class PropertiesSourceProcessor extends BaseSourceProcessor {
 
 	@Override
+	protected String doFormat(
+			File file, String fileName, String absolutePath, String content)
+		throws Exception {
+
+		if (!portalSource && fileName.endsWith("portlet.properties")) {
+			return formatPortletProperties(content);
+		}
+
+		formatPortalProperties(fileName, content);
+
+		return content;
+	}
+
+	@Override
 	protected void format() throws Exception {
-		String portalPortalPropertiesContent = formatPortalPortalProperties();
+		_portalPortalPropertiesContent = formatPortalPortalProperties();
 
 		String[] includes = null;
 
@@ -52,22 +65,7 @@ public class PropertiesSourceProcessor extends BaseSourceProcessor {
 		List<String> fileNames = getFileNames(new String[0], includes);
 
 		for (String fileName : fileNames) {
-			File file = new File(BASEDIR + fileName);
-
-			fileName = StringUtil.replace(
-				fileName, StringPool.BACK_SLASH, StringPool.SLASH);
-
-			String content = fileUtil.read(file);
-
-			if (!portalSource && fileName.endsWith("portlet.properties")) {
-				String newContent = formatPortletProperties(content);
-
-				compareAndAutoFixContent(file, fileName, content, newContent);
-			}
-			else {
-				formatPortalProperties(
-					fileName, content, portalPortalPropertiesContent);
-			}
+			format(fileName);
 		}
 	}
 
@@ -84,24 +82,23 @@ public class PropertiesSourceProcessor extends BaseSourceProcessor {
 
 		StringBundler sb = new StringBundler();
 
-		UnsyncBufferedReader unsyncBufferedReader = new UnsyncBufferedReader(
-			new UnsyncStringReader(content));
+		try (UnsyncBufferedReader unsyncBufferedReader =
+				new UnsyncBufferedReader(new UnsyncStringReader(content))) {
 
-		String line = null;
+			String line = null;
 
-		while ((line = unsyncBufferedReader.readLine()) != null) {
-			line = trimLine(line, true);
+			while ((line = unsyncBufferedReader.readLine()) != null) {
+				line = trimLine(line, true);
 
-			if (line.startsWith(StringPool.TAB)) {
-				line = line.replaceFirst(
-					StringPool.TAB, StringPool.FOUR_SPACES);
+				if (line.startsWith(StringPool.TAB)) {
+					line = line.replaceFirst(
+						StringPool.TAB, StringPool.FOUR_SPACES);
+				}
+
+				sb.append(line);
+				sb.append("\n");
 			}
-
-			sb.append(line);
-			sb.append("\n");
 		}
-
-		unsyncBufferedReader.close();
 
 		String newContent = sb.toString();
 
@@ -109,14 +106,12 @@ public class PropertiesSourceProcessor extends BaseSourceProcessor {
 			newContent = newContent.substring(0, newContent.length() - 1);
 		}
 
-		compareAndAutoFixContent(file, fileName, content, newContent);
+		processFormattedFile(file, fileName, content, newContent);
 
 		return newContent;
 	}
 
-	protected void formatPortalProperties(
-			String fileName, String content,
-			String portalPortalPropertiesContent)
+	protected void formatPortalProperties(String fileName, String content)
 		throws IOException {
 
 		UnsyncBufferedReader unsyncBufferedReader = new UnsyncBufferedReader(
@@ -141,7 +136,7 @@ public class PropertiesSourceProcessor extends BaseSourceProcessor {
 
 			property = property.trim();
 
-			pos = portalPortalPropertiesContent.indexOf(
+			pos = _portalPortalPropertiesContent.indexOf(
 				StringPool.FOUR_SPACES + property);
 
 			if (pos == -1) {
@@ -166,5 +161,7 @@ public class PropertiesSourceProcessor extends BaseSourceProcessor {
 
 		return content;
 	}
+
+	private String _portalPortalPropertiesContent;
 
 }

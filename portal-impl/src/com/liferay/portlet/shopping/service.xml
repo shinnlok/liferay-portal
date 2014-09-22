@@ -87,6 +87,10 @@
 			<finder-column name="groupId" />
 			<finder-column name="parentCategoryId" />
 		</finder>
+		<finder name="G_N" return-type="ShoppingCategory">
+			<finder-column name="groupId" />
+			<finder-column name="name" />
+		</finder>
 
 		<!-- References -->
 
@@ -448,6 +452,7 @@
 		<exception>CouponName</exception>
 		<exception>CouponStartDate</exception>
 		<exception>DuplicateCouponCode</exception>
+		<exception>DuplicateItemFieldName</exception>
 		<exception>DuplicateItemSKU</exception>
 		<exception>ItemLargeImageName</exception>
 		<exception>ItemLargeImageSize</exception>

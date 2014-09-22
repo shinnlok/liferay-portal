@@ -355,11 +355,10 @@ public class LayoutServiceSoap {
 	}
 
 	public static void deleteTempFileEntry(long groupId,
-		java.lang.String fileName, java.lang.String tempFolderName)
+		java.lang.String folderName, java.lang.String fileName)
 		throws RemoteException {
 		try {
-			LayoutServiceUtil.deleteTempFileEntry(groupId, fileName,
-				tempFolderName);
+			LayoutServiceUtil.deleteTempFileEntry(groupId, folderName, fileName);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -592,11 +591,26 @@ public class LayoutServiceSoap {
 		}
 	}
 
-	public static java.lang.String[] getTempFileEntryNames(long groupId,
-		java.lang.String tempFolderName) throws RemoteException {
+	public static int getLayoutsCount(long groupId, boolean privateLayout,
+		long parentLayoutId) throws RemoteException {
 		try {
-			java.lang.String[] returnValue = LayoutServiceUtil.getTempFileEntryNames(groupId,
-					tempFolderName);
+			int returnValue = LayoutServiceUtil.getLayoutsCount(groupId,
+					privateLayout, parentLayoutId);
+
+			return returnValue;
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static java.lang.String[] getTempFileNames(long groupId,
+		java.lang.String folderName) throws RemoteException {
+		try {
+			java.lang.String[] returnValue = LayoutServiceUtil.getTempFileNames(groupId,
+					folderName);
 
 			return returnValue;
 		}
@@ -1033,6 +1047,30 @@ public class LayoutServiceSoap {
 		try {
 			com.liferay.portal.model.Layout returnValue = LayoutServiceUtil.updateParentLayoutId(plid,
 					parentPlid);
+
+			return com.liferay.portal.model.LayoutSoap.toSoapModel(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	/**
+	* Updates the parent layout ID and priority of the layout.
+	*
+	* @param plid the primary key of the layout
+	* @param parentPlid the primary key of the parent layout
+	* @param priority the layout's new priority
+	* @return the layout matching the primary key
+	* @throws PortalException if a portal exception occurred
+	*/
+	public static com.liferay.portal.model.LayoutSoap updateParentLayoutIdAndPriority(
+		long plid, long parentPlid, int priority) throws RemoteException {
+		try {
+			com.liferay.portal.model.Layout returnValue = LayoutServiceUtil.updateParentLayoutIdAndPriority(plid,
+					parentPlid, priority);
 
 			return com.liferay.portal.model.LayoutSoap.toSoapModel(returnValue);
 		}

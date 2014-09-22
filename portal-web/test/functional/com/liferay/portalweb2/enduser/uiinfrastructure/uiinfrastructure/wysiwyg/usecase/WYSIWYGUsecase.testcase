@@ -24,7 +24,11 @@
 			<var name="pageName" value="${pageName}" />
 		</execute>
 
-		<execute macro="WikiPage#addAttachmentPG">
+		<execute macro="WikiPage#gotoPG">
+			<var name="wikiPageTitle" value="FrontPage" />
+		</execute>
+
+		<execute macro="WikiPage#addAttachmentViaPageDetailsPG">
 			<var name="attachmentFileName" value="Document_1.jpg" />
 			<var name="wikiPageTitle" value="FrontPage" />
 		</execute>
@@ -111,6 +115,7 @@
 
 		<execute action="CKEditor#assertTextEquals" locator-key1="TOOLBAR_FONT_BUTTON_PORTLET" value1="Font" />
 		<execute action="CKEditor#assertTextEquals" locator-key1="TOOLBAR_SIZE_BUTTON_PORTLET" value1="Size" />
+		<execute action="CKEditor#assertElementPresent" locator1="" value1="//script[contains(@src,'/html/js/editor/ckeditor/plugins/bbcode/bbcode_parser.js')]" />
 		<execute action="CKEditor#assertClick" locator-key1="TOOLBAR_FORMAT_BUTTON_PORTLET" value1="Format" />
 		<execute action="CKEditor#selectFrame" locator-key1="TOOLBAR_FORMAT_IFRAME" />
 
@@ -154,7 +159,7 @@
 		<execute action="CKEditor#selectFrame" value1="relative=top" />
 	</command>
 
-	<command name="ViewWikiFrontPageLTR" priority="4">
+	<command name="ViewWikiFrontPageLeftToRight" priority="4">
 		<execute macro="Page#addPG">
 			<var name="pageName" value="${pageName}" />
 		</execute>
@@ -170,11 +175,19 @@
 		<execute macro="WikiPage#addLocalizedFrontPagePG">
 			<var name="emptyPageMessage" value="This page is empty. Edit it to add some text." />
 			<var name="successMessage" value="Your request completed successfully." />
-			<var name="wikiPageContent" value="Wiki LTR Content" />
+			<var name="wikiPageContent" value="Wiki Left to Right Content" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute macro="WikiPage#viewLocalizedFrontPagePG">
+			<var name="wikiPageContent" value="Wiki Left to Right Content" />
 		</execute>
 	</command>
 
-	<command name="ViewWikiFrontPageRTL" priority="4">
+	<command name="ViewWikiFrontPageRightToLeft" priority="4">
 		<var name="currentPortalLanguages" value="English (United States),Arabic (Saudi Arabia)" />
 
 		<execute macro="Page#gotoCP">
@@ -210,7 +223,16 @@
 			<var name="emptyPageMessage" value="هذه الصفحة فارغة. قم بتحريرها لإضافة نص." />
 			<var name="rtl" value="true" />
 			<var name="successMessage" value="تم تنفيذ طلبك بنجاح." />
-			<var name="wikiPageContent" value="Wiki RTL محتوى" />
+			<var name="wikiPageContent" value="Wiki Right to Left محتوى" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute macro="WikiPage#viewLocalizedFrontPagePG">
+			<var name="rightToLeft" value="true" />
+			<var name="wikiPageContent" value="Wiki Right to Left محتوى" />
 		</execute>
 
 		<execute macro="LanguagePortlet#selectLanguagePG">

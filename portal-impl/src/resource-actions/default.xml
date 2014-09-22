@@ -19,12 +19,10 @@
 	<resource file="resource-actions/login.xml" />
 	<resource file="resource-actions/messageboards.xml" />
 	<resource file="resource-actions/mobiledevicerules.xml" />
-	<resource file="resource-actions/polls.xml" />
 	<resource file="resource-actions/shopping.xml" />
 	<resource file="resource-actions/sites.xml" />
 	<resource file="resource-actions/social.xml" />
 	<resource file="resource-actions/softwarecatalog.xml" />
 	<resource file="resource-actions/wiki.xml" />
 	<resource file="resource-actions/workflow.xml" />
-	<resource file="resource-actions/xslcontent.xml" />
 </resource-action-mapping>

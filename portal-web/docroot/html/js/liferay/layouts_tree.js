@@ -3,7 +3,7 @@ AUI.add(
 	function(A) {
 		var Lang = A.Lang;
 
-		var Util = Liferay.Util;
+		var LString = Lang.String;
 
 		var NODE_ID_TPL = '{treeId}_layoutId_{layoutId}_plid_{plid}_groupId_{groupId}';
 
@@ -168,15 +168,29 @@ AUI.add(
 					}
 				);
 
-				data.id = data.url ? Util.escapeHTML(instance._treeId + '_layout_' + data.url.substring(1)) : STR_EMPTY;
+				data.id = data.url ? LString.escapeHTML(instance._treeId + '_layout_' + data.url.substring(1)) : STR_EMPTY;
 
 				data.title = data.title ? data.title : STR_EMPTY;
 
-				data.url = data.url ? Util.escapeHTML(data.url) : STR_EMPTY;
+				data.url = data.url ? LString.escapeHTML(data.url) : STR_EMPTY;
 
-				data.uuid = data.uuid ? Util.escapeHTML(data.uuid) : STR_EMPTY;
+				data.uuid = data.uuid ? LString.escapeHTML(data.uuid) : STR_EMPTY;
 
 				return A.Lang.sub(NODE_LINK_TPL, data);
+			},
+
+			_displayNotice: function(message, type, timeout, useAnimation) {
+				new Liferay.Notice(
+					{
+						closeText: false,
+						content: message + '<button type="button" class="close">&times;</button>',
+						noticeClass: 'hide',
+						timeout: timeout || 10000,
+						toggleText: false,
+						type: type || 'warning',
+						useAnimation: Lang.isValue(useAnimation) ? useAnimation : true
+					}
+				).show();
 			},
 
 			_formatJSONResults: function(json) {
@@ -223,7 +237,7 @@ AUI.add(
 					total = nodeChildren.total;
 				}
 
-				var expanded = (total > 0);
+				var expanded = (childLayouts.length > 0);
 
 				var maxChildren = instance.get('maxChildren');
 
@@ -243,7 +257,7 @@ AUI.add(
 						start: Math.max(childLayouts.length - maxChildren, 0),
 						total: total
 					},
-					type: (nodeChildren && expanded) ? 'node' : 'io'
+					type: (total > 0) ? 'io' : 'node'
 				};
 
 				if (nodeChildren && expanded) {
@@ -252,14 +266,14 @@ AUI.add(
 
 				var cssClass = STR_EMPTY;
 				var title = STR_EMPTY;
-				var name = Util.escapeHTML(node.name);
+				var name = LString.escapeHTML(node.name);
 
 				if (node.layoutRevisionId) {
 					if (!node.layoutRevisionHead) {
 						title =  Liferay.Language.get('there-is-not-a-version-of-this-page-marked-as-ready-for-publication');
 					}
 					else if (node.layoutBranchName) {
-						node.layoutBranchName = Util.escapeHTML(node.layoutBranchName);
+						node.layoutBranchName = LString.escapeHTML(node.layoutBranchName);
 
 						name += Lang.sub(' <span class="layout-branch-name" title="' + Liferay.Language.get('this-is-the-page-variation-that-is-marked-as-ready-for-publication') + '">[{layoutBranchName}]</span>', node);
 					}
@@ -302,7 +316,7 @@ AUI.add(
 
 				var rootLabel = instance._createNodeLink(
 					{
-						label: Liferay.Util.escapeHTML(rootConfig.label),
+						label: LString.escapeHTML(rootConfig.label),
 						plid: rootConfig.defaultParentLayoutId
 					}
 				);
@@ -427,7 +441,68 @@ AUI.add(
 				return value;
 			},
 
+			_restoreNodePosition: function(response) {
+				var instance = this;
+
+				instance._displayNotice(response.message, 'warning', 10000, true);
+
+				var nodeId = A.Lang.sub(
+					NODE_ID_TPL,
+					{
+						groupId: response.groupId,
+						layoutId: response.layoutId,
+						plid: response.plid,
+						treeId: instance._treeId
+					}
+				);
+
+				var parentNodeId = A.Lang.sub(
+					NODE_ID_TPL,
+					{
+						groupId: response.groupId,
+						layoutId: response.originalParentLayoutId,
+						plid: response.originalParentPlid,
+						treeId: instance._treeId
+					}
+				);
+
+				var action = 'append';
+
+				var index = response.originalPriority;
+
+				var node = instance.getNodeById(nodeId);
+				var parentNode = instance.getNodeById(parentNodeId);
+
+				var sibling;
+
+				if (index > 0) {
+					if (index === parentNode.childrenLength) {
+						action = 'append';
+					}
+					else {
+						var siblingIndex = index;
+
+						if (node.get('parentNode').get('id') !== parentNodeId) {
+							siblingIndex -= 1;
+						}
+
+						sibling = parentNode.item(siblingIndex);
+
+						action = 'after';
+					}
+				}
+
+				if (sibling) {
+					instance.insert(node, sibling, action);
+				}
+				else {
+					parentNode.appendChild(node);
+				}
+			},
+
 			_updateLayout: function(data) {
+				var instance = this;
+
 				A.io.request(
 					themeDisplay.getPathMain() + '/layouts_admin/update_page',
 					{
@@ -440,7 +515,23 @@ AUI.add(
 								p_l_id: themeDisplay.getPlid(),
 								p_p_id: '88'
 							}
-						)
+						),
+						dataType: 'JSON',
+						on: {
+							success: function(event, id, xhr) {
+								var response;
+
+								try {
+									response = A.JSON.parse(xhr.responseText);
+
+									if (response.status === Liferay.STATUS_CODE.BAD_REQUEST) {
+										instance._restoreNodePosition(response);
+									}
+								}
+								catch (e) {
+								}
+							}
+						}
 					}
 				);
 			},

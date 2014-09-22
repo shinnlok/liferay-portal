@@ -41,6 +41,15 @@ public class MailServiceTestUtil {
 		return _smtpServer.getEmailCount();
 	}
 
+	public static MailMessage getLastMailMessage() {
+		if (_smtpServer.getEmailCount() > 0) {
+			return _smtpServer.getMessage(_smtpServer.getEmailCount() - 1);
+		}
+
+		throw new IndexOutOfBoundsException(
+			"There are no messages in the inbox");
+	}
+
 	public static List<MailMessage> getMailMessages(
 		String headerName, String headerValue) {
 
@@ -69,6 +78,14 @@ public class MailServiceTestUtil {
 		return mailMessages;
 	}
 
+	public static boolean lastMailMessageContains(String text) {
+		MailMessage mailMessage = getLastMailMessage();
+
+		String bodyMailMessage = mailMessage.getBody();
+
+		return bodyMailMessage.contains(text);
+	}
+
 	public static void start() {
 		if (_smtpServer != null) {
 			throw new IllegalStateException("Server is already running");
@@ -83,7 +100,7 @@ public class MailServiceTestUtil {
 				public void addMessage(MailMessage message) {
 					try {
 						List<MailMessage> receivedMail =
-							(List<MailMessage>)ReflectionTestUtil.getFieldValue(
+							ReflectionTestUtil.getFieldValue(
 								this, "receivedMail");
 
 						receivedMail.add(message);

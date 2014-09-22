@@ -25,8 +25,10 @@ import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
+import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -145,7 +147,9 @@ public class DDLRecordLocalServiceImpl extends DDLRecordLocalServiceBaseImpl {
 
 		DDMStructure ddmStructure = recordSet.getDDMStructure();
 
-		Fields fields = toFields(ddmStructure.getStructureId(), fieldsMap);
+		Fields fields = toFields(
+			ddmStructure.getStructureId(), fieldsMap,
+			serviceContext.getLocale(), LocaleUtil.getSiteDefault());
 
 		return ddlRecordLocalService.addRecord(
 			userId, groupId, recordSetId, displayIndex, fields, serviceContext);
@@ -380,6 +384,8 @@ public class DDLRecordLocalServiceImpl extends DDLRecordLocalServiceBaseImpl {
 		Fields fields = StorageEngineUtil.getFields(
 			recordVersion.getDDMStorageId());
 
+		serviceContext.setCommand(Constants.REVERT);
+
 		ddlRecordLocalService.updateRecord(
 			userId, recordId, true, recordVersion.getDisplayIndex(), fields,
 			false, serviceContext);
@@ -533,10 +539,8 @@ public class DDLRecordLocalServiceImpl extends DDLRecordLocalServiceBaseImpl {
 				recordVersion.getStatus(), serviceContext);
 		}
 
-		if (!majorVersion &&
-			isKeepRecordVersionLabel(
-				record.getRecordVersion(), recordVersion,
-				serviceContext.getWorkflowAction())) {
+		if (isKeepRecordVersionLabel(
+				record.getRecordVersion(), recordVersion, serviceContext)) {
 
 			ddlRecordVersionPersistence.remove(recordVersion);
 
@@ -566,11 +570,15 @@ public class DDLRecordLocalServiceImpl extends DDLRecordLocalServiceBaseImpl {
 
 		DDLRecord record = ddlRecordPersistence.findByPrimaryKey(recordId);
 
+		Fields oldFields = record.getFields();
+
 		DDLRecordSet recordSet = record.getRecordSet();
 
 		DDMStructure ddmStructure = recordSet.getDDMStructure();
 
-		Fields fields = toFields(ddmStructure.getStructureId(), fieldsMap);
+		Fields fields = toFields(
+			ddmStructure.getStructureId(), fieldsMap,
+			serviceContext.getLocale(), oldFields.getDefaultLocale());
 
 		return ddlRecordLocalService.updateRecord(
 			userId, recordId, false, displayIndex, fields, mergeFields,
@@ -694,14 +702,20 @@ public class DDLRecordLocalServiceImpl extends DDLRecordLocalServiceBaseImpl {
 
 	/**
 	 * @see com.liferay.portlet.documentlibrary.service.impl.DLFileEntryLocalServiceImpl#isKeepFileVersionLabel(
-	 *      DLFileEntry, DLFileVersion, DLFileVersion, int)
+	 *      DLFileEntry, DLFileVersion, DLFileVersion, ServiceContext)
 	 */
 	protected boolean isKeepRecordVersionLabel(
 			DDLRecordVersion lastRecordVersion,
-			DDLRecordVersion latestRecordVersion, int workflowContext)
+			DDLRecordVersion latestRecordVersion, ServiceContext serviceContext)
 		throws PortalException {
 
-		if (workflowContext == WorkflowConstants.ACTION_SAVE_DRAFT) {
+		if (Validator.equals(serviceContext.getCommand(), Constants.REVERT)) {
+			return false;
+		}
+
+		if (serviceContext.getWorkflowAction() ==
+				WorkflowConstants.ACTION_SAVE_DRAFT) {
+
 			return false;
 		}
 
@@ -738,14 +752,23 @@ public class DDLRecordLocalServiceImpl extends DDLRecordLocalServiceBaseImpl {
 	}
 
 	protected Fields toFields(
-		long ddmStructureId, Map<String, Serializable> fieldsMap) {
+		long ddmStructureId, Map<String, Serializable> fieldsMap,
+		Locale locale, Locale defaultLocale) {
 
 		Fields fields = new Fields();
 
-		for (String name : fieldsMap.keySet()) {
-			String value = String.valueOf(fieldsMap.get(name));
+		for (Map.Entry<String, Serializable> entry : fieldsMap.entrySet()) {
+			Field field = new Field();
 
-			Field field = new Field(ddmStructureId, name, value);
+			field.setDDMStructureId(ddmStructureId);
+			field.setName(entry.getKey());
+			field.addValue(locale, String.valueOf(entry.getValue()));
+
+			if (!locale.equals(defaultLocale)) {
+				field.addValue(defaultLocale, String.valueOf(entry.getValue()));
+			}
+
+			field.setDefaultLocale(defaultLocale);
 
 			fields.put(field);
 		}

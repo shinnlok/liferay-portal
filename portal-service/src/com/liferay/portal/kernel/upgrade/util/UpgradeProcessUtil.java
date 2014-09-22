@@ -23,15 +23,17 @@ import com.liferay.portal.kernel.search.SearchEngineUtil;
 import com.liferay.portal.kernel.upgrade.UpgradeException;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
-import com.liferay.portal.kernel.util.StringPool;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -73,12 +75,42 @@ public class UpgradeProcessUtil {
 				return languageId;
 			}
 			else {
-				return StringPool.BLANK;
+				return LocaleUtil.toLanguageId(LocaleUtil.US);
 			}
 		}
 		finally {
 			DataAccess.cleanUp(con, ps, rs);
 		}
+	}
+
+	public static List<UpgradeProcess> initUpgradeProcesses(
+		ClassLoader classLoader, String[] upgradeProcessClassNames) {
+
+		List<UpgradeProcess> upgradeProcesses = new ArrayList<UpgradeProcess>();
+
+		for (String upgradeProcessClassName : upgradeProcessClassNames) {
+			if (_log.isDebugEnabled()) {
+				_log.debug("Initializing upgrade " + upgradeProcessClassName);
+			}
+
+			UpgradeProcess upgradeProcess = null;
+
+			try {
+				Class<?> clazz = classLoader.loadClass(upgradeProcessClassName);
+
+				upgradeProcess = (UpgradeProcess)clazz.newInstance();
+			}
+			catch (Exception e) {
+				_log.error(
+					"Unable to initialize upgrade " + upgradeProcessClassName);
+
+				continue;
+			}
+
+			upgradeProcesses.add(upgradeProcess);
+		}
+
+		return upgradeProcesses;
 	}
 
 	public static boolean isCreateIGImageDocumentType() {
@@ -92,18 +124,15 @@ public class UpgradeProcessUtil {
 	}
 
 	public static boolean upgradeProcess(
-			int buildNumber, String[] upgradeProcessClassNames,
-			ClassLoader classLoader)
+			int buildNumber, List<UpgradeProcess> upgradeProcesses)
 		throws UpgradeException {
 
-		return upgradeProcess(
-			buildNumber, upgradeProcessClassNames, classLoader,
-			_INDEX_ON_UPGRADE);
+		return upgradeProcess(buildNumber, upgradeProcesses, _INDEX_ON_UPGRADE);
 	}
 
 	public static boolean upgradeProcess(
-			int buildNumber, String[] upgradeProcessClassNames,
-			ClassLoader classLoader, boolean indexOnUpgrade)
+			int buildNumber, List<UpgradeProcess> upgradeProcesses,
+			boolean indexOnUpgrade)
 		throws UpgradeException {
 
 		boolean ranUpgradeProcess = false;
@@ -115,9 +144,9 @@ public class UpgradeProcessUtil {
 		}
 
 		try {
-			for (String upgradeProcessClassName : upgradeProcessClassNames) {
+			for (UpgradeProcess upgradeProcess : upgradeProcesses) {
 				boolean tempRanUpgradeProcess = _upgradeProcess(
-					buildNumber, upgradeProcessClassName, classLoader);
+					buildNumber, upgradeProcess);
 
 				if (tempRanUpgradeProcess) {
 					ranUpgradeProcess = true;
@@ -132,42 +161,22 @@ public class UpgradeProcessUtil {
 	}
 
 	private static boolean _upgradeProcess(
-			int buildNumber, String upgradeProcessClassName,
-			ClassLoader classLoader)
+			int buildNumber, UpgradeProcess upgradeProcess)
 		throws UpgradeException {
 
-		if (_log.isDebugEnabled()) {
-			_log.debug("Initializing upgrade " + upgradeProcessClassName);
-		}
-
-		UpgradeProcess upgradeProcess = null;
-
-		try {
-			Class<?> clazz = classLoader.loadClass(upgradeProcessClassName);
-
-			upgradeProcess = (UpgradeProcess)clazz.newInstance();
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-		}
-
-		if (upgradeProcess == null) {
-			_log.error(upgradeProcessClassName + " cannot be found");
-
-			return false;
-		}
+		Class<?> clazz = upgradeProcess.getClass();
 
 		if ((upgradeProcess.getThreshold() == 0) ||
 			(upgradeProcess.getThreshold() > buildNumber)) {
 
 			if (_log.isDebugEnabled()) {
-				_log.debug("Running upgrade " + upgradeProcessClassName);
+				_log.debug("Running upgrade " + clazz.getName());
 			}
 
 			upgradeProcess.upgrade();
 
 			if (_log.isDebugEnabled()) {
-				_log.debug("Finished upgrade " + upgradeProcessClassName);
+				_log.debug("Finished upgrade " + clazz.getName());
 			}
 
 			return true;
@@ -178,7 +187,7 @@ public class UpgradeProcessUtil {
 				"Upgrade threshold " + upgradeProcess.getThreshold() +
 					" will not trigger upgrade");
 
-			_log.debug("Skipping upgrade " + upgradeProcessClassName);
+			_log.debug("Skipping upgrade " + clazz.getName());
 		}
 
 		return false;

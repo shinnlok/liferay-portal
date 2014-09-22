@@ -705,6 +705,18 @@ public class DLFolderLocalServiceWrapper implements DLFolderLocalService,
 	}
 
 	@Override
+	public java.util.List<com.liferay.portlet.documentlibrary.model.DLFolder> getRepositoryFolders(
+		long repositoryId, int start, int end) {
+		return _dlFolderLocalService.getRepositoryFolders(repositoryId, start,
+			end);
+	}
+
+	@Override
+	public int getRepositoryFoldersCount(long repositoryId) {
+		return _dlFolderLocalService.getRepositoryFoldersCount(repositoryId);
+	}
+
+	@Override
 	public void getSubfolderIds(java.util.List<java.lang.Long> folderIds,
 		long groupId, long folderId) {
 		_dlFolderLocalService.getSubfolderIds(folderIds, groupId, folderId);
@@ -751,8 +763,17 @@ public class DLFolderLocalServiceWrapper implements DLFolderLocalService,
 	}
 
 	@Override
-	public void rebuildTree(long companyId) {
+	public void rebuildTree(long companyId)
+		throws com.liferay.portal.kernel.exception.PortalException {
 		_dlFolderLocalService.rebuildTree(companyId);
+	}
+
+	@Override
+	public void rebuildTree(long companyId, long parentFolderId,
+		java.lang.String parentTreePath, boolean reindex)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		_dlFolderLocalService.rebuildTree(companyId, parentFolderId,
+			parentTreePath, reindex);
 	}
 
 	/**

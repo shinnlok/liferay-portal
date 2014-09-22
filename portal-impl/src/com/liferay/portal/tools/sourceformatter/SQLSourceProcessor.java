@@ -23,7 +23,6 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.io.File;
-import java.io.IOException;
 
 import java.util.List;
 
@@ -31,6 +30,63 @@ import java.util.List;
  * @author Hugo Huijser
  */
 public class SQLSourceProcessor extends BaseSourceProcessor {
+
+	@Override
+	protected String doFormat(
+			File file, String fileName, String absolutePath, String content)
+		throws Exception {
+
+		StringBundler sb = new StringBundler();
+
+		try (UnsyncBufferedReader unsyncBufferedReader =
+				new UnsyncBufferedReader(new UnsyncStringReader(content))) {
+			
+			String line = null;
+
+			String previousLineSqlCommand = StringPool.BLANK;
+
+			while ((line = unsyncBufferedReader.readLine()) != null) {
+				line = trimLine(line, false);
+
+				if (Validator.isNotNull(line) && 
+					!line.startsWith(StringPool.TAB)) {
+					
+					String sqlCommand = StringUtil.split(
+						line, CharPool.SPACE)[0];
+
+					if (Validator.isNotNull(previousLineSqlCommand) &&
+						!previousLineSqlCommand.equals(sqlCommand)) {
+
+						sb.append("\n");
+					}
+
+					previousLineSqlCommand = sqlCommand;
+				}
+				else {
+					previousLineSqlCommand = StringPool.BLANK;
+				}
+
+				String strippedQuotesLine = stripQuotes(
+					line, CharPool.APOSTROPHE);
+
+				if (strippedQuotesLine.contains(StringPool.QUOTE)) {
+					line = StringUtil.replace(
+						line, StringPool.QUOTE, StringPool.APOSTROPHE);
+				}
+
+				sb.append(line);
+				sb.append("\n");
+			}
+		}
+
+		content = sb.toString();
+
+		if (content.endsWith("\n")) {
+			content = content.substring(0, content.length() - 1);
+		}
+
+		return content;
+	}
 
 	@Override
 	protected void format() throws Exception {
@@ -41,69 +97,6 @@ public class SQLSourceProcessor extends BaseSourceProcessor {
 		for (String fileName : fileNames) {
 			format(fileName);
 		}
-	}
-
-	@Override
-	protected String format(String fileName) throws Exception {
-		File file = new File(BASEDIR + fileName);
-
-		String content = fileUtil.read(file);
-
-		String newContent = formatSQL(content);
-
-		compareAndAutoFixContent(file, fileName, content, newContent);
-
-		return newContent;
-	}
-
-	protected String formatSQL(String content) throws IOException {
-		StringBundler sb = new StringBundler();
-
-		UnsyncBufferedReader unsyncBufferedReader = new UnsyncBufferedReader(
-			new UnsyncStringReader(content));
-
-		String line = null;
-
-		String previousLineSqlCommand = StringPool.BLANK;
-
-		while ((line = unsyncBufferedReader.readLine()) != null) {
-			line = trimLine(line, false);
-
-			if (Validator.isNotNull(line) && !line.startsWith(StringPool.TAB)) {
-				String sqlCommand = StringUtil.split(line, CharPool.SPACE)[0];
-
-				if (Validator.isNotNull(previousLineSqlCommand) &&
-					!previousLineSqlCommand.equals(sqlCommand)) {
-
-					sb.append("\n");
-				}
-
-				previousLineSqlCommand = sqlCommand;
-			}
-			else {
-				previousLineSqlCommand = StringPool.BLANK;
-			}
-
-			String strippedQuotesLine = stripQuotes(line, CharPool.APOSTROPHE);
-
-			if (strippedQuotesLine.contains(StringPool.QUOTE)) {
-				line = StringUtil.replace(
-					line, StringPool.QUOTE, StringPool.APOSTROPHE);
-			}
-
-			sb.append(line);
-			sb.append("\n");
-		}
-
-		unsyncBufferedReader.close();
-
-		content = sb.toString();
-
-		if (content.endsWith("\n")) {
-			content = content.substring(0, content.length() - 1);
-		}
-
-		return content;
 	}
 
 }

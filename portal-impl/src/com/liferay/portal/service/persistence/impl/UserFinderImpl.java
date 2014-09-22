@@ -43,13 +43,10 @@ import com.liferay.portal.service.persistence.UserUtil;
 import com.liferay.util.dao.orm.CustomSQLUtil;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Brian Wing Shun Chan
@@ -268,207 +265,12 @@ public class UserFinderImpl
 		String[] lastNames, String[] screenNames, String[] emailAddresses,
 		int status, LinkedHashMap<String, Object> params, boolean andOperator) {
 
-		firstNames = CustomSQLUtil.keywords(firstNames);
-		middleNames = CustomSQLUtil.keywords(middleNames);
-		lastNames = CustomSQLUtil.keywords(lastNames);
-		screenNames = CustomSQLUtil.keywords(screenNames);
-		emailAddresses = CustomSQLUtil.keywords(emailAddresses);
+		List<Long> userIds = doFindByC_FN_MN_LN_SN_EA_S(
+			companyId, firstNames, middleNames, lastNames, screenNames,
+			emailAddresses, status, params, andOperator, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 
-		if (params == null) {
-			params = _emptyLinkedHashMap;
-		}
-
-		LinkedHashMap<String, Object> params1 = params;
-
-		LinkedHashMap<String, Object> params2 = null;
-
-		LinkedHashMap<String, Object> params3 = null;
-
-		LinkedHashMap<String, Object> params4 = null;
-
-		Long[] groupIds = null;
-
-		if (params.get("usersGroups") instanceof Long) {
-			Long groupId = (Long)params.get("usersGroups");
-
-			if (groupId > 0) {
-				groupIds = new Long[] {groupId};
-			}
-		}
-		else {
-			groupIds = (Long[])params.get("usersGroups");
-		}
-
-		Long[] roleIds = null;
-
-		if (params.get("usersRoles") instanceof Long) {
-			Long roleId = (Long)params.get("usersRoles");
-
-			if (roleId > 0) {
-				roleIds = new Long[] {roleId};
-			}
-		}
-		else {
-			roleIds = (Long[])params.get("usersRoles");
-		}
-
-		boolean inherit = GetterUtil.getBoolean(params.get("inherit"));
-
-		if (ArrayUtil.isNotEmpty(groupIds) && inherit) {
-			List<Long> organizationIds = new ArrayList<Long>();
-			List<Long> userGroupIds = new ArrayList<Long>();
-
-			for (long groupId : groupIds) {
-				Group group = GroupLocalServiceUtil.fetchGroup(groupId);
-
-				if (group == null) {
-					continue;
-				}
-
-				if (group.isOrganization()) {
-					organizationIds.add(group.getOrganizationId());
-				}
-				else if (group.isUserGroup()) {
-					userGroupIds.add(group.getClassPK());
-				}
-				else {
-					organizationIds.addAll(
-						ListUtil.toList(
-							GroupUtil.getOrganizationPrimaryKeys(groupId)));
-
-					userGroupIds.addAll(
-						ListUtil.toList(
-							GroupUtil.getUserGroupPrimaryKeys(groupId)));
-				}
-			}
-
-			if (!organizationIds.isEmpty()) {
-				params2 = new LinkedHashMap<String, Object>(params1);
-
-				params2.remove("usersGroups");
-
-				params2.put(
-					"usersOrgs",
-					organizationIds.toArray(new Long[organizationIds.size()]));
-			}
-
-			if (!userGroupIds.isEmpty()) {
-				params3 = new LinkedHashMap<String, Object>(params1);
-
-				params3.remove("usersGroups");
-
-				params3.put(
-					"usersUserGroups",
-					userGroupIds.toArray(new Long[userGroupIds.size()]));
-			}
-		}
-
-		if (ArrayUtil.isNotEmpty(roleIds) && inherit) {
-			List<Long> organizationIds = new ArrayList<Long>();
-			List<Long> roleGroupIds = new ArrayList<Long>();
-			List<Long> userGroupIds = new ArrayList<Long>();
-
-			for (long roleId : roleIds) {
-				List<Group> groups = RoleUtil.getGroups(roleId);
-
-				for (Group group : groups) {
-					if (group.isOrganization()) {
-						organizationIds.add(group.getOrganizationId());
-					}
-					else if (group.isUserGroup()) {
-						userGroupIds.add(group.getClassPK());
-					}
-					else {
-						organizationIds.addAll(
-							ListUtil.toList(
-								GroupUtil.getOrganizationPrimaryKeys(
-									group.getGroupId())));
-
-						roleGroupIds.add(group.getGroupId());
-
-						userGroupIds.addAll(
-							ListUtil.toList(
-								GroupUtil.getUserGroupPrimaryKeys(
-									group.getGroupId())));
-					}
-				}
-			}
-
-			if (!roleGroupIds.isEmpty()) {
-				params2 = new LinkedHashMap<String, Object>(params1);
-
-				params2.remove("usersRoles");
-
-				params2.put(
-					"usersGroups",
-					roleGroupIds.toArray(new Long[roleGroupIds.size()]));
-			}
-
-			if (!userGroupIds.isEmpty()) {
-				params3 = new LinkedHashMap<String, Object>(params1);
-
-				params3.remove("usersRoles");
-
-				params3.put(
-					"usersUserGroups",
-					userGroupIds.toArray(new Long[userGroupIds.size()]));
-			}
-
-			if (!organizationIds.isEmpty()) {
-				params4 = new LinkedHashMap<String, Object>(params1);
-
-				params4.remove("usersRoles");
-
-				params4.put(
-					"usersOrgs",
-					organizationIds.toArray(new Long[organizationIds.size()]));
-			}
-		}
-
-		Session session = null;
-
-		try {
-			session = openSession();
-
-			Set<Long> userIds = new HashSet<Long>();
-
-			userIds.addAll(
-				countByC_FN_MN_LN_SN_EA_S(
-					session, companyId, firstNames, middleNames, lastNames,
-					screenNames, emailAddresses, status, params1, andOperator));
-
-			if (params2 != null) {
-				userIds.addAll(
-					countByC_FN_MN_LN_SN_EA_S(
-						session, companyId, firstNames, middleNames, lastNames,
-						screenNames, emailAddresses, status, params2,
-						andOperator));
-			}
-
-			if (params3 != null) {
-				userIds.addAll(
-					countByC_FN_MN_LN_SN_EA_S(
-						session, companyId, firstNames, middleNames, lastNames,
-						screenNames, emailAddresses, status, params3,
-						andOperator));
-			}
-
-			if (params4 != null) {
-				userIds.addAll(
-					countByC_FN_MN_LN_SN_EA_S(
-						session, companyId, firstNames, middleNames, lastNames,
-						screenNames, emailAddresses, status, params4,
-						andOperator));
-			}
-
-			return userIds.size();
-		}
-		catch (Exception e) {
-			throw new SystemException(e);
-		}
-		finally {
-			closeSession(session);
-		}
+		return userIds.size();
 	}
 
 	@Override
@@ -642,6 +444,32 @@ public class UserFinderImpl
 
 	@Override
 	public List<User> findByC_FN_MN_LN_SN_EA_S(
+		long companyId, String[] firstNames, String[] middleNames,
+		String[] lastNames, String[] screenNames, String[] emailAddresses,
+		int status, LinkedHashMap<String, Object> params, boolean andOperator,
+		int start, int end, OrderByComparator<User> obc) {
+
+		try {
+			List<Long> userIds = doFindByC_FN_MN_LN_SN_EA_S(
+				companyId, firstNames, middleNames, lastNames, screenNames,
+				emailAddresses, status, params, andOperator, start, end, obc);
+
+			List<User> users = new ArrayList<User>(userIds.size());
+
+			for (Long userId : userIds) {
+				User user = UserUtil.findByPrimaryKey(userId);
+
+				users.add(user);
+			}
+
+			return users;
+		}
+		catch (Exception e) {
+			throw new SystemException(e);
+		}
+	}
+
+	protected List<Long> doFindByC_FN_MN_LN_SN_EA_S(
 		long companyId, String[] firstNames, String[] middleNames,
 		String[] lastNames, String[] screenNames, String[] emailAddresses,
 		int status, LinkedHashMap<String, Object> params, boolean andOperator,
@@ -951,18 +779,7 @@ public class UserFinderImpl
 				}
 			}
 
-			Set<Long> userIds = new LinkedHashSet<Long>(
-				(List<Long>)QueryUtil.list(q, getDialect(), start, end));
-
-			List<User> users = new ArrayList<User>(userIds.size());
-
-			for (Long userId : userIds) {
-				User user = UserUtil.findByPrimaryKey(userId);
-
-				users.add(user);
-			}
-
-			return users;
+			return (List<Long>)QueryUtil.list(q, getDialect(), start, end);
 		}
 		catch (Exception e) {
 			throw new SystemException(e);
@@ -970,58 +787,6 @@ public class UserFinderImpl
 		finally {
 			closeSession(session);
 		}
-	}
-
-	protected List<Long> countByC_FN_MN_LN_SN_EA_S(
-		Session session, long companyId, String[] firstNames,
-		String[] middleNames, String[] lastNames, String[] screenNames,
-		String[] emailAddresses, int status,
-		LinkedHashMap<String, Object> params, boolean andOperator) {
-
-		String sql = CustomSQLUtil.get(FIND_BY_C_FN_MN_LN_SN_EA_S);
-
-		sql = CustomSQLUtil.replaceKeywords(
-			sql, "lower(User_.firstName)", StringPool.LIKE, false, firstNames);
-		sql = CustomSQLUtil.replaceKeywords(
-			sql, "lower(User_.middleName)", StringPool.LIKE, false,
-			middleNames);
-		sql = CustomSQLUtil.replaceKeywords(
-			sql, "lower(User_.lastName)", StringPool.LIKE, false, lastNames);
-		sql = CustomSQLUtil.replaceKeywords(
-			sql, "lower(User_.screenName)", StringPool.LIKE, false,
-			screenNames);
-		sql = CustomSQLUtil.replaceKeywords(
-			sql, "lower(User_.emailAddress)", StringPool.LIKE, true,
-			emailAddresses);
-
-		if (status == WorkflowConstants.STATUS_ANY) {
-			sql = StringUtil.replace(sql, _STATUS_SQL, StringPool.BLANK);
-		}
-
-		sql = replaceJoinAndWhere(sql, params);
-		sql = CustomSQLUtil.replaceAndOperator(sql, andOperator);
-
-		SQLQuery q = session.createSynchronizedSQLQuery(sql);
-
-		q.addScalar("userId", Type.LONG);
-
-		QueryPos qPos = QueryPos.getInstance(q);
-
-		setJoin(qPos, params);
-
-		qPos.add(companyId);
-		qPos.add(false);
-		qPos.add(firstNames, 2);
-		qPos.add(middleNames, 2);
-		qPos.add(lastNames, 2);
-		qPos.add(screenNames, 2);
-		qPos.add(emailAddresses, 2);
-
-		if (status != WorkflowConstants.STATUS_ANY) {
-			qPos.add(status);
-		}
-
-		return q.list(true);
 	}
 
 	protected String getJoin(LinkedHashMap<String, Object> params) {

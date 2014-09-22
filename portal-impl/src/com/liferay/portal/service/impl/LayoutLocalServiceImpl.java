@@ -66,6 +66,7 @@ import com.liferay.portal.model.LayoutPrototype;
 import com.liferay.portal.model.LayoutReference;
 import com.liferay.portal.model.LayoutSet;
 import com.liferay.portal.model.LayoutSetPrototype;
+import com.liferay.portal.model.LayoutType;
 import com.liferay.portal.model.LayoutTypePortlet;
 import com.liferay.portal.model.PortletConstants;
 import com.liferay.portal.model.ResourceConstants;
@@ -2194,7 +2195,9 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 			Layout layout = layoutPersistence.findByG_P_L(
 				groupId, privateLayout, layoutIds[0]);
 
-			if (!PortalUtil.isLayoutFirstPageable(layout.getType())) {
+			LayoutType layoutType = layout.getLayoutType();
+
+			if (!layoutType.isFirstPageable()) {
 				throw new RequiredLayoutException(
 					RequiredLayoutException.FIRST_LAYOUT_TYPE);
 			}
@@ -2817,6 +2820,26 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		layoutPersistence.update(layout);
 
 		return layout;
+	}
+
+	/**
+	 * Updates the parent layout ID and priority of the layout.
+	 *
+	 * @param  plid the primary key of the layout
+	 * @param  parentPlid the primary key of the parent layout
+	 * @param  priority the layout's new priority
+	 * @return the layout matching the primary key
+	 * @throws PortalException if a layout with the primary key could not be
+	 *         found or if a valid parent layout ID could not be found
+	 */
+	@Override
+	public Layout updateParentLayoutIdAndPriority(
+			long plid, long parentPlid, int priority)
+		throws PortalException {
+
+		Layout layout = updateParentLayoutId(plid, parentPlid);
+
+		return updatePriority(layout, priority);
 	}
 
 	/**

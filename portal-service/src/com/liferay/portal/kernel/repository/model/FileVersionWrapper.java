@@ -61,6 +61,13 @@ public class FileVersionWrapper
 	}
 
 	@Override
+	public void execute(RepositoryModelOperation repositoryModelOperation)
+		throws PortalException {
+
+		repositoryModelOperation.execute(this);
+	}
+
+	@Override
 	public Map<String, Serializable> getAttributes() {
 		return _fileVersion.getAttributes();
 	}
@@ -115,6 +122,11 @@ public class FileVersionWrapper
 	@Override
 	public long getFileEntryId() {
 		return _fileVersion.getFileEntryId();
+	}
+
+	@Override
+	public String getFileName() {
+		return _fileVersion.getFileName();
 	}
 
 	@Override

@@ -68,7 +68,6 @@ public abstract class JSONAction extends Action {
 		}
 
 		String callback = ParamUtil.getString(request, "callback");
-		String instance = ParamUtil.getString(request, "inst");
 
 		String json = null;
 
@@ -79,9 +78,6 @@ public abstract class JSONAction extends Action {
 
 			if (Validator.isNotNull(callback)) {
 				json = callback + "(" + json + ");";
-			}
-			else if (Validator.isNotNull(instance)) {
-				json = "var " + instance + "=" + json + ";";
 			}
 		}
 		catch (SecurityException se) {
@@ -113,13 +109,11 @@ public abstract class JSONAction extends Action {
 				HttpHeaders.CACHE_CONTROL,
 				HttpHeaders.CACHE_CONTROL_NO_CACHE_VALUE);
 
-			OutputStream outputStream = response.getOutputStream();
+			try (OutputStream outputStream = response.getOutputStream()) {
+				byte[] bytes = json.getBytes(StringPool.UTF8);
 
-			byte[] bytes = json.getBytes(StringPool.UTF8);
-
-			outputStream.write(bytes);
-
-			outputStream.close();
+				outputStream.write(bytes);
+			}
 		}
 
 		return null;

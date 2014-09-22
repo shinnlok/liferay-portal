@@ -19,8 +19,8 @@
 		<m:dependency.management__org.jboss.shrinkwrap.resolver__shrinkwrap-resolver-api-maven__version>2.0.0</m:dependency.management__org.jboss.shrinkwrap.resolver__shrinkwrap-resolver-api-maven__version>
 		<m:dependency.management__org.jboss.arquillian.config__arquillian-config-api__version>1.1.2.Final</m:dependency.management__org.jboss.arquillian.config__arquillian-config-api__version>
 		<m:properties__version.jdepend.plugin>2.0-beta-2</m:properties__version.jdepend.plugin>
-		<m:properties__version.jboss.osgi.spi>4.0.0.Final</m:properties__version.jboss.osgi.spi>
 		<m:dependency.management__org.jboss.shrinkwrap.resolver__shrinkwrap-resolver-impl-maven__version>2.0.0</m:dependency.management__org.jboss.shrinkwrap.resolver__shrinkwrap-resolver-impl-maven__version>
+		<m:properties__version.jboss.osgi.spi>4.0.0.Final</m:properties__version.jboss.osgi.spi>
 		<m:dependency.management__org.jboss.arquillian.testenricher__arquillian-testenricher-cdi__version>1.1.2.Final</m:dependency.management__org.jboss.arquillian.testenricher__arquillian-testenricher-cdi__version>
 		<m:dependency.management__org.jboss.arquillian.testng__arquillian-testng-container__version>1.1.2.Final</m:dependency.management__org.jboss.arquillian.testng__arquillian-testng-container__version>
 		<m:properties__version.javancss.plugin>2.0</m:properties__version.javancss.plugin>
@@ -107,8 +107,8 @@
 		<m:dependency.management__org.jboss.shrinkwrap.descriptors__shrinkwrap-descriptors-spi__version>2.0.0-alpha-3</m:dependency.management__org.jboss.shrinkwrap.descriptors__shrinkwrap-descriptors-spi__version>
 		<m:dependency.management__org.apache.felix__org.apache.felix.main__version>4.2.1</m:dependency.management__org.apache.felix__org.apache.felix.main__version>
 		<m:dependency.management__org.jboss.arquillian.junit__arquillian-junit-standalone__version>1.1.2.Final</m:dependency.management__org.jboss.arquillian.junit__arquillian-junit-standalone__version>
-		<m:properties__version.gpg.plugin>1.4</m:properties__version.gpg.plugin>
 		<m:properties__version.ejb.plugin>2.2.1</m:properties__version.ejb.plugin>
+		<m:properties__version.gpg.plugin>1.4</m:properties__version.gpg.plugin>
 		<m:properties__version.dependency.plugin>2.3</m:properties__version.dependency.plugin>
 		<m:properties__version.apache.felix.framework>4.2.1</m:properties__version.apache.felix.framework>
 		<m:dependency.management__org.jboss.arquillian.testenricher__arquillian-testenricher-resource__version>1.1.2.Final</m:dependency.management__org.jboss.arquillian.testenricher__arquillian-testenricher-resource__version>

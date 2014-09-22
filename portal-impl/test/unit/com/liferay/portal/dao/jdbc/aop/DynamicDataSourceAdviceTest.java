@@ -114,10 +114,9 @@ public class DynamicDataSourceAdviceTest {
 	}
 
 	@Test
-	public void testAnnotationType() throws Exception {
-		MasterDataSource masterDataSource =
-			(MasterDataSource)ReflectionTestUtil.getFieldValue(
-				DynamicDataSourceAdvice.class, "_nullMasterDataSource");
+	public void testAnnotationType() {
+		MasterDataSource masterDataSource = ReflectionTestUtil.getFieldValue(
+			DynamicDataSourceAdvice.class, "_nullMasterDataSource");
 
 		Assert.assertSame(
 			MasterDataSource.class, masterDataSource.annotationType());

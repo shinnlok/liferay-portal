@@ -14,8 +14,6 @@
 
 package com.liferay.portal.dao.jdbc.util;
 
-import com.liferay.portal.tools.javadocformatter.SinceJava;
-
 import java.io.PrintWriter;
 
 import java.sql.Connection;
@@ -56,7 +54,7 @@ public class DataSourceWrapper implements DataSource {
 		return _dataSource.getLogWriter();
 	}
 
-	@SinceJava(1.7)
+	@Override
 	public Logger getParentLogger() {
 		throw new UnsupportedOperationException();
 	}

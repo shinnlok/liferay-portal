@@ -50,6 +50,22 @@
 	<#elseif name == "execute">
 		<#assign variableContext = variableContextStack.peek()>
 
+		executeScopeVariables = new HashMap<String, String>();
+
+		executeScopeVariables.putAll(${variableContext});
+
+		<#if element.element("var")??>
+			<#assign varElements = element.elements("var")>
+
+			<#assign void = variableContextStack.push("executeScopeVariables")>
+
+			<#list varElements as varElement>
+				<#include "var_element.ftl">
+			</#list>
+
+			<#assign void = variableContextStack.pop()>
+		</#if>
+
 		<#if element.attributeValue("action")??>
 			<#assign action = element.attributeValue("action")>
 
@@ -68,6 +84,8 @@
 			<#assign actionElement = element>
 
 			<#include "action_log_element.ftl">
+
+			${selenium}.saveScreenshotBeforeAction(false);
 
 			<#include "action_element.ftl">
 

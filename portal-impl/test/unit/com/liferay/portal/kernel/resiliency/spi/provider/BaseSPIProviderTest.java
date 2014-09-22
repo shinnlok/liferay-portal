@@ -14,10 +14,17 @@
 
 package com.liferay.portal.kernel.resiliency.spi.provider;
 
+import com.liferay.portal.kernel.concurrent.AsyncBroker;
+import com.liferay.portal.kernel.concurrent.DefaultNoticeableFuture;
+import com.liferay.portal.kernel.io.DummyOutputStream;
 import com.liferay.portal.kernel.nio.intraband.blocking.ExecutorIntraband;
 import com.liferay.portal.kernel.process.ProcessCallable;
+import com.liferay.portal.kernel.process.ProcessChannel;
 import com.liferay.portal.kernel.process.ProcessConfig;
 import com.liferay.portal.kernel.process.ProcessException;
+import com.liferay.portal.kernel.process.ProcessExecutor;
+import com.liferay.portal.kernel.process.ProcessExecutorUtil;
+import com.liferay.portal.kernel.process.local.LocalProcessChannel;
 import com.liferay.portal.kernel.resiliency.PortalResiliencyException;
 import com.liferay.portal.kernel.resiliency.mpi.MPIHelperUtil;
 import com.liferay.portal.kernel.resiliency.spi.MockRemoteSPI;
@@ -36,29 +43,22 @@ import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.resiliency.spi.SPIRegistryImpl;
-import com.liferay.portal.test.AdviseWith;
-import com.liferay.portal.test.runners.AspectJMockingNewClassLoaderJUnitTestRunner;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
-import java.util.concurrent.Callable;
-import java.util.concurrent.FutureTask;
 import java.util.logging.Level;
-
-import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Aspect;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 /**
  * @author Shuyang Zhou
  */
-@RunWith(AspectJMockingNewClassLoaderJUnitTestRunner.class)
 public class BaseSPIProviderTest {
 
 	@ClassRule
@@ -84,12 +84,15 @@ public class BaseSPIProviderTest {
 
 		MPIHelperUtil.registerSPIProvider(_testSPIProvider);
 
+		ProcessExecutorUtil processExecutorUtil = new ProcessExecutorUtil();
+
+		processExecutorUtil.setProcessExecutor(_mockProcessExecutor);
+
 		SPIRegistryUtil spiRegistryUtil = new SPIRegistryUtil();
 
 		spiRegistryUtil.setSPIRegistry(new SPIRegistryImpl());
 	}
 
-	@AdviseWith(adviceClasses = {ProcessExecutorAdvice.class})
 	@Test
 	public void testCreateSPI() throws PortalResiliencyException {
 		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
@@ -113,7 +116,7 @@ public class BaseSPIProviderTest {
 
 			// Sucess
 
-			ProcessExecutorAdvice.setRegisterBack(true);
+			_mockProcessExecutor.setRegisterBack(true);
 
 			SPI spi = _testSPIProvider.createSPI(_spiConfiguration);
 
@@ -135,8 +138,8 @@ public class BaseSPIProviderTest {
 
 			// Interrupt
 
-			ProcessExecutorAdvice.setInterrupt(true);
-			ProcessExecutorAdvice.setRegisterBack(false);
+			_mockProcessExecutor.setInterrupt(true);
+			_mockProcessExecutor.setRegisterBack(false);
 
 			try {
 				_testSPIProvider.createSPI(_spiConfiguration);
@@ -155,9 +158,9 @@ public class BaseSPIProviderTest {
 
 			// Process executor failure
 
-			ProcessExecutorAdvice.setInterrupt(false);
-			ProcessExecutorAdvice.setRegisterBack(false);
-			ProcessExecutorAdvice.setThrowException(true);
+			_mockProcessExecutor.setInterrupt(false);
+			_mockProcessExecutor.setRegisterBack(false);
+			_mockProcessExecutor.setThrowException(true);
 
 			try {
 				_testSPIProvider.createSPI(_spiConfiguration);
@@ -177,33 +180,19 @@ public class BaseSPIProviderTest {
 		}
 	}
 
-	@Aspect
-	public static class ProcessExecutorAdvice {
+	private MockProcessExecutor _mockProcessExecutor =
+		new MockProcessExecutor();
+	private SPIConfiguration _spiConfiguration = new SPIConfiguration(
+		"testId", "java", "", MockSPIAgent.class.getName(), 8081, "",
+		new String[0], new String[0], 10, 10, 10, "");
+	private TestSPIProvider _testSPIProvider;
 
-		public static FutureTask<SPI> getFutureTask() {
-			return _futureTask;
-		}
+	private static class MockProcessExecutor implements ProcessExecutor {
 
-		public static void setInterrupt(boolean interrupt) {
-			_interrupt = interrupt;
-		}
-
-		public static void setRegisterBack(boolean registerBack) {
-			_registerBack = registerBack;
-		}
-
-		public static void setThrowException(boolean throwException) {
-			_throwException = throwException;
-		}
-
-		@Around(
-			"execution(* com.liferay.portal.kernel.process.ProcessExecutor." +
-				"execute(com.liferay.portal.kernel.process.ProcessConfig," +
-					"com.liferay.portal.kernel.process.ProcessCallable)) && " +
-						"args(processConfig, processCallable)")
-		public Object execute(
-				ProcessConfig processConfig,
-				ProcessCallable<? extends Serializable> processCallable)
+		@Override
+		@SuppressWarnings("unchecked")
+		public <T extends Serializable> ProcessChannel<T> execute(
+				ProcessConfig processConfig, ProcessCallable<T> processCallable)
 			throws ProcessException {
 
 			if (_interrupt) {
@@ -239,31 +228,39 @@ public class BaseSPIProviderTest {
 				throw new ProcessException("ProcessException");
 			}
 
-			_futureTask = new FutureTask<SPI>(
-				new Callable<SPI>() {
+			DefaultNoticeableFuture<T> defaultNoticeableFuture =
+				new DefaultNoticeableFuture<T>();
 
-					@Override
-					public SPI call() throws Exception {
-						return mockSPI;
-					}
+			defaultNoticeableFuture.set((T)mockSPI);
 
-				}
-			);
-
-			return _futureTask;
+			try {
+				return new LocalProcessChannel<T>(
+					defaultNoticeableFuture,
+					new ObjectOutputStream(new DummyOutputStream()),
+					new AsyncBroker<Long, Serializable>());
+			}
+			catch (IOException ioe) {
+				throw new RuntimeException(ioe);
+			}
 		}
 
-		private static FutureTask<SPI> _futureTask;
-		private static boolean _interrupt;
-		private static boolean _registerBack;
-		private static boolean _throwException;
+		public void setInterrupt(boolean interrupt) {
+			_interrupt = interrupt;
+		}
+
+		public void setRegisterBack(boolean registerBack) {
+			_registerBack = registerBack;
+		}
+
+		public void setThrowException(boolean throwException) {
+			_throwException = throwException;
+		}
+
+		private boolean _interrupt;
+		private boolean _registerBack;
+		private boolean _throwException;
 
 	}
-
-	private SPIConfiguration _spiConfiguration = new SPIConfiguration(
-		"testId", "java", "", MockSPIAgent.class.getName(), 8081, "",
-		new String[0], new String[0], 10, 10, 10, "");
-	private TestSPIProvider _testSPIProvider;
 
 	private static class TestSPIProvider extends BaseSPIProvider {
 

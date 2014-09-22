@@ -368,6 +368,13 @@ public class DLFileEntryLocalServiceWrapper implements DLFileEntryLocalService,
 	}
 
 	@Override
+	public com.liferay.portlet.documentlibrary.model.DLFileEntry fetchFileEntryByFileName(
+		long groupId, long folderId, java.lang.String fileName) {
+		return _dlFileEntryLocalService.fetchFileEntryByFileName(groupId,
+			folderId, fileName);
+	}
+
+	@Override
 	public com.liferay.portlet.documentlibrary.model.DLFileEntry fetchFileEntryByName(
 		long groupId, long folderId, java.lang.String name) {
 		return _dlFileEntryLocalService.fetchFileEntryByName(groupId, folderId,
@@ -786,6 +793,18 @@ public class DLFileEntryLocalServiceWrapper implements DLFileEntryLocalService,
 	}
 
 	@Override
+	public java.util.List<com.liferay.portlet.documentlibrary.model.DLFileEntry> getRepositoryFileEntries(
+		long repositoryId, int start, int end) {
+		return _dlFileEntryLocalService.getRepositoryFileEntries(repositoryId,
+			start, end);
+	}
+
+	@Override
+	public int getRepositoryFileEntriesCount(long repositoryId) {
+		return _dlFileEntryLocalService.getRepositoryFileEntriesCount(repositoryId);
+	}
+
+	@Override
 	public boolean hasExtraSettings() {
 		return _dlFileEntryLocalService.hasExtraSettings();
 	}
@@ -826,7 +845,8 @@ public class DLFileEntryLocalServiceWrapper implements DLFileEntryLocalService,
 	}
 
 	@Override
-	public void rebuildTree(long companyId) {
+	public void rebuildTree(long companyId)
+		throws com.liferay.portal.kernel.exception.PortalException {
 		_dlFileEntryLocalService.rebuildTree(companyId);
 	}
 
@@ -864,6 +884,13 @@ public class DLFileEntryLocalServiceWrapper implements DLFileEntryLocalService,
 	@Override
 	public void setBeanIdentifier(java.lang.String beanIdentifier) {
 		_dlFileEntryLocalService.setBeanIdentifier(beanIdentifier);
+	}
+
+	@Override
+	public void setTreePaths(long folderId, java.lang.String treePath,
+		boolean reindex)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		_dlFileEntryLocalService.setTreePaths(folderId, treePath, reindex);
 	}
 
 	@Override
@@ -913,6 +940,14 @@ public class DLFileEntryLocalServiceWrapper implements DLFileEntryLocalService,
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _dlFileEntryLocalService.updateStatus(userId, fileVersionId,
 			status, serviceContext, workflowContext);
+	}
+
+	@Override
+	public void validateFile(long groupId, long folderId, long fileEntryId,
+		java.lang.String fileName, java.lang.String title)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		_dlFileEntryLocalService.validateFile(groupId, folderId, fileEntryId,
+			fileName, title);
 	}
 
 	@Override

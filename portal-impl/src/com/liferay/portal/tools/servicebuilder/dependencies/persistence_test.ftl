@@ -16,7 +16,12 @@ package ${packagePath}.service.persistence;
 
 <#assign noSuchEntity = serviceBuilder.getNoSuchEntityException(entity)>
 
-import ${packagePath}.${noSuchEntity}Exception;
+<#if osgiModule>
+	import ${packagePath}.exception.${noSuchEntity}Exception;
+<#else>
+	import ${packagePath}.${noSuchEntity}Exception;
+</#if>
+
 import ${packagePath}.model.${entity.name};
 import ${packagePath}.model.impl.${entity.name}ModelImpl;
 import ${packagePath}.service.${entity.name}LocalServiceUtil;
@@ -42,9 +47,8 @@ import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.test.TransactionalTestRule;
-import com.liferay.portal.test.runners.LiferayIntegrationJUnitTestRunner;
+import com.liferay.portal.test.runners.PersistenceIntegrationJUnitTestRunner;
 import com.liferay.portal.tools.DBUpgrader;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.test.RandomTestUtil;
@@ -82,7 +86,7 @@ import org.junit.Test;
 <#if osgiModule>
 	@RunWith(Arquillian.class)
 <#else>
-	@RunWith(LiferayIntegrationJUnitTestRunner.class)
+	@RunWith(PersistenceIntegrationJUnitTestRunner.class)
 </#if>
 public class ${entity.name}PersistenceTest {
 
@@ -101,15 +105,6 @@ public class ${entity.name}PersistenceTest {
 		TemplateManagerUtil.init();
 	}
 
-	@Before
-	public void setUp() {
-		_modelListeners = _persistence.getListeners();
-
-		for (ModelListener<${entity.name}> modelListener : _modelListeners) {
-			_persistence.unregisterListener(modelListener);
-		}
-	}
-
 	@After
 	public void tearDown() throws Exception {
 		Iterator<${entity.name}> iterator = _${entity.varNames}.iterator();
@@ -118,10 +113,6 @@ public class ${entity.name}PersistenceTest {
 			_persistence.remove(iterator.next());
 
 			iterator.remove();
-		}
-
-		for (ModelListener<${entity.name}> modelListener : _modelListeners) {
-			_persistence.registerListener(modelListener);
 		}
 	}
 
@@ -1254,7 +1245,6 @@ public class ${entity.name}PersistenceTest {
 	private static Log _log = LogFactoryUtil.getLog(${entity.name}PersistenceTest.class);
 
 	private List<${entity.name}> _${entity.varNames} = new ArrayList<${entity.name}>();
-	private ModelListener<${entity.name}>[] _modelListeners;
 	private ${entity.name}Persistence _persistence = ${entity.name}Util.getPersistence();
 
 }

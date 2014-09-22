@@ -279,6 +279,10 @@ public class InstrumentationAgent {
 	private static void _assertClassDataCoverage(
 		Class<?> clazz, ClassData classData) {
 
+		if (clazz.isSynthetic()) {
+			return;
+		}
+
 		if (classData == null) {
 			throw new RuntimeException(
 				"Class " + clazz.getName() + " has no coverage data");
@@ -327,6 +331,8 @@ public class InstrumentationAgent {
 	private static String[] _includes;
 	private static Instrumentation _instrumentation;
 	private static File _lockFile;
+	private static List<OriginalClassDefinition> _originalClassDefinitions;
+	private static boolean _staticallyInstrumented;
 
 	static {
 		File dataFile = CoverageDataFileHandler.getDefaultDataFile();
@@ -350,9 +356,6 @@ public class InstrumentationAgent {
 			throw new ExceptionInInitializerError(ioe);
 		}
 	}
-
-	private static List<OriginalClassDefinition> _originalClassDefinitions;
-	private static boolean _staticallyInstrumented;
 
 	private static class OriginalClassDefinition {
 

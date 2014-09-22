@@ -128,7 +128,7 @@ public class DynamicCSSUtil {
 				if (PortalUtil.isRightToLeft(request) &&
 					!RTLCSSUtil.isExcludedPath(resourcePath)) {
 
-					content = RTLCSSUtil.getRtlCss(content);
+					content = RTLCSSUtil.getRtlCss(resourcePath, content);
 				}
 
 				return content;
@@ -139,14 +139,6 @@ public class DynamicCSSUtil {
 
 		boolean themeCssFastLoad = _isThemeCssFastLoad(request, themeDisplay);
 
-		URLConnection resourceURLConnection = null;
-
-		URL resourceURL = servletContext.getResource(resourcePath);
-
-		if (resourceURL != null) {
-			resourceURLConnection = resourceURL.openConnection();
-		}
-
 		URLConnection cacheResourceURLConnection = null;
 
 		URL cacheResourceURL = _getCacheResourceURL(
@@ -154,13 +146,25 @@ public class DynamicCSSUtil {
 
 		if (cacheResourceURL != null) {
 			cacheResourceURLConnection = cacheResourceURL.openConnection();
+
+			if (PropsValues.THEME_CSS_FAST_LOAD_CHECK_MODIFIED_DATE) {
+				URL resourceURL = servletContext.getResource(resourcePath);
+
+				if (resourceURL != null) {
+					URLConnection resourceURLConnection =
+						resourceURL.openConnection();
+
+					if (cacheResourceURLConnection.getLastModified() <
+							resourceURLConnection.getLastModified()) {
+
+						cacheResourceURLConnection = null;
+					}
+				}
+			}
 		}
 
 		if ((themeCssFastLoad || !content.contains(_CSS_IMPORT_BEGIN)) &&
-			(cacheResourceURLConnection != null) &&
-			(resourceURLConnection != null) &&
-			(cacheResourceURLConnection.getLastModified() >=
-				resourceURLConnection.getLastModified())) {
+			(cacheResourceURLConnection != null)) {
 
 			parsedContent = StringUtil.read(
 				cacheResourceURLConnection.getInputStream());
@@ -192,7 +196,8 @@ public class DynamicCSSUtil {
 			if (PortalUtil.isRightToLeft(request) &&
 				!RTLCSSUtil.isExcludedPath(resourcePath)) {
 
-				parsedContent = RTLCSSUtil.getRtlCss(parsedContent);
+				parsedContent = RTLCSSUtil.getRtlCss(
+					resourcePath, parsedContent);
 
 				// Append custom CSS for RTL
 
@@ -510,6 +515,10 @@ public class DynamicCSSUtil {
 
 	private static boolean _isThemeCssFastLoad(
 		HttpServletRequest request, ThemeDisplay themeDisplay) {
+
+		if (!PropsValues.THEME_CSS_FAST_LOAD_CHECK_REQUEST_PARAMETER) {
+			return PropsValues.THEME_CSS_FAST_LOAD;
+		}
 
 		if (themeDisplay != null) {
 			return themeDisplay.isThemeCssFastLoad();

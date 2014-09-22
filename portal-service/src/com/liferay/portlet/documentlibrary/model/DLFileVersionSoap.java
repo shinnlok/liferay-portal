@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.documentlibrary.model;
 
+import aQute.bnd.annotation.ProviderType;
+
 import java.io.Serializable;
 
 import java.util.ArrayList;
@@ -27,6 +29,7 @@ import java.util.List;
  * @see com.liferay.portlet.documentlibrary.service.http.DLFileVersionServiceSoap
  * @generated
  */
+@ProviderType
 public class DLFileVersionSoap implements Serializable {
 	public static DLFileVersionSoap toSoapModel(DLFileVersion model) {
 		DLFileVersionSoap soapModel = new DLFileVersionSoap();
@@ -43,6 +46,7 @@ public class DLFileVersionSoap implements Serializable {
 		soapModel.setFolderId(model.getFolderId());
 		soapModel.setFileEntryId(model.getFileEntryId());
 		soapModel.setTreePath(model.getTreePath());
+		soapModel.setFileName(model.getFileName());
 		soapModel.setExtension(model.getExtension());
 		soapModel.setMimeType(model.getMimeType());
 		soapModel.setTitle(model.getTitle());
@@ -205,6 +209,14 @@ public class DLFileVersionSoap implements Serializable {
 		_treePath = treePath;
 	}
 
+	public String getFileName() {
+		return _fileName;
+	}
+
+	public void setFileName(String fileName) {
+		_fileName = fileName;
+	}
+
 	public String getExtension() {
 		return _extension;
 	}
@@ -329,6 +341,7 @@ public class DLFileVersionSoap implements Serializable {
 	private long _folderId;
 	private long _fileEntryId;
 	private String _treePath;
+	private String _fileName;
 	private String _extension;
 	private String _mimeType;
 	private String _title;

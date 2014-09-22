@@ -329,7 +329,7 @@ public class PortletPreferencesLocalServiceTest {
 		throws Exception {
 
 		PortletPreferencesTestUtil.addLayoutPortletPreferences(
-				_layout, _portlet);
+			_layout, _portlet);
 
 		Portlet portlet = PortletLocalServiceUtil.getPortletById(
 			_layout.getCompanyId(), String.valueOf(_PORTLET_ID + 1));
@@ -1544,14 +1544,13 @@ public class PortletPreferencesLocalServiceTest {
 					getWrappedService());
 
 			try {
-				return (javax.portlet.PortletPreferences)
-					ReflectionTestUtil.invoke(
-						classLoaderBeanHandler.getBean(), "getPreferences",
-						new Class[] {
-							long.class, long.class, int.class, long.class,
-							String.class, String.class, boolean.class},
-						companyId, ownerId, ownerType, plid, portletId, null,
-						_strict);
+				return ReflectionTestUtil.invoke(
+					classLoaderBeanHandler.getBean(), "getPreferences",
+					new Class[] {
+						long.class, long.class, int.class, long.class,
+						String.class, String.class, boolean.class},
+					companyId, ownerId, ownerType, plid, portletId, null,
+					_strict);
 			}
 			catch (Exception e) {
 				throw new SystemException(e);

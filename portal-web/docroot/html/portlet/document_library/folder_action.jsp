@@ -114,7 +114,7 @@ String iconMenuId = null;
 %>
 
 <liferay-util:buffer var="iconMenu">
-	<liferay-ui:icon-menu direction='<%= dlActionsDisplayContext.isShowMinimalActionsButton() ? "down" : "left" %>' extended="<%= dlActionsDisplayContext.isShowMinimalActionsButton() ? false : true %>" icon="<%= dlActionsDisplayContext.isShowMinimalActionsButton() ? StringPool.BLANK : null %>" message='<%= dlActionsDisplayContext.isShowMinimalActionsButton() ? StringPool.BLANK : "actions" %>' showExpanded="<%= view %>" showWhenSingleIcon="<%= showWhenSingleIcon %>" triggerCssClass="btn btn-default">
+	<liferay-ui:icon-menu direction='<%= dlActionsDisplayContext.isShowMinimalActionsButton() ? "down" : "left" %>' icon="<%= dlActionsDisplayContext.isShowMinimalActionsButton() ? StringPool.BLANK : null %>" message='<%= dlActionsDisplayContext.isShowMinimalActionsButton() ? StringPool.BLANK : "actions" %>' showExpanded="<%= view %>" showWhenSingleIcon="<%= showWhenSingleIcon %>">
 
 		<%
 		boolean hasViewPermission = DLFolderPermission.contains(permissionChecker, scopeGroupId, folderId, ActionKeys.VIEW);
@@ -219,6 +219,33 @@ String iconMenuId = null;
 							message="add-subfolder"
 							url="<%= addFolderURL %>"
 						/>
+					</c:if>
+
+					<c:if test="<%= folder.isMountPoint() %>">
+
+						<%
+						LocalRepository localRepository = RepositoryLocalServiceUtil.getLocalRepositoryImpl(folder.getRepositoryId());
+
+						if (localRepository.isCapabilityProvided(TemporaryFileEntriesCapability.class)) {
+						%>
+
+							<portlet:actionURL var="deleteExpiredTemporaryFileEntriesURL">
+								<portlet:param name="struts_action" value="/document_library/edit_folder" />
+								<portlet:param name="<%= Constants.CMD %>" value="deleteExpiredTemporaryFileEntries" />
+								<portlet:param name="redirect" value="<%= currentURL %>" />
+								<portlet:param name="repositoryId" value="<%= String.valueOf(folder.getRepositoryId()) %>" />
+							</portlet:actionURL>
+
+							<liferay-ui:icon
+								iconCssClass="icon-remove"
+								message="delete-expired-temporary-files"
+								url="<%= deleteExpiredTemporaryFileEntriesURL %>"
+							/>
+
+						<%
+						}
+						%>
+
 					</c:if>
 				</c:when>
 				<c:otherwise>

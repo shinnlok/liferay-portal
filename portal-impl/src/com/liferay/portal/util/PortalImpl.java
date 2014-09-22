@@ -109,6 +109,7 @@ import com.liferay.portal.model.LayoutFriendlyURLComposite;
 import com.liferay.portal.model.LayoutQueryStringComposite;
 import com.liferay.portal.model.LayoutSet;
 import com.liferay.portal.model.LayoutType;
+import com.liferay.portal.model.LayoutTypeController;
 import com.liferay.portal.model.LayoutTypePortlet;
 import com.liferay.portal.model.LayoutTypePortletConstants;
 import com.liferay.portal.model.Organization;
@@ -127,7 +128,6 @@ import com.liferay.portal.model.UserGroup;
 import com.liferay.portal.model.VirtualHost;
 import com.liferay.portal.model.VirtualLayoutConstants;
 import com.liferay.portal.model.impl.CookieRemotePreference;
-import com.liferay.portal.model.impl.LayoutTypePortletImpl;
 import com.liferay.portal.model.impl.VirtualLayout;
 import com.liferay.portal.plugin.PluginPackageUtil;
 import com.liferay.portal.security.auth.AuthException;
@@ -820,7 +820,7 @@ public class PortalImpl implements Portal {
 			domain = domain.substring(0, pos);
 		}
 
-		if (isValidVirtualHostname(domain)) {
+		if (isValidPortalDomain(domain)) {
 			return url;
 		}
 
@@ -2557,8 +2557,11 @@ public class PortalImpl implements Portal {
 	public String getFirstPageLayoutTypes(HttpServletRequest request) {
 		StringBundler sb = new StringBundler();
 
-		for (String type : PropsValues.LAYOUT_TYPES) {
-			if (isLayoutFirstPageable(type)) {
+		for (String type : LayoutTypeControllerTracker.getTypes()) {
+			LayoutTypeController layoutTypeController =
+				LayoutTypeControllerTracker.getLayoutTypeController(type);
+
+			if (layoutTypeController.isFirstPageable()) {
 				sb.append(LanguageUtil.get(request, "layout.types." + type));
 				sb.append(StringPool.COMMA);
 				sb.append(StringPool.SPACE);
@@ -2836,7 +2839,7 @@ public class PortalImpl implements Portal {
 			defaultAssetPublisherPortletId;
 
 		if (Validator.isNull(defaultAssetPublisherPortletId)) {
-			String instanceId = LayoutTypePortletImpl.generateInstanceId();
+			String instanceId = PortletConstants.generateInstanceId();
 
 			defaultAssetPublisherPortletId = PortletConstants.assemblePortletId(
 				PortletKeys.ASSET_PUBLISHER, instanceId);
@@ -2954,9 +2957,7 @@ public class PortalImpl implements Portal {
 
 		variables.putAll(typeSettingsProperties);
 
-		LayoutSettings layoutSettings = LayoutSettings.getInstance(layout);
-
-		return layoutSettings.getURL(variables);
+		return layoutType.getURL(variables);
 	}
 
 	@Override
@@ -3008,25 +3009,12 @@ public class PortalImpl implements Portal {
 	}
 
 	@Override
-	public String getLayoutEditPage(Layout layout) {
-		LayoutSettings layoutSettings = LayoutSettings.getInstance(
-			layout.getType());
-
-		return layoutSettings.getEditPage();
-	}
-
-	@Override
-	public String getLayoutEditPage(String type) {
-		LayoutSettings layoutSettings = LayoutSettings.getInstance(type);
-
-		return layoutSettings.getEditPage();
-	}
-
-	@Override
 	public String getLayoutFriendlyURL(Layout layout, ThemeDisplay themeDisplay)
 		throws PortalException {
 
-		if (!isLayoutFriendliable(layout)) {
+		LayoutType layoutType = layout.getLayoutType();
+
+		if (!layoutType.isURLFriendliable()) {
 			return null;
 		}
 
@@ -3361,21 +3349,6 @@ public class PortalImpl implements Portal {
 		throws PortalException {
 
 		return getLayoutURL(themeDisplay.getLayout(), themeDisplay);
-	}
-
-	@Override
-	public String getLayoutViewPage(Layout layout) {
-		LayoutSettings layoutSettings = LayoutSettings.getInstance(
-			layout.getType());
-
-		return layoutSettings.getViewPage();
-	}
-
-	@Override
-	public String getLayoutViewPage(String type) {
-		LayoutSettings layoutSettings = LayoutSettings.getInstance(type);
-
-		return layoutSettings.getViewPage();
 	}
 
 	@Override
@@ -4150,12 +4123,8 @@ public class PortalImpl implements Portal {
 
 	@Override
 	public String getPortalURL(HttpServletRequest request, boolean secure) {
-		long companyId = getCompanyId(request);
-
-		String domain = getValidPortalDomain(
-			companyId, request.getServerName());
-
-		return getPortalURL(domain, request.getServerPort(), secure);
+		return getPortalURL(
+			request.getServerName(), request.getServerPort(), secure);
 	}
 
 	@Override
@@ -4202,12 +4171,9 @@ public class PortalImpl implements Portal {
 
 	@Override
 	public String getPortalURL(PortletRequest portletRequest, boolean secure) {
-		long companyId = getCompanyId(portletRequest);
-
-		String domain = getValidPortalDomain(
-			companyId, portletRequest.getServerName());
-
-		return getPortalURL(domain, portletRequest.getServerPort(), secure);
+		return getPortalURL(
+			portletRequest.getServerName(), portletRequest.getServerPort(),
+			secure);
 	}
 
 	@Override
@@ -4819,20 +4785,23 @@ public class PortalImpl implements Portal {
 		if (layout != null) {
 			Group group = layout.getGroup();
 
+			long doAsGroupId = ParamUtil.getLong(request, "doAsGroupId");
+
+			if (doAsGroupId <= 0) {
+				HttpServletRequest originalRequest = getOriginalServletRequest(
+					request);
+
+				doAsGroupId = ParamUtil.getLong(originalRequest, "doAsGroupId");
+			}
+
+			Group doAsGroup = null;
+
+			if (doAsGroupId > 0) {
+				doAsGroup = GroupLocalServiceUtil.fetchGroup(doAsGroupId);
+			}
+
 			if (group.isControlPanel()) {
-				long doAsGroupId = ParamUtil.getLong(request, "doAsGroupId");
-
-				if (doAsGroupId <= 0) {
-					HttpServletRequest originalRequest =
-						getOriginalServletRequest(request);
-
-					doAsGroupId = ParamUtil.getLong(
-						originalRequest, "doAsGroupId");
-				}
-
-				Group doAsGroup = GroupLocalServiceUtil.fetchGroup(doAsGroupId);
-
-				if ((doAsGroupId <= 0) || (doAsGroup == null)) {
+				if (doAsGroup == null) {
 					doAsGroupId = getDefaultScopeGroupId(group.getCompanyId());
 				}
 
@@ -4852,8 +4821,11 @@ public class PortalImpl implements Portal {
 					}
 				}
 			}
+			else if (doAsGroup != null) {
+				scopeGroupId = doAsGroupId;
+			}
 
-			if ((portletId != null) &&
+			if ((portletId != null) && (group != null) &&
 				(group.isStaged() || group.isStagingGroup())) {
 
 				Group liveGroup = group;
@@ -5624,7 +5596,7 @@ public class PortalImpl implements Portal {
 			StringBundler sb = new StringBundler(4);
 
 			sb.append(url.substring(0, x));
-			sb.append(_JSESSIONID);
+			sb.append(JSESSIONID);
 			sb.append(sessionId);
 			sb.append(url.substring(x));
 
@@ -5648,7 +5620,7 @@ public class PortalImpl implements Portal {
 			}
 		}
 
-		sb.append(_JSESSIONID);
+		sb.append(JSESSIONID);
 		sb.append(sessionId);
 
 		return sb.toString();
@@ -5928,6 +5900,38 @@ public class PortalImpl implements Portal {
 		catch (PortalException pe) {
 			return StringPool.BLANK;
 		}
+	}
+
+	@Override
+	public String getValidPortalDomain(long companyId, String domain) {
+		for (String virtualHost : PropsValues.VIRTUAL_HOSTS_VALID_HOSTS) {
+			if (StringUtil.equalsIgnoreCase(domain, virtualHost) ||
+				StringUtil.wildcardMatches(
+					domain, virtualHost, CharPool.QUESTION, CharPool.STAR,
+					CharPool.PERCENT, false)) {
+
+				return domain;
+			}
+		}
+
+		if (_log.isWarnEnabled()) {
+			_log.warn(
+				"Set the property \"" + PropsKeys.VIRTUAL_HOSTS_VALID_HOSTS +
+					"\" in portal.properties to allow \"" + domain +
+						"\" as a domain");
+		}
+
+		try {
+			Company company = CompanyLocalServiceUtil.getCompanyById(
+				getDefaultCompanyId());
+
+			return company.getVirtualHostname();
+		}
+		catch (Exception e) {
+			_log.error("Unable to load default portal instance", e);
+		}
+
+		return _LOCALHOST;
 	}
 
 	@Override
@@ -6572,54 +6576,14 @@ public class PortalImpl implements Portal {
 	}
 
 	@Override
-	public boolean isLayoutFirstPageable(Layout layout) {
-		LayoutSettings layoutSettings = LayoutSettings.getInstance(layout);
-
-		return layoutSettings.isFirstPageable();
-	}
-
-	@Override
-	public boolean isLayoutFirstPageable(String type) {
-		LayoutSettings layoutSettings = LayoutSettings.getInstance(type);
-
-		return layoutSettings.isFirstPageable();
-	}
-
-	@Override
-	public boolean isLayoutFriendliable(Layout layout) {
-		LayoutSettings layoutSettings = LayoutSettings.getInstance(layout);
-
-		return layoutSettings.isURLFriendliable();
-	}
-
-	@Override
-	public boolean isLayoutFriendliable(String type) {
-		LayoutSettings layoutSettings = LayoutSettings.getInstance(type);
-
-		return layoutSettings.isURLFriendliable();
-	}
-
-	@Override
-	public boolean isLayoutParentable(Layout layout) {
-		return isLayoutParentable(layout.getType());
-	}
-
-	@Override
-	public boolean isLayoutParentable(String type) {
-		LayoutSettings layoutSettings = LayoutSettings.getInstance(type);
-
-		return layoutSettings.isParentable();
-	}
-
-	@Override
 	public boolean isLayoutSitemapable(Layout layout) {
 		if (layout.isPrivateLayout()) {
 			return false;
 		}
 
-		LayoutSettings layoutSettings = LayoutSettings.getInstance(layout);
+		LayoutType layoutType = layout.getLayoutType();
 
-		return layoutSettings.isSitemapable();
+		return layoutType.isSitemapable();
 	}
 
 	@Override
@@ -6696,6 +6660,11 @@ public class PortalImpl implements Portal {
 	@Override
 	public boolean isOmniadmin(long userId) {
 		return OmniadminUtil.isOmniadmin(userId);
+	}
+
+	@Override
+	public boolean isOmniadmin(User user) {
+		return OmniadminUtil.isOmniadmin(user);
 	}
 
 	@Override
@@ -7953,9 +7922,30 @@ public class PortalImpl implements Portal {
 
 		String portalURL = themeDisplay.getPortalURL();
 
-		if (isUseGroupVirtualHostName(
-				group, privateLayoutSet, themeDisplay, canonicalURL)) {
+		boolean useGroupVirtualHostName = false;
 
+		if (canonicalURL ||
+			!StringUtil.equalsIgnoreCase(
+				themeDisplay.getServerName(), _LOCALHOST)) {
+
+			useGroupVirtualHostName = true;
+		}
+
+		long refererPlid = themeDisplay.getRefererPlid();
+
+		if (refererPlid > 0) {
+			Layout refererLayout = LayoutLocalServiceUtil.fetchLayout(
+				refererPlid);
+
+			if ((refererLayout != null) &&
+				((refererLayout.getGroupId() != group.getGroupId()) ||
+				 (refererLayout.isPrivateLayout() != privateLayoutSet))) {
+
+				useGroupVirtualHostName = false;
+			}
+		}
+
+		if (useGroupVirtualHostName) {
 			String virtualHostname = getVirtualHostname(layoutSet);
 
 			String portalDomain = HttpUtil.getDomain(portalURL);
@@ -7971,17 +7961,19 @@ public class PortalImpl implements Portal {
 					virtualHostname, themeDisplay.getServerPort(),
 					themeDisplay.isSecure());
 
-				String path = StringPool.BLANK;
+				if (canonicalURL || virtualHostname.contains(portalDomain)) {
+					String path = StringPool.BLANK;
 
-				if (themeDisplay.isWidget()) {
-					path = PropsValues.WIDGET_SERVLET_MAPPING;
+					if (themeDisplay.isWidget()) {
+						path = PropsValues.WIDGET_SERVLET_MAPPING;
+					}
+
+					if (themeDisplay.isI18n() && !canonicalURL) {
+						path = themeDisplay.getI18nPath();
+					}
+
+					return virtualHostname.concat(_pathContext).concat(path);
 				}
-
-				if (themeDisplay.isI18n() && !canonicalURL) {
-					path = themeDisplay.getI18nPath();
-				}
-
-				return virtualHostname.concat(_pathContext).concat(path);
 			}
 			else {
 				LayoutSet curLayoutSet = LayoutSetLocalServiceUtil.getLayoutSet(
@@ -8168,47 +8160,6 @@ public class PortalImpl implements Portal {
 		return sb.toString();
 	}
 
-	protected String getValidPortalDomain(long companyId, String domain) {
-		if (isValidVirtualHost(domain)) {
-			return domain;
-		}
-
-		if (StringUtil.equalsIgnoreCase(domain, PropsValues.WEB_SERVER_HOST)) {
-			return PropsValues.WEB_SERVER_HOST;
-		}
-
-		if (isValidVirtualHostname(domain)) {
-			return domain;
-		}
-
-		if (StringUtil.equalsIgnoreCase(domain, getCDNHostHttp(companyId))) {
-			return domain;
-		}
-
-		if (StringUtil.equalsIgnoreCase(domain, getCDNHostHttps(companyId))) {
-			return domain;
-		}
-
-		if (_log.isWarnEnabled()) {
-			_log.warn(
-				"Set the property \"" + PropsKeys.VIRTUAL_HOSTS_VALID_HOSTS +
-					"\" in portal.properties to allow \"" + domain +
-						"\" as a domain");
-		}
-
-		try {
-			Company company = CompanyLocalServiceUtil.getCompanyById(
-				getDefaultCompanyId());
-
-			return company.getVirtualHostname();
-		}
-		catch (Exception e) {
-			_log.error("Unable to load default portal instance", e);
-		}
-
-		return _LOCALHOST;
-	}
-
 	protected boolean isAlwaysAllowDoAsUser(HttpServletRequest request)
 		throws Exception {
 
@@ -8292,32 +8243,11 @@ public class PortalImpl implements Portal {
 		return false;
 	}
 
-	protected boolean isUseGroupVirtualHostName(
-		Group group, boolean privateLayoutSet, ThemeDisplay themeDisplay,
-		boolean canonicalURL) {
-
-		if (!canonicalURL || isValidVirtualHost(themeDisplay.getServerName())) {
+	protected boolean isValidPortalDomain(long companyId, String domain) {
+		if (!Validator.isHostName(domain)) {
 			return false;
 		}
 
-		long refererPlid = themeDisplay.getRefererPlid();
-
-		if (refererPlid > 0) {
-			Layout refererLayout = LayoutLocalServiceUtil.fetchLayout(
-				refererPlid);
-
-			if ((refererLayout != null) &&
-				((refererLayout.getGroupId() != group.getGroupId()) ||
-				 (refererLayout.isPrivateLayout() != privateLayoutSet))) {
-
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	protected boolean isValidVirtualHost(String domain) {
 		for (String virtualHost : PropsValues.VIRTUAL_HOSTS_VALID_HOSTS) {
 			if (StringUtil.equalsIgnoreCase(domain, virtualHost) ||
 				StringUtil.wildcardMatches(
@@ -8328,7 +8258,29 @@ public class PortalImpl implements Portal {
 			}
 		}
 
+		if (StringUtil.equalsIgnoreCase(domain, PropsValues.WEB_SERVER_HOST)) {
+			return true;
+		}
+
+		if (isValidVirtualHostname(domain)) {
+			return true;
+		}
+
+		if (StringUtil.equalsIgnoreCase(domain, getCDNHostHttp(companyId))) {
+			return true;
+		}
+
+		if (StringUtil.equalsIgnoreCase(domain, getCDNHostHttps(companyId))) {
+			return true;
+		}
+
 		return false;
+	}
+
+	protected boolean isValidPortalDomain(String domain) {
+		long companyId = CompanyThreadLocal.getCompanyId();
+
+		return isValidPortalDomain(companyId, domain);
 	}
 
 	protected boolean isValidVirtualHostname(String virtualHostname) {
@@ -8436,8 +8388,6 @@ public class PortalImpl implements Portal {
 	}
 
 	private static final String _J_SECURITY_CHECK = "j_security_check";
-
-	private static final String _JSESSIONID = ";jsessionid=";
 
 	private static final String _LOCALHOST = "localhost";
 

@@ -31,9 +31,8 @@ import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.test.TransactionalTestRule;
-import com.liferay.portal.test.runners.LiferayIntegrationJUnitTestRunner;
+import com.liferay.portal.test.runners.PersistenceIntegrationJUnitTestRunner;
 import com.liferay.portal.tools.DBUpgrader;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.test.RandomTestUtil;
@@ -45,7 +44,6 @@ import com.liferay.portlet.blogs.service.BlogsEntryLocalServiceUtil;
 
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -64,7 +62,7 @@ import java.util.Set;
 /**
  * @generated
  */
-@RunWith(LiferayIntegrationJUnitTestRunner.class)
+@RunWith(PersistenceIntegrationJUnitTestRunner.class)
 public class BlogsEntryPersistenceTest {
 	@ClassRule
 	public static TransactionalTestRule transactionalTestRule = new TransactionalTestRule(Propagation.REQUIRED);
@@ -81,15 +79,6 @@ public class BlogsEntryPersistenceTest {
 		TemplateManagerUtil.init();
 	}
 
-	@Before
-	public void setUp() {
-		_modelListeners = _persistence.getListeners();
-
-		for (ModelListener<BlogsEntry> modelListener : _modelListeners) {
-			_persistence.unregisterListener(modelListener);
-		}
-	}
-
 	@After
 	public void tearDown() throws Exception {
 		Iterator<BlogsEntry> iterator = _blogsEntries.iterator();
@@ -98,10 +87,6 @@ public class BlogsEntryPersistenceTest {
 			_persistence.remove(iterator.next());
 
 			iterator.remove();
-		}
-
-		for (ModelListener<BlogsEntry> modelListener : _modelListeners) {
-			_persistence.registerListener(modelListener);
 		}
 	}
 
@@ -172,6 +157,8 @@ public class BlogsEntryPersistenceTest {
 
 		newBlogsEntry.setSmallImage(RandomTestUtil.randomBoolean());
 
+		newBlogsEntry.setSmallImageFileEntryId(RandomTestUtil.nextLong());
+
 		newBlogsEntry.setSmallImageId(RandomTestUtil.nextLong());
 
 		newBlogsEntry.setSmallImageURL(RandomTestUtil.randomString());
@@ -227,6 +214,8 @@ public class BlogsEntryPersistenceTest {
 			newBlogsEntry.getTrackbacks());
 		Assert.assertEquals(existingBlogsEntry.getSmallImage(),
 			newBlogsEntry.getSmallImage());
+		Assert.assertEquals(existingBlogsEntry.getSmallImageFileEntryId(),
+			newBlogsEntry.getSmallImageFileEntryId());
 		Assert.assertEquals(existingBlogsEntry.getSmallImageId(),
 			newBlogsEntry.getSmallImageId());
 		Assert.assertEquals(existingBlogsEntry.getSmallImageURL(),
@@ -625,8 +614,9 @@ public class BlogsEntryPersistenceTest {
 			"title", true, "subtitle", true, "urlTitle", true, "description",
 			true, "content", true, "displayDate", true, "allowPingbacks", true,
 			"allowTrackbacks", true, "trackbacks", true, "smallImage", true,
-			"smallImageId", true, "smallImageURL", true, "status", true,
-			"statusByUserId", true, "statusByUserName", true, "statusDate", true);
+			"smallImageFileEntryId", true, "smallImageId", true,
+			"smallImageURL", true, "status", true, "statusByUserId", true,
+			"statusByUserName", true, "statusDate", true);
 	}
 
 	@Test
@@ -887,6 +877,8 @@ public class BlogsEntryPersistenceTest {
 
 		blogsEntry.setSmallImage(RandomTestUtil.randomBoolean());
 
+		blogsEntry.setSmallImageFileEntryId(RandomTestUtil.nextLong());
+
 		blogsEntry.setSmallImageId(RandomTestUtil.nextLong());
 
 		blogsEntry.setSmallImageURL(RandomTestUtil.randomString());
@@ -906,6 +898,5 @@ public class BlogsEntryPersistenceTest {
 
 	private static Log _log = LogFactoryUtil.getLog(BlogsEntryPersistenceTest.class);
 	private List<BlogsEntry> _blogsEntries = new ArrayList<BlogsEntry>();
-	private ModelListener<BlogsEntry>[] _modelListeners;
 	private BlogsEntryPersistence _persistence = BlogsEntryUtil.getPersistence();
 }

@@ -49,8 +49,8 @@
 		<m:dependency.management__org.jboss.shrinkwrap__shrinkwrap-spi__version>1.1.2</m:dependency.management__org.jboss.shrinkwrap__shrinkwrap-spi__version>
 		<m:dependency.management__org.jboss.arquillian.config__arquillian-config-spi__version>1.1.2.Final</m:dependency.management__org.jboss.arquillian.config__arquillian-config-spi__version>
 		<m:properties__jboss.releases.repo.url>https://repository.jboss.org/nexus/service/local/staging/deploy/maven2/</m:properties__jboss.releases.repo.url>
-		<m:dependency.management__org.jboss.arquillian.testng__arquillian-testng-standalone__version>1.1.2.Final</m:dependency.management__org.jboss.arquillian.testng__arquillian-testng-standalone__version>
 		<m:dependency.management__org.jboss.arquillian.core__arquillian-core-impl-base__version>1.1.2.Final</m:dependency.management__org.jboss.arquillian.core__arquillian-core-impl-base__version>
+		<m:dependency.management__org.jboss.arquillian.testng__arquillian-testng-standalone__version>1.1.2.Final</m:dependency.management__org.jboss.arquillian.testng__arquillian-testng-standalone__version>
 		<m:dependency.management__org.jboss.arquillian.container__arquillian-container-spi__version>1.1.2.Final</m:dependency.management__org.jboss.arquillian.container__arquillian-container-spi__version>
 		<m:dependency.management__org.jboss.arquillian.core__arquillian-core-api__version>1.1.2.Final</m:dependency.management__org.jboss.arquillian.core__arquillian-core-api__version>
 		<m:dependency.management__org.jboss.shrinkwrap__shrinkwrap-impl-nio2__version>1.1.2</m:dependency.management__org.jboss.shrinkwrap__shrinkwrap-impl-nio2__version>

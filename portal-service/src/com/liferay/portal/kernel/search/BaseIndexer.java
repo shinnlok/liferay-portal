@@ -112,7 +112,7 @@ public abstract class BaseIndexer implements Indexer {
 	public void delete(long companyId, String uid) throws SearchException {
 		try {
 			SearchEngineUtil.deleteDocument(
-				getSearchEngineId(), companyId, uid);
+				getSearchEngineId(), companyId, uid, _commitImmediately);
 		}
 		catch (SearchException se) {
 			throw se;
@@ -361,6 +361,11 @@ public abstract class BaseIndexer implements Indexer {
 	}
 
 	@Override
+	public boolean isCommitImmediately() {
+		return _commitImmediately;
+	}
+
+	@Override
 	public boolean isFilterSearch() {
 		return _filterSearch;
 	}
@@ -435,7 +440,16 @@ public abstract class BaseIndexer implements Indexer {
 				return;
 			}
 
-			doReindex(obj);
+			if (obj instanceof List<?>) {
+				List<?> list = (List<?>)obj;
+
+				for (Object element : list) {
+					doReindex(element);
+				}
+			}
+			else {
+				doReindex(obj);
+			}
 		}
 		catch (SearchException se) {
 			throw se;
@@ -512,6 +526,8 @@ public abstract class BaseIndexer implements Indexer {
 
 			QueryConfig queryConfig = searchContext.getQueryConfig();
 
+			addDefaultHighlightFieldNames(queryConfig);
+
 			if (ArrayUtil.isEmpty(queryConfig.getSelectedFieldNames())) {
 				addDefaultSelectedFieldNames(searchContext);
 			}
@@ -556,6 +572,10 @@ public abstract class BaseIndexer implements Indexer {
 		queryConfig.setSelectedFieldNames(selectedFieldNames);
 
 		return search(searchContext);
+	}
+
+	public void setCommitImmediately(boolean commitImmediately) {
+		_commitImmediately = commitImmediately;
 	}
 
 	public void setSelectAllLocales(boolean selectAllLocales) {
@@ -634,6 +654,15 @@ public abstract class BaseIndexer implements Indexer {
 		document.addLocalizedKeyword(
 			"localized_title", assetEntry.getTitleMap(), true, true);
 		document.addKeyword("visible", assetEntry.isVisible());
+	}
+
+	protected void addDefaultHighlightFieldNames(QueryConfig queryConfig) {
+		queryConfig.addHighlightFieldNames(Field.ASSET_CATEGORY_TITLES);
+
+		if (queryConfig.isHighlightEnabled()) {
+			queryConfig.addHighlightFieldNames(
+				Field.CONTENT, Field.DESCRIPTION, Field.TITLE);
+		}
 	}
 
 	protected void addDefaultSelectedFieldNames(SearchContext searchContext) {
@@ -1414,7 +1443,8 @@ public abstract class BaseIndexer implements Indexer {
 		document.addUID(getPortletId(), field1);
 
 		SearchEngineUtil.deleteDocument(
-			getSearchEngineId(), companyId, document.get(Field.UID));
+			getSearchEngineId(), companyId, document.get(Field.UID),
+			_commitImmediately);
 	}
 
 	protected void deleteDocument(long companyId, String field1, String field2)
@@ -1425,7 +1455,8 @@ public abstract class BaseIndexer implements Indexer {
 		document.addUID(getPortletId(), field1, field2);
 
 		SearchEngineUtil.deleteDocument(
-			getSearchEngineId(), companyId, document.get(Field.UID));
+			getSearchEngineId(), companyId, document.get(Field.UID),
+			_commitImmediately);
 	}
 
 	protected abstract void doDelete(Object obj) throws Exception;
@@ -1503,10 +1534,8 @@ public abstract class BaseIndexer implements Indexer {
 		List<AssetCategory> assetCategories =
 			AssetCategoryLocalServiceUtil.getCategories(className, classPK);
 
-		long[] assetCategoryIds = StringUtil.split(
-			ListUtil.toString(
-				assetCategories, AssetCategory.CATEGORY_ID_ACCESSOR),
-			0L);
+		long[] assetCategoryIds = ListUtil.toLongArray(
+			assetCategories, AssetCategory.CATEGORY_ID_ACCESSOR);
 
 		document.addKeyword(Field.ASSET_CATEGORY_IDS, assetCategoryIds);
 
@@ -1518,13 +1547,13 @@ public abstract class BaseIndexer implements Indexer {
 		List<AssetTag> assetTags = AssetTagLocalServiceUtil.getTags(
 			classNameId, classPK);
 
-		String[] assetTagNames = StringUtil.split(
-			ListUtil.toString(assetTags, AssetTag.NAME_ACCESSOR));
+		String[] assetTagNames = ListUtil.toArray(
+			assetTags, AssetTag.NAME_ACCESSOR);
 
 		document.addText(Field.ASSET_TAG_NAMES, assetTagNames);
 
-		long[] assetTagsIds = StringUtil.split(
-			ListUtil.toString(assetTags, AssetTag.TAG_ID_ACCESSOR), 0L);
+		long[] assetTagsIds = ListUtil.toLongArray(
+			assetTags, AssetTag.TAG_ID_ACCESSOR);
 
 		document.addKeyword(Field.ASSET_TAG_IDS, assetTagsIds);
 
@@ -1815,6 +1844,7 @@ public abstract class BaseIndexer implements Indexer {
 
 	private static Log _log = LogFactoryUtil.getLog(BaseIndexer.class);
 
+	private boolean _commitImmediately;
 	private String[] _defaultSelectedFieldNames;
 	private String[] _defaultSelectedLocalizedFieldNames;
 	private Document _document = new DocumentImpl();

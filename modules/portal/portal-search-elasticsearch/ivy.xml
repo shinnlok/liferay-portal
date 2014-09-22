@@ -2,10 +2,13 @@
 
 <ivy-module
 	version="2.0"
+	xmlns:m2="http://ant.apache.org/ivy/maven"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd"
 >
-	<info module="${plugin.name}" organisation="com.liferay" />
+	<info module="${plugin.name}" organisation="com.liferay">
+		<extends extendType="configurations,description,info" location="${sdk.dir}/ivy.xml" module="com.liferay.sdk" organisation="com.liferay" revision="latest.integration" />
+	</info>
 
 	<dependencies defaultconf="default">
 		<dependency name="elasticsearch" org="org.elasticsearch" rev="1.3.0" />
@@ -30,6 +33,8 @@
 		<dependency name="lucene-spatial" org="org.apache.lucene" rev="4.9.0" />
 		<dependency name="lucene-suggest" org="org.apache.lucene" rev="4.9.0" />
 		<dependency name="log4j-over-slf4j" org="org.slf4j" rev="1.7.7" />
+		<dependency name="org.osgi.compendium" org="org.osgi" rev="5.0.0" />
+		<dependency name="org.osgi.core" org="org.osgi" rev="5.0.0" />
 		<dependency name="spatial4j" org="com.spatial4j" rev="0.4.1" />
 	</dependencies>
 </ivy-module>

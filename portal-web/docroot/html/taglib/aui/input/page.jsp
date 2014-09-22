@@ -32,8 +32,8 @@
 	</c:if>
 </liferay-util:buffer>
 
-<c:if test='<%= !choiceField && !type.equals("hidden") && !wrappedField %>'>
-	<div class="<%= controlGroupCssClass %>">
+<c:if test='<%= !type.equals("hidden") && !wrappedField && useInputWrapper %>'>
+	<div class="<%= inputWrapperClass %>">
 </c:if>
 
 <c:if test='<%= !type.equals("assetCategories") && !type.equals("hidden") && Validator.isNotNull(label) %>'>
@@ -148,6 +148,12 @@
 
 		if (dynamicAttributes.get("displayStyle") != null) {
 			displayStyle = GetterUtil.getInteger((String)dynamicAttributes.get("displayStyle"));
+		}
+
+		if (Validator.isNull(value)) {
+			TimeZone defaultTimeZone = TimeZoneUtil.getDefault();
+
+			value = BeanPropertiesUtil.getStringSilent(bean, field, defaultTimeZone.getID());
 		}
 		%>
 
@@ -265,7 +271,7 @@
 	</c:if>
 </c:if>
 
-<c:if test='<%= !choiceField && !type.equals("hidden") && !wrappedField %>'>
+<c:if test='<%= !type.equals("hidden") && !wrappedField && useInputWrapper %>'>
 	</div>
 </c:if>
 

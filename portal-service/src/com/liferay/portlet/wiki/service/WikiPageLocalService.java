@@ -93,8 +93,8 @@ public interface WikiPageLocalService extends BaseLocalService,
 		java.lang.String[] groupPermissions, java.lang.String[] guestPermissions)
 		throws com.liferay.portal.kernel.exception.PortalException;
 
-	public void addTempPageAttachment(long groupId, long userId,
-		java.lang.String fileName, java.lang.String tempFolderName,
+	public void addTempFileEntry(long groupId, long userId,
+		java.lang.String folderName, java.lang.String fileName,
 		java.io.InputStream inputStream, java.lang.String mimeType)
 		throws com.liferay.portal.kernel.exception.PortalException;
 
@@ -107,6 +107,10 @@ public interface WikiPageLocalService extends BaseLocalService,
 	@com.liferay.portal.kernel.search.Indexable(type = IndexableType.REINDEX)
 	public com.liferay.portlet.wiki.model.WikiPage addWikiPage(
 		com.liferay.portlet.wiki.model.WikiPage wikiPage);
+
+	public void changeNode(long userId, long nodeId, java.lang.String title,
+		long newNodeId, com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException;
 
 	public com.liferay.portlet.wiki.model.WikiPage changeParent(long userId,
 		long nodeId, java.lang.String title, java.lang.String newParentTitle,
@@ -158,8 +162,8 @@ public interface WikiPageLocalService extends BaseLocalService,
 		com.liferay.portal.model.PersistedModel persistedModel)
 		throws com.liferay.portal.kernel.exception.PortalException;
 
-	public void deleteTempPageAttachment(long groupId, long userId,
-		java.lang.String fileName, java.lang.String tempFolderName)
+	public void deleteTempFileEntry(long groupId, long userId,
+		java.lang.String folderName, java.lang.String fileName)
 		throws com.liferay.portal.kernel.exception.PortalException;
 
 	public void deleteTrashPageAttachments(long nodeId, java.lang.String title)
@@ -275,6 +279,10 @@ public interface WikiPageLocalService extends BaseLocalService,
 		java.lang.String title, double version);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portlet.wiki.model.WikiPage fetchPage(
+		long resourcePrimKey);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portlet.wiki.model.WikiPage fetchWikiPage(long pageId);
 
 	/**
@@ -318,6 +326,10 @@ public interface WikiPageLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getChildrenCount(long nodeId, boolean head,
 		java.lang.String parentTitle, int status);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.portlet.wiki.model.WikiPage> getDependentPages(
+		long nodeId, boolean head, java.lang.String title, int status);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portlet.wiki.model.WikiPage getDraftPage(long nodeId,
@@ -513,8 +525,12 @@ public interface WikiPageLocalService extends BaseLocalService,
 		throws com.liferay.portal.kernel.exception.PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.lang.String[] getTempPageAttachmentNames(long groupId,
-		long userId, java.lang.String tempFolderName)
+	public java.util.List<com.liferay.portlet.wiki.model.WikiPage> getRedirectPages(
+		long nodeId, boolean head, java.lang.String redirectTitle, int status);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.lang.String[] getTempFileNames(long groupId, long userId,
+		java.lang.String folderName)
 		throws com.liferay.portal.kernel.exception.PortalException;
 
 	/**
@@ -580,11 +596,21 @@ public interface WikiPageLocalService extends BaseLocalService,
 		com.liferay.portlet.wiki.model.WikiPage page, long trashEntryId)
 		throws com.liferay.portal.kernel.exception.PortalException;
 
+	/**
+	* @deprecated As of 7.0.0, replaced by {@link #renamePage(long, long,
+	String, String, ServiceContext)}
+	*/
+	@java.lang.Deprecated
 	public void movePage(long userId, long nodeId, java.lang.String title,
 		java.lang.String newTitle,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException;
 
+	/**
+	* @deprecated As of 6.2.0, replaced by {@link #renamePage(long, long,
+	String, String, boolean, ServiceContext)}
+	*/
+	@java.lang.Deprecated
 	public void movePage(long userId, long nodeId, java.lang.String title,
 		java.lang.String newTitle, boolean strict,
 		com.liferay.portal.service.ServiceContext serviceContext)
@@ -595,6 +621,16 @@ public interface WikiPageLocalService extends BaseLocalService,
 		java.lang.String fileName)
 		throws com.liferay.portal.kernel.exception.PortalException;
 
+	public com.liferay.portlet.wiki.model.WikiPage movePageFromTrash(
+		long userId, long nodeId, java.lang.String title, long newNodeId,
+		java.lang.String newParentTitle)
+		throws com.liferay.portal.kernel.exception.PortalException;
+
+	/**
+	* @deprecated As of 7.0.0, replaced by {@link #movePageFromTrash(long,
+	long, String, long, String)} *
+	*/
+	@java.lang.Deprecated
 	public com.liferay.portlet.wiki.model.WikiPage movePageFromTrash(
 		long userId, long nodeId, java.lang.String title,
 		java.lang.String newParentTitle,
@@ -613,8 +649,14 @@ public interface WikiPageLocalService extends BaseLocalService,
 		long userId, com.liferay.portlet.wiki.model.WikiPage page)
 		throws com.liferay.portal.kernel.exception.PortalException;
 
-	public void restoreDependentFromTrash(
-		com.liferay.portlet.wiki.model.WikiPage page, long trashEntryId)
+	public void renamePage(long userId, long nodeId, java.lang.String title,
+		java.lang.String newTitle,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException;
+
+	public void renamePage(long userId, long nodeId, java.lang.String title,
+		java.lang.String newTitle, boolean strict,
+		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException;
 
 	public void restorePageAttachmentFromTrash(long userId, long nodeId,

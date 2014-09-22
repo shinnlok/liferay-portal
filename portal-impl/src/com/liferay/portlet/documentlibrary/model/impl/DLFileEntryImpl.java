@@ -65,6 +65,10 @@ public class DLFileEntryImpl extends DLFileEntryBaseImpl {
 
 	@Override
 	public String buildTreePath() throws PortalException {
+		if (getFolderId() == DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
+			return StringPool.SLASH;
+		}
+
 		DLFolder dlFolder = getFolder();
 
 		return dlFolder.buildTreePath();
@@ -85,6 +89,12 @@ public class DLFileEntryImpl extends DLFileEntryBaseImpl {
 	public long getDataRepositoryId() {
 		return DLFolderConstants.getDataRepositoryId(
 			getGroupId(), getFolderId());
+	}
+
+	@Override
+	public DLFileEntryType getDLFileEntryType() throws PortalException {
+		return DLFileEntryTypeLocalServiceUtil.getDLFileEntryType(
+			getFileEntryTypeId());
 	}
 
 	@Override
@@ -142,8 +152,7 @@ public class DLFileEntryImpl extends DLFileEntryBaseImpl {
 			return fieldsMap;
 		}
 
-		DLFileEntryType dlFileEntryType =
-			DLFileEntryTypeLocalServiceUtil.getFileEntryType(fileEntryTypeId);
+		DLFileEntryType dlFileEntryType = getDLFileEntryType();
 
 		List<DDMStructure> ddmStructures = dlFileEntryType.getDDMStructures();
 

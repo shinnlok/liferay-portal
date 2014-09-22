@@ -106,7 +106,7 @@ public class IntrabandProxyInstallationUtilTest {
 
 	@AdviseWith(adviceClasses = {PortalExecutorManagerUtilAdvice.class})
 	@Test
-	public void testInstallSkeletonLocally() throws Exception {
+	public void testInstallSkeletonLocally() {
 		IntrabandProxyInstallationUtil.checkProxyMethodSignatures(
 			IntrabandProxyInstallationUtil.installSkeleton(
 				TestClass.class, _targetLocator),
@@ -119,9 +119,8 @@ public class IntrabandProxyInstallationUtilTest {
 			AsyncIntrabandProxySkeleton.class,
 			intrabandProxySkeleton.getClass());
 
-		intrabandProxySkeleton =
-			(IntrabandProxySkeleton)ReflectionTestUtil.getFieldValue(
-				intrabandProxySkeleton, "_intrabandProxySkeleton");
+		intrabandProxySkeleton = ReflectionTestUtil.getFieldValue(
+			intrabandProxySkeleton, "_intrabandProxySkeleton");
 
 		Assert.assertEquals(
 			_targetLocator,
@@ -181,9 +180,8 @@ public class IntrabandProxyInstallationUtilTest {
 			AsyncIntrabandProxySkeleton.class,
 			intrabandProxySkeleton.getClass());
 
-		intrabandProxySkeleton =
-			(IntrabandProxySkeleton)ReflectionTestUtil.getFieldValue(
-				intrabandProxySkeleton, "_intrabandProxySkeleton");
+		intrabandProxySkeleton = ReflectionTestUtil.getFieldValue(
+			intrabandProxySkeleton, "_intrabandProxySkeleton");
 
 		Assert.assertEquals(
 			_targetLocator,

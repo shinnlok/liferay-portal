@@ -286,6 +286,10 @@ public interface DLFileEntryLocalService extends BaseLocalService,
 		long imageId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portlet.documentlibrary.model.DLFileEntry fetchFileEntryByFileName(
+		long groupId, long folderId, java.lang.String fileName);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portlet.documentlibrary.model.DLFileEntry fetchFileEntryByName(
 		long groupId, long folderId, java.lang.String name);
 
@@ -569,6 +573,13 @@ public interface DLFileEntryLocalService extends BaseLocalService,
 		throws com.liferay.portal.kernel.exception.PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.portlet.documentlibrary.model.DLFileEntry> getRepositoryFileEntries(
+		long repositoryId, int start, int end);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getRepositoryFileEntriesCount(long repositoryId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public boolean hasExtraSettings();
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
@@ -594,7 +605,8 @@ public interface DLFileEntryLocalService extends BaseLocalService,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException;
 
-	public void rebuildTree(long companyId);
+	public void rebuildTree(long companyId)
+		throws com.liferay.portal.kernel.exception.PortalException;
 
 	public void revertFileEntry(long userId, long fileEntryId,
 		java.lang.String version,
@@ -618,6 +630,10 @@ public interface DLFileEntryLocalService extends BaseLocalService,
 	* @param beanIdentifier the Spring bean ID for this bean
 	*/
 	public void setBeanIdentifier(java.lang.String beanIdentifier);
+
+	public void setTreePaths(long folderId, java.lang.String treePath,
+		boolean reindex)
+		throws com.liferay.portal.kernel.exception.PortalException;
 
 	public void unlockFileEntry(long fileEntryId);
 
@@ -648,6 +664,10 @@ public interface DLFileEntryLocalService extends BaseLocalService,
 		long userId, long fileVersionId, int status,
 		com.liferay.portal.service.ServiceContext serviceContext,
 		java.util.Map<java.lang.String, java.io.Serializable> workflowContext)
+		throws com.liferay.portal.kernel.exception.PortalException;
+
+	public void validateFile(long groupId, long folderId, long fileEntryId,
+		java.lang.String fileName, java.lang.String title)
 		throws com.liferay.portal.kernel.exception.PortalException;
 
 	public boolean verifyFileEntryCheckOut(long fileEntryId,

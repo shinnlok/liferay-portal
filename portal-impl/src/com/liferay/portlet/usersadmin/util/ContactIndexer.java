@@ -105,10 +105,10 @@ public class ContactIndexer extends BaseIndexer {
 		Contact contact = (Contact)obj;
 
 		if (contact.isUser()) {
-			User user = UserLocalServiceUtil.getUserByContactId(
+			User user = UserLocalServiceUtil.fetchUserByContactId(
 				contact.getContactId());
 
-			if (user.isDefaultUser() ||
+			if ((user == null) || user.isDefaultUser() ||
 				(user.getStatus() != WorkflowConstants.STATUS_APPROVED)) {
 
 				return null;
@@ -167,7 +167,8 @@ public class ContactIndexer extends BaseIndexer {
 
 		if (document != null) {
 			SearchEngineUtil.updateDocument(
-				getSearchEngineId(), contact.getCompanyId(), document);
+				getSearchEngineId(), contact.getCompanyId(), document,
+				isCommitImmediately());
 		}
 	}
 

@@ -24,6 +24,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.repository.model.RepositoryModelOperation;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.Lock;
 import com.liferay.portal.security.permission.PermissionChecker;
@@ -82,6 +83,13 @@ public class FileEntryProxyBean
 	}
 
 	@Override
+	public void execute(RepositoryModelOperation repositoryModelOperation)
+		throws PortalException {
+
+		repositoryModelOperation.execute(this);
+	}
+
+	@Override
 	public Map<String, Serializable> getAttributes() {
 		return _fileEntry.getAttributes();
 	}
@@ -127,6 +135,11 @@ public class FileEntryProxyBean
 	@Override
 	public long getFileEntryId() {
 		return _fileEntry.getFileEntryId();
+	}
+
+	@Override
+	public String getFileName() {
+		return _fileEntry.getFileName();
 	}
 
 	@Override

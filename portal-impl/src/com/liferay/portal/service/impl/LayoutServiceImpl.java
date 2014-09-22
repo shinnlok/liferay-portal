@@ -28,7 +28,7 @@ import com.liferay.portal.kernel.scheduler.SchedulerEngineHelperUtil;
 import com.liferay.portal.kernel.scheduler.StorageType;
 import com.liferay.portal.kernel.scheduler.Trigger;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.TempFileUtil;
+import com.liferay.portal.kernel.util.TempFileEntryUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -285,16 +285,15 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 
 	@Override
 	public FileEntry addTempFileEntry(
-			long groupId, String fileName, String tempFolderName,
+			long groupId, String folderName, String fileName,
 			InputStream inputStream, String mimeType)
 		throws PortalException {
 
 		GroupPermissionUtil.check(
 			getPermissionChecker(), groupId, ActionKeys.EXPORT_IMPORT_LAYOUTS);
 
-		return TempFileUtil.addTempFile(
-			groupId, getUserId(), fileName, tempFolderName, inputStream,
-			mimeType);
+		return TempFileEntryUtil.addTempFileEntry(
+			groupId, getUserId(), folderName, fileName, inputStream, mimeType);
 	}
 
 	/**
@@ -345,14 +344,14 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 
 	@Override
 	public void deleteTempFileEntry(
-			long groupId, String fileName, String tempFolderName)
+			long groupId, String folderName, String fileName)
 		throws PortalException {
 
 		GroupPermissionUtil.check(
 			getPermissionChecker(), groupId, ActionKeys.EXPORT_IMPORT_LAYOUTS);
 
-		TempFileUtil.deleteTempFile(
-			groupId, getUserId(), fileName, tempFolderName);
+		TempFileEntryUtil.deleteTempFileEntry(
+			groupId, getUserId(), folderName, fileName);
 	}
 
 	/**
@@ -879,25 +878,30 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 
 	@Override
 	public List<Layout> getLayouts(
-			long groupId, boolean privateLayout, long parentLayoutId,
-			boolean incomplete, int start, int end)
-		throws PortalException {
+		long groupId, boolean privateLayout, long parentLayoutId,
+		boolean incomplete, int start, int end) {
 
-		List<Layout> layouts = layoutLocalService.getLayouts(
-			groupId, privateLayout, parentLayoutId, incomplete, start, end);
-
-		return filterLayouts(layouts);
+		return layoutPersistence.filterFindByG_P_P(
+			groupId, privateLayout, parentLayoutId, start, end);
 	}
 
 	@Override
-	public String[] getTempFileEntryNames(long groupId, String tempFolderName)
+	public int getLayoutsCount(
+		long groupId, boolean privateLayout, long parentLayoutId) {
+
+		return layoutPersistence.filterCountByG_P_P(
+			groupId, privateLayout, parentLayoutId);
+	}
+
+	@Override
+	public String[] getTempFileNames(long groupId, String folderName)
 		throws PortalException {
 
 		GroupPermissionUtil.check(
 			getPermissionChecker(), groupId, ActionKeys.EXPORT_IMPORT_LAYOUTS);
 
-		return TempFileUtil.getTempFileEntryNames(
-			groupId, getUserId(), tempFolderName);
+		return TempFileEntryUtil.getTempFileNames(
+			groupId, getUserId(), folderName);
 	}
 
 	/**
@@ -1718,6 +1722,24 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 			getPermissionChecker(), plid, ActionKeys.UPDATE);
 
 		return layoutLocalService.updateParentLayoutId(plid, parentPlid);
+	}
+
+	/**
+	 * Updates the parent layout ID and priority of the layout.
+	 *
+	 * @param  plid the primary key of the layout
+	 * @param  parentPlid the primary key of the parent layout
+	 * @param  priority the layout's new priority
+	 * @return the layout matching the primary key
+	 * @throws PortalException if a portal exception occurred
+	 */
+	@Override
+	public Layout updateParentLayoutIdAndPriority(
+			long plid, long parentPlid, int priority)
+		throws PortalException {
+
+		return layoutLocalService.updateParentLayoutIdAndPriority(
+			plid, parentPlid, priority);
 	}
 
 	/**

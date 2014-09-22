@@ -11,7 +11,7 @@
 		<execute macro="Page#tearDownPG" />
 	</tear-down>
 
-	<command name="AuthenticationCAS" priority="5">
+	<command known-issues="LPS-49945" name="AuthenticationCAS" priority="5">
 		<property name="web.plugins.includes" value="cas-web" />
 
 		<var name="userEmailAddress" value="userea@liferay.com" />
@@ -119,7 +119,7 @@
 		<execute action="Jsonwebservices#assertElementNotPresent" locator-key1="SECURITY_TEST_PAGE_POPULATED" />
 	</command>
 
-	<command name="ValidateCannotStealAdminAccount" priority="5">
+	<command known-issues="LPS-49848" name="ValidateCannotStealAdminAccount" priority="5">
 		<var name="url" value="http://localhost:8080/c/portal/json_service?serviceClassName=com.liferay.portal.service.UserServiceUtil&amp;serviceMethodName=updateStatus&amp;serviceParameters=[userId,status]&amp;userId=10202&amp;status=6&amp;p_auth=" />
 
 		<execute macro="Api#gotoPAuthURL" />
@@ -130,6 +130,8 @@
 	</command>
 
 	<command name="ValidateForwardURLPG" priority="4">
+		<property name="custom.properties" value="virtual.hosts.valid.hosts=localhost,127.0.0.1,${ip.address}" />
+
 		<execute action="Home#open" locator1="http://localhost:8080/html/common/forward_jsp.jsp?FORWARD_URL=http://www.msn.com" />
 		<execute action="Home#pause" locator1="3000" />
 
@@ -292,6 +294,43 @@
 		<execute action="PGOpensocialgadget#assertTextEquals" locator-key1="PORTLET_TITLE" value1="To-Do List" />
 	</command>
 
+	<command name="ViewGoogleAnalyticsIDNoXSS" priority="5">
+		<execute macro="Page#gotoConfigurationCP">
+			<var name="portletName" value="Site Settings" />
+		</execute>
+
+		<execute macro="Site#editGoogleAnalyticsIDCP">
+			<var name="googleAnalyticsID"><![CDATA[']);alert(/googleAnalyticsId/);//]]></var>
+		</execute>
+
+		<execute macro="Page#openURL" />
+		<execute action="Home#assertAlertNotPresent" />
+	</command>
+
+	<command name="ViewJSONWSNoXSS" priority="5">
+		<var name="url" value="http://localhost:8080/api/jsonws?contextPath=%22%3E%3Cimg%20src=x%20onerror=alert%28/contextPath/%29%3E" />
+
+		<execute action="Home#open" locator1="${url}" />
+		<execute action="Home#assertAlertNotPresent" />
+	</command>
+
+	<command name="ViewLiferayPortletListNoXSS" priority="5">
+		<var name="url" value="http://localhost:8080/web/guest/home?p_p_id=86&amp;p_p_state=pop_up&amp;_86_portletResource=101_INSTANCE_S1GhHANAwleV;alert(1)//%22;alert(2)//%22;alert(3)//%E2%80%93%3E%3C/script%3E%22%3E%27%3E%3Cscript%3Ealert(4)%3C/script%3E&amp;_86_resourcePrimKey=asdfxxx&amp;_86_struts_action=%2Fportlet_configuration%2Fedit_configuration" />
+
+		<execute macro="Portlet#addPG">
+			<var name="portletName" value="Asset Publisher" />
+		</execute>
+
+		<execute action="Home#open" locator1="${url}" />
+		<execute action="Home#assertAlertNotPresent" />
+
+		<execute action="Home#refresh" />
+		<execute action="Home#assertAlertNotPresent" />
+
+		<execute macro="Page#openURL" />
+		<execute action="Home#assertAlertNotPresent" />
+	</command>
+
 	<command name="ViewLookAndFeelNoXSS" priority="4">
 		<var name="pageName"><![CDATA[<script>alert(123)</script>]]></var>
 
@@ -365,6 +404,38 @@
 		</execute>
 
 		<execute action="CPRecyclebin#assertAlertNotPresent" />
+	</command>
+
+	<command known-issues="LPS-47697" name="ViewUpdateUserViaJSONWS" priority="5">
+		<property name="custom.properties" value="company.security.strangers.verify=true" />
+
+		<execute macro="Api#apiJsonwsUserView" />
+
+		<execute macro="Api#editJsonwsUserView">
+			<var name="userBirthdayDay" value="24" />
+			<var name="userBirthdayMonth" value="10" />
+			<var name="userBirthdayYear" value="1984" />
+			<var name="userEmailAddress" value="test1@liferay.com" />
+			<var name="userFacebookId" value="0" />
+			<var name="userFirstName" value="test1" />
+			<var name="userId" value="10205" />
+			<var name="userLastName" value="test1" />
+			<var name="userPrefixId" value="0" />
+			<var name="userScreenName" value="test1" />
+			<var name="userSuffixId" value="0" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#viewCP">
+			<var name="userScreenName" value="test1" />
+		</execute>
+
+		<execute action="CPUsersandorganizationsUser#assertValue" locator-key1="DETAILS_USER_ID_FIELD" value1="${userId}" />
+		<execute action="CPUsersandorganizationsUser#assertSelectedLabel" locator-key1="DETAILS_GENDER_SELECT" value1="Male" />
+		<execute action="CPUsersandorganizationsUser#assertValue" locator-key1="DETAILS_BIRTHDAY_FIELD" value1="${userBirthdayMonth}/${userBirthdayDay}/${userBirthdayYear}" />
 	</command>
 
 	<command name="ViewURLValidateNoXSS" priority="5">
@@ -449,6 +520,8 @@
 		<execute macro="WikiNode#gotoCP">
 			<var name="wikiNodeName" value="Wiki Node Name" />
 		</execute>
+
+		<execute macro="WikiPage#gotoAllPagesCP" />
 
 		<execute macro="WikiPage#addCP">
 			<var name="wikiPageContent" value="Wiki Page Content" />

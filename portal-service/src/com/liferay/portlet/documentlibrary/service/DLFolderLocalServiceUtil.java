@@ -640,6 +640,15 @@ public class DLFolderLocalServiceUtil {
 		return getService().getPersistedModel(primaryKeyObj);
 	}
 
+	public static java.util.List<com.liferay.portlet.documentlibrary.model.DLFolder> getRepositoryFolders(
+		long repositoryId, int start, int end) {
+		return getService().getRepositoryFolders(repositoryId, start, end);
+	}
+
+	public static int getRepositoryFoldersCount(long repositoryId) {
+		return getService().getRepositoryFoldersCount(repositoryId);
+	}
+
 	public static void getSubfolderIds(
 		java.util.List<java.lang.Long> folderIds, long groupId, long folderId) {
 		getService().getSubfolderIds(folderIds, groupId, folderId);
@@ -681,8 +690,16 @@ public class DLFolderLocalServiceUtil {
 				   .moveFolder(userId, folderId, parentFolderId, serviceContext);
 	}
 
-	public static void rebuildTree(long companyId) {
+	public static void rebuildTree(long companyId)
+		throws com.liferay.portal.kernel.exception.PortalException {
 		getService().rebuildTree(companyId);
+	}
+
+	public static void rebuildTree(long companyId, long parentFolderId,
+		java.lang.String parentTreePath, boolean reindex)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		getService()
+			.rebuildTree(companyId, parentFolderId, parentTreePath, reindex);
 	}
 
 	/**

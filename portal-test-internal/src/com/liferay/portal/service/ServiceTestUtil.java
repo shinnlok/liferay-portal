@@ -16,6 +16,8 @@ package com.liferay.portal.service;
 
 import com.liferay.portal.jcr.JCRFactoryUtil;
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.BaseDestination;
 import com.liferay.portal.kernel.messaging.DestinationNames;
 import com.liferay.portal.kernel.messaging.MessageBus;
@@ -27,6 +29,7 @@ import com.liferay.portal.kernel.scheduler.SchedulerEngineHelperUtil;
 import com.liferay.portal.kernel.search.SearchEngineUtil;
 import com.liferay.portal.kernel.template.TemplateManagerUtil;
 import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.model.Portlet;
 import com.liferay.portal.model.Role;
@@ -52,6 +55,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 /**
@@ -122,7 +126,7 @@ public class ServiceTestUtil {
 			setUser(TestPropsValues.getUser());
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			_log.warn(e.getMessage(), e);
 		}
 	}
 
@@ -134,7 +138,7 @@ public class ServiceTestUtil {
 			JCRFactoryUtil.prepare();
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			_log.warn(e.getMessage(), e);
 		}
 
 		// Template manager
@@ -143,7 +147,7 @@ public class ServiceTestUtil {
 			TemplateManagerUtil.init();
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			_log.warn(e.getMessage(), e);
 		}
 
 		// Indexers
@@ -155,8 +159,11 @@ public class ServiceTestUtil {
 		try {
 			DBUpgrader.upgrade();
 		}
+		catch (AssertionError ae) {
+			_log.warn(ae.getMessage(), ae);
+		}
 		catch (Exception e) {
-			e.printStackTrace();
+			_log.warn(e.getMessage(), e);
 		}
 
 		// Messaging
@@ -194,7 +201,7 @@ public class ServiceTestUtil {
 			SchedulerEngineHelperUtil.start();
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			_log.warn(e.getMessage(), e);
 		}
 
 		// Verify
@@ -203,7 +210,7 @@ public class ServiceTestUtil {
 			DBUpgrader.verify();
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			_log.warn(e.getMessage(), e);
 		}
 
 		// Class names
@@ -216,7 +223,7 @@ public class ServiceTestUtil {
 			_checkResourceActions();
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			_log.warn(e.getMessage(), e);
 		}
 
 		// Trash
@@ -231,6 +238,10 @@ public class ServiceTestUtil {
 
 		PortalRegisterTestUtil.registerAssetRendererFactories();
 
+		// Thread locals
+
+		_setThreadLocals();
+
 		// Company
 
 		try {
@@ -238,7 +249,7 @@ public class ServiceTestUtil {
 				TestPropsValues.COMPANY_WEB_ID);
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			_log.warn(e.getMessage(), e);
 		}
 
 		// Directories
@@ -254,7 +265,7 @@ public class ServiceTestUtil {
 			SearchEngineUtil.initialize(TestPropsValues.getCompanyId());
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			_log.warn(e.getMessage(), e);
 		}
 	}
 
@@ -328,7 +339,7 @@ public class ServiceTestUtil {
 				PropsValues.LUCENE_DIR + TestPropsValues.getCompanyId());
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			_log.warn(e.getMessage(), e);
 		}
 	}
 
@@ -342,4 +353,16 @@ public class ServiceTestUtil {
 		messageBus.replace(baseDestination);
 	}
 
+	private static void _setThreadLocals() {
+		LocaleThreadLocal.setThemeDisplayLocale(new Locale("en", "US"));
+
+		ServiceContext serviceContext = new ServiceContext();
+
+		serviceContext.setPathMain("path");
+		serviceContext.setPortalURL("http://tests:8080");
+
+		ServiceContextThreadLocal.pushServiceContext(serviceContext);
+	}
+
+	private static Log _log = LogFactoryUtil.getLog(ServiceTestUtil.class);
 }

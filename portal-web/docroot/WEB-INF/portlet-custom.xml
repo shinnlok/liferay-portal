@@ -144,51 +144,6 @@
 		</security-role-ref>
 	</portlet>
 	<portlet>
-		<portlet-name>16</portlet-name>
-		<display-name>Currency Converter</display-name>
-		<portlet-class>com.liferay.portlet.StrutsPortlet</portlet-class>
-		<init-param>
-			<name>edit-action</name>
-			<value>/currency_converter/edit</value>
-		</init-param>
-		<init-param>
-			<name>edit-guest-action</name>
-			<value>/currency_converter/edit</value>
-		</init-param>
-		<init-param>
-			<name>template-path</name>
-			<value>/html/portlet/currency_converter/</value>
-		</init-param>
-		<init-param>
-			<name>view-action</name>
-			<value>/currency_converter/view</value>
-		</init-param>
-		<expiration-cache>0</expiration-cache>
-		<supports>
-			<mime-type>text/html</mime-type>
-			<portlet-mode>edit</portlet-mode>
-			<portlet-mode>edit_guest</portlet-mode>
-		</supports>
-		<resource-bundle>com.liferay.portlet.StrutsResourceBundle</resource-bundle>
-		<portlet-preferences>
-			<preference>
-				<name>symbols</name>
-				<value>GBP</value>
-				<value>CNY</value>
-				<value>EUR</value>
-				<value>JPY</value>
-				<value>USD</value>
-			</preference>
-			<preferences-validator>com.liferay.portlet.currencyconverter.CurrencyPreferencesValidator</preferences-validator>
-		</portlet-preferences>
-		<security-role-ref>
-			<role-name>power-user</role-name>
-		</security-role-ref>
-		<security-role-ref>
-			<role-name>user</role-name>
-		</security-role-ref>
-	</portlet>
-	<portlet>
 		<portlet-name>19</portlet-name>
 		<display-name>Message Boards</display-name>
 		<portlet-class>com.liferay.portlet.StrutsPortlet</portlet-class>
@@ -246,54 +201,6 @@
 		<supported-public-render-parameter>categoryId</supported-public-render-parameter>
 		<supported-public-render-parameter>resetCur</supported-public-render-parameter>
 		<supported-public-render-parameter>tag</supported-public-render-parameter>
-	</portlet>
-	<portlet>
-		<portlet-name>23</portlet-name>
-		<display-name>Dictionary</display-name>
-		<portlet-class>com.liferay.util.bridges.mvc.MVCPortlet</portlet-class>
-		<init-param>
-			<name>template-path</name>
-			<value>/html/portlet/dictionary/</value>
-		</init-param>
-		<init-param>
-			<name>view-template</name>
-			<value>/html/portlet/dictionary/view.jsp</value>
-		</init-param>
-		<expiration-cache>0</expiration-cache>
-		<supports>
-			<mime-type>text/html</mime-type>
-		</supports>
-		<resource-bundle>com.liferay.portlet.StrutsResourceBundle</resource-bundle>
-		<security-role-ref>
-			<role-name>power-user</role-name>
-		</security-role-ref>
-		<security-role-ref>
-			<role-name>user</role-name>
-		</security-role-ref>
-	</portlet>
-	<portlet>
-		<portlet-name>25</portlet-name>
-		<display-name>Polls</display-name>
-		<portlet-class>com.liferay.portlet.StrutsPortlet</portlet-class>
-		<init-param>
-			<name>template-path</name>
-			<value>/html/portlet/polls/</value>
-		</init-param>
-		<init-param>
-			<name>view-action</name>
-			<value>/polls/view</value>
-		</init-param>
-		<expiration-cache>0</expiration-cache>
-		<supports>
-			<mime-type>text/html</mime-type>
-		</supports>
-		<resource-bundle>com.liferay.portlet.StrutsResourceBundle</resource-bundle>
-		<security-role-ref>
-			<role-name>power-user</role-name>
-		</security-role-ref>
-		<security-role-ref>
-			<role-name>user</role-name>
-		</security-role-ref>
 	</portlet>
 	<portlet>
 		<portlet-name>26</portlet-name>
@@ -381,30 +288,6 @@
 		<init-param>
 			<name>view-action</name>
 			<value>/my_sites/view</value>
-		</init-param>
-		<expiration-cache>0</expiration-cache>
-		<supports>
-			<mime-type>text/html</mime-type>
-		</supports>
-		<resource-bundle>com.liferay.portlet.StrutsResourceBundle</resource-bundle>
-		<security-role-ref>
-			<role-name>power-user</role-name>
-		</security-role-ref>
-		<security-role-ref>
-			<role-name>user</role-name>
-		</security-role-ref>
-	</portlet>
-	<portlet>
-		<portlet-name>30</portlet-name>
-		<display-name>Network</display-name>
-		<portlet-class>com.liferay.portlet.StrutsPortlet</portlet-class>
-		<init-param>
-			<name>template-path</name>
-			<value>/html/portlet/network/</value>
-		</init-param>
-		<init-param>
-			<name>view-action</name>
-			<value>/network/view</value>
 		</init-param>
 		<expiration-cache>0</expiration-cache>
 		<supports>
@@ -609,60 +492,6 @@
 		</security-role-ref>
 	</portlet>
 	<portlet>
-		<portlet-name>48</portlet-name>
-		<display-name>IFrame</display-name>
-		<portlet-class>com.liferay.portlet.iframe.IFramePortlet</portlet-class>
-		<init-param>
-			<name>config-template</name>
-			<value>/html/portlet/iframe/configuration.jsp</value>
-		</init-param>
-		<init-param>
-			<name>template-path</name>
-			<value>/html/portlet/iframe/</value>
-		</init-param>
-		<expiration-cache>0</expiration-cache>
-		<supports>
-			<mime-type>text/html</mime-type>
-		</supports>
-		<resource-bundle>com.liferay.portlet.StrutsResourceBundle</resource-bundle>
-		<portlet-preferences>
-			<preference>
-				<name>auth</name>
-				<value>false</value>
-			</preference>
-			<preference>
-				<name>auth-type</name>
-				<value>basic</value>
-			</preference>
-			<preference>
-				<name>form-method</name>
-				<value>post</value>
-			</preference>
-			<preference>
-				<name>hidden-variables</name>
-				<value>var1=hello;var2=world</value>
-			</preference>
-			<preference>
-				<name>password</name>
-				<value/>
-			</preference>
-			<preference>
-				<name>src</name>
-				<value/>
-			</preference>
-			<preference>
-				<name>user-name</name>
-				<value/>
-			</preference>
-		</portlet-preferences>
-		<security-role-ref>
-			<role-name>power-user</role-name>
-		</security-role-ref>
-		<security-role-ref>
-			<role-name>user</role-name>
-		</security-role-ref>
-	</portlet>
-	<portlet>
 		<portlet-name>49</portlet-name>
 		<display-name>Site Redirector</display-name>
 		<portlet-class>com.liferay.portlet.StrutsPortlet</portlet-class>
@@ -679,33 +508,6 @@
 			<mime-type>text/html</mime-type>
 		</supports>
 		<resource-bundle>com.liferay.portlet.StrutsResourceBundle</resource-bundle>
-		<security-role-ref>
-			<role-name>power-user</role-name>
-		</security-role-ref>
-		<security-role-ref>
-			<role-name>user</role-name>
-		</security-role-ref>
-	</portlet>
-	<portlet>
-		<portlet-name>50</portlet-name>
-		<display-name>Hello Velocity</display-name>
-		<portlet-class>com.liferay.portlet.VelocityPortlet</portlet-class>
-		<init-param>
-			<name>view-template</name>
-			<value>/portlet/hello_velocity/view.vm</value>
-		</init-param>
-		<expiration-cache>0</expiration-cache>
-		<supports>
-			<mime-type>text/html</mime-type>
-		</supports>
-		<portlet-info>
-			<title>Hello Velocity</title>
-			<short-title>Hello Velocity</short-title>
-			<keywords>Hello Velocity</keywords>
-		</portlet-info>
-		<security-role-ref>
-			<role-name>guest</role-name>
-		</security-role-ref>
 		<security-role-ref>
 			<role-name>power-user</role-name>
 		</security-role-ref>
@@ -807,58 +609,6 @@
 		</security-role-ref>
 	</portlet>
 	<portlet>
-		<portlet-name>59</portlet-name>
-		<display-name>Polls Display</display-name>
-		<portlet-class>com.liferay.portlet.StrutsPortlet</portlet-class>
-		<init-param>
-			<name>config-template</name>
-			<value>/html/portlet/polls_display/configuration.jsp</value>
-		</init-param>
-		<init-param>
-			<name>template-path</name>
-			<value>/html/portlet/polls_display/</value>
-		</init-param>
-		<init-param>
-			<name>view-action</name>
-			<value>/polls_display/view</value>
-		</init-param>
-		<expiration-cache>0</expiration-cache>
-		<supports>
-			<mime-type>text/html</mime-type>
-		</supports>
-		<resource-bundle>com.liferay.portlet.StrutsResourceBundle</resource-bundle>
-		<security-role-ref>
-			<role-name>power-user</role-name>
-		</security-role-ref>
-		<security-role-ref>
-			<role-name>user</role-name>
-		</security-role-ref>
-	</portlet>
-	<portlet>
-		<portlet-name>61</portlet-name>
-		<display-name>Loan Calculator</display-name>
-		<portlet-class>com.liferay.util.bridges.mvc.MVCPortlet</portlet-class>
-		<init-param>
-			<name>template-path</name>
-			<value>/html/portlet/loan_calculator/</value>
-		</init-param>
-		<init-param>
-			<name>view-template</name>
-			<value>/html/portlet/loan_calculator/view.jsp</value>
-		</init-param>
-		<expiration-cache>0</expiration-cache>
-		<supports>
-			<mime-type>text/html</mime-type>
-		</supports>
-		<resource-bundle>com.liferay.portlet.StrutsResourceBundle</resource-bundle>
-		<security-role-ref>
-			<role-name>power-user</role-name>
-		</security-role-ref>
-		<security-role-ref>
-			<role-name>user</role-name>
-		</security-role-ref>
-	</portlet>
-	<portlet>
 		<portlet-name>62</portlet-name>
 		<display-name>Journal Articles</display-name>
 		<portlet-class>com.liferay.portlet.StrutsPortlet</portlet-class>
@@ -906,157 +656,6 @@
 		<security-role-ref>
 			<role-name>guest</role-name>
 		</security-role-ref>
-		<security-role-ref>
-			<role-name>power-user</role-name>
-		</security-role-ref>
-		<security-role-ref>
-			<role-name>user</role-name>
-		</security-role-ref>
-	</portlet>
-	<portlet>
-		<portlet-name>66</portlet-name>
-		<display-name>Web Proxy</display-name>
-		<portlet-class>com.liferay.portlet.webproxy.WebProxyPortlet</portlet-class>
-		<init-param>
-			<name>authenticatorClassName</name>
-			<value>org.portletbridge.portlet.DefaultBridgeAuthenticator</value>
-		</init-param>
-		<init-param>
-			<name>config-template</name>
-			<value>/html/portlet/web_proxy/configuration.jsp</value>
-		</init-param>
-		<init-param>
-			<name>cssRegex</name>
-			<value>(?:url\((?:'|")?(.*?)(?:'|")?\))|(?:@import\s+[^url](?:'|")?(.*?)(?:'|")|;|\s+|$)</value>
-		</init-param>
-		<init-param>
-			<name>editStylesheet</name>
-			<value>classpath:/org/portletbridge/xsl/pages/edit.xsl</value>
-		</init-param>
-		<init-param>
-			<name>errorStylesheet</name>
-			<value>classpath:/org/portletbridge/xsl/pages/error.xsl</value>
-		</init-param>
-		<init-param>
-			<name>helpStylesheet</name>
-			<value>classpath:/org/portletbridge/xsl/pages/help.xsl</value>
-		</init-param>
-		<init-param>
-			<name>idParamKey</name>
-			<value>id</value>
-		</init-param>
-		<init-param>
-			<name>jsRegex</name>
-			<value>open\('([^']*)'|open\("([^\"]*)"</value>
-		</init-param>
-		<init-param>
-			<name>mementoSessionKey</name>
-			<value>mementoSessionKey</value>
-		</init-param>
-		<init-param>
-			<name>parserClassName</name>
-			<value>org.cyberneko.html.parsers.SAXParser</value>
-		</init-param>
-		<init-param>
-			<name>servletName</name>
-			<value>pbhs</value>
-		</init-param>
-		<init-param>
-			<name>stylesheetUrl</name>
-			<value>classpath:/org/portletbridge/xsl/default.xsl</value>
-		</init-param>
-		<expiration-cache>0</expiration-cache>
-		<supports>
-			<mime-type>text/html</mime-type>
-		</supports>
-		<resource-bundle>com.liferay.portlet.StrutsResourceBundle</resource-bundle>
-		<portlet-preferences>
-			<preference>
-				<name>initUrl</name>
-				<value/>
-			</preference>
-			<preference>
-				<name>proxyAuthentication</name>
-				<value>none</value>
-			</preference>
-			<preference>
-				<name>proxyAuthenticationDomain</name>
-				<value/>
-			</preference>
-			<preference>
-				<name>proxyAuthenticationHost</name>
-				<value/>
-			</preference>
-			<preference>
-				<name>proxyAuthenticationPassword</name>
-				<value/>
-			</preference>
-			<preference>
-				<name>proxyAuthenticationUsername</name>
-				<value/>
-			</preference>
-			<preference>
-				<name>proxyHost</name>
-				<value/>
-			</preference>
-			<preference>
-				<name>proxyPort</name>
-				<value/>
-			</preference>
-			<preference>
-				<name>scope</name>
-				<value>.*</value>
-			</preference>
-			<preference>
-				<name>secureEdit</name>
-				<value>false</value>
-				<read-only>true</read-only>
-			</preference>
-			<preference>
-				<name>stylesheet</name>
-				<value/>
-			</preference>
-			<preferences-validator>org.portletbridge.portlet.PortletBridgePortletValidator</preferences-validator>
-		</portlet-preferences>
-		<security-role-ref>
-			<role-name>power-user</role-name>
-		</security-role-ref>
-		<security-role-ref>
-			<role-name>user</role-name>
-		</security-role-ref>
-	</portlet>
-	<portlet>
-		<portlet-name>67</portlet-name>
-		<display-name>Amazon Rankings</display-name>
-		<portlet-class>com.liferay.portlet.StrutsPortlet</portlet-class>
-		<init-param>
-			<name>config-template</name>
-			<value>/html/portlet/amazon_rankings/configuration.jsp</value>
-		</init-param>
-		<init-param>
-			<name>template-path</name>
-			<value>/html/portlet/amazon_rankings/</value>
-		</init-param>
-		<init-param>
-			<name>view-action</name>
-			<value>/amazon_rankings/view</value>
-		</init-param>
-		<expiration-cache>0</expiration-cache>
-		<supports>
-			<mime-type>text/html</mime-type>
-		</supports>
-		<resource-bundle>com.liferay.portlet.StrutsResourceBundle</resource-bundle>
-		<portlet-preferences>
-			<preference>
-				<name>isbns</name>
-				<value>0066620996</value>
-				<value>0131412752</value>
-				<value>0201633612</value>
-				<value>0310205719</value>
-				<value>0310241448</value>
-			</preference>
-			<preferences-validator>com.liferay.portlet.amazonrankings.AmazonRankingsPreferencesValidator</preferences-validator>
-		</portlet-preferences>
 		<security-role-ref>
 			<role-name>power-user</role-name>
 		</security-role-ref>
@@ -1426,34 +1025,6 @@
 		</security-role-ref>
 	</portlet>
 	<portlet>
-		<portlet-name>100</portlet-name>
-		<display-name>Invitation</display-name>
-		<portlet-class>com.liferay.portlet.StrutsPortlet</portlet-class>
-		<init-param>
-			<name>config-template</name>
-			<value>/html/portlet/invitation/configuration.jsp</value>
-		</init-param>
-		<init-param>
-			<name>template-path</name>
-			<value>/html/portlet/invitation/</value>
-		</init-param>
-		<init-param>
-			<name>view-action</name>
-			<value>/invitation/view</value>
-		</init-param>
-		<expiration-cache>0</expiration-cache>
-		<supports>
-			<mime-type>text/html</mime-type>
-		</supports>
-		<resource-bundle>com.liferay.portlet.StrutsResourceBundle</resource-bundle>
-		<security-role-ref>
-			<role-name>power-user</role-name>
-		</security-role-ref>
-		<security-role-ref>
-			<role-name>user</role-name>
-		</security-role-ref>
-	</portlet>
-	<portlet>
 		<portlet-name>101</portlet-name>
 		<display-name>Asset Publisher</display-name>
 		<portlet-class>com.liferay.portlet.StrutsPortlet</portlet-class>
@@ -1486,38 +1057,6 @@
 		<supported-public-render-parameter>categoryId</supported-public-render-parameter>
 		<supported-public-render-parameter>resetCur</supported-public-render-parameter>
 		<supported-public-render-parameter>tag</supported-public-render-parameter>
-		<supported-public-render-parameter>tags</supported-public-render-parameter>
-	</portlet>
-	<portlet>
-		<portlet-name>102</portlet-name>
-		<display-name>XSL Content</display-name>
-		<portlet-class>com.liferay.portlet.StrutsPortlet</portlet-class>
-		<init-param>
-			<name>config-template</name>
-			<value>/html/portlet/xsl_content/configuration.jsp</value>
-		</init-param>
-		<init-param>
-			<name>template-path</name>
-			<value>/html/portlet/xsl_content/</value>
-		</init-param>
-		<init-param>
-			<name>view-action</name>
-			<value>/xsl_content/view</value>
-		</init-param>
-		<expiration-cache>0</expiration-cache>
-		<supports>
-			<mime-type>text/html</mime-type>
-		</supports>
-		<resource-bundle>com.liferay.portlet.StrutsResourceBundle</resource-bundle>
-		<security-role-ref>
-			<role-name>guest</role-name>
-		</security-role-ref>
-		<security-role-ref>
-			<role-name>power-user</role-name>
-		</security-role-ref>
-		<security-role-ref>
-			<role-name>user</role-name>
-		</security-role-ref>
 		<supported-public-render-parameter>tags</supported-public-render-parameter>
 	</portlet>
 	<portlet>
@@ -1678,37 +1217,6 @@
 		<init-param>
 			<name>view-action</name>
 			<value>/blogs_aggregator/view</value>
-		</init-param>
-		<expiration-cache>0</expiration-cache>
-		<supports>
-			<mime-type>text/html</mime-type>
-		</supports>
-		<resource-bundle>com.liferay.portlet.StrutsResourceBundle</resource-bundle>
-		<security-role-ref>
-			<role-name>guest</role-name>
-		</security-role-ref>
-		<security-role-ref>
-			<role-name>power-user</role-name>
-		</security-role-ref>
-		<security-role-ref>
-			<role-name>user</role-name>
-		</security-role-ref>
-	</portlet>
-	<portlet>
-		<portlet-name>116</portlet-name>
-		<display-name>Activities</display-name>
-		<portlet-class>com.liferay.portlet.StrutsPortlet</portlet-class>
-		<init-param>
-			<name>config-template</name>
-			<value>/html/portlet/activities/configuration.jsp</value>
-		</init-param>
-		<init-param>
-			<name>template-path</name>
-			<value>/html/portlet/activities/</value>
-		</init-param>
-		<init-param>
-			<name>view-action</name>
-			<value>/activities/view</value>
 		</init-param>
 		<expiration-cache>0</expiration-cache>
 		<supports>
@@ -3735,6 +3243,15 @@
 	<user-attribute>
 		<name>user.business-info.online.uri</name>
 	</user-attribute>
+	<filter>
+		<filter-name>Related Assets Render Parameters Portlet Filter</filter-name>
+		<filter-class>com.liferay.portlet.relatedassets.filter.RelatedAssetsRenderParametersPortletFilter</filter-class>
+		<lifecycle>RENDER_PHASE</lifecycle>
+	</filter>
+	<filter-mapping>
+		<filter-name>Related Assets Render Parameters Portlet Filter</filter-name>
+		<portlet-name>175</portlet-name>
+	</filter-mapping>
 	<public-render-parameter>
 		<identifier>categoryId</identifier>
 		<qname xmlns:x="http://www.liferay.com/public-render-parameters">x:categoryId</qname>

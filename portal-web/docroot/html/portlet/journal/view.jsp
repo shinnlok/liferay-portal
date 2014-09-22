@@ -51,8 +51,6 @@ request.setAttribute("view.jsp-folderId", String.valueOf(folderId));
 	<aui:row cssClass="lfr-app-column-view">
 		<aui:col cssClass="navigation-pane" width="<%= 25 %>">
 			<liferay-util:include page="/html/portlet/journal/view_folders.jsp" />
-
-			<div class="folder-pagination"></div>
 		</aui:col>
 
 		<aui:col cssClass="context-pane" last="<%= true %>" width="<%= 75 %>">
@@ -129,7 +127,7 @@ request.setAttribute("view.jsp-folderId", String.valueOf(folderId));
 <aui:script use="liferay-journal-navigation">
 	<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" varImpl="mainURL" />
 
-	new Liferay.Portlet.JournalNavigation(
+	var journalNavigation = new Liferay.Portlet.JournalNavigation(
 		{
 			advancedSearch: '<%= DisplayTerms.ADVANCED_SEARCH %>',
 			displayStyle: '<%= HtmlUtil.escapeJS(JournalUtil.getDisplayStyle(liferayPortletRequest, displayViews)) %>',
@@ -142,25 +140,23 @@ request.setAttribute("view.jsp-folderId", String.valueOf(folderId));
 					method: 'POST',
 					node: A.one(document.<portlet:namespace />fm)
 				},
-				moveEntryRenderUrl: '<portlet:renderURL><portlet:param name="struts_action" value="/journal/move_entry" /></portlet:renderURL>',
+				moveEntryRenderUrl: '<portlet:renderURL><portlet:param name="struts_action" value="/journal/move_entry" /><portlet:param name="redirect" value="<%= currentURL %>" /></portlet:renderURL>',
 				trashLinkId: '<%= TrashUtil.isTrashEnabled(scopeGroupId) ? "_" + PortletKeys.CONTROL_PANEL_MENU + "_portlet_" + PortletKeys.TRASH : StringPool.BLANK %>',
 				updateable: true
 			},
 			namespace: '<portlet:namespace />',
 			portletId: '<%= portletDisplay.getId() %>',
-			rowIds: '<%= RowChecker.ROW_IDS %>',
-			select: {
-
-				<%
-				String[] escapedDisplayViews = new String[displayViews.length];
-
-				for (int i = 0; i < displayViews.length; i++) {
-					escapedDisplayViews[i] = HtmlUtil.escapeJS(displayViews[i]);
-				}
-				%>
-
-				displayViews: ['<%= StringUtil.merge(escapedDisplayViews, "','") %>']
-			}
+			rowIds: '<%= RowChecker.ROW_IDS %>'
 		}
 	);
+
+	var clearJournalNavigationHandles = function(event) {
+		if (event.portletId === '<%= portletDisplay.getRootPortletId() %>') {
+			journalNavigation.destroy();
+
+			Liferay.detach('destroyPortlet', clearJournalNavigationHandles);
+		}
+	};
+
+	Liferay.on('destroyPortlet', clearJournalNavigationHandles);
 </aui:script>

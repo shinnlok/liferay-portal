@@ -55,6 +55,8 @@ public interface PropsKeys {
 
 	public static final String ADMIN_MAIL_HOST_NAMES = "admin.mail.host.names";
 
+	public static final String ADMIN_OBFUSCATED_PROPERTIES = "admin.obfuscated.properties";
+
 	public static final String ADMIN_RESERVED_EMAIL_ADDRESSES = "admin.reserved.email.addresses";
 
 	public static final String ADMIN_RESERVED_SCREEN_NAMES = "admin.reserved.screen.names";
@@ -64,12 +66,6 @@ public interface PropsKeys {
 	public static final String AIM_LOGIN = "aim.login";
 
 	public static final String AIM_PASSWORD = "aim.password";
-
-	public static final String AMAZON_ACCESS_KEY_ID = "amazon.access.key.id";
-
-	public static final String AMAZON_ASSOCIATE_TAG = "amazon.associate.tag";
-
-	public static final String AMAZON_SECRET_ACCESS_KEY = "amazon.secret.access.key";
 
 	public static final String ANNOUNCEMENTS_EMAIL_BODY = "announcements.email.body";
 
@@ -815,7 +811,11 @@ public interface PropsKeys {
 
 	public static final String DL_REPOSITORY_IMPL = "dl.repository.impl";
 
+	public static final String DL_SHOW_HIDDEN_MOUNT_FOLDERS = "dl.show.hidden.mount.folders";
+
 	public static final String DL_SHOW_LIFERAY_SYNC_MESSAGE = "dl.show.liferay.sync.message";
+
+	public static final String DL_STORE_ADVANCED_FILE_SYSTEM_ROOT_DIR = "dl.store.advanced.file.system.root.dir";
 
 	public static final String DL_STORE_ANTIVIRUS_ENABLED = "dl.store.antivirus.enabled";
 
@@ -1037,6 +1037,8 @@ public interface PropsKeys {
 
 	public static final String IMAGE_HOOK_IMPL = "image.hook.impl";
 
+	public static final String IMAGE_IO_USE_DISK_CACHE = "image.io.use.disk.cache";
+
 	public static final String IMAGEMAGICK_ENABLED = "imagemagick.enabled";
 
 	public static final String IMAGEMAGICK_GLOBAL_SEARCH_PATH = "imagemagick.global.search.path";
@@ -1066,6 +1068,8 @@ public interface PropsKeys {
 	public static final String INDEX_SEARCH_HIGHLIGHT_ENABLED = "index.search.highlight.enabled";
 
 	public static final String INDEX_SEARCH_HIGHLIGHT_FRAGMENT_SIZE = "index.search.highlight.fragment.size";
+
+	public static final String INDEX_SEARCH_HIGHLIGHT_REQUIRE_FIELD_MATCH = "index.search.highlight.require.field.match";
 
 	public static final String INDEX_SEARCH_HIGHLIGHT_SNIPPET_SIZE = "index.search.highlight.snippet.size";
 
@@ -1124,12 +1128,6 @@ public interface PropsKeys {
 	public static final String INTRABAND_WELDER_SOCKET_SO_TIMEOUT = "intraband.welder.socket.so.timeout";
 
 	public static final String INTRABAND_WELDER_SOCKET_TCP_NO_DELAY = "intraband.welder.socket.tcp.no.delay";
-
-	public static final String INVITATION_EMAIL_MAX_RECIPIENTS = "invitation.email.max.recipients";
-
-	public static final String INVITATION_EMAIL_MESSAGE_BODY = "invitation.email.message.body";
-
-	public static final String INVITATION_EMAIL_MESSAGE_SUBJECT = "invitation.email.message.subject";
 
 	public static final String INVOKER_FILTER_CHAIN_SIZE = "invoker.filter.chain.cache.size";
 
@@ -1287,8 +1285,6 @@ public interface PropsKeys {
 
 	public static final String JOURNAL_TRANSFORMER_LISTENER = "journal.transformer.listener";
 
-	public static final String JSON_DESERIALIZER_STRICT_MODE = "json.deserializer.strict.mode";
-
 	public static final String JSON_SERVICE_AUTH_TOKEN_ENABLED = "json.service.auth.token.enabled";
 
 	public static final String JSON_SERVICE_AUTH_TOKEN_HOSTS_ALLOWED = "json.service.auth.token.hosts.allowed";
@@ -1385,6 +1381,8 @@ public interface PropsKeys {
 
 	public static final String LAYOUT_SET_PROTOTYPE_MERGE_LOCK_MAX_TIME = "layout.set.prototype.merge.lock.max.time";
 
+	public static final String LAYOUT_SET_PROTOTYPE_PROPAGATE_LOGO = "layout.set.prototype.propagate.logo";
+
 	public static final String LAYOUT_SHOW_HTTP_STATUS = "layout.show.http.status";
 
 	public static final String LAYOUT_SHOW_PORTLET_ACCESS_DENIED = "layout.show.portlet.access.denied";
@@ -1400,8 +1398,6 @@ public interface PropsKeys {
 	public static final String LAYOUT_STATIC_PORTLETS_START = "layout.static.portlets.start.";
 
 	public static final String LAYOUT_TEMPLATE_CACHE_ENABLED = "layout.template.cache.enabled";
-
-	public static final String LAYOUT_TYPES = "layout.types";
 
 	public static final String LAYOUT_URL = "layout.url";
 
@@ -2069,8 +2065,6 @@ public interface PropsKeys {
 
 	public static final String POLLER_REQUEST_TIMEOUT = "poller.request.timeout";
 
-	public static final String POLLS_PUBLISH_TO_LIVE_BY_DEFAULT = "polls.publish.to.live.by.default";
-
 	public static final String POP_SERVER_NOTIFICATIONS_ENABLED = "pop.server.notifications.enabled";
 
 	public static final String POP_SERVER_NOTIFICATIONS_INTERVAL = "pop.server.notifications.interval";
@@ -2547,7 +2541,13 @@ public interface PropsKeys {
 
 	public static final String THEME_CSS_FAST_LOAD = "theme.css.fast.load";
 
+	public static final String THEME_CSS_FAST_LOAD_CHECK_MODIFIED_DATE = "theme.css.fast.load.check.modified.date";
+
+	public static final String THEME_CSS_FAST_LOAD_CHECK_REQUEST_PARAMETER = "theme.css.fast.load.check.request.parameter";
+
 	public static final String THEME_IMAGES_FAST_LOAD = "theme.images.fast.load";
+
+	public static final String THEME_IMAGES_FAST_LOAD_CHECK_REQUEST_PARAMETER = "theme.images.fast.load.check.request.parameter";
 
 	public static final String THEME_JSP_OVERRIDE_ENABLED = "theme.jsp.override.enabled";
 

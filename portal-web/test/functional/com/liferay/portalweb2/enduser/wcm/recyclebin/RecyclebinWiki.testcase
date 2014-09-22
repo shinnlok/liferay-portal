@@ -22,6 +22,14 @@
 			<var name="portletName" value="Wiki" />
 		</execute>
 
+		<execute macro="WikiNode#gotoCP">
+			<var name="wikiNodeName" value="${wikiNodeName}" />
+		</execute>
+
+		<execute macro="WikiPage#gotoCP">
+			<var name="wikiPageTitle" value="${wikiPageTitle}" />
+		</execute>
+
 		<execute macro="WikiPage#addFrontPageCP">
 			<var name="wikiFrontPageContent" value="${wikiFrontPageContent}" />
 			<var name="wikiNodeName" value="${wikiNodeName}" />
@@ -29,6 +37,10 @@
 
 		<execute macro="Page#gotoContentCP">
 			<var name="portletName" value="Wiki" />
+		</execute>
+
+		<execute macro="WikiNode#gotoCP">
+			<var name="wikiNodeName" value="${wikiNodeName}" />
 		</execute>
 
 		<execute macro="WikiPage#moveToRecycleBinCP">
@@ -57,6 +69,12 @@
 			<var name="portletName" value="Wiki" />
 		</execute>
 
+		<execute macro="WikiNode#gotoCP">
+			<var name="wikiNodeName" value="${wikiNodeName}" />
+		</execute>
+
+		<execute macro="WikiPage#gotoFrontPageCP" />
+
 		<execute macro="WikiPage#viewFrontPageDefaultCP">
 			<var name="wikiPageTitle" value="${wikiPageTitle}" />
 		</execute>
@@ -74,6 +92,14 @@
 			<var name="portletName" value="Wiki" />
 		</execute>
 
+		<execute macro="WikiNode#gotoCP">
+			<var name="wikiNodeName" value="${wikiNodeName}" />
+		</execute>
+
+		<execute macro="WikiPage#gotoCP">
+			<var name="wikiPageTitle" value="${wikiPageTitle}" />
+		</execute>
+
 		<execute macro="WikiPage#addFrontPageCP">
 			<var name="wikiFrontPageContent" value="${wikiFrontPageContent}" />
 			<var name="wikiPageTitle" value="${wikiPageTitle}" />
@@ -81,6 +107,10 @@
 
 		<execute macro="Page#gotoContentCP">
 			<var name="portletName" value="Wiki" />
+		</execute>
+
+		<execute macro="WikiNode#gotoCP">
+			<var name="wikiNodeName" value="${wikiNodeName}" />
 		</execute>
 
 		<execute macro="WikiPage#moveToRecycleBinCP">
@@ -109,6 +139,12 @@
 		<execute macro="Page#gotoContentCP">
 			<var name="portletName" value="Wiki" />
 		</execute>
+
+		<execute macro="WikiNode#gotoCP">
+			<var name="wikiNodeName" value="${wikiNodeName}" />
+		</execute>
+
+		<execute macro="WikiPage#gotoFrontPageCP" />
 
 		<execute macro="WikiPage#viewFrontPageCP">
 			<var name="webContentContent" value="${webContentContent}" />

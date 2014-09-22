@@ -121,6 +121,35 @@ public class DLFileVersionTest extends BaseDLAppTestCase {
 	}
 
 	@Test
+	public void testRevertVersion() throws Exception {
+		DLAppServiceUtil.updateFileEntry(
+			_fileVersion.getFileEntryId(), _SOURCE_FILE_NAME,
+			_fileVersion.getMimeType(), _fileVersion.getTitle(),
+			_fileVersion.getDescription(), _fileVersion.getChangeLog(), false,
+			_DATA_VERSION_1, _serviceContext);
+
+		DLAppServiceUtil.updateFileEntry(
+			_fileVersion.getFileEntryId(), _SOURCE_FILE_NAME,
+			_fileVersion.getMimeType(), _UPDATE_VALUE,
+			_fileVersion.getDescription(), _fileVersion.getChangeLog(), false,
+			_DATA_VERSION_1, _serviceContext);
+
+		FileEntry fileEntry = DLAppServiceUtil.updateFileEntry(
+			_fileVersion.getFileEntryId(), _SOURCE_FILE_NAME,
+			_fileVersion.getMimeType(), _fileVersion.getTitle(),
+			_fileVersion.getDescription(), _fileVersion.getChangeLog(), false,
+			_DATA_VERSION_1, _serviceContext);
+
+		DLAppServiceUtil.revertFileEntry(
+			fileEntry.getFileEntryId(), DLFileEntryConstants.VERSION_DEFAULT,
+			_serviceContext);
+
+		fileEntry = DLAppServiceUtil.getFileEntry(fileEntry.getFileEntryId());
+
+		Assert.assertEquals("2.0", fileEntry.getVersion());
+	}
+
+	@Test
 	public void testUpdateChecksum() throws Exception {
 		FileEntry fileEntry = DLAppServiceUtil.updateFileEntry(
 			_fileVersion.getFileEntryId(), _SOURCE_FILE_NAME,
@@ -170,18 +199,6 @@ public class DLFileVersionTest extends BaseDLAppTestCase {
 			_fileVersion.getFileEntryId(), _SOURCE_FILE_NAME,
 			_fileVersion.getMimeType(), _fileVersion.getTitle(),
 			_fileVersion.getDescription(), _fileVersion.getChangeLog(), false,
-			_DATA_VERSION_1, _serviceContext);
-
-		Assert.assertNotEquals(
-			DLFileEntryConstants.VERSION_DEFAULT, fileEntry.getVersion());
-	}
-
-	@Test
-	public void testUpdateMajorVersion() throws Exception {
-		FileEntry fileEntry = DLAppServiceUtil.updateFileEntry(
-			_fileVersion.getFileEntryId(), _SOURCE_FILE_NAME,
-			_fileVersion.getMimeType(), _fileVersion.getTitle(),
-			_fileVersion.getDescription(), _fileVersion.getChangeLog(), true,
 			_DATA_VERSION_1, _serviceContext);
 
 		Assert.assertNotEquals(
@@ -368,6 +385,14 @@ public class DLFileVersionTest extends BaseDLAppTestCase {
 
 	private static final byte[] _DATA_VERSION_3 = new byte[_DATA_SIZE_2];
 
+	private static final String _EXPANDO_ATTRIBUTE_NAME = "Expando";
+
+	private static final String _SOURCE_FILE_NAME = "SourceFileName.txt";
+
+	private static final String _TITLE = "Title";
+
+	private static final String _UPDATE_VALUE = "Update Value";
+
 	static {
 		for (int i = 0; i < _DATA_SIZE_1; i++) {
 			_DATA_VERSION_1[i] = (byte)i;
@@ -378,14 +403,6 @@ public class DLFileVersionTest extends BaseDLAppTestCase {
 			_DATA_VERSION_3[i] = (byte)i;
 		}
 	}
-
-	private static final String _EXPANDO_ATTRIBUTE_NAME = "Expando";
-
-	private static final String _SOURCE_FILE_NAME = "SourceFileName.txt";
-
-	private static final String _TITLE = "Title";
-
-	private static final String _UPDATE_VALUE = "Update Value";
 
 	private long _contractDLFileEntryTypeId;
 	private DLFileVersion _fileVersion;

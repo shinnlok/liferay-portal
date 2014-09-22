@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.repository.model.RepositoryModelOperation;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
@@ -50,7 +51,7 @@ import java.util.Map;
 public class LiferayFileEntry extends LiferayModel implements FileEntry {
 
 	public LiferayFileEntry(DLFileEntry dlFileEntry) {
-		_dlFileEntry = dlFileEntry;
+		this(dlFileEntry, false);
 	}
 
 	public LiferayFileEntry(DLFileEntry fileEntry, boolean escapedModel) {
@@ -114,6 +115,13 @@ public class LiferayFileEntry extends LiferayModel implements FileEntry {
 		}
 
 		return false;
+	}
+
+	@Override
+	public void execute(RepositoryModelOperation repositoryModelOperation)
+		throws PortalException {
+
+		repositoryModelOperation.execute(this);
 	}
 
 	@Override
@@ -193,6 +201,11 @@ public class LiferayFileEntry extends LiferayModel implements FileEntry {
 	@Override
 	public long getFileEntryId() {
 		return _dlFileEntry.getFileEntryId();
+	}
+
+	@Override
+	public String getFileName() {
+		return _dlFileEntry.getFileName();
 	}
 
 	@Override
@@ -574,8 +587,8 @@ public class LiferayFileEntry extends LiferayModel implements FileEntry {
 
 	private static Log _log = LogFactoryUtil.getLog(LiferayFileEntry.class);
 
-	private DLFileEntry _dlFileEntry;
+	private final DLFileEntry _dlFileEntry;
 	private DLFileVersion _dlFileVersion;
-	private boolean _escapedModel;
+	private final boolean _escapedModel;
 
 }

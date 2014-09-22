@@ -101,6 +101,10 @@ $dockbarOpenGradientStart: #0EA6F9;
 
 	li {
 		line-height: 27px;
+
+		.radio input, .checkbox input {
+			top: 3px;
+		}
 	}
 
 	select:focus {
@@ -267,18 +271,13 @@ $dockbarOpenGradientStart: #0EA6F9;
 				}
 			}
 		}
+
+		&.has-alerts .portlet-dockbar {
+			position: relative;
+		}
 	}
 
 	.dockbar {
-		&.navbar {
-			border-bottom-width: 0;
-			min-height: 40px;
-		}
-
-		&.navbar-default {
-			background-color: transparent;
-		}
-
 		.container, .container-fluid {
 			background-color: $dockbarGradientStart;
 
@@ -521,6 +520,23 @@ $dockbarOpenGradientStart: #0EA6F9;
 
 			&:focus, &:hover {
 				background: #009AE5;
+			}
+		}
+	}
+
+	.navigation-pane .navigation-entry {
+		&.folder.error {
+			color: #34404F;
+			text-decoration: none;
+		}
+
+		.overlay.entry-action {
+			.btn {
+				background: transparent;
+
+				@include respond-to(desktop) {
+					padding: 14px 10px;
+				}
 			}
 		}
 	}
@@ -871,13 +887,12 @@ $dockbarOpenGradientStart: #0EA6F9;
 			}
 		}
 
-		.panel-group .lfr-add-content .toggler-header {
-			border: solid #D3D3D3;
-			border-width: 0 1px 1px 1px;
-		}
+		.panel-group .lfr-add-content {
+			margin-top: -1px;
 
-		.panel-group .lfr-add-content:first-of-type .toggler-header {
-			border-top-width: 1px;
+			.toggler-header {
+				border: 1px solid #D3D3D3;
+			}
 		}
 	}
 
@@ -948,13 +963,12 @@ $dockbarOpenGradientStart: #0EA6F9;
 	}
 
 	.lfr-edit-layout-panel {
-		.panel-group .toggler-header {
-			border: solid #D3D3D3;
-			border-width: 0 1px 1px 1px;
-		}
+		.panel-group .panel {
+			margin-top: -1px;
 
-		.panel-group .panel:first-of-type .toggler-header {
-			border-top-width: 1px;
+			.toggler-header {
+				border: 1px solid #D3D3D3;
+			}
 		}
 	}
 
@@ -969,6 +983,37 @@ $dockbarOpenGradientStart: #0EA6F9;
 		}
 	}
 
+	/* ---------- Alloy editor ---------- */
+
+	.alloy-editor {
+		outline: 0;
+
+		a {
+			cursor: auto;
+		}
+	}
+
+	.alloy-editor-toolbar {
+		.alloy-editor-button {
+			background-color: #215EC0;
+			background-image: none;
+			border-width: 0;
+			line-height: normal;
+		}
+
+		&.alloy-editor-toolbar-styles {
+			.link-wrapper .input-container input {
+				border-width: 0;
+				margin: 0;
+				padding: 0;
+			}
+		}
+	}
+
+	.alloy-editor-tooltip-link .link-container .icon-link-container {
+		line-height: 20px;
+	}
+
 	/* ---------- Extras ---------- */
 
 	$prefixes: ("-webkit-", "-moz-", "-o-", "");
@@ -979,6 +1024,17 @@ $dockbarOpenGradientStart: #0EA6F9;
 			color: #FFF;
 
 			@include text-shadow(-1px -1px rgba(0, 0, 0, 0.3));
+		}
+
+		.alloy-editor ::#{$prefix}selection {
+			background: #E6F1FA !important;
+			color: #555;
+
+			@include text-shadow(none);
+		}
+
+		.alloyeditor-add-toolbar ::#{$prefix}selection {
+			background: #F3DADA !important;
 		}
 	}
 
@@ -1030,14 +1086,6 @@ $dockbarOpenGradientStart: #0EA6F9;
 
 	.panel.panel-default {
 		@include box-shadow(none);
-	}
-
-	.portlet-options {
-		&, &.open {
-			.dropdown-toggle {
-				@include box-shadow(none);
-			}
-		}
 	}
 
 	.table {
@@ -1095,6 +1143,10 @@ $dockbarOpenGradientStart: #0EA6F9;
 				@include box-shadow(none);
 			}
 		}
+	}
+
+	.alloy-editor-toolbar.alloy-editor-toolbar-styles .link-wrapper .input-container input:focus {
+		@include box-shadow(none);
 	}
 
 	body.yui3-skin-sam .yui3-widget-mask {

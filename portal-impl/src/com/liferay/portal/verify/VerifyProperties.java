@@ -259,6 +259,8 @@ public class VerifyProperties extends VerifyProcess {
 	};
 
 	private static final String[] _OBSOLETE_PORTAL_KEYS = new String[] {
+		"amazon.access.key.id", "amazon.associate.tag",
+		"amazon.secret.access.key",
 		"asset.entry.increment.view.counter.enabled", "auth.max.failures.limit",
 		"buffered.increment.parallel.queue.size",
 		"buffered.increment.serial.queue.size", "cas.validate.url",
@@ -289,7 +291,9 @@ public class VerifyProperties extends VerifyProcess {
 		"editor.wysiwyg.portal-web.docroot.html.portlet.portal_settings." +
 			"email_notifications.jsp",
 		"ehcache.statistics.enabled", "index.filter.search.limit",
-		"javax.persistence.validation.mode", "jbi.workflow.url",
+		"invitation.email.max.recipients", "invitation.email.message.body",
+		"invitation.email.message.subject", "javax.persistence.validation.mode",
+		"jbi.workflow.url", "json.deserializer.strict.mode",
 		"journal.template.language.parser[css]",
 		"journal.template.language.parser[ftl]",
 		"journal.template.language.parser[vm]",
@@ -298,7 +302,7 @@ public class VerifyProperties extends VerifyProcess {
 		"jpa.database.platform", "jpa.database.type", "jpa.load.time.weaver",
 		"jpa.provider", "jpa.provider.property.eclipselink.allow-zero-id",
 		"jpa.provider.property.eclipselink.logging.level",
-		"jpa.provider.property.eclipselink.logging.timestamp",
+		"jpa.provider.property.eclipselink.logging.timestamp", "layout.types",
 		"lucene.analyzer", "lucene.store.jdbc.auto.clean.up",
 		"lucene.store.jdbc.auto.clean.up.enabled",
 		"lucene.store.jdbc.auto.clean.up.interval",

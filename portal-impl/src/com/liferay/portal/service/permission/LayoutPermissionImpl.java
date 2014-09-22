@@ -15,10 +15,12 @@
 package com.liferay.portal.service.permission;
 
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portal.kernel.staging.permission.StagingPermissionUtil;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.LayoutConstants;
+import com.liferay.portal.model.LayoutType;
 import com.liferay.portal.model.Organization;
 import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.ResourcePermission;
@@ -34,7 +36,6 @@ import com.liferay.portal.service.OrganizationLocalServiceUtil;
 import com.liferay.portal.service.ResourceLocalServiceUtil;
 import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
-import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.sites.util.SitesUtil;
 
@@ -45,8 +46,24 @@ import java.util.List;
  * @author Brian Wing Shun Chan
  * @author Raymond Augé
  */
+@OSGiBeanProperties(
+	property = {"model.class.name=com.liferay.portal.model.Layout"}
+)
 public class LayoutPermissionImpl
 	implements BaseModelPermissionChecker, LayoutPermission {
+
+	@Override
+	public void check(
+			PermissionChecker permissionChecker, Layout layout,
+			boolean checkViewableGroup, String actionId)
+		throws PortalException {
+
+		if (!contains(
+				permissionChecker, layout, checkViewableGroup, actionId)) {
+
+			throw new PrincipalException();
+		}
+	}
 
 	@Override
 	public void check(
@@ -215,6 +232,18 @@ public class LayoutPermissionImpl
 			layout = virtualLayout.getWrappedModel();
 		}
 
+		if (actionId.equals(ActionKeys.ADD_LAYOUT)) {
+			if (!SitesUtil.isLayoutSortable(layout)) {
+				return false;
+			}
+
+			LayoutType layoutType = layout.getLayoutType();
+
+			if (!layoutType.isParentable()) {
+				return false;
+			}
+		}
+
 		if (actionId.equals(ActionKeys.DELETE) &&
 			!SitesUtil.isLayoutDeleteable(layout)) {
 
@@ -257,18 +286,11 @@ public class LayoutPermissionImpl
 			}
 		}
 
-		if (actionId.equals(ActionKeys.ADD_LAYOUT)) {
-			if (!PortalUtil.isLayoutParentable(layout.getType()) ||
-				!SitesUtil.isLayoutSortable(layout)) {
+		if (actionId.equals(ActionKeys.ADD_LAYOUT) &&
+			GroupPermissionUtil.contains(
+				permissionChecker, group, ActionKeys.ADD_LAYOUT)) {
 
-				return false;
-			}
-
-			if (GroupPermissionUtil.contains(
-					permissionChecker, group, ActionKeys.ADD_LAYOUT)) {
-
-				return true;
-			}
+			return true;
 		}
 
 		if (GroupPermissionUtil.contains(

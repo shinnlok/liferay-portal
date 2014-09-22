@@ -116,12 +116,12 @@ public class WikiPageLocalServiceWrapper implements WikiPageLocalService,
 	}
 
 	@Override
-	public void addTempPageAttachment(long groupId, long userId,
-		java.lang.String fileName, java.lang.String tempFolderName,
+	public void addTempFileEntry(long groupId, long userId,
+		java.lang.String folderName, java.lang.String fileName,
 		java.io.InputStream inputStream, java.lang.String mimeType)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		_wikiPageLocalService.addTempPageAttachment(groupId, userId, fileName,
-			tempFolderName, inputStream, mimeType);
+		_wikiPageLocalService.addTempFileEntry(groupId, userId, folderName,
+			fileName, inputStream, mimeType);
 	}
 
 	/**
@@ -134,6 +134,14 @@ public class WikiPageLocalServiceWrapper implements WikiPageLocalService,
 	public com.liferay.portlet.wiki.model.WikiPage addWikiPage(
 		com.liferay.portlet.wiki.model.WikiPage wikiPage) {
 		return _wikiPageLocalService.addWikiPage(wikiPage);
+	}
+
+	@Override
+	public void changeNode(long userId, long nodeId, java.lang.String title,
+		long newNodeId, com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		_wikiPageLocalService.changeNode(userId, nodeId, title, newNodeId,
+			serviceContext);
 	}
 
 	@Override
@@ -217,11 +225,11 @@ public class WikiPageLocalServiceWrapper implements WikiPageLocalService,
 	}
 
 	@Override
-	public void deleteTempPageAttachment(long groupId, long userId,
-		java.lang.String fileName, java.lang.String tempFolderName)
+	public void deleteTempFileEntry(long groupId, long userId,
+		java.lang.String folderName, java.lang.String fileName)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		_wikiPageLocalService.deleteTempPageAttachment(groupId, userId,
-			fileName, tempFolderName);
+		_wikiPageLocalService.deleteTempFileEntry(groupId, userId, folderName,
+			fileName);
 	}
 
 	@Override
@@ -379,6 +387,12 @@ public class WikiPageLocalServiceWrapper implements WikiPageLocalService,
 	}
 
 	@Override
+	public com.liferay.portlet.wiki.model.WikiPage fetchPage(
+		long resourcePrimKey) {
+		return _wikiPageLocalService.fetchPage(resourcePrimKey);
+	}
+
+	@Override
 	public com.liferay.portlet.wiki.model.WikiPage fetchWikiPage(long pageId) {
 		return _wikiPageLocalService.fetchWikiPage(pageId);
 	}
@@ -443,6 +457,13 @@ public class WikiPageLocalServiceWrapper implements WikiPageLocalService,
 		java.lang.String parentTitle, int status) {
 		return _wikiPageLocalService.getChildrenCount(nodeId, head,
 			parentTitle, status);
+	}
+
+	@Override
+	public java.util.List<com.liferay.portlet.wiki.model.WikiPage> getDependentPages(
+		long nodeId, boolean head, java.lang.String title, int status) {
+		return _wikiPageLocalService.getDependentPages(nodeId, head, title,
+			status);
 	}
 
 	@Override
@@ -736,11 +757,18 @@ public class WikiPageLocalServiceWrapper implements WikiPageLocalService,
 	}
 
 	@Override
-	public java.lang.String[] getTempPageAttachmentNames(long groupId,
-		long userId, java.lang.String tempFolderName)
+	public java.util.List<com.liferay.portlet.wiki.model.WikiPage> getRedirectPages(
+		long nodeId, boolean head, java.lang.String redirectTitle, int status) {
+		return _wikiPageLocalService.getRedirectPages(nodeId, head,
+			redirectTitle, status);
+	}
+
+	@Override
+	public java.lang.String[] getTempFileNames(long groupId, long userId,
+		java.lang.String folderName)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		return _wikiPageLocalService.getTempPageAttachmentNames(groupId,
-			userId, tempFolderName);
+		return _wikiPageLocalService.getTempFileNames(groupId, userId,
+			folderName);
 	}
 
 	/**
@@ -825,6 +853,11 @@ public class WikiPageLocalServiceWrapper implements WikiPageLocalService,
 		_wikiPageLocalService.moveDependentToTrash(page, trashEntryId);
 	}
 
+	/**
+	* @deprecated As of 7.0.0, replaced by {@link #renamePage(long, long,
+	String, String, ServiceContext)}
+	*/
+	@Deprecated
 	@Override
 	public void movePage(long userId, long nodeId, java.lang.String title,
 		java.lang.String newTitle,
@@ -834,6 +867,11 @@ public class WikiPageLocalServiceWrapper implements WikiPageLocalService,
 			serviceContext);
 	}
 
+	/**
+	* @deprecated As of 6.2.0, replaced by {@link #renamePage(long, long,
+	String, String, boolean, ServiceContext)}
+	*/
+	@Deprecated
 	@Override
 	public void movePage(long userId, long nodeId, java.lang.String title,
 		java.lang.String newTitle, boolean strict,
@@ -852,6 +890,20 @@ public class WikiPageLocalServiceWrapper implements WikiPageLocalService,
 			title, fileName);
 	}
 
+	@Override
+	public com.liferay.portlet.wiki.model.WikiPage movePageFromTrash(
+		long userId, long nodeId, java.lang.String title, long newNodeId,
+		java.lang.String newParentTitle)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _wikiPageLocalService.movePageFromTrash(userId, nodeId, title,
+			newNodeId, newParentTitle);
+	}
+
+	/**
+	* @deprecated As of 7.0.0, replaced by {@link #movePageFromTrash(long,
+	long, String, long, String)} *
+	*/
+	@Deprecated
 	@Override
 	public com.liferay.portlet.wiki.model.WikiPage movePageFromTrash(
 		long userId, long nodeId, java.lang.String title,
@@ -885,10 +937,21 @@ public class WikiPageLocalServiceWrapper implements WikiPageLocalService,
 	}
 
 	@Override
-	public void restoreDependentFromTrash(
-		com.liferay.portlet.wiki.model.WikiPage page, long trashEntryId)
+	public void renamePage(long userId, long nodeId, java.lang.String title,
+		java.lang.String newTitle,
+		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		_wikiPageLocalService.restoreDependentFromTrash(page, trashEntryId);
+		_wikiPageLocalService.renamePage(userId, nodeId, title, newTitle,
+			serviceContext);
+	}
+
+	@Override
+	public void renamePage(long userId, long nodeId, java.lang.String title,
+		java.lang.String newTitle, boolean strict,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		_wikiPageLocalService.renamePage(userId, nodeId, title, newTitle,
+			strict, serviceContext);
 	}
 
 	@Override

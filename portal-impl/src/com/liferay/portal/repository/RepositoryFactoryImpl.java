@@ -14,110 +14,125 @@
 
 package com.liferay.portal.repository;
 
+import com.liferay.portal.kernel.bean.BeanReference;
+import com.liferay.portal.kernel.bean.ClassLoaderBeanHandler;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.repository.LocalRepository;
 import com.liferay.portal.kernel.repository.Repository;
 import com.liferay.portal.kernel.repository.RepositoryFactory;
+import com.liferay.portal.kernel.repository.UndeployedExternalRepositoryException;
+import com.liferay.portal.kernel.repository.capabilities.ConfigurationCapability;
+import com.liferay.portal.kernel.repository.capabilities.RepositoryEventTriggerCapability;
+import com.liferay.portal.kernel.repository.cmis.CMISRepositoryHandler;
+import com.liferay.portal.kernel.util.ProxyUtil;
+import com.liferay.portal.model.ClassName;
+import com.liferay.portal.repository.capabilities.BaseCapabilityRepository;
+import com.liferay.portal.repository.capabilities.CapabilityLocalRepository;
 import com.liferay.portal.repository.capabilities.CapabilityRepository;
+import com.liferay.portal.repository.capabilities.ConfigurationCapabilityImpl;
+import com.liferay.portal.repository.capabilities.LiferayRepositoryEventTriggerCapability;
 import com.liferay.portal.repository.liferayrepository.LiferayRepository;
+import com.liferay.portal.repository.proxy.BaseRepositoryProxyBean;
+import com.liferay.portal.repository.registry.RepositoryClassDefinition;
+import com.liferay.portal.repository.registry.RepositoryClassDefinitionCatalog;
+import com.liferay.portal.service.ClassNameLocalService;
 import com.liferay.portal.service.RepositoryLocalService;
-import com.liferay.portlet.documentlibrary.model.DLFileEntry;
-import com.liferay.portlet.documentlibrary.model.DLFileVersion;
-import com.liferay.portlet.documentlibrary.model.DLFolder;
+import com.liferay.portlet.documentlibrary.service.DLFileEntryLocalService;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryService;
+import com.liferay.portlet.documentlibrary.service.DLFileVersionLocalService;
 import com.liferay.portlet.documentlibrary.service.DLFileVersionService;
+import com.liferay.portlet.documentlibrary.service.DLFolderLocalService;
 import com.liferay.portlet.documentlibrary.service.DLFolderService;
 
 /**
  * @author Adolfo Pérez
  */
-public class RepositoryFactoryImpl extends BaseRepositoryFactory<Repository>
-	implements RepositoryFactory {
+public class RepositoryFactoryImpl implements RepositoryFactory {
 
 	@Override
-	protected Repository createExternalRepository(
-			long repositoryId, long classNameId)
+	public LocalRepository createLocalRepository(long repositoryId)
 		throws PortalException {
 
-		Repository repository = createExternalRepositoryImpl(
-			repositoryId, classNameId);
+		long classNameId = getRepositoryClassNameId(repositoryId);
 
-		return new CapabilityRepository(
-			repository, getExternalSupportedCapabilities(),
-			getExternalExportedCapabilityClasses());
+		RepositoryClassDefinition repositoryClassDefinition =
+			getRepositoryClassDefinition(classNameId);
+
+		CapabilityLocalRepository capabilityLocalRepository =
+			repositoryClassDefinition.createCapabilityLocalRepository(
+				repositoryId);
+
+		setupCommonCapabilities(
+			capabilityLocalRepository, repositoryClassDefinition);
+
+		return capabilityLocalRepository;
 	}
 
 	@Override
-	protected Repository createExternalRepository(
-			long folderId, long fileEntryId, long fileVersionId)
+	public Repository createRepository(long repositoryId)
 		throws PortalException {
 
-		long repositoryId = getRepositoryId(
-			folderId, fileEntryId, fileVersionId);
+		long classNameId = getRepositoryClassNameId(repositoryId);
 
-		Repository repository = create(repositoryId);
+		RepositoryClassDefinition repositoryClassDefinition =
+			getRepositoryClassDefinition(classNameId);
 
-		return new CapabilityRepository(
-			repository, getExternalSupportedCapabilities(),
-			getExternalExportedCapabilityClasses());
+		CapabilityRepository capabilityRepository =
+			repositoryClassDefinition.createCapabilityRepository(repositoryId);
+
+		setupCommonCapabilities(
+			capabilityRepository, repositoryClassDefinition);
+
+		setupCapabilityRepositoryCapabilities(capabilityRepository);
+
+		return capabilityRepository;
 	}
 
-	@Override
-	protected Repository createInternalRepositoryInstance(
-		long groupId, long repositoryId, long dlFolderId) {
+	protected CMISRepositoryHandler getCMISRepositoryHandler(
+		Repository repository) {
 
-		Repository repository = createLiferayInternalRepository(
-			groupId, repositoryId, dlFolderId);
+		if (repository instanceof BaseRepositoryProxyBean) {
+			BaseRepositoryProxyBean baseRepositoryProxyBean =
+				(BaseRepositoryProxyBean)repository;
 
-		return new CapabilityRepository(
-			repository, getInternalSupportedCapabilities(),
-			getInternalExportedCapabilityClasses());
+			ClassLoaderBeanHandler classLoaderBeanHandler =
+				(ClassLoaderBeanHandler)ProxyUtil.getInvocationHandler(
+					baseRepositoryProxyBean.getProxyBean());
+
+			Object bean = classLoaderBeanHandler.getBean();
+
+			if (bean instanceof CMISRepositoryHandler) {
+				return (CMISRepositoryHandler)bean;
+			}
+		}
+
+		return null;
 	}
 
-	protected Repository createLiferayInternalRepository(
-		long groupId, long repositoryId, long dlFolderId) {
-
-		return new LiferayRepository(
-			getRepositoryLocalService(), getRepositoryService(),
-			getDlAppHelperLocalService(), getDlFileEntryLocalService(),
-			getDlFileEntryService(), getDlFileEntryTypeLocalService(),
-			getDlFileVersionLocalService(), getDlFileVersionService(),
-			getDlFolderLocalService(), getDlFolderService(),
-			getResourceLocalService(), groupId, repositoryId, dlFolderId);
+	protected DLFileEntryLocalService getDlFileEntryLocalService() {
+		return _dlFileEntryLocalService;
 	}
 
-	@Override
-	protected long getFileEntryRepositoryId(long fileEntryId)
-		throws PortalException {
-
-		DLFileEntryService dlFileEntryService = getDlFileEntryService();
-
-		DLFileEntry dlFileEntry = dlFileEntryService.getFileEntry(fileEntryId);
-
-		return dlFileEntry.getRepositoryId();
+	protected DLFileEntryService getDlFileEntryService() {
+		return _dlFileEntryService;
 	}
 
-	@Override
-	protected long getFileVersionRepositoryId(long fileVersionId)
-		throws PortalException {
-
-		DLFileVersionService dlFileVersionService = getDlFileVersionService();
-
-		DLFileVersion dlFileVersion = dlFileVersionService.getFileVersion(
-			fileVersionId);
-
-		return dlFileVersion.getRepositoryId();
+	protected DLFileVersionLocalService getDlFileVersionLocalService() {
+		return _dlFileVersionLocalService;
 	}
 
-	@Override
-	protected long getFolderRepositoryId(long folderId) throws PortalException {
-		DLFolderService dlFolderService = getDlFolderService();
-
-		DLFolder dlFolder = dlFolderService.getFolder(folderId);
-
-		return dlFolder.getRepositoryId();
+	protected DLFileVersionService getDlFileVersionService() {
+		return _dlFileVersionService;
 	}
 
-	@Override
+	protected DLFolderLocalService getDlFolderLocalService() {
+		return _dlFolderLocalService;
+	}
+
+	protected DLFolderService getDlFolderService() {
+		return _dlFolderService;
+	}
+
 	protected com.liferay.portal.model.Repository getRepository(
 		long repositoryId) {
 
@@ -126,5 +141,101 @@ public class RepositoryFactoryImpl extends BaseRepositoryFactory<Repository>
 
 		return repositoryLocalService.fetchRepository(repositoryId);
 	}
+
+	protected RepositoryClassDefinition getRepositoryClassDefinition(
+			long classNameId)
+		throws PortalException {
+
+		ClassName className = _classNameLocalService.getClassName(classNameId);
+
+		RepositoryClassDefinition repositoryDefinition =
+			_repositoryClassDefinitionCatalog.getRepositoryClassDefinition(
+				className.getClassName());
+
+		if (repositoryDefinition == null) {
+			throw new UndeployedExternalRepositoryException(className);
+		}
+
+		return repositoryDefinition;
+	}
+
+	protected long getRepositoryClassNameId(long repositoryId) {
+		com.liferay.portal.model.Repository repository =
+			_repositoryLocalService.fetchRepository(repositoryId);
+
+		if (repository != null) {
+			return repository.getClassNameId();
+		}
+
+		return _classNameLocalService.getClassNameId(
+			LiferayRepository.class.getName());
+	}
+
+	protected RepositoryLocalService getRepositoryLocalService() {
+		return _repositoryLocalService;
+	}
+
+	protected void setupCapabilityRepositoryCapabilities(
+		CapabilityRepository capabilityRepository) {
+
+		Repository repository = capabilityRepository.getRepository();
+
+		CMISRepositoryHandler cmisRepositoryHandler = getCMISRepositoryHandler(
+			repository);
+
+		if (cmisRepositoryHandler != null) {
+			capabilityRepository.addExportedCapability(
+				CMISRepositoryHandler.class, cmisRepositoryHandler);
+		}
+	}
+
+	protected void setupCommonCapabilities(
+		BaseCapabilityRepository<?> baseCapabilityRepository,
+		RepositoryClassDefinition repositoryClassDefinition) {
+
+		if (!baseCapabilityRepository.isCapabilityProvided(
+				ConfigurationCapability.class)) {
+
+			baseCapabilityRepository.addExportedCapability(
+				ConfigurationCapability.class,
+				new ConfigurationCapabilityImpl(baseCapabilityRepository));
+		}
+
+		if (!baseCapabilityRepository.isCapabilityProvided(
+				RepositoryEventTriggerCapability.class)) {
+
+			baseCapabilityRepository.addExportedCapability(
+				RepositoryEventTriggerCapability.class,
+				new LiferayRepositoryEventTriggerCapability(
+					repositoryClassDefinition.getRepositoryEventTrigger()));
+		}
+	}
+
+	@BeanReference(type = ClassNameLocalService.class)
+	private ClassNameLocalService _classNameLocalService;
+
+	@BeanReference(type = DLFileEntryLocalService.class)
+	private DLFileEntryLocalService _dlFileEntryLocalService;
+
+	@BeanReference(type = DLFileEntryService.class)
+	private DLFileEntryService _dlFileEntryService;
+
+	@BeanReference(type = DLFileVersionLocalService.class)
+	private DLFileVersionLocalService _dlFileVersionLocalService;
+
+	@BeanReference(type = DLFileVersionService.class)
+	private DLFileVersionService _dlFileVersionService;
+
+	@BeanReference(type = DLFolderLocalService.class)
+	private DLFolderLocalService _dlFolderLocalService;
+
+	@BeanReference(type = DLFolderService.class)
+	private DLFolderService _dlFolderService;
+
+	@BeanReference(type = RepositoryClassDefinitionCatalog.class)
+	private RepositoryClassDefinitionCatalog _repositoryClassDefinitionCatalog;
+
+	@BeanReference(type = RepositoryLocalService.class)
+	private RepositoryLocalService _repositoryLocalService;
 
 }

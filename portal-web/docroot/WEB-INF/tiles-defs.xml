@@ -104,14 +104,6 @@
 		<put name="content" value="/portal/verify_email_address.jsp" />
 	</definition>
 
-	<!-- Activities -->
-
-	<definition name="portlet.activities" extends="portlet" />
-
-	<definition name="portlet.activities.view" extends="portlet.activities">
-		<put name="portlet_content" value="/portlet/activities/view.jsp" />
-	</definition>
-
 	<!-- Admin -->
 
 	<definition name="portlet.admin" extends="portlet" />
@@ -130,14 +122,6 @@
 
 	<definition name="portlet.admin.view" extends="portlet.admin">
 		<put name="portlet_content" value="/portlet/admin/view.jsp" />
-	</definition>
-
-	<!-- Amazon Rankings -->
-
-	<definition name="portlet.amazon_rankings" extends="portlet" />
-
-	<definition name="portlet.amazon_rankings.view" extends="portlet.amazon_rankings">
-		<put name="portlet_content" value="/portlet/amazon_rankings/view.jsp" />
 	</definition>
 
 	<!-- Announcements -->
@@ -392,18 +376,6 @@
 
 	<definition name="portlet.control_panel_menu.view" extends="portlet.control_panel_menu">
 		<put name="portlet_content" value="/portlet/control_panel_menu/view.jsp" />
-	</definition>
-
-	<!-- Currency Converter -->
-
-	<definition name="portlet.currency_converter" extends="portlet" />
-
-	<definition name="portlet.currency_converter.edit" extends="portlet.currency_converter">
-		<put name="portlet_content" value="/portlet/currency_converter/edit.jsp" />
-	</definition>
-
-	<definition name="portlet.currency_converter.view" extends="portlet.currency_converter">
-		<put name="portlet_content" value="/portlet/currency_converter/view.jsp" />
 	</definition>
 
 	<!-- Directory -->
@@ -676,14 +648,6 @@
 		<put name="portlet_content" value="/portlet/group_statistics/add_activity_counter.jsp" />
 	</definition>
 
-	<!-- IFrame -->
-
-	<definition name="portlet.iframe" extends="portlet" />
-
-	<definition name="portlet.iframe.view" extends="portlet.iframe">
-		<put name="portlet_content" value="/portlet/iframe/view.jsp" />
-	</definition>
-
 	<!-- Image Gallery Display -->
 
 	<definition name="portlet.image_gallery_display" extends="portlet" />
@@ -882,6 +846,10 @@
 
 	<definition name="portlet.layouts_admin.add_layout" extends="portlet.layouts_admin">
 		<put name="portlet_content" value="/portlet/layouts_admin/add_layout.jsp" />
+	</definition>
+
+	<definition name="portlet.layouts_admin.confirmation" extends="portlet.layouts_admin">
+		<put name="portlet_content" value="/portlet/layouts_admin/export_configuration/confirmation.jsp" />
 	</definition>
 
 	<definition name="portlet.layouts_admin.edit_layouts" extends="portlet.layouts_admin">
@@ -1090,14 +1058,6 @@
 		<put name="portlet_content" value="/portlet/nested_portlets/view.jsp" />
 	</definition>
 
-	<!-- Network -->
-
-	<definition name="portlet.network" extends="portlet" />
-
-	<definition name="portlet.network.view" extends="portlet.network">
-		<put name="portlet_content" value="/portlet/network/view.jsp" />
-	</definition>
-
 	<!-- News -->
 
 	<definition name="portlet.news" extends="portlet" />
@@ -1180,42 +1140,6 @@
 
 	<definition name="portlet.plugins_admin.view" extends="portlet.plugins_admin">
 		<put name="portlet_content" value="/portlet/plugins_admin/view.jsp" />
-	</definition>
-
-	<!-- Polls -->
-
-	<definition name="portlet.polls" extends="portlet" />
-
-	<definition name="portlet.polls.edit_question" extends="portlet.polls">
-		<put name="portlet_content" value="/portlet/polls/edit_question.jsp" />
-	</definition>
-
-	<definition name="portlet.polls.error" extends="portlet.polls">
-		<put name="portlet_content" value="/portlet/polls/error.jsp" />
-	</definition>
-
-	<definition name="portlet.polls.view" extends="portlet.polls">
-		<put name="portlet_content" value="/portlet/polls/view.jsp" />
-	</definition>
-
-	<definition name="portlet.polls.view_question" extends="portlet.polls">
-		<put name="portlet_content" value="/portlet/polls/view_question.jsp" />
-	</definition>
-
-	<!-- Polls Display -->
-
-	<definition name="portlet.polls_display" extends="portlet" />
-
-	<definition name="portlet.polls_display.add_question_redirect" extends="portlet.polls_display">
-		<put name="portlet_content" value="/portlet/polls_display/add_question_redirect.jsp" />
-	</definition>
-
-	<definition name="portlet.polls_display.error" extends="portlet.polls_display">
-		<put name="portlet_content" value="/portlet/polls_display/error.jsp" />
-	</definition>
-
-	<definition name="portlet.polls_display.view" extends="portlet.polls_display">
-		<put name="portlet_content" value="/portlet/polls_display/view.jsp" />
 	</definition>
 
 	<!-- Portal Settings -->
@@ -1410,10 +1334,6 @@
 	<!-- Shopping -->
 
 	<definition name="portlet.shopping" extends="portlet" />
-
-	<definition name="portlet.shopping.add_book_items" extends="portlet.shopping">
-		<put name="portlet_content" value="/portlet/shopping/add_book_items.jsp" />
-	</definition>
 
 	<definition name="portlet.shopping.cart" extends="portlet.shopping">
 		<put name="portlet_content" value="/portlet/shopping/cart.jsp" />
@@ -1881,13 +1801,5 @@
 
 	<definition name="portlet.workflow_tasks.view" extends="portlet.workflow_tasks">
 		<put name="portlet_content" value="/portlet/workflow_tasks/view.jsp" />
-	</definition>
-
-	<!-- XSL Content -->
-
-	<definition name="portlet.xsl_content" extends="portlet" />
-
-	<definition name="portlet.xsl_content.view" extends="portlet.xsl_content">
-		<put name="portlet_content" value="/portlet/xsl_content/view.jsp" />
 	</definition>
 </tiles-definitions>

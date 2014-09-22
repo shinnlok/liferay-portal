@@ -28,7 +28,9 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.LayoutConstants;
 import com.liferay.portal.model.LayoutPrototype;
+import com.liferay.portal.model.LayoutType;
 import com.liferay.portal.security.permission.ActionKeys;
+import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.LayoutPrototypeServiceUtil;
 import com.liferay.portal.service.LayoutServiceUtil;
 import com.liferay.portal.service.ServiceContext;
@@ -37,7 +39,6 @@ import com.liferay.portal.service.permission.GroupPermissionUtil;
 import com.liferay.portal.service.permission.LayoutPermissionUtil;
 import com.liferay.portal.struts.JSONAction;
 import com.liferay.portal.theme.ThemeDisplay;
-import com.liferay.portal.util.LayoutSettings;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.sites.util.SitesUtil;
@@ -99,7 +100,24 @@ public class UpdateLayoutAction extends JSONAction {
 			jsonObject.put(
 				"message",
 				getLayoutTypeExceptionMessage(themeDisplay, lte, cmd));
-			jsonObject.put("status", HttpServletResponse.SC_BAD_REQUEST);
+
+			long plid = ParamUtil.getLong(request, "plid");
+
+			if ((lte.getType() == LayoutTypeException.FIRST_LAYOUT) &&
+				(plid > 0)) {
+
+				Layout layout = LayoutLocalServiceUtil.getLayout(plid);
+
+				jsonObject.put("groupId", layout.getGroupId());
+				jsonObject.put("layoutId", layout.getLayoutId());
+				jsonObject.put(
+					"originalParentLayoutId", layout.getParentLayoutId());
+				jsonObject.put("originalParentPlid", layout.getParentPlid());
+				jsonObject.put("originalPriority", layout.getPriority());
+				jsonObject.put("plid", plid);
+
+				jsonObject.put("status", HttpServletResponse.SC_BAD_REQUEST);
+			}
 		}
 
 		return jsonObject.toString();
@@ -150,11 +168,11 @@ public class UpdateLayoutAction extends JSONAction {
 				description, type, hidden, friendlyURL, serviceContext);
 		}
 
-		LayoutSettings layoutSettings = LayoutSettings.getInstance(layout);
+		LayoutType layoutType = layout.getLayoutType();
 
 		EventsProcessorUtil.process(
 			PropsKeys.LAYOUT_CONFIGURATION_ACTION_UPDATE,
-			layoutSettings.getConfigurationActionUpdate(), request, response);
+			layoutType.getConfigurationActionUpdate(), request, response);
 
 		String layoutURL = PortalUtil.getLayoutURL(layout, themeDisplay);
 
@@ -271,25 +289,11 @@ public class UpdateLayoutAction extends JSONAction {
 		throws Exception {
 
 		long plid = ParamUtil.getLong(request, "plid");
-
 		long parentPlid = ParamUtil.getLong(request, "parentPlid");
+		int priority = ParamUtil.getInteger(request, "priority");
 
-		long groupId = ParamUtil.getLong(request, "groupId");
-		boolean privateLayout = ParamUtil.getBoolean(request, "privateLayout");
-		long layoutId = ParamUtil.getLong(request, "layoutId");
-		long parentLayoutId = ParamUtil.getLong(
-			request, "parentLayoutId",
-			LayoutConstants.DEFAULT_PARENT_LAYOUT_ID);
-
-		if (plid <= 0) {
-			LayoutServiceUtil.updateParentLayoutId(
-				groupId, privateLayout, layoutId, parentLayoutId);
-		}
-		else {
-			LayoutServiceUtil.updateParentLayoutId(plid, parentPlid);
-		}
-
-		updatePriority(request);
+		LayoutServiceUtil.updateParentLayoutIdAndPriority(
+			plid, parentPlid, priority);
 	}
 
 	protected void updatePriority(HttpServletRequest request) throws Exception {

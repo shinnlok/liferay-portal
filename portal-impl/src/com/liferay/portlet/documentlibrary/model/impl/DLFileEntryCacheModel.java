@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.documentlibrary.model.impl;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -34,11 +36,12 @@ import java.util.Date;
  * @see DLFileEntry
  * @generated
  */
+@ProviderType
 public class DLFileEntryCacheModel implements CacheModel<DLFileEntry>,
 	Externalizable {
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(57);
+		StringBundler sb = new StringBundler(59);
 
 		sb.append("{uuid=");
 		sb.append(uuid);
@@ -68,6 +71,8 @@ public class DLFileEntryCacheModel implements CacheModel<DLFileEntry>,
 		sb.append(treePath);
 		sb.append(", name=");
 		sb.append(name);
+		sb.append(", fileName=");
+		sb.append(fileName);
 		sb.append(", extension=");
 		sb.append(extension);
 		sb.append(", mimeType=");
@@ -157,6 +162,13 @@ public class DLFileEntryCacheModel implements CacheModel<DLFileEntry>,
 			dlFileEntryImpl.setName(name);
 		}
 
+		if (fileName == null) {
+			dlFileEntryImpl.setFileName(StringPool.BLANK);
+		}
+		else {
+			dlFileEntryImpl.setFileName(fileName);
+		}
+
 		if (extension == null) {
 			dlFileEntryImpl.setExtension(StringPool.BLANK);
 		}
@@ -230,6 +242,7 @@ public class DLFileEntryCacheModel implements CacheModel<DLFileEntry>,
 		folderId = objectInput.readLong();
 		treePath = objectInput.readUTF();
 		name = objectInput.readUTF();
+		fileName = objectInput.readUTF();
 		extension = objectInput.readUTF();
 		mimeType = objectInput.readUTF();
 		title = objectInput.readUTF();
@@ -287,6 +300,13 @@ public class DLFileEntryCacheModel implements CacheModel<DLFileEntry>,
 		}
 		else {
 			objectOutput.writeUTF(name);
+		}
+
+		if (fileName == null) {
+			objectOutput.writeUTF(StringPool.BLANK);
+		}
+		else {
+			objectOutput.writeUTF(fileName);
 		}
 
 		if (extension == null) {
@@ -356,6 +376,7 @@ public class DLFileEntryCacheModel implements CacheModel<DLFileEntry>,
 	public long folderId;
 	public String treePath;
 	public String name;
+	public String fileName;
 	public String extension;
 	public String mimeType;
 	public String title;

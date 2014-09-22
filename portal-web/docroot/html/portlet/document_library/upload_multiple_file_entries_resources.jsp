@@ -80,7 +80,7 @@ if (fileEntryTypeId > 0) {
 
 long assetClassPK = 0;
 
-DLFileEntryActionsDisplayContext dlFileEntryActionsDisplayContext = new DLFileEntryActionsDisplayContext(request, dlPortletInstanceSettings, fileEntry, fileVersion);
+DLFileVersionDisplayContext dlFileVersionDisplayContext = DLFileVersionDisplayContextUtil.getDLFileVersionActionsDisplayContext(request, response, fileVersion);
 %>
 
 <portlet:actionURL var="uploadMultipleFileEntriesURL">
@@ -258,7 +258,7 @@ DLFileEntryActionsDisplayContext dlFileEntryActionsDisplayContext = new DLFileEn
 
 	<span id="<portlet:namespace />selectedFileNameContainer"></span>
 
-	<aui:button type="submit" value="<%= dlFileEntryActionsDisplayContext.getPublishButtonLabel() %>" />
+	<aui:button type="submit" value="<%= dlFileVersionDisplayContext.getPublishButtonLabel() %>" />
 </aui:form>
 
 <aui:script>

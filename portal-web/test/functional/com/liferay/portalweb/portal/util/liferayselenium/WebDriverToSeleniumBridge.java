@@ -16,14 +16,11 @@ package com.liferay.portalweb.portal.util.liferayselenium;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portalweb.portal.BaseTestCase;
-import com.liferay.portalweb.portal.util.TestPropsValues;
 
 import com.thoughtworks.selenium.Selenium;
 
@@ -37,8 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
-import java.util.concurrent.TimeUnit;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -51,7 +47,6 @@ import javax.xml.xpath.XPathFactory;
 
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
@@ -63,8 +58,6 @@ import org.openqa.selenium.internal.WrapsDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
-
-import org.sikuli.script.Screen;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -85,7 +78,7 @@ public class WebDriverToSeleniumBridge
 		initKeys();
 		initKeysSpecialChars();
 
-		defaultWindowHandle = getWindowHandle();
+		WebDriverHelper.setDefaultWindowHandle(webDriver.getWindowHandle());
 	}
 
 	@Override
@@ -503,15 +496,7 @@ public class WebDriverToSeleniumBridge
 
 	@Override
 	public String getAttribute(String attributeLocator) {
-		int pos = attributeLocator.lastIndexOf(CharPool.AT);
-
-		String locator = attributeLocator.substring(0, pos);
-
-		WebElement webElement = getWebElement(locator);
-
-		String attribute = attributeLocator.substring(pos + 1);
-
-		return webElement.getAttribute(attribute);
+		return WebDriverHelper.getAttribute(this, attributeLocator);
 	}
 
 	@Override
@@ -594,15 +579,7 @@ public class WebDriverToSeleniumBridge
 
 	@Override
 	public String getEval(String script) {
-		WebElement webElement = getWebElement("//body");
-
-		WrapsDriver wrapsDriver = (WrapsDriver)webElement;
-
-		WebDriver webDriver = wrapsDriver.getWrappedDriver();
-
-		JavascriptExecutor javascriptExecutor = (JavascriptExecutor)webDriver;
-
-		return (String)javascriptExecutor.executeScript(script);
+		return WebDriverHelper.getEval(this, script);
 	}
 
 	@Override
@@ -675,7 +652,7 @@ public class WebDriverToSeleniumBridge
 
 	@Override
 	public String getLocation() {
-		return getCurrentUrl();
+		return WebDriverHelper.getLocation(this);
 	}
 
 	@Override
@@ -783,17 +760,7 @@ public class WebDriverToSeleniumBridge
 			return getHtmlNodeText(locator);
 		}
 
-		WebElement webElement = getWebElement(locator, timeout);
-
-		if (!webElement.isDisplayed()) {
-			scrollWebElementIntoView(webElement);
-		}
-
-		String text = webElement.getText();
-
-		text = text.trim();
-
-		return text.replace("\n", " ");
+		return WebDriverHelper.getText(this, locator, timeout);
 	}
 
 	@Override
@@ -831,7 +798,7 @@ public class WebDriverToSeleniumBridge
 	}
 
 	@Override
-	public Number getXpathCount(String xpath) {
+	public Number getXpathCount(String xPath) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -900,9 +867,7 @@ public class WebDriverToSeleniumBridge
 
 	@Override
 	public boolean isElementPresent(String locator) {
-		List<WebElement> webElements = getWebElements(locator, "1");
-
-		return !webElements.isEmpty();
+		return WebDriverHelper.isElementPresent(this, locator);
 	}
 
 	@Override
@@ -931,13 +896,7 @@ public class WebDriverToSeleniumBridge
 
 	@Override
 	public boolean isVisible(String locator) {
-		WebElement webElement = getWebElement(locator, "1");
-
-		if (!webElement.isDisplayed()) {
-			scrollWebElementIntoView(webElement);
-		}
-
-		return webElement.isDisplayed();
+		return WebDriverHelper.isVisible(this, locator);
 	}
 
 	@Override
@@ -1212,10 +1171,6 @@ public class WebDriverToSeleniumBridge
 
 	@Override
 	public void mouseOver(String locator) {
-		if (TestPropsValues.MOBILE_DEVICE_ENABLED) {
-			return;
-		}
-
 		WebElement webElement = getWebElement(locator);
 
 		if (!webElement.isDisplayed()) {
@@ -1301,38 +1256,7 @@ public class WebDriverToSeleniumBridge
 
 	@Override
 	public void open(String url) {
-		String targetURL = "";
-
-		if (url.startsWith("/")) {
-			targetURL = TestPropsValues.PORTAL_URL + url;
-		}
-		else {
-			targetURL = url;
-		}
-
-		for (int second = 0;; second++) {
-			if (second >= TestPropsValues.TIMEOUT_IMPLICIT_WAIT) {
-				break;
-			}
-
-			try {
-				get(targetURL);
-
-				if (TestPropsValues.BROWSER_TYPE.equals("*iehta") ||
-					TestPropsValues.BROWSER_TYPE.equals("*iexplore")) {
-
-					refresh();
-				}
-
-				if (targetURL.equals(getLocation())) {
-					break;
-				}
-
-				Thread.sleep(1000);
-			}
-			catch (Exception e) {
-			}
-		}
+		WebDriverHelper.open(this, url);
 	}
 
 	@Override
@@ -1347,9 +1271,7 @@ public class WebDriverToSeleniumBridge
 
 	@Override
 	public void refresh() {
-		WebDriver.Navigation navigation = navigate();
-
-		navigation.refresh();
+		WebDriverHelper.refresh(this);
 	}
 
 	@Override
@@ -1440,29 +1362,7 @@ public class WebDriverToSeleniumBridge
 
 	@Override
 	public void selectFrame(String locator) {
-		WebDriver.TargetLocator targetLocator = switchTo();
-
-		if (locator.equals("relative=parent")) {
-			targetLocator.window(defaultWindowHandle);
-
-			if (!_frameWebElements.isEmpty()) {
-				_frameWebElements.pop();
-
-				if (!_frameWebElements.isEmpty()) {
-					targetLocator.frame(_frameWebElements.peek());
-				}
-			}
-		}
-		else if (locator.equals("relative=top")) {
-			_frameWebElements = new Stack<WebElement>();
-
-			targetLocator.window(defaultWindowHandle);
-		}
-		else {
-			_frameWebElements.push(getWebElement(locator));
-
-			targetLocator.frame(_frameWebElements.peek());
-		}
+		WebDriverHelper.selectFrame(this, locator);
 	}
 
 	@Override
@@ -1489,49 +1389,7 @@ public class WebDriverToSeleniumBridge
 
 	@Override
 	public void selectWindow(String windowID) {
-		Set<String> windowHandles = getWindowHandles();
-
-		if (windowID.equals("name=undefined")) {
-			String title = getTitle();
-
-			for (String windowHandle : windowHandles) {
-				WebDriver.TargetLocator targetLocator = switchTo();
-
-				targetLocator.window(windowHandle);
-
-				if (!title.equals(getTitle())) {
-					return;
-				}
-			}
-
-			BaseTestCase.fail(
-				"Unable to find the window ID \"" + windowID + "\"");
-		}
-		else if (windowID.equals("null")) {
-			WebDriver.TargetLocator targetLocator = switchTo();
-
-			targetLocator.window(defaultWindowHandle);
-		}
-		else {
-			String targetWindowTitle = windowID;
-
-			if (targetWindowTitle.startsWith("title=")) {
-				targetWindowTitle = targetWindowTitle.substring(6);
-			}
-
-			for (String windowHandle : windowHandles) {
-				WebDriver.TargetLocator targetLocator = switchTo();
-
-				targetLocator.window(windowHandle);
-
-				if (targetWindowTitle.equals(getTitle())) {
-					return;
-				}
-			}
-
-			BaseTestCase.fail(
-				"Unable to find the window ID \"" + windowID + "\"");
-		}
+		WebDriverHelper.selectWindow(this, windowID);
 	}
 
 	@Override
@@ -1550,9 +1408,7 @@ public class WebDriverToSeleniumBridge
 	}
 
 	public void setDefaultTimeoutImplicit() {
-		int timeout = TestPropsValues.TIMEOUT_IMPLICIT_WAIT * 1000;
-
-		setTimeoutImplicit(String.valueOf(timeout));
+		WebDriverHelper.setDefaultTimeoutImplicit(this);
 	}
 
 	@Override
@@ -1575,12 +1431,7 @@ public class WebDriverToSeleniumBridge
 	}
 
 	public void setTimeoutImplicit(String timeout) {
-		WebDriver.Options options = manage();
-
-		WebDriver.Timeouts timeouts = options.timeouts();
-
-		timeouts.implicitlyWait(
-			GetterUtil.getInteger(timeout), TimeUnit.MILLISECONDS);
+		WebDriverHelper.setTimeoutImplicit(this, timeout);
 	}
 
 	@Override
@@ -1635,84 +1486,44 @@ public class WebDriverToSeleniumBridge
 
 	@Override
 	public void type(String locator, String value) {
-		WebElement webElement = getWebElement(locator);
-
-		if (!webElement.isEnabled()) {
-			return;
-		}
-
-		if (TestPropsValues.MOBILE_DEVICE_ENABLED) {
-			webElement.clear();
-
-			webElement.click();
-
-			try {
-				Thread.sleep(1000);
-			}
-			catch (Exception e) {
-			}
-
-			Screen screen = new Screen();
-
-			screen.type(value);
-		}
-		else {
-			webElement.clear();
-
-			webElement.sendKeys(value);
-		}
+		WebDriverHelper.type(this, locator, value);
 	}
 
 	@Override
 	public void typeKeys(String locator, String value) {
-		typeKeys(locator, value, false);
-	}
-
-	public void typeKeys(String locator, String value, boolean typeAceEditor) {
 		WebElement webElement = getWebElement(locator);
 
 		if (!webElement.isEnabled()) {
 			return;
 		}
 
-		StringBundler sb = new StringBundler();
-
-		sb.append(".*[");
-
-		Set<String> keysSpecialCharsSet = _keysSpecialChars.keySet();
-
-		for (String specialChar : keysSpecialCharsSet) {
-			sb.append("\\");
-			sb.append(specialChar);
+		if (value.contains("line-number=")) {
+			value = value.replaceAll("line-number=\"\\d+\"", "");
 		}
 
-		sb.append("]*.*");
+		int i = 0;
 
-		if (value.matches(sb.toString()) || typeAceEditor) {
-			char[] chars = value.toCharArray();
+		Set<Integer> specialCharIndexes = getSpecialCharIndexes(value);
 
-			for (char c : chars) {
-				String s = String.valueOf(c);
+		for (int specialCharIndex : specialCharIndexes) {
+			webElement.sendKeys(value.substring(i, specialCharIndex));
 
-				if (keysSpecialCharsSet.contains(s)) {
-					webElement.sendKeys(Keys.SHIFT, _keysSpecialChars.get(s));
-				}
-				else {
-					webElement.sendKeys(s);
-				}
+			webElement.sendKeys(Keys.ESCAPE);
 
-				if (typeAceEditor) {
-					if (s.equals("(") || s.equals("\"")) {
-						keyPress(locator, "\\46");
-					}
+			String specialChar = String.valueOf(value.charAt(specialCharIndex));
 
-					keyPress(locator, "\\27");
-				}
+			if (specialChar.equals("-")) {
+				webElement.sendKeys(Keys.SUBTRACT);
 			}
+			else {
+				webElement.sendKeys(
+					Keys.SHIFT, _keysSpecialChars.get(specialChar));
+			}
+
+			i = specialCharIndex + 1;
 		}
-		else {
-			webElement.sendKeys(value);
-		}
+
+		webElement.sendKeys(value.substring(i, value.length()));
 	}
 
 	@Override
@@ -1783,7 +1594,8 @@ public class WebDriverToSeleniumBridge
 					targetLocator.window(windowHandle);
 
 					if (targetWindowTitle.equals(getTitle())) {
-						targetLocator.window(defaultWindowHandle);
+						targetLocator.window(
+							WebDriverHelper.getDefaultWindowHandle());
 
 						return;
 					}
@@ -1818,74 +1630,40 @@ public class WebDriverToSeleniumBridge
 		alert.accept();
 	}
 
+	protected Set<Integer> getSpecialCharIndexes(String value) {
+		Set<Integer> specialCharIndexes = new TreeSet<Integer>();
+
+		while (value.contains("-")) {
+			specialCharIndexes.add(value.indexOf("-"));
+
+			value = StringUtil.replaceFirst(value, "-", " ");
+		}
+
+		for (String specialChar : _keysSpecialChars.keySet()) {
+			while (value.contains(specialChar)) {
+				specialCharIndexes.add(value.indexOf(specialChar));
+
+				value = StringUtil.replaceFirst(value, specialChar, " ");
+			}
+		}
+
+		return specialCharIndexes;
+	}
+
 	protected WebElement getWebElement(String locator) {
-		return getWebElement(locator, null);
+		return WebDriverHelper.getWebElement(this, locator);
 	}
 
 	protected WebElement getWebElement(String locator, String timeout) {
-		List<WebElement> webElements = getWebElements(locator, timeout);
-
-		if (!webElements.isEmpty()) {
-			return webElements.get(0);
-		}
-
-		return null;
+		return WebDriverHelper.getWebElement(this, locator, timeout);
 	}
 
 	protected List<WebElement> getWebElements(String locator) {
-		return getWebElements(locator, null);
+		return WebDriverHelper.getWebElements(this, locator);
 	}
 
 	protected List<WebElement> getWebElements(String locator, String timeout) {
-		if (timeout != null) {
-			setTimeoutImplicit(timeout);
-		}
-
-		try {
-			if (locator.startsWith("//")) {
-				return findElements(By.xpath(locator));
-			}
-			else if (locator.startsWith("class=")) {
-				locator = locator.substring(6);
-
-				return findElements(By.className(locator));
-			}
-			else if (locator.startsWith("css=")) {
-				locator = locator.substring(4);
-
-				return findElements(By.cssSelector(locator));
-			}
-			else if (locator.startsWith("link=")) {
-				locator = locator.substring(5);
-
-				return findElements(By.linkText(locator));
-			}
-			else if (locator.startsWith("name=")) {
-				locator = locator.substring(5);
-
-				return findElements(By.name(locator));
-			}
-			else if (locator.startsWith("tag=")) {
-				locator = locator.substring(4);
-
-				return findElements(By.tagName(locator));
-			}
-			else if (locator.startsWith("xpath=") ||
-					 locator.startsWith("xPath=")) {
-
-				locator = locator.substring(6);
-
-				return findElements(By.xpath(locator));
-			}
-			else {
-				return findElements(By.id(locator));
-			}
-		}
-		finally {
-			if (timeout != null) {
-				setDefaultTimeoutImplicit();
-			}
-		}
+		return WebDriverHelper.getWebElements(this, locator, timeout);
 	}
 
 	protected void initKeys() {
@@ -1969,14 +1747,7 @@ public class WebDriverToSeleniumBridge
 	}
 
 	protected void scrollWebElementIntoView(WebElement webElement) {
-		WrapsDriver wrapsDriver = (WrapsDriver)webElement;
-
-		WebDriver webDriver = wrapsDriver.getWrappedDriver();
-
-		JavascriptExecutor javascriptExecutor = (JavascriptExecutor)webDriver;
-
-		javascriptExecutor.executeScript(
-			"arguments[0].scrollIntoView();", webElement);
+		WebDriverHelper.scrollWebElementIntoView(this, webElement);
 	}
 
 	protected void selectByRegexpText(String selectLocator, String regexp) {
@@ -2032,12 +1803,9 @@ public class WebDriverToSeleniumBridge
 		select.selectByIndex(index);
 	}
 
-	protected String defaultWindowHandle;
-
 	private static Log _log = LogFactoryUtil.getLog(
 		WebDriverToSeleniumBridge.class);
 
-	private Stack<WebElement> _frameWebElements = new Stack<WebElement>();
 	private Keys[] _keysArray = new Keys[128];
 	private Map<String, String> _keysSpecialChars =
 		new HashMap<String, String>();

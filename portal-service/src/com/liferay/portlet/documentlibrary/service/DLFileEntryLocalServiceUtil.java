@@ -342,6 +342,11 @@ public class DLFileEntryLocalServiceUtil {
 		return getService().fetchFileEntryByAnyImageId(imageId);
 	}
 
+	public static com.liferay.portlet.documentlibrary.model.DLFileEntry fetchFileEntryByFileName(
+		long groupId, long folderId, java.lang.String fileName) {
+		return getService().fetchFileEntryByFileName(groupId, folderId, fileName);
+	}
+
 	public static com.liferay.portlet.documentlibrary.model.DLFileEntry fetchFileEntryByName(
 		long groupId, long folderId, java.lang.String name) {
 		return getService().fetchFileEntryByName(groupId, folderId, name);
@@ -710,6 +715,15 @@ public class DLFileEntryLocalServiceUtil {
 		return getService().getPersistedModel(primaryKeyObj);
 	}
 
+	public static java.util.List<com.liferay.portlet.documentlibrary.model.DLFileEntry> getRepositoryFileEntries(
+		long repositoryId, int start, int end) {
+		return getService().getRepositoryFileEntries(repositoryId, start, end);
+	}
+
+	public static int getRepositoryFileEntriesCount(long repositoryId) {
+		return getService().getRepositoryFileEntriesCount(repositoryId);
+	}
+
 	public static boolean hasExtraSettings() {
 		return getService().hasExtraSettings();
 	}
@@ -745,7 +759,8 @@ public class DLFileEntryLocalServiceUtil {
 			serviceContext);
 	}
 
-	public static void rebuildTree(long companyId) {
+	public static void rebuildTree(long companyId)
+		throws com.liferay.portal.kernel.exception.PortalException {
 		getService().rebuildTree(companyId);
 	}
 
@@ -780,6 +795,12 @@ public class DLFileEntryLocalServiceUtil {
 	*/
 	public static void setBeanIdentifier(java.lang.String beanIdentifier) {
 		getService().setBeanIdentifier(beanIdentifier);
+	}
+
+	public static void setTreePaths(long folderId, java.lang.String treePath,
+		boolean reindex)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		getService().setTreePaths(folderId, treePath, reindex);
 	}
 
 	public static void unlockFileEntry(long fileEntryId) {
@@ -825,6 +846,13 @@ public class DLFileEntryLocalServiceUtil {
 		return getService()
 				   .updateStatus(userId, fileVersionId, status, serviceContext,
 			workflowContext);
+	}
+
+	public static void validateFile(long groupId, long folderId,
+		long fileEntryId, java.lang.String fileName, java.lang.String title)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		getService()
+			.validateFile(groupId, folderId, fileEntryId, fileName, title);
 	}
 
 	public static boolean verifyFileEntryCheckOut(long fileEntryId,

@@ -78,7 +78,7 @@ if (fileEntry != null) {
 
 DLFileEntryType dlFileEntryType = null;
 
-if (fileEntryTypeId > 0) {
+if (fileEntryTypeId >= 0) {
 	dlFileEntryType = DLFileEntryTypeLocalServiceUtil.getFileEntryType(fileEntryTypeId);
 }
 
@@ -112,7 +112,16 @@ if ((checkedOut || pending) && !PropsValues.DL_FILE_ENTRY_DRAFTS_ENABLED) {
 	saveAsDraft = true;
 }
 
-DLFileEntryActionsDisplayContext dlFileEntryActionsDisplayContext = new DLFileEntryActionsDisplayContext(request, dlPortletInstanceSettings, fileEntry, fileVersion);
+DLEditFileEntryDisplayContext dlEditFileEntryDisplayContext = null;
+
+if (fileEntry == null) {
+	dlEditFileEntryDisplayContext = DLEditFileEntryDisplayContextUtil.getDLEditFileEntryDisplayContext(request, response, dlFileEntryType);
+}
+else {
+	dlEditFileEntryDisplayContext = DLEditFileEntryDisplayContextUtil.getDLEditFileEntryDisplayContext(request, response, fileEntry);
+}
+
+DLFileVersionDisplayContext dlFileVersionDisplayContext = DLFileVersionDisplayContextUtil.getDLFileVersionActionsDisplayContext(request, response, fileVersion);
 %>
 
 <c:if test="<%= Validator.isNull(referringPortletResource) %>">
@@ -156,7 +165,7 @@ DLFileEntryActionsDisplayContext dlFileEntryActionsDisplayContext = new DLFileEn
 		headerTitle = fileVersion.getTitle();
 		localizeTitle= false;
 	}
-	else if (dlFileEntryType != null) {
+	else if ((dlFileEntryType != null) && (fileEntryTypeId != 0)) {
 		headerTitle = LanguageUtil.format(request, "new-x", dlFileEntryType.getName(locale), false);
 	}
 	%>
@@ -215,11 +224,7 @@ DLFileEntryActionsDisplayContext dlFileEntryActionsDisplayContext = new DLFileEn
 	</liferay-ui:error>
 
 	<%
-	long fileMaxSize = PrefsPropsUtil.getLong(PropsKeys.DL_FILE_MAX_SIZE);
-
-	if (fileMaxSize == 0) {
-		fileMaxSize = PrefsPropsUtil.getLong(PropsKeys.UPLOAD_SERVLET_REQUEST_IMPL_MAX_SIZE);
-	}
+	long fileMaxSize = dlEditFileEntryDisplayContext.getMaximumUploadSize();
 	%>
 
 	<liferay-ui:error exception="<%= FileSizeException.class %>">
@@ -452,24 +457,24 @@ DLFileEntryActionsDisplayContext dlFileEntryActionsDisplayContext = new DLFileEn
 		</c:if>
 
 		<aui:button-row>
-			<c:if test="<%= dlFileEntryActionsDisplayContext.isSaveButtonVisible() %>">
-				<aui:button disabled="<%= dlFileEntryActionsDisplayContext.isSaveButtonDisabled() %>" name="saveButton" onClick='<%= renderResponse.getNamespace() + "saveFileEntry(true);" %>' value="<%= dlFileEntryActionsDisplayContext.getSaveButtonLabel() %>" />
+			<c:if test="<%= dlFileVersionDisplayContext.isSaveButtonVisible() %>">
+				<aui:button disabled="<%= dlFileVersionDisplayContext.isSaveButtonDisabled() %>" name="saveButton" onClick='<%= renderResponse.getNamespace() + "saveFileEntry(true);" %>' value="<%= dlFileVersionDisplayContext.getSaveButtonLabel() %>" />
 			</c:if>
 
-			<c:if test="<%= dlFileEntryActionsDisplayContext.isPublishButtonVisible() %>">
-				<aui:button disabled="<%= dlFileEntryActionsDisplayContext.isPublishButtonDisabled() %>" name="publishButton" type="submit" value="<%= dlFileEntryActionsDisplayContext.getPublishButtonLabel() %>" />
+			<c:if test="<%= dlFileVersionDisplayContext.isPublishButtonVisible() %>">
+				<aui:button disabled="<%= dlFileVersionDisplayContext.isPublishButtonDisabled() %>" name="publishButton" type="submit" value="<%= dlFileVersionDisplayContext.getPublishButtonLabel() %>" />
 			</c:if>
 
-			<c:if test="<%= dlFileEntryActionsDisplayContext.isCheckoutDocumentButtonVisible() %>">
-				<aui:button disabled="<%= dlFileEntryActionsDisplayContext.isCheckoutDocumentDisabled() %>" onClick='<%= renderResponse.getNamespace() + "checkOut();" %>' value="checkout[document]" />
+			<c:if test="<%= dlFileVersionDisplayContext.isCheckoutDocumentButtonVisible() %>">
+				<aui:button disabled="<%= dlFileVersionDisplayContext.isCheckoutDocumentDisabled() %>" onClick='<%= renderResponse.getNamespace() + "checkOut();" %>' value="checkout[document]" />
 			</c:if>
 
-			<c:if test="<%= dlFileEntryActionsDisplayContext.isCheckinButtonVisible() %>">
-				<aui:button disabled="<%= dlFileEntryActionsDisplayContext.isCheckinButtonDisabled() %>" onClick='<%= renderResponse.getNamespace() + "checkIn();" %>' value="save-and-checkin" />
+			<c:if test="<%= dlFileVersionDisplayContext.isCheckinButtonVisible() %>">
+				<aui:button disabled="<%= dlFileVersionDisplayContext.isCheckinButtonDisabled() %>" onClick='<%= renderResponse.getNamespace() + "checkIn();" %>' value="save-and-checkin" />
 			</c:if>
 
-			<c:if test="<%= dlFileEntryActionsDisplayContext.isCancelCheckoutDocumentButtonVisible() %>">
-				<aui:button disabled="<%= dlFileEntryActionsDisplayContext.isCancelCheckoutDocumentButtonDisabled() %>" onClick='<%= renderResponse.getNamespace() + "cancelCheckOut();" %>' value="cancel-checkout[document]" />
+			<c:if test="<%= dlFileVersionDisplayContext.isCancelCheckoutDocumentButtonVisible() %>">
+				<aui:button disabled="<%= dlFileVersionDisplayContext.isCancelCheckoutDocumentButtonDisabled() %>" onClick='<%= renderResponse.getNamespace() + "cancelCheckOut();" %>' value="cancel-checkout[document]" />
 			</c:if>
 
 			<aui:button href="<%= redirect %>" type="cancel" />
