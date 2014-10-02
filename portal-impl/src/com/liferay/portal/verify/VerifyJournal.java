@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
+import com.liferay.portal.kernel.xml.Node;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.service.ResourceLocalServiceUtil;
 import com.liferay.portal.util.PortalInstances;
@@ -82,6 +83,44 @@ public class VerifyJournal extends VerifyProcess {
 		verifySearch();
 		verifyTree();
 		verifyURLTitle();
+	}
+
+	protected void updateElements(List<Element> elements) {
+		for (Element element : elements) {
+			String type = element.attributeValue("type");
+
+			if (!type.equals("document_library")) {
+				continue;
+			}
+
+			updateElements(element.elements("dynamic-element"));
+
+			Element dynamicContentElement = element.element("dynamic-content");
+
+			String path = dynamicContentElement.getStringValue();
+
+			String[] pathArray = StringUtil.split(path, CharPool.SLASH);
+
+			if (pathArray.length != 5) {
+				continue;
+			}
+
+			long groupId = GetterUtil.getLong(pathArray[2]);
+			long folderId = GetterUtil.getLong(pathArray[3]);
+			String title = HttpUtil.decodeURL(HtmlUtil.escape(pathArray[4]));
+
+			DLFileEntry dlFileEntry =
+				DLFileEntryLocalServiceUtil.fetchFileEntry(
+					groupId, folderId, title);
+
+			if (dlFileEntry == null) {
+				continue;
+			}
+
+			Node node = dynamicContentElement.node(0);
+
+			node.setText(path + StringPool.SLASH + dlFileEntry.getUuid());
+		}
 	}
 
 	protected void updateFolderAssets() throws Exception {
@@ -169,42 +208,7 @@ public class VerifyJournal extends VerifyProcess {
 
 				Element rootElement = document.getRootElement();
 
-				List<Element> elements = rootElement.elements();
-
-				for (Element element : elements) {
-					String type = element.attributeValue("type");
-
-					if (!type.equals("document_library")) {
-						continue;
-					}
-
-					Element dynamicContentElement = element.element(
-						"dynamic-content");
-
-					String path = dynamicContentElement.getStringValue();
-
-					String[] pathArray = StringUtil.split(path, CharPool.SLASH);
-
-					if (pathArray.length != 5) {
-						continue;
-					}
-
-					long groupId = GetterUtil.getLong(pathArray[2]);
-					long folderId = GetterUtil.getLong(pathArray[3]);
-					String title = HttpUtil.decodeURL(
-						HtmlUtil.escape(pathArray[4]));
-
-					DLFileEntry dlFileEntry =
-						DLFileEntryLocalServiceUtil.fetchFileEntry(
-							groupId, folderId, title);
-
-					if (dlFileEntry == null) {
-						continue;
-					}
-
-					dynamicContentElement.setText(
-						path + StringPool.SLASH + dlFileEntry.getUuid());
-				}
+				updateElements(rootElement.elements());
 
 				article.setContent(document.asXML());
 
