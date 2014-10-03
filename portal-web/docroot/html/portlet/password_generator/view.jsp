@@ -72,7 +72,7 @@ catch (Exception e) {
 
 			</aui:select>
 
-			<aui:input name="newPassword" type="resource" value="<%= newPassword %>"/>
+			<aui:input name="newPassword" type="resource" value="<%= newPassword %>" />
 		</aui:field-wrapper>
 	</aui:fieldset>
 
