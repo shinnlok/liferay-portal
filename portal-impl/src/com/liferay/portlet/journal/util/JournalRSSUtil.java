@@ -64,12 +64,6 @@ public class JournalRSSUtil {
 		String description = null;
 		String content = null;
 
-		String type = feed.getType();
-
-		if (Validator.isNull(type)) {
-			type = null;
-		}
-
 		String structureId = feed.getStructureId();
 
 		if (Validator.isNull(structureId)) {
@@ -104,9 +98,8 @@ public class JournalRSSUtil {
 		return JournalArticleLocalServiceUtil.search(
 			companyId, groupId, folderIds,
 			JournalArticleConstants.CLASSNAME_ID_DEFAULT, articleId, version,
-			title, description, content, type, structureId, templateId,
-			displayDateGT, displayDateLT, status, reviewDate, andOperator,
-			start, end, obc);
+			title, description, content, structureId, templateId, displayDateGT,
+			displayDateLT, status, reviewDate, andOperator, start, end, obc);
 	}
 
 	public static List<SyndEnclosure> getDLEnclosures(
@@ -345,6 +338,6 @@ public class JournalRSSUtil {
 		return null;
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(JournalRSSUtil.class);
+	private static final Log _log = LogFactoryUtil.getLog(JournalRSSUtil.class);
 
 }

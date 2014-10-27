@@ -65,6 +65,8 @@ public class Watcher implements Runnable {
 		_recursive = recursive;
 		_watchEventListener = watchEventListener;
 
+		_dataFilePath = filePath.resolve(".data");
+
 		FileSystem fileSystem = FileSystems.getDefault();
 
 		_watchService = fileSystem.newWatchService();
@@ -83,6 +85,10 @@ public class Watcher implements Runnable {
 		catch (Exception e) {
 			_watchService = null;
 		}
+	}
+
+	public List<String> getCreatedFilePathNames() {
+		return _createdFilePathNames;
 	}
 
 	public List<String> getDownloadedFilePathNames() {
@@ -144,14 +150,15 @@ public class Watcher implements Runnable {
 					pathImpl.toString());
 
 				if (kind == StandardWatchEventKind.ENTRY_CREATE) {
-					if (skipWatchEvent(
-							childFilePath, i + 1, parentFilePath,
-							watchEvents)) {
-
-						i++;
+					if (isIgnoredFilePath(childFilePath)) {
+						continue;
 					}
 
-					if (isIgnoredFilePath(childFilePath)) {
+					_createdFilePathNames.add(childFilePath.toString());
+
+					if (_downloadedFilePathNames.remove(
+							childFilePath.toString())) {
+
 						continue;
 					}
 
@@ -175,7 +182,10 @@ public class Watcher implements Runnable {
 					fireWatchEventListener(childFilePath, watchEvent);
 				}
 				else if (kind == StandardWatchEventKind.ENTRY_MODIFY) {
-					if (Files.isDirectory(childFilePath)) {
+					if (_createdFilePathNames.remove(
+							childFilePath.toString()) ||
+						Files.isDirectory(childFilePath)) {
+
 						continue;
 					}
 
@@ -231,7 +241,9 @@ public class Watcher implements Runnable {
 							BasicFileAttributes basicFileAttributes)
 						throws IOException {
 
-						doRegister(filePath, false);
+						if (!filePath.equals(_dataFilePath)) {
+							doRegister(filePath, false);
+						}
 
 						return FileVisitResult.CONTINUE;
 					}
@@ -324,33 +336,24 @@ public class Watcher implements Runnable {
 	}
 
 	protected boolean isIgnoredFilePath(Path filePath) {
-		if (_downloadedFilePathNames.remove(filePath.toString())) {
+		if (Files.notExists(filePath)) {
 			return true;
 		}
 
-		try {
-			String fileName = String.valueOf(filePath.getFileName());
+		String fileName = String.valueOf(filePath.getFileName());
 
-			if (FileUtil.isIgnoredFilePath(filePath) ||
-				((Files.isDirectory(filePath) && (fileName.length() > 100)) ||
-				 (!Files.isDirectory(filePath) && (fileName.length() > 255)))) {
+		if (FileUtil.isIgnoredFilePath(filePath) ||
+			((Files.isDirectory(filePath) && (fileName.length() > 100)) ||
+			 (!Files.isDirectory(filePath) && (fileName.length() > 255)))) {
 
-				if (_logger.isDebugEnabled()) {
-					_logger.debug("Ignored file path {}", filePath);
-				}
-
-				return true;
-			}
-
-			return false;
-		}
-		catch (Exception e) {
 			if (_logger.isDebugEnabled()) {
-				_logger.debug(e.getMessage(), e);
+				_logger.debug("Ignored file path {}", filePath);
 			}
 
-			return false;
+			return true;
 		}
+
+		return false;
 	}
 
 	protected void processMissingFilePath(Path filePath) {
@@ -379,36 +382,10 @@ public class Watcher implements Runnable {
 		}
 	}
 
-	protected boolean skipWatchEvent(
-		Path childFilePath, int index, Path parentFilePath,
-		List<WatchEvent<?>> watchEvents) {
-
-		if (index < watchEvents.size()) {
-			WatchEvent<Path> nextWatchEvent = (WatchEvent<Path>)watchEvents.get(
-				index);
-
-			if ((nextWatchEvent != null) &&
-				((WatchEvent.Kind<?>)nextWatchEvent.kind() ==
-					StandardWatchEventKind.ENTRY_MODIFY)) {
-
-				PathImpl nextPathImpl = (PathImpl)nextWatchEvent.context();
-
-				if (nextPathImpl != null) {
-					Path nextFilePath = parentFilePath.resolve(
-						nextPathImpl.toString());
-
-					if (childFilePath.equals(nextFilePath)) {
-						return true;
-					}
-				}
-			}
-		}
-
-		return false;
-	}
-
 	private static Logger _logger = LoggerFactory.getLogger(Watcher.class);
 
+	private List<String> _createdFilePathNames = new ArrayList<String>();
+	private Path _dataFilePath;
 	private List<String> _downloadedFilePathNames = new ArrayList<String>();
 	private BidirectionalMap<WatchKey, Path> _filePaths =
 		new BidirectionalMap<WatchKey, Path>();
