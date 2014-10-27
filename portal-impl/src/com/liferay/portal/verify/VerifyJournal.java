@@ -163,9 +163,9 @@ public class VerifyJournal extends VerifyProcess {
 
 		Node node = dynamicContentElement.node(0);
 
-		String nodeText = node.getText();
+		String text = node.getText();
 
-		if (!nodeText.endsWith(StringPool.AT + groupId)) {
+		if (!text.isEmpty() && !text.endsWith(StringPool.AT + groupId)) {
 			node.setText(
 				dynamicContentElement.getStringValue() + StringPool.AT +
 					groupId);
