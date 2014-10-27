@@ -2405,7 +2405,7 @@
 			</library>
 			<library>
 				<file-name>lib/portal/jodd.jar</file-name>
-				<version>3.6</version>
+				<version>3.6.1</version>
 				<project-name>Jodd</project-name>
 				<project-url>http://jodd.org</project-url>
 				<licenses>
@@ -2904,6 +2904,18 @@
 					<license>
 						<license-name>Netcdf License</license-name>
 						<license-url>http://www.unidata.ucar.edu/software/netcdf/copyright.html</license-url>
+					</license>
+				</licenses>
+			</library>
+			<library>
+				<file-name>lib/portal/netty-all.jar</file-name>
+				<version>4.0.23</version>
+				<project-name>Netty</project-name>
+				<project-url>http://netty.io/</project-url>
+				<licenses>
+					<license>
+						<license-name>Apache License 2.0</license-name>
+						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
 					</license>
 				</licenses>
 			</library>

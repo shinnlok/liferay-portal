@@ -19,14 +19,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.liferay.sync.engine.documentlibrary.event.Event;
 import com.liferay.sync.engine.documentlibrary.model.SyncContext;
+import com.liferay.sync.engine.documentlibrary.util.FileEventUtil;
 import com.liferay.sync.engine.model.SyncAccount;
 import com.liferay.sync.engine.model.SyncUser;
 import com.liferay.sync.engine.service.SyncAccountService;
 import com.liferay.sync.engine.service.SyncUserService;
+import com.liferay.sync.engine.util.ConnectionRetryUtil;
 import com.liferay.sync.engine.util.ReleaseInfo;
-import com.liferay.sync.engine.util.RetryUtil;
 
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Shinn Lok
@@ -66,9 +70,15 @@ public class GetSyncContextHandler extends BaseJSONHandler {
 			syncContext.isSocialOfficeInstalled());
 
 		if (ReleaseInfo.isServerCompatible(syncContext)) {
+			if (_logger.isDebugEnabled()) {
+				_logger.debug("Connected to {}", syncAccount.getUrl());
+			}
+
 			syncAccount.setState(SyncAccount.STATE_CONNECTED);
 
-			RetryUtil.resetRetryDelay(getSyncAccountId());
+			FileEventUtil.retryFileTransfers(getSyncAccountId());
+
+			ConnectionRetryUtil.resetRetryDelay(getSyncAccountId());
 		}
 		else {
 			syncAccount.setState(SyncAccount.STATE_DISCONNECTED);
@@ -83,8 +93,12 @@ public class GetSyncContextHandler extends BaseJSONHandler {
 			syncAccount.getSyncAccountId());
 
 		remoteSyncUser.setSyncAccountId(localSyncUser.getSyncAccountId());
+		remoteSyncUser.setSyncUserId(localSyncUser.getSyncUserId());
 
 		SyncUserService.update(remoteSyncUser);
 	}
+
+	private static final Logger _logger = LoggerFactory.getLogger(
+		GetSyncContextHandler.class);
 
 }

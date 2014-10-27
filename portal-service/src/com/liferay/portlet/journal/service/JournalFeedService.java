@@ -50,10 +50,9 @@ public interface JournalFeedService extends BaseService {
 	 */
 	public com.liferay.portlet.journal.model.JournalFeed addFeed(long groupId,
 		java.lang.String feedId, boolean autoFeedId, java.lang.String name,
-		java.lang.String description, java.lang.String type,
-		java.lang.String structureId, java.lang.String templateId,
-		java.lang.String rendererTemplateId, int delta,
-		java.lang.String orderByCol, java.lang.String orderByType,
+		java.lang.String description, java.lang.String structureId,
+		java.lang.String templateId, java.lang.String rendererTemplateId,
+		int delta, java.lang.String orderByCol, java.lang.String orderByType,
 		java.lang.String targetLayoutFriendlyUrl,
 		java.lang.String targetPortletId, java.lang.String contentField,
 		java.lang.String feedType, double feedVersion,
@@ -63,15 +62,15 @@ public interface JournalFeedService extends BaseService {
 	public void deleteFeed(long feedId)
 		throws com.liferay.portal.kernel.exception.PortalException;
 
-	public void deleteFeed(long groupId, java.lang.String feedId)
-		throws com.liferay.portal.kernel.exception.PortalException;
-
 	/**
 	* @deprecated As of 6.2.0, replaced by {@link #deleteFeed(long, String)}
 	*/
 	@java.lang.Deprecated
 	@com.liferay.portal.kernel.jsonwebservice.JSONWebService(mode = JSONWebServiceMode.IGNORE)
 	public void deleteFeed(long groupId, long feedId)
+		throws com.liferay.portal.kernel.exception.PortalException;
+
+	public void deleteFeed(long groupId, java.lang.String feedId)
 		throws com.liferay.portal.kernel.exception.PortalException;
 
 	/**
@@ -85,11 +84,6 @@ public interface JournalFeedService extends BaseService {
 	public com.liferay.portlet.journal.model.JournalFeed getFeed(long feedId)
 		throws com.liferay.portal.kernel.exception.PortalException;
 
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portlet.journal.model.JournalFeed getFeed(long groupId,
-		java.lang.String feedId)
-		throws com.liferay.portal.kernel.exception.PortalException;
-
 	/**
 	* @deprecated As of 6.2.0, replaced by {@link #getFeed(long, String)}
 	*/
@@ -98,6 +92,11 @@ public interface JournalFeedService extends BaseService {
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portlet.journal.model.JournalFeed getFeed(long groupId,
 		long feedId) throws com.liferay.portal.kernel.exception.PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portlet.journal.model.JournalFeed getFeed(long groupId,
+		java.lang.String feedId)
+		throws com.liferay.portal.kernel.exception.PortalException;
 
 	/**
 	* Sets the Spring bean ID for this bean.
@@ -108,10 +107,9 @@ public interface JournalFeedService extends BaseService {
 
 	public com.liferay.portlet.journal.model.JournalFeed updateFeed(
 		long groupId, java.lang.String feedId, java.lang.String name,
-		java.lang.String description, java.lang.String type,
-		java.lang.String structureId, java.lang.String templateId,
-		java.lang.String rendererTemplateId, int delta,
-		java.lang.String orderByCol, java.lang.String orderByType,
+		java.lang.String description, java.lang.String structureId,
+		java.lang.String templateId, java.lang.String rendererTemplateId,
+		int delta, java.lang.String orderByCol, java.lang.String orderByType,
 		java.lang.String targetLayoutFriendlyUrl,
 		java.lang.String targetPortletId, java.lang.String contentField,
 		java.lang.String feedType, double feedVersion,

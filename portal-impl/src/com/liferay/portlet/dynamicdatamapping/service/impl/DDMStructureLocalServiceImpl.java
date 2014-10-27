@@ -51,6 +51,7 @@ import com.liferay.portlet.dynamicdatamapping.model.DDMForm;
 import com.liferay.portlet.dynamicdatamapping.model.DDMFormField;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructureConstants;
+import com.liferay.portlet.dynamicdatamapping.model.DDMStructureVersion;
 import com.liferay.portlet.dynamicdatamapping.model.DDMTemplate;
 import com.liferay.portlet.dynamicdatamapping.model.DDMTemplateConstants;
 import com.liferay.portlet.dynamicdatamapping.service.base.DDMStructureLocalServiceBaseImpl;
@@ -171,6 +172,7 @@ public class DDMStructureLocalServiceImpl
 		structure.setParentStructureId(parentStructureId);
 		structure.setClassNameId(classNameId);
 		structure.setStructureKey(structureKey);
+		structure.setVersion(DDMStructureConstants.VERSION_DEFAULT);
 		structure.setNameMap(nameMap);
 		structure.setDescriptionMap(descriptionMap);
 		structure.setDefinition(definition);
@@ -193,6 +195,10 @@ public class DDMStructureLocalServiceImpl
 				structure, serviceContext.getGroupPermissions(),
 				serviceContext.getGuestPermissions());
 		}
+
+		// Structure version
+
+		addStructureVersion(structure, DDMStructureConstants.VERSION_DEFAULT);
 
 		return structure;
 	}
@@ -486,9 +492,17 @@ public class DDMStructureLocalServiceImpl
 		List<DDMStructure> structures = ddmStructurePersistence.findByGroupId(
 			groupId);
 
-		for (DDMStructure structure : structures) {
-			ddmStructureLocalService.deleteStructure(structure);
-		}
+		deleteStructures(structures);
+	}
+
+	@Override
+	public void deleteStructures(long groupId, long classNameId)
+		throws PortalException {
+
+		List<DDMStructure> structures = ddmStructurePersistence.findByG_C(
+			groupId, classNameId);
+
+		deleteStructures(structures);
 	}
 
 	/**
@@ -1315,11 +1329,66 @@ public class DDMStructureLocalServiceImpl
 			serviceContext, structure);
 	}
 
+	protected DDMStructureVersion addStructureVersion(
+		DDMStructure structure, String version) {
+
+		long structureVersionId = counterLocalService.increment();
+
+		DDMStructureVersion structureVersion =
+			ddmStructureVersionPersistence.create(structureVersionId);
+
+		structureVersion.setGroupId(structure.getGroupId());
+		structureVersion.setCompanyId(structure.getCompanyId());
+		structureVersion.setUserId(structure.getUserId());
+		structureVersion.setUserName(structure.getUserName());
+		structureVersion.setCreateDate(structure.getModifiedDate());
+		structureVersion.setStructureId(structure.getStructureId());
+		structureVersion.setVersion(version);
+		structureVersion.setName(structure.getName());
+		structureVersion.setDescription(structure.getDescription());
+		structureVersion.setDefinition(structure.getDefinition());
+		structureVersion.setStorageType(structure.getStorageType());
+		structureVersion.setType(structure.getType());
+
+		ddmStructureVersionPersistence.update(structureVersion);
+
+		return structureVersion;
+	}
+
+	protected Set<Long> deleteStructures(List<DDMStructure> structures)
+		throws PortalException {
+
+		Set<Long> deletedStructureIds = new HashSet<Long>();
+
+		for (DDMStructure structure : structures) {
+			if (deletedStructureIds.contains(structure.getStructureId())) {
+				continue;
+			}
+
+			if (!GroupThreadLocal.isDeleteInProcess()) {
+				List<DDMStructure> childDDMStructures =
+					ddmStructurePersistence.findByParentStructureId(
+						structure.getStructureId());
+
+				deletedStructureIds.addAll(
+					deleteStructures(childDDMStructures));
+			}
+
+			ddmStructureLocalService.deleteStructure(structure);
+
+			deletedStructureIds.add(structure.getStructureId());
+		}
+
+		return deletedStructureIds;
+	}
+
 	protected DDMStructure doUpdateStructure(
 			long parentStructureId, Map<Locale, String> nameMap,
 			Map<Locale, String> descriptionMap, String definition,
 			ServiceContext serviceContext, DDMStructure structure)
 		throws PortalException {
+
+		// Structure
 
 		try {
 			definition = DDMXMLUtil.validateXML(definition);
@@ -1335,13 +1404,30 @@ public class DDMStructureLocalServiceImpl
 
 		structure.setModifiedDate(serviceContext.getModifiedDate(null));
 		structure.setParentStructureId(parentStructureId);
+
+		DDMStructureVersion latestStructureVersion =
+			ddmStructureVersionLocalService.getLatestStructureVersion(
+				structure.getStructureId());
+
+		String version = getNextVersion(
+			latestStructureVersion.getVersion(), false);
+
+		structure.setVersion(version);
 		structure.setNameMap(nameMap);
 		structure.setDescriptionMap(descriptionMap);
 		structure.setDefinition(definition);
 
 		ddmStructurePersistence.update(structure);
 
+		// Structure templates
+
 		syncStructureTemplatesFields(structure);
+
+		// Structure version
+
+		addStructureVersion(structure, version);
+
+		// Indexer
 
 		Indexer indexer = IndexerRegistryUtil.getIndexer(
 			structure.getClassName());
@@ -1417,9 +1503,21 @@ public class DDMStructureLocalServiceImpl
 		return elementNames;
 	}
 
-	protected DDMForm getParentDDMForm(long parentStructureId)
-		throws PortalException {
+	protected String getNextVersion(String version, boolean majorVersion) {
+		int[] versionParts = StringUtil.split(version, StringPool.PERIOD, 0);
 
+		if (majorVersion) {
+			versionParts[0]++;
+			versionParts[1] = 0;
+		}
+		else {
+			versionParts[1]++;
+		}
+
+		return versionParts[0] + StringPool.PERIOD + versionParts[1];
+	}
+
+	protected DDMForm getParentDDMForm(long parentStructureId) {
 		DDMStructure parentStructure =
 			ddmStructurePersistence.fetchByPrimaryKey(parentStructureId);
 

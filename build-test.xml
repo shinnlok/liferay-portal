@@ -1218,16 +1218,6 @@ create database lportal2 character set utf8;</echo>
 			value="${env.JENKINS_HOME}/jobs/${env.JOB_NAME}/builds/${previous.build.number}"
 		/>
 
-		<copy
-			file="git-commit-plugins"
-			todir="${changelog.dir}"
-		/>
-
-		<copy
-			file="git-commit-portal"
-			todir="${changelog.dir}"
-		/>
-
 		<if>
 			<and>
 				<available file="${previous.changelog.dir}/git-build-log.html" />
@@ -1638,17 +1628,33 @@ create database lportal2 character set utf8;</echo>
 
 		<loadfile property="test.suites.xml.content" srcfile="test-results/TESTS-TestSuites.xml" />
 
-		<propertyregex
-			input="${test.suites.xml.content}"
-			override="true"
-			property="test.suites.xml.content"
-			regexp="&lt;properties[\s\S.]*?&lt;testcase"
-			replace="&lt;testcase"
+		<replaceregexp
+			file="test-results/TESTS-TestSuites.xml"
+			flags="g"
+			match="\s*\&lt;/?propert[^\n^\r]*[\n\r]"
+			replace=""
 		/>
 
 		<echo file="test-results/TESTS-TestSuites.xml">${test.suites.xml.content}</echo>
 
 		<echo message="A report with all the test results can be found at test-results/html/index.html." />
+	</target>
+
+	<target name="move-file">
+		<fail message="Please set the property ${file}." unless="file" />
+		<fail message="Please set the property ${tofile}." unless="tofile" />
+
+		<if>
+			<available file="${file}" />
+			<then>
+				<move file="${file}" tofile="${tofile}" />
+
+				<echo message="Moved file ${file} to ${tofile}." />
+			</then>
+			<else>
+				<echo message="File ${file} does not exist." />
+			</else>
+		</if>
 	</target>
 
 	<target name="parse-test-class">
@@ -2104,6 +2110,13 @@ tck.url=true</echo>
 		</if>
 
 		<if>
+			<isset property="test.set.default.portal.properties" />
+			<then>
+				<echo file="portal-impl/src/portal-ext.properties">liferay.home=${liferay.home}</echo>
+			</then>
+		</if>
+
+		<if>
 			<contains string="${app.server.portal.dir}" substring="liferay-portal.war" />
 			<then>
 				<property name="test.build.liferay.portal.zip.file.name" value="${app.server.portal.dir}" />
@@ -2135,6 +2148,10 @@ tck.url=true</echo>
 					tofile="${tstamp.value}/WEB-INF/classes/portal-ext.properties"
 				/>
 
+				<echo append="true" file="${tstamp.value}/WEB-INF/classes/portal-ext.properties">
+
+module.framework.properties.osgi.console=11312</echo>
+
 				<zip
 					basedir="${tstamp.value}"
 					destfile="${test.build.liferay.portal.zip.file.name}"
@@ -2148,6 +2165,10 @@ tck.url=true</echo>
 					file="portal-impl/src/portal-ext.properties"
 					tofile="${app.server.classes.portal.dir}/portal-ext.properties"
 				/>
+
+				<echo append="true" file="${app.server.classes.portal.dir}/portal-ext.properties">
+
+module.framework.properties.osgi.console=11312</echo>
 			</else>
 		</if>
 	</target>
@@ -2561,10 +2582,37 @@ app.server.tomcat.dir=${app.server.parent.dir}/tomcat-7.0.27</echo>
 		</if>
 
 		<if>
-			<equals arg1="${test.build.bundle.jbosseap6.1}" arg2="true" />
+			<and>
+				<equals arg1="${test.build.bundle.jbosseap6.1}" arg2="true" />
+				<isset property="test.build.portal.war.url" />
+			</and>
 			<then>
-				<ant antfile="build-dist.xml" target="build-dist-jboss-eap-6.1" inheritAll="false" />
+				<property name="test.app.server.jboss.eap.version" value="6.1" />
+
+				<app-server-properties-update>
+					app.server.type=jboss
+					app.server.jboss.version=6.1.0
+					app.server.jboss.dir=${app.server.parent.dir}/jboss-eap-6.1
+					app.server.jboss.zip.name=jboss-eap-6.1.0.zip
+					app.server.jboss.zip.url=http://mirrors/www.jboss.org/jbossas/downloads/jboss-eap-6.1.0.zip
+				</app-server-properties-update>
+
+				<antcall target="prepare-test-bundle">
+					<param name="app.server.lib.global.dir" value="${app.server.parent.dir}/jboss-eap-6.1/modules/com/liferay/portal/main" />
+					<param name="app.server.portal.dir" value="${app.server.parent.dir}/jboss-eap-6.1/standalone/deployments/ROOT.war" />
+					<param name="app.server.type" value="jboss" />
+				</antcall>
+
+				<app-server-properties-reset />
+
+				<var name="test.app.server.jboss.eap.version" unset="true" />
 			</then>
+			<elseif>
+				<equals arg1="${test.build.bundle.jbosseap6.1}" arg2="true" />
+				<then>
+					<ant antfile="build-dist.xml" target="build-dist-jboss-eap-6.1" inheritAll="false" />
+				</then>
+			</elseif>
 		</if>
 
 		<if>
@@ -2625,6 +2673,8 @@ app.server.tomcat.dir=${app.server.parent.dir}/tomcat-7.0.27</echo>
 			</and>
 			<then>
 				<antcall target="prepare-test-bundle">
+					<param name="app.server.lib.global.dir" value="${app.server.tcserver.lib.global.dir}" />
+					<param name="app.server.portal.dir" value="${app.server.tcserver.portal.dir}" />
 					<param name="app.server.type" value="tcserver" />
 				</antcall>
 			</then>
@@ -2659,6 +2709,8 @@ app.server.tomcat.dir=${app.server.parent.dir}/tomcat-7.0.27</echo>
 			</and>
 			<then>
 				<antcall target="prepare-test-bundle">
+					<param name="app.server.lib.global.dir" value="${app.server.tcserver.lib.global.dir}" />
+					<param name="app.server.portal.dir" value="${app.server.tcserver.portal.dir}" />
 					<param name="app.server.type" value="weblogic" />
 				</antcall>
 			</then>
@@ -2707,7 +2759,7 @@ app.server.tomcat.dir=${app.server.parent.dir}/tomcat-7.0.27</echo>
 			</then>
 		</if>
 
-		<ant dir="portal-impl" target="build-selenium-new-block" inheritAll="false" />
+		<ant dir="portal-impl" target="build-selenium-block" inheritAll="false" />
 
 		<antcall target="compile-test" inheritAll="false" />
 
@@ -2748,95 +2800,8 @@ plugins.includes=marketplace-portlet</echo>
 
 	<target name="prepare-test-bundle">
 		<if>
-			<equals arg1="${app.server.type}" arg2="tcserver" />
+			<matches pattern="http" string="${test.build.bundle.zip.url}" />
 			<then>
-				<ant antfile="build-dist.xml" target="unzip-tcserver" inheritAll="false" />
-
-				<mkdir dir="dist" />
-
-				<get
-					dest="dist/liferay-portal-${lp.version}.war"
-					src="${test.build.portal.war.url}"
-				/>
-
-				<unzip
-					dest="${app.server.tcserver.portal.dir}"
-					src="dist/liferay-portal-${lp.version}.war"
-				/>
-
-				<delete dir="dist" />
-
-				<get
-					dest="liferay-portal-dependencies.zip"
-					src="${test.build.portal.dependencies.zip.url}"
-				/>
-
-				<unzip
-					dest="${app.server.tcserver.lib.global.dir}"
-					src="liferay-portal-dependencies.zip"
-				>
-					<mapper
-						from="[^/]+/(.*)"
-						to="\1"
-						type="regexp"
-					/>
-				</unzip>
-
-				<delete file="liferay-portal-dependencies.zip" />
-
-				<copy todir="${app.server.tcserver.lib.global.dir}">
-					<fileset
-						dir="lib/development"
-						includes="activation.jar,jms.jar,jta.jar,jutf7.jar,mail.jar,mysql.jar,persistence.jar,script-10.jar"
-					/>
-				</copy>
-
-				<copy todir="${app.server.tcserver.lib.global.dir}">
-					<fileset
-						dir="lib/portal"
-						includes="ccpp.jar"
-					/>
-				</copy>
-			</then>
-			<elseif>
-				<equals arg1="${app.server.type}" arg2="weblogic" />
-				<then>
-					<ant antfile="build-dist.xml" target="unzip-weblogic" inheritAll="false" />
-
-					<mkdir dir="dist" />
-
-					<get
-						dest="dist/liferay-portal-${lp.version}.war"
-						src="${test.build.portal.war.url}"
-					/>
-
-					<unzip
-						dest="${app.server.weblogic.portal.dir}"
-						src="dist/liferay-portal-${lp.version}.war"
-					/>
-
-					<delete dir="dist" />
-
-					<get
-						dest="liferay-portal-dependencies.zip"
-						src="${test.build.portal.dependencies.zip.url}"
-					/>
-
-					<unzip
-						dest="${app.server.weblogic.lib.global.dir}"
-						src="liferay-portal-dependencies.zip"
-					>
-						<mapper
-							from="[^/]+/(.*)"
-							to="\1"
-							type="regexp"
-						/>
-					</unzip>
-
-					<delete file="liferay-portal-dependencies.zip" />
-				</then>
-			</elseif>
-			<else>
 				<mkdir dir="${app.server.parent.dir}" />
 
 				<tstamp>
@@ -2902,6 +2867,65 @@ plugins.includes=marketplace-portlet</echo>
 				</if>
 
 				<prepare-fix-pack-bundle />
+			</then>
+			<else>
+				<if>
+					<and>
+						<equals arg1="${app.server.type}" arg2="jboss" />
+						<equals arg1="${test.app.server.jboss.eap.version}" arg2="6.1" />
+					</and>
+					<then>
+						<ant antfile="build-dist.xml" target="unzip-jboss" inheritAll="false" />
+					</then>
+					<elseif>
+						<equals arg1="${app.server.type}" arg2="tcserver" />
+						<then>
+							<ant antfile="build-dist.xml" target="unzip-tcserver" inheritAll="false" />
+						</then>
+					</elseif>
+					<elseif>
+						<equals arg1="${app.server.type}" arg2="weblogic" />
+						<then>
+							<ant antfile="build-dist.xml" target="unzip-weblogic" inheritAll="false" />
+						</then>
+					</elseif>
+				</if>
+
+				<mkdir dir="dist" />
+
+				<get
+					dest="dist/liferay-portal-${lp.version}.war"
+					src="${test.build.portal.war.url}"
+				/>
+
+				<unzip
+					dest="${app.server.portal.dir}"
+					src="dist/liferay-portal-${lp.version}.war"
+				/>
+
+				<delete dir="dist" />
+
+				<ant antfile="build.xml" target="deploy-additional-jars" inheritAll="false" />
+
+				<ant antfile="build.xml" target="update-app-server-scripts" inheritAll="false" />
+
+				<get
+					dest="liferay-portal-dependencies.zip"
+					src="${test.build.portal.dependencies.zip.url}"
+				/>
+
+				<unzip
+					dest="${app.server.lib.global.dir}"
+					src="liferay-portal-dependencies.zip"
+				>
+					<mapper
+						from="[^/]+/(.*)"
+						to="\1"
+						type="regexp"
+					/>
+				</unzip>
+
+				<delete file="liferay-portal-dependencies.zip" />
 			</else>
 		</if>
 	</target>
@@ -3388,6 +3412,8 @@ if (ppstate.equals("normal")) {
 			<else>
 				<antcallback return="test.simple.class.name" target="parse-test-class" />
 
+				<var name="test.class" unset="true" />
+
 				<ant dir="portal-web" target="test-class" inheritAll="false">
 					<property name="test.class" value="${test.simple.class.name}" />
 				</ant>
@@ -3441,7 +3467,7 @@ if (ppstate.equals("normal")) {
 				<antcall target="build-test-results-xml" />
 
 				<first id="first">
-					<fileset dir="portal-web/test-results/functional/" includes="TEST-com.liferay.portalweb2.*.xml" />
+					<fileset dir="portal-web/test-results/functional/" includes="TEST-com.liferay.portalweb.*.xml,TEST-com.liferay.portalweb2.*.xml" />
 				</first>
 
 				<property name="jenkins.results.xml.file" value="${toString:first}" />
@@ -3606,6 +3632,18 @@ if (ppstate.equals("normal")) {
 			</then>
 		</if>
 
+		<if>
+			<and>
+				<contains string="${hook.plugins.includes}" substring="so-hook" />
+				<equals arg1="${app.server.type}" arg2="jboss" />
+			</and>
+			<then>
+				<start-app-server />
+
+				<stop-app-server />
+			</then>
+		</if>
+
 		<antcall target="prepare-selenium" />
 
 		<if>
@@ -3710,13 +3748,6 @@ if (ppstate.equals("normal")) {
 						}
 					]]>
 				</script>
-			</then>
-		</if>
-
-		<if>
-			<contains string="${hook.plugins.includes}" substring="so-hook" />
-			<then>
-				<echo file="${app.server.portal.dir}/html/portlet/dockbar/license_warning.jsp" />
 			</then>
 		</if>
 
