@@ -1396,16 +1396,12 @@
 				{User_.*}
 			FROM
 				User_
+			LEFT JOIN
+				Contact_
+			ON
+				Contact_.contactId = User_.contactId
 			WHERE
-				(userId NOT IN (
-					SELECT
-						User_.userId
-					FROM
-						User_
-					INNER JOIN
-						Contact_ ON
-							(Contact_.contactId = User_.contactId)
-				))
+				Contact_.contactId IS NULL
 		]]>
 	</sql>
 	<sql id="com.liferay.portal.service.persistence.UserFinder.findByNoGroups">
