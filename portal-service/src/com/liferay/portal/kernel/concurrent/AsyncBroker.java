@@ -39,7 +39,7 @@ public class AsyncBroker<K, V> {
 	}
 
 	public NoticeableFuture<V> post(final K key) {
-		DefaultNoticeableFuture<V> defaultNoticeableFuture =
+		final DefaultNoticeableFuture<V> defaultNoticeableFuture =
 			new DefaultNoticeableFuture<V>();
 
 		DefaultNoticeableFuture<V> previousDefaultNoticeableFuture =
@@ -54,7 +54,8 @@ public class AsyncBroker<K, V> {
 
 				@Override
 				public void complete(Future<V> future) {
-					_defaultNoticeableFutures.remove(key);
+					_defaultNoticeableFutures.remove(
+						key, defaultNoticeableFuture);
 				}
 
 			});
@@ -66,6 +67,10 @@ public class AsyncBroker<K, V> {
 		}
 
 		return defaultNoticeableFuture;
+	}
+
+	public NoticeableFuture<V> take(K key) {
+		return _defaultNoticeableFutures.remove(key);
 	}
 
 	public boolean takeWithException(K key, Throwable throwable) {
@@ -96,7 +101,7 @@ public class AsyncBroker<K, V> {
 
 	private static final Field _REFERENT_FIELD;
 
-	private static Log _log = LogFactoryUtil.getLog(AsyncBroker.class);
+	private static final Log _log = LogFactoryUtil.getLog(AsyncBroker.class);
 
 	static {
 		Field referentField = null;
