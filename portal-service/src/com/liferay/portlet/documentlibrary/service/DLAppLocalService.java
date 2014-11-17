@@ -443,19 +443,22 @@ public interface DLAppLocalService extends BaseLocalService {
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException;
 
+	/**
+	* @deprecated As of 7.0.0, replaced by {@link
+	RepositoryTrashUtil#moveFileEntryFromTrash(long, long, long,
+	long, ServiceContext)}
+	*/
+	@java.lang.Deprecated
 	public com.liferay.portal.kernel.repository.model.FileEntry moveFileEntryFromTrash(
 		long userId, long fileEntryId, long newFolderId,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException;
 
 	/**
-	* Moves the file entry with the primary key to the trash portlet.
-	*
-	* @param userId the primary key of the user
-	* @param fileEntryId the primary key of the file entry
-	* @return the file entry
-	* @throws PortalException if the file entry could not be found
+	* @deprecated As of 7.0.0, replaced by {@link
+	RepositoryTrashUtil#moveFileEntryToTrash(long, long, long)}
 	*/
+	@java.lang.Deprecated
 	public com.liferay.portal.kernel.repository.model.FileEntry moveFileEntryToTrash(
 		long userId, long fileEntryId)
 		throws com.liferay.portal.kernel.exception.PortalException;
@@ -466,12 +469,11 @@ public interface DLAppLocalService extends BaseLocalService {
 		throws com.liferay.portal.kernel.exception.PortalException;
 
 	/**
-	* Restores the file entry with the primary key from the trash portlet.
-	*
-	* @param userId the primary key of the user
-	* @param fileEntryId the primary key of the file entry
-	* @throws PortalException if the file entry could not be found
+	* @deprecated As of 7.0.0, replaced by {@link
+	RepositoryTrashUtil#restoreFileEntryFromTrash(long, long,
+	long)}
 	*/
+	@java.lang.Deprecated
 	public void restoreFileEntryFromTrash(long userId, long fileEntryId)
 		throws com.liferay.portal.kernel.exception.PortalException;
 
@@ -723,8 +725,7 @@ public interface DLAppLocalService extends BaseLocalService {
 	*
 	* @param toRepositoryId the primary key of the repository
 	* @param oldToFileEntryId the primary key of the old file entry pointed to
-	* @param newToFileEntryId the primary key of the new file entry to point
-	to
+	* @param newToFileEntryId the primary key of the new file entry to point to
 	*/
 	public void updateFileShortcuts(long toRepositoryId, long oldToFileEntryId,
 		long newToFileEntryId);

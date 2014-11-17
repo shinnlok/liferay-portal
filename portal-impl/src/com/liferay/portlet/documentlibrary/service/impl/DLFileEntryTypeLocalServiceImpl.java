@@ -44,8 +44,11 @@ import com.liferay.portlet.documentlibrary.service.base.DLFileEntryTypeLocalServ
 import com.liferay.portlet.documentlibrary.util.DLUtil;
 import com.liferay.portlet.dynamicdatamapping.RequiredStructureException;
 import com.liferay.portlet.dynamicdatamapping.StructureDefinitionException;
+import com.liferay.portlet.dynamicdatamapping.io.DDMFormXSDDeserializerUtil;
+import com.liferay.portlet.dynamicdatamapping.model.DDMForm;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructureConstants;
+import com.liferay.portlet.dynamicdatamapping.util.DDMXMLUtil;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -527,9 +530,8 @@ public class DLFileEntryTypeLocalServiceImpl
 					dlFileVersion.getFileVersionId());
 			}
 
-			dlFileEntryLocalService.updateFileEntry(
-				userId, dlFileEntry.getFileEntryId(), null, null, null, null,
-				null, false, defaultFileEntryTypeId, null, null, null, 0,
+			dlFileEntryLocalService.updateFileEntryType(
+				userId, dlFileEntry.getFileEntryId(), defaultFileEntryTypeId,
 				serviceContext);
 
 			dlAppHelperLocalService.updateAsset(
@@ -570,6 +572,12 @@ public class DLFileEntryTypeLocalServiceImpl
 
 			ddmStructureLocalService.updateDDMStructure(ddmStructure);
 		}
+	}
+
+	protected DDMForm getDDMForm(String definition) throws PortalException {
+		DDMXMLUtil.validateXML(definition);
+
+		return DDMFormXSDDeserializerUtil.deserialize(definition);
 	}
 
 	protected List<Long> getFileEntryTypeIds(
@@ -628,7 +636,8 @@ public class DLFileEntryTypeLocalServiceImpl
 					DDMStructureConstants.DEFAULT_PARENT_STRUCTURE_ID,
 					classNameLocalService.getClassNameId(
 						DLFileEntryMetadata.class),
-					ddmStructureKey, nameMap, descriptionMap, definition, "xml",
+					ddmStructureKey, nameMap, descriptionMap,
+					getDDMForm(definition), "xml",
 					DDMStructureConstants.TYPE_AUTO, serviceContext);
 			}
 			else {

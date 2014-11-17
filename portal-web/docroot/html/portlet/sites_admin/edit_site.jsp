@@ -187,6 +187,7 @@ if (!portletName.equals(PortletKeys.SITE_SETTINGS)) {
 	<aui:input name="groupId" type="hidden" value="<%= groupId %>" />
 	<aui:input name="liveGroupId" type="hidden" value="<%= liveGroupId %>" />
 	<aui:input name="stagingGroupId" type="hidden" value="<%= stagingGroupId %>" />
+	<aui:input name="forceDisable" type="hidden" value="<%= false %>" />
 
 	<%
 	request.setAttribute("site.group", group);
@@ -209,15 +210,17 @@ if (!portletName.equals(PortletKeys.SITE_SETTINGS)) {
 </aui:form>
 
 <aui:script>
-	function <portlet:namespace />saveGroup() {
-		document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = '<%= (group == null) ? Constants.ADD : Constants.UPDATE %>';
+	function <portlet:namespace />saveGroup(forceDisable) {
+		var $ = AUI.$;
+
+		var form = $(document.<portlet:namespace />fm);
+
+		form.fm('<%= Constants.CMD %>').val('<%= (group == null) ? Constants.ADD : Constants.UPDATE %>');
 
 		var ok = true;
 
 		<c:if test="<%= liveGroup != null %>">
-			A = AUI();
-
-			var stagingTypeEl = A.one('input[name=<portlet:namespace />stagingType]:checked');
+			var stagingTypeEl = $('input[name=<portlet:namespace />stagingType]:checked');
 
 			<c:choose>
 				<c:when test="<%= liveGroup.isStaged() && !liveGroup.isStagedRemotely() %>">
@@ -231,56 +234,59 @@ if (!portletName.equals(PortletKeys.SITE_SETTINGS)) {
 				</c:otherwise>
 			</c:choose>
 
-			if (stagingTypeEl && (stagingTypeEl.val() != oldValue)) {
-				var currentValue = stagingTypeEl.val();
+			var currentValue = stagingTypeEl.val();
 
+			if (currentValue != oldValue) {
 				ok = false;
 
-				if (0 == currentValue) {
+				if (currentValue == 0) {
 					ok = confirm('<%= UnicodeLanguageUtil.format(request, "are-you-sure-you-want-to-deactivate-staging-for-x", liveGroup.getDescriptiveName(locale), false) %>');
 				}
-				else if (1 == currentValue) {
+				else if (currentValue == 1) {
 					ok = confirm('<%= UnicodeLanguageUtil.format(request, "are-you-sure-you-want-to-activate-local-staging-for-x", liveGroup.getDescriptiveName(locale), false) %>');
 				}
-				else if (2 == currentValue) {
+				else if (currentValue == 2) {
 					ok = confirm('<%= UnicodeLanguageUtil.format(request, "are-you-sure-you-want-to-activate-remote-staging-for-x", liveGroup.getDescriptiveName(locale), false) %>');
 				}
 			}
 		</c:if>
 
 		if (ok) {
+			if (forceDisable) {
+				form.fm('forceDisable').val(true);
+				form.fm('local').prop('checked', false);
+				form.fm('none').prop('checked', true);
+				form.fm('redirect').val('<portlet:renderURL><portlet:param name="struts_action" value="/sites_admin/edit_site" /><portlet:param name="historyKey" value='<%= renderResponse.getNamespace() + "staging" %>' /></portlet:renderURL>');
+				form.fm('remote').prop('checked', false);
+			}
+
 			<c:if test="<%= (group != null) && !group.isCompany() %>">
 				<portlet:namespace />saveLocales();
 			</c:if>
 
-			submitForm(document.<portlet:namespace />fm);
+			submitForm(form);
 		}
 	}
 </aui:script>
 
-<aui:script use="aui-base">
-	var applicationAdapter = A.one('#<portlet:namespace />customJspServletContextName');
+<aui:script sandbox="<%= true %>">
+	var applicationAdapter = $('#<portlet:namespace />customJspServletContextName');
 
-	if (applicationAdapter) {
-		var publicPages = A.one('#<portlet:namespace />publicLayoutSetPrototypeId');
-		var privatePages = A.one('#<portlet:namespace />privateLayoutSetPrototypeId');
+	if (applicationAdapter.length) {
+		var publicPages = $('#<portlet:namespace />publicLayoutSetPrototypeId');
+		var privatePages = $('#<portlet:namespace />privateLayoutSetPrototypeId');
 
 		var toggleCompatibleSiteTemplates = function(event) {
 			var siteTemplate = applicationAdapter.val();
 
-			var options = A.all([]);
+			var options = $();
 
-			if (publicPages) {
-				options = options.concat(publicPages.all('option[data-servletContextName]'));
-			}
+			options = options.add(publicPages.find('option[data-servletContextName]'));
+			options = options.add(privatePages.find('option[data-servletContextName]'));
 
-			if (privatePages) {
-				options = options.concat(privatePages.all('option[data-servletContextName]'));
-			}
+			options.prop('disabled', false);
 
-			options.attr('disabled', false);
-
-			options.filter(':not([data-servletContextName=' + siteTemplate + '])').attr('disabled', true);
+			options.filter(':not([data-servletContextName=' + siteTemplate + '])').prop('disabled', true);
 		};
 
 		applicationAdapter.on('change', toggleCompatibleSiteTemplates);

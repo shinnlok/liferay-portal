@@ -75,6 +75,16 @@ public class DefaultLocalRepositoryImpl implements LocalRepository {
 	}
 
 	@Override
+	public FileEntry copyFileEntry(
+			long userId, long groupId, long fileEntryId, long destFolderId,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		return _repository.copyFileEntry(
+			userId, groupId, fileEntryId, destFolderId, serviceContext);
+	}
+
+	@Override
 	public void deleteAll() {
 		throw new UnsupportedOperationException();
 	}
@@ -204,6 +214,6 @@ public class DefaultLocalRepositoryImpl implements LocalRepository {
 		throw new UnsupportedOperationException();
 	}
 
-	private Repository _repository;
+	private final Repository _repository;
 
 }

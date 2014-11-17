@@ -14,11 +14,20 @@
 
 package com.liferay.sync.engine.service;
 
-import com.liferay.sync.engine.documentlibrary.event.GetUserSitesGroupsEvent;
 import com.liferay.sync.engine.model.ModelListener;
+import com.liferay.sync.engine.model.SyncFile;
 import com.liferay.sync.engine.model.SyncSite;
 import com.liferay.sync.engine.model.SyncSiteModelListener;
 import com.liferay.sync.engine.service.persistence.SyncSitePersistence;
+
+import java.io.IOException;
+
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 
 import java.sql.SQLException;
 
@@ -37,8 +46,12 @@ import org.slf4j.LoggerFactory;
  */
 public class SyncSiteService {
 
-	public static SyncSite activateSyncSite(long syncAccountId, boolean reset) {
-		SyncSite syncSite = fetchSyncSite(syncAccountId);
+	public static SyncSite activateSyncSite(long syncSiteId, boolean reset) {
+		SyncSite syncSite = fetchSyncSite(syncSiteId);
+
+		if (syncSite.isActive()) {
+			return syncSite;
+		}
 
 		syncSite.setActive(true);
 
@@ -51,9 +64,33 @@ public class SyncSiteService {
 		return syncSite;
 	}
 
+	public static SyncSite deactivateSyncSite(long syncSiteId) {
+		SyncSite syncSite = fetchSyncSite(syncSiteId);
+
+		if (!syncSite.isActive()) {
+			return syncSite;
+		}
+
+		return deactivateSyncSite(syncSite);
+	}
+
 	public static void deleteSyncSite(long syncSiteId) {
 		try {
+
+			// Sync site
+
+			SyncSite syncSite = fetchSyncSite(syncSiteId);
+
 			_syncSitePersistence.deleteById(syncSiteId);
+
+			// Sync files
+
+			try {
+				deleteSyncFiles(syncSite);
+			}
+			catch (IOException ioe) {
+				_logger.error(ioe.getMessage(), ioe);
+			}
 		}
 		catch (SQLException sqle) {
 			if (_logger.isDebugEnabled()) {
@@ -167,14 +204,6 @@ public class SyncSiteService {
 		_syncSitePersistence.registerModelListener(modelListener);
 	}
 
-	public static void synchronizeSyncSites(long syncAccountId) {
-		GetUserSitesGroupsEvent getUserSitesGroupsEvent =
-			new GetUserSitesGroupsEvent(
-				syncAccountId, Collections.<String, Object>emptyMap());
-
-		getUserSitesGroupsEvent.run();
-	}
-
 	public static void unregisterModelListener(
 		ModelListener<SyncSite> modelListener) {
 
@@ -196,10 +225,73 @@ public class SyncSiteService {
 		}
 	}
 
-	private static Logger _logger = LoggerFactory.getLogger(
+	protected static SyncSite deactivateSyncSite(SyncSite syncSite) {
+
+		// Sync site
+
+		syncSite.setActive(false);
+
+		syncSite = update(syncSite);
+
+		// Sync files
+
+		try {
+			deleteSyncFiles(syncSite);
+		}
+		catch (IOException ioe) {
+			_logger.error(ioe.getMessage(), ioe);
+		}
+
+		return syncSite;
+	}
+
+	protected static void deleteSyncFiles(SyncSite syncSite)
+		throws IOException {
+
+		List<SyncFile> syncFiles = SyncFileService.findSyncFilesByRepositoryId(
+			syncSite.getGroupId(), syncSite.getSyncAccountId());
+
+		for (SyncFile syncFile : syncFiles) {
+			SyncFileService.deleteSyncFile(syncFile, false);
+		}
+
+		Path filePath = Paths.get(syncSite.getFilePathName());
+
+		if (!Files.exists(filePath)) {
+			return;
+		}
+
+		Files.walkFileTree(
+			filePath,
+			new SimpleFileVisitor<Path>() {
+
+				@Override
+				public FileVisitResult postVisitDirectory(
+						Path filePath, IOException ioe)
+					throws IOException {
+
+					Files.deleteIfExists(filePath);
+
+					return FileVisitResult.CONTINUE;
+				}
+
+				@Override
+				public FileVisitResult visitFile(
+						Path filePath, BasicFileAttributes basicFileAttributes)
+					throws IOException {
+
+					Files.deleteIfExists(filePath);
+
+					return FileVisitResult.CONTINUE;
+				}
+
+			});
+	}
+
+	private static final Logger _logger = LoggerFactory.getLogger(
 		SyncSiteService.class);
 
-	private static Map<Long, Set<Long>> _activeSyncSiteIds =
+	private static final Map<Long, Set<Long>> _activeSyncSiteIds =
 		new HashMap<Long, Set<Long>>();
 	private static SyncSitePersistence _syncSitePersistence =
 		getSyncSitePersistence();

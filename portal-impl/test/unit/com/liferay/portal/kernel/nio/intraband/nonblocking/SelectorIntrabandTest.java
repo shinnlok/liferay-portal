@@ -28,9 +28,10 @@ import com.liferay.portal.kernel.nio.intraband.RegistrationReference;
 import com.liferay.portal.kernel.test.CaptureHandler;
 import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
+import com.liferay.portal.kernel.test.NewEnv;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.test.AdviseWith;
-import com.liferay.portal.test.runners.AspectJMockingNewClassLoaderJUnitTestRunner;
+import com.liferay.portal.test.AspectJNewEnvMethodRule;
 
 import java.io.IOException;
 
@@ -65,13 +66,12 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 /**
  * @author Shuyang Zhou
  */
-@RunWith(AspectJMockingNewClassLoaderJUnitTestRunner.class)
 public class SelectorIntrabandTest {
 
 	@ClassRule
@@ -97,14 +97,12 @@ public class SelectorIntrabandTest {
 
 	@Test
 	public void testCreateAndDestroy() throws Exception {
-		CaptureHandler captureHandler = null;
+		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
+			SelectorIntraband.class.getName(), Level.INFO);
 
 		try {
 
 			// Close selector, with log
-
-			captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-				SelectorIntraband.class.getName(), Level.INFO);
 
 			List<LogRecord> logRecords = captureHandler.getLogRecords();
 
@@ -169,13 +167,12 @@ public class SelectorIntrabandTest {
 			Assert.assertTrue(logRecords.isEmpty());
 		}
 		finally {
-			if (captureHandler != null) {
-				captureHandler.close();
-			}
+			captureHandler.close();
 		}
 	}
 
 	@AdviseWith(adviceClasses = {Jdk14LogImplAdvice.class})
+	@NewEnv(type = NewEnv.Type.CLASSLOADER)
 	@Test
 	public void testReceiveDatagram() throws Exception {
 		Pipe readPipe = Pipe.open();
@@ -191,14 +188,12 @@ public class SelectorIntrabandTest {
 
 		long sequenceId = 100;
 
-		CaptureHandler captureHandler = null;
+		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
+			BaseIntraband.class.getName(), Level.WARNING);
 
 		try {
 
 			// Receive ACK response, no ACK request, with log
-
-			captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-				BaseIntraband.class.getName(), Level.WARNING);
 
 			List<LogRecord> logRecords = captureHandler.getLogRecords();
 
@@ -504,9 +499,7 @@ public class SelectorIntrabandTest {
 			scatteringByteChannel.close();
 		}
 		finally {
-			if (captureHandler != null) {
-				captureHandler.close();
-			}
+			captureHandler.close();
 		}
 	}
 
@@ -913,6 +906,7 @@ public class SelectorIntrabandTest {
 	}
 
 	@AdviseWith(adviceClasses = {Jdk14LogImplAdvice.class})
+	@NewEnv(type = NewEnv.Type.CLASSLOADER)
 	@Test
 	public void testSendDatagramWithCallback() throws Exception {
 
@@ -950,16 +944,14 @@ public class SelectorIntrabandTest {
 
 		Assert.assertArrayEquals(_data, dataByteBuffer.array());
 
-		CaptureHandler captureHandler = null;
+		CaptureHandler captureHandler1 = JDKLoggerTestUtil.configureJDKLogger(
+			BaseIntraband.class.getName(), Level.WARNING);
 
 		try {
 
 			// Callback timeout, with log
 
-			captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-				BaseIntraband.class.getName(), Level.WARNING);
-
-			List<LogRecord> logRecords = captureHandler.getLogRecords();
+			List<LogRecord> logRecords = captureHandler1.getLogRecords();
 
 			recordCompletionHandler = new RecordCompletionHandler<Object>();
 
@@ -982,7 +974,7 @@ public class SelectorIntrabandTest {
 
 			// Callback timeout, without log
 
-			logRecords = captureHandler.resetLogLevel(Level.OFF);
+			logRecords = captureHandler1.resetLogLevel(Level.OFF);
 
 			recordCompletionHandler = new RecordCompletionHandler<Object>();
 
@@ -999,18 +991,16 @@ public class SelectorIntrabandTest {
 			Assert.assertTrue(logRecords.isEmpty());
 		}
 		finally {
-			if (captureHandler != null) {
-				captureHandler.close();
-			}
+			captureHandler1.close();
 		}
 
 		// Callback timeout, completion handler causes NPE
 
-		captureHandler = JDKLoggerTestUtil.configureJDKLogger(
+		captureHandler1 = JDKLoggerTestUtil.configureJDKLogger(
 			SelectorIntraband.class.getName(), Level.SEVERE);
 
 		try {
-			List<LogRecord> logRecords = captureHandler.getLogRecords();
+			List<LogRecord> logRecords1 = captureHandler1.getLogRecords();
 
 			recordCompletionHandler = new RecordCompletionHandler<Object>() {
 
@@ -1027,24 +1017,45 @@ public class SelectorIntrabandTest {
 
 			Selector selector = _selectorIntraband.selector;
 
+			Datagram datagram = Datagram.createRequestDatagram(_type, _data);
+
 			try {
 				_selectorIntraband.sendDatagram(
-					registrationReference,
-					Datagram.createRequestDatagram(_type, _data), attachment,
+					registrationReference, datagram, attachment,
 					EnumSet.of(CompletionType.DELIVERED),
 					recordCompletionHandler, 10, TimeUnit.MILLISECONDS);
 			}
 			finally {
-				recordCompletionHandler.waitUntilTimeouted(selector);
+				CaptureHandler captureHandler2 =
+					JDKLoggerTestUtil.configureJDKLogger(
+						BaseIntraband.class.getName(), Level.WARNING);
+
+				try {
+					recordCompletionHandler.waitUntilTimeouted(selector);
+
+					List<LogRecord> logRecords2 =
+						captureHandler2.getLogRecords();
+
+					Assert.assertEquals(1, logRecords2.size());
+
+					LogRecord logRecord = logRecords2.get(0);
+
+					Assert.assertEquals(
+						"Removed timeout response waiting datagram " + datagram,
+						logRecord.getMessage());
+				}
+				finally {
+					captureHandler2.close();
+				}
 
 				Jdk14LogImplAdvice.waitUntilErrorCalled();
 			}
 
 			Assert.assertFalse(selector.isOpen());
-			Assert.assertEquals(1, logRecords.size());
+			Assert.assertEquals(1, logRecords1.size());
 
 			IntrabandTestUtil.assertMessageStartWith(
-				logRecords.get(0),
+				logRecords1.get(0),
 				SelectorIntraband.class +
 					".threadFactory-1 exiting exceptionally");
 
@@ -1052,7 +1063,7 @@ public class SelectorIntrabandTest {
 			scatteringByteChannel.close();
 		}
 		finally {
-			captureHandler.close();
+			captureHandler1.close();
 		}
 	}
 
@@ -1266,6 +1277,10 @@ public class SelectorIntrabandTest {
 			_unregisterChannels(registrationReference);
 		}
 	}
+
+	@Rule
+	public final AspectJNewEnvMethodRule aspectJNewEnvMethodRule =
+		new AspectJNewEnvMethodRule();
 
 	@Aspect
 	public static class Jdk14LogImplAdvice {

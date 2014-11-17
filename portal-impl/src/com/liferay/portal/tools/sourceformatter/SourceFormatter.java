@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author Hugo Huijser
@@ -34,8 +35,8 @@ public class SourceFormatter {
 
 			sourceFormatter.format();
 		}
-		catch (Exception e) {
-			e.printStackTrace();
+		catch (Throwable t) {
+			t.printStackTrace();
 		}
 	}
 
@@ -50,7 +51,10 @@ public class SourceFormatter {
 		_autoFix = autoFix;
 	}
 
-	public void format() throws Exception {
+	public void format() throws Throwable {
+		final AtomicReference<Throwable> exceptionReference1 =
+			new AtomicReference<Throwable>();
+
 		Thread thread1 = new Thread () {
 
 			@Override
@@ -78,12 +82,17 @@ public class SourceFormatter {
 						_runSourceProcessor(sourceProcessor);
 					}
 				}
-				catch (Exception e) {
-					e.printStackTrace();
+				catch (Throwable t) {
+					t.printStackTrace();
+
+					exceptionReference1.set(t);
 				}
 			}
 
 		};
+
+		final AtomicReference<Throwable> exceptionReference2 =
+			new AtomicReference<Throwable>();
 
 		Thread thread2 = new Thread () {
 
@@ -102,8 +111,10 @@ public class SourceFormatter {
 						_runSourceProcessor(sourceProcessor);
 					}
 				}
-				catch (Exception e) {
-					e.printStackTrace();
+				catch (Throwable t) {
+					t.printStackTrace();
+
+					exceptionReference2.set(t);
 				}
 			}
 
@@ -114,6 +125,20 @@ public class SourceFormatter {
 
 		thread1.join();
 		thread2.join();
+
+		Throwable throwable1 = exceptionReference1.get();
+		Throwable throwable2 = exceptionReference2.get();
+
+		if (throwable1 != null) {
+			if (throwable2 != null) {
+				throwable1.addSuppressed(throwable2);
+			}
+
+			throw throwable1;
+		}
+		else if (throwable2 != null) {
+			throw throwable2;
+		}
 
 		if (_throwException) {
 			if (!_errorMessages.isEmpty()) {
@@ -131,6 +156,12 @@ public class SourceFormatter {
 
 		if (fileName.endsWith(".testjava")) {
 			sourceProcessor = JavaSourceProcessor.class.newInstance();
+		}
+		else if (fileName.endsWith(".testsql")) {
+			sourceProcessor = SQLSourceProcessor.class.newInstance();
+		}
+		else if (fileName.endsWith(".testtld")) {
+			sourceProcessor = TLDSourceProcessor.class.newInstance();
 		}
 		else if (fileName.endsWith(".testxml")) {
 			sourceProcessor = XMLSourceProcessor.class.newInstance();
@@ -159,11 +190,11 @@ public class SourceFormatter {
 		}
 	}
 
-	private boolean _autoFix;
-	private Set<String> _errorMessages = new LinkedHashSet<String>();
+	private final boolean _autoFix;
+	private final Set<String> _errorMessages = new LinkedHashSet<String>();
 	private SourceMismatchException _firstSourceMismatchException;
-	private boolean _printErrors;
-	private boolean _throwException;
-	private boolean _useProperties;
+	private final boolean _printErrors;
+	private final boolean _throwException;
+	private final boolean _useProperties;
 
 }

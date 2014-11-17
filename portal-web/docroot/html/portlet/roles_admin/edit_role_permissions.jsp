@@ -23,6 +23,7 @@ String tabs1 = "roles";
 String tabs2 = ParamUtil.getString(request, "tabs2", "current");
 
 String redirect = ParamUtil.getString(request, "redirect");
+
 String backURL = ParamUtil.getString(request, "backURL", redirect);
 
 Role role = (Role)request.getAttribute(WebKeys.ROLE);
@@ -316,8 +317,12 @@ portletURL.setParameter("roleId", String.valueOf(role.getRoleId()));
 
 				permissionContentContainerNode.unplug(AParseContent);
 
+				var href = event.currentTarget.attr('data-resource-href');
+
+				href = Liferay.Util.addParams('p_p_isolated=true', href);
+
 				A.io.request(
-					event.currentTarget.attr('data-resource-href'),
+					href,
 					{
 						on: {
 							failure: function() {

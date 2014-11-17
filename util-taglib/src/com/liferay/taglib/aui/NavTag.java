@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.User;
 import com.liferay.portal.theme.ThemeDisplay;
+import com.liferay.portal.util.PortalUtil;
 import com.liferay.taglib.aui.base.BaseNavTag;
 
 import javax.portlet.PortletResponse;
@@ -86,9 +87,7 @@ public class NavTag extends BaseNavTag implements BodyTag {
 			String icon = getIcon();
 
 			if (Validator.isNull(icon)) {
-				sb.append("<span class=\"icon-bar\"></span>");
-				sb.append("<span class=\"icon-bar\"></span>");
-				sb.append("<span class=\"icon-bar\"></span>");
+				sb.append("<i class=\"icon-reorder\"></i>");
 			}
 			else if (icon.equals("user") && themeDisplay.isSignedIn()) {
 				try {
@@ -151,12 +150,13 @@ public class NavTag extends BaseNavTag implements BodyTag {
 
 		_namespacedId = getId();
 
-		if (Validator.isNull(_namespacedId)) {
-			_namespacedId = StringUtil.randomId();
-		}
-
 		HttpServletRequest request =
 			(HttpServletRequest)pageContext.getRequest();
+
+		if (Validator.isNull(_namespacedId)) {
+			_namespacedId = PortalUtil.getUniqueElementId(
+				request, StringPool.BLANK, AUIUtil.normalizeId("navTag"));
+		}
 
 		PortletResponse portletResponse = (PortletResponse)request.getAttribute(
 			JavaConstants.JAVAX_PORTLET_RESPONSE);

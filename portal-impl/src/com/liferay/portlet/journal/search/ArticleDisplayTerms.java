@@ -15,18 +15,10 @@
 package com.liferay.portlet.journal.search;
 
 import com.liferay.portal.kernel.dao.search.DisplayTerms;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.theme.ThemeDisplay;
-import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.WebKeys;
-import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
-import com.liferay.portlet.dynamicdatamapping.model.DDMTemplate;
-import com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalServiceUtil;
-import com.liferay.portlet.dynamicdatamapping.service.DDMTemplateLocalServiceUtil;
-import com.liferay.portlet.journal.model.JournalArticle;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -43,6 +35,10 @@ public class ArticleDisplayTerms extends DisplayTerms {
 
 	public static final String CONTENT = "content";
 
+	public static final String DDM_STRUCTURE_KEY = "ddmStructureKey";
+
+	public static final String DDM_TEMPLATE_KEY = "ddmTemplateKey";
+
 	public static final String DESCRIPTION = "description";
 
 	public static final String DISPLAY_DATE_GT = "displayDateGT";
@@ -57,13 +53,7 @@ public class ArticleDisplayTerms extends DisplayTerms {
 
 	public static final String STATUS = "status";
 
-	public static final String STRUCTURE_ID = "structureId";
-
-	public static final String TEMPLATE_ID = "templateId";
-
 	public static final String TITLE = "title";
-
-	public static final String TYPE = "type";
 
 	public static final String VERSION = "version";
 
@@ -72,14 +62,14 @@ public class ArticleDisplayTerms extends DisplayTerms {
 
 		articleId = ParamUtil.getString(portletRequest, ARTICLE_ID);
 		content = ParamUtil.getString(portletRequest, CONTENT);
+		ddmStructureKey = ParamUtil.getString(
+			portletRequest, DDM_STRUCTURE_KEY);
+		ddmTemplateKey = ParamUtil.getString(portletRequest, DDM_TEMPLATE_KEY);
 		description = ParamUtil.getString(portletRequest, DESCRIPTION);
 		folderId = ParamUtil.getLong(portletRequest, FOLDER_ID);
 		navigation = ParamUtil.getString(portletRequest, NAVIGATION);
 		status = ParamUtil.getInteger(portletRequest, STATUS);
-		structureId = ParamUtil.getString(portletRequest, STRUCTURE_ID);
-		templateId = ParamUtil.getString(portletRequest, TEMPLATE_ID);
 		title = ParamUtil.getString(portletRequest, TITLE);
-		type = ParamUtil.getString(portletRequest, TYPE);
 		version = ParamUtil.getDouble(portletRequest, VERSION);
 
 		groupId = setGroupId(portletRequest);
@@ -91,6 +81,14 @@ public class ArticleDisplayTerms extends DisplayTerms {
 
 	public String getContent() {
 		return content;
+	}
+
+	public String getDDMStructureKey() {
+		return ddmStructureKey;
+	}
+
+	public String getDDMTemplateKey() {
+		return ddmTemplateKey;
 	}
 
 	public String getDescription() {
@@ -133,20 +131,8 @@ public class ArticleDisplayTerms extends DisplayTerms {
 		return status;
 	}
 
-	public String getStructureId() {
-		return structureId;
-	}
-
-	public String getTemplateId() {
-		return templateId;
-	}
-
 	public String getTitle() {
 		return title;
-	}
-
-	public String getType() {
-		return type;
 	}
 
 	public double getVersion() {
@@ -192,40 +178,6 @@ public class ArticleDisplayTerms extends DisplayTerms {
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		if (Validator.isNotNull(structureId) && !structureId.equals("0")) {
-			DDMStructure ddmStructure = null;
-
-			try {
-				ddmStructure = DDMStructureLocalServiceUtil.fetchStructure(
-					themeDisplay.getSiteGroupId(),
-					PortalUtil.getClassNameId(JournalArticle.class),
-					structureId);
-			}
-			catch (SystemException se) {
-			}
-
-			if (ddmStructure != null) {
-				return 0;
-			}
-		}
-
-		if (Validator.isNotNull(templateId) && !templateId.equals("0")) {
-			DDMTemplate ddmTemplate = null;
-
-			try {
-				ddmTemplate = DDMTemplateLocalServiceUtil.fetchTemplate(
-					themeDisplay.getSiteGroupId(),
-					PortalUtil.getClassNameId(JournalArticle.class),
-					templateId);
-			}
-			catch (SystemException se) {
-			}
-
-			if (ddmTemplate != null) {
-				return 0;
-			}
-		}
-
 		return themeDisplay.getScopeGroupId();
 	}
 
@@ -235,6 +187,8 @@ public class ArticleDisplayTerms extends DisplayTerms {
 
 	protected String articleId;
 	protected String content;
+	protected String ddmStructureKey;
+	protected String ddmTemplateKey;
 	protected String description;
 	protected Date displayDateGT;
 	protected Date displayDateLT;
@@ -243,10 +197,7 @@ public class ArticleDisplayTerms extends DisplayTerms {
 	protected long groupId;
 	protected String navigation;
 	protected int status;
-	protected String structureId;
-	protected String templateId;
 	protected String title;
-	protected String type;
 	protected double version;
 
 }

@@ -22,11 +22,11 @@ dlPortletInstanceSettings = DLPortletInstanceSettings.getInstance(layout, portle
 DLConfigurationDisplayContext dlConfigurationDisplayContext = new DLConfigurationDisplayContext(request, dlPortletInstanceSettings);
 %>
 
-<liferay-portlet:actionURL portletConfiguration="true" var="configurationActionURL">
+<liferay-portlet:actionURL portletConfiguration="<%= true %>" var="configurationActionURL">
 	<liferay-portlet:param name="settingsScope" value="portletInstance" />
 </liferay-portlet:actionURL>
 
-<liferay-portlet:renderURL portletConfiguration="true" var="configurationRenderURL" />
+<liferay-portlet:renderURL portletConfiguration="<%= true %>" var="configurationRenderURL" />
 
 <aui:form action="<%= configurationActionURL %>" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "saveConfiguration();" %>'>
 	<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.UPDATE %>" />
@@ -113,8 +113,8 @@ DLConfigurationDisplayContext dlConfigurationDisplayContext = new DLConfiguratio
 				</liferay-ui:panel>
 			</liferay-ui:panel-container>
 
-			<aui:script use="aui-base">
-				A.one('#<portlet:namespace />selectFolderButton').on(
+			<aui:script>
+				AUI.$('#<portlet:namespace />selectFolderButton').on(
 					'click',
 					function(event) {
 						Liferay.Util.selectEntity(

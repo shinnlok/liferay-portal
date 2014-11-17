@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ReflectionUtil;
 import com.liferay.portal.kernel.util.ReleaseInfo;
+import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -42,6 +43,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -292,7 +294,9 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 	protected void checkInefficientStringMethods(
 		String line, String fileName, String absolutePath, int lineCount) {
 
-		if (isRunsOutsidePortal(absolutePath)) {
+		if (isRunsOutsidePortal(absolutePath) ||
+			fileName.endsWith("GetterUtil.java")) {
+
 			return;
 		}
 
@@ -692,19 +696,23 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 	}
 
 	protected String formatJavaTerms(
+			String javaClassName, String packagePath, File file,
 			String fileName, String absolutePath, String content,
 			String javaClassContent, int javaClassLineCount,
+			List<String> checkJavaFieldTypesExclusions,
 			List<String> javaTermAccessLevelModifierExclusions,
 			List<String> javaTermSortExclusions,
 			List<String> testAnnotationsExclusions)
 		throws Exception {
 
 		JavaClass javaClass = new JavaClass(
-			fileName, absolutePath, javaClassContent, javaClassLineCount,
-			StringPool.TAB);
+			javaClassName, packagePath, file, fileName, absolutePath,
+			javaClassContent, javaClassLineCount, StringPool.TAB, null,
+			javaTermAccessLevelModifierExclusions);
 
 		String newJavaClassContent = javaClass.formatJavaTerms(
-			javaTermAccessLevelModifierExclusions, javaTermSortExclusions,
+			getAnnotationsExclusions(), getImmutableFieldTypes(),
+			checkJavaFieldTypesExclusions, javaTermSortExclusions,
 			testAnnotationsExclusions);
 
 		if (!javaClassContent.equals(newJavaClassContent)) {
@@ -715,10 +723,28 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		return content;
 	}
 
+	protected String formatTagAttributeType(
+			String line, String tag, String attributeAndValue)
+		throws Exception {
+
+		return line;
+	}
+
 	protected String getAbsolutePath(File file) {
 		String absolutePath = fileUtil.getAbsolutePath(file);
 
 		return StringUtil.replace(absolutePath, "/./", StringPool.SLASH);
+	}
+
+	protected Set<String> getAnnotationsExclusions() {
+		if (_annotationsExclusions != null) {
+			return _annotationsExclusions;
+		}
+
+		_annotationsExclusions = SetUtil.fromArray(
+			new String[] {"BeanReference", "Mock", "SuppressWarnings"});
+
+		return _annotationsExclusions;
 	}
 
 	protected Map<String, String> getCompatClassNamesMap() throws IOException {
@@ -850,6 +876,25 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 
 	protected List<String> getFileNames(String[] excludes, String[] includes) {
 		return getFileNames(BASEDIR, excludes, includes);
+	}
+
+	protected Set<String> getImmutableFieldTypes() {
+		if (_immutableFieldTypes != null) {
+			return _immutableFieldTypes;
+		}
+
+		Set<String> immutableFieldTypes = SetUtil.fromArray(
+			new String[] {
+				"boolean", "byte", "char", "double", "float", "int", "long",
+				"short", "Boolean", "Byte", "Character", "Class", "Double",
+				"Float", "Int", "Long", "Number", "Short", "String",
+			});
+
+		immutableFieldTypes.addAll(getPropertyList("immutable.field.types"));
+
+		_immutableFieldTypes = immutableFieldTypes;
+
+		return _immutableFieldTypes;
 	}
 
 	protected String[] getLanguageKeys(Matcher matcher) {
@@ -1153,18 +1198,22 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 	}
 
 	protected String sortAttributes(
-		String fileName, String line, int lineCount,
-		boolean allowApostropheDelimeter) {
+			String fileName, String line, int lineCount,
+			boolean allowApostropheDelimeter)
+		throws Exception {
 
 		String s = line;
 
-		int x = s.indexOf(StringPool.SPACE);
+		int x = s.indexOf(StringPool.LESS_THAN);
+		int y = s.indexOf(StringPool.SPACE);
 
-		if (x == -1) {
+		if ((x == -1) || (x >= y)) {
 			return line;
 		}
 
-		s = s.substring(x + 1);
+		String tag = s.substring(x + 1, y);
+
+		s = s.substring(y + 1);
 
 		String previousAttribute = null;
 		String previousAttributeAndValue = null;
@@ -1209,7 +1258,7 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 
 			String value = null;
 
-			int y = -1;
+			y = -1;
 
 			while (true) {
 				y = s.indexOf(delimeter, y + 1);
@@ -1273,6 +1322,14 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 			sb.append(delimeter);
 
 			String currentAttributeAndValue = sb.toString();
+
+			String newLine = formatTagAttributeType(
+				line, tag, currentAttributeAndValue);
+
+			if (!newLine.equals(line)) {
+				return sortAttributes(
+					fileName, newLine, lineCount, allowApostropheDelimeter);
+			}
 
 			if (wrongOrder) {
 				if ((StringUtil.count(line, currentAttributeAndValue) == 1) &&
@@ -1389,7 +1446,7 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 
 		StringBundler sb = new StringBundler();
 
-		try (UnsyncBufferedReader unsyncBufferedReader = 
+		try (UnsyncBufferedReader unsyncBufferedReader =
 				new UnsyncBufferedReader(new UnsyncStringReader(content))) {
 
 			String line = null;
@@ -1491,20 +1548,15 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 
 		Properties properties = new Properties();
 
-		if (portalSource) {
-			ClassLoader classLoader =
-				BaseSourceProcessor.class.getClassLoader();
-
-			properties.load(
-				classLoader.getResourceAsStream(
-					"com/liferay/portal/tools/dependencies/" + fileName));
-
-			return properties;
-		}
-
 		List<Properties> propertiesList = new ArrayList<Properties>();
 
-		for (int i = 0; i <= 2; i++) {
+		int level = 2;
+
+		if (portalSource) {
+			level = 3;
+		}
+
+		for (int i = 0; i <= level; i++) {
 			try {
 				InputStream inputStream = new FileInputStream(fileName);
 
@@ -1545,15 +1597,18 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 					continue;
 				}
 
-				if (properties.containsKey(key)) {
+				if (key.contains("excludes")) {
 					String existingValue = properties.getProperty(key);
 
 					if (Validator.isNotNull(existingValue)) {
 						value = existingValue + StringPool.COMMA + value;
 					}
-				}
 
-				properties.put(key, value);
+					properties.put(key, value);
+				}
+				else if (!properties.containsKey(key)) {
+					properties.put(key, value);
+				}
 			}
 		}
 
@@ -1593,11 +1648,13 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		new HashMap<String, List<String>>();
 	private static boolean _printErrors;
 
+	private Set<String> _annotationsExclusions;
 	private boolean _autoFix;
 	private Map<String, String> _compatClassNamesMap;
 	private String _copyright;
 	private String[] _excludes;
 	private SourceMismatchException _firstSourceMismatchException;
+	private Set<String> _immutableFieldTypes;
 	private String _mainReleaseVersion;
 	private String _oldCopyright;
 	private Properties _portalLanguageProperties;
