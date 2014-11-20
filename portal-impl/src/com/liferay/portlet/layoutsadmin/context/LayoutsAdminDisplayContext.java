@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.UnicodeProperties;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
@@ -55,8 +56,9 @@ import javax.servlet.http.HttpServletRequest;
 public class LayoutsAdminDisplayContext {
 
 	public LayoutsAdminDisplayContext(
-		HttpServletRequest request,
-		LiferayPortletResponse liferayPortletResponse) {
+			HttpServletRequest request,
+			LiferayPortletResponse liferayPortletResponse)
+		throws PortalException {
 
 		_request = request;
 		_liferayPortletResponse = liferayPortletResponse;
@@ -64,7 +66,22 @@ public class LayoutsAdminDisplayContext {
 		_groupDisplayContextHelper = new GroupDisplayContextHelper(request);
 
 		boolean privateLayout = false;
-		String tabs1 = ParamUtil.getString(request, "tabs1", "public-pages");
+		String tabs1 = ParamUtil.getString(request, "tabs1");
+
+		_themeDisplay = (ThemeDisplay)request.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		if (Validator.isNull(tabs1)) {
+			tabs1 = "public-pages";
+
+			LayoutSet layoutSet = _themeDisplay.getLayoutSet();
+
+			Group group = layoutSet.getGroup();
+
+			if (!group.isControlPanel() && layoutSet.isPrivateLayout()) {
+				tabs1 = "private-pages";
+			}
+		}
 
 		if (tabs1.equals("my-dashboard") || tabs1.equals("private-pages")) {
 			privateLayout = true;
@@ -99,10 +116,7 @@ public class LayoutsAdminDisplayContext {
 		if (portletName.equals(PortletKeys.LAYOUTS_ADMIN) ||
 			portletName.equals(PortletKeys.MY_ACCOUNT)) {
 
-			ThemeDisplay themeDisplay = (ThemeDisplay) _request.getAttribute(
-				WebKeys.THEME_DISPLAY);
-
-			PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
+			PortletDisplay portletDisplay = _themeDisplay.getPortletDisplay();
 
 			portletDisplay.setURLBack(getBackURL());
 		}
@@ -165,12 +179,9 @@ public class LayoutsAdminDisplayContext {
 			return _layoutDescriptions;
 		}
 
-		ThemeDisplay themeDisplay = (ThemeDisplay) _request.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
 		_layoutDescriptions = LayoutListUtil.getLayoutDescriptions(
 			getGroupId(), isPrivateLayout(), getRootNodeName(),
-			themeDisplay.getLocale());
+			_themeDisplay.getLocale());
 
 		return _layoutDescriptions;
 	}
@@ -282,13 +293,10 @@ public class LayoutsAdminDisplayContext {
 			return _rootNodeName;
 		}
 
-		ThemeDisplay themeDisplay = (ThemeDisplay) _request.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
 		Group liveGroup = getLiveGroup();
 
 		_rootNodeName = liveGroup.getLayoutRootNodeName(
-			isPrivateLayout(), themeDisplay.getLocale());
+			isPrivateLayout(), _themeDisplay.getLocale());
 
 		return _rootNodeName;
 	}
@@ -412,14 +420,11 @@ public class LayoutsAdminDisplayContext {
 	}
 
 	protected boolean hasPowerUserRole() {
-		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
 		try {
 			User selUser = getSelUser();
 
 			return RoleLocalServiceUtil.hasUserRole(
-				selUser.getUserId(), themeDisplay.getCompanyId(),
+				selUser.getUserId(), _themeDisplay.getCompanyId(),
 				RoleConstants.POWER_USER, true);
 		}
 		catch (Exception e) {
@@ -467,6 +472,7 @@ public class LayoutsAdminDisplayContext {
 	private User _selUser;
 	private final String _tabs1;
 	private String _tabs1Names;
+	private final ThemeDisplay _themeDisplay;
 	private UserGroup _userGroup;
 
 }

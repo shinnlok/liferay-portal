@@ -142,8 +142,9 @@ public abstract class BaseMobileDriverImpl
 	@Override
 	public void assertNotPartialText(String locator, String pattern)
 		throws Exception {
-			throw new UnsupportedOperationException();
-		}
+
+		throw new UnsupportedOperationException();
+	}
 
 	@Override
 	public void assertNotSelectedLabel(String selectLocator, String pattern)
@@ -166,7 +167,7 @@ public abstract class BaseMobileDriverImpl
 
 	@Override
 	public void assertNotVisible(String locator) throws Exception {
-		throw new UnsupportedOperationException();
+		LiferaySeleniumHelper.assertNotVisible(this, locator);
 	}
 
 	@Override
@@ -748,7 +749,7 @@ public abstract class BaseMobileDriverImpl
 
 	@Override
 	public void waitForNotVisible(String locator) throws Exception {
-		throw new UnsupportedOperationException();
+		LiferaySeleniumHelper.waitForNotVisible(this, locator);
 	}
 
 	@Override

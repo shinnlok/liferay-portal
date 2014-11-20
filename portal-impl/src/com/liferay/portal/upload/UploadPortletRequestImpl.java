@@ -67,7 +67,11 @@ public class UploadPortletRequestImpl
 		if (Validator.isNull(contentType) ||
 			contentType.equals(ContentTypes.APPLICATION_OCTET_STREAM)) {
 
-			contentType = MimeTypesUtil.getContentType(getFile(name));
+			File file = getFile(name);
+
+			if (file != null) {
+				contentType = MimeTypesUtil.getContentType(file);
+			}
 		}
 
 		return contentType;
@@ -324,7 +328,7 @@ public class UploadPortletRequestImpl
 		}
 	}
 
-	private String _namespace;
-	private UploadServletRequest _uploadServletRequest;
+	private final String _namespace;
+	private final UploadServletRequest _uploadServletRequest;
 
 }

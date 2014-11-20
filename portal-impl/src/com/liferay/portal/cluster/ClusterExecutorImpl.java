@@ -22,7 +22,6 @@ import com.liferay.portal.kernel.cluster.ClusterExecutor;
 import com.liferay.portal.kernel.cluster.ClusterMessageType;
 import com.liferay.portal.kernel.cluster.ClusterNode;
 import com.liferay.portal.kernel.cluster.ClusterNodeResponse;
-import com.liferay.portal.kernel.cluster.ClusterNodeResponses;
 import com.liferay.portal.kernel.cluster.ClusterRequest;
 import com.liferay.portal.kernel.cluster.ClusterResponseCallback;
 import com.liferay.portal.kernel.cluster.FutureClusterResponses;
@@ -61,8 +60,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import org.jgroups.JChannel;
 
@@ -87,22 +84,6 @@ public class ClusterExecutorImpl
 		}
 
 		_clusterEventListeners.addIfAbsent(clusterEventListener);
-	}
-
-	@Override
-	public void afterPropertiesSet() {
-		if (PropsValues.CLUSTER_EXECUTOR_DEBUG_ENABLED) {
-			addClusterEventListener(new DebuggingClusterEventListenerImpl());
-		}
-
-		if (PropsValues.LIVE_USERS_ENABLED) {
-			addClusterEventListener(new LiveUsersClusterEventListenerImpl());
-		}
-
-		_secure = StringUtil.equalsIgnoreCase(
-			Http.HTTPS, PropsValues.WEB_SERVER_PROTOCOL);
-
-		super.afterPropertiesSet();
 	}
 
 	@Override
@@ -177,7 +158,7 @@ public class ClusterExecutorImpl
 	}
 
 	@Override
-	public void execute(
+	public FutureClusterResponses execute(
 		ClusterRequest clusterRequest,
 		ClusterResponseCallback clusterResponseCallback) {
 
@@ -188,22 +169,8 @@ public class ClusterExecutorImpl
 				clusterResponseCallback, futureClusterResponses);
 
 		_executorService.execute(clusterResponseCallbackJob);
-	}
 
-	@Override
-	public void execute(
-		ClusterRequest clusterRequest,
-		ClusterResponseCallback clusterResponseCallback, long timeout,
-		TimeUnit timeUnit) {
-
-		FutureClusterResponses futureClusterResponses = execute(clusterRequest);
-
-		ClusterResponseCallbackJob clusterResponseCallbackJob =
-			new ClusterResponseCallbackJob(
-				clusterResponseCallback, futureClusterResponses, timeout,
-				timeUnit);
-
-		_executorService.execute(clusterResponseCallbackJob);
+		return futureClusterResponses;
 	}
 
 	@Override
@@ -257,23 +224,45 @@ public class ClusterExecutorImpl
 			return;
 		}
 
+		_secure = StringUtil.equalsIgnoreCase(
+			Http.HTTPS, PropsValues.WEB_SERVER_PROTOCOL);
+
 		_executorService = PortalExecutorManagerUtil.getPortalExecutor(
 			CLUSTER_EXECUTOR_CALLBACK_THREAD_POOL);
 
 		PortalUtil.addPortalInetSocketAddressEventListener(this);
 
-		_localAddress = new AddressImpl(_controlJChannel.getAddress());
+		if (PropsValues.CLUSTER_EXECUTOR_DEBUG_ENABLED) {
+			addClusterEventListener(new DebuggingClusterEventListenerImpl());
+		}
 
-		initLocalClusterNode();
+		if (PropsValues.LIVE_USERS_ENABLED) {
+			addClusterEventListener(new LiveUsersClusterEventListenerImpl());
+		}
 
-		memberJoined(_localAddress, _localClusterNode);
+		try {
+			initControlChannel();
 
-		sendNotifyRequest();
+			_localAddress = new AddressImpl(_controlJChannel.getAddress());
 
-		ClusterRequestReceiver clusterRequestReceiver =
-			(ClusterRequestReceiver)_controlJChannel.getReceiver();
+			initLocalClusterNode();
 
-		clusterRequestReceiver.openLatch();
+			memberJoined(_localAddress, _localClusterNode);
+
+			sendNotifyRequest();
+
+			BaseReceiver baseReceiver =
+				(BaseReceiver)_controlJChannel.getReceiver();
+
+			baseReceiver.openLatch();
+		}
+		catch (Exception e) {
+			if (_log.isErrorEnabled()) {
+				_log.error("Unable to initialize", e);
+			}
+
+			throw new IllegalStateException(e);
+		}
 	}
 
 	@Override
@@ -436,8 +425,7 @@ public class ClusterExecutorImpl
 		return _futureClusterResponses.get(uuid);
 	}
 
-	@Override
-	protected void initChannels() throws Exception {
+	protected void initControlChannel() throws Exception {
 		Properties controlProperties = PropsUtil.getProperties(
 			PropsKeys.CLUSTER_LINK_CHANNEL_PROPERTIES_CONTROL, false);
 
@@ -594,18 +582,20 @@ public class ClusterExecutorImpl
 	private static final String _DEFAULT_CLUSTER_NAME =
 		"LIFERAY-CONTROL-CHANNEL";
 
-	private static Log _log = LogFactoryUtil.getLog(ClusterExecutorImpl.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		ClusterExecutorImpl.class);
 
-	private CopyOnWriteArrayList<ClusterEventListener> _clusterEventListeners =
-		new CopyOnWriteArrayList<ClusterEventListener>();
-	private Map<String, Address> _clusterNodeAddresses =
+	private final CopyOnWriteArrayList<ClusterEventListener>
+		_clusterEventListeners =
+			new CopyOnWriteArrayList<ClusterEventListener>();
+	private final Map<String, Address> _clusterNodeAddresses =
 		new ConcurrentHashMap<String, Address>();
 	private JChannel _controlJChannel;
 	private ExecutorService _executorService;
 	private Map<String, FutureClusterResponses> _futureClusterResponses =
 		new ConcurrentReferenceValueHashMap<String, FutureClusterResponses>(
 			FinalizeManager.WEAK_REFERENCE_FACTORY);
-	private Map<Address, ClusterNode> _liveInstances =
+	private final Map<Address, ClusterNode> _liveInstances =
 		new ConcurrentHashMap<Address, ClusterNode>();
 	private Address _localAddress;
 	private ClusterNode _localClusterNode;
@@ -620,21 +610,6 @@ public class ClusterExecutorImpl
 
 			_clusterResponseCallback = clusterResponseCallback;
 			_futureClusterResponses = futureClusterResponses;
-			_timeout = -1;
-			_timeoutGet = false;
-			_timeUnit = TimeUnit.SECONDS;
-		}
-
-		public ClusterResponseCallbackJob(
-			ClusterResponseCallback clusterResponseCallback,
-			FutureClusterResponses futureClusterResponses, long timeout,
-			TimeUnit timeUnit) {
-
-			_clusterResponseCallback = clusterResponseCallback;
-			_futureClusterResponses = futureClusterResponses;
-			_timeout = timeout;
-			_timeoutGet = true;
-			_timeUnit = timeUnit;
 		}
 
 		@Override
@@ -643,33 +618,10 @@ public class ClusterExecutorImpl
 				_futureClusterResponses.getPartialResults();
 
 			_clusterResponseCallback.callback(blockingQueue);
-
-			ClusterNodeResponses clusterNodeResponses = null;
-
-			try {
-				if (_timeoutGet) {
-					clusterNodeResponses = _futureClusterResponses.get(
-						_timeout, _timeUnit);
-				}
-				else {
-					clusterNodeResponses = _futureClusterResponses.get();
-				}
-
-				_clusterResponseCallback.callback(clusterNodeResponses);
-			}
-			catch (InterruptedException ie) {
-				_clusterResponseCallback.processInterruptedException(ie);
-			}
-			catch (TimeoutException te) {
-				_clusterResponseCallback.processTimeoutException(te);
-			}
 		}
 
 		private final ClusterResponseCallback _clusterResponseCallback;
 		private final FutureClusterResponses _futureClusterResponses;
-		private final long _timeout;
-		private final boolean _timeoutGet;
-		private final TimeUnit _timeUnit;
 
 	}
 

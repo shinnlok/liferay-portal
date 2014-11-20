@@ -15,12 +15,14 @@
 package com.liferay.portlet.blogs.subscriptions;
 
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
+import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.test.Sync;
 import com.liferay.portal.test.SynchronousMailExecutionTestListener;
 import com.liferay.portal.test.listeners.MainServletExecutionTestListener;
 import com.liferay.portal.test.runners.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.util.subscriptions.BaseSubscriptionRootContainerModelTestCase;
-import com.liferay.portal.util.test.TestPropsValues;
+import com.liferay.portal.util.test.RandomTestUtil;
+import com.liferay.portal.util.test.ServiceContextTestUtil;
 import com.liferay.portlet.blogs.model.BlogsEntry;
 import com.liferay.portlet.blogs.service.BlogsEntryLocalServiceUtil;
 import com.liferay.portlet.blogs.util.test.BlogsTestUtil;
@@ -46,13 +48,25 @@ public class BlogsSubscriptionRootContainerModelTest
 	@Ignore
 	@Override
 	@Test
-	public void testSubscriptionRootContainerModelWhenInContainerModel() {
+	public void testSubscriptionRootContainerModelWhenAddingBaseModelInContainerModel() {
 	}
 
 	@Ignore
 	@Override
 	@Test
-	public void testSubscriptionRootContainerModelWhenInSubcontainerModel() {
+	public void testSubscriptionRootContainerModelWhenAddingBaseModelInSubcontainerModel() {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testSubscriptionRootContainerModelWhenUpdatingBaseModelInContainerModel() {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testSubscriptionRootContainerModelWhenUpdatingBaseModelInSubcontainerModel() {
 	}
 
 	@Override
@@ -67,7 +81,20 @@ public class BlogsSubscriptionRootContainerModelTest
 		throws Exception {
 
 		BlogsEntryLocalServiceUtil.subscribe(
-			TestPropsValues.getUserId(), group.getGroupId());
+			user.getUserId(), group.getGroupId());
+	}
+
+	@Override
+	protected void updateBaseModel(long baseModelId) throws Exception {
+		BlogsEntry entry = BlogsEntryLocalServiceUtil.getEntry(baseModelId);
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(group.getGroupId());
+
+		serviceContext.setAttribute("sendEmailEntryUpdated", true);
+
+		BlogsTestUtil.updateEntry(
+			entry, RandomTestUtil.randomString(), true, serviceContext);
 	}
 
 }

@@ -16,13 +16,13 @@ package com.liferay.portlet.documentlibrary.service;
 
 import com.liferay.portal.events.AddDefaultDocumentLibraryStructuresAction;
 import com.liferay.portal.kernel.events.SimpleAction;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringPool;
@@ -88,13 +88,16 @@ public class DLFileEntryTypeServiceTest {
 			PortalUtil.getCurrentAndAncestorSiteGroupIds(_group.getGroupId()));
 
 		for (DLFileEntryType dlFileEntryType : _dlFileEntryTypes) {
-			String name = dlFileEntryType.getName(LocaleUtil.getSiteDefault());
+			String fileEntryTypeKey = dlFileEntryType.getFileEntryTypeKey();
 
-			if (name.equals(DLFileEntryTypeConstants.NAME_CONTRACT)) {
+			if (fileEntryTypeKey.equals(
+					DLFileEntryTypeConstants.FILE_ENTRY_TYPE_KEY_CONTRACT)) {
+
 				_contractDLFileEntryType = dlFileEntryType;
 			}
-			else if (name.equals(
-						DLFileEntryTypeConstants.NAME_MARKETING_BANNER)) {
+			else if (fileEntryTypeKey.equals(
+						DLFileEntryTypeConstants.
+							FILE_ENTRY_TYPE_KEY_MARKETING_BANNER)) {
 
 				_marketingBannerDLFileEntryType = dlFileEntryType;
 			}
@@ -165,17 +168,11 @@ public class DLFileEntryTypeServiceTest {
 
 		// Configure folder
 
-		DLFolderLocalServiceUtil.updateFolder(
+		DLAppLocalServiceUtil.updateFolder(
 			_folder.getFolderId(), _folder.getParentFolderId(),
 			_folder.getName(), _folder.getDescription(),
-			_contractDLFileEntryType.getPrimaryKey(),
-			ListUtil.toList(
-				new long[] {
-					_contractDLFileEntryType.getPrimaryKey(),
-					_marketingBannerDLFileEntryType.getPrimaryKey()
-				}),
-			true,
-			ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
+			_getFolderServiceContext(
+				_contractDLFileEntryType, _marketingBannerDLFileEntryType));
 
 		// Add file to folder
 
@@ -200,14 +197,10 @@ public class DLFileEntryTypeServiceTest {
 
 		// Configure subfolder
 
-		DLFolderLocalServiceUtil.updateFolder(
+		DLAppLocalServiceUtil.updateFolder(
 			_subfolder.getFolderId(), _subfolder.getParentFolderId(),
 			_subfolder.getName(), _subfolder.getDescription(),
-			_basicDocumentDLFileEntryType.getPrimaryKey(),
-			ListUtil.toList(
-				new long[] {_basicDocumentDLFileEntryType.getPrimaryKey()}),
-			true,
-			ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
+			_getFolderServiceContext(_basicDocumentDLFileEntryType));
 
 		fileEntry = DLAppServiceUtil.getFileEntry(fileEntry.getFileEntryId());
 
@@ -304,6 +297,25 @@ public class DLFileEntryTypeServiceTest {
 			"File should be of file entry type " +
 				dlFileEntryType.getFileEntryTypeId(),
 			dlFileEntryType.getPrimaryKey(), dlFileEntry.getFileEntryTypeId());
+	}
+
+	private ServiceContext _getFolderServiceContext(
+			DLFileEntryType... dlFileEntryTypes)
+		throws PortalException {
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
+
+		serviceContext.setAttribute(
+			"defaultFileEntryTypeId", dlFileEntryTypes[0].getPrimaryKey());
+		serviceContext.setAttribute(
+			"dlFileEntryTypesSearchContainerPrimaryKeys",
+			ArrayUtil.toString(dlFileEntryTypes, "primaryKey"));
+		serviceContext.setAttribute(
+			"restrictionType",
+			DLFolderConstants.RESTRICTION_TYPE_FILE_ENTRY_TYPES_AND_WORKFLOW);
+
+		return serviceContext;
 	}
 
 	private static final String _CONTENT =

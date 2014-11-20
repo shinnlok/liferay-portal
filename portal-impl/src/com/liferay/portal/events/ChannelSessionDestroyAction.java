@@ -61,7 +61,7 @@ public class ChannelSessionDestroyAction extends SessionAction {
 			}
 
 			try {
-				ChannelHubManagerUtil.destroyChannel(
+				ChannelHubManagerUtil.destroyClusterChannel(
 					user.getCompanyId(), user.getUserId());
 			}
 			catch (ChannelException ce) {
@@ -78,7 +78,7 @@ public class ChannelSessionDestroyAction extends SessionAction {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		ChannelSessionDestroyAction.class);
 
 }

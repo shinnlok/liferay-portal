@@ -188,6 +188,22 @@
 						path: 'browser_selectors.js',
 						requires: ['yui-base']
 					},
+					'liferay-cover-cropper': {
+						path: 'cover_cropper.js',
+						requires: [
+							'aui-base',
+							'dd-constrain',
+							'dd-drag',
+							'liferay-crop-region',
+							'plugin'
+						]
+					},
+					'liferay-crop-region': {
+						path: 'crop_region.js',
+						requires: [
+							'aui-base'
+						]
+					},
 					'liferay-ddm-form': {
 						path: 'ddm_form.js',
 						requires: [
@@ -521,6 +537,7 @@
 						requires: [
 							'aui-image-cropper',
 							'aui-io-request',
+							'liferay-crop-region',
 							'liferay-portlet-base',
 							'liferay-storage-formatter'
 						]
@@ -539,6 +556,26 @@
 							'aui-io-request',
 							'aui-modal',
 							'aui-tabview'
+						]
+					},
+					'liferay-map-base': {
+						path: 'map_base.js',
+						requires: [
+							'aui-base'
+						]
+					},
+					'liferay-map-google': {
+						path: 'map_google.js',
+						requires: [
+							'liferay-map-base'
+						]
+					},
+					'liferay-map-openstreet': {
+						path: 'map_openstreet.js',
+						requires: [
+							'jsonp',
+							'liferay-map-base',
+							'timers'
 						]
 					},
 					'liferay-menu': {

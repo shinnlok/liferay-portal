@@ -764,6 +764,14 @@ public class LiferaySeleniumHelper {
 
 				return true;
 			}
+
+			if (line.contains("[org.apache.xmlbeans.impl.store.CharUtil$1]")) {
+				return true;
+			}
+
+			if (line.contains("[org.apache.xmlbeans.impl.store.Locale$1]")) {
+				return true;
+			}
 		}
 
 		// LPS-49505
@@ -820,6 +828,28 @@ public class LiferaySeleniumHelper {
 
 			if (line.contains(
 					"[com.sun.syndication.feed.impl.ToStringBean$1]")) {
+
+				return true;
+			}
+		}
+
+		// LPS-50936
+
+		if (line.matches(
+				"Liferay does not have the Xuggler native libraries " +
+					"installed.")) {
+
+			return true;
+		}
+
+		// LPS-51371
+
+		if (line.matches(
+				".*The web application \\[/jasperreports-web\\] created a " +
+					"ThreadLocal with key of type.*")) {
+
+			if (line.contains(
+					"[net.sf.jasperreports.engine.fonts.FontUtil$1]")) {
 
 				return true;
 			}
@@ -1152,6 +1182,12 @@ public class LiferaySeleniumHelper {
 			LiferaySelenium liferaySelenium, String image, String value)
 		throws Exception {
 
+		_screen.click(
+			liferaySelenium.getProjectDirName() +
+			liferaySelenium.getSikuliImagesDirName() + image);
+
+		_screen.type("a", Key.CTRL);
+
 		sikuliType(
 			liferaySelenium, image,
 			liferaySelenium.getProjectDirName() +
@@ -1179,6 +1215,12 @@ public class LiferaySeleniumHelper {
 	public static void sikuliUploadTempFile(
 			LiferaySelenium liferaySelenium, String image, String value)
 		throws Exception {
+
+		_screen.click(
+			liferaySelenium.getProjectDirName() +
+			liferaySelenium.getSikuliImagesDirName() + image);
+
+		_screen.type("a", Key.CTRL);
 
 		String slash = "/";
 

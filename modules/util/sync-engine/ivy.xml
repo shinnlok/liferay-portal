@@ -25,17 +25,16 @@
 		<dependency name="commons-lang" org="commons-lang" rev="2.6" />
 		<dependency name="commons-logging" org="commons-logging" rev="1.1.3" />
 		<dependency name="h2" org="com.h2database" rev="1.3.174" />
-		<dependency name="httpclient" org="org.apache.httpcomponents" rev="4.3.1" />
-		<dependency name="httpcore" org="org.apache.httpcomponents" rev="4.3.1" />
-		<dependency name="httpmime" org="org.apache.httpcomponents" rev="4.3.1" />
+		<dependency name="httpclient" org="org.apache.httpcomponents" rev="4.3.5" />
+		<dependency name="httpcore" org="org.apache.httpcomponents" rev="4.3.2" />
+		<dependency name="httpmime" org="org.apache.httpcomponents" rev="4.3.5" />
 		<dependency name="jackson-annotations" org="com.fasterxml.jackson.core" rev="2.1.5" />
 		<dependency name="jackson-core" org="com.fasterxml.jackson.core" rev="2.1.5" />
 		<dependency name="jackson-databind" org="com.fasterxml.jackson.core" rev="2.1.5" />
 		<dependency name="jpathwatch" org="net.sf.jpathwatch" rev="0.95" />
-		<dependency name="log4j" org="log4j" rev="1.2.17" />
+		<dependency name="logback-classic" org="ch.qos.logback" rev="1.1.2" />
 		<dependency name="ormlite-core" org="com.j256.ormlite" rev="4.47" />
 		<dependency name="ormlite-jdbc" org="com.j256.ormlite" rev="4.47" />
-		<dependency name="slf4j-api" org="org.slf4j" rev="1.7.5" />
-		<dependency name="slf4j-log4j12" org="org.slf4j" rev="1.7.5" />
+		<dependency name="slf4j-api" org="org.slf4j" rev="1.7.6" />
 	</dependencies>
 </ivy-module>

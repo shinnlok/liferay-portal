@@ -11,9 +11,13 @@ AUI.add(
 
 		var SELECTOR_REPEAT_BUTTONS = '.lfr-ddm-repeatable-add-button, .lfr-ddm-repeatable-delete-button';
 
-		var TPL_ADD_REPEATABLE = '<a class="lfr-ddm-repeatable-add-button icon-plus-sign" href="javascript:;"></a>';
+		var TPL_REPEATABLE_ADD = '<a class="icon-plus-sign lfr-ddm-repeatable-add-button" href="javascript:;"></a>';
 
-		var TPL_DELETE_REPEATABLE = '<a class="lfr-ddm-repeatable-delete-button icon-minus-sign" href="javascript:;"></a>';
+		var TPL_REPEATABLE_DELETE = '<a class="hide icon-minus-sign lfr-ddm-repeatable-delete-button" href="javascript:;"></a>';
+
+		var TPL_REPEATABLE_HELPER = '<div class="lfr-ddm-repeatable-helper"></div>';
+
+		var TPL_REPEATABLE_PLACEHOLDER = '<div class="lfr-ddm-repeatable-placeholder"></div>';
 
 		var FieldTypes = Liferay.namespace('DDM.FieldTypes');
 
@@ -28,12 +32,6 @@ AUI.add(
 		var DDMPortletSupport = function() {};
 
 		DDMPortletSupport.ATTRS = {
-			classNameId: {
-			},
-
-			classPK: {
-			},
-
 			doAsGroupId: {
 			},
 
@@ -64,12 +62,23 @@ AUI.add(
 				valueFn: '_valueFields'
 			},
 
+			mode: {
+			},
+
 			values: {
 				value: {}
 			}
 		};
 
 		FieldsSupport.prototype = {
+			extractInstanceId: function(fieldNode) {
+				var instance = this;
+
+				var fieldInstanceId = fieldNode.getData('fieldNamespace');
+
+				return fieldInstanceId.replace(INSTANCE_ID_PREFIX, '');
+			},
+
 			getFieldInfo: function(tree, key, value) {
 				var queue = new A.Queue(tree);
 
@@ -108,9 +117,7 @@ AUI.add(
 			_getField: function(fieldNode) {
 				var instance = this;
 
-				var fieldInstanceId = fieldNode.getData('fieldNamespace');
-
-				fieldInstanceId = fieldInstanceId.replace(INSTANCE_ID_PREFIX, '');
+				var fieldInstanceId = instance.extractInstanceId(fieldNode);
 
 				var fieldName = fieldNode.getData('fieldName');
 
@@ -125,6 +132,7 @@ AUI.add(
 						instance.getAttrs(A.Object.keys(DDMPortletSupport.ATTRS)),
 						{
 							container: fieldNode,
+							dataType: fieldDefinition.dataType,
 							definition: definition,
 							displayLocale: instance.get('displayLocale'),
 							instanceId: fieldInstanceId,
@@ -135,7 +143,13 @@ AUI.add(
 					)
 				);
 
-				instance.addTarget(field);
+				field.addTarget(instance);
+
+				var translationManager = instance.get('translationManager');
+
+				if (translationManager) {
+					translationManager.addTarget(field);
+				}
 
 				return field;
 			},
@@ -147,11 +161,11 @@ AUI.add(
 					themeDisplay.getPathMain() + '/dynamic_data_mapping/render_structure_field',
 					{
 						data: {
-							classNameId: instance.get('classNameId'),
-							classPK: instance.get('classPK'),
 							controlPanelCategory: 'portlet',
+							definition: AJSON.stringify(instance.get('definition')),
 							doAsGroupId: instance.get('doAsGroupId'),
 							fieldName: instance.get('name'),
+							mode: instance.get('mode'),
 							namespace: instance.get('namespace'),
 							p_l_id: instance.get('p_l_id'),
 							p_p_id: '166',
@@ -190,6 +204,9 @@ AUI.add(
 				ATTRS: {
 					container: {
 						setter: A.one
+					},
+
+					dataType: {
 					},
 
 					definition: {
@@ -248,21 +265,19 @@ AUI.add(
 						var instance = this;
 
 						if (instance.get('repeatable')) {
-							var container = instance.get('container');
-
-							container.append(TPL_ADD_REPEATABLE);
-
-							if (AArray.indexOf(instance.getSiblings(), instance) > 0) {
-								container.append(TPL_DELETE_REPEATABLE);
-							}
-
-							container.delegate('click', instance._handleToolbarClick, SELECTOR_REPEAT_BUTTONS, instance);
-
-							container.plug(A.Plugin.ParseContent);
+							instance.renderRepeatableUI();
+							instance.syncRepeatablelUI();
 						}
 
 						instance.syncLabelUI();
 						instance.syncValueUI();
+
+						instance.fire(
+							'render',
+							{
+								field: instance
+							}
+						);
 					},
 
 					_afterDeleteAvailableLocale: function(event) {
@@ -310,6 +325,8 @@ AUI.add(
 						var instance = this;
 
 						var currentTarget = event.currentTarget;
+
+						instance.ddmRepeatableButton = currentTarget;
 
 						if (currentTarget.hasClass('lfr-ddm-repeatable-add-button')) {
 							instance.repeat();
@@ -379,18 +396,24 @@ AUI.add(
 						return instance.get('container').one('.control-label');
 					},
 
+					getRepeatedSiblings: function() {
+						var instance = this;
+
+						return AArray.filter(
+							instance.getSiblings(),
+							function(item) {
+								return item.get('name') === instance.get('name');
+							}
+						);
+					},
+
 					getSiblings: function() {
 						var instance = this;
 
 						var parent = instance.get('parent');
 						var name = instance.get('name');
 
-						return AArray.filter(
-							parent.get('fields'),
-							function(item) {
-								return item.get('name') === name;
-							}
-						);
+						return parent.get('fields');
 					},
 
 					getValue: function() {
@@ -404,19 +427,35 @@ AUI.add(
 					remove: function() {
 						var instance = this;
 
-						var container = instance.get('container');
-
-						container.remove(true);
-
-						var parent = instance.get('parent');
-
-						var siblings = parent.get('fields');
+						var siblings = instance.getSiblings();
 
 						var index = AArray.indexOf(siblings, instance);
 
 						siblings.splice(index, 1);
 
+						instance.fire(
+							'remove',
+							{
+								field: instance
+							}
+						);
+
 						instance.destroy();
+
+						instance.get('container').remove(true);
+					},
+
+					renderRepeatableUI: function() {
+						var instance = this;
+
+						var container = instance.get('container');
+
+						container.append(TPL_REPEATABLE_ADD);
+						container.append(TPL_REPEATABLE_DELETE);
+
+						container.delegate('click', instance._handleToolbarClick, SELECTOR_REPEAT_BUTTONS, instance);
+
+						container.plug(A.Plugin.ParseContent);
 					},
 
 					repeat: function() {
@@ -430,7 +469,7 @@ AUI.add(
 
 								var parent = instance.get('parent');
 
-								var siblings = parent.get('fields');
+								var siblings = instance.getSiblings();
 
 								var field = instance._getField(fieldNode);
 
@@ -441,6 +480,14 @@ AUI.add(
 								field.set('parent', parent);
 
 								field.renderUI();
+
+								instance.fire(
+									'repeat',
+									{
+										field: field,
+										originalField: instance
+									}
+								);
 							}
 						);
 					},
@@ -451,7 +498,7 @@ AUI.add(
 						var labelNode = instance.getLabelNode();
 
 						if (Lang.isValue(label)) {
-							labelNode.html(label);
+							labelNode.html(A.Escape.html(label));
 						}
 					},
 
@@ -475,37 +522,56 @@ AUI.add(
 						instance.setLabel(labelsMap[instance.get('displayLocale')]);
 					},
 
+					syncRepeatablelUI: function() {
+						var instance = this;
+
+						var container = instance.get('container');
+
+						var siblings = instance.getRepeatedSiblings();
+
+						container.one('.lfr-ddm-repeatable-delete-button').toggle(siblings.length > 1);
+					},
+
 					syncValueUI: function() {
 						var instance = this;
 
-						var localizationMap = instance.get('localizationMap');
+						var dataType = instance.get('dataType');
 
-						var value;
+						if (dataType) {
+							var localizationMap = instance.get('localizationMap');
 
-						if (Lang.isString(localizationMap)) {
-							value = localizationMap;
+							var value;
+
+							if (Lang.isString(localizationMap)) {
+								value = localizationMap;
+							}
+							else if (!A.Object.isEmpty(localizationMap)) {
+								value = localizationMap[instance.get('displayLocale')];
+							}
+
+							if (Lang.isUndefined(value)) {
+								value = instance.getValue();
+							}
+
+							instance.setValue(value);
 						}
-						else if (!A.Object.isEmpty(localizationMap)) {
-							value = localizationMap[instance.get('displayLocale')];
-						}
-
-						if (Lang.isUndefined(value)) {
-							value = instance.getValue();
-						}
-
-						instance.setValue(value);
 					},
 
 					toJSON: function() {
 						var instance = this;
 
-						instance.updateLocalizationMap(instance.get('displayLocale'));
-
 						var fieldJSON = {
 							instanceId: instance.get('instanceId'),
-							name: instance.get('name'),
-							value: instance.get('localizationMap')
+							name: instance.get('name')
 						};
+
+						var dataType = instance.get('dataType');
+
+						if (dataType) {
+							instance.updateLocalizationMap(instance.get('displayLocale'));
+
+							fieldJSON.value = instance.get('localizationMap');
+						}
 
 						var fields = instance.get('fields');
 
@@ -563,7 +629,7 @@ AUI.add(
 						var inputNode = instance.getInputNode();
 
 						if (Lang.isValue(label)) {
-							labelNode.html('&nbsp;' + label);
+							labelNode.html('&nbsp;' + A.Escape.html(label));
 
 							labelNode.prepend(inputNode);
 						}
@@ -626,6 +692,11 @@ AUI.add(
 
 		var DocumentLibraryField = A.Component.create(
 			{
+				ATTRS: {
+					acceptedFileFormats: {
+						value: ['*']
+					}
+				},
 				EXTENDS: Field,
 
 				prototype: {
@@ -635,6 +706,76 @@ AUI.add(
 						var container = instance.get('container');
 
 						container.delegate('click', instance._handleButtonsClick, '.btn', instance);
+
+						instance.uploader = new A.Uploader(
+							{
+								after: {
+									fileselect: function(event) {
+										instance.setPercentUploaded(0);
+
+										if (instance.notice) {
+											instance.notice.hide();
+										}
+
+										instance.uploader.uploadAll();
+									}
+								},
+								appendNewFiles: false,
+								dragAndDropArea: '#' + instance.getInputName() + 'Title',
+								fileFieldName: 'file',
+								fileFilters: instance.get('acceptedFileFormats'),
+								on: {
+									uploadcomplete: function(event) {
+										try {
+											var data = A.JSON.parse(event.data);
+
+											if (data.status) {
+												instance.showNotice(data.message);
+
+												instance.setPercentUploaded(0);
+											}
+											else {
+												data.tempFile = true;
+												data.title = data.name;
+
+												instance.setValue(data);
+
+												instance.setPercentUploaded(100);
+											}
+										}
+										catch (e) {
+											instance.showNotice(Liferay.Language.get('an-unexpected-error-occurred'));
+
+											instance.setPercentUploaded(0);
+										}
+									},
+									uploaderror: function(event) {
+										instance.showNotice(Liferay.Language.get('an-unexpected-error-occurred'));
+
+										instance.setPercentUploaded(0);
+									},
+									uploadprogress: function(event) {
+										instance.setPercentUploaded(event.percentLoaded);
+									}
+								},
+								uploadURL: instance.getUploadURL(),
+								withCredentials: false
+							}
+						).render('#' + instance.getInputName() + 'UploadContainer');
+					},
+
+					syncUI: function() {
+						var instance = this;
+
+						var parsedValue = instance.getParsedValue(instance.getValue());
+
+						var titleNode = A.one('#' + instance.getInputName() + 'Title');
+
+						titleNode.val(parsedValue.title || Liferay.Language.get('drag-file-here'));
+
+						var clearButtonNode = A.one('#' + instance.getInputName() + 'ClearButton');
+
+						clearButtonNode.toggle(!!parsedValue.uuid);
 					},
 
 					_handleButtonsClick: function(event) {
@@ -642,35 +783,62 @@ AUI.add(
 
 						var currentTarget = event.currentTarget;
 
-						var portletNamespace = instance.get('portletNamespace');
-
 						if (currentTarget.test('.select-button')) {
-							Liferay.Util.selectEntity(
-								{
-									dialog: {
-										constrain: true,
-										destroyOnHide: true,
-										modal: true
-									},
-									eventName: portletNamespace + 'selectDocumentLibrary',
-									id: portletNamespace + 'selectDocumentLibrary',
-									title: Liferay.Language.get('select-document'),
-									uri: instance.getDocumentLibraryURL()
-								},
-								function(event) {
-									instance.setValue(
-										{
-											groupId: event.groupid,
-											title: event.title,
-											uuid: event.uuid
-										}
-									);
-								}
-							);
+							instance._handleSelectButtonClick(event);
+						}
+						else if (currentTarget.test('.upload-button')) {
+							instance._handleUploadButtonClick(event);
 						}
 						else if (currentTarget.test('.clear-button')) {
-							instance.setValue('');
+							instance._handleClearButtonClick(event);
 						}
+					},
+
+					_handleClearButtonClick: function(event) {
+						var instance = this;
+
+						instance.setValue('');
+
+						instance.uploader.set('fileList', []);
+
+						instance.setPercentUploaded(0);
+					},
+
+					_handleSelectButtonClick: function(event) {
+						var instance = this;
+
+						var portletNamespace = instance.get('portletNamespace');
+
+						instance.setPercentUploaded(0);
+
+						Liferay.Util.selectEntity(
+							{
+								dialog: {
+									constrain: true,
+									destroyOnHide: true,
+									modal: true
+								},
+								eventName: portletNamespace + 'selectDocumentLibrary',
+								id: portletNamespace + 'selectDocumentLibrary',
+								title: Liferay.Language.get('select-document'),
+								uri: instance.getDocumentLibraryURL()
+							},
+							function(event) {
+								instance.setValue(
+									{
+										groupId: event.groupid,
+										title: event.title,
+										uuid: event.uuid
+									}
+								);
+							}
+						);
+					},
+
+					_handleUploadButtonClick: function(event) {
+						var instance = this;
+
+						instance.uploader.openFileSelectDialog();
 					},
 
 					getDocumentLibraryURL: function() {
@@ -692,24 +860,259 @@ AUI.add(
 						return portletURL.toString();
 					},
 
+					getParsedValue: function(value) {
+						var instance = this;
+
+						if (Lang.isString(value)) {
+							if (value !== '') {
+								value = AJSON.parse(value);
+							}
+							else {
+								value = {};
+							}
+						}
+
+						return value;
+					},
+
+					getUploadURL: function() {
+						var instance = this;
+
+						var portletNamespace = instance.get('portletNamespace');
+
+						var portletURL = Liferay.PortletURL.createURL(themeDisplay.getURLControlPanel());
+
+						portletURL.setDoAsGroupId(instance.get('doAsGroupId'));
+
+						portletURL.setLifecycle(Liferay.PortletURL.ACTION_PHASE);
+
+						portletURL.setParameter('cmd', 'add_temp');
+						portletURL.setParameter('p_auth', Liferay.authToken);
+						portletURL.setParameter('struts_action', '/journal/upload_file_entry');
+
+						portletURL.setPortletId(15);
+
+						return portletURL.toString();
+					},
+
+					setPercentUploaded: function(value) {
+						var instance = this;
+
+						var progressContainerNode = A.one('#' + instance.getInputName() + 'Progress');
+
+						progressContainerNode.toggle(value > 0);
+
+						var progressBarNode = progressContainerNode.one('.progress-bar');
+
+						progressBarNode.attr('aria-valuenow', value);
+						progressBarNode.setStyle('width', value + '%');
+					},
+
 					setValue: function(value) {
 						var instance = this;
 
-						if (Lang.isString(value) && value !== '') {
-							value = AJSON.parse(value);
+						var parsedValue = instance.getParsedValue(value);
+
+						if (!parsedValue.title && !parsedValue.uuid) {
+							value = '';
+						}
+						else {
+							value = AJSON.stringify(parsedValue);
 						}
 
-						var titleNode = A.one('#' + instance.getInputName() + 'Title');
+						DocumentLibraryField.superclass.setValue.call(instance, value);
 
-						titleNode.val((value && value.title) || '');
+						instance.syncUI();
+					},
 
-						DocumentLibraryField.superclass.setValue.call(instance, AJSON.stringify(value));
+					showNotice: function(message) {
+						var instance = this;
+
+						if (!instance.notice) {
+							instance.notice = new Liferay.Notice(
+								{
+									toggleText: false,
+									type: 'warning'
+								}
+							).hide();
+						}
+
+						instance.notice.html(message);
+						instance.notice.show();
 					}
 				}
 			}
 		);
 
 		FieldTypes['ddm-documentlibrary'] = DocumentLibraryField;
+
+		var ImageField = A.Component.create(
+			{
+				ATTRS: {
+					acceptedFileFormats: {
+						value: ['image/gif', 'image/jpeg', 'image/jpg', 'image/png']
+					}
+				},
+
+				EXTENDS: DocumentLibraryField,
+
+				prototype: {
+					syncUI: function() {
+						var instance = this;
+
+						var parsedValue = instance.getParsedValue(instance.getValue());
+
+						var notEmpty = instance.isNotEmpty(parsedValue);
+
+						var altNode = A.one('#' + instance.getInputName() + 'Alt');
+
+						altNode.attr('disabled', !notEmpty);
+
+						var titleNode = A.one('#' + instance.getInputName() + 'Title');
+
+						if (notEmpty) {
+							altNode.val(parsedValue.alt || '');
+
+							titleNode.val(parsedValue.name || '');
+						}
+						else {
+							altNode.val('');
+
+							titleNode.val(Liferay.Language.get('drag-file-here'));
+						}
+
+						var clearButtonNode = A.one('#' + instance.getInputName() + 'ClearButton');
+
+						clearButtonNode.toggle(notEmpty);
+
+						var previewButtonNode = A.one('#' + instance.getInputName() + 'PreviewButton');
+
+						previewButtonNode.toggle(notEmpty);
+					},
+
+					_getImagePreviewURL: function() {
+						var instance = this;
+
+						var imagePreviewURL;
+
+						var value = instance.getParsedValue(instance.getValue());
+
+						if (value.data) {
+							imagePreviewURL = value.data;
+						}
+						else if (value.uuid) {
+							imagePreviewURL = [
+								'/documents',
+								value.groupId,
+								value.uuid
+							].join('/');
+						}
+
+						return imagePreviewURL;
+					},
+
+					_handleButtonsClick: function(event) {
+						var instance = this;
+
+						var currentTarget = event.currentTarget;
+
+						if (currentTarget.test('.preview-button')) {
+							instance._handlePreviewButtonClick(event);
+						}
+
+						ImageField.superclass._handleButtonsClick.apply(instance, arguments);
+					},
+
+					_handlePreviewButtonClick: function(event) {
+						var instance = this;
+
+						if (!instance.viewer) {
+							instance.viewer = new A.ImageViewer(
+								{
+									caption: 'alt',
+									links: '#' + instance.getInputName() + 'PreviewContainer a',
+									preloadAllImages: false,
+									zIndex: Liferay.zIndex.OVERLAY
+								}
+							).render();
+						}
+
+						var imagePreviewURL = instance._getImagePreviewURL();
+
+						var previewLinkNode = A.one('#' + instance.getInputName() + 'PreviewContainer a');
+						var previewImageNode = A.one('#' + instance.getInputName() + 'PreviewContainer img');
+
+						previewLinkNode.attr('href', imagePreviewURL);
+						previewImageNode.attr('src', imagePreviewURL);
+
+						instance.viewer.set('currentIndex', 0);
+						instance.viewer.set('links', previewLinkNode);
+
+						instance.viewer.show();
+					},
+
+					getDocumentLibraryURL: function() {
+						var instance = this;
+
+						var portletURL = ImageField.superclass.getDocumentLibraryURL.apply(instance, arguments);
+
+						return portletURL + '&Type=image';
+					},
+
+					getValue: function() {
+						var instance = this;
+
+						var value;
+
+						var parsedValue = instance.getParsedValue(ImageField.superclass.getValue.apply(instance, arguments));
+
+						if (instance.isNotEmpty(parsedValue)) {
+							var altNode = A.one('#' + instance.getInputName() + 'Alt');
+
+							parsedValue.alt = altNode.val();
+
+							value = AJSON.stringify(parsedValue);
+						}
+						else {
+							value = '';
+						}
+
+						return value;
+					},
+
+					isNotEmpty: function(value) {
+						var instance = this;
+
+						var parsedValue = instance.getParsedValue(value);
+
+						return (parsedValue.hasOwnProperty('data') && parsedValue.data !== '') || parsedValue.hasOwnProperty('uuid');
+					},
+
+					setValue: function(value) {
+						var instance = this;
+
+						var parsedValue = instance.getParsedValue(value);
+
+						if (instance.isNotEmpty(parsedValue)) {
+							if (!parsedValue.name && parsedValue.title) {
+								parsedValue.name = parsedValue.title;
+							}
+
+							value = AJSON.stringify(parsedValue);
+						}
+						else {
+							value = '';
+						}
+
+						DocumentLibraryField.superclass.setValue.call(instance, value);
+
+						instance.syncUI();
+					}
+				}
+			}
+		);
+
+		FieldTypes['ddm-image'] = ImageField;
 
 		var GeolocationField = A.Component.create(
 			{
@@ -746,10 +1149,24 @@ AUI.add(
 										}
 									)
 								);
-
-								coordinatesNode.html([latitude, longitude].join(', '));
 							}
 						);
+					},
+
+					setValue: function(value) {
+						var instance = this;
+
+						if (Lang.isString(value) && value !== '') {
+							var inputNode = instance.getInputNode();
+
+							inputNode.val(value);
+
+							value = AJSON.parse(value);
+
+							var coordinatesNode = A.one('#' + instance.getInputName() + 'Coordinates');
+
+							coordinatesNode.html([value.latitude, value.longitude].join(', '));
+						}
 					}
 				}
 			}
@@ -835,7 +1252,7 @@ AUI.add(
 								var optionLabel = optionDefinition.label[instance.get('displayLocale')];
 
 								if (Lang.isValue(optionLabel)) {
-									item.html(optionLabel);
+									item.html(A.Escape.html(optionLabel));
 
 									item.prepend(inputNode);
 								}
@@ -881,6 +1298,12 @@ AUI.add(
 						return Field.prototype.getInputNode.apply(instance, arguments);
 					},
 
+					getValue: function() {
+						var instance = this;
+
+						return instance.getInputNode().all('option:selected').val();
+					},
+
 					setLabel: function() {
 						var instance = this;
 
@@ -893,7 +1316,7 @@ AUI.add(
 								var optionLabel = optionDefinition.label[instance.get('displayLocale')];
 
 								if (Lang.isValue(optionLabel)) {
-									item.html(optionLabel);
+									item.html(A.Escape.html(optionLabel));
 								}
 							}
 						);
@@ -908,11 +1331,11 @@ AUI.add(
 							value = AJSON.parse(value);
 						}
 
-						if (value.length) {
-							value = value[0];
-						}
-
-						Field.prototype.setValue.call(instance, value);
+						instance.getInputNode().all('option').each(
+							function(item, index) {
+								item.set('selected', AArray.indexOf(value, item.val()) > -1);
+							}
+						);
 					}
 				}
 			}
@@ -948,6 +1371,8 @@ AUI.add(
 				NAME: 'liferay-ddm-form',
 
 				prototype: {
+					repeatableInstances: {},
+
 					initializer: function() {
 						var instance = this;
 
@@ -970,19 +1395,103 @@ AUI.add(
 
 						if (instance.formNode) {
 							instance.formNode.on('submit', instance._onSubmitForm, instance);
+
+							Liferay.on('submitForm', instance._onLiferaySubmitForm, instance);
+
+							Liferay.after('form:registered', instance._afterFormRegistered, instance);
+
+							instance.after(
+								['liferay-ddm-field:repeat', 'liferay-ddm-field:remove'],
+								instance._afterUpdateRepeatableFields,
+								instance
+							);
+
+							instance.after('liferay-ddm-field:render', instance._afterRenderField, instance);
+						}
+					},
+
+					_afterFormRegistered: function(event) {
+						var instance = this;
+
+						if (event.formName === instance.formNode.attr('name')) {
+							instance.liferayForm = event.form;
+						}
+					},
+
+					_afterRenderField: function(event) {
+						var instance = this;
+
+						var field = event.field;
+
+						if (field.get('repeatable')) {
+							instance.registerRepeatable(field);
+						}
+					},
+
+					_afterRepeatableDragEnd: function(event, parentField) {
+						var instance = this;
+
+						var node = event.target.get('node');
+
+						var oldIndex = -1;
+
+						AArray.some(
+							parentField.get('fields'),
+							function(item, index) {
+								oldIndex = index;
+
+								return item.get('instanceId') === instance.extractInstanceId(node);
+							}
+						);
+
+						var newIndex = node.ancestor().all('> .field-wrapper').indexOf(node);
+
+						instance.moveField(parentField, oldIndex, newIndex);
+					},
+
+					_afterUpdateRepeatableFields: function(event) {
+						var instance = this;
+
+						var field = event.field;
+
+						var liferayForm = instance.liferayForm;
+
+						if (liferayForm) {
+							var validatorRules = liferayForm.formValidator.get('rules');
+
+							if (event.type === 'liferay-ddm-field:repeat') {
+								var originalField = event.originalField;
+
+								var originalFieldInputName = originalField.getInputName();
+
+								validatorRules[field.getInputName()] = validatorRules[originalFieldInputName];
+							}
+							else if (event.type === 'liferay-ddm-field:remove') {
+								delete validatorRules[field.getInputName()];
+
+								liferayForm.formValidator.resetField(field.getInputNode());
+
+								instance.unregisterRepeatable(field);
+							}
+
+							liferayForm.formValidator.set('rules', validatorRules);
+						}
+
+						AArray.invoke(field.getRepeatedSiblings(), 'syncRepeatablelUI');
+					},
+
+					_onLiferaySubmitForm: function(event) {
+						var instance = this;
+
+						if (event.form.attr('name') === instance.formNode.attr('name')) {
+							instance.updateDDMFormInputValue();
 						}
 					},
 
 					_onSubmitForm: function(event) {
 						var instance = this;
 
-						event.preventDefault();
-
-						var ddmFormValuesInput = instance.get('ddmFormValuesInput');
-
-						ddmFormValuesInput.set('value', AJSON.stringify(instance.toJSON()));
-
-						submitForm(instance.formNode);
+						instance.updateDDMFormInputValue();
 					},
 
 					_valueDisplayLocale: function() {
@@ -1007,6 +1516,45 @@ AUI.add(
 						return translationManager;
 					},
 
+					moveField: function(parentField, oldIndex, newIndex) {
+						var instance = this;
+
+						var fields = parentField.get('fields');
+
+						fields.splice(newIndex, 0, fields.splice(oldIndex, 1)[0]);
+					},
+
+					registerRepeatable: function(field) {
+						var instance = this;
+
+						var fieldName = field.get('name');
+
+						var repeatableInstance = instance.repeatableInstances[fieldName];
+
+						if (!repeatableInstance) {
+							repeatableInstance = new A.SortableList(
+								{
+									dropOn: field.get('container').get('parentNode'),
+									helper: A.Node.create(TPL_REPEATABLE_HELPER),
+									nodes: '[data-fieldName=' + fieldName + ']',
+									placeholder: A.Node.create(TPL_REPEATABLE_PLACEHOLDER),
+									sortCondition: function(event) {
+										var dropNode = event.drop.get('node');
+
+										return dropNode.getData('fieldName') === fieldName;
+									}
+								}
+							);
+
+							repeatableInstance.after('drag:end', A.rbind(instance._afterRepeatableDragEnd, instance, field.get('parent')));
+
+							instance.repeatableInstances[fieldName] = repeatableInstance;
+						}
+						else {
+							repeatableInstance.add(field.get('container'));
+						}
+					},
+
 					toJSON: function() {
 						var instance = this;
 
@@ -1017,6 +1565,20 @@ AUI.add(
 							defaultLanguageId: translationManager.get('defaultLocale'),
 							fieldValues: AArray.invoke(instance.get('fields'), 'toJSON')
 						};
+					},
+
+					unregisterRepeatable: function(field) {
+						var instance = this;
+
+						field.get('container').dd.destroy();
+					},
+
+					updateDDMFormInputValue: function() {
+						var instance = this;
+
+						var ddmFormValuesInput = instance.get('ddmFormValuesInput');
+
+						ddmFormValuesInput.val(AJSON.stringify(instance.toJSON()));
 					}
 				}
 			}
@@ -1026,6 +1588,6 @@ AUI.add(
 	},
 	'',
 	{
-		requires: ['aui-base', 'aui-datatype', 'aui-io-request', 'aui-parse-content', 'aui-set', 'json', 'liferay-portlet-url', 'liferay-translation-manager']
+		requires: ['aui-base', 'aui-datatype', 'aui-image-viewer', 'aui-io-request', 'aui-parse-content', 'aui-set', 'aui-sortable-list', 'json', 'liferay-notice', 'liferay-portlet-url', 'liferay-translation-manager', 'uploader']
 	}
 );

@@ -93,10 +93,12 @@ public class PollerServlet extends HttpServlet {
 		SynchronousPollerChannelListener synchronousPollerChannelListener =
 			new SynchronousPollerChannelListener();
 
-		try {
-			ChannelHubManagerUtil.registerChannelListener(
-				companyId, userId, synchronousPollerChannelListener);
+		ChannelHubManagerUtil.getChannel(companyId, userId, true);
 
+		ChannelHubManagerUtil.registerChannelListener(
+			companyId, userId, synchronousPollerChannelListener);
+
+		try {
 			JSONObject pollerResponseHeaderJSONObject =
 				PollerRequestHandlerUtil.processRequest(
 					request, pollerRequestString);
@@ -115,6 +117,6 @@ public class PollerServlet extends HttpServlet {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(PollerServlet.class);
+	private static final Log _log = LogFactoryUtil.getLog(PollerServlet.class);
 
 }

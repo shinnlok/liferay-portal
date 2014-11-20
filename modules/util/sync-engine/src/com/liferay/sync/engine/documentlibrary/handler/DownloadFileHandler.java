@@ -57,13 +57,13 @@ public class DownloadFileHandler extends BaseHandler {
 
 	@Override
 	public void handleException(Exception e) {
-		_logger.error(e.getMessage(), e);
-
 		if (!(e instanceof HttpResponseException)) {
 			super.handleException(e);
 
 			return;
 		}
+
+		_logger.error(e.getMessage(), e);
 
 		HttpResponseException hre = (HttpResponseException)e;
 
@@ -104,6 +104,14 @@ public class DownloadFileHandler extends BaseHandler {
 		InputStream inputStream = null;
 
 		SyncFile syncFile = (SyncFile)getParameterValue("syncFile");
+
+		syncFile = SyncFileService.fetchSyncFile(syncFile.getSyncFileId());
+
+		if ((syncFile == null) ||
+			(syncFile.getState() == SyncFile.STATE_UNSYNCED)) {
+
+			return;
+		}
 
 		Path filePath = Paths.get(syncFile.getFilePathName());
 
@@ -157,6 +165,8 @@ public class DownloadFileHandler extends BaseHandler {
 			SyncFileService.update(syncFile);
 
 			SyncFileService.updateFileKeySyncFile(syncFile);
+
+			IODeltaUtil.checksums(syncFile);
 		}
 		catch (FileSystemException fse) {
 			downloadedFilePathNames.remove(filePath.toString());
@@ -175,7 +185,7 @@ public class DownloadFileHandler extends BaseHandler {
 		}
 	}
 
-	private static Logger _logger = LoggerFactory.getLogger(
+	private static final Logger _logger = LoggerFactory.getLogger(
 		DownloadFileHandler.class);
 
 }

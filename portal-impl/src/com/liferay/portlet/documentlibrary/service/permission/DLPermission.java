@@ -17,10 +17,12 @@ package com.liferay.portlet.documentlibrary.service.permission;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portal.kernel.staging.permission.StagingPermissionUtil;
 import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.security.permission.PermissionChecker;
+import com.liferay.portal.security.permission.ResourcePermissionChecker;
 import com.liferay.portal.service.ResourceLocalServiceUtil;
 import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
 import com.liferay.portal.util.PortletKeys;
@@ -28,7 +30,12 @@ import com.liferay.portal.util.PortletKeys;
 /**
  * @author Jorge Ferrer
  */
-public class DLPermission {
+@OSGiBeanProperties(
+	property = {
+		"resource.name=com.liferay.portlet.documentlibrary"
+	}
+)
+public class DLPermission implements ResourcePermissionChecker {
 
 	public static final String RESOURCE_NAME =
 		"com.liferay.portlet.documentlibrary";
@@ -43,10 +50,10 @@ public class DLPermission {
 	}
 
 	public static boolean contains(
-		PermissionChecker permissionChecker, long groupId, String actionId) {
+		PermissionChecker permissionChecker, long classPK, String actionId) {
 
 		Boolean hasPermission = StagingPermissionUtil.hasPermission(
-			permissionChecker, groupId, RESOURCE_NAME, groupId,
+			permissionChecker, classPK, RESOURCE_NAME, classPK,
 			PortletKeys.DOCUMENT_LIBRARY, actionId);
 
 		if (hasPermission != null) {
@@ -58,12 +65,12 @@ public class DLPermission {
 				ResourcePermissionLocalServiceUtil.getResourcePermissionsCount(
 					permissionChecker.getCompanyId(), RESOURCE_NAME,
 					ResourceConstants.SCOPE_INDIVIDUAL,
-					String.valueOf(groupId));
+					String.valueOf(classPK));
 
 			if (count == 0) {
 				ResourceLocalServiceUtil.addResources(
-					permissionChecker.getCompanyId(), groupId, 0, RESOURCE_NAME,
-					groupId, false, true, true);
+					permissionChecker.getCompanyId(), classPK, 0, RESOURCE_NAME,
+					classPK, false, true, true);
 			}
 		}
 		catch (Exception e) {
@@ -73,9 +80,16 @@ public class DLPermission {
 		}
 
 		return permissionChecker.hasPermission(
-			groupId, RESOURCE_NAME, groupId, actionId);
+			classPK, RESOURCE_NAME, classPK, actionId);
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(DLPermission.class);
+	@Override
+	public Boolean checkResource(
+		PermissionChecker permissionChecker, long classPK, String actionId) {
+
+		return contains(permissionChecker, classPK, actionId);
+	}
+
+	private static final Log _log = LogFactoryUtil.getLog(DLPermission.class);
 
 }

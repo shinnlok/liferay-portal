@@ -172,8 +172,7 @@ public class DLFileEntryAssetRenderer
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		String thumbnailSrc = DLUtil.getThumbnailSrc(
-			_fileEntry, null, themeDisplay);
+		String thumbnailSrc = DLUtil.getThumbnailSrc(_fileEntry, themeDisplay);
 
 		if (Validator.isNotNull(thumbnailSrc)) {
 			return thumbnailSrc;
@@ -384,7 +383,7 @@ public class DLFileEntryAssetRenderer
 		super.setAddToPagePreferences(preferences, portletId, themeDisplay);
 	}
 
-	private FileEntry _fileEntry;
+	private final FileEntry _fileEntry;
 	private FileVersion _fileVersion;
 
 }
