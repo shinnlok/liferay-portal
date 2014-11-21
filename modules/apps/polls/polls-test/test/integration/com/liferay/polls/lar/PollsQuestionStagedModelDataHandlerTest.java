@@ -28,7 +28,6 @@ import java.util.Map;
 
 import org.jboss.arquillian.junit.Arquillian;
 
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
 
@@ -39,13 +38,13 @@ import org.junit.runner.RunWith;
 public class PollsQuestionStagedModelDataHandlerTest
 	extends BaseStagedModelDataHandlerTestCase {
 
-	@ClassRule
-	public static TransactionalTestRule transactionalTestRule =
-		new TransactionalTestRule();
-
 	@Rule
 	public DeleteAfterTestRunRule deleteAfterTestRunRule =
 		new DeleteAfterTestRunRule(this);
+
+	@Rule
+	public TransactionalTestRule transactionalTestRule =
+		new TransactionalTestRule();
 
 	@Override
 	protected StagedModel addStagedModel(

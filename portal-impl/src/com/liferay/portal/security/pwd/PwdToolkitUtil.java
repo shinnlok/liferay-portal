@@ -43,8 +43,7 @@ public class PwdToolkitUtil {
 		throws PortalException {
 
 		if (!password1.equals(password2)) {
-			throw new UserPasswordException(
-				UserPasswordException.PASSWORDS_DO_NOT_MATCH);
+			throw new UserPasswordException.MustMatch(userId);
 		}
 
 		if (!LDAPSettingsUtil.isPasswordPolicyEnabled(companyId) &&
@@ -64,8 +63,8 @@ public class PwdToolkitUtil {
 		_serviceTracker.open();
 	}
 
-	private static PwdToolkitUtil _instance = new PwdToolkitUtil();
+	private static final PwdToolkitUtil _instance = new PwdToolkitUtil();
 
-	private ServiceTracker<Toolkit, Toolkit> _serviceTracker;
+	private final ServiceTracker<Toolkit, Toolkit> _serviceTracker;
 
 }

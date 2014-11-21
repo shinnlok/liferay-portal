@@ -16,9 +16,10 @@ package com.liferay.portal.cache.ehcache;
 
 import com.liferay.portal.cache.cluster.EhcachePortalCacheClusterReplicatorFactory;
 import com.liferay.portal.kernel.test.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.NewEnv;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.test.AdviseWith;
-import com.liferay.portal.test.runners.AspectJMockingNewClassLoaderJUnitTestRunner;
+import com.liferay.portal.test.AspectJNewEnvTestRule;
 
 import java.net.URL;
 
@@ -39,13 +40,13 @@ import org.aspectj.lang.annotation.Aspect;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 /**
  * @author Tina Tian
  */
-@RunWith(AspectJMockingNewClassLoaderJUnitTestRunner.class)
+@NewEnv(type = NewEnv.Type.CLASSLOADER)
 public class EhcacheConfigurationUtilTest {
 
 	@ClassRule
@@ -172,9 +173,8 @@ public class EhcacheConfigurationUtilTest {
 	)
 	@Test
 	public void testClusterEnabled2() {
-		Configuration configuration =
-			EhcacheConfigurationUtil.getConfiguration(
-				_configurationURL, false, false);
+		Configuration configuration = EhcacheConfigurationUtil.getConfiguration(
+			_configurationURL, false, false);
 
 		_assertListenerConfigsEquals(_configuration, configuration);
 
@@ -194,6 +194,7 @@ public class EhcacheConfigurationUtilTest {
 		_assertClusterLinkReplicatorConfigs(configuration, true);
 	}
 
+	@NewEnv(type = NewEnv.Type.NONE)
 	@Test
 	public void testMisc() {
 		Configuration configuration = EhcacheConfigurationUtil.getConfiguration(
@@ -228,6 +229,10 @@ public class EhcacheConfigurationUtilTest {
 
 		new EhcacheConfigurationUtil();
 	}
+
+	@Rule
+	public final AspectJNewEnvTestRule aspectJNewEnvTestRule =
+		new AspectJNewEnvTestRule();
 
 	@Aspect
 	public static class DisableClusterLinkAdvice {

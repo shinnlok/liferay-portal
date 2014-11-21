@@ -37,7 +37,7 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -52,10 +52,6 @@ import org.junit.runner.RunWith;
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
 @Sync
 public class JournalFolderFinderTest {
-
-	@ClassRule
-	public static TransactionalTestRule transactionalTestRule =
-		new TransactionalTestRule();
 
 	@Before
 	public void setUp() throws Exception {
@@ -190,6 +186,10 @@ public class JournalFolderFinderTest {
 
 		Assert.assertEquals(_folder2.getFolderId(), folder.getFolderId());
 	}
+
+	@Rule
+	public TransactionalTestRule transactionalTestRule =
+		new TransactionalTestRule();
 
 	private JournalFolder _folder1;
 	private JournalFolder _folder2;

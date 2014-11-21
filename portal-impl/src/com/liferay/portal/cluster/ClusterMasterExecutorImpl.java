@@ -21,9 +21,11 @@ import com.liferay.portal.kernel.cluster.ClusterEventListener;
 import com.liferay.portal.kernel.cluster.ClusterExecutor;
 import com.liferay.portal.kernel.cluster.ClusterMasterExecutor;
 import com.liferay.portal.kernel.cluster.ClusterMasterTokenTransitionListener;
+import com.liferay.portal.kernel.cluster.ClusterNodeResponse;
 import com.liferay.portal.kernel.cluster.ClusterNodeResponses;
 import com.liferay.portal.kernel.cluster.ClusterRequest;
 import com.liferay.portal.kernel.concurrent.DefaultNoticeableFuture;
+import com.liferay.portal.kernel.concurrent.NoticeableFuture;
 import com.liferay.portal.kernel.concurrent.NoticeableFutureConverter;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
@@ -35,7 +37,6 @@ import com.liferay.portal.service.LockLocalServiceUtil;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.Future;
 
 /**
  * @author Michael C. Han
@@ -61,7 +62,9 @@ public class ClusterMasterExecutorImpl implements ClusterMasterExecutor {
 	}
 
 	@Override
-	public <T> Future<T> executeOnMaster(MethodHandler methodHandler) {
+	public <T> NoticeableFuture<T> executeOnMaster(
+		MethodHandler methodHandler) {
+
 		if (!_enabled) {
 			if (_log.isWarnEnabled()) {
 				_log.warn(
@@ -96,10 +99,13 @@ public class ClusterMasterExecutorImpl implements ClusterMasterExecutor {
 
 					@Override
 					protected T convert(
-						ClusterNodeResponses clusterNodeResponses) {
+							ClusterNodeResponses clusterNodeResponses)
+						throws Exception {
 
-						return (T)clusterNodeResponses.getClusterResponse(
-							address);
+						ClusterNodeResponse clusterNodeResponse =
+							clusterNodeResponses.getClusterResponse(address);
+
+						return (T)clusterNodeResponse.getResult();
 					}
 
 				};
@@ -116,26 +122,19 @@ public class ClusterMasterExecutorImpl implements ClusterMasterExecutor {
 			return;
 		}
 
-		try {
-			_localClusterNodeAddress = AddressSerializerUtil.serialize(
-				_clusterExecutor.getLocalClusterNodeAddress());
+		_localClusterNodeAddress = AddressSerializerUtil.serialize(
+			_clusterExecutor.getLocalClusterNodeAddress());
 
-			_clusterEventListener =
-				new ClusterMasterTokenClusterEventListener();
+		_clusterEventListener = new ClusterMasterTokenClusterEventListener();
 
-			_clusterExecutor.addClusterEventListener(_clusterEventListener);
+		_clusterExecutor.addClusterEventListener(_clusterEventListener);
 
-			String masterAddressString = getMasterAddressString();
+		String masterAddressString = getMasterAddressString();
 
-			_enabled = true;
+		_enabled = true;
 
-			notifyMasterTokenTransitionListeners(
-				_localClusterNodeAddress.equals(masterAddressString));
-		}
-		catch (Exception e) {
-			throw new RuntimeException(
-				"Unable to initialize cluster master executor", e);
-		}
+		notifyMasterTokenTransitionListeners(
+			_localClusterNodeAddress.equals(masterAddressString));
 	}
 
 	@Override
@@ -145,7 +144,11 @@ public class ClusterMasterExecutorImpl implements ClusterMasterExecutor {
 
 	@Override
 	public boolean isMaster() {
-		return _master;
+		if (isEnabled()) {
+			return _master;
+		}
+
+		return true;
 	}
 
 	@Override
@@ -206,8 +209,7 @@ public class ClusterMasterExecutorImpl implements ClusterMasterExecutor {
 			}
 			catch (Exception e) {
 				if (_log.isWarnEnabled()) {
-					_log.warn(
-						"Unable to acquire memory scheduler cluster lock", e);
+					_log.warn("Unable to acquire the cluster master lock", e);
 				}
 			}
 
@@ -216,8 +218,7 @@ public class ClusterMasterExecutorImpl implements ClusterMasterExecutor {
 					_log.info("Lock currently held by " + owner);
 				}
 
-				_log.info(
-					"Reattempting to acquire memory scheduler cluster lock");
+				_log.info("Reattempting to acquire the cluster master lock");
 			}
 		}
 
@@ -255,14 +256,14 @@ public class ClusterMasterExecutorImpl implements ClusterMasterExecutor {
 	private static final String _LOCK_CLASS_NAME =
 		ClusterMasterExecutorImpl.class.getName();
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		ClusterMasterExecutorImpl.class);
 
 	private static volatile boolean _master;
 
 	private ClusterEventListener _clusterEventListener;
 	private ClusterExecutor _clusterExecutor;
-	private Set<ClusterMasterTokenTransitionListener>
+	private final Set<ClusterMasterTokenTransitionListener>
 		_clusterMasterTokenTransitionListeners =
 			new HashSet<ClusterMasterTokenTransitionListener>();
 	private volatile boolean _enabled;
@@ -273,13 +274,9 @@ public class ClusterMasterExecutorImpl implements ClusterMasterExecutor {
 
 		@Override
 		public void processClusterEvent(ClusterEvent clusterEvent) {
-			try {
-				getMasterAddressString();
-			}
-			catch (Exception e) {
-				_log.error("Unable to update the cluster master lock", e);
-			}
+			getMasterAddressString();
 		}
+
 	}
 
 }

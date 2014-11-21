@@ -125,6 +125,20 @@ public class WikiPageLocalServiceWrapper implements WikiPageLocalService,
 	}
 
 	/**
+	* @deprecated As of 7.0.0 replaced by {@link #addTempFileEntry(long, long,
+	String, String, InputStream, String)}
+	*/
+	@Deprecated
+	@Override
+	public void addTempPageAttachment(long groupId, long userId,
+		java.lang.String fileName, java.lang.String tempFolderName,
+		java.io.InputStream inputStream, java.lang.String mimeType)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		_wikiPageLocalService.addTempPageAttachment(groupId, userId, fileName,
+			tempFolderName, inputStream, mimeType);
+	}
+
+	/**
 	* Adds the wiki page to the database. Also notifies the appropriate model listeners.
 	*
 	* @param wikiPage the wiki page
@@ -328,10 +342,10 @@ public class WikiPageLocalServiceWrapper implements WikiPageLocalService,
 	}
 
 	/**
-	* Returns the number of rows that match the dynamic query.
+	* Returns the number of rows matching the dynamic query.
 	*
 	* @param dynamicQuery the dynamic query
-	* @return the number of rows that match the dynamic query
+	* @return the number of rows matching the dynamic query
 	*/
 	@Override
 	public long dynamicQueryCount(
@@ -340,11 +354,11 @@ public class WikiPageLocalServiceWrapper implements WikiPageLocalService,
 	}
 
 	/**
-	* Returns the number of rows that match the dynamic query.
+	* Returns the number of rows matching the dynamic query.
 	*
 	* @param dynamicQuery the dynamic query
 	* @param projection the projection to apply to the query
-	* @return the number of rows that match the dynamic query
+	* @return the number of rows matching the dynamic query
 	*/
 	@Override
 	public long dynamicQueryCount(
@@ -816,6 +830,13 @@ public class WikiPageLocalServiceWrapper implements WikiPageLocalService,
 		return _wikiPageLocalService.getWikiPages(start, end);
 	}
 
+	/**
+	* Returns all the wiki pages matching the UUID and company.
+	*
+	* @param uuid the UUID of the wiki pages
+	* @param companyId the primary key of the company
+	* @return the matching wiki pages, or an empty list if no matches were found
+	*/
 	@Override
 	public java.util.List<com.liferay.portlet.wiki.model.WikiPage> getWikiPagesByUuidAndCompanyId(
 		java.lang.String uuid, long companyId) {
@@ -823,6 +844,16 @@ public class WikiPageLocalServiceWrapper implements WikiPageLocalService,
 			companyId);
 	}
 
+	/**
+	* Returns a range of wiki pages matching the UUID and company.
+	*
+	* @param uuid the UUID of the wiki pages
+	* @param companyId the primary key of the company
+	* @param start the lower bound of the range of wiki pages
+	* @param end the upper bound of the range of wiki pages (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the range of matching wiki pages, or an empty list if no matches were found
+	*/
 	@Override
 	public java.util.List<com.liferay.portlet.wiki.model.WikiPage> getWikiPagesByUuidAndCompanyId(
 		java.lang.String uuid, long companyId, int start, int end,

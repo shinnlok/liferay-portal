@@ -24,21 +24,21 @@ import com.liferay.portal.kernel.nio.intraband.test.MockRegistrationReference;
 import com.liferay.portal.kernel.process.ProcessCallable;
 import com.liferay.portal.kernel.process.ProcessException;
 import com.liferay.portal.kernel.test.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.NewEnv;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.test.AdviseWith;
-import com.liferay.portal.test.runners.AspectJMockingNewClassLoaderJUnitTestRunner;
+import com.liferay.portal.test.AspectJNewEnvTestRule;
 
 import java.util.List;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 /**
  * @author Shuyang Zhou
  */
-@RunWith(AspectJMockingNewClassLoaderJUnitTestRunner.class)
 public class RPCDatagramReceiveHandlerTest {
 
 	@ClassRule
@@ -53,6 +53,7 @@ public class RPCDatagramReceiveHandlerTest {
 		};
 
 	@AdviseWith(adviceClasses = {PortalExecutorManagerUtilAdvice.class})
+	@NewEnv(type = NewEnv.Type.CLASSLOADER)
 	@Test
 	public void testDoReceive() throws Exception {
 		PortalClassLoaderUtil.setClassLoader(getClass().getClassLoader());
@@ -107,6 +108,10 @@ public class RPCDatagramReceiveHandlerTest {
 		Assert.assertEquals(
 			ErrorTestProcessCallable.class.getName(), exception.getMessage());
 	}
+
+	@Rule
+	public final AspectJNewEnvTestRule aspectJNewEnvTestRule =
+		new AspectJNewEnvTestRule();
 
 	private static class ErrorTestProcessCallable
 		implements ProcessCallable<String> {

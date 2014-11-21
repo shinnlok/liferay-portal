@@ -45,7 +45,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
-import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -56,10 +56,6 @@ import org.junit.runner.RunWith;
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
 public class FileEntryStagedModelDataHandlerTest
 	extends BaseStagedModelDataHandlerTestCase {
-
-	@ClassRule
-	public static TransactionalTestRule transactionalTestRule =
-		new TransactionalTestRule();
 
 	@Test
 	public void testCompanyScopeDependencies() throws Exception {
@@ -103,6 +99,10 @@ public class FileEntryStagedModelDataHandlerTest
 
 		Assert.assertEquals(importedFileEntry.getExtension(), "pdf");
 	}
+
+	@Rule
+	public TransactionalTestRule transactionalTestRule =
+		new TransactionalTestRule();
 
 	protected Map<String, List<StagedModel>> addCompanyDependencies()
 		throws Exception {

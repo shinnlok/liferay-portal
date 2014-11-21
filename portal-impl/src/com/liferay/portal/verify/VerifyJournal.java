@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
+import com.liferay.portal.kernel.xml.Node;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.service.ResourceLocalServiceUtil;
 import com.liferay.portal.util.PortalInstances;
@@ -41,11 +42,14 @@ import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryLocalServiceUtil;
 import com.liferay.portlet.dynamicdatamapping.NoSuchStructureException;
+import com.liferay.portlet.dynamicdatamapping.util.DDMFieldsCounter;
 import com.liferay.portlet.journal.model.JournalArticle;
 import com.liferay.portlet.journal.model.JournalArticleConstants;
+import com.liferay.portlet.journal.model.JournalArticleImage;
 import com.liferay.portlet.journal.model.JournalArticleResource;
 import com.liferay.portlet.journal.model.JournalContentSearch;
 import com.liferay.portlet.journal.model.JournalFolder;
+import com.liferay.portlet.journal.service.JournalArticleImageLocalServiceUtil;
 import com.liferay.portlet.journal.service.JournalArticleLocalServiceUtil;
 import com.liferay.portlet.journal.service.JournalArticleResourceLocalServiceUtil;
 import com.liferay.portlet.journal.service.JournalContentSearchLocalServiceUtil;
@@ -75,13 +79,83 @@ public class VerifyJournal extends VerifyProcess {
 	@Override
 	protected void doVerify() throws Exception {
 		verifyContent();
-		verifyCreateDate();
+		verifyCreateAndModifiedDates();
+		verifyDynamicElements();
 		updateFolderAssets();
 		verifyOracleNewLine();
 		verifyPermissionsAndAssets();
 		verifySearch();
 		verifyTree();
 		verifyURLTitle();
+	}
+
+	protected void updateDocumentLibraryElements(Element element) {
+		Element dynamicContentElement = element.element("dynamic-content");
+
+		String path = dynamicContentElement.getStringValue();
+
+		String[] pathArray = StringUtil.split(path, CharPool.SLASH);
+
+		if (pathArray.length != 5) {
+			return;
+		}
+
+		long groupId = GetterUtil.getLong(pathArray[2]);
+		long folderId = GetterUtil.getLong(pathArray[3]);
+		String title = HttpUtil.decodeURL(HtmlUtil.escape(pathArray[4]));
+
+		DLFileEntry dlFileEntry = DLFileEntryLocalServiceUtil.fetchFileEntry(
+			groupId, folderId, title);
+
+		if (dlFileEntry == null) {
+			return;
+		}
+
+		Node node = dynamicContentElement.node(0);
+
+		node.setText(path + StringPool.SLASH + dlFileEntry.getUuid());
+	}
+
+	protected void updateDynamicElements(List<Element> dynamicElements)
+		throws PortalException {
+
+		DDMFieldsCounter ddmFieldsCounter = new DDMFieldsCounter();
+
+		for (Element dynamicElement : dynamicElements) {
+			updateDynamicElements(dynamicElement.elements("dynamic-element"));
+
+			String name = dynamicElement.attributeValue("name");
+
+			int index = ddmFieldsCounter.get(name);
+
+			dynamicElement.addAttribute("index", String.valueOf(index));
+
+			String type = dynamicElement.attributeValue("type");
+
+			if (type.equals("image")) {
+				updateImageElement(dynamicElement, name, index);
+			}
+
+			ddmFieldsCounter.incrementKey(name);
+		}
+	}
+
+	protected void updateElement(long groupId, Element element) {
+		List<Element> dynamicElementElements = element.elements(
+			"dynamic-element");
+
+		for (Element dynamicElementElement : dynamicElementElements) {
+			updateElement(groupId, dynamicElementElement);
+		}
+
+		String type = element.attributeValue("type");
+
+		if (type.equals("document_library")) {
+			updateDocumentLibraryElements(element);
+		}
+		else if (type.equals("link_to_layout")) {
+			updateLinkToLayoutElements(groupId, element);
+		}
 	}
 
 	protected void updateFolderAssets() throws Exception {
@@ -109,6 +183,37 @@ public class VerifyJournal extends VerifyProcess {
 
 		if (_log.isDebugEnabled()) {
 			_log.debug("Assets verified for folders");
+		}
+	}
+
+	protected void updateImageElement(Element element, String name, int index)
+		throws PortalException {
+
+		Element dynamicContentElement = element.element("dynamic-content");
+
+		long articleImageId = GetterUtil.getLong(
+			dynamicContentElement.attributeValue("id"));
+
+		JournalArticleImage articleImage =
+			JournalArticleImageLocalServiceUtil.getArticleImage(articleImageId);
+
+		articleImage.setElName(name + StringPool.UNDERLINE + index);
+
+		JournalArticleImageLocalServiceUtil.updateJournalArticleImage(
+			articleImage);
+	}
+
+	protected void updateLinkToLayoutElements(long groupId, Element element) {
+		Element dynamicContentElement = element.element("dynamic-content");
+
+		Node node = dynamicContentElement.node(0);
+
+		String text = node.getText();
+
+		if (!text.isEmpty() && !text.endsWith(StringPool.AT + groupId)) {
+			node.setText(
+				dynamicContentElement.getStringValue() + StringPool.AT +
+					groupId);
 		}
 	}
 
@@ -154,8 +259,9 @@ public class VerifyJournal extends VerifyProcess {
 			con = DataAccess.getUpgradeOptimizedConnection();
 
 			ps = con.prepareStatement(
-				"select id_ from JournalArticle where content like " +
-					"'%document_library%' and structureId != ''");
+				"select id_ from JournalArticle where (content like " +
+					"'%document_library%' or content like '%link_to_layout%')" +
+						" and DDMStructureKey != ''");
 
 			rs = ps.executeQuery();
 
@@ -169,41 +275,8 @@ public class VerifyJournal extends VerifyProcess {
 
 				Element rootElement = document.getRootElement();
 
-				List<Element> elements = rootElement.elements();
-
-				for (Element element : elements) {
-					String type = element.attributeValue("type");
-
-					if (!type.equals("document_library")) {
-						continue;
-					}
-
-					Element dynamicContentElement = element.element(
-						"dynamic-content");
-
-					String path = dynamicContentElement.getStringValue();
-
-					String[] pathArray = StringUtil.split(path, CharPool.SLASH);
-
-					if (pathArray.length != 5) {
-						continue;
-					}
-
-					long groupId = GetterUtil.getLong(pathArray[2]);
-					long folderId = GetterUtil.getLong(pathArray[3]);
-					String title = HttpUtil.decodeURL(
-						HtmlUtil.escape(pathArray[4]));
-
-					DLFileEntry dlFileEntry =
-						DLFileEntryLocalServiceUtil.fetchFileEntry(
-							groupId, folderId, title);
-
-					if (dlFileEntry == null) {
-						continue;
-					}
-
-					dynamicContentElement.setText(
-						path + StringPool.SLASH + dlFileEntry.getUuid());
+				for (Element element : rootElement.elements()) {
+					updateElement(article.getGroupId(), element);
 				}
 
 				article.setContent(document.asXML());
@@ -266,7 +339,7 @@ public class VerifyJournal extends VerifyProcess {
 		}
 	}
 
-	protected void verifyCreateDate() throws Exception {
+	protected void verifyCreateAndModifiedDates() throws Exception {
 		ActionableDynamicQuery actionableDynamicQuery =
 			JournalArticleResourceLocalServiceUtil.getActionableDynamicQuery();
 
@@ -279,6 +352,7 @@ public class VerifyJournal extends VerifyProcess {
 						(JournalArticleResource)object;
 
 					verifyCreateDate(articleResource);
+					verifyModifiedDate(articleResource);
 				}
 
 			});
@@ -286,7 +360,7 @@ public class VerifyJournal extends VerifyProcess {
 		actionableDynamicQuery.performActions();
 
 		if (_log.isDebugEnabled()) {
-			_log.debug("Create dates verified for articles");
+			_log.debug("Create and modified dates verified for articles");
 		}
 	}
 
@@ -312,6 +386,79 @@ public class VerifyJournal extends VerifyProcess {
 				JournalArticleLocalServiceUtil.updateJournalArticle(article);
 			}
 		}
+	}
+
+	protected void verifyDynamicElements() throws PortalException {
+		ActionableDynamicQuery actionableDynamicQuery =
+			JournalArticleLocalServiceUtil.getActionableDynamicQuery();
+
+		actionableDynamicQuery.setPerformActionMethod(
+			new ActionableDynamicQuery.PerformActionMethod() {
+
+				@Override
+				public void performAction(Object object) {
+					JournalArticle article = (JournalArticle)object;
+
+					try {
+						verifyDynamicElements(article);
+					}
+					catch (Exception e) {
+						_log.error(
+							"Unable to update content for article " +
+								article.getId(),
+							e);
+					}
+				}
+
+			});
+
+		actionableDynamicQuery.performActions();
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("Dynamic elements verified for articles");
+		}
+	}
+
+	protected void verifyDynamicElements(JournalArticle article)
+		throws Exception {
+
+		Document document = SAXReaderUtil.read(article.getContent());
+
+		Element rootElement = document.getRootElement();
+
+		updateDynamicElements(rootElement.elements("dynamic-element"));
+
+		article.setContent(document.asXML());
+
+		JournalArticleLocalServiceUtil.updateJournalArticle(article);
+	}
+
+	protected void verifyModifiedDate(JournalArticleResource articleResource) {
+		JournalArticle article =
+			JournalArticleLocalServiceUtil.fetchLatestArticle(
+				articleResource.getResourcePrimKey(),
+				WorkflowConstants.STATUS_APPROVED, true);
+
+		if (article == null) {
+			return;
+		}
+
+		AssetEntry assetEntry = AssetEntryLocalServiceUtil.fetchEntry(
+			articleResource.getGroupId(), articleResource.getUuid());
+
+		if (assetEntry == null) {
+			return;
+		}
+
+		Date modifiedDate = article.getModifiedDate();
+
+		if (modifiedDate.equals(assetEntry.getModifiedDate())) {
+			return;
+		}
+
+		article.setModifiedDate(assetEntry.getModifiedDate());
+
+		JournalArticleLocalServiceUtil.updateJournalArticle(article);
 	}
 
 	protected void verifyOracleNewLine() throws Exception {
@@ -451,8 +598,8 @@ public class VerifyJournal extends VerifyProcess {
 						article.getId());
 			}
 
-			article.setStructureId(StringPool.BLANK);
-			article.setTemplateId(StringPool.BLANK);
+			article.setDDMStructureKey(StringPool.BLANK);
+			article.setDDMTemplateKey(StringPool.BLANK);
 
 			JournalArticleLocalServiceUtil.updateJournalArticle(article);
 		}

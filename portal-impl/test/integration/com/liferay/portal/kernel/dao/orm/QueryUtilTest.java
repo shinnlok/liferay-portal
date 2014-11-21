@@ -26,7 +26,7 @@ import java.util.List;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -35,10 +35,6 @@ import org.junit.runner.RunWith;
  */
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
 public class QueryUtilTest {
-
-	@ClassRule
-	public static TransactionalTestRule transactionalTestRule =
-		new TransactionalTestRule();
 
 	@BeforeClass
 	public static void setUpClass() throws Exception {
@@ -206,6 +202,10 @@ public class QueryUtilTest {
 	public void testUnionSQL6() throws Exception {
 		testUnionSQL("DESC", _SIZE, _SIZE * 2, _SIZE, "id", "id");
 	}
+
+	@Rule
+	public TransactionalTestRule transactionalTestRule =
+		new TransactionalTestRule();
 
 	protected static String[] createInserts(int amount) {
 		String[] sqls = new String[amount];

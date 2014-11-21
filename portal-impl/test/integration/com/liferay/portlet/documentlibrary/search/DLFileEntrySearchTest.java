@@ -47,6 +47,8 @@ import com.liferay.portlet.documentlibrary.service.DLAppServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryTypeLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.util.test.DLAppTestUtil;
+import com.liferay.portlet.dynamicdatamapping.io.DDMFormXSDDeserializerUtil;
+import com.liferay.portlet.dynamicdatamapping.model.DDMForm;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalServiceUtil;
 import com.liferay.portlet.dynamicdatamapping.storage.Field;
@@ -160,7 +162,7 @@ public class DLFileEntrySearchTest extends BaseSearchTestCase {
 			Fields.class.getName() + _ddmStructure.getStructureId(), fields);
 
 		FileEntry fileEntry = DLAppTestUtil.addFileEntry(
-			serviceContext.getUserId(), serviceContext.getScopeGroupId(),
+			serviceContext.getScopeGroupId(),
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, "Text.txt",
 			ContentTypes.TEXT_PLAIN, "Title", content.getBytes(),
 			WorkflowConstants.ACTION_PUBLISH, serviceContext);
@@ -308,10 +310,12 @@ public class DLFileEntrySearchTest extends BaseSearchTestCase {
 		String definition = DDMStructureTestUtil.getSampleStructureDefinition(
 			"title");
 
+		DDMForm ddmForm = DDMFormXSDDeserializerUtil.deserialize(definition);
+
 		DDMStructureLocalServiceUtil.updateStructure(
 			_ddmStructure.getStructureId(),
 			_ddmStructure.getParentStructureId(), _ddmStructure.getNameMap(),
-			_ddmStructure.getDescriptionMap(), definition, serviceContext);
+			_ddmStructure.getDescriptionMap(), ddmForm, serviceContext);
 	}
 
 	private static final int _FOLDER_NAME_MAX_LENGTH = 100;

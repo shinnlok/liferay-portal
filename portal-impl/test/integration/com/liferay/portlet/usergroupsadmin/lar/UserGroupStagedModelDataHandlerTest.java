@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.After;
-import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.runner.RunWith;
 
 /**
@@ -41,10 +41,6 @@ import org.junit.runner.RunWith;
 public class UserGroupStagedModelDataHandlerTest
 	extends BaseStagedModelDataHandlerTestCase {
 
-	@ClassRule
-	public static TransactionalTestRule transactionalTestRule =
-		new TransactionalTestRule();
-
 	@After
 	@Override
 	public void tearDown() throws Exception {
@@ -53,6 +49,10 @@ public class UserGroupStagedModelDataHandlerTest
 		_userGroup = UserGroupLocalServiceUtil.fetchUserGroupByUuidAndCompanyId(
 			_userGroup.getUuid(), _userGroup.getCompanyId());
 	}
+
+	@Rule
+	public TransactionalTestRule transactionalTestRule =
+		new TransactionalTestRule();
 
 	@Override
 	protected StagedModel addStagedModel(

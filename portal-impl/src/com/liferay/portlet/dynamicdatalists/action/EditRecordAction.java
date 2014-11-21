@@ -14,8 +14,8 @@
 
 package com.liferay.portlet.dynamicdatalists.action;
 
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.servlet.SessionErrors;
-import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -23,13 +23,19 @@ import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
 import com.liferay.portal.struts.PortletAction;
-import com.liferay.portal.util.PortalUtil;
+import com.liferay.portlet.documentlibrary.DuplicateFileException;
 import com.liferay.portlet.documentlibrary.FileSizeException;
 import com.liferay.portlet.dynamicdatalists.NoSuchRecordException;
 import com.liferay.portlet.dynamicdatalists.model.DDLRecord;
+import com.liferay.portlet.dynamicdatalists.model.DDLRecordConstants;
+import com.liferay.portlet.dynamicdatalists.model.DDLRecordSet;
 import com.liferay.portlet.dynamicdatalists.service.DDLRecordServiceUtil;
-import com.liferay.portlet.dynamicdatalists.util.DDLUtil;
+import com.liferay.portlet.dynamicdatalists.service.DDLRecordSetServiceUtil;
 import com.liferay.portlet.dynamicdatamapping.StorageFieldRequiredException;
+import com.liferay.portlet.dynamicdatamapping.io.DDMFormValuesJSONDeserializerUtil;
+import com.liferay.portlet.dynamicdatamapping.model.DDMForm;
+import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
+import com.liferay.portlet.dynamicdatamapping.storage.DDMFormValues;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -64,17 +70,10 @@ public class EditRecordAction extends PortletAction {
 				deleteRecord(actionRequest);
 			}
 			else if (cmd.equals(Constants.REVERT)) {
-				revertRecordVersion(actionRequest);
-			}
-			else if (cmd.equals(Constants.TRANSLATE)) {
-				updateRecord(actionRequest);
-
-				setForward(
-					actionRequest,
-					"portlet.dynamic_data_lists.update_translation_redirect");
+				revertRecord(actionRequest);
 			}
 
-			if (Validator.isNotNull(cmd) && !cmd.equals(Constants.TRANSLATE)) {
+			if (Validator.isNotNull(cmd)) {
 				sendRedirect(actionRequest, actionResponse);
 			}
 		}
@@ -92,7 +91,15 @@ public class EditRecordAction extends PortletAction {
 				SessionErrors.add(actionRequest, e.getClass());
 			}
 			else {
-				throw e;
+				Throwable cause = e.getCause();
+
+				if (cause instanceof DuplicateFileException) {
+					SessionErrors.add(
+						actionRequest, DuplicateFileException.class);
+				}
+				else {
+					throw e;
+				}
 			}
 		}
 	}
@@ -132,9 +139,32 @@ public class EditRecordAction extends PortletAction {
 		DDLRecordServiceUtil.deleteRecord(recordId);
 	}
 
-	protected void revertRecordVersion(ActionRequest actionRequest)
-		throws Exception {
+	protected DDMForm getDDMForm(ActionRequest actionRequest)
+		throws PortalException {
 
+		long recordSetId = ParamUtil.getLong(actionRequest, "recordSetId");
+
+		DDLRecordSet recordSet = DDLRecordSetServiceUtil.getRecordSet(
+			recordSetId);
+
+		DDMStructure ddmStructure = recordSet.getDDMStructure();
+
+		return ddmStructure.getFullHierarchyDDMForm();
+	}
+
+	protected DDMFormValues getDDMFormValues(ActionRequest actionRequest)
+		throws PortalException {
+
+		DDMForm ddmForm = getDDMForm(actionRequest);
+
+		String serializedDDMFormValues = ParamUtil.getString(
+			actionRequest, "ddmFormValues");
+
+		return DDMFormValuesJSONDeserializerUtil.deserialize(
+			ddmForm, serializedDDMFormValues);
+	}
+
+	protected void revertRecord(ActionRequest actionRequest) throws Exception {
 		long recordId = ParamUtil.getLong(actionRequest, "recordId");
 
 		String version = ParamUtil.getString(actionRequest, "version");
@@ -142,25 +172,40 @@ public class EditRecordAction extends PortletAction {
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			DDLRecord.class.getName(), actionRequest);
 
-		DDLRecordServiceUtil.revertRecordVersion(
-			recordId, version, serviceContext);
+		DDLRecordServiceUtil.revertRecord(recordId, version, serviceContext);
 	}
 
 	protected DDLRecord updateRecord(ActionRequest actionRequest)
 		throws Exception {
 
-		UploadPortletRequest uploadPortletRequest =
-			PortalUtil.getUploadPortletRequest(actionRequest);
+		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
+
+		long recordId = ParamUtil.getLong(actionRequest, "recordId");
+
+		long groupId = ParamUtil.getLong(actionRequest, "groupId");
+		long recordSetId = ParamUtil.getLong(actionRequest, "recordSetId");
+		DDMFormValues ddmFormValues = getDDMFormValues(actionRequest);
+		boolean majorVersion = ParamUtil.getBoolean(
+			actionRequest, "majorVersion");
 
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
-			DDLRecord.class.getName(), uploadPortletRequest);
+			DDLRecord.class.getName(), actionRequest);
 
-		long recordId = ParamUtil.getLong(serviceContext, "recordId");
+		DDLRecord record = null;
 
-		long recordSetId = ParamUtil.getLong(serviceContext, "recordSetId");
+		if (cmd.equals(Constants.ADD)) {
+			record = DDLRecordServiceUtil.addRecord(
+				groupId, recordSetId, DDLRecordConstants.DISPLAY_INDEX_DEFAULT,
+				ddmFormValues, serviceContext);
+		}
+		else {
+			record = DDLRecordServiceUtil.updateRecord(
+				recordId, majorVersion,
+				DDLRecordConstants.DISPLAY_INDEX_DEFAULT, ddmFormValues,
+				serviceContext);
+		}
 
-		return DDLUtil.updateRecord(
-			recordId, recordSetId, true, serviceContext);
+		return record;
 	}
 
 }

@@ -20,10 +20,10 @@ import com.liferay.portal.test.SynchronousMailExecutionTestListener;
 import com.liferay.portal.test.listeners.MainServletExecutionTestListener;
 import com.liferay.portal.test.runners.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.util.subscriptions.BaseSubscriptionContainerModelTestCase;
-import com.liferay.portal.util.test.TestPropsValues;
 import com.liferay.portlet.wiki.model.WikiNode;
 import com.liferay.portlet.wiki.model.WikiPage;
 import com.liferay.portlet.wiki.service.WikiNodeLocalServiceUtil;
+import com.liferay.portlet.wiki.service.WikiPageLocalServiceUtil;
 import com.liferay.portlet.wiki.util.test.WikiTestUtil;
 
 import org.junit.Ignore;
@@ -47,13 +47,25 @@ public class WikiSubscriptionContainerModelTest
 	@Ignore
 	@Override
 	@Test
-	public void testSubscriptionContainerModelWhenInRootContainerModel() {
+	public void testSubscriptionContainerModelWhenAddingBaseModelInRootContainerModel() {
 	}
 
 	@Ignore
 	@Override
 	@Test
-	public void testSubscriptionContainerModelWhenInSubcontainerModel() {
+	public void testSubscriptionContainerModelWhenAddingBaseModelInSubcontainerModel() {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testSubscriptionContainerModelWhenUpdatingBaseModelInRootContainerModel() {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testSubscriptionContainerModelWhenUpdatingBaseModelInSubcontainerModel() {
 	}
 
 	@Override
@@ -76,7 +88,14 @@ public class WikiSubscriptionContainerModelTest
 		throws Exception {
 
 		WikiNodeLocalServiceUtil.subscribeNode(
-			TestPropsValues.getUserId(), containerModelId);
+			user.getUserId(), containerModelId);
+	}
+
+	@Override
+	protected void updateBaseModel(long baseModelId) throws Exception {
+		WikiPage page = WikiPageLocalServiceUtil.getPage(baseModelId, true);
+
+		WikiTestUtil.updatePage(page);
 	}
 
 }

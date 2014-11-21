@@ -21,14 +21,16 @@ import com.liferay.portal.kernel.dao.orm.QueryPos;
 import com.liferay.portal.kernel.dao.orm.SQLQuery;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.dao.orm.SessionFactory;
+import com.liferay.portal.kernel.test.ExecutionTestListeners;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.test.TransactionalTestRule;
+import com.liferay.portal.test.listeners.MainServletExecutionTestListener;
 import com.liferay.portal.test.runners.LiferayIntegrationJUnitTestRunner;
 
 import java.util.List;
 
 import org.junit.Assert;
-import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -436,12 +438,9 @@ import org.junit.runner.RunWith;
  *
  * @author Shuyang Zhou
  */
+@ExecutionTestListeners(listeners = {MainServletExecutionTestListener.class})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
 public class SQLNullTest {
-
-	@ClassRule
-	public static TransactionalTestRule transactionalTestRule =
-		new TransactionalTestRule();
 
 	@Test
 	public void testBlankStringEqualsNull() {
@@ -917,6 +916,10 @@ public class SQLNullTest {
 		}
 	}
 
+	@Rule
+	public TransactionalTestRule transactionalTestRule =
+		new TransactionalTestRule();
+
 	protected boolean isDBType(String dBType) {
 		DB db = DBFactoryUtil.getDB();
 
@@ -944,24 +947,24 @@ public class SQLNullTest {
 	}
 
 	private static final String _SQL_EQUALS_NULL =
-		"SELECT DISTINCT 1 FROM ClassName_ WHERE ? = NULL";
+		"SELECT DISTINCT 1 FROM Counter WHERE ? = NULL";
 
 	private static final String _SQL_IS_NOT_NULL =
-		"SELECT DISTINCT 1 FROM ClassName_ WHERE ? IS NOT NULL";
+		"SELECT DISTINCT 1 FROM Counter WHERE ? IS NOT NULL";
 
 	private static final String _SQL_IS_NULL =
-		"SELECT DISTINCT 1 FROM ClassName_ WHERE ? IS NULL";
+		"SELECT DISTINCT 1 FROM Counter WHERE ? IS NULL";
 
 	private static final String _SQL_LIKE_NULL =
-		"SELECT DISTINCT 1 FROM ClassName_ WHERE ? LIKE NULL";
+		"SELECT DISTINCT 1 FROM Counter WHERE ? LIKE NULL";
 
 	private static final String _SQL_NOT_EQUALS_NULL =
-		"SELECT DISTINCT 1 FROM ClassName_ WHERE ? != NULL";
+		"SELECT DISTINCT 1 FROM Counter WHERE ? != NULL";
 
 	private static final String _SQL_NOT_LIKE_NULL =
-		"SELECT DISTINCT 1 FROM ClassName_ WHERE ? NOT LIKE NULL";
+		"SELECT DISTINCT 1 FROM Counter WHERE ? NOT LIKE NULL";
 
-	private SessionFactory _sessionFactory =
+	private final SessionFactory _sessionFactory =
 		(SessionFactory)PortalBeanLocatorUtil.locate("liferaySessionFactory");
 
 }

@@ -20,10 +20,6 @@ import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.template.TemplateException;
-import com.liferay.portal.kernel.template.TemplateManagerUtil;
 import com.liferay.portal.kernel.test.AssertUtils;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.util.IntegerWrapper;
@@ -32,9 +28,9 @@ import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.test.PersistenceTestRule;
 import com.liferay.portal.test.TransactionalTestRule;
-import com.liferay.portal.test.runners.PersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.tools.DBUpgrader;
+import com.liferay.portal.test.runners.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.test.RandomTestUtil;
 
@@ -45,8 +41,7 @@ import com.liferay.portlet.journal.service.JournalFeedLocalServiceUtil;
 
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 import org.junit.runner.RunWith;
@@ -63,22 +58,12 @@ import java.util.Set;
 /**
  * @generated
  */
-@RunWith(PersistenceIntegrationJUnitTestRunner.class)
+@RunWith(LiferayIntegrationJUnitTestRunner.class)
 public class JournalFeedPersistenceTest {
-	@ClassRule
-	public static TransactionalTestRule transactionalTestRule = new TransactionalTestRule(Propagation.REQUIRED);
-
-	@BeforeClass
-	public static void setupClass() throws TemplateException {
-		try {
-			DBUpgrader.upgrade();
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-		}
-
-		TemplateManagerUtil.init();
-	}
+	@Rule
+	public PersistenceTestRule persistenceTestRule = new PersistenceTestRule();
+	@Rule
+	public TransactionalTestRule transactionalTestRule = new TransactionalTestRule(Propagation.REQUIRED);
 
 	@After
 	public void tearDown() throws Exception {
@@ -144,13 +129,11 @@ public class JournalFeedPersistenceTest {
 
 		newJournalFeed.setDescription(RandomTestUtil.randomString());
 
-		newJournalFeed.setType(RandomTestUtil.randomString());
+		newJournalFeed.setDDMStructureKey(RandomTestUtil.randomString());
 
-		newJournalFeed.setStructureId(RandomTestUtil.randomString());
+		newJournalFeed.setDDMTemplateKey(RandomTestUtil.randomString());
 
-		newJournalFeed.setTemplateId(RandomTestUtil.randomString());
-
-		newJournalFeed.setRendererTemplateId(RandomTestUtil.randomString());
+		newJournalFeed.setDDMRendererTemplateKey(RandomTestUtil.randomString());
 
 		newJournalFeed.setDelta(RandomTestUtil.nextInt());
 
@@ -195,14 +178,12 @@ public class JournalFeedPersistenceTest {
 			newJournalFeed.getName());
 		Assert.assertEquals(existingJournalFeed.getDescription(),
 			newJournalFeed.getDescription());
-		Assert.assertEquals(existingJournalFeed.getType(),
-			newJournalFeed.getType());
-		Assert.assertEquals(existingJournalFeed.getStructureId(),
-			newJournalFeed.getStructureId());
-		Assert.assertEquals(existingJournalFeed.getTemplateId(),
-			newJournalFeed.getTemplateId());
-		Assert.assertEquals(existingJournalFeed.getRendererTemplateId(),
-			newJournalFeed.getRendererTemplateId());
+		Assert.assertEquals(existingJournalFeed.getDDMStructureKey(),
+			newJournalFeed.getDDMStructureKey());
+		Assert.assertEquals(existingJournalFeed.getDDMTemplateKey(),
+			newJournalFeed.getDDMTemplateKey());
+		Assert.assertEquals(existingJournalFeed.getDDMRendererTemplateKey(),
+			newJournalFeed.getDDMRendererTemplateKey());
 		Assert.assertEquals(existingJournalFeed.getDelta(),
 			newJournalFeed.getDelta());
 		Assert.assertEquals(existingJournalFeed.getOrderByCol(),
@@ -339,11 +320,12 @@ public class JournalFeedPersistenceTest {
 		return OrderByComparatorFactoryUtil.create("JournalFeed", "uuid", true,
 			"id", true, "groupId", true, "companyId", true, "userId", true,
 			"userName", true, "createDate", true, "modifiedDate", true,
-			"feedId", true, "name", true, "description", true, "type", true,
-			"structureId", true, "templateId", true, "rendererTemplateId",
-			true, "delta", true, "orderByCol", true, "orderByType", true,
-			"targetLayoutFriendlyUrl", true, "targetPortletId", true,
-			"contentField", true, "feedFormat", true, "feedVersion", true);
+			"feedId", true, "name", true, "description", true,
+			"DDMStructureKey", true, "DDMTemplateKey", true,
+			"DDMRendererTemplateKey", true, "delta", true, "orderByCol", true,
+			"orderByType", true, "targetLayoutFriendlyUrl", true,
+			"targetPortletId", true, "contentField", true, "feedFormat", true,
+			"feedVersion", true);
 	}
 
 	@Test
@@ -588,13 +570,11 @@ public class JournalFeedPersistenceTest {
 
 		journalFeed.setDescription(RandomTestUtil.randomString());
 
-		journalFeed.setType(RandomTestUtil.randomString());
+		journalFeed.setDDMStructureKey(RandomTestUtil.randomString());
 
-		journalFeed.setStructureId(RandomTestUtil.randomString());
+		journalFeed.setDDMTemplateKey(RandomTestUtil.randomString());
 
-		journalFeed.setTemplateId(RandomTestUtil.randomString());
-
-		journalFeed.setRendererTemplateId(RandomTestUtil.randomString());
+		journalFeed.setDDMRendererTemplateKey(RandomTestUtil.randomString());
 
 		journalFeed.setDelta(RandomTestUtil.nextInt());
 
@@ -617,7 +597,6 @@ public class JournalFeedPersistenceTest {
 		return journalFeed;
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(JournalFeedPersistenceTest.class);
 	private List<JournalFeed> _journalFeeds = new ArrayList<JournalFeed>();
 	private JournalFeedPersistence _persistence = JournalFeedUtil.getPersistence();
 }

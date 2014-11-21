@@ -40,7 +40,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
-import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -51,10 +51,6 @@ import org.junit.runner.RunWith;
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
 public class LayoutStagedModelDataHandlerTest
 	extends BaseStagedModelDataHandlerTestCase {
-
-	@ClassRule
-	public static TransactionalTestRule transactionalTestRule =
-		new TransactionalTestRule();
 
 	@Test
 	public void testTypeArticle() throws Exception {
@@ -72,8 +68,7 @@ public class LayoutStagedModelDataHandlerTest
 			dependentStagedModelsMap, JournalArticle.class, journalArticle);
 
 		Layout layout = LayoutTestUtil.addTypeArticleLayout(
-			stagingGroup.getGroupId(), RandomTestUtil.randomString(),
-			journalArticle.getArticleId());
+			stagingGroup.getGroupId(), journalArticle.getArticleId());
 
 		addDependentLayoutFriendlyURLs(dependentStagedModelsMap, layout);
 
@@ -97,8 +92,7 @@ public class LayoutStagedModelDataHandlerTest
 		Map<String, List<StagedModel>> dependentStagedModelsMap =
 			new HashMap<String, List<StagedModel>>();
 
-		Layout linkedLayout = LayoutTestUtil.addLayout(
-			stagingGroup.getGroupId(), RandomTestUtil.randomString());
+		Layout linkedLayout = LayoutTestUtil.addLayout(stagingGroup);
 
 		List<LayoutFriendlyURL> linkedLayoutFriendlyURLs =
 			LayoutFriendlyURLLocalServiceUtil.getLayoutFriendlyURLs(
@@ -110,8 +104,7 @@ public class LayoutStagedModelDataHandlerTest
 		addDependentLayoutFriendlyURLs(dependentStagedModelsMap, linkedLayout);
 
 		Layout layout = LayoutTestUtil.addTypeLinkToLayoutLayout(
-			stagingGroup.getGroupId(), RandomTestUtil.randomString(),
-			linkedLayout.getLayoutId());
+			stagingGroup.getGroupId(), linkedLayout.getLayoutId());
 
 		List<LayoutFriendlyURL> layoutFriendlyURLs =
 			LayoutFriendlyURLLocalServiceUtil.getLayoutFriendlyURLs(
@@ -149,6 +142,10 @@ public class LayoutStagedModelDataHandlerTest
 			layoutFriendlyURL.getUuid(), liveGroup.getGroupId());
 	}
 
+	@Rule
+	public TransactionalTestRule transactionalTestRule =
+		new TransactionalTestRule();
+
 	protected void addDependentLayoutFriendlyURLs(
 			Map<String, List<StagedModel>> dependentStagedModelsMap,
 			Layout layout)
@@ -173,8 +170,7 @@ public class LayoutStagedModelDataHandlerTest
 		Map<String, List<StagedModel>> dependentStagedModelsMap =
 			new HashMap<String, List<StagedModel>>();
 
-		Layout parentLayout = LayoutTestUtil.addLayout(
-			group.getGroupId(), RandomTestUtil.randomString());
+		Layout parentLayout = LayoutTestUtil.addLayout(group);
 
 		addDependentStagedModel(
 			dependentStagedModelsMap, Layout.class, parentLayout);
@@ -195,9 +191,7 @@ public class LayoutStagedModelDataHandlerTest
 
 		Layout parentLayout = (Layout)dependentStagedModels.get(0);
 
-		Layout layout = LayoutTestUtil.addLayout(
-			group.getGroupId(), RandomTestUtil.randomString(),
-			parentLayout.getPlid());
+		Layout layout = LayoutTestUtil.addLayout(group, parentLayout.getPlid());
 
 		addDependentLayoutFriendlyURLs(dependentStagedModelsMap, layout);
 

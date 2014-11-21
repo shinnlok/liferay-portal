@@ -79,6 +79,7 @@ public class WebDriverToSeleniumBridge
 		initKeysSpecialChars();
 
 		WebDriverHelper.setDefaultWindowHandle(webDriver.getWindowHandle());
+		WebDriverHelper.setNavigationBarHeight(120);
 	}
 
 	@Override
@@ -199,7 +200,18 @@ public class WebDriverToSeleniumBridge
 			open(url);
 		}
 		else {
-			WebDriverHelper.click(this, locator);
+			WebElement webElement = getWebElement(locator);
+
+			try {
+				webElement.click();
+			}
+			catch (Exception e) {
+				if (!webElement.isDisplayed()) {
+					scrollWebElementIntoView(webElement);
+				}
+
+				webElement.click();
+			}
 		}
 	}
 
@@ -369,13 +381,19 @@ public class WebDriverToSeleniumBridge
 
 	@Override
 	public void dragAndDrop(String locator, String coordString) {
-		WebElement webElement = getWebElement(locator);
-
 		try {
-			Point point = webElement.getLocation();
+			int x = WebDriverHelper.getElementPositionCenterX(this, locator);
 
-			int x = point.getX() + 45;
-			int y = point.getY() + 100;
+			x += WebDriverHelper.getFramePositionLeft(this);
+			x += WebDriverHelper.getWindowPositionLeft(this);
+			x -= WebDriverHelper.getScrollOffsetX(this);
+
+			int y = WebDriverHelper.getElementPositionCenterY(this, locator);
+
+			y += WebDriverHelper.getFramePositionTop(this);
+			y += WebDriverHelper.getNavigationBarHeight();
+			y += WebDriverHelper.getWindowPositionTop(this);
+			y -= WebDriverHelper.getScrollOffsetY(this);
 
 			Robot robot = new Robot();
 
@@ -749,7 +767,17 @@ public class WebDriverToSeleniumBridge
 			return getHtmlNodeText(locator);
 		}
 
-		return WebDriverHelper.getText(this, locator, timeout);
+		WebElement webElement = getWebElement(locator, timeout);
+
+		if (!webElement.isDisplayed()) {
+			scrollWebElementIntoView(webElement);
+		}
+
+		String text = webElement.getText();
+
+		text = text.trim();
+
+		return text.replace("\n", " ");
 	}
 
 	@Override
@@ -885,7 +913,13 @@ public class WebDriverToSeleniumBridge
 
 	@Override
 	public boolean isVisible(String locator) {
-		return WebDriverHelper.isVisible(this, locator);
+		WebElement webElement = getWebElement(locator, "1");
+
+		if (!webElement.isDisplayed()) {
+			scrollWebElementIntoView(webElement);
+		}
+
+		return webElement.isDisplayed();
 	}
 
 	@Override

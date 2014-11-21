@@ -25,7 +25,7 @@ import com.liferay.portal.util.test.RandomTestUtil;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryType;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryTypeConstants;
-import com.liferay.portlet.documentlibrary.service.DLAppServiceUtil;
+import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryTypeLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.util.test.DLAppTestUtil;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
@@ -73,8 +73,16 @@ public class DLSubscriptionClassTypeTest
 
 	@Override
 	protected void addSubscriptionClassType(long classTypeId) throws Exception {
-		DLAppServiceUtil.subscribeFileEntryType(
-			group.getGroupId(), classTypeId);
+		DLAppLocalServiceUtil.subscribeFileEntryType(
+			user.getUserId(), group.getGroupId(), classTypeId);
+	}
+
+	@Override
+	protected void deleteSubscriptionClassType(long classTypeId)
+		throws Exception {
+
+		DLAppLocalServiceUtil.unsubscribeFileEntryType(
+			user.getUserId(), group.getGroupId(), classTypeId);
 	}
 
 	@Override
@@ -86,6 +94,12 @@ public class DLSubscriptionClassTypeTest
 		Assert.assertNotNull(basicEntryType);
 
 		return basicEntryType.getPrimaryKey();
+	}
+
+	@Override
+	protected void updateBaseModel(long baseModelId) throws Exception {
+		DLAppTestUtil.updateFileEntryWithWorkflow(
+			group.getGroupId(), baseModelId, false, true);
 	}
 
 }

@@ -21,7 +21,6 @@ import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.dao.orm.Type;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.CalendarUtil;
-import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
@@ -295,17 +294,37 @@ public class AssetEntryFinderImpl
 		// Keywords
 
 		if (Validator.isNotNull(entryQuery.getKeywords())) {
-			sb.append(" AND ((AssetEntry.title LIKE ?) OR");
+			sb.append(" AND ((AssetEntry.userName LIKE ?) OR");
+			sb.append(" (AssetEntry.title LIKE ?) OR");
 			sb.append(" (AssetEntry.description LIKE ?))");
 		}
-		else {
+		else if (Validator.isNotNull(entryQuery.getUserName()) ||
+				 Validator.isNotNull(entryQuery.getTitle()) ||
+				 Validator.isNotNull(entryQuery.getDescription())) {
+
+			sb.append("AND (");
+			sb.append(
+				entryQuery.isAndOperator() ? Boolean.TRUE : Boolean.FALSE);
+
+			if (Validator.isNotNull(entryQuery.getUserName())) {
+				sb.append(entryQuery.isAndOperator() ? " AND " : " OR ");
+
+				sb.append("(AssetEntry.userName LIKE ?)");
+			}
+
 			if (Validator.isNotNull(entryQuery.getTitle())) {
-				sb.append(" AND (AssetEntry.title LIKE ?)");
+				sb.append(entryQuery.isAndOperator() ? " AND " : " OR ");
+
+				sb.append("(AssetEntry.title LIKE ?)");
 			}
 
 			if (Validator.isNotNull(entryQuery.getDescription())) {
-				sb.append(" AND (AssetEntry.description LIKE ?)");
+				sb.append(entryQuery.isAndOperator() ? " AND " : " OR ");
+
+				sb.append("(AssetEntry.description LIKE ?)");
 			}
+
+			sb.append(")");
 		}
 
 		// Layout
@@ -434,16 +453,30 @@ public class AssetEntryFinderImpl
 		}
 
 		if (Validator.isNotNull(entryQuery.getKeywords())) {
-			qPos.add(entryQuery.getKeywords() + CharPool.PERCENT);
-			qPos.add(entryQuery.getKeywords() + CharPool.PERCENT);
+			qPos.add(
+				StringUtil.quote(entryQuery.getKeywords(), StringPool.PERCENT));
+			qPos.add(
+				StringUtil.quote(entryQuery.getKeywords(), StringPool.PERCENT));
+			qPos.add(
+				StringUtil.quote(entryQuery.getKeywords(), StringPool.PERCENT));
 		}
 		else {
+			if (Validator.isNotNull(entryQuery.getUserName())) {
+				qPos.add(
+					StringUtil.quote(
+						entryQuery.getUserName(), StringPool.PERCENT));
+			}
+
 			if (Validator.isNotNull(entryQuery.getTitle())) {
-				qPos.add(entryQuery.getTitle() + CharPool.PERCENT);
+				qPos.add(
+					StringUtil.quote(
+						entryQuery.getTitle(), StringPool.PERCENT));
 			}
 
 			if (Validator.isNotNull(entryQuery.getDescription())) {
-				qPos.add(entryQuery.getDescription() + CharPool.PERCENT);
+				qPos.add(
+					StringUtil.quote(
+						entryQuery.getDescription(), StringPool.PERCENT));
 			}
 		}
 

@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.backgroundtask.BackgroundTaskThreadLocal;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.lar.ExportImportDateUtil;
 import com.liferay.portal.kernel.lar.ExportImportHelperUtil;
 import com.liferay.portal.kernel.lar.ExportImportPathUtil;
 import com.liferay.portal.kernel.lar.ExportImportThreadLocal;
@@ -32,8 +33,9 @@ import com.liferay.portal.kernel.lar.PortletDataHandlerKeys;
 import com.liferay.portal.kernel.lar.PortletDataHandlerStatusMessageSenderUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.staging.StagingUtil;
+import com.liferay.portal.kernel.transaction.TransactionCommitCallbackRegistryUtil;
 import com.liferay.portal.kernel.util.CharPool;
+import com.liferay.portal.kernel.util.DateRange;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.ReleaseInfo;
@@ -59,6 +61,7 @@ import com.liferay.portal.model.PortletConstants;
 import com.liferay.portal.model.PortletItem;
 import com.liferay.portal.model.PortletPreferences;
 import com.liferay.portal.model.User;
+import com.liferay.portal.model.impl.LayoutImpl;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.PortletItemLocalServiceUtil;
@@ -87,6 +90,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.Callable;
 
 import org.apache.commons.lang.time.StopWatch;
 
@@ -172,13 +176,20 @@ public class PortletExporter {
 			return;
 		}
 
-		String data = null;
+		Date originalStartDate = portletDataContext.getStartDate();
+
+		Date portletLastPublishDate = ExportImportDateUtil.getLastPublishDate(
+			portletDataContext, jxPortletPreferences);
+
+		portletDataContext.setStartDate(portletLastPublishDate);
 
 		long groupId = portletDataContext.getGroupId();
 
 		portletDataContext.setGroupId(portletDataContext.getScopeGroupId());
 
 		portletDataContext.clearScopedPrimaryKeys();
+
+		String data = null;
 
 		try {
 			data = portletDataHandler.exportData(
@@ -192,6 +203,7 @@ public class PortletExporter {
 		}
 		finally {
 			portletDataContext.setGroupId(groupId);
+			portletDataContext.setStartDate(originalStartDate);
 		}
 
 		if (Validator.isNull(data)) {
@@ -210,15 +222,19 @@ public class PortletExporter {
 
 		portletDataContext.addZipEntry(path, data);
 
-		Date endDate = portletDataContext.getEndDate();
-
 		boolean updateLastPublishDate = MapUtil.getBoolean(
 			portletDataContext.getParameterMap(),
 			PortletDataHandlerKeys.UPDATE_LAST_PUBLISH_DATE);
 
 		if (updateLastPublishDate) {
-			StagingUtil.updateLastPublishDate(
-				portletId, jxPortletPreferences, endDate);
+			DateRange adjustedDateRange = new DateRange(
+				portletLastPublishDate, portletDataContext.getEndDate());
+
+			TransactionCommitCallbackRegistryUtil.registerCallback(
+				new UpdatePortletLastPublishDateCallable(
+					adjustedDateRange, portletDataContext.getEndDate(),
+					portletDataContext.getGroupId(), layout.getPlid(),
+					portletId));
 		}
 	}
 
@@ -1212,13 +1228,75 @@ public class PortletExporter {
 	private PortletExporter() {
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(PortletExporter.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		PortletExporter.class);
 
-	private static PortletExporter _instance = new PortletExporter();
+	private static final PortletExporter _instance = new PortletExporter();
 
-	private DeletionSystemEventExporter _deletionSystemEventExporter =
+	private final DeletionSystemEventExporter _deletionSystemEventExporter =
 		DeletionSystemEventExporter.getInstance();
-	private PermissionExporter _permissionExporter =
+	private final PermissionExporter _permissionExporter =
 		PermissionExporter.getInstance();
+
+	private class UpdatePortletLastPublishDateCallable
+		implements Callable<Void> {
+
+		public UpdatePortletLastPublishDateCallable(
+			DateRange dateRange, Date endDate, long groupId, long plid,
+			String portletId) {
+
+			_dateRange = dateRange;
+			_endDate = endDate;
+			_groupId = groupId;
+			_plid = plid;
+			_portletId = portletId;
+		}
+
+		@Override
+		public Void call() throws PortalException {
+			Group group = GroupLocalServiceUtil.getGroup(_groupId);
+
+			if (group.isStagedRemotely()) {
+				return null;
+			}
+
+			Layout layout = LayoutLocalServiceUtil.fetchLayout(_plid);
+
+			if (ExportImportThreadLocal.isStagingInProcess() &&
+				group.hasStagingGroup()) {
+
+				group = group.getStagingGroup();
+
+				if (layout != null) {
+					layout = LayoutLocalServiceUtil.fetchLayoutByUuidAndGroupId(
+						layout.getUuid(), group.getGroupId(),
+						layout.isPrivateLayout());
+				}
+			}
+
+			if (layout == null) {
+				layout = new LayoutImpl();
+
+				layout.setCompanyId(group.getCompanyId());
+				layout.setGroupId(group.getGroupId());
+			}
+
+			javax.portlet.PortletPreferences jxPortletPreferences =
+				PortletPreferencesFactoryUtil.getStrictPortletSetup(
+					layout, _portletId);
+
+			ExportImportDateUtil.updateLastPublishDate(
+				_portletId, jxPortletPreferences, _dateRange, _endDate);
+
+			return null;
+		}
+
+		private final DateRange _dateRange;
+		private final Date _endDate;
+		private final long _groupId;
+		private final long _plid;
+		private final String _portletId;
+
+	}
 
 }

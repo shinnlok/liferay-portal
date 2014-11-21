@@ -21,10 +21,6 @@ import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.template.TemplateException;
-import com.liferay.portal.kernel.template.TemplateManagerUtil;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.util.IntegerWrapper;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -33,15 +29,14 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.model.BackgroundTask;
 import com.liferay.portal.service.BackgroundTaskLocalServiceUtil;
+import com.liferay.portal.test.PersistenceTestRule;
 import com.liferay.portal.test.TransactionalTestRule;
-import com.liferay.portal.test.runners.PersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.tools.DBUpgrader;
+import com.liferay.portal.test.runners.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.util.test.RandomTestUtil;
 
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 import org.junit.runner.RunWith;
@@ -49,6 +44,7 @@ import org.junit.runner.RunWith;
 import java.io.Serializable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -58,22 +54,12 @@ import java.util.Set;
 /**
  * @generated
  */
-@RunWith(PersistenceIntegrationJUnitTestRunner.class)
+@RunWith(LiferayIntegrationJUnitTestRunner.class)
 public class BackgroundTaskPersistenceTest {
-	@ClassRule
-	public static TransactionalTestRule transactionalTestRule = new TransactionalTestRule(Propagation.REQUIRED);
-
-	@BeforeClass
-	public static void setupClass() throws TemplateException {
-		try {
-			DBUpgrader.upgrade();
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-		}
-
-		TemplateManagerUtil.init();
-	}
+	@Rule
+	public PersistenceTestRule persistenceTestRule = new PersistenceTestRule();
+	@Rule
+	public TransactionalTestRule transactionalTestRule = new TransactionalTestRule(Propagation.REQUIRED);
 
 	@After
 	public void tearDown() throws Exception {
@@ -139,7 +125,7 @@ public class BackgroundTaskPersistenceTest {
 
 		newBackgroundTask.setTaskExecutorClassName(RandomTestUtil.randomString());
 
-		newBackgroundTask.setTaskContext(RandomTestUtil.randomString());
+		newBackgroundTask.setTaskContextMap(new HashMap<String, Serializable>());
 
 		newBackgroundTask.setCompleted(RandomTestUtil.randomBoolean());
 
@@ -177,8 +163,8 @@ public class BackgroundTaskPersistenceTest {
 			newBackgroundTask.getServletContextNames());
 		Assert.assertEquals(existingBackgroundTask.getTaskExecutorClassName(),
 			newBackgroundTask.getTaskExecutorClassName());
-		Assert.assertEquals(existingBackgroundTask.getTaskContext(),
-			newBackgroundTask.getTaskContext());
+		Assert.assertEquals(existingBackgroundTask.getTaskContextMap(),
+			newBackgroundTask.getTaskContextMap());
 		Assert.assertEquals(existingBackgroundTask.getCompleted(),
 			newBackgroundTask.getCompleted());
 		Assert.assertEquals(Time.getShortTimestamp(
@@ -426,7 +412,7 @@ public class BackgroundTaskPersistenceTest {
 			"mvccVersion", true, "backgroundTaskId", true, "groupId", true,
 			"companyId", true, "userId", true, "userName", true, "createDate",
 			true, "modifiedDate", true, "name", true, "servletContextNames",
-			true, "taskExecutorClassName", true, "taskContext", true,
+			true, "taskExecutorClassName", true, "taskContextMap", true,
 			"completed", true, "completionDate", true, "status", true,
 			"statusMessage", true);
 	}
@@ -652,7 +638,7 @@ public class BackgroundTaskPersistenceTest {
 
 		backgroundTask.setTaskExecutorClassName(RandomTestUtil.randomString());
 
-		backgroundTask.setTaskContext(RandomTestUtil.randomString());
+		backgroundTask.setTaskContextMap(new HashMap<String, Serializable>());
 
 		backgroundTask.setCompleted(RandomTestUtil.randomBoolean());
 
@@ -667,7 +653,6 @@ public class BackgroundTaskPersistenceTest {
 		return backgroundTask;
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(BackgroundTaskPersistenceTest.class);
 	private List<BackgroundTask> _backgroundTasks = new ArrayList<BackgroundTask>();
 	private BackgroundTaskPersistence _persistence = BackgroundTaskUtil.getPersistence();
 }

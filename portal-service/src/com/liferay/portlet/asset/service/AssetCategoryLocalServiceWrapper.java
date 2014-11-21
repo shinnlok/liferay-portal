@@ -182,6 +182,19 @@ public class AssetCategoryLocalServiceWrapper
 	}
 
 	@Override
+	public void deleteCategories(
+		java.util.List<com.liferay.portlet.asset.model.AssetCategory> categories)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		_assetCategoryLocalService.deleteCategories(categories);
+	}
+
+	@Override
+	public void deleteCategories(long[] categoryIds)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		_assetCategoryLocalService.deleteCategories(categoryIds);
+	}
+
+	@Override
 	public com.liferay.portlet.asset.model.AssetCategory deleteCategory(
 		com.liferay.portlet.asset.model.AssetCategory category)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -191,9 +204,10 @@ public class AssetCategoryLocalServiceWrapper
 	@Override
 	public com.liferay.portlet.asset.model.AssetCategory deleteCategory(
 		com.liferay.portlet.asset.model.AssetCategory category,
-		boolean childCategory)
+		boolean skipRebuildTree)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		return _assetCategoryLocalService.deleteCategory(category, childCategory);
+		return _assetCategoryLocalService.deleteCategory(category,
+			skipRebuildTree);
 	}
 
 	@Override
@@ -278,10 +292,10 @@ public class AssetCategoryLocalServiceWrapper
 	}
 
 	/**
-	* Returns the number of rows that match the dynamic query.
+	* Returns the number of rows matching the dynamic query.
 	*
 	* @param dynamicQuery the dynamic query
-	* @return the number of rows that match the dynamic query
+	* @return the number of rows matching the dynamic query
 	*/
 	@Override
 	public long dynamicQueryCount(
@@ -290,11 +304,11 @@ public class AssetCategoryLocalServiceWrapper
 	}
 
 	/**
-	* Returns the number of rows that match the dynamic query.
+	* Returns the number of rows matching the dynamic query.
 	*
 	* @param dynamicQuery the dynamic query
 	* @param projection the projection to apply to the query
-	* @return the number of rows that match the dynamic query
+	* @return the number of rows matching the dynamic query
 	*/
 	@Override
 	public long dynamicQueryCount(
@@ -352,6 +366,13 @@ public class AssetCategoryLocalServiceWrapper
 		return _assetCategoryLocalService.getAssetCategories(start, end);
 	}
 
+	/**
+	* Returns all the asset categories matching the UUID and company.
+	*
+	* @param uuid the UUID of the asset categories
+	* @param companyId the primary key of the company
+	* @return the matching asset categories, or an empty list if no matches were found
+	*/
 	@Override
 	public java.util.List<com.liferay.portlet.asset.model.AssetCategory> getAssetCategoriesByUuidAndCompanyId(
 		java.lang.String uuid, long companyId) {
@@ -359,6 +380,16 @@ public class AssetCategoryLocalServiceWrapper
 			companyId);
 	}
 
+	/**
+	* Returns a range of asset categories matching the UUID and company.
+	*
+	* @param uuid the UUID of the asset categories
+	* @param companyId the primary key of the company
+	* @param start the lower bound of the range of asset categories
+	* @param end the upper bound of the range of asset categories (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the range of matching asset categories, or an empty list if no matches were found
+	*/
 	@Override
 	public java.util.List<com.liferay.portlet.asset.model.AssetCategory> getAssetCategoriesByUuidAndCompanyId(
 		java.lang.String uuid, long companyId, int start, int end,

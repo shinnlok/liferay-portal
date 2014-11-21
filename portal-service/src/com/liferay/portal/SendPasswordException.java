@@ -26,13 +26,14 @@ public class SendPasswordException extends PortalException {
 	/**
 	 * @deprecated As of 7.0.0, replaced by the inner classes
 	 */
+	@Deprecated
 	public SendPasswordException() {
-		super();
 	}
 
 	/**
 	 * @deprecated As of 7.0.0, replaced by the inner classes
 	 */
+	@Deprecated
 	public SendPasswordException(String msg, Throwable cause) {
 		super(msg, cause);
 	}
@@ -40,6 +41,7 @@ public class SendPasswordException extends PortalException {
 	/**
 	 * @deprecated As of 7.0.0, replaced by the inner classes
 	 */
+	@Deprecated
 	public SendPasswordException(Throwable cause) {
 		super(cause);
 	}
@@ -53,14 +55,10 @@ public class SendPasswordException extends PortalException {
 						"company %s",
 				company));
 
-			_company = company;
+			this.company = company;
 		}
 
-		public Company getCompany() {
-			return _company;
-		}
-
-		private Company _company;
+		public final Company company;
 
 	}
 

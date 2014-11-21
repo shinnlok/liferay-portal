@@ -28,7 +28,7 @@ import com.liferay.portlet.wiki.util.test.WikiTestUtil;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.runner.RunWith;
 
 /**
@@ -39,8 +39,8 @@ import org.junit.runner.RunWith;
 public class WikiNodeStagedModelDataHandlerTest
 	extends BaseStagedModelDataHandlerTestCase {
 
-	@ClassRule
-	public static TransactionalTestRule transactionalTestRule =
+	@Rule
+	public TransactionalTestRule transactionalTestRule =
 		new TransactionalTestRule();
 
 	@Override

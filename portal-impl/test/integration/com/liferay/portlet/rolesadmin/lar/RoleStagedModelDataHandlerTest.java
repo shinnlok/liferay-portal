@@ -25,13 +25,12 @@ import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.test.TransactionalTestRule;
 import com.liferay.portal.test.listeners.MainServletExecutionTestListener;
 import com.liferay.portal.test.runners.LiferayIntegrationJUnitTestRunner;
-import com.liferay.portal.util.test.RandomTestUtil;
 import com.liferay.portal.util.test.RoleTestUtil;
 
 import java.util.List;
 import java.util.Map;
 
-import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.runner.RunWith;
 
 /**
@@ -42,8 +41,8 @@ import org.junit.runner.RunWith;
 public class RoleStagedModelDataHandlerTest
 	extends BaseStagedModelDataHandlerTestCase {
 
-	@ClassRule
-	public static TransactionalTestRule transactionalTestRule =
+	@Rule
+	public TransactionalTestRule transactionalTestRule =
 		new TransactionalTestRule();
 
 	@Override
@@ -52,8 +51,7 @@ public class RoleStagedModelDataHandlerTest
 			Map<String, List<StagedModel>> dependentStagedModelsMap)
 		throws Exception {
 
-		return RoleTestUtil.addRole(
-			RandomTestUtil.randomString(), RoleConstants.TYPE_REGULAR);
+		return RoleTestUtil.addRole(RoleConstants.TYPE_REGULAR);
 	}
 
 	@Override

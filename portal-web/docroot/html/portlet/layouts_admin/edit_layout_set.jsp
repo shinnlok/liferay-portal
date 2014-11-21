@@ -69,21 +69,47 @@ boolean hasAddPageLayoutsPermission = GroupPermissionUtil.contains(permissionChe
 boolean hasViewPagesPermission = (pagesCount > 0) && (liveGroup.isStaged() || selGroup.isLayoutSetPrototype() || selGroup.isStagingGroup() || portletName.equals(PortletKeys.MY_SITES) || portletName.equals(PortletKeys.GROUP_PAGES) || portletName.equals(PortletKeys.SITES_ADMIN) || portletName.equals(PortletKeys.USERS_ADMIN));
 %>
 
-<div class="add-content-menu hide" id="<portlet:namespace />addLayout">
-	<liferay-util:include page="/html/portlet/layouts_admin/add_layout.jsp" />
-</div>
-
 <aui:nav-bar>
-	<aui:nav cssClass="navbar-nav" id="layoutsNav">
+	<aui:nav cssClass="navbar-nav">
 		<c:if test="<%= hasViewPagesPermission %>">
-			<aui:nav-item data-value="view-pages" iconCssClass="icon-file" label="view-pages" />
+			<liferay-portlet:actionURL plid="<%= layoutsAdminDisplayContext.getSelPlid() %>" portletName="<%= PortletKeys.SITE_REDIRECTOR %>" var="viewPagesURL">
+				<portlet:param name="struts_action" value="/my_sites/view" />
+				<portlet:param name="groupId" value="<%= String.valueOf(groupId) %>" />
+				<portlet:param name="privateLayout" value="<%= String.valueOf(privateLayout) %>" />
+			</liferay-portlet:actionURL>
+
+			<aui:nav-item href="<%= viewPagesURL %>" iconCssClass="icon-file" label="view-pages" target="_blank" />
 		</c:if>
 		<c:if test="<%= hasAddPageLayoutsPermission %>">
-			<aui:nav-item data-value="add-page" iconCssClass="icon-plus" label="add-page" />
+			<portlet:renderURL var="addPagesURL">
+				<portlet:param name="struts_action" value="/layouts_admin/add_layout" />
+				<portlet:param name="groupId" value="<%= String.valueOf(groupId) %>" />
+				<portlet:param name="privateLayout" value="<%= String.valueOf(privateLayout) %>" />
+			</portlet:renderURL>
+
+			<aui:nav-item href="<%= addPagesURL %>" iconCssClass="icon-plus" label="add-page" />
 		</c:if>
 		<c:if test="<%= hasExportImportLayoutsPermission %>">
-			<aui:nav-item data-value="export" iconCssClass="icon-arrow-down" label="export" />
-			<aui:nav-item data-value="import" iconCssClass="icon-arrow-up" label="import" />
+			<portlet:renderURL var="exportPagesURL">
+				<portlet:param name="struts_action" value="/layouts_admin/export_layouts" />
+				<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.EXPORT %>" />
+				<portlet:param name="groupId" value="<%= String.valueOf(groupId) %>" />
+				<portlet:param name="liveGroupId" value="<%= String.valueOf(liveGroupId) %>" />
+				<portlet:param name="privateLayout" value="<%= String.valueOf(privateLayout) %>" />
+				<portlet:param name="rootNodeName" value="<%= rootNodeName %>" />
+			</portlet:renderURL>
+
+			<aui:nav-item href="<%= exportPagesURL %>" iconCssClass="icon-arrow-down" label="export" />
+
+			<portlet:renderURL var="importPagesURL">
+				<portlet:param name="struts_action" value="/layouts_admin/import_layouts" />
+				<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.VALIDATE %>" />
+				<portlet:param name="groupId" value="<%= String.valueOf(groupId) %>" />
+				<portlet:param name="privateLayout" value="<%= String.valueOf(privateLayout) %>" />
+				<portlet:param name="rootNodeName" value="<%= rootNodeName %>" />
+			</portlet:renderURL>
+
+			<aui:nav-item href="<%= importPagesURL %>" iconCssClass="icon-arrow-up" label="import" />
 		</c:if>
 	</aui:nav>
 </aui:nav-bar>
@@ -124,170 +150,14 @@ boolean hasViewPagesPermission = (pagesCount > 0) && (liveGroup.isStaged() || se
 
 <aui:script>
 	function <portlet:namespace />saveLayoutset(action) {
-		document.<portlet:namespace />fm.encoding = 'multipart/form-data';
+		var form = AUI.$(document.<portlet:namespace />fm);
 
-		if (action) {
-			document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = action;
-		}
-		else {
-			document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = 'update';
-		}
+		form.prop('encoding', 'multipart/form-data');
 
-		submitForm(document.<portlet:namespace />fm);
+		form.fm('<%= Constants.CMD %>').val(action ? action : 'update');
+
+		submitForm(form);
 	}
-
-	function <portlet:namespace />updateLogo() {
-		document.<portlet:namespace />fm.encoding = 'multipart/form-data';
-		document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = 'logo';
-
-		submitForm(document.<portlet:namespace />fm);
-	}
-
-	function <portlet:namespace />updateRobots() {
-		document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = 'robots';
-
-		submitForm(document.<portlet:namespace />fm);
-	}
-
-	Liferay.provide(
-		window,
-		'<portlet:namespace />removePage',
-		function(box) {
-			var A = AUI();
-
-			var selectEl = A.one(box);
-
-			var currentValue = selectEl.val() || null;
-
-			Liferay.Util.removeItem(box);
-		},
-		['aui-base']
-	);
-
-	Liferay.provide(
-		window,
-		'<portlet:namespace />updateDisplayOrder',
-		function() {
-			document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = 'display_order';
-			document.<portlet:namespace />fm.<portlet:namespace />layoutIds.value = Liferay.Util.listSelect(document.<portlet:namespace />fm.<portlet:namespace />layoutIdsBox);
-
-			submitForm(document.<portlet:namespace />fm);
-		},
-		['liferay-util-list-fields']
-	);
-
-	Liferay.provide(
-		window,
-		'<portlet:namespace />updateStaging',
-		function() {
-			var A = AUI();
-
-			var selectEl = A.one('#<portlet:namespace />stagingType');
-
-			var currentValue = selectEl.val() || null;
-
-			var ok = false;
-
-			if (currentValue == 0) {
-				ok = confirm('<%= UnicodeLanguageUtil.format(request, "are-you-sure-you-want-to-deactivate-staging-for-x", liveGroup.getDescriptiveName(locale), false) %>');
-			}
-			else if (currentValue == 1) {
-				ok = confirm('<%= UnicodeLanguageUtil.format(request, "are-you-sure-you-want-to-activate-local-staging-for-x", liveGroup.getDescriptiveName(locale), false) %>');
-			}
-			else if (currentValue == 2) {
-				ok = confirm('<%= UnicodeLanguageUtil.format(request, "are-you-sure-you-want-to-activate-remote-staging-for-x", liveGroup.getDescriptiveName(locale), false) %>');
-			}
-
-			if (ok) {
-				document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = 'staging';
-
-				submitForm(document.<portlet:namespace />fm);
-			}
-		},
-		['aui-base']
-	);
-</aui:script>
-
-<aui:script use="liferay-util-window">
-	var popup;
-
-	var clickHandler = function(event) {
-		var dataValue = event.target.ancestor('li').attr('data-value');
-
-		processDataValue(dataValue);
-	};
-
-	var processDataValue = function(dataValue) {
-		if (dataValue === 'add-page' || dataValue === 'add-child-page') {
-			var content = A.one('#<portlet:namespace />addLayout');
-
-			if (!popup) {
-				popup = Liferay.Util.Window.getWindow(
-					{
-						dialog: {
-							bodyContent: content.show(),
-							cssClass: 'lfr-add-dialog',
-							width: 600
-						},
-						title: '<%= UnicodeLanguageUtil.get(request, "add-page") %>'
-					}
-				);
-			}
-
-			popup.show();
-
-			var cancelButton = popup.get('contentBox').one('#<portlet:namespace />cancelAddOperation');
-
-			if (cancelButton) {
-				cancelButton.on(
-					'click',
-					function(event) {
-						popup.hide();
-					}
-				);
-			}
-
-			Liferay.Util.focusFormField(content.one('input:text'));
-		}
-		else if (dataValue === 'view-pages') {
-			<liferay-portlet:actionURL plid="<%= layoutsAdminDisplayContext.getSelPlid() %>" portletName="<%= PortletKeys.SITE_REDIRECTOR %>" var="viewPagesURL">
-				<portlet:param name="struts_action" value="/my_sites/view" />
-				<portlet:param name="groupId" value="<%= String.valueOf(groupId) %>" />
-				<portlet:param name="privateLayout" value="<%= String.valueOf(privateLayout) %>" />
-			</liferay-portlet:actionURL>
-
-			window.open('<%= viewPagesURL %>').focus();
-		}
-		else if (dataValue === 'import') {
-			<portlet:renderURL var="importPagesURL">
-				<portlet:param name="struts_action" value="/layouts_admin/import_layouts" />
-				<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.VALIDATE %>" />
-				<portlet:param name="groupId" value="<%= String.valueOf(groupId) %>" />
-				<portlet:param name="privateLayout" value="<%= String.valueOf(privateLayout) %>" />
-				<portlet:param name="rootNodeName" value="<%= rootNodeName %>" />
-			</portlet:renderURL>
-
-			location.href = '<%= importPagesURL %>';
-		}
-		else if (dataValue === 'export') {
-			<portlet:renderURL var="exportPagesURL">
-				<portlet:param name="struts_action" value="/layouts_admin/export_layouts" />
-				<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.EXPORT %>" />
-				<portlet:param name="groupId" value="<%= String.valueOf(groupId) %>" />
-				<portlet:param name="liveGroupId" value="<%= String.valueOf(liveGroupId) %>" />
-				<portlet:param name="privateLayout" value="<%= String.valueOf(privateLayout) %>" />
-				<portlet:param name="rootNodeName" value="<%= rootNodeName %>" />
-			</portlet:renderURL>
-
-			location.href = '<%= exportPagesURL %>';
-		}
-	};
-
-	A.one('#<portlet:namespace />layoutsNav').delegate('click', clickHandler, 'li a');
-
-	<c:if test='<%= layout.isTypeControlPanel() && (SessionMessages.get(liferayPortletRequest, portletDisplay.getId() + "addError") != null) %>'>
-		processDataValue('add-page');
-	</c:if>
 </aui:script>
 
 <%!

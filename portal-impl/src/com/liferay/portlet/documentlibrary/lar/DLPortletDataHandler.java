@@ -15,9 +15,12 @@
 package com.liferay.portlet.documentlibrary.lar;
 
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.Conjunction;
 import com.liferay.portal.kernel.dao.orm.Disjunction;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.QueryDefinition;
@@ -29,6 +32,8 @@ import com.liferay.portal.kernel.lar.ManifestSummary;
 import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.lar.PortletDataHandlerBoolean;
 import com.liferay.portal.kernel.lar.PortletDataHandlerControl;
+import com.liferay.portal.kernel.lar.StagedModelDataHandler;
+import com.liferay.portal.kernel.lar.StagedModelDataHandlerRegistryUtil;
 import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.lar.xstream.XStreamAliasRegistryUtil;
@@ -39,7 +44,9 @@ import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.TempFileEntryUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.model.Repository;
@@ -57,6 +64,7 @@ import com.liferay.portlet.documentlibrary.model.DLFileEntryConstants;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryType;
 import com.liferay.portlet.documentlibrary.model.DLFileRank;
 import com.liferay.portlet.documentlibrary.model.DLFileShortcut;
+import com.liferay.portlet.documentlibrary.model.DLFileVersion;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.model.impl.DLFileEntryImpl;
@@ -479,11 +487,45 @@ public class DLPortletDataHandler extends BasePortletDataHandler {
 				public void addCriteria(DynamicQuery dynamicQuery) {
 					addCriteriaMethod.addCriteria(dynamicQuery);
 
-					Property property = PropertyFactoryUtil.forName(
+					DynamicQuery fileVersionDynamicQuery =
+						DynamicQueryFactoryUtil.forClass(
+							DLFileVersion.class, "dlFileVersion",
+							PortalClassLoaderUtil.getClassLoader());
+
+					fileVersionDynamicQuery.setProjection(
+						ProjectionFactoryUtil.property("fileEntryId"));
+
+					fileVersionDynamicQuery.add(
+						RestrictionsFactoryUtil.eqProperty(
+							"dlFileVersion.fileEntryId", "fileEntryId"));
+					fileVersionDynamicQuery.add(
+						RestrictionsFactoryUtil.eqProperty(
+							"dlFileVersion.version", "version"));
+
+					Property statusProperty = PropertyFactoryUtil.forName(
+						"status");
+
+					StagedModelDataHandler<?> stagedModelDataHandler =
+						StagedModelDataHandlerRegistryUtil.
+							getStagedModelDataHandler(
+								DLFileEntry.class.getName());
+
+					fileVersionDynamicQuery.add(
+						statusProperty.in(
+							stagedModelDataHandler.getExportableStatuses()));
+
+					Property fileEntryIdProperty = PropertyFactoryUtil.forName(
+						"fileEntryId");
+
+					dynamicQuery.add(
+						fileEntryIdProperty.in(fileVersionDynamicQuery));
+
+					Property repositoryIdProperty = PropertyFactoryUtil.forName(
 						"repositoryId");
 
 					dynamicQuery.add(
-						property.eq(portletDataContext.getScopeGroupId()));
+						repositoryIdProperty.eq(
+							portletDataContext.getScopeGroupId()));
 				}
 
 			});
@@ -617,14 +659,25 @@ public class DLPortletDataHandler extends BasePortletDataHandler {
 				public void addCriteria(DynamicQuery dynamicQuery) {
 					addCriteriaMethod.addCriteria(dynamicQuery);
 
+					Conjunction conjunction =
+						RestrictionsFactoryUtil.conjunction();
+
 					Property classNameIdProperty = PropertyFactoryUtil.forName(
 						"classNameId");
 
 					long liferayRepositoryClassNameId =
 						PortalUtil.getClassNameId(LiferayRepository.class);
 
-					dynamicQuery.add(
+					conjunction.add(
 						classNameIdProperty.ne(liferayRepositoryClassNameId));
+
+					long tempFileRepositoryClassNameId =
+						PortalUtil.getClassNameId(TempFileEntryUtil.class);
+
+					conjunction.add(
+						classNameIdProperty.ne(tempFileRepositoryClassNameId));
+
+					dynamicQuery.add(conjunction);
 
 					Disjunction disjunction =
 						RestrictionsFactoryUtil.disjunction();
@@ -647,6 +700,7 @@ public class DLPortletDataHandler extends BasePortletDataHandler {
 		return exportActionableDynamicQuery;
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(DLPortletDataHandler.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		DLPortletDataHandler.class);
 
 }

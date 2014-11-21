@@ -15,6 +15,7 @@
 package com.liferay.portalweb.portal.util.liferayselenium;
 
 import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -124,14 +125,16 @@ public class Logger {
 		log("descriptionLog", sb.toString(), "descriptionLog");
 	}
 
-	public void logError(Method method, Object[] arguments, Throwable throwable)
+	public void logError(
+			Method method, Object[] arguments, Throwable throwable,
+			boolean failTest)
 		throws Exception {
 
 		send("", "fail");
 
 		_errorCount++;
 
-		String thowableMessage = throwable.getMessage();
+		String throwableMessage = throwable.getMessage();
 
 		StringBundler sb = new StringBundler();
 
@@ -178,7 +181,7 @@ public class Logger {
 		}
 
 		sb.append(": ");
-		sb.append(thowableMessage);
+		sb.append(throwableMessage);
 
 		log("actionCommandLog", sb.toString(), "selenium");
 
@@ -235,31 +238,33 @@ public class Logger {
 			Thread.sleep(1000);
 		}
 
-		sb = new StringBundler();
+		if (failTest) {
+			sb = new StringBundler();
 
-		sb.append("Command failure \"");
-		sb.append(method.getName());
-		sb.append("\"");
+			sb.append("Command failure \"");
+			sb.append(method.getName());
+			sb.append("\"");
 
-		if (arguments != null) {
-			if (arguments.length == 1) {
-				sb.append(" with parameter ");
-			}
-			else if (arguments.length > 1) {
-				sb.append(" with parameters ");
+			if (arguments != null) {
+				if (arguments.length == 1) {
+					sb.append(" with parameter ");
+				}
+				else if (arguments.length > 1) {
+					sb.append(" with parameters ");
+				}
+
+				for (Object argument : arguments) {
+					sb.append("\"");
+					sb.append(HtmlUtil.escape(String.valueOf(argument)));
+					sb.append("\" ");
+				}
 			}
 
-			for (Object argument : arguments) {
-				sb.append("\"");
-				sb.append(String.valueOf(argument));
-				sb.append("\" ");
-			}
+			sb.append(": ");
+			sb.append(throwableMessage);
+
+			BaseTestCase.fail(sb.toString());
 		}
-
-		sb.append(": ");
-		sb.append(thowableMessage);
-
-		BaseTestCase.fail(sb.toString());
 	}
 
 	public void logMacroDescription(Object[] arguments) throws Exception {
@@ -317,7 +322,7 @@ public class Logger {
 
 			for (Object argument : arguments) {
 				sb.append("<b>");
-				sb.append(String.valueOf(argument));
+				sb.append(HtmlUtil.escape(String.valueOf(argument)));
 				sb.append("</b> ");
 			}
 		}
@@ -601,7 +606,7 @@ public class Logger {
 
 			if (Validator.isNotNull(value)) {
 				sb.append(" value <b>");
-				sb.append(value);
+				sb.append(HtmlUtil.escape(value));
 				sb.append("</b>");
 			}
 		}
