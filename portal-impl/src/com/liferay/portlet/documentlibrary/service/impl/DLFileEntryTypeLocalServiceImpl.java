@@ -44,8 +44,11 @@ import com.liferay.portlet.documentlibrary.service.base.DLFileEntryTypeLocalServ
 import com.liferay.portlet.documentlibrary.util.DLUtil;
 import com.liferay.portlet.dynamicdatamapping.RequiredStructureException;
 import com.liferay.portlet.dynamicdatamapping.StructureDefinitionException;
+import com.liferay.portlet.dynamicdatamapping.io.DDMFormXSDDeserializerUtil;
+import com.liferay.portlet.dynamicdatamapping.model.DDMForm;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructureConstants;
+import com.liferay.portlet.dynamicdatamapping.util.DDMXMLUtil;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -527,9 +530,8 @@ public class DLFileEntryTypeLocalServiceImpl
 					dlFileVersion.getFileVersionId());
 			}
 
-			dlFileEntryLocalService.updateFileEntry(
-				userId, dlFileEntry.getFileEntryId(), null, null, null, null,
-				null, false, defaultFileEntryTypeId, null, null, null, 0,
+			dlFileEntryLocalService.updateFileEntryType(
+				userId, dlFileEntry.getFileEntryId(), defaultFileEntryTypeId,
 				serviceContext);
 
 			dlAppHelperLocalService.updateAsset(
@@ -546,7 +548,9 @@ public class DLFileEntryTypeLocalServiceImpl
 		for (DLFolder subFolder : subFolders) {
 			long subFolderId = subFolder.getFolderId();
 
-			if (subFolder.isOverrideFileEntryTypes()) {
+			if (subFolder.getRestrictionType() ==
+					DLFolderConstants.RESTRICTION_TYPE_INHERIT) {
+
 				continue;
 			}
 
@@ -572,6 +576,12 @@ public class DLFileEntryTypeLocalServiceImpl
 		}
 	}
 
+	protected DDMForm getDDMForm(String definition) throws PortalException {
+		DDMXMLUtil.validateXML(definition);
+
+		return DDMFormXSDDeserializerUtil.deserialize(definition);
+	}
+
 	protected List<Long> getFileEntryTypeIds(
 		List<DLFileEntryType> dlFileEntryTypes) {
 
@@ -590,7 +600,10 @@ public class DLFileEntryTypeLocalServiceImpl
 		while (folderId != DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
 			DLFolder dlFolder = dlFolderPersistence.findByPrimaryKey(folderId);
 
-			if (dlFolder.isOverrideFileEntryTypes()) {
+			if (dlFolder.getRestrictionType() ==
+					DLFolderConstants.
+						RESTRICTION_TYPE_FILE_ENTRY_TYPES_AND_WORKFLOW) {
+
 				break;
 			}
 
@@ -622,20 +635,22 @@ public class DLFileEntryTypeLocalServiceImpl
 		}
 
 		try {
+			DDMForm ddmForm = getDDMForm(definition);
+
 			if (ddmStructure == null) {
 				ddmStructure = ddmStructureLocalService.addStructure(
 					userId, groupId,
 					DDMStructureConstants.DEFAULT_PARENT_STRUCTURE_ID,
 					classNameLocalService.getClassNameId(
 						DLFileEntryMetadata.class),
-					ddmStructureKey, nameMap, descriptionMap, definition, "xml",
+					ddmStructureKey, nameMap, descriptionMap, ddmForm, "xml",
 					DDMStructureConstants.TYPE_AUTO, serviceContext);
 			}
 			else {
 				ddmStructure = ddmStructureLocalService.updateStructure(
 					ddmStructure.getStructureId(),
 					ddmStructure.getParentStructureId(), nameMap,
-					descriptionMap, definition, serviceContext);
+					descriptionMap, ddmForm, serviceContext);
 			}
 
 			return ddmStructure.getStructureId();

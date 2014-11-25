@@ -65,7 +65,7 @@ import org.junit.Test;
 public class TableMapperTest {
 
 	@ClassRule
-	public static CodeCoverageAssertor codeCoverageAssertor =
+	public static final CodeCoverageAssertor codeCoverageAssertor =
 		new CodeCoverageAssertor() {
 
 			@Override
@@ -438,8 +438,7 @@ public class TableMapperTest {
 		MockDeleteLeftPrimaryKeyTableMappingsSqlUpdate
 			mockDeleteLeftPrimaryKeyTableMappingsSqlUpdate =
 				(MockDeleteLeftPrimaryKeyTableMappingsSqlUpdate)
-					_tableMapperImpl.
-						deleteLeftPrimaryKeyTableMappingsSqlUpdate;
+					_tableMapperImpl.deleteLeftPrimaryKeyTableMappingsSqlUpdate;
 
 		mockDeleteLeftPrimaryKeyTableMappingsSqlUpdate.setDatabaseError(true);
 
@@ -991,9 +990,8 @@ public class TableMapperTest {
 
 		long leftPrimaryKey = 1;
 
-		List<Right> rights =
-			_tableMapperImpl.getRightBaseModels(
-				leftPrimaryKey, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		List<Right> rights = _tableMapperImpl.getRightBaseModels(
+			leftPrimaryKey, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 
 		Assert.assertSame(Collections.emptyList(), rights);
 
@@ -1762,6 +1760,7 @@ public class TableMapperTest {
 		}
 
 		private int _counter;
+
 	}
 
 	private class MockMultiVMPool implements MultiVMPool {

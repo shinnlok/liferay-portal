@@ -14,39 +14,55 @@
 
 package com.liferay.portlet.journal.subscriptions;
 
-import com.liferay.portal.kernel.test.ExecutionTestListeners;
+import com.liferay.portal.kernel.test.AggregateTestRule;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.service.PortletPreferencesLocalServiceUtil;
+import com.liferay.portal.test.MainServletTestRule;
 import com.liferay.portal.test.Sync;
-import com.liferay.portal.test.SynchronousMailExecutionTestListener;
-import com.liferay.portal.test.listeners.MainServletExecutionTestListener;
+import com.liferay.portal.test.SynchronousMailTestRule;
 import com.liferay.portal.test.runners.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.subscriptions.BaseSubscriptionLocalizedContentTestCase;
-import com.liferay.portal.util.test.TestPropsValues;
+import com.liferay.portal.util.test.UserTestUtil;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portlet.journal.model.JournalArticle;
+import com.liferay.portlet.journal.service.JournalArticleLocalServiceUtil;
 import com.liferay.portlet.journal.service.JournalFolderLocalServiceUtil;
 import com.liferay.portlet.journal.util.test.JournalTestUtil;
 
 import javax.portlet.PortletPreferences;
 
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.runner.RunWith;
 
 /**
  * @author Zsolt Berentey
  * @author Roberto Díaz
  */
-@ExecutionTestListeners(
-	listeners = {
-		MainServletExecutionTestListener.class,
-		SynchronousMailExecutionTestListener.class
-	})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
 @Sync
 public class JournalSubscriptionLocalizedContentTest
 	extends BaseSubscriptionLocalizedContentTestCase {
+
+	@ClassRule
+	public static final AggregateTestRule aggregateTestRule =
+		new AggregateTestRule(
+			MainServletTestRule.INSTANCE, SynchronousMailTestRule.INSTANCE);
+
+	@Before
+	@Override
+	public void setUp() throws Exception {
+		super.setUp();
+
+		user = UserTestUtil.addOmniAdminUser();
+	}
+
+	@Rule
+	public final SynchronousMailTestRule synchronousMailTestRule =
+		SynchronousMailTestRule.INSTANCE;
 
 	@Override
 	protected long addBaseModel(long containerModelId) throws Exception {
@@ -61,7 +77,7 @@ public class JournalSubscriptionLocalizedContentTest
 		throws Exception {
 
 		JournalFolderLocalServiceUtil.subscribe(
-			TestPropsValues.getUserId(), group.getGroupId(), containerModelId);
+			user.getUserId(), group.getGroupId(), containerModelId);
 	}
 
 	@Override
@@ -70,12 +86,18 @@ public class JournalSubscriptionLocalizedContentTest
 	}
 
 	@Override
-	protected String getSubscriptionBodyPreferenceName() throws Exception {
+	protected String getSubscriptionAddedBodyPreferenceName() {
 		return "emailArticleAddedBody";
 	}
 
 	@Override
-	protected void setAddBaseModelSubscriptionBodyPreferences()
+	protected String getSubscriptionUpdatedBodyPreferenceName() {
+		return "emailArticleUpdatedBody";
+	}
+
+	@Override
+	protected void setBaseModelSubscriptionBodyPreferences(
+			String bodyPreferenceName)
 		throws Exception {
 
 		PortletPreferences portletPreferences =
@@ -83,15 +105,23 @@ public class JournalSubscriptionLocalizedContentTest
 				layout, getPortletId());
 
 		LocalizationUtil.setPreferencesValue(
-			portletPreferences, getSubscriptionBodyPreferenceName(),
+			portletPreferences, bodyPreferenceName,
 			LocaleUtil.toLanguageId(LocaleUtil.GERMANY), GERMAN_BODY);
 		LocalizationUtil.setPreferencesValue(
-			portletPreferences, getSubscriptionBodyPreferenceName(),
+			portletPreferences, bodyPreferenceName,
 			LocaleUtil.toLanguageId(LocaleUtil.SPAIN), SPANISH_BODY);
 
 		PortletPreferencesLocalServiceUtil.updatePreferences(
 			group.getGroupId(), PortletKeys.PREFS_OWNER_TYPE_GROUP,
 			PortletKeys.PREFS_PLID_SHARED, getPortletId(), portletPreferences);
+	}
+
+	@Override
+	protected void updateBaseModel(long baseModelId) throws Exception {
+		JournalArticle article =
+			JournalArticleLocalServiceUtil.getLatestArticle(baseModelId);
+
+		JournalTestUtil.updateArticleWithWorkflow(article, true);
 	}
 
 }

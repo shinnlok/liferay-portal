@@ -97,8 +97,8 @@ import org.junit.Test;
 public class RemoteSPITest {
 
 	@ClassRule
-	public static CodeCoverageAssertor codeCoverageAssertor =
-		new CodeCoverageAssertor();
+	public static final CodeCoverageAssertor codeCoverageAssertor =
+		CodeCoverageAssertor.INSTANCE;
 
 	@BeforeClass
 	public static void setUpClass() {
@@ -977,7 +977,7 @@ public class RemoteSPITest {
 		return new MockRegistrationReference(mockIntraband);
 	}
 
-	private static File _currentDir = new File(".");
+	private static final File _currentDir = new File(".");
 
 	private MockRemoteSPI _mockRemoteSPI;
 	private SPIConfiguration _spiConfiguration;

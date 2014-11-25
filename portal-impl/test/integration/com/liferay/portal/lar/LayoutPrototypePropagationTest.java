@@ -14,28 +14,33 @@
 
 package com.liferay.portal.lar;
 
-import com.liferay.portal.kernel.test.ExecutionTestListeners;
+import com.liferay.portal.kernel.test.AggregateTestRule;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
-import com.liferay.portal.test.listeners.MainServletExecutionTestListener;
-import com.liferay.portal.test.listeners.ResetDatabaseExecutionTestListener;
+import com.liferay.portal.test.MainServletTestRule;
+import com.liferay.portal.test.ResetDatabaseTestRule;
 import com.liferay.portal.test.runners.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.util.test.LayoutTestUtil;
-import com.liferay.portal.util.test.RandomTestUtil;
 import com.liferay.portal.util.test.TestPropsValues;
 
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.runner.RunWith;
 
 /**
  * @author Eduardo Garcia
  */
-@ExecutionTestListeners(
-	listeners = {
-		MainServletExecutionTestListener.class,
-		ResetDatabaseExecutionTestListener.class
-	})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
 public class LayoutPrototypePropagationTest
 	extends BasePrototypePropagationTestCase {
+
+	@ClassRule
+	public static final AggregateTestRule aggregateTestRule =
+		new AggregateTestRule(
+			MainServletTestRule.INSTANCE, ResetDatabaseTestRule.INSTANCE);
+
+	@Rule
+	public final ResetDatabaseTestRule resetDatabaseTestRule =
+		ResetDatabaseTestRule.INSTANCE;
 
 	@Override
 	protected void doSetUp() throws Exception {
@@ -43,14 +48,11 @@ public class LayoutPrototypePropagationTest
 
 		journalArticle = globalJournalArticle;
 
-		journalContentPortletId =
-			addJournalContentPortletToLayout(
-				TestPropsValues.getUserId(), layoutPrototypeLayout,
-				journalArticle, "column-1");
+		portletId = addPortletToLayout(
+			TestPropsValues.getUserId(), layoutPrototypeLayout, journalArticle,
+			"column-1");
 
-		layout = LayoutTestUtil.addLayout(
-			group.getGroupId(), RandomTestUtil.randomString(), true,
-			layoutPrototype, true);
+		layout = LayoutTestUtil.addLayout(group, true, layoutPrototype, true);
 
 		layout = propagateChanges(layout);
 	}

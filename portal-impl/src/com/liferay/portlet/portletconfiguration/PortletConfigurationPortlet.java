@@ -118,22 +118,14 @@ public class PortletConfigurationPortlet extends StrutsPortlet {
 		super.serveResource(resourceRequest, resourceResponse);
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		PortletConfigurationPortlet.class);
 
-	private ThreadLocal<PortletRequest> _portletRequestThreadLocal =
+	private final ThreadLocal<PortletRequest> _portletRequestThreadLocal =
 		new AutoResetThreadLocal<PortletRequest>("_portletRequestThreadLocal");
 
 	private class PortletConfigurationPortletPortletConfig
 		extends PortletConfigImpl {
-
-		private PortletConfigurationPortletPortletConfig(
-			PortletConfigImpl portletConfigImpl) {
-
-			super(
-				portletConfigImpl.getPortlet(),
-				portletConfigImpl.getPortletContext());
-		}
 
 		@Override
 		public ResourceBundle getResourceBundle(Locale locale) {
@@ -165,6 +157,15 @@ public class PortletConfigurationPortlet extends StrutsPortlet {
 
 			return super.getResourceBundle(locale);
 		}
+
+		private PortletConfigurationPortletPortletConfig(
+			PortletConfigImpl portletConfigImpl) {
+
+			super(
+				portletConfigImpl.getPortlet(),
+				portletConfigImpl.getPortletContext());
+		}
+
 	}
 
 }

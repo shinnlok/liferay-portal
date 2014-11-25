@@ -43,9 +43,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class LocalProcessLauncher {
 
-	public static void main(String[] arguments)
-		throws ClassNotFoundException, IOException {
-
+	public static void main(String[] arguments) throws IOException {
 		PrintStream oldOutPrintStream = System.out;
 
 		ObjectOutputStream objectOutputStream = null;
@@ -130,11 +128,20 @@ public class LocalProcessLauncher {
 
 			outProcessOutputStream.flush();
 		}
-		catch (ProcessException pe) {
+		catch (Throwable t) {
 			errPrintStream.flush();
 
+			ProcessException processException = null;
+
+			if (t instanceof ProcessException) {
+				processException = (ProcessException)t;
+			}
+			else {
+				processException = new ProcessException(t);
+			}
+
 			errProcessOutputStream.writeProcessCallable(
-				new ExceptionProcessCallable(pe));
+				new ExceptionProcessCallable(processException));
 
 			errProcessOutputStream.flush();
 		}
@@ -199,9 +206,9 @@ public class LocalProcessLauncher {
 		private ProcessContext() {
 		}
 
-		private static ConcurrentMap<String, Object> _attributes =
+		private static final ConcurrentMap<String, Object> _attributes =
 			new ConcurrentHashMap<String, Object>();
-		private static AtomicReference<HeartbeatThread>
+		private static final AtomicReference<HeartbeatThread>
 			_heartbeatThreadReference = new AtomicReference<HeartbeatThread>();
 		private static ProcessOutputStream _processOutputStream;
 
@@ -287,9 +294,9 @@ public class LocalProcessLauncher {
 		}
 
 		private volatile boolean _detach;
-		private long _interval;
-		private ProcessCallable<String> _pringBackProcessCallable;
-		private ShutdownHook _shutdownHook;
+		private final long _interval;
+		private final ProcessCallable<String> _pringBackProcessCallable;
+		private final ShutdownHook _shutdownHook;
 
 	}
 
@@ -307,7 +314,7 @@ public class LocalProcessLauncher {
 
 		private static final long serialVersionUID = 1L;
 
-		private String _message;
+		private final String _message;
 
 	}
 

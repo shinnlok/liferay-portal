@@ -607,20 +607,6 @@ public class PortalUtil {
 		return getPortal().getClassNameId(value);
 	}
 
-	/**
-	 * Returns the ID of certain portlets from the fully qualified name of one
-	 * of their classes. The portlets this method supports are: blogs,
-	 * bookmarks, calendar, document library, image gallery, journal, message
-	 * boards, and wiki.
-	 *
-	 * @param  className the fully qualified name of a class in a portlet
-	 * @return the ID of the portlet the class is a part of, or an empty string
-	 *         if the class is not supported
-	 */
-	public static String getClassNamePortletId(String className) {
-		return getPortal().getClassNamePortletId(className);
-	}
-
 	public static Company getCompany(HttpServletRequest request)
 		throws PortalException {
 
@@ -896,6 +882,13 @@ public class PortalUtil {
 	}
 
 	public static Map<String, Serializable> getExpandoBridgeAttributes(
+			ExpandoBridge expandoBridge, HttpServletRequest request)
+		throws PortalException {
+
+		return getPortal().getExpandoBridgeAttributes(expandoBridge, request);
+	}
+
+	public static Map<String, Serializable> getExpandoBridgeAttributes(
 			ExpandoBridge expandoBridge, PortletRequest portletRequest)
 		throws PortalException {
 
@@ -910,6 +903,14 @@ public class PortalUtil {
 
 		return getPortal().getExpandoBridgeAttributes(
 			expandoBridge, uploadPortletRequest);
+	}
+
+	public static Serializable getExpandoValue(
+			HttpServletRequest request, String name, int type,
+			String displayType)
+		throws PortalException {
+
+		return getPortal().getExpandoValue(request, name, type, displayType);
 	}
 
 	public static Serializable getExpandoValue(

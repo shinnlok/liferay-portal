@@ -455,6 +455,14 @@ public class SeleniumBuilderFileUtil {
 
 	protected void throwValidationException(
 		int errorCode, String fileName, Element element, String[] array,
+		String string1) {
+
+		throwValidationException(
+			errorCode, fileName, element, array, string1, null, null);
+	}
+
+	protected void throwValidationException(
+		int errorCode, String fileName, Element element, String[] array,
 		String string1, String string2, Exception e) {
 
 		String prefix = "Error " + errorCode + ": ";
@@ -543,6 +551,11 @@ public class SeleniumBuilderFileUtil {
 			throw new IllegalArgumentException(
 				prefix + "Description '" + string1 +
 					"' must end with a '.' in " + suffix);
+		}
+		else if (errorCode == 1018) {
+			throw new IllegalArgumentException(
+				prefix + "Missing (" + StringUtil.merge(array, "|") +
+					") in attribute " + string1 + " at " + suffix);
 		}
 		else if (errorCode == 2000) {
 			throw new IllegalArgumentException(
@@ -917,6 +930,34 @@ public class SeleniumBuilderFileUtil {
 
 					throwValidationException(
 						1005, fileName, executeElement, attributeName);
+				}
+
+				String attributeValue = attribute.getValue();
+
+				if (attributeName.equals("value1") &&
+					attributeValue.contains("move-file")) {
+
+					if (!attributeValue.contains("-Dfile") ||
+						!attributeValue.contains("-Dtofile")) {
+
+						throwValidationException(
+							1018, fileName, executeElement,
+							new String[] {"-Dfile", "-Dtofile"}, "value1");
+					}
+				}
+
+				if (attributeName.equals("value1") &&
+					attributeValue.contains("replace-file")) {
+
+					if (!attributeValue.contains("-Dfile") ||
+						!attributeValue.contains("-Dtoken") ||
+						!attributeValue.contains("-Dvalue")) {
+
+						throwValidationException(
+							1018, fileName, executeElement,
+							new String[] {"-Dfile", "-Dtoken", "-Dvalue"},
+							"value1");
+					}
 				}
 			}
 		}
@@ -1361,7 +1402,8 @@ public class SeleniumBuilderFileUtil {
 						"description", "echo", "execute", "fail", "for", "if",
 						"take-screenshot", "var", "while",
 					},
-					new String[] {"action", "macro"}, new String[] {"var"},
+					new String[] {"action", "function", "macro"},
+					new String[] {"var"},
 					new String[] {
 						"and", "condition", "contains", "equals", "isset",
 						"not", "or"
@@ -1702,7 +1744,7 @@ public class SeleniumBuilderFileUtil {
 						"description", "echo", "execute", "fail", "for", "if",
 						"property", "take-screenshot", "var", "while"
 					},
-					new String[] {"action", "macro", "test-case"},
+					new String[] {"action", "function", "macro", "test-case"},
 					new String[] {"var"},
 					new String[] {
 						"and", "condition", "contains", "equals", "isset",
@@ -1732,7 +1774,7 @@ public class SeleniumBuilderFileUtil {
 						"description", "echo", "execute", "fail", "if",
 						"take-screenshot", "var", "while"
 					},
-					new String[] {"action", "macro", "test-case"},
+					new String[] {"action", "function", "macro", "test-case"},
 					new String[] {"var"},
 					new String[] {
 						"and", "condition", "contains", "equals", "isset",

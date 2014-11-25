@@ -24,17 +24,21 @@ import com.liferay.portal.kernel.resiliency.spi.provider.SPIProvider;
 import com.liferay.portal.kernel.test.CaptureHandler;
 import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
-import com.liferay.portal.kernel.test.NewClassLoaderJUnitTestRunner;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
+import com.liferay.portal.kernel.util.Props;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.util.PropsImpl;
+import com.liferay.portal.kernel.util.StringPool;
 
 import java.io.File;
 import java.io.IOException;
+
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -57,19 +61,17 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import org.springframework.mock.web.MockServletContext;
 
 /**
  * @author Shuyang Zhou
  */
-@RunWith(NewClassLoaderJUnitTestRunner.class)
 public class SPIClassPathContextListenerTest {
 
 	@ClassRule
-	public static CodeCoverageAssertor codeCoverageAssertor =
-		new CodeCoverageAssertor();
+	public static final CodeCoverageAssertor codeCoverageAssertor =
+		CodeCoverageAssertor.INSTANCE;
 
 	@Before
 	public void setUp() throws Exception {
@@ -153,19 +155,31 @@ public class SPIClassPathContextListenerTest {
 		putResource(
 			resources, _portalServiceJarFile, PortalException.class.getName());
 
-		PropsUtil.setProps(
-			new PropsImpl() {
+		final Method getMethod = Props.class.getMethod("get", String.class);
 
-				@Override
-				public String get(String key) {
-					if (key.equals(PropsKeys.JDBC_DEFAULT_DRIVER_CLASS_NAME)) {
-						return driverClassName;
+		PropsUtil.setProps(
+			(Props)ProxyUtil.newProxyInstance(
+				Props.class.getClassLoader(), new Class<?>[] {Props.class},
+				new InvocationHandler() {
+
+					@Override
+					public Object invoke(
+						Object proxy, Method method, Object[] args) {
+
+						if (getMethod.equals(method)) {
+							if (args[0].equals(
+									PropsKeys.JDBC_DEFAULT_DRIVER_CLASS_NAME)) {
+
+								return driverClassName;
+							}
+
+							return StringPool.BLANK;
+						}
+
+						throw new UnsupportedOperationException();
 					}
 
-					return super.get(key);
-				}
-
-			});
+				}));
 
 		PortalClassLoaderUtil.setClassLoader(new ClassLoader() {
 
@@ -192,14 +206,12 @@ public class SPIClassPathContextListenerTest {
 
 	@Test
 	public void testClassPathGeneration() {
-		CaptureHandler captureHandler = null;
+		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
+			SPIClassPathContextListener.class.getName(), Level.FINE);
 
 		try {
 
 			// With log
-
-			captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-				SPIClassPathContextListener.class.getName(), Level.FINE);
 
 			List<LogRecord> logRecords = captureHandler.getLogRecords();
 
@@ -266,9 +278,7 @@ public class SPIClassPathContextListenerTest {
 			Assert.assertTrue(logRecords.isEmpty());
 		}
 		finally {
-			if (captureHandler != null) {
-				captureHandler.close();
-			}
+			captureHandler.close();
 		}
 	}
 
@@ -507,15 +517,16 @@ public class SPIClassPathContextListenerTest {
 		}
 	}
 
-	private static String _CONTEXT_PATH = System.getProperty("java.io.tmpdir");
+	private static final String _CONTEXT_PATH = System.getProperty(
+		"java.io.tmpdir");
 
-	private static String _EMBEDDED_LIB_DIR_NAME = "/embeddedLib";
+	private static final String _EMBEDDED_LIB_DIR_NAME = "/embeddedLib";
 
-	private static String _EMBEDDED_LIB_EXT_DIR_NAME = "/embeddedLib/ext";
+	private static final String _EMBEDDED_LIB_EXT_DIR_NAME = "/embeddedLib/ext";
 
-	private static String _GLOBAL_LIB_1_DIR_NAME = "/globalLib1";
+	private static final String _GLOBAL_LIB_1_DIR_NAME = "/globalLib1";
 
-	private static String _GLOBAL_LIB_2_DIR_NAME = "/globalLib2";
+	private static final String _GLOBAL_LIB_2_DIR_NAME = "/globalLib2";
 
 	private File _extJarFile;
 	private File _global1JarFile;
@@ -523,18 +534,19 @@ public class SPIClassPathContextListenerTest {
 	private File _jarFile;
 	private File _jdbcDriverJarFile;
 
-	private MockServletContext _mockServletContext = new MockServletContext() {
+	private final MockServletContext _mockServletContext =
+		new MockServletContext() {
 
-		{
-			addInitParameter("spiEmbeddedLibDir", _EMBEDDED_LIB_DIR_NAME);
-		}
+			{
+				addInitParameter("spiEmbeddedLibDir", _EMBEDDED_LIB_DIR_NAME);
+			}
 
-		@Override
-		public String getRealPath(String path) {
-			return _CONTEXT_PATH;
-		}
+			@Override
+			public String getRealPath(String path) {
+				return _CONTEXT_PATH;
+			}
 
-	};
+		};
 
 	private File _portalServiceJarFile;
 

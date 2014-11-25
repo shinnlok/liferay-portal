@@ -17,7 +17,7 @@ AUI.add(
 		var MAP_HIDDEN_FIELD_ATTRS = {
 			checkbox: ['readOnly', 'required'],
 
-			DEFAULT: ['readOnly'],
+			DEFAULT: ['readOnly', 'width'],
 
 			separator: ['indexType', 'localizable', 'predefinedValue', 'readOnly', 'required']
 		};
@@ -153,7 +153,7 @@ AUI.add(
 
 				UNIQUE_FIELD_NAMES_MAP: new A.Map(),
 
-				UNLOCALIZABLE_FIELD_ATTRS: ['dataType', 'fieldNamespace', 'indexType', 'localizable', 'multiple', 'name', 'readOnly', 'repeatable', 'required', 'type'],
+				UNLOCALIZABLE_FIELD_ATTRS: ['dataType', 'fieldNamespace', 'indexType', 'localizable', 'multiple', 'name', 'readOnly', 'repeatable', 'required', 'showLabel', 'type'],
 
 				prototype: {
 					initializer: function() {
@@ -353,6 +353,24 @@ AUI.add(
 						);
 					},
 
+					_getGeneratedFieldName: function(label) {
+						var instance = this;
+
+						var normalizedLabel = LiferayFormBuilder.Util.normalizeKey(label);
+
+						var generatedName = normalizedLabel;
+
+						if (LiferayFormBuilder.Util.validateFieldName(generatedName)) {
+							var counter = 1;
+
+							while (LiferayFormBuilder.UNIQUE_FIELD_NAMES_MAP.has(generatedName)) {
+								generatedName = normalizedLabel + counter++;
+							}
+						}
+
+						return generatedName;
+					},
+
 					_getSerializedFields: function() {
 						var instance = this;
 
@@ -388,20 +406,10 @@ AUI.add(
 								var translationManager = instance.translationManager;
 
 								if (translationManager.get('editingLocale') === translationManager.get('defaultLocale')) {
-									var normalizedLabel = LiferayFormBuilder.Util.normalizeKey(changed.value.newVal);
-
-									var generatedName = normalizedLabel;
+									var generatedName = instance._getGeneratedFieldName(changed.value.newVal);
 
 									if (LiferayFormBuilder.Util.validateFieldName(generatedName)) {
-										var counter = 1;
-
-										while (LiferayFormBuilder.UNIQUE_FIELD_NAMES_MAP.has(generatedName)) {
-											generatedName = normalizedLabel + counter++;
-										}
-
-										var modelList = instance.propertyList.get('data');
-
-										var nameModel = modelList.filter(
+										var nameModel = instance.propertyList.get('data').filter(
 											function(item, index) {
 												return (item.get('attributeName') === 'name');
 											}
@@ -499,14 +507,13 @@ AUI.add(
 				var instance = this;
 
 				if (isString(str)) {
-					A.each(
-						str,
-						function(item, index) {
-							if (!A.Text.Unicode.test(item, 'L') && !A.Text.Unicode.test(item, 'N') && !A.Text.Unicode.test(item, 'Pd')) {
-								str = str.replace(item, STR_SPACE);
-							}
+					for (var i = 0; i < str.length; i++) {
+						var item = str.charAt(i);
+
+						if (!A.Text.Unicode.test(item, 'L') && !A.Text.Unicode.test(item, 'N') && !A.Text.Unicode.test(item, 'Pd')) {
+							str = str.replace(item, STR_SPACE);
 						}
-					);
+					}
 
 					str = str.replace(/\s/g, '_');
 				}

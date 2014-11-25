@@ -14,7 +14,7 @@
 
 package com.liferay.portal.model.impl;
 
-import com.liferay.portal.kernel.test.ExecutionTestListeners;
+import com.liferay.portal.kernel.test.AggregateTestRule;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.LayoutTemplate;
@@ -22,39 +22,41 @@ import com.liferay.portal.model.LayoutTypePortlet;
 import com.liferay.portal.model.Portlet;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.PortletLocalServiceUtil;
-import com.liferay.portal.test.listeners.MainServletExecutionTestListener;
-import com.liferay.portal.test.listeners.ResetDatabaseExecutionTestListener;
+import com.liferay.portal.test.MainServletTestRule;
+import com.liferay.portal.test.ResetDatabaseTestRule;
 import com.liferay.portal.test.runners.LiferayIntegrationJUnitTestRunner;
-import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.test.GroupTestUtil;
 import com.liferay.portal.util.test.LayoutTestUtil;
 import com.liferay.portal.util.test.RandomTestUtil;
 import com.liferay.portal.util.test.TestPropsValues;
 import com.liferay.portal.util.test.UserTestUtil;
 import com.liferay.portlet.PortletInstanceFactoryUtil;
+import com.liferay.portlet.util.PortletKeys;
 
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
  * @author Raymond Augé
  */
-@ExecutionTestListeners(
-	listeners = {
-		MainServletExecutionTestListener.class,
-		ResetDatabaseExecutionTestListener.class
-	})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
 public class LayoutTypePortletTest {
+
+	@ClassRule
+	public static final AggregateTestRule aggregateTestRule =
+		new AggregateTestRule(
+			MainServletTestRule.INSTANCE, ResetDatabaseTestRule.INSTANCE);
 
 	@Test
 	public void testAddModeAboutPortletId() throws Exception {
 		LayoutTypePortlet layoutTypePortlet = getLayoutTypePortlet();
 
-		String portletId = PortletKeys.JOURNAL_CONTENT;
+		String portletId = PortletKeys.TEST;
 
 		Assert.assertFalse(layoutTypePortlet.hasModeAboutPortletId(portletId));
 
@@ -67,7 +69,7 @@ public class LayoutTypePortletTest {
 	public void testAddModeConfigPortletId() throws Exception {
 		LayoutTypePortlet layoutTypePortlet = getLayoutTypePortlet();
 
-		String portletId = PortletKeys.JOURNAL_CONTENT;
+		String portletId = PortletKeys.TEST;
 
 		Assert.assertFalse(layoutTypePortlet.hasModeConfigPortletId(portletId));
 
@@ -80,7 +82,7 @@ public class LayoutTypePortletTest {
 	public void testAddModeEditDefaultsPortletId() throws Exception {
 		LayoutTypePortlet layoutTypePortlet = getLayoutTypePortlet();
 
-		String portletId = PortletKeys.JOURNAL_CONTENT;
+		String portletId = PortletKeys.TEST;
 
 		Assert.assertFalse(
 			layoutTypePortlet.hasModeEditDefaultsPortletId(portletId));
@@ -95,7 +97,7 @@ public class LayoutTypePortletTest {
 	public void testAddModeEditGuestPortletId() throws Exception {
 		LayoutTypePortlet layoutTypePortlet = getLayoutTypePortlet();
 
-		String portletId = PortletKeys.JOURNAL_CONTENT;
+		String portletId = PortletKeys.TEST;
 
 		Assert.assertFalse(
 			layoutTypePortlet.hasModeEditGuestPortletId(portletId));
@@ -110,7 +112,7 @@ public class LayoutTypePortletTest {
 	public void testAddModeEditPortletId() throws Exception {
 		LayoutTypePortlet layoutTypePortlet = getLayoutTypePortlet();
 
-		String portletId = PortletKeys.JOURNAL_CONTENT;
+		String portletId = PortletKeys.TEST;
 
 		Assert.assertFalse(layoutTypePortlet.hasModeEditPortletId(portletId));
 
@@ -123,7 +125,7 @@ public class LayoutTypePortletTest {
 	public void testAddModeHelpPortletId() throws Exception {
 		LayoutTypePortlet layoutTypePortlet = getLayoutTypePortlet();
 
-		String portletId = PortletKeys.JOURNAL_CONTENT;
+		String portletId = PortletKeys.TEST;
 
 		Assert.assertFalse(layoutTypePortlet.hasModeHelpPortletId(portletId));
 
@@ -136,7 +138,7 @@ public class LayoutTypePortletTest {
 	public void testAddModePreviewPortletId() throws Exception {
 		LayoutTypePortlet layoutTypePortlet = getLayoutTypePortlet();
 
-		String portletId = PortletKeys.JOURNAL_CONTENT;
+		String portletId = PortletKeys.TEST;
 
 		Assert.assertFalse(
 			layoutTypePortlet.hasModePreviewPortletId(portletId));
@@ -150,7 +152,7 @@ public class LayoutTypePortletTest {
 	public void testAddModePrintPortletId() throws Exception {
 		LayoutTypePortlet layoutTypePortlet = getLayoutTypePortlet();
 
-		String portletId = PortletKeys.JOURNAL_CONTENT;
+		String portletId = PortletKeys.TEST;
 
 		Assert.assertFalse(layoutTypePortlet.hasModePrintPortletId(portletId));
 
@@ -168,7 +170,7 @@ public class LayoutTypePortletTest {
 		User user = UserTestUtil.addUser(
 			RandomTestUtil.randomString(), layout.getGroupId());
 
-		String portletId = PortletKeys.JOURNAL_CONTENT;
+		String portletId = PortletKeys.TEST;
 
 		LayoutTemplate layoutTemplate = layoutTypePortlet.getLayoutTemplate();
 
@@ -196,7 +198,7 @@ public class LayoutTypePortletTest {
 		User user = UserTestUtil.addUser(
 			RandomTestUtil.randomString(), layout.getGroupId());
 
-		String portletId = PortletKeys.JOURNAL_CONTENT;
+		String portletId = PortletKeys.TEST;
 
 		LayoutTemplate layoutTemplate = layoutTypePortlet.getLayoutTemplate();
 
@@ -264,7 +266,7 @@ public class LayoutTypePortletTest {
 		User user = UserTestUtil.addUser(
 			RandomTestUtil.randomString(), layout.getGroupId());
 
-		String portletId = PortletKeys.JOURNAL_CONTENT;
+		String portletId = PortletKeys.TEST;
 
 		portletId = layoutTypePortlet.addPortletId(user.getUserId(), portletId);
 
@@ -281,7 +283,7 @@ public class LayoutTypePortletTest {
 			RandomTestUtil.randomString(), layout.getGroupId());
 
 		String portletId = layoutTypePortlet.addPortletId(
-			user.getUserId(), PortletKeys.JOURNAL_CONTENT);
+			user.getUserId(), PortletKeys.TEST);
 
 		List<Portlet> portlets = layoutTypePortlet.getAllPortlets();
 
@@ -306,11 +308,14 @@ public class LayoutTypePortletTest {
 		Assert.assertEquals(0, portlets.size());
 	}
 
+	@Rule
+	public final ResetDatabaseTestRule resetDatabaseTestRule =
+		ResetDatabaseTestRule.INSTANCE;
+
 	protected LayoutTypePortlet getLayoutTypePortlet() throws Exception {
 		Group group = GroupTestUtil.addGroup();
 
-		Layout layout = LayoutTestUtil.addLayout(
-			group.getGroupId(), RandomTestUtil.randomString(), false);
+		Layout layout = LayoutTestUtil.addLayout(group, false);
 
 		return (LayoutTypePortlet)layout.getLayoutType();
 	}

@@ -20,7 +20,6 @@ import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermissio
 
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author Tina Tian
@@ -62,32 +61,17 @@ public class ClusterExecutorUtil {
 		return clusterExecutor.execute(clusterRequest);
 	}
 
-	public static void execute(
+	public static FutureClusterResponses execute(
 		ClusterRequest clusterRequest,
 		ClusterResponseCallback clusterResponseCallback) {
 
 		ClusterExecutor clusterExecutor = getClusterExecutor();
 
 		if (clusterExecutor == null) {
-			return;
+			return null;
 		}
 
-		clusterExecutor.execute(clusterRequest, clusterResponseCallback);
-	}
-
-	public static void execute(
-		ClusterRequest clusterRequest,
-		ClusterResponseCallback clusterResponseCallback, long timeout,
-		TimeUnit timeUnit) {
-
-		ClusterExecutor clusterExecutor = getClusterExecutor();
-
-		if (clusterExecutor == null) {
-			return;
-		}
-
-		clusterExecutor.execute(
-			clusterRequest, clusterResponseCallback, timeout, timeUnit);
+		return clusterExecutor.execute(clusterRequest, clusterResponseCallback);
 	}
 
 	public static ClusterExecutor getClusterExecutor() {
@@ -202,7 +186,8 @@ public class ClusterExecutorUtil {
 		_clusterExecutor = clusterExecutor;
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(ClusterExecutorUtil.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		ClusterExecutorUtil.class);
 
 	private static ClusterExecutor _clusterExecutor;
 

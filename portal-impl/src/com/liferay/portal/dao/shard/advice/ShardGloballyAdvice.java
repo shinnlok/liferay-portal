@@ -49,7 +49,7 @@ public class ShardGloballyAdvice implements MethodInterceptor {
 							methodInvocation.toString());
 				}
 
-				ShardUtil.setTargetSource(shardName);
+				String previousShardName = ShardUtil.setTargetSource(shardName);
 
 				_shardAdvice.pushCompanyService(shardName);
 
@@ -62,6 +62,8 @@ public class ShardGloballyAdvice implements MethodInterceptor {
 				}
 				finally {
 					_shardAdvice.popCompanyService();
+
+					ShardUtil.setTargetSource(previousShardName);
 
 					CacheRegistryUtil.clear();
 				}
@@ -78,7 +80,8 @@ public class ShardGloballyAdvice implements MethodInterceptor {
 		_shardAdvice = shardAdvice;
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(ShardGloballyAdvice.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		ShardGloballyAdvice.class);
 
 	private ShardAdvice _shardAdvice;
 

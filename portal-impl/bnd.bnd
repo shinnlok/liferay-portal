@@ -15,6 +15,7 @@ Export-Package:\
 	com.liferay.portal.kernel.util,\
 	com.liferay.portal.messaging.async,\
 	com.liferay.portal.monitoring.statistics.service,\
+	com.liferay.portal.plugin,\
 	com.liferay.portal.resiliency.service,\
 	com.liferay.portal.search,\
 	com.liferay.portal.security.ac,\
@@ -25,8 +26,15 @@ Export-Package:\
 	com.liferay.portal.spring.hibernate,\
 	com.liferay.portal.spring.transaction,\
 	com.liferay.portal.systemevent,\
+	com.liferay.portal.upgrade.v7_0_0,\
 	com.liferay.portal.verify,\
 	com.liferay.portal.xml,\
+	com.liferay.portlet.dynamicdatamapping.service.permission,\
+	com.liferay.portlet.journal.asset,\
+	com.liferay.portlet.journal.ddm,\
+	com.liferay.portlet.journal.lar,\
+	com.liferay.portlet.journal.service.permission,\
+	com.liferay.util.log4j,\
 	\
 	javax.sql,org.hibernate,\
 	\

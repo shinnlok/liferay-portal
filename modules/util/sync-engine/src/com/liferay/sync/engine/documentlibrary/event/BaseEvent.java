@@ -17,6 +17,7 @@ package com.liferay.sync.engine.documentlibrary.event;
 import com.liferay.sync.engine.SyncEngine;
 import com.liferay.sync.engine.documentlibrary.handler.Handler;
 import com.liferay.sync.engine.model.SyncAccount;
+import com.liferay.sync.engine.model.SyncFile;
 import com.liferay.sync.engine.service.SyncAccountService;
 import com.liferay.sync.engine.session.Session;
 import com.liferay.sync.engine.session.SessionManager;
@@ -43,7 +44,7 @@ public abstract class BaseEvent implements Event {
 		Session session = SessionManager.getSession(_syncAccountId);
 
 		SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
-			getSyncAccountId());
+			_syncAccountId);
 
 		session.executeAsynchronousGet(
 			syncAccount.getUrl() + urlPath, _handler);
@@ -56,7 +57,7 @@ public abstract class BaseEvent implements Event {
 		Session session = SessionManager.getSession(_syncAccountId);
 
 		SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
-			getSyncAccountId());
+			_syncAccountId);
 
 		session.executeAsynchronousPost(
 			syncAccount.getUrl() + "/api/jsonws" + urlPath, parameters,
@@ -67,7 +68,7 @@ public abstract class BaseEvent implements Event {
 		Session session = SessionManager.getSession(_syncAccountId);
 
 		SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
-			getSyncAccountId());
+			_syncAccountId);
 
 		session.executeGet(syncAccount.getUrl() + urlPath, _handler);
 	}
@@ -78,12 +79,14 @@ public abstract class BaseEvent implements Event {
 		Session session = SessionManager.getSession(_syncAccountId);
 
 		SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
-			getSyncAccountId());
+			_syncAccountId);
 
 		session.executePost(
 			syncAccount.getUrl() + "/api/jsonws" + urlPath, parameters,
 			_handler);
 	}
+
+	public abstract Handler<Void> getHandler();
 
 	@Override
 	public Map<String, Object> getParameters() {
@@ -112,7 +115,16 @@ public abstract class BaseEvent implements Event {
 			if (_logger.isTraceEnabled()) {
 				Class<?> clazz = this.getClass();
 
-				_logger.trace("Processing {}", clazz.getSimpleName());
+				SyncFile syncFile = (SyncFile)getParameterValue("syncFile");
+
+				if (syncFile != null) {
+					_logger.trace(
+						"Processing event {} file path {}",
+						clazz.getSimpleName(), syncFile.getFilePathName());
+				}
+				else {
+					_logger.trace("Processing event {}", clazz.getSimpleName());
+				}
 			}
 
 			processRequest();
@@ -122,8 +134,6 @@ public abstract class BaseEvent implements Event {
 		}
 	}
 
-	protected abstract Handler<Void> getHandler();
-
 	protected void processAsynchronousRequest() throws Exception {
 		executeAsynchronousPost(_urlPath, _parameters);
 	}
@@ -132,11 +142,12 @@ public abstract class BaseEvent implements Event {
 		executePost(_urlPath, _parameters);
 	}
 
-	private static Logger _logger = LoggerFactory.getLogger(BaseEvent.class);
+	private static final Logger _logger = LoggerFactory.getLogger(
+		BaseEvent.class);
 
 	private Handler<Void> _handler;
-	private Map<String, Object> _parameters;
-	private long _syncAccountId;
-	private String _urlPath;
+	private final Map<String, Object> _parameters;
+	private final long _syncAccountId;
+	private final String _urlPath;
 
 }

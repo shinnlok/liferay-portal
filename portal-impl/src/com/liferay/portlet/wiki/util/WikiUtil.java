@@ -32,7 +32,7 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
-import com.liferay.portal.kernel.util.InstancePool;
+import com.liferay.portal.kernel.util.InstanceFactory;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -237,7 +237,7 @@ public class WikiUtil {
 	}
 
 	public static Map<String, String> getEmailFromDefinitionTerms(
-		RenderRequest request, String emailFromAddress, String emailFromName) {
+		RenderRequest request) {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
 			WebKeys.THEME_DISPLAY);
@@ -716,28 +716,25 @@ public class WikiUtil {
 			}
 
 			try {
-				String engineClass = PropsUtil.get(
+				String engineClassName = PropsUtil.get(
 					PropsKeys.WIKI_FORMATS_ENGINE, new Filter(format));
 
-				if (engineClass == null) {
+				if (engineClassName == null) {
 					throw new WikiFormatException(format);
 				}
 
-				if (!InstancePool.contains(engineClass)) {
-					engine = (WikiEngine)InstancePool.get(engineClass);
+				Class<?> clazz = getClass();
 
-					engine.setMainConfiguration(
-						_readConfigurationFile(
-							PropsKeys.WIKI_FORMATS_CONFIGURATION_MAIN, format));
+				engine = (WikiEngine)InstanceFactory.newInstance(
+					clazz.getClassLoader(), engineClassName);
 
-					engine.setInterWikiConfiguration(
-						_readConfigurationFile(
-							PropsKeys.WIKI_FORMATS_CONFIGURATION_INTERWIKI,
-							format));
-				}
-				else {
-					engine = (WikiEngine)InstancePool.get(engineClass);
-				}
+				engine.setInterWikiConfiguration(
+					_readConfigurationFile(
+						PropsKeys.WIKI_FORMATS_CONFIGURATION_INTERWIKI,
+						format));
+				engine.setMainConfiguration(
+					_readConfigurationFile(
+						PropsKeys.WIKI_FORMATS_CONFIGURATION_MAIN, format));
 
 				_engines.put(format, engine);
 
@@ -812,17 +809,17 @@ public class WikiUtil {
 		StringPool.PLUS, StringPool.QUESTION, StringPool.SLASH
 	};
 
-	private static Log _log = LogFactoryUtil.getLog(WikiUtil.class);
+	private static final Log _log = LogFactoryUtil.getLog(WikiUtil.class);
 
-	private static WikiUtil _instance = new WikiUtil();
+	private static final WikiUtil _instance = new WikiUtil();
 
-	private static Pattern _editPageURLPattern = Pattern.compile(
+	private static final Pattern _editPageURLPattern = Pattern.compile(
 		"\\[\\$BEGIN_PAGE_TITLE_EDIT\\$\\](.*?)" +
 			"\\[\\$END_PAGE_TITLE_EDIT\\$\\]");
-	private static Pattern _viewPageURLPattern = Pattern.compile(
+	private static final Pattern _viewPageURLPattern = Pattern.compile(
 		"\\[\\$BEGIN_PAGE_TITLE\\$\\](.*?)\\[\\$END_PAGE_TITLE\\$\\]");
 
-	private Map<String, WikiEngine> _engines =
+	private final Map<String, WikiEngine> _engines =
 		new ConcurrentHashMap<String, WikiEngine>();
 
 }

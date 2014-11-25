@@ -15,8 +15,12 @@
 package com.liferay.portal.search;
 
 import com.liferay.portal.kernel.search.SearchEngineUtil;
-import com.liferay.portal.kernel.test.ExecutionTestListeners;
-import com.liferay.portal.test.listeners.MainServletExecutionTestListener;
+import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.model.Group;
+import com.liferay.portal.test.DeleteAfterTestRun;
+import com.liferay.portal.test.MainServletTestRule;
+import com.liferay.portal.test.Sync;
+import com.liferay.portal.test.SynchronousDestinationTestRule;
 import com.liferay.portal.test.runners.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.util.PortalInstances;
 import com.liferay.portal.util.test.GroupTestUtil;
@@ -24,24 +28,31 @@ import com.liferay.portal.util.test.GroupTestUtil;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
  * @author Cristina González
  */
-@ExecutionTestListeners(listeners = {MainServletExecutionTestListener.class})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
+@Sync
 public class BackupAndRestoreIndexesTest {
+
+	@ClassRule
+	public static final MainServletTestRule mainServletTestRule =
+		MainServletTestRule.INSTANCE;
 
 	@Test
 	public void testBackupAndRestore() throws Exception {
 		Map<Long, String> backupNames = new HashMap<Long, String>();
 
 		for (long companyId : PortalInstances.getCompanyIds()) {
-			String backupName =
-				BackupAndRestoreIndexesTest.class.getName() + "-" +
-					System.currentTimeMillis();
+			String backupName = StringUtil.lowerCase(
+				BackupAndRestoreIndexesTest.class.getName());
+
+			backupName = backupName + "-" + System.currentTimeMillis();
 
 			SearchEngineUtil.backup(
 				companyId, SearchEngineUtil.SYSTEM_ENGINE_ID, backupName);
@@ -49,7 +60,7 @@ public class BackupAndRestoreIndexesTest {
 			backupNames.put(companyId, backupName);
 		}
 
-		GroupTestUtil.addGroup();
+		_group = GroupTestUtil.addGroup();
 
 		for (Map.Entry<Long, String> entry : backupNames.entrySet()) {
 			String backupName = entry.getValue();
@@ -59,5 +70,12 @@ public class BackupAndRestoreIndexesTest {
 			SearchEngineUtil.removeBackup(entry.getKey(), backupName);
 		}
 	}
+
+	@Rule
+	public final SynchronousDestinationTestRule synchronousDestinationTestRule =
+		SynchronousDestinationTestRule.INSTANCE;
+
+	@DeleteAfterTestRun
+	private Group _group;
 
 }

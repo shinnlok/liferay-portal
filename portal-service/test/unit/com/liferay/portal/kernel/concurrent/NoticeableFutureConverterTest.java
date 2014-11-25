@@ -32,8 +32,8 @@ import org.junit.Test;
 public class NoticeableFutureConverterTest {
 
 	@ClassRule
-	public static CodeCoverageAssertor codeCoverageAssertor =
-		new CodeCoverageAssertor();
+	public static final CodeCoverageAssertor codeCoverageAssertor =
+		CodeCoverageAssertor.INSTANCE;
 
 	@Test
 	public void testCancelInner() throws Exception {
@@ -104,7 +104,8 @@ public class NoticeableFutureConverterTest {
 		final Exception exception = new Exception();
 
 		NoticeableFuture<Object> noticeableFutureConverter =
-			new NoticeableFutureConverter(_defaultNoticeableFuture) {
+			new NoticeableFutureConverter<Object, Object>(
+				_defaultNoticeableFuture) {
 
 				@Override
 				protected Object convert(Object v) throws Exception {

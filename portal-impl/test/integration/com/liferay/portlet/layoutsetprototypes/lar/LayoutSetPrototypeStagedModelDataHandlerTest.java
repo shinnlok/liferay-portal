@@ -15,7 +15,7 @@
 package com.liferay.portlet.layoutsetprototypes.lar;
 
 import com.liferay.portal.kernel.lar.ExportImportPathUtil;
-import com.liferay.portal.kernel.test.ExecutionTestListeners;
+import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
@@ -36,8 +36,8 @@ import com.liferay.portal.service.LayoutFriendlyURLLocalServiceUtil;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.LayoutPrototypeLocalServiceUtil;
 import com.liferay.portal.service.LayoutSetPrototypeLocalServiceUtil;
+import com.liferay.portal.test.MainServletTestRule;
 import com.liferay.portal.test.TransactionalTestRule;
-import com.liferay.portal.test.listeners.MainServletExecutionTestListener;
 import com.liferay.portal.test.runners.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.util.test.LayoutTestUtil;
 import com.liferay.portal.util.test.RandomTestUtil;
@@ -53,19 +53,19 @@ import java.util.Map;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.runner.RunWith;
 
 /**
  * @author Daniela Zapata Riesco
  */
-@ExecutionTestListeners(listeners = {MainServletExecutionTestListener.class})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
 public class LayoutSetPrototypeStagedModelDataHandlerTest
 	extends BaseStagedModelDataHandlerTestCase {
 
 	@ClassRule
-	public static TransactionalTestRule transactionalTestRule =
-		new TransactionalTestRule();
+	public static final MainServletTestRule mainServletTestRule =
+		MainServletTestRule.INSTANCE;
 
 	@After
 	@Override
@@ -89,6 +89,10 @@ public class LayoutSetPrototypeStagedModelDataHandlerTest
 
 		LayoutPrototypeLocalServiceUtil.deleteLayoutPrototype(_layoutPrototype);
 	}
+
+	@Rule
+	public final TransactionalTestRule transactionalTestRule =
+		TransactionalTestRule.INSTANCE;
 
 	protected void addLayout(Class<?> clazz, Layout layout) throws Exception {
 		List<Layout> layouts = _layouts.get(clazz.getSimpleName());
@@ -191,8 +195,7 @@ public class LayoutSetPrototypeStagedModelDataHandlerTest
 			dependentStagedModelsMap);
 
 		Layout prototypedLayout = LayoutTestUtil.addLayout(
-			_layoutSetPrototype.getGroupId(), RandomTestUtil.randomString(),
-			true, layoutPrototype, true);
+			_layoutSetPrototype.getGroupId(), true, layoutPrototype, true);
 
 		addLayout(LayoutSetPrototype.class, prototypedLayout);
 		addLayoutFriendlyURLs(
@@ -315,7 +318,14 @@ public class LayoutSetPrototypeStagedModelDataHandlerTest
 
 		Assert.assertEquals(1, importedLayouts.size());
 
-		return importedLayouts.get(0);
+		try {
+			return importedLayouts.get(0);
+		}
+		finally {
+			zipReader.close();
+
+			StreamUtil.cleanUp(inputStream);
+		}
 	}
 
 	@Override
@@ -403,10 +413,10 @@ public class LayoutSetPrototypeStagedModelDataHandlerTest
 		}
 	}
 
-	private Map<String, List<LayoutFriendlyURL>> _layoutFriendlyURLs =
+	private final Map<String, List<LayoutFriendlyURL>> _layoutFriendlyURLs =
 		new HashMap<String, List<LayoutFriendlyURL>>();
 	private LayoutPrototype _layoutPrototype;
-	private Map<String, List<Layout>> _layouts =
+	private final Map<String, List<Layout>> _layouts =
 		new HashMap<String, List<Layout>>();
 	private LayoutSetPrototype _layoutSetPrototype;
 

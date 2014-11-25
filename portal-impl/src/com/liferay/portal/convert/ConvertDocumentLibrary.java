@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.InstanceFactory;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
@@ -46,6 +47,7 @@ import com.liferay.portlet.documentlibrary.store.JCRStore;
 import com.liferay.portlet.documentlibrary.store.S3Store;
 import com.liferay.portlet.documentlibrary.store.Store;
 import com.liferay.portlet.documentlibrary.store.StoreFactory;
+import com.liferay.portlet.documentlibrary.util.DLPreviewableProcessor;
 import com.liferay.portlet.documentlibrary.util.comparator.FileVersionVersionComparator;
 import com.liferay.portlet.messageboards.model.MBMessage;
 import com.liferay.portlet.messageboards.service.MBMessageLocalServiceUtil;
@@ -61,7 +63,7 @@ import java.util.List;
  * @author Alexander Chow
  * @author László Csontos
  */
-public class ConvertDocumentLibrary extends ConvertProcess {
+public class ConvertDocumentLibrary extends BaseConvertProcess {
 
 	@Override
 	public String getDescription() {
@@ -87,7 +89,9 @@ public class ConvertDocumentLibrary extends ConvertProcess {
 			}
 		}
 
-		return new String[] {sb.toString()};
+		return new String[] {
+			sb.toString(), "delete-files-from-previous-repository=checkbox"
+		};
 	}
 
 	@Override
@@ -193,6 +197,12 @@ public class ConvertDocumentLibrary extends ConvertProcess {
 		return values[0];
 	}
 
+	protected boolean isDeleteFilesFromSourceStore() {
+		String[] values = getParameterValues();
+
+		return GetterUtil.getBoolean(values[1]);
+	}
+
 	protected void migrateDL() throws PortalException {
 		int count = DLFileEntryLocalServiceUtil.getFileEntriesCount();
 
@@ -229,6 +239,10 @@ public class ConvertDocumentLibrary extends ConvertProcess {
 			});
 
 		actionableDynamicQuery.performActions();
+
+		if (isDeleteFilesFromSourceStore()) {
+			DLPreviewableProcessor.deleteFiles();
+		}
 	}
 
 	protected void migrateDLFileEntry(
@@ -267,6 +281,11 @@ public class ConvertDocumentLibrary extends ConvertProcess {
 			else {
 				_targetStore.updateFile(
 					companyId, repositoryId, fileName, versionNumber, is);
+			}
+
+			if (isDeleteFilesFromSourceStore()) {
+				_sourceStore.deleteFile(
+					companyId, repositoryId, fileName, versionNumber);
 			}
 		}
 		catch (Exception e) {
@@ -401,7 +420,7 @@ public class ConvertDocumentLibrary extends ConvertProcess {
 		JCRStore.class.getName(), S3Store.class.getName()
 	};
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		ConvertDocumentLibrary.class);
 
 	private Store _sourceStore;

@@ -48,7 +48,9 @@ portletURL.setParameter("recordSetId", String.valueOf(recordSet.getRecordSetId()
 
 	DDMStructure ddmStructure = recordSet.getDDMStructure(formDDMTemplateId);
 
-	List<DDMFormField> ddmFormfields = ddmStructure.getDDMFormFields(false);
+	DDMForm ddmForm = ddmStructure.getFullHierarchyDDMForm();
+
+	List<DDMFormField> ddmFormfields = ddmForm.getDDMFormFields();
 
 	for (DDMFormField ddmFormField : ddmFormfields) {
 		if (ddmStructure.isFieldPrivate(ddmFormField.getName())) {
@@ -124,7 +126,9 @@ portletURL.setParameter("recordSetId", String.valueOf(recordSet.getRecordSetId()
 				recordVersion = record.getLatestRecordVersion();
 			}
 
-			Fields fieldsModel = StorageEngineUtil.getFields(recordVersion.getDDMStorageId());
+			DDMFormValues ddmFormValues = StorageEngineUtil.getDDMFormValues(recordVersion.getDDMStorageId());
+
+			Map<String, List<DDMFormFieldValue>> ddmFormFieldValuesMap = ddmFormValues.getDDMFormFieldValuesMap();
 
 			ResultRow row = new ResultRow(record, record.getRecordId(), i);
 

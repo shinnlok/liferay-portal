@@ -28,7 +28,7 @@
 
 		<#assign message = element.attributeValue("message")>
 
-		${selenium}.sendMacroDescriptionLogger(RuntimeVariables.evaluateVariable("${seleniumBuilderFileUtil.escapeJava(message)}", ${variableContext}));
+		${selenium}.sendMacroDescriptionLogger(HtmlUtil.escape(RuntimeVariables.evaluateVariable("${seleniumBuilderFileUtil.escapeJava(message)}", ${variableContext})));
 
 		<#assign lineNumber = element.attributeValue("line-number")>
 
@@ -147,6 +147,8 @@
 
 		${selenium}.sendLogger(${lineId} + "${lineNumber}", "pass");
 	<#elseif name == "if">
+		<#assign variableContext = variableContextStack.peek()>
+
 		executeScopeVariables = new HashMap<String, String>();
 
 		executeScopeVariables.putAll(${variableContext});

@@ -72,15 +72,7 @@ public class XhtmlTranslator extends XhtmlTranslationVisitor {
 
 		traverse(headingNode.getChildASTNodes());
 
-		append("<a class=\"hashlink\" href=\"");
-
-		if (_viewPageURL != null) {
-			append(_viewPageURL.toString());
-		}
-
-		append(StringPool.POUND);
-		append(markup);
-		append("\">#</a></h");
+		append("</h");
 		append(headingNode.getLevel());
 		append(">");
 	}
@@ -303,7 +295,8 @@ public class XhtmlTranslator extends XhtmlTranslationVisitor {
 
 	private static final String _HEADING_ANCHOR_PREFIX = "section-";
 
-	private static Log _log = LogFactoryUtil.getLog(XhtmlTranslator.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		XhtmlTranslator.class);
 
 	private String _attachmentURLPrefix;
 	private PortletURL _editPageURL;

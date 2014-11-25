@@ -22,38 +22,42 @@ import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.QueryConfig;
 import com.liferay.portal.kernel.search.SearchContext;
-import com.liferay.portal.kernel.test.ExecutionTestListeners;
+import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.test.DeleteAfterTestRun;
+import com.liferay.portal.test.MainServletTestRule;
 import com.liferay.portal.test.Sync;
-import com.liferay.portal.test.SynchronousDestinationExecutionTestListener;
-import com.liferay.portal.test.listeners.MainServletExecutionTestListener;
+import com.liferay.portal.test.SynchronousDestinationTestRule;
 import com.liferay.portal.test.runners.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.util.test.RandomTestUtil;
 import com.liferay.portal.util.test.TestPropsValues;
 import com.liferay.portal.util.test.UserTestUtil;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
  * @author Roberto Díaz
  */
-@ExecutionTestListeners(
-	listeners = {
-		MainServletExecutionTestListener.class,
-		SynchronousDestinationExecutionTestListener.class
-	})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
 @Sync
 public class SearchPaginationTest {
+
+	@ClassRule
+	public static final MainServletTestRule mainServletTestRule =
+		MainServletTestRule.INSTANCE;
 
 	@Before
 	public void setUp() throws Exception {
@@ -76,6 +80,20 @@ public class SearchPaginationTest {
 
 			_users.add(user);
 		}
+
+		Collections.sort(
+			_users,
+			new Comparator<User>() {
+
+				@Override
+				public int compare(User user1, User user2) {
+					String screenName1 = user1.getScreenName();
+					String screenName2 = user2.getScreenName();
+
+					return screenName1.compareTo(screenName2);
+				}
+
+			});
 	}
 
 	@Test
@@ -192,6 +210,10 @@ public class SearchPaginationTest {
 		Assert.assertEquals(1, hits.getDocs().length);
 	}
 
+	@Rule
+	public final SynchronousDestinationTestRule synchronousDestinationTestRule =
+		SynchronousDestinationTestRule.INSTANCE;
+
 	protected Hits getHits(int start, int end) throws Exception {
 		return getHits(_randomLastName, start, end);
 	}
@@ -212,6 +234,7 @@ public class SearchPaginationTest {
 
 		searchContext.setQueryConfig(queryConfig);
 
+		searchContext.setSorts(new Sort("screenName", false));
 		searchContext.setStart(start);
 
 		return indexer.search(searchContext);
@@ -238,16 +261,38 @@ public class SearchPaginationTest {
 
 		Assert.assertEquals(expectedTotal, hits.getDocs().length);
 
+		List<User> returnedUsers = new ArrayList<User>();
+
 		for (int i = 0; i < hits.getDocs().length; i++) {
 			Document doc = hits.doc(i);
 
 			long userId = GetterUtil.getLong(doc.get(Field.USER_ID));
 
-			User returnedUser = UserLocalServiceUtil.getUser(userId);
-
-			Assert.assertEquals(
-				_users.get(expectedRecalculatedStart + i), returnedUser);
+			returnedUsers.add(UserLocalServiceUtil.getUser(userId));
 		}
+
+		StringBundler sb = new StringBundler(13);
+
+		sb.append("{end=");
+		sb.append(end);
+		sb.append(", expectedRecalculatedStart=");
+		sb.append(expectedRecalculatedStart);
+		sb.append(", expectedTotal=");
+		sb.append(expectedTotal);
+		sb.append(", returnedUsers=");
+		sb.append(returnedUsers);
+		sb.append(", start=");
+		sb.append(start);
+		sb.append(", _users=");
+		sb.append(_users);
+		sb.append("}");
+
+		Assert.assertEquals(
+			sb.toString(),
+			_users.subList(
+				expectedRecalculatedStart,
+				expectedRecalculatedStart + hits.getDocs().length),
+			returnedUsers);
 	}
 
 	private static final int _USERS_COUNT = 5;

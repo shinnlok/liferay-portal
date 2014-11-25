@@ -14,8 +14,8 @@
 
 package com.liferay.portal.security.permission;
 
-import com.liferay.portal.kernel.test.ExecutionTestListeners;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Organization;
 import com.liferay.portal.model.Role;
@@ -23,8 +23,9 @@ import com.liferay.portal.model.RoleConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.test.DeleteAfterTestRun;
-import com.liferay.portal.test.listeners.MainServletExecutionTestListener;
+import com.liferay.portal.test.MainServletTestRule;
 import com.liferay.portal.test.runners.LiferayIntegrationJUnitTestRunner;
+import com.liferay.portal.util.test.CompanyTestUtil;
 import com.liferay.portal.util.test.GroupTestUtil;
 import com.liferay.portal.util.test.OrganizationTestUtil;
 import com.liferay.portal.util.test.RoleTestUtil;
@@ -33,15 +34,19 @@ import com.liferay.portal.util.test.UserTestUtil;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
  * @author Roberto Díaz
  */
-@ExecutionTestListeners(listeners = {MainServletExecutionTestListener.class})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
 public class PermissionCheckerTest {
+
+	@ClassRule
+	public static final MainServletTestRule mainServletTestRule =
+		MainServletTestRule.INSTANCE;
 
 	@Before
 	public void setUp() throws Exception {
@@ -195,17 +200,20 @@ public class PermissionCheckerTest {
 
 	@Test
 	public void testIsOmniAdminWithAdministratorRoleUser() throws Exception {
-		_user = UserTestUtil.addOmniAdmin();
+		_user = UserTestUtil.addOmniAdminUser();
 
 		PermissionChecker permissionChecker = _getPermissionChecker(_user);
 
-		Assert.assertFalse(permissionChecker.isOmniadmin());
+		Assert.assertTrue(permissionChecker.isOmniadmin());
 	}
 
 	@Test
 	public void testIsOmniAdminWithCompanyAdmin() throws Exception {
-		PermissionChecker permissionChecker = _getPermissionChecker(
-			TestPropsValues.getUser());
+		Company company = CompanyTestUtil.addCompany();
+
+		User adminUser = UserTestUtil.addCompanyAdminUser(company);
+
+		PermissionChecker permissionChecker = _getPermissionChecker(adminUser);
 
 		Assert.assertFalse(permissionChecker.isOmniadmin());
 	}

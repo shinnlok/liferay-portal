@@ -22,9 +22,11 @@ import com.liferay.portal.kernel.search.IndexWriter;
 import com.liferay.portal.kernel.search.SearchEngine;
 import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.PortalRunMode;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.SystemProperties;
+import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.elasticsearch.connection.ElasticsearchConnectionManager;
 import com.liferay.portal.search.elasticsearch.index.IndexFactory;
@@ -112,8 +114,18 @@ public class ElasticsearchSearchEngine extends BaseSearchEngine {
 	public void initialize(long companyId) {
 		super.initialize(companyId);
 
-		ClusterHealthResponse clusterHealthResponse =
-			_elasticsearchConnectionManager.getClusterHealthResponse();
+		ClusterHealthResponse clusterHealthResponse = null;
+
+		if (PortalRunMode.isTestMode()) {
+			clusterHealthResponse =
+				_elasticsearchConnectionManager.getClusterHealthResponse(
+					Time.HOUR, 1);
+		}
+		else {
+			clusterHealthResponse =
+				_elasticsearchConnectionManager.getClusterHealthResponse(
+					30 * Time.SECOND, 2);
+		}
 
 		if (clusterHealthResponse.getStatus() == ClusterHealthStatus.RED) {
 			throw new IllegalStateException(
@@ -177,6 +189,10 @@ public class ElasticsearchSearchEngine extends BaseSearchEngine {
 	public synchronized void restore(long companyId, String backupName)
 		throws SearchException {
 
+		backupName = StringUtil.toLowerCase(backupName);
+
+		validateBackupName(backupName);
+
 		AdminClient adminClient =
 			_elasticsearchConnectionManager.getAdminClient();
 
@@ -219,8 +235,18 @@ public class ElasticsearchSearchEngine extends BaseSearchEngine {
 			throw new SearchException(e);
 		}
 
-		ClusterHealthResponse clusterHealthResponse =
-			_elasticsearchConnectionManager.getClusterHealthResponse();
+		ClusterHealthResponse clusterHealthResponse = null;
+
+		if (PortalRunMode.isTestMode()) {
+			clusterHealthResponse =
+				_elasticsearchConnectionManager.getClusterHealthResponse(
+					Time.HOUR, 1);
+		}
+		else {
+			clusterHealthResponse =
+				_elasticsearchConnectionManager.getClusterHealthResponse(
+					30 * Time.SECOND, 2);
+		}
 
 		if (clusterHealthResponse.getStatus() == ClusterHealthStatus.RED) {
 			throw new IllegalStateException(
@@ -370,7 +396,7 @@ public class ElasticsearchSearchEngine extends BaseSearchEngine {
 
 	private static final String _BACKUP_REPOSITORY_NAME = "liferay_backup";
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		ElasticsearchSearchEngine.class);
 
 	private ElasticsearchConnectionManager _elasticsearchConnectionManager;

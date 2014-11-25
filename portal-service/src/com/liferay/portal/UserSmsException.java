@@ -26,7 +26,6 @@ public class UserSmsException extends PortalException {
 	 */
 	@Deprecated
 	public UserSmsException() {
-		super();
 	}
 
 	/**
@@ -58,14 +57,10 @@ public class UserSmsException extends PortalException {
 		public MustBeEmailAddress(String smsSn) {
 			super(String.format("SMS %s must be an email address", smsSn));
 
-			_smsSn = smsSn;
+			this.smsSn = smsSn;
 		}
 
-		public String getSmsSn() {
-			return _smsSn;
-		}
-
-		private String _smsSn;
+		public final String smsSn;
 
 	}
 

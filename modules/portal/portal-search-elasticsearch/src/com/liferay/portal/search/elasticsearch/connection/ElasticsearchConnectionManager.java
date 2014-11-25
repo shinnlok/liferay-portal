@@ -56,8 +56,11 @@ public class ElasticsearchConnectionManager {
 		return adminClient.cluster();
 	}
 
-	public ClusterHealthResponse getClusterHealthResponse() {
-		return _elasticsearchConnection.get().getClusterHealthResponse();
+	public ClusterHealthResponse getClusterHealthResponse(
+		long timeout, int nodesCount) {
+
+		return _elasticsearchConnection.get().getClusterHealthResponse(
+			timeout, nodesCount);
 	}
 
 	public ElasticsearchConnection getElasticsearchConnection() {
@@ -81,7 +84,8 @@ public class ElasticsearchConnectionManager {
 		_elasticsearchConnection.set(null);
 	}
 
-	private AtomicReference<ElasticsearchConnection> _elasticsearchConnection =
-		new AtomicReference<ElasticsearchConnection>();
+	private final AtomicReference<ElasticsearchConnection>
+		_elasticsearchConnection =
+			new AtomicReference<ElasticsearchConnection>();
 
 }

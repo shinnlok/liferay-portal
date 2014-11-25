@@ -14,18 +14,18 @@
 
 package com.liferay.portlet.dynamicdatalists.lar;
 
-import com.liferay.portal.kernel.test.ExecutionTestListeners;
 import com.liferay.portal.lar.BaseStagedModelDataHandlerTestCase;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.StagedModel;
+import com.liferay.portal.test.MainServletTestRule;
 import com.liferay.portal.test.TransactionalTestRule;
-import com.liferay.portal.test.listeners.MainServletExecutionTestListener;
 import com.liferay.portal.test.runners.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portlet.dynamicdatalists.model.DDLRecord;
 import com.liferay.portlet.dynamicdatalists.model.DDLRecordSet;
 import com.liferay.portlet.dynamicdatalists.service.DDLRecordLocalServiceUtil;
 import com.liferay.portlet.dynamicdatalists.service.DDLRecordSetLocalServiceUtil;
-import com.liferay.portlet.dynamicdatalists.util.test.DDLTestUtil;
+import com.liferay.portlet.dynamicdatalists.util.test.DDLRecordSetTestHelper;
+import com.liferay.portlet.dynamicdatalists.util.test.DDLRecordTestHelper;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.model.DDMTemplate;
 import com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalServiceUtil;
@@ -39,19 +39,23 @@ import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.runner.RunWith;
 
 /**
  * @author Daniel Kocsis
  */
-@ExecutionTestListeners(listeners = {MainServletExecutionTestListener.class})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
 public class DDLRecordStagedModelDataHandlerTest
 	extends BaseStagedModelDataHandlerTestCase {
 
 	@ClassRule
-	public static TransactionalTestRule transactionalTestRule =
-		new TransactionalTestRule();
+	public static final MainServletTestRule mainServletTestRule =
+		MainServletTestRule.INSTANCE;
+
+	@Rule
+	public final TransactionalTestRule transactionalTestRule =
+		TransactionalTestRule.INSTANCE;
 
 	@Override
 	protected Map<String, List<StagedModel>> addDependentStagedModelsMap(
@@ -79,8 +83,10 @@ public class DDLRecordStagedModelDataHandlerTest
 		addDependentStagedModel(
 			dependentStagedModelsMap, DDMTemplate.class, ddmTemplate2);
 
-		DDLRecordSet recordSet = DDLTestUtil.addRecordSet(
-			group.getGroupId(), ddmStructure.getStructureId());
+		DDLRecordSetTestHelper recordSetTestHelper = new DDLRecordSetTestHelper(
+			group);
+
+		DDLRecordSet recordSet = recordSetTestHelper.addRecordSet(ddmStructure);
 
 		addDependentStagedModel(
 			dependentStagedModelsMap, DDLRecordSet.class, recordSet);
@@ -99,8 +105,10 @@ public class DDLRecordStagedModelDataHandlerTest
 
 		DDLRecordSet recordSet = (DDLRecordSet)dependentStagedModels.get(0);
 
-		return DDLTestUtil.addRecord(
-			group.getGroupId(), recordSet.getRecordSetId());
+		DDLRecordTestHelper recordTestHelper = new DDLRecordTestHelper(
+			group, recordSet);
+
+		return recordTestHelper.addRecord();
 	}
 
 	@Override

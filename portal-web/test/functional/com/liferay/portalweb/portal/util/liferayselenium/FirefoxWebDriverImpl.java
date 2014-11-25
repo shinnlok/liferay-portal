@@ -16,7 +16,7 @@ package com.liferay.portalweb.portal.util.liferayselenium;
 
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portalweb.portal.util.TestPropsValues;
+import com.liferay.portalweb.util.TestPropsValues;
 
 import java.io.File;
 
@@ -32,7 +32,7 @@ public class FirefoxWebDriverImpl extends BaseWebDriverImpl {
 		super(projectDirName, browserURL, new FirefoxDriver(_firefoxProfile));
 	}
 
-	private static FirefoxProfile _firefoxProfile = new FirefoxProfile();
+	private static final FirefoxProfile _firefoxProfile = new FirefoxProfile();
 
 	static {
 		try {

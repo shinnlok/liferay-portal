@@ -15,15 +15,15 @@
 package com.liferay.portlet.journal.service.persistence;
 
 import com.liferay.portal.kernel.dao.orm.QueryDefinition;
-import com.liferay.portal.kernel.test.ExecutionTestListeners;
+import com.liferay.portal.kernel.test.AggregateTestRule;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.test.DeleteAfterTestRun;
+import com.liferay.portal.test.MainServletTestRule;
 import com.liferay.portal.test.Sync;
-import com.liferay.portal.test.SynchronousDestinationExecutionTestListener;
+import com.liferay.portal.test.SynchronousDestinationTestRule;
 import com.liferay.portal.test.TransactionalTestRule;
-import com.liferay.portal.test.listeners.MainServletExecutionTestListener;
 import com.liferay.portal.test.runners.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.test.GroupTestUtil;
@@ -55,6 +55,7 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -62,18 +63,13 @@ import org.junit.runner.RunWith;
  * @author Zsolt Berentey
  * @author Laszlo Csontos
  */
-@ExecutionTestListeners(
-	listeners = {
-		MainServletExecutionTestListener.class,
-		SynchronousDestinationExecutionTestListener.class
-	})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
 @Sync
 public class JournalArticleFinderTest {
 
 	@ClassRule
-	public static TransactionalTestRule transactionalTestRule =
-		new TransactionalTestRule();
+	public static final MainServletTestRule mainServletTestRule =
+		MainServletTestRule.INSTANCE;
 
 	@Before
 	public void setUp() throws Exception {
@@ -84,9 +80,8 @@ public class JournalArticleFinderTest {
 
 		_folder = JournalTestUtil.addFolder(_group.getGroupId(), "Folder 1");
 
-		_basicWebContentDDMStructure =
-			DDMStructureTestUtil.addStructure(
-				_group.getGroupId(), JournalArticle.class.getName());
+		_basicWebContentDDMStructure = DDMStructureTestUtil.addStructure(
+			_group.getGroupId(), JournalArticle.class.getName());
 
 		DDMTemplate basicWebContentTemplate = DDMTemplateTestUtil.addTemplate(
 			_group.getGroupId(), _basicWebContentDDMStructure.getStructureId());
@@ -351,6 +346,11 @@ public class JournalArticleFinderTest {
 			JournalArticleConstants.CLASSNAME_ID_DEFAULT, queryDefinition, 0);
 	}
 
+	@Rule
+	public final AggregateTestRule aggregateTestRule = new AggregateTestRule(
+		SynchronousDestinationTestRule.INSTANCE,
+		TransactionalTestRule.INSTANCE);
+
 	protected void prepareSortedArticles() throws Exception {
 		Calendar calendar = new GregorianCalendar();
 
@@ -385,20 +385,20 @@ public class JournalArticleFinderTest {
 		throws Exception {
 
 		int actualCount =
-			JournalArticleFinderUtil.countByC_G_F_C_A_V_T_D_C_T_S_T_D_R(
+			JournalArticleFinderUtil.countByC_G_F_C_A_V_T_D_C_S_T_D_R(
 				companyId, groupId, folderIds, classNameId, articleId, version,
-				title, description, content, type, ddmStructureKey,
-				ddmTemplateKey, displayDateGT, displayDateLT, reviewDate,
-				andOperator, queryDefinition);
+				title, description, content, ddmStructureKey, ddmTemplateKey,
+				displayDateGT, displayDateLT, reviewDate, andOperator,
+				queryDefinition);
 
 		Assert.assertEquals(expectedCount, actualCount);
 
 		List<JournalArticle> articles =
-			JournalArticleFinderUtil.findByC_G_F_C_A_V_T_D_C_T_S_T_D_R(
+			JournalArticleFinderUtil.findByC_G_F_C_A_V_T_D_C_S_T_D_R(
 				companyId, groupId, folderIds, classNameId, articleId, version,
-				title, description, content, type, ddmStructureKey,
-				ddmTemplateKey, displayDateGT, displayDateLT, reviewDate,
-				andOperator, queryDefinition);
+				title, description, content, ddmStructureKey, ddmTemplateKey,
+				displayDateGT, displayDateLT, reviewDate, andOperator,
+				queryDefinition);
 
 		actualCount = articles.size();
 

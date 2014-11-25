@@ -15,6 +15,7 @@
 package com.liferay.portalweb.portal.util;
 
 import com.liferay.portalweb.portal.util.liferayselenium.LiferaySelenium;
+import com.liferay.portalweb.util.RuntimeVariables;
 
 import com.thoughtworks.selenium.SeleneseTestBase;
 import com.thoughtworks.selenium.SeleneseTestCase;
@@ -38,7 +39,6 @@ public class LiferaySeleneseTestCase extends SeleneseTestCase {
 	}
 
 	public LiferaySeleneseTestCase() {
-		super();
 	}
 
 	public LiferaySeleneseTestCase(String name) {

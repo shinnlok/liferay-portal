@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
@@ -59,6 +60,7 @@ import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.PortletURLFactoryUtil;
 import com.liferay.portlet.documentlibrary.DLPortletInstanceSettings;
+import com.liferay.portlet.documentlibrary.action.EditFileEntryAction;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryConstants;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryType;
@@ -741,6 +743,49 @@ public class DLImpl implements DL {
 	}
 
 	@Override
+	public String getFileName(
+		long groupId, long folderId, String tempFileName) {
+
+		String extension = FileUtil.getExtension(tempFileName);
+
+		int pos = tempFileName.lastIndexOf(
+			EditFileEntryAction.TEMP_RANDOM_SUFFIX);
+
+		if (pos != -1) {
+			tempFileName = tempFileName.substring(0, pos);
+
+			if (Validator.isNotNull(extension)) {
+				tempFileName = tempFileName + StringPool.PERIOD + extension;
+			}
+		}
+
+		while (true) {
+			try {
+				DLAppLocalServiceUtil.getFileEntry(
+					groupId, folderId, tempFileName);
+
+				StringBundler sb = new StringBundler(5);
+
+				sb.append(FileUtil.stripExtension(tempFileName));
+				sb.append(StringPool.DASH);
+				sb.append(StringUtil.randomString());
+
+				if (Validator.isNotNull(extension)) {
+					sb.append(StringPool.PERIOD);
+					sb.append(extension);
+				}
+
+				tempFileName = sb.toString();
+			}
+			catch (Exception e) {
+				break;
+			}
+		}
+
+		return tempFileName;
+	}
+
+	@Override
 	public String getGenericName(String extension) {
 		String genericName = _genericNames.get(extension);
 
@@ -923,7 +968,7 @@ public class DLImpl implements DL {
 			title, StringPool.SLASH, StringPool.UNDERLINE);
 
 		if (Validator.isNotNull(extension) &&
-			!fileName.endsWith(StringPool.PERIOD + extension)) {
+			!StringUtil.endsWith(fileName, StringPool.PERIOD + extension)) {
 
 			fileName += StringPool.PERIOD + extension;
 		}
@@ -932,7 +977,7 @@ public class DLImpl implements DL {
 			int x = fileName.length() - 1;
 
 			if (Validator.isNotNull(extension)) {
-				x = fileName.lastIndexOf(StringPool.PERIOD + extension);
+				x = fileName.lastIndexOf(StringPool.PERIOD);
 			}
 
 			int y = x - (fileName.length() - 255);
@@ -965,6 +1010,11 @@ public class DLImpl implements DL {
 		return sb.toString();
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #getThumbnailSrc(FileEntry,
+	 *             ThemeDisplay)}
+	 */
+	@Deprecated
 	@Override
 	public String getThumbnailSrc(
 			FileEntry fileEntry, DLFileShortcut dlFileShortcut,
@@ -972,14 +1022,27 @@ public class DLImpl implements DL {
 		throws Exception {
 
 		return getThumbnailSrc(
-			fileEntry, fileEntry.getFileVersion(), dlFileShortcut,
-			themeDisplay);
+			fileEntry, fileEntry.getFileVersion(), themeDisplay);
+	}
+
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #getThumbnailSrc(FileEntry,
+	 *             FileVersion, ThemeDisplay)}
+	 */
+	@Deprecated
+	@Override
+	public String getThumbnailSrc(
+			FileEntry fileEntry, FileVersion fileVersion,
+			DLFileShortcut dlFileShortcut, ThemeDisplay themeDisplay)
+		throws Exception {
+
+		return getThumbnailSrc(fileEntry, fileVersion, themeDisplay);
 	}
 
 	@Override
 	public String getThumbnailSrc(
 			FileEntry fileEntry, FileVersion fileVersion,
-			DLFileShortcut dlFileShortcut, ThemeDisplay themeDisplay)
+			ThemeDisplay themeDisplay)
 		throws Exception {
 
 		String thumbnailQueryString = null;
@@ -998,6 +1061,15 @@ public class DLImpl implements DL {
 
 		return getImageSrc(
 			fileEntry, fileVersion, themeDisplay, thumbnailQueryString);
+	}
+
+	@Override
+	public String getThumbnailSrc(
+			FileEntry fileEntry, ThemeDisplay themeDisplay)
+		throws Exception {
+
+		return getThumbnailSrc(
+			fileEntry, fileEntry.getFileVersion(), themeDisplay);
 	}
 
 	@Override
@@ -1164,7 +1236,9 @@ public class DLImpl implements DL {
 				return false;
 			}
 
-			if (dlFolder.isOverrideFileEntryTypes()) {
+			if (dlFolder.getRestrictionType() !=
+					DLFolderConstants.RESTRICTION_TYPE_INHERIT) {
+
 				break;
 			}
 
@@ -1249,7 +1323,7 @@ public class DLImpl implements DL {
 		long[] folderIdsArray = ArrayUtil.toLongArray(ancestorFolderIds);
 
 		return SubscriptionLocalServiceUtil.isSubscribed(
-			companyId, userId, Folder.class.getName(), folderIdsArray);
+			companyId, userId, DLFolder.class.getName(), folderIdsArray);
 	}
 
 	@Override

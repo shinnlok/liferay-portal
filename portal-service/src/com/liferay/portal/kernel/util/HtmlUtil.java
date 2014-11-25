@@ -100,6 +100,10 @@ public class HtmlUtil {
 		return getHtml().escapeJS(js);
 	}
 
+	public static String escapeJSLink(String link) {
+		return getHtml().escapeJSLink(link);
+	}
+
 	/**
 	 * Escapes the URL value so that it is safe to use as a URL.
 	 *
@@ -174,9 +178,9 @@ public class HtmlUtil {
 	 * Replaces all Microsoft&reg; Word Unicode characters with plain HTML
 	 * entities or characters.
 	 *
-	 * @param  text the text
-	 * @return the converted text, or <code>null</code> if the text is
-	 *         <code>null</code>
+	 * @param      text the text
+	 * @return     the converted text, or <code>null</code> if the text is
+	 *             <code>null</code>
 	 * @deprecated As of 7.0.0, with no direct replacement
 	 */
 	@Deprecated

@@ -78,6 +78,16 @@ public interface WikiPageService extends BaseService {
 		java.lang.String mimeType)
 		throws com.liferay.portal.kernel.exception.PortalException;
 
+	/**
+	* @deprecated As of 7.0.0 replaced by {@link #addTempFileEntry(long,
+	String, String, InputStream, String)}
+	*/
+	@java.lang.Deprecated
+	public void addTempPageAttachment(long nodeId, java.lang.String fileName,
+		java.lang.String tempFolderName, java.io.InputStream inputStream,
+		java.lang.String mimeType)
+		throws com.liferay.portal.kernel.exception.PortalException;
+
 	public void changeNode(long nodeId, java.lang.String title, long newNodeId,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException;
@@ -242,9 +252,9 @@ public interface WikiPageService extends BaseService {
 
 	/**
 	* @deprecated As of 6.2.0, replaced by {@link #renamePage(long, String,
-	String, ServiceContext)}
-	*
+	String, ServiceContext)} *
 	*/
+	@java.lang.Deprecated
 	public void movePage(long nodeId, java.lang.String title,
 		java.lang.String newTitle,
 		com.liferay.portal.service.ServiceContext serviceContext)

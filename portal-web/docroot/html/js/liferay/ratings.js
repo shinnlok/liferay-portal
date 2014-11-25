@@ -52,7 +52,19 @@ AUI.add(
 
 					uri: {},
 
-					yourScore: {}
+					yourScore: {
+						getter: function(value) {
+							var instance = this;
+
+							var yourScore = value;
+
+							if ((instance.get('type') == 'stars') && (yourScore == -1.0)) {
+								yourScore = 0;
+							}
+
+							return yourScore;
+						}
+					}
 				},
 
 				EXTENDS: A.Base,
@@ -78,7 +90,7 @@ AUI.add(
 						if (score == 1.0) {
 							scoreIndex = 0;
 						}
-						else if (score == -1.0) {
+						else if (score == 0.0) {
 							scoreIndex = 1;
 						}
 
@@ -97,7 +109,7 @@ AUI.add(
 						return prefix + score;
 					},
 
-					_getLabel: function(desc, totalEntries, ratingScore) {
+					_getLabel: function(desc, totalEntries) {
 						var instance = this;
 
 						var voteLabel = '';
@@ -204,7 +216,10 @@ AUI.add(
 
 					var ratings = Liferay.Ratings.StarRating;
 
-					if (config.type != 'stars') {
+					if (config.type === 'like') {
+						ratings = Liferay.Ratings.LikeRating;
+					}
+					else if (config.type === 'thumbs') {
 						ratings = Liferay.Ratings.ThumbRating;
 					}
 
@@ -243,8 +258,8 @@ AUI.add(
 				_INSTANCES: {},
 
 				_thumbScoreMap: {
-					'-1': 0,
-					'down': -1,
+					'-1': -1,
+					'down': 0,
 					'up': 1
 				}
 			}
@@ -265,7 +280,7 @@ AUI.add(
 						var instance = this;
 
 						var uri = instance.get(STR_URI);
-						var score = instance.ratings.get('selectedIndex') + 1;
+						var score = (instance.ratings.get('selectedIndex') + 1) / instance.get(STR_SIZE);
 
 						instance._sendVoteRequest(uri, score, instance._saveCallback);
 					},
@@ -278,7 +293,7 @@ AUI.add(
 						instance._ratingScoreNode = A.one('#' + namespace + 'ratingScoreContent');
 
 						if (themeDisplay.isSignedIn()) {
-							var yourScore = instance.get(STR_YOUR_SCORE);
+							var yourScore = instance.get(STR_YOUR_SCORE) * instance.get(STR_SIZE);
 
 							instance.ratings = new A.StarRating(
 								{
@@ -314,9 +329,9 @@ AUI.add(
 
 						var description = Liferay.Language.get('average');
 
-						var averageScore = json.averageScore;
+						var averageScore = json.averageScore * instance.get(STR_SIZE);
 
-						var label = instance._getLabel(description, json.totalEntries, averageScore);
+						var label = instance._getLabel(description, json.totalEntries);
 
 						var averageIndex = instance.get('round') ? Math.round(averageScore) : Math.floor(averageScore);
 
@@ -355,6 +370,31 @@ AUI.add(
 				EXTENDS: Ratings,
 
 				prototype: {
+					_buildLabel: function() {
+						var instance = this;
+
+						var totalEntries = instance.get('totalEntries');
+						var totalScore = instance.get('totalScore');
+
+						var description = instance._fixScore(totalScore - (totalEntries - totalScore));
+
+						return instance._getLabel(description, totalEntries);
+					},
+
+					_createRating: function() {
+						var instance = this;
+
+						var namespace = instance.get(STR_NAMESPACE);
+
+						instance.ratings = new A.ThumbRating(
+							{
+								boundingBox: '#' + namespace + 'ratingThumb',
+								label: instance._buildLabel(),
+								srcNode: '#' + namespace + 'ratingThumbContent'
+							}
+						).render();
+					},
+
 					_itemSelect: function(event) {
 						var instance = this;
 
@@ -370,26 +410,13 @@ AUI.add(
 						var instance = this;
 
 						if (themeDisplay.isSignedIn()) {
-							var description = instance._fixScore(instance.get('totalScore'));
-
-							var totalEntries = instance.get('totalEntries');
-							var averageScore = instance.get('averageScore');
-							var size = instance.get(STR_SIZE);
 							var yourScore = instance.get(STR_YOUR_SCORE);
-
-							var label = instance._getLabel(description, totalEntries, averageScore);
 
 							var yourScoreIndex = instance._convertToIndex(yourScore);
 
 							var namespace = instance.get(STR_NAMESPACE);
 
-							instance.ratings = new A.ThumbRating(
-								{
-									boundingBox: '#' + namespace + 'ratingThumb',
-									label: label,
-									srcNode: '#' + namespace + 'ratingThumbContent'
-								}
-							).render();
+							instance._createRating();
 
 							if (instance.get(STR_INITIAL_FOCUS)) {
 								A.one('#' + namespace + 'ratingThumb a').focus();
@@ -408,7 +435,7 @@ AUI.add(
 
 						var json = xhr.get(STR_RESPONSE_DATA);
 
-						var score = Math.round(json.totalEntries * json.averageScore);
+						var score = Math.round(json.totalScore - (json.totalEntries - json.totalScore));
 
 						var description = instance._fixScore(score);
 						var label = instance._getLabel(description, json.totalEntries);
@@ -419,6 +446,63 @@ AUI.add(
 			}
 		);
 
+		var LikeRatingImpl = A.Component.create(
+			{
+				EXTENDS: A.ThumbRating,
+
+				NAME: 'LikeRatingImpl',
+
+				prototype: {
+					renderUI: function() {
+						var instance = this;
+
+						var cssClasses = instance.get('cssClasses');
+
+						A.ThumbRating.superclass.renderUI.apply(this, arguments);
+
+						var elements = instance.get('elements');
+
+						elements.addClass(cssClasses.off);
+						elements.item(0).addClass(cssClasses.up);
+					}
+				}
+			}
+		);
+
+		var LikeRating = A.Component.create(
+			{
+				EXTENDS: ThumbRating,
+
+				NAME: 'LikeRating',
+
+				prototype: {
+					_createRating: function() {
+						var instance = this;
+
+						var namespace = instance.get(STR_NAMESPACE);
+
+						instance.ratings = new LikeRatingImpl(
+							{
+								boundingBox: '#' + namespace + 'ratingLike',
+								label: instance._buildLabel(),
+								srcNode: '#' + namespace + 'ratingLikeContent'
+							}
+						).render();
+					},
+
+					_getLabel: function(desc, totalEntries) {
+						return Lang.sub(
+							'{desc}',
+							{
+								desc: desc
+							}
+						);
+					}
+				}
+			}
+		);
+
+		Ratings.LikeRating = LikeRating;
 		Ratings.StarRating = StarRating;
 		Ratings.ThumbRating = ThumbRating;
 

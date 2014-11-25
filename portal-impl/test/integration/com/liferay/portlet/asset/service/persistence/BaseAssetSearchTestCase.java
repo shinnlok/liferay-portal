@@ -17,16 +17,17 @@ package com.liferay.portlet.asset.service.persistence;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.SearchContext;
-import com.liferay.portal.kernel.test.ExecutionTestListeners;
+import com.liferay.portal.kernel.security.RandomUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.model.BaseModel;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.test.DeleteAfterTestRun;
+import com.liferay.portal.test.MainServletTestRule;
 import com.liferay.portal.test.Sync;
-import com.liferay.portal.test.listeners.MainServletExecutionTestListener;
 import com.liferay.portal.test.runners.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsValues;
@@ -55,16 +56,20 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
  * @author Eudaldo Alonso
  */
-@ExecutionTestListeners(listeners = {MainServletExecutionTestListener.class})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
 @Sync
 public abstract class BaseAssetSearchTestCase {
+
+	@ClassRule
+	public static final MainServletTestRule mainServletTestRule =
+		MainServletTestRule.INSTANCE;
 
 	@Before
 	public void setUp() throws Exception {
@@ -506,9 +511,8 @@ public abstract class BaseAssetSearchTestCase {
 
 	@Test
 	public void testClassName2() throws Exception {
-		long[] classNameIds =
-			AssetRendererFactoryRegistryUtil.getClassNameIds(
-				TestPropsValues.getCompanyId());
+		long[] classNameIds = AssetRendererFactoryRegistryUtil.getClassNameIds(
+			TestPropsValues.getCompanyId());
 
 		classNameIds = ArrayUtil.remove(
 			classNameIds, PortalUtil.getClassNameId(getBaseModelClass()));
@@ -923,8 +927,7 @@ public abstract class BaseAssetSearchTestCase {
 
 		for (int i = 0; i < size; i++) {
 			Date date = new Date(
-				startDate.getTime() +
-				(long)(Math.random() * 60 * 60 * 24 * 365));
+				startDate.getTime() + (RandomUtil.nextInt(365) + 1) * Time.DAY);
 
 			Calendar calendar = new GregorianCalendar();
 

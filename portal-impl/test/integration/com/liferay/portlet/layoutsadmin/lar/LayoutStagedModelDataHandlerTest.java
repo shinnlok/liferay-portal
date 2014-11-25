@@ -15,7 +15,6 @@
 package com.liferay.portlet.layoutsadmin.lar;
 
 import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
-import com.liferay.portal.kernel.test.ExecutionTestListeners;
 import com.liferay.portal.lar.BaseStagedModelDataHandlerTestCase;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
@@ -25,8 +24,8 @@ import com.liferay.portal.service.LayoutFriendlyURLLocalServiceUtil;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextThreadLocal;
+import com.liferay.portal.test.MainServletTestRule;
 import com.liferay.portal.test.TransactionalTestRule;
-import com.liferay.portal.test.listeners.MainServletExecutionTestListener;
 import com.liferay.portal.test.runners.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.util.test.LayoutTestUtil;
 import com.liferay.portal.util.test.RandomTestUtil;
@@ -41,20 +40,20 @@ import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
  * @author Mate Thurzo
  */
-@ExecutionTestListeners(listeners = {MainServletExecutionTestListener.class})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
 public class LayoutStagedModelDataHandlerTest
 	extends BaseStagedModelDataHandlerTestCase {
 
 	@ClassRule
-	public static TransactionalTestRule transactionalTestRule =
-		new TransactionalTestRule();
+	public static final MainServletTestRule mainServletTestRule =
+		MainServletTestRule.INSTANCE;
 
 	@Test
 	public void testTypeArticle() throws Exception {
@@ -72,8 +71,7 @@ public class LayoutStagedModelDataHandlerTest
 			dependentStagedModelsMap, JournalArticle.class, journalArticle);
 
 		Layout layout = LayoutTestUtil.addTypeArticleLayout(
-			stagingGroup.getGroupId(), RandomTestUtil.randomString(),
-			journalArticle.getArticleId());
+			stagingGroup.getGroupId(), journalArticle.getArticleId());
 
 		addDependentLayoutFriendlyURLs(dependentStagedModelsMap, layout);
 
@@ -97,8 +95,7 @@ public class LayoutStagedModelDataHandlerTest
 		Map<String, List<StagedModel>> dependentStagedModelsMap =
 			new HashMap<String, List<StagedModel>>();
 
-		Layout linkedLayout = LayoutTestUtil.addLayout(
-			stagingGroup.getGroupId(), RandomTestUtil.randomString());
+		Layout linkedLayout = LayoutTestUtil.addLayout(stagingGroup);
 
 		List<LayoutFriendlyURL> linkedLayoutFriendlyURLs =
 			LayoutFriendlyURLLocalServiceUtil.getLayoutFriendlyURLs(
@@ -110,8 +107,7 @@ public class LayoutStagedModelDataHandlerTest
 		addDependentLayoutFriendlyURLs(dependentStagedModelsMap, linkedLayout);
 
 		Layout layout = LayoutTestUtil.addTypeLinkToLayoutLayout(
-			stagingGroup.getGroupId(), RandomTestUtil.randomString(),
-			linkedLayout.getLayoutId());
+			stagingGroup.getGroupId(), linkedLayout.getLayoutId());
 
 		List<LayoutFriendlyURL> layoutFriendlyURLs =
 			LayoutFriendlyURLLocalServiceUtil.getLayoutFriendlyURLs(
@@ -149,6 +145,10 @@ public class LayoutStagedModelDataHandlerTest
 			layoutFriendlyURL.getUuid(), liveGroup.getGroupId());
 	}
 
+	@Rule
+	public final TransactionalTestRule transactionalTestRule =
+		TransactionalTestRule.INSTANCE;
+
 	protected void addDependentLayoutFriendlyURLs(
 			Map<String, List<StagedModel>> dependentStagedModelsMap,
 			Layout layout)
@@ -173,8 +173,7 @@ public class LayoutStagedModelDataHandlerTest
 		Map<String, List<StagedModel>> dependentStagedModelsMap =
 			new HashMap<String, List<StagedModel>>();
 
-		Layout parentLayout = LayoutTestUtil.addLayout(
-			group.getGroupId(), RandomTestUtil.randomString());
+		Layout parentLayout = LayoutTestUtil.addLayout(group);
 
 		addDependentStagedModel(
 			dependentStagedModelsMap, Layout.class, parentLayout);
@@ -195,9 +194,7 @@ public class LayoutStagedModelDataHandlerTest
 
 		Layout parentLayout = (Layout)dependentStagedModels.get(0);
 
-		Layout layout = LayoutTestUtil.addLayout(
-			group.getGroupId(), RandomTestUtil.randomString(),
-			parentLayout.getPlid());
+		Layout layout = LayoutTestUtil.addLayout(group, parentLayout.getPlid());
 
 		addDependentLayoutFriendlyURLs(dependentStagedModelsMap, layout);
 

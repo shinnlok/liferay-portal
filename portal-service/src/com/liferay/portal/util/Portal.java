@@ -485,18 +485,6 @@ public interface Portal {
 	 */
 	public long getClassNameId(String value);
 
-	/**
-	 * Returns the ID of certain portlets from the fully qualified name of one
-	 * of their classes. The portlets this method supports are: blogs,
-	 * bookmarks, calendar, document library, image gallery, journal, message
-	 * boards, and wiki.
-	 *
-	 * @param  className the fully qualified name of a class in a portlet
-	 * @return the ID of the portlet the class is a part of, or an empty string
-	 *         if the class is not supported
-	 */
-	public String getClassNamePortletId(String className);
-
 	public Company getCompany(HttpServletRequest request)
 		throws PortalException;
 
@@ -671,12 +659,21 @@ public interface Portal {
 		PortletPreferences preferences, long companyId, String defaultValue);
 
 	public Map<String, Serializable> getExpandoBridgeAttributes(
+			ExpandoBridge expandoBridge, HttpServletRequest request)
+		throws PortalException;
+
+	public Map<String, Serializable> getExpandoBridgeAttributes(
 			ExpandoBridge expandoBridge, PortletRequest portletRequest)
 		throws PortalException;
 
 	public Map<String, Serializable> getExpandoBridgeAttributes(
 			ExpandoBridge expandoBridge,
 			UploadPortletRequest uploadPortletRequest)
+		throws PortalException;
+
+	public Serializable getExpandoValue(
+			HttpServletRequest request, String name, int type,
+			String displayType)
 		throws PortalException;
 
 	public Serializable getExpandoValue(

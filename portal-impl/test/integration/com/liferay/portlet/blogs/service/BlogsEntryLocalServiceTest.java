@@ -16,7 +16,6 @@ package com.liferay.portlet.blogs.service;
 
 import com.liferay.portal.kernel.dao.orm.QueryDefinition;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
-import com.liferay.portal.kernel.test.ExecutionTestListeners;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Organization;
@@ -24,14 +23,16 @@ import com.liferay.portal.model.User;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.service.SubscriptionLocalServiceUtil;
 import com.liferay.portal.test.DeleteAfterTestRun;
+import com.liferay.portal.test.MainServletTestRule;
 import com.liferay.portal.test.Sync;
-import com.liferay.portal.test.SynchronousDestinationExecutionTestListener;
-import com.liferay.portal.test.listeners.MainServletExecutionTestListener;
+import com.liferay.portal.test.SynchronousDestinationTestRule;
 import com.liferay.portal.test.runners.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.util.test.GroupTestUtil;
 import com.liferay.portal.util.test.OrganizationTestUtil;
 import com.liferay.portal.util.test.TestPropsValues;
 import com.liferay.portal.util.test.UserTestUtil;
+import com.liferay.portlet.asset.model.AssetEntry;
+import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.blogs.model.BlogsEntry;
 import com.liferay.portlet.blogs.util.test.BlogsTestUtil;
 import com.liferay.portlet.messageboards.service.MBMessageLocalServiceUtil;
@@ -41,6 +42,8 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -48,14 +51,13 @@ import org.junit.runner.RunWith;
  * @author Cristina González
  * @author Manuel de la Peña
  */
-@ExecutionTestListeners(
-	listeners = {
-		MainServletExecutionTestListener.class,
-		SynchronousDestinationExecutionTestListener.class
-	})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
 @Sync
 public class BlogsEntryLocalServiceTest {
+
+	@ClassRule
+	public static final MainServletTestRule mainServletTestRule =
+		MainServletTestRule.INSTANCE;
 
 	@Before
 	public void setUp() throws Exception {
@@ -139,9 +141,8 @@ public class BlogsEntryLocalServiceTest {
 
 		BlogsEntry nextEntry = addEntry(false);
 
-		BlogsEntry[] entries =
-			BlogsEntryLocalServiceUtil.getEntriesPrevAndNext(
-				currentEntry.getEntryId());
+		BlogsEntry[] entries = BlogsEntryLocalServiceUtil.getEntriesPrevAndNext(
+			currentEntry.getEntryId());
 
 		Assert.assertNotNull(
 			"The previous entry relative to entry " +
@@ -362,6 +363,24 @@ public class BlogsEntryLocalServiceTest {
 	}
 
 	@Test
+	public void testGetNoAssetEntries() throws Exception {
+		BlogsEntry entry = BlogsTestUtil.addEntry(_group, true);
+
+		AssetEntry assetEntry = AssetEntryLocalServiceUtil.fetchEntry(
+			BlogsEntry.class.getName(), entry.getEntryId());
+
+		Assert.assertNotNull(assetEntry);
+
+		AssetEntryLocalServiceUtil.deleteAssetEntry(assetEntry);
+
+		List<BlogsEntry> entries =
+			BlogsEntryLocalServiceUtil.getNoAssetEntries();
+
+		Assert.assertEquals(1, entries.size());
+		Assert.assertEquals(entry, entries.get(0));
+	}
+
+	@Test
 	public void testGetOrganizationEntriesCountInTrash() throws Exception {
 		testGetOrganizationEntriesCount(true);
 	}
@@ -423,6 +442,10 @@ public class BlogsEntryLocalServiceTest {
 		BlogsEntryLocalServiceUtil.updateEntryResources(
 			entry, new String[] {ActionKeys.ADD_DISCUSSION}, null);
 	}
+
+	@Rule
+	public final SynchronousDestinationTestRule synchronousDestinationTestRule =
+		SynchronousDestinationTestRule.INSTANCE;
 
 	protected BlogsEntry addEntry(boolean statusInTrash) throws Exception {
 		return addEntry(TestPropsValues.getUserId(), statusInTrash);

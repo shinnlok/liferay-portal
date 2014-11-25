@@ -14,19 +14,18 @@
 
 package com.liferay.portlet.journal.subscriptions;
 
-import com.liferay.portal.kernel.test.ExecutionTestListeners;
+import com.liferay.portal.kernel.test.AggregateTestRule;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.service.CompanyLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.test.MainServletTestRule;
 import com.liferay.portal.test.Sync;
-import com.liferay.portal.test.SynchronousMailExecutionTestListener;
-import com.liferay.portal.test.listeners.MainServletExecutionTestListener;
+import com.liferay.portal.test.SynchronousMailTestRule;
 import com.liferay.portal.test.runners.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.subscriptions.BaseSubscriptionClassTypeTestCase;
 import com.liferay.portal.util.test.ServiceContextTestUtil;
-import com.liferay.portal.util.test.TestPropsValues;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.model.DDMTemplate;
 import com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalServiceUtil;
@@ -39,22 +38,27 @@ import com.liferay.portlet.journal.util.test.JournalTestUtil;
 
 import java.util.List;
 
-import org.junit.Assert;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.runner.RunWith;
 
 /**
  * @author Zsolt Berentey
  * @author Roberto Díaz
  */
-@ExecutionTestListeners(
-	listeners = {
-		MainServletExecutionTestListener.class,
-		SynchronousMailExecutionTestListener.class
-	})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
 @Sync
 public class JournalSubscriptionClassTypeTest
 	extends BaseSubscriptionClassTypeTestCase {
+
+	@ClassRule
+	public static final AggregateTestRule aggregateTestRule =
+		new AggregateTestRule(
+			MainServletTestRule.INSTANCE, SynchronousMailTestRule.INSTANCE);
+
+	@Rule
+	public final SynchronousMailTestRule synchronousMailTestRule =
+		SynchronousMailTestRule.INSTANCE;
 
 	@Override
 	protected long addBaseModelWithClassType(long containerId, long classTypeId)
@@ -83,19 +87,27 @@ public class JournalSubscriptionClassTypeTest
 
 	@Override
 	protected long addClassType() throws Exception {
-		_ddmStructure = DDMStructureTestUtil.addStructure(
+		DDMStructure ddmStructure = DDMStructureTestUtil.addStructure(
 			group.getGroupId(), JournalArticle.class.getName());
 
-		_ddmTemplate = DDMTemplateTestUtil.addTemplate(
-			group.getGroupId(), _ddmStructure.getStructureId());
+		DDMTemplateTestUtil.addTemplate(
+			group.getGroupId(), ddmStructure.getStructureId());
 
-		return _ddmStructure.getStructureId();
+		return ddmStructure.getStructureId();
 	}
 
 	@Override
 	protected void addSubscriptionClassType(long classTypeId) throws Exception {
 		JournalArticleLocalServiceUtil.subscribeStructure(
-			group.getGroupId(), TestPropsValues.getUserId(), classTypeId);
+			group.getGroupId(), user.getUserId(), classTypeId);
+	}
+
+	@Override
+	protected void deleteSubscriptionClassType(long classTypeId)
+		throws Exception {
+
+		JournalArticleLocalServiceUtil.unsubscribeStructure(
+			group.getGroupId(), user.getUserId(), classTypeId);
 	}
 
 	@Override
@@ -108,12 +120,15 @@ public class JournalSubscriptionClassTypeTest
 			PortalUtil.getClassNameId(JournalArticle.class),
 			"BASIC-WEB-CONTENT");
 
-		Assert.assertNotNull(ddmStructure);
-
 		return ddmStructure.getStructureId();
 	}
 
-	protected DDMStructure _ddmStructure;
-	protected DDMTemplate _ddmTemplate;
+	@Override
+	protected void updateBaseModel(long baseModelId) throws Exception {
+		JournalArticle article =
+			JournalArticleLocalServiceUtil.getLatestArticle(baseModelId);
+
+		JournalTestUtil.updateArticleWithWorkflow(article, true);
+	}
 
 }

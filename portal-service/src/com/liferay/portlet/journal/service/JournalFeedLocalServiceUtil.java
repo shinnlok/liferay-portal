@@ -43,9 +43,9 @@ public class JournalFeedLocalServiceUtil {
 	public static com.liferay.portlet.journal.model.JournalFeed addFeed(
 		long userId, long groupId, java.lang.String feedId, boolean autoFeedId,
 		java.lang.String name, java.lang.String description,
-		java.lang.String type, java.lang.String structureId,
-		java.lang.String templateId, java.lang.String rendererTemplateId,
-		int delta, java.lang.String orderByCol, java.lang.String orderByType,
+		java.lang.String ddmStructureKey, java.lang.String ddmTemplateKey,
+		java.lang.String ddmRendererTemplateKey, int delta,
+		java.lang.String orderByCol, java.lang.String orderByType,
 		java.lang.String targetLayoutFriendlyUrl,
 		java.lang.String targetPortletId, java.lang.String contentField,
 		java.lang.String feedFormat, double feedVersion,
@@ -53,10 +53,10 @@ public class JournalFeedLocalServiceUtil {
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
 				   .addFeed(userId, groupId, feedId, autoFeedId, name,
-			description, type, structureId, templateId, rendererTemplateId,
-			delta, orderByCol, orderByType, targetLayoutFriendlyUrl,
-			targetPortletId, contentField, feedFormat, feedVersion,
-			serviceContext);
+			description, ddmStructureKey, ddmTemplateKey,
+			ddmRendererTemplateKey, delta, orderByCol, orderByType,
+			targetLayoutFriendlyUrl, targetPortletId, contentField, feedFormat,
+			feedVersion, serviceContext);
 	}
 
 	public static void addFeedResources(
@@ -212,10 +212,10 @@ public class JournalFeedLocalServiceUtil {
 	}
 
 	/**
-	* Returns the number of rows that match the dynamic query.
+	* Returns the number of rows matching the dynamic query.
 	*
 	* @param dynamicQuery the dynamic query
-	* @return the number of rows that match the dynamic query
+	* @return the number of rows matching the dynamic query
 	*/
 	public static long dynamicQueryCount(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
@@ -223,11 +223,11 @@ public class JournalFeedLocalServiceUtil {
 	}
 
 	/**
-	* Returns the number of rows that match the dynamic query.
+	* Returns the number of rows matching the dynamic query.
 	*
 	* @param dynamicQuery the dynamic query
 	* @param projection the projection to apply to the query
-	* @return the number of rows that match the dynamic query
+	* @return the number of rows matching the dynamic query
 	*/
 	public static long dynamicQueryCount(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery,
@@ -346,11 +346,28 @@ public class JournalFeedLocalServiceUtil {
 		return getService().getJournalFeeds(start, end);
 	}
 
+	/**
+	* Returns all the journal feeds matching the UUID and company.
+	*
+	* @param uuid the UUID of the journal feeds
+	* @param companyId the primary key of the company
+	* @return the matching journal feeds, or an empty list if no matches were found
+	*/
 	public static java.util.List<com.liferay.portlet.journal.model.JournalFeed> getJournalFeedsByUuidAndCompanyId(
 		java.lang.String uuid, long companyId) {
 		return getService().getJournalFeedsByUuidAndCompanyId(uuid, companyId);
 	}
 
+	/**
+	* Returns a range of journal feeds matching the UUID and company.
+	*
+	* @param uuid the UUID of the journal feeds
+	* @param companyId the primary key of the company
+	* @param start the lower bound of the range of journal feeds
+	* @param end the upper bound of the range of journal feeds (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the range of matching journal feeds, or an empty list if no matches were found
+	*/
 	public static java.util.List<com.liferay.portlet.journal.model.JournalFeed> getJournalFeedsByUuidAndCompanyId(
 		java.lang.String uuid, long companyId, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.journal.model.JournalFeed> orderByComparator) {
@@ -415,9 +432,9 @@ public class JournalFeedLocalServiceUtil {
 
 	public static com.liferay.portlet.journal.model.JournalFeed updateFeed(
 		long groupId, java.lang.String feedId, java.lang.String name,
-		java.lang.String description, java.lang.String type,
-		java.lang.String structureId, java.lang.String templateId,
-		java.lang.String rendererTemplateId, int delta,
+		java.lang.String description, java.lang.String ddmStructureKey,
+		java.lang.String ddmTemplateKey,
+		java.lang.String ddmRendererTemplateKey, int delta,
 		java.lang.String orderByCol, java.lang.String orderByType,
 		java.lang.String targetLayoutFriendlyUrl,
 		java.lang.String targetPortletId, java.lang.String contentField,
@@ -425,9 +442,9 @@ public class JournalFeedLocalServiceUtil {
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
-				   .updateFeed(groupId, feedId, name, description, type,
-			structureId, templateId, rendererTemplateId, delta, orderByCol,
-			orderByType, targetLayoutFriendlyUrl, targetPortletId,
+				   .updateFeed(groupId, feedId, name, description,
+			ddmStructureKey, ddmTemplateKey, ddmRendererTemplateKey, delta,
+			orderByCol, orderByType, targetLayoutFriendlyUrl, targetPortletId,
 			contentField, feedFormat, feedVersion, serviceContext);
 	}
 
