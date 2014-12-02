@@ -1,4 +1,3 @@
-<%--
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
@@ -12,6 +11,17 @@
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
  */
---%>
 
-<%@ include file="/html/portlet/users_admin/user_search_results_database.jspf" %>
+package com.liferay.portal.kernel.lar.lifecycle;
+
+import java.io.Serializable;
+
+/**
+ * @author Daniel Kocsis
+ */
+public interface ExportImportLifecycleEventFactory {
+
+	public ExportImportLifecycleEvent create(
+		int code, Serializable... attributes);
+
+}

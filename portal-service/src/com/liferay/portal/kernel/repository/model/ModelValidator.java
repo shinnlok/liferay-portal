@@ -12,19 +12,15 @@
  * details.
  */
 
-package com.liferay.portal.kernel.messaging.proxy;
+package com.liferay.portal.kernel.repository.model;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import com.liferay.portal.kernel.exception.PortalException;
 
 /**
- * @author Michael C. Han
+ * @author Adolfo Pérez
  */
-@Documented
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.PARAMETER)
-public @interface ExecutingClassLoaders {
+public interface ModelValidator<T> {
+
+	public void validate(T t) throws PortalException;
+
 }
