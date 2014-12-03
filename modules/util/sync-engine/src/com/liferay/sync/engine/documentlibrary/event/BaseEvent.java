@@ -21,6 +21,8 @@ import com.liferay.sync.engine.model.SyncFile;
 import com.liferay.sync.engine.service.SyncAccountService;
 import com.liferay.sync.engine.session.Session;
 import com.liferay.sync.engine.session.SessionManager;
+import com.liferay.sync.engine.util.BatchEvent;
+import com.liferay.sync.engine.util.BatchEventUtil;
 
 import java.util.Map;
 
@@ -86,8 +88,6 @@ public abstract class BaseEvent implements Event {
 			_handler);
 	}
 
-	public abstract Handler<Void> getHandler();
-
 	@Override
 	public Map<String, Object> getParameters() {
 		return _parameters;
@@ -101,6 +101,11 @@ public abstract class BaseEvent implements Event {
 	@Override
 	public long getSyncAccountId() {
 		return _syncAccountId;
+	}
+
+	@Override
+	public String getURLPath() {
+		return _urlPath;
 	}
 
 	@Override
@@ -135,7 +140,11 @@ public abstract class BaseEvent implements Event {
 	}
 
 	protected void processAsynchronousRequest() throws Exception {
-		executeAsynchronousPost(_urlPath, _parameters);
+		BatchEvent batchEvent = BatchEventUtil.getBatchEvent(_syncAccountId);
+
+		if (!batchEvent.addEvent(this)) {
+			executeAsynchronousPost(_urlPath, _parameters);
+		}
 	}
 
 	protected void processRequest() throws Exception {

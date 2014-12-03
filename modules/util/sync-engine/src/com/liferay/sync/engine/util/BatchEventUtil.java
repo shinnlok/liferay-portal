@@ -12,25 +12,35 @@
  * details.
  */
 
-package com.liferay.sync.engine.documentlibrary.event;
+package com.liferay.sync.engine.util;
 
-import com.liferay.sync.engine.documentlibrary.handler.Handler;
-
+import java.util.HashMap;
 import java.util.Map;
 
 /**
  * @author Shinn Lok
  */
-public interface Event extends Runnable {
+public class BatchEventUtil {
 
-	public Handler<Void> getHandler();
+	public static synchronized BatchEvent getBatchEvent(long syncAccountId) {
+		try {
+			BatchEvent batchEvent = _batchEvents.get(syncAccountId);
 
-	public Map<String, Object> getParameters();
+			if ((batchEvent != null) && !batchEvent.isClosed()) {
+				return batchEvent;
+			}
 
-	public Object getParameterValue(String key);
+			batchEvent = new BatchEvent(syncAccountId);
 
-	public long getSyncAccountId();
+			_batchEvents.put(syncAccountId, batchEvent);
 
-	public String getURLPath();
+			return batchEvent;
+		}
+		catch (Exception e) {
+			return null;
+		}
+	}
+
+	private static final Map<Long, BatchEvent> _batchEvents = new HashMap<>();
 
 }

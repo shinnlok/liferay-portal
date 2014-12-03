@@ -315,11 +315,19 @@ public class Session {
 
 		Path deltaFilePath = (Path)parameters.get("deltaFilePath");
 		Path filePath = (Path)parameters.get("filePath");
+		Path zipFilePath = (Path)parameters.get("zipFilePath");
 
 		MultipartEntityBuilder multipartEntityBuilder =
 			_getMultipartEntityBuilder(parameters);
 
-		if (deltaFilePath != null) {
+		if (zipFilePath != null) {
+			multipartEntityBuilder.addPart(
+				"zipFile",
+				_getFileBody(
+					zipFilePath, "application/zip",
+					String.valueOf(zipFilePath.getFileName())));
+		}
+		else if (deltaFilePath != null) {
 			multipartEntityBuilder.addPart(
 				"deltaFile",
 				_getFileBody(
