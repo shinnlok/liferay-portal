@@ -28,8 +28,10 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -42,11 +44,13 @@ import org.apache.commons.io.output.CountingOutputStream;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.HttpClientContext;
@@ -64,6 +68,7 @@ import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.SystemDefaultRoutePlanner;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 
@@ -272,6 +277,27 @@ public class Session {
 			_httpHost, httpPost, handler, getBasicHttpContext());
 	}
 
+	public HttpResponse executePostUrlEncoded(String urlPath, Map<String, Object> parameters)
+		throws Exception {
+
+		HttpPost httpPost = new HttpPost(urlPath);
+
+		httpPost.setHeader("Sync-JWT", _token);
+
+		List<NameValuePair> nameValuePairs = new ArrayList<>();
+
+		for (Map.Entry<String, Object> entry : parameters.entrySet()) {
+			NameValuePair nameValuePair = new BasicNameValuePair(
+				entry.getKey(), String.valueOf(entry.getValue()));
+
+			nameValuePairs.add(nameValuePair);
+		}
+
+		httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+
+		return _httpClient.execute(_httpHost, httpPost, getBasicHttpContext());
+	}
+	
 	public BasicHttpContext getBasicHttpContext() {
 		if (_basicHttpContext != null) {
 			return _basicHttpContext;
