@@ -85,7 +85,7 @@ public abstract class BaseEvent implements Event {
 
 		session.executePost(
 			syncAccount.getUrl() + "/api/jsonws" + urlPath, parameters,
-			_handler);
+			_handler, false);
 	}
 
 	@Override
