@@ -30,6 +30,7 @@ import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
+import com.liferay.portal.service.LayoutSetLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PortletKeys;
@@ -69,8 +70,7 @@ public class JournalArticleAssetRenderer
 
 	public static long getClassPK(JournalArticle article) {
 		if ((article.isDraft() || article.isPending()) &&
-			(article.getVersion() !=
-				JournalArticleConstants.VERSION_DEFAULT)) {
+			(article.getVersion() != JournalArticleConstants.VERSION_DEFAULT)) {
 
 			return article.getPrimaryKey();
 		}
@@ -304,7 +304,9 @@ public class JournalArticleAssetRenderer
 			}
 
 			String groupFriendlyURL = PortalUtil.getGroupFriendlyURL(
-				group, layout.isPrivateLayout(), themeDisplay);
+				LayoutSetLocalServiceUtil.getLayoutSet(
+					group.getGroupId(), layout.isPrivateLayout()),
+				themeDisplay);
 
 			return PortalUtil.addPreservedParameters(
 				themeDisplay,

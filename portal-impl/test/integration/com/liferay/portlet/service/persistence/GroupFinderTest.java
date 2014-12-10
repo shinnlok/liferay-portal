@@ -30,9 +30,9 @@ import com.liferay.portal.service.ResourceActionLocalServiceUtil;
 import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
 import com.liferay.portal.service.ResourceTypePermissionLocalServiceUtil;
 import com.liferay.portal.service.persistence.GroupFinderUtil;
+import com.liferay.portal.test.LiferayIntegrationTestRule;
 import com.liferay.portal.test.MainServletTestRule;
 import com.liferay.portal.test.TransactionalTestRule;
-import com.liferay.portal.test.runners.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.comparator.GroupNameComparator;
 import com.liferay.portal.util.test.GroupTestUtil;
@@ -52,20 +52,19 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 /**
  * @author Alberto Chaparro
  * @author László Csontos
  */
-@RunWith(LiferayIntegrationJUnitTestRunner.class)
 public class GroupFinderTest {
 
 	@ClassRule
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
 		new AggregateTestRule(
-			MainServletTestRule.INSTANCE, TransactionalTestRule.INSTANCE);
+			new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE,
+			TransactionalTestRule.INSTANCE);
 
 	@BeforeClass
 	public static void setUpClass() throws Exception {
@@ -169,20 +168,17 @@ public class GroupFinderTest {
 
 		int initialGroupCount = groups.size();
 
-		GroupTestUtil.addGroup(RandomTestUtil.randomString());
+		GroupTestUtil.addGroup();
 
-		Group parentGroup = GroupTestUtil.addGroup(
-			RandomTestUtil.randomString());
+		Group parentGroup = GroupTestUtil.addGroup();
 
 		LayoutTestUtil.addLayout(parentGroup, false);
 
-		Group childGroup1 = GroupTestUtil.addGroup(
-			parentGroup.getGroupId(), RandomTestUtil.randomString());
+		Group childGroup1 = GroupTestUtil.addGroup(parentGroup.getGroupId());
 
 		LayoutTestUtil.addLayout(childGroup1, false);
 
-		Group childGroup2 = GroupTestUtil.addGroup(
-			parentGroup.getGroupId(), RandomTestUtil.randomString());
+		Group childGroup2 = GroupTestUtil.addGroup(parentGroup.getGroupId());
 
 		LayoutTestUtil.addLayout(childGroup2, true);
 

@@ -17,10 +17,11 @@ package com.liferay.portal.model;
 import com.liferay.portal.ModelListenerException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.model.impl.UserModelImpl;
 import com.liferay.portal.security.auth.PrincipalThreadLocal;
-import com.liferay.portal.security.ldap.LDAPUserTransactionThreadLocal;
-import com.liferay.portal.security.ldap.PortalLDAPExporterUtil;
+import com.liferay.portal.security.exportimport.UserExporterUtil;
+import com.liferay.portal.security.exportimport.UserImportTransactionThreadLocal;
 import com.liferay.portal.service.MembershipRequestLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextThreadLocal;
@@ -30,6 +31,7 @@ import java.io.Serializable;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Scott Lee
@@ -37,7 +39,7 @@ import java.util.Map;
  * @author Raymond Augé
  * @author Vilmos Papp
  */
-public class UserModelListener extends BaseModelListener<User> {
+public class UserModelListener extends UserCollectionReindexListener<User> {
 
 	@Override
 	public void onAfterAddAssociation(
@@ -46,12 +48,16 @@ public class UserModelListener extends BaseModelListener<User> {
 		throws ModelListenerException {
 
 		try {
+			long userId = ((Long)classPK).longValue();
+
 			if (associationClassName.equals(Group.class.getName())) {
-				long userId = ((Long)classPK).longValue();
 				long groupId = ((Long)associationClassPK).longValue();
 
 				updateMembershipRequestStatus(userId, groupId);
 			}
+
+			super.onAfterAddAssociation(
+				classPK, associationClassName, associationClassPK);
 		}
 		catch (Exception e) {
 			throw new ModelListenerException(e);
@@ -82,13 +88,13 @@ public class UserModelListener extends BaseModelListener<User> {
 	public void onBeforeUpdate(User user) {
 		UserModelImpl userModelImpl = (UserModelImpl)user;
 
-		LDAPUserTransactionThreadLocal.setOriginalEmailAddress(
+		UserImportTransactionThreadLocal.setOriginalEmailAddress(
 			userModelImpl.getOriginalEmailAddress());
 	}
 
 	protected void exportToLDAP(User user) throws Exception {
 		if (user.isDefaultUser() ||
-			LDAPUserTransactionThreadLocal.isOriginatesFromLDAP()) {
+			UserImportTransactionThreadLocal.isOriginatesFromImport()) {
 
 			return;
 		}
@@ -103,7 +109,22 @@ public class UserModelListener extends BaseModelListener<User> {
 				serviceContext.getExpandoBridgeAttributes();
 		}
 
-		PortalLDAPExporterUtil.exportToLDAP(user, expandoBridgeAttributes);
+		UserExporterUtil.exportUser(user, expandoBridgeAttributes);
+	}
+
+	@Override
+	protected Set<String> getTableMapperClasses() {
+		return _TABLE_MAPPER_CLASSES;
+	}
+
+	@Override
+	protected long[] getUserIds(Object classPK) {
+		return new long[] { (Long)classPK };
+	}
+
+	@Override
+	protected boolean isAssociationReindex() {
+		return true;
 	}
 
 	protected void updateMembershipRequestStatus(long userId, long groupId)
@@ -127,5 +148,12 @@ public class UserModelListener extends BaseModelListener<User> {
 				new ServiceContext());
 		}
 	}
+
+	private static final Set<String> _TABLE_MAPPER_CLASSES =
+		SetUtil.fromArray(new String[] {
+			Group.class.getName(), Organization.class.getName(),
+			Role.class.getName(), Team.class.getName(),
+			UserGroup.class.getName()
+		});
 
 }

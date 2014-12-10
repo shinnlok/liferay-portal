@@ -129,6 +129,28 @@ public abstract class BaseRepositoryImpl
 			serviceContext);
 	}
 
+	public abstract Folder addFolder(
+			long userId, long parentFolderId, String name, String description,
+			ServiceContext serviceContext)
+		throws PortalException;
+
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #addFolder(long, long,
+	 *             String, String, ServiceContext)}
+	 */
+	@Deprecated
+	@Override
+	public Folder addFolder(
+			long parentFolderId, String name, String description,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		return addFolder(
+			com.liferay.portal.kernel.repository.util.RepositoryUserUtil.
+				getUserId(),
+			name, description, serviceContext);
+	}
+
 	/**
 	 * @deprecated As of 7.0.0, replaced by {@link #checkInFileEntry(long, long,
 	 *             boolean, String, ServiceContext)}
@@ -174,6 +196,15 @@ public abstract class BaseRepositoryImpl
 			fileEntryId, lockUuid, serviceContext);
 	}
 
+	public abstract FileEntry checkOutFileEntry(
+			long fileEntryId, ServiceContext serviceContext)
+		throws PortalException;
+
+	public abstract FileEntry checkOutFileEntry(
+			long fileEntryId, String owner, long expirationTime,
+			ServiceContext serviceContext)
+		throws PortalException;
+
 	/**
 	 * @deprecated As of 7.0.0, replaced by {@link #copyFileEntry(long, long,
 	 *             long, long, ServiceContext)}
@@ -189,6 +220,11 @@ public abstract class BaseRepositoryImpl
 			com.liferay.portal.kernel.repository.util.RepositoryUserUtil.
 				getUserId(),
 			groupId, fileEntryId, destFolderId, serviceContext);
+	}
+
+	@Override
+	public void deleteAll() {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -429,6 +465,39 @@ public abstract class BaseRepositoryImpl
 	}
 
 	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #moveFileEntry(long, long,
+	 *             long, ServiceContext)}
+	 */
+	@Deprecated
+	@Override
+	public FileEntry moveFileEntry(
+			long fileEntryId, long newFolderId, ServiceContext serviceContext)
+		throws PortalException {
+
+		return moveFileEntry(
+			com.liferay.portal.kernel.repository.util.RepositoryUserUtil.
+				getUserId(),
+			fileEntryId, newFolderId, serviceContext);
+	}
+
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #moveFolder(long, long, long,
+	 *             ServiceContext)}
+	 */
+	@Deprecated
+	@Override
+	public Folder moveFolder(
+			long folderId, long newParentFolderId,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		return moveFolder(
+			com.liferay.portal.kernel.repository.util.RepositoryUserUtil.
+				getUserId(),
+			folderId, newParentFolderId, serviceContext);
+	}
+
+	/**
 	 * @deprecated As of 7.0.0, replaced by {@link #revertFileEntry(long, long,
 	 *             String, ServiceContext)}
 	 */
@@ -589,6 +658,14 @@ public abstract class BaseRepositoryImpl
 				getUserId(),
 			fileEntryId, sourceFileName, mimeType, title, description,
 			changeLog, majorVersion, is, size, serviceContext);
+	}
+
+	@Override
+	public Folder updateFolder(
+		long folderId, long parentFolderId, String name, String description,
+		ServiceContext serviceContext) {
+
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

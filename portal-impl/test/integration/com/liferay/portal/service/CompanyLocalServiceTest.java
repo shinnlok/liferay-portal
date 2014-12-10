@@ -40,11 +40,11 @@ import com.liferay.portal.security.auth.CompanyThreadLocal;
 import com.liferay.portal.service.persistence.PasswordPolicyUtil;
 import com.liferay.portal.service.persistence.PortalPreferencesUtil;
 import com.liferay.portal.service.persistence.PortletUtil;
+import com.liferay.portal.test.LiferayIntegrationTestRule;
 import com.liferay.portal.test.MainServletTestRule;
 import com.liferay.portal.test.Sync;
 import com.liferay.portal.test.SynchronousDestinationTestRule;
 import com.liferay.portal.test.TransactionalTestRule;
-import com.liferay.portal.test.runners.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.util.PortalInstances;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.PropsValues;
@@ -72,7 +72,6 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import org.springframework.core.io.FileSystemResourceLoader;
 import org.springframework.mock.web.MockServletContext;
@@ -81,7 +80,6 @@ import org.springframework.mock.web.MockServletContext;
  * @author Mika Koivisto
  * @author Dale Shan
  */
-@RunWith(LiferayIntegrationJUnitTestRunner.class)
 @Sync
 public class CompanyLocalServiceTest {
 
@@ -89,7 +87,7 @@ public class CompanyLocalServiceTest {
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
 		new AggregateTestRule(
-			MainServletTestRule.INSTANCE,
+			new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE,
 			SynchronousDestinationTestRule.INSTANCE,
 			TransactionalTestRule.INSTANCE);
 
@@ -205,8 +203,7 @@ public class CompanyLocalServiceTest {
 		long userId = UserLocalServiceUtil.getDefaultUserId(companyId);
 
 		Group group = GroupTestUtil.addGroup(
-			companyId, userId, GroupConstants.DEFAULT_PARENT_GROUP_ID,
-			RandomTestUtil.randomString(), RandomTestUtil.randomString());
+			companyId, userId, GroupConstants.DEFAULT_PARENT_GROUP_ID);
 
 		LayoutSetPrototype layoutSetPrototype = addLayoutSetPrototype(
 			companyId, userId, RandomTestUtil.randomString());
@@ -237,12 +234,10 @@ public class CompanyLocalServiceTest {
 		long userId = UserLocalServiceUtil.getDefaultUserId(companyId);
 
 		Group parentGroup = GroupTestUtil.addGroup(
-			companyId, userId, GroupConstants.DEFAULT_PARENT_GROUP_ID,
-			RandomTestUtil.randomString(), RandomTestUtil.randomString());
+			companyId, userId, GroupConstants.DEFAULT_PARENT_GROUP_ID);
 
 		Group group = GroupTestUtil.addGroup(
-			companyId, userId, parentGroup.getGroupId(),
-			RandomTestUtil.randomString(), RandomTestUtil.randomString());
+			companyId, userId, parentGroup.getGroupId());
 
 		addUser(
 			companyId, userId, group.getGroupId(),
@@ -467,7 +462,8 @@ public class CompanyLocalServiceTest {
 		GroupLocalServiceUtil.updateGroup(group);
 
 		testUpdateAccountNames(
-			company, new String[] {StringPool.BLANK, group.getName()}, true);
+			company,
+			new String[] {StringPool.BLANK, group.getDescriptiveName()}, true);
 
 		GroupLocalServiceUtil.deleteGroup(group);
 

@@ -34,6 +34,7 @@ import com.liferay.portal.kernel.test.AggregateTestRule;
 import com.liferay.portal.kernel.test.AssertUtils;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.workflow.test.WorkflowHandlerInvocationCounter;
@@ -42,19 +43,24 @@ import com.liferay.portal.security.permission.DoAsUserThread;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceTestUtil;
 import com.liferay.portal.test.DeleteAfterTestRun;
+import com.liferay.portal.test.LiferayIntegrationTestRule;
 import com.liferay.portal.test.MainServletTestRule;
 import com.liferay.portal.test.Sync;
 import com.liferay.portal.test.SynchronousDestinationTestRule;
 import com.liferay.portal.test.log.ExpectedLog;
 import com.liferay.portal.test.log.ExpectedLogs;
 import com.liferay.portal.test.log.ExpectedType;
-import com.liferay.portal.test.runners.LiferayIntegrationJUnitTestRunner;
+import com.liferay.portal.util.PropsValues;
+import com.liferay.portal.util.test.PrefsPropsTemporarySwapper;
 import com.liferay.portal.util.test.RandomTestUtil;
 import com.liferay.portal.util.test.ServiceContextTestUtil;
 import com.liferay.portal.util.test.UserTestUtil;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.DuplicateFileException;
+import com.liferay.portlet.documentlibrary.FileExtensionException;
+import com.liferay.portlet.documentlibrary.FileNameException;
+import com.liferay.portlet.documentlibrary.FileSizeException;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryConstants;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
@@ -84,7 +90,6 @@ import org.junit.runner.RunWith;
 @RunWith(Enclosed.class)
 public class DLAppServiceTest extends BaseDLAppTestCase {
 
-	@RunWith(LiferayIntegrationJUnitTestRunner.class)
 	@Sync
 	public static class WhenAddingAFileEntry extends BaseDLAppTestCase {
 
@@ -92,7 +97,7 @@ public class DLAppServiceTest extends BaseDLAppTestCase {
 		@Rule
 		public static final AggregateTestRule aggregateTestRule =
 			new AggregateTestRule(
-				MainServletTestRule.INSTANCE,
+				new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE,
 				SynchronousDestinationTestRule.INSTANCE);
 
 		@Test
@@ -175,6 +180,111 @@ public class DLAppServiceTest extends BaseDLAppTestCase {
 		public void shouldFailIfDuplicateNameInFolder() throws Exception {
 			addFileEntry(group.getGroupId(), parentFolder.getFolderId());
 			addFileEntry(group.getGroupId(), parentFolder.getFolderId());
+		}
+
+		@Test(expected = FileSizeException.class)
+		public void shouldFailIfSizeLimitExceeded() throws Exception {
+			try (PrefsPropsTemporarySwapper prefsPropsReplacement =
+					new PrefsPropsTemporarySwapper(
+						PropsKeys.DL_FILE_MAX_SIZE, 1L)) {
+
+				String fileName = RandomTestUtil.randomString();
+
+				ServiceContext serviceContext =
+					ServiceContextTestUtil.getServiceContext(
+						group.getGroupId());
+
+				byte[] bytes = RandomTestUtil.randomBytes();
+
+				DLAppServiceUtil.addFileEntry(
+					group.getGroupId(), parentFolder.getFolderId(), fileName,
+					ContentTypes.TEXT_PLAIN, fileName, StringPool.BLANK,
+					StringPool.BLANK, bytes, serviceContext);
+			}
+		}
+
+		@Test(expected = FileNameException.class)
+		public void shouldFailIfSourceFileNameContainsBlacklistedChar()
+			throws Exception {
+
+			int i =
+				RandomTestUtil.randomInt() %
+					PropsValues.DL_CHAR_BLACKLIST.length;
+
+			String blackListedChar = PropsValues.DL_CHAR_BLACKLIST[i];
+
+			String sourceFileName =
+				RandomTestUtil.randomString() + blackListedChar +
+					RandomTestUtil.randomString();
+
+			ServiceContext serviceContext =
+				ServiceContextTestUtil.getServiceContext(group.getGroupId());
+
+			DLAppServiceUtil.addFileEntry(
+				group.getGroupId(), parentFolder.getFolderId(), sourceFileName,
+				ContentTypes.TEXT_PLAIN, sourceFileName, StringPool.BLANK,
+				StringPool.BLANK, RandomTestUtil.randomBytes(), serviceContext);
+		}
+
+		@Test(expected = FileNameException.class)
+		public void shouldFailIfSourceFileNameEndsWithBlacklistedChar()
+			throws Exception {
+
+			int i =
+				RandomTestUtil.randomInt() %
+					PropsValues.DL_CHAR_LAST_BLACKLIST.length;
+
+			String blackListedChar = PropsValues.DL_CHAR_LAST_BLACKLIST[i];
+
+			String sourceFileName =
+				RandomTestUtil.randomString() + blackListedChar;
+
+			ServiceContext serviceContext =
+				ServiceContextTestUtil.getServiceContext(group.getGroupId());
+
+			DLAppServiceUtil.addFileEntry(
+				group.getGroupId(), parentFolder.getFolderId(), sourceFileName,
+				ContentTypes.TEXT_PLAIN, sourceFileName, StringPool.BLANK,
+				StringPool.BLANK, RandomTestUtil.randomBytes(), serviceContext);
+		}
+
+		@Test(expected = FileExtensionException.class)
+		public void shouldFailIfSourceFileNameExtensionNotSupported()
+			throws Exception {
+
+			try (PrefsPropsTemporarySwapper prefsPropsTemporarySwapper =
+					new PrefsPropsTemporarySwapper(
+						PropsKeys.DL_FILE_EXTENSIONS, "")) {
+
+				String sourceFileName = "file.jpg";
+
+				ServiceContext serviceContext =
+					ServiceContextTestUtil.getServiceContext(
+						group.getGroupId());
+
+				DLAppServiceUtil.addFileEntry(
+					group.getGroupId(), parentFolder.getFolderId(),
+					sourceFileName, ContentTypes.TEXT_PLAIN, sourceFileName,
+					StringPool.BLANK, StringPool.BLANK,
+					RandomTestUtil.randomBytes(), serviceContext);
+			}
+		}
+
+		@Test(expected = FileNameException.class)
+		public void shouldFailIfSourceFileNameIsBlacklisted() throws Exception {
+			int i =
+				RandomTestUtil.randomInt() %
+					PropsValues.DL_NAME_BLACKLIST.length;
+
+			String blackListedName = PropsValues.DL_NAME_BLACKLIST[i];
+
+			ServiceContext serviceContext =
+				ServiceContextTestUtil.getServiceContext(group.getGroupId());
+
+			DLAppServiceUtil.addFileEntry(
+				group.getGroupId(), parentFolder.getFolderId(), blackListedName,
+				ContentTypes.TEXT_PLAIN, blackListedName, StringPool.BLANK,
+				StringPool.BLANK, RandomTestUtil.randomBytes(), serviceContext);
 		}
 
 		@Test
@@ -406,7 +516,6 @@ public class DLAppServiceTest extends BaseDLAppTestCase {
 
 	}
 
-	@RunWith(LiferayIntegrationJUnitTestRunner.class)
 	@Sync
 	public static class WhenAddingAFolder extends BaseDLAppTestCase {
 
@@ -414,7 +523,7 @@ public class DLAppServiceTest extends BaseDLAppTestCase {
 		@Rule
 		public static final AggregateTestRule aggregateTestRule =
 			new AggregateTestRule(
-				MainServletTestRule.INSTANCE,
+				new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE,
 				SynchronousDestinationTestRule.INSTANCE);
 
 		@Test
@@ -446,7 +555,6 @@ public class DLAppServiceTest extends BaseDLAppTestCase {
 
 	}
 
-	@RunWith(LiferayIntegrationJUnitTestRunner.class)
 	@Sync
 	public static class WhenCheckingInAFileEntry extends BaseDLAppTestCase {
 
@@ -454,7 +562,7 @@ public class DLAppServiceTest extends BaseDLAppTestCase {
 		@Rule
 		public static final AggregateTestRule aggregateTestRule =
 			new AggregateTestRule(
-				MainServletTestRule.INSTANCE,
+				new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE,
 				SynchronousDestinationTestRule.INSTANCE);
 
 		@Test
@@ -527,7 +635,6 @@ public class DLAppServiceTest extends BaseDLAppTestCase {
 
 	}
 
-	@RunWith(LiferayIntegrationJUnitTestRunner.class)
 	@Sync
 	public static class WhenCheckingOutAFileEntry extends BaseDLAppTestCase {
 
@@ -535,7 +642,7 @@ public class DLAppServiceTest extends BaseDLAppTestCase {
 		@Rule
 		public static final AggregateTestRule aggregateTestRule =
 			new AggregateTestRule(
-				MainServletTestRule.INSTANCE,
+				new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE,
 				SynchronousDestinationTestRule.INSTANCE);
 
 		@Test
@@ -557,7 +664,6 @@ public class DLAppServiceTest extends BaseDLAppTestCase {
 
 	}
 
-	@RunWith(LiferayIntegrationJUnitTestRunner.class)
 	@Sync
 	public static class WhenCopyingAFolder extends BaseDLAppTestCase {
 
@@ -565,7 +671,7 @@ public class DLAppServiceTest extends BaseDLAppTestCase {
 		@Rule
 		public static final AggregateTestRule aggregateTestRule =
 			new AggregateTestRule(
-				MainServletTestRule.INSTANCE,
+				new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE,
 				SynchronousDestinationTestRule.INSTANCE);
 
 		@Test
@@ -631,7 +737,6 @@ public class DLAppServiceTest extends BaseDLAppTestCase {
 
 	}
 
-	@RunWith(LiferayIntegrationJUnitTestRunner.class)
 	@Sync
 	public static class WhenDeletingAFileEntry extends BaseDLAppTestCase {
 
@@ -639,7 +744,7 @@ public class DLAppServiceTest extends BaseDLAppTestCase {
 		@Rule
 		public static final AggregateTestRule aggregateTestRule =
 			new AggregateTestRule(
-				MainServletTestRule.INSTANCE,
+				new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE,
 				SynchronousDestinationTestRule.INSTANCE);
 
 		@Test
@@ -657,7 +762,6 @@ public class DLAppServiceTest extends BaseDLAppTestCase {
 
 	}
 
-	@RunWith(LiferayIntegrationJUnitTestRunner.class)
 	@Sync
 	public static class WhenDeletingAFolder extends BaseDLAppTestCase {
 
@@ -665,7 +769,7 @@ public class DLAppServiceTest extends BaseDLAppTestCase {
 		@Rule
 		public static final AggregateTestRule aggregateTestRule =
 			new AggregateTestRule(
-				MainServletTestRule.INSTANCE,
+				new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE,
 				SynchronousDestinationTestRule.INSTANCE);
 
 		@Test
@@ -722,7 +826,6 @@ public class DLAppServiceTest extends BaseDLAppTestCase {
 
 	}
 
-	@RunWith(LiferayIntegrationJUnitTestRunner.class)
 	@Sync
 	public static class WhenDeletingAFolderByName extends BaseDLAppTestCase {
 
@@ -730,7 +833,7 @@ public class DLAppServiceTest extends BaseDLAppTestCase {
 		@Rule
 		public static final AggregateTestRule aggregateTestRule =
 			new AggregateTestRule(
-				MainServletTestRule.INSTANCE,
+				new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE,
 				SynchronousDestinationTestRule.INSTANCE);
 
 		@Test
@@ -782,7 +885,6 @@ public class DLAppServiceTest extends BaseDLAppTestCase {
 
 	}
 
-	@RunWith(LiferayIntegrationJUnitTestRunner.class)
 	@Sync
 	public static class WhenMovingAFileEntry extends BaseDLAppTestCase {
 
@@ -790,7 +892,7 @@ public class DLAppServiceTest extends BaseDLAppTestCase {
 		@Rule
 		public static final AggregateTestRule aggregateTestRule =
 			new AggregateTestRule(
-				MainServletTestRule.INSTANCE,
+				new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE,
 				SynchronousDestinationTestRule.INSTANCE);
 
 		@Test
@@ -818,7 +920,6 @@ public class DLAppServiceTest extends BaseDLAppTestCase {
 
 	}
 
-	@RunWith(LiferayIntegrationJUnitTestRunner.class)
 	@Sync
 	public static class WhenMovingAFolder extends BaseDLAppTestCase {
 
@@ -826,7 +927,7 @@ public class DLAppServiceTest extends BaseDLAppTestCase {
 		@Rule
 		public static final AggregateTestRule aggregateTestRule =
 			new AggregateTestRule(
-				MainServletTestRule.INSTANCE,
+				new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE,
 				SynchronousDestinationTestRule.INSTANCE);
 
 		@Test
@@ -853,7 +954,6 @@ public class DLAppServiceTest extends BaseDLAppTestCase {
 
 	}
 
-	@RunWith(LiferayIntegrationJUnitTestRunner.class)
 	@Sync
 	public static class WhenRevertingAFileEntry extends BaseDLAppTestCase {
 
@@ -861,7 +961,7 @@ public class DLAppServiceTest extends BaseDLAppTestCase {
 		@Rule
 		public static final AggregateTestRule aggregateTestRule =
 			new AggregateTestRule(
-				MainServletTestRule.INSTANCE,
+				new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE,
 				SynchronousDestinationTestRule.INSTANCE);
 
 		@Test
@@ -932,7 +1032,6 @@ public class DLAppServiceTest extends BaseDLAppTestCase {
 
 	}
 
-	@RunWith(LiferayIntegrationJUnitTestRunner.class)
 	@Sync
 	public static class WhenSearchingFileEntries extends BaseDLAppTestCase {
 
@@ -940,7 +1039,7 @@ public class DLAppServiceTest extends BaseDLAppTestCase {
 		@Rule
 		public static final AggregateTestRule aggregateTestRule =
 			new AggregateTestRule(
-				MainServletTestRule.INSTANCE,
+				new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE,
 				SynchronousDestinationTestRule.INSTANCE);
 
 		@Test
@@ -1014,7 +1113,6 @@ public class DLAppServiceTest extends BaseDLAppTestCase {
 
 	}
 
-	@RunWith(LiferayIntegrationJUnitTestRunner.class)
 	@Sync
 	public static class WhenUpdatingAFileEntry extends BaseDLAppTestCase {
 
@@ -1022,7 +1120,7 @@ public class DLAppServiceTest extends BaseDLAppTestCase {
 		@Rule
 		public static final AggregateTestRule aggregateTestRule =
 			new AggregateTestRule(
-				MainServletTestRule.INSTANCE,
+				new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE,
 				SynchronousDestinationTestRule.INSTANCE);
 
 		@Test
@@ -1082,6 +1180,31 @@ public class DLAppServiceTest extends BaseDLAppTestCase {
 					2,
 					workflowHandlerInvocationCounter.getCount(
 						"updateStatus", int.class, Map.class));
+			}
+		}
+
+		@Test(expected = FileSizeException.class)
+		public void shouldFailIfSizeLimitExceeded() throws Exception {
+			String fileName = RandomTestUtil.randomString();
+
+			ServiceContext serviceContext =
+				ServiceContextTestUtil.getServiceContext(group.getGroupId());
+
+			FileEntry fileEntry = DLAppServiceUtil.addFileEntry(
+				group.getGroupId(), parentFolder.getFolderId(), fileName,
+				ContentTypes.TEXT_PLAIN, fileName, StringPool.BLANK,
+				StringPool.BLANK, null, 0, serviceContext);
+
+			try (PrefsPropsTemporarySwapper prefsPropsReplacement =
+					new PrefsPropsTemporarySwapper(
+						PropsKeys.DL_FILE_MAX_SIZE, 1L)) {
+
+				byte[] bytes = RandomTestUtil.randomBytes();
+
+				DLAppServiceUtil.updateFileEntry(
+					fileEntry.getFileEntryId(), fileName,
+					ContentTypes.TEXT_PLAIN, StringPool.BLANK, StringPool.BLANK,
+					StringPool.BLANK, true, bytes, serviceContext);
 			}
 		}
 
@@ -1220,7 +1343,6 @@ public class DLAppServiceTest extends BaseDLAppTestCase {
 
 	}
 
-	@RunWith(LiferayIntegrationJUnitTestRunner.class)
 	@Sync
 	public static class WhenUpdatingAFolder extends BaseDLAppTestCase {
 
@@ -1228,7 +1350,7 @@ public class DLAppServiceTest extends BaseDLAppTestCase {
 		@Rule
 		public static final AggregateTestRule aggregateTestRule =
 			new AggregateTestRule(
-				MainServletTestRule.INSTANCE,
+				new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE,
 				SynchronousDestinationTestRule.INSTANCE);
 
 		@Test

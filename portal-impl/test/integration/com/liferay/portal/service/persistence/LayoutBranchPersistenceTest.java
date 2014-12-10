@@ -31,9 +31,9 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.LayoutBranch;
 import com.liferay.portal.model.impl.LayoutBranchModelImpl;
 import com.liferay.portal.service.LayoutBranchLocalServiceUtil;
+import com.liferay.portal.test.LiferayIntegrationTestRule;
 import com.liferay.portal.test.PersistenceTestRule;
 import com.liferay.portal.test.TransactionalTestRule;
-import com.liferay.portal.test.runners.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.test.RandomTestUtil;
 
@@ -41,8 +41,6 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-
-import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
@@ -56,10 +54,10 @@ import java.util.Set;
 /**
  * @generated
  */
-@RunWith(LiferayIntegrationJUnitTestRunner.class)
 public class LayoutBranchPersistenceTest {
 	@Rule
-	public final AggregateTestRule aggregateTestRule = new AggregateTestRule(PersistenceTestRule.INSTANCE,
+	public final AggregateTestRule aggregateTestRule = new AggregateTestRule(new LiferayIntegrationTestRule(),
+			PersistenceTestRule.INSTANCE,
 			new TransactionalTestRule(Propagation.REQUIRED));
 
 	@After
@@ -243,7 +241,7 @@ public class LayoutBranchPersistenceTest {
 
 	protected OrderByComparator<LayoutBranch> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create("LayoutBranch",
-			"mvccVersion", true, "LayoutBranchId", true, "groupId", true,
+			"mvccVersion", true, "layoutBranchId", true, "groupId", true,
 			"companyId", true, "userId", true, "userName", true,
 			"layoutSetBranchId", true, "plid", true, "name", true,
 			"description", true, "master", true);
@@ -379,7 +377,7 @@ public class LayoutBranchPersistenceTest {
 		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(LayoutBranch.class,
 				LayoutBranch.class.getClassLoader());
 
-		dynamicQuery.add(RestrictionsFactoryUtil.eq("LayoutBranchId",
+		dynamicQuery.add(RestrictionsFactoryUtil.eq("layoutBranchId",
 				newLayoutBranch.getLayoutBranchId()));
 
 		List<LayoutBranch> result = _persistence.findWithDynamicQuery(dynamicQuery);
@@ -396,7 +394,7 @@ public class LayoutBranchPersistenceTest {
 		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(LayoutBranch.class,
 				LayoutBranch.class.getClassLoader());
 
-		dynamicQuery.add(RestrictionsFactoryUtil.eq("LayoutBranchId",
+		dynamicQuery.add(RestrictionsFactoryUtil.eq("layoutBranchId",
 				RandomTestUtil.nextLong()));
 
 		List<LayoutBranch> result = _persistence.findWithDynamicQuery(dynamicQuery);
@@ -413,11 +411,11 @@ public class LayoutBranchPersistenceTest {
 				LayoutBranch.class.getClassLoader());
 
 		dynamicQuery.setProjection(ProjectionFactoryUtil.property(
-				"LayoutBranchId"));
+				"layoutBranchId"));
 
 		Object newLayoutBranchId = newLayoutBranch.getLayoutBranchId();
 
-		dynamicQuery.add(RestrictionsFactoryUtil.in("LayoutBranchId",
+		dynamicQuery.add(RestrictionsFactoryUtil.in("layoutBranchId",
 				new Object[] { newLayoutBranchId }));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
@@ -435,9 +433,9 @@ public class LayoutBranchPersistenceTest {
 				LayoutBranch.class.getClassLoader());
 
 		dynamicQuery.setProjection(ProjectionFactoryUtil.property(
-				"LayoutBranchId"));
+				"layoutBranchId"));
 
-		dynamicQuery.add(RestrictionsFactoryUtil.in("LayoutBranchId",
+		dynamicQuery.add(RestrictionsFactoryUtil.in("layoutBranchId",
 				new Object[] { RandomTestUtil.nextLong() }));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
