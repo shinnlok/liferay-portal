@@ -51,6 +51,118 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 		super(event);
 	}
 
+	@Override
+	public void processResponse(String response) throws Exception {
+		ObjectMapper objectMapper = new ObjectMapper();
+
+		SyncDLObjectUpdate syncDLObjectUpdate = objectMapper.readValue(
+			response, new TypeReference<SyncDLObjectUpdate>() {});
+
+		for (SyncFile targetSyncFile : syncDLObjectUpdate.getSyncDLObjects()) {
+			SyncFile parentSyncFile = SyncFileService.fetchSyncFile(
+				targetSyncFile.getRepositoryId(), getSyncAccountId(),
+				targetSyncFile.getParentFolderId());
+
+			if (parentSyncFile == null) {
+				continue;
+			}
+
+			String filePathName = "";
+
+			try {
+				filePathName = FileUtil.getFilePathName(
+					parentSyncFile.getFilePathName(),
+					FileUtil.getSanitizedFileName(
+						targetSyncFile.getName(),
+						targetSyncFile.getExtension()));
+
+				SyncFile sourceSyncFile = SyncFileService.fetchSyncFile(
+					targetSyncFile.getRepositoryId(), getSyncAccountId(),
+					targetSyncFile.getTypePK());
+
+				if (isIgnoredFilePath(sourceSyncFile, filePathName) ||
+					((sourceSyncFile != null) &&
+					 (sourceSyncFile.getModifiedTime() ==
+						targetSyncFile.getModifiedTime()))) {
+
+					continue;
+				}
+
+				String event = targetSyncFile.getEvent();
+
+				if (event.equals(SyncFile.EVENT_ADD) ||
+					event.equals(SyncFile.EVENT_GET) ||
+					event.equals(SyncFile.EVENT_RESTORE)) {
+
+					if (sourceSyncFile != null) {
+						updateFile(
+							sourceSyncFile, targetSyncFile, filePathName);
+
+						continue;
+					}
+
+					addFile(targetSyncFile, filePathName);
+				}
+				else if (event.equals(SyncFile.EVENT_DELETE)) {
+					if (sourceSyncFile == null) {
+						continue;
+					}
+
+					deleteFile(sourceSyncFile, false);
+				}
+				else if (event.equals(SyncFile.EVENT_MOVE)) {
+					if (sourceSyncFile == null) {
+						addFile(targetSyncFile, filePathName);
+
+						continue;
+					}
+
+					moveFile(sourceSyncFile, targetSyncFile, filePathName);
+				}
+				else if (event.equals(SyncFile.EVENT_TRASH)) {
+					if (sourceSyncFile == null) {
+						continue;
+					}
+
+					deleteFile(sourceSyncFile, true);
+				}
+				else if (event.equals(SyncFile.EVENT_UPDATE)) {
+					if (sourceSyncFile == null) {
+						addFile(targetSyncFile, filePathName);
+
+						continue;
+					}
+
+					updateFile(sourceSyncFile, targetSyncFile, filePathName);
+				}
+			}
+			catch (Exception e) {
+				_logger.error(e.getMessage(), e);
+
+				if (e instanceof FileSystemException) {
+					String message = e.getMessage();
+
+					if (message.contains("File name too long")) {
+						targetSyncFile.setState(SyncFile.STATE_ERROR);
+						targetSyncFile.setUiEvent(
+							SyncFile.UI_EVENT_FILE_NAME_TOO_LONG);
+
+						SyncFileService.update(targetSyncFile);
+					}
+				}
+			}
+		}
+
+		if (getParameterValue("parentFolderId") == null) {
+			SyncSite syncSite = SyncSiteService.fetchSyncSite(
+				(Long)getParameterValue("repositoryId"), getSyncAccountId());
+
+			syncSite.setRemoteSyncTime(syncDLObjectUpdate.getLastAccessTime());
+
+			SyncSiteService.update(syncSite);
+		}
+	}
+
 	protected void addFile(SyncFile syncFile, String filePathName)
 		throws Exception {
 
@@ -209,118 +321,6 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 		sourceSyncFile.setUiEvent(SyncFile.UI_EVENT_MOVED_REMOTE);
 
 		SyncFileService.update(sourceSyncFile);
-	}
-
-	@Override
-	protected void processResponse(String response) throws Exception {
-		ObjectMapper objectMapper = new ObjectMapper();
-
-		SyncDLObjectUpdate syncDLObjectUpdate = objectMapper.readValue(
-			response, new TypeReference<SyncDLObjectUpdate>() {});
-
-		for (SyncFile targetSyncFile : syncDLObjectUpdate.getSyncDLObjects()) {
-			SyncFile parentSyncFile = SyncFileService.fetchSyncFile(
-				targetSyncFile.getRepositoryId(), getSyncAccountId(),
-				targetSyncFile.getParentFolderId());
-
-			if (parentSyncFile == null) {
-				continue;
-			}
-
-			String filePathName = "";
-
-			try {
-				filePathName = FileUtil.getFilePathName(
-					parentSyncFile.getFilePathName(),
-					FileUtil.getSanitizedFileName(
-						targetSyncFile.getName(),
-						targetSyncFile.getExtension()));
-
-				SyncFile sourceSyncFile = SyncFileService.fetchSyncFile(
-					targetSyncFile.getRepositoryId(), getSyncAccountId(),
-					targetSyncFile.getTypePK());
-
-				if (isIgnoredFilePath(sourceSyncFile, filePathName) ||
-					((sourceSyncFile != null) &&
-					 (sourceSyncFile.getModifiedTime() ==
-						targetSyncFile.getModifiedTime()))) {
-
-					continue;
-				}
-
-				String event = targetSyncFile.getEvent();
-
-				if (event.equals(SyncFile.EVENT_ADD) ||
-					event.equals(SyncFile.EVENT_GET) ||
-					event.equals(SyncFile.EVENT_RESTORE)) {
-
-					if (sourceSyncFile != null) {
-						updateFile(
-							sourceSyncFile, targetSyncFile, filePathName);
-
-						continue;
-					}
-
-					addFile(targetSyncFile, filePathName);
-				}
-				else if (event.equals(SyncFile.EVENT_DELETE)) {
-					if (sourceSyncFile == null) {
-						continue;
-					}
-
-					deleteFile(sourceSyncFile, false);
-				}
-				else if (event.equals(SyncFile.EVENT_MOVE)) {
-					if (sourceSyncFile == null) {
-						addFile(targetSyncFile, filePathName);
-
-						continue;
-					}
-
-					moveFile(sourceSyncFile, targetSyncFile, filePathName);
-				}
-				else if (event.equals(SyncFile.EVENT_TRASH)) {
-					if (sourceSyncFile == null) {
-						continue;
-					}
-
-					deleteFile(sourceSyncFile, true);
-				}
-				else if (event.equals(SyncFile.EVENT_UPDATE)) {
-					if (sourceSyncFile == null) {
-						addFile(targetSyncFile, filePathName);
-
-						continue;
-					}
-
-					updateFile(sourceSyncFile, targetSyncFile, filePathName);
-				}
-			}
-			catch (Exception e) {
-				_logger.error(e.getMessage(), e);
-
-				if (e instanceof FileSystemException) {
-					String message = e.getMessage();
-
-					if (message.contains("File name too long")) {
-						targetSyncFile.setState(SyncFile.STATE_ERROR);
-						targetSyncFile.setUiEvent(
-							SyncFile.UI_EVENT_FILE_NAME_TOO_LONG);
-
-						SyncFileService.update(targetSyncFile);
-					}
-				}
-			}
-		}
-
-		if (getParameterValue("parentFolderId") == null) {
-			SyncSite syncSite = SyncSiteService.fetchSyncSite(
-				(Long)getParameterValue("repositoryId"), getSyncAccountId());
-
-			syncSite.setRemoteSyncTime(syncDLObjectUpdate.getLastAccessTime());
-
-			SyncSiteService.update(syncSite);
-		}
 	}
 
 	protected void updateFile(

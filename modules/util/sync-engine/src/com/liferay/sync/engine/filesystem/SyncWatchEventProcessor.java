@@ -15,6 +15,8 @@
 package com.liferay.sync.engine.filesystem;
 
 import com.liferay.sync.engine.SyncEngine;
+import com.liferay.sync.engine.documentlibrary.util.BatchEvent;
+import com.liferay.sync.engine.documentlibrary.util.BatchEventManager;
 import com.liferay.sync.engine.model.SyncAccount;
 import com.liferay.sync.engine.model.SyncFile;
 import com.liferay.sync.engine.model.SyncWatchEvent;
@@ -306,6 +308,10 @@ public class SyncWatchEventProcessor implements Runnable {
 	}
 
 	protected void doRun() throws Exception {
+		BatchEvent batchEvent = BatchEventManager.getBatchEvent(_syncAccountId);
+
+		batchEvent.fireBatchEvent();
+
 		SyncWatchEvent lastSyncWatchEvent =
 			SyncWatchEventService.fetchLastSyncWatchEvent(_syncAccountId);
 
