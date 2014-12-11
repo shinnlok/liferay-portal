@@ -87,7 +87,7 @@ public class DownloadFilesHandler extends BaseHandler {
 			while ((zipEntry = zipInputStream.getNextEntry()) != null) {
 				String zipEntryName = zipEntry.getName();
 
-				if (zipEntryName.equals("manifest.json")) {
+				if (zipEntryName.equals("errors.json")) {
 					ObjectMapper objectMapper = new ObjectMapper();
 
 					JsonNode rootJsonNode = objectMapper.readTree(

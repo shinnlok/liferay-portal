@@ -231,6 +231,28 @@ public class Session {
 		_executorService.execute(runnable);
 	}
 
+	public void executeAsynchronousPost(
+			final String urlPath, final Map<String, Object> parameters,
+			final Handler<Void> handler, boolean urlEncodedForm)
+		throws Exception {
+
+		Runnable runnable = new Runnable() {
+
+			@Override
+			public void run() {
+				try {
+					executePost(urlPath, parameters, handler, urlEncodedForm);
+				}
+				catch (Exception e) {
+					handler.handleException(e);
+				}
+			}
+
+		};
+
+		_executorService.execute(runnable);
+	}
+
 	public HttpResponse executeGet(String urlPath) throws Exception {
 		HttpGet httpGet = new HttpGet(urlPath);
 

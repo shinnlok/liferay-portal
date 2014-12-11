@@ -48,7 +48,7 @@ public class DownloadFilesEvent extends BaseEvent {
 
 		Session session = SessionManager.getSession(getSyncAccountId());
 
-		session.executePost(
+		session.executeAsynchronousPost(
 			syncAccount.getUrl() + _URL_PATH, getParameters(), _handler, true);
 	}
 
