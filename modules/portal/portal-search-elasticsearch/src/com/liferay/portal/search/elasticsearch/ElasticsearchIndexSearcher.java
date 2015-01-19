@@ -334,7 +334,7 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 			return;
 		}
 
-		Set<String> sortFieldNames = new HashSet<String>();
+		Set<String> sortFieldNames = new HashSet<>();
 
 		for (Sort sort : sorts) {
 			if (sort == null) {
@@ -389,12 +389,21 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 
 		Client client = _elasticsearchConnectionManager.getClient();
 
-		SearchRequestBuilder searchRequestBuilder = client.prepareSearch(
-			String.valueOf(searchContext.getCompanyId()));
+		SearchRequestBuilder searchRequestBuilder = null;
+
+		QueryConfig queryConfig = query.getQueryConfig();
+
+		String[] selectedIndexNames = queryConfig.getSelectedIndexNames();
+
+		if (ArrayUtil.isEmpty(selectedIndexNames)) {
+			searchRequestBuilder = client.prepareSearch(
+				String.valueOf(searchContext.getCompanyId()));
+		}
+		else {
+			searchRequestBuilder = client.prepareSearch(selectedIndexNames);
+		}
 
 		if (!count) {
-			QueryConfig queryConfig = query.getQueryConfig();
-
 			addFacets(searchRequestBuilder, searchContext);
 			addHighlights(searchRequestBuilder, queryConfig);
 			addPagination(searchRequestBuilder, start, end);
@@ -411,7 +420,14 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 
 		searchRequestBuilder.setQuery(queryBuilder);
 
-		searchRequestBuilder.setTypes(DocumentTypes.LIFERAY);
+		String[] selectedTypes = queryConfig.getSelectedTypes();
+
+		if (ArrayUtil.isEmpty(selectedTypes)) {
+			searchRequestBuilder.setTypes(DocumentTypes.LIFERAY);
+		}
+		else {
+			searchRequestBuilder.setTypes(selectedTypes);
+		}
 
 		SearchRequest searchRequest = searchRequestBuilder.request();
 
@@ -428,10 +444,12 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 		return searchResponse;
 	}
 
-	protected Document processSearchHit(SearchHit hit) {
+	protected Document processSearchHit(
+		SearchHit searchHit, QueryConfig queryConfig) {
+
 		Document document = new DocumentImpl();
 
-		Map<String, SearchHitField> searchHitFields = hit.getFields();
+		Map<String, SearchHitField> searchHitFields = searchHit.getFields();
 
 		for (Map.Entry<String, SearchHitField> entry :
 				searchHitFields.entrySet()) {
@@ -448,6 +466,8 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 			document.add(field);
 		}
 
+		populateUID(document, queryConfig);
+
 		return document;
 	}
 
@@ -461,15 +481,16 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 
 		Hits hits = new HitsImpl();
 
-		List<Document> documents = new ArrayList<Document>();
-		Set<String> queryTerms = new HashSet<String>();
-		List<Float> scores = new ArrayList<Float>();
+		List<Document> documents = new ArrayList<>();
+		Set<String> queryTerms = new HashSet<>();
+		List<Float> scores = new ArrayList<>();
 
 		if (searchHits.totalHits() > 0) {
 			SearchHit[] searchHitsArray = searchHits.getHits();
 
 			for (SearchHit searchHit : searchHitsArray) {
-				Document document = processSearchHit(searchHit);
+				Document document = processSearchHit(
+					searchHit, query.getQueryConfig());
 
 				documents.add(document);
 

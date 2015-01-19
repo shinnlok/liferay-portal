@@ -385,6 +385,7 @@ public abstract class BaseDefaultDLViewFileVersionDisplayContext
 			new URLMenuItem(), menuItems, "icon-download",
 			DLUIItemKeys.DOWNLOAD, label, url);
 
+		urlMenuItem.setMethod("get");
 		urlMenuItem.setTarget("_blank");
 	}
 
@@ -465,7 +466,7 @@ public abstract class BaseDefaultDLViewFileVersionDisplayContext
 
 		String javaScript = _processFreeMarkerTemplate(
 			"/com/liferay/portlet/documentlibrary/context/dependencies" +
-				"open_in_ms_office_js.ftl",
+				"/open_in_ms_office_js.ftl",
 			context);
 
 		javascriptMenuItem.setJavascript(javaScript);

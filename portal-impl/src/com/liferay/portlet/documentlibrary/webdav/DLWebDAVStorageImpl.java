@@ -23,9 +23,11 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
+import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.StringPool;
@@ -350,7 +352,7 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 			List<Resource> fileEntries = getFileEntries(
 				webDAVRequest, folderId);
 
-			List<Resource> resources = new ArrayList<Resource>(
+			List<Resource> resources = new ArrayList<>(
 				folders.size() + fileEntries.size());
 
 			resources.addAll(folders);
@@ -722,11 +724,15 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 
 				populateServiceContext(serviceContext, fileEntry);
 
+				serviceContext.setCommand(Constants.UPDATE_WEBDAV);
+
 				DLAppServiceUtil.updateFileEntry(
 					fileEntryId, title, contentType, title, description,
 					changeLog, false, file, serviceContext);
 			}
 			catch (NoSuchFileEntryException nsfee) {
+				serviceContext.setCommand(Constants.ADD_WEBDAV);
+
 				DLAppServiceUtil.addFileEntry(
 					groupId, parentFolderId, title, contentType, title,
 					description, changeLog, file, serviceContext);
@@ -901,7 +907,7 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 			WebDAVRequest webDAVRequest, long parentFolderId)
 		throws Exception {
 
-		List<Resource> resources = new ArrayList<Resource>();
+		List<Resource> resources = new ArrayList<>();
 
 		List<FileEntry> fileEntries = DLAppServiceUtil.getFileEntries(
 			webDAVRequest.getGroupId(), parentFolderId);
@@ -940,7 +946,7 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 		}
 
 		for (int i = 2; i < x; i++) {
-			String name = pathArray[i];
+			String name = HttpUtil.decodeURL(pathArray[i]);
 
 			Folder folder = DLAppServiceUtil.getFolder(groupId, folderId, name);
 
@@ -956,7 +962,7 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 			WebDAVRequest webDAVRequest, long parentFolderId)
 		throws Exception {
 
-		List<Resource> resources = new ArrayList<Resource>();
+		List<Resource> resources = new ArrayList<>();
 
 		long groupId = webDAVRequest.getGroupId();
 
@@ -1071,6 +1077,7 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 		return resource;
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(DLWebDAVStorageImpl.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		DLWebDAVStorageImpl.class);
 
 }

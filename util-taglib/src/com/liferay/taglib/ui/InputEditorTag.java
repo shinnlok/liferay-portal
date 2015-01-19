@@ -49,6 +49,10 @@ public class InputEditorTag extends IncludeTag {
 		_cssClass = cssClass;
 	}
 
+	public void setData(Map<String, Object> data) {
+		_data = data;
+	}
+
 	public void setEditorImpl(String editorImpl) {
 		_editorImpl = editorImpl;
 	}
@@ -105,6 +109,10 @@ public class InputEditorTag extends IncludeTag {
 		_resizable = resizable;
 	}
 
+	public void setShowSource(boolean showSource) {
+		_showSource = showSource;
+	}
+
 	public void setSkipEditorLoading(boolean skipEditorLoading) {
 		_skipEditorLoading = skipEditorLoading;
 	}
@@ -124,6 +132,7 @@ public class InputEditorTag extends IncludeTag {
 		_contents = null;
 		_contentsLanguageId = null;
 		_cssClass = null;
+		_data = null;
 		_editorImpl = null;
 		_fileBrowserParams = null;
 		_height = null;
@@ -138,6 +147,7 @@ public class InputEditorTag extends IncludeTag {
 		_page = null;
 		_placeholder = null;
 		_resizable = true;
+		_showSource = true;
 		_skipEditorLoading = false;
 		_toolbarSet = "liferay";
 		_width = null;
@@ -179,6 +189,7 @@ public class InputEditorTag extends IncludeTag {
 			"liferay-ui:input-editor:contentsLanguageId", _contentsLanguageId);
 		request.setAttribute("liferay-ui:input-editor:cssClass", _cssClass);
 		request.setAttribute("liferay-ui:input-editor:cssClasses", cssClasses);
+		request.setAttribute("liferay-ui:input-editor:data", _data);
 		request.setAttribute("liferay-ui:input-editor:editorImpl", editorImpl);
 		request.setAttribute(
 			"liferay-ui:input-editor:fileBrowserParams", _fileBrowserParams);
@@ -202,6 +213,8 @@ public class InputEditorTag extends IncludeTag {
 		request.setAttribute(
 			"liferay-ui:input-editor:resizable", String.valueOf(_resizable));
 		request.setAttribute(
+			"liferay-ui:input-editor:showSource", String.valueOf(_showSource));
+		request.setAttribute(
 			"liferay-ui:input-editor:skipEditorLoading",
 			String.valueOf(_skipEditorLoading));
 		request.setAttribute("liferay-ui:input-editor:toolbarSet", _toolbarSet);
@@ -213,6 +226,7 @@ public class InputEditorTag extends IncludeTag {
 	private String _contents;
 	private String _contentsLanguageId;
 	private String _cssClass;
+	private Map<String, Object> _data = null;
 	private String _editorImpl;
 	private Map<String, String> _fileBrowserParams;
 	private String _height;
@@ -227,6 +241,7 @@ public class InputEditorTag extends IncludeTag {
 	private String _page;
 	private String _placeholder;
 	private boolean _resizable = true;
+	private boolean _showSource = true;
 	private boolean _skipEditorLoading;
 	private String _toolbarSet = "liferay";
 	private String _width;

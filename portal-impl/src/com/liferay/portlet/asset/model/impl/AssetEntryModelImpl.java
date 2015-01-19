@@ -88,6 +88,7 @@ public class AssetEntryModelImpl extends BaseModelImpl<AssetEntry>
 			{ "classPK", Types.BIGINT },
 			{ "classUuid", Types.VARCHAR },
 			{ "classTypeId", Types.BIGINT },
+			{ "listable", Types.BOOLEAN },
 			{ "visible", Types.BOOLEAN },
 			{ "startDate", Types.TIMESTAMP },
 			{ "endDate", Types.TIMESTAMP },
@@ -104,7 +105,7 @@ public class AssetEntryModelImpl extends BaseModelImpl<AssetEntry>
 			{ "priority", Types.DOUBLE },
 			{ "viewCount", Types.INTEGER }
 		};
-	public static final String TABLE_SQL_CREATE = "create table AssetEntry (entryId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,classNameId LONG,classPK LONG,classUuid VARCHAR(75) null,classTypeId LONG,visible BOOLEAN,startDate DATE null,endDate DATE null,publishDate DATE null,expirationDate DATE null,mimeType VARCHAR(75) null,title STRING null,description TEXT null,summary TEXT null,url STRING null,layoutUuid VARCHAR(75) null,height INTEGER,width INTEGER,priority DOUBLE,viewCount INTEGER)";
+	public static final String TABLE_SQL_CREATE = "create table AssetEntry (entryId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,classNameId LONG,classPK LONG,classUuid VARCHAR(75) null,classTypeId LONG,listable BOOLEAN,visible BOOLEAN,startDate DATE null,endDate DATE null,publishDate DATE null,expirationDate DATE null,mimeType VARCHAR(75) null,title STRING null,description TEXT null,summary TEXT null,url STRING null,layoutUuid VARCHAR(75) null,height INTEGER,width INTEGER,priority DOUBLE,viewCount INTEGER)";
 	public static final String TABLE_SQL_DROP = "drop table AssetEntry";
 	public static final String ORDER_BY_JPQL = " ORDER BY assetEntry.entryId ASC";
 	public static final String ORDER_BY_SQL = " ORDER BY AssetEntry.entryId ASC";
@@ -155,6 +156,7 @@ public class AssetEntryModelImpl extends BaseModelImpl<AssetEntry>
 		model.setClassPK(soapModel.getClassPK());
 		model.setClassUuid(soapModel.getClassUuid());
 		model.setClassTypeId(soapModel.getClassTypeId());
+		model.setListable(soapModel.getListable());
 		model.setVisible(soapModel.getVisible());
 		model.setStartDate(soapModel.getStartDate());
 		model.setEndDate(soapModel.getEndDate());
@@ -266,6 +268,7 @@ public class AssetEntryModelImpl extends BaseModelImpl<AssetEntry>
 		attributes.put("classPK", getClassPK());
 		attributes.put("classUuid", getClassUuid());
 		attributes.put("classTypeId", getClassTypeId());
+		attributes.put("listable", getListable());
 		attributes.put("visible", getVisible());
 		attributes.put("startDate", getStartDate());
 		attributes.put("endDate", getEndDate());
@@ -354,6 +357,12 @@ public class AssetEntryModelImpl extends BaseModelImpl<AssetEntry>
 
 		if (classTypeId != null) {
 			setClassTypeId(classTypeId);
+		}
+
+		Boolean listable = (Boolean)attributes.get("listable");
+
+		if (listable != null) {
+			setListable(listable);
 		}
 
 		Boolean visible = (Boolean)attributes.get("visible");
@@ -670,6 +679,22 @@ public class AssetEntryModelImpl extends BaseModelImpl<AssetEntry>
 	@Override
 	public void setClassTypeId(long classTypeId) {
 		_classTypeId = classTypeId;
+	}
+
+	@JSON
+	@Override
+	public boolean getListable() {
+		return _listable;
+	}
+
+	@Override
+	public boolean isListable() {
+		return _listable;
+	}
+
+	@Override
+	public void setListable(boolean listable) {
+		_listable = listable;
 	}
 
 	@JSON
@@ -1312,6 +1337,7 @@ public class AssetEntryModelImpl extends BaseModelImpl<AssetEntry>
 		assetEntryImpl.setClassPK(getClassPK());
 		assetEntryImpl.setClassUuid(getClassUuid());
 		assetEntryImpl.setClassTypeId(getClassTypeId());
+		assetEntryImpl.setListable(getListable());
 		assetEntryImpl.setVisible(getVisible());
 		assetEntryImpl.setStartDate(getStartDate());
 		assetEntryImpl.setEndDate(getEndDate());
@@ -1472,6 +1498,8 @@ public class AssetEntryModelImpl extends BaseModelImpl<AssetEntry>
 
 		assetEntryCacheModel.classTypeId = getClassTypeId();
 
+		assetEntryCacheModel.listable = getListable();
+
 		assetEntryCacheModel.visible = getVisible();
 
 		Date startDate = getStartDate();
@@ -1571,7 +1599,7 @@ public class AssetEntryModelImpl extends BaseModelImpl<AssetEntry>
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(53);
+		StringBundler sb = new StringBundler(55);
 
 		sb.append("{entryId=");
 		sb.append(getEntryId());
@@ -1595,6 +1623,8 @@ public class AssetEntryModelImpl extends BaseModelImpl<AssetEntry>
 		sb.append(getClassUuid());
 		sb.append(", classTypeId=");
 		sb.append(getClassTypeId());
+		sb.append(", listable=");
+		sb.append(getListable());
 		sb.append(", visible=");
 		sb.append(getVisible());
 		sb.append(", startDate=");
@@ -1632,7 +1662,7 @@ public class AssetEntryModelImpl extends BaseModelImpl<AssetEntry>
 
 	@Override
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(82);
+		StringBundler sb = new StringBundler(85);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.portlet.asset.model.AssetEntry");
@@ -1681,6 +1711,10 @@ public class AssetEntryModelImpl extends BaseModelImpl<AssetEntry>
 		sb.append(
 			"<column><column-name>classTypeId</column-name><column-value><![CDATA[");
 		sb.append(getClassTypeId());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>listable</column-name><column-value><![CDATA[");
+		sb.append(getListable());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>visible</column-name><column-value><![CDATA[");
@@ -1772,6 +1806,7 @@ public class AssetEntryModelImpl extends BaseModelImpl<AssetEntry>
 	private String _classUuid;
 	private String _originalClassUuid;
 	private long _classTypeId;
+	private boolean _listable;
 	private boolean _visible;
 	private boolean _originalVisible;
 	private boolean _setOriginalVisible;

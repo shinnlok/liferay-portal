@@ -228,7 +228,7 @@ public class JournalContentPortletLayoutListener
 	protected Set<String> getRuntimePortletIds(String content)
 		throws Exception {
 
-		Set<String> portletIds = new LinkedHashSet<String>();
+		Set<String> portletIds = new LinkedHashSet<>();
 
 		for (int index = 0;;) {
 			index = content.indexOf(PortletLogic.OPEN_TAG, index);
@@ -262,7 +262,7 @@ public class JournalContentPortletLayoutListener
 		return portletIds;
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		JournalContentPortletLayoutListener.class);
 
 }

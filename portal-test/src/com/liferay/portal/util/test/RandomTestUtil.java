@@ -84,7 +84,7 @@ public class RandomTestUtil {
 	}
 
 	public static Map<Locale, String> randomLocaleStringMap(Locale locale) {
-		Map<Locale, String> map = new HashMap<Locale, String>();
+		Map<Locale, String> map = new HashMap<>();
 
 		map.put(LocaleUtil.getDefault(), randomString());
 
@@ -166,6 +166,6 @@ public class RandomTestUtil {
 
 	private static final int _RANDOMIZER_BUMPER_TRIES_MAX = 100;
 
-	private static Random _random = new Random();
+	private static final Random _random = new Random();
 
 }

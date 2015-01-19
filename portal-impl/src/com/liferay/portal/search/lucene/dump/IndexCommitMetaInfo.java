@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.Serializable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.lucene.index.IndexCommit;
@@ -34,14 +35,18 @@ public class IndexCommitMetaInfo implements Serializable {
 	public IndexCommitMetaInfo(IndexCommit indexCommit) throws IOException {
 		if (indexCommit == null) {
 			_empty = true;
+			_generation = 0;
+			_segments = Collections.emptyList();
 
 			return;
 		}
 
-		List<String> fileNames = new ArrayList<String>(
-			indexCommit.getFileNames());
+		_empty = false;
+		_generation = indexCommit.getGeneration();
 
-		_segments = new ArrayList<Segment>(fileNames.size());
+		List<String> fileNames = new ArrayList<>(indexCommit.getFileNames());
+
+		_segments = new ArrayList<>(fileNames.size());
 
 		Directory directory = indexCommit.getDirectory();
 
@@ -51,8 +56,6 @@ public class IndexCommitMetaInfo implements Serializable {
 
 			_segments.add(segment);
 		}
-
-		_generation = indexCommit.getGeneration();
 	}
 
 	public long getGeneration() {
@@ -125,13 +128,13 @@ public class IndexCommitMetaInfo implements Serializable {
 			return sb.toString();
 		}
 
-		private String _fileName;
-		private long _fileSize;
+		private final String _fileName;
+		private final long _fileSize;
 
 	}
 
-	private boolean _empty;
-	private long _generation;
-	private List<Segment> _segments;
+	private final boolean _empty;
+	private final long _generation;
+	private final List<Segment> _segments;
 
 }

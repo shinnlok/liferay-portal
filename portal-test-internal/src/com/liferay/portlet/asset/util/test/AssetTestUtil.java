@@ -75,13 +75,13 @@ public class AssetTestUtil {
 			long groupId, long vocabularyId, long parentCategoryId)
 		throws Exception {
 
-		Map<Locale, String> titleMap = new HashMap<Locale, String>();
+		Map<Locale, String> titleMap = new HashMap<>();
 
 		Locale locale = LocaleUtil.getSiteDefault();
 
 		titleMap.put(locale, RandomTestUtil.randomString());
 
-		Map<Locale, String> descriptionMap = new HashMap<Locale, String>();
+		Map<Locale, String> descriptionMap = new HashMap<>();
 
 		descriptionMap.put(locale, RandomTestUtil.randomString());
 
@@ -99,14 +99,11 @@ public class AssetTestUtil {
 	public static AssetTag addTag(long groupId) throws Exception {
 		long userId = TestPropsValues.getUserId();
 
-		String[] tagProperties = null;
-
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(groupId, userId);
 
 		return AssetTagLocalServiceUtil.addTag(
-			userId, RandomTestUtil.randomString(), tagProperties,
-			serviceContext);
+			userId, RandomTestUtil.randomString(), serviceContext);
 	}
 
 	public static AssetVocabulary addVocabulary(long groupId) throws Exception {
@@ -123,13 +120,13 @@ public class AssetTestUtil {
 			long groupId, long classNameId, long classTypePK, boolean required)
 		throws Exception {
 
-		Map<Locale, String> titleMap = new HashMap<Locale, String>();
+		Map<Locale, String> titleMap = new HashMap<>();
 
 		Locale locale = LocaleUtil.getSiteDefault();
 
 		titleMap.put(locale, RandomTestUtil.randomString());
 
-		Map<Locale, String> descriptionMap = new HashMap<Locale, String>();
+		Map<Locale, String> descriptionMap = new HashMap<>();
 
 		descriptionMap.put(locale, RandomTestUtil.randomString());
 

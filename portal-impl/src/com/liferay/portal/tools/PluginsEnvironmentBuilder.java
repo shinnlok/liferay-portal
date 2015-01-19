@@ -89,8 +89,7 @@ public class PluginsEnvironmentBuilder {
 
 			boolean osgiProject = false;
 
-			if (content.contains(
-					"<import file=\"../../build-common-osgi-plugin.xml\" />") ||
+			if (content.contains("../build-common-osgi-plugin.xml\" />") ||
 				content.contains(
 					"../tools/sdk/build-common-osgi-plugin.xml\" />")) {
 
@@ -261,7 +260,12 @@ public class PluginsEnvironmentBuilder {
 				continue;
 			}
 
-			addClasspathEntry(sb, dirName + "/" + fileName);
+			int index = dirName.indexOf("/.ivy");
+
+			String eclipseRelativeDirName =
+				"/portal" + dirName.substring(index);
+
+			addClasspathEntry(sb, eclipseRelativeDirName + "/" + fileName);
 
 			return;
 		}
@@ -303,7 +307,7 @@ public class PluginsEnvironmentBuilder {
 	}
 
 	protected List<String> getCommonJars() {
-		List<String> jars = new ArrayList<String>();
+		List<String> jars = new ArrayList<>();
 
 		jars.add("commons-logging.jar");
 		jars.add("log4j.jar");
@@ -324,7 +328,7 @@ public class PluginsEnvironmentBuilder {
 		int x = content.indexOf("import.shared");
 
 		if (x == -1) {
-			return new ArrayList<String>();
+			return new ArrayList<>();
 		}
 
 		x = content.indexOf("value=\"", x);
@@ -333,16 +337,16 @@ public class PluginsEnvironmentBuilder {
 		int y = content.indexOf("\" />", x);
 
 		if ((x == -1) || (y == -1)) {
-			return new ArrayList<String>();
+			return new ArrayList<>();
 		}
 
 		String[] importShared = StringUtil.split(content.substring(x + 1, y));
 
 		if (importShared.length == 0) {
-			return new ArrayList<String>();
+			return new ArrayList<>();
 		}
 
-		List<String> jars = new ArrayList<String>();
+		List<String> jars = new ArrayList<>();
 
 		for (String currentImportShared : importShared) {
 			jars.add(currentImportShared + ".jar");
@@ -375,7 +379,7 @@ public class PluginsEnvironmentBuilder {
 			File libDir, Properties properties)
 		throws Exception {
 
-		List<String> jars = new ArrayList<String>();
+		List<String> jars = new ArrayList<>();
 
 		String[] requiredDeploymentContexts = StringUtil.split(
 			properties.getProperty("required-deployment-contexts"));
@@ -390,6 +394,17 @@ public class PluginsEnvironmentBuilder {
 		}
 
 		return jars;
+	}
+
+	protected boolean hasModulesGitIgnore(String dirName) {
+		int index = dirName.indexOf("/modules/");
+
+		if (index == -1) {
+			return false;
+		}
+
+		return _fileUtil.exists(
+			dirName.substring(0, index) + "/modules/.gitignore");
 	}
 
 	protected void setupJarProject(
@@ -420,6 +435,12 @@ public class PluginsEnvironmentBuilder {
 		File gitignoreFile = new File(
 			projectDir.getCanonicalPath() + "/.gitignore");
 
+		if (hasModulesGitIgnore(dirName)) {
+			gitignoreFile.delete();
+
+			return;
+		}
+
 		String[] gitIgnores = importSharedJars.toArray(
 			new String[importSharedJars.size()]);
 
@@ -447,7 +468,7 @@ public class PluginsEnvironmentBuilder {
 
 		properties.load(new FileInputStream(propertiesFile));
 
-		Set<String> jars = new TreeSet<String>();
+		Set<String> jars = new TreeSet<>();
 
 		jars.addAll(getCommonJars());
 
@@ -506,11 +527,11 @@ public class PluginsEnvironmentBuilder {
 			return;
 		}
 
-		Set<String> globalJars = new LinkedHashSet<String>();
-		List<String> portalJars = new ArrayList<String>();
+		Set<String> globalJars = new LinkedHashSet<>();
+		List<String> portalJars = new ArrayList<>();
 
-		Set<String> extGlobalJars = new LinkedHashSet<String>();
-		Set<String> extPortalJars = new LinkedHashSet<String>();
+		Set<String> extGlobalJars = new LinkedHashSet<>();
+		Set<String> extPortalJars = new LinkedHashSet<>();
 
 		String libDirPath = StringUtil.replace(
 			libDir.getPath(), StringPool.BACK_SLASH, StringPool.SLASH);
@@ -579,7 +600,7 @@ public class PluginsEnvironmentBuilder {
 			Collections.sort(customJars);
 		}
 		else {
-			customJars = new ArrayList<String>();
+			customJars = new ArrayList<>();
 		}
 
 		StringBundler sb = new StringBundler();
@@ -622,6 +643,7 @@ public class PluginsEnvironmentBuilder {
 				sb, "/portal/lib/development/powermock-api-mockito.jar");
 			addClasspathEntry(
 				sb, "/portal/lib/development/powermock-api-support.jar");
+			addClasspathEntry(sb, "/portal/lib/development/powermock-core.jar");
 			addClasspathEntry(
 				sb, "/portal/lib/development/powermock-module-junit4.jar");
 			addClasspathEntry(
@@ -639,7 +661,7 @@ public class PluginsEnvironmentBuilder {
 		addClasspathEntry(sb, "/portal/lib/development/mail.jar");
 		addClasspathEntry(sb, "/portal/lib/development/servlet-api.jar");
 
-		Map<String, String> attributes = new HashMap<String, String>();
+		Map<String, String> attributes = new HashMap<>();
 
 		if (libDirPath.contains("/ext/")) {
 			attributes.put("optional", "true");
@@ -752,7 +774,7 @@ public class PluginsEnvironmentBuilder {
 
 		for (String sourceDirName : _SOURCE_DIR_NAMES) {
 			if (_fileUtil.exists(projectDirName + "/" + sourceDirName)) {
-				List<String> gitIgnores = new ArrayList<String>();
+				List<String> gitIgnores = new ArrayList<>();
 
 				if (sourceDirName.endsWith("ext-impl/src")) {
 					gitIgnores.add("/classes");
@@ -854,7 +876,8 @@ public class PluginsEnvironmentBuilder {
 
 	private static final String[] _TEST_TYPES = {"integration", "unit"};
 
-	private static FileImpl _fileUtil = FileImpl.getInstance();
-	private static SAXReaderImpl _saxReaderUtil = SAXReaderImpl.getInstance();
+	private static final FileImpl _fileUtil = FileImpl.getInstance();
+	private static final SAXReaderImpl _saxReaderUtil =
+		SAXReaderImpl.getInstance();
 
 }

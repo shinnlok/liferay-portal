@@ -76,7 +76,7 @@ public class LockLocalServiceTest {
 	public void testMutualExcludeLockingParallel() throws Exception {
 		ExecutorService executorService = Executors.newFixedThreadPool(10);
 
-		List<LockingJob> lockingJobs = new ArrayList<LockingJob>();
+		List<LockingJob> lockingJobs = new ArrayList<>();
 
 		for (int i = 0; i < 10; i++) {
 			LockingJob lockingJob = new LockingJob(
@@ -233,10 +233,10 @@ public class LockLocalServiceTest {
 			return false;
 		}
 
-		private String _className;
-		private String _key;
-		private String _owner;
-		private int _requiredSuccessCount;
+		private final String _className;
+		private final String _key;
+		private final String _owner;
+		private final int _requiredSuccessCount;
 		private SystemException _systemException;
 
 	}

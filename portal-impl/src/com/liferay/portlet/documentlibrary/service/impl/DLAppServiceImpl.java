@@ -3265,8 +3265,8 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		Queue<Folder[]> folders = new LinkedList<Folder[]>();
-		final List<FileEntry> fileEntries = new ArrayList<FileEntry>();
+		Queue<Folder[]> folders = new LinkedList<>();
+		final List<FileEntry> fileEntries = new ArrayList<>();
 
 		Folder curSrcFolder = srcFolder;
 		Folder curDestFolder = destFolder;
@@ -3543,6 +3543,7 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 		return newFolder;
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(DLAppServiceImpl.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		DLAppServiceImpl.class);
 
 }

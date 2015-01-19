@@ -116,7 +116,7 @@ public class DLDisplayConfigurationDisplayContext {
 		String[] fileEntryColumns =
 			_dlPortletInstanceSettings.getFileEntryColumns();
 
-		_currentFileEntryColumns = new ArrayList<KeyValuePair>();
+		_currentFileEntryColumns = new ArrayList<>();
 
 		for (String fileEntryColumn : fileEntryColumns) {
 			_currentFileEntryColumns.add(
@@ -126,7 +126,7 @@ public class DLDisplayConfigurationDisplayContext {
 						_themeDisplay.getLocale(), fileEntryColumn)));
 		}
 
-		_availableFileEntryColumns = new ArrayList<KeyValuePair>();
+		_availableFileEntryColumns = new ArrayList<>();
 
 		Arrays.sort(fileEntryColumns);
 
@@ -151,7 +151,7 @@ public class DLDisplayConfigurationDisplayContext {
 	private void _populateFolderColumns() {
 		String[] folderColumns = _dlPortletInstanceSettings.getFolderColumns();
 
-		_currentFolderColumns = new ArrayList<KeyValuePair>();
+		_currentFolderColumns = new ArrayList<>();
 
 		for (String folderColumn : folderColumns) {
 			_currentFolderColumns.add(
@@ -160,7 +160,7 @@ public class DLDisplayConfigurationDisplayContext {
 					LanguageUtil.get(_themeDisplay.getLocale(), folderColumn)));
 		}
 
-		_availableFolderColumns = new ArrayList<KeyValuePair>();
+		_availableFolderColumns = new ArrayList<>();
 
 		Arrays.sort(folderColumns);
 
@@ -185,8 +185,8 @@ public class DLDisplayConfigurationDisplayContext {
 	private List<KeyValuePair> _availableFolderColumns;
 	private List<KeyValuePair> _currentFileEntryColumns;
 	private List<KeyValuePair> _currentFolderColumns;
-	private DLActionsDisplayContext _dlActionsDisplayContext;
-	private DLPortletInstanceSettings _dlPortletInstanceSettings;
-	private ThemeDisplay _themeDisplay;
+	private final DLActionsDisplayContext _dlActionsDisplayContext;
+	private final DLPortletInstanceSettings _dlPortletInstanceSettings;
+	private final ThemeDisplay _themeDisplay;
 
 }

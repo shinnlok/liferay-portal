@@ -1,3 +1,11 @@
+alter table AssetEntry add listable BOOLEAN;
+
+COMMIT_TRANSACTION;
+
+update AssetEntry set listable = TRUE;
+
+drop table AssetTagProperty;
+
 alter table BlogsEntry add subtitle STRING null;
 alter table BlogsEntry add coverImageFileEntryId LONG;
 alter table BlogsEntry add coverImageURL STRING null;
@@ -66,6 +74,10 @@ create table ExportImportConfiguration (
 	statusByUserName VARCHAR(75) null,
 	statusDate DATE null
 );
+
+alter table Group_ add groupKey STRING;
+
+update Group_ set groupKey = name;
 
 alter table Group_ add inheritContent BOOLEAN;
 

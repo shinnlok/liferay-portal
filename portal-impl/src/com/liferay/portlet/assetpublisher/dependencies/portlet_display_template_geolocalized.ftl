@@ -104,12 +104,16 @@
 	}
 
 	#<@liferay_portlet.namespace />assetEntryAbstract .asset-entry-abstract-image {
+		display: block;
 		float: left;
+		height: 128px;
+		margin-right: 1em;
+		text-align: center;
 	}
 
 	#<@liferay_portlet.namespace />assetEntryAbstract .asset-entry-abstract-image img {
 		display: block;
-		margin-right: 2em;
+		margin: 0 auto;
 	}
 
 	#<@liferay_portlet.namespace />assetEntryAbstract .taglib-icon {
@@ -160,7 +164,7 @@
 		<#if showEditURL && assetRenderer.hasEditPermission(permissionChecker)>
 			<#assign redirectURL = renderResponse.createLiferayPortletURL(themeDisplay.getPlid(), themeDisplay.getPortletDisplay().getId(), "RENDER_PHASE", false) />
 
-			${redirectURL.setParameter("struts_action", "/asset_publisher/add_asset_redirect")}
+			${redirectURL.setParameter("mvcPath", "/html/portlet/asset_publisher/add_asset_redirect.jsp")}
 
 			<#assign editPortletURL = assetRenderer.getURLEdit(renderRequest, renderResponse, windowStateFactory.getWindowState("POP_UP"), redirectURL) />
 

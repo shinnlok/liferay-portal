@@ -247,11 +247,9 @@ public interface User extends UserModel, PersistedModel {
 	@com.liferay.portal.kernel.bean.AutoEscape()
 	public java.lang.String getFullName();
 
-	public com.liferay.portal.model.Group getGroup()
-		throws com.liferay.portal.kernel.exception.PortalException;
+	public com.liferay.portal.model.Group getGroup();
 
-	public long getGroupId()
-		throws com.liferay.portal.kernel.exception.PortalException;
+	public long getGroupId();
 
 	public long[] getGroupIds();
 
@@ -343,6 +341,8 @@ public interface User extends UserModel, PersistedModel {
 	public java.util.List<com.liferay.portal.model.Organization> getOrganizations(
 		boolean includeAdministrative)
 		throws com.liferay.portal.kernel.exception.PortalException;
+
+	public java.lang.String getOriginalEmailAddress();
 
 	public boolean getPasswordModified();
 

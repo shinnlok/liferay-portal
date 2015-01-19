@@ -501,7 +501,7 @@ public abstract class BaseDB implements DB {
 			validIndexNames = dropIndexes(con, tablesSQL, indexesSQL, indexes);
 		}
 		else {
-			validIndexNames = new HashSet<String>();
+			validIndexNames = new HashSet<>();
 
 			for (Index index : indexes) {
 				String indexName = StringUtil.toUpperCase(index.getIndexName());
@@ -662,7 +662,7 @@ public abstract class BaseDB implements DB {
 			_log.info("Dropping stale indexes");
 		}
 
-		Set<String> validIndexNames = new HashSet<String>();
+		Set<String> validIndexNames = new HashSet<>();
 
 		if (indexes.isEmpty()) {
 			return validIndexNames;
@@ -673,7 +673,7 @@ public abstract class BaseDB implements DB {
 
 		String[] lines = StringUtil.splitLines(indexesSQL);
 
-		Set<String> indexNames = new HashSet<String>();
+		Set<String> indexNames = new HashSet<>();
 
 		for (String line : lines) {
 			if (Validator.isNull(line)) {
@@ -735,7 +735,7 @@ public abstract class BaseDB implements DB {
 	}
 
 	protected String evaluateVM(String template) throws Exception {
-		Map<String, Object> variables = new HashMap<String, Object>();
+		Map<String, Object> variables = new HashMap<>();
 
 		variables.put("counter", new SimpleCounter());
 		variables.put("portalUUIDUtil", PortalUUIDUtil.class);
@@ -1073,10 +1073,10 @@ public abstract class BaseDB implements DB {
 
 	private static final boolean _SUPPORTS_UPDATE_WITH_INNER_JOIN = true;
 
-	private static Log _log = LogFactoryUtil.getLog(BaseDB.class);
+	private static final Log _log = LogFactoryUtil.getLog(BaseDB.class);
 
-	private static Pattern _templatePattern;
-	private static Pattern _timestampPattern = Pattern.compile(
+	private static final Pattern _templatePattern;
+	private static final Pattern _timestampPattern = Pattern.compile(
 		"SPECIFIC_TIMESTAMP_\\d+");
 
 	static {
@@ -1105,7 +1105,7 @@ public abstract class BaseDB implements DB {
 	}
 
 	private boolean _supportsStringCaseSensitiveQuery;
-	private Map<String, String> _templateMap = new HashMap<String, String>();
-	private String _type;
+	private final Map<String, String> _templateMap = new HashMap<>();
+	private final String _type;
 
 }

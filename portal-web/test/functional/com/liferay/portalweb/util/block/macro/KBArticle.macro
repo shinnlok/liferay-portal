@@ -250,6 +250,20 @@
 		<execute action="PGKnowledgebasedisplay#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request completed successfully." />
 	</command>
 
+	<command name="goBackCP">
+		<execute action="CPKnowledgebaseadminArticle#assertClick" locator-key1="BACK_TO_ICON" value1="Back" />
+	</command>
+
+	<command name="gotoCP">
+		<var name="key_kbArticleTitle" value="${kbArticleTitle}" />
+
+		<execute action="CPKnowledgebaseadmin#assertTextEquals" locator-key1="ARTICLE_TABLE_PRIORITY" value1="${kbPriority}" />
+		<execute action="CPKnowledgebaseadmin#assertTextEquals" locator-key1="ARTICLE_TABLE_TITLE" value1="${kbArticleTitle}" />
+		<execute action="CPKnowledgebaseadmin#assertTextEquals" locator-key1="ARTICLE_TABLE_AUTHOR" value1="${kbAuthor}" />
+		<execute action="CPKnowledgebaseadmin#click" locator-key1="ARTICLE_TABLE_ACTIONS" />
+		<execute action="CPKnowledgebaseadmin#assertClick" locator-key1="ARTICLE_MENULIST_VIEW" value1="View" />
+	</command>
+
 	<command name="gotoPGViaKBSearchResult">
 		<var name="key_kbArticleTitle" value="${kbArticleTitle}" />
 
@@ -274,6 +288,19 @@
 		<execute action="PGKnowledgebasedisplay#assertClick" locator-key1="RELATED_ASSETS_LINKS" value1="${kbArticleRelatedAssetTitle}" />
 	</command>
 
+	<command name="gotoSuggestionsNavigationCP">
+		<execute action="CPKnowledgebaseadmin#assertClick" locator-key1="NAVIGATION_SUGGESTIONS" value1="Suggestions" />
+	</command>
+
+	<command name="gotoSuggestionsNavigationPG">
+		<if>
+			<condition action="PGKnowledgebasedisplay#isElementNotPresent" locator-key1="SUGGESTION_NAVIGATION_BAR" />
+			<then>
+				<execute action="PGKnowledgebasedisplay#click" locator-key1="ARTICLE_THERE_ARE_SUGGESTIONS_LINK" />
+			</then>
+		</if>
+	</command>
+
 	<command name="gotoViaKBAdminCP">
 		<var name="key_kbArticleTitle" value="${kbArticleTitle}" />
 
@@ -291,7 +318,12 @@
 	<command name="gotoViaKBDisplayPG">
 		<var name="key_kbArticleTitle" value="${kbArticleTitle}" />
 
-		<execute action="PGKnowledgebasedisplay#assertClick" locator-key1="ARTICLE_NAVIGATION" value1="${kbArticleTitle}" />
+		<if>
+			<condition action="PGKnowledgebasedisplay#isElementPresent" locator-key1="ARTICLE_NAVIGATION" />
+			<then>
+				<execute action="PGKnowledgebasedisplay#assertClick" locator-key1="ARTICLE_NAVIGATION" value1="${kbArticleTitle}" />
+			</then>
+		</if>
 	</command>
 
 	<command name="gotoViaKBDisplayPGHierarchyNavigationPG">
@@ -319,6 +351,27 @@
 		<execute action="PGKnowledgebasedisplayMoveArticle#assertTextEquals" locator-key1="ARTICLE_HEADER" value1="${kbArticleTitle}" />
 		<execute action="PGKnowledgebasedisplayMoveArticle#assertTextEquals" locator-key1="CURRENT_PARENT_TITLE" value1="(None)" />
 		<execute action="PGKnowledgebasedisplayMoveArticle#assertClick" locator-key1="SELECT_PARENT" value1="Select Parent »" />
+	</command>
+
+	<command name="rateArticlePG">
+		<var name="key_kbArticleTitle" value="${kbArticleTitle}" />
+
+		<execute action="PGKnowledgebasedisplay#assertTextEquals" locator-key1="ARTICLE_TITLE" value1="${kbArticleTitle}" />
+
+		<if>
+			<equals arg1="${rateUp}" arg2="true" />
+			<then>
+				<execute action="PGKnowledgebasedisplay#click" locator-key1="ARTICLE_VOTE_UP" />
+			</then>
+			<elseif>
+				<equals arg1="${rateUp}" arg2="false" />
+				<then>
+					<execute action="PGKnowledgebasedisplay#click" locator-key1="ARTICLE_VOTE_DOWN" />
+				</then>
+			</elseif>
+		</if>
+
+		<execute action="PGKnowledgebasedisplay#assertTextEquals" locator-key1="ARTICLE_VOTES" value1="${articleVoteCount}" />
 	</command>
 
 	<command name="searchPGViaKBSearch">
@@ -418,6 +471,52 @@
 		</if>
 	</command>
 
+	<command name="viewArticleHistoryPG">
+		<execute action="PGKnowledgebasedisplay#assertClick" locator-key1="ARTICLE_HISTORY" value1="History" />
+
+		<execute action="PGKnowledgebasedisplayArticleHistory#assertTextEquals" locator-key1="ARTICLE_TITLE" value1="${kbArticleTitle}" />
+
+		<if>
+			<isset var="kbArticleTitleRemovedDiff" />
+			<then>
+				<execute action="PGKnowledgebasedisplayArticleHistory#assertTextEquals" locator-key1="ARTICLE_TITLE_EDIT_REMOVED_DIFF" value1="${kbArticleTitleRemovedDiff}" />
+			</then>
+		</if>
+
+		<if>
+			<isset var="kbArticleTitleAddedDiff" />
+			<then>
+				<execute action="PGKnowledgebasedisplayArticleHistory#assertTextEquals" locator-key1="ARTICLE_TITLE_EDIT_ADDED_DIFF" value1="${kbArticleTitleAddedDiff}" />
+			</then>
+		</if>
+
+		<execute action="PGKnowledgebasedisplayArticleHistory#assertTextEquals" locator-key1="ARTICLE_CONTENT" value1="${kbArticleContent}" />
+
+		<if>
+			<isset var="kbArticleContentRemovedDiff" />
+			<then>
+				<execute action="PGKnowledgebasedisplayArticleHistory#assertTextEquals" locator-key1="ARTICLE_CONTENT_EDIT_REMOVED_DIFF" value1="${kbArticleContentRemovedDiff}" />
+			</then>
+		</if>
+
+		<if>
+			<isset var="kbArticleContentAddedDiff" />
+			<then>
+				<execute action="PGKnowledgebasedisplayArticleHistory#assertTextEquals" locator-key1="ARTICLE_CONTENT_EDIT_ADDED_DIFF" value1="${kbArticleContentAddedDiff}" />
+			</then>
+		</if>
+
+		<if>
+			<equals arg1="${viewNoXMLInTitle}" arg2="true" />
+			<then>
+				<execute action="PGKnowledgebasedisplayArticleHistory#assertTextNotPresent" locator-key1="ARTICLE_TITLE" value1="xml" />
+			</then>
+		</if>
+
+		<execute action="PGKnowledgebasedisplayArticleHistory#assertTextEquals" locator-key1="VERSION_TABLE_TARGET" value1="${kbArticleHistoryTarget}" />
+		<execute action="PGKnowledgebasedisplayArticleHistory#assertTextEquals" locator-key1="VERSION_TABLE_SOURCE" value1="${kbArticleHistorySource}" />
+	</command>
+
 	<command name="viewChildArticleCP">
 		<execute action="CPKnowledgebaseadmin#assertTextEquals" locator-key1="INFO_MESSAGE" value1="Child Articles for ${kbArticleTitle}." />
 
@@ -429,20 +528,12 @@
 		<execute action="CPKnowledgebaseadmin#click" locator-key1="ARTICLE_TABLE_ACTIONS" />
 		<execute action="CPKnowledgebaseadmin#assertClick" locator-key1="ARTICLE_MENULIST_VIEW" value1="View" />
 
-		<execute action="CPKnowledgebaseadminChildarticle#assertTextEquals" locator-key1="BACK_TO_HEADER" value1="${kbChildArticleTitle}" />
+		<execute action="CPKnowledgebaseadminChildarticle#assertTextEquals" locator-key1="HEADER_TITLE" value1="${kbChildArticleTitle}" />
 		<execute action="CPKnowledgebaseadminChildarticle#assertTextEquals" locator-key1="CONTENT" value1="${kbChildArticleContent}" />
 	</command>
 
 	<command name="viewCP">
-		<var name="key_kbArticleTitle" value="${kbArticleTitle}" />
-
-		<execute action="CPKnowledgebaseadmin#assertTextEquals" locator-key1="ARTICLE_TABLE_PRIORITY" value1="${kbPriority}" />
-		<execute action="CPKnowledgebaseadmin#assertTextEquals" locator-key1="ARTICLE_TABLE_TITLE" value1="${kbArticleTitle}" />
-		<execute action="CPKnowledgebaseadmin#assertTextEquals" locator-key1="ARTICLE_TABLE_AUTHOR" value1="${kbAuthor}" />
-		<execute action="CPKnowledgebaseadmin#click" locator-key1="ARTICLE_TABLE_ACTIONS" />
-		<execute action="CPKnowledgebaseadmin#assertClick" locator-key1="ARTICLE_MENULIST_VIEW" value1="View" />
-
-		<execute action="CPKnowledgebaseadminArticle#assertTextEquals" locator-key1="BACK_TO_HEADER" value1="${kbArticleTitle}" />
+		<execute action="CPKnowledgebaseadminArticle#assertTextEquals" locator-key1="HEADER_TITLE" value1="${kbArticleTitle}" />
 		<execute action="CPKnowledgebaseadminArticle#assertTextEquals" locator-key1="CONTENT" value1="${kbArticleContent}" />
 
 		<if>
@@ -649,12 +740,12 @@
 		<if>
 			<equals arg1="${previous}" arg2="true" />
 			<then>
-				<execute action="PGKnowledgebasedisplay#assertElementPresent" locator-key1="ARTICLE_PREVIOUS" value1="Previous" />
+				<execute action="PGKnowledgebasedisplay#assertElementPresent" locator-key1="ARTICLE_PREVIOUS" />
 			</then>
 			<elseif>
 				<equals arg1="${previous}" arg2="false" />
 				<then>
-					<execute action="PGKnowledgebasedisplay#assertElementNotPresent" locator-key1="ARTICLE_PREVIOUS" value1="Previous" />
+					<execute action="PGKnowledgebasedisplay#assertElementNotPresent" locator-key1="ARTICLE_PREVIOUS" />
 				</then>
 			</elseif>
 		</if>
@@ -662,12 +753,12 @@
 		<if>
 			<equals arg1="${next}" arg2="true" />
 			<then>
-				<execute action="PGKnowledgebasedisplay#assertElementPresent" locator-key1="ARTICLE_NEXT" value1="Next" />
+				<execute action="PGKnowledgebasedisplay#assertElementPresent" locator-key1="ARTICLE_NEXT" />
 			</then>
 			<elseif>
 				<equals arg1="${next}" arg2="false" />
 				<then>
-					<execute action="PGKnowledgebasedisplay#assertElementNotPresent" locator-key1="ARTICLE_NEXT" value1="Next" />
+					<execute action="PGKnowledgebasedisplay#assertElementNotPresent" locator-key1="ARTICLE_NEXT" />
 				</then>
 			</elseif>
 		</if>
@@ -756,5 +847,12 @@
 	<command name="viewViaKBSectionPG">
 		<execute action="PGKnowledgebasesectionArticle#assertTextEquals" locator-key1="ARTICLE_TITLE" value1="${kbArticleTitle}" />
 		<execute action="PGKnowledgebasesectionArticle#assertTextEquals" locator-key1="ARTICLE_CONTENT" value1="${kbArticleContent}" />
+	</command>
+
+	<command name="viewViaReadMoreLinkPG">
+		<execute action="PGKnowledgebasedisplay#assertTextEquals" locator-key1="ARTICLE_TITLE" value1="${kbArticleTitle}" />
+		<execute action="PGKnowledgebasedisplay#assertTextNotPresent" locator-key1="ARTICLE_CHILD_CONTENT" value1="This last sentence of the child article should only be visible after clicking on Read More. " />
+		<execute action="PGKnowledgebasedisplay#assertClick" locator-key1="ARTICLE_READ_MORE" value1="Read More" />
+		<execute action="PGKnowledgebasedisplay#assertTextPresent" locator-key1="ARTICLE_CONTENT" value1="This last sentence of the child article should only be visible after clicking on Read More." />
 	</command>
 </definition>

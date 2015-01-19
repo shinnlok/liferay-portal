@@ -54,7 +54,7 @@ public class MetaInfoCacheServletResponseTest {
 
 	@Test
 	public void testAddCookie() {
-		final List<Cookie> cookies = new ArrayList<Cookie>();
+		final List<Cookie> cookies = new ArrayList<>();
 
 		StubHttpServletResponse stubHttpServletResponse =
 			new StubHttpServletResponse() {
@@ -146,7 +146,7 @@ public class MetaInfoCacheServletResponseTest {
 	@Test
 	public void testAddDateHeader() {
 		final List<ObjectValuePair<String, Long>> objectValuePairs =
-			new ArrayList<ObjectValuePair<String, Long>>();
+			new ArrayList<>();
 
 		StubHttpServletResponse stubHttpServletResponse =
 			new StubHttpServletResponse() {
@@ -221,7 +221,7 @@ public class MetaInfoCacheServletResponseTest {
 		final AtomicReference<String> contentTypeReference =
 			new AtomicReference<String>();
 		final List<ObjectValuePair<String, String>> objectValuePairs =
-			new ArrayList<ObjectValuePair<String, String>>();
+			new ArrayList<>();
 
 		StubHttpServletResponse stubHttpServletResponse =
 			new StubHttpServletResponse() {
@@ -315,7 +315,7 @@ public class MetaInfoCacheServletResponseTest {
 	@Test
 	public void testAddIntHeader() {
 		final List<ObjectValuePair<String, Integer>> objectValuePairs =
-			new ArrayList<ObjectValuePair<String, Integer>>();
+			new ArrayList<>();
 
 		StubHttpServletResponse stubHttpServletResponse =
 			new StubHttpServletResponse() {
@@ -465,6 +465,10 @@ public class MetaInfoCacheServletResponseTest {
 					statusReference.set(status);
 				}
 
+				/**
+				 * @deprecated As of 7.0.0
+				 */
+				@Deprecated
 				@Override
 				public void setStatus(int status, String message) {
 					statusReference.set(status);
@@ -1219,6 +1223,10 @@ public class MetaInfoCacheServletResponseTest {
 				statusReference.set(status);
 			}
 
+			/**
+			 * @deprecated As of 7.0.0
+			 */
+			@Deprecated
 			@Override
 			public void setStatus(int status, String message) {
 				statusReference.set(status);
@@ -1291,7 +1299,7 @@ public class MetaInfoCacheServletResponseTest {
 	@Test
 	public void testSetDateHeader() {
 		final List<ObjectValuePair<String, Long>> objectValuePairs =
-			new ArrayList<ObjectValuePair<String, Long>>();
+			new ArrayList<>();
 
 		StubHttpServletResponse stubHttpServletResponse =
 			new StubHttpServletResponse() {
@@ -1380,6 +1388,10 @@ public class MetaInfoCacheServletResponseTest {
 					statusReference.set(status);
 				}
 
+				/**
+				 * @deprecated As of 7.0.0
+				 */
+				@Deprecated
 				@Override
 				public void setStatus(int status, String message) {
 					statusReference.set(status);
@@ -1439,7 +1451,7 @@ public class MetaInfoCacheServletResponseTest {
 		final AtomicReference<String> contentTypeReference =
 			new AtomicReference<String>();
 		final List<ObjectValuePair<String, String>> objectValuePairs =
-			new ArrayList<ObjectValuePair<String, String>>();
+			new ArrayList<>();
 
 		StubHttpServletResponse stubHttpServletResponse =
 			new StubHttpServletResponse() {
@@ -1533,7 +1545,7 @@ public class MetaInfoCacheServletResponseTest {
 	@Test
 	public void testSetIntHeader() {
 		final List<ObjectValuePair<String, Integer>> objectValuePairs =
-			new ArrayList<ObjectValuePair<String, Integer>>();
+			new ArrayList<>();
 
 		StubHttpServletResponse stubHttpServletResponse =
 			new StubHttpServletResponse() {

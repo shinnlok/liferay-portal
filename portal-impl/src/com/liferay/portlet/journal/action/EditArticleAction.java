@@ -335,7 +335,7 @@ public class EditArticleAction extends PortletAction {
 				ParamUtil.getString(actionRequest, "articleIds"));
 		}
 
-		List<TrashedModel> trashedModels = new ArrayList<TrashedModel>();
+		List<TrashedModel> trashedModels = new ArrayList<>();
 
 		for (String deleteArticleId : deleteArticleIds) {
 			if (moveToTrash) {
@@ -670,6 +670,7 @@ public class EditArticleAction extends PortletAction {
 			portletResource, articleId, true);
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(EditArticleAction.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		EditArticleAction.class);
 
 }

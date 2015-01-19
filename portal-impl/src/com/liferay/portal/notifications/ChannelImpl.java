@@ -293,7 +293,7 @@ public class ChannelImpl extends BaseChannelImpl {
 	public void removeTransientNotificationEventsByUuid(
 		Collection<String> notificationEventUuids) {
 
-		Set<String> notificationEventUuidsSet = new HashSet<String>(
+		Set<String> notificationEventUuidsSet = new HashSet<>(
 			notificationEventUuids);
 
 		_reentrantLock.lock();
@@ -329,7 +329,7 @@ public class ChannelImpl extends BaseChannelImpl {
 		try {
 			long currentTime = System.currentTimeMillis();
 
-			storeNotificationEvent(notificationEvent, currentTime);
+			doStoreNotificationEvent(notificationEvent, currentTime);
 
 			if (PropsValues.USER_NOTIFICATION_EVENT_CONFIRMATION_ENABLED &&
 				notificationEvent.isDeliveryRequired()) {
@@ -359,10 +359,10 @@ public class ChannelImpl extends BaseChannelImpl {
 			long currentTime = System.currentTimeMillis();
 
 			List<NotificationEvent> persistedNotificationEvents =
-				new ArrayList<NotificationEvent>(notificationEvents.size());
+				new ArrayList<>(notificationEvents.size());
 
 			for (NotificationEvent notificationEvent : notificationEvents) {
-				storeNotificationEvent(notificationEvent, currentTime);
+				doStoreNotificationEvent(notificationEvent, currentTime);
 
 				if (PropsValues.USER_NOTIFICATION_EVENT_CONFIRMATION_ENABLED &&
 					notificationEvent.isDeliveryRequired()) {
@@ -392,33 +392,13 @@ public class ChannelImpl extends BaseChannelImpl {
 	public void storeNotificationEvent(
 		NotificationEvent notificationEvent, long currentTime) {
 
-		if (isRemoveNotificationEvent(notificationEvent, currentTime)) {
-			return;
+		_reentrantLock.lock();
+
+		try {
+			doStoreNotificationEvent(notificationEvent, currentTime);
 		}
-
-		if (PropsValues.USER_NOTIFICATION_EVENT_CONFIRMATION_ENABLED &&
-			notificationEvent.isDeliveryRequired()) {
-
-			Map<String, NotificationEvent> unconfirmedNotificationEvents =
-				_getUnconfirmedNotificationEvents();
-
-			unconfirmedNotificationEvents.put(
-				notificationEvent.getUuid(), notificationEvent);
-		}
-		else {
-			TreeSet<NotificationEvent> notificationEvents =
-				_getNotificationEvents();
-
-			notificationEvents.add(notificationEvent);
-
-			if (notificationEvents.size() >
-					PropsValues.NOTIFICATIONS_MAX_EVENTS) {
-
-				NotificationEvent firstNotificationEvent =
-					notificationEvents.first();
-
-				notificationEvents.remove(firstNotificationEvent);
-			}
+		finally {
+			_reentrantLock.unlock();
 		}
 	}
 
@@ -445,7 +425,7 @@ public class ChannelImpl extends BaseChannelImpl {
 			Map<String, NotificationEvent> unconfirmedNotificationEvents =
 				_getUnconfirmedNotificationEvents();
 
-			List<String> invalidNotificationEventUuids = new ArrayList<String>(
+			List<String> invalidNotificationEventUuids = new ArrayList<>(
 				unconfirmedNotificationEvents.size());
 
 			Set<Map.Entry<String, NotificationEvent>>
@@ -516,7 +496,7 @@ public class ChannelImpl extends BaseChannelImpl {
 			notificationEventsSet.retainAll(notificationEvents);
 		}
 
-		List<String> invalidNotificationEventUuids = new ArrayList<String>(
+		List<String> invalidNotificationEventUuids = new ArrayList<>(
 			unconfirmedNotificationEvents.size());
 
 		Set<Map.Entry<String, NotificationEvent>>
@@ -565,7 +545,7 @@ public class ChannelImpl extends BaseChannelImpl {
 		Map<String, NotificationEvent> unconfirmedNotificationEvents =
 			_getUnconfirmedNotificationEvents();
 
-		List<String> invalidNotificationEventUuids = new ArrayList<String>(
+		List<String> invalidNotificationEventUuids = new ArrayList<>(
 			unconfirmedNotificationEvents.size());
 
 		long currentTime = System.currentTimeMillis();
@@ -611,6 +591,39 @@ public class ChannelImpl extends BaseChannelImpl {
 		}
 	}
 
+	protected void doStoreNotificationEvent(
+		NotificationEvent notificationEvent, long currentTime) {
+
+		if (isRemoveNotificationEvent(notificationEvent, currentTime)) {
+			return;
+		}
+
+		if (PropsValues.USER_NOTIFICATION_EVENT_CONFIRMATION_ENABLED &&
+			notificationEvent.isDeliveryRequired()) {
+
+			Map<String, NotificationEvent> unconfirmedNotificationEvents =
+				_getUnconfirmedNotificationEvents();
+
+			unconfirmedNotificationEvents.put(
+				notificationEvent.getUuid(), notificationEvent);
+		}
+		else {
+			TreeSet<NotificationEvent> notificationEvents =
+				_getNotificationEvents();
+
+			notificationEvents.add(notificationEvent);
+
+			if (notificationEvents.size() >
+					PropsValues.NOTIFICATIONS_MAX_EVENTS) {
+
+				NotificationEvent firstNotificationEvent =
+					notificationEvents.first();
+
+				notificationEvents.remove(firstNotificationEvent);
+			}
+		}
+	}
+
 	protected boolean isRemoveNotificationEvent(
 		NotificationEvent notificationEvent, long currentTime) {
 
@@ -626,7 +639,7 @@ public class ChannelImpl extends BaseChannelImpl {
 
 	private TreeSet<NotificationEvent> _getNotificationEvents() {
 		if (_notificationEvents == null) {
-			_notificationEvents = new TreeSet<NotificationEvent>(_comparator);
+			_notificationEvents = new TreeSet<>(_comparator);
 		}
 
 		return _notificationEvents;
@@ -634,8 +647,7 @@ public class ChannelImpl extends BaseChannelImpl {
 
 	private Map<String, NotificationEvent> _getUnconfirmedNotificationEvents() {
 		if (_unconfirmedNotificationEvents == null) {
-			_unconfirmedNotificationEvents =
-				new LinkedHashMap<String, NotificationEvent>();
+			_unconfirmedNotificationEvents = new LinkedHashMap<>();
 		}
 
 		return _unconfirmedNotificationEvents;

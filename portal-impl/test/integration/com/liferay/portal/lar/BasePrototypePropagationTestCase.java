@@ -24,6 +24,7 @@ import com.liferay.portal.model.LayoutPrototype;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.ServiceContextThreadLocal;
 import com.liferay.portal.service.persistence.CompanyUtil;
+import com.liferay.portal.test.DeleteAfterTestRun;
 import com.liferay.portal.util.test.GroupTestUtil;
 import com.liferay.portal.util.test.LayoutTestUtil;
 import com.liferay.portal.util.test.RandomTestUtil;
@@ -108,7 +109,7 @@ public abstract class BasePrototypePropagationTestCase {
 			String columnId)
 		throws Exception {
 
-		Map<String, String[]> parameterMap = new HashMap<String, String[]>();
+		Map<String, String[]> parameterMap = new HashMap<>();
 
 		parameterMap.put(
 			"articleId", new String[] {journalArticle.getArticleId()});
@@ -197,8 +198,7 @@ public abstract class BasePrototypePropagationTestCase {
 
 		MergeLayoutPrototypesThreadLocal.clearMergeComplete();
 
-		Map<String, String> portletPreferencesMap =
-			new HashMap<String, String>();
+		Map<String, String> portletPreferencesMap = new HashMap<>();
 
 		portletPreferencesMap.put("articleId", StringPool.BLANK);
 		portletPreferencesMap.put(
@@ -264,12 +264,23 @@ public abstract class BasePrototypePropagationTestCase {
 	}
 
 	protected long globalGroupId;
+
+	@DeleteAfterTestRun
 	protected JournalArticle globalJournalArticle;
+
+	@DeleteAfterTestRun
 	protected Group group;
+
 	protected String initialLayoutTemplateId = "2_2_columns";
+
+	@DeleteAfterTestRun
 	protected JournalArticle journalArticle;
+
 	protected Layout layout;
+
+	@DeleteAfterTestRun
 	protected LayoutPrototype layoutPrototype;
+
 	protected Layout layoutPrototypeLayout;
 	protected String portletId;
 	protected Layout prototypeLayout;

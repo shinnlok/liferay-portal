@@ -628,7 +628,7 @@ public class DLFileEntryLocalServiceImpl
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		Map<String, Fields> fieldsMap = new HashMap<String, Fields>();
+		Map<String, Fields> fieldsMap = new HashMap<>();
 
 		List<DDMStructure> ddmStructures = null;
 
@@ -1102,7 +1102,7 @@ public class DLFileEntryLocalServiceImpl
 		long groupId, long folderId, int status, int start, int end,
 		OrderByComparator<DLFileEntry> obc) {
 
-		List<Long> folderIds = new ArrayList<Long>();
+		List<Long> folderIds = new ArrayList<>();
 
 		folderIds.add(folderId);
 
@@ -1169,7 +1169,7 @@ public class DLFileEntryLocalServiceImpl
 
 	@Override
 	public int getFileEntriesCount(long groupId, long folderId, int status) {
-		List<Long> folderIds = new ArrayList<Long>();
+		List<Long> folderIds = new ArrayList<>();
 
 		folderIds.add(folderId);
 
@@ -1623,14 +1623,7 @@ public class DLFileEntryLocalServiceImpl
 		searchContext.setCompanyId(group.getCompanyId());
 
 		searchContext.setEnd(end);
-
-		if (folderId != DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
-			List<Long> folderIds = dlFolderService.getFolderIds(
-				groupId, folderId);
-
-			searchContext.setFolderIds(folderIds);
-		}
-
+		searchContext.setFolderIds(new long[] {folderId});
 		searchContext.setGroupIds(new long[] {groupId});
 		searchContext.setSorts(new Sort(Field.MODIFIED_DATE, true));
 		searchContext.setStart(start);
@@ -2711,7 +2704,7 @@ public class DLFileEntryLocalServiceImpl
 
 	private static final int _DELETE_INTERVAL = 100;
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		DLFileEntryLocalServiceImpl.class);
 
 }

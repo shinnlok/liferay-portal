@@ -240,7 +240,7 @@ public class AssetPublisherImpl implements AssetPublisher {
 			plid = themeDisplay.getPlid();
 		}
 
-		List<AssetEntry> assetEntries = new ArrayList<AssetEntry>();
+		List<AssetEntry> assetEntries = new ArrayList<>();
 
 		assetEntries.add(assetEntry);
 
@@ -476,9 +476,9 @@ public class AssetPublisherImpl implements AssetPublisher {
 		String[] assetEntryXmls = portletPreferences.getValues(
 			"assetEntryXml", new String[0]);
 
-		List<AssetEntry> assetEntries = new ArrayList<AssetEntry>();
+		List<AssetEntry> assetEntries = new ArrayList<>();
 
-		List<String> missingAssetEntryUuids = new ArrayList<String>();
+		List<String> missingAssetEntryUuids = new ArrayList<>();
 
 		for (String assetEntryXml : assetEntryXmls) {
 			Document document = SAXReaderUtil.read(assetEntryXml);
@@ -950,8 +950,7 @@ public class AssetPublisherImpl implements AssetPublisher {
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		Map<String, String> definitionTerms =
-			new LinkedHashMap<String, String>();
+		Map<String, String> definitionTerms = new LinkedHashMap<>();
 
 		definitionTerms.put(
 			"[$ASSET_ENTRIES$]",
@@ -980,7 +979,8 @@ public class AssetPublisherImpl implements AssetPublisher {
 		definitionTerms.put("[$PORTAL_URL$]", company.getVirtualHostname());
 
 		definitionTerms.put(
-			"[$PORTLET_NAME$]", PortalUtil.getPortletTitle(portletRequest));
+			"[$PORTLET_NAME$]",
+			HtmlUtil.escape(PortalUtil.getPortletTitle(portletRequest)));
 		definitionTerms.put(
 			"[$SITE_NAME$]",
 			LanguageUtil.get(
@@ -1068,14 +1068,19 @@ public class AssetPublisherImpl implements AssetPublisher {
 				scopeIdGroup = scopeIdLayout.getScopeGroup();
 			}
 			else {
+				Map<Locale, String> nameMap = new HashMap<>();
+
+				nameMap.put(
+					LocaleUtil.getDefault(),
+					String.valueOf(scopeIdLayout.getPlid()));
+
 				scopeIdGroup = GroupLocalServiceUtil.addGroup(
 					PrincipalThreadLocal.getUserId(),
 					GroupConstants.DEFAULT_PARENT_GROUP_ID,
 					Layout.class.getName(), scopeIdLayout.getPlid(),
-					GroupConstants.DEFAULT_LIVE_GROUP_ID,
-					String.valueOf(scopeIdLayout.getPlid()), null, 0, true,
-					GroupConstants.DEFAULT_MEMBERSHIP_RESTRICTION, null, false,
-					true, null);
+					GroupConstants.DEFAULT_LIVE_GROUP_ID, nameMap, null, 0,
+					true, GroupConstants.DEFAULT_MEMBERSHIP_RESTRICTION, null,
+					false, true, null);
 			}
 
 			return scopeIdGroup.getGroupId();
@@ -1129,7 +1134,7 @@ public class AssetPublisherImpl implements AssetPublisher {
 		String[] scopeIds = portletPreferences.getValues(
 			"scopeIds", new String[] {SCOPE_ID_GROUP_PREFIX + scopeGroupId});
 
-		List<Long> groupIds = new ArrayList<Long>();
+		List<Long> groupIds = new ArrayList<>();
 
 		for (String scopeId : scopeIds) {
 			try {
@@ -1454,7 +1459,7 @@ public class AssetPublisherImpl implements AssetPublisher {
 	}
 
 	protected long[] getSiteGroupIds(long[] groupIds) throws PortalException {
-		Set<Long> siteGroupIds = new HashSet<Long>();
+		Set<Long> siteGroupIds = new HashSet<>();
 
 		for (long groupId : groupIds) {
 			siteGroupIds.add(PortalUtil.getSiteGroupId(groupId));
@@ -1494,7 +1499,7 @@ public class AssetPublisherImpl implements AssetPublisher {
 		long[] notifiedAssetEntryIds = GetterUtil.getLongValues(
 			portletPreferences.getValues("notifiedAssetEntryIds", null));
 
-		List<AssetEntry> newAssetEntries = new ArrayList<AssetEntry>();
+		List<AssetEntry> newAssetEntries = new ArrayList<>();
 
 		for (int i = 0; i < assetEntries.size(); i++) {
 			AssetEntry assetEntry = assetEntries.get(i);
@@ -1531,7 +1536,7 @@ public class AssetPublisherImpl implements AssetPublisher {
 			List<AssetEntry> assetEntries, long[] assetCategoryIds)
 		throws Exception {
 
-		List<AssetEntry> filteredAssetEntries = new ArrayList<AssetEntry>();
+		List<AssetEntry> filteredAssetEntries = new ArrayList<>();
 
 		for (AssetEntry assetEntry : assetEntries) {
 			if (ArrayUtil.containsAll(
@@ -1548,7 +1553,7 @@ public class AssetPublisherImpl implements AssetPublisher {
 			List<AssetEntry> assetEntries, String[] assetTagNames)
 		throws Exception {
 
-		List<AssetEntry> filteredAssetEntries = new ArrayList<AssetEntry>();
+		List<AssetEntry> filteredAssetEntries = new ArrayList<>();
 
 		for (AssetEntry assetEntry : assetEntries) {
 			List<AssetTag> assetTags = assetEntry.getTags();
@@ -1618,7 +1623,7 @@ public class AssetPublisherImpl implements AssetPublisher {
 			(Map<String, Long>)session.getAttribute(key);
 
 		if (recentFolderIds == null) {
-			recentFolderIds = new HashMap<String, Long>();
+			recentFolderIds = new HashMap<>();
 		}
 
 		session.setAttribute(key, recentFolderIds);
@@ -1626,12 +1631,13 @@ public class AssetPublisherImpl implements AssetPublisher {
 		return recentFolderIds;
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(AssetPublisherImpl.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		AssetPublisherImpl.class);
 
-	private Map<String, AssetEntryQueryProcessor> _assetEntryQueryProcessor =
-		new ConcurrentHashMap<String, AssetEntryQueryProcessor>();
+	private final Map<String, AssetEntryQueryProcessor>
+		_assetEntryQueryProcessor = new ConcurrentHashMap<>();
 
-	private Accessor<AssetEntry, String> _titleAccessor =
+	private final Accessor<AssetEntry, String> _titleAccessor =
 		new Accessor<AssetEntry, String>() {
 
 			@Override

@@ -41,6 +41,7 @@ import com.liferay.portlet.dynamicdatamapping.model.DDMForm;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructureConstants;
 import com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalServiceUtil;
+import com.liferay.portlet.dynamicdatamapping.storage.StorageType;
 
 import java.io.StringReader;
 
@@ -76,7 +77,7 @@ public class AddDefaultDocumentLibraryStructuresAction
 			ServiceContext serviceContext)
 		throws Exception {
 
-		List<Long> ddmStructureIds = new ArrayList<Long>();
+		List<Long> ddmStructureIds = new ArrayList<>();
 
 		for (String ddmStructureName : ddmStructureNames) {
 			String ddmStructureKey = ddmStructureName;
@@ -122,7 +123,7 @@ public class AddDefaultDocumentLibraryStructuresAction
 			long userId, long groupId, ServiceContext serviceContext)
 		throws Exception {
 
-		List<String> ddmStructureNames = new ArrayList<String>();
+		List<String> ddmStructureNames = new ArrayList<>();
 
 		addDLFileEntryType(
 			userId, groupId, DLFileEntryTypeConstants.NAME_CONTRACT,
@@ -201,12 +202,11 @@ public class AddDefaultDocumentLibraryStructuresAction
 				DDMStructureLocalServiceUtil.updateDDMStructure(ddmStructure);
 			}
 			else {
-				Map<Locale, String> nameMap = new HashMap<Locale, String>();
+				Map<Locale, String> nameMap = new HashMap<>();
 
 				nameMap.put(locale, name);
 
-				Map<Locale, String> descriptionMap =
-					new HashMap<Locale, String>();
+				Map<Locale, String> descriptionMap = new HashMap<>();
 
 				descriptionMap.put(locale, description);
 
@@ -217,7 +217,8 @@ public class AddDefaultDocumentLibraryStructuresAction
 					userId, groupId,
 					DDMStructureConstants.DEFAULT_PARENT_STRUCTURE_ID,
 					PortalUtil.getClassNameId(RawMetadataProcessor.class), name,
-					nameMap, descriptionMap, ddmForm, "xml",
+					nameMap, descriptionMap, ddmForm,
+					StorageType.JSON.toString(),
 					DDMStructureConstants.TYPE_DEFAULT, serviceContext);
 			}
 		}
@@ -315,7 +316,7 @@ public class AddDefaultDocumentLibraryStructuresAction
 	}
 
 	protected Map<Locale, String> getLocalizationMap(String content) {
-		Map<Locale, String> localizationMap = new HashMap<Locale, String>();
+		Map<Locale, String> localizationMap = new HashMap<>();
 
 		Locale defaultLocale = LocaleUtil.getDefault();
 

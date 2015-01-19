@@ -236,6 +236,12 @@ public class MBMessageStagedModelDataHandler
 
 		long threadId = MapUtil.getLong(threadIds, message.getThreadId(), 0);
 
+		if (!message.isRoot()) {
+			StagedModelDataHandlerUtil.importReferenceStagedModel(
+				portletDataContext, message, MBMessage.class,
+				message.getParentMessageId());
+		}
+
 		Map<Long, Long> messageIds =
 			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
 				MBMessage.class);
@@ -400,7 +406,7 @@ public class MBMessageStagedModelDataHandler
 		}
 
 		List<ObjectValuePair<String, InputStream>> inputStreamOVPs =
-			new ArrayList<ObjectValuePair<String, InputStream>>();
+			new ArrayList<>();
 
 		List<Element> attachmentElements =
 			portletDataContext.getReferenceDataElements(

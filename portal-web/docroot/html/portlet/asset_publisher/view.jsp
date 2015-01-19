@@ -33,36 +33,6 @@ if (Validator.isNotNull(assetTagName)) {
 	PortalUtil.setPageKeywords(assetTagName, request);
 }
 
-if (assetPublisherDisplayContext.isMergeURLTags() || assetPublisherDisplayContext.isMergeLayoutTags()) {
-	String[] compilerTagNames = assetPublisherDisplayContext.getCompilerTagNames();
-
-	String titleEntry = ArrayUtil.isNotEmpty(compilerTagNames) ? compilerTagNames[compilerTagNames.length - 1] : null;
-
-	String portletTitle = portletDisplay.getTitle();
-
-	portletTitle = AssetUtil.substituteTagPropertyVariables(scopeGroupId, titleEntry, portletTitle);
-
-	renderResponse.setTitle(portletTitle);
-}
-
-for (String curAssetTagName : assetPublisherDisplayContext.getAllAssetTagNames()) {
-	try {
-		AssetTag assetTag = AssetTagLocalServiceUtil.getTag(scopeGroupId, curAssetTagName);
-
-		AssetTagProperty journalTemplateIdProperty = AssetTagPropertyLocalServiceUtil.getTagProperty(assetTag.getTagId(), "journal-template-id");
-
-		String journalTemplateId = journalTemplateIdProperty.getValue();
-
-		request.setAttribute(WebKeys.JOURNAL_TEMPLATE_ID, journalTemplateId);
-
-		break;
-	}
-	catch (NoSuchTagException nste) {
-	}
-	catch (NoSuchTagPropertyException nstpe) {
-	}
-}
-
 if (assetPublisherDisplayContext.isEnableTagBasedNavigation() && assetPublisherDisplayContext.isSelectionStyleManual() && ((assetPublisherDisplayContext.getAllAssetCategoryIds().length > 0) || (assetPublisherDisplayContext.getAllAssetTagNames().length > 0))) {
 	assetPublisherDisplayContext.setSelectionStyle("dynamic");
 }
@@ -108,9 +78,7 @@ boolean hasAddPortletURLs = false;
 	<c:if test="<%= !portletName.equals(PortletKeys.HIGHEST_RATED_ASSETS) && !portletName.equals(PortletKeys.MOST_VIEWED_ASSETS) && !portletName.equals(PortletKeys.RECENT_CONTENT) && !portletName.equals(PortletKeys.RELATED_ASSETS) && PortletPermissionUtil.contains(permissionChecker, plid, portletDisplay.getId(), ActionKeys.SUBSCRIBE) && AssetPublisherUtil.getEmailAssetEntryAddedEnabled(portletPreferences) %>">
 		<c:choose>
 			<c:when test="<%= AssetPublisherUtil.isSubscribed(themeDisplay.getCompanyId(), user.getUserId(), themeDisplay.getPlid(), portletDisplay.getId()) %>">
-				<portlet:actionURL var="unsubscribeURL">
-					<portlet:param name="struts_action" value="/asset_publisher/edit_subscription" />
-					<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.UNSUBSCRIBE %>" />
+				<portlet:actionURL name="unsubscribe" var="unsubscribeURL">
 					<portlet:param name="redirect" value="<%= currentURL %>" />
 				</portlet:actionURL>
 
@@ -122,9 +90,7 @@ boolean hasAddPortletURLs = false;
 				/>
 			</c:when>
 			<c:otherwise>
-				<portlet:actionURL var="subscribeURL">
-					<portlet:param name="struts_action" value="/asset_publisher/edit_subscription" />
-					<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.SUBSCRIBE %>" />
+				<portlet:actionURL name="subscribe" var="subscribeURL">
 					<portlet:param name="redirect" value="<%= currentURL %>" />
 				</portlet:actionURL>
 
@@ -144,7 +110,7 @@ boolean hasAddPortletURLs = false;
 
 	<c:if test="<%= enableRSS %>">
 		<liferay-portlet:resourceURL varImpl="rssURL">
-			<portlet:param name="struts_action" value="/asset_publisher/rss" />
+			<portlet:param name="<%= Constants.CMD %>" value="rss" />
 		</liferay-portlet:resourceURL>
 
 		<liferay-ui:rss resourceURL="<%= rssURL %>" />

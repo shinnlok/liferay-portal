@@ -135,7 +135,7 @@ public class ServiceTrackerWrapper<S, T> implements ServiceTracker<S, T> {
 	@Override
 	public SortedMap<ServiceReference<S>, T> getTrackedServiceReferences() {
 		SortedMap<ServiceReference<S>, T> trackedServiceReferences =
-			new TreeMap<ServiceReference<S>, T>(Collections.reverseOrder());
+			new TreeMap<>(Collections.reverseOrder());
 
 		SortedMap<org.osgi.framework.ServiceReference<S>, T>
 			trackedOSGiServiceReferences = _serviceTracker.getTracked();
@@ -224,6 +224,6 @@ public class ServiceTrackerWrapper<S, T> implements ServiceTracker<S, T> {
 		return _serviceTracker.waitForService(timeout);
 	}
 
-	private org.osgi.util.tracker.ServiceTracker<S, T> _serviceTracker;
+	private final org.osgi.util.tracker.ServiceTracker<S, T> _serviceTracker;
 
 }
