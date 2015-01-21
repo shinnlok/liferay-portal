@@ -123,11 +123,11 @@ public abstract class AbstractPortalCacheManager<K extends Serializable, V>
 		if (PropsValues.TRANSACTIONAL_CACHE_ENABLED &&
 			isTransactionalPortalCache(name)) {
 
-			portalCache = new TransactionalPortalCache<K, V>(portalCache);
+			portalCache = new TransactionalPortalCache<>(portalCache);
 		}
 
 		if (PropsValues.EHCACHE_BLOCKING_CACHE_ALLOWED && blocking) {
-			portalCache = new BlockingPortalCache<K, V>(portalCache);
+			portalCache = new BlockingPortalCache<>(portalCache);
 		}
 
 		PortalCache<K, V> previousPortalCache = portalCaches.putIfAbsent(
@@ -260,7 +260,7 @@ public abstract class AbstractPortalCacheManager<K extends Serializable, V>
 		aggregatedCacheManagerListener = new AggregatedCacheManagerListener();
 	protected boolean clusterAware;
 	protected final ConcurrentMap<String, PortalCache<K, V>> portalCaches =
-		new ConcurrentHashMap<String, PortalCache<K, V>>();
+		new ConcurrentHashMap<>();
 
 	private void _initPortalCacheListeners(
 		PortalCache<K, V> portalCache,

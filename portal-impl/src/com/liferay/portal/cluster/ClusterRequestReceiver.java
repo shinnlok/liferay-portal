@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.cluster.Address;
 import com.liferay.portal.kernel.cluster.ClusterException;
 import com.liferay.portal.kernel.cluster.ClusterInvokeThreadLocal;
 import com.liferay.portal.kernel.cluster.ClusterMessageType;
+import com.liferay.portal.kernel.cluster.ClusterNode;
 import com.liferay.portal.kernel.cluster.ClusterNodeResponse;
 import com.liferay.portal.kernel.cluster.ClusterRequest;
 import com.liferay.portal.kernel.cluster.FutureClusterResponses;
@@ -63,11 +64,7 @@ public class ClusterRequestReceiver extends BaseReceiver {
 		if (sourceAddress.equals(
 				_clusterExecutorImpl.getLocalClusterNodeAddress())) {
 
-			boolean isProcessed = processLocalMessage(obj);
-
-			if (isProcessed) {
-				return;
-			}
+			return;
 		}
 
 		try {
@@ -114,8 +111,8 @@ public class ClusterRequestReceiver extends BaseReceiver {
 			newView.getMembers();
 		List<org.jgroups.Address> lastJGroupsAddresses = oldView.getMembers();
 
-		List<org.jgroups.Address> departJGroupsAddresses =
-			new ArrayList<org.jgroups.Address>(lastJGroupsAddresses);
+		List<org.jgroups.Address> departJGroupsAddresses = new ArrayList<>(
+			lastJGroupsAddresses);
 
 		departJGroupsAddresses.removeAll(currentJGroupsAddresses);
 
@@ -123,7 +120,7 @@ public class ClusterRequestReceiver extends BaseReceiver {
 			return Collections.emptyList();
 		}
 
-		List<Address> departAddresses = new ArrayList<Address>(
+		List<Address> departAddresses = new ArrayList<>(
 			departJGroupsAddresses.size());
 
 		for (org.jgroups.Address departJGroupsAddress :
@@ -142,8 +139,8 @@ public class ClusterRequestReceiver extends BaseReceiver {
 			newView.getMembers();
 		List<org.jgroups.Address> lastJGroupsAddresses = oldView.getMembers();
 
-		List<org.jgroups.Address> newJGroupsAddresses =
-			new ArrayList<org.jgroups.Address>(currentJGroupsAddresses);
+		List<org.jgroups.Address> newJGroupsAddresses = new ArrayList<>(
+			currentJGroupsAddresses);
 
 		newJGroupsAddresses.removeAll(lastJGroupsAddresses);
 
@@ -151,7 +148,7 @@ public class ClusterRequestReceiver extends BaseReceiver {
 			return Collections.emptyList();
 		}
 
-		List<Address> newAddresses = new ArrayList<Address>(
+		List<Address> newAddresses = new ArrayList<>(
 			newJGroupsAddresses.size());
 
 		for (org.jgroups.Address newJGroupsAddress : newJGroupsAddresses) {
@@ -263,30 +260,21 @@ public class ClusterRequestReceiver extends BaseReceiver {
 			return;
 		}
 
-		if (futureClusterResponses.expectsReply(sourceAddress)) {
+		ClusterNode clusterNode = clusterNodeResponse.getClusterNode();
+
+		if (futureClusterResponses.expectsReply(
+				clusterNode.getClusterNodeId())) {
+
 			futureClusterResponses.addClusterNodeResponse(clusterNodeResponse);
 		}
 		else {
 			if (_log.isWarnEnabled()) {
-				_log.warn("Unknown uuid " + uuid + " from " + sourceAddress);
+				_log.warn(
+					"Unexpected cluster node ID " +
+						clusterNode.getClusterNodeId() +
+							" for response container with UUID " + uuid);
 			}
 		}
-	}
-
-	protected boolean processLocalMessage(Object message) {
-		if (message instanceof ClusterRequest) {
-			ClusterRequest clusterRequest = (ClusterRequest)message;
-
-			if (clusterRequest.isSkipLocal()) {
-				return true;
-			}
-		}
-
-		if (_clusterExecutorImpl.isShortcutLocalMethod()) {
-			return true;
-		}
-
-		return false;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

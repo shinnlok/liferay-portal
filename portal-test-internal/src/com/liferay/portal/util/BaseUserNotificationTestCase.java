@@ -292,7 +292,6 @@ public abstract class BaseUserNotificationTestCase {
 	protected abstract BaseModel<?> addBaseModel() throws Exception;
 
 	protected void addContainerModel() throws Exception {
-		return;
 	}
 
 	protected void deleteUserNotificationDeliveries() throws Exception {
@@ -320,7 +319,7 @@ public abstract class BaseUserNotificationTestCase {
 		throws Exception {
 
 		List<UserNotificationDelivery> userNotificationDeliveries =
-			new ArrayList<UserNotificationDelivery>();
+			new ArrayList<>();
 
 		userNotificationDeliveries.add(
 			UserNotificationDeliveryLocalServiceUtil.
@@ -438,6 +437,6 @@ public abstract class BaseUserNotificationTestCase {
 	protected User user;
 
 	protected List<UserNotificationDelivery> userNotificationDeliveries =
-		new ArrayList<UserNotificationDelivery>();
+		new ArrayList<>();
 
 }

@@ -71,8 +71,8 @@ public class NettyFabricWorkerConfigTest {
 			Assert.assertEquals("Process callable is null", npe.getMessage());
 		}
 
-		ProcessCallable<String> processCallable =
-			new ReturnProcessCallable<String>(StringPool.BLANK);
+		ProcessCallable<String> processCallable = new ReturnProcessCallable<>(
+			StringPool.BLANK);
 
 		try {
 			new NettyFabricWorkerConfig<String>(
@@ -131,10 +131,10 @@ public class NettyFabricWorkerConfigTest {
 
 		long id = 10;
 
-		ProcessCallable<String> processCallable =
-			new ReturnProcessCallable<String>("Test ProcessCallable");
+		ProcessCallable<String> processCallable = new ReturnProcessCallable<>(
+			"Test ProcessCallable");
 
-		Map<Path, Path> inputPathMap = new HashMap<Path, Path>();
+		Map<Path, Path> inputPathMap = new HashMap<>();
 
 		inputPathMap.put(Paths.get("path1"), Paths.get("path2"));
 		inputPathMap.put(Paths.get("path3"), Paths.get("path4"));

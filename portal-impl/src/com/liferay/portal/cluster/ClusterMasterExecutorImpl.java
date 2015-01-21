@@ -73,7 +73,7 @@ public class ClusterMasterExecutorImpl implements ClusterMasterExecutor {
 			}
 
 			DefaultNoticeableFuture<T> defaultNoticeableFuture =
-				new DefaultNoticeableFuture<T>();
+				new DefaultNoticeableFuture<>();
 
 			try {
 				defaultNoticeableFuture.set((T)methodHandler.invoke());
@@ -264,8 +264,7 @@ public class ClusterMasterExecutorImpl implements ClusterMasterExecutor {
 	private ClusterEventListener _clusterEventListener;
 	private ClusterExecutor _clusterExecutor;
 	private final Set<ClusterMasterTokenTransitionListener>
-		_clusterMasterTokenTransitionListeners =
-			new HashSet<ClusterMasterTokenTransitionListener>();
+		_clusterMasterTokenTransitionListeners = new HashSet<>();
 	private volatile boolean _enabled;
 	private volatile String _localClusterNodeAddress;
 

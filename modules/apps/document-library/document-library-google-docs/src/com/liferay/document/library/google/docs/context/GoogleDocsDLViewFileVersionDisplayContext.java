@@ -31,7 +31,6 @@ import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portlet.documentlibrary.context.BaseDLViewFileVersionDisplayContext;
 import com.liferay.portlet.documentlibrary.context.DLUIItemKeys;
 import com.liferay.portlet.documentlibrary.context.DLViewFileVersionDisplayContext;
-import com.liferay.portlet.documentlibrary.model.DLFileVersion;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 
 import java.io.IOException;
@@ -54,12 +53,12 @@ public class GoogleDocsDLViewFileVersionDisplayContext
 	public GoogleDocsDLViewFileVersionDisplayContext(
 		DLViewFileVersionDisplayContext parentDLDisplayContext,
 		HttpServletRequest request, HttpServletResponse response,
-		FileVersion fileVersion) {
+		FileVersion fileVersion,
+		GoogleDocsMetadataHelper googleDocsMetadataHelper) {
 
 		super(_UUID, parentDLDisplayContext, request, response, fileVersion);
 
-		_googleDocsMetadataHelper = new GoogleDocsMetadataHelper(
-			(DLFileVersion)fileVersion.getModel());
+		_googleDocsMetadataHelper = googleDocsMetadataHelper;
 	}
 
 	@Override
@@ -111,6 +110,33 @@ public class GoogleDocsDLViewFileVersionDisplayContext
 	}
 
 	@Override
+	public boolean isCancelCheckoutDocumentButtonVisible()
+		throws PortalException {
+
+		return false;
+	}
+
+	@Override
+	public boolean isCheckinButtonVisible() throws PortalException {
+		return false;
+	}
+
+	@Override
+	public boolean isCheckoutDocumentButtonVisible() throws PortalException {
+		return false;
+	}
+
+	@Override
+	public boolean isDownloadLinkVisible() throws PortalException {
+		return false;
+	}
+
+	@Override
+	public boolean isVersionInfoVisible() throws PortalException {
+		return false;
+	}
+
+	@Override
 	public void renderPreview(
 			HttpServletRequest request, HttpServletResponse response)
 		throws IOException {
@@ -118,7 +144,7 @@ public class GoogleDocsDLViewFileVersionDisplayContext
 		PrintWriter printWriter = response.getWriter();
 
 		if (!_googleDocsMetadataHelper.containsField(
-				GoogleDocsConstants.DDM_FIELD_NAME_EMBED_URL)) {
+				GoogleDocsConstants.DDM_FIELD_NAME_EMBEDDABLE_URL)) {
 
 			return;
 		}
@@ -127,7 +153,7 @@ public class GoogleDocsDLViewFileVersionDisplayContext
 			"<iframe frameborder=\"0\" height=\"300\" src=\"%s\" " +
 				"width=\"100%%\"></iframe>",
 			_googleDocsMetadataHelper.getFieldValue(
-				GoogleDocsConstants.DDM_FIELD_NAME_EMBED_URL));
+				GoogleDocsConstants.DDM_FIELD_NAME_EMBEDDABLE_URL));
 	}
 
 	private int _getIndex(List<? extends UIItem> uiItems, String key) {
@@ -146,7 +172,7 @@ public class GoogleDocsDLViewFileVersionDisplayContext
 		T urlUIItem, List<? super T> urlUIItems) {
 
 		if (!_googleDocsMetadataHelper.containsField(
-				GoogleDocsConstants.DDM_FIELD_NAME_EDIT_URL)) {
+				GoogleDocsConstants.DDM_FIELD_NAME_URL)) {
 
 			return urlUIItem;
 		}
@@ -175,7 +201,7 @@ public class GoogleDocsDLViewFileVersionDisplayContext
 		urlUIItem.setTarget("_blank");
 
 		String editURL = _googleDocsMetadataHelper.getFieldValue(
-			GoogleDocsConstants.DDM_FIELD_NAME_EDIT_URL);
+			GoogleDocsConstants.DDM_FIELD_NAME_URL);
 
 		urlUIItem.setURL(editURL);
 
@@ -193,6 +219,9 @@ public class GoogleDocsDLViewFileVersionDisplayContext
 	}
 
 	private void _removeUnsupportedUIItems(List<? extends UIItem> uiItems) {
+		_removeUIItem(uiItems, DLUIItemKeys.CANCEL_CHECKOUT);
+		_removeUIItem(uiItems, DLUIItemKeys.CHECKIN);
+		_removeUIItem(uiItems, DLUIItemKeys.CHECKOUT);
 		_removeUIItem(uiItems, DLUIItemKeys.DOWNLOAD);
 		_removeUIItem(uiItems, DLUIItemKeys.OPEN_IN_MS_OFFICE);
 	}
@@ -200,6 +229,6 @@ public class GoogleDocsDLViewFileVersionDisplayContext
 	private static final UUID _UUID = UUID.fromString(
 		"7B61EA79-83AE-4FFD-A77A-1D47E06EBBE9");
 
-	private GoogleDocsMetadataHelper _googleDocsMetadataHelper;
+	private final GoogleDocsMetadataHelper _googleDocsMetadataHelper;
 
 }

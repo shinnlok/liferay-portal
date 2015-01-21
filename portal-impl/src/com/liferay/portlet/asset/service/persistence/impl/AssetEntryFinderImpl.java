@@ -173,7 +173,7 @@ public class AssetEntryFinderImpl
 		String categoryIdsString = null;
 
 		if (PropsValues.ASSET_CATEGORIES_SEARCH_HIERARCHICAL) {
-			List<Long> categoryIdsList = new ArrayList<Long>();
+			List<Long> categoryIdsList = new ArrayList<>();
 
 			for (long categoryId : categoryIds) {
 				categoryIdsList.addAll(getSubcategoryIds(categoryId));
@@ -281,6 +281,10 @@ public class AssetEntryFinderImpl
 			sb.append(" AND ((AssetLink.entryId1 = ?) OR ");
 			sb.append("(AssetLink.entryId2 = ?))");
 			sb.append(" AND (AssetEntry.entryId != ?)");
+		}
+
+		if (entryQuery.isListable() != null) {
+			sb.append(" AND (listable = ?)");
 		}
 
 		if (entryQuery.isVisible() != null) {
@@ -448,6 +452,10 @@ public class AssetEntryFinderImpl
 			qPos.add(entryQuery.getLinkedAssetEntryId());
 		}
 
+		if (entryQuery.isListable() != null) {
+			qPos.add(entryQuery.isListable());
+		}
+
 		if (entryQuery.isVisible() != null) {
 			qPos.add(entryQuery.isVisible());
 		}
@@ -579,7 +587,7 @@ public class AssetEntryFinderImpl
 		String notCategoryIdsString = null;
 
 		if (PropsValues.ASSET_CATEGORIES_SEARCH_HIERARCHICAL) {
-			List<Long> notCategoryIdsList = new ArrayList<Long>();
+			List<Long> notCategoryIdsList = new ArrayList<>();
 
 			for (long notCategoryId : notCategoryIds) {
 				notCategoryIdsList.addAll(getSubcategoryIds(notCategoryId));

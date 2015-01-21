@@ -55,9 +55,9 @@ public class BufferedIncrementConfigurationTest {
 	@AdviseWith(adviceClasses = PropsUtilAdvice.class)
 	@Test
 	public void testInvalidSettingWithLog() {
-		CaptureHandler captureHandler = _doTestInvalidSetting(Level.WARNING);
+		try (CaptureHandler captureHandler =
+				_doTestInvalidSetting(Level.WARNING)) {
 
-		try {
 			List<LogRecord> logRecords = captureHandler.getLogRecords();
 
 			Assert.assertEquals(2, logRecords.size());
@@ -76,30 +76,22 @@ public class BufferedIncrementConfigurationTest {
 					"[]=-4. Auto reset to 1.",
 				logRecord2.getMessage());
 		}
-		finally {
-			captureHandler.close();
-		}
 	}
 
 	@AdviseWith(adviceClasses = PropsUtilAdvice.class)
 	@Test
 	public void testInvalidSettingWithoutLog() {
-		CaptureHandler captureHandler = _doTestInvalidSetting(Level.OFF);
-
-		try {
+		try (CaptureHandler captureHandler = _doTestInvalidSetting(Level.OFF)) {
 			List<LogRecord> logRecords = captureHandler.getLogRecords();
 
 			Assert.assertTrue(logRecords.isEmpty());
-		}
-		finally {
-			captureHandler.close();
 		}
 	}
 
 	@AdviseWith(adviceClasses = PropsUtilAdvice.class)
 	@Test
 	public void testValidSetting() {
-		Map<String, String> props = new HashMap<String, String>();
+		Map<String, String> props = new HashMap<>();
 
 		props.put(PropsKeys.BUFFERED_INCREMENT_ENABLED, "false");
 		props.put(PropsKeys.BUFFERED_INCREMENT_STANDBY_QUEUE_THRESHOLD, "10");
@@ -182,7 +174,7 @@ public class BufferedIncrementConfigurationTest {
 	}
 
 	private CaptureHandler _doTestInvalidSetting(Level level) {
-		Map<String, String> props = new HashMap<String, String>();
+		Map<String, String> props = new HashMap<>();
 
 		props.put(PropsKeys.BUFFERED_INCREMENT_ENABLED, "false");
 

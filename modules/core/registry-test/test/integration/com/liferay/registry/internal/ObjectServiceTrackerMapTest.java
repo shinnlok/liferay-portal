@@ -14,6 +14,7 @@
 
 package com.liferay.registry.internal;
 
+import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
 import com.liferay.registry.ServiceReference;
@@ -26,7 +27,6 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Dictionary;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -266,8 +266,7 @@ public class ObjectServiceTrackerMapTest {
 
 			serviceTrackerMap.open();
 
-			Dictionary<String, String> properties =
-				new Hashtable<String, String>();
+			Dictionary<String, String> properties = new HashMapDictionary<>();
 
 			properties.put("other", "aProperty");
 			properties.put("target", "aTarget");
@@ -466,7 +465,7 @@ public class ObjectServiceTrackerMapTest {
 			ServiceRegistration<TrackedOne> serviceRegistration4 =
 				registerService(new TrackedOne(), "aTarget2");
 
-			Set<String> targets = new HashSet<String>();
+			Set<String> targets = new HashSet<>();
 
 			targets.add("aTarget1");
 			targets.add("aTarget2");
@@ -628,7 +627,7 @@ public class ObjectServiceTrackerMapTest {
 	protected ServiceRegistration<TrackedOne> registerService(
 		TrackedOne trackedOne, int ranking, String target) {
 
-		Dictionary<String, Object> properties = new Hashtable<String, Object>();
+		Dictionary<String, Object> properties = new HashMapDictionary<>();
 
 		properties.put("service.ranking", ranking);
 		properties.put("target", target);
@@ -640,7 +639,7 @@ public class ObjectServiceTrackerMapTest {
 	protected ServiceRegistration<TrackedOne> registerService(
 		TrackedOne trackedOne, String target) {
 
-		Dictionary<String, Object> properties = new Hashtable<String, Object>();
+		Dictionary<String, Object> properties = new HashMapDictionary<>();
 
 		properties.put("target", target);
 

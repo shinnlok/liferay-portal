@@ -84,9 +84,9 @@ public class WikiNodeImpl extends WikiNodeBaseImpl {
 
 		try {
 			Folder folder = PortletFileRepositoryUtil.getPortletFolder(
-				getUserId(), repository.getRepositoryId(),
+				repository.getRepositoryId(),
 				DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
-				String.valueOf(getNodeId()), serviceContext);
+				String.valueOf(getNodeId()));
 
 			_attachmentsFolderId = folder.getFolderId();
 		}
@@ -101,7 +101,7 @@ public class WikiNodeImpl extends WikiNodeBaseImpl {
 		List<WikiPage> wikiPages = WikiPageLocalServiceUtil.getPages(
 			getNodeId(), true, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 
-		List<FileEntry> fileEntries = new ArrayList<FileEntry>();
+		List<FileEntry> fileEntries = new ArrayList<>();
 
 		for (WikiPage wikiPage : wikiPages) {
 			fileEntries.addAll(wikiPage.getDeletedAttachmentsFileEntries());

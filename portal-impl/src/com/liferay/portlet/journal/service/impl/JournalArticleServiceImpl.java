@@ -678,10 +678,10 @@ public class JournalArticleServiceImpl extends JournalArticleServiceBaseImpl {
 	 */
 	@Override
 	public List<JournalArticle> getArticles(long groupId, long folderId) {
-		QueryDefinition<JournalArticle> queryDefinition =
-			new QueryDefinition<JournalArticle>(WorkflowConstants.STATUS_ANY);
+		QueryDefinition<JournalArticle> queryDefinition = new QueryDefinition<>(
+			WorkflowConstants.STATUS_ANY);
 
-		List<Long> folderIds = new ArrayList<Long>();
+		List<Long> folderIds = new ArrayList<>();
 
 		folderIds.add(folderId);
 
@@ -717,11 +717,10 @@ public class JournalArticleServiceImpl extends JournalArticleServiceBaseImpl {
 		long groupId, long folderId, int start, int end,
 		OrderByComparator<JournalArticle> obc) {
 
-		QueryDefinition<JournalArticle> queryDefinition =
-			new QueryDefinition<JournalArticle>(
-				WorkflowConstants.STATUS_ANY, start, end, obc);
+		QueryDefinition<JournalArticle> queryDefinition = new QueryDefinition<>(
+			WorkflowConstants.STATUS_ANY, start, end, obc);
 
-		List<Long> folderIds = new ArrayList<Long>();
+		List<Long> folderIds = new ArrayList<>();
 
 		folderIds.add(folderId);
 
@@ -814,8 +813,8 @@ public class JournalArticleServiceImpl extends JournalArticleServiceBaseImpl {
 		long groupId, long classNameId, String ddmStructureKey, int status,
 		int start, int end, OrderByComparator<JournalArticle> obc) {
 
-		QueryDefinition<JournalArticle> queryDefinition =
-			new QueryDefinition<JournalArticle>(status, start, end, obc);
+		QueryDefinition<JournalArticle> queryDefinition = new QueryDefinition<>(
+			status, start, end, obc);
 
 		return journalArticleFinder.filterFindByG_C_S(
 			groupId, classNameId, ddmStructureKey, queryDefinition);
@@ -851,9 +850,8 @@ public class JournalArticleServiceImpl extends JournalArticleServiceBaseImpl {
 		long groupId, String ddmStructureKey, int start, int end,
 		OrderByComparator<JournalArticle> obc) {
 
-		QueryDefinition<JournalArticle> queryDefinition =
-			new QueryDefinition<JournalArticle>(
-				WorkflowConstants.STATUS_ANY, start, end, obc);
+		QueryDefinition<JournalArticle> queryDefinition = new QueryDefinition<>(
+			WorkflowConstants.STATUS_ANY, start, end, obc);
 
 		return journalArticleFinder.filterFindByG_C_S(
 			groupId, JournalArticleConstants.CLASSNAME_ID_DEFAULT,
@@ -886,10 +884,10 @@ public class JournalArticleServiceImpl extends JournalArticleServiceBaseImpl {
 	 */
 	@Override
 	public int getArticlesCount(long groupId, long folderId, int status) {
-		QueryDefinition<JournalArticle> queryDefinition =
-			new QueryDefinition<JournalArticle>(status);
+		QueryDefinition<JournalArticle> queryDefinition = new QueryDefinition<>(
+			status);
 
-		List<Long> folderIds = new ArrayList<Long>();
+		List<Long> folderIds = new ArrayList<>();
 
 		folderIds.add(folderId);
 
@@ -1034,16 +1032,15 @@ public class JournalArticleServiceImpl extends JournalArticleServiceBaseImpl {
 			int end, OrderByComparator<JournalArticle> orderByComparator)
 		throws PortalException {
 
-		List<Long> folderIds = new ArrayList<Long>();
+		List<Long> folderIds = new ArrayList<>();
 
 		if (rootFolderId != JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
 			folderIds = journalFolderService.getFolderIds(
 				groupId, rootFolderId);
 		}
 
-		QueryDefinition<JournalArticle> queryDefinition =
-			new QueryDefinition<JournalArticle>(
-				status, start, end, orderByComparator);
+		QueryDefinition<JournalArticle> queryDefinition = new QueryDefinition<>(
+			status, start, end, orderByComparator);
 
 		return journalArticleFinder.filterFindByG_U_F_C(
 			groupId, userId, folderIds,
@@ -1132,15 +1129,15 @@ public class JournalArticleServiceImpl extends JournalArticleServiceBaseImpl {
 			long groupId, long userId, long rootFolderId, int status)
 		throws PortalException {
 
-		List<Long> folderIds = new ArrayList<Long>();
+		List<Long> folderIds = new ArrayList<>();
 
 		if (rootFolderId != JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
 			folderIds = journalFolderService.getFolderIds(
 				groupId, rootFolderId);
 		}
 
-		QueryDefinition<JournalArticle> queryDefinition =
-			new QueryDefinition<JournalArticle>(status);
+		QueryDefinition<JournalArticle> queryDefinition = new QueryDefinition<>(
+			status);
 
 		return journalArticleFinder.filterCountByG_U_F_C(
 			groupId, userId, folderIds,
@@ -1624,8 +1621,8 @@ public class JournalArticleServiceImpl extends JournalArticleServiceBaseImpl {
 		boolean andOperator, int start, int end,
 		OrderByComparator<JournalArticle> obc) {
 
-		QueryDefinition<JournalArticle> queryDefinition =
-			new QueryDefinition<JournalArticle>(status, start, end, obc);
+		QueryDefinition<JournalArticle> queryDefinition = new QueryDefinition<>(
+			status, start, end, obc);
 
 		return journalArticleFinder.filterFindByC_G_F_C_A_V_T_D_C_S_T_D_R(
 			companyId, groupId, folderIds, classNameId, articleId, version,
@@ -1706,8 +1703,8 @@ public class JournalArticleServiceImpl extends JournalArticleServiceBaseImpl {
 		boolean andOperator, int start, int end,
 		OrderByComparator<JournalArticle> obc) {
 
-		QueryDefinition<JournalArticle> queryDefinition =
-			new QueryDefinition<JournalArticle>(status, start, end, obc);
+		QueryDefinition<JournalArticle> queryDefinition = new QueryDefinition<>(
+			status, start, end, obc);
 
 		return journalArticleFinder.filterFindByC_G_F_C_A_V_T_D_C_S_T_D_R(
 			companyId, groupId, folderIds, classNameId, articleId, version,

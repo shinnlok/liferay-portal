@@ -110,8 +110,7 @@ public class LuceneIndexSearcher extends BaseIndexSearcher {
 			indexSearcher = LuceneHelperUtil.getIndexSearcher(
 				searchContext.getCompanyId());
 
-			List<FacetHandler<?>> facetHandlers =
-				new ArrayList<FacetHandler<?>>();
+			List<FacetHandler<?>> facetHandlers = new ArrayList<>();
 
 			facets = searchContext.getFacets();
 
@@ -139,7 +138,7 @@ public class LuceneIndexSearcher extends BaseIndexSearcher {
 					facetHandlers.add(multiValueFacetHandler);
 				}
 				else if (facet instanceof RangeFacet) {
-					List<String> ranges = new ArrayList<String>();
+					List<String> ranges = new ArrayList<>();
 
 					JSONObject dataJSONObject = facetConfiguration.getData();
 
@@ -423,7 +422,7 @@ public class LuceneIndexSearcher extends BaseIndexSearcher {
 	}
 
 	protected Set<String> getQueryTerms(Query query) {
-		Set<String> queryTerms = new HashSet<String>();
+		Set<String> queryTerms = new HashSet<>();
 
 		try {
 			queryTerms = LuceneHelperUtil.getQueryTerms(
@@ -512,7 +511,7 @@ public class LuceneIndexSearcher extends BaseIndexSearcher {
 		start = startAndEnd[0];
 		end = startAndEnd[1];
 
-		Set<String> queryTerms = new HashSet<String>();
+		Set<String> queryTerms = new HashSet<>();
 
 		IndexReader indexReader = indexSearcher.getIndexReader();
 
@@ -538,8 +537,8 @@ public class LuceneIndexSearcher extends BaseIndexSearcher {
 			subsetTotal = PropsValues.INDEX_SEARCH_LIMIT;
 		}
 
-		List<Document> subsetDocs = new ArrayList<Document>(subsetTotal);
-		List<Float> subsetScores = new ArrayList<Float>(subsetTotal);
+		List<Document> subsetDocs = new ArrayList<>(subsetTotal);
+		List<Float> subsetScores = new ArrayList<>(subsetTotal);
 
 		FieldSelector fieldSelector = null;
 
@@ -608,10 +607,11 @@ public class LuceneIndexSearcher extends BaseIndexSearcher {
 		return hits;
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(LuceneIndexSearcher.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		LuceneIndexSearcher.class);
 
-	private static java.lang.reflect.Field _runtimeFacetDataMapField;
-	private static java.lang.reflect.Field _runtimeFacetHandlerMapField;
+	private static final java.lang.reflect.Field _runtimeFacetDataMapField;
+	private static final java.lang.reflect.Field _runtimeFacetHandlerMapField;
 
 	static {
 		try {
@@ -642,7 +642,7 @@ public class LuceneIndexSearcher extends BaseIndexSearcher {
 			return originalText;
 		}
 
-		private Set<String> _terms = new HashSet<String>();
+		private final Set<String> _terms = new HashSet<>();
 
 	}
 

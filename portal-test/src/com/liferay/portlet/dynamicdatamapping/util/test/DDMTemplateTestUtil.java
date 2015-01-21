@@ -103,7 +103,7 @@ public class DDMTemplateTestUtil {
 			String script, Locale defaultLocale)
 		throws Exception {
 
-		Map<Locale, String> nameMap = new HashMap<Locale, String>();
+		Map<Locale, String> nameMap = new HashMap<>();
 
 		nameMap.put(defaultLocale, "Test Template");
 
@@ -113,9 +113,9 @@ public class DDMTemplateTestUtil {
 		serviceContext.setAddGuestPermissions(true);
 
 		return DDMTemplateLocalServiceUtil.addTemplate(
-			TestPropsValues.getUserId(), groupId, classNameId, classPK, nameMap,
-			null, DDMTemplateConstants.TEMPLATE_TYPE_DISPLAY, null, language,
-			script, serviceContext);
+			TestPropsValues.getUserId(), groupId, classNameId, classPK, 0,
+			nameMap, null, DDMTemplateConstants.TEMPLATE_TYPE_DISPLAY, null,
+			language, script, serviceContext);
 	}
 
 	public static DDMTemplate addTemplate(

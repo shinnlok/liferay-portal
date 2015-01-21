@@ -680,6 +680,29 @@ public class ArrayUtil {
 		return false;
 	}
 
+	public static boolean contains(
+		String[] array, String value, boolean ignoreCase) {
+
+		if (isEmpty(array)) {
+			return false;
+		}
+
+		for (int i = 0; i < array.length; i++) {
+			if (ignoreCase) {
+				if (StringUtil.equalsIgnoreCase(array[i], value )) {
+					return true;
+				}
+			}
+			else {
+				if (array[i].equals(value)) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
 	public static boolean containsAll(boolean[] array1, boolean[] array2) {
 		if (isEmpty(array1) || isEmpty(array2)) {
 			return false;
@@ -836,10 +859,10 @@ public class ArrayUtil {
 		Set<String> set = null;
 
 		if (comparator == null) {
-			set = new TreeSet<String>();
+			set = new TreeSet<>();
 		}
 		else {
-			set = new TreeSet<String>(comparator);
+			set = new TreeSet<>(comparator);
 		}
 
 		for (String s : array) {
@@ -872,7 +895,7 @@ public class ArrayUtil {
 			return array;
 		}
 
-		List<Boolean> filteredList = new ArrayList<Boolean>();
+		List<Boolean> filteredList = new ArrayList<>();
 
 		for (boolean b : array) {
 			if (predicateFilter.filter(b)) {
@@ -890,7 +913,7 @@ public class ArrayUtil {
 			return array;
 		}
 
-		List<Byte> filteredList = new ArrayList<Byte>();
+		List<Byte> filteredList = new ArrayList<>();
 
 		for (byte b : array) {
 			if (predicateFilter.filter(b)) {
@@ -908,7 +931,7 @@ public class ArrayUtil {
 			return array;
 		}
 
-		List<Character> filteredList = new ArrayList<Character>();
+		List<Character> filteredList = new ArrayList<>();
 
 		for (char c : array) {
 			if (predicateFilter.filter(c)) {
@@ -927,7 +950,7 @@ public class ArrayUtil {
 			return array;
 		}
 
-		List<Double> filteredList = new ArrayList<Double>();
+		List<Double> filteredList = new ArrayList<>();
 
 		for (double d : array) {
 			if (predicateFilter.filter(d)) {
@@ -945,7 +968,7 @@ public class ArrayUtil {
 			return array;
 		}
 
-		List<Float> filteredList = new ArrayList<Float>();
+		List<Float> filteredList = new ArrayList<>();
 
 		for (float f : array) {
 			if (predicateFilter.filter(f)) {
@@ -963,7 +986,7 @@ public class ArrayUtil {
 			return array;
 		}
 
-		List<Integer> filteredList = new ArrayList<Integer>();
+		List<Integer> filteredList = new ArrayList<>();
 
 		for (int i : array) {
 			if (predicateFilter.filter(i)) {
@@ -981,7 +1004,7 @@ public class ArrayUtil {
 			return array;
 		}
 
-		List<Long> filteredList = new ArrayList<Long>();
+		List<Long> filteredList = new ArrayList<>();
 
 		for (long l : array) {
 			if (predicateFilter.filter(l)) {
@@ -999,7 +1022,7 @@ public class ArrayUtil {
 			return array;
 		}
 
-		List<Short> filteredList = new ArrayList<Short>();
+		List<Short> filteredList = new ArrayList<>();
 
 		for (short s : array) {
 			if (predicateFilter.filter(s)) {
@@ -1017,7 +1040,7 @@ public class ArrayUtil {
 			return array;
 		}
 
-		List<T> filteredList = new ArrayList<T>();
+		List<T> filteredList = new ArrayList<>();
 
 		for (T t : array) {
 			if (filterPredicate.filter(t)) {
@@ -1158,11 +1181,15 @@ public class ArrayUtil {
 	}
 
 	public static boolean[] remove(boolean[] array, boolean value) {
-		List<Boolean> list = new ArrayList<Boolean>();
+		if (isEmpty(array)) {
+			return array;
+		}
+
+		List<Boolean> list = new ArrayList<>();
 
 		for (int i = 0; i < array.length; i++) {
 			if (value != array[i]) {
-				list.add(new Boolean(array[i]));
+				list.add(array[i]);
 			}
 		}
 
@@ -1170,7 +1197,11 @@ public class ArrayUtil {
 	}
 
 	public static byte[] remove(byte[] array, byte value) {
-		List<Byte> list = new ArrayList<Byte>();
+		if (isEmpty(array)) {
+			return array;
+		}
+
+		List<Byte> list = new ArrayList<>();
 
 		for (int i = 0; i < array.length; i++) {
 			if (value != array[i]) {
@@ -1182,7 +1213,11 @@ public class ArrayUtil {
 	}
 
 	public static char[] remove(char[] array, char value) {
-		List<Character> list = new ArrayList<Character>();
+		if (isEmpty(array)) {
+			return array;
+		}
+
+		List<Character> list = new ArrayList<>();
 
 		for (int i = 0; i < array.length; i++) {
 			if (value != array[i]) {
@@ -1194,7 +1229,11 @@ public class ArrayUtil {
 	}
 
 	public static double[] remove(double[] array, double value) {
-		List<Double> list = new ArrayList<Double>();
+		if (isEmpty(array)) {
+			return array;
+		}
+
+		List<Double> list = new ArrayList<>();
 
 		for (int i = 0; i < array.length; i++) {
 			if (value != array[i]) {
@@ -1206,7 +1245,11 @@ public class ArrayUtil {
 	}
 
 	public static float[] remove(float[] array, float value) {
-		List<Float> list = new ArrayList<Float>();
+		if (isEmpty(array)) {
+			return array;
+		}
+
+		List<Float> list = new ArrayList<>();
 
 		for (int i = 0; i < array.length; i++) {
 			if (value != array[i]) {
@@ -1218,7 +1261,11 @@ public class ArrayUtil {
 	}
 
 	public static int[] remove(int[] array, int value) {
-		List<Integer> list = new ArrayList<Integer>();
+		if (isEmpty(array)) {
+			return array;
+		}
+
+		List<Integer> list = new ArrayList<>();
 
 		for (int i = 0; i < array.length; i++) {
 			if (value != array[i]) {
@@ -1230,7 +1277,11 @@ public class ArrayUtil {
 	}
 
 	public static long[] remove(long[] array, long value) {
-		List<Long> list = new ArrayList<Long>();
+		if (isEmpty(array)) {
+			return array;
+		}
+
+		List<Long> list = new ArrayList<>();
 
 		for (int i = 0; i < array.length; i++) {
 			if (value != array[i]) {
@@ -1242,7 +1293,11 @@ public class ArrayUtil {
 	}
 
 	public static short[] remove(short[] array, short value) {
-		List<Short> list = new ArrayList<Short>();
+		if (isEmpty(array)) {
+			return array;
+		}
+
+		List<Short> list = new ArrayList<>();
 
 		for (int i = 0; i < array.length; i++) {
 			if (value != array[i]) {
@@ -1254,7 +1309,11 @@ public class ArrayUtil {
 	}
 
 	public static String[] remove(String[] array, String value) {
-		List<String> list = new ArrayList<String>();
+		if (isEmpty(array)) {
+			return array;
+		}
+
+		List<String> list = new ArrayList<>();
 
 		for (String s : array) {
 			if (!s.equals(value)) {
@@ -1266,7 +1325,7 @@ public class ArrayUtil {
 	}
 
 	public static String[] removeByPrefix(String[] array, String prefix) {
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 
 		for (String s : array) {
 			if (!s.startsWith(prefix)) {
@@ -2047,7 +2106,7 @@ public class ArrayUtil {
 	}
 
 	public static byte[] unique(byte[] array) {
-		Set<Byte> set = new LinkedHashSet<Byte>();
+		Set<Byte> set = new LinkedHashSet<>();
 
 		for (int i = 0; i < array.length; i++) {
 			set.add(array[i]);
@@ -2057,7 +2116,7 @@ public class ArrayUtil {
 	}
 
 	public static double[] unique(double[] array) {
-		Set<Double> set = new LinkedHashSet<Double>();
+		Set<Double> set = new LinkedHashSet<>();
 
 		for (int i = 0; i < array.length; i++) {
 			set.add(array[i]);
@@ -2067,7 +2126,7 @@ public class ArrayUtil {
 	}
 
 	public static float[] unique(float[] array) {
-		Set<Float> set = new LinkedHashSet<Float>();
+		Set<Float> set = new LinkedHashSet<>();
 
 		for (int i = 0; i < array.length; i++) {
 			set.add(array[i]);
@@ -2077,7 +2136,7 @@ public class ArrayUtil {
 	}
 
 	public static int[] unique(int[] array) {
-		Set<Integer> set = new LinkedHashSet<Integer>();
+		Set<Integer> set = new LinkedHashSet<>();
 
 		for (int i = 0; i < array.length; i++) {
 			set.add(array[i]);
@@ -2087,7 +2146,7 @@ public class ArrayUtil {
 	}
 
 	public static long[] unique(long[] array) {
-		Set<Long> set = new LinkedHashSet<Long>();
+		Set<Long> set = new LinkedHashSet<>();
 
 		for (int i = 0; i < array.length; i++) {
 			set.add(array[i]);
@@ -2097,7 +2156,7 @@ public class ArrayUtil {
 	}
 
 	public static short[] unique(short[] array) {
-		Set<Short> set = new LinkedHashSet<Short>();
+		Set<Short> set = new LinkedHashSet<>();
 
 		for (int i = 0; i < array.length; i++) {
 			set.add(array[i]);

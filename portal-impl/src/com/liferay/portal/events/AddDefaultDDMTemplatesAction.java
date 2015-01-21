@@ -95,10 +95,10 @@ public class AddDefaultDDMTemplatesAction extends SimpleAction {
 					templateElement.elementText("cacheable"));
 
 				DDMTemplateLocalServiceUtil.addTemplate(
-					userId, groupId, classNameId, 0, templateKey, nameMap,
-					descriptionMap, DDMTemplateConstants.TEMPLATE_TYPE_DISPLAY,
-					null, language, script, cacheable, false, null, null,
-					serviceContext);
+					userId, groupId, classNameId, 0, classNameId, templateKey,
+					nameMap, descriptionMap,
+					DDMTemplateConstants.TEMPLATE_TYPE_DISPLAY, null, language,
+					script, cacheable, false, null, null, serviceContext);
 			}
 		}
 	}
@@ -118,7 +118,7 @@ public class AddDefaultDDMTemplatesAction extends SimpleAction {
 	}
 
 	protected Map<Locale, String> getLocalizationMap(long groupId, String key) {
-		Map<Locale, String> map = new HashMap<Locale, String>();
+		Map<Locale, String> map = new HashMap<>();
 
 		Locale[] locales = LanguageUtil.getAvailableLocales(groupId);
 

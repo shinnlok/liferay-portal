@@ -22,7 +22,6 @@ import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -50,6 +49,8 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.DateRange;
+import com.liferay.portal.kernel.util.Digester;
+import com.liferay.portal.kernel.util.DigesterUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
@@ -84,6 +85,7 @@ import com.liferay.portal.model.StagedGroupedModel;
 import com.liferay.portal.model.StagedModel;
 import com.liferay.portal.model.SystemEventConstants;
 import com.liferay.portal.model.User;
+import com.liferay.portal.security.xml.SecureXMLFactoryProviderUtil;
 import com.liferay.portal.service.CompanyLocalServiceUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutFriendlyURLLocalServiceUtil;
@@ -134,9 +136,8 @@ import java.util.regex.Pattern;
 import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
 
-import org.apache.xerces.parsers.SAXParser;
-
 import org.xml.sax.InputSource;
+import org.xml.sax.XMLReader;
 
 /**
  * @author Zsolt Berentey
@@ -275,8 +276,7 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 			Map<String, String[]> parameterMap, String type)
 		throws Exception {
 
-		Map<String, Boolean> exportPortletControlsMap =
-			new HashMap<String, Boolean>();
+		Map<String, Boolean> exportPortletControlsMap = new HashMap<>();
 
 		boolean exportPortletData = getExportPortletData(
 			companyId, portletId, parameterMap);
@@ -345,8 +345,7 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 		boolean importCurPortletData = getImportPortletData(
 			companyId, portletId, parameterMap, portletDataElement);
 
-		Map<String, Boolean> importPortletControlsMap =
-			new HashMap<String, Boolean>();
+		Map<String, Boolean> importPortletControlsMap = new HashMap<>();
 
 		importPortletControlsMap.put(
 			PortletDataHandlerKeys.PORTLET_DATA, importCurPortletData);
@@ -362,7 +361,7 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 	public Map<Long, Boolean> getLayoutIdMap(PortletRequest portletRequest)
 		throws PortalException {
 
-		Map<Long, Boolean> layoutIdMap = new LinkedHashMap<Long, Boolean>();
+		Map<Long, Boolean> layoutIdMap = new LinkedHashMap<>();
 
 		String layoutIdsJSON = ParamUtil.getString(portletRequest, "layoutIds");
 
@@ -413,7 +412,7 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 			return new long[0];
 		}
 
-		List<Layout> layouts = new ArrayList<Layout>();
+		List<Layout> layouts = new ArrayList<>();
 
 		for (Map.Entry<Long, Boolean> entry : layoutIdMap.entrySet()) {
 			long plid = GetterUtil.getLong(String.valueOf(entry.getKey()));
@@ -542,7 +541,7 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 			PortletDataContext portletDataContext)
 		throws Exception {
 
-		SAXParser saxParser = new SAXParser();
+		XMLReader xmlReader = SecureXMLFactoryProviderUtil.newXMLReader();
 
 		Group group = GroupLocalServiceUtil.getGroup(
 			portletDataContext.getGroupId());
@@ -552,9 +551,9 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 			new ManifestSummaryElementProcessor(group, manifestSummary),
 			new String[] {"header", "portlet", "staged-model"});
 
-		saxParser.setContentHandler(elementHandler);
+		xmlReader.setContentHandler(elementHandler);
 
-		saxParser.parse(
+		xmlReader.parse(
 			new InputSource(
 				portletDataContext.getZipEntryAsInputStream("/manifest.xml")));
 
@@ -569,7 +568,7 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 	public List<Layout> getMissingParentLayouts(Layout layout, long liveGroupId)
 		throws PortalException {
 
-		List<Layout> missingParentLayouts = new ArrayList<Layout>();
+		List<Layout> missingParentLayouts = new ArrayList<>();
 
 		long parentLayoutId = layout.getParentLayoutId();
 
@@ -652,7 +651,9 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 		}
 
 		return TempFileEntryUtil.getTempFileEntry(
-			groupId, userId, folderName, tempFileNames[0]);
+			groupId, userId,
+			DigesterUtil.digestHex(Digester.SHA_256, folderName),
+			tempFileNames[0]);
 	}
 
 	@Override
@@ -1107,8 +1108,8 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 			StagedModel entityStagedModel, String content)
 		throws Exception {
 
-		List<String> oldLinksToLayout = new ArrayList<String>();
-		List<String> newLinksToLayout = new ArrayList<String>();
+		List<String> oldLinksToLayout = new ArrayList<>();
+		List<String> newLinksToLayout = new ArrayList<>();
 
 		Matcher matcher = _exportLinksToLayoutPattern.matcher(content);
 
@@ -1130,9 +1131,7 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 
 				sb.append(type);
 				sb.append(StringPool.AT);
-				sb.append(layout.getUuid());
-				sb.append(StringPool.AT);
-				sb.append(layout.getFriendlyURL());
+				sb.append(layout.getPlid());
 
 				String newLinkToLayout = StringUtil.replace(
 					oldLinkToLayout, type, sb.toString());
@@ -1407,13 +1406,21 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 			PortletDataContext portletDataContext, String content)
 		throws Exception {
 
-		List<String> oldLinksToLayout = new ArrayList<String>();
-		List<String> newLinksToLayout = new ArrayList<String>();
+		List<String> oldLinksToLayout = new ArrayList<>();
+		List<String> newLinksToLayout = new ArrayList<>();
 
 		Matcher matcher = _importLinksToLayoutPattern.matcher(content);
 
+		Map<Long, Long> layoutPlids =
+			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
+				Layout.class);
+
 		while (matcher.find()) {
-			long oldGroupId = GetterUtil.getLong(matcher.group(7));
+			long oldPlid = GetterUtil.getLong(matcher.group(4));
+
+			Long newPlid = MapUtil.getLong(layoutPlids, oldPlid);
+
+			long oldGroupId = GetterUtil.getLong(matcher.group(6));
 
 			long newGroupId = oldGroupId;
 
@@ -1421,75 +1428,23 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 
 			long newLayoutId = oldLayoutId;
 
-			String type = matcher.group(2);
+			Layout layout = LayoutLocalServiceUtil.fetchLayout(newPlid);
 
-			boolean privateLayout = type.startsWith("private");
-
-			String layoutUuid = matcher.group(4);
-			String friendlyURL = matcher.group(5);
-
-			try {
-				Layout layout =
-					LayoutLocalServiceUtil.fetchLayoutByUuidAndGroupId(
-						layoutUuid, portletDataContext.getScopeGroupId(),
-						privateLayout);
-
-				if (layout == null) {
-					layout = LayoutLocalServiceUtil.fetchLayoutByFriendlyURL(
-						portletDataContext.getScopeGroupId(), privateLayout,
-						friendlyURL);
-				}
-
-				if (layout == null) {
-					if (_log.isWarnEnabled()) {
-						StringBundler sb = new StringBundler(9);
-
-						sb.append("Unable to get layout with UUID ");
-						sb.append(layoutUuid);
-						sb.append(", friendly URL ");
-						sb.append(friendlyURL);
-						sb.append(", or ");
-						sb.append("layoutId ");
-						sb.append(oldLayoutId);
-						sb.append(" in group ");
-						sb.append(portletDataContext.getScopeGroupId());
-
-						_log.warn(sb.toString());
-					}
-				}
-				else {
-					newGroupId = layout.getGroupId();
-
-					newLayoutId = layout.getLayoutId();
-				}
+			if (layout != null) {
+				newGroupId = layout.getGroupId();
+				newLayoutId = layout.getLayoutId();
 			}
-			catch (SystemException se) {
-				if (_log.isDebugEnabled() || _log.isWarnEnabled()) {
-					String message =
-						"Unable to get layout in group " +
-							portletDataContext.getScopeGroupId();
-
-					if (_log.isDebugEnabled()) {
-						_log.debug(message, se);
-					}
-					else {
-						_log.warn(message);
-					}
-				}
+			else if (_log.isWarnEnabled()) {
+				_log.warn("Unable to get layout with plid " + oldPlid);
 			}
 
 			String oldLinkToLayout = matcher.group(0);
 
-			StringBundler sb = new StringBundler(4);
-
-			sb.append(StringPool.AT);
-			sb.append(layoutUuid);
-			sb.append(StringPool.AT);
-			sb.append(friendlyURL);
-
 			String newLinkToLayout = StringUtil.replaceFirst(
 				oldLinkToLayout,
-				new String[] {sb.toString(), String.valueOf(oldLayoutId)},
+				new String[] {
+					StringPool.AT + oldPlid, String.valueOf(oldLayoutId)
+				},
 				new String[] {StringPool.BLANK, String.valueOf(newLayoutId)});
 
 			if ((oldGroupId != 0) && (oldGroupId != newGroupId)) {
@@ -1684,7 +1639,7 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 
 		final MissingReferences missingReferences = new MissingReferences();
 
-		SAXParser saxParser = new SAXParser();
+		XMLReader xmlReader = SecureXMLFactoryProviderUtil.newXMLReader();
 
 		ElementHandler elementHandler = new ElementHandler(
 			new ElementProcessor() {
@@ -1702,9 +1657,9 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 			},
 			new String[] {"missing-reference"});
 
-		saxParser.setContentHandler(elementHandler);
+		xmlReader.setContentHandler(elementHandler);
 
-		saxParser.parse(
+		xmlReader.parse(
 			new InputSource(
 				portletDataContext.getZipEntryAsInputStream("/manifest.xml")));
 
@@ -1840,7 +1795,7 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 			return null;
 		}
 
-		Map<String, String[]> map = new HashMap<String, String[]>();
+		Map<String, String[]> map = new HashMap<>();
 
 		String dlReference = content.substring(beginPos, endPos);
 
@@ -2082,8 +2037,7 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 							StringPool.UNDERLINE + rootPortletId);
 		}
 
-		Map<String, Boolean> exportPortletSetupControlsMap =
-			new HashMap<String, Boolean>();
+		Map<String, Boolean> exportPortletSetupControlsMap = new HashMap<>();
 
 		exportPortletSetupControlsMap.put(
 			PortletDataHandlerKeys.PORTLET_ARCHIVED_SETUPS,
@@ -2381,8 +2335,7 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 							StringPool.UNDERLINE + rootPortletId);
 		}
 
-		Map<String, Boolean> importPortletSetupMap =
-			new HashMap<String, Boolean>();
+		Map<String, Boolean> importPortletSetupMap = new HashMap<>();
 
 		importPortletSetupMap.put(
 			PortletDataHandlerKeys.PORTLET_ARCHIVED_SETUPS,
@@ -2601,15 +2554,13 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 		PropsValues.LAYOUT_FRIENDLY_URL_PUBLIC_SERVLET_MAPPING +
 			StringPool.SLASH;
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		ExportImportHelperImpl.class);
 
-	private Pattern _exportLinksToLayoutPattern = Pattern.compile(
+	private final Pattern _exportLinksToLayoutPattern = Pattern.compile(
 		"\\[([\\d]+)@(private(-group|-user)?|public)(@([\\d]+))?\\]");
-	private Pattern _importLinksToLayoutPattern = Pattern.compile(
-		"\\[([\\d]+)@(private(-group|-user)?|public)@(\\p{XDigit}{8}\\-" +
-			"(?:\\p{XDigit}{4}\\-){3}\\p{XDigit}{12})@([a-z0-9./_-]*)" +
-				"(@([\\d]+))?\\]");
+	private final Pattern _importLinksToLayoutPattern = Pattern.compile(
+		"\\[([\\d]+)@(private(-group|-user)?|public)@([\\d]+)(@([\\d]+))?\\]");
 
 	private class ManifestSummaryElementProcessor implements ElementProcessor {
 
@@ -2689,8 +2640,8 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 			}
 		}
 
-		private Group _group;
-		private ManifestSummary _manifestSummary;
+		private final Group _group;
+		private final ManifestSummary _manifestSummary;
 
 	}
 

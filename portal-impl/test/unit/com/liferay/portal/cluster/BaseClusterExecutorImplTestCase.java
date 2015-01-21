@@ -259,7 +259,7 @@ public abstract class BaseClusterExecutorImplTestCase
 			Object exceptedResult, Address expectedAddress)
 		throws Exception {
 
-		List<Address> expectedAddresses = new ArrayList<Address>();
+		List<Address> expectedAddresses = new ArrayList<>();
 
 		expectedAddresses.add(expectedAddress);
 
@@ -295,8 +295,6 @@ public abstract class BaseClusterExecutorImplTestCase
 
 		ClusterExecutorImpl clusterExecutorImpl = new ClusterExecutorImpl();
 
-		clusterExecutorImpl.setShortcutLocalMethod(true);
-
 		clusterExecutorImpl.afterPropertiesSet();
 
 		clusterExecutorImpl.initialize();
@@ -313,8 +311,7 @@ public abstract class BaseClusterExecutorImplTestCase
 
 		org.jgroups.Address jAddress = localJChannel.getAddress();
 
-		List<org.jgroups.Address> jAddresses =
-			new ArrayList<org.jgroups.Address>();
+		List<org.jgroups.Address> jAddresses = new ArrayList<>();
 
 		jAddresses.add(jAddress);
 
@@ -393,9 +390,9 @@ public abstract class BaseClusterExecutorImplTestCase
 		}
 
 		private final Exchanger<ClusterEvent> _departMessageExchanger =
-			new Exchanger<ClusterEvent>();
+			new Exchanger<>();
 		private final Exchanger<ClusterEvent> _joinMessageExchanger =
-			new Exchanger<ClusterEvent>();
+			new Exchanger<>();
 
 	}
 
@@ -424,8 +421,7 @@ public abstract class BaseClusterExecutorImplTestCase
 		}
 
 		private final Exchanger<BlockingQueue<ClusterNodeResponse>>
-			_messageExchanger =
-				new Exchanger<BlockingQueue<ClusterNodeResponse>>();
+			_messageExchanger = new Exchanger<>();
 
 	}
 

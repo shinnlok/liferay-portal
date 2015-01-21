@@ -101,7 +101,7 @@ public class LayoutSetPrototypeLocalServiceImpl
 			LayoutSetPrototype.class.getName(),
 			layoutSetPrototype.getLayoutSetPrototypeId(),
 			GroupConstants.DEFAULT_LIVE_GROUP_ID,
-			layoutSetPrototype.getName(LocaleUtil.getDefault()), null, 0, true,
+			layoutSetPrototype.getNameMap(), null, 0, true,
 			GroupConstants.DEFAULT_MEMBERSHIP_RESTRICTION, friendlyURL, false,
 			true, serviceContext);
 
@@ -129,7 +129,7 @@ public class LayoutSetPrototypeLocalServiceImpl
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		Map<Locale, String> descriptionMap = new HashMap<Locale, String>();
+		Map<Locale, String> descriptionMap = new HashMap<>();
 
 		descriptionMap.put(LocaleUtil.getDefault(), description);
 
@@ -312,7 +312,7 @@ public class LayoutSetPrototypeLocalServiceImpl
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		Map<Locale, String> descriptionMap = new HashMap<Locale, String>();
+		Map<Locale, String> descriptionMap = new HashMap<>();
 
 		descriptionMap.put(LocaleUtil.getDefault(), description);
 

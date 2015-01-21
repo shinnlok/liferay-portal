@@ -257,7 +257,7 @@ public class MBUtil {
 				collectMultipartContent(mimeMultipart, mbMailMessage);
 			}
 			else if (partContent instanceof String) {
-				Map<String, Object> options = new HashMap<String, Object>();
+				Map<String, Object> options = new HashMap<>();
 
 				options.put("emailPartToMBMessageBody", Boolean.TRUE);
 
@@ -351,7 +351,7 @@ public class MBUtil {
 			SubscriptionLocalServiceUtil.getUserSubscriptions(
 				userId, MBCategory.class.getName());
 
-		Set<Long> classPKs = new HashSet<Long>(subscriptions.size());
+		Set<Long> classPKs = new HashSet<>(subscriptions.size());
 
 		for (Subscription subscription : subscriptions) {
 			classPKs.add(subscription.getClassPK());
@@ -367,8 +367,7 @@ public class MBUtil {
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		Map<String, String> definitionTerms =
-			new LinkedHashMap<String, String>();
+		Map<String, String> definitionTerms = new LinkedHashMap<>();
 
 		definitionTerms.put(
 			"[$CATEGORY_NAME$]",
@@ -429,7 +428,8 @@ public class MBUtil {
 		definitionTerms.put("[$PORTAL_URL$]", company.getVirtualHostname());
 
 		definitionTerms.put(
-			"[$PORTLET_NAME$]", PortalUtil.getPortletTitle(portletRequest));
+			"[$PORTLET_NAME$]",
+			HtmlUtil.escape(PortalUtil.getPortletTitle(portletRequest)));
 		definitionTerms.put(
 			"[$SITE_NAME$]",
 			LanguageUtil.get(
@@ -458,8 +458,7 @@ public class MBUtil {
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		Map<String, String> definitionTerms =
-			new LinkedHashMap<String, String>();
+		Map<String, String> definitionTerms = new LinkedHashMap<>();
 
 		definitionTerms.put(
 			"[$COMPANY_ID$]",
@@ -495,7 +494,8 @@ public class MBUtil {
 			LanguageUtil.get(
 				themeDisplay.getLocale(), "the-user-who-added-the-message"));
 		definitionTerms.put(
-			"[$PORTLET_NAME$]", PortalUtil.getPortletTitle(portletRequest));
+			"[$PORTLET_NAME$]",
+			HtmlUtil.escape(PortalUtil.getPortletTitle(portletRequest)));
 		definitionTerms.put(
 			"[$SITE_NAME$]",
 			LanguageUtil.get(
@@ -506,7 +506,7 @@ public class MBUtil {
 	}
 
 	public static List<Object> getEntries(Hits hits) {
-		List<Object> entries = new ArrayList<Object>();
+		List<Object> entries = new ArrayList<>();
 
 		for (Document document : hits.getDocs()) {
 			long categoryId = GetterUtil.getLong(
@@ -740,7 +740,7 @@ public class MBUtil {
 			SubscriptionLocalServiceUtil.getUserSubscriptions(
 				userId, MBThread.class.getName());
 
-		Set<Long> classPKs = new HashSet<Long>(subscriptions.size());
+		Set<Long> classPKs = new HashSet<>(subscriptions.size());
 
 		for (Subscription subscription : subscriptions) {
 			classPKs.add(subscription.getClassPK());
@@ -1203,6 +1203,6 @@ public class MBUtil {
 		return false;
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(MBUtil.class);
+	private static final Log _log = LogFactoryUtil.getLog(MBUtil.class);
 
 }

@@ -30,26 +30,31 @@ import java.net.InetSocketAddress;
 @ProviderType
 public class ClusterNode implements Comparable<ClusterNode>, Serializable {
 
-	public ClusterNode(String clusterNodeId, InetAddress bindInetAddress) {
+	public ClusterNode(String clusterNodeId) {
 		if (clusterNodeId == null) {
 			throw new IllegalArgumentException("Cluster node ID is null");
 		}
 
-		if (bindInetAddress == null) {
-			throw new IllegalArgumentException("Bind inet address is null");
-		}
-
 		_clusterNodeId = clusterNodeId;
-		_bindInetAddress = bindInetAddress;
 	}
 
 	@Override
 	public int compareTo(ClusterNode clusterNode) {
-		InetAddress bindInetAddress = clusterNode._bindInetAddress;
+		if ((_portalProtocol == null) ||
+			(clusterNode._portalProtocol == null)) {
 
-		String hostAddress = _bindInetAddress.getHostAddress();
+			if (_portalProtocol != null) {
+				return 1;
+			}
 
-		int value = hostAddress.compareTo(bindInetAddress.getHostAddress());
+			if (clusterNode._portalProtocol != null) {
+				return -1;
+			}
+
+			return 0;
+		}
+
+		int value = _portalProtocol.compareTo(clusterNode._portalProtocol);
 
 		if (value != 0) {
 			return value;
@@ -111,15 +116,16 @@ public class ClusterNode implements Comparable<ClusterNode>, Serializable {
 
 		ClusterNode clusterNode = (ClusterNode)obj;
 
-		if (Validator.equals(_clusterNodeId, clusterNode._clusterNodeId)) {
+		if (Validator.equals(_clusterNodeId, clusterNode._clusterNodeId) &&
+			Validator.equals(
+				_portalInetSocketAddress,
+				clusterNode._portalInetSocketAddress) &&
+			Validator.equals(_portalProtocol, clusterNode._portalProtocol)) {
+
 			return true;
 		}
 
 		return false;
-	}
-
-	public InetAddress getBindInetAddress() {
-		return _bindInetAddress;
 	}
 
 	public String getClusterNodeId() {
@@ -146,6 +152,10 @@ public class ClusterNode implements Comparable<ClusterNode>, Serializable {
 		return _portalInetSocketAddress.getPort();
 	}
 
+	public String getPortalProtocol() {
+		return _portalProtocol;
+	}
+
 	@Override
 	public int hashCode() {
 		return _clusterNodeId.hashCode();
@@ -157,23 +167,27 @@ public class ClusterNode implements Comparable<ClusterNode>, Serializable {
 		_portalInetSocketAddress = portalInetSocketAddress;
 	}
 
+	public void setPortalProtocol(String portalProtocol) {
+		_portalProtocol = portalProtocol;
+	}
+
 	@Override
 	public String toString() {
 		StringBundler sb = new StringBundler(7);
 
-		sb.append("{bindInetAddress=");
-		sb.append(_bindInetAddress);
 		sb.append(", clusterNodeId=");
 		sb.append(_clusterNodeId);
 		sb.append(", portalInetSocketAddress=");
 		sb.append(_portalInetSocketAddress);
+		sb.append(", portalProtocol=");
+		sb.append(_portalProtocol);
 		sb.append("}");
 
 		return sb.toString();
 	}
 
-	private final InetAddress _bindInetAddress;
 	private final String _clusterNodeId;
 	private InetSocketAddress _portalInetSocketAddress;
+	private String _portalProtocol;
 
 }

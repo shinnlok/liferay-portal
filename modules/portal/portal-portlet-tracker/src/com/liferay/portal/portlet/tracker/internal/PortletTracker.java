@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.portlet.PortletBagPool;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringPool;
@@ -63,7 +64,6 @@ import java.util.Dictionary;
 import java.util.EventListener;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -210,9 +210,8 @@ public class PortletTracker
 
 		BundleContext bundleContext = _componentContext.getBundleContext();
 
-		_serviceTracker =
-			new ServiceTracker<Portlet, com.liferay.portal.model.Portlet>(
-				bundleContext, Portlet.class, this);
+		_serviceTracker = new ServiceTracker<>(
+			bundleContext, Portlet.class, this);
 
 		_serviceTracker.open();
 
@@ -261,7 +260,7 @@ public class PortletTracker
 		portletBagFactory.setClassLoader(bundleWiring.getClassLoader());
 		portletBagFactory.setServletContext(
 			bundlePortletApp.getServletContext());
-		portletBagFactory.setWARFile(true);
+		portletBagFactory.setWARFile(false);
 
 		try {
 			portletBagFactory.create(portletModel);
@@ -388,7 +387,7 @@ public class PortletTracker
 		ServiceReference<Portlet> serviceReference,
 		com.liferay.portal.model.Portlet portletModel) {
 
-		Map<String, String> initParams = new HashMap<String, String>();
+		Map<String, String> initParams = new HashMap<>();
 
 		for (String initParamKey : serviceReference.getPropertyKeys()) {
 			if (!initParamKey.startsWith("javax.portlet.init-param.")) {
@@ -654,8 +653,7 @@ public class PortletTracker
 		ServiceReference<Portlet> serviceReference,
 		com.liferay.portal.model.Portlet portletModel) {
 
-		Map<String, Set<String>> portletModes =
-			new HashMap<String, Set<String>>();
+		Map<String, Set<String>> portletModes = new HashMap<>();
 
 		portletModes.put(
 			ContentTypes.TEXT_HTML,
@@ -674,7 +672,7 @@ public class PortletTracker
 
 			String mimeType = portletModesStringParts[0];
 
-			Set<String> mimeTypePortletModes = new HashSet<String>();
+			Set<String> mimeTypePortletModes = new HashSet<>();
 
 			mimeTypePortletModes.add(toLowerCase(PortletMode.VIEW));
 			mimeTypePortletModes.addAll(
@@ -729,7 +727,7 @@ public class PortletTracker
 		ServiceReference<Portlet> serviceReference,
 		com.liferay.portal.model.Portlet portletModel) {
 
-		Set<String> unlinkedRoles = new HashSet<String>();
+		Set<String> unlinkedRoles = new HashSet<>();
 
 		List<String> roleRefs = StringPlus.asList(
 			serviceReference.getProperty("javax.portlet.security-role-ref"));
@@ -749,7 +747,7 @@ public class PortletTracker
 		ServiceReference<Portlet> serviceReference,
 		com.liferay.portal.model.Portlet portletModel) {
 
-		Set<QName> processingEvents = new HashSet<QName>();
+		Set<QName> processingEvents = new HashSet<>();
 
 		PortletApp portletApp = portletModel.getPortletApp();
 
@@ -793,8 +791,7 @@ public class PortletTracker
 		ServiceReference<Portlet> serviceReference,
 		com.liferay.portal.model.Portlet portletModel) {
 
-		Set<PublicRenderParameter> publicRenderParameters =
-			new HashSet<PublicRenderParameter>();
+		Set<PublicRenderParameter> publicRenderParameters = new HashSet<>();
 
 		PortletApp portletApp = portletModel.getPortletApp();
 
@@ -824,7 +821,7 @@ public class PortletTracker
 		ServiceReference<Portlet> serviceReference,
 		com.liferay.portal.model.Portlet portletModel) {
 
-		Set<QName> publishingEvents = new HashSet<QName>();
+		Set<QName> publishingEvents = new HashSet<>();
 
 		PortletApp portletApp = portletModel.getPortletApp();
 
@@ -857,8 +854,7 @@ public class PortletTracker
 		ServiceReference<Portlet> serviceReference,
 		com.liferay.portal.model.Portlet portletModel) {
 
-		Map<String, Set<String>> windowStates =
-			new HashMap<String, Set<String>>();
+		Map<String, Set<String>> windowStates = new HashMap<>();
 
 		windowStates.put(
 			ContentTypes.TEXT_HTML,
@@ -884,7 +880,7 @@ public class PortletTracker
 
 			String mimeType = windowStatesStringParts[0];
 
-			Set<String> mimeTypeWindowStates = new HashSet<String>();
+			Set<String> mimeTypeWindowStates = new HashSet<>();
 
 			mimeTypeWindowStates.add(toLowerCase(WindowState.NORMAL));
 
@@ -935,14 +931,15 @@ public class PortletTracker
 
 		BundleContext bundleContext = bundle.getBundleContext();
 
-		Dictionary<String, Object> properties = new Hashtable<String, Object>();
+		Dictionary<String, Object> properties = new HashMapDictionary<>();
 
 		properties.put(
 			HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT,
 			bundlePortletApp.getServletContextName());
 
-		bundleContext.registerService(
-			EventListener.class, bundlePortletApp, properties);
+		serviceRegistrations.addServiceRegistration(
+			bundleContext.registerService(
+				EventListener.class, bundlePortletApp, properties));
 
 		return bundlePortletApp;
 	}
@@ -956,7 +953,7 @@ public class PortletTracker
 
 		BundleContext bundleContext = bundle.getBundleContext();
 
-		Dictionary<String, Object> properties = new Hashtable<String, Object>();
+		Dictionary<String, Object> properties = new HashMapDictionary<>();
 
 		properties.put(
 			HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME,
@@ -974,7 +971,7 @@ public class PortletTracker
 	protected ServiceRegistration<Servlet> createDefaultServlet(
 		BundleContext bundleContext, String contextName) {
 
-		Dictionary<String, Object> properties = new Hashtable<String, Object>();
+		Dictionary<String, Object> properties = new HashMapDictionary<>();
 
 		properties.put(
 			HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT,
@@ -997,7 +994,7 @@ public class PortletTracker
 
 		try {
 			Class<?> clazz = Class.forName(
-				"com.liferay.portal.servlet.jsp.JspServlet");
+				"com.liferay.portal.servlet.jsp.compiler.JspServlet");
 
 			servlet = (Servlet)clazz.newInstance();
 		}
@@ -1011,7 +1008,7 @@ public class PortletTracker
 			return null;
 		}
 
-		Dictionary<String, Object> properties = new Hashtable<String, Object>();
+		Dictionary<String, Object> properties = new HashMapDictionary<>();
 
 		properties.put(
 			HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT,
@@ -1112,7 +1109,7 @@ public class PortletTracker
 		for (String resourceActionConfig : resourceActionConfigs) {
 			try {
 				ResourceActionsUtil.read(
-					servletContextName, classLoader, resourceActionConfig);
+					null, classLoader, resourceActionConfig);
 			}
 			catch (Exception e) {
 				_log.error(e, e);
@@ -1207,19 +1204,19 @@ public class PortletTracker
 		255 - PortletConstants.INSTANCE_SEPARATOR.length() +
 			PortletConstants.USER_SEPARATOR.length() + 39;
 
-	private static Log _log = LogFactoryUtil.getLog(PortletTracker.class);
+	private static final Log _log = LogFactoryUtil.getLog(PortletTracker.class);
 
 	private CompanyLocalService _companyLocalService;
 	private ComponentContext _componentContext;
 	private String _httpServiceEndpoint;
 	private PortletInstanceFactory _portletInstanceFactory;
 	private PortletLocalService _portletLocalService;
-	private PortletPropertyValidator _portletPropertyValidator =
+	private final PortletPropertyValidator _portletPropertyValidator =
 		new PortletPropertyValidator();
 	private ResourceActionLocalService _resourceActionLocalService;
 	private ResourceActions _resourceActions;
 	private ConcurrentMap<Bundle, ServiceRegistrations> _serviceRegistrations =
-		new ConcurrentHashMap<Bundle, ServiceRegistrations>();
+		new ConcurrentHashMap<>();
 	private ServiceTracker<Portlet, com.liferay.portal.model.Portlet>
 		_serviceTracker;
 

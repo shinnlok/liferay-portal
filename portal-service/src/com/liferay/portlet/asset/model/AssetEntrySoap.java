@@ -45,6 +45,7 @@ public class AssetEntrySoap implements Serializable {
 		soapModel.setClassPK(model.getClassPK());
 		soapModel.setClassUuid(model.getClassUuid());
 		soapModel.setClassTypeId(model.getClassTypeId());
+		soapModel.setListable(model.getListable());
 		soapModel.setVisible(model.getVisible());
 		soapModel.setStartDate(model.getStartDate());
 		soapModel.setEndDate(model.getEndDate());
@@ -200,6 +201,18 @@ public class AssetEntrySoap implements Serializable {
 		_classTypeId = classTypeId;
 	}
 
+	public boolean getListable() {
+		return _listable;
+	}
+
+	public boolean isListable() {
+		return _listable;
+	}
+
+	public void setListable(boolean listable) {
+		_listable = listable;
+	}
+
 	public boolean getVisible() {
 		return _visible;
 	}
@@ -335,6 +348,7 @@ public class AssetEntrySoap implements Serializable {
 	private long _classPK;
 	private String _classUuid;
 	private long _classTypeId;
+	private boolean _listable;
 	private boolean _visible;
 	private Date _startDate;
 	private Date _endDate;

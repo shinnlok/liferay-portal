@@ -92,12 +92,10 @@ public class BaseExportImportTestCase {
 	}
 
 	protected void deleteStagedModel(StagedModel stagedModel) throws Exception {
-		return;
 	}
 
 	protected Map<String, String[]> getExportParameterMap() throws Exception {
-		Map<String, String[]> parameterMap =
-			new LinkedHashMap<String, String[]>();
+		Map<String, String[]> parameterMap = new LinkedHashMap<>();
 
 		parameterMap.put(
 			PortletDataHandlerKeys.PORTLET_CONFIGURATION,
@@ -119,8 +117,7 @@ public class BaseExportImportTestCase {
 	}
 
 	protected Map<String, String[]> getImportParameterMap() throws Exception {
-		Map<String, String[]> parameterMap =
-			new LinkedHashMap<String, String[]>();
+		Map<String, String[]> parameterMap = new LinkedHashMap<>();
 
 		parameterMap.put(
 			PortletDataHandlerKeys.DATA_STRATEGY,

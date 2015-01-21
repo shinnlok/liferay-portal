@@ -16,6 +16,7 @@ package com.liferay.portlet.asset.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -40,8 +41,32 @@ import java.util.Date;
 public class AssetEntryCacheModel implements CacheModel<AssetEntry>,
 	Externalizable {
 	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof AssetEntryCacheModel)) {
+			return false;
+		}
+
+		AssetEntryCacheModel assetEntryCacheModel = (AssetEntryCacheModel)obj;
+
+		if (entryId == assetEntryCacheModel.entryId) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return HashUtil.hash(0, entryId);
+	}
+
+	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(53);
+		StringBundler sb = new StringBundler(55);
 
 		sb.append("{entryId=");
 		sb.append(entryId);
@@ -65,6 +90,8 @@ public class AssetEntryCacheModel implements CacheModel<AssetEntry>,
 		sb.append(classUuid);
 		sb.append(", classTypeId=");
 		sb.append(classTypeId);
+		sb.append(", listable=");
+		sb.append(listable);
 		sb.append(", visible=");
 		sb.append(visible);
 		sb.append(", startDate=");
@@ -141,6 +168,7 @@ public class AssetEntryCacheModel implements CacheModel<AssetEntry>,
 		}
 
 		assetEntryImpl.setClassTypeId(classTypeId);
+		assetEntryImpl.setListable(listable);
 		assetEntryImpl.setVisible(visible);
 
 		if (startDate == Long.MIN_VALUE) {
@@ -236,6 +264,7 @@ public class AssetEntryCacheModel implements CacheModel<AssetEntry>,
 		classPK = objectInput.readLong();
 		classUuid = objectInput.readUTF();
 		classTypeId = objectInput.readLong();
+		listable = objectInput.readBoolean();
 		visible = objectInput.readBoolean();
 		startDate = objectInput.readLong();
 		endDate = objectInput.readLong();
@@ -281,6 +310,7 @@ public class AssetEntryCacheModel implements CacheModel<AssetEntry>,
 		}
 
 		objectOutput.writeLong(classTypeId);
+		objectOutput.writeBoolean(listable);
 		objectOutput.writeBoolean(visible);
 		objectOutput.writeLong(startDate);
 		objectOutput.writeLong(endDate);
@@ -346,6 +376,7 @@ public class AssetEntryCacheModel implements CacheModel<AssetEntry>,
 	public long classPK;
 	public String classUuid;
 	public long classTypeId;
+	public boolean listable;
 	public boolean visible;
 	public long startDate;
 	public long endDate;

@@ -126,6 +126,8 @@ public class BookmarksFolderLocalServiceImpl
 			BookmarksFolder folder, boolean includeTrashedEntries)
 		throws PortalException {
 
+		// Folders
+
 		List<BookmarksFolder> folders = bookmarksFolderPersistence.findByG_P(
 			folder.getGroupId(), folder.getFolderId());
 
@@ -678,7 +680,7 @@ public class BookmarksFolderLocalServiceImpl
 			return folder.getParentFolderId();
 		}
 
-		List<Long> subfolderIds = new ArrayList<Long>();
+		List<Long> subfolderIds = new ArrayList<>();
 
 		getSubfolderIds(
 			subfolderIds, folder.getGroupId(), folder.getFolderId());

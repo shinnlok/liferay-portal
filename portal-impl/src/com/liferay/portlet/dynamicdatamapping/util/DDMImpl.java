@@ -41,7 +41,6 @@ import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.util.DLUtil;
 import com.liferay.portlet.dynamicdatamapping.NoSuchTemplateException;
@@ -241,7 +240,7 @@ public class DDMImpl implements DDM {
 				ddmStructure.getFieldProperty(fieldName, "localizable"), true);
 
 			if (!localizable && translating &&
-				!ddmStructure.isFieldPrivate(fieldName)) {
+				!fieldName.startsWith(StringPool.UNDERLINE)) {
 
 				continue;
 			}
@@ -298,7 +297,7 @@ public class DDMImpl implements DDM {
 
 		DDMStructure ddmStructure = fieldsDisplayField.getDDMStructure();
 
-		List<String> fieldsDisplayValues = new ArrayList<String>();
+		List<String> fieldsDisplayValues = new ArrayList<>();
 
 		String[] values = splitFieldsDisplayValue(fieldsDisplayField);
 
@@ -457,7 +456,7 @@ public class DDMImpl implements DDM {
 
 		Locale defaultLocale = LocaleUtil.fromLanguageId(defaultLanguageId);
 
-		if (ddmStructure.isFieldPrivate(fieldName)) {
+		if (fieldName.startsWith(StringPool.UNDERLINE)) {
 			locale = LocaleUtil.getSiteDefault();
 
 			defaultLocale = LocaleUtil.getSiteDefault();
@@ -533,9 +532,9 @@ public class DDMImpl implements DDM {
 				fieldNamespace + FIELDS_DISPLAY_NAME));
 
 		List<String> privateFieldNames = ListUtil.fromArray(
-			PropsValues.DYNAMIC_DATA_MAPPING_STRUCTURE_PRIVATE_FIELD_NAMES);
+			new String[] {FIELDS_DISPLAY_NAME});
 
-		List<String> fieldNames = new ArrayList<String>();
+		List<String> fieldNames = new ArrayList<>();
 
 		if ((fieldsDisplayValues.length == 0) ||
 			privateFieldNames.contains(fieldName)) {
@@ -581,8 +580,10 @@ public class DDMImpl implements DDM {
 
 		int offset = 0;
 
+		String prefix = fieldName.concat(INSTANCE_SEPARATOR);
+
 		for (String fieldsDisplayValue : fieldsDisplayValues) {
-			if (fieldsDisplayValue.startsWith(fieldName)) {
+			if (fieldsDisplayValue.startsWith(prefix)) {
 				String fieldIstanceId = StringUtil.extractLast(
 					fieldsDisplayValue, DDMImpl.INSTANCE_SEPARATOR);
 
@@ -608,8 +609,7 @@ public class DDMImpl implements DDM {
 		List<String> fieldNames = getFieldNames(
 			fieldNamespace, fieldName, serviceContext);
 
-		List<Serializable> fieldValues = new ArrayList<Serializable>(
-			fieldNames.size());
+		List<Serializable> fieldValues = new ArrayList<>(fieldNames.size());
 
 		for (String fieldNameValue : fieldNames) {
 			Serializable fieldValue = serviceContext.getAttribute(
@@ -731,7 +731,7 @@ public class DDMImpl implements DDM {
 		Set<Locale> newFieldAvailableLocales,
 		Set<Locale> existingFieldAvailableLocales) {
 
-		Set<Locale> mergedAvailableLocales = new HashSet<Locale>();
+		Set<Locale> mergedAvailableLocales = new HashSet<>();
 
 		mergedAvailableLocales.addAll(newFieldAvailableLocales);
 		mergedAvailableLocales.addAll(existingFieldAvailableLocales);
@@ -749,7 +749,7 @@ public class DDMImpl implements DDM {
 			return newFieldValues;
 		}
 
-		List<Serializable> mergedLocaleValues = new ArrayList<Serializable>();
+		List<Serializable> mergedLocaleValues = new ArrayList<>();
 
 		int repetition = countFieldRepetition(
 			newFieldsDisplayValues, fieldName);

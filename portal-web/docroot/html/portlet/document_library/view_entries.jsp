@@ -319,7 +319,7 @@ dlSearchContainer.setResults(results);
 						<%
 						String folderImage = "folder_empty_document";
 
-						if (DLAppServiceUtil.getFoldersAndFileEntriesAndFileShortcutsCount(curFolder.getRepositoryId(), curFolder.getFolderId(), status, true) > 0) {
+						if (PropsValues.DL_FOLDER_ICON_CHECK_COUNT && (DLAppServiceUtil.getFoldersAndFileEntriesAndFileShortcutsCount(curFolder.getRepositoryId(), curFolder.getFolderId(), status, true) > 0)) {
 							folderImage = "folder_full_document";
 						}
 
@@ -498,11 +498,6 @@ dlSearchContainer.setResults(results);
 								>
 
 									<%
-									data = new HashMap<String, Object>();
-
-									data.put("folder", true);
-									data.put("folder-id", curFolder.getFolderId());
-
 									AssetRendererFactory assetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(DLFolder.class.getName());
 
 									AssetRenderer assetRenderer = assetRendererFactory.getAssetRenderer(curFolder.getFolderId());
@@ -515,7 +510,6 @@ dlSearchContainer.setResults(results);
 									%>
 
 									<liferay-ui:app-view-entry
-										data="<%= data %>"
 										displayStyle="<%= displayStyle %>"
 										folder="<%= true %>"
 										iconCssClass="<%= assetRenderer.getIconCssClass() %>"

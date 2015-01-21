@@ -30,8 +30,7 @@ import java.util.List;
 public class FacetConfigurationUtil {
 
 	public static List<FacetConfiguration> load(String configuration) {
-		List<FacetConfiguration> facetConfigurations =
-			new ArrayList<FacetConfiguration>();
+		List<FacetConfiguration> facetConfigurations = new ArrayList<>();
 
 		try {
 			if (Validator.isNull(configuration)) {
@@ -87,7 +86,7 @@ public class FacetConfigurationUtil {
 		return facetConfiguration;
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		FacetConfigurationUtil.class);
 
 }

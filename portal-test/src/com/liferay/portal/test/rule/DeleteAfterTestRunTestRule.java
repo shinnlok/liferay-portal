@@ -21,6 +21,8 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Group;
+import com.liferay.portal.model.LayoutPrototype;
+import com.liferay.portal.model.LayoutSetPrototype;
 import com.liferay.portal.model.Organization;
 import com.liferay.portal.model.PersistedModel;
 import com.liferay.portal.model.Role;
@@ -72,8 +74,7 @@ public class DeleteAfterTestRunTestRule extends BaseTestRule<Object, Object> {
 	protected void afterMethod(Description description, Object object) {
 		Class<?> testClass = description.getTestClass();
 
-		Map<Class<?>, FieldBag> deleteAfterTestRunFieldBags =
-			new HashMap<Class<?>, FieldBag>();
+		Map<Class<?>, FieldBag> deleteAfterTestRunFieldBags = new HashMap<>();
 
 		while (testClass != null) {
 			for (Field field : testClass.getDeclaredFields()) {
@@ -191,7 +192,7 @@ public class DeleteAfterTestRunTestRule extends BaseTestRule<Object, Object> {
 		Class<? extends PersistedModel> collectionType = null;
 
 		for (Object object : collection) {
-			Queue<Class<?>> classes = new LinkedList<Class<?>>();
+			Queue<Class<?>> classes = new LinkedList<>();
 
 			classes.add(object.getClass());
 
@@ -294,7 +295,7 @@ public class DeleteAfterTestRunTestRule extends BaseTestRule<Object, Object> {
 		}
 
 		private final Class<?> _fieldClass;
-		private final List<Field> _fields = new ArrayList<Field>();
+		private final List<Field> _fields = new ArrayList<>();
 
 	}
 
@@ -305,7 +306,8 @@ public class DeleteAfterTestRunTestRule extends BaseTestRule<Object, Object> {
 		new LinkedHashSet<Class<?>>(
 			Arrays.<Class<?>>asList(
 				User.class, Organization.class, Role.class, UserGroup.class,
-				Group.class, Company.class));
+				Group.class, LayoutPrototype.class, LayoutSetPrototype.class,
+				Company.class));
 
 	private Object _instance;
 

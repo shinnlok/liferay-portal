@@ -99,12 +99,12 @@ public class NestedPortletsPortlet extends MVCPortlet {
 
 		String layoutTemplateId = portletPreferences.getValue(
 			"layoutTemplateId",
-			_nestedPortletsConfiguration.getLayoutTemplateDefault());
+			_nestedPortletsConfiguration.layoutTemplateDefault());
 
 		String templateId = StringPool.BLANK;
 		String templateContent = StringPool.BLANK;
 
-		Map<String, String> columnIds = new HashMap<String, String>();
+		Map<String, String> columnIds = new HashMap<>();
 
 		if (Validator.isNotNull(layoutTemplateId)) {
 			Theme theme = themeDisplay.getTheme();

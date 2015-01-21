@@ -118,8 +118,7 @@ public class BasicRegistryImpl implements Registry {
 			String className, String filterString)
 		throws Exception {
 
-		List<ServiceReference<T>> serviceReferences =
-			new ArrayList<ServiceReference<T>>();
+		List<ServiceReference<T>> serviceReferences = new ArrayList<>();
 
 		Filter filter = new BasicFilter(filterString);
 
@@ -147,7 +146,7 @@ public class BasicRegistryImpl implements Registry {
 	public <T> T[] getServices(String className, String filterString)
 		throws Exception {
 
-		List<T> services = new ArrayList<T>();
+		List<T> services = new ArrayList<>();
 
 		Filter filter = new BasicFilter(filterString);
 
@@ -181,7 +180,7 @@ public class BasicRegistryImpl implements Registry {
 
 		_addingService(basicServiceReference, service);
 
-		return new BasicServiceRegistration<T>(basicServiceReference);
+		return new BasicServiceRegistration<>(basicServiceReference);
 	}
 
 	@Override
@@ -201,7 +200,7 @@ public class BasicRegistryImpl implements Registry {
 
 		_addingService(basicServiceReference, service);
 
-		return new BasicServiceRegistration<T>(basicServiceReference);
+		return new BasicServiceRegistration<>(basicServiceReference);
 	}
 
 	@Override
@@ -215,7 +214,7 @@ public class BasicRegistryImpl implements Registry {
 
 		_addingService(basicServiceReference, service);
 
-		return new BasicServiceRegistration<T>(basicServiceReference);
+		return new BasicServiceRegistration<>(basicServiceReference);
 	}
 
 	@Override
@@ -235,7 +234,7 @@ public class BasicRegistryImpl implements Registry {
 
 		_addingService(basicServiceReference, service);
 
-		return new BasicServiceRegistration<T>(basicServiceReference);
+		return new BasicServiceRegistration<>(basicServiceReference);
 	}
 
 	@Override
@@ -246,7 +245,7 @@ public class BasicRegistryImpl implements Registry {
 			throw new IllegalArgumentException();
 		}
 
-		Map<String, Object> properties = new HashMap<String, Object>();
+		Map<String, Object> properties = new HashMap<>();
 
 		properties.put("objectClass", classNames);
 
@@ -257,7 +256,7 @@ public class BasicRegistryImpl implements Registry {
 
 		_addingService(basicServiceReference, service);
 
-		return new BasicServiceRegistration<T>(basicServiceReference);
+		return new BasicServiceRegistration<>(basicServiceReference);
 	}
 
 	@Override
@@ -283,7 +282,7 @@ public class BasicRegistryImpl implements Registry {
 
 		_addingService(basicServiceReference, service);
 
-		return new BasicServiceRegistration<T>(basicServiceReference);
+		return new BasicServiceRegistration<>(basicServiceReference);
 	}
 
 	@Override
@@ -296,7 +295,7 @@ public class BasicRegistryImpl implements Registry {
 		Filter filter = new BasicFilter(
 			"(objectClass=" + clazz.getName() + ")");
 
-		return new BasicServiceTracker<S, T>(filter);
+		return new BasicServiceTracker<>(filter);
 	}
 
 	@Override
@@ -307,12 +306,12 @@ public class BasicRegistryImpl implements Registry {
 		Filter filter = new BasicFilter(
 			"(objectClass=" + clazz.getName() + ")");
 
-		return new BasicServiceTracker<S, T>(filter, serviceTrackerCustomizer);
+		return new BasicServiceTracker<>(filter, serviceTrackerCustomizer);
 	}
 
 	@Override
 	public <S, T> ServiceTracker<S, T> trackServices(Filter filter) {
-		return new BasicServiceTracker<S, T>(filter);
+		return new BasicServiceTracker<>(filter);
 	}
 
 	@Override
@@ -320,12 +319,12 @@ public class BasicRegistryImpl implements Registry {
 		Filter filter,
 		ServiceTrackerCustomizer<S, T> serviceTrackerCustomizer) {
 
-		return new BasicServiceTracker<S, T>(filter, serviceTrackerCustomizer);
+		return new BasicServiceTracker<>(filter, serviceTrackerCustomizer);
 	}
 
 	@Override
 	public <S, T> ServiceTracker<S, T> trackServices(String className) {
-		return new BasicServiceTracker<S, T>(
+		return new BasicServiceTracker<>(
 			new BasicFilter("(objectClass=" + className + ")"));
 	}
 
@@ -336,7 +335,7 @@ public class BasicRegistryImpl implements Registry {
 
 		Filter filter = new BasicFilter("(objectClass=" + className + ")");
 
-		return new BasicServiceTracker<S, T>(filter, serviceTrackerCustomizer);
+		return new BasicServiceTracker<>(filter, serviceTrackerCustomizer);
 	}
 
 	@Override
@@ -434,9 +433,9 @@ public class BasicRegistryImpl implements Registry {
 
 	private final AtomicLong _serviceIdCounter = new AtomicLong();
 	private final Map<ServiceReference<?>, Object> _services =
-		new ConcurrentSkipListMap<ServiceReference<?>, Object>();
+		new ConcurrentSkipListMap<>();
 	private final Map<ServiceTracker<?, ?>, Filter> _serviceTrackers =
-		new ConcurrentHashMap<ServiceTracker<?, ?>, Filter>();
+		new ConcurrentHashMap<>();
 
 	private class BasicFilter implements Filter {
 
@@ -482,7 +481,7 @@ public class BasicRegistryImpl implements Registry {
 			_properties.put("service.id", id);
 			_properties.put("service.ranking", ranking);
 
-			List<String> classNames = new ArrayList<String>();
+			List<String> classNames = new ArrayList<>();
 
 			classNames.add(className);
 			classNames.addAll(StringPlus.asList(properties.get("objectClass")));
@@ -850,7 +849,7 @@ public class BasicRegistryImpl implements Registry {
 		private final ServiceTrackerCustomizer<S, T> _serviceTrackerCustomizer;
 		private final AtomicInteger _stateCounter = new AtomicInteger();
 		private final NavigableMap<ServiceReference<S>, T> _trackedServices =
-			new ConcurrentSkipListMap<ServiceReference<S>, T>();
+			new ConcurrentSkipListMap<>();
 
 	}
 

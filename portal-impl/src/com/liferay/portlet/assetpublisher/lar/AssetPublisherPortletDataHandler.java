@@ -380,7 +380,7 @@ public class AssetPublisherPortletDataHandler
 		String companyGroupScopeId =
 			AssetPublisher.SCOPE_ID_GROUP_PREFIX + companyGroupId;
 
-		List<String> newValues = new ArrayList<String>(oldValues.length);
+		List<String> newValues = new ArrayList<>(oldValues.length);
 
 		for (String oldValue : oldValues) {
 			String newValue = StringUtil.replace(
@@ -417,7 +417,7 @@ public class AssetPublisherPortletDataHandler
 			key, newValues.toArray(new String[newValues.size()]));
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		AssetPublisherPortletDataHandler.class);
 
 }

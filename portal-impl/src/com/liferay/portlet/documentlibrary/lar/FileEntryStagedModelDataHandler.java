@@ -62,8 +62,9 @@ import com.liferay.portlet.documentlibrary.util.DLProcessorRegistryUtil;
 import com.liferay.portlet.documentlibrary.util.DLProcessorThreadLocal;
 import com.liferay.portlet.documentlibrary.util.DLUtil;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
-import com.liferay.portlet.dynamicdatamapping.storage.Fields;
+import com.liferay.portlet.dynamicdatamapping.storage.DDMFormValues;
 import com.liferay.portlet.dynamicdatamapping.storage.StorageEngineUtil;
+import com.liferay.portlet.trash.util.TrashUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -130,6 +131,10 @@ public class FileEntryStagedModelDataHandler
 
 	@Override
 	public String getDisplayName(FileEntry fileEntry) {
+		if (fileEntry.isInTrash()) {
+			return TrashUtil.getOriginalTitle(fileEntry.getTitle());
+		}
+
 		return fileEntry.getTitle();
 	}
 
@@ -591,10 +596,10 @@ public class FileEntryStagedModelDataHandler
 			structureFields.addAttribute(
 				"structureUuid", ddmStructure.getUuid());
 
-			Fields fields = StorageEngineUtil.getFields(
+			DDMFormValues ddmFormValues = StorageEngineUtil.getDDMFormValues(
 				dlFileEntryMetadata.getDDMStorageId());
 
-			portletDataContext.addZipEntry(path, fields);
+			portletDataContext.addZipEntry(path, ddmFormValues);
 		}
 	}
 
@@ -643,11 +648,12 @@ public class FileEntryStagedModelDataHandler
 
 			String path = structureFieldsElement.attributeValue("path");
 
-			Fields fields = (Fields)portletDataContext.getZipEntryAsObject(
-				path);
+			DDMFormValues ddmFormValues =
+				(DDMFormValues)portletDataContext.getZipEntryAsObject(path);
 
 			serviceContext.setAttribute(
-				Fields.class.getName() + ddmStructure.getStructureId(), fields);
+				DDMFormValues.class.getName() + ddmStructure.getStructureId(),
+				ddmFormValues);
 		}
 	}
 
@@ -720,7 +726,7 @@ public class FileEntryStagedModelDataHandler
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		FileEntryStagedModelDataHandler.class);
 
 }

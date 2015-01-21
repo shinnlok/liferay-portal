@@ -437,8 +437,7 @@ public class DDLRecordLocalServiceImpl extends DDLRecordLocalServiceBaseImpl {
 
 			List<DDLRecord> ddlRecords = DDLUtil.getRecords(hits);
 
-			return new BaseModelSearchResult<DDLRecord>(
-				ddlRecords, hits.getLength());
+			return new BaseModelSearchResult<>(ddlRecords, hits.getLength());
 		}
 		catch (Exception e) {
 			throw new SystemException(e);
@@ -686,6 +685,14 @@ public class DDLRecordLocalServiceImpl extends DDLRecordLocalServiceBaseImpl {
 				ddlRecordPersistence.update(record);
 			}
 		}
+
+		// Asset
+
+		Locale locale = serviceContext.getLocale();
+
+		updateAsset(
+			userId, record, recordVersion, serviceContext.getAssetCategoryIds(),
+			serviceContext.getAssetTagNames(), locale);
 
 		return record;
 	}

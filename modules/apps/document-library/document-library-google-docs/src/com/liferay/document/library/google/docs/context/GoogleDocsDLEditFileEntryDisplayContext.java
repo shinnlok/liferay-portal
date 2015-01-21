@@ -15,7 +15,6 @@
 package com.liferay.document.library.google.docs.context;
 
 import com.liferay.document.library.google.docs.util.GoogleDocsConstants;
-import com.liferay.document.library.google.docs.util.GoogleDocsMetadataHelper;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -60,22 +59,35 @@ public class GoogleDocsDLEditFileEntryDisplayContext
 
 	@Override
 	public DLFilePicker getDLFilePicker(String onFilePickCallback) {
-		GoogleDocsMetadataHelper googleDocsMetadataHelper =
-			new GoogleDocsMetadataHelper(dlFileEntryType);
-
 		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
 		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
 
 		return new GoogleDocsDLFilePicker(
-			googleDocsMetadataHelper, themeDisplay,
-			portletDisplay.getNamespace(), onFilePickCallback);
+			portletDisplay.getNamespace(), onFilePickCallback, themeDisplay);
 	}
 
 	@Override
 	public long getMaximumUploadSize() {
 		return 0;
+	}
+
+	@Override
+	public boolean isCancelCheckoutDocumentButtonVisible()
+		throws PortalException {
+
+		return false;
+	}
+
+	@Override
+	public boolean isCheckinButtonVisible() throws PortalException {
+		return false;
+	}
+
+	@Override
+	public boolean isCheckoutDocumentButtonVisible() throws PortalException {
+		return false;
 	}
 
 	@Override
@@ -91,6 +103,11 @@ public class GoogleDocsDLEditFileEntryDisplayContext
 		}
 
 		return super.isDDMStructureVisible(ddmStructure);
+	}
+
+	@Override
+	public boolean isVersionInfoVisible() {
+		return false;
 	}
 
 	private static final UUID _UUID = UUID.fromString(

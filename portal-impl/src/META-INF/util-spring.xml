@@ -318,6 +318,11 @@
 			<bean class="com.liferay.portal.settings.SettingsFactoryImpl" />
 		</property>
 	</bean>
+	<bean id="com.liferay.portal.kernel.spring.orm.LastSessionRecorderHelperUtil" class="com.liferay.portal.kernel.spring.orm.LastSessionRecorderHelperUtil">
+		<property name="lastSessionRecorderHelper">
+			<bean class="com.liferay.portal.spring.hibernate.LastSessionRecorderHelperImpl" />
+		</property>
+	</bean>
 	<bean id="com.liferay.portal.kernel.spring.util.SpringFactory" class="com.liferay.portal.spring.util.SpringFactoryImpl">
 		<property name="beanDefinitions">
 			<map />
@@ -506,6 +511,12 @@
 	<bean id="com.liferay.portal.kernel.xml.SAXReaderUtil" class="com.liferay.portal.kernel.xml.SAXReaderUtil">
 		<property name="SAXReader" ref="com.liferay.portal.kernel.xml.SAXReader" />
 	</bean>
+	<bean id="com.liferay.portal.kernel.xml.SecureSAXReaderUtil" class="com.liferay.portal.kernel.xml.SecureSAXReaderUtil">
+		<property name="SAXReader" ref="com.liferay.portal.kernel.xml.SAXReader" />
+	</bean>
+	<bean id="com.liferay.portal.kernel.xml.UnsecureSAXReaderUtil" class="com.liferay.portal.kernel.xml.UnsecureSAXReaderUtil">
+		<property name="SAXReader" ref="com.liferay.portal.kernel.xml.SAXReader" />
+	</bean>
 	<bean id="com.liferay.portal.kernel.xmlrpc.XmlRpc" class="com.liferay.portal.xmlrpc.XmlRpcImpl" />
 	<bean id="com.liferay.portal.kernel.xmlrpc.XmlRpcUtil" class="com.liferay.portal.kernel.xmlrpc.XmlRpcUtil">
 		<property name="xmlRpc" ref="com.liferay.portal.kernel.xmlrpc.XmlRpc" />
@@ -588,6 +599,8 @@
 			<bean class="com.liferay.portal.security.ac.AccessControlImpl" />
 		</property>
 	</bean>
+	<bean id="com.liferay.portal.security.ac.AllowedHostsAccessControlPolicy" class="com.liferay.portal.security.ac.AllowedHostsAccessControlPolicy" />
+	<bean id="com.liferay.portal.security.ac.AuthenticatedAccessControlPolicy" class="com.liferay.portal.security.ac.AuthenticatedAccessControlPolicy" />
 	<bean id="com.liferay.portal.security.auth.AuthenticatedUserUUIDStoreUtil" class="com.liferay.portal.security.auth.AuthenticatedUserUUIDStoreUtil">
 		<property name="authenticatedUserUUIDStore">
 			<bean class="com.liferay.portal.security.auth.DefaultAuthenticatedUserUUIDStoreImpl" />
@@ -633,8 +646,6 @@
 	<bean id="com.liferay.portal.security.auth.SessionAuthToken" class="com.liferay.portal.security.auth.SessionAuthToken" />
 	<bean id="com.liferay.portal.security.auth.SiteMinderAutoLogin" class="com.liferay.portal.security.auth.SiteMinderAutoLogin" />
 	<bean id="com.liferay.portal.security.auth.TunnelingServletAuthVerifier" class="com.liferay.portal.security.auth.TunnelingServletAuthVerifier" />
-	<bean id="com.liferay.portal.security.ldap.AttributesTransformerFactory" class="com.liferay.portal.security.ldap.AttributesTransformerFactory" />
-	<bean id="com.liferay.portal.security.ldap.DefaultAttributesTransformer" class="com.liferay.portal.security.ldap.DefaultAttributesTransformer" />
 	<bean id="com.liferay.portal.security.membershippolicy.DefaultSiteMembershipPolicy" class="com.liferay.portal.security.membershippolicy.DefaultSiteMembershipPolicy" />
 	<bean id="com.liferay.portal.security.membershippolicy.DummyOrganizationMembershipPolicy" class="com.liferay.portal.security.membershippolicy.DummyOrganizationMembershipPolicy" />
 	<bean id="com.liferay.portal.security.membershippolicy.DummyRoleMembershipPolicy" class="com.liferay.portal.security.membershippolicy.DummyRoleMembershipPolicy" />
@@ -680,6 +691,11 @@
 		<property name="resourceActions" ref="com.liferay.portal.security.permission.ResourceActions" />
 	</bean>
 	<bean id="com.liferay.portal.security.pwd.PasswordPolicyToolkit" class="com.liferay.portal.security.pwd.PasswordPolicyToolkit" />
+	<bean id="com.liferay.portal.security.xml.SecureXMLFactoryProviderUtil" class="com.liferay.portal.security.xml.SecureXMLFactoryProviderUtil">
+		<property name="secureXMLFactoryProvider">
+			<bean class="com.liferay.portal.security.xml.SecureXMLFactoryProviderImpl" />
+		</property>
+	</bean>
 	<bean id="com.liferay.portal.service.impl.LayoutLocalServiceHelper" class="com.liferay.portal.service.impl.LayoutLocalServiceHelper" />
 	<bean id="com.liferay.portal.service.permission.AccountPermissionUtil" class="com.liferay.portal.service.permission.AccountPermissionUtil">
 		<property name="accountPermission">
@@ -834,6 +850,7 @@
 	<bean class="com.liferay.portal.verify.model.DLFolderVerifiableModel" />
 	<bean class="com.liferay.portal.verify.model.EmailAddressVerifiableModel" />
 	<bean class="com.liferay.portal.verify.model.GroupVerifiableModel" />
+	<bean class="com.liferay.portal.verify.model.GroupVerifiableResourcedModel" />
 	<bean class="com.liferay.portal.verify.model.JournalArticleResourceVerifiableModel" />
 	<bean class="com.liferay.portal.verify.model.JournalArticleVerifiableModel" />
 	<bean class="com.liferay.portal.verify.model.JournalFeedVerifiableModel" />
@@ -896,6 +913,11 @@
 			<bean class="com.liferay.portlet.documentlibrary.antivirus.AntivirusScannerImpl" />
 		</property>
 	</bean>
+	<bean id="com.liferay.portlet.documentlibrary.context.DLDisplayContextFactoryProviderUtil" class="com.liferay.portlet.documentlibrary.context.DLDisplayContextFactoryProviderUtil">
+		<property name="DLDisplayContextFactoryProvider">
+			<bean class="com.liferay.portlet.documentlibrary.context.DLDisplayContextFactoryProviderImpl" />
+		</property>
+	</bean>
 	<bean id="com.liferay.portlet.documentlibrary.service.permission.DLFileEntryPermission" class="com.liferay.portlet.documentlibrary.service.permission.DLFileEntryPermission" />
 	<bean id="com.liferay.portlet.documentlibrary.service.permission.DLFolderPermission" class="com.liferay.portlet.documentlibrary.service.permission.DLFolderPermission" />
 	<bean id="com.liferay.portlet.documentlibrary.service.permission.DLPermission" class="com.liferay.portlet.documentlibrary.service.permission.DLPermission" />
@@ -946,6 +968,16 @@
 	<bean id="com.liferay.portlet.dynamicdatamapping.io.DDMFormJSONSerializerUtil" class="com.liferay.portlet.dynamicdatamapping.io.DDMFormJSONSerializerUtil">
 		<property name="DDMFormJSONSerializer">
 			<bean class="com.liferay.portlet.dynamicdatamapping.io.DDMFormJSONSerializerImpl" />
+		</property>
+	</bean>
+	<bean id="com.liferay.portlet.dynamicdatamapping.io.DDMFormLayoutJSONDeserializerUtil" class="com.liferay.portlet.dynamicdatamapping.io.DDMFormLayoutJSONDeserializerUtil">
+		<property name="DDMFormLayoutJSONDeserializer">
+			<bean class="com.liferay.portlet.dynamicdatamapping.io.DDMFormLayoutJSONDeserializerImpl" />
+		</property>
+	</bean>
+	<bean id="com.liferay.portlet.dynamicdatamapping.io.DDMFormLayoutJSONSerializerUtil" class="com.liferay.portlet.dynamicdatamapping.io.DDMFormLayoutJSONSerializerUtil">
+		<property name="DDMFormLayoutJSONSerializer">
+			<bean class="com.liferay.portlet.dynamicdatamapping.io.DDMFormLayoutJSONSerializerImpl" />
 		</property>
 	</bean>
 	<bean id="com.liferay.portlet.dynamicdatamapping.io.DDMFormValuesJSONDeserializerUtil" class="com.liferay.portlet.dynamicdatamapping.io.DDMFormValuesJSONDeserializerUtil">
@@ -1037,10 +1069,9 @@
 	<bean id="com.liferay.portlet.dynamicdatamapping.storage.StorageAdapterRegistryUtil" class="com.liferay.portlet.dynamicdatamapping.storage.StorageAdapterRegistryUtil">
 		<property name="storageAdapterRegistry" ref="com.liferay.portlet.dynamicdatamapping.storage.StorageAdapterRegistry" />
 	</bean>
+	<bean id="com.liferay.portlet.dynamicdatamapping.storage.StorageEngine" class="com.liferay.portlet.dynamicdatamapping.storage.StorageEngineImpl" />
 	<bean id="com.liferay.portlet.dynamicdatamapping.storage.StorageEngineUtil" class="com.liferay.portlet.dynamicdatamapping.storage.StorageEngineUtil">
-		<property name="storageEngine">
-			<bean class="com.liferay.portlet.dynamicdatamapping.storage.StorageEngineImpl" />
-		</property>
+		<property name="storageEngine" ref="com.liferay.portlet.dynamicdatamapping.storage.StorageEngine" />
 	</bean>
 	<bean id="com.liferay.portlet.dynamicdatamapping.storage.query.ConditionFactoryUtil" class="com.liferay.portlet.dynamicdatamapping.storage.query.ConditionFactoryUtil">
 		<property name="conditionFactory">

@@ -345,9 +345,7 @@ public class LiferayEhcacheRegionFactory extends EhCacheRegionFactory {
 
 					Cache cache = _cacheManager.getCache(name);
 
-					portalCache =
-						new EhcachePortalCache<Serializable, Serializable>(
-							this, cache);
+					portalCache = new EhcachePortalCache<>(this, cache);
 
 					_portalCaches.put(name, portalCache);
 				}
@@ -409,8 +407,7 @@ public class LiferayEhcacheRegionFactory extends EhCacheRegionFactory {
 
 		private final CacheManager _cacheManager;
 		private final Map<String, PortalCache<Serializable, Serializable>>
-			_portalCaches =
-				new HashMap<String, PortalCache<Serializable, Serializable>>();
+			_portalCaches = new HashMap<>();
 
 	}
 

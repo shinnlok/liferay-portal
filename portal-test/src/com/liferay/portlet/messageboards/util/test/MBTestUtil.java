@@ -274,12 +274,10 @@ public class MBTestUtil {
 		ObjectValuePair<String, InputStream> inputStreamOVP = null;
 
 		if (Validator.isBlank(keywords)) {
-			inputStreamOVP = new ObjectValuePair<String, InputStream>(
-				fileName, inputStream);
+			inputStreamOVP = new ObjectValuePair<>(fileName, inputStream);
 		}
 		else {
-			inputStreamOVP = new ObjectValuePair<String, InputStream>(
-				keywords, inputStream);
+			inputStreamOVP = new ObjectValuePair<>(keywords, inputStream);
 		}
 
 		inputStreamOVPs.add(inputStreamOVP);
@@ -401,8 +399,7 @@ public class MBTestUtil {
 			MBMessage message, ServiceContext serviceContext)
 		throws Exception {
 
-		Map<String, Serializable> workflowContext =
-			new HashMap<String, Serializable>();
+		Map<String, Serializable> workflowContext = new HashMap<>();
 
 		workflowContext.put(WorkflowConstants.CONTEXT_URL, "http://localhost");
 

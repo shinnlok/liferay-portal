@@ -178,7 +178,7 @@ public class EditPageAttachmentsAction extends EditFileEntryAction {
 		int numOfFiles = ParamUtil.getInteger(actionRequest, "numOfFiles");
 
 		List<ObjectValuePair<String, InputStream>> inputStreamOVPs =
-			new ArrayList<ObjectValuePair<String, InputStream>>();
+			new ArrayList<>();
 
 		try {
 			if (numOfFiles == 0) {
@@ -188,8 +188,7 @@ public class EditPageAttachmentsAction extends EditFileEntryAction {
 
 				if (inputStream != null) {
 					ObjectValuePair<String, InputStream> inputStreamOVP =
-						new ObjectValuePair<String, InputStream>(
-							fileName, inputStream);
+						new ObjectValuePair<>(fileName, inputStream);
 
 					inputStreamOVPs.add(inputStreamOVP);
 				}
@@ -206,8 +205,7 @@ public class EditPageAttachmentsAction extends EditFileEntryAction {
 					}
 
 					ObjectValuePair<String, InputStream> inputStreamOVP =
-						new ObjectValuePair<String, InputStream>(
-							fileName, inputStream);
+						new ObjectValuePair<>(fileName, inputStream);
 
 					inputStreamOVPs.add(inputStreamOVP);
 				}

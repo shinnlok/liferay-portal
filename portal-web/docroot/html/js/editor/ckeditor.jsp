@@ -86,6 +86,7 @@ if (Validator.isNotNull(onInitMethod)) {
 }
 
 boolean resizable = GetterUtil.getBoolean((String)request.getAttribute("liferay-ui:input-editor:resizable"));
+boolean showSource = GetterUtil.getBoolean((String)request.getAttribute("liferay-ui:input-editor:showSource"));
 boolean skipEditorLoading = GetterUtil.getBoolean((String)request.getAttribute("liferay-ui:input-editor:skipEditorLoading"));
 String toolbarSet = (String)request.getAttribute("liferay-ui:input-editor:toolbarSet");
 
@@ -308,25 +309,28 @@ if (inlineEdit && Validator.isNotNull(inlineEditSaveURL)) {
 		);
 	</c:if>
 
-	var createEditor = function() {
+	var currentToolbarSet;
+
+	var initialToolbarSet = '<%= TextFormatter.format(HtmlUtil.escapeJS(toolbarSet), TextFormatter.M) %>';
+
+	function getToolbarSet(toolbarSet) {
 		var Util = Liferay.Util;
 
+		if (Util.isPhone()) {
+			toolbarSet = 'phone';
+		}
+		else if (Util.isTablet()) {
+			toolbarSet = 'tablet';
+		}
+
+		return toolbarSet;
+	}
+
+	var createEditor = function() {
 		var editorNode = A.one('#<%= name %>');
 
-		editorNode.setAttribute('contenteditable', true);
-
+		editorNode.attr('contenteditable', true);
 		editorNode.addClass('lfr-editable');
-
-		function getToolbarSet(toolbarSet) {
-			if (Util.isPhone()) {
-				toolbarSet = 'phone';
-			}
-			else if (Util.isTablet()) {
-				toolbarSet = 'tablet';
-			}
-
-			return toolbarSet;
-		}
 
 		function initData() {
 			<c:if test="<%= Validator.isNotNull(initMethod) && !(inlineEdit && Validator.isNotNull(inlineEditSaveURL)) %>">
@@ -354,6 +358,8 @@ if (inlineEdit && Validator.isNotNull(inlineEditSaveURL)) {
 			window['<%= name %>'].instanceReady = true;
 		}
 
+		currentToolbarSet = getToolbarSet(initialToolbarSet);
+
 		<c:choose>
 			<c:when test="<%= inlineEdit %>">
 				CKEDITOR.inline(
@@ -365,7 +371,7 @@ if (inlineEdit && Validator.isNotNull(inlineEditSaveURL)) {
 
 			'<%= name %>',
 			{
-				customConfig: '<%= PortalUtil.getPathContext() %>/html/js/editor/ckeditor/<%= HtmlUtil.escapeJS(ckEditorConfigFileName) %>?p_p_id=<%= HttpUtil.encodeURL(portletId) %>&p_main_path=<%= HttpUtil.encodeURL(mainPath) %>&contentsLanguageId=<%= HttpUtil.encodeURL(contentsLanguageId) %>&colorSchemeCssClass=<%= HttpUtil.encodeURL(themeDisplay.getColorScheme().getCssClass()) %>&cssClasses=<%= HttpUtil.encodeURL(cssClasses) %>&cssPath=<%= HttpUtil.encodeURL(themeDisplay.getPathThemeCss()) %>&doAsGroupId=<%= HttpUtil.encodeURL(String.valueOf(doAsGroupId)) %>&doAsUserId=<%= HttpUtil.encodeURL(doAsUserId) %>&imagesPath=<%= HttpUtil.encodeURL(themeDisplay.getPathThemeImages()) %>&inlineEdit=<%= inlineEdit %><%= configParams %>&languageId=<%= HttpUtil.encodeURL(LocaleUtil.toLanguageId(locale)) %>&name=<%= name %>&resizable=<%= resizable %>',
+				customConfig: '<%= PortalUtil.getPathContext() %>/html/js/editor/ckeditor/<%= HtmlUtil.escapeJS(ckEditorConfigFileName) %>?p_p_id=<%= HttpUtil.encodeURL(portletId) %>&p_main_path=<%= HttpUtil.encodeURL(mainPath) %>&contentsLanguageId=<%= HttpUtil.encodeURL(contentsLanguageId) %>&colorSchemeCssClass=<%= HttpUtil.encodeURL(themeDisplay.getColorScheme().getCssClass()) %>&cssClasses=<%= HttpUtil.encodeURL(cssClasses) %>&cssPath=<%= HttpUtil.encodeURL(themeDisplay.getPathThemeCss()) %>&doAsGroupId=<%= HttpUtil.encodeURL(String.valueOf(doAsGroupId)) %>&doAsUserId=<%= HttpUtil.encodeURL(doAsUserId) %>&imagesPath=<%= HttpUtil.encodeURL(themeDisplay.getPathThemeImages()) %>&inlineEdit=<%= inlineEdit %><%= configParams %>&languageId=<%= HttpUtil.encodeURL(LocaleUtil.toLanguageId(locale)) %>&name=<%= name %>&resizable=<%= resizable %>&showSource=<%= showSource %>',
 
 				<c:choose>
 					<c:when test="<%= allowBrowseDocuments %>">
@@ -412,7 +418,7 @@ if (inlineEdit && Validator.isNotNull(inlineEditSaveURL)) {
 				</c:choose>
 
 				filebrowserUploadUrl: null,
-				toolbar: getToolbarSet('<%= TextFormatter.format(HtmlUtil.escapeJS(toolbarSet), TextFormatter.M) %>')
+				toolbar: currentToolbarSet
 			}
 		);
 
@@ -622,6 +628,39 @@ if (inlineEdit && Validator.isNotNull(inlineEditSaveURL)) {
 			success();
 		}
 	};
+
+	<c:if test="<%= !(inlineEdit && Validator.isNotNull(inlineEditSaveURL)) %>">
+		A.getWin().on(
+			'resize',
+			A.debounce(
+				function() {
+					if (currentToolbarSet != getToolbarSet(initialToolbarSet)) {
+						var ckeditorInstance = CKEDITOR.instances['<%= name %>'];
+
+						if (ckeditorInstance) {
+							var currentDialog = CKEDITOR.dialog.getCurrent();
+
+							if (currentDialog) {
+								currentDialog.hide();
+							}
+
+							ckeditorInstance.destroy();
+
+							ckeditorInstance = null;
+
+							var editorNode = A.one('#<%= name %>');
+
+							editorNode.removeAttribute('contenteditable');
+							editorNode.removeClass('lfr-editable');
+
+							createEditor();
+						}
+					}
+				},
+				250
+			)
+		);
+	</c:if>
 </aui:script>
 
 <%!

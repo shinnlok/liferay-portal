@@ -357,7 +357,7 @@ public class SearchEngineUtil {
 	}
 
 	public static String[] getEntryClassNames() {
-		Set<String> assetEntryClassNames = new HashSet<String>();
+		Set<String> assetEntryClassNames = new HashSet<>();
 
 		for (Indexer indexer : IndexerRegistryUtil.getIndexers()) {
 			for (String className : indexer.getClassNames()) {
@@ -1096,19 +1096,20 @@ public class SearchEngineUtil {
 		_serviceTracker.open();
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(SearchEngineUtil.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		SearchEngineUtil.class);
 
-	private static Set<Long> _companyIds = new HashSet<Long>();
+	private static final Set<Long> _companyIds = new HashSet<>();
 	private static String _defaultSearchEngineId;
-	private static Set<String> _excludedEntryClassNames = new HashSet<String>();
+	private static final Set<String> _excludedEntryClassNames = new HashSet<>();
 	private static boolean _indexReadOnly = GetterUtil.getBoolean(
 		PropsUtil.get(PropsKeys.INDEX_READ_ONLY));
-	private static Map<String, SearchEngine> _searchEngines =
-		new ConcurrentHashMap<String, SearchEngine>();
+	private static final Map<String, SearchEngine> _searchEngines =
+		new ConcurrentHashMap<>();
 	private static SearchPermissionChecker _searchPermissionChecker;
 
-	private ServiceTracker<SearchEngineConfigurator, SearchEngineConfigurator>
-		_serviceTracker;
+	private final ServiceTracker<
+		SearchEngineConfigurator, SearchEngineConfigurator> _serviceTracker;
 
 	private class SearchEngineConfiguratorServiceTrackerCustomizer
 		implements ServiceTrackerCustomizer

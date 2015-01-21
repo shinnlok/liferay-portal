@@ -48,6 +48,7 @@ import com.liferay.portlet.dynamicdatamapping.io.DDMFormXSDDeserializerUtil;
 import com.liferay.portlet.dynamicdatamapping.model.DDMForm;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructureConstants;
+import com.liferay.portlet.dynamicdatamapping.storage.StorageType;
 import com.liferay.portlet.dynamicdatamapping.util.DDMXMLUtil;
 
 import java.util.ArrayList;
@@ -144,11 +145,11 @@ public class DLFileEntryTypeLocalServiceImpl
 			long[] ddmStructureIds, ServiceContext serviceContext)
 		throws PortalException {
 
-		Map<Locale, String> nameMap = new HashMap<Locale, String>();
+		Map<Locale, String> nameMap = new HashMap<>();
 
 		nameMap.put(LocaleUtil.getSiteDefault(), name);
 
-		Map<Locale, String> descriptionMap = new HashMap<Locale, String>();
+		Map<Locale, String> descriptionMap = new HashMap<>();
 
 		descriptionMap.put(LocaleUtil.getSiteDefault(), description);
 
@@ -307,8 +308,7 @@ public class DLFileEntryTypeLocalServiceImpl
 				folderId);
 		}
 		else {
-			dlFileEntryTypes = new ArrayList<DLFileEntryType>(
-				getFileEntryTypes(groupIds));
+			dlFileEntryTypes = new ArrayList<>(getFileEntryTypes(groupIds));
 
 			DLFileEntryType dlFileEntryType =
 				dlFileEntryTypePersistence.findByPrimaryKey(
@@ -434,11 +434,11 @@ public class DLFileEntryTypeLocalServiceImpl
 			long[] ddmStructureIds, ServiceContext serviceContext)
 		throws PortalException {
 
-		Map<Locale, String> nameMap = new HashMap<Locale, String>();
+		Map<Locale, String> nameMap = new HashMap<>();
 
 		nameMap.put(LocaleUtil.getSiteDefault(), name);
 
-		Map<Locale, String> descriptionMap = new HashMap<Locale, String>();
+		Map<Locale, String> descriptionMap = new HashMap<>();
 
 		descriptionMap.put(LocaleUtil.getSiteDefault(), description);
 
@@ -585,7 +585,7 @@ public class DLFileEntryTypeLocalServiceImpl
 	protected List<Long> getFileEntryTypeIds(
 		List<DLFileEntryType> dlFileEntryTypes) {
 
-		List<Long> fileEntryTypeIds = new SortedArrayList<Long>();
+		List<Long> fileEntryTypeIds = new SortedArrayList<>();
 
 		for (DLFileEntryType dlFileEntryType : dlFileEntryTypes) {
 			fileEntryTypeIds.add(dlFileEntryType.getFileEntryTypeId());
@@ -643,7 +643,8 @@ public class DLFileEntryTypeLocalServiceImpl
 					DDMStructureConstants.DEFAULT_PARENT_STRUCTURE_ID,
 					classNameLocalService.getClassNameId(
 						DLFileEntryMetadata.class),
-					ddmStructureKey, nameMap, descriptionMap, ddmForm, "xml",
+					ddmStructureKey, nameMap, descriptionMap, ddmForm,
+					StorageType.JSON.toString(),
 					DDMStructureConstants.TYPE_AUTO, serviceContext);
 			}
 			else {

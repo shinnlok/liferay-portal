@@ -867,7 +867,7 @@ public class IntrabandProxyUtilTest {
 		}
 
 		final AtomicReference<RPCResponse> rpcResponseReference =
-			new AtomicReference<RPCResponse>();
+			new AtomicReference<>();
 
 		MockIntraband mockIntraband = new MockIntraband() {
 
@@ -1218,8 +1218,7 @@ public class IntrabandProxyUtilTest {
 		Assert.assertEquals(name, methodNode.name);
 		Assert.assertEquals(desc, methodNode.desc);
 
-		List<String> exceptions = new ArrayList<String>(
-			exceptionClasses.length);
+		List<String> exceptions = new ArrayList<>(exceptionClasses.length);
 
 		for (Class<?> exceptionClass : exceptionClasses) {
 			exceptions.add(Type.getInternalName(exceptionClass));
@@ -1249,7 +1248,7 @@ public class IntrabandProxyUtilTest {
 	}
 
 	private String[] _buildProxyMethodSignatures(Class<?> clazz) {
-		List<Method> proxyMethods = new ArrayList<Method>();
+		List<Method> proxyMethods = new ArrayList<>();
 
 		for (Method method : ReflectionUtil.getVisibleMethods(clazz)) {
 			if (method.getAnnotation(Proxy.class) != null) {
@@ -1666,7 +1665,7 @@ public class IntrabandProxyUtilTest {
 						"Unknow method index " + i +
 							" for proxy methods mappings " +
 								ReflectionTestUtil.getFieldValue(
-									skeletonClass, "_proxyMethodsMapping"),
+									skeletonClass, "_PROXY_METHODS_MAPPING"),
 						throwable.getMessage());
 				}
 				finally {
@@ -1755,14 +1754,14 @@ public class IntrabandProxyUtilTest {
 		sb.append(StringPool.CLOSE_CURLY_BRACE);
 
 		Field proxyMethodsMappingField = _assertDeclaredField(
-			skeletonClass, "_proxyMethodsMapping",
+			skeletonClass, "_PROXY_METHODS_MAPPING",
 			Modifier.PRIVATE | Modifier.STATIC | Modifier.FINAL, String.class);
 
 		Assert.assertEquals(sb.toString(), proxyMethodsMappingField.get(null));
 
 		Field logField = _assertDeclaredField(
-			skeletonClass, "_log", Modifier.PRIVATE | Modifier.STATIC,
-			Log.class);
+			skeletonClass, "_log",
+			Modifier.FINAL | Modifier.PRIVATE | Modifier.STATIC, Log.class);
 
 		LogWrapper logWrapper = (LogWrapper)logField.get(null);
 
@@ -2145,6 +2144,7 @@ public class IntrabandProxyUtilTest {
 
 			@SuppressWarnings("unused")
 			private String[] PROXY_METHOD_SIGNATURES;
+
 		}
 
 		try {
@@ -2166,7 +2166,7 @@ public class IntrabandProxyUtilTest {
 			class TestValidateClass2 {
 
 				@SuppressWarnings("unused")
-				private String _proxyMethodsMapping;
+				private String _PROXY_METHODS_MAPPING;
 			}
 
 			try {
@@ -2178,7 +2178,7 @@ public class IntrabandProxyUtilTest {
 			catch (IllegalArgumentException iae) {
 				Assert.assertEquals(
 					"Field " + TestValidateClass2.class.getDeclaredField(
-							"_proxyMethodsMapping") +
+							"_PROXY_METHODS_MAPPING") +
 						" is expected to be of type " + String.class +
 							" and static",
 					iae.getMessage());
@@ -2333,7 +2333,7 @@ public class IntrabandProxyUtilTest {
 	}
 
 	private List<Method> _getCopiedMethods(Class<?> clazz) {
-		List<Method> emptyMethods = new ArrayList<Method>();
+		List<Method> emptyMethods = new ArrayList<>();
 
 		for (Method method : ReflectionUtil.getVisibleMethods(clazz)) {
 			String name = method.getName();
@@ -2351,7 +2351,7 @@ public class IntrabandProxyUtilTest {
 	}
 
 	private List<Method> _getEmptyMethods(Class<?> clazz) {
-		List<Method> emptyMethods = new ArrayList<Method>();
+		List<Method> emptyMethods = new ArrayList<>();
 
 		for (Method method : ReflectionUtil.getVisibleMethods(clazz)) {
 			if (Modifier.isAbstract(method.getModifiers()) &&
@@ -2366,7 +2366,7 @@ public class IntrabandProxyUtilTest {
 	}
 
 	private List<Method> _getIdMethods(Class<?> clazz) {
-		List<Method> idMethods = new ArrayList<Method>();
+		List<Method> idMethods = new ArrayList<>();
 
 		for (Method method : ReflectionUtil.getVisibleMethods(clazz)) {
 			if (method.getAnnotation(Id.class) != null) {
@@ -2378,7 +2378,7 @@ public class IntrabandProxyUtilTest {
 	}
 
 	private List<Method> _getProxyMethods(Class<?> clazz) {
-		List<Method> proxyMethods = new ArrayList<Method>();
+		List<Method> proxyMethods = new ArrayList<>();
 
 		for (Method method : ReflectionUtil.getVisibleMethods(clazz)) {
 			if (method.getAnnotation(Proxy.class) != null) {
@@ -2419,15 +2419,15 @@ public class IntrabandProxyUtilTest {
 		return classNode;
 	}
 
-	private static Map<Class<?>, Class<?>> _autoboxingMap =
-		new HashMap<Class<?>, Class<?>>();
-	private static ClassLoader _classLoader =
+	private static final Map<Class<?>, Class<?>> _autoboxingMap =
+		new HashMap<>();
+	private static final ClassLoader _classLoader =
 		IntrabandProxyUtilTest.class.getClassLoader();
-	private static Map<Class<?>, Object> _defaultValueMap =
-		new HashMap<Class<?>, Object>();
-	private static Map<Class<?>, Object> _sampleValueMap =
-		new HashMap<Class<?>, Object>();
-	private static Type[] _types = {
+	private static final Map<Class<?>, Object> _defaultValueMap =
+		new HashMap<>();
+	private static final Map<Class<?>, Object> _sampleValueMap =
+		new HashMap<>();
+	private static final Type[] _types = {
 		Type.BOOLEAN_TYPE, Type.BYTE_TYPE, Type.CHAR_TYPE, Type.DOUBLE_TYPE,
 		Type.FLOAT_TYPE, Type.INT_TYPE, Type.LONG_TYPE, Type.SHORT_TYPE,
 		Type.getType(String.class), Type.getType(Object.class)
@@ -2600,7 +2600,7 @@ public class IntrabandProxyUtilTest {
 			}
 		}
 
-		private static Log _log = LogFactoryUtil.getLog(
+		private static final Log _log = LogFactoryUtil.getLog(
 			TestGenerateStubFunction1.class);
 
 		static {
@@ -2644,7 +2644,7 @@ public class IntrabandProxyUtilTest {
 			}
 		}
 
-		private static Log _log = LogFactoryUtil.getLog(
+		private static final Log _log = LogFactoryUtil.getLog(
 			TestGenerateStubFunction2.class);
 
 	}
@@ -2694,7 +2694,7 @@ public class IntrabandProxyUtilTest {
 				});
 		}
 
-		private Class<?> _clazz;
+		private final Class<?> _clazz;
 		private String _id;
 
 	}
@@ -2725,13 +2725,13 @@ public class IntrabandProxyUtilTest {
 	private static class TestValidateClass {
 
 		@SuppressWarnings("unused")
+		private static String _PROXY_METHODS_MAPPING;
+
+		@SuppressWarnings("unused")
 		private static String[] PROXY_METHOD_SIGNATURES;
 
 		@SuppressWarnings("unused")
 		private static Log _log;
-
-		@SuppressWarnings("unused")
-		private static String _proxyMethodsMapping;
 
 		@SuppressWarnings("unused")
 		private static byte _proxyType;

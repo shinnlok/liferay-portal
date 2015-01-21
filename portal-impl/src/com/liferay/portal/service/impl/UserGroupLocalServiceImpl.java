@@ -199,9 +199,10 @@ public class UserGroupLocalServiceImpl extends UserGroupLocalServiceBaseImpl {
 		groupLocalService.addGroup(
 			userId, GroupConstants.DEFAULT_PARENT_GROUP_ID,
 			UserGroup.class.getName(), userGroup.getUserGroupId(),
-			GroupConstants.DEFAULT_LIVE_GROUP_ID, String.valueOf(userGroupId),
-			null, 0, true, GroupConstants.DEFAULT_MEMBERSHIP_RESTRICTION, null,
-			false, true, null);
+			GroupConstants.DEFAULT_LIVE_GROUP_ID,
+			getLocalizationMap(String.valueOf(userGroupId)), null, 0, true,
+			GroupConstants.DEFAULT_MEMBERSHIP_RESTRICTION, null, false, true,
+			null);
 
 		// Resources
 
@@ -440,8 +441,7 @@ public class UserGroupLocalServiceImpl extends UserGroupLocalServiceBaseImpl {
 			return Collections.emptyList();
 		}
 
-		List<UserGroup> userGroups = new ArrayList<UserGroup>(
-			userGroupIds.size());
+		List<UserGroup> userGroups = new ArrayList<>(userGroupIds.size());
 
 		for (Long userGroupId : userGroupIds) {
 			userGroups.add(userGroupPersistence.findByPrimaryKey(userGroupId));
@@ -487,8 +487,7 @@ public class UserGroupLocalServiceImpl extends UserGroupLocalServiceBaseImpl {
 	public List<UserGroup> getUserGroups(long[] userGroupIds)
 		throws PortalException {
 
-		List<UserGroup> userGroups = new ArrayList<UserGroup>(
-			userGroupIds.length);
+		List<UserGroup> userGroups = new ArrayList<>(userGroupIds.length);
 
 		for (long userGroupId : userGroupIds) {
 			UserGroup userGroup = getUserGroup(userGroupId);
@@ -831,7 +830,7 @@ public class UserGroupLocalServiceImpl extends UserGroupLocalServiceBaseImpl {
 			List<UserGroup> userGroups = UsersAdminUtil.getUserGroups(hits);
 
 			if (userGroups != null) {
-				return new BaseModelSearchResult<UserGroup>(
+				return new BaseModelSearchResult<>(
 					userGroups, hits.getLength());
 			}
 		}
@@ -976,8 +975,7 @@ public class UserGroupLocalServiceImpl extends UserGroupLocalServiceBaseImpl {
 
 		searchContext.setAndSearch(andSearch);
 
-		Map<String, Serializable> attributes =
-			new HashMap<String, Serializable>();
+		Map<String, Serializable> attributes = new HashMap<>();
 
 		attributes.put("description", description);
 		attributes.put("name", name);
@@ -1034,8 +1032,7 @@ public class UserGroupLocalServiceImpl extends UserGroupLocalServiceBaseImpl {
 	}
 
 	protected Map<String, String[]> getLayoutTemplatesParameters() {
-		Map<String, String[]> parameterMap =
-			new LinkedHashMap<String, String[]>();
+		Map<String, String[]> parameterMap = new LinkedHashMap<>();
 
 		parameterMap.put(
 			PortletDataHandlerKeys.DATA_STRATEGY,

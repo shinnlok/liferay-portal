@@ -46,7 +46,7 @@ import java.util.regex.Pattern;
 public class HtmlBBCodeTranslatorImpl implements BBCodeTranslator {
 
 	public HtmlBBCodeTranslatorImpl() {
-		_listStyles = new HashMap<String, String>();
+		_listStyles = new HashMap<>();
 
 		_listStyles.put("a", "list-style: lower-alpha outside;");
 		_listStyles.put("A", "list-style: upper-alpha outside;");
@@ -54,7 +54,7 @@ public class HtmlBBCodeTranslatorImpl implements BBCodeTranslator {
 		_listStyles.put("i", "list-style: lower-roman outside;");
 		_listStyles.put("I", "list-style: upper-roman outside;");
 
-		_excludeNewLineTypes = new HashMap<String, Integer>();
+		_excludeNewLineTypes = new HashMap<>();
 
 		_excludeNewLineTypes.put("*", BBCodeParser.TYPE_TAG_START_END);
 		_excludeNewLineTypes.put("li", BBCodeParser.TYPE_TAG_START_END);
@@ -63,7 +63,7 @@ public class HtmlBBCodeTranslatorImpl implements BBCodeTranslator {
 		_excludeNewLineTypes.put("th", BBCodeParser.TYPE_TAG_START_END);
 		_excludeNewLineTypes.put("tr", BBCodeParser.TYPE_TAG_START_END);
 
-		_bbCodeCharacters = new HashMap<String, String>();
+		_bbCodeCharacters = new HashMap<>();
 
 		_bbCodeCharacters.put("&", "&amp;");
 		_bbCodeCharacters.put("<", "&lt;");
@@ -143,7 +143,7 @@ public class HtmlBBCodeTranslatorImpl implements BBCodeTranslator {
 		StringBundler sb = new StringBundler();
 
 		List<BBCodeItem> bbCodeItems = _bbCodeParser.parse(text);
-		Stack<String> tags = new Stack<String>();
+		Stack<String> tags = new Stack<>();
 		IntegerWrapper marker = new IntegerWrapper();
 
 		for (; marker.getValue() < bbCodeItems.size(); marker.increment()) {
@@ -750,33 +750,34 @@ public class HtmlBBCodeTranslatorImpl implements BBCodeTranslator {
 		{"wub.gif", ":wub:", "wub"}
 	};
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		HtmlBBCodeTranslatorImpl.class);
 
-	private Pattern _attributesPattern = Pattern.compile(
+	private final Pattern _attributesPattern = Pattern.compile(
 		"\\s*([^=]+)\\s*=\\s*\"([^\"]+)\"\\s*");
-	private Map<String, String> _bbCodeCharacters;
-	private BBCodeParser _bbCodeParser = new BBCodeParser();
-	private Pattern _bbCodePattern = Pattern.compile("[]&<>'\"`\\[()]");
-	private Pattern _colorPattern = Pattern.compile(
+	private final Map<String, String> _bbCodeCharacters;
+	private final BBCodeParser _bbCodeParser = new BBCodeParser();
+	private final Pattern _bbCodePattern = Pattern.compile("[]&<>'\"`\\[()]");
+	private final Pattern _colorPattern = Pattern.compile(
 		"^(:?aqua|black|blue|fuchsia|gray|green|lime|maroon|navy|olive|purple" +
 			"|red|silver|teal|white|yellow|#(?:[0-9a-f]{3})?[0-9a-f]{3})$",
 		Pattern.CASE_INSENSITIVE);
-	private String[] _emoticonDescriptions = new String[_EMOTICONS.length];
-	private String[] _emoticonFiles = new String[_EMOTICONS.length];
-	private String[] _emoticonSymbols = new String[_EMOTICONS.length];
-	private Map<String, Integer> _excludeNewLineTypes;
-	private int[] _fontSizes = {10, 12, 16, 18, 24, 32, 48};
-	private Set<String> _imageAttributes;
-	private Pattern _imagePattern = Pattern.compile(
+	private final String[] _emoticonDescriptions =
+		new String[_EMOTICONS.length];
+	private final String[] _emoticonFiles = new String[_EMOTICONS.length];
+	private final String[] _emoticonSymbols = new String[_EMOTICONS.length];
+	private final Map<String, Integer> _excludeNewLineTypes;
+	private final int[] _fontSizes = {10, 12, 16, 18, 24, 32, 48};
+	private final Set<String> _imageAttributes;
+	private final Pattern _imagePattern = Pattern.compile(
 		"^(?:https?://|/)[-;/?:@&=+$,_.!~*'()%0-9a-z]{1,512}$",
 		Pattern.CASE_INSENSITIVE);
-	private Map<String, String> _listStyles;
-	private Pattern _tagPattern = Pattern.compile(
+	private final Map<String, String> _listStyles;
+	private final Pattern _tagPattern = Pattern.compile(
 		"^/?(?:b|center|code|colou?r|email|i|img|justify|left|pre|q|quote|" +
 			"right|\\*|s|size|table|tr|th|td|li|list|font|u|url)$",
 		Pattern.CASE_INSENSITIVE);
-	private Pattern _urlPattern = Pattern.compile(
+	private final Pattern _urlPattern = Pattern.compile(
 		"^[-;/?:@&=+$,_.!~*'()%0-9a-z#]{1,512}$", Pattern.CASE_INSENSITIVE);
 
 }

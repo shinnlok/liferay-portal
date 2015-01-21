@@ -233,7 +233,7 @@ public class DLFileVersionTest extends BaseDLAppTestCase {
 			_fileVersion.getFileEntryId(), _SOURCE_FILE_NAME,
 			_fileVersion.getMimeType(), _fileVersion.getTitle(),
 			_fileVersion.getDescription(), _fileVersion.getChangeLog(), false,
-			_DATA_VERSION_1, getServiceContext());
+			_DATA_VERSION_1, _serviceContext);
 
 		Assert.assertEquals(
 			DLFileEntryConstants.VERSION_DEFAULT, fileEntry.getVersion());
@@ -275,13 +275,9 @@ public class DLFileVersionTest extends BaseDLAppTestCase {
 	protected Field createFieldsDisplayField(
 		DDMStructure ddmStructure, Set<String> fieldNames) {
 
-		List<String> fieldsDisplayValues = new ArrayList<String>();
+		List<String> fieldsDisplayValues = new ArrayList<>();
 
 		for (String fieldName : fieldNames) {
-			if (ddmStructure.isFieldPrivate(fieldName)) {
-				continue;
-			}
-
 			fieldsDisplayValues.add(
 				fieldName + DDMImpl.INSTANCE_SEPARATOR +
 				StringUtil.randomString());
@@ -322,10 +318,6 @@ public class DLFileVersionTest extends BaseDLAppTestCase {
 			Set<String> fieldNames = ddmStructure.getFieldNames();
 
 			for (String fieldName : fieldNames) {
-				if (ddmStructure.isFieldPrivate(fieldName)) {
-					continue;
-				}
-
 				Field field = createField(ddmStructure, fieldName);
 
 				fields.put(field);

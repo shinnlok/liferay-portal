@@ -52,9 +52,11 @@ import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.dynamicdatamapping.StructureFieldException;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalServiceUtil;
+import com.liferay.portlet.dynamicdatamapping.storage.DDMFormValues;
 import com.liferay.portlet.dynamicdatamapping.storage.Fields;
 import com.liferay.portlet.dynamicdatamapping.util.DDMIndexerUtil;
 import com.liferay.portlet.dynamicdatamapping.util.DDMUtil;
+import com.liferay.portlet.dynamicdatamapping.util.FieldsToDDMFormValuesConverterUtil;
 import com.liferay.portlet.journal.model.JournalArticle;
 import com.liferay.portlet.journal.model.JournalArticleDisplay;
 import com.liferay.portlet.journal.service.JournalArticleLocalServiceUtil;
@@ -256,18 +258,21 @@ public class JournalArticleIndexer extends BaseIndexer {
 
 		document.addKeyword(Field.CLASS_TYPE_ID, ddmStructure.getStructureId());
 
-		Fields fields = null;
+		DDMFormValues ddmFormValues = null;
 
 		try {
-			fields = JournalConverterUtil.getDDMFields(
+			Fields fields = JournalConverterUtil.getDDMFields(
 				ddmStructure, article.getDocument());
+
+			ddmFormValues = FieldsToDDMFormValuesConverterUtil.convert(
+				ddmStructure, fields);
 		}
 		catch (Exception e) {
 			return;
 		}
 
-		if (fields != null) {
-			DDMIndexerUtil.addAttributes(document, ddmStructure, fields);
+		if (ddmFormValues != null) {
+			DDMIndexerUtil.addAttributes(document, ddmStructure, ddmFormValues);
 		}
 	}
 
@@ -488,6 +493,18 @@ public class JournalArticleIndexer extends BaseIndexer {
 			return;
 		}
 
+		if (!PropsValues.JOURNAL_ARTICLE_INDEX_ALL_VERSIONS) {
+			int status = article.getStatus();
+
+			if (!article.isIndexable() ||
+				((status != WorkflowConstants.STATUS_APPROVED) &&
+				 (status != WorkflowConstants.STATUS_IN_TRASH))) {
+
+				deleteDocument(
+					article.getCompanyId(), article.getResourcePrimKey());
+			}
+		}
+
 		if (allVersions) {
 			reindexArticleVersions(article);
 		}
@@ -565,28 +582,31 @@ public class JournalArticleIndexer extends BaseIndexer {
 			return StringPool.BLANK;
 		}
 
-		Fields fields = null;
+		DDMFormValues ddmFormValues = null;
 
 		try {
-			fields = JournalConverterUtil.getDDMFields(
+			Fields fields = JournalConverterUtil.getDDMFields(
 				ddmStructure, article.getDocument());
+
+			ddmFormValues = FieldsToDDMFormValuesConverterUtil.convert(
+				ddmStructure, fields);
 		}
 		catch (Exception e) {
 			return StringPool.BLANK;
 		}
 
-		if (fields == null) {
+		if (ddmFormValues == null) {
 			return StringPool.BLANK;
 		}
 
 		return DDMIndexerUtil.extractAttributes(
-			ddmStructure, fields, LocaleUtil.fromLanguageId(languageId));
+			ddmStructure, ddmFormValues, LocaleUtil.fromLanguageId(languageId));
 	}
 
 	protected Collection<Document> getArticleVersions(JournalArticle article)
 		throws PortalException {
 
-		Collection<Document> documents = new ArrayList<Document>();
+		Collection<Document> documents = new ArrayList<>();
 
 		List<JournalArticle> articles = null;
 
@@ -597,13 +617,19 @@ public class JournalArticleIndexer extends BaseIndexer {
 						article.getResourcePrimKey());
 		}
 		else {
-			articles = new ArrayList<JournalArticle>();
+			articles = new ArrayList<>();
 
 			JournalArticle latestIndexableArticle =
-				JournalArticleLocalServiceUtil.fetchLatestIndexableArticle(
-					article.getResourcePrimKey());
+				JournalArticleLocalServiceUtil.fetchLatestArticle(
+					article.getResourcePrimKey(),
+					new int[] {
+						WorkflowConstants.STATUS_APPROVED,
+						WorkflowConstants.STATUS_IN_TRASH
+					});
 
-			if (latestIndexableArticle != null) {
+			if ((latestIndexableArticle != null) &&
+				latestIndexableArticle.isIndexable()) {
+
 				articles.add(latestIndexableArticle);
 			}
 		}
@@ -742,7 +768,7 @@ public class JournalArticleIndexer extends BaseIndexer {
 			getArticleVersions(article), isCommitImmediately());
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		JournalArticleIndexer.class);
 
 }

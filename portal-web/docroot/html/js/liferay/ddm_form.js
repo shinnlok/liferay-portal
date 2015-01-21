@@ -272,6 +272,8 @@ AUI.add(
 						instance.syncLabelUI();
 						instance.syncValueUI();
 
+						AArray.invoke(instance.get('fields'), 'renderUI');
+
 						instance.fire(
 							'render',
 							{
@@ -334,6 +336,8 @@ AUI.add(
 						else if (currentTarget.hasClass('lfr-ddm-repeatable-delete-button')) {
 							instance.remove();
 						}
+
+						event.stopPropagation();
 					},
 
 					_valueLocalizationMap: function() {
@@ -471,7 +475,7 @@ AUI.add(
 
 								var siblings = instance.getSiblings();
 
-								var field = instance._getField(fieldNode);
+								var field = parent._getField(fieldNode);
 
 								var index = AArray.indexOf(siblings, instance);
 
@@ -570,6 +574,8 @@ AUI.add(
 						if (dataType) {
 							instance.updateLocalizationMap(instance.get('displayLocale'));
 
+							instance.updateTranslationsDefaultValue();
+
 							fieldJSON.value = instance.get('localizationMap');
 						}
 
@@ -597,6 +603,27 @@ AUI.add(
 						}
 
 						instance.set('localizationMap', localizationMap);
+					},
+
+					updateTranslationsDefaultValue: function() {
+						var instance = this;
+
+						var parent = instance.get('parent');
+
+						var translationManager = parent.get('translationManager');
+
+						var localizationMap = instance.get('localizationMap');
+
+						AArray.each(
+							translationManager.get('availableLocales'),
+							function(item, index) {
+								var value = localizationMap[item];
+
+								if (Lang.isUndefined(value)) {
+									localizationMap[item] = instance.getValue();
+								}
+							}
+						);
 					}
 				}
 			}
@@ -736,7 +763,6 @@ AUI.add(
 											}
 											else {
 												data.tempFile = true;
-												data.title = data.name;
 
 												instance.setValue(data);
 
@@ -854,7 +880,7 @@ AUI.add(
 						portletURL.setParameter('refererPortletName', '');
 						portletURL.setParameter('struts_action', '/document_selector/view');
 						portletURL.setParameter('tabs1Names', 'documents');
-						portletURL.setPortletId('200');
+						portletURL.setPortletId(Liferay.PortletKeys.DOCUMENT_SELECTOR);
 						portletURL.setWindowState('pop_up');
 
 						return portletURL.toString();
@@ -890,7 +916,7 @@ AUI.add(
 						portletURL.setParameter('p_auth', Liferay.authToken);
 						portletURL.setParameter('struts_action', '/journal/upload_file_entry');
 
-						portletURL.setPortletId(15);
+						portletURL.setPortletId(Liferay.PortletKeys.JOURNAL);
 
 						return portletURL.toString();
 					},
@@ -998,10 +1024,11 @@ AUI.add(
 						var value = instance.getParsedValue(instance.getValue());
 
 						if (value.data) {
-							imagePreviewURL = value.data;
+							imagePreviewURL = themeDisplay.getPathContext() + value.data;
 						}
 						else if (value.uuid) {
 							imagePreviewURL = [
+								themeDisplay.getPathContext(),
 								'/documents',
 								value.groupId,
 								value.uuid
@@ -1458,8 +1485,6 @@ AUI.add(
 
 							liferayForm.formValidator.set('rules', validatorRules);
 						}
-
-						AArray.invoke(field.getRepeatedSiblings(), 'syncRepeatablelUI');
 					},
 
 					_onLiferaySubmitForm: function(event) {
@@ -1490,7 +1515,11 @@ AUI.add(
 						var translationManager = Liferay.component(instance.get('portletNamespace') + 'translationManager');
 
 						if (!translationManager) {
-							translationManager = new Liferay.TranslationManager();
+							translationManager = new Liferay.TranslationManager(
+								{
+									defaultLocale: themeDisplay.getLanguageId()
+								}
+							);
 						}
 
 						translationManager.addTarget(instance);
