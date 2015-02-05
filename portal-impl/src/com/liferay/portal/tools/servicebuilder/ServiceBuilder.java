@@ -129,8 +129,8 @@ public class ServiceBuilder {
 
 		Element authorElement = null;
 		Element namespaceElement = null;
-		Map<String, Element> entityElements = new TreeMap<String, Element>();
-		Map<String, Element> exceptionElements = new TreeMap<String, Element>();
+		Map<String, Element> entityElements = new TreeMap<>();
+		Map<String, Element> exceptionElements = new TreeMap<>();
 
 		for (Element element : rootElement.elements()) {
 			String elementName = element.getName();
@@ -225,26 +225,33 @@ public class ServiceBuilder {
 		ToolDependencies.wireServiceBuilder();
 
 		String apiDir = arguments.get("service.api.dir");
-		boolean autoImportDefaultReferences = GetterUtil.getBoolean(arguments.get("service.auto.import.default.references"), true);
-		boolean autoNamespaceTables = GetterUtil.getBoolean(arguments.get("service.auto.namespace.tables"));
+		boolean autoImportDefaultReferences = GetterUtil.getBoolean(
+			arguments.get("service.auto.import.default.references"), true);
+		boolean autoNamespaceTables = GetterUtil.getBoolean(
+			arguments.get("service.auto.namespace.tables"));
 		String beanLocatorUtil = arguments.get("service.bean.locator.util");
-		long buildNumber = GetterUtil.getLong(arguments.get("service.build.number"), 1);
-		boolean buildNumberIncrement = GetterUtil.getBoolean(arguments.get("service.build.number.increment"), true);
+		long buildNumber = GetterUtil.getLong(
+			arguments.get("service.build.number"), 1);
+		boolean buildNumberIncrement = GetterUtil.getBoolean(
+			arguments.get("service.build.number.increment"), true);
 		String hbmFileName = arguments.get("service.hbm.file");
 		String implDir = arguments.get("service.impl.dir");
 		String inputFileName = arguments.get("service.input.file");
 		String modelHintsFileName = arguments.get("service.model.hints.file");
-		boolean osgiModule = GetterUtil.getBoolean(arguments.get("service.osgi.module"));
+		boolean osgiModule = GetterUtil.getBoolean(
+			arguments.get("service.osgi.module"));
 		String pluginName = arguments.get("service.plugin.name");
 		String propsUtil = arguments.get("service.props.util");
 		String remotingFileName = arguments.get("service.remoting.file");
 		String resourcesDir = arguments.get("service.resources.dir");
 		String springFileName = arguments.get("service.spring.file");
-		String[] springNamespaces = StringUtil.split(arguments.get("service.spring.namespaces"));
+		String[] springNamespaces = StringUtil.split(
+			arguments.get("service.spring.namespaces"));
 		String sqlDir = arguments.get("service.sql.dir");
 		String sqlFileName = arguments.get("service.sql.file");
 		String sqlIndexesFileName = arguments.get("service.sql.indexes.file");
-		String sqlSequencesFileName = arguments.get("service.sql.sequences.file");
+		String sqlSequencesFileName = arguments.get(
+			"service.sql.sequences.file");
 		String targetEntityName = arguments.get("service.target.entity.name");
 		String testDir = arguments.get("service.test.dir");
 
@@ -443,7 +450,7 @@ public class ServiceBuilder {
 		}
 
 		if (jalopySettings == null) {
-			jalopySettings = new HashMap<String, Object>();
+			jalopySettings = new HashMap<>();
 		}
 
 		Environment env = Environment.getInstance();
@@ -699,8 +706,8 @@ public class ServiceBuilder {
 				}
 			}
 
-			_ejbList = new ArrayList<Entity>();
-			_entityMappings = new HashMap<String, EntityMapping>();
+			_ejbList = new ArrayList<>();
+			_entityMappings = new HashMap<>();
 
 			List<Element> entityElements = rootElement.elements("entity");
 
@@ -708,7 +715,7 @@ public class ServiceBuilder {
 				_parseEntity(entityElement);
 			}
 
-			List<String> exceptionList = new ArrayList<String>();
+			List<String> exceptionList = new ArrayList<>();
 
 			Element exceptionsElement = rootElement.element("exceptions");
 
@@ -837,7 +844,8 @@ public class ServiceBuilder {
 						}
 						else {
 							_removeServiceImpl(entity, _SESSION_TYPE_REMOTE);
-							_removeServiceBaseImpl(entity, _SESSION_TYPE_REMOTE);
+							_removeServiceBaseImpl(
+								entity, _SESSION_TYPE_REMOTE);
 							_removeService(entity, _SESSION_TYPE_REMOTE);
 							_removeServiceUtil(entity, _SESSION_TYPE_REMOTE);
 
@@ -1250,8 +1258,7 @@ public class ServiceBuilder {
 	public List<EntityColumn> getMappingEntities(String mappingTable)
 		throws IOException {
 
-		List<EntityColumn> mappingEntitiesPKList =
-			new ArrayList<EntityColumn>();
+		List<EntityColumn> mappingEntitiesPKList = new ArrayList<>();
 
 		EntityMapping entityMapping = _entityMappings.get(mappingTable);
 
@@ -1849,7 +1856,7 @@ public class ServiceBuilder {
 		List<IndexMetadata> indexMetadataList = indexMetadataMap.get(tableName);
 
 		if (indexMetadataList == null) {
-			indexMetadataList = new ArrayList<IndexMetadata>();
+			indexMetadataList = new ArrayList<>();
 
 			indexMetadataMap.put(tableName, indexMetadataList);
 		}
@@ -1903,8 +1910,7 @@ public class ServiceBuilder {
 	}
 
 	private void _createBlobModels(Entity entity) throws Exception {
-		List<EntityColumn> blobList = new ArrayList<EntityColumn>(
-			entity.getBlobList());
+		List<EntityColumn> blobList = new ArrayList<>(entity.getBlobList());
 
 		Iterator<EntityColumn> itr = blobList.iterator();
 
@@ -2350,7 +2356,7 @@ public class ServiceBuilder {
 		JavaClass javaClass = _getJavaClass(
 			_outputPath + "/model/impl/" + entity.getName() + "Impl.java");
 
-		Map<String, JavaMethod> methods = new HashMap<String, JavaMethod>();
+		Map<String, JavaMethod> methods = new HashMap<>();
 
 		for (JavaMethod method : javaClass.getMethods()) {
 			methods.put(method.getDeclarationSignature(false), method);
@@ -2587,10 +2593,20 @@ public class ServiceBuilder {
 		// Write file
 
 		File ejbFile = new File(
-			_testOutputPath + "/service/persistence/" + entity.getName() +
+			_testOutputPath + "/service/persistence/test/" + entity.getName() +
 				"PersistenceTest.java");
 
 		writeFile(ejbFile, content, _author);
+
+		ejbFile = new File(
+			_testOutputPath + "/service/persistence/" + entity.getName() +
+				"PersistenceTest.java");
+
+		if (ejbFile.exists()) {
+			System.out.println("Relocating " + ejbFile);
+
+			ejbFile.delete();
+		}
 	}
 
 	private void _createPersistenceUtil(Entity entity) throws Exception {
@@ -2775,7 +2791,7 @@ public class ServiceBuilder {
 	private void _createService(Entity entity, int sessionType)
 		throws Exception {
 
-		Set<String> imports = new HashSet<String>();
+		Set<String> imports = new HashSet<>();
 
 		JavaClass javaClass = _getJavaClass(
 			_outputPath + "/service/impl/" + entity.getName() +
@@ -3019,7 +3035,7 @@ public class ServiceBuilder {
 
 		context.put("entity", entity);
 		context.put("methods", _getMethods(javaClass));
-		context.put("hasHttpMethods", new Boolean(_hasHttpMethods(javaClass)));
+		context.put("hasHttpMethods", _hasHttpMethods(javaClass));
 
 		context = _putDeprecatedKeys(context, javaClass);
 
@@ -3283,8 +3299,7 @@ public class ServiceBuilder {
 			FileUtil.write(sqlFile, "");
 		}
 
-		Map<String, List<IndexMetadata>> indexMetadataMap =
-			new TreeMap<String, List<IndexMetadata>>();
+		Map<String, List<IndexMetadata>> indexMetadataMap = new TreeMap<>();
 
 		try (UnsyncBufferedReader unsyncBufferedReader =
 				new UnsyncBufferedReader(new FileReader(sqlFile))) {
@@ -3306,7 +3321,8 @@ public class ServiceBuilder {
 					IndexMetadataFactoryUtil.createIndexMetadata(indexSQL);
 
 				_addIndexMetadata(
-					indexMetadataMap, indexMetadata.getTableName(), indexMetadata);
+					indexMetadataMap, indexMetadata.getTableName(),
+					indexMetadata);
 			}
 		}
 
@@ -3329,7 +3345,7 @@ public class ServiceBuilder {
 				EntityFinder finder = finderList.get(j);
 
 				if (finder.isDBIndex()) {
-					List<String> finderColsNames = new ArrayList<String>();
+					List<String> finderColsNames = new ArrayList<>();
 
 					List<EntityColumn> finderColsList = finder.getColumns();
 
@@ -3466,7 +3482,7 @@ public class ServiceBuilder {
 			FileUtil.write(sqlFile, "");
 		}
 
-		Set<String> sequenceSQLs = new TreeSet<String>();
+		Set<String> sequenceSQLs = new TreeSet<>();
 
 		try (UnsyncBufferedReader unsyncBufferedReader =
 				new UnsyncBufferedReader(new FileReader(sqlFile))) {
@@ -3793,7 +3809,7 @@ public class ServiceBuilder {
 			return new JavaField[0];
 		}
 
-		List<JavaField> javaFields = new ArrayList<JavaField>();
+		List<JavaField> javaFields = new ArrayList<>();
 
 		for (JavaField javaField : javaClass.getFields()) {
 			Annotation[] annotations = javaField.getAnnotations();
@@ -3819,7 +3835,7 @@ public class ServiceBuilder {
 
 		TemplateHashModel staticModels = wrapper.getStaticModels();
 
-		Map<String, Object> context = new HashMap<String, Object>();
+		Map<String, Object> context = new HashMap<>();
 
 		context.put("apiDir", _apiDir);
 		context.put("arrayUtil", ArrayUtil_IW.getInstance());
@@ -4321,7 +4337,7 @@ public class ServiceBuilder {
 
 		Matcher matcher = _getterPattern.matcher(content);
 
-		Set<String> getters = new HashSet<String>();
+		Set<String> getters = new HashSet<>();
 
 		while (!matcher.hitEnd()) {
 			boolean found = matcher.find();
@@ -4350,7 +4366,7 @@ public class ServiceBuilder {
 
 		matcher = _setterPattern.matcher(content);
 
-		Set<String> setters = new HashSet<String>();
+		Set<String> setters = new HashSet<>();
 
 		while (!matcher.hitEnd()) {
 			boolean found = matcher.find();
@@ -4373,7 +4389,7 @@ public class ServiceBuilder {
 
 		getters.retainAll(setters);
 
-		List<String> transients = new ArrayList<String>(getters);
+		List<String> transients = new ArrayList<>(getters);
 
 		Collections.sort(transients);
 
@@ -4427,7 +4443,7 @@ public class ServiceBuilder {
 	private Annotation[] _mergeAnnotations(
 		Annotation[] annotations1, Annotation[] annotations2) {
 
-		Map<Type, Annotation> annotationsMap = new HashMap<Type, Annotation>();
+		Map<Type, Annotation> annotationsMap = new HashMap<>();
 
 		for (Annotation annotation : annotations2) {
 			annotationsMap.put(annotation.getType(), annotation);
@@ -4437,8 +4453,7 @@ public class ServiceBuilder {
 			annotationsMap.put(annotation.getType(), annotation);
 		}
 
-		List<Annotation> annotations = new ArrayList<Annotation>(
-			annotationsMap.values());
+		List<Annotation> annotations = new ArrayList<>(annotationsMap.values());
 
 		Comparator<Annotation> comparator = new Comparator<Annotation>() {
 
@@ -4461,8 +4476,7 @@ public class ServiceBuilder {
 		JavaMethod[] javaMethods1, JavaMethod[] javaMethods2,
 		boolean mergeAnnotations) {
 
-		Map<String, JavaMethod> javaMethodMap =
-			new HashMap<String, JavaMethod>();
+		Map<String, JavaMethod> javaMethodMap = new HashMap<>();
 
 		for (JavaMethod javaMethod : javaMethods2) {
 			javaMethodMap.put(_getMethodKey(javaMethod), javaMethod);
@@ -4485,8 +4499,7 @@ public class ServiceBuilder {
 			}
 		}
 
-		List<JavaMethod> javaMethods = new ArrayList<JavaMethod>(
-			javaMethodMap.values());
+		List<JavaMethod> javaMethods = new ArrayList<>(javaMethodMap.values());
 
 		Comparator<JavaMethod> comparator = new Comparator<JavaMethod>() {
 
@@ -4508,7 +4521,7 @@ public class ServiceBuilder {
 	private List<Entity> _mergeReferenceList(Entity entity) {
 		List<Entity> referenceList = entity.getReferenceList();
 
-		Set<Entity> set = new LinkedHashSet<Entity>();
+		Set<Entity> set = new LinkedHashSet<>();
 
 		if (_autoImportDefaultReferences) {
 			set.addAll(_ejbList);
@@ -4519,7 +4532,7 @@ public class ServiceBuilder {
 
 		set.addAll(referenceList);
 
-		return new ArrayList<Entity>(set);
+		return new ArrayList<>(set);
 	}
 
 	private void _parseEntity(Element entityElement) throws Exception {
@@ -4617,11 +4630,11 @@ public class ServiceBuilder {
 			entityElement.attributeValue("dynamic-update-enabled"),
 			mvccEnabled);
 
-		List<EntityColumn> pkList = new ArrayList<EntityColumn>();
-		List<EntityColumn> regularColList = new ArrayList<EntityColumn>();
-		List<EntityColumn> blobList = new ArrayList<EntityColumn>();
-		List<EntityColumn> collectionList = new ArrayList<EntityColumn>();
-		List<EntityColumn> columnList = new ArrayList<EntityColumn>();
+		List<EntityColumn> pkList = new ArrayList<>();
+		List<EntityColumn> regularColList = new ArrayList<>();
+		List<EntityColumn> blobList = new ArrayList<>();
+		List<EntityColumn> collectionList = new ArrayList<>();
+		List<EntityColumn> columnList = new ArrayList<>();
 
 		boolean permissionedModel = false;
 
@@ -4749,7 +4762,7 @@ public class ServiceBuilder {
 				asc = false;
 			}
 
-			List<EntityColumn> orderColsList = new ArrayList<EntityColumn>();
+			List<EntityColumn> orderColsList = new ArrayList<>();
 
 			order = new EntityOrder(asc, orderColsList);
 
@@ -4786,7 +4799,7 @@ public class ServiceBuilder {
 			}
 		}
 
-		List<EntityFinder> finderList = new ArrayList<EntityFinder>();
+		List<EntityFinder> finderList = new ArrayList<>();
 
 		List<Element> finderElements = entityElement.elements("finder");
 
@@ -4894,7 +4907,7 @@ public class ServiceBuilder {
 			boolean finderDBIndex = GetterUtil.getBoolean(
 				finderElement.attributeValue("db-index"), true);
 
-			List<EntityColumn> finderColsList = new ArrayList<EntityColumn>();
+			List<EntityColumn> finderColsList = new ArrayList<>();
 
 			List<Element> finderColumnElements = finderElement.elements(
 				"finder-column");
@@ -4934,8 +4947,8 @@ public class ServiceBuilder {
 					finderDBIndex, finderColsList));
 		}
 
-		List<Entity> referenceList = new ArrayList<Entity>();
-		List<String> unresolvedReferenceList = new ArrayList<String>();
+		List<Entity> referenceList = new ArrayList<>();
+		List<String> unresolvedReferenceList = new ArrayList<>();
 
 		if (_build) {
 			if (Validator.isNotNull(_pluginName)) {
@@ -4953,7 +4966,7 @@ public class ServiceBuilder {
 			List<Element> referenceElements = entityElement.elements(
 				"reference");
 
-			Set<String> referenceSet = new TreeSet<String>();
+			Set<String> referenceSet = new TreeSet<>();
 
 			for (Element referenceElement : referenceElements) {
 				String referencePackage = referenceElement.attributeValue(
@@ -4984,7 +4997,7 @@ public class ServiceBuilder {
 			}
 		}
 
-		List<String> txRequiredList = new ArrayList<String>();
+		List<String> txRequiredList = new ArrayList<>();
 
 		List<Element> txRequiredElements = entityElement.elements(
 			"tx-required");
@@ -5031,7 +5044,7 @@ public class ServiceBuilder {
 	private Set<String> _readLines(String fileName) throws Exception {
 		ClassLoader classLoader = getClass().getClassLoader();
 
-		Set<String> lines = new HashSet<String>();
+		Set<String> lines = new HashSet<>();
 
 		StringUtil.readLines(classLoader.getResourceAsStream(fileName), lines);
 
@@ -5178,11 +5191,10 @@ public class ServiceBuilder {
 	private boolean _buildNumberIncrement;
 	private List<Entity> _ejbList;
 	private Map<String, EntityMapping> _entityMappings;
-	private Map<String, Entity> _entityPool = new HashMap<String, Entity>();
+	private Map<String, Entity> _entityPool = new HashMap<>();
 	private String _hbmFileName;
 	private String _implDir;
-	private Map<String, JavaClass> _javaClasses =
-		new HashMap<String, JavaClass>();
+	private Map<String, JavaClass> _javaClasses = new HashMap<>();
 	private String _modelHintsFileName;
 	private boolean _mvccEnabled;
 	private boolean _osgiModule;

@@ -14,6 +14,7 @@
 
 package com.liferay.portal.kernel.lar.xstream;
 
+import com.liferay.portal.kernel.util.AggregateClassLoader;
 import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
 import com.liferay.registry.ServiceReference;
@@ -22,7 +23,9 @@ import com.liferay.registry.ServiceTracker;
 import com.liferay.registry.ServiceTrackerCustomizer;
 import com.liferay.registry.collections.ServiceRegistrationMap;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -32,6 +35,22 @@ public class XStreamAliasRegistryUtil {
 
 	public static Map<Class<?>, String> getAliases() {
 		return _instance._getAliases();
+	}
+
+	public static ClassLoader getAliasesClassLoader(
+		ClassLoader masterClassLoader) {
+
+		Set<ClassLoader> classLoaders = new HashSet<>();
+
+		Map<Class<?>, String> aliases = _instance._getAliases();
+
+		for (Class<?> clazz : aliases.keySet()) {
+			classLoaders.add(clazz.getClassLoader());
+		}
+
+		return AggregateClassLoader.getAggregateClassLoader(
+			masterClassLoader,
+			classLoaders.toArray(new ClassLoader[classLoaders.size()]));
 	}
 
 	public static void register(Class<?> clazz, String name) {
@@ -81,10 +100,10 @@ public class XStreamAliasRegistryUtil {
 		new XStreamAliasRegistryUtil();
 
 	private final ServiceRegistrationMap<XStreamAlias> _serviceRegistrations =
-		new ServiceRegistrationMap<XStreamAlias>();
+		new ServiceRegistrationMap<>();
 	private final ServiceTracker<XStreamAlias, XStreamAlias> _serviceTracker;
 	private final Map<Class<?>, String> _xstreamAliases =
-		new ConcurrentHashMap<Class<?>, String>();
+		new ConcurrentHashMap<>();
 
 	private class XStreamAlias {
 

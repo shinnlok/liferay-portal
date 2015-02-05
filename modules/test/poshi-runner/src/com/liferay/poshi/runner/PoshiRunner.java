@@ -14,12 +14,11 @@
 
 package com.liferay.poshi.runner;
 
-import java.io.File;
+import com.liferay.poshi.runner.selenium.SeleniumUtil;
 
 import junit.framework.TestCase;
 
-import org.dom4j.Document;
-import org.dom4j.io.SAXReader;
+import org.dom4j.Element;
 
 /**
  * @author Brian Wing Shun Chan
@@ -28,31 +27,23 @@ import org.dom4j.io.SAXReader;
  */
 public class PoshiRunner extends TestCase {
 
+	@Override
+	public void setUp() throws Exception {
+		SeleniumUtil.startSelenium();
+	}
+
+	@Override
+	public void tearDown() throws Exception {
+		SeleniumUtil.stopSelenium();
+	}
+
 	public void testPoshiRunner() throws Exception {
-		File file = new File(
-			"../../../portal-web/test/functional/com/liferay/portalweb" +
-				"/development/tools/testinginfrastructure");
+		String classCommandName = System.getProperty("test.case.name");
 
-		_findFiles(file);
+		Element element = PoshiRunnerContext.getTestcaseCommandElement(
+			classCommandName);
 
-		System.out.println("Test " + file.exists());
-	}
-
-	private void _findFiles(File file) throws Exception {
-		if (file.isDirectory()) {
-			for (File childFile : file.listFiles()) {
-				_findFiles(childFile);
-			}
-		}
-		else {
-			_parseFile(file);
-		}
-	}
-
-	private void _parseFile(File file) throws Exception {
-		SAXReader saxReader = new SAXReader();
-
-		Document document = saxReader.read(file);
+		PoshiRunnerExecutor.parseElement(element);
 	}
 
 }

@@ -21,12 +21,12 @@ import com.liferay.portal.cache.memory.MemoryPortalCache;
 import com.liferay.portal.kernel.cache.LowLevelCache;
 import com.liferay.portal.kernel.cache.PortalCache;
 import com.liferay.portal.kernel.cache.PortalCacheHelperUtil;
-import com.liferay.portal.kernel.test.AggregateTestRule;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
-import com.liferay.portal.kernel.test.NewEnv;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.rule.NewEnv;
 import com.liferay.portal.model.MVCCModel;
-import com.liferay.portal.test.AdviseWith;
-import com.liferay.portal.test.AspectJNewEnvTestRule;
+import com.liferay.portal.test.rule.AdviseWith;
+import com.liferay.portal.test.rule.AspectJNewEnvTestRule;
 
 import java.io.Serializable;
 
@@ -60,14 +60,14 @@ public class MVCCPortalCacheTest {
 				_PORTAL_CACHE_MANAGER_NAME),
 			_PORTAL_CACHE_NAME, 16);
 
-		_mvccPortalCache = new MVCCPortalCache<String, MVCCModel>(
+		_mvccPortalCache = new MVCCPortalCache<>(
 			(LowLevelCache<String, MVCCModel>)_portalCache);
 
-		_testCacheListener = new TestCacheListener<String, MVCCModel>();
+		_testCacheListener = new TestCacheListener<>();
 
 		_portalCache.registerCacheListener(_testCacheListener);
 
-		_testCacheReplicator = new TestCacheReplicator<String, MVCCModel>();
+		_testCacheReplicator = new TestCacheReplicator<>();
 
 		_portalCache.registerCacheListener(_testCacheReplicator);
 	}
@@ -226,7 +226,8 @@ public class MVCCPortalCacheTest {
 
 		@Around(
 			"execution(protected * com.liferay.portal.cache.memory." +
-				"MemoryPortalCache.doPutIfAbsent(..))")
+				"MemoryPortalCache.doPutIfAbsent(..))"
+		)
 		public Object doPutIfAbsent(ProceedingJoinPoint proceedingJoinPoint)
 			throws Throwable {
 
@@ -241,7 +242,8 @@ public class MVCCPortalCacheTest {
 
 		@Around(
 			"execution(protected * com.liferay.portal.cache.memory." +
-				"MemoryPortalCache.doReplace(..))")
+				"MemoryPortalCache.doReplace(..))"
+		)
 		public Object doReplace(ProceedingJoinPoint proceedingJoinPoint)
 			throws Throwable {
 

@@ -130,8 +130,7 @@ public class SettingsFactoryImpl implements SettingsFactory {
 	public List<ArchivedSettings> getPortletInstanceArchivedSettingsList(
 		long groupId, String portletId) {
 
-		List<ArchivedSettings> archivedSettingsList =
-			new ArrayList<ArchivedSettings>();
+		List<ArchivedSettings> archivedSettingsList = new ArrayList<>();
 
 		List<PortletItem> portletItems =
 			PortletItemLocalServiceUtil.getPortletItems(
@@ -187,14 +186,9 @@ public class SettingsFactoryImpl implements SettingsFactory {
 
 		settingsId = PortletConstants.getRootPortletId(settingsId);
 
-		if (_multiValuedKeysMap.get(settingsId) != null) {
-			throw new IllegalStateException(
-				"Unable to overwrite multi valued keys for " + settingsId);
-		}
-
 		_fallbackKeysMap.put(settingsId, fallbackKeys);
 
-		List<String> multiValuedKeysList = new ArrayList<String>();
+		List<String> multiValuedKeysList = new ArrayList<>();
 
 		Collections.addAll(multiValuedKeysList, multiValuedKeysArray);
 
@@ -353,14 +347,14 @@ public class SettingsFactoryImpl implements SettingsFactory {
 	}
 
 	private final ConcurrentMap<String, FallbackKeys> _fallbackKeysMap =
-		new ConcurrentHashMap<String, FallbackKeys>();
+		new ConcurrentHashMap<>();
 	private final ConcurrentMap<String, List<String>> _multiValuedKeysMap =
-		new ConcurrentHashMap<String, List<String>>();
+		new ConcurrentHashMap<>();
 	private final Map<String, Properties> _portletPropertiesMap =
-		new ConcurrentHashMap<String, Properties>();
+		new ConcurrentHashMap<>();
 	private final Map<String, Properties> _propertiesMap =
-		new ConcurrentHashMap<String, Properties>();
+		new ConcurrentHashMap<>();
 	private final ConcurrentMap<String, ResourceManager> _resourceManagers =
-		new ConcurrentHashMap<String, ResourceManager>();
+		new ConcurrentHashMap<>();
 
 }

@@ -20,7 +20,7 @@ import com.liferay.portal.kernel.cache.PortalCacheManager;
 import com.liferay.portal.kernel.cache.PortalCacheProvider;
 import com.liferay.portal.kernel.cluster.Address;
 import com.liferay.portal.kernel.cluster.ClusterExecutorUtil;
-import com.liferay.portal.kernel.cluster.ClusterLinkUtil;
+import com.liferay.portal.kernel.cluster.ClusterNode;
 import com.liferay.portal.kernel.cluster.ClusterNodeResponse;
 import com.liferay.portal.kernel.cluster.ClusterRequest;
 import com.liferay.portal.kernel.cluster.FutureClusterResponses;
@@ -68,9 +68,12 @@ public class ClusterLinkBootstrapLoaderHelperUtil {
 			String portalCacheManagerName, List<String> portalCacheNames)
 		throws Exception {
 
+		ClusterNode localClusterNode =
+			ClusterExecutorUtil.getLocalClusterNode();
+
 		ServerSocketChannel serverSocketChannel =
 			SocketUtil.createServerSocketChannel(
-				ClusterLinkUtil.getBindInetAddress(),
+				localClusterNode.getBindInetAddress(),
 				PropsValues.EHCACHE_SOCKET_START_PORT,
 				_serverSocketConfigurator);
 
@@ -139,7 +142,7 @@ public class ClusterLinkBootstrapLoaderHelperUtil {
 					portalCacheManagerName);
 
 				if (portalCaches == null) {
-					portalCaches = new ArrayList<String>();
+					portalCaches = new ArrayList<>();
 
 					_deferredPortalCaches.put(
 						portalCacheManagerName, portalCaches);
@@ -302,7 +305,7 @@ public class ClusterLinkBootstrapLoaderHelperUtil {
 			ClusterLinkBootstrapLoaderHelperUtil.class,
 			"createServerSocketFromCluster", String.class, List.class);
 	private static final Map<String, List<String>> _deferredPortalCaches =
-		new HashMap<String, List<String>>();
+		new HashMap<>();
 	private static final ServerSocketConfigurator _serverSocketConfigurator =
 		new SocketCacheServerSocketConfiguration();
 	private static final ThreadLocal<Boolean> _skipBootstrapLoaderThreadLocal =

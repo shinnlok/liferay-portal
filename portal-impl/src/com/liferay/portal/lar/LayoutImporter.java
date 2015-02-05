@@ -472,7 +472,7 @@ public class LayoutImporter {
 		List<Element> portletElements = portletsElement.elements("portlet");
 
 		if (BackgroundTaskThreadLocal.hasBackgroundTask()) {
-			List<String> portletIds = new ArrayList<String>();
+			List<String> portletIds = new ArrayList<>();
 
 			for (Element portletElement : portletElements) {
 				String portletId = portletElement.attributeValue("portlet-id");
@@ -515,7 +515,7 @@ public class LayoutImporter {
 
 		// Layouts
 
-		Set<Layout> modifiedLayouts = new HashSet<Layout>();
+		Set<Layout> modifiedLayouts = new HashSet<>();
 		List<Layout> previousLayouts = LayoutUtil.findByG_P(
 			portletDataContext.getGroupId(),
 			portletDataContext.isPrivateLayout());
@@ -563,7 +563,7 @@ public class LayoutImporter {
 			}
 		}
 
-		List<String> sourceLayoutsUuids = new ArrayList<String>();
+		List<String> sourceLayoutsUuids = new ArrayList<>();
 
 		for (Element layoutElement : layoutElements) {
 			importLayout(portletDataContext, sourceLayoutsUuids, layoutElement);
@@ -942,13 +942,17 @@ public class LayoutImporter {
 					scopeGroup = scopeLayout.getScopeGroup();
 				}
 				else {
-					String name = String.valueOf(scopeLayout.getPlid());
+					Map<Locale, String> nameMap = new HashMap<>();
+
+					nameMap.put(
+						LocaleUtil.getDefault(),
+						String.valueOf(scopeLayout.getPlid()));
 
 					scopeGroup = GroupLocalServiceUtil.addGroup(
 						portletDataContext.getUserId(null),
 						GroupConstants.DEFAULT_PARENT_GROUP_ID,
 						Layout.class.getName(), scopeLayout.getPlid(),
-						GroupConstants.DEFAULT_LIVE_GROUP_ID, name, null, 0,
+						GroupConstants.DEFAULT_LIVE_GROUP_ID, nameMap, null, 0,
 						true, GroupConstants.DEFAULT_MEMBERSHIP_RESTRICTION,
 						null, false, true, null);
 				}
@@ -1014,7 +1018,7 @@ public class LayoutImporter {
 			(Map<Long, Layout>)portletDataContext.getNewPrimaryKeysMap(
 				Layout.class + ".layout");
 
-		Map<Long, Integer> layoutPriorities = new HashMap<Long, Integer>();
+		Map<Long, Integer> layoutPriorities = new HashMap<>();
 
 		int maxPriority = Integer.MIN_VALUE;
 
@@ -1034,6 +1038,13 @@ public class LayoutImporter {
 					layoutElement.attributeValue("layout-id"));
 
 				Layout layout = layouts.get(layoutId);
+
+				// Layout might have not been imported due to a controlled
+				// error. See SitesImpl#addMergeFailFriendlyURLLayout.
+
+				if (layout == null) {
+					continue;
+				}
 
 				int layoutPriority = GetterUtil.getInteger(
 					layoutElement.attributeValue("layout-priority"));
@@ -1136,7 +1147,19 @@ public class LayoutImporter {
 			long sourceGroupId = GetterUtil.getLong(
 				headerElement.attributeValue("group-id"));
 
-			if (group.isCompany() ^ (sourceCompanyGroupId == sourceGroupId)) {
+			boolean companySourceGroup = false;
+
+			if (sourceCompanyGroupId == sourceGroupId) {
+				companySourceGroup = true;
+			}
+			else if (group.isStaged() || group.hasStagingGroup()) {
+				Group sourceGroup = GroupLocalServiceUtil.fetchGroup(
+					sourceGroupId);
+
+				companySourceGroup = sourceGroup.isCompany();
+			}
+
+			if (group.isCompany() ^ companySourceGroup) {
 				throw new LARTypeException(
 					"A company site can only be imported to a company site");
 			}
@@ -1187,7 +1210,7 @@ public class LayoutImporter {
 			long companyId, Element layoutsElement)
 		throws Exception {
 
-		List<Tuple> missingLayoutPrototypes = new ArrayList<Tuple>();
+		List<Tuple> missingLayoutPrototypes = new ArrayList<>();
 
 		String layoutSetPrototypeUuid = layoutsElement.attributeValue(
 			"layout-set-prototype-uuid");
@@ -1248,15 +1271,16 @@ public class LayoutImporter {
 		XStreamAliasRegistryUtil.register(LayoutImpl.class, "Layout");
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(LayoutImporter.class);
+	private static final Log _log = LogFactoryUtil.getLog(LayoutImporter.class);
 
-	private static LayoutImporter _instance = new LayoutImporter();
+	private static final LayoutImporter _instance = new LayoutImporter();
 
-	private DeletionSystemEventImporter _deletionSystemEventImporter =
+	private final DeletionSystemEventImporter _deletionSystemEventImporter =
 		DeletionSystemEventImporter.getInstance();
-	private PermissionImporter _permissionImporter =
+	private final PermissionImporter _permissionImporter =
 		PermissionImporter.getInstance();
-	private PortletImporter _portletImporter = PortletImporter.getInstance();
-	private ThemeImporter _themeImporter = ThemeImporter.getInstance();
+	private final PortletImporter _portletImporter =
+		PortletImporter.getInstance();
+	private final ThemeImporter _themeImporter = ThemeImporter.getInstance();
 
 }

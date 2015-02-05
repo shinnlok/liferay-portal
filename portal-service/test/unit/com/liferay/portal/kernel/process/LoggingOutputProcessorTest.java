@@ -16,8 +16,8 @@ package com.liferay.portal.kernel.process;
 
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
 import com.liferay.portal.kernel.test.CaptureHandler;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 import com.liferay.portal.kernel.util.StringPool;
 
 import java.util.List;
@@ -52,10 +52,10 @@ public class LoggingOutputProcessorTest extends BaseOutputProcessorTestCase {
 		byte[] stdErrBytes = stdErrString.getBytes(
 			StringPool.DEFAULT_CHARSET_NAME);
 
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			LoggingOutputProcessor.class.getName(), Level.OFF);
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					LoggingOutputProcessor.class.getName(), Level.OFF)) {
 
-		try {
 			List<LogRecord> logRecords = captureHandler.getLogRecords();
 
 			Assert.assertNull(
@@ -99,9 +99,6 @@ public class LoggingOutputProcessorTest extends BaseOutputProcessorTestCase {
 			logRecord = logRecords.get(0);
 
 			Assert.assertEquals(stdOutString, logRecord.getMessage());
-		}
-		finally {
-			captureHandler.close();
 		}
 	}
 

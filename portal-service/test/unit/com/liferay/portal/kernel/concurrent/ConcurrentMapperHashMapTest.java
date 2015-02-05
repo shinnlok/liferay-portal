@@ -16,7 +16,7 @@ package com.liferay.portal.kernel.concurrent;
 
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 import com.liferay.portal.kernel.util.SetUtil;
 
 import java.io.ObjectInputStream;
@@ -889,7 +889,7 @@ public class ConcurrentMapperHashMapTest {
 	}
 
 	protected Map<Key, Value> _createDataMap() {
-		Map<Key, Value> map = new HashMap<Key, Value>();
+		Map<Key, Value> map = new HashMap<>();
 
 		map.put(_testKey, _testValue);
 		map.put(new Key("testKey2"), _testValue2);

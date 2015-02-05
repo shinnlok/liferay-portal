@@ -31,8 +31,9 @@ import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
 import com.liferay.portal.kernel.test.CaptureHandler;
 import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
-import com.liferay.portal.kernel.test.NewEnv;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
+import com.liferay.portal.kernel.test.rule.NewEnv;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.MethodHandler;
 import com.liferay.portal.kernel.util.MethodKey;
 import com.liferay.portal.kernel.util.ObjectValuePair;
@@ -40,8 +41,8 @@ import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.security.auth.TransientTokenUtil;
-import com.liferay.portal.test.AdviseWith;
-import com.liferay.portal.test.AspectJNewEnvTestRule;
+import com.liferay.portal.test.rule.AdviseWith;
+import com.liferay.portal.test.rule.AspectJNewEnvTestRule;
 import com.liferay.portal.util.PortalImpl;
 import com.liferay.portal.util.PortalInstances;
 import com.liferay.portal.util.PortalUtil;
@@ -69,8 +70,10 @@ import java.net.URLStreamHandler;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -146,6 +149,8 @@ public class LuceneHelperImplTest {
 
 		_clusterNode = new ClusterNode(_CLUSER_NODE_ID, _localhostInetAddress);
 
+		_clusterNode.setPortalProtocol(Http.HTTP);
+
 		_captureHandler = JDKLoggerTestUtil.configureJDKLogger(
 			LuceneHelperImpl.class.getName(), Level.ALL);
 	}
@@ -158,7 +163,7 @@ public class LuceneHelperImplTest {
 	@AdviseWith(
 		adviceClasses = {
 			DisableIndexOnStartUpAdvice.class, EnableClusterLinkAdvice.class,
-			EnableLuceneReplicateWriteAdvice.class,
+			EnableLuceneReplicateWriteAdvice.class
 		}
 	)
 	@Test
@@ -531,7 +536,8 @@ public class LuceneHelperImplTest {
 	public static class DisableClusterLinkAdvice {
 
 		@Around(
-			"set(* com.liferay.portal.util.PropsValues.CLUSTER_LINK_ENABLED)")
+			"set(* com.liferay.portal.util.PropsValues.CLUSTER_LINK_ENABLED)"
+		)
 		public Object disableClusterLink(
 				ProceedingJoinPoint proceedingJoinPoint)
 			throws Throwable {
@@ -545,7 +551,8 @@ public class LuceneHelperImplTest {
 	public static class DisableIndexOnStartUpAdvice {
 
 		@Around(
-			"set(* com.liferay.portal.util.PropsValues.INDEX_ON_STARTUP)")
+			"set(* com.liferay.portal.util.PropsValues.INDEX_ON_STARTUP)"
+		)
 		public Object disableIndexOnStartUp(
 				ProceedingJoinPoint proceedingJoinPoint)
 			throws Throwable {
@@ -559,7 +566,8 @@ public class LuceneHelperImplTest {
 	public static class EnableClusterLinkAdvice {
 
 		@Around(
-			"set(* com.liferay.portal.util.PropsValues.CLUSTER_LINK_ENABLED)")
+			"set(* com.liferay.portal.util.PropsValues.CLUSTER_LINK_ENABLED)"
+		)
 		public Object enableClusterLink(ProceedingJoinPoint proceedingJoinPoint)
 			throws Throwable {
 
@@ -572,7 +580,8 @@ public class LuceneHelperImplTest {
 	public static class EnableLuceneReplicateWriteAdvice {
 
 		@Around(
-			"set(* com.liferay.portal.util.PropsValues.LUCENE_REPLICATE_WRITE)")
+			"set(* com.liferay.portal.util.PropsValues.LUCENE_REPLICATE_WRITE)"
+		)
 		public Object enableLuceneReplicateWrite(
 				ProceedingJoinPoint proceedingJoinPoint)
 			throws Throwable {
@@ -599,7 +608,8 @@ public class LuceneHelperImplTest {
 
 		@Around(
 			"execution(* com.liferay.portal.search.lucene.cluster." +
-				"LuceneClusterUtil.loadIndexesFromCluster(long))")
+				"LuceneClusterUtil.loadIndexesFromCluster(long))"
+		)
 		public void loadIndexesFromCluster(
 				ProceedingJoinPoint proceedingJoinPoint)
 			throws Throwable {
@@ -627,9 +637,10 @@ public class LuceneHelperImplTest {
 
 		@Around(
 			"execution(* com.liferay.portal.search.lucene.LuceneHelperImpl." +
-				"_getBootupClusterNodeObjectValuePair(..))")
+				"_getBootupClusterNodeObjectValuePair(..))"
+		)
 		public Object _getBootupClusterNodeObjectValuePair() {
-			return new ObjectValuePair<String, URL>(StringPool.BLANK, _url);
+			return new ObjectValuePair<>(StringPool.BLANK, _url);
 		}
 
 		private static URL _url;
@@ -643,7 +654,8 @@ public class LuceneHelperImplTest {
 			"execution(* com.liferay.portal.search.lucene.LuceneHelperImpl." +
 				"getLoadIndexesInputStreamFromCluster(" +
 					"long, com.liferay.portal.kernel.cluster.Address)) && " +
-						"args(companyId, bootupAddress)")
+						"args(companyId, bootupAddress)"
+		)
 		public Object getLoadIndexesInputStreamFromCluster(
 			long companyId, Address bootupAddress) {
 
@@ -774,7 +786,7 @@ public class LuceneHelperImplTest {
 			return _blockingQueue.poll(1000, TimeUnit.MILLISECONDS);
 		}
 
-		private BlockingQueue<E> _blockingQueue;
+		private final BlockingQueue<E> _blockingQueue;
 
 	}
 
@@ -797,11 +809,17 @@ public class LuceneHelperImplTest {
 		public FutureClusterResponses execute(ClusterRequest clusterRequest) {
 			if (!_autoResponse) {
 				return new FutureClusterResponses(
-					Collections.<Address>emptyList());
+					Collections.<String>emptySet());
+			}
+
+			Set<String> clusterNodeIds = new HashSet<>();
+
+			for (Address address : _addresses) {
+				clusterNodeIds.add(address.toString());
 			}
 
 			FutureClusterResponses futureClusterResponses =
-				new FutureClusterResponses(_addresses);
+				new FutureClusterResponses(clusterNodeIds);
 
 			for (Address address : _addresses) {
 				ClusterNodeResponse clusterNodeResponse =
@@ -814,12 +832,13 @@ public class LuceneHelperImplTest {
 				clusterNodeResponse.setUuid(clusterRequest.getUuid());
 
 				ClusterNode clusterNode = new ClusterNode(
-					String.valueOf(System.currentTimeMillis()),
-					_localhostInetAddress);
+					address.toString(), _localhostInetAddress);
 
 				try {
 					clusterNode.setPortalInetSocketAddress(
 						new InetSocketAddress(_portalInetAddress, _port));
+
+					clusterNode.setPortalProtocol(Http.HTTP);
 				}
 				catch (IllegalArgumentException iae) {
 				}
@@ -854,7 +873,7 @@ public class LuceneHelperImplTest {
 					futureClusterResponses.get().getClusterResponses();
 
 				MockBlockingQueue<ClusterNodeResponse> mockBlockingQueue =
-					new MockBlockingQueue<ClusterNodeResponse>(blockingQueue);
+					new MockBlockingQueue<>(blockingQueue);
 
 				clusterResponseCallback.callback(mockBlockingQueue);
 			}
@@ -969,10 +988,10 @@ public class LuceneHelperImplTest {
 			return null;
 		}
 
-		private List<Address> _addresses = new ArrayList<Address>();
+		private final List<Address> _addresses = new ArrayList<>();
 		private boolean _autoResponse = true;
 		private final List<ClusterEventListener> _clusterEventListeners =
-			new ArrayList<ClusterEventListener>();
+			new ArrayList<>();
 		private final MethodKey _createTokenMethodKey = new MethodKey(
 			TransientTokenUtil.class, "createToken", long.class);
 		private final MethodKey _getLastGenerationMethodKey = new MethodKey(

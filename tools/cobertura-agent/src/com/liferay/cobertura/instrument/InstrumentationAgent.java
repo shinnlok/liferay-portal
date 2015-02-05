@@ -30,6 +30,7 @@ import net.sourceforge.cobertura.coveragedata.CoverageData;
 import net.sourceforge.cobertura.coveragedata.CoverageDataFileHandler;
 import net.sourceforge.cobertura.coveragedata.LineData;
 import net.sourceforge.cobertura.coveragedata.ProjectData;
+import net.sourceforge.cobertura.coveragedata.TouchCollector;
 
 /**
  * @author Shuyang Zhou
@@ -43,16 +44,19 @@ public class InstrumentationAgent {
 			return;
 		}
 
-		File dataFile = CoverageDataFileHandler.getDefaultDataFile();
+		_instrumentation.removeTransformer(_coberturaClassFileTransformer);
+
+		_coberturaClassFileTransformer = null;
 
 		try {
-			ProjectData projectData = ProjectDataUtil.captureProjectData(
-				dataFile, _lockFile);
+			ProjectData projectData = ProjectDataUtil.captureProjectData();
+
+			List<AssertionError> assertionErrors = new ArrayList<>();
 
 			for (Class<?> clazz : classes) {
 				ClassData classData = projectData.getClassData(clazz.getName());
 
-				_assertClassDataCoverage(clazz, classData);
+				_assertClassDataCoverage(assertionErrors, clazz, classData);
 
 				if (includeInnerClasses) {
 					Class<?>[] declaredClasses = clazz.getDeclaredClasses();
@@ -68,27 +72,31 @@ public class InstrumentationAgent {
 						classData = projectData.getClassData(
 							declaredClass.getName());
 
-						_assertClassDataCoverage(declaredClass, classData);
+						_assertClassDataCoverage(
+							assertionErrors, declaredClass, classData);
 					}
 				}
 			}
+
+			if (!assertionErrors.isEmpty()) {
+				AssertionError assertionError = assertionErrors.get(0);
+
+				for (int i = 1; i < assertionErrors.size(); i++) {
+					assertionError.addSuppressed(assertionErrors.get(i));
+				}
+
+				throw assertionError;
+			}
 		}
 		finally {
-			dataFile.delete();
-
 			System.clearProperty("junit.code.coverage");
 
 			_dynamicallyInstrumented = false;
 
-			_instrumentation.removeTransformer(_coberturaClassFileTransformer);
-
-			_coberturaClassFileTransformer = null;
-
 			if (_originalClassDefinitions != null) {
 				try {
-					List<ClassDefinition> classDefinitions =
-						new ArrayList<ClassDefinition>(
-							_originalClassDefinitions.size());
+					List<ClassDefinition> classDefinitions = new ArrayList<>(
+						_originalClassDefinitions.size());
 
 					for (int i = 0; i < _originalClassDefinitions.size(); i++) {
 						OriginalClassDefinition originalClassDefinition =
@@ -134,14 +142,14 @@ public class InstrumentationAgent {
 
 		if (_coberturaClassFileTransformer == null) {
 			_coberturaClassFileTransformer = new CoberturaClassFileTransformer(
-				includes, excludes, _lockFile);
+				includes, excludes);
 		}
 
 		_instrumentation.addTransformer(_coberturaClassFileTransformer, true);
 
 		Class<?>[] allLoadedClasses =_instrumentation.getAllLoadedClasses();
 
-		List<Class<?>> modifiableClasses = new ArrayList<Class<?>>();
+		List<Class<?>> modifiableClasses = new ArrayList<>();
 
 		for (Class<?> loadedClass : allLoadedClasses) {
 			if (_instrumentation.isModifiableClass(loadedClass)) {
@@ -155,11 +163,12 @@ public class InstrumentationAgent {
 			}
 		}
 
-		if (!modifiableClasses.isEmpty()) {
-			_instrumentation.retransformClasses(
-				modifiableClasses.toArray(
-					new Class<?>[modifiableClasses.size()]));
-		}
+		// See LPS-52161
+
+		modifiableClasses.add(TouchCollector.class);
+
+		_instrumentation.retransformClasses(
+			modifiableClasses.toArray(new Class<?>[modifiableClasses.size()]));
 
 		_dynamicallyInstrumented = true;
 		_originalClassDefinitions = null;
@@ -167,23 +176,12 @@ public class InstrumentationAgent {
 		System.setProperty("junit.code.coverage", "true");
 	}
 
+	public static File getLockFile() {
+		return _lockFile;
+	}
+
 	public static void initialize() {
-		ProjectDataUtil.addShutdownHook(
-			new Runnable() {
-
-				@Override
-				public void run() {
-					File dataFile =
-						CoverageDataFileHandler.getDefaultDataFile();
-
-					ProjectData projectData =
-						ProjectDataUtil.collectProjectData();
-
-					ProjectDataUtil.mergeSave(dataFile, _lockFile, projectData);
-				}
-
-			}
-		);
+		ProjectDataUtil.addMergeHook();
 	}
 
 	public static synchronized void premain(
@@ -195,11 +193,22 @@ public class InstrumentationAgent {
 		String[] excludes = arguments[1].split(",");
 
 		if (Boolean.getBoolean("junit.code.coverage")) {
-			CoberturaClassFileTransformer coberturaClassFileTransformer =
-				new CoberturaClassFileTransformer(
-					includes, excludes, _lockFile);
+			final CoberturaClassFileTransformer coberturaClassFileTransformer =
+				new CoberturaClassFileTransformer(includes, excludes);
 
 			instrumentation.addTransformer(coberturaClassFileTransformer);
+
+			Runtime runtime = Runtime.getRuntime();
+
+			runtime.addShutdownHook(
+				new Thread() {
+
+					@Override
+					public void run() {
+						ProjectDataUtil.runMergeHooks();
+					}
+
+				});
 		}
 		else if (instrumentation.isRedefineClassesSupported() &&
 				 instrumentation.isRetransformClassesSupported()) {
@@ -252,8 +261,7 @@ public class InstrumentationAgent {
 		}
 
 		if (_originalClassDefinitions == null) {
-			_originalClassDefinitions =
-				new ArrayList<OriginalClassDefinition>();
+			_originalClassDefinitions = new ArrayList<>();
 		}
 
 		OriginalClassDefinition originalClassDefinition =
@@ -263,15 +271,19 @@ public class InstrumentationAgent {
 	}
 
 	private static void _assertClassDataCoverage(
-		Class<?> clazz, ClassData classData) {
+		List<AssertionError> assertionErrors, Class<?> clazz,
+		ClassData classData) {
 
-		if (clazz.isSynthetic()) {
+		if (clazz.isInterface() || clazz.isSynthetic()) {
 			return;
 		}
 
 		if (classData == null) {
-			throw new RuntimeException(
-				"Class " + clazz.getName() + " has no coverage data");
+			assertionErrors.add(
+				new AssertionError(
+					"Class " + clazz.getName() + " has no coverage data"));
+
+			return;
 		}
 
 		if ((classData.getBranchCoverageRate() != 1.0) ||
@@ -303,8 +315,11 @@ public class InstrumentationAgent {
 					classData.getName(), lineData.getLineNumber());
 			}
 
-			throw new AssertionError(
-				classData.getName() + " is not fully covered");
+			assertionErrors.add(
+				new AssertionError(
+					classData.getName() + " is not fully covered"));
+
+			return;
 		}
 
 		System.out.printf(
@@ -316,7 +331,7 @@ public class InstrumentationAgent {
 	private static String[] _excludes;
 	private static String[] _includes;
 	private static Instrumentation _instrumentation;
-	private static File _lockFile;
+	private static final File _lockFile;
 	private static List<OriginalClassDefinition> _originalClassDefinitions;
 
 	static {

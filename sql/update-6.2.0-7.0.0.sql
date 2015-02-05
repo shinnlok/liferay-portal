@@ -1,3 +1,11 @@
+alter table AssetEntry add listable BOOLEAN;
+
+COMMIT_TRANSACTION;
+
+update AssetEntry set listable = TRUE;
+
+drop table AssetTagProperty;
+
 alter table BlogsEntry add subtitle STRING null;
 alter table BlogsEntry add coverImageFileEntryId LONG;
 alter table BlogsEntry add coverImageURL STRING null;
@@ -6,6 +14,19 @@ alter table BlogsEntry add smallImageFileEntryId LONG;
 alter table DDMStructure add version VARCHAR(75) null;
 
 update DDMStructure set version = '1.0';
+
+create table DDMStructureLayout (
+	uuid_ VARCHAR(75) null,
+	structureLayoutId LONG not null primary key,
+	groupId LONG,
+	companyId LONG,
+	userId LONG,
+	userName VARCHAR(75) null,
+	createDate DATE null,
+	modifiedDate DATE null,
+	structureVersionId LONG,
+	definition TEXT null
+);
 
 create table DDMStructureVersion (
 	structureVersionId LONG not null primary key,
@@ -23,6 +44,7 @@ create table DDMStructureVersion (
 	type_ INTEGER
 );
 
+alter table DDMTemplate add sourceClassNameId LONG;
 alter table DDMTemplate add version VARCHAR(75) null;
 
 update DDMTemplate set version = '1.0';
@@ -66,6 +88,10 @@ create table ExportImportConfiguration (
 	statusByUserName VARCHAR(75) null,
 	statusDate DATE null
 );
+
+alter table Group_ add groupKey STRING;
+
+update Group_ set groupKey = name;
 
 alter table Group_ add inheritContent BOOLEAN;
 

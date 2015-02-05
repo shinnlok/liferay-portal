@@ -14,12 +14,12 @@
 
 package com.liferay.portlet.dynamicdatalists.util.test;
 
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.util.test.RandomTestUtil;
-import com.liferay.portal.util.test.TestPropsValues;
 import com.liferay.portlet.dynamicdatalists.model.DDLRecord;
 import com.liferay.portlet.dynamicdatalists.model.DDLRecordConstants;
 import com.liferay.portlet.dynamicdatalists.model.DDLRecordSet;
@@ -52,10 +52,6 @@ public class DDLRecordTestHelper {
 			LocaleUtil.US);
 
 		for (DDMFormField ddmFormField : ddmForm.getDDMFormFields()) {
-			if (ddmStructure.isFieldPrivate(ddmFormField.getName())) {
-				continue;
-			}
-
 			if (ddmFormField.isLocalizable()) {
 				ddmFormValues.addDDMFormFieldValue(
 					DDLRecordTestUtil.createLocalizedTextDDMFormFieldValue(

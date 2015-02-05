@@ -25,13 +25,15 @@ import com.liferay.portal.kernel.process.ProcessConfig;
 import com.liferay.portal.kernel.process.ProcessConfig.Builder;
 import com.liferay.portal.kernel.process.ProcessException;
 import com.liferay.portal.kernel.process.ProcessExecutorUtil;
-import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.MainServletTestRule;
 import com.liferay.portal.util.InitUtil;
+import com.liferay.registry.BasicRegistryImpl;
+import com.liferay.registry.RegistryUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -87,7 +89,7 @@ public class CounterLocalServiceTest {
 
 		ProcessConfig processConfig = builder.build();
 
-		List<Future<Long[]>> futuresList = new ArrayList<Future<Long[]>>();
+		List<Future<Long[]>> futuresList = new ArrayList<>();
 
 		for (int i = 0; i < _PROCESS_COUNT; i++) {
 			ProcessCallable<Long[]> processCallable =
@@ -105,7 +107,7 @@ public class CounterLocalServiceTest {
 
 		int total = _PROCESS_COUNT * _INCREMENT_COUNT;
 
-		List<Long> ids = new ArrayList<Long>(total);
+		List<Long> ids = new ArrayList<>(total);
 
 		for (Future<Long[]> futures : futuresList) {
 			ids.addAll(Arrays.asList(futures.get()));
@@ -141,6 +143,8 @@ public class CounterLocalServiceTest {
 
 		@Override
 		public Long[] call() throws ProcessException {
+			RegistryUtil.setRegistry(new BasicRegistryImpl());
+
 			System.setProperty(
 				PropsKeys.COUNTER_INCREMENT + "." + _counterName, "1");
 
@@ -161,7 +165,7 @@ public class CounterLocalServiceTest {
 					"META-INF/counter-spring.xml"),
 				false);
 
-			List<Long> ids = new ArrayList<Long>();
+			List<Long> ids = new ArrayList<>();
 
 			try {
 				for (int i = 0; i < _incrementCount; i++) {
@@ -182,9 +186,9 @@ public class CounterLocalServiceTest {
 
 		private static final long serialVersionUID = 1L;
 
-		private String _counterName;
-		private int _incrementCount;
-		private String _processName;
+		private final String _counterName;
+		private final int _incrementCount;
+		private final String _processName;
 
 	}
 

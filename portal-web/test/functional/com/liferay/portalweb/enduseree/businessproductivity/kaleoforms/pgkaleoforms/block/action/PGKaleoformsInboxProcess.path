@@ -19,6 +19,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>PROCESS_NAME</td>
+	<td>//h3[@class='header-title']/span[contains(.,'${key_kfProcessName}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>WORKFLOW_STATUS</td>
 	<td>//div[@class='lfr-asset-summary']//div</td>
 	<td></td>
@@ -26,6 +31,11 @@
 <tr>
 	<td>ASSIGN_TO_ME</td>
 	<td>//a/span[contains(.,'Assign to Me')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>COMPLETE_FORM</td>
+	<td>//a/span[contains(.,'Complete Form')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -100,6 +110,17 @@
 <tr>
 	<td>DUE_DATE_DATE</td>
 	<td>//div[@class='lfr-asset-due-date']/div</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+<!--CURRENT_ENTRY-->
+<tr>
+	<td>CURRENT_ENTRY_FIELD</td>
+	<td>//label[contains(.,'${key_fieldName}')]/../../div[contains(.,'${key_fieldName}') and contains(.,'${key_kfProcessFieldData}')] | //span[contains(.,'${key_fieldName}')]/../../div[contains(.,'${key_fieldName}') and contains(.,'${key_kfProcessFieldData}')]</td>
 	<td></td>
 </tr>
 <tr>

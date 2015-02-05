@@ -16,8 +16,8 @@ package com.liferay.portal.kernel.process;
 
 import com.liferay.portal.kernel.concurrent.ThreadPoolExecutor;
 import com.liferay.portal.kernel.test.CaptureHandler;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 import com.liferay.portal.kernel.util.ObjectValuePair;
 
 import java.io.IOException;
@@ -73,7 +73,7 @@ public class ProcessUtilTest {
 	@Test
 	public void testConcurrentCreateExecutorService() throws Exception {
 		final AtomicReference<ExecutorService> atomicReference =
-			new AtomicReference<ExecutorService>();
+			new AtomicReference<>();
 
 		Thread thread = new Thread() {
 
@@ -200,10 +200,10 @@ public class ProcessUtilTest {
 
 		// Logging
 
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			LoggingOutputProcessor.class.getName(), Level.INFO);
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					LoggingOutputProcessor.class.getName(), Level.INFO)) {
 
-		try {
 			List<LogRecord> logRecords = captureHandler.getLogRecords();
 
 			Future<ObjectValuePair<Void, Void>> loggingFuture =
@@ -215,7 +215,7 @@ public class ProcessUtilTest {
 
 			loggingFuture.cancel(true);
 
-			List<String> messageRecords = new ArrayList<String>();
+			List<String> messageRecords = new ArrayList<>();
 
 			for (LogRecord logRecord : logRecords) {
 				messageRecords.add(logRecord.getMessage());
@@ -229,9 +229,6 @@ public class ProcessUtilTest {
 				messageRecords.contains(Echo.buildMessage(true, 0)));
 			Assert.assertTrue(
 				messageRecords.contains(Echo.buildMessage(true, 1)));
-		}
-		finally {
-			captureHandler.close();
 		}
 
 		// Collector
@@ -501,7 +498,7 @@ public class ProcessUtilTest {
 	private static String[] _buildArguments(
 		Class<?> clazz, String... arguments) {
 
-		List<String> argumentsList = new ArrayList<String>();
+		List<String> argumentsList = new ArrayList<>();
 
 		argumentsList.add("java");
 		argumentsList.add("-cp");
@@ -578,7 +575,7 @@ public class ProcessUtilTest {
 			_countDownLatch.await();
 		}
 
-		private CountDownLatch _countDownLatch;
+		private final CountDownLatch _countDownLatch;
 
 	}
 

@@ -47,7 +47,6 @@ import com.liferay.portlet.PortletURLFactoryUtil;
 import com.liferay.portlet.PortletURLImpl;
 import com.liferay.portlet.asset.AssetCategoryException;
 import com.liferay.portlet.asset.AssetTagException;
-import com.liferay.portlet.assetpublisher.util.AssetPublisherUtil;
 import com.liferay.portlet.documentlibrary.DuplicateFileException;
 import com.liferay.portlet.documentlibrary.FileSizeException;
 import com.liferay.portlet.dynamicdatamapping.NoSuchStructureException;
@@ -335,7 +334,7 @@ public class EditArticleAction extends PortletAction {
 				ParamUtil.getString(actionRequest, "articleIds"));
 		}
 
-		List<TrashedModel> trashedModels = new ArrayList<TrashedModel>();
+		List<TrashedModel> trashedModels = new ArrayList<>();
 
 		for (String deleteArticleId : deleteArticleIds) {
 			if (moveToTrash) {
@@ -596,10 +595,6 @@ public class EditArticleAction extends PortletAction {
 				reviewDateHour, reviewDateMinute, neverReview, indexable,
 				smallImage, smallImageURL, smallFile, images, articleURL,
 				serviceContext);
-
-			AssetPublisherUtil.addAndStoreSelection(
-				actionRequest, JournalArticle.class.getName(),
-				article.getResourcePrimKey(), -1);
 		}
 		else {
 
@@ -670,6 +665,7 @@ public class EditArticleAction extends PortletAction {
 			portletResource, articleId, true);
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(EditArticleAction.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		EditArticleAction.class);
 
 }

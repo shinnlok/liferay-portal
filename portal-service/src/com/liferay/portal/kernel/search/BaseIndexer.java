@@ -135,6 +135,15 @@ public abstract class BaseIndexer implements Indexer {
 		}
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #getSearchClassNames}
+	 */
+	@Deprecated
+	@Override
+	public String[] getClassNames() {
+		return getSearchClassNames();
+	}
+
 	@Override
 	public int getDatabaseCount() throws Exception {
 		return 0;
@@ -188,9 +197,18 @@ public abstract class BaseIndexer implements Indexer {
 			SearchPermissionChecker searchPermissionChecker =
 				SearchEngineUtil.getSearchPermissionChecker();
 
+			long[] groupIds = searchContext.getGroupIds();
+
+			long groupId = GetterUtil.getLong(
+				searchContext.getAttribute("groupId"));
+
+			if (groupId > 0) {
+				groupIds = new long[] {groupId};
+			}
+
 			facetQuery =
 				(BooleanQuery)searchPermissionChecker.getPermissionQuery(
-					searchContext.getCompanyId(), searchContext.getGroupIds(),
+					searchContext.getCompanyId(), groupIds,
 					searchContext.getUserId(), className, facetQuery,
 					searchContext);
 		}
@@ -212,11 +230,11 @@ public abstract class BaseIndexer implements Indexer {
 
 			if (ArrayUtil.isNotEmpty(fullQueryEntryClassNames)) {
 				searchContext.setAttribute(
-					"relatedEntryClassNames", getClassNames());
+					"relatedEntryClassNames", getSearchClassNames());
 			}
 
 			String[] entryClassNames = ArrayUtil.append(
-				getClassNames(), fullQueryEntryClassNames);
+				getSearchClassNames(), fullQueryEntryClassNames);
 
 			searchContext.setEntryClassNames(entryClassNames);
 
@@ -249,6 +267,20 @@ public abstract class BaseIndexer implements Indexer {
 	@Override
 	public IndexerPostProcessor[] getIndexerPostProcessors() {
 		return _indexerPostProcessors;
+	}
+
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #getClassName}
+	 */
+	@Deprecated
+	@Override
+	public String getPortletId() {
+		return StringPool.BLANK;
+	}
+
+	@Override
+	public String[] getSearchClassNames() {
+		return new String[] {getClassName()};
 	}
 
 	@Override
@@ -684,7 +716,7 @@ public abstract class BaseIndexer implements Indexer {
 
 		if (!ArrayUtil.isEmpty(getDefaultSelectedLocalizedFieldNames())) {
 			if (selectedFieldNames == null) {
-				selectedFieldNames = new HashSet<String>();
+				selectedFieldNames = new HashSet<>();
 			}
 
 			if (isSelectAllLocales()) {
@@ -908,8 +940,7 @@ public abstract class BaseIndexer implements Indexer {
 	protected void addSearchAssetCategoryTitles(
 		Document document, String field, List<AssetCategory> assetCategories) {
 
-		Map<Locale, List<String>> assetCategoryTitles =
-			new HashMap<Locale, List<String>>();
+		Map<Locale, List<String>> assetCategoryTitles = new HashMap<>();
 
 		Locale defaultLocale = LocaleUtil.getDefault();
 
@@ -927,7 +958,7 @@ public abstract class BaseIndexer implements Indexer {
 				List<String> titles = assetCategoryTitles.get(locale);
 
 				if (titles == null) {
-					titles = new ArrayList<String>();
+					titles = new ArrayList<>();
 
 					assetCategoryTitles.put(locale, titles);
 				}
@@ -1069,7 +1100,14 @@ public abstract class BaseIndexer implements Indexer {
 
 		multiValueFacet.setFieldName(Field.TREE_PATH);
 		multiValueFacet.setStatic(true);
-		multiValueFacet.setValues(searchContext.getFolderIds());
+
+		long[] folderIds = searchContext.getFolderIds();
+
+		if (ArrayUtil.isNotEmpty(folderIds)) {
+			folderIds = ArrayUtil.remove(folderIds, _DEFAULT_FOLDER_ID);
+
+			multiValueFacet.setValues(folderIds);
+		}
 
 		searchContext.addFacet(multiValueFacet);
 	}
@@ -1439,7 +1477,7 @@ public abstract class BaseIndexer implements Indexer {
 
 		Document document = new DocumentImpl();
 
-		document.addUID(getPortletId(), field1);
+		document.addUID(getClassName(), field1);
 
 		SearchEngineUtil.deleteDocument(
 			getSearchEngineId(), companyId, document.get(Field.UID),
@@ -1451,7 +1489,7 @@ public abstract class BaseIndexer implements Indexer {
 
 		Document document = new DocumentImpl();
 
-		document.addUID(getPortletId(), field1, field2);
+		document.addUID(getClassName(), field1, field2);
 
 		SearchEngineUtil.deleteDocument(
 			getSearchEngineId(), companyId, document.get(Field.UID),
@@ -1528,7 +1566,7 @@ public abstract class BaseIndexer implements Indexer {
 
 		documentHelper.setEntryKey(className, classPK);
 
-		document.addUID(portletId, classPK);
+		document.addUID(className, classPK);
 
 		List<AssetCategory> assetCategories =
 			AssetCategoryLocalServiceUtil.getCategories(className, classPK);
@@ -1555,8 +1593,6 @@ public abstract class BaseIndexer implements Indexer {
 			assetTags, AssetTag.TAG_ID_ACCESSOR);
 
 		document.addKeyword(Field.ASSET_TAG_IDS, assetTagsIds);
-
-		document.addKeyword(Field.PORTLET_ID, portletId);
 
 		if (resourcePrimKey > 0) {
 			document.addKeyword(Field.ROOT_ENTRY_CLASS_PK, resourcePrimKey);
@@ -1619,9 +1655,7 @@ public abstract class BaseIndexer implements Indexer {
 	}
 
 	protected String getClassName(SearchContext searchContext) {
-		String[] classNames = getClassNames();
-
-		return classNames[0];
+		return getClassName();
 	}
 
 	protected String[] getDefaultSelectedFieldNames() {
@@ -1641,7 +1675,7 @@ public abstract class BaseIndexer implements Indexer {
 	}
 
 	protected Set<String> getLocalizedCountryNames(Country country) {
-		Set<String> countryNames = new HashSet<String>();
+		Set<String> countryNames = new HashSet<>();
 
 		Locale[] locales = LanguageUtil.getAvailableLocales();
 
@@ -1664,7 +1698,13 @@ public abstract class BaseIndexer implements Indexer {
 		return getSiteGroupId(groupId);
 	}
 
-	protected abstract String getPortletId(SearchContext searchContext);
+	/**
+	 * @deprecated As of 7.0.0 replaced by {@link #getClassName}
+	 */
+	@Deprecated
+	protected String getPortletId(SearchContext searchContext) {
+		return StringPool.BLANK;
+	}
 
 	protected long getSiteGroupId(long groupId) {
 		long siteGroupId = groupId;
@@ -1732,9 +1772,9 @@ public abstract class BaseIndexer implements Indexer {
 			long countryId)
 		throws PortalException {
 
-		List<String> cities = new ArrayList<String>();
+		List<String> cities = new ArrayList<>();
 
-		List<String> countries = new ArrayList<String>();
+		List<String> countries = new ArrayList<>();
 
 		if (countryId > 0) {
 			try {
@@ -1749,7 +1789,7 @@ public abstract class BaseIndexer implements Indexer {
 			}
 		}
 
-		List<String> regions = new ArrayList<String>();
+		List<String> regions = new ArrayList<>();
 
 		if (regionId > 0) {
 			try {
@@ -1764,8 +1804,8 @@ public abstract class BaseIndexer implements Indexer {
 			}
 		}
 
-		List<String> streets = new ArrayList<String>();
-		List<String> zips = new ArrayList<String>();
+		List<String> streets = new ArrayList<>();
+		List<String> zips = new ArrayList<>();
 
 		for (Address address : addresses) {
 			cities.add(StringUtil.toLowerCase(address.getCity()));
@@ -1840,6 +1880,8 @@ public abstract class BaseIndexer implements Indexer {
 	protected void setStagingAware(boolean stagingAware) {
 		_stagingAware = stagingAware;
 	}
+
+	private static final long _DEFAULT_FOLDER_ID = 0L;
 
 	private static final Log _log = LogFactoryUtil.getLog(BaseIndexer.class);
 

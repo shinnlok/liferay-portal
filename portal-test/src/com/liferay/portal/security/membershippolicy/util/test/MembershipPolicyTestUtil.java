@@ -15,6 +15,9 @@
 package com.liferay.portal.security.membershippolicy.util.test;
 
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringPool;
@@ -39,9 +42,6 @@ import com.liferay.portal.service.RoleServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.UserGroupServiceUtil;
 import com.liferay.portal.service.UserServiceUtil;
-import com.liferay.portal.util.test.RandomTestUtil;
-import com.liferay.portal.util.test.ServiceContextTestUtil;
-import com.liferay.portal.util.test.TestPropsValues;
 import com.liferay.portlet.announcements.model.AnnouncementsDelivery;
 import com.liferay.portlet.asset.model.AssetCategory;
 import com.liferay.portlet.asset.model.AssetTag;
@@ -72,12 +72,18 @@ public class MembershipPolicyTestUtil {
 
 	public static Group addGroup() throws Exception {
 		String name = RandomTestUtil.randomString();
+
+		Map<Locale, String> nameMap = new HashMap<>();
+
+		nameMap.put(LocaleUtil.getDefault(), name);
+
 		String friendlyURL =
 			StringPool.SLASH + FriendlyURLNormalizerUtil.normalize(name);
 
 		return GroupServiceUtil.addGroup(
 			GroupConstants.DEFAULT_PARENT_GROUP_ID,
-			GroupConstants.DEFAULT_LIVE_GROUP_ID, name, "This is a test group",
+			GroupConstants.DEFAULT_LIVE_GROUP_ID, nameMap,
+			RandomTestUtil.randomLocaleStringMap(),
 			GroupConstants.TYPE_SITE_OPEN, true,
 			GroupConstants.DEFAULT_MEMBERSHIP_RESTRICTION, friendlyURL, true,
 			true, populateServiceContext(Group.class, true));
@@ -193,12 +199,11 @@ public class MembershipPolicyTestUtil {
 		String twitterSn = RandomTestUtil.randomString();
 		String ymSn = RandomTestUtil.randomString();
 
-		List<Address> addresses = new ArrayList<Address>();
-		List<EmailAddress> emailAddresses = new ArrayList<EmailAddress>();
-		List<Phone> phones = new ArrayList<Phone>();
-		List<Website> websites = new ArrayList<Website>();
-		List<AnnouncementsDelivery> announcementsDelivers =
-			new ArrayList<AnnouncementsDelivery>();
+		List<Address> addresses = new ArrayList<>();
+		List<EmailAddress> emailAddresses = new ArrayList<>();
+		List<Phone> phones = new ArrayList<>();
+		List<Website> websites = new ArrayList<>();
+		List<AnnouncementsDelivery> announcementsDelivers = new ArrayList<>();
 
 		ServiceContext serviceContext = new ServiceContext();
 
@@ -225,8 +230,7 @@ public class MembershipPolicyTestUtil {
 		expandoBridge.addAttribute("key3", false);
 		expandoBridge.addAttribute("key4", false);
 
-		Map<String, Serializable> expandoMap =
-			new HashMap<String, Serializable>();
+		Map<String, Serializable> expandoMap = new HashMap<>();
 
 		expandoMap.put("key1", "value1");
 		expandoMap.put("key2", "value2");
@@ -249,7 +253,7 @@ public class MembershipPolicyTestUtil {
 		if (includeCategorization) {
 			AssetTag tag = AssetTagLocalServiceUtil.addTag(
 				TestPropsValues.getUserId(), RandomTestUtil.randomString(),
-				null, new ServiceContext());
+				new ServiceContext());
 
 			serviceContext.setAssetTagNames(new String[] {tag.getName()});
 

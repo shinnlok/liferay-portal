@@ -1,5 +1,5 @@
 <definition component-name="portal-wcm">
-	<property name="testray.main.component.name" value="WCM" />
+	<property name="testray.main.component.name" value="Sites Administration" />
 
 	<set-up>
 		<execute macro="User#firstLoginPG" />
@@ -817,7 +817,7 @@
 		</execute>
 	</command>
 
-	<command known-issues="LPS-51046,LPS-51074" name="SitesDemoSiteManagement" priority="5">
+	<command known-issues="LPS-51074" name="SitesDemoSiteManagement" priority="5">
 		<execute macro="Page#gotoCP">
 			<var name="portletName" value="Sites" />
 		</execute>

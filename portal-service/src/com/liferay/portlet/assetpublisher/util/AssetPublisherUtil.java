@@ -27,6 +27,7 @@ import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetRendererFactory;
 import com.liferay.portlet.asset.model.ClassType;
 import com.liferay.portlet.asset.service.persistence.AssetEntryQuery;
+import com.liferay.portlet.asset.util.AssetEntryQueryProcessor;
 
 import java.util.List;
 import java.util.Locale;
@@ -48,13 +49,6 @@ public class AssetPublisherUtil {
 
 		getAssetPublisher().addAndStoreSelection(
 			portletRequest, className, classPK, assetEntryOrder);
-	}
-
-	public static void addRecentFolderId(
-		PortletRequest portletRequest, String className, long classPK) {
-
-		getAssetPublisher().addRecentFolderId(
-			portletRequest, className, classPK);
 	}
 
 	public static void addSelection(
@@ -97,6 +91,13 @@ public class AssetPublisherUtil {
 		return getAssetPublisher().getAssetCategoryIds(portletPreferences);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil#getEntries(
+	 *             long[], long[], String, String, String, String, boolean,
+	 *             boolean, int, int, String, String, String, String)}
+	 */
+	@Deprecated
 	public static List<AssetEntry> getAssetEntries(
 		long[] groupIds, long[] classNameIds, String keywords, String userName,
 		String title, String description, boolean advancedSearch,
@@ -186,6 +187,13 @@ public class AssetPublisherUtil {
 			assetEntryXmls, deleteMissingAssetEntries, checkPermission);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil#getEntriesCount(
+	 *             long[], long[], String, String, String, String, boolean,
+	 *             boolean, int, int)}
+	 */
+	@Deprecated
 	public static int getAssetEntriesCount(
 		long[] groupIds, long[] classNameIds, String keywords, String userName,
 		String title, String description, boolean advancedSearch,
@@ -335,12 +343,6 @@ public class AssetPublisherUtil {
 			portletPreferences, scopeGroupId, layout);
 	}
 
-	public static long getRecentFolderId(
-		PortletRequest portletRequest, String className) {
-
-		return getAssetPublisher().getRecentFolderId(portletRequest, className);
-	}
-
 	public static String getScopeId(Group group, long scopeGroupId)
 		throws PortalException {
 
@@ -388,6 +390,10 @@ public class AssetPublisherUtil {
 			user, portletPreferences, assetEntryQuery);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	public static void registerAssetQueryProcessor(
 		String name, AssetEntryQueryProcessor assetQueryProcessor) {
 
@@ -403,13 +409,6 @@ public class AssetPublisherUtil {
 			assetEntryUuids, portletPreferences);
 	}
 
-	public static void removeRecentFolderId(
-		PortletRequest portletRequest, String className, long classPK) {
-
-		getAssetPublisher().removeRecentFolderId(
-			portletRequest, className, classPK);
-	}
-
 	public static void subscribe(
 			PermissionChecker permissionChecker, long groupId, long plid,
 			String portletId)
@@ -419,6 +418,10 @@ public class AssetPublisherUtil {
 			permissionChecker, groupId, plid, portletId);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	public static void unregisterAssetQueryProcessor(
 		String assetQueryProcessorClassName) {
 

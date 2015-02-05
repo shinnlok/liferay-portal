@@ -14,8 +14,10 @@
 
 package com.liferay.portal.security.exportimport;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
 import com.liferay.portal.model.User;
+import com.liferay.registry.Registry;
+import com.liferay.registry.RegistryUtil;
+import com.liferay.registry.ServiceTracker;
 
 /**
  * @author Edward Han
@@ -25,10 +27,8 @@ import com.liferay.portal.model.User;
  */
 public class UserImporterUtil {
 
-	public static UserImporter getUserImporter() {
-		PortalRuntimePermission.checkGetBeanProperty(UserImporterUtil.class);
-
-		return _userImporter;
+	public static long getLastImportTime() throws Exception {
+		return _getInstance().getLastImportTime();
 	}
 
 	public static User importUser(
@@ -36,7 +36,7 @@ public class UserImporterUtil {
 			String screenName)
 		throws Exception {
 
-		return getUserImporter().importUser(
+		return _getInstance().importUser(
 			ldapServerId, companyId, emailAddress, screenName);
 	}
 
@@ -44,36 +44,43 @@ public class UserImporterUtil {
 			long companyId, String emailAddress, String screenName)
 		throws Exception {
 
-		return getUserImporter().importUser(
-			companyId, emailAddress, screenName);
+		return _getInstance().importUser(companyId, emailAddress, screenName);
 	}
 
 	public static User importUserByScreenName(long companyId, String screenName)
 		throws Exception {
 
-		return getUserImporter().importUserByScreenName(companyId, screenName);
+		return _getInstance().importUserByScreenName(companyId, screenName);
 	}
 
 	public static void importUsers() throws Exception {
-		getUserImporter().importUsers();
+		_getInstance().importUsers();
 	}
 
 	public static void importUsers(long companyId) throws Exception {
-		getUserImporter().importUsers(companyId);
+		_getInstance().importUsers(companyId);
 	}
 
 	public static void importUsers(long ldapServerId, long companyId)
 		throws Exception {
 
-		getUserImporter().importUsers(ldapServerId, companyId);
+		_getInstance().importUsers(ldapServerId, companyId);
 	}
 
-	public void setUserImporter(UserImporter userImporter) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
-		_userImporter = userImporter;
+	private static UserImporter _getInstance() {
+		return _instance._serviceTracker.getService();
 	}
 
-	private static UserImporter _userImporter;
+	private UserImporterUtil() {
+		Registry registry = RegistryUtil.getRegistry();
+
+		_serviceTracker = registry.trackServices(UserImporter.class);
+
+		_serviceTracker.open();
+	}
+
+	private static final UserImporterUtil _instance = new UserImporterUtil();
+
+	private final ServiceTracker<UserImporter, UserImporter> _serviceTracker;
 
 }

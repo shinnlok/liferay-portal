@@ -1433,7 +1433,7 @@ public class UserLocalServiceUtil {
 	* @throws PortalException if a user with the primary key could not be
 	found
 	* @deprecated As of 7.0.0, replaced by {@link #getSocialUsers(long, int,
-	boolean, int, int, OrderByComparator)}
+	String, int, int, OrderByComparator)}
 	*/
 	@Deprecated
 	public static java.util.List<com.liferay.portal.model.User> getSocialUsers(
@@ -2369,18 +2369,79 @@ public class UserLocalServiceUtil {
 			fromAddress, subject, body, serviceContext);
 	}
 
+	/**
+	* Sends a password notification email to the user matching the email
+	* address. The portal's settings determine whether a password is sent
+	* explicitly or whether a link for resetting the user's password is sent.
+	* The method sends the email asynchronously and returns before the email is
+	* sent.
+	*
+	* <p>
+	* The content of the notification email is specified with the
+	* <code>admin.email.password</code> portal property keys. They can be
+	* overridden via a <code>portal-ext.properties</code> file or modified
+	* through the Portal Settings UI.
+	* </p>
+	*
+	* @param companyId the primary key of the user's company
+	* @param emailAddress the user's email address
+	* @return <code>true</code> if the notification email includes a new
+	password; <code>false</code> if the notification email only
+	contains a reset link
+	* @throws PortalException if a user with the email address could not be
+	found
+	*/
 	public static boolean sendPasswordByEmailAddress(long companyId,
 		java.lang.String emailAddress)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().sendPasswordByEmailAddress(companyId, emailAddress);
 	}
 
+	/**
+	* Sends a password notification email to the user matching the screen name.
+	* The portal's settings determine whether a password is sent explicitly or
+	* whether a link for resetting the user's password is sent. The method
+	* sends the email asynchronously and returns before the email is sent.
+	*
+	* <p>
+	* The content of the notification email is specified with the
+	* <code>admin.email.password</code> portal property keys. They can be
+	* overridden via a <code>portal-ext.properties</code> file or modified
+	* through the Portal Settings UI.
+	* </p>
+	*
+	* @param companyId the primary key of the user's company
+	* @param screenName the user's screen name
+	* @return <code>true</code> if the notification email includes a new
+	password; <code>false</code> if the notification email only
+	contains a reset link
+	* @throws PortalException if a user with the screen name could not be found
+	*/
 	public static boolean sendPasswordByScreenName(long companyId,
 		java.lang.String screenName)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().sendPasswordByScreenName(companyId, screenName);
 	}
 
+	/**
+	* Sends a password notification email to the user matching the ID. The
+	* portal's settings determine whether a password is sent explicitly or
+	* whether a link for resetting the user's password is sent. The method
+	* sends the email asynchronously and returns before the email is sent.
+	*
+	* <p>
+	* The content of the notification email is specified with the
+	* <code>admin.email.password</code> portal property keys. They can be
+	* overridden via a <code>portal-ext.properties</code> file or modified
+	* through the Portal Settings UI.
+	* </p>
+	*
+	* @param userId the user's primary key
+	* @return <code>true</code> if the notification email includes a new
+	password; <code>false</code> if the notification email only
+	contains a reset link
+	* @throws PortalException if a user with the user ID could not be found
+	*/
 	public static boolean sendPasswordByUserId(long userId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().sendPasswordByUserId(userId);
@@ -3078,11 +3139,11 @@ public class UserLocalServiceUtil {
 	found or if the new information was invalid
 	* @deprecated As of 7.0.0, replaced by {@link #updateUser(long, String,
 	String, String, boolean, String, String, String, String,
-	long, String, String, String, String, String, String, String,
-	String, int, int, boolean, int, int, int, String, String,
-	String, String, String, String, String, String, String,
-	String, String, long[], long[], long[], java.util.List,
-	long[], boolean, byte[], ServiceContext)}
+	long, String, boolean, byte[], String, String, String,
+	String, String, String, String, int, int, boolean, int, int,
+	int, String, String, String, String, String, String, String,
+	String, String, String, String, long[], long[], long[],
+	java.util.List, long[], ServiceContext)}
 	*/
 	@Deprecated
 	public static com.liferay.portal.model.User updateUser(long userId,

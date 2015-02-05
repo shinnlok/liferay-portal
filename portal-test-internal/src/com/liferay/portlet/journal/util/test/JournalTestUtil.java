@@ -20,6 +20,9 @@ import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.QueryConfig;
 import com.liferay.portal.kernel.search.SearchContext;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -38,9 +41,6 @@ import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portal.util.test.RandomTestUtil;
-import com.liferay.portal.util.test.ServiceContextTestUtil;
-import com.liferay.portal.util.test.TestPropsValues;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.model.DDMTemplate;
 import com.liferay.portlet.dynamicdatamapping.util.test.DDMStructureTestUtil;
@@ -209,19 +209,19 @@ public class JournalTestUtil {
 			ServiceContext serviceContext)
 		throws Exception {
 
-		Map<Locale, String> titleMap = new HashMap<Locale, String>();
+		Map<Locale, String> titleMap = new HashMap<>();
 
 		for (Locale locale : _locales) {
 			titleMap.put(locale, title);
 		}
 
-		Map<Locale, String> descriptionMap = new HashMap<Locale, String>();
+		Map<Locale, String> descriptionMap = new HashMap<>();
 
 		for (Locale locale : _locales) {
 			descriptionMap.put(locale, description);
 		}
 
-		Map<Locale, String> contentMap = new HashMap<Locale, String>();
+		Map<Locale, String> contentMap = new HashMap<>();
 
 		for (Locale locale : _locales) {
 			contentMap.put(locale, content);
@@ -377,19 +377,19 @@ public class JournalTestUtil {
 			boolean approved, ServiceContext serviceContext)
 		throws Exception {
 
-		Map<Locale, String> titleMap = new HashMap<Locale, String>();
+		Map<Locale, String> titleMap = new HashMap<>();
 
 		for (Locale locale : _locales) {
 			titleMap.put(locale, title);
 		}
 
-		Map<Locale, String> descriptionMap = new HashMap<Locale, String>();
+		Map<Locale, String> descriptionMap = new HashMap<>();
 
 		for (Locale locale : _locales) {
 			descriptionMap.put(locale, RandomTestUtil.randomString(50));
 		}
 
-		Map<Locale, String> contentMap = new HashMap<Locale, String>();
+		Map<Locale, String> contentMap = new HashMap<>();
 
 		for (Locale locale : _locales) {
 			contentMap.put(locale, content);
@@ -440,7 +440,7 @@ public class JournalTestUtil {
 			Map<String, byte[]> images, ServiceContext serviceContext)
 		throws Exception {
 
-		Map<Locale, String> titleMap = new HashMap<Locale, String>();
+		Map<Locale, String> titleMap = new HashMap<>();
 
 		titleMap.put(defaultLocale, "Test Article");
 
@@ -664,8 +664,7 @@ public class JournalTestUtil {
 	public static Map<String, Map<String, String>> getXsdMap(String xsd)
 		throws Exception {
 
-		Map<String, Map<String, String>> map =
-			new HashMap<String, Map<String, String>>();
+		Map<String, Map<String, String>> map = new HashMap<>();
 
 		Document document = SAXReaderUtil.read(xsd);
 
@@ -697,26 +696,8 @@ public class JournalTestUtil {
 	}
 
 	public static JournalArticle updateArticle(
-			JournalArticle article, String title)
-		throws Exception {
-
-		return updateArticle(
-			article, title, article.getContent(), false, false,
-			ServiceContextTestUtil.getServiceContext());
-	}
-
-	public static JournalArticle updateArticle(
-			JournalArticle article, String title, String content)
-		throws Exception {
-
-		return updateArticle(
-			article, title, content, false, false,
-			ServiceContextTestUtil.getServiceContext());
-	}
-
-	public static JournalArticle updateArticle(
-			JournalArticle article, String title, String content,
-			boolean workflowEnabled, boolean approved,
+			JournalArticle article, Map<Locale, String> titleMap,
+			String content, boolean workflowEnabled, boolean approved,
 			ServiceContext serviceContext)
 		throws Exception {
 
@@ -731,12 +712,6 @@ public class JournalTestUtil {
 				serviceContext.setWorkflowAction(
 					WorkflowConstants.ACTION_SAVE_DRAFT);
 			}
-		}
-
-		Map<Locale, String> titleMap = new HashMap<Locale, String>();
-
-		for (Locale locale : _locales) {
-			titleMap.put(locale, title);
 		}
 
 		Date displayDate = article.getDisplayDate();
@@ -772,6 +747,41 @@ public class JournalTestUtil {
 			displayDateMinute, 0, 0, 0, 0, 0, true, 0, 0, 0, 0, 0, true,
 			article.getIndexable(), article.isSmallImage(),
 			article.getSmallImageURL(), null, null, null, serviceContext);
+	}
+
+	public static JournalArticle updateArticle(
+			JournalArticle article, String title)
+		throws Exception {
+
+		return updateArticle(
+			article, title, article.getContent(), false, false,
+			ServiceContextTestUtil.getServiceContext());
+	}
+
+	public static JournalArticle updateArticle(
+			JournalArticle article, String title, String content)
+		throws Exception {
+
+		return updateArticle(
+			article, title, content, false, false,
+			ServiceContextTestUtil.getServiceContext());
+	}
+
+	public static JournalArticle updateArticle(
+			JournalArticle article, String title, String content,
+			boolean workflowEnabled, boolean approved,
+			ServiceContext serviceContext)
+		throws Exception {
+
+		Map<Locale, String> titleMap = new HashMap<>();
+
+		for (Locale locale : _locales) {
+			titleMap.put(locale, title);
+		}
+
+		return updateArticle(
+			article, titleMap, content, workflowEnabled, approved,
+			serviceContext);
 	}
 
 	public static JournalArticle updateArticleWithWorkflow(
@@ -813,7 +823,7 @@ public class JournalTestUtil {
 	}
 
 	private static Map<String, String> _getMap(Element dynamicElementElement) {
-		Map<String, String> map = new HashMap<String, String>();
+		Map<String, String> map = new HashMap<>();
 
 		Element parentElement = dynamicElementElement.getParent();
 

@@ -29,7 +29,6 @@ import com.liferay.portal.kernel.util.Accessor;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
-import com.liferay.portal.kernel.util.InstanceFactory;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
@@ -59,6 +58,7 @@ import com.liferay.portal.service.PortletPreferencesLocalServiceUtil;
 import com.liferay.portal.service.SubscriptionLocalServiceUtil;
 import com.liferay.portal.service.permission.GroupPermissionUtil;
 import com.liferay.portal.service.permission.PortletPermissionUtil;
+import com.liferay.portal.theme.PortletDisplay;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PortletKeys;
@@ -79,8 +79,14 @@ import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetEntryServiceUtil;
 import com.liferay.portlet.asset.service.AssetTagLocalServiceUtil;
 import com.liferay.portlet.asset.service.persistence.AssetEntryQuery;
+import com.liferay.portlet.asset.util.AssetEntryQueryProcessor;
 import com.liferay.portlet.expando.model.ExpandoBridge;
 import com.liferay.portlet.sites.util.SitesUtil;
+import com.liferay.registry.Registry;
+import com.liferay.registry.RegistryUtil;
+import com.liferay.registry.ServiceReference;
+import com.liferay.registry.ServiceTracker;
+import com.liferay.registry.ServiceTrackerCustomizer;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -94,14 +100,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.portlet.PortletException;
 import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 /**
  * @author Raymond Augé
@@ -110,22 +113,13 @@ import javax.servlet.http.HttpSession;
 public class AssetPublisherImpl implements AssetPublisher {
 
 	public AssetPublisherImpl() {
-		for (String assetEntryQueryProcessorClassName :
-				PropsValues.ASSET_PUBLISHER_ASSET_ENTRY_QUERY_PROCESSORS) {
+		Registry registry = RegistryUtil.getRegistry();
 
-			try {
-				AssetEntryQueryProcessor assetEntryQueryProcessor =
-					(AssetEntryQueryProcessor)InstanceFactory.newInstance(
-						assetEntryQueryProcessorClassName);
+		_serviceTracker = registry.trackServices(
+			AssetEntryQueryProcessor.class,
+			new AssetEntryQueryServiceTrackerCustomizer());
 
-				registerAssetQueryProcessor(
-					assetEntryQueryProcessorClassName,
-					assetEntryQueryProcessor);
-			}
-			catch (Exception e) {
-				_log.error(e, e);
-			}
-		}
+		_serviceTracker.open();
 	}
 
 	@Override
@@ -134,15 +128,9 @@ public class AssetPublisherImpl implements AssetPublisher {
 			int assetEntryOrder)
 		throws Exception {
 
-		String referringPortletResource = ParamUtil.getString(
-			portletRequest, "referringPortletResource");
+		String portletId = PortalUtil.getPortletId(portletRequest);
 
-		if (Validator.isNull(referringPortletResource)) {
-			return;
-		}
-
-		String rootPortletId = PortletConstants.getRootPortletId(
-			referringPortletResource);
+		String rootPortletId = PortletConstants.getRootPortletId(portletId);
 
 		if (!rootPortletId.equals(PortletKeys.ASSET_PUBLISHER)) {
 			return;
@@ -152,11 +140,11 @@ public class AssetPublisherImpl implements AssetPublisher {
 			WebKeys.THEME_DISPLAY);
 
 		Layout layout = LayoutLocalServiceUtil.getLayout(
-			themeDisplay.getRefererPlid());
+			themeDisplay.getPlid());
 
 		PortletPreferences portletPreferences =
 			PortletPreferencesFactoryUtil.getStrictPortletSetup(
-				layout, referringPortletResource);
+				layout, portletId);
 
 		if (portletPreferences instanceof StrictPortletPreferencesImpl) {
 			return;
@@ -173,17 +161,10 @@ public class AssetPublisherImpl implements AssetPublisher {
 			className, classPK);
 
 		addSelection(
-			themeDisplay, portletPreferences, referringPortletResource,
+			themeDisplay, portletPreferences, portletId,
 			assetEntry.getEntryId(), assetEntryOrder, className);
 
 		portletPreferences.store();
-	}
-
-	@Override
-	public void addRecentFolderId(
-		PortletRequest portletRequest, String className, long classPK) {
-
-		_getRecentFolderIds(portletRequest).put(className, classPK);
 	}
 
 	@Override
@@ -240,7 +221,7 @@ public class AssetPublisherImpl implements AssetPublisher {
 			plid = themeDisplay.getPlid();
 		}
 
-		List<AssetEntry> assetEntries = new ArrayList<AssetEntry>();
+		List<AssetEntry> assetEntries = new ArrayList<>();
 
 		assetEntries.add(assetEntry);
 
@@ -369,6 +350,13 @@ public class AssetPublisherImpl implements AssetPublisher {
 		return assetCategoryIds;
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             AssetEntryLocalServiceUtil#getEntries(long[], long[], String,
+	 *             String, String, String, boolean, boolean, int, int, String,
+	 *             String, String, String)}
+	 */
+	@Deprecated
 	@Override
 	public List<AssetEntry> getAssetEntries(
 		long[] groupIds, long[] classNameIds, String keywords, String userName,
@@ -376,12 +364,10 @@ public class AssetPublisherImpl implements AssetPublisher {
 		boolean andOperator, int start, int end, String orderByCol1,
 		String orderByCol2, String orderByType1, String orderByType2) {
 
-		AssetEntryQuery assetEntryQuery = getAssetEntryQuery(
+		return AssetEntryLocalServiceUtil.getEntries(
 			groupIds, classNameIds, keywords, userName, title, description,
 			advancedSearch, andOperator, start, end, orderByCol1, orderByCol2,
 			orderByType1, orderByType2);
-
-		return AssetEntryLocalServiceUtil.getEntries(assetEntryQuery);
 	}
 
 	@Override
@@ -476,9 +462,9 @@ public class AssetPublisherImpl implements AssetPublisher {
 		String[] assetEntryXmls = portletPreferences.getValues(
 			"assetEntryXml", new String[0]);
 
-		List<AssetEntry> assetEntries = new ArrayList<AssetEntry>();
+		List<AssetEntry> assetEntries = new ArrayList<>();
 
-		List<String> missingAssetEntryUuids = new ArrayList<String>();
+		List<String> missingAssetEntryUuids = new ArrayList<>();
 
 		for (String assetEntryXml : assetEntryXmls) {
 			Document document = SAXReaderUtil.read(assetEntryXml);
@@ -629,17 +615,21 @@ public class AssetPublisherImpl implements AssetPublisher {
 			deleteMissingAssetEntries, checkPermission);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             AssetEntryLocalServiceUtil#getEntriesCount(long[], long[],
+	 *             String, String, String, String, boolean, boolean)}
+	 */
+	@Deprecated
 	@Override
 	public int getAssetEntriesCount(
 		long[] groupIds, long[] classNameIds, String keywords, String userName,
 		String title, String description, boolean advancedSearch,
 		boolean andOperator, int start, int end) {
 
-		AssetEntryQuery assetEntryQuery = getAssetEntryQuery(
+		return AssetEntryLocalServiceUtil.getEntriesCount(
 			groupIds, classNameIds, keywords, userName, title, description,
-			advancedSearch, andOperator, start, end, null, null, null, null);
-
-		return AssetEntryLocalServiceUtil.getEntriesCount(assetEntryQuery);
+			advancedSearch, andOperator);
 	}
 
 	/**
@@ -950,8 +940,7 @@ public class AssetPublisherImpl implements AssetPublisher {
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		Map<String, String> definitionTerms =
-			new LinkedHashMap<String, String>();
+		Map<String, String> definitionTerms = new LinkedHashMap<>();
 
 		definitionTerms.put(
 			"[$ASSET_ENTRIES$]",
@@ -979,8 +968,11 @@ public class AssetPublisherImpl implements AssetPublisher {
 
 		definitionTerms.put("[$PORTAL_URL$]", company.getVirtualHostname());
 
+		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
+
 		definitionTerms.put(
-			"[$PORTLET_NAME$]", PortalUtil.getPortletTitle(portletRequest));
+			"[$PORTLET_NAME$]", HtmlUtil.escape(portletDisplay.getTitle()));
+
 		definitionTerms.put(
 			"[$SITE_NAME$]",
 			LanguageUtil.get(
@@ -1068,14 +1060,19 @@ public class AssetPublisherImpl implements AssetPublisher {
 				scopeIdGroup = scopeIdLayout.getScopeGroup();
 			}
 			else {
+				Map<Locale, String> nameMap = new HashMap<>();
+
+				nameMap.put(
+					LocaleUtil.getDefault(),
+					String.valueOf(scopeIdLayout.getPlid()));
+
 				scopeIdGroup = GroupLocalServiceUtil.addGroup(
 					PrincipalThreadLocal.getUserId(),
 					GroupConstants.DEFAULT_PARENT_GROUP_ID,
 					Layout.class.getName(), scopeIdLayout.getPlid(),
-					GroupConstants.DEFAULT_LIVE_GROUP_ID,
-					String.valueOf(scopeIdLayout.getPlid()), null, 0, true,
-					GroupConstants.DEFAULT_MEMBERSHIP_RESTRICTION, null, false,
-					true, null);
+					GroupConstants.DEFAULT_LIVE_GROUP_ID, nameMap, null, 0,
+					true, GroupConstants.DEFAULT_MEMBERSHIP_RESTRICTION, null,
+					false, true, null);
 			}
 
 			return scopeIdGroup.getGroupId();
@@ -1129,7 +1126,7 @@ public class AssetPublisherImpl implements AssetPublisher {
 		String[] scopeIds = portletPreferences.getValues(
 			"scopeIds", new String[] {SCOPE_ID_GROUP_PREFIX + scopeGroupId});
 
-		List<Long> groupIds = new ArrayList<Long>();
+		List<Long> groupIds = new ArrayList<>();
 
 		for (String scopeId : scopeIds) {
 			try {
@@ -1144,20 +1141,6 @@ public class AssetPublisherImpl implements AssetPublisher {
 		}
 
 		return ArrayUtil.toLongArray(groupIds);
-	}
-
-	@Override
-	public long getRecentFolderId(
-		PortletRequest portletRequest, String className) {
-
-		Long classPK = _getRecentFolderIds(portletRequest).get(className);
-
-		if (classPK == null) {
-			return 0;
-		}
-		else {
-			return classPK.longValue();
-		}
 	}
 
 	@Override
@@ -1321,24 +1304,21 @@ public class AssetPublisherImpl implements AssetPublisher {
 		throws Exception {
 
 		for (AssetEntryQueryProcessor assetEntryQueryProcessor :
-				_assetEntryQueryProcessor.values()) {
+				_assetEntryQueryProcessors) {
 
 			assetEntryQueryProcessor.processAssetEntryQuery(
 				user, portletPreferences, assetEntryQuery);
 		}
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	@Override
 	public void registerAssetQueryProcessor(
 		String assetQueryProcessorClassName,
 		AssetEntryQueryProcessor assetQueryProcessor) {
-
-		if (assetQueryProcessor == null) {
-			return;
-		}
-
-		_assetEntryQueryProcessor.put(
-			assetQueryProcessorClassName, assetQueryProcessor);
 	}
 
 	@Override
@@ -1379,15 +1359,6 @@ public class AssetPublisherImpl implements AssetPublisher {
 	}
 
 	@Override
-	public void removeRecentFolderId(
-		PortletRequest portletRequest, String className, long classPK) {
-
-		if (getRecentFolderId(portletRequest, className) == classPK) {
-			_getRecentFolderIds(portletRequest).remove(className);
-		}
-	}
-
-	@Override
 	public void subscribe(
 			PermissionChecker permissionChecker, long groupId, long plid,
 			String portletId)
@@ -1402,11 +1373,13 @@ public class AssetPublisherImpl implements AssetPublisher {
 			getSubscriptionClassPK(plid, portletId));
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	@Override
 	public void unregisterAssetQueryProcessor(
 		String assetQueryProcessorClassName) {
-
-		_assetEntryQueryProcessor.remove(assetQueryProcessorClassName);
 	}
 
 	@Override
@@ -1423,38 +1396,8 @@ public class AssetPublisherImpl implements AssetPublisher {
 			getSubscriptionClassPK(plid, portletId));
 	}
 
-	protected AssetEntryQuery getAssetEntryQuery(
-		long[] groupIds, long[] classNameIds, String keywords, String userName,
-		String title, String description, boolean advancedSearch,
-		boolean andOperator, int start, int end, String orderByCol1,
-		String orderByCol2, String orderByType1, String orderByType2) {
-
-		AssetEntryQuery assetEntryQuery = new AssetEntryQuery();
-
-		if (advancedSearch) {
-			assetEntryQuery.setAndOperator(andOperator);
-			assetEntryQuery.setDescription(description);
-			assetEntryQuery.setTitle(title);
-			assetEntryQuery.setUserName(userName);
-		}
-		else {
-			assetEntryQuery.setKeywords(keywords);
-		}
-
-		assetEntryQuery.setClassNameIds(classNameIds);
-		assetEntryQuery.setEnd(end);
-		assetEntryQuery.setGroupIds(groupIds);
-		assetEntryQuery.setOrderByCol1(orderByCol1);
-		assetEntryQuery.setOrderByCol2(orderByCol2);
-		assetEntryQuery.setOrderByType1(orderByType1);
-		assetEntryQuery.setOrderByType2(orderByType2);
-		assetEntryQuery.setStart(start);
-
-		return assetEntryQuery;
-	}
-
 	protected long[] getSiteGroupIds(long[] groupIds) throws PortalException {
-		Set<Long> siteGroupIds = new HashSet<Long>();
+		Set<Long> siteGroupIds = new HashSet<>();
 
 		for (long groupId : groupIds) {
 			siteGroupIds.add(PortalUtil.getSiteGroupId(groupId));
@@ -1494,7 +1437,7 @@ public class AssetPublisherImpl implements AssetPublisher {
 		long[] notifiedAssetEntryIds = GetterUtil.getLongValues(
 			portletPreferences.getValues("notifiedAssetEntryIds", null));
 
-		List<AssetEntry> newAssetEntries = new ArrayList<AssetEntry>();
+		List<AssetEntry> newAssetEntries = new ArrayList<>();
 
 		for (int i = 0; i < assetEntries.size(); i++) {
 			AssetEntry assetEntry = assetEntries.get(i);
@@ -1531,7 +1474,7 @@ public class AssetPublisherImpl implements AssetPublisher {
 			List<AssetEntry> assetEntries, long[] assetCategoryIds)
 		throws Exception {
 
-		List<AssetEntry> filteredAssetEntries = new ArrayList<AssetEntry>();
+		List<AssetEntry> filteredAssetEntries = new ArrayList<>();
 
 		for (AssetEntry assetEntry : assetEntries) {
 			if (ArrayUtil.containsAll(
@@ -1548,7 +1491,7 @@ public class AssetPublisherImpl implements AssetPublisher {
 			List<AssetEntry> assetEntries, String[] assetTagNames)
 		throws Exception {
 
-		List<AssetEntry> filteredAssetEntries = new ArrayList<AssetEntry>();
+		List<AssetEntry> filteredAssetEntries = new ArrayList<>();
 
 		for (AssetEntry assetEntry : assetEntries) {
 			List<AssetTag> assetTags = assetEntry.getTags();
@@ -1600,38 +1543,15 @@ public class AssetPublisherImpl implements AssetPublisher {
 		return xml;
 	}
 
-	private Map<String, Long> _getRecentFolderIds(
-		PortletRequest portletRequest) {
+	private static final Log _log = LogFactoryUtil.getLog(
+		AssetPublisherImpl.class);
 
-		HttpServletRequest request = PortalUtil.getHttpServletRequest(
-			portletRequest);
-		HttpSession session = request.getSession();
+	private final List<AssetEntryQueryProcessor>
+		_assetEntryQueryProcessors = new CopyOnWriteArrayList<>();
+	private final ServiceTracker
+		<AssetEntryQueryProcessor, AssetEntryQueryProcessor> _serviceTracker;
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
-		String key =
-			AssetPublisherUtil.class + StringPool.UNDERLINE +
-				themeDisplay.getScopeGroupId();
-
-		Map<String, Long> recentFolderIds =
-			(Map<String, Long>)session.getAttribute(key);
-
-		if (recentFolderIds == null) {
-			recentFolderIds = new HashMap<String, Long>();
-		}
-
-		session.setAttribute(key, recentFolderIds);
-
-		return recentFolderIds;
-	}
-
-	private static Log _log = LogFactoryUtil.getLog(AssetPublisherImpl.class);
-
-	private Map<String, AssetEntryQueryProcessor> _assetEntryQueryProcessor =
-		new ConcurrentHashMap<String, AssetEntryQueryProcessor>();
-
-	private Accessor<AssetEntry, String> _titleAccessor =
+	private final Accessor<AssetEntry, String> _titleAccessor =
 		new Accessor<AssetEntry, String>() {
 
 			@Override
@@ -1650,5 +1570,43 @@ public class AssetPublisherImpl implements AssetPublisher {
 			}
 
 		};
+
+	private class AssetEntryQueryServiceTrackerCustomizer
+		implements ServiceTrackerCustomizer
+			<AssetEntryQueryProcessor, AssetEntryQueryProcessor> {
+
+		@Override
+		public AssetEntryQueryProcessor addingService(
+			ServiceReference<AssetEntryQueryProcessor> serviceReference) {
+
+			Registry registry = RegistryUtil.getRegistry();
+
+			AssetEntryQueryProcessor assetEntryQueryProcessor =
+				registry.getService(serviceReference);
+
+			_assetEntryQueryProcessors.add(assetEntryQueryProcessor);
+
+			return assetEntryQueryProcessor;
+		}
+
+		@Override
+		public void modifiedService(
+			ServiceReference<AssetEntryQueryProcessor> serviceReference,
+			AssetEntryQueryProcessor assetEntryQueryProcessor) {
+		}
+
+		@Override
+		public void removedService(
+			ServiceReference<AssetEntryQueryProcessor> serviceReference,
+			AssetEntryQueryProcessor assetEntryQueryProcessor) {
+
+			Registry registry = RegistryUtil.getRegistry();
+
+			registry.ungetService(serviceReference);
+
+			_assetEntryQueryProcessors.remove(assetEntryQueryProcessor);
+		}
+
+	}
 
 }

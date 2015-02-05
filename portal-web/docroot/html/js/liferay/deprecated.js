@@ -207,6 +207,17 @@
 		return (Math.round(Math.random() * (max - min))) + min;
 	};
 
+	Util.selectAndCopy = function(el) {
+		el.focus();
+		el.select();
+
+		if (document.all) {
+			var textRange = el.createTextRange();
+
+			textRange.execCommand('copy');
+		}
+	};
+
 	Util.setBox = function(oldBox, newBox) {
 		for (var i = oldBox.length - 1; i > -1; i--) {
 			oldBox.options[i] = null;
@@ -326,6 +337,19 @@
 
 	Liferay.provide(
 		Util,
+		'check',
+		function(form, name, checked) {
+			var checkbox = A.one(form[name]);
+
+			if (checkbox) {
+				checkbox.attr('checked', checked);
+			}
+		},
+		['aui-base']
+	);
+
+	Liferay.provide(
+		Util,
 		'disableSelectBoxes',
 		function(toggleBoxId, value, selectBoxId) {
 			var selectBox = A.one('#' + selectBoxId);
@@ -379,6 +403,24 @@
 				textarea.attr('textareatabs', 'disabled');
 
 				textarea.on('keydown', Util.textareaTabs);
+			}
+		},
+		['aui-base']
+	);
+
+	Liferay.provide(
+		Util,
+		'removeItem',
+		function(box, value) {
+			box = A.one(box);
+
+			var selectedIndex = box.get('selectedIndex');
+
+			if (!value) {
+				box.all('option').item(selectedIndex).remove(true);
+			}
+			else {
+				box.all('option[value=' + value + STR_RIGHT_SQUARE_BRACKET).item(selectedIndex).remove(true);
 			}
 		},
 		['aui-base']

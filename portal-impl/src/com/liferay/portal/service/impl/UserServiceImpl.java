@@ -1016,6 +1016,28 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 		return userLocalService.hasRoleUser(companyId, name, userId, inherited);
 	}
 
+	/**
+	 * Sends a password notification email to the user matching the email
+	 * address. The portal's settings determine whether a password is sent
+	 * explicitly or whether a link for resetting the user's password is sent.
+	 * The method sends the email asynchronously and returns before the email is
+	 * sent.
+	 *
+	 * <p>
+	 * The content of the notification email is specified with the
+	 * <code>admin.email.password</code> portal property keys. They can be
+	 * overridden via a <code>portal-ext.properties</code> file or modified
+	 * through the Portal Settings UI.
+	 * </p>
+	 *
+	 * @param  companyId the primary key of the user's company
+	 * @param  emailAddress the user's email address
+	 * @return <code>true</code> if the notification email includes a new
+	 *         password; <code>false</code> if the notification email only
+	 *         contains a reset link
+	 * @throws PortalException if a user with the email address could not be
+	 *         found
+	 */
 	@Override
 	public boolean sendPasswordByEmailAddress(
 			long companyId, String emailAddress)
@@ -1025,6 +1047,26 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 			companyId, emailAddress);
 	}
 
+	/**
+	 * Sends a password notification email to the user matching the screen name.
+	 * The portal's settings determine whether a password is sent explicitly or
+	 * whether a link for resetting the user's password is sent. The method
+	 * sends the email asynchronously and returns before the email is sent.
+	 *
+	 * <p>
+	 * The content of the notification email is specified with the
+	 * <code>admin.email.password</code> portal property keys. They can be
+	 * overridden via a <code>portal-ext.properties</code> file or modified
+	 * through the Portal Settings UI.
+	 * </p>
+	 *
+	 * @param  companyId the primary key of the user's company
+	 * @param  screenName the user's screen name
+	 * @return <code>true</code> if the notification email includes a new
+	 *         password; <code>false</code> if the notification email only
+	 *         contains a reset link
+	 * @throws PortalException if a user with the screen name could not be found
+	 */
 	@Override
 	public boolean sendPasswordByScreenName(long companyId, String screenName)
 		throws PortalException {
@@ -1032,6 +1074,25 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 		return userLocalService.sendPasswordByScreenName(companyId, screenName);
 	}
 
+	/**
+	 * Sends a password notification email to the user matching the ID. The
+	 * portal's settings determine whether a password is sent explicitly or
+	 * whether a link for resetting the user's password is sent. The method
+	 * sends the email asynchronously and returns before the email is sent.
+	 *
+	 * <p>
+	 * The content of the notification email is specified with the
+	 * <code>admin.email.password</code> portal property keys. They can be
+	 * overridden via a <code>portal-ext.properties</code> file or modified
+	 * through the Portal Settings UI.
+	 * </p>
+	 *
+	 * @param  userId the user's primary key
+	 * @return <code>true</code> if the notification email includes a new
+	 *         password; <code>false</code> if the notification email only
+	 *         contains a reset link
+	 * @throws PortalException if a user with the user ID could not be found
+	 */
 	@Override
 	public boolean sendPasswordByUserId(long userId) throws PortalException {
 		return userLocalService.sendPasswordByUserId(userId);
@@ -1810,7 +1871,7 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 
 		long[] oldGroupIds = user.getGroupIds();
 
-		List<Long> addGroupIds = new ArrayList<Long>();
+		List<Long> addGroupIds = new ArrayList<>();
 		List<Long> removeGroupIds = ListUtil.toList(oldGroupIds);
 
 		if (groupIds != null) {
@@ -1836,7 +1897,7 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 
 		long[] oldOrganizationIds = user.getOrganizationIds();
 
-		List<Long> addOrganizationIds = new ArrayList<Long>();
+		List<Long> addOrganizationIds = new ArrayList<>();
 		List<Long> removeOrganizationIds = ListUtil.toList(oldOrganizationIds);
 
 		if (organizationIds != null) {
@@ -1865,7 +1926,7 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 
 		long[] oldRoleIds = user.getRoleIds();
 
-		List<Long> addRoleIds = new ArrayList<Long>();
+		List<Long> addRoleIds = new ArrayList<>();
 		List<Long> removeRoleIds = ListUtil.toList(oldRoleIds);
 
 		if (roleIds != null) {
@@ -1887,10 +1948,8 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 			}
 		}
 
-		List<UserGroupRole> oldOrganizationUserGroupRoles =
-			new ArrayList<UserGroupRole>();
-		List<UserGroupRole> oldSiteUserGroupRoles =
-			new ArrayList<UserGroupRole>();
+		List<UserGroupRole> oldOrganizationUserGroupRoles = new ArrayList<>();
+		List<UserGroupRole> oldSiteUserGroupRoles = new ArrayList<>();
 
 		List<UserGroupRole> oldUserGroupRoles =
 			userGroupRolePersistence.findByUserId(userId);
@@ -1906,12 +1965,10 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 			}
 		}
 
-		List<UserGroupRole> addOrganizationUserGroupRoles =
-			new ArrayList<UserGroupRole>();
+		List<UserGroupRole> addOrganizationUserGroupRoles = new ArrayList<>();
 		List<UserGroupRole> removeOrganizationUserGroupRoles = ListUtil.copy(
 			oldOrganizationUserGroupRoles);
-		List<UserGroupRole> addSiteUserGroupRoles =
-			new ArrayList<UserGroupRole>();
+		List<UserGroupRole> addSiteUserGroupRoles = new ArrayList<>();
 		List<UserGroupRole> removeSiteUserGroupRoles = ListUtil.copy(
 			oldSiteUserGroupRoles);
 
@@ -1959,7 +2016,7 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 
 		long[] oldUserGroupIds = user.getUserGroupIds();
 
-		List<Long> addUserGroupIds = new ArrayList<Long>();
+		List<Long> addUserGroupIds = new ArrayList<>();
 		List<Long> removeUserGroupIds = ListUtil.toList(oldUserGroupIds);
 
 		if (userGroupIds != null) {
@@ -2101,12 +2158,12 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 	 *             operation was not allowed by the membership policy
 	 * @deprecated As of 7.0.0, replaced by {@link #updateUser(long, String,
 	 *             String, String, boolean, String, String, String, String,
-	 *             long, String, String, String, String, String, String, String,
-	 *             String, int, int, boolean, int, int, int, String, String,
-	 *             String, String, String, String, String, String, String,
-	 *             String, String, long[], long[], long[], java.util.List,
-	 *             long[], java.util.List, java.util.List, java.util.List,
-	 *             java.util.List, java.util.List, boolean, byte[],
+	 *             long, String, boolean, byte[], String, String, String,
+	 *             String, String, String, String, int, int, boolean, int, int,
+	 *             int, String, String, String, String, String, String, String,
+	 *             String, String, String, String, long[], long[], long[],
+	 *             java.util.List, long[], java.util.List, java.util.List,
+	 *             java.util.List, java.util.List, java.util.List,
 	 *             com.liferay.portal.service.ServiceContext)}
 	 */
 	@Deprecated
@@ -2698,7 +2755,7 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 			String jobTitle)
 		throws PortalException {
 
-		List<String> fields = new ArrayList<String>();
+		List<String> fields = new ArrayList<>();
 
 		Contact contact = user.getContact();
 

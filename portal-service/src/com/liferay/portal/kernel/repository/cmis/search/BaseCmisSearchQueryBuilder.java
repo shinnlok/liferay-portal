@@ -464,14 +464,14 @@ public class BaseCmisSearchQueryBuilder implements CMISSearchQueryBuilder {
 
 	private static final String _STAR_PATTERN = Pattern.quote(StringPool.STAR);
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		BaseCmisSearchQueryBuilder.class);
 
-	private static Map<String, String> _cmisFields;
-	private static Set<String> _supportedFields;
+	private static final Map<String, String> _cmisFields;
+	private static final Set<String> _supportedFields;
 
 	static {
-		_cmisFields = new HashMap<String, String>();
+		_cmisFields = new HashMap<>();
 
 		_cmisFields.put(Field.CREATE_DATE, "cmis:creationDate");
 		_cmisFields.put(Field.MODIFIED_DATE, "cmis:lastModificationDate");
@@ -480,7 +480,7 @@ public class BaseCmisSearchQueryBuilder implements CMISSearchQueryBuilder {
 		_cmisFields.put(Field.USER_ID, "cmis:createdBy");
 		_cmisFields.put(Field.USER_NAME, "cmis:createdBy");
 
-		_supportedFields = new HashSet<String>();
+		_supportedFields = new HashSet<>();
 
 		_supportedFields.add(Field.CREATE_DATE);
 		_supportedFields.add(Field.FOLDER_ID);

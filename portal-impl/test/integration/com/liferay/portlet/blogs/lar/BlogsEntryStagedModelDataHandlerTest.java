@@ -14,13 +14,13 @@
 
 package com.liferay.portlet.blogs.lar;
 
-import com.liferay.portal.kernel.test.AggregateTestRule;
-import com.liferay.portal.lar.BaseWorkflowedStagedModelDataHandlerTestCase;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.TransactionalTestRule;
+import com.liferay.portal.lar.test.BaseWorkflowedStagedModelDataHandlerTestCase;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.StagedModel;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.test.TransactionalTestRule;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.MainServletTestRule;
 import com.liferay.portlet.blogs.model.BlogsEntry;
 import com.liferay.portlet.blogs.service.BlogsEntryLocalServiceUtil;
 import com.liferay.portlet.blogs.util.test.BlogsTestUtil;
@@ -58,7 +58,7 @@ public class BlogsEntryStagedModelDataHandlerTest
 	protected List<StagedModel> addWorkflowedStagedModels(Group group)
 		throws Exception {
 
-		List<StagedModel> stagedModels = new ArrayList<StagedModel>();
+		List<StagedModel> stagedModels = new ArrayList<>();
 
 		stagedModels.add(BlogsTestUtil.addEntry(group, true));
 		stagedModels.add(BlogsTestUtil.addEntry(group, false));

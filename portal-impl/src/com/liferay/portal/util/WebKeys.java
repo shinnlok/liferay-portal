@@ -79,8 +79,6 @@ public class WebKeys implements com.liferay.portal.kernel.util.WebKeys {
 
 	public static final String DEVICE = "DEVICE";
 
-	public static final String DIFF_HTML_RESULTS = "DIFF_HTML_RESULTS";
-
 	public static final String DIFF_RESULTS = "DIFF_RESULTS";
 
 	public static final String DIFF_VERSION = "DIFF_VERSION";
@@ -207,9 +205,6 @@ public class WebKeys implements com.liferay.portal.kernel.util.WebKeys {
 
 	public static final String LANGUAGE_ID = "LANGUAGE_ID";
 
-	@Distributed
-	public static final String LAYOUT_ASSET_ENTRY = "LIFERAY_SHARED_LAYOUT_ASSET_ENTRY";
-
 	public static final String LAYOUT_CONTENT = "LAYOUT_CONTENT";
 
 	public static final String LAYOUT_DEFAULT = "LAYOUT_DEFAULT";
@@ -293,10 +288,6 @@ public class WebKeys implements com.liferay.portal.kernel.util.WebKeys {
 	public static final String NETVIBES = "NETVIBES";
 
 	public static final String NOTES_LIST = "NOTES_LIST";
-
-	public static final String NTLM_REMOTE_USER = "NTLM_REMOTE_USER";
-
-	public static final String NTLM_USER_ACCOUNT = "NTLM_USER_ACCOUNT";
 
 	public static final String OPEN_ID_DISCO = "openid-disco";
 
@@ -403,8 +394,6 @@ public class WebKeys implements com.liferay.portal.kernel.util.WebKeys {
 
 	public static final String SOURCE_NAME = "SOURCE_NAME";
 
-	public static final String SOURCE_VERSION = "SOURCE_VERSION";
-
 	public static final String STALE_SESSION = "STALE_SESSION";
 
 	public static final String STARTUP_FINISHED = "STARTUP_FINISHED";
@@ -419,13 +408,9 @@ public class WebKeys implements com.liferay.portal.kernel.util.WebKeys {
 
 	public static final String TARGET_NAME = "TARGET_NAME";
 
-	public static final String TARGET_VERSION = "TARGET_VERSION";
-
 	public static final String TASK_LIST = "TASK_LIST";
 
 	public static final String TEAM = "TEAM";
-
-	public static final String TITLE = "TITLE";
 
 	public static final String TRANSLATOR_TRANSLATION = "TRANSLATOR_TRANSLATION";
 
@@ -462,18 +447,6 @@ public class WebKeys implements com.liferay.portal.kernel.util.WebKeys {
 	public static final String WEBSITE = "WEBSITE";
 
 	public static final String WIDGET = "WIDGET";
-
-	public static final String WIKI_NODE = "WIKI_NODE";
-
-	public static final String WIKI_NODE_ID = "WIKI_NODE_ID";
-
-	public static final String WIKI_PAGE = "WIKI_PAGE";
-
-	public static final String WIKI_TREE_WALKER_DEPTH = "WIKI_TREE_WALKER_DEPTH";
-
-	public static final String WIKI_TREE_WALKER_PAGE = "WIKI_TREE_WALKER_PAGE";
-
-	public static final String WIKI_TREE_WALKER_PARENT = "WIKI_TREE_WALKER_PARENT";
 
 	public static final String WORDS_LIST = "WORDS_LIST";
 

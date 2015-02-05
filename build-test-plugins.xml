@@ -3,6 +3,67 @@
 <project name="portal-test-plugins" basedir="." default="test" xmlns:antelope="antlib:ise.antelope.tasks">
 	<import file="build-test.xml" />
 
+	<target name="compile-plugins">
+		<echo file="${lp.plugins.dir}/build.${user.name}.properties">app.server.parent.dir=${app.server.parent.dir}
+app.server.type=${app.server.type}
+
+auto.deploy.dir=${liferay.home}/deploy
+
+plugins.includes=${plugins.includes}</echo>
+
+		<for list="${plugins.includes}" param="plugin">
+			<sequential>
+				<if>
+					<contains string="@{plugin}" substring="layouttpl" />
+					<then>
+						<var name="select" value="\2" />
+					</then>
+					<else>
+						<var name="select" value="\2s" />
+					</else>
+				</if>
+
+				<propertyregex
+					input="@{plugin}"
+					override="true"
+					property="plugin.type"
+					regexp="(\w+-)+(\w+)"
+					select="${select}"
+				/>
+
+				<ant-execute
+					ant.dir="${lp.plugins.dir}/${plugin.type}/@{plugin}"
+					ant.target="clean"
+				/>
+
+				<if>
+					<contains string="@{plugin}" substring="portlet" />
+					<then>
+						<ant-execute
+							ant.dir="${lp.plugins.dir}/${plugin.type}/@{plugin}"
+							ant.target="compile-jsp"
+						/>
+					</then>
+					<else>
+						<ant-execute
+							ant.dir="${lp.plugins.dir}/${plugin.type}/@{plugin}"
+							ant.target="compile"
+						/>
+					</else>
+				</if>
+			</sequential>
+		</for>
+	</target>
+
+	<target name="deploy-extra-apps">
+		<fail message="Please set the property ${extra.apps.zip.file.name}" unless="extra.apps.zip.file.name" />
+
+		<unzip
+			dest="${liferay.home}/deploy"
+			src="${extra.apps.zip.file.name}"
+		/>
+	</target>
+
 	<target name="deploy-simple-server-plugins">
 		<if>
 			<equals arg1="${app.server.type}" arg2="jboss" />
@@ -79,20 +140,6 @@ app.server.tomcat.dir=${app.server.parent.dir}/tomcat-7.0.27</echo>
 				</if>
 			</sequential>
 		</for>
-
-		<if>
-			<and>
-				<isset property="jenkins.shared.user.content.dir" />
-				<isset property="top.level.build.number" />
-				<isset property="top.level.job.name" />
-			</and>
-			<then>
-				<unzip
-					dest="${liferay.home}/deploy"
-					src="${jenkins.shared.user.content.dir}/jobs/${top.level.job.name}/builds/${top.level.build.number}/downloads/extraapps.zip"
-				/>
-			</then>
-		</if>
 
 		<if>
 			<matches pattern="http" string="${test.build.plugins.war.zip.url}" />

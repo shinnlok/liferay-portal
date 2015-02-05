@@ -4037,6 +4037,7 @@ public class AssetEntryPersistenceImpl extends BasePersistenceImpl<AssetEntry>
 		assetEntryImpl.setClassPK(assetEntry.getClassPK());
 		assetEntryImpl.setClassUuid(assetEntry.getClassUuid());
 		assetEntryImpl.setClassTypeId(assetEntry.getClassTypeId());
+		assetEntryImpl.setListable(assetEntry.isListable());
 		assetEntryImpl.setVisible(assetEntry.isVisible());
 		assetEntryImpl.setStartDate(assetEntry.getStartDate());
 		assetEntryImpl.setEndDate(assetEntry.getEndDate());

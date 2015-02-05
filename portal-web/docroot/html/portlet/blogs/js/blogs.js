@@ -5,9 +5,9 @@ AUI.add(
 
 		var STR_BLANK = '';
 
-		var STR_CLICK = 'click';
-
 		var STR_CHANGE = 'change';
+
+		var STR_CLICK = 'click';
 
 		var STR_SUFFIX = '...';
 
@@ -38,6 +38,7 @@ AUI.add(
 					strings: {
 						validator: Lang.isObject,
 						value: {
+							confirmDiscardImages: Liferay.Language.get('uploads-are-in-progress-confirmation'),
 							savedAtMessage: Liferay.Language.get('entry-saved-at-x'),
 							savedDraftAtMessage: Liferay.Language.get('draft-saved-at-x'),
 							saveDraftError: Liferay.Language.get('could-not-save-draft-to-the-server'),
@@ -109,7 +110,7 @@ AUI.add(
 
 						if (publishButton) {
 							eventHandles.push(
-								publishButton.on(STR_CLICK, A.bind('_saveEntry', instance, false, false))
+								publishButton.on(STR_CLICK, A.bind('_checkImagesBeforeSave', instance, false, false))
 							);
 						}
 
@@ -117,7 +118,7 @@ AUI.add(
 
 						if (saveButton) {
 							eventHandles.push(
-								saveButton.on(STR_CLICK, A.bind('_saveEntry', instance, true, false))
+								saveButton.on(STR_CLICK, A.bind('_checkImagesBeforeSave', instance, true, false))
 							);
 						}
 
@@ -138,6 +139,26 @@ AUI.add(
 						}
 
 						instance._eventHandles = eventHandles;
+					},
+
+					_checkImagesBeforeSave: function(draft, ajax) {
+						var instance = this;
+
+						if (instance._hasTempImages()) {
+							if (confirm(instance.get('strings').confirmDiscardImages)) {
+
+								instance._getTempImages().each(
+									function(node) {
+										node.ancestor().remove();
+									}
+								);
+
+								instance._saveEntry(draft, ajax);
+							}
+						}
+						else {
+							instance._saveEntry(draft, ajax);
+						}
 					},
 
 					_configureAbstract: function(event) {
@@ -166,14 +187,30 @@ AUI.add(
 						return instance.one('form[name=' + instance.ns(formName || 'fm') + ']');
 					},
 
+					_getTempImages: function() {
+						var instance = this;
+
+						return instance.all('img[data-random-id]');
+					},
+
+					_hasTempImages: function() {
+						var instance = this;
+
+						return instance._getTempImages().size() > 0;
+					},
+
 					_initDraftSaveInterval: function() {
 						var instance = this;
 
 						instance._saveDraftTimer = A.later(
 							instance.get('saveInterval'),
 							instance,
-							instance._saveEntry,
-							[true, true],
+							function() {
+								if (!instance._hasTempImages()) {
+									instance._saveEntry(true, true);
+								}
+							},
+							null,
 							true
 						);
 
@@ -246,8 +283,13 @@ AUI.add(
 
 								var saveStatus = instance.one('#saveStatus');
 
+								var allowPingbacks = instance.one('#allowPingbacks');
+								var allowTrackbacks = instance.one('#allowTrackbacks');
+
 								var data = instance.ns(
 									{
+										'allowPingbacks': allowPingbacks && allowPingbacks.val(),
+										'allowTrackbacks': allowTrackbacks && allowTrackbacks.val(),
 										'assetTagNames': instance.one('#assetTagNames').val(),
 										'cmd': constants.ADD,
 										'content': content,
@@ -296,7 +338,14 @@ AUI.add(
 
 												if (message) {
 													instance.one('#entryId').val(message.entryId);
-													instance.one('#redirect').val(message.redirect);
+
+													if (message.updateRedirect) {
+														instance.one('#redirect').val(message.redirect);
+													}
+
+													if (message.blogsEntryAttachmentReferences) {
+														instance._updateImages(message.blogsEntryAttachmentReferences);
+													}
 
 													var tabs1BackButton = instance.one('#tabs1TabsBack');
 
@@ -370,6 +419,23 @@ AUI.add(
 						}
 
 						return text;
+					},
+
+					_updateImages: function(persistentImages) {
+						var instance = this;
+
+						A.Array.each(
+							persistentImages,
+							function(item, index) {
+								var el = instance.one('img[' + item.attributeDataImageId + '="' + item.fileEntryId + '"]');
+
+								if (el) {
+									el.attr('src', item.fileEntryUrl);
+
+									el.removeAttribute(item.attributeDataImageId);
+								}
+							}
+						);
 					},
 
 					_updateStatus: function(text, className) {

@@ -182,7 +182,7 @@ public class LayoutImpl extends LayoutBaseImpl {
 	 */
 	@Override
 	public List<Layout> getAllChildren() {
-		List<Layout> layouts = new ArrayList<Layout>();
+		List<Layout> layouts = new ArrayList<>();
 
 		for (Layout layout : getChildren()) {
 			layouts.add(layout);
@@ -260,7 +260,7 @@ public class LayoutImpl extends LayoutBaseImpl {
 	 */
 	@Override
 	public List<Layout> getAncestors() throws PortalException {
-		List<Layout> layouts = new ArrayList<Layout>();
+		List<Layout> layouts = new ArrayList<>();
 
 		Layout layout = this;
 
@@ -439,7 +439,7 @@ public class LayoutImpl extends LayoutBaseImpl {
 	 */
 	@Override
 	public Map<Locale, String> getFriendlyURLMap() {
-		Map<Locale, String> friendlyURLMap = new HashMap<Locale, String>();
+		Map<Locale, String> friendlyURLMap = new HashMap<>();
 
 		List<LayoutFriendlyURL> layoutFriendlyURLs =
 			LayoutFriendlyURLLocalServiceUtil.getLayoutFriendlyURLs(getPlid());
@@ -448,6 +448,21 @@ public class LayoutImpl extends LayoutBaseImpl {
 			friendlyURLMap.put(
 				LocaleUtil.fromLanguageId(layoutFriendlyURL.getLanguageId()),
 				layoutFriendlyURL.getFriendlyURL());
+		}
+
+		// If the site/portal default language changes, there may not exist a
+		// value for the new default language. In this situation, we will use
+		// the value from the previous default language.
+
+		Locale defaultSiteLocale = LocaleUtil.getSiteDefault();
+
+		if (Validator.isNull(friendlyURLMap.get(defaultSiteLocale))) {
+			Locale defaultLocale = LocaleUtil.fromLanguageId(
+				getDefaultLanguageId());
+
+			String defaultFriendlyURL = friendlyURLMap.get(defaultLocale);
+
+			friendlyURLMap.put(defaultSiteLocale, defaultFriendlyURL);
 		}
 
 		return friendlyURLMap;
@@ -459,7 +474,7 @@ public class LayoutImpl extends LayoutBaseImpl {
 
 		return LocalizationUtil.updateLocalization(
 			friendlyURLMap, StringPool.BLANK, "FriendlyURL",
-			LocaleUtil.toLanguageId(LocaleUtil.getDefault()));
+			LocaleUtil.toLanguageId(LocaleUtil.getSiteDefault()));
 	}
 
 	/**
@@ -1282,7 +1297,7 @@ public class LayoutImpl extends LayoutBaseImpl {
 		return url;
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(LayoutImpl.class);
+	private static final Log _log = LogFactoryUtil.getLog(LayoutImpl.class);
 
 	private static String[] _friendlyURLKeywords;
 

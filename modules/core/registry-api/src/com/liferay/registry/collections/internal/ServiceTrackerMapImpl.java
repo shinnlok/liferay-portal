@@ -97,8 +97,7 @@ public class ServiceTrackerMapImpl<K, SR, TS, R>
 	private final ServiceTracker<SR, ServiceReferenceServiceTuple<SR, TS>>
 		_serviceTracker;
 	private final ConcurrentHashMap<K, ServiceTrackerBucket<SR, TS, R>>
-		_serviceTrackerBuckets =
-			new ConcurrentHashMap<K, ServiceTrackerBucket<SR, TS, R>>();
+		_serviceTrackerBuckets = new ConcurrentHashMap<>();
 	private final ServiceTrackerCustomizer<SR, TS> _serviceTrackerCustomizer;
 	private final ServiceTrackerBucketFactory<SR, TS, R>
 		_serviceTrackerMapBucketFactory;
@@ -127,7 +126,7 @@ public class ServiceTrackerMapImpl<K, SR, TS, R>
 			final ServiceReference<SR> serviceReference) {
 
 			final Holder<ServiceReferenceServiceTuple<SR, TS>> holder =
-				new Holder<ServiceReferenceServiceTuple<SR, TS>>();
+				new Holder<>();
 
 			_serviceReferenceMapper.map(
 				serviceReference,
@@ -161,7 +160,7 @@ public class ServiceTrackerMapImpl<K, SR, TS, R>
 									serviceReference);
 
 							serviceReferenceServiceTuple =
-								new ServiceReferenceServiceTuple<SR, TS>(
+								new ServiceReferenceServiceTuple<>(
 									serviceReference, service);
 
 							holder.set(serviceReferenceServiceTuple);

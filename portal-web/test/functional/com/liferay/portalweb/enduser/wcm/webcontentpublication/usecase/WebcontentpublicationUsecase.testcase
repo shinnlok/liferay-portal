@@ -1,5 +1,5 @@
 <definition component-name="portal-wcm">
-	<property name="testray.main.component.name" value="WCM" />
+	<property name="testray.main.component.name" value="Asset Publisher" />
 
 	<var name="globalSiteName" value="Global" />
 	<var name="pageName" value="Asset Publisher Page" />
@@ -44,7 +44,7 @@
 		<execute macro="Site#tearDownCP" />
 	</tear-down>
 
-	<command known-issues="LPS-44575" name="AddAndEditAssetsViaVirtualHostOrganizations" priority="4">
+	<command name="AddAndEditAssetsViaVirtualHostOrganizations" priority="4">
 		<execute macro="Page#gotoCP">
 			<var name="portletName" value="Users and Organizations" />
 		</execute>

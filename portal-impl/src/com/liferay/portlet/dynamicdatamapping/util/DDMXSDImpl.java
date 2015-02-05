@@ -22,9 +22,9 @@ import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.security.pacl.DoPrivileged;
-import com.liferay.portal.kernel.servlet.JSPSupportServlet;
 import com.liferay.portal.kernel.template.Template;
 import com.liferay.portal.kernel.template.TemplateConstants;
+import com.liferay.portal.kernel.template.TemplateManager;
 import com.liferay.portal.kernel.template.TemplateManagerUtil;
 import com.liferay.portal.kernel.template.TemplateResource;
 import com.liferay.portal.kernel.template.URLTemplateResource;
@@ -58,13 +58,6 @@ import com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalServiceUt
 import com.liferay.portlet.dynamicdatamapping.service.DDMTemplateLocalServiceUtil;
 import com.liferay.portlet.dynamicdatamapping.storage.Field;
 import com.liferay.portlet.dynamicdatamapping.storage.Fields;
-import com.liferay.util.freemarker.FreeMarkerTaglibFactoryUtil;
-
-import freemarker.ext.servlet.HttpRequestHashModel;
-import freemarker.ext.servlet.ServletContextHashModel;
-
-import freemarker.template.ObjectWrapper;
-import freemarker.template.TemplateHashModel;
 
 import java.io.Writer;
 
@@ -76,7 +69,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.servlet.GenericServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -666,7 +658,7 @@ public class DDMXSDImpl implements DDMXSD {
 			(Element)dynamicElementElement.selectSingleNode(
 				"meta-data[@locale='" + structureLanguageId + "']");
 
-		fieldContext = new HashMap<String, Object>();
+		fieldContext = new HashMap<>();
 
 		if (metadataElement != null) {
 			for (Element metadataEntry : metadataElement.elements()) {
@@ -743,7 +735,7 @@ public class DDMXSDImpl implements DDMXSD {
 				fieldsContextKey);
 
 		if (fieldsContext == null) {
-			fieldsContext = new HashMap<String, Map<String, Object>>();
+			fieldsContext = new HashMap<>();
 
 			request.setAttribute(fieldsContextKey, fieldsContext);
 		}
@@ -789,7 +781,7 @@ public class DDMXSDImpl implements DDMXSD {
 	}
 
 	protected String[] getFieldsDisplayValues(String fieldDisplayValue) {
-		List<String> fieldsDisplayValues = new ArrayList<String>();
+		List<String> fieldsDisplayValues = new ArrayList<>();
 
 		for (String value : StringUtil.split(fieldDisplayValue)) {
 			String fieldName = StringUtil.extractFirst(
@@ -807,13 +799,13 @@ public class DDMXSDImpl implements DDMXSD {
 		String portletNamespace, String namespace,
 		Element dynamicElementElement, Locale locale) {
 
-		Map<String, Object> freeMarkerContext = new HashMap<String, Object>();
+		Map<String, Object> freeMarkerContext = new HashMap<>();
 
 		Map<String, Object> fieldContext = getFieldContext(
 			request, response, portletNamespace, namespace,
 			dynamicElementElement, locale);
 
-		Map<String, Object> parentFieldContext = new HashMap<String, Object>();
+		Map<String, Object> parentFieldContext = new HashMap<>();
 
 		Element parentElement = dynamicElementElement.getParent();
 
@@ -919,6 +911,17 @@ public class DDMXSDImpl implements DDMXSD {
 			template.put(entry.getKey(), entry.getValue());
 		}
 
+		TemplateManager templateManager =
+			TemplateManagerUtil.getTemplateManager(
+				TemplateConstants.LANG_TYPE_FTL);
+
+		templateManager.addTaglibApplication(
+			template, "Application", request.getServletContext());
+		templateManager.addTaglibFactory(
+			template, "PortalJspTagLibs", request.getServletContext());
+		templateManager.addTaglibRequest(
+			template, "Request", request, response);
+
 		return processFTL(request, response, template);
 	}
 
@@ -930,39 +933,9 @@ public class DDMXSDImpl implements DDMXSD {
 			Template template)
 		throws Exception {
 
-		// FreeMarker variables
-
 		template.prepare(request);
 
-		// Tag libraries
-
 		Writer writer = new UnsyncStringWriter();
-
-		// Portal JSP tag library factory
-
-		TemplateHashModel portalTaglib =
-			FreeMarkerTaglibFactoryUtil.createTaglibFactory(
-				request.getServletContext());
-
-		template.put("PortalJspTagLibs", portalTaglib);
-
-		// FreeMarker JSP tag library support
-
-		GenericServlet genericServlet = new JSPSupportServlet(
-			request.getServletContext());
-
-		ServletContextHashModel servletContextHashModel =
-			new ServletContextHashModel(
-				genericServlet, ObjectWrapper.DEFAULT_WRAPPER);
-
-		template.put("Application", servletContextHashModel);
-
-		HttpRequestHashModel httpRequestHashModel = new HttpRequestHashModel(
-			request, response, ObjectWrapper.DEFAULT_WRAPPER);
-
-		template.put("Request", httpRequestHashModel);
-
-		// Merge templates
 
 		template.processTemplate(writer);
 
@@ -1001,7 +974,7 @@ public class DDMXSDImpl implements DDMXSD {
 	private static final String _TPL_PATH =
 		"com/liferay/portlet/dynamicdatamapping/dependencies/";
 
-	private TemplateResource _defaultReadOnlyTemplateResource;
-	private TemplateResource _defaultTemplateResource;
+	private final TemplateResource _defaultReadOnlyTemplateResource;
+	private final TemplateResource _defaultTemplateResource;
 
 }

@@ -19,24 +19,24 @@ import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.SearchContext;
-import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.rule.Sync;
+import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
+import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.SearchContextTestUtil;
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.test.DeleteAfterTestRun;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.test.Sync;
-import com.liferay.portal.test.SynchronousDestinationTestRule;
-import com.liferay.portal.util.test.GroupTestUtil;
-import com.liferay.portal.util.test.RandomTestUtil;
-import com.liferay.portal.util.test.SearchContextTestUtil;
-import com.liferay.portal.util.test.ServiceContextTestUtil;
-import com.liferay.portal.util.test.TestPropsValues;
-import com.liferay.portal.util.test.UserTestUtil;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.MainServletTestRule;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.model.DDMTemplate;
 import com.liferay.portlet.dynamicdatamapping.util.test.DDMStructureTestUtil;
@@ -151,7 +151,7 @@ public class JournalIndexerTest {
 		serviceContext.setWorkflowAction(WorkflowConstants.ACTION_PUBLISH);
 
 		JournalTestUtil.updateArticle(
-			article1, article1.getTitle(), content, false, true,
+			article1, article1.getTitleMap(), content, false, true,
 			serviceContext);
 
 		JournalArticle article2 = JournalTestUtil.addArticleWithWorkflow(
@@ -166,7 +166,7 @@ public class JournalIndexerTest {
 			"Architectural Tablet");
 
 		JournalTestUtil.updateArticle(
-			article2, article2.getTitle(), content, false, true,
+			article2, article2.getTitleMap(), content, false, true,
 			serviceContext);
 
 		JournalArticleLocalServiceUtil.deleteArticles(_group.getGroupId());
@@ -219,7 +219,7 @@ public class JournalIndexerTest {
 		serviceContext.setWorkflowAction(WorkflowConstants.ACTION_PUBLISH);
 
 		article = JournalTestUtil.updateArticle(
-			article, article.getTitle(), article.getContent(), false, true,
+			article, article.getTitleMap(), article.getContent(), false, true,
 			serviceContext);
 
 		Assert.assertEquals(
@@ -231,7 +231,7 @@ public class JournalIndexerTest {
 		serviceContext.setWorkflowAction(WorkflowConstants.ACTION_SAVE_DRAFT);
 
 		JournalTestUtil.updateArticle(
-			article, article.getTitle(), article.getContent(), false, true,
+			article, article.getTitleMap(), article.getContent(), false, true,
 			serviceContext);
 
 		Assert.assertEquals(
@@ -337,13 +337,13 @@ public class JournalIndexerTest {
 		int initialSearchCount2 = searchCount(
 			_group.getGroupId(), searchContext2);
 
-		Map<Locale, String> titleMap = new HashMap<Locale, String>();
+		Map<Locale, String> titleMap = new HashMap<>();
 
 		titleMap.put(LocaleUtil.GERMANY, "Titel");
 		titleMap.put(LocaleUtil.SPAIN, "Titulo");
 		titleMap.put(LocaleUtil.US, "Title");
 
-		Map<Locale, String> contentMap = new HashMap<Locale, String>();
+		Map<Locale, String> contentMap = new HashMap<>();
 
 		contentMap.put(LocaleUtil.GERMANY, "Liferay Architektur Ansatz");
 		contentMap.put(LocaleUtil.SPAIN, "Liferay Arquitectura Aproximacion");
@@ -401,13 +401,13 @@ public class JournalIndexerTest {
 		int initialSearchCount2 = searchCount(
 			_group.getGroupId(), searchContext2);
 
-		Map<Locale, String> titleMap = new HashMap<Locale, String>();
+		Map<Locale, String> titleMap = new HashMap<>();
 
 		titleMap.put(LocaleUtil.GERMANY, "Titel");
 		titleMap.put(LocaleUtil.SPAIN, "Titulo");
 		titleMap.put(LocaleUtil.US, "Title");
 
-		Map<Locale, String> contentMap = new HashMap<Locale, String>();
+		Map<Locale, String> contentMap = new HashMap<>();
 
 		contentMap.put(LocaleUtil.GERMANY, "Liferay Architektur Ansatz");
 		contentMap.put(LocaleUtil.SPAIN, "Liferay Arquitectura Aproximacion");
@@ -546,7 +546,8 @@ public class JournalIndexerTest {
 		serviceContext.setWorkflowAction(WorkflowConstants.ACTION_PUBLISH);
 
 		article = JournalTestUtil.updateArticle(
-			article, article.getTitle(), content, false, true, serviceContext);
+			article, article.getTitleMap(), content, false, true,
+			serviceContext);
 
 		Assert.assertEquals(
 			initialSearchCount1,
@@ -618,7 +619,7 @@ public class JournalIndexerTest {
 		serviceContext.setWorkflowAction(WorkflowConstants.ACTION_PUBLISH);
 
 		article = JournalTestUtil.updateArticle(
-			article, article.getTitle(), article.getContent(), false, true,
+			article, article.getTitleMap(), article.getContent(), false, true,
 			serviceContext);
 
 		Assert.assertEquals(
@@ -803,7 +804,8 @@ public class JournalIndexerTest {
 		}
 
 		JournalTestUtil.updateArticle(
-			article, article.getTitle(), content, false, true, serviceContext);
+			article, article.getTitleMap(), content, false, true,
+			serviceContext);
 
 		if (approve) {
 			Assert.assertEquals(

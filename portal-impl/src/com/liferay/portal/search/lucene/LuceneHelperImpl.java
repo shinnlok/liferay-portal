@@ -43,7 +43,6 @@ import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.SearchEngineUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.MethodHandler;
 import com.liferay.portal.kernel.util.MethodKey;
 import com.liferay.portal.kernel.util.ObjectValuePair;
@@ -526,7 +525,7 @@ public class LuceneHelperImpl implements LuceneHelper {
 			}
 		}
 
-		Set<String> queryTerms = new HashSet<String>();
+		Set<String> queryTerms = new HashSet<>();
 
 		for (WeightedTerm weightedTerm : weightedTerms) {
 			queryTerms.add(weightedTerm.getTerm());
@@ -813,17 +812,11 @@ public class LuceneHelperImpl implements LuceneHelper {
 			ClusterExecutorUtil.addClusterEventListener(
 				_loadIndexClusterEventListener);
 		}
+		else {
+			_loadIndexClusterEventListener = null;
+		}
 
 		BooleanQuery.setMaxClauseCount(_LUCENE_BOOLEAN_QUERY_CLAUSE_MAX_SIZE);
-
-		if (StringUtil.equalsIgnoreCase(
-				Http.HTTPS, PropsValues.WEB_SERVER_PROTOCOL)) {
-
-			_protocol = Http.HTTPS;
-		}
-		else {
-			_protocol = Http.HTTP;
-		}
 	}
 
 	private ObjectValuePair<String, URL>
@@ -875,12 +868,12 @@ public class LuceneHelperImpl implements LuceneHelper {
 			fileName = fileName.concat("lucene/dump");
 
 			URL url = new URL(
-				_protocol, inetAddress.getHostAddress(),
+				clusterNode.getPortalProtocol(), inetAddress.getHostAddress(),
 				inetSocketAddress.getPort(), fileName);
 
 			String transientToken = (String)clusterNodeResponse.getResult();
 
-			return new ObjectValuePair<String, URL>(transientToken, url);
+			return new ObjectValuePair<>(transientToken, url);
 		}
 		catch (Exception e) {
 			throw new SystemException(e);
@@ -892,18 +885,18 @@ public class LuceneHelperImpl implements LuceneHelper {
 		Query query, BooleanClause.Occur occur) {
 
 		if (query instanceof TermQuery) {
-			Set<Term> terms = new HashSet<Term>();
+			Set<Term> terms = new HashSet<>();
 
 			TermQuery termQuery = (TermQuery)query;
 
 			termQuery.extractTerms(terms);
 
-			float boost = termQuery.getBoost();
-
 			for (Term term : terms) {
 				String termValue = term.text();
 
-				if (like) {
+				if (like &&
+					Validator.equals(term.field(), queryParser.getField())) {
+
 					termValue = termValue.toLowerCase(queryParser.getLocale());
 
 					term = term.createTerm(
@@ -916,7 +909,7 @@ public class LuceneHelperImpl implements LuceneHelper {
 					query = new TermQuery(term);
 				}
 
-				query.setBoost(boost);
+				query.setBoost(termQuery.getBoost());
 
 				boolean included = false;
 
@@ -1015,19 +1008,19 @@ public class LuceneHelperImpl implements LuceneHelper {
 			PropsUtil.get(PropsKeys.LUCENE_BOOLEAN_QUERY_CLAUSE_MAX_SIZE),
 			BooleanQuery.getMaxClauseCount());
 
-	private static Log _log = LogFactoryUtil.getLog(LuceneHelperImpl.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		LuceneHelperImpl.class);
 
-	private static MethodKey _createTokenMethodKey = new MethodKey(
+	private static final MethodKey _createTokenMethodKey = new MethodKey(
 		TransientTokenUtil.class, "createToken", long.class);
-	private static MethodKey _getLastGenerationMethodKey = new MethodKey(
+	private static final MethodKey _getLastGenerationMethodKey = new MethodKey(
 		LuceneHelperUtil.class, "getLastGeneration", long.class);
 
 	private Analyzer _analyzer;
-	private Map<Long, IndexAccessor> _indexAccessors =
-		new ConcurrentHashMap<Long, IndexAccessor>();
-	private LoadIndexClusterEventListener _loadIndexClusterEventListener;
+	private final Map<Long, IndexAccessor> _indexAccessors =
+		new ConcurrentHashMap<>();
+	private final LoadIndexClusterEventListener _loadIndexClusterEventListener;
 	private ThreadPoolExecutor _luceneIndexThreadPoolExecutor;
-	private String _protocol;
 	private Version _version;
 
 	private static class ShutdownSyncJob implements Runnable {
@@ -1222,9 +1215,9 @@ public class LuceneHelperImpl implements LuceneHelper {
 		}
 
 		private int _clusterNodeAddressesCount;
-		private long _companyId;
-		private IndexAccessor _indexAccessor;
-		private long _localLastGeneration;
+		private final long _companyId;
+		private final IndexAccessor _indexAccessor;
+		private final long _localLastGeneration;
 
 	}
 

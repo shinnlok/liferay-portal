@@ -26,8 +26,6 @@ import com.liferay.portal.servlet.filters.dynamiccss.RTLCSSUtil;
 import com.liferay.portal.tools.sass.SassExecutorUtil;
 import com.liferay.portal.util.FastDateFormatFactoryImpl;
 import com.liferay.portal.util.FileImpl;
-import com.liferay.portal.util.PortalImpl;
-import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsImpl;
 
 import java.io.File;
@@ -75,7 +73,7 @@ public class SassToCssBuilder {
 	public static void main(String[] args) throws Exception {
 		Map<String, String> arguments = ArgumentsUtil.parseArguments(args);
 
-		List<String> dirNames = new ArrayList<String>();
+		List<String> dirNames = new ArrayList<>();
 
 		String dirName = arguments.get("sass.dir");
 
@@ -129,7 +127,7 @@ public class SassToCssBuilder {
 
 		_initUtil(classLoader);
 
-		List<String> fileNames = new ArrayList<String>();
+		List<String> fileNames = new ArrayList<>();
 
 		for (String dirName : dirNames) {
 			_collectSassFiles(fileNames, dirName, docrootDirName);
@@ -191,10 +189,6 @@ public class SassToCssBuilder {
 		fileUtil.setFile(new FileImpl());
 
 		PortalClassLoaderUtil.setClassLoader(classLoader);
-
-		PortalUtil portalUtil = new PortalUtil();
-
-		portalUtil.setPortal(new PortalImpl());
 
 		PropsUtil.setProps(new PropsImpl());
 

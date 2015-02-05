@@ -100,6 +100,7 @@ import com.liferay.portlet.documentlibrary.util.DLUtil;
 import com.liferay.portlet.documentlibrary.util.DLValidatorUtil;
 import com.liferay.portlet.documentlibrary.util.comparator.RepositoryModelModifiedDateComparator;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
+import com.liferay.portlet.dynamicdatamapping.storage.DDMFormValues;
 import com.liferay.portlet.dynamicdatamapping.storage.Fields;
 import com.liferay.portlet.dynamicdatamapping.storage.StorageEngineUtil;
 import com.liferay.portlet.expando.NoSuchRowException;
@@ -423,7 +424,7 @@ public class DLFileEntryLocalServiceImpl
 				Lock lock = lockLocalService.getLock(
 					DLFileEntry.class.getName(), fileEntryId);
 
-				if (!lock.getUuid().equals(lockUuid)) {
+				if (!Validator.equals(lock.getUuid(), lockUuid)) {
 					throw new InvalidLockException("UUIDs do not match");
 				}
 			}
@@ -628,7 +629,7 @@ public class DLFileEntryLocalServiceImpl
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		Map<String, Fields> fieldsMap = new HashMap<String, Fields>();
+		Map<String, Fields> fieldsMap = new HashMap<>();
 
 		List<DDMStructure> ddmStructures = null;
 
@@ -688,7 +689,8 @@ public class DLFileEntryLocalServiceImpl
 	@Override
 	@SystemEvent(
 		action = SystemEventConstants.ACTION_SKIP,
-		type = SystemEventConstants.TYPE_DELETE)
+		type = SystemEventConstants.TYPE_DELETE
+	)
 	public DLFileEntry deleteFileEntry(DLFileEntry dlFileEntry)
 		throws PortalException {
 
@@ -940,6 +942,14 @@ public class DLFileEntryLocalServiceImpl
 
 	@Override
 	public List<DLFileEntry> getDDMStructureFileEntries(
+		long groupId, long[] ddmStructureIds) {
+
+		return dlFileEntryFinder.findByDDMStructureIds(
+			groupId, ddmStructureIds, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+	}
+
+	@Override
+	public List<DLFileEntry> getDDMStructureFileEntries(
 		long[] ddmStructureIds) {
 
 		return dlFileEntryFinder.findByDDMStructureIds(
@@ -1102,12 +1112,12 @@ public class DLFileEntryLocalServiceImpl
 		long groupId, long folderId, int status, int start, int end,
 		OrderByComparator<DLFileEntry> obc) {
 
-		List<Long> folderIds = new ArrayList<Long>();
+		List<Long> folderIds = new ArrayList<>();
 
 		folderIds.add(folderId);
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>(status, false, start, end, obc);
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>(
+			status, false, start, end, obc);
 
 		return dlFileEntryFinder.findByG_F(groupId, folderIds, queryDefinition);
 	}
@@ -1169,7 +1179,7 @@ public class DLFileEntryLocalServiceImpl
 
 	@Override
 	public int getFileEntriesCount(long groupId, long folderId, int status) {
-		List<Long> folderIds = new ArrayList<Long>();
+		List<Long> folderIds = new ArrayList<>();
 
 		folderIds.add(folderId);
 
@@ -1326,9 +1336,8 @@ public class DLFileEntryLocalServiceImpl
 			return Collections.emptyList();
 		}
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>(
-				WorkflowConstants.STATUS_ANY, start, end, obc);
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>(
+			WorkflowConstants.STATUS_ANY, start, end, obc);
 
 		if (repositoryId == 0) {
 			if (userId <= 0) {
@@ -1430,7 +1439,8 @@ public class DLFileEntryLocalServiceImpl
 	}
 
 	@BufferedIncrement(
-		configuration = "DLFileEntry", incrementClass = NumberIncrement.class)
+		configuration = "DLFileEntry", incrementClass = NumberIncrement.class
+	)
 	@Override
 	public void incrementViewCounter(DLFileEntry dlFileEntry, int increment) {
 		if (ExportImportThreadLocal.isImportInProcess()) {
@@ -1623,14 +1633,7 @@ public class DLFileEntryLocalServiceImpl
 		searchContext.setCompanyId(group.getCompanyId());
 
 		searchContext.setEnd(end);
-
-		if (folderId != DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
-			List<Long> folderIds = dlFolderService.getFolderIds(
-				groupId, folderId);
-
-			searchContext.setFolderIds(folderIds);
-		}
-
+		searchContext.setFolderIds(new long[] {folderId});
 		searchContext.setGroupIds(new long[] {groupId});
 		searchContext.setSorts(new Sort(Field.MODIFIED_DATE, true));
 		searchContext.setStart(start);
@@ -1852,7 +1855,8 @@ public class DLFileEntryLocalServiceImpl
 			// File entry
 
 			if ((status != WorkflowConstants.STATUS_IN_TRASH) &&
-				dlFileEntry.getVersion().equals(dlFileVersion.getVersion())) {
+				Validator.equals(
+					dlFileEntry.getVersion(), dlFileVersion.getVersion())) {
 
 				String newVersion = DLFileEntryConstants.VERSION_DEFAULT;
 
@@ -1872,7 +1876,8 @@ public class DLFileEntryLocalServiceImpl
 
 			// Indexer
 
-			if (dlFileVersion.getVersion().equals(
+			if (Validator.equals(
+					dlFileVersion.getVersion(),
 					DLFileEntryConstants.VERSION_DEFAULT)) {
 
 				Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
@@ -1958,7 +1963,7 @@ public class DLFileEntryLocalServiceImpl
 			Lock lock = lockLocalService.getLock(
 				DLFileEntry.class.getName(), fileEntryId);
 
-			if (lock.getUuid().equals(lockUuid)) {
+			if (Validator.equals(lock.getUuid(), lockUuid)) {
 				lockVerified = true;
 			}
 		}
@@ -2206,7 +2211,9 @@ public class DLFileEntryLocalServiceImpl
 
 	/**
 	 * @see com.liferay.portlet.dynamicdatalists.service.impl.DDLRecordLocalServiceImpl#isKeepRecordVersionLabel(
-	 *      DDLRecordVersion, DDLRecordVersion, ServiceContext)
+	 *      com.liferay.portlet.dynamicdatalists.model.DDLRecordVersion,
+	 *      com.liferay.portlet.dynamicdatalists.model.DDLRecordVersion,
+	 *      ServiceContext)
 	 */
 	protected boolean isKeepFileVersionLabel(
 			DLFileEntry dlFileEntry, DLFileVersion lastDLFileVersion,
@@ -2271,12 +2278,14 @@ public class DLFileEntryLocalServiceImpl
 					ddmStructure.getStructureId(),
 					latestDLFileVersion.getFileVersionId());
 
-			Fields lastFields = StorageEngineUtil.getFields(
-				lastFileEntryMetadata.getDDMStorageId());
-			Fields latestFields = StorageEngineUtil.getFields(
-				latestFileEntryMetadata.getDDMStorageId());
+			DDMFormValues lastDDMFormValues =
+				StorageEngineUtil.getDDMFormValues(
+					lastFileEntryMetadata.getDDMStorageId());
+			DDMFormValues latestDDMFormValues =
+				StorageEngineUtil.getDDMFormValues(
+					latestFileEntryMetadata.getDDMStorageId());
 
-			if (!lastFields.equals(latestFields, false)) {
+			if (!lastDDMFormValues.equals(latestDDMFormValues)) {
 				return false;
 			}
 		}
@@ -2470,7 +2479,14 @@ public class DLFileEntryLocalServiceImpl
 			dlFileVersionLocalService.getLatestFileVersion(
 				fileEntryId, !checkedOut);
 
-		boolean autoCheckIn = !checkedOut && dlFileVersion.isApproved();
+		boolean autoCheckIn = false;
+
+		if (!checkedOut && dlFileVersion.isApproved() &&
+			!Validator.equals(
+				dlFileVersion.getUuid(), serviceContext.getUuid())) {
+
+			autoCheckIn = true;
+		}
 
 		if (autoCheckIn) {
 			dlFileEntry = checkOutFileEntry(
@@ -2711,7 +2727,7 @@ public class DLFileEntryLocalServiceImpl
 
 	private static final int _DELETE_INTERVAL = 100;
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		DLFileEntryLocalServiceImpl.class);
 
 }

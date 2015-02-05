@@ -188,11 +188,10 @@ public class AggregatedCacheListener<K extends Serializable, V>
 	}
 
 	private static final ThreadLocal<Boolean> _remoteInvokeThreadLocal =
-		new InitialThreadLocal<Boolean>(
+		new InitialThreadLocal<>(
 			AggregatedCacheListener.class + "._remoteInvokeThreadLocal", false);
 
 	private final ConcurrentMap<CacheListener<K, V>, CacheListenerScope>
-		_cacheListeners =
-			new ConcurrentHashMap<CacheListener<K, V>, CacheListenerScope>();
+		_cacheListeners = new ConcurrentHashMap<>();
 
 }

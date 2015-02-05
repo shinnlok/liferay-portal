@@ -24,7 +24,7 @@ import javax.servlet.jsp.JspException;
  * @author Julio Camarero
  * @generated
  */
-public class BaseAlertTag extends com.liferay.taglib.util.IncludeTag {
+public abstract class BaseAlertTag extends com.liferay.taglib.util.IncludeTag {
 
 	@Override
 	public int doStartTag() throws JspException {
@@ -105,6 +105,8 @@ public class BaseAlertTag extends com.liferay.taglib.util.IncludeTag {
 
 	@Override
 	protected void cleanUp() {
+		super.cleanUp();
+
 		_animated = false;
 		_closeable = true;
 		_cssClass = null;

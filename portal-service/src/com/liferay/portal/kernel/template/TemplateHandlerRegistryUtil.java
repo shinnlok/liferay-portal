@@ -65,7 +65,7 @@ public class TemplateHandlerRegistryUtil {
 	}
 
 	public static List<TemplateHandler> getTemplateHandlers() {
-		List<TemplateHandler> templateHandlers = new ArrayList<TemplateHandler>(
+		List<TemplateHandler> templateHandlers = new ArrayList<>(
 			_instance._templateHandlers.values());
 
 		return Collections.unmodifiableList(templateHandlers);
@@ -108,15 +108,15 @@ public class TemplateHandlerRegistryUtil {
 		}
 	}
 
-	private static TemplateHandlerRegistryUtil _instance =
+	private static final TemplateHandlerRegistryUtil _instance =
 		new TemplateHandlerRegistryUtil();
 
-	private StringServiceRegistrationMap<TemplateHandler>
-		_serviceRegistrations =
-			new StringServiceRegistrationMap<TemplateHandler>();
-	private ServiceTracker<TemplateHandler, TemplateHandler> _serviceTracker;
-	private Map<String, TemplateHandler> _templateHandlers =
-		new ConcurrentHashMap<String, TemplateHandler>();
+	private final StringServiceRegistrationMap<TemplateHandler>
+		_serviceRegistrations = new StringServiceRegistrationMap<>();
+	private final ServiceTracker<TemplateHandler, TemplateHandler>
+		_serviceTracker;
+	private final Map<String, TemplateHandler> _templateHandlers =
+		new ConcurrentHashMap<>();
 
 	private class TemplateHandlerServiceTrackerCustomizer
 		implements ServiceTrackerCustomizer<TemplateHandler, TemplateHandler> {

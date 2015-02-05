@@ -80,8 +80,7 @@ public class DDMFormXSDSerializerImpl implements DDMFormXSDSerializer {
 	protected void addDynamicElementElement(
 		DDMFormField ddmFormField, Element element) {
 
-		Element dynamicElementElement = SAXReaderUtil.createElement(
-			"dynamic-element");
+		Element dynamicElementElement = element.addElement("dynamic-element");
 
 		addDynamicElementAttributes(ddmFormField, dynamicElementElement);
 
@@ -101,12 +100,6 @@ public class DDMFormXSDSerializerImpl implements DDMFormXSDSerializer {
 			getDDMFormFieldMetadataMap(ddmFormField);
 
 		addMetadataElements(metadataMap, dynamicElementElement);
-
-		List<Element> elements = dynamicElementElement.elements();
-
-		if (!elements.isEmpty()) {
-			element.add(dynamicElementElement);
-		}
 	}
 
 	protected void addDynamicElementElements(
@@ -153,7 +146,7 @@ public class DDMFormXSDSerializerImpl implements DDMFormXSDSerializer {
 				availableLocale);
 
 			if (metadataMap == null) {
-				metadataMap = new HashMap<String, String>();
+				metadataMap = new HashMap<>();
 
 				ddmFormFieldMetadataMap.put(availableLocale, metadataMap);
 			}
@@ -204,7 +197,7 @@ public class DDMFormXSDSerializerImpl implements DDMFormXSDSerializer {
 		DDMFormField ddmFormField) {
 
 		Map<Locale, Map<String, String>> ddmFormFieldMetadataMap =
-			new HashMap<Locale, Map<String, String>>();
+			new HashMap<>();
 
 		addMetadataEntryValues(
 			ddmFormFieldMetadataMap, "label", ddmFormField.getLabel());
@@ -222,12 +215,10 @@ public class DDMFormXSDSerializerImpl implements DDMFormXSDSerializer {
 	protected Map<Locale, Map<String, String>> getOptionLabelsMap(
 		LocalizedValue optionLabels) {
 
-		Map<Locale, Map<String, String>> optionLabelsMap =
-			new HashMap<Locale, Map<String, String>>();
+		Map<Locale, Map<String, String>> optionLabelsMap = new HashMap<>();
 
 		for (Locale availableLocale : optionLabels.getAvailableLocales()) {
-			Map<String, String> optionMetadataEntries =
-				new HashMap<String, String>();
+			Map<String, String> optionMetadataEntries = new HashMap<>();
 
 			optionMetadataEntries.put(
 				"label", optionLabels.getString(availableLocale));

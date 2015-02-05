@@ -351,6 +351,15 @@
 							'aui-base'
 						]
 					},
+					'liferay-editor-image-uploader': {
+						path: 'editor_image_uploader.js',
+						requires: [
+							'aui-alert',
+							'aui-base',
+							'aui-progressbar',
+							'uploader'
+						]
+					},
 					'liferay-form': {
 						path: 'form.js',
 						requires: [
@@ -794,6 +803,12 @@
 						requires: [
 							'aui-component',
 							'aui-node'
+						]
+					},
+					'liferay-source-editor': {
+						path: 'source_editor.js',
+						requires: [
+							'aui-ace-editor'
 						]
 					},
 					'liferay-storage-formatter': {

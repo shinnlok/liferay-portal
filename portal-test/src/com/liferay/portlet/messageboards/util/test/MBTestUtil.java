@@ -14,6 +14,10 @@
 
 package com.liferay.portlet.messageboards.util.test;
 
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.kernel.util.StringPool;
@@ -22,10 +26,6 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.workflow.WorkflowThreadLocal;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.util.test.RandomTestUtil;
-import com.liferay.portal.util.test.ServiceContextTestUtil;
-import com.liferay.portal.util.test.TestPropsValues;
-import com.liferay.portal.util.test.UserTestUtil;
 import com.liferay.portlet.messageboards.model.MBBan;
 import com.liferay.portlet.messageboards.model.MBCategory;
 import com.liferay.portlet.messageboards.model.MBCategoryConstants;
@@ -274,12 +274,10 @@ public class MBTestUtil {
 		ObjectValuePair<String, InputStream> inputStreamOVP = null;
 
 		if (Validator.isBlank(keywords)) {
-			inputStreamOVP = new ObjectValuePair<String, InputStream>(
-				fileName, inputStream);
+			inputStreamOVP = new ObjectValuePair<>(fileName, inputStream);
 		}
 		else {
-			inputStreamOVP = new ObjectValuePair<String, InputStream>(
-				keywords, inputStream);
+			inputStreamOVP = new ObjectValuePair<>(keywords, inputStream);
 		}
 
 		inputStreamOVPs.add(inputStreamOVP);
@@ -401,8 +399,7 @@ public class MBTestUtil {
 			MBMessage message, ServiceContext serviceContext)
 		throws Exception {
 
-		Map<String, Serializable> workflowContext =
-			new HashMap<String, Serializable>();
+		Map<String, Serializable> workflowContext = new HashMap<>();
 
 		workflowContext.put(WorkflowConstants.CONTEXT_URL, "http://localhost");
 

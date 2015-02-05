@@ -56,6 +56,11 @@ public class BaseHandler implements Handler<Void> {
 	}
 
 	@Override
+	public String getException(String response) {
+		return null;
+	}
+
+	@Override
 	public void handleException(Exception e) {
 		SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
 			getSyncAccountId());
@@ -88,8 +93,6 @@ public class BaseHandler implements Handler<Void> {
 		}
 		else if ((e instanceof ConnectTimeoutException) ||
 				 (e instanceof HttpHostConnectException) ||
-				 (e instanceof NoHttpResponseException) ||
-				 (e instanceof SocketException) ||
 				 (e instanceof SocketTimeoutException) ||
 				 (e instanceof UnknownHostException)) {
 
@@ -107,6 +110,22 @@ public class BaseHandler implements Handler<Void> {
 
 				SyncAccountService.update(syncAccount);
 			}
+
+			// Retry connection for now. We are periodically receiving
+			// extraneous HttpStatus.SC_UNAUTHORIZED exceptions.
+
+			retryServerConnection(SyncAccount.UI_EVENT_CONNECTION_EXCEPTION);
+		}
+		else if ((e instanceof NoHttpResponseException) ||
+				 (e instanceof SocketException)) {
+
+			String message = e.getMessage();
+
+			if (message.equals("Connection reset") ||
+				message.equals("The target server failed to respond")) {
+
+				retryServerConnection(SyncAccount.UI_EVENT_NONE);
+			}
 			else {
 				retryServerConnection(
 					SyncAccount.UI_EVENT_CONNECTION_EXCEPTION);
@@ -115,6 +134,11 @@ public class BaseHandler implements Handler<Void> {
 		else {
 			_logger.error(e.getMessage(), e);
 		}
+	}
+
+	@Override
+	public boolean handlePortalException(String exception) throws Exception {
+		return false;
 	}
 
 	@Override
@@ -130,7 +154,7 @@ public class BaseHandler implements Handler<Void> {
 			}
 
 			if (_logger.isTraceEnabled()) {
-				Class<?> clazz = this.getClass();
+				Class<?> clazz = getClass();
 
 				SyncFile syncFile = (SyncFile)getParameterValue("syncFile");
 
@@ -152,6 +176,10 @@ public class BaseHandler implements Handler<Void> {
 		}
 
 		return null;
+	}
+
+	@Override
+	public void processResponse(String response) throws Exception {
 	}
 
 	protected void doHandleResponse(HttpResponse httpResponse)

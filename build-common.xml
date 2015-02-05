@@ -913,6 +913,7 @@ Please set the environment variable ANT_OPTS to the recommended value of
 				<jvmarg value="-Dfile.encoding=UTF-8" />
 				<jvmarg value="-Dfixed.issues=${fixed.issues}" />
 				<jvmarg value="-Djava.net.preferIPv4Stack=true" />
+				<jvmarg value="-Dliferay.mode=test" />
 				<misc />
 				<jvmarg value="-Duser.timezone=GMT" />
 				<classpath location="test-coverage" />
@@ -937,8 +938,8 @@ Please set the environment variable ANT_OPTS to the recommended value of
 					/>
 				</try>
 				<catch>
-					<ant antfile="${project.dir}/portal-service/build.xml" target="compile" inheritAll="false" />
-					<ant antfile="${project.dir}/util-java/build.xml" target="compile" inheritAll="false" />
+					<ant dir="../portal-service" target="compile" inheritAll="false" />
+					<ant dir="../util-java" target="compile" inheritAll="false" />
 
 					<taskdef
 						classname="com.liferay.util.ant.ManifestHelperTask"
@@ -1139,7 +1140,7 @@ Please set the environment variable ANT_OPTS to the recommended value of
 
 		<sequential>
 			<ivy:resolve log="download-only">
-				<dependency name="arquillian-junit-container" org="org.jboss.arquillian.junit" rev="1.1.2.Final" />
+				<dependency name="arquillian-junit-container" org="org.jboss.arquillian.junit" rev="1.1.6.Final" />
 				<dependency name="com.liferay.arquillian.extension" org="com.liferay" rev="1.0.0-SNAPSHOT" />
 				<exclude org="junit" />
 			</ivy:resolve>
@@ -1302,7 +1303,8 @@ rerun your task.
 					>
 						<misc>
 							<jvmarg value="-Dliferay.lib.portal.dir=${project.dir}/lib/portal" />
-							<jvmarg value="-Dliferay.mode=test" />
+							<jvmarg value="-Dtest.class.group.index=${test.class.group.index}" />
+							<jvmarg value="-Dtest.class.groups=${TEST_CLASS_GROUPS}" />
 						</misc>
 						<test.classes>
 							<batchtest todir="test-results/@{test.type}">
@@ -1312,9 +1314,9 @@ rerun your task.
 									<exclude name="**/DLAppServiceSoapTest.class" />
 									<exclude name="**/UserServiceHttpTest.class" />
 									<exclude name="**/UserServiceSoapTest.class" />
+									<exclude name="**/pacl/test/*Test.class" />
 									<exclude name="${test.excludes}" />
 									<filename regex="${junit.test.excludes}" negate="true" />
-									<filename regex=".*/pacl/test/[\w]+Test.class" negate="true" />
 								</fileset>
 							</batchtest>
 						</test.classes>
@@ -1380,6 +1382,12 @@ rerun your task.
 
 	<target name="print-properties">
 		<echoproperties />
+	</target>
+
+	<target name="run-pmd">
+		<ant antfile="build-common.xml" dir="${project.dir}/tools/sdk" inheritRefs="true" target="run-pmd">
+			<property name="pmd.basedir" value="${basedir}" />
+		</ant>
 	</target>
 
 	<target name="setproxy" if="setproxy.proxy.host">

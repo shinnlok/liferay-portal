@@ -27,13 +27,13 @@ import com.liferay.portal.kernel.nio.intraband.PortalExecutorManagerUtilAdvice;
 import com.liferay.portal.kernel.nio.intraband.SystemDataType;
 import com.liferay.portal.kernel.nio.intraband.test.MockIntraband;
 import com.liferay.portal.kernel.nio.intraband.test.MockRegistrationReference;
-import com.liferay.portal.kernel.test.AggregateTestRule;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
-import com.liferay.portal.kernel.test.NewEnv;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.rule.NewEnv;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
-import com.liferay.portal.test.AdviseWith;
-import com.liferay.portal.test.AspectJNewEnvTestRule;
+import com.liferay.portal.test.rule.AdviseWith;
+import com.liferay.portal.test.rule.AspectJNewEnvTestRule;
 
 import java.nio.ByteBuffer;
 
@@ -134,7 +134,7 @@ public class MessageDatagramReceiveHandlerTest {
 		// Normal destination, synchronized, with listener
 
 		final AtomicReference<Message> messageReference =
-			new AtomicReference<Message>();
+			new AtomicReference<>();
 
 		baseDestination.register(
 			new MessageListener() {
@@ -207,7 +207,7 @@ public class MessageDatagramReceiveHandlerTest {
 			MessageDatagramReceiveHandlerTest.class.getName());
 
 		final AtomicReference<MessageRoutingBag> messageRoutingBagReference =
-			new AtomicReference<MessageRoutingBag>();
+			new AtomicReference<>();
 
 		IntrabandBridgeDestination intrabandBridgeDestination =
 			new IntrabandBridgeDestination(baseDestination) {

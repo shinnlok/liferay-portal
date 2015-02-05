@@ -39,8 +39,6 @@ import com.liferay.portal.kernel.search.OpenSearch;
 import com.liferay.portal.kernel.servlet.URLEncoder;
 import com.liferay.portal.kernel.template.TemplateHandler;
 import com.liferay.portal.kernel.trash.TrashHandler;
-import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.ClassUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -370,7 +368,7 @@ public class PortletBagFactory {
 	protected <S> ServiceTrackerList<S> getServiceTrackerList(
 		Class<S> clazz, Portlet portlet) {
 
-		Map<String, Object> properties = new HashMap<String, Object>();
+		Map<String, Object> properties = new HashMap<>();
 
 		properties.put("javax.portlet.name", portlet.getPortletId());
 
@@ -591,15 +589,7 @@ public class PortletBagFactory {
 			Indexer indexerInstance = (Indexer)newInstance(
 				Indexer.class, indexerClass);
 
-			Map<String, Object> properties = new HashMap<String, Object>();
-
-			String[] classNames = ArrayUtil.append(
-				indexerInstance.getClassNames(),
-				ClassUtil.getClassName(indexerInstance));
-
-			properties.put("indexer.classNames", classNames);
-
-			indexerInstances.add(indexerInstance, properties);
+			indexerInstances.add(indexerInstance);
 		}
 
 		return indexerInstances;

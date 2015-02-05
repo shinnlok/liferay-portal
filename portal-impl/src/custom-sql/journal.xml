@@ -29,7 +29,7 @@
 			WHERE
 				(groupId = ?) AND
 				(classNameId = ?) AND
-				(DDMStructureKey = ?) AND
+				([$DDM_STRUCTURE_KEY$]) AND
 				([$STATUS$])
 		]]>
 	</sql>
@@ -119,7 +119,7 @@
 				ResourcePermission ON
 					(ResourcePermission.companyId = JournalArticle.companyId) AND
 					(ResourcePermission.name = 'com.liferay.portlet.journal.model.JournalArticle') AND
-					(ResourcePermission.primKey = JournalArticle.resourcePrimKey) AND
+					(ResourcePermission.primKey = CAST_TEXT(JournalArticle.resourcePrimKey)) AND
 					(ResourcePermission.scope = ?)
 			WHERE
 				ResourcePermission.primKey IS NULL
@@ -187,7 +187,7 @@
 			WHERE
 				(JournalArticle.groupId = ?) AND
 				(JournalArticle.classNameId = ?) AND
-				(JournalArticle.DDMStructureKey = ?) AND
+				([$DDM_STRUCTURE_KEY$]) AND
 				([$STATUS$]) AND
 				(tempJournalArticle.id_ IS NULL)
 			ORDER BY

@@ -15,19 +15,19 @@
 package com.liferay.portlet.journal.service.persistence;
 
 import com.liferay.portal.kernel.dao.orm.QueryDefinition;
-import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.rule.Sync;
+import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
+import com.liferay.portal.kernel.test.rule.TransactionalTestRule;
+import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Group;
-import com.liferay.portal.test.DeleteAfterTestRun;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.test.Sync;
-import com.liferay.portal.test.SynchronousDestinationTestRule;
-import com.liferay.portal.test.TransactionalTestRule;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.MainServletTestRule;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portal.util.test.GroupTestUtil;
-import com.liferay.portal.util.test.TestPropsValues;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.model.DDMTemplate;
 import com.liferay.portlet.dynamicdatamapping.util.test.DDMStructureTestUtil;
@@ -153,7 +153,7 @@ public class JournalArticleFinderTest {
 	@Test
 	public void testFindByExpirationDate() throws Exception {
 		QueryDefinition<JournalArticle> queryDefinition =
-			new QueryDefinition<JournalArticle>();
+			new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_ANY);
 
@@ -224,7 +224,7 @@ public class JournalArticleFinderTest {
 	@Test
 	public void testQueryByC_G_F_C_A_V_T_D_C_T_S_T_D_R() throws Exception {
 		QueryDefinition<JournalArticle> queryDefinition =
-			new QueryDefinition<JournalArticle>();
+			new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_ANY);
 
@@ -260,7 +260,7 @@ public class JournalArticleFinderTest {
 	@Test
 	public void testQueryByG_C_S() throws Exception {
 		QueryDefinition<JournalArticle> queryDefinition =
-			new QueryDefinition<JournalArticle>();
+			new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_ANY);
 
@@ -293,7 +293,7 @@ public class JournalArticleFinderTest {
 	@Test
 	public void testQueryByG_F() throws Exception {
 		QueryDefinition<JournalArticle> queryDefinition =
-			new QueryDefinition<JournalArticle>();
+			new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_ANY);
 
@@ -326,7 +326,7 @@ public class JournalArticleFinderTest {
 	@Test
 	public void testQueryByG_U_F_C() throws Exception {
 		QueryDefinition<JournalArticle> queryDefinition =
-			new QueryDefinition<JournalArticle>();
+			new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_ANY);
 
@@ -445,7 +445,7 @@ public class JournalArticleFinderTest {
 		prepareSortedArticles();
 
 		QueryDefinition<JournalArticle> queryDefinition =
-			new QueryDefinition<JournalArticle>();
+			new QueryDefinition<>();
 
 		queryDefinition.setOrderByComparator(orderByComparator);
 
@@ -455,7 +455,7 @@ public class JournalArticleFinderTest {
 			expectedArticles = _articles;
 		}
 		else {
-			expectedArticles = new ArrayList<JournalArticle>(_articles);
+			expectedArticles = new ArrayList<>(_articles);
 
 			Collections.reverse(expectedArticles);
 		}
@@ -488,11 +488,11 @@ public class JournalArticleFinderTest {
 	private static final long _USER_ID = 1234L;
 
 	private JournalArticle _article;
-	private List<JournalArticle> _articles = new ArrayList<JournalArticle>();
+	private final List<JournalArticle> _articles = new ArrayList<>();
 	private DDMStructure _basicWebContentDDMStructure;
 	private DDMStructure _ddmStructure;
 	private JournalFolder _folder;
-	private List<Long> _folderIds = new ArrayList<Long>();
+	private final List<Long> _folderIds = new ArrayList<>();
 
 	@DeleteAfterTestRun
 	private Group _group;

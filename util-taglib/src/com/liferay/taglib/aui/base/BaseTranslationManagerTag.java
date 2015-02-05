@@ -24,7 +24,7 @@ import javax.servlet.jsp.JspException;
  * @author Julio Camarero
  * @generated
  */
-public class BaseTranslationManagerTag extends com.liferay.taglib.util.IncludeTag {
+public abstract class BaseTranslationManagerTag extends com.liferay.taglib.util.IncludeTag {
 
 	@Override
 	public int doStartTag() throws JspException {
@@ -95,6 +95,8 @@ public class BaseTranslationManagerTag extends com.liferay.taglib.util.IncludeTa
 
 	@Override
 	protected void cleanUp() {
+		super.cleanUp();
+
 		_availableLocales = null;
 		_defaultLanguageId = null;
 		_editingLanguageId = null;

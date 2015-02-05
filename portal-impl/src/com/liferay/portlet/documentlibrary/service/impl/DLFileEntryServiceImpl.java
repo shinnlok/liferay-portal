@@ -305,12 +305,12 @@ public class DLFileEntryServiceImpl extends DLFileEntryServiceBaseImpl {
 		DLFolderPermission.check(
 			getPermissionChecker(), groupId, folderId, ActionKeys.VIEW);
 
-		List<Long> folderIds = new ArrayList<Long>();
+		List<Long> folderIds = new ArrayList<>();
 
 		folderIds.add(folderId);
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>(status, false, start, end, obc);
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>(
+			status, false, start, end, obc);
 
 		return dlFileEntryFinder.filterFindByG_F(
 			groupId, folderIds, queryDefinition);
@@ -349,13 +349,12 @@ public class DLFileEntryServiceImpl extends DLFileEntryServiceBaseImpl {
 		DLFolderPermission.check(
 			getPermissionChecker(), groupId, folderId, ActionKeys.VIEW);
 
-		List<Long> folderIds = new ArrayList<Long>();
+		List<Long> folderIds = new ArrayList<>();
 
 		folderIds.add(folderId);
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>(
-				WorkflowConstants.STATUS_IN_TRASH, true, start, end, obc);
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>(
+			WorkflowConstants.STATUS_IN_TRASH, true, start, end, obc);
 
 		return dlFileEntryFinder.filterFindByG_U_F_M(
 			groupId, 0, folderIds, mimeTypes, queryDefinition);
@@ -369,7 +368,7 @@ public class DLFileEntryServiceImpl extends DLFileEntryServiceBaseImpl {
 
 	@Override
 	public int getFileEntriesCount(long groupId, long folderId, int status) {
-		List<Long> folderIds = new ArrayList<Long>();
+		List<Long> folderIds = new ArrayList<>();
 
 		folderIds.add(folderId);
 
@@ -389,7 +388,7 @@ public class DLFileEntryServiceImpl extends DLFileEntryServiceBaseImpl {
 	public int getFileEntriesCount(
 		long groupId, long folderId, String[] mimeTypes) {
 
-		List<Long> folderIds = new ArrayList<Long>();
+		List<Long> folderIds = new ArrayList<>();
 
 		folderIds.add(folderId);
 
@@ -447,8 +446,8 @@ public class DLFileEntryServiceImpl extends DLFileEntryServiceBaseImpl {
 	public int getFoldersFileEntriesCount(
 		long groupId, List<Long> folderIds, int status) {
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>(status);
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>(
+			status);
 
 		if (folderIds.size() <= PropsValues.SQL_DATA_MAX_PARAMETERS) {
 			return dlFileEntryFinder.filterCountByG_F(
@@ -500,14 +499,14 @@ public class DLFileEntryServiceImpl extends DLFileEntryServiceBaseImpl {
 			OrderByComparator<DLFileEntry> obc)
 		throws PortalException {
 
-		List<Long> repositoryIds = new ArrayList<Long>();
+		List<Long> repositoryIds = new ArrayList<>();
 
 		if (repositoryId != 0) {
 			repositoryIds.add(repositoryId);
 		}
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>(status, start, end, obc);
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>(
+			status, start, end, obc);
 
 		if (rootFolderId == DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
 			return dlFileEntryFinder.filterFindByG_U_R_F_M(
@@ -565,7 +564,7 @@ public class DLFileEntryServiceImpl extends DLFileEntryServiceBaseImpl {
 			String[] mimeTypes, int status)
 		throws PortalException {
 
-		List<Long> repositoryIds = new ArrayList<Long>();
+		List<Long> repositoryIds = new ArrayList<>();
 
 		if (repositoryId != 0) {
 			repositoryIds.add(repositoryId);

@@ -16,6 +16,7 @@ package com.liferay.portal.spring.context;
 
 import com.liferay.portal.bean.BeanLocatorImpl;
 import com.liferay.portal.cache.ehcache.ClearEhcacheThreadUtil;
+import com.liferay.portal.dao.orm.hibernate.FieldInterceptionHelperUtil;
 import com.liferay.portal.deploy.hot.IndexerPostProcessorRegistry;
 import com.liferay.portal.deploy.hot.SchedulerEntryRegistry;
 import com.liferay.portal.deploy.hot.ServiceWrapperRegistry;
@@ -39,7 +40,7 @@ import com.liferay.portal.kernel.servlet.SerializableSessionAttributeListener;
 import com.liferay.portal.kernel.servlet.ServletContextPool;
 import com.liferay.portal.kernel.settings.SettingsFactoryUtil;
 import com.liferay.portal.kernel.template.TemplateResourceLoaderUtil;
-import com.liferay.portal.kernel.util.CharBufferPool;
+import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.ClassLoaderPool;
 import com.liferay.portal.kernel.util.ClearThreadLocalUtil;
 import com.liferay.portal.kernel.util.ClearTimerThreadUtil;
@@ -48,13 +49,17 @@ import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.MethodCache;
 import com.liferay.portal.kernel.util.PortalLifecycle;
 import com.liferay.portal.kernel.util.PortalLifecycleUtil;
+import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 import com.liferay.portal.kernel.util.ReflectionUtil;
 import com.liferay.portal.kernel.util.ServerDetector;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.SystemProperties;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.webcache.WebCachePoolUtil;
 import com.liferay.portal.module.framework.ModuleFrameworkUtilAdapter;
+import com.liferay.portal.scripting.ruby.RubyExecutor;
 import com.liferay.portal.security.lang.SecurityManagerUtil;
 import com.liferay.portal.security.permission.PermissionCacheUtil;
 import com.liferay.portal.servlet.filters.cache.CacheUtil;
@@ -194,10 +199,22 @@ public class PortalContextLoaderListener extends ContextLoaderListener {
 
 		ReferenceRegistry.releaseReferences();
 
-		InitUtil.init();
+		FieldInterceptionHelperUtil.initialize();
 
 		final ServletContext servletContext =
 			servletContextEvent.getServletContext();
+
+		String portalLibDir = servletContext.getRealPath("/WEB-INF/lib");
+
+		portalLibDir = StringUtil.replace(
+			portalLibDir, CharPool.BACK_SLASH, CharPool.FORWARD_SLASH);
+
+		if (Validator.isNotNull(portalLibDir)) {
+			SystemProperties.set(
+				PropsKeys.LIFERAY_LIB_PORTAL_DIR, portalLibDir);
+		}
+
+		InitUtil.init();
 
 		_portalServletContextName = servletContext.getServletContextName();
 
@@ -222,7 +239,6 @@ public class PortalContextLoaderListener extends ContextLoaderListener {
 		ClassPathUtil.initializeClassPaths(servletContext);
 
 		CacheRegistryUtil.clear();
-		CharBufferPool.cleanUp();
 		PortletContextBagPool.clear();
 		WebAppPool.clear();
 
@@ -329,6 +345,8 @@ public class PortalContextLoaderListener extends ContextLoaderListener {
 		}
 
 		initListeners(servletContext);
+
+		RubyExecutor.initRubyGems(servletContext);
 	}
 
 	protected void clearFilteredPropertyDescriptorsCache(

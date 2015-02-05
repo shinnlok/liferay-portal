@@ -21,7 +21,7 @@ import javax.servlet.jsp.JspException;
  * @author Bruno Basto
  * @generated
  */
-public class BaseHTMLFieldTag extends com.liferay.taglib.util.IncludeTag {
+public abstract class BaseHTMLFieldTag extends com.liferay.taglib.util.IncludeTag {
 
 	@Override
 	public int doStartTag() throws JspException {
@@ -112,6 +112,8 @@ public class BaseHTMLFieldTag extends com.liferay.taglib.util.IncludeTag {
 
 	@Override
 	protected void cleanUp() {
+		super.cleanUp();
+
 		_classNameId = 0;
 		_classPK = 0;
 		_field = null;

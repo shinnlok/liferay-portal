@@ -188,6 +188,20 @@ public class AssetVocabularyServiceSoap {
 		}
 	}
 
+	public static com.liferay.portlet.asset.model.AssetVocabularySoap fetchVocabulary(
+		long vocabularyId) throws RemoteException {
+		try {
+			com.liferay.portlet.asset.model.AssetVocabulary returnValue = AssetVocabularyServiceUtil.fetchVocabulary(vocabularyId);
+
+			return com.liferay.portlet.asset.model.AssetVocabularySoap.toSoapModel(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
 	/**
 	* @deprecated As of 7.0.0, with no direct replacement
 	*/
@@ -457,7 +471,7 @@ public class AssetVocabularyServiceSoap {
 
 	/**
 	* @deprecated As of 7.0.0, replaced by {@link
-	#AssetUtil.filterVocabularyIds(PermissionChecker, long[])}
+	AssetUtil#filterVocabularyIds(PermissionChecker, long[])}
 	*/
 	@Deprecated
 	public static com.liferay.portlet.asset.model.AssetVocabularySoap[] getVocabularies(

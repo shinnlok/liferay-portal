@@ -37,13 +37,13 @@ public class GetAllFolderSyncDLObjectsHandler extends BaseJSONHandler {
 	}
 
 	@Override
-	protected void processResponse(String response) throws Exception {
+	public void processResponse(String response) throws Exception {
 		ObjectMapper objectMapper = new ObjectMapper();
 
 		_syncFiles = objectMapper.readValue(
 			response, new TypeReference<List<SyncFile>>() {});
 	}
 
-	private List<SyncFile> _syncFiles = new ArrayList<SyncFile>();
+	private List<SyncFile> _syncFiles = new ArrayList<>();
 
 }

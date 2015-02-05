@@ -14,8 +14,8 @@
 
 package com.liferay.portal.language;
 
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -39,8 +39,7 @@ public class ResourceBundleEnumerationTest {
 
 	@Test
 	public void testWithEnumeration() {
-		Set<String> set = new LinkedHashSet<String>(
-			Arrays.asList("key1", "key2"));
+		Set<String> set = new LinkedHashSet<>(Arrays.asList("key1", "key2"));
 		Enumeration<String> enumeration = Collections.enumeration(
 			Arrays.asList("key2", "key3"));
 
@@ -67,8 +66,7 @@ public class ResourceBundleEnumerationTest {
 
 	@Test
 	public void testWithoutEnumeration() {
-		Set<String> set = new LinkedHashSet<String>(
-			Arrays.asList("key1", "key2"));
+		Set<String> set = new LinkedHashSet<>(Arrays.asList("key1", "key2"));
 
 		ResourceBundleEnumeration resourceBundleEnumeration =
 			new ResourceBundleEnumeration(set, null);

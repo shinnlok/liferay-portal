@@ -38,8 +38,6 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.resiliency.mpi.MPIHelperUtil;
 import com.liferay.portal.kernel.scheduler.SchedulerEngineHelperUtil;
-import com.liferay.portal.kernel.template.TemplateManagerUtil;
-import com.liferay.portal.kernel.template.TemplateResourceLoaderUtil;
 import com.liferay.portal.kernel.util.CentralizedThreadLocal;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
@@ -52,6 +50,9 @@ import com.liferay.util.ThirdPartyThreadLocalRegistry;
 
 import java.sql.Connection;
 import java.sql.Statement;
+
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Brian Wing Shun Chan
@@ -193,22 +194,6 @@ public class GlobalShutdownAction extends SimpleAction {
 		catch (Exception e) {
 			e.printStackTrace();
 		}
-
-		// Template manager
-
-		try {
-			TemplateManagerUtil.destroy();
-		}
-		catch (Exception e) {
-		}
-
-		// Template resource loader
-
-		try {
-			TemplateResourceLoaderUtil.destroy();
-		}
-		catch (Exception e) {
-		}
 	}
 
 	protected void shutdownLevel2() {
@@ -236,7 +221,11 @@ public class GlobalShutdownAction extends SimpleAction {
 
 		if (PropsValues.PORTAL_FABRIC_ENABLED) {
 			try {
-				FabricServerUtil.stop();
+				Future<?> future = FabricServerUtil.stop();
+
+				future.get(
+					PropsValues.PORTAL_FABRIC_SHUTDOWN_TIMEOUT,
+					TimeUnit.MILLISECONDS);
 			}
 			catch (Exception e) {
 				_log.error("Unable to stop fabric server", e);
@@ -330,6 +319,7 @@ public class GlobalShutdownAction extends SimpleAction {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(GlobalShutdownAction.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		GlobalShutdownAction.class);
 
 }

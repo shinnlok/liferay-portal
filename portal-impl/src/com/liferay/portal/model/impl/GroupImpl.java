@@ -118,7 +118,7 @@ public class GroupImpl extends GroupBaseImpl {
 			group = this;
 		}
 
-		List<Group> groups = new ArrayList<Group>();
+		List<Group> groups = new ArrayList<>();
 
 		while (!group.isRoot()) {
 			group = group.getParentGroup();
@@ -137,7 +137,8 @@ public class GroupImpl extends GroupBaseImpl {
 
 	/**
 	 * @deprecated As of 7.0.0, replaced by {@link
-	 *             #getChildrenWithLayouts(boolean, int, int, OrderByComparator}
+	 *             #getChildrenWithLayouts(boolean, int, int,
+	 *             OrderByComparator)}
 	 */
 	@Deprecated
 	@Override
@@ -173,14 +174,14 @@ public class GroupImpl extends GroupBaseImpl {
 
 	@Override
 	public List<Group> getDescendants(boolean site) {
-		Set<Group> descendants = new LinkedHashSet<Group>();
+		Set<Group> descendants = new LinkedHashSet<>();
 
 		for (Group group : getChildren(site)) {
 			descendants.add(group);
 			descendants.addAll(group.getDescendants(site));
 		}
 
-		return new ArrayList<Group>(descendants);
+		return new ArrayList<>(descendants);
 	}
 
 	@Override
@@ -192,13 +193,21 @@ public class GroupImpl extends GroupBaseImpl {
 	public String getDescriptiveName(Locale locale) throws PortalException {
 		Group curGroup = this;
 
-		String name = getName();
+		String name = getName(locale);
 
 		if (isCompany() && !isCompanyStagingGroup()) {
 			name = LanguageUtil.get(locale, "global");
 		}
 		else if (isControlPanel()) {
 			name = LanguageUtil.get(locale, "control-panel");
+		}
+		else if (isGuest()) {
+			Company company = CompanyLocalServiceUtil.getCompany(
+				getCompanyId());
+
+			Account account = company.getAccount();
+
+			name = account.getName();
 		}
 		else if (isLayout()) {
 			Layout layout = LayoutLocalServiceUtil.getLayout(getClassPK());
@@ -246,14 +255,6 @@ public class GroupImpl extends GroupBaseImpl {
 		}
 		else if (isUserPersonalSite()) {
 			name = LanguageUtil.get(locale, "user-personal-site");
-		}
-		else if (name.equals(GroupConstants.GUEST)) {
-			Company company = CompanyLocalServiceUtil.getCompany(
-				getCompanyId());
-
-			Account account = company.getAccount();
-
-			name = account.getName();
 		}
 
 		if (curGroup.isStaged() && !curGroup.isStagedRemotely() &&
@@ -816,9 +817,9 @@ public class GroupImpl extends GroupBaseImpl {
 
 	@Override
 	public boolean isControlPanel() {
-		String name = getName();
+		String groupKey = getGroupKey();
 
-		if (name.equals(GroupConstants.CONTROL_PANEL)) {
+		if (groupKey.equals(GroupConstants.CONTROL_PANEL)) {
 			return true;
 		}
 		else {
@@ -828,9 +829,9 @@ public class GroupImpl extends GroupBaseImpl {
 
 	@Override
 	public boolean isGuest() {
-		String name = getName();
+		String groupKey = getGroupKey();
 
-		if (name.equals(GroupConstants.GUEST)) {
+		if (groupKey.equals(GroupConstants.GUEST)) {
 			return true;
 		}
 		else {
@@ -1060,6 +1061,18 @@ public class GroupImpl extends GroupBaseImpl {
 	@Override
 	public boolean isUserPersonalSite() {
 		return hasClassName(UserPersonalSite.class);
+	}
+
+	@Override
+	public boolean isUserPersonalSpace() {
+		String groupKey = getGroupKey();
+
+		if (groupKey.equals(GroupConstants.USER_PERSONAL_SPACE)) {
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 
 	@Override

@@ -15,12 +15,12 @@
 package com.liferay.portlet.documentlibrary.store;
 
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
-import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.util.test.RandomTestUtil;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.MainServletTestRule;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
@@ -549,7 +549,7 @@ public class DBStoreTest {
 
 	private static final byte[] _DATA_VERSION_2 = new byte[_DATA_SIZE];
 
-	private static Store _store = new DBStore();
+	private static final Store _store = new DBStore();
 
 	static {
 		for (int i = 0; i < _DATA_SIZE; i++) {

@@ -14,7 +14,7 @@
 
 package com.liferay.portal.kernel.servlet;
 
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ObjectValuePair;
@@ -54,7 +54,7 @@ public class MetaInfoCacheServletResponseTest {
 
 	@Test
 	public void testAddCookie() {
-		final List<Cookie> cookies = new ArrayList<Cookie>();
+		final List<Cookie> cookies = new ArrayList<>();
 
 		StubHttpServletResponse stubHttpServletResponse =
 			new StubHttpServletResponse() {
@@ -146,7 +146,7 @@ public class MetaInfoCacheServletResponseTest {
 	@Test
 	public void testAddDateHeader() {
 		final List<ObjectValuePair<String, Long>> objectValuePairs =
-			new ArrayList<ObjectValuePair<String, Long>>();
+			new ArrayList<>();
 
 		StubHttpServletResponse stubHttpServletResponse =
 			new StubHttpServletResponse() {
@@ -219,9 +219,9 @@ public class MetaInfoCacheServletResponseTest {
 	@Test
 	public void testAddHeader() {
 		final AtomicReference<String> contentTypeReference =
-			new AtomicReference<String>();
+			new AtomicReference<>();
 		final List<ObjectValuePair<String, String>> objectValuePairs =
-			new ArrayList<ObjectValuePair<String, String>>();
+			new ArrayList<>();
 
 		StubHttpServletResponse stubHttpServletResponse =
 			new StubHttpServletResponse() {
@@ -315,7 +315,7 @@ public class MetaInfoCacheServletResponseTest {
 	@Test
 	public void testAddIntHeader() {
 		final List<ObjectValuePair<String, Integer>> objectValuePairs =
-			new ArrayList<ObjectValuePair<String, Integer>>();
+			new ArrayList<>();
 
 		StubHttpServletResponse stubHttpServletResponse =
 			new StubHttpServletResponse() {
@@ -402,9 +402,9 @@ public class MetaInfoCacheServletResponseTest {
 	public void testFinishResponse() throws IOException {
 		final AtomicLong contentLengthReference = new AtomicLong();
 		final AtomicReference<String> locationReference =
-			new AtomicReference<String>();
+			new AtomicReference<>();
 		final AtomicReference<String> messageReference =
-			new AtomicReference<String>();
+			new AtomicReference<>();
 		final AtomicInteger statusReference = new AtomicInteger();
 
 		StubHttpServletResponse stubHttpServletResponse =
@@ -465,6 +465,10 @@ public class MetaInfoCacheServletResponseTest {
 					statusReference.set(status);
 				}
 
+				/**
+				 * @deprecated As of 7.0.0
+				 */
+				@Deprecated
 				@Override
 				public void setStatus(int status, String message) {
 					statusReference.set(status);
@@ -723,7 +727,7 @@ public class MetaInfoCacheServletResponseTest {
 	@Test
 	public void testGetSetCharacterEncoding() throws IOException {
 		final AtomicReference<String> characterEncodingReference =
-			new AtomicReference<String>();
+			new AtomicReference<>();
 
 		StubHttpServletResponse stubHttpServletResponse =
 			new StubHttpServletResponse() {
@@ -802,9 +806,9 @@ public class MetaInfoCacheServletResponseTest {
 	@Test
 	public void testGetSetContentType() throws IOException {
 		final AtomicReference<String> characterEncodingReference =
-			new AtomicReference<String>();
+			new AtomicReference<>();
 		final AtomicReference<String> contentTypeReference =
-			new AtomicReference<String>();
+			new AtomicReference<>();
 
 		StubHttpServletResponse stubHttpServletResponse =
 			new StubHttpServletResponse() {
@@ -905,8 +909,7 @@ public class MetaInfoCacheServletResponseTest {
 
 	@Test
 	public void testGetSetLocale() throws IOException {
-		final AtomicReference<Locale> localeReference =
-			new AtomicReference<Locale>();
+		final AtomicReference<Locale> localeReference = new AtomicReference<>();
 
 		StubHttpServletResponse stubHttpServletResponse =
 			new StubHttpServletResponse() {
@@ -1100,7 +1103,7 @@ public class MetaInfoCacheServletResponseTest {
 	@Test
 	public void testSendError() throws IOException {
 		final AtomicReference<String> messageReference =
-			new AtomicReference<String>();
+			new AtomicReference<>();
 		final AtomicInteger statusReference = new AtomicInteger();
 
 		StubHttpServletResponse stubHttpServletResponse =
@@ -1192,9 +1195,9 @@ public class MetaInfoCacheServletResponseTest {
 	@Test
 	public void testSendRedirect() throws IOException {
 		final AtomicReference<String> locationReference =
-			new AtomicReference<String>();
+			new AtomicReference<>();
 		final AtomicReference<String> messageReference =
-			new AtomicReference<String>();
+			new AtomicReference<>();
 		final AtomicInteger statusReference = new AtomicInteger();
 
 		StubHttpServletResponse stubHttpServletResponse =
@@ -1219,6 +1222,10 @@ public class MetaInfoCacheServletResponseTest {
 				statusReference.set(status);
 			}
 
+			/**
+			 * @deprecated As of 7.0.0
+			 */
+			@Deprecated
 			@Override
 			public void setStatus(int status, String message) {
 				statusReference.set(status);
@@ -1291,7 +1298,7 @@ public class MetaInfoCacheServletResponseTest {
 	@Test
 	public void testSetDateHeader() {
 		final List<ObjectValuePair<String, Long>> objectValuePairs =
-			new ArrayList<ObjectValuePair<String, Long>>();
+			new ArrayList<>();
 
 		StubHttpServletResponse stubHttpServletResponse =
 			new StubHttpServletResponse() {
@@ -1364,7 +1371,7 @@ public class MetaInfoCacheServletResponseTest {
 	@Test
 	public void testSetGetStatus() throws IOException {
 		final AtomicReference<String> messageReference =
-			new AtomicReference<String>();
+			new AtomicReference<>();
 		final AtomicInteger statusReference = new AtomicInteger();
 
 		StubHttpServletResponse stubHttpServletResponse =
@@ -1380,6 +1387,10 @@ public class MetaInfoCacheServletResponseTest {
 					statusReference.set(status);
 				}
 
+				/**
+				 * @deprecated As of 7.0.0
+				 */
+				@Deprecated
 				@Override
 				public void setStatus(int status, String message) {
 					statusReference.set(status);
@@ -1437,9 +1448,9 @@ public class MetaInfoCacheServletResponseTest {
 	@Test
 	public void testSetHeader() {
 		final AtomicReference<String> contentTypeReference =
-			new AtomicReference<String>();
+			new AtomicReference<>();
 		final List<ObjectValuePair<String, String>> objectValuePairs =
-			new ArrayList<ObjectValuePair<String, String>>();
+			new ArrayList<>();
 
 		StubHttpServletResponse stubHttpServletResponse =
 			new StubHttpServletResponse() {
@@ -1533,7 +1544,7 @@ public class MetaInfoCacheServletResponseTest {
 	@Test
 	public void testSetIntHeader() {
 		final List<ObjectValuePair<String, Integer>> objectValuePairs =
-			new ArrayList<ObjectValuePair<String, Integer>>();
+			new ArrayList<>();
 
 		StubHttpServletResponse stubHttpServletResponse =
 			new StubHttpServletResponse() {

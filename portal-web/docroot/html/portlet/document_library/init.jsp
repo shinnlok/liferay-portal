@@ -24,7 +24,6 @@ page import="com.liferay.portal.kernel.repository.RepositoryException" %><%@
 page import="com.liferay.portal.kernel.repository.capabilities.TemporaryFileEntriesCapability" %><%@
 page import="com.liferay.portal.kernel.search.Document" %><%@
 page import="com.liferay.portal.kernel.search.SearchResult" %><%@
-page import="com.liferay.portal.kernel.servlet.taglib.ui.MenuItem" %><%@
 page import="com.liferay.portal.kernel.servlet.taglib.ui.ToolbarItem" %><%@
 page import="com.liferay.portal.repository.registry.RepositoryClassDefinitionCatalogUtil" %><%@
 page import="com.liferay.portlet.documentlibrary.DLPortletInstanceSettings" %><%@
@@ -44,14 +43,13 @@ page import="com.liferay.portlet.documentlibrary.RepositoryNameException" %><%@
 page import="com.liferay.portlet.documentlibrary.RequiredFileEntryTypeException" %><%@
 page import="com.liferay.portlet.documentlibrary.SourceFileNameException" %><%@
 page import="com.liferay.portlet.documentlibrary.action.EditFileEntryAction" %><%@
-page import="com.liferay.portlet.documentlibrary.context.DLActionsDisplayContext" %><%@
-page import="com.liferay.portlet.documentlibrary.context.DLConfigurationDisplayContext" %><%@
-page import="com.liferay.portlet.documentlibrary.context.DLEditFileEntryDisplayContext" %><%@
-page import="com.liferay.portlet.documentlibrary.context.DLEditFileEntryDisplayContextUtil" %><%@
-page import="com.liferay.portlet.documentlibrary.context.DLEntryListDisplayContext" %><%@
-page import="com.liferay.portlet.documentlibrary.context.DLFilePicker" %><%@
-page import="com.liferay.portlet.documentlibrary.context.DLViewFileVersionDisplayContext" %><%@
-page import="com.liferay.portlet.documentlibrary.context.DLViewFileVersionDisplayContextUtil" %><%@
+page import="com.liferay.portlet.documentlibrary.display.context.DLDisplayContextProviderUtil" %><%@
+page import="com.liferay.portlet.documentlibrary.display.context.DLEditFileEntryDisplayContext" %><%@
+page import="com.liferay.portlet.documentlibrary.display.context.DLFilePicker" %><%@
+page import="com.liferay.portlet.documentlibrary.display.context.DLViewFileVersionDisplayContext" %><%@
+page import="com.liferay.portlet.documentlibrary.display.context.logic.DLPortletInstanceSettingsHelper" %><%@
+page import="com.liferay.portlet.documentlibrary.display.context.logic.DLVisualizationHelper" %><%@
+page import="com.liferay.portlet.documentlibrary.display.context.util.DLRequestHelper" %><%@
 page import="com.liferay.portlet.documentlibrary.model.DLFileEntryMetadata" %><%@
 page import="com.liferay.portlet.documentlibrary.model.DLFileEntryType" %><%@
 page import="com.liferay.portlet.documentlibrary.model.DLFileEntryTypeConstants" %><%@
@@ -82,23 +80,23 @@ page import="com.liferay.portlet.dynamicdatamapping.search.StructureSearch" %><%
 page import="com.liferay.portlet.dynamicdatamapping.search.StructureSearchTerms" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.service.DDMStorageLinkLocalServiceUtil" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.storage.StorageEngineUtil" %><%@
+page import="com.liferay.portlet.dynamicdatamapping.util.DDMFormValuesToFieldsConverterUtil" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.util.DDMXSDUtil" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.util.comparator.StructureStructureKeyComparator" %>
 
 <%
 PortalPreferences portalPreferences = PortletPreferencesFactoryUtil.getPortalPreferences(liferayPortletRequest);
 
-String portletResource = ParamUtil.getString(request, "portletResource");
+DLRequestHelper dlRequestHelper = new DLRequestHelper(request);
 
-String portletId = portletDisplay.getId();
+String portletId = dlRequestHelper.getResourcePortletId();
 
-if (portletId.equals(PortletKeys.PORTLET_CONFIGURATION)) {
-	portletId = portletResource;
-	portletName = portletResource;
-}
+portletName = dlRequestHelper.getResourcePortletName();
 
-DLPortletInstanceSettings dlPortletInstanceSettings = DLPortletInstanceSettings.getInstance(layout, portletId);
-DLSettings dlSettings = DLSettings.getInstance(scopeGroupId);
+String portletResource = dlRequestHelper.getPortletResource();
+
+DLPortletInstanceSettings dlPortletInstanceSettings = dlRequestHelper.getDLPortletInstanceSettings();
+DLSettings dlSettings = dlRequestHelper.getDLSettings();
 
 long rootFolderId = dlPortletInstanceSettings.getRootFolderId();
 String rootFolderName = StringPool.BLANK;
@@ -119,6 +117,7 @@ if (rootFolderId != DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
 	}
 }
 
+boolean showComments = ParamUtil.getBoolean(request, "showComments", true);
 boolean showHeader = ParamUtil.getBoolean(request, "showHeader", true);
 
 Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);

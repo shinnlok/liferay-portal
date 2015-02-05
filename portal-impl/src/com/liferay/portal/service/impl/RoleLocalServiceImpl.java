@@ -351,7 +351,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 					StringUtil.replace(name, CharPool.SPACE, CharPool.PERIOD) +
 						".description";
 
-			Map<Locale, String> descriptionMap = new HashMap<Locale, String>();
+			Map<Locale, String> descriptionMap = new HashMap<>();
 
 			descriptionMap.put(LocaleUtil.getDefault(), PropsUtil.get(key));
 
@@ -371,7 +371,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 					StringUtil.replace(name, CharPool.SPACE, CharPool.PERIOD) +
 						".description";
 
-			Map<Locale, String> descriptionMap = new HashMap<Locale, String>();
+			Map<Locale, String> descriptionMap = new HashMap<>();
 
 			descriptionMap.put(LocaleUtil.getDefault(), PropsUtil.get(key));
 
@@ -390,7 +390,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 					StringUtil.replace(name, CharPool.SPACE, CharPool.PERIOD) +
 						".description";
 
-			Map<Locale, String> descriptionMap = new HashMap<Locale, String>();
+			Map<Locale, String> descriptionMap = new HashMap<>();
 
 			descriptionMap.put(LocaleUtil.getDefault(), PropsUtil.get(key));
 
@@ -444,11 +444,10 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	@Override
 	@SystemEvent(
 		action = SystemEventConstants.ACTION_SKIP,
-		type = SystemEventConstants.TYPE_DELETE)
+		type = SystemEventConstants.TYPE_DELETE
+	)
 	public Role deleteRole(Role role) throws PortalException {
-		if (PortalUtil.isSystemRole(role.getName()) &&
-			!CompanyThreadLocal.isDeleteInProcess()) {
-
+		if (role.isSystem() && !CompanyThreadLocal.isDeleteInProcess()) {
 			throw new RequiredRoleException();
 		}
 
@@ -604,7 +603,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	public List<Role> getGroupRelatedRoles(long groupId)
 		throws PortalException {
 
-		List<Role> roles = new ArrayList<Role>();
+		List<Role> roles = new ArrayList<>();
 
 		Group group = groupLocalService.getGroup(groupId);
 
@@ -751,7 +750,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	 */
 	@Override
 	public List<Role> getRoles(long[] roleIds) throws PortalException {
-		List<Role> roles = new ArrayList<Role>(roleIds.length);
+		List<Role> roles = new ArrayList<>(roleIds.length);
 
 		for (long roleId : roleIds) {
 			Role role = getRole(roleId);
@@ -1409,7 +1408,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 
 		validate(roleId, role.getCompanyId(), role.getClassNameId(), name);
 
-		if (PortalUtil.isSystemRole(role.getName())) {
+		if (role.isSystem()) {
 			name = role.getName();
 			subtype = null;
 		}
@@ -1488,7 +1487,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 
 		Set<Long> roleIds = SetUtil.fromArray(excludedRoleIds);
 
-		Map<Team, Role> teamRoleMap = new LinkedHashMap<Team, Role>();
+		Map<Team, Role> teamRoleMap = new LinkedHashMap<>();
 
 		for (Team team : teams) {
 			Role role = getTeamRole(team.getCompanyId(), team.getTeamId());
@@ -1578,7 +1577,6 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 		}
 	}
 
-	private final Map<String, Role> _systemRolesMap =
-		new HashMap<String, Role>();
+	private final Map<String, Role> _systemRolesMap = new HashMap<>();
 
 }

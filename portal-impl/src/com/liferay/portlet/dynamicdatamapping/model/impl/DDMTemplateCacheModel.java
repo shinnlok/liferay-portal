@@ -16,6 +16,7 @@ package com.liferay.portlet.dynamicdatamapping.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
@@ -40,8 +41,32 @@ import java.util.Date;
 public class DDMTemplateCacheModel implements CacheModel<DDMTemplate>,
 	Externalizable {
 	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof DDMTemplateCacheModel)) {
+			return false;
+		}
+
+		DDMTemplateCacheModel ddmTemplateCacheModel = (DDMTemplateCacheModel)obj;
+
+		if (templateId == ddmTemplateCacheModel.templateId) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return HashUtil.hash(0, templateId);
+	}
+
+	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(45);
+		StringBundler sb = new StringBundler(47);
 
 		sb.append("{uuid=");
 		sb.append(uuid);
@@ -63,6 +88,8 @@ public class DDMTemplateCacheModel implements CacheModel<DDMTemplate>,
 		sb.append(classNameId);
 		sb.append(", classPK=");
 		sb.append(classPK);
+		sb.append(", sourceClassNameId=");
+		sb.append(sourceClassNameId);
 		sb.append(", templateKey=");
 		sb.append(templateKey);
 		sb.append(", version=");
@@ -131,6 +158,7 @@ public class DDMTemplateCacheModel implements CacheModel<DDMTemplate>,
 
 		ddmTemplateImpl.setClassNameId(classNameId);
 		ddmTemplateImpl.setClassPK(classPK);
+		ddmTemplateImpl.setSourceClassNameId(sourceClassNameId);
 
 		if (templateKey == null) {
 			ddmTemplateImpl.setTemplateKey(StringPool.BLANK);
@@ -216,6 +244,7 @@ public class DDMTemplateCacheModel implements CacheModel<DDMTemplate>,
 		modifiedDate = objectInput.readLong();
 		classNameId = objectInput.readLong();
 		classPK = objectInput.readLong();
+		sourceClassNameId = objectInput.readLong();
 		templateKey = objectInput.readUTF();
 		version = objectInput.readUTF();
 		name = objectInput.readUTF();
@@ -256,6 +285,7 @@ public class DDMTemplateCacheModel implements CacheModel<DDMTemplate>,
 		objectOutput.writeLong(modifiedDate);
 		objectOutput.writeLong(classNameId);
 		objectOutput.writeLong(classPK);
+		objectOutput.writeLong(sourceClassNameId);
 
 		if (templateKey == null) {
 			objectOutput.writeUTF(StringPool.BLANK);
@@ -335,6 +365,7 @@ public class DDMTemplateCacheModel implements CacheModel<DDMTemplate>,
 	public long modifiedDate;
 	public long classNameId;
 	public long classPK;
+	public long sourceClassNameId;
 	public String templateKey;
 	public String version;
 	public String name;

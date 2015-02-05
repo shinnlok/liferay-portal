@@ -578,11 +578,11 @@ public class SitesImpl implements Sites {
 	}
 
 	@Override
-	public Long[] filterGroups(List<Group> groups, String[] names) {
-		List<Long> groupIds = new ArrayList<Long>();
+	public Long[] filterGroups(List<Group> groups, String[] groupKeys) {
+		List<Long> groupIds = new ArrayList<>();
 
 		for (Group group : groups) {
-			if (!ArrayUtil.contains(names, group.getName())) {
+			if (!ArrayUtil.contains(groupKeys, group.getGroupKey())) {
 				groupIds.add(group.getGroupId());
 			}
 		}
@@ -621,8 +621,7 @@ public class SitesImpl implements Sites {
 	public Map<String, String[]> getLayoutSetPrototypeParameters(
 		ServiceContext serviceContext) {
 
-		Map<String, String[]> parameterMap =
-			new LinkedHashMap<String, String[]>();
+		Map<String, String[]> parameterMap = new LinkedHashMap<>();
 
 		parameterMap.put(
 			PortletDataHandlerKeys.DATA_STRATEGY,
@@ -662,10 +661,6 @@ public class SitesImpl implements Sites {
 			new String[] {Boolean.TRUE.toString()});
 		parameterMap.put(
 			PortletDataHandlerKeys.PORTLET_DATA,
-			new String[] {Boolean.TRUE.toString()});
-		parameterMap.put(
-			PortletDataHandlerKeys.PORTLET_DATA + StringPool.UNDERLINE +
-				PortletKeys.ASSET_CATEGORIES_ADMIN,
 			new String[] {Boolean.TRUE.toString()});
 		parameterMap.put(
 			PortletDataHandlerKeys.PORTLET_DATA_ALL,
@@ -757,7 +752,7 @@ public class SitesImpl implements Sites {
 			MERGE_FAIL_FRIENDLY_URL_LAYOUTS);
 
 		if (Validator.isNotNull(uuids)) {
-			List<Layout> layouts = new ArrayList<Layout>();
+			List<Layout> layouts = new ArrayList<>();
 
 			for (String uuid : StringUtil.split(uuids)) {
 				Layout layout =
@@ -1412,10 +1407,9 @@ public class SitesImpl implements Sites {
 			GroupLocalServiceUtil.addGroup(
 				userId, GroupConstants.DEFAULT_PARENT_GROUP_ID,
 				Layout.class.getName(), targetLayout.getPlid(),
-				GroupConstants.DEFAULT_LIVE_GROUP_ID,
-				targetLayout.getName(languageId), null, 0, true,
-				GroupConstants.DEFAULT_MEMBERSHIP_RESTRICTION, null, false,
-				true, null);
+				GroupConstants.DEFAULT_LIVE_GROUP_ID, targetLayout.getNameMap(),
+				null, 0, true, GroupConstants.DEFAULT_MEMBERSHIP_RESTRICTION,
+				null, false, true, null);
 		}
 
 		String portletTitle = PortalUtil.getPortletTitle(
@@ -1650,8 +1644,7 @@ public class SitesImpl implements Sites {
 	protected Map<String, String[]> getLayoutSetPrototypesParameters(
 		boolean importData) {
 
-		Map<String, String[]> parameterMap =
-			new LinkedHashMap<String, String[]>();
+		Map<String, String[]> parameterMap = new LinkedHashMap<>();
 
 		parameterMap.put(
 			PortletDataHandlerKeys.DELETE_MISSING_LAYOUTS,
@@ -1682,10 +1675,6 @@ public class SitesImpl implements Sites {
 			new String[] {Boolean.TRUE.toString()});
 		parameterMap.put(
 			PortletDataHandlerKeys.PORTLET_CONFIGURATION_ALL,
-			new String[] {Boolean.TRUE.toString()});
-		parameterMap.put(
-			PortletDataHandlerKeys.PORTLET_DATA + StringPool.UNDERLINE +
-				PortletKeys.ASSET_CATEGORIES_ADMIN,
 			new String[] {Boolean.TRUE.toString()});
 		parameterMap.put(
 			PortletDataHandlerKeys.PORTLET_SETUP_ALL,
@@ -1908,6 +1897,6 @@ public class SitesImpl implements Sites {
 		SystemProperties.get(SystemProperties.TMP_DIR) +
 			"/liferay/layout_set_prototype/";
 
-	private static Log _log = LogFactoryUtil.getLog(SitesImpl.class);
+	private static final Log _log = LogFactoryUtil.getLog(SitesImpl.class);
 
 }

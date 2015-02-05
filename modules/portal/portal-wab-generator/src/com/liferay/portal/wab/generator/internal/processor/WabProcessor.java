@@ -368,7 +368,7 @@ public class WabProcessor {
 
 		// Class path order is critical
 
-		Map<String, File> classPath = new LinkedHashMap<String, File>();
+		Map<String, File> classPath = new LinkedHashMap<>();
 
 		classPath.put(
 			"ext/WEB-INF/classes", new File(_pluginDir, "ext/WEB-INF/classes"));
@@ -439,7 +439,7 @@ public class WabProcessor {
 			return Collections.emptySet();
 		}
 
-		Set<String> packageNames = new HashSet<String>();
+		Set<String> packageNames = new HashSet<>();
 
 		try {
 			ClassReader classReader = new ClassReader(inputStream);
@@ -686,7 +686,7 @@ public class WabProcessor {
 		int contentX = -1;
 		int contentY = content.length();
 
-		Set<String> packageNames = new HashSet<String>();
+		Set<String> packageNames = new HashSet<>();
 
 		while (true) {
 			contentX = content.lastIndexOf("<%@", contentY);
@@ -1196,21 +1196,21 @@ public class WabProcessor {
 	private static final String _SERVICE_BEAN_POST_PROCESSOR_SPRING_XML =
 		"/WEB-INF/classes/META-INF/service-bean-post-processor-spring.xml";
 
-	private static Log _log = LogFactoryUtil.getLog(WabProcessor.class);
+	private static final Log _log = LogFactoryUtil.getLog(WabProcessor.class);
 
 	private String _bundleVersion;
-	private ClassLoader _classLoader;
+	private final ClassLoader _classLoader;
 	private String _context;
-	private Set<String> _exportPackageNames = new HashSet<String>();
-	private File _file;
-	private Set<String> _ignoredResources = new HashSet<String>();
-	private Set<String> _importPackageNames = new HashSet<String>();
+	private final Set<String> _exportPackageNames = new HashSet<>();
+	private final File _file;
+	private final Set<String> _ignoredResources = new HashSet<>();
+	private final Set<String> _importPackageNames = new HashSet<>();
 	private File _manifestFile;
-	private Map<String, String[]> _parameters;
+	private final Map<String, String[]> _parameters;
 	private File _pluginDir;
 	private PluginPackage _pluginPackage;
 	private String _servicePackageName;
-	private Pattern _tldPackagesPattern = Pattern.compile(
+	private final Pattern _tldPackagesPattern = Pattern.compile(
 		"<[^>]+?-class>\\p{Space}*?(.*?)\\p{Space}*?</[^>]+?-class>");
 
 }

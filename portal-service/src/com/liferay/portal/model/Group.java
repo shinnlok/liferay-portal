@@ -42,7 +42,8 @@ public interface Group extends GroupModel, PersistedModel, TreeModel {
 
 	/**
 	* @deprecated As of 7.0.0, replaced by {@link
-	#getChildrenWithLayouts(boolean, int, int, OrderByComparator}
+	#getChildrenWithLayouts(boolean, int, int,
+	OrderByComparator)}
 	*/
 	@java.lang.Deprecated()
 	public java.util.List<com.liferay.portal.model.Group> getChildrenWithLayouts(
@@ -191,6 +192,8 @@ public interface Group extends GroupModel, PersistedModel, TreeModel {
 	public boolean isUserGroup();
 
 	public boolean isUserPersonalSite();
+
+	public boolean isUserPersonalSpace();
 
 	public void setTypeSettingsProperties(
 		com.liferay.portal.kernel.util.UnicodeProperties typeSettingsProperties);

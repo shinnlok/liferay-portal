@@ -16,11 +16,11 @@ package com.liferay.portlet.portletdisplaytemplate.lar;
 
 import com.liferay.portal.kernel.lar.PortletDataHandler;
 import com.liferay.portal.kernel.repository.model.FileEntry;
-import com.liferay.portal.kernel.test.AggregateTestRule;
-import com.liferay.portal.lar.BasePortletDataHandlerTestCase;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.lar.test.BasePortletDataHandlerTestCase;
 import com.liferay.portal.model.LayoutSet;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.MainServletTestRule;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portlet.asset.model.AssetCategory;
@@ -30,7 +30,6 @@ import com.liferay.portlet.blogs.model.BlogsEntry;
 import com.liferay.portlet.dynamicdatalists.model.DDLRecordSet;
 import com.liferay.portlet.dynamicdatamapping.util.test.DDMTemplateTestUtil;
 import com.liferay.portlet.journal.model.JournalArticle;
-import com.liferay.portlet.wiki.model.WikiPage;
 
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -68,7 +67,7 @@ public class PortletDisplayTemplatePortletDataHandlerTest
 	private final Class<?>[] _DDM_TEMPLATE_CLASSES = {
 		AssetCategory.class, AssetEntry.class, AssetTag.class, BlogsEntry.class,
 		DDLRecordSet.class, FileEntry.class, JournalArticle.class,
-		LayoutSet.class, WikiPage.class
+		LayoutSet.class
 	};
 
 }

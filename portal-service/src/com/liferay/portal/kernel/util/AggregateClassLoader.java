@@ -43,7 +43,7 @@ public class AggregateClassLoader extends ClassLoader {
 		ClassLoader parentClassLoader, ClassLoader[] classLoaders) {
 
 		if (ArrayUtil.isEmpty(classLoaders)) {
-			return null;
+			return parentClassLoader;
 		}
 
 		if (classLoaders.length == 1) {
@@ -71,8 +71,7 @@ public class AggregateClassLoader extends ClassLoader {
 	}
 
 	public AggregateClassLoader(ClassLoader classLoader) {
-		_parentClassLoaderReference = new WeakReference<ClassLoader>(
-			classLoader);
+		_parentClassLoaderReference = new WeakReference<>(classLoader);
 	}
 
 	public void addClassLoader(ClassLoader classLoader) {
@@ -138,7 +137,7 @@ public class AggregateClassLoader extends ClassLoader {
 	}
 
 	public List<ClassLoader> getClassLoaders() {
-		List<ClassLoader> classLoaders = new ArrayList<ClassLoader>(
+		List<ClassLoader> classLoaders = new ArrayList<>(
 			_classLoaderReferences.size());
 
 		Iterator<EqualityWeakReference<ClassLoader>> itr =
@@ -181,7 +180,7 @@ public class AggregateClassLoader extends ClassLoader {
 
 	@Override
 	public Enumeration<URL> getResources(String name) throws IOException {
-		List<URL> urls = new ArrayList<URL>();
+		List<URL> urls = new ArrayList<>();
 
 		for (ClassLoader classLoader : getClassLoaders()) {
 			urls.addAll(Collections.list(_getResources(classLoader, name)));
@@ -343,8 +342,7 @@ public class AggregateClassLoader extends ClassLoader {
 	}
 
 	private final List<EqualityWeakReference<ClassLoader>>
-		_classLoaderReferences =
-			new ArrayList<EqualityWeakReference<ClassLoader>>();
+		_classLoaderReferences = new ArrayList<>();
 	private final WeakReference<ClassLoader> _parentClassLoaderReference;
 
 }

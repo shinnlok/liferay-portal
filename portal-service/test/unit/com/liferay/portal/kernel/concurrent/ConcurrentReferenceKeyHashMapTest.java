@@ -15,10 +15,10 @@
 package com.liferay.portal.kernel.concurrent;
 
 import com.liferay.portal.kernel.memory.FinalizeManager;
-import com.liferay.portal.kernel.test.AggregateTestRule;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
-import com.liferay.portal.kernel.test.NewEnv;
-import com.liferay.portal.kernel.test.NewEnvTestRule;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.rule.NewEnv;
+import com.liferay.portal.kernel.test.rule.NewEnvTestRule;
 import com.liferay.portal.kernel.util.StringPool;
 
 import java.lang.ref.Reference;
@@ -64,7 +64,7 @@ public class ConcurrentReferenceKeyHashMapTest
 	@Test
 	public void testConstructor() {
 		ConcurrentMap<Reference<String>, Object> innerConcurrentMap =
-			new ConcurrentHashMap<Reference<String>, Object>();
+			new ConcurrentHashMap<>();
 
 		ConcurrentReferenceKeyHashMap<String, Object>
 			concurrentReferenceKeyHashMap =

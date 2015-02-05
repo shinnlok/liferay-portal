@@ -176,51 +176,6 @@ svn://svn.liferay.com/repos/public/alloy/trunk/sandbox/taglibs.
 		<delete dir="${tstamp.value}" />
 	</target>
 
-	<target name="build-creole-parser">
-		<delete>
-			<fileset
-				dir="src/com/liferay/portal/parsers/creole/parser"
-				includes="*.*"
-			/>
-		</delete>
-
-		<path id="antlr.classpath">
-			<fileset dir="${project.dir}/lib/portal" includes="antlr2.jar,antlr3.jar,antlr3-runtime.jar,stringtemplate.jar" />
-		</path>
-
-		<java
-			classname="org.antlr.Tool"
-			classpathref="antlr.classpath"
-			dir="src/com/liferay/portal/parsers/creole/grammar"
-			fork="true"
-			maxmemory="1024m"
-			newenvironment="true"
-		>
-			<arg value="-o" />
-			<arg value="../parser" />
-			<arg value="Creole10.g" />
-		</java>
-
-		<replace file="src/com/liferay/portal/parsers/creole/parser/Creole10Lexer.java">
-			<replacetoken>public class Creole10Lexer</replacetoken>
-			<replacevalue><![CDATA[@SuppressWarnings("all")
-public class Creole10Lexer]]></replacevalue>
-		</replace>
-
-		<replace file="src/com/liferay/portal/parsers/creole/parser/Creole10Parser.java">
-			<replacetoken>public class Creole10Parser</replacetoken>
-			<replacevalue><![CDATA[@SuppressWarnings("all")
-public class Creole10Parser]]></replacevalue>
-		</replace>
-
-		<fixcrlf
-			includes="*.java"
-			javafiles="yes"
-			srcdir="src/com/liferay/portal/parsers/creole/parser"
-			tab="add"
-		/>
-	</target>
-
 	<target name="build-css">
 		<ant dir="../portal-web" target="build-css" />
 	</target>
@@ -247,57 +202,6 @@ public class Creole10Parser]]></replacevalue>
 
 	<target name="build-db">
 		<ant dir="../sql" target="build-db" />
-	</target>
-
-	<target name="build-freemarker-jar">
-		<get
-			dest="freemarker-2.3.17-sources.zip"
-			src="http://search.maven.org/remotecontent?filepath=org/freemarker/freemarker/2.3.17/freemarker-2.3.17-sources.jar"
-		/>
-
-		<tstamp>
-			<format property="tstamp.value" pattern="yyyyMMddkkmmssSSS" />
-		</tstamp>
-
-		<unzip
-			dest="${tstamp.value}"
-			src="freemarker-2.3.17-sources.zip"
-		>
-			<patternset>
-				<include name="**/DebugBreak.java" />
-				<include name="**/EnvironmentSuspendedEvent.java" />
-				<include name="**/DebuggerServer.java" />
-				<include name="**/DebuggerService.java" />
-				<include name="**/RmiDebuggedEnvironmentImpl.java" />
-				<include name="**/RmiDebuggerImpl.java" />
-				<include name="**/RmiDebuggerService.java" />
-			</patternset>
-		</unzip>
-
-		<delete file="freemarker-2.3.17-sources.zip" />
-
-		<patch
-			dir="${tstamp.value}"
-			patchfile="${project.dir}/lib/portal/freemarker/LPS-35775.patch"
-			strip="1"
-		/>
-
-		<antcall target="compile-java">
-			<param name="javac.classpathref" value="project.classpath" />
-			<param name="javac.destdir" value="${tstamp.value}" />
-			<param name="javac.srcdir" value="${tstamp.value}" />
-		</antcall>
-
-		<get
-			dest="${project.dir}/lib/portal/freemarker.jar.new"
-			src="http://search.maven.org/remotecontent?filepath=org/freemarker/freemarker/2.3.17/freemarker-2.3.17.jar"
-		/>
-
-		<jar destfile="${project.dir}/lib/portal/freemarker.jar.new" update="true">
-			<zipfileset dir="${tstamp.value}" includes="**/*.class" />
-		</jar>
-
-		<delete dir="${tstamp.value}" />
 	</target>
 
 	<target name="build-icu4j-jar">
@@ -524,7 +428,7 @@ public class Creole10Parser]]></replacevalue>
 			<format property="tstamp.value" pattern="yyyyMMddkkmmssSSS" />
 		</tstamp>
 
-		<property name="r2.version" value="liferay-0.2" />
+		<property name="r2.version" value="liferay-0.3" />
 
 		<property name="r2.dir" value="${tstamp.value}/R2-${r2.version}" />
 
@@ -999,12 +903,6 @@ public class Creole10Parser]]></replacevalue>
 		</antcall>
 	</target>
 
-	<target name="build-service-portlet-wiki">
-		<antcall target="build-service">
-			<param name="service.file" value="${basedir}/src/com/liferay/portlet/wiki/service.xml" />
-		</antcall>
-	</target>
-
 	<target name="build-service-portlets">
 		<antcall target="build-service-portlet-announcements" />
 		<antcall target="build-service-portlet-asset" />
@@ -1023,56 +921,12 @@ public class Creole10Parser]]></replacevalue>
 		<antcall target="build-service-portlet-social" />
 		<antcall target="build-service-portlet-softwarecatalog" />
 		<antcall target="build-service-portlet-trash" />
-		<antcall target="build-service-portlet-wiki" />
 	</target>
 
 	<target name="build-services">
 		<antcall target="build-service-counter" />
 		<antcall target="build-service-portal" />
 		<antcall target="build-service-portlets" />
-	</target>
-
-	<target name="build-struts-jar">
-		<get
-			dest="struts-1.2.9-sources.zip"
-			src="http://search.maven.org/remotecontent?filepath=struts/struts/1.2.9/struts-1.2.9-sources.jar"
-		/>
-
-		<tstamp>
-			<format property="tstamp.value" pattern="yyyyMMddkkmmssSSS" />
-		</tstamp>
-
-		<unzip
-			dest="${tstamp.value}"
-			src="struts-1.2.9-sources.zip"
-		>
-			<patternset>
-				<include name="**/I18nFactorySet.java" />
-			</patternset>
-		</unzip>
-
-		<delete file="struts-1.2.9-sources.zip" />
-
-		<replace file="${tstamp.value}/org/apache/struts/tiles/xmlDefinition/I18nFactorySet.java">
-			<replacefilter token="private XmlDefinitionsSet " value="protected XmlDefinitionsSet " />
-		</replace>
-
-		<antcall target="compile-java">
-			<param name="javac.classpathref" value="project.classpath" />
-			<param name="javac.destdir" value="${tstamp.value}" />
-			<param name="javac.srcdir" value="${tstamp.value}" />
-		</antcall>
-
-		<get
-			dest="${project.dir}/lib/portal/struts.jar.new"
-			src="http://search.maven.org/remotecontent?filepath=struts/struts/1.2.9/struts-1.2.9.jar"
-		/>
-
-		<jar destfile="${project.dir}/lib/portal/struts.jar.new" update="true">
-			<zipfileset dir="${tstamp.value}" includes="**/*.class" />
-		</jar>
-
-		<delete dir="${tstamp.value}" />
 	</target>
 
 	<target name="build-themes">
@@ -1288,12 +1142,6 @@ public class Creole10Parser]]></replacevalue>
 		</antcall>
 	</target>
 
-	<target name="build-wsdd-portlet-wiki">
-		<antcall target="build-wsdd">
-			<param name="service.file" value="${basedir}/src/com/liferay/portlet/wiki/service.xml" />
-		</antcall>
-	</target>
-
 	<target name="build-wsdd-portlets">
 		<antcall target="build-wsdd-portlet-announcements" />
 		<antcall target="build-wsdd-portlet-asset" />
@@ -1311,7 +1159,6 @@ public class Creole10Parser]]></replacevalue>
 		<antcall target="build-wsdd-portlet-social" />
 		<antcall target="build-wsdd-portlet-softwarecatalog" />
 		<antcall target="build-wsdd-portlet-trash" />
-		<antcall target="build-wsdd-portlet-wiki" />
 	</target>
 
 	<target name="build-wsdds">
@@ -1343,31 +1190,9 @@ public class Creole10Parser]]></replacevalue>
 	</target>
 
 	<target name="compile">
-		<if>
-			<and>
-				<equals arg1="${app.server.type}" arg2="tomcat" />
-				<antelope:endswith string="${app.server.portal.dir}" with="/portal-web/docroot" />
-			</and>
-			<then>
-				<delete file="${app.server.lib.portal.dir}/portal-impl.jar" />
-			</then>
-		</if>
-
 		<antcall target="compile-dependencies" />
 
 		<antcall target="build-common-java.compile" />
-
-		<if>
-			<and>
-				<equals arg1="${app.server.type}" arg2="tomcat" />
-				<antelope:endswith string="${app.server.portal.dir}" with="/portal-web/docroot" />
-			</and>
-			<then>
-				<copy todir="${app.server.classes.portal.dir}" overwrite="true" preservelastmodified="true">
-					<fileset dir="classes" />
-				</copy>
-			</then>
-		</if>
 
 		<antcall target="print-current-time" />
 	</target>
@@ -1463,7 +1288,7 @@ public class Creole10Parser]]></replacevalue>
 		/>
 	</target>
 
-	<target name="deploy">
+	<target name="deploy" depends="check-deploy-uptodate,jar" unless="${deploy.uptodate}">
 		<ant dir="../portal-service" target="deploy" inheritAll="false" />
 
 		<antcall target="deploy-properties" />
@@ -1474,17 +1299,9 @@ public class Creole10Parser]]></replacevalue>
 				<antelope:endswith string="${app.server.portal.dir}" with="/portal-web/docroot" />
 			</and>
 			<then>
-				<delete file="${app.server.lib.portal.dir}/portal-impl.jar" />
+				<delete file="${app.server.lib.portal.dir}/portal-impl.jar" failonerror="false" />
 
-				<copy todir="${app.server.classes.portal.dir}/com/liferay/portal/definitions" preservelastmodified="true">
-					<fileset dir="${project.dir}/definitions" />
-				</copy>
-
-				<copy todir="${app.server.classes.portal.dir}" preservelastmodified="true">
-					<fileset dir="src" includes="**/dependencies/**,**/service.xml" />
-				</copy>
-
-				<antcall target="compile" />
+				<unjar dest="${app.server.classes.portal.dir}" src="portal-impl.jar" />
 			</then>
 			<else>
 				<antcall target="build-common-java.deploy" />

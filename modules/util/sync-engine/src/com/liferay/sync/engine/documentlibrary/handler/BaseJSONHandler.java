@@ -51,58 +51,7 @@ public class BaseJSONHandler extends BaseHandler {
 	}
 
 	@Override
-	public Void handleResponse(HttpResponse httpResponse) {
-		try {
-			StatusLine statusLine = httpResponse.getStatusLine();
-
-			if (statusLine.getStatusCode() != HttpStatus.SC_OK) {
-				String response = getResponseString(httpResponse);
-
-				if (handlePortalException(getException(response))) {
-					return null;
-				}
-
-				_logger.error("Status code {}", statusLine.getStatusCode());
-
-				throw new HttpResponseException(
-					statusLine.getStatusCode(), statusLine.getReasonPhrase());
-			}
-
-			doHandleResponse(httpResponse);
-		}
-		catch (Exception e) {
-			handleException(e);
-		}
-
-		return null;
-	}
-
-	@Override
-	protected void doHandleResponse(HttpResponse httpResponse)
-		throws Exception {
-
-		Header header = httpResponse.getFirstHeader("Sync-JWT");
-
-		if (header != null) {
-			Session session = SessionManager.getSession(getSyncAccountId());
-
-			session.setToken(header.getValue());
-		}
-
-		String response = getResponseString(httpResponse);
-
-		if (handlePortalException(getException(response))) {
-			return;
-		}
-
-		if (_logger.isTraceEnabled()) {
-			_logger.trace("Handling response {}", response);
-		}
-
-		processResponse(response);
-	}
-
-	protected String getException(String response) {
+	public String getException(String response) {
 		ObjectMapper objectMapper = new ObjectMapper();
 
 		JsonNode responseJsonNode = null;
@@ -142,16 +91,9 @@ public class BaseJSONHandler extends BaseHandler {
 		return typeJsonNode.asText();
 	}
 
-	protected String getResponseString(HttpResponse httpResponse)
-		throws Exception {
-
-		HttpEntity httpEntity = httpResponse.getEntity();
-
-		return EntityUtils.toString(httpEntity);
-	}
-
-	protected boolean handlePortalException(String exception) throws Exception {
-		if (exception.equals("")) {
+	@Override
+	public boolean handlePortalException(String exception) throws Exception {
+		if (exception.isEmpty()) {
 			return false;
 		}
 
@@ -243,7 +185,7 @@ public class BaseJSONHandler extends BaseHandler {
 			SyncFile syncFile = (SyncFile)getParameterValue("syncFile");
 
 			syncFile.setState(SyncFile.STATE_ERROR);
-			syncFile.setUiEvent(SyncFile.UI_EVENT_DEFAULT);
+			syncFile.setUiEvent(SyncFile.UI_EVENT_NONE);
 
 			SyncFileService.update(syncFile);
 		}
@@ -251,7 +193,67 @@ public class BaseJSONHandler extends BaseHandler {
 		return true;
 	}
 
-	protected void processResponse(String response) throws Exception {
+	@Override
+	public Void handleResponse(HttpResponse httpResponse) {
+		try {
+			StatusLine statusLine = httpResponse.getStatusLine();
+
+			if (statusLine.getStatusCode() != HttpStatus.SC_OK) {
+				String response = getResponseString(httpResponse);
+
+				if (handlePortalException(getException(response))) {
+					return null;
+				}
+
+				_logger.error("Status code {}", statusLine.getStatusCode());
+
+				throw new HttpResponseException(
+					statusLine.getStatusCode(), statusLine.getReasonPhrase());
+			}
+
+			doHandleResponse(httpResponse);
+		}
+		catch (Exception e) {
+			handleException(e);
+		}
+
+		return null;
+	}
+
+	@Override
+	protected void doHandleResponse(HttpResponse httpResponse)
+		throws Exception {
+
+		Header header = httpResponse.getFirstHeader("Sync-JWT");
+
+		if (header != null) {
+			Session session = SessionManager.getSession(getSyncAccountId());
+
+			session.setToken(header.getValue());
+		}
+
+		String response = getResponseString(httpResponse);
+
+		if (handlePortalException(getException(response))) {
+			return;
+		}
+
+		if (_logger.isTraceEnabled()) {
+			Class<?> clazz = getClass();
+
+			_logger.trace(
+				"Handling response {} {}", clazz.getSimpleName(), response);
+		}
+
+		processResponse(response);
+	}
+
+	protected String getResponseString(HttpResponse httpResponse)
+		throws Exception {
+
+		HttpEntity httpEntity = httpResponse.getEntity();
+
+		return EntityUtils.toString(httpEntity);
 	}
 
 	private static final Logger _logger = LoggerFactory.getLogger(

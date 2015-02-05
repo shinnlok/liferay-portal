@@ -25,12 +25,10 @@ import com.liferay.portal.service.ServiceContextFactory;
 import com.liferay.portal.struts.PortletAction;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.WebKeys;
-import com.liferay.portlet.assetpublisher.util.AssetPublisherUtil;
 import com.liferay.portlet.journal.DuplicateFolderNameException;
 import com.liferay.portlet.journal.FolderNameException;
 import com.liferay.portlet.journal.InvalidDDMStructureException;
 import com.liferay.portlet.journal.NoSuchFolderException;
-import com.liferay.portlet.journal.model.JournalArticle;
 import com.liferay.portlet.journal.model.JournalFolder;
 import com.liferay.portlet.journal.model.JournalFolderConstants;
 import com.liferay.portlet.journal.service.JournalFolderServiceUtil;
@@ -148,7 +146,7 @@ public class EditFolderAction extends PortletAction {
 				ParamUtil.getString(actionRequest, "folderIds"), 0L);
 		}
 
-		List<TrashedModel> trashedModels = new ArrayList<TrashedModel>();
+		List<TrashedModel> trashedModels = new ArrayList<>();
 
 		for (long deleteFolderId : deleteFolderIds) {
 			if (moveToTrash) {
@@ -160,9 +158,6 @@ public class EditFolderAction extends PortletAction {
 			else {
 				JournalFolderServiceUtil.deleteFolder(deleteFolderId);
 			}
-
-			AssetPublisherUtil.removeRecentFolderId(
-				actionRequest, JournalArticle.class.getName(), deleteFolderId);
 		}
 
 		if (moveToTrash && !trashedModels.isEmpty()) {

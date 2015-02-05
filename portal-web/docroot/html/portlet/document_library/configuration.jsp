@@ -17,9 +17,7 @@
 <%@ include file="/html/portlet/document_library/init.jsp" %>
 
 <%
-dlPortletInstanceSettings = DLPortletInstanceSettings.getInstance(layout, portletId, request.getParameterMap());
-
-DLConfigurationDisplayContext dlConfigurationDisplayContext = new DLConfigurationDisplayContext(request, dlPortletInstanceSettings);
+DLPortletInstanceSettingsHelper dlPortletInstanceSettingsHelper = new DLPortletInstanceSettingsHelper(dlRequestHelper);
 %>
 
 <liferay-portlet:actionURL portletConfiguration="<%= true %>" var="configurationActionURL">
@@ -53,7 +51,7 @@ DLConfigurationDisplayContext dlConfigurationDisplayContext = new DLConfiguratio
 							<aui:button name="selectFolderButton" value="select" />
 
 							<%
-							String taglibRemoveFolder = "Liferay.Util.removeFolderSelection('rootFolderId', 'rootFolderName', '" + renderResponse.getNamespace() + "');";
+							String taglibRemoveFolder = "Liferay.Util.removeEntitySelection('rootFolderId', 'rootFolderName', this, '" + renderResponse.getNamespace() + "');";
 							%>
 
 							<aui:button disabled="<%= rootFolderId <= 0 %>" name="removeFolderButton" onClick="<%= taglibRemoveFolder %>" value="remove" />
@@ -80,11 +78,11 @@ DLConfigurationDisplayContext dlConfigurationDisplayContext = new DLConfiguratio
 						<aui:field-wrapper label="display-style-views">
 							<liferay-ui:input-move-boxes
 								leftBoxName="currentDisplayViews"
-								leftList="<%= dlConfigurationDisplayContext.getCurrentDisplayViews() %>"
+								leftList="<%= dlPortletInstanceSettingsHelper.getCurrentDisplayViews() %>"
 								leftReorder="true"
 								leftTitle="current"
 								rightBoxName="availableDisplayViews"
-								rightList="<%= dlConfigurationDisplayContext.getAvailableDisplayViews() %>"
+								rightList="<%= dlPortletInstanceSettingsHelper.getAvailableDisplayViews() %>"
 								rightTitle="available"
 							/>
 						</aui:field-wrapper>
@@ -96,11 +94,11 @@ DLConfigurationDisplayContext dlConfigurationDisplayContext = new DLConfiguratio
 						<aui:field-wrapper label="show-columns">
 							<liferay-ui:input-move-boxes
 								leftBoxName="currentEntryColumns"
-								leftList="<%= dlConfigurationDisplayContext.getCurrentEntryColumns() %>"
+								leftList="<%= dlPortletInstanceSettingsHelper.getCurrentEntryColumns() %>"
 								leftReorder="true"
 								leftTitle="current"
 								rightBoxName="availableEntryColumns"
-								rightList="<%= dlConfigurationDisplayContext.getAvailableEntryColumns() %>"
+								rightList="<%= dlPortletInstanceSettingsHelper.getAvailableEntryColumns() %>"
 								rightTitle="available"
 							/>
 						</aui:field-wrapper>
