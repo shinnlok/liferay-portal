@@ -12,15 +12,29 @@
  * details.
  */
 
-package com.liferay.sync.engine.upgrade;
+package com.liferay.sync.engine.upgrade.v2_0_6;
+
+import com.liferay.sync.engine.service.SyncFileService;
+import com.liferay.sync.engine.service.persistence.SyncFilePersistence;
+import com.liferay.sync.engine.upgrade.UpgradeProcess;
 
 /**
- * @author Shinn Lok
+ * @author Dennis Ju
  */
-public abstract class UpgradeProcess {
+public class UpgradeProcess_2_0_6 extends UpgradeProcess {
 
-	public abstract int getThreshold();
+	@Override
+	public int getThreshold() {
+		return 2006;
+	}
 
-	public abstract void upgrade() throws Exception;
+	@Override
+	public void upgrade() throws Exception {
+		SyncFilePersistence syncFilePersistence =
+			SyncFileService.getSyncFilePersistence();
+
+		syncFilePersistence.updateRaw(
+			"update SyncFile set fileKey = syncFileId");
+	}
 
 }
