@@ -21,7 +21,6 @@ import com.liferay.sync.engine.model.SyncFileModelListener;
 import com.liferay.sync.engine.service.persistence.SyncFilePersistence;
 import com.liferay.sync.engine.util.FileUtil;
 import com.liferay.sync.engine.util.IODeltaUtil;
-import com.liferay.sync.engine.util.OSDetector;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -507,16 +506,10 @@ public class SyncFileService {
 	public static SyncFile updateFileKeySyncFile(
 		SyncFile syncFile, Path filePath) {
 
-		if (OSDetector.isWindows()) {
-			FileUtil.writeFileKey(
-				filePath, String.valueOf(syncFile.getSyncFileId()));
+		FileUtil.writeFileKey(
+			filePath, String.valueOf(syncFile.getSyncFileId()));
 
-			syncFile.setFileKey(String.valueOf(syncFile.getSyncFileId()));
-		}
-		else {
-			syncFile.setFileKey(
-				FileUtil.getFileKey(syncFile.getFilePathName()));
-		}
+		syncFile.setFileKey(String.valueOf(syncFile.getSyncFileId()));
 
 		return update(syncFile);
 	}
@@ -527,10 +520,8 @@ public class SyncFileService {
 
 		// Local sync file
 
-		if (OSDetector.isWindows()) {
-			FileUtil.writeFileKey(
-				filePath, String.valueOf(syncFile.getSyncFileId()));
-		}
+		FileUtil.writeFileKey(
+			filePath, String.valueOf(syncFile.getSyncFileId()));
 
 		Path deltaFilePath = null;
 

@@ -14,6 +14,8 @@
 
 package com.liferay.sync.engine.util;
 
+import ch.securityvision.xattrj.Xattrj;
+
 import com.liferay.sync.engine.model.SyncFile;
 import com.liferay.sync.engine.service.SyncFileService;
 
@@ -30,7 +32,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.nio.file.attribute.UserDefinedFileAttributeView;
 
@@ -43,6 +44,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 
@@ -89,7 +91,30 @@ public class FileUtil {
 		}
 
 		try {
-			if (OSDetector.isWindows()) {
+			if (OSDetector.isApple()) {
+				Xattrj xattrj = _getXattrj();
+
+				if (xattrj == null) {
+					return "";
+				}
+
+				String[] list = xattrj.listAttributes(filePath.toFile());
+
+				if (!ArrayUtils.contains(list, "fileKey")) {
+					return "";
+				}
+
+				String fileKey = xattrj.readAttribute(
+					filePath.toFile(), "fileKey");
+
+				if (fileKey == null) {
+					return "";
+				}
+				else {
+					return fileKey;
+				}
+			}
+			else {
 				UserDefinedFileAttributeView userDefinedFileAttributeView =
 					Files.getFileAttributeView(
 						filePath, UserDefinedFileAttributeView.class);
@@ -109,14 +134,6 @@ public class FileUtil {
 					(ByteBuffer)byteBuffer.flip());
 
 				return charBuffer.toString();
-			}
-			else {
-				BasicFileAttributes basicFileAttributes = Files.readAttributes(
-					filePath, BasicFileAttributes.class);
-
-				Object fileKey = basicFileAttributes.fileKey();
-
-				return fileKey.toString();
 			}
 		}
 		catch (Exception e) {
@@ -389,26 +406,33 @@ public class FileUtil {
 	}
 
 	public static void writeFileKey(Path filePath, String fileKey) {
-		if (!OSDetector.isWindows()) {
-			return;
+		if (OSDetector.isApple()) {
+			Xattrj xattrj = _getXattrj();
+
+			if (xattrj == null) {
+				return;
+			}
+
+			xattrj.writeAttribute(filePath.toFile(), "fileKey", fileKey);
 		}
+		else {
+			File file = filePath.toFile();
 
-		File file = filePath.toFile();
+			if (!file.canWrite()) {
+				file.setWritable(true);
+			}
 
-		if (!file.canWrite()) {
-			file.setWritable(true);
-		}
+			UserDefinedFileAttributeView userDefinedFileAttributeView =
+				Files.getFileAttributeView(
+					filePath, UserDefinedFileAttributeView.class);
 
-		UserDefinedFileAttributeView userDefinedFileAttributeView =
-			Files.getFileAttributeView(
-				filePath, UserDefinedFileAttributeView.class);
-
-		try {
-			userDefinedFileAttributeView.write(
-				"fileKey", _CHARSET.encode(CharBuffer.wrap(fileKey)));
-		}
-		catch (Exception e) {
-			_logger.error(e.getMessage(), e);
+			try {
+				userDefinedFileAttributeView.write(
+					"fileKey", _CHARSET.encode(CharBuffer.wrap(fileKey)));
+			}
+			catch (Exception e) {
+				_logger.error(e.getMessage(), e);
+			}
 		}
 	}
 
@@ -450,6 +474,21 @@ public class FileUtil {
 		return false;
 	}
 
+	private static Xattrj _getXattrj() {
+		if (_xattrj != null) {
+			return _xattrj;
+		}
+
+		try {
+			return _xattrj = new Xattrj();
+		}
+		catch (IOException ioe) {
+			_logger.error(ioe.getMessage(), ioe);
+
+			return null;
+		}
+	}
+
 	private static final Charset _CHARSET = Charset.forName("UTF-8");
 
 	private static final Logger _logger = LoggerFactory.getLogger(
@@ -457,5 +496,6 @@ public class FileUtil {
 
 	private static final Set<String> _syncFileIgnoreNames = new HashSet<>(
 		Arrays.asList(PropsValues.SYNC_FILE_IGNORE_NAMES));
+	private static Xattrj _xattrj;
 
 }
