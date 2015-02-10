@@ -763,14 +763,12 @@ public class UserWrapper implements User, ModelWrapper<User> {
 	}
 
 	@Override
-	public com.liferay.portal.model.Group getGroup()
-		throws com.liferay.portal.kernel.exception.PortalException {
+	public com.liferay.portal.model.Group getGroup() {
 		return _user.getGroup();
 	}
 
 	@Override
-	public long getGroupId()
-		throws com.liferay.portal.kernel.exception.PortalException {
+	public long getGroupId() {
 		return _user.getGroupId();
 	}
 
@@ -1070,6 +1068,11 @@ public class UserWrapper implements User, ModelWrapper<User> {
 		boolean includeAdministrative)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _user.getOrganizations(includeAdministrative);
+	}
+
+	@Override
+	public java.lang.String getOriginalEmailAddress() {
+		return _user.getOriginalEmailAddress();
 	}
 
 	/**

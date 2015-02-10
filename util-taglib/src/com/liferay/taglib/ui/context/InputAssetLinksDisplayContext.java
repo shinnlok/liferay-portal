@@ -32,7 +32,6 @@ import com.liferay.portal.model.Group;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portal.util.PortletKeys;
 import com.liferay.portlet.PortletURLFactoryUtil;
 import com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil;
 import com.liferay.portlet.asset.model.AssetEntry;
@@ -40,6 +39,8 @@ import com.liferay.portlet.asset.model.AssetLink;
 import com.liferay.portlet.asset.model.AssetRendererFactory;
 import com.liferay.portlet.asset.model.ClassType;
 import com.liferay.portlet.asset.model.ClassTypeReader;
+import com.liferay.portlet.asset.provider.PortletProvider;
+import com.liferay.portlet.asset.provider.PortletProviderUtil;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetEntryServiceUtil;
 import com.liferay.portlet.asset.service.AssetLinkLocalServiceUtil;
@@ -169,8 +170,7 @@ public class InputAssetLinksDisplayContext {
 	}
 
 	public List<Map<String, Object>> getSelectorEntries() throws Exception {
-		List<Map<String, Object>> selectorEntries =
-			new ArrayList<Map<String, Object>>();
+		List<Map<String, Object>> selectorEntries = new ArrayList<>();
 
 		for (AssetRendererFactory assetRendererFactory :
 				getAssetRendererFactories()) {
@@ -180,8 +180,7 @@ public class InputAssetLinksDisplayContext {
 					_getSelectorEntries(assetRendererFactory));
 			}
 			else {
-				Map<String, Object> selectorEntry =
-					new HashMap<String, Object>();
+				Map<String, Object> selectorEntry = new HashMap<>();
 
 				selectorEntry.put(
 					"data", _geSelectorEntryData(assetRendererFactory));
@@ -203,7 +202,7 @@ public class InputAssetLinksDisplayContext {
 	}
 
 	private List<AssetLink> _createAssetLinks() throws PortalException {
-		List<AssetLink> assetLinks = new ArrayList<AssetLink>();
+		List<AssetLink> assetLinks = new ArrayList<>();
 
 		String assetLinksSearchContainerPrimaryKeys = ParamUtil.getString(
 			_request, "assetLinksSearchContainerPrimaryKeys");
@@ -263,7 +262,7 @@ public class InputAssetLinksDisplayContext {
 			AssetRendererFactory assetRendererFactory)
 		throws Exception {
 
-		Map<String, Object> selectorEntryData = new HashMap<String, Object>();
+		Map<String, Object> selectorEntryData = new HashMap<>();
 
 		selectorEntryData.put(
 			"href",
@@ -309,11 +308,11 @@ public class InputAssetLinksDisplayContext {
 		long controlPanelPlid = PortalUtil.getControlPanelPlid(
 			_themeDisplay.getCompanyId());
 
-		PortletURL portletURL = PortletURLFactoryUtil.create(
-			_request, PortletKeys.ASSET_BROWSER, controlPanelPlid,
-			PortletRequest.RENDER_PHASE);
+		String portletId = PortletProviderUtil.getPortletId(
+			assetRendererFactory.getClassName(), PortletProvider.Action.BROWSE);
 
-		portletURL.setParameter("struts_action", "/asset_browser/view");
+		PortletURL portletURL = PortletURLFactoryUtil.create(
+			_request, portletId, controlPanelPlid, PortletRequest.RENDER_PHASE);
 
 		long groupId = _getAssetBrowserGroupId(assetRendererFactory);
 
@@ -357,11 +356,10 @@ public class InputAssetLinksDisplayContext {
 			return Collections.emptyList();
 		}
 
-		List<Map<String, Object>> selectorEntries =
-			new ArrayList<Map<String, Object>>();
+		List<Map<String, Object>> selectorEntries = new ArrayList<>();
 
 		for (ClassType classType : classTypes) {
-			Map<String, Object> selectorEntry = new HashMap<String, Object>();
+			Map<String, Object> selectorEntry = new HashMap<>();
 
 			selectorEntry.put(
 				"data",
@@ -386,7 +384,7 @@ public class InputAssetLinksDisplayContext {
 			AssetRendererFactory assetRendererFactory, ClassType classType)
 		throws Exception {
 
-		Map<String, Object> selectorEntryData = new HashMap<String, Object>();
+		Map<String, Object> selectorEntryData = new HashMap<>();
 
 		PortletURL portletURL = _getAssetBrowserPortletURL(
 			assetRendererFactory);
@@ -491,15 +489,15 @@ public class InputAssetLinksDisplayContext {
 		return _stagedReferrerPortlet;
 	}
 
-	private long _assetEntryId;
+	private final long _assetEntryId;
 	private List<AssetLink> _assetLinks;
 	private String _eventName;
-	private PageContext _pageContext;
-	private PortletRequest _portletRequest;
+	private final PageContext _pageContext;
+	private final PortletRequest _portletRequest;
 	private String _randomNamespace;
-	private HttpServletRequest _request;
+	private final HttpServletRequest _request;
 	private Boolean _stagedLocally;
 	private Boolean _stagedReferrerPortlet;
-	private ThemeDisplay _themeDisplay;
+	private final ThemeDisplay _themeDisplay;
 
 }

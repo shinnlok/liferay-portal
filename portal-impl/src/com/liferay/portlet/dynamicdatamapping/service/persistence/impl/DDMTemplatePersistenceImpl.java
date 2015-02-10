@@ -64,7 +64,7 @@ import java.util.Set;
  *
  * @author Brian Wing Shun Chan
  * @see DDMTemplatePersistence
- * @see DDMTemplateUtil
+ * @see com.liferay.portlet.dynamicdatamapping.service.persistence.DDMTemplateUtil
  * @generated
  */
 @ProviderType
@@ -12111,6 +12111,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 		ddmTemplateImpl.setModifiedDate(ddmTemplate.getModifiedDate());
 		ddmTemplateImpl.setClassNameId(ddmTemplate.getClassNameId());
 		ddmTemplateImpl.setClassPK(ddmTemplate.getClassPK());
+		ddmTemplateImpl.setSourceClassNameId(ddmTemplate.getSourceClassNameId());
 		ddmTemplateImpl.setTemplateKey(ddmTemplate.getTemplateKey());
 		ddmTemplateImpl.setVersion(ddmTemplate.getVersion());
 		ddmTemplateImpl.setName(ddmTemplate.getName());

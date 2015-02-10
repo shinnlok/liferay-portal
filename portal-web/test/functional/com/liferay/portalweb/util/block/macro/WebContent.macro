@@ -42,6 +42,7 @@
 			<then>
 				<execute action="CPWebcontentAddwebcontent#click" locator-key1="AUDIO_BUTTON" />
 				<execute action="CPWebcontentAddwebcontent#assertClick" locator-key1="AUDIO_BROWSE_SERVER_BUTTON" value1="Browse Server" />
+				<execute action="CPWebcontentAddwebcontent#pause" locator1="10000" />
 				<execute action="CPWebcontentAddwebcontent#selectFrame" locator-key1="BROWSE_IFRAME" />
 				<execute action="CPWebcontentAddwebcontent#assertClick" locator-key1="CHOOSE_BUTTON" value1="Choose" />
 				<execute action="CPWebcontentAddwebcontent#selectFrame" value1="relative=top" />
@@ -316,7 +317,7 @@
 
 				<var name="key_lowercaseLanguageCode" value="${lowercaseLanguageCode}" />
 
-				<execute action="PGWebcontentdisplayAddwebcontent#type" locator-key1="TITLE_FIELD_LOCALIZED" value1="${webContentTitle}" />
+				<execute action="PGWebcontentdisplayAddwebcontent#type" locator-key1="TITLE_FIELD" value1="${webContentTitle}" />
 				<execute action="PGWebcontentdisplayAddwebcontent#type" locator-key1="CONTENT_FIELD_LOCALIZED" value1="${webContentContent}" />
 				<execute action="PGWebcontentdisplayAddwebcontent#click" locator-key1="LOCALIZED_PUBLISH_BUTTON" />
 			</then>
@@ -327,19 +328,28 @@
 
 				<execute action="PGWebcontentdisplayAddwebcontent#type" locator-key1="TITLE_FIELD" value1="${webContentTitle}" />
 				<execute action="PGWebcontentdisplayAddwebcontent#type" locator-key1="CONTENT_FIELD" value1="${webContentContent}" />
-				<execute action="PGWebcontentdisplayAddwebcontent#click" locator-key1="PUBLISH_BUTTON" />
-			</else>
-		</if>
 
-		<execute action="PGWebcontentdisplay#selectFrame" value1="relative=top" />
+				<if>
+					<equals arg1="${draft}" arg2="true" />
+					<then>
+						<execute action="PGWebcontentdisplayAddwebcontent#click" locator-key1="SAVE_AS_DRAFT_BUTTON" />
+						<execute action="PGWebcontentdisplayAddwebcontent#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request completed successfully." />
+					</then>
+					<else>
+						<execute action="PGWebcontentdisplayAddwebcontent#click" locator-key1="PUBLISH_BUTTON" />
+						<execute action="PGWebcontentdisplay#selectFrame" value1="relative=top" />
 
-		<if>
-			<equals arg1="${webContentJavascript}" arg2="true" />
-			<then>
-				<execute action="PGWebcontentdisplay#assertTextEquals" locator1="//div[@class='journal-content-article']//span[contains(@class,'portlet-title-text')]" value1="${embeddedPortletTitle}" />
-			</then>
-			<else>
-				<execute action="PGWebcontentdisplay#assertTextEquals" locator-key1="WEB_CONTENT_CONTENT" value1="${webContentContent}" />
+						<if>
+							<equals arg1="${webContentJavascript}" arg2="true" />
+							<then>
+								<execute action="PGWebcontentdisplay#assertTextEquals" locator1="//div[@class='journal-content-article']//span[contains(@class,'portlet-title-text')]" value1="${embeddedPortletTitle}" />
+							</then>
+							<else>
+								<execute action="PGWebcontentdisplay#assertTextEquals" locator-key1="WEB_CONTENT_CONTENT" value1="${webContentContent}" />
+							</else>
+						</if>
+					</else>
+				</if>
 			</else>
 		</if>
 	</command>
@@ -422,6 +432,15 @@
 				<var name="key_fieldName" value="Text" />
 
 				<execute action="CPWebcontentEditwebcontent#type" locator-key1="TEXT_FIELD" value1="${localizedText}" />
+			</then>
+		</if>
+
+		<if>
+			<isset var="localizedTextBox" />
+			<then>
+				<var name="key_fieldName" value="Text_Box" />
+
+				<execute action="CPWebcontentEditwebcontent#type" locator-key1="TEXT_BOX_FIELD" value1="${localizedTextBox}" />
 			</then>
 		</if>
 
@@ -878,6 +897,7 @@
 
 		<execute action="CPWebcontentAddwebcontent#assertClick" locator-key1="MENU_DISPLAY_PAGE" value1="Display Page" />
 		<execute action="CPWebcontentAddwebcontent#assertClick" locator-key1="DISPLAY_PAGE_CHOOSE" value1="Choose" />
+		<execute action="CPWebcontentAddwebcontent#pause" locator1="5000" />
 
 		<var name="key_pageName" value="${pageName}" />
 
@@ -999,6 +1019,7 @@
 		<execute action="PGWebcontentdisplay#click" locator-key1="EDIT_WEB_CONTENT" />
 
 		<execute action="PGWebcontentdisplayEditwebcontent#selectFrame" locator-key1="WEB_CONTENT_IFRAME" />
+		<execute action="PGWebcontentdisplayEditwebcontent#pause" locator1="5000" />
 		<execute action="PGWebcontentdisplayEditwebcontent#assertClick" locator-key1="TOOLBAR_VIEW_HISTORY" value1="View History" />
 
 		<var name="key_historyStatus" value="Expired" />
@@ -1497,10 +1518,16 @@
 
 	<command name="viewPGViaWCD">
 		<if>
-			<equals arg1="${expiredContent}" arg2="true" />
+			<equals arg1="${draft}" arg2="true" />
 			<then>
-				<execute action="PGWebcontentdisplay#assertTextEquals" locator-key1="ALERT_MESSAGE" value1="${webContentTitle} is expired." />
+				<execute action="PGWebcontentdisplay#assertTextEquals" locator-key1="ALERT_MESSAGE" value1="${webContentTitle} is not approved." />
 			</then>
+			<elseif>
+				<equals arg1="${expiredContent}" arg2="true" />
+				<then>
+					<execute action="PGWebcontentdisplay#assertTextEquals" locator-key1="ALERT_MESSAGE" value1="${webContentTitle} is expired." />
+				</then>
+			</elseif>
 			<else>
 				<execute action="PGWebcontentdisplay#assertTextEquals" locator-key1="WEB_CONTENT_CONTENT" value1="${webContentContent}" />
 			</else>
@@ -1647,6 +1674,36 @@
 		<execute action="PGWebcontentdisplayEditwebcontent#selectFrame" value1="relative=top" />
 	</command>
 
+	<command name="viewUnlocalizableTextBox">
+		<var name="key_webContentTitle" value="${webContentTitle}" />
+
+		<execute macro="WebContent#gotoCP">
+			<var name="key_webContentTitle" value="${webContentTitle}" />
+		</execute>
+
+		<var name="key_fieldName" value="Text" />
+
+		<execute action="CPWebcontentEditwebcontent#assertTextEquals" locator-key1="TITLE_FIELD" value1="${webContentTitle}" />
+
+		<var name="key_fieldName" value="Text_Box" />
+
+		<execute action="CPWebcontentEditwebcontent#assertTextEquals" locator-key1="TEXT_BOX_FIELD" value1="${localizedTextBox}" />
+
+		<var name="key_translationLocale" value="es_ES" />
+
+		<execute action="CPWebcontentEditwebcontent#click" locator-key1="TRANSLATION_LOCALE" />
+
+		<execute action="CPWebcontentEditwebcontent#assertTextEquals" locator-key1="TITLE_FIELD" value1="${localizedTitle}" />
+
+		<var name="key_fieldName" value="Text" />
+
+		<execute action="CPWebcontentEditwebcontent#assertTextEquals" locator-key1="TEXT_FIELD" value1="${localizedText}" />
+
+		<var name="key_fieldName" value="Text_Box" />
+
+		<execute action="CPWebcontentEditwebcontent#assertTextEquals" locator-key1="TEXT_BOX_FIELD" value1="${localizedTextBox}" />
+	</command>
+
 	<command name="viewWithWorkflowCP">
 		<var name="key_webContentTitle" value="${webContentTitle}" />
 
@@ -1669,7 +1726,7 @@
 
 	<command name="viewWithWorkflowPGViaWCD">
 		<execute action="PGWebcontentdisplay#assertTextEquals" locator-key1="ALERT_MESSAGE" value1="${webContentTitle} is not approved." />
-		<execute action="PGWebcontentdisplay#assertClick" locator-key1="ALERT_MESSAGE" value1="${webContentTitle} is not approved." />
+		<execute action="PGWebcontentdisplay#assertClick" locator-key1="ALERT_MESSAGE_LINK" value1="${webContentTitle} is not approved." />
 
 		<execute action="PGWebcontentdisplayEditwebcontent#assertTextEquals" locator-key1="WORKFLOW_STATUS" value1="Pending (${workflowTask})" />
 		<execute action="PGWebcontentdisplayEditwebcontent#assertTextEquals" locator-key1="TITLE_FIELD" value1="${webContentTitle}" />

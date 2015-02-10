@@ -90,7 +90,8 @@ public class BaseClusterTestCase {
 
 		@Around(
 			"execution(* com.liferay.portal.cluster.BaseReceiver." +
-				"doReceive(org.jgroups.Message))")
+				"doReceive(org.jgroups.Message))"
+		)
 		public void doReceive(ProceedingJoinPoint proceedingJoinPoint) {
 			Receiver receiver = (Receiver)proceedingJoinPoint.getThis();
 			org.jgroups.Message jGroupsMessage =
@@ -100,7 +101,7 @@ public class BaseClusterTestCase {
 				receiver);
 
 			if (jGroupsMessageList == null) {
-				jGroupsMessageList = new ArrayList<org.jgroups.Message>();
+				jGroupsMessageList = new ArrayList<>();
 
 				List<org.jgroups.Message> previousJgroupsMessageList =
 					_jGroupsMessages.putIfAbsent(receiver, jGroupsMessageList);
@@ -117,8 +118,7 @@ public class BaseClusterTestCase {
 
 		private static CountDownLatch _countDownLatch;
 		private static final ConcurrentMap<Receiver, List<org.jgroups.Message>>
-			_jGroupsMessages =
-				new ConcurrentHashMap<Receiver, List<org.jgroups.Message>>();
+			_jGroupsMessages = new ConcurrentHashMap<>();
 
 	}
 
@@ -127,7 +127,8 @@ public class BaseClusterTestCase {
 
 		@Around(
 			"set(* com.liferay.portal.util.PropsValues." +
-				"CLUSTER_LINK_AUTODETECT_ADDRESS)")
+				"CLUSTER_LINK_AUTODETECT_ADDRESS)"
+		)
 		public Object disableAutodetectedAddress(
 				ProceedingJoinPoint proceedingJoinPoint)
 			throws Throwable {
@@ -141,7 +142,8 @@ public class BaseClusterTestCase {
 	public static class DisableClusterLinkAdvice {
 
 		@Around(
-			"set(* com.liferay.portal.util.PropsValues.CLUSTER_LINK_ENABLED)")
+			"set(* com.liferay.portal.util.PropsValues.CLUSTER_LINK_ENABLED)"
+		)
 		public Object disableClusterLink(
 				ProceedingJoinPoint proceedingJoinPoint)
 			throws Throwable {
@@ -155,7 +157,8 @@ public class BaseClusterTestCase {
 	public static class EnableClusterLinkAdvice {
 
 		@Around(
-			"set(* com.liferay.portal.util.PropsValues.CLUSTER_LINK_ENABLED)")
+			"set(* com.liferay.portal.util.PropsValues.CLUSTER_LINK_ENABLED)"
+		)
 		public Object enableClusterLink(ProceedingJoinPoint proceedingJoinPoint)
 			throws Throwable {
 

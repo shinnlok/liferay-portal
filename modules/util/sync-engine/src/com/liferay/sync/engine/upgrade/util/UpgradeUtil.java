@@ -26,6 +26,8 @@ import com.liferay.sync.engine.service.persistence.SyncPropPersistence;
 import com.liferay.sync.engine.service.persistence.SyncSitePersistence;
 import com.liferay.sync.engine.service.persistence.SyncUserPersistence;
 import com.liferay.sync.engine.service.persistence.SyncWatchEventPersistence;
+import com.liferay.sync.engine.upgrade.UpgradeProcess;
+import com.liferay.sync.engine.upgrade.v2_0_6.UpgradeProcess_2_0_6;
 import com.liferay.sync.engine.util.LoggerUtil;
 import com.liferay.sync.engine.util.PropsValues;
 import com.liferay.sync.engine.util.ReleaseInfo;
@@ -35,6 +37,9 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Shinn Lok
@@ -63,9 +68,23 @@ public class UpgradeUtil {
 
 				Files.copy(inputStream, loggerConfigurationFilePath);
 			}
+
+			SyncPropService.updateSyncProp(
+				"buildNumber", ReleaseInfo.getBuildNumber());
+
+			return;
 		}
 		else if (buildNumber == ReleaseInfo.getBuildNumber()) {
 			return;
+		}
+
+		UpgradeProcess upgradeProcess_v2_0_6 = new UpgradeProcess_2_0_6();
+
+		if (buildNumber < upgradeProcess_v2_0_6.getThreshold()) {
+			_logger.info(
+				"Upgrading to {}", upgradeProcess_v2_0_6.getThreshold());
+
+			upgradeProcess_v2_0_6.upgrade();
 		}
 
 		SyncPropService.updateSyncProp(
@@ -115,5 +134,8 @@ public class UpgradeUtil {
 			syncWatchEventPersistence.createTable();
 		}
 	}
+
+	private static final Logger _logger = LoggerFactory.getLogger(
+		UpgradeUtil.class);
 
 }

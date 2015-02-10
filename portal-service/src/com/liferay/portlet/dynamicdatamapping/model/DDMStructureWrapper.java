@@ -268,6 +268,12 @@ public class DDMStructureWrapper implements DDMStructure,
 	}
 
 	@Override
+	public com.liferay.portlet.dynamicdatamapping.model.DDMFormLayout getDDMFormLayout()
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _ddmStructure.getDDMFormLayout();
+	}
+
+	@Override
 	public java.lang.String getDefaultLanguageId() {
 		return _ddmStructure.getDefaultLanguageId();
 	}
@@ -598,6 +604,12 @@ public class DDMStructureWrapper implements DDMStructure,
 	}
 
 	@Override
+	public com.liferay.portlet.dynamicdatamapping.model.DDMStructureVersion getStructureVersion()
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _ddmStructure.getStructureVersion();
+	}
+
+	@Override
 	public java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMTemplate> getTemplates() {
 		return _ddmStructure.getTemplates();
 	}
@@ -704,11 +716,6 @@ public class DDMStructureWrapper implements DDMStructure,
 	@Override
 	public boolean isEscapedModel() {
 		return _ddmStructure.isEscapedModel();
-	}
-
-	@Override
-	public boolean isFieldPrivate(java.lang.String fieldName) {
-		return _ddmStructure.isFieldPrivate(fieldName);
 	}
 
 	@Override

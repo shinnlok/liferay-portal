@@ -115,6 +115,14 @@
 				]
 			},
 
+			PortletKeys: {
+				DOCUMENT_SELECTOR : '<%= PortletKeys.DOCUMENT_SELECTOR %>',
+				DYNAMIC_DATA_MAPPING: '<%= PortletKeys.DYNAMIC_DATA_MAPPING %>',
+				JOURNAL : '<%= PortletKeys.JOURNAL %>',
+				PORTLET_CONFIGURATION: '<%= PortletKeys.PORTLET_CONFIGURATION %>',
+				PORTLET_SHARING : '<%= PortletKeys.PORTLET_SHARING %>'
+			},
+
 			PropsValues: {
 				NTLM_AUTH_ENABLED: <%= PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), PropsKeys.NTLM_AUTH_ENABLED, PropsValues.NTLM_AUTH_ENABLED) %>
 			},
@@ -208,14 +216,7 @@
 					return '<%= themeDisplay.getSiteGroupIdOrLiveGroupId() %>';
 				},
 				getSessionId: function() {
-					<c:choose>
-						<c:when test="<%= PropsValues.SESSION_ENABLE_URL_WITH_SESSION_ID %>">
-							return '<%= session.getId() %>';
-						</c:when>
-						<c:otherwise>
-							return '';
-						</c:otherwise>
-					</c:choose>
+					return '<%= PropsValues.SESSION_ENABLE_URL_WITH_SESSION_ID ? session.getId() : StringPool.BLANK %>';
 				},
 				getSiteGroupId: function() {
 					return '<%= themeDisplay.getSiteGroupId() %>';
@@ -230,14 +231,7 @@
 					return '<%= themeDisplay.getUserId() %>';
 				},
 				getUserName: function() {
-					<c:choose>
-						<c:when test="<%= themeDisplay.isSignedIn() %>">
-							return '<%= UnicodeFormatter.toString(user.getFullName()) %>';
-						</c:when>
-						<c:otherwise>
-							return '';
-						</c:otherwise>
-					</c:choose>
+					return '<%= themeDisplay.isSignedIn() ? UnicodeFormatter.toString(user.getFullName()) : StringPool.BLANK %>';
 				},
 				isAddSessionIdToURL: function() {
 					return <%= themeDisplay.isAddSessionIdToURL() %>;
@@ -281,17 +275,18 @@
 				return '<%= PortalUtil.getStaticResourceURL(request, themeDisplay.getCDNDynamicResourcesHost() + themeDisplay.getPathContext() + "/combo/", "minifierType=", javaScriptLastModified) %>&';
 			},
 			getFilter: function() {
+				var filter = 'raw';
+
 				<c:choose>
 					<c:when test="<%= themeDisplay.isThemeJsFastLoad() %>">
-						return 'min';
+						filter = 'min';
 					</c:when>
 					<c:when test="<%= PropsValues.JAVASCRIPT_LOG_ENABLED %>">
-						return 'debug';
+						filter = 'debug';
 					</c:when>
-					<c:otherwise>
-						return 'raw';
-					</c:otherwise>
 				</c:choose>
+
+				return filter;
 			},
 			getJavaScriptRootPath: function() {
 				return '<%= themeDisplay.getPathContext() %>/html/js';
@@ -426,22 +421,28 @@ for (String analyticsType : analyticsTypes) {
 
 			<c:if test="<%= Validator.isNotNull(googleAnalyticsId) %>">
 				<script type="text/javascript">
-					var _gaq = _gaq || [];
+					(function(i, s, o, g, r, a, m) {
+						i['GoogleAnalyticsObject'] = r;
 
-					_gaq.push(['_setAccount', '<%= HtmlUtil.escapeJS(googleAnalyticsId) %>']);
-					_gaq.push(['_trackPageview']);
+						i[r] = i[r] || function() {
+							var arrayValue = i[r].q || [];
 
-					(function() {
-						var ga = document.createElement('script');
+							i[r].q = arrayValue;
 
-						ga.async = true;
-						ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-						ga.type = 'text/javascript';
+							(i[r].q).push(arguments);
+						};
 
-						var s = document.getElementsByTagName('script')[0];
+						i[r].l = 1 * new Date();
 
-						s.parentNode.insertBefore(ga, s);
-					})();
+						a = s.createElement(o);
+						m = s.getElementsByTagName(o)[0];
+						a.async = 1;
+						a.src = g;
+						m.parentNode.insertBefore(a, m);
+					})(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+					ga('create', '<%= googleAnalyticsId %>', 'auto');
+					ga('send', 'pageview');
 				</script>
 			</c:if>
 		</c:when>

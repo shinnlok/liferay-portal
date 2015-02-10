@@ -14,10 +14,15 @@
 
 package com.liferay.portlet.blogs.util.test;
 
+import com.liferay.portal.kernel.editor.EditorConstants;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.servlet.taglib.ui.ImageSelector;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.TempFileEntryUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -25,9 +30,6 @@ import com.liferay.portal.kernel.workflow.WorkflowThreadLocal;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.util.test.RandomTestUtil;
-import com.liferay.portal.util.test.ServiceContextTestUtil;
-import com.liferay.portal.util.test.TestPropsValues;
 import com.liferay.portlet.blogs.model.BlogsEntry;
 import com.liferay.portlet.blogs.service.BlogsEntryLocalServiceUtil;
 
@@ -210,6 +212,22 @@ public class BlogsTestUtil {
 			expectedEntry.isSmallImage(), actualEntry.isSmallImage());
 	}
 
+	public static String getTempBlogsEntryAttachmentFileEntryImgTag(
+		long dataImageId, String url) {
+
+		StringBundler sb = new StringBundler(7);
+
+		sb.append("<img ");
+		sb.append(EditorConstants.ATTRIBUTE_DATA_IMAGE_ID);
+		sb.append("=\"");
+		sb.append(dataImageId);
+		sb.append("\" src=\"");
+		sb.append(url);
+		sb.append("\"/>");
+
+		return sb.toString();
+	}
+
 	public static BlogsEntry updateEntry(BlogsEntry entry, boolean approved)
 		throws Exception {
 
@@ -264,8 +282,7 @@ public class BlogsTestUtil {
 			BlogsEntry entry, ServiceContext serviceContext)
 		throws Exception {
 
-		Map<String, Serializable> workflowContext =
-			new HashMap<String, Serializable>();
+		Map<String, Serializable> workflowContext = new HashMap<>();
 
 		workflowContext.put(WorkflowConstants.CONTEXT_URL, "http://localhost");
 		workflowContext.put(

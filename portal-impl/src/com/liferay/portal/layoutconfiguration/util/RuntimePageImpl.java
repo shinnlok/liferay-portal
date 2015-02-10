@@ -376,8 +376,7 @@ public class RuntimePageImpl implements RuntimePage {
 
 		Lock lock = null;
 
-		Map<String, StringBundler> contentsMap =
-			new HashMap<String, StringBundler>();
+		Map<String, StringBundler> contentsMap = new HashMap<>();
 
 		Map<Integer, List<PortletRenderer>> portletRenderersMap =
 			processor.getPortletRenderers();
@@ -518,9 +517,8 @@ public class RuntimePageImpl implements RuntimePage {
 			PortalExecutorManagerUtil.getPortalExecutor(
 				RuntimePageImpl.class.getName());
 
-		Map<Future<StringBundler>, PortletRenderer> futures =
-			new HashMap<Future<StringBundler>, PortletRenderer>(
-				portletRenderers.size());
+		Map<Future<StringBundler>, PortletRenderer> futures = new HashMap<>(
+			portletRenderers.size());
 
 		for (PortletRenderer portletRenderer : portletRenderers) {
 			if (_log.isDebugEnabled()) {
@@ -548,7 +546,7 @@ public class RuntimePageImpl implements RuntimePage {
 				// setting, but to be more robust, we take care of this by
 				// converting the rejection to a fallback action.
 
-				future = new FutureTask<StringBundler>(renderCallable);
+				future = new FutureTask<>(renderCallable);
 
 				// Cancel immediately
 
@@ -673,7 +671,8 @@ public class RuntimePageImpl implements RuntimePage {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(RuntimePageImpl.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		RuntimePageImpl.class);
 
 	private int _waitTime = Integer.MAX_VALUE;
 

@@ -31,7 +31,6 @@ import com.liferay.portal.NoSuchUserException;
 import com.liferay.portal.PhoneNumberException;
 import com.liferay.portal.RequiredUserException;
 import com.liferay.portal.ReservedUserEmailAddressException;
-import com.liferay.portal.ReservedUserScreenNameException;
 import com.liferay.portal.UserEmailAddressException;
 import com.liferay.portal.UserFieldException;
 import com.liferay.portal.UserIdException;
@@ -250,7 +249,6 @@ public class EditUserAction extends PortletAction {
 					 e instanceof PhoneNumberException ||
 					 e instanceof RequiredUserException ||
 					 e instanceof ReservedUserEmailAddressException ||
-					 e instanceof ReservedUserScreenNameException ||
 					 e instanceof UserEmailAddressException ||
 					 e instanceof UserFieldException ||
 					 e instanceof UserIdException ||
@@ -271,11 +269,31 @@ public class EditUserAction extends PortletAction {
 					SessionErrors.add(actionRequest, e.getClass(), e);
 				}
 
+				String password1 = actionRequest.getParameter("password1");
+				String password2 = actionRequest.getParameter("password2");
+
+				boolean submittedPassword = false;
+
+				if (!Validator.isBlank(password1) ||
+					!Validator.isBlank(password2)) {
+
+					submittedPassword = true;
+				}
+
 				if (e instanceof CompanyMaxUsersException ||
-					e instanceof RequiredUserException) {
+					e instanceof RequiredUserException ||
+					submittedPassword) {
 
 					String redirect = PortalUtil.escapeRedirect(
 						ParamUtil.getString(actionRequest, "redirect"));
+
+					if (submittedPassword) {
+						User user = PortalUtil.getSelectedUser(actionRequest);
+
+						redirect = HttpUtil.setParameter(
+							redirect, actionResponse.getNamespace() + "p_u_i_d",
+							user.getUserId());
+					}
 
 					if (Validator.isNotNull(redirect)) {
 						actionResponse.sendRedirect(redirect);
@@ -345,8 +363,8 @@ public class EditUserAction extends PortletAction {
 		String firstName = ParamUtil.getString(actionRequest, "firstName");
 		String middleName = ParamUtil.getString(actionRequest, "middleName");
 		String lastName = ParamUtil.getString(actionRequest, "lastName");
-		int prefixId = ParamUtil.getInteger(actionRequest, "prefixId");
-		int suffixId = ParamUtil.getInteger(actionRequest, "suffixId");
+		long prefixId = ParamUtil.getInteger(actionRequest, "prefixId");
+		long suffixId = ParamUtil.getInteger(actionRequest, "suffixId");
 		boolean male = ParamUtil.getBoolean(actionRequest, "male", true);
 		int birthdayMonth = ParamUtil.getInteger(
 			actionRequest, "birthdayMonth");
@@ -464,8 +482,7 @@ public class EditUserAction extends PortletAction {
 	protected List<AnnouncementsDelivery> getAnnouncementsDeliveries(
 		ActionRequest actionRequest) {
 
-		List<AnnouncementsDelivery> announcementsDeliveries =
-			new ArrayList<AnnouncementsDelivery>();
+		List<AnnouncementsDelivery> announcementsDeliveries = new ArrayList<>();
 
 		for (String type : AnnouncementsEntryConstants.TYPES) {
 			boolean email = ParamUtil.getBoolean(
@@ -573,9 +590,9 @@ public class EditUserAction extends PortletAction {
 			user, actionRequest, "middleName");
 		String lastName = BeanParamUtil.getString(
 			user, actionRequest, "lastName");
-		int prefixId = BeanParamUtil.getInteger(
+		long prefixId = BeanParamUtil.getInteger(
 			contact, actionRequest, "prefixId");
-		int suffixId = BeanParamUtil.getInteger(
+		long suffixId = BeanParamUtil.getInteger(
 			contact, actionRequest, "suffixId");
 		boolean male = BeanParamUtil.getBoolean(
 			user, actionRequest, "male", true);

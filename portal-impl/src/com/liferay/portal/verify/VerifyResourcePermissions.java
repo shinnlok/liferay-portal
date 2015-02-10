@@ -60,8 +60,7 @@ public class VerifyResourcePermissions extends VerifyProcess {
 				companyId, RoleConstants.OWNER);
 
 			List<VerifyResourcedModelRunnable> verifyResourcedModelRunnables =
-				new ArrayList<VerifyResourcedModelRunnable>(
-					verifiableResourcedModels.length);
+				new ArrayList<>(verifiableResourcedModels.length);
 
 			for (VerifiableResourcedModel verifiableResourcedModel :
 					verifiableResourcedModels) {
@@ -210,7 +209,8 @@ public class VerifyResourcePermissions extends VerifyProcess {
 			for (int i = 0; rs.next(); i++) {
 				long primKey = rs.getLong(
 					verifiableResourcedModel.getPrimaryKeyColumnName());
-				long userId = rs.getLong("userId");
+				long userId = rs.getLong(
+					verifiableResourcedModel.getUserIdColumnName());
 
 				verifyResourcedModel(
 					role.getCompanyId(),
@@ -223,7 +223,7 @@ public class VerifyResourcePermissions extends VerifyProcess {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		VerifyResourcePermissions.class);
 
 	private class VerifyResourcedModelRunnable extends ThrowableAwareRunnable {

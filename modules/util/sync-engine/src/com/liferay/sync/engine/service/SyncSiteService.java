@@ -22,12 +22,9 @@ import com.liferay.sync.engine.service.persistence.SyncSitePersistence;
 
 import java.io.IOException;
 
-import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
 
 import java.sql.SQLException;
 
@@ -37,6 +34,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.commons.io.FileUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -161,7 +160,7 @@ public class SyncSiteService {
 				return activeSyncSiteIds;
 			}
 
-			activeSyncSiteIds = new HashSet<Long>(
+			activeSyncSiteIds = new HashSet<>(
 				_syncSitePersistence.findByA_S(true, syncAccountId));
 
 			_activeSyncSiteIds.put(syncAccountId, activeSyncSiteIds);
@@ -261,38 +260,14 @@ public class SyncSiteService {
 			return;
 		}
 
-		Files.walkFileTree(
-			filePath,
-			new SimpleFileVisitor<Path>() {
-
-				@Override
-				public FileVisitResult postVisitDirectory(
-						Path filePath, IOException ioe)
-					throws IOException {
-
-					Files.deleteIfExists(filePath);
-
-					return FileVisitResult.CONTINUE;
-				}
-
-				@Override
-				public FileVisitResult visitFile(
-						Path filePath, BasicFileAttributes basicFileAttributes)
-					throws IOException {
-
-					Files.deleteIfExists(filePath);
-
-					return FileVisitResult.CONTINUE;
-				}
-
-			});
+		FileUtils.deleteDirectory(filePath.toFile());
 	}
 
 	private static final Logger _logger = LoggerFactory.getLogger(
 		SyncSiteService.class);
 
 	private static final Map<Long, Set<Long>> _activeSyncSiteIds =
-		new HashMap<Long, Set<Long>>();
+		new HashMap<>();
 	private static SyncSitePersistence _syncSitePersistence =
 		getSyncSitePersistence();
 

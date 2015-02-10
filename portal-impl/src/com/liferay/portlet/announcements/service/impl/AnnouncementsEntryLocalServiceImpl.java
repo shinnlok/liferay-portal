@@ -390,8 +390,7 @@ public class AnnouncementsEntryLocalServiceImpl
 
 		long teamId = 0;
 
-		LinkedHashMap<String, Object> params =
-			new LinkedHashMap<String, Object>();
+		LinkedHashMap<String, Object> params = new LinkedHashMap<>();
 
 		params.put("announcementsDeliveryEmailOrSms", entry.getType());
 
@@ -581,7 +580,7 @@ public class AnnouncementsEntryLocalServiceImpl
 	private static final long _ANNOUNCEMENTS_ENTRY_CHECK_INTERVAL =
 		PropsValues.ANNOUNCEMENTS_ENTRY_CHECK_INTERVAL * Time.MINUTE;
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		AnnouncementsEntryLocalServiceImpl.class);
 
 	private Date _previousCheckDate;

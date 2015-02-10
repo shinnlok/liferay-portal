@@ -143,7 +143,7 @@ public class LayoutStagedModelDataHandler
 	public Map<String, String> getReferenceAttributes(
 		PortletDataContext portletDataContext, Layout layout) {
 
-		Map<String, String> referenceAttributes = new HashMap<String, String>();
+		Map<String, String> referenceAttributes = new HashMap<>();
 
 		referenceAttributes.put(
 			"private-layout", String.valueOf(layout.isPrivateLayout()));
@@ -1331,10 +1331,10 @@ public class LayoutStagedModelDataHandler
 	private static final String _SAME_GROUP_FRIENDLY_URL =
 		"/[$SAME_GROUP_FRIENDLY_URL$]";
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		LayoutStagedModelDataHandler.class);
 
-	private LayoutLocalServiceHelper _layoutLocalServiceHelper =
+	private final LayoutLocalServiceHelper _layoutLocalServiceHelper =
 		(LayoutLocalServiceHelper)PortalBeanLocatorUtil.locate(
 			LayoutLocalServiceHelper.class.getName());
 

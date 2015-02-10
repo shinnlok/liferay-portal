@@ -7,11 +7,16 @@
 		margin-top: 1em;
 	}
 
+	.ratings-type-select {
+		margin-left: 20px;
+	}
+
 	.staging-section {
 		margin-left: 1.5em;
 	}
 
-	.staging-types .field-choice label {
+	.staging-types .field-wrapper label {
+		display: block;
 		font-weight: normal;
 	}
 

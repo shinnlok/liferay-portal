@@ -93,7 +93,7 @@ public class SubscriptionSender implements Serializable {
 		}
 
 		if (fileAttachments == null) {
-			fileAttachments = new ArrayList<FileAttachment>();
+			fileAttachments = new ArrayList<>();
 		}
 
 		FileAttachment attachment = new FileAttachment(file, fileName);
@@ -102,15 +102,15 @@ public class SubscriptionSender implements Serializable {
 	}
 
 	public void addPersistedSubscribers(String className, long classPK) {
-		ObjectValuePair<String, Long> ovp = new ObjectValuePair<String, Long>(
+		ObjectValuePair<String, Long> ovp = new ObjectValuePair<>(
 			className, classPK);
 
 		_persistestedSubscribersOVPs.add(ovp);
 	}
 
 	public void addRuntimeSubscribers(String toAddress, String toName) {
-		ObjectValuePair<String, String> ovp =
-			new ObjectValuePair<String, String>(toAddress, toName);
+		ObjectValuePair<String, String> ovp = new ObjectValuePair<>(
+			toAddress, toName);
 
 		_runtimeSubscribersOVPs.add(ovp);
 	}
@@ -563,7 +563,7 @@ public class SubscriptionSender implements Serializable {
 					user.getEmailAddress(), user.getFullName());
 
 				if (_bulkAddresses == null) {
-					_bulkAddresses = new ArrayList<InternetAddress>();
+					_bulkAddresses = new ArrayList<>();
 				}
 
 				_bulkAddresses.add(bulkAddress);
@@ -855,8 +855,7 @@ public class SubscriptionSender implements Serializable {
 	protected String body;
 	protected boolean bulk;
 	protected long companyId;
-	protected List<FileAttachment> fileAttachments =
-		new ArrayList<FileAttachment>();
+	protected List<FileAttachment> fileAttachments = new ArrayList<>();
 	protected String fromAddress;
 	protected String fromName;
 	protected long groupId;
@@ -900,14 +899,15 @@ public class SubscriptionSender implements Serializable {
 		objectOutputStream.writeUTF(servletContextName);
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(SubscriptionSender.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		SubscriptionSender.class);
 
 	private List<InternetAddress> _bulkAddresses;
 	private transient ClassLoader _classLoader;
 	private String _className;
 	private long _classPK;
-	private Map<String, EscapableObject<String>> _context =
-		new HashMap<String, EscapableObject<String>>();
+	private final Map<String, EscapableObject<String>> _context =
+		new HashMap<>();
 	private String _contextUserPrefix;
 	private String _entryTitle;
 	private String _entryURL;
@@ -916,10 +916,10 @@ public class SubscriptionSender implements Serializable {
 	private String _mailIdPopPortletPrefix;
 	private long _notificationClassNameId;
 	private int _notificationType;
-	private List<ObjectValuePair<String, Long>> _persistestedSubscribersOVPs =
-		new ArrayList<ObjectValuePair<String, Long>>();
-	private List<ObjectValuePair<String, String>> _runtimeSubscribersOVPs =
-		new ArrayList<ObjectValuePair<String, String>>();
-	private Set<String> _sentEmailAddresses = new HashSet<String>();
+	private final List<ObjectValuePair<String, Long>>
+		_persistestedSubscribersOVPs = new ArrayList<>();
+	private final List<ObjectValuePair<String, String>>
+		_runtimeSubscribersOVPs = new ArrayList<>();
+	private final Set<String> _sentEmailAddresses = new HashSet<>();
 
 }
