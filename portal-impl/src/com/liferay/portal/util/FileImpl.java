@@ -669,7 +669,7 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 
 	@Override
 	public String[] listDirs(File file) {
-		List<String> dirs = new ArrayList<String>();
+		List<String> dirs = new ArrayList<>();
 
 		File[] fileArray = file.listFiles();
 
@@ -689,7 +689,7 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 
 	@Override
 	public String[] listFiles(File file) {
-		List<String> files = new ArrayList<String>();
+		List<String> files = new ArrayList<>();
 
 		File[] fileArray = file.listFiles();
 
@@ -789,8 +789,8 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 
 		Arrays.sort(files, new FileComparator());
 
-		List<File> directoryList = new ArrayList<File>();
-		List<File> fileList = new ArrayList<File>();
+		List<File> directoryList = new ArrayList<>();
+		List<File> fileList = new ArrayList<>();
 
 		for (int i = 0; i < files.length; i++) {
 			if (files[i].isDirectory()) {
@@ -824,7 +824,7 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 
 	@Override
 	public List<String> toList(Reader reader) {
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 
 		try (UnsyncBufferedReader unsyncBufferedReader =
 				new UnsyncBufferedReader(reader)) {
@@ -847,7 +847,7 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 			return toList(new FileReader(fileName));
 		}
 		catch (IOException ioe) {
-			return new ArrayList<String>();
+			return new ArrayList<>();
 		}
 	}
 
@@ -1045,9 +1045,9 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 		"_AMP_", "_CP_", "_OP_", "_SEM_"
 	};
 
-	private static Log _log = LogFactoryUtil.getLog(FileImpl.class);
+	private static final Log _log = LogFactoryUtil.getLog(FileImpl.class);
 
-	private static FileImpl _instance = new FileImpl();
+	private static final FileImpl _instance = new FileImpl();
 
 	private static class ExtractTextProcessCallable
 		implements ProcessCallable<String> {
@@ -1071,7 +1071,7 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 
 		private static final long serialVersionUID = 1L;
 
-		private byte[] _data;
+		private final byte[] _data;
 
 	}
 

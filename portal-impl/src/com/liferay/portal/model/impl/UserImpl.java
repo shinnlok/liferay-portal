@@ -459,20 +459,57 @@ public class UserImpl extends UserBaseImpl {
 	@AutoEscape
 	@Override
 	public String getFullName() {
+		return getFullName(false, false);
+	}
+
+	/**
+	 * Returns the user's full name.
+	 *
+	 * @return the user's full name
+	 */
+	@AutoEscape
+	@Override
+	public String getFullName(boolean usePrefix, boolean useSuffix) {
 		FullNameGenerator fullNameGenerator =
 			FullNameGeneratorFactory.getInstance();
 
-		return fullNameGenerator.getFullName(
-			getFirstName(), getMiddleName(), getLastName());
+		long prefixId = 0;
+
+		try {
+			if (usePrefix) {
+				Contact contact = getContact();
+
+				prefixId = contact.getPrefixId();
+			}
+		}
+		catch (PortalException pe) {
+		}
+
+		long suffixId = 0;
+
+		try {
+			if (useSuffix) {
+				Contact contact = getContact();
+
+				suffixId = contact.getSuffixId();
+			}
+		}
+		catch (PortalException pe) {
+		}
+
+		return fullNameGenerator.getLocalizedFullName(
+			getFirstName(), getMiddleName(), getLastName(), getLocale(),
+			prefixId, suffixId);
 	}
 
 	@Override
-	public Group getGroup() throws PortalException {
-		return GroupLocalServiceUtil.getUserGroup(getCompanyId(), getUserId());
+	public Group getGroup() {
+		return GroupLocalServiceUtil.fetchUserGroup(
+			getCompanyId(), getUserId());
 	}
 
 	@Override
-	public long getGroupId() throws PortalException {
+	public long getGroupId() {
 		Group group = getGroup();
 
 		return group.getGroupId();
@@ -640,6 +677,11 @@ public class UserImpl extends UserBaseImpl {
 	}
 
 	@Override
+	public String getOriginalEmailAddress() {
+		return super.getOriginalEmailAddress();
+	}
+
+	@Override
 	public boolean getPasswordModified() {
 		return _passwordModified;
 	}
@@ -687,7 +729,7 @@ public class UserImpl extends UserBaseImpl {
 
 	@Override
 	public Set<String> getReminderQueryQuestions() throws PortalException {
-		Set<String> questions = new TreeSet<String>();
+		Set<String> questions = new TreeSet<>();
 
 		List<Organization> organizations =
 			OrganizationLocalServiceUtil.getUserOrganizations(getUserId());
@@ -999,14 +1041,14 @@ public class UserImpl extends UserBaseImpl {
 			});
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(UserImpl.class);
+	private static final Log _log = LogFactoryUtil.getLog(UserImpl.class);
 
 	private Locale _locale;
 	private boolean _passwordModified;
 	private PasswordPolicy _passwordPolicy;
 	private String _passwordUnencrypted;
-	private transient Map<String, RemotePreference> _remotePreferences =
-		new HashMap<String, RemotePreference>();
+	private final transient Map<String, RemotePreference> _remotePreferences =
+		new HashMap<>();
 	private TimeZone _timeZone;
 
 }

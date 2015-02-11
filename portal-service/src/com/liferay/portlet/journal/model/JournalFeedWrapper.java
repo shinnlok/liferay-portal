@@ -421,6 +421,7 @@ public class JournalFeedWrapper implements JournalFeed,
 	/**
 	* @deprecated As of 7.0.0, replaced by {@link #getDDMRendererTemplateKey()}
 	*/
+	@Deprecated
 	@Override
 	public java.lang.String getRendererTemplateId() {
 		return _journalFeed.getRendererTemplateId();
@@ -429,6 +430,7 @@ public class JournalFeedWrapper implements JournalFeed,
 	/**
 	* @deprecated As of 7.0.0, replaced by {@link #getDDMStructureKey()}
 	*/
+	@Deprecated
 	@Override
 	public java.lang.String getStructureId() {
 		return _journalFeed.getStructureId();
@@ -457,6 +459,7 @@ public class JournalFeedWrapper implements JournalFeed,
 	/**
 	* @deprecated As of 7.0.0, replaced by {@link #getDDMTemplateKey()}
 	*/
+	@Deprecated
 	@Override
 	public java.lang.String getTemplateId() {
 		return _journalFeed.getTemplateId();
@@ -742,16 +745,19 @@ public class JournalFeedWrapper implements JournalFeed,
 	}
 
 	/**
-	* @deprecated As of 7.0.0, replaced by {@link #setRendererTemplateKey()}
+	* @deprecated As of 7.0.0, replaced by {@link
+	#setDDMRendererTemplateKey(String)}
 	*/
+	@Deprecated
 	@Override
 	public void setRendererTemplateId(java.lang.String rendererTemplateKey) {
 		_journalFeed.setRendererTemplateId(rendererTemplateKey);
 	}
 
 	/**
-	* @deprecated As of 7.0.0, replaced by {@link #setDDMStructureKey()}
+	* @deprecated As of 7.0.0, replaced by {@link #setDDMStructureKey(String)}
 	*/
+	@Deprecated
 	@Override
 	public void setStructureId(java.lang.String structureKey) {
 		_journalFeed.setStructureId(structureKey);
@@ -779,8 +785,9 @@ public class JournalFeedWrapper implements JournalFeed,
 	}
 
 	/**
-	* @deprecated As of 7.0.0, replaced by {@link #setDDMTemplateKey()}
+	* @deprecated As of 7.0.0, replaced by {@link #setDDMTemplateKey(String)}
 	*/
+	@Deprecated
 	@Override
 	public void setTemplateId(java.lang.String templateKey) {
 		_journalFeed.setTemplateId(templateKey);

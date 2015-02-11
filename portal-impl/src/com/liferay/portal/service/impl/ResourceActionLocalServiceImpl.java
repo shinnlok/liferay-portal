@@ -115,7 +115,7 @@ public class ResourceActionLocalServiceImpl
 				resourceActionPersistence.update(resourceAction);
 
 				if (newResourceActions == null) {
-					newResourceActions = new ArrayList<ResourceAction>();
+					newResourceActions = new ArrayList<>();
 				}
 
 				newResourceActions.add(resourceAction);
@@ -209,7 +209,7 @@ public class ResourceActionLocalServiceImpl
 		return name.concat(StringPool.POUND).concat(actionId);
 	}
 
-	private static Map<String, ResourceAction> _resourceActions =
-		new ConcurrentHashMap<String, ResourceAction>();
+	private static final Map<String, ResourceAction> _resourceActions =
+		new ConcurrentHashMap<>();
 
 }

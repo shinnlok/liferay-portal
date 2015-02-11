@@ -20,13 +20,22 @@ import com.liferay.portal.kernel.template.TemplateConstants;
 import com.liferay.portal.kernel.template.TemplateException;
 import com.liferay.portal.kernel.template.TemplateResource;
 import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.ReflectionUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.model.Layout;
 import com.liferay.portal.template.BaseTemplateManager;
 import com.liferay.portal.template.RestrictedTemplate;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.taglib.util.VelocityTaglib;
+import com.liferay.taglib.util.VelocityTaglibImpl;
+
+import java.lang.reflect.Method;
 
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.collections.ExtendedProperties;
 import org.apache.velocity.app.VelocityEngine;
@@ -38,6 +47,33 @@ import org.apache.velocity.util.introspection.SecureUberspector;
  */
 @DoPrivileged
 public class VelocityManager extends BaseTemplateManager {
+
+	@Override
+	public void addTaglibTheme(
+		Map<String, Object> contextObjects, String themeName,
+		HttpServletRequest request, HttpServletResponse response) {
+
+		VelocityTaglib velocityTaglib = new VelocityTaglibImpl(
+			request.getServletContext(), request, response, contextObjects);
+
+		contextObjects.put(themeName, velocityTaglib);
+
+		try {
+			Class<?> clazz = VelocityTaglib.class;
+
+			Method method = clazz.getMethod(
+				"layoutIcon", new Class[] {Layout.class});
+
+			contextObjects.put("velocityTaglib_layoutIcon", method);
+		}
+		catch (Exception e) {
+			ReflectionUtil.throwException(e);
+		}
+
+		// Legacy support
+
+		contextObjects.put("theme", velocityTaglib);
+	}
 
 	@Override
 	public void destroy() {
@@ -60,6 +96,12 @@ public class VelocityManager extends BaseTemplateManager {
 	@Override
 	public String getName() {
 		return TemplateConstants.LANG_TYPE_VM;
+	}
+
+	@Override
+	public String[] getRestrictedVariables() {
+		return PropsUtil.getArray(
+			PropsKeys.VELOCITY_ENGINE_RESTRICTED_VARIABLES);
 	}
 
 	@Override

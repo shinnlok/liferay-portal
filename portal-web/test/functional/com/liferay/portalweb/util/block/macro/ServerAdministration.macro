@@ -1,25 +1,26 @@
 <definition>
-	<command name="configureDMFileUploadMaxSize">
-		<execute macro="Page#gotoCP">
-			<var name="portletName" value="Server Administration" />
-		</execute>
+	<command name="addCategoryLogLevels">
+		<execute action="CPServeradministration#assertClick" locator-key1="NAVIGATION_LOG_LEVELS" value1="Log Levels" />
 
-		<execute action="CPServeradministration#assertClick" locator-key1="NAVIGATION_FILE_UPLOADS" value1="File Uploads" />
-		<execute action="CPServeradministrationFileuploads#type" locator-key1="DOCUMENTS_AND_MEDIA_MAX_FILE_SIZE" value1="${maxFileSize}" />
-		<execute action="CPServeradministrationFileuploads#assertClick" locator-key1="SAVE_BUTTON" value1="Save" />
-		<execute action="CPServeradministrationFileuploads#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request completed successfully." />
+		<execute action="CPServeradministrationLogLevels#assertClick" locator-key1="NAVIGATION_ADD_CATEGORY" value1="Add Category" />
+
+		<execute action="CPServeradministrationLogLevelsAddCategory#type" locator-key1="CATEGORY_NAME_FIELD" value1="${catagoryName}" />
+		<execute action="CPServeradministrationLogLevelsAddCategory#select" locator-key1="CATEGORY_PRIORITY_SELECT" value1="${categoryPriority}" />
+		<execute action="CPServeradministrationLogLevelsAddCategory#assertClick" locator-key1="SAVE_BUTTON" value1="Save" />
+
+		<execute action="CPServeradministrationLogLevelsAddCategory#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request completed successfully." />
 	</command>
 
 	<command name="configureExternalServices">
 		<execute action="CPServeradministration#assertClick" locator-key1="NAVIGATION_EXTERNAL_SERVICES" value1="External Services" />
 
 		<if>
-			<equals arg1="enableOpenOfficeIntegration" arg2="true" />
+			<equals arg1="${enableOpenOfficeIntegration}" arg2="true" />
 			<then>
 				<execute action="CPServeradministrationExternalservices#check" locator-key1="OPEN_OFFICE_INTEGRATION_ENABLED_CHECKBOX" />
 			</then>
 			<elseif>
-				<equals arg1="enableOpenOfficeIntegration" arg2="false" />
+				<equals arg1="${enableOpenOfficeIntegration}" arg2="false" />
 				<then>
 					<execute action="CPServeradministrationExternalservices#uncheck" locator-key1="OPEN_OFFICE_INTEGRATION_ENABLED_CHECKBOX" />
 				</then>
@@ -48,6 +49,17 @@
 
 		<execute action="CPServeradministrationExternalservices#assertClick" locator-key1="SAVE_BUTTON" value1="Save" />
 		<execute action="CPServeradministrationExternalservices#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request completed successfully." />
+	</command>
+
+	<command name="configureFileUploadOverallMaximumFileSize">
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Server Administration" />
+		</execute>
+
+		<execute action="CPServeradministration#assertClick" locator-key1="NAVIGATION_FILE_UPLOADS" value1="File Uploads" />
+		<execute action="CPServeradministrationFileuploads#type" locator-key1="FILE_UPLOADS_GENERAL_OVERALL_MAX_FILE_SIZE_FIELD" value1="${maxFileSize}" />
+		<execute action="CPServeradministrationFileuploads#assertClick" locator-key1="SAVE_BUTTON" value1="Save" />
+		<execute action="CPServeradministrationFileuploads#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request completed successfully." />
 	</command>
 
 	<command name="configureMailServerSettings">

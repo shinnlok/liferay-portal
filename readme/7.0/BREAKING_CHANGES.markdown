@@ -20,7 +20,7 @@ feature or API will be dropped in an upcoming version.
 replaces an old API, in spite of the old API being kept in Liferay Portal for
 backwards compatibility.
 
-*This document has been reviewed through commit `87c168f`.*
+*This document has been reviewed through commit `58fc0bd`.*
 
 ## Breaking Changes Contribution Guidelines
 
@@ -72,6 +72,72 @@ The remaining content of this document consists of the breaking changes listed
 in ascending chronological order.
 
 ## Breaking Changes List
+
+### liferay-ui:logo-selector requires changes to the parameters
+- **Date:** 2013-Dec-5
+- **JIRA Ticket:** LPS-42645
+
+#### What changed?
+The Logo Selector taglib now supports uploading and image (storing it as a
+temporary file, cropping it and cancell before saving.
+The taglib now doesn't require creating a UI to include the image (this
+parameter was called editLogoURL and it has been removed). The new parameters
+supported are:
+- currentLogoURL: the URL to display the image being currently stored
+- hasUpdateLogoPermission: true if the current user can update this logo
+- maxFileSize: Limit of size to the logo to be uploaded
+- tempImageFileName: unique identifier to store the temporary image on upload
+
+
+#### Who is affected?
+Plugins or templates that were using the taglib <liferay-ui:logo-selector> will
+need to update their usage of the taglib.
+
+#### How should I update my code?
+Remove the parameter *editLogoURL* and include (if neccessary) the parameters
+*currentLogoURL*, *hasUpdateLogoPermission*, *maxFileSize*, *tempImageFileName*
+
+
+**Example**
+
+Replace:
+
+```
+<portlet:renderURL var="editUserPortraitURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
+	<portlet:param name="struts_action" value="/users_admin/edit_user_portrait" />
+	<portlet:param name="redirect" value="<%= currentURL %>" />
+	<portlet:param name="p_u_i_d" value="<%= String.valueOf(selUser.getUserId()) %>" />
+	<portlet:param name="portrait_id" value="<%= String.valueOf(selUser.getPortraitId()) %>" />
+</portlet:renderURL>
+
+<liferay-ui:logo-selector
+	defaultLogoURL="<%= UserConstants.getPortraitURL(themeDisplay.getPathImage(), selUser.isMale(), 0) %>"
+	editLogoURL="<%= editUserPortraitURL %>"
+	imageId="<%= selUser.getPortraitId() %>"
+	logoDisplaySelector=".user-logo"
+/>
+```
+
+With:
+```
+<liferay-ui:logo-selector
+	currentLogoURL="<%= selUser.getPortraitURL(themeDisplay) %>"
+	defaultLogoURL="<%= UserConstants.getPortraitURL(themeDisplay.getPathImage(), selUser.isMale(), 0) %>"
+	hasUpdateLogoPermission='<%= UsersAdminUtil.hasUpdateFieldPermission(selUser, "portrait") %>'
+	imageId="<%= selUser.getPortraitId() %>"
+	logoDisplaySelector=".user-logo"
+	maxFileSize="<%= PrefsPropsUtil.getLong(PropsKeys.USERS_IMAGE_MAX_SIZE) / 1024 %>"
+	tempImageFileName="<%= String.valueOf(selUser.getUserId()) %>"
+/>
+```
+
+#### Why was this change made?
+This change helps keep a unified UI and consistent experience for uploading
+logos all around the portal that can be customized from a single location.
+In addition, it adds new features such as cropping and support for cancelling.
+
+
+---------------------------------------
 
 ### Merged Configured Email Signature Field into the Body of Email Messages from Message Boards and Wiki
 - **Date:** 2014-Feb-28
@@ -546,7 +612,7 @@ system. Duplication can cause `ClassCastException`s.
 
 #### What changed?
 
-The implementation class `com.liferay.portal.convert.ConvertProcess` was renamed 
+The implementation class `com.liferay.portal.convert.ConvertProcess` was renamed
 `com.liferay.portal.convert.BaseConvertProcess`. An interface named
 `com.liferay.portal.convert.ConvertProcess` was created for it.
 
@@ -573,7 +639,7 @@ should see your convert process in the configuration UI.
 #### Why was this change made?
 
 This change was made as a part of the ongoing strategy to modularize Liferay
-Portal by means of an OSGi container. 
+Portal by means of an OSGi container.
 
 ---------------------------------------
 
@@ -663,5 +729,217 @@ the RSS portlet.
 The support for ADTs in the RSS portlet not only covers this use case, but also
 covers many other use cases, providing a much simpler way to create custom
 preferences.
+
+---------------------------------------
+
+### Removed the `createFlyouts` Method from `liferay/util.js` and Related Resources
+- **Date:** 2014-Dec-18
+- **JIRA Ticket:** LPS-52275
+
+#### What changed?
+
+The `Liferay.Util.createFlyouts` method has been completely removed from core
+files.
+
+#### Who is affected?
+
+This only affects third party developers who are explicitly calling
+`Liferay.Util.createFlyouts` for the creation of flyout menus. It will not
+affect any menus in core files.
+
+#### How should I update my code?
+
+If you are using the method, you can achieve the same behavior with CSS.
+
+#### Why was this change made?
+
+This method was removed due to there being no working use cases in Portal, and
+its overall lack of functionality.
+
+---------------------------------------
+
+### Removed Support for *Flat* Thread View in Discussion Comments
+- **Date:** 2014-Dec-30
+- **JIRA Ticket:** LPS-51876
+
+#### What changed?
+
+Discussion comments are now displayed using the *Combination* thread view, and
+the number of levels displayed in the tree is limited.
+
+#### Who is affected?
+
+This affects installations that specify portal property setting
+`discussion.thread.view=flat`, which was the default setting.
+
+#### How should I update my code?
+
+There is no need to update anything since the portal property has been removed
+and the `combination` thread view is now hard-coded.
+
+#### Why was this change made?
+
+Flat view comments were originally implemented as an option to tree view
+comments, which were having performance issues with comment pagination.
+
+Portal now uses a new pagination implementation that performs well. It allows
+comments to display in a hierarchical view, making it easier to see reply
+history. Therefore, the `flat` thread view is no longer needed.
+
+---------------------------------------
+
+### Removed *Asset Tag Properties*
+- **Date:** 2015-Jan-13
+- **JIRA Ticket:** LPS-52588
+
+#### What changed?
+
+The *Asset Tag Properties* have been removed. The service no longer exists and
+the Asset Tag Service API no longer has this parameter. The behavior associated
+with tag properties in the Asset Publisher and XSL portlets has also been
+removed.
+
+#### Who is affected?
+
+This affects any plugin that uses the Asset Tag Properties service.
+
+#### How should I update my code?
+
+If you are using this functionality, you can achieve the same behavior with
+*Asset Category Properties*. If you are using the Asset Tag Service, remove the
+`String[]` tag properties parameter from your calls to the service's methods.
+
+#### Why was this change made?
+
+The Asset Tag Properties were deprecated for the 6.2 version of Liferay Portal.
+
+---------------------------------------
+
+### Removed the `asset.publisher.asset.entry.query.processors` Property
+- **Date:** 2015-Jan-22
+- **JIRA Ticket:** LPS-52966
+
+#### What changed?
+
+The `asset.publisher.asset.entry.query.processors` property has been removed
+from `portal.properties`.
+
+#### Who is affected?
+
+This affects any hook that uses the
+`asset.publisher.asset.entry.query.processors` property.
+
+#### How should I update my code?
+
+If you are using this property to register Asset Entry Query Processors, your
+Asset Entry Query Processor must implement the
+`com.liferay.portlet.assetpublisher.util.AssetEntryQueryProcessor` interface and
+must specify the `@Component(service=AssetEntryQueryProcessor.class)`
+annotation.
+
+#### Why was this change made?
+
+This change was made as a part of the ongoing strategy to modularize Liferay
+Portal.
+
+---------------------------------------
+
+### Replaced the `ReservedUserScreenNameException` with `UserScreenNameException.MustNotBeReserved` in `UserLocalService`
+- **Date:** 2015-Jan-29
+- **JIRA Ticket:** LPS-53113
+
+#### What changed?
+
+Previous to Liferay 7, several methods of `UserLocalService` could throw a
+`ReservedUserScreenNameException` when a user set a screen name that was not
+allowed. That exception has been deprecated and replaced with
+`UserScreenNameException.MustNotBeReserved`.
+
+#### Who is affected?
+
+This affects developers who have written code that catches the
+`ReservedUserScreenNameException` while calling the affected methods.
+
+#### How should I update my code?
+
+You should replace catching exception `ReservedUserScreenNameException` with
+catching exception `UserScreenNameException.MustNotBeReserved`.
+
+#### Why was this change made?
+
+A new pattern has been defined for exceptions that provides higher expressivity
+in their names and also more information regarding why the exception was thrown.
+
+The new exception `UserScreenNameException.MustNotBeReserved` has all the
+necessary information about why the exception was thrown and its context. In
+particular, it contains the user ID, the problematic screen name, and the list
+of reserved screen names.
+
+---------------------------------------
+
+### Attribute `paginationURL' is mandatory for taglib `liferay-ui:discussion`
+- **Date:** 2015-Feb-5
+- **JIRA Ticket:** LPS-53313
+
+#### What changed?
+
+Taglib `liferay-ui:discussion` contains a new attribute that is mandatory.
+
+#### Who is affected?
+
+This affects all developers who were using this taglib in their plugins.
+
+#### How should I update my code?
+
+You should include the new attribute `paginationURL` in the taglib. This
+attribute is a URL that returns a HTML fragment containing the next comments.
+
+If  you are using Liferay `MVCPortlet` class you can use this URL:
+
+<portlet:resourceURL var="discussionPaginationURL">
+    <portlet:param name="invokeTaglibDiscussion"
+        value="<%= Boolean.TRUE.toString() %>" />
+</portlet:resourceURL>
+
+#### Why was this change made?
+
+We need this new parameter so we can paginate the comments.
+
+---------------------------------------
+
+### Replaced `ReservedUserEmailAddressException` with `UserEmailAddressException` inner classes in User Services
+- **Date:** 2015-Feb-03
+- **JIRA Ticket:** LPS-53279
+
+#### What changed?
+
+Previous to Liferay 7, several methods of `UserLocalService` and `UserService`
+could throw a `ReservedUserEmailAddressException` when a user set an email 
+address that was not allowed. That exception has been deprecated and replaced
+with `UserEmailAddressException.MustNotBeCompanyMx`,
+`UserEmailAddressException.MustNotBePOP`, and
+`UserEmailAddressException.MustNotBeReserved`.
+
+#### Who is affected?
+
+This affects developers who have written code that catches the
+`ReservedUserEmailAddressException` while calling the affected methods.
+
+#### How should I update my code?
+
+You should replace catching exception `ReservedUserEmailAddressException` with
+catching exception `UserEmailAddressException.MustNotBeCompanyMx`,
+`UserEmailAddressException.MustNotBePOP`, or
+`UserEmailAddressException.MustNotBeReserved`.
+
+#### Why was this change made?
+
+A new pattern has been defined for exceptions that provides higher expressivity
+in their names and also more information regarding why the exception was thrown.
+
+The new exception `UserEmailAddressException.MustNotBeReserved` has all the
+necessary information about why the exception was thrown and its context. In
+particular, it contains the problematic email address, and the list of reserved
+email addresses.
 
 ---------------------------------------

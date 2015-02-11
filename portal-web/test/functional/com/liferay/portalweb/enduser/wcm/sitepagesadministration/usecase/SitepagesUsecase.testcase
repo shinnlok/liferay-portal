@@ -1,5 +1,5 @@
 <definition component-name="portal-wcm">
-	<property name="testray.main.component.name" value="WCM" />
+	<property name="testray.main.component.name" value="Site Pages Administration" />
 
 	<set-up>
 		<execute macro="User#firstLoginPG" />
@@ -1247,7 +1247,7 @@
 		<execute action="Home#assertLocation" value1="http://localhost:8080/web/page-type-test-site-name/embedded-page" />
 
 		<execute action="PGEmbedded#selectFrame" locator-key1="EMBEDDED_IFRAME" />
-		<execute action="PGEmbedded#assertTextEquals" locator-key1="EMBEDDED_LIFERAY_COPYRIGHT_TEXT" value1="© 2014 LIFERAY INC. ALL RIGHTS RESERVED" />
+		<execute action="PGEmbedded#assertTextEquals" locator-key1="EMBEDDED_LIFERAY_COPYRIGHT_TEXT" value1="© 2015 LIFERAY INC. ALL RIGHTS RESERVED" />
 		<execute action="PGEmbedded#selectFrame" value1="relative=top" />
 
 		<execute macro="Page#gotoPG">

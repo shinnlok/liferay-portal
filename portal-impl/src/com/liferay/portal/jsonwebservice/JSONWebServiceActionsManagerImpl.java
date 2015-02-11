@@ -63,7 +63,7 @@ public class JSONWebServiceActionsManagerImpl
 
 	@Override
 	public Set<String> getContextNames() {
-		Set<String> contextNames = new TreeSet<String>();
+		Set<String> contextNames = new TreeSet<>();
 
 		for (JSONWebServiceActionConfig jsonWebServiceActionConfig :
 				_jsonWebServiceActionConfigs) {
@@ -171,8 +171,7 @@ public class JSONWebServiceActionsManagerImpl
 		String contextName) {
 
 		List<JSONWebServiceActionMapping> jsonWebServiceActionMappings =
-			new ArrayList<JSONWebServiceActionMapping>(
-				_jsonWebServiceActionConfigs.size());
+			new ArrayList<>(_jsonWebServiceActionConfigs.size());
 
 		for (JSONWebServiceActionConfig jsonWebServiceActionConfig :
 				_jsonWebServiceActionConfigs) {
@@ -647,15 +646,15 @@ public class JSONWebServiceActionsManagerImpl
 		return new String[] {contextName, path};
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		JSONWebServiceActionsManagerImpl.class);
 
-	private SortedArrayList<JSONWebServiceActionConfig>
-		_jsonWebServiceActionConfigs =
-			new SortedArrayList<JSONWebServiceActionConfig>();
-	private JSONWebServiceNaming _jsonWebServiceNaming =
+	private final SortedArrayList<JSONWebServiceActionConfig>
+		_jsonWebServiceActionConfigs = new SortedArrayList<>();
+	private final JSONWebServiceNaming _jsonWebServiceNaming =
 		new JSONWebServiceNaming();
-	private BinarySearch<String> _pathBinarySearch = new PathBinarySearch();
+	private final BinarySearch<String> _pathBinarySearch =
+		new PathBinarySearch();
 
 	private class PathBinarySearch extends BinarySearch<String> {
 

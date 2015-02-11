@@ -1,3 +1,5 @@
+@import url(common_main.css);
+
 .portlet-blogs {
 	.taglib-custom-attributes-list {
 		margin-bottom: 1em;
@@ -37,6 +39,10 @@
 		margin-bottom: 10px;
 	}
 
+	.edit-actions {
+		padding-left: 0;
+	}
+
 	.entry-abstract-wrapper {
 		color: #2B4256;
 
@@ -73,8 +79,9 @@
 		}
 	}
 
-	.entry-date {
-		color: #999;
+	.read-more {
+		font-size: 14px;
+		margin-bottom: 40px;
 	}
 
 	.entry-footer:after {
@@ -90,32 +97,31 @@
 		padding-left: 10px;
 	}
 
-	.alloy-editor-placeholder {
-		color: #2B4256;
-		padding-left: 10px;
-
-		&:empty:not(:focus) {
-			background: transparent;
-			border-left: 2px solid #DBDDE1;
-			color: #B0B4BB;
+	.edit-entry {
+		.entry-status {
+			padding-left: 30px;
 		}
 
-		&.readonly {
-			color: #CCC;
+		.entry-title, .entry-subtitle, .entry-body {
+			margin-left: 24px;
 		}
-	}
 
-	.entry-title, .entry-subtitle, .entry-content {
-		margin-left: 24px;
+		.entry-body {
+			padding-bottom: 60px;
+		}
+
+		.entry-subtitle {
+			margin-bottom: 30px;
+		}
 	}
 
 	.entry-title {
 		display: block;
-		font-weight: bold;
 
 		h2 {
-			font-size: 30px;
-			margin-bottom: 30px;
+			font-size: 26px;
+			font-weight: bold;
+			margin-bottom: 24px;
 
 			.alloy-editor-placeholder {
 				color: #32A8E6;
@@ -125,24 +131,9 @@
 				}
 			}
 		}
-	}
 
-	.entry-subtitle {
-		color: #2B4256;
-		font-size: 27px;
-		margin-bottom: 30px;
-	}
-
-	.entry-content {
-		font-size: 21px;
-		padding-bottom: 60px;
-
-		p {
-			margin-bottom: 30px;
-
-			&:last-child {
-				margin-bottom: 0;
-			}
+		a {
+			font-weight: bold;
 		}
 	}
 
@@ -178,7 +169,8 @@
 	}
 
 	.lfr-blogs-cover-image-selector {
-		margin: 20px 0 60px;
+		margin: 0 0 60px;
+		padding-top: 10px;
 	}
 
 	.preview {

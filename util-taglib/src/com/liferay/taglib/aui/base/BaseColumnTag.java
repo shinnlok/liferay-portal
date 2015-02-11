@@ -24,7 +24,7 @@ import javax.servlet.jsp.JspException;
  * @author Julio Camarero
  * @generated
  */
-public class BaseColumnTag extends com.liferay.taglib.util.IncludeTag {
+public abstract class BaseColumnTag extends com.liferay.taglib.util.IncludeTag {
 
 	@Override
 	public int doStartTag() throws JspException {
@@ -85,6 +85,8 @@ public class BaseColumnTag extends com.liferay.taglib.util.IncludeTag {
 
 	@Override
 	protected void cleanUp() {
+		super.cleanUp();
+
 		_columnWidth = 0;
 		_cssClass = null;
 		_first = false;

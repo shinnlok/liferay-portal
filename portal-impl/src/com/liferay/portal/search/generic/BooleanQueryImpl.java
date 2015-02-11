@@ -385,9 +385,9 @@ public class BooleanQueryImpl extends BaseBooleanQueryImpl {
 		return !_booleanClauses.isEmpty();
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(BooleanQueryImpl.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		BooleanQueryImpl.class);
 
-	private List<BooleanClause> _booleanClauses =
-		new ArrayList<BooleanClause>();
+	private final List<BooleanClause> _booleanClauses = new ArrayList<>();
 
 }

@@ -110,7 +110,7 @@ public class LocalProcessExecutor implements ProcessExecutor {
 		try {
 			List<String> arguments = processConfig.getArguments();
 
-			List<String> commands = new ArrayList<String>(arguments.size() + 4);
+			List<String> commands = new ArrayList<>(arguments.size() + 4);
 
 			commands.add(processConfig.getJavaExecutable());
 			commands.add("-cp");
@@ -138,8 +138,7 @@ public class LocalProcessExecutor implements ProcessExecutor {
 
 			ThreadPoolExecutor threadPoolExecutor = _getThreadPoolExecutor();
 
-			AsyncBroker<Long, Serializable> asyncBroker =
-				new AsyncBroker<Long, Serializable>();
+			AsyncBroker<Long, Serializable> asyncBroker = new AsyncBroker<>();
 
 			SubprocessReactor subprocessReactor = new SubprocessReactor(
 				process, processConfig.getReactClassLoader(), asyncBroker);
@@ -197,7 +196,7 @@ public class LocalProcessExecutor implements ProcessExecutor {
 
 						};
 
-				return new LocalProcessChannel<T>(
+				return new LocalProcessChannel<>(
 					noticeableFuture, objectOutputStream, asyncBroker);
 			}
 			catch (RejectedExecutionException ree) {
@@ -237,7 +236,7 @@ public class LocalProcessExecutor implements ProcessExecutor {
 		LocalProcessExecutor.class);
 
 	private final Map<Process, NoticeableFuture<?>> _managedProcesses =
-		new ConcurrentHashMap<Process, NoticeableFuture<?>>();
+		new ConcurrentHashMap<>();
 	private volatile ThreadPoolExecutor _threadPoolExecutor;
 
 	private class SubprocessReactor

@@ -16,6 +16,8 @@ package com.liferay.portal.service.impl;
 
 import com.liferay.portal.PortletIdException;
 import com.liferay.portal.kernel.cluster.Clusterable;
+import com.liferay.portal.kernel.configuration.Configuration;
+import com.liferay.portal.kernel.configuration.ConfigurationFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.image.SpriteProcessor;
@@ -388,7 +390,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 	@Skip
 	public List<CustomAttributesDisplay> getCustomAttributesDisplays() {
 		List<CustomAttributesDisplay> customAttributesDisplays =
-			new ArrayList<CustomAttributesDisplay>();
+			new ArrayList<>();
 
 		for (Portlet portlet : getPortlets()) {
 			if (!portlet.isActive() || !portlet.isInclude() ||
@@ -425,7 +427,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 	@Override
 	@Skip
 	public List<Portlet> getFriendlyURLMapperPortlets() {
-		List<Portlet> portlets = new ArrayList<Portlet>();
+		List<Portlet> portlets = new ArrayList<>();
 
 		for (Portlet portlet : getPortlets()) {
 			if (!portlet.isActive() || !portlet.isInclude() ||
@@ -448,8 +450,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 	@Override
 	@Skip
 	public List<FriendlyURLMapper> getFriendlyURLMappers() {
-		List<FriendlyURLMapper> friendlyURLMappers =
-			new ArrayList<FriendlyURLMapper>();
+		List<FriendlyURLMapper> friendlyURLMappers = new ArrayList<>();
 
 		for (Portlet portlet : getPortlets()) {
 			if (!portlet.isActive() || !portlet.isInclude() ||
@@ -530,7 +531,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 
 			initParams.put("view-jsp", "/html/portal/undeployed_portlet.jsp");
 
-			Set<String> mimeTypePortletModes = new HashSet<String>();
+			Set<String> mimeTypePortletModes = new HashSet<>();
 
 			mimeTypePortletModes.add(
 				StringUtil.toLowerCase(PortletMode.VIEW.toString()));
@@ -539,7 +540,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 
 			portletModes.put(ContentTypes.TEXT_HTML, mimeTypePortletModes);
 
-			Set<String> mimeTypeWindowStates = new HashSet<String>();
+			Set<String> mimeTypeWindowStates = new HashSet<>();
 
 			mimeTypeWindowStates.add(
 				StringUtil.toLowerCase(WindowState.NORMAL.toString()));
@@ -781,7 +782,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 		String servletContextName, ServletContext servletContext, String[] xmls,
 		PluginPackage pluginPackage) {
 
-		List<Portlet> portlets = new ArrayList<Portlet>();
+		List<Portlet> portlets = new ArrayList<>();
 
 		Map<String, Portlet> portletsPool = _getPortletsPool();
 
@@ -854,8 +855,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 
 	@Override
 	public Map<String, Portlet> loadGetPortletsPool(long companyId) {
-		Map<String, Portlet> portletsPool =
-			new ConcurrentHashMap<String, Portlet>();
+		Map<String, Portlet> portletsPool = new ConcurrentHashMap<>();
 
 		Map<String, Portlet> parentPortletsPool = _getPortletsPool();
 
@@ -993,7 +993,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 		int pos = portletName.indexOf(CharPool.STAR);
 
 		if (pos == -1) {
-			portlets = new ArrayList<Portlet>();
+			portlets = new ArrayList<>();
 
 			String portletId = portletName;
 
@@ -1037,7 +1037,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 	private List<Portlet> _getPortletsByServletContextName(
 		String servletContextName, Map<String, Portlet> portletsPool) {
 
-		List<Portlet> portlets = new ArrayList<Portlet>();
+		List<Portlet> portlets = new ArrayList<>();
 
 		String servletContextNameSuffix = servletContextName;
 
@@ -1079,6 +1079,32 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 		}
 
 		return portletsPool;
+	}
+
+	private String _getTriggerValue(Portlet portlet, String propertyKey) {
+		PortletApp portletApp = portlet.getPortletApp();
+
+		ServletContext servletContext = portletApp.getServletContext();
+
+		ClassLoader classLoader = servletContext.getClassLoader();
+
+		Configuration configuration = _propertiesConfigurations.get(
+			classLoader);
+
+		if (configuration == null) {
+			String propertyFileName = "portal";
+
+			if (portletApp.isWARFile()) {
+				propertyFileName = "portlet";
+			}
+
+			configuration = ConfigurationFactoryUtil.getConfiguration(
+				classLoader, propertyFileName);
+
+			_propertiesConfigurations.put(classLoader, configuration);
+		}
+
+		return configuration.get(propertyKey);
 	}
 
 	private void _readLiferayDisplay(
@@ -1136,7 +1162,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 
 		Element rootElement = document.getRootElement();
 
-		Set<String> portletIds = new HashSet<String>();
+		Set<String> portletIds = new HashSet<>();
 
 		_readLiferayDisplay(
 			servletContextName, rootElement, portletCategory, portletIds);
@@ -1144,7 +1170,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 		// Portlets that do not belong to any categories should default to the
 		// Undefined category
 
-		Set<String> undefinedPortletIds = new HashSet<String>();
+		Set<String> undefinedPortletIds = new HashSet<>();
 
 		for (Portlet portlet : _getPortletsPool().values()) {
 			String portletId = portlet.getPortletId();
@@ -1260,7 +1286,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 				portletElement.elementText("configuration-action-class"),
 				portletModel.getConfigurationActionClass()));
 
-		List<String> indexerClasses = new ArrayList<String>();
+		List<String> indexerClasses = new ArrayList<>();
 
 		for (Element indexerClassElement :
 				portletElement.elements("indexer-class")) {
@@ -1302,8 +1328,9 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 					"property-key");
 
 				if (propertyKeyElement != null) {
-					schedulerEntry.setPropertyKey(
-						propertyKeyElement.getTextTrim());
+					schedulerEntry.setTriggerValue(
+						_getTriggerValue(
+							portletModel, propertyKeyElement.getTextTrim()));
 				}
 				else {
 					schedulerEntry.setTriggerValue(
@@ -1317,8 +1344,9 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 					"property-key");
 
 				if (propertyKeyElement != null) {
-					schedulerEntry.setPropertyKey(
-						propertyKeyElement.getTextTrim());
+					schedulerEntry.setTriggerValue(
+						_getTriggerValue(
+							portletModel, propertyKeyElement.getTextTrim()));
 				}
 				else {
 					Element simpleTriggerValueElement = simpleElement.element(
@@ -1371,7 +1399,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 
 		portletModel.setPortletDataHandlerClass(portletDataHandlerClass);
 
-		List<String> stagedModelDataHandlerClasses = new ArrayList<String>();
+		List<String> stagedModelDataHandlerClasses = new ArrayList<>();
 
 		for (Element stagedModelDataHandlerClassElement :
 				portletElement.elements("staged-model-data-handler-class")) {
@@ -1400,7 +1428,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 				portletElement.elementText("pop-message-listener-class"),
 				portletModel.getPopMessageListenerClass()));
 
-		List<String> socialActivityInterpreterClasses = new ArrayList<String>();
+		List<String> socialActivityInterpreterClasses = new ArrayList<>();
 
 		for (Element socialActivityInterpreterClassElement :
 				portletElement.elements("social-activity-interpreter-class")) {
@@ -1425,7 +1453,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 				portletElement.elementText("user-notification-definitions"),
 				portletModel.getUserNotificationDefinitions()));
 
-		List<String> userNotificationHandlerClasses = new ArrayList<String>();
+		List<String> userNotificationHandlerClasses = new ArrayList<>();
 
 		for (Element userNotificationHandlerClassElement :
 				portletElement.elements(
@@ -1480,7 +1508,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 				portletElement.elementText("control-panel-entry-class"),
 				portletModel.getControlPanelEntryClass()));
 
-		List<String> assetRendererFactoryClasses = new ArrayList<String>();
+		List<String> assetRendererFactoryClasses = new ArrayList<>();
 
 		for (Element assetRendererFactoryClassElement :
 				portletElement.elements("asset-renderer-factory")) {
@@ -1492,7 +1520,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 		portletModel.setAssetRendererFactoryClasses(
 			assetRendererFactoryClasses);
 
-		List<String> atomCollectionAdapterClasses = new ArrayList<String>();
+		List<String> atomCollectionAdapterClasses = new ArrayList<>();
 
 		for (Element atomCollectionAdapterClassElement :
 				portletElement.elements("atom-collection-adapter")) {
@@ -1504,7 +1532,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 		portletModel.setAtomCollectionAdapterClasses(
 			atomCollectionAdapterClasses);
 
-		List<String> customAttributesDisplayClasses = new ArrayList<String>();
+		List<String> customAttributesDisplayClasses = new ArrayList<>();
 
 		for (Element customAttributesDisplayClassElement :
 				portletElement.elements("custom-attributes-display")) {
@@ -1525,7 +1553,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 				portletElement.elementText("permission-propagator"),
 				portletModel.getPermissionPropagatorClass()));
 
-		List<String> trashHandlerClasses = new ArrayList<String>();
+		List<String> trashHandlerClasses = new ArrayList<>();
 
 		for (Element trashHandlerClassElement :
 				portletElement.elements("trash-handler")) {
@@ -1535,7 +1563,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 
 		portletModel.setTrashHandlerClasses(trashHandlerClasses);
 
-		List<String> workflowHandlerClasses = new ArrayList<String>();
+		List<String> workflowHandlerClasses = new ArrayList<>();
 
 		for (Element workflowHandlerClassElement :
 				portletElement.elements("workflow-handler")) {
@@ -1625,7 +1653,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 		Element autopropagatedParametersElement = portletElement.element(
 			"autopropagated-parameters");
 
-		Set<String> autopropagatedParameters = new HashSet<String>();
+		Set<String> autopropagatedParameters = new HashSet<>();
 
 		if (autopropagatedParametersElement != null) {
 			String[] autopropagatedParametersArray = StringUtil.split(
@@ -1661,7 +1689,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 				portletElement.elementText("ajaxable"),
 				portletModel.isAjaxable()));
 
-		List<String> headerPortalCssList = new ArrayList<String>();
+		List<String> headerPortalCssList = new ArrayList<>();
 
 		for (Element headerPortalCssElement :
 				portletElement.elements("header-portal-css")) {
@@ -1671,7 +1699,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 
 		portletModel.setHeaderPortalCss(headerPortalCssList);
 
-		List<String> headerPortletCssList = new ArrayList<String>();
+		List<String> headerPortletCssList = new ArrayList<>();
 
 		for (Element headerPortletCssElement :
 				portletElement.elements("header-portlet-css")) {
@@ -1681,7 +1709,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 
 		portletModel.setHeaderPortletCss(headerPortletCssList);
 
-		List<String> headerPortalJavaScriptList = new ArrayList<String>();
+		List<String> headerPortalJavaScriptList = new ArrayList<>();
 
 		for (Element headerPortalJavaScriptElement :
 				portletElement.elements("header-portal-javascript")) {
@@ -1692,7 +1720,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 
 		portletModel.setHeaderPortalJavaScript(headerPortalJavaScriptList);
 
-		List<String> headerPortletJavaScriptList = new ArrayList<String>();
+		List<String> headerPortletJavaScriptList = new ArrayList<>();
 
 		for (Element headerPortletJavaScriptElement :
 				portletElement.elements("header-portlet-javascript")) {
@@ -1703,7 +1731,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 
 		portletModel.setHeaderPortletJavaScript(headerPortletJavaScriptList);
 
-		List<String> footerPortalCssList = new ArrayList<String>();
+		List<String> footerPortalCssList = new ArrayList<>();
 
 		for (Element footerPortalCssElement :
 				portletElement.elements("footer-portal-css")) {
@@ -1713,7 +1741,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 
 		portletModel.setFooterPortalCss(footerPortalCssList);
 
-		List<String> footerPortletCssList = new ArrayList<String>();
+		List<String> footerPortletCssList = new ArrayList<>();
 
 		for (Element footerPortletCssElement :
 				portletElement.elements("footer-portlet-css")) {
@@ -1723,7 +1751,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 
 		portletModel.setFooterPortletCss(footerPortletCssList);
 
-		List<String> footerPortalJavaScriptList = new ArrayList<String>();
+		List<String> footerPortalJavaScriptList = new ArrayList<>();
 
 		for (Element footerPortalJavaScriptElement :
 				portletElement.elements("footer-portal-javascript")) {
@@ -1734,7 +1762,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 
 		portletModel.setFooterPortalJavaScript(footerPortalJavaScriptList);
 
-		List<String> footerPortletJavaScriptList = new ArrayList<String>();
+		List<String> footerPortletJavaScriptList = new ArrayList<>();
 
 		for (Element footerPortletJavaScriptElement :
 				portletElement.elements("footer-portlet-javascript")) {
@@ -1787,7 +1815,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 			Map<String, Portlet> portletsPool)
 		throws Exception {
 
-		Set<String> liferayPortletIds = new HashSet<String>();
+		Set<String> liferayPortletIds = new HashSet<>();
 
 		if (xml == null) {
 			return liferayPortletIds;
@@ -1799,7 +1827,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 
 		PortletApp portletApp = _getPortletApp(servletContextName);
 
-		Map<String, String> roleMappers = new HashMap<String, String>();
+		Map<String, String> roleMappers = new HashMap<>();
 
 		for (Element roleMapperElement : rootElement.elements("role-mapper")) {
 			String roleName = roleMapperElement.elementText("role-name");
@@ -1897,7 +1925,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 		portletModel.setPortletClass(
 			GetterUtil.getString(portletElement.elementText("portlet-class")));
 
-		Map<String, String> initParams = new HashMap<String, String>();
+		Map<String, String> initParams = new HashMap<>();
 
 		for (Element initParamElement : portletElement.elements("init-param")) {
 			initParams.put(
@@ -1915,15 +1943,13 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 				GetterUtil.getInteger(expirationCacheElement.getText()));
 		}
 
-		Map<String, Set<String>> portletModes =
-			new HashMap<String, Set<String>>();
-		Map<String, Set<String>> windowStates =
-			new HashMap<String, Set<String>>();
+		Map<String, Set<String>> portletModes = new HashMap<>();
+		Map<String, Set<String>> windowStates = new HashMap<>();
 
 		for (Element supportsElement : portletElement.elements("supports")) {
 			String mimeType = supportsElement.elementText("mime-type");
 
-			Set<String> mimeTypePortletModes = new HashSet<String>();
+			Set<String> mimeTypePortletModes = new HashSet<>();
 
 			mimeTypePortletModes.add(
 				StringUtil.toLowerCase(PortletMode.VIEW.toString()));
@@ -1937,7 +1963,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 
 			portletModes.put(mimeType, mimeTypePortletModes);
 
-			Set<String> mimeTypeWindowStates = new HashSet<String>();
+			Set<String> mimeTypeWindowStates = new HashSet<>();
 
 			mimeTypeWindowStates.add(
 				StringUtil.toLowerCase(WindowState.NORMAL.toString()));
@@ -1969,7 +1995,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 		portletModel.setPortletModes(portletModes);
 		portletModel.setWindowStates(windowStates);
 
-		Set<String> supportedLocales = new HashSet<String>();
+		Set<String> supportedLocales = new HashSet<>();
 
 		//supportedLocales.add(
 		//	LocaleUtil.toLanguageId(LocaleUtil.getDefault()));
@@ -2050,7 +2076,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 			}
 		}
 
-		Set<String> unlinkedRoles = new HashSet<String>();
+		Set<String> unlinkedRoles = new HashSet<>();
 
 		for (Element roleElement :
 				portletElement.elements("security-role-ref")) {
@@ -2060,7 +2086,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 
 		portletModel.setUnlinkedRoles(unlinkedRoles);
 
-		Set<QName> processingEvents = new HashSet<QName>();
+		Set<QName> processingEvents = new HashSet<>();
 
 		for (Element supportedProcessingEventElement :
 				portletElement.elements("supported-processing-event")) {
@@ -2089,7 +2115,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 
 		portletModel.setProcessingEvents(processingEvents);
 
-		Set<QName> publishingEvents = new HashSet<QName>();
+		Set<QName> publishingEvents = new HashSet<>();
 
 		for (Element supportedPublishingEventElement :
 				portletElement.elements("supported-publishing-event")) {
@@ -2107,8 +2133,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 
 		portletModel.setPublishingEvents(publishingEvents);
 
-		Set<PublicRenderParameter> publicRenderParameters =
-			new HashSet<PublicRenderParameter>();
+		Set<PublicRenderParameter> publicRenderParameters = new HashSet<>();
 
 		for (Element supportedPublicRenderParameter :
 				portletElement.elements("supported-public-render-parameter")) {
@@ -2138,7 +2163,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 			Set<String> servletURLPatterns, PluginPackage pluginPackage)
 		throws Exception {
 
-		Set<String> portletIds = new HashSet<String>();
+		Set<String> portletIds = new HashSet<>();
 
 		if (xml == null) {
 			return portletIds;
@@ -2219,7 +2244,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 			String name = GetterUtil.getString(
 				containerRuntimeOptionElement.elementText("name"));
 
-			List<String> values = new ArrayList<String>();
+			List<String> values = new ArrayList<>();
 
 			for (Element valueElement :
 					containerRuntimeOptionElement.elements("value")) {
@@ -2251,7 +2276,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 			String filterName = filterElement.elementText("filter-name");
 			String filterClass = filterElement.elementText("filter-class");
 
-			Set<String> lifecycles = new LinkedHashSet<String>();
+			Set<String> lifecycles = new LinkedHashSet<>();
 
 			for (Element lifecycleElement :
 					filterElement.elements("lifecycle")) {
@@ -2259,7 +2284,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 				lifecycles.add(lifecycleElement.getText());
 			}
 
-			Map<String, String> initParams = new HashMap<String, String>();
+			Map<String, String> initParams = new HashMap<>();
 
 			for (Element initParamElement :
 					filterElement.elements("init-param")) {
@@ -2326,7 +2351,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 	}
 
 	private Set<String> _readWebXML(String xml) throws Exception {
-		Set<String> servletURLPatterns = new LinkedHashSet<String>();
+		Set<String> servletURLPatterns = new LinkedHashSet<>();
 
 		if (xml == null) {
 			return servletURLPatterns;
@@ -2360,7 +2385,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 			return;
 		}
 
-		List<URL> imageURLs = new ArrayList<URL>(resourcePaths.size());
+		List<URL> imageURLs = new ArrayList<>(resourcePaths.size());
 
 		for (String curResourcePath : resourcePaths) {
 			if (curResourcePath.endsWith(StringPool.SLASH)) {
@@ -2411,12 +2436,14 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 		PortletLocalServiceImpl.class);
 
 	private static final Map<Long, Map<String, Portlet>> _companyPortletsPool =
-		new ConcurrentHashMap<Long, Map<String, Portlet>>();
+		new ConcurrentHashMap<>();
 	private static final Map<String, PortletApp> _portletAppsPool =
-		new ConcurrentHashMap<String, PortletApp>();
+		new ConcurrentHashMap<>();
 	private static final Map<String, String> _portletIdsByStrutsPath =
-		new ConcurrentHashMap<String, String>();
+		new ConcurrentHashMap<>();
 	private static final Map<String, Portlet> _portletsPool =
-		new ConcurrentHashMap<String, Portlet>();
+		new ConcurrentHashMap<>();
+	private static final Map<ClassLoader, Configuration>
+		_propertiesConfigurations = new ConcurrentHashMap<>();
 
 }

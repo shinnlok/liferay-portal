@@ -255,14 +255,14 @@ request.setAttribute(WebKeys.WORKFLOW_ASSET_PREVIEW, Boolean.TRUE);
 					</c:choose>
 
 					<%
-					boolean filterByMetadata = false;
-
 					String[] metadataFields = new String[] {"author", "categories", "tags"};
 					%>
 
-					<div class="asset-metadata">
-						<%@ include file="/html/portlet/asset_publisher/asset_metadata.jspf" %>
-					</div>
+					<liferay-ui:asset-metadata
+						className="<%= className %>"
+						classPK="<%= classPK %>"
+						metadataFields="<%= metadataFields %>"
+					/>
 				</liferay-ui:panel>
 			</c:if>
 
@@ -287,12 +287,17 @@ request.setAttribute(WebKeys.WORKFLOW_ASSET_PREVIEW, Boolean.TRUE);
 					<portlet:param name="struts_action" value="/workflow_tasks/edit_workflow_task_discussion" />
 				</portlet:actionURL>
 
+				<portlet:resourceURL var="discussionPaginationURL">
+					<portlet:param name="struts_action" value="/workflow_tasks/edit_workflow_task_discussion" />
+				</portlet:resourceURL>
+
 				<liferay-ui:discussion
 					assetEntryVisible="<%= false %>"
 					className="<%= WorkflowInstance.class.getName() %>"
 					classPK="<%= workflowTask.getWorkflowInstanceId() %>"
 					formAction="<%= discussionURL %>"
 					formName="fm1"
+					paginationURL="<%= discussionPaginationURL %>"
 					ratingsEnabled="<%= false %>"
 					redirect="<%= currentURL %>"
 					userId="<%= user.getUserId() %>"

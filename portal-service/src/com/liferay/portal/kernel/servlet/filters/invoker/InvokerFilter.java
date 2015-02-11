@@ -31,7 +31,9 @@ import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ServerDetector;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
@@ -69,9 +71,29 @@ public class InvokerFilter extends BasePortalLifecycle implements Filter {
 
 		String uri = getURI(request);
 
-		request = handleNonSerializableRequest(request);
-
 		HttpServletResponse response = (HttpServletResponse)servletResponse;
+
+		String requestURL = getURL(request);
+
+		if (requestURL.length() > _invokerFilterURIMaxLength) {
+			response.sendError(HttpServletResponse.SC_REQUEST_URI_TOO_LONG);
+
+			if (_log.isWarnEnabled()) {
+				StringBundler sb = new StringBundler(7);
+
+				sb.append("Rejected ");
+				sb.append(StringUtil.shorten(uri, _invokerFilterURIMaxLength));
+				sb.append(" because it has more than ");
+				sb.append(_invokerFilterURIMaxLength);
+				sb.append(" characters");
+
+				_log.warn(sb.toString());
+			}
+
+			return;
+		}
+
+		request = handleNonSerializableRequest(request);
 
 		if (ServletVersionDetector.is3_0()) {
 			response =
@@ -154,9 +176,11 @@ public class InvokerFilter extends BasePortalLifecycle implements Filter {
 			PropsUtil.get(PropsKeys.INVOKER_FILTER_CHAIN_SIZE));
 
 		if (_invokerFilterChainSize > 0) {
-			_filterChains = new ConcurrentLFUCache<String, InvokerFilterChain>(
-				_invokerFilterChainSize);
+			_filterChains = new ConcurrentLFUCache<>(_invokerFilterChainSize);
 		}
+
+		_invokerFilterURIMaxLength = GetterUtil.getInteger(
+			PropsUtil.get(PropsKeys.INVOKER_FILTER_URI_MAX_LENGTH));
 
 		ServletContext servletContext = _filterConfig.getServletContext();
 
@@ -249,6 +273,23 @@ public class InvokerFilter extends BasePortalLifecycle implements Filter {
 		return HttpUtil.removePathParameters(uri);
 	}
 
+	protected String getURL(HttpServletRequest request) {
+		StringBuffer requestURL = request.getRequestURL();
+
+		if (requestURL == null) {
+			return StringPool.BLANK;
+		}
+
+		String queryString = request.getQueryString();
+
+		if (!Validator.isBlank(queryString)) {
+			requestURL.append(StringPool.QUESTION);
+			requestURL.append(request.getQueryString());
+		}
+
+		return requestURL.toString();
+	}
+
 	protected HttpServletRequest handleNonSerializableRequest(
 		HttpServletRequest request) {
 
@@ -287,5 +328,6 @@ public class InvokerFilter extends BasePortalLifecycle implements Filter {
 	private FilterConfig _filterConfig;
 	private int _invokerFilterChainSize;
 	private InvokerFilterHelper _invokerFilterHelper;
+	private int _invokerFilterURIMaxLength;
 
 }

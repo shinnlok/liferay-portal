@@ -24,10 +24,10 @@ import com.liferay.portal.kernel.concurrent.DefaultNoticeableFuture;
 import com.liferay.portal.kernel.concurrent.NoticeableFuture;
 import com.liferay.portal.kernel.process.ProcessCallable;
 import com.liferay.portal.kernel.process.ProcessException;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.ReflectionUtil;
-import com.liferay.portal.util.test.RandomTestUtil;
 
 import java.io.Serializable;
 
@@ -720,7 +720,7 @@ public class JMXProxyUtilTest {
 				ProcessCallable<V> processCallable) {
 
 				DefaultNoticeableFuture<V> defaultNoticeableFuture =
-					new DefaultNoticeableFuture<V>();
+					new DefaultNoticeableFuture<>();
 
 				try {
 					defaultNoticeableFuture.set(processCallable.call());

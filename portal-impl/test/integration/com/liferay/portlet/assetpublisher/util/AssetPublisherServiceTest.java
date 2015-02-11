@@ -14,19 +14,19 @@
 
 package com.liferay.portlet.assetpublisher.util;
 
-import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.test.DeleteAfterTestRun;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.util.test.GroupTestUtil;
-import com.liferay.portal.util.test.RandomTestUtil;
-import com.liferay.portal.util.test.ServiceContextTestUtil;
-import com.liferay.portal.util.test.TestPropsValues;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.MainServletTestRule;
 import com.liferay.portlet.asset.model.AssetCategory;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetVocabulary;
@@ -195,7 +195,7 @@ public class AssetPublisherServiceTest {
 			boolean manualMode)
 		throws Exception {
 
-		List<AssetEntry> assetEntries = new ArrayList<AssetEntry>();
+		List<AssetEntry> assetEntries = new ArrayList<>();
 
 		for (int i = 0; i < count; i++) {
 			JournalArticle article = JournalTestUtil.addArticle(
@@ -265,7 +265,7 @@ public class AssetPublisherServiceTest {
 	private static final String[] _NO_ASSET_TAG_NAMES = new String[0];
 
 	private long[] _assetCategoryIds = new long[0];
-	private List<AssetEntry> _assetEntries = new ArrayList<AssetEntry>();
+	private List<AssetEntry> _assetEntries = new ArrayList<>();
 	private String[] _assetEntryXmls = new String[0];
 
 	@DeleteAfterTestRun

@@ -144,102 +144,6 @@
 		<put name="portlet_content" value="/portlet/announcements/view.jsp" />
 	</definition>
 
-	<!-- Asset Browser -->
-
-	<definition name="portlet.asset_browser" extends="portlet" />
-
-	<definition name="portlet.asset_browser.view" extends="portlet.asset_browser">
-		<put name="portlet_content" value="/portlet/asset_browser/view.jsp" />
-	</definition>
-
-	<!-- Asset Category Admin -->
-
-	<definition name="portlet.asset_category_admin" extends="portlet" />
-
-	<definition name="portlet.asset_category_admin.edit_category" extends="portlet.asset_category_admin">
-		<put name="portlet_content" value="/portlet/asset_category_admin/edit_category.jsp" />
-	</definition>
-
-	<definition name="portlet.asset_category_admin.edit_vocabulary" extends="portlet.asset_category_admin">
-		<put name="portlet_content" value="/portlet/asset_category_admin/edit_vocabulary.jsp" />
-	</definition>
-
-	<definition name="portlet.asset_category_admin.error" extends="portlet.asset_category_admin">
-		<put name="portlet_content" value="/portlet/asset_category_admin/error.jsp" />
-	</definition>
-
-	<definition name="portlet.asset_category_admin.move_category" extends="portlet.asset_category_admin">
-		<put name="portlet_content" value="/portlet/asset_category_admin/move_category.jsp" />
-	</definition>
-
-	<definition name="portlet.asset_category_admin.view" extends="portlet.asset_category_admin">
-		<put name="portlet_content" value="/portlet/asset_category_admin/view.jsp" />
-	</definition>
-
-	<definition name="portlet.asset_category_admin.view_categories" extends="portlet.asset_category_admin">
-		<put name="portlet_content" value="/portlet/asset_category_admin/view_categories.jsp" />
-	</definition>
-
-	<!-- Asset Publisher -->
-
-	<definition name="portlet.asset_publisher" extends="portlet" />
-
-	<definition name="portlet.asset_publisher.add_asset_redirect" extends="portlet.asset_publisher">
-		<put name="portlet_content" value="/portlet/asset_publisher/add_asset_redirect.jsp" />
-	</definition>
-
-	<definition name="portlet.asset_publisher.edit_query_rule" extends="portlet.asset_publisher">
-		<put name="portlet_content" value="/portlet/asset_publisher/edit_query_rule.jsp" />
-	</definition>
-
-	<definition name="portlet.asset_publisher.error" extends="portlet.asset_publisher">
-		<put name="portlet_content" value="/portlet/asset_publisher/error.jsp" />
-	</definition>
-
-	<definition name="portlet.asset_publisher.select_structure_field" extends="portlet.asset_publisher">
-		<put name="portlet_content" value="/portlet/asset_publisher/select_structure_field.jsp" />
-	</definition>
-
-	<definition name="portlet.asset_publisher.view" extends="portlet.asset_publisher">
-		<put name="portlet_content" value="/portlet/asset_publisher/view.jsp" />
-	</definition>
-
-	<definition name="portlet.asset_publisher.view_content" extends="portlet.asset_publisher">
-		<put name="portlet_content" value="/portlet/asset_publisher/view_content.jsp" />
-	</definition>
-
-	<!-- Asset Tag Admin -->
-
-	<definition name="portlet.asset_tag_admin" extends="portlet" />
-
-	<definition name="portlet.asset_tag_admin.edit_tag" extends="portlet.asset_tag_admin">
-		<put name="portlet_content" value="/portlet/asset_tag_admin/edit_tag.jsp" />
-	</definition>
-
-	<definition name="portlet.asset_tag_admin.error" extends="portlet.asset_tag_admin">
-		<put name="portlet_content" value="/portlet/asset_tag_admin/error.jsp" />
-	</definition>
-
-	<definition name="portlet.asset_tag_admin.merge_tag" extends="portlet.asset_tag_admin">
-		<put name="portlet_content" value="/portlet/asset_tag_admin/merge_tag.jsp" />
-	</definition>
-
-	<definition name="portlet.asset_tag_admin.view" extends="portlet.asset_tag_admin">
-		<put name="portlet_content" value="/portlet/asset_tag_admin/view.jsp" />
-	</definition>
-
-	<definition name="portlet.asset_tag_admin.view_tag" extends="portlet.asset_tag_admin">
-		<put name="portlet_content" value="/portlet/asset_tag_admin/view_tag.jsp" />
-	</definition>
-
-	<!-- Asset Tags Navigation -->
-
-	<definition name="portlet.asset_tags_navigation" extends="portlet" />
-
-	<definition name="portlet.asset_tags_navigation.view" extends="portlet.asset_tags_navigation">
-		<put name="portlet_content" value="/portlet/asset_tags_navigation/view.jsp" />
-	</definition>
-
 	<!-- Background Task-->
 
 	<definition name="portlet.background_task" extends="portlet" />
@@ -1278,22 +1182,6 @@
 		<put name="portlet_content" value="/portlet/shopping/view_item.jsp" />
 	</definition>
 
-	<!-- Site Browser -->
-
-	<definition name="portlet.site_browser" extends="portlet" />
-
-	<definition name="portlet.site_browser.view" extends="portlet.site_browser">
-		<put name="portlet_content" value="/portlet/site_browser/view.jsp" />
-	</definition>
-
-	<!-- Site Map -->
-
-	<definition name="portlet.site_map" extends="portlet" />
-
-	<definition name="portlet.site_map.view" extends="portlet.site_map">
-		<put name="portlet_content" value="/portlet/site_map/view.jsp" />
-	</definition>
-
 	<!-- Site Settings -->
 
 	<definition name="portlet.site_settings" extends="portlet" />
@@ -1506,6 +1394,10 @@
 		<put name="portlet_content" value="/portlet/users_admin/edit_user.jsp" />
 	</definition>
 
+	<definition name="portlet.users_admin.edit_user_details" extends="portlet.users_admin">
+		<put name="portlet_content" value="/portlet/users_admin/user/details.jsp" />
+	</definition>
+
 	<definition name="portlet.users_admin.error" extends="portlet.users_admin">
 		<put name="portlet_content" value="/portlet/users_admin/error.jsp" />
 	</definition>
@@ -1516,114 +1408,6 @@
 
 	<definition name="portlet.users_admin.view" extends="portlet.users_admin">
 		<put name="portlet_content" value="/portlet/users_admin/view.jsp" />
-	</definition>
-
-	<!-- Wiki -->
-
-	<definition name="portlet.wiki" extends="portlet" />
-
-	<definition name="portlet.wiki.compare_versions" extends="portlet.wiki">
-		<put name="portlet_content" value="/portlet/wiki/compare_versions.jsp" />
-	</definition>
-
-	<definition name="portlet.wiki.edit_node" extends="portlet.wiki">
-		<put name="portlet_content" value="/portlet/wiki/edit_node.jsp" />
-	</definition>
-
-	<definition name="portlet.wiki.edit_page" extends="portlet.wiki">
-		<put name="portlet_content" value="/portlet/wiki/edit_page.jsp" />
-	</definition>
-
-	<definition name="portlet.wiki.edit_page_attachment" extends="portlet.wiki">
-		<put name="portlet_content" value="/portlet/wiki/edit_page_attachment.jsp" />
-	</definition>
-
-	<definition name="portlet.wiki.error" extends="portlet.wiki">
-		<put name="portlet_content" value="/portlet/wiki/error.jsp" />
-	</definition>
-
-	<definition name="portlet.wiki.import_pages" extends="portlet.wiki">
-		<put name="portlet_content" value="/portlet/wiki/import_pages.jsp" />
-	</definition>
-
-	<definition name="portlet.wiki.move_page" extends="portlet.wiki">
-		<put name="portlet_content" value="/portlet/wiki/move_page.jsp" />
-	</definition>
-
-	<definition name="portlet.wiki.search" extends="portlet.wiki">
-		<put name="portlet_content" value="/portlet/wiki/search.jsp" />
-	</definition>
-
-	<definition name="portlet.wiki.select_version" extends="portlet.wiki">
-		<put name="portlet_content" value="/portlet/wiki/select_version.jsp" />
-	</definition>
-
-	<definition name="portlet.wiki.view" extends="portlet.wiki">
-		<put name="portlet_content" value="/portlet/wiki/view.jsp" />
-	</definition>
-
-	<definition name="portlet.wiki.view_all_pages" extends="portlet.wiki">
-		<put name="portlet_content" value="/portlet/wiki/view_all_pages.jsp" />
-	</definition>
-
-	<definition name="portlet.wiki.view_categorized_pages" extends="portlet.wiki">
-		<put name="portlet_content" value="/portlet/wiki/view_categorized_pages.jsp" />
-	</definition>
-
-	<definition name="portlet.wiki.view_draft_pages" extends="portlet.wiki">
-		<put name="portlet_content" value="/portlet/wiki/view_draft_pages.jsp" />
-	</definition>
-
-	<definition name="portlet.wiki.view_node_deleted_attachments" extends="portlet.wiki">
-		<put name="portlet_content" value="/portlet/wiki/view_node_deleted_attachments.jsp" />
-	</definition>
-
-	<definition name="portlet.wiki.view_nodes" extends="portlet.wiki">
-		<put name="portlet_content" value="/portlet/wiki/view_nodes.jsp" />
-	</definition>
-
-	<definition name="portlet.wiki.view_orphan_pages" extends="portlet.wiki">
-		<put name="portlet_content" value="/portlet/wiki/view_orphan_pages.jsp" />
-	</definition>
-
-	<definition name="portlet.wiki.view_page_activities" extends="portlet.wiki">
-		<put name="portlet_content" value="/portlet/wiki/view_page_activities.jsp" />
-	</definition>
-
-	<definition name="portlet.wiki.view_page_attachments" extends="portlet.wiki">
-		<put name="portlet_content" value="/portlet/wiki/view_page_attachments.jsp" />
-	</definition>
-
-	<definition name="portlet.wiki.view_page_details" extends="portlet.wiki">
-		<put name="portlet_content" value="/portlet/wiki/view_page_details.jsp" />
-	</definition>
-
-	<definition name="portlet.wiki.view_page_history" extends="portlet.wiki">
-		<put name="portlet_content" value="/portlet/wiki/view_page_history.jsp" />
-	</definition>
-
-	<definition name="portlet.wiki.view_page_incoming_links" extends="portlet.wiki">
-		<put name="portlet_content" value="/portlet/wiki/view_page_incoming_links.jsp" />
-	</definition>
-
-	<definition name="portlet.wiki.view_page_outgoing_links" extends="portlet.wiki">
-		<put name="portlet_content" value="/portlet/wiki/view_page_outgoing_links.jsp" />
-	</definition>
-
-	<definition name="portlet.wiki.view_recent_changes" extends="portlet.wiki">
-		<put name="portlet_content" value="/portlet/wiki/view_recent_changes.jsp" />
-	</definition>
-
-	<definition name="portlet.wiki.view_tagged_pages" extends="portlet.wiki">
-		<put name="portlet_content" value="/portlet/wiki/view_tagged_pages.jsp" />
-	</definition>
-
-	<!-- Wiki Display -->
-
-	<definition name="portlet.wiki_display" extends="portlet" />
-
-	<definition name="portlet.wiki_display.view" extends="portlet.wiki_display">
-		<put name="portlet_content" value="/portlet/wiki_display/view.jsp" />
 	</definition>
 
 	<!-- Workflow Definition Links -->

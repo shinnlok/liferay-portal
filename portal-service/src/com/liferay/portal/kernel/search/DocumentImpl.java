@@ -387,8 +387,7 @@ public class DocumentImpl implements Document {
 		}
 
 		if (lowerCase) {
-			Map<Locale, String> lowerCaseValues = new HashMap<Locale, String>(
-				values.size());
+			Map<Locale, String> lowerCaseValues = new HashMap<>(values.size());
 
 			for (Map.Entry<Locale, String> entry : values.entrySet()) {
 				String value = GetterUtil.getString(entry.getValue());
@@ -413,8 +412,7 @@ public class DocumentImpl implements Document {
 		}
 
 		if (lowerCase) {
-			Map<Locale, String> lowerCaseValues = new HashMap<Locale, String>(
-				values.size());
+			Map<Locale, String> lowerCaseValues = new HashMap<>(values.size());
 
 			for (Map.Entry<Locale, String> entry : values.entrySet()) {
 				String value = GetterUtil.getString(entry.getValue());
@@ -925,10 +923,11 @@ public class DocumentImpl implements Document {
 	private static final String _UID_PORTLET = "_PORTLET_";
 
 	private static Format _dateFormat;
-	private static Set<String> _defaultSortableTextFields = SetUtil.fromArray(
-		PropsUtil.getArray(PropsKeys.INDEX_SORTABLE_TEXT_FIELDS));
+	private static final Set<String> _defaultSortableTextFields =
+		SetUtil.fromArray(
+			PropsUtil.getArray(PropsKeys.INDEX_SORTABLE_TEXT_FIELDS));
 
-	private Map<String, Field> _fields = new HashMap<String, Field>();
+	private Map<String, Field> _fields = new HashMap<>();
 	private Set<String> _sortableTextFields = _defaultSortableTextFields;
 
 }

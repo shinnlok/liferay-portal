@@ -21,6 +21,10 @@ import com.liferay.sync.engine.documentlibrary.event.AddFileEntryEvent;
 import com.liferay.sync.engine.documentlibrary.event.Event;
 import com.liferay.sync.engine.model.SyncFile;
 import com.liferay.sync.engine.service.SyncFileService;
+import com.liferay.sync.engine.util.FileUtil;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +39,7 @@ public class AddFileFolderHandler extends BaseJSONHandler {
 	}
 
 	@Override
-	protected boolean handlePortalException(String exception) throws Exception {
+	public boolean handlePortalException(String exception) throws Exception {
 		if (exception.equals(
 				"com.liferay.sync.SyncDLObjectChecksumException")) {
 
@@ -55,7 +59,7 @@ public class AddFileFolderHandler extends BaseJSONHandler {
 	}
 
 	@Override
-	protected void processResponse(String response) throws Exception {
+	public void processResponse(String response) throws Exception {
 		ObjectMapper objectMapper = new ObjectMapper();
 
 		SyncFile remoteSyncFile = objectMapper.readValue(
@@ -82,6 +86,10 @@ public class AddFileFolderHandler extends BaseJSONHandler {
 		localSyncFile.setVersion(remoteSyncFile.getVersion());
 
 		SyncFileService.update(localSyncFile);
+
+		Path filePath = Paths.get(localSyncFile.getFilePathName());
+
+		FileUtil.setModifiedTime(filePath, remoteSyncFile.getModifiedTime());
 	}
 
 	private static final Logger _logger = LoggerFactory.getLogger(

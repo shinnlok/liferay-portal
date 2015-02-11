@@ -1,4 +1,27 @@
 <definition>
+	<command name="changeTemplate">
+		<execute action="PGWebcontentdisplay#click" locator-key1="EDIT_WEB_CONTENT" />
+
+		<execute action="PGWebcontentdisplayEditwebcontent#selectFrame" locator-key1="WEB_CONTENT_EDIT_IFRAME" />
+		<execute action="PGWebcontentdisplayEditwebcontent#assertTextEquals" locator-key1="STRUCTURE_NAME" value1="${structureName}" />
+		<execute action="PGWebcontentdisplayEditwebcontent#assertClick" locator-key1="SELECT_TEMPLATE" value1="Select" />
+
+		<execute action="PGWebcontentdisplayEdittemplate#selectFrame" value1="relative=top" />
+		<execute action="PGWebcontentdisplayEdittemplate#selectFrame" locator-key1="TEMPLATES_LIST_IFRAME" />
+
+		<var name="key_templateName" value="${templateName}" />
+
+		<execute action="PGWebcontentdisplayEdittemplate#assertClick" locator-key1="CHOOSE_BUTTON" value1="Choose" />
+		<execute action="CPWebcontentTemplates#confirm" value1="Selecting a new template will delete all unsaved content. Do you want to proceed?" />
+
+		<execute action="PGWebcontentdisplayEditwebcontent#selectFrame" value1="relative=top" />
+		<execute action="PGWebcontentdisplayEditwebcontent#selectFrame" locator-key1="WEB_CONTENT_EDIT_IFRAME" />
+		<execute action="PGWebcontentdisplayEditwebcontent#assertTextEquals" locator-key1="TEMPLATE_NAME" value1="${templateName}" />
+		<execute action="PGWebcontentdisplayEditwebcontent#assertClick" locator-key1="PUBLISH_BUTTON" value1="Publish" />
+
+		<execute action="PGWebcontentdisplay#selectFrame" value1="relative=top" />
+	</command>
+
 	<command name="configureScopePG">
 		<execute macro="Portlet#gotoPortletOptions">
 			<var name="portletOption" value="Configuration" />
@@ -24,188 +47,98 @@
 		<execute action="PGWebcontentdisplayConfiguration#selectFrame" locator-key1="CONFIGURATION_IFRAME" />
 
 		<if>
-			<equals arg1="${wcdPortletShowAvailableLocales}" arg2="true" />
+			<isset var="wcdConfigurationSettings" />
 			<then>
-				<execute action="PGWebcontentdisplayConfiguration#check" locator-key1="SHOW_AVAILABLE_LOCALES_CHECKBOX" />
+				<for list="${wcdConfigurationSettings}" param="wcdConfigurationSetting">
+					<var name="key_configurationSetting" value="${wcdConfigurationSetting}" />
+
+					<execute action="PGWebcontentdisplayConfiguration#check" locator-key1="SETTING_CHECKBOX" />
+				</for>
+
+				<execute action="PGWebcontentdisplayConfiguration#assertClick" locator-key1="SAVE_BUTTON" value1="Save" />
+				<execute action="PGWebcontentdisplayConfigurationScope#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="You have successfully updated the setup." />
+
+				<for list="${wcdConfigurationSettings}" param="wcdConfigurationSetting">
+					<var name="key_configurationSetting" value="${wcdConfigurationSetting}" />
+
+					<execute action="PGWebcontentdisplayConfiguration#assertChecked" locator-key1="SETTING_CHECKBOX" />
+				</for>
 			</then>
-			<elseif>
-				<equals arg1="${wcdPortletShowAvailableLocales}" arg2="false" />
-				<then>
-					<execute action="PGWebcontentdisplayConfiguration#uncheck" locator-key1="SHOW_AVAILABLE_LOCALES_CHECKBOX" />
-				</then>
-			</elseif>
 		</if>
 
 		<if>
-			<equals arg1="${wcdPortletEnablePrint}" arg2="true" />
+			<isset var="enableFileTypes" />
 			<then>
-				<execute action="PGWebcontentdisplayConfiguration#check" locator-key1="ENABLE_PRINT_CHECKBOX" />
-			</then>
-			<elseif>
-				<equals arg1="${wcdPortletEnablePrint}" arg2="false" />
-				<then>
-					<execute action="PGWebcontentdisplayConfiguration#uncheck" locator-key1="ENABLE_PRINT_CHECKBOX" />
-				</then>
-			</elseif>
-		</if>
+				<for list="${enableFileTypes}" param="fileType">
+					<var name="key_fileType" value="${fileType}" />
 
-		<if>
-			<equals arg1="${wcdPortletEnableRelatedAssets}" arg2="true" />
-			<then>
-				<execute action="PGWebcontentdisplayConfiguration#check" locator-key1="ENABLE_RELATED_ASSETS_CHECKBOX" />
+					<execute action="PGWebcontentdisplayConfiguration#select" locator-key1="AVAILABLE_FILE_TYPES_SELECT" value1="${fileType}" />
+					<execute action="PGWebcontentdisplayConfiguration#click" locator-key1="MOVE_AVAILABLE_TO_CURRENT_BUTTON" />
+					<execute action="PGWebcontentdisplayConfiguration#assertTextEquals" locator-key1="CURRENT_FILE_TYPES_SELECT" value1="${fileType}" />
+				</for>
 			</then>
-			<elseif>
-				<equals arg1="${wcdPortletEnableRelatedAssets}" arg2="false" />
-				<then>
-					<execute action="PGWebcontentdisplayConfiguration#uncheck" locator-key1="ENABLE_RELATED_ASSETS_CHECKBOX" />
-				</then>
-			</elseif>
-		</if>
-
-		<if>
-			<equals arg1="${wcdPortletEnableRatings}" arg2="true" />
-			<then>
-				<execute action="PGWebcontentdisplayConfiguration#check" locator-key1="ENABLE_RATINGS_CHECKBOX" />
-			</then>
-			<elseif>
-				<equals arg1="${wcdPortletEnableRatings}" arg2="false" />
-				<then>
-					<execute action="PGWebcontentdisplayConfiguration#uncheck" locator-key1="ENABLE_RATINGS_CHECKBOX" />
-				</then>
-			</elseif>
-		</if>
-
-		<if>
-			<equals arg1="${wcdPortletEnableComments}" arg2="true" />
-			<then>
-				<execute action="PGWebcontentdisplayConfiguration#check" locator-key1="ENABLE_COMMENTS_CHECKBOX" />
-			</then>
-			<elseif>
-				<equals arg1="${wcdPortletEnableComments}" arg2="false" />
-				<then>
-					<execute action="PGWebcontentdisplayConfiguration#uncheck" locator-key1="ENABLE_COMMENTS_CHECKBOX" />
-				</then>
-			</elseif>
-		</if>
-
-		<if>
-			<equals arg1="${wcdPortletEnableCommentRatings}" arg2="true" />
-			<then>
-				<execute action="PGWebcontentdisplayConfiguration#check" locator-key1="ENABLE_COMMENT_RATINGS_CHECKBOX" />
-			</then>
-			<elseif>
-				<equals arg1="${wcdPortletEnableCommentRatings}" arg2="false" />
-				<then>
-					<execute action="PGWebcontentdisplayConfiguration#uncheck" locator-key1="ENABLE_COMMENT_RATINGS_CHECKBOX" />
-				</then>
-			</elseif>
-		</if>
-
-		<if>
-			<equals arg1="${wcdPortletEnableViewCountIncrement}" arg2="true" />
-			<then>
-				<execute action="PGWebcontentdisplayConfiguration#check" locator-key1="ENABLE_VIEW_COUNT_INCREMENT_CHECKBOX" />
-			</then>
-			<elseif>
-				<equals arg1="${wcdPortletEnableViewCountIncrement}" arg2="false" />
-				<then>
-					<execute action="PGWebcontentdisplayConfiguration#uncheck" locator-key1="ENABLE_VIEW_COUNT_INCREMENT_CHECKBOX" />
-				</then>
-			</elseif>
 		</if>
 
 		<execute action="PGWebcontentdisplayConfiguration#assertClick" locator-key1="SAVE_BUTTON" value1="Save" />
-		<execute action="PGWebcontentdisplayConfigurationScope#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="You have successfully updated the setup." />
+		<execute action="PGWebcontentdisplayConfiguration#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="You have successfully updated the setup." />
+		<execute action="PGWebcontentdisplayConfiguration#selectFrame" value1="relative=top" />
+	</command>
+
+	<command name="editTemplate">
+		<if>
+			<equals arg1="${editTemplateButton}" arg2="true" />
+			<then>
+				<execute action="PGWebcontentdisplay#click" locator-key1="EDIT_TEMPLATE" />
+			</then>
+			<else>
+				<execute action="PGWebcontentdisplay#click" locator-key1="EDIT_WEB_CONTENT" />
+
+				<execute action="PGWebcontentdisplayEditwebcontent#selectFrame" locator-key1="WEB_CONTENT_EDIT_IFRAME" />
+				<execute action="PGWebcontentdisplayEditwebcontent#assertTextEquals" locator-key1="STRUCTURE_NAME" value1="${structureName}" />
+				<execute action="PGWebcontentdisplayEditwebcontent#clickNoError" locator-key1="EDIT_TEMPLATE" />
+				<execute action="PGWebcontentdisplayEditwebcontent#confirm" locator-key1="CONFIRMATION" value1="Editing the current template will delete all unsaved content." />
+			</else>
+		</if>
+
+		<execute action="PGWebcontentdisplayEdittemplate#selectFrame" value1="relative=top" />
+		<execute action="PGWebcontentdisplayEdittemplate#selectFrame" locator-key1="TEMPLATES_IFRAME" />
+		<execute action="PGWebcontentdisplayEdittemplate#type" locator-key1="NAME_FIELD" value1="Template Edit" />
 
 		<if>
-			<equals arg1="${wcdPortletShowAvailableLocales}" arg2="true" />
+			<isset var="templateScript" />
 			<then>
-				<execute action="PGWebcontentdisplayConfiguration#assertChecked" locator-key1="SHOW_AVAILABLE_LOCALES_CHECKBOX" />
+				<execute action="PGWebcontentdisplayEdittemplate#type" locator-key1="SCRIPT_CONTENT_FIELD" value1="${templateScript}" />
 			</then>
-			<elseif>
-				<equals arg1="${wcdPortletShowAvailableLocales}" arg2="false" />
-				<then>
-					<execute action="PGWebcontentdisplayConfiguration#assertNotChecked" locator-key1="SHOW_AVAILABLE_LOCALES_CHECKBOX" />
-				</then>
-			</elseif>
+		</if>
+
+		<execute action="PGWebcontentdisplayEdittemplate#assertClick" locator-key1="SAVE_BUTTON" value1="Save" />
+
+		<if>
+			<equals arg1="${editTemplateButton}" arg2="true" />
+			<then>
+				<execute action="PGWebcontentdisplay#selectFrame" value1="relative=top" />
+			</then>
+			<else>
+				<execute action="PGWebcontentdisplayEdittemplate#pause" locator1="2000" />
+				<execute action="PGWebcontentdisplayEdittemplate#sikuliClick" locator-key1="CLOSE_BUTTON_PNG" />
+
+				<execute action="PGWebcontentdisplayEditwebcontent#selectFrame" value1="relative=top" />
+				<execute action="PGWebcontentdisplayEditwebcontent#selectFrame" locator-key1="WEB_CONTENT_EDIT_IFRAME" />
+				<execute action="PGWebcontentdisplayEditwebcontent#assertTextEquals" locator-key1="TEMPLATE_NAME" value1="${templateName}" />
+				<execute action="PGWebcontentdisplayEditwebcontent#assertClick" locator-key1="PUBLISH_BUTTON" value1="Publish" />
+
+				<execute action="PGWebcontentdisplay#selectFrame" value1="relative=top" />
+			</else>
 		</if>
 
 		<if>
-			<equals arg1="${wcdPortletEnablePrint}" arg2="true" />
+			<isset var="templateScript" />
 			<then>
-				<execute action="PGWebcontentdisplayConfiguration#assertChecked" locator-key1="ENABLE_PRINT_CHECKBOX" />
+				<execute action="PGWebcontentdisplay#assertTextEquals" locator-key1="WEB_CONTENT_CONTENT" value1="${templateScript}" />
 			</then>
-			<elseif>
-				<equals arg1="${wcdPortletEnablePrint}" arg2="false" />
-				<then>
-					<execute action="PGWebcontentdisplayConfiguration#assertNotChecked" locator-key1="ENABLE_PRINT_CHECKBOX" />
-				</then>
-			</elseif>
-		</if>
-
-		<if>
-			<equals arg1="${wcdPortletEnableRelatedAssets}" arg2="true" />
-			<then>
-				<execute action="PGWebcontentdisplayConfiguration#assertChecked" locator-key1="ENABLE_RELATED_ASSETS_CHECKBOX" />
-			</then>
-			<elseif>
-				<equals arg1="${wcdPortletEnableRelatedAssets}" arg2="false" />
-				<then>
-					<execute action="PGWebcontentdisplayConfiguration#assertNotChecked" locator-key1="ENABLE_RELATED_ASSETS_CHECKBOX" />
-				</then>
-			</elseif>
-		</if>
-
-		<if>
-			<equals arg1="${wcdPortletEnableRatings}" arg2="true" />
-			<then>
-				<execute action="PGWebcontentdisplayConfiguration#assertChecked" locator-key1="ENABLE_RATINGS_CHECKBOX" />
-			</then>
-			<elseif>
-				<equals arg1="${wcdPortletEnableRatings}" arg2="false" />
-				<then>
-					<execute action="PGWebcontentdisplayConfiguration#assertNotChecked" locator-key1="ENABLE_RATINGS_CHECKBOX" />
-				</then>
-			</elseif>
-		</if>
-
-		<if>
-			<equals arg1="${wcdPortletEnableComments}" arg2="true" />
-			<then>
-				<execute action="PGWebcontentdisplayConfiguration#assertChecked" locator-key1="ENABLE_COMMENTS_CHECKBOX" />
-			</then>
-			<elseif>
-				<equals arg1="${wcdPortletEnableComments}" arg2="false" />
-				<then>
-					<execute action="PGWebcontentdisplayConfiguration#assertNotChecked" locator-key1="ENABLE_COMMENTS_CHECKBOX" />
-				</then>
-			</elseif>
-		</if>
-
-		<if>
-			<equals arg1="${wcdPortletEnableCommentRatings}" arg2="true" />
-			<then>
-				<execute action="PGWebcontentdisplayConfiguration#assertChecked" locator-key1="ENABLE_COMMENT_RATINGS_CHECKBOX" />
-			</then>
-			<elseif>
-				<equals arg1="${wcdPortletEnableCommentRatings}" arg2="false" />
-				<then>
-					<execute action="PGWebcontentdisplayConfiguration#assertNotChecked" locator-key1="ENABLE_COMMENT_RATINGS_CHECKBOX" />
-				</then>
-			</elseif>
-		</if>
-
-		<if>
-			<equals arg1="${wcdPortletEnableViewCountIncrement}" arg2="true" />
-			<then>
-				<execute action="PGWebcontentdisplayConfiguration#assertChecked" locator-key1="ENABLE_VIEW_COUNT_INCREMENT_CHECKBOX" />
-			</then>
-			<elseif>
-				<equals arg1="${wcdPortletEnableViewCountIncrement}" arg2="false" />
-				<then>
-					<execute action="PGWebcontentdisplayConfiguration#assertNotChecked" locator-key1="ENABLE_VIEW_COUNT_INCREMENT_CHECKBOX" />
-				</then>
-			</elseif>
+			<else>
+				<execute action="PGWebcontentdisplay#assertTextEquals" locator-key1="WEB_CONTENT_CONTENT" value1="${webContentContent}" />
+			</else>
 		</if>
 	</command>
 
@@ -241,7 +174,7 @@
 		<if>
 			<equals arg1="${addSearchedContent}" arg2="true" />
 			<then>
-				<execute action="PGWebcontentdisplayConfiguration#assertClick" locator-key1="WEB_CONTENT_TABLE_TITLE" value1="${webContentTitle}" />
+				<execute action="PGWebcontentdisplayConfiguration#assertClick" locator-key1="WEB_CONTENT_CHOOSE_BUTTON" value1="${webContentTitle}" />
 				<execute action="PGWebcontentdisplayConfiguration#assertTextEquals" locator-key1="INFO_MESSAGE_ARTICLE" value1="${webContentTitle} (Modified)" />
 				<execute action="PGWebcontentdisplayConfiguration#assertClick" locator-key1="SAVE_BUTTON" value1="Save" />
 				<execute action="PGWebcontentdisplayConfiguration#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="You have successfully updated the setup." />
@@ -299,6 +232,22 @@
 		</execute>
 	</command>
 
+	<command name="viewAllSettingsEnabledPG">
+		<execute action="PGWebcontentdisplay#assertTextEquals" locator-key1="PRINT_WEB_CONTENT" value1="Print" />
+		<execute action="PGWebcontentdisplay#assertTextEquals" locator-key1="NO_COMMENTS_MESSAGE" value1="No comments yet" />
+		<execute action="PGWebcontentdisplay#assertTextEquals" locator-key1="SUBCRIBE_TO_COMMENTS" value1="Subscribe to Comments" />
+
+		<var name="key_assetTitle" value="${relatedAssetTitle}" />
+
+		<execute action="PGWebcontentdisplay#assertTextEquals" locator-key1="RELATED_ASSETS" value1="${relatedAssetTitle}" />
+		<execute action="PGWebcontentdisplay#assertClick" locator-key1="BE_THE_FIRST" value1="Be the first" />
+		<execute action="PGWebcontentdisplay#assertTextEquals" locator-key1="COMMENT_LABEL" value1="Comment" />
+		<execute action="PGWebcontentdisplay#type" locator-key1="COMMENT_FIELD" value1="Hello World!" />
+		<execute action="PGWebcontentdisplay#assertClick" locator-key1="COMMENT_REPLY_BUTTON" value1="Reply" />
+		<execute action="PGWebcontentdisplay#assertElementPresent" locator-key1="COMMENT_THUMBS_UP" />
+		<execute action="PGWebcontentdisplay#assertElementPresent" locator-key1="COMMENT_THUMBS_DOWN" />
+	</command>
+
 	<command name="viewConfigureScopePG">
 		<if>
 			<equals arg1="${scopeSelectionDefault}" arg2="true" />
@@ -317,5 +266,24 @@
 		<execute action="PGWebcontentdisplayConfiguration#selectFrame" locator-key1="CONFIGURATION_IFRAME" />
 		<execute action="PGWebcontentdisplayConfiguration#assertClick" locator-key1="NAVIGATION_SCOPE" value1="Scope" />
 		<execute action="PGWebcontentdisplayConfigurationScope#assertTextEquals" locator-key1="SCOPE_MENULIST" value1="${scopeSelection}" />
+	</command>
+
+	<command name="viewContentPageBreak">
+		<execute action="PGWebcontentdisplay#assertClick" locator-key1="PAGINATION_PAGE_2" value1="2" />
+		<execute action="PGWebcontentdisplay#assertTextEquals" locator-key1="WEB_CONTENT_CONTENT" value1="${webContentContent}" />
+		<execute action="PGWebcontentdisplay#assertClick" locator-key1="PAGINATION_PREVIOUS" value1="Previous" />
+	</command>
+
+	<command name="viewDeletedArticlePGViaWCD">
+		<execute action="PGWebcontentdisplay#assertTextEquals" locator-key1="ERROR_MESSAGE" value1="The selected web content no longer exists." />
+	</command>
+
+	<command name="viewEnabledFileTypesPGViaWCD">
+		<for list="${fileTypes}" param="fileType">
+			<var name="key_fileType" value="${fileType}" />
+
+			<execute action="PGWebcontentdisplay#assertTextEquals" locator-key1="DOCUMENT_CONVERSION_TYPE" value1="${fileType}" />
+			<execute action="PGWebcontentdisplay#assertElementPresent" locator-key1="DOCUMENT_CONVERSION_TYPE_ICON" />
+		</for>
 	</command>
 </definition>

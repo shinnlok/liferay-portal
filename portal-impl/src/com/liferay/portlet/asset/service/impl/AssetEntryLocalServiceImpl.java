@@ -14,6 +14,7 @@
 
 package com.liferay.portlet.asset.service.impl;
 
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.increment.BufferedIncrement;
@@ -46,14 +47,13 @@ import com.liferay.portlet.asset.model.AssetTag;
 import com.liferay.portlet.asset.service.base.AssetEntryLocalServiceBaseImpl;
 import com.liferay.portlet.asset.service.persistence.AssetEntryQuery;
 import com.liferay.portlet.asset.util.AssetEntryValidator;
-import com.liferay.portlet.assetpublisher.util.AssetSearcher;
+import com.liferay.portlet.asset.util.AssetSearcher;
 import com.liferay.portlet.blogs.model.BlogsEntry;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.util.DLUtil;
 import com.liferay.portlet.journal.model.JournalArticle;
 import com.liferay.portlet.messageboards.model.MBMessage;
 import com.liferay.portlet.social.model.SocialActivityConstants;
-import com.liferay.portlet.wiki.model.WikiPage;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -148,7 +148,7 @@ public class AssetEntryLocalServiceImpl extends AssetEntryLocalServiceBaseImpl {
 	public List<AssetEntry> getAncestorEntries(long entryId)
 		throws PortalException {
 
-		List<AssetEntry> entries = new ArrayList<AssetEntry>();
+		List<AssetEntry> entries = new ArrayList<>();
 
 		AssetEntry parentEntry = getParentEntry(entryId);
 
@@ -165,7 +165,7 @@ public class AssetEntryLocalServiceImpl extends AssetEntryLocalServiceBaseImpl {
 	public List<AssetEntry> getChildEntries(long entryId)
 		throws PortalException {
 
-		List<AssetEntry> entries = new ArrayList<AssetEntry>();
+		List<AssetEntry> entries = new ArrayList<>();
 
 		List<AssetLink> links = assetLinkLocalService.getDirectLinks(
 			entryId, AssetLinkConstants.TYPE_CHILD);
@@ -197,8 +197,37 @@ public class AssetEntryLocalServiceImpl extends AssetEntryLocalServiceBaseImpl {
 	}
 
 	@Override
+	public List<AssetEntry> getEntries(
+		long[] groupIds, long[] classNameIds, String keywords, String userName,
+		String title, String description, boolean advancedSearch,
+		boolean andOperator, int start, int end, String orderByCol1,
+		String orderByCol2, String orderByType1, String orderByType2) {
+
+		AssetEntryQuery assetEntryQuery = getAssetEntryQuery(
+			groupIds, classNameIds, keywords, userName, title, description,
+			advancedSearch, andOperator, start, end, orderByCol1, orderByCol2,
+			orderByType1, orderByType2);
+
+		return getEntries(assetEntryQuery);
+	}
+
+	@Override
 	public int getEntriesCount(AssetEntryQuery entryQuery) {
 		return assetEntryFinder.countEntries(entryQuery);
+	}
+
+	@Override
+	public int getEntriesCount(
+		long[] groupIds, long[] classNameIds, String keywords, String userName,
+		String title, String description, boolean advancedSearch,
+		boolean andOperator) {
+
+		AssetEntryQuery assetEntryQuery = getAssetEntryQuery(
+			groupIds, classNameIds, keywords, userName, title, description,
+			advancedSearch, andOperator, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+			null, null, null, null);
+
+		return getEntriesCount(assetEntryQuery);
 	}
 
 	@Override
@@ -354,7 +383,8 @@ public class AssetEntryLocalServiceImpl extends AssetEntryLocalServiceBaseImpl {
 	}
 
 	@BufferedIncrement(
-		configuration = "AssetEntry", incrementClass = NumberIncrement.class)
+		configuration = "AssetEntry", incrementClass = NumberIncrement.class
+	)
 	@Override
 	public void incrementViewCounter(
 		long userId, String className, long classPK, int increment) {
@@ -575,12 +605,9 @@ public class AssetEntryLocalServiceImpl extends AssetEntryLocalServiceBaseImpl {
 
 			entry.setCreateDate(createDate);
 
-			entry.setModifiedDate(modifiedDate);
 			entry.setClassNameId(classNameId);
 			entry.setClassPK(classPK);
 			entry.setClassUuid(classUuid);
-			entry.setVisible(visible);
-			entry.setExpirationDate(expirationDate);
 
 			if (priority == null) {
 				entry.setPriority(0);
@@ -592,6 +619,15 @@ public class AssetEntryLocalServiceImpl extends AssetEntryLocalServiceBaseImpl {
 		entry.setGroupId(groupId);
 		entry.setModifiedDate(modifiedDate);
 		entry.setClassTypeId(classTypeId);
+
+		AssetRendererFactory assetRendererFactory =
+			AssetRendererFactoryRegistryUtil.
+				getAssetRendererFactoryByClassNameId(classNameId);
+
+		if (assetRendererFactory != null) {
+			entry.setListable(assetRendererFactory.isListable(classPK));
+		}
+
 		entry.setVisible(visible);
 		entry.setStartDate(startDate);
 		entry.setEndDate(endDate);
@@ -713,14 +749,6 @@ public class AssetEntryLocalServiceImpl extends AssetEntryLocalServiceBaseImpl {
 
 				mbMessagePersistence.update(mbMessage);
 			}
-			else if (className.equals(WikiPage.class.getName())) {
-				WikiPage wikiPage = wikiPagePersistence.findByPrimaryKey(
-					classPK);
-
-				wikiPage.setTitle(title);
-
-				wikiPagePersistence.update(wikiPage);
-			}
 		}
 
 		// Indexer
@@ -819,6 +847,12 @@ public class AssetEntryLocalServiceImpl extends AssetEntryLocalServiceBaseImpl {
 		AssetEntry entry = assetEntryPersistence.findByC_C(
 			classNameId, classPK);
 
+		AssetRendererFactory assetRendererFactory =
+			AssetRendererFactoryRegistryUtil.
+				getAssetRendererFactoryByClassNameId(classNameId);
+
+		entry.setListable(assetRendererFactory.isListable(classPK));
+
 		entry.setPublishDate(publishDate);
 
 		return updateVisible(entry, visible);
@@ -834,6 +868,12 @@ public class AssetEntryLocalServiceImpl extends AssetEntryLocalServiceBaseImpl {
 
 		AssetEntry entry = assetEntryPersistence.findByC_C(
 			classNameId, classPK);
+
+		AssetRendererFactory assetRendererFactory =
+			AssetRendererFactoryRegistryUtil.
+				getAssetRendererFactoryByClassNameId(classNameId);
+
+		entry.setListable(assetRendererFactory.isListable(classPK));
 
 		entry.setExpirationDate(expirationDate);
 		entry.setPublishDate(publishDate);
@@ -885,6 +925,36 @@ public class AssetEntryLocalServiceImpl extends AssetEntryLocalServiceBaseImpl {
 		validate(
 			groupId, className, AssetCategoryConstants.ALL_CLASS_TYPE_PK,
 			categoryIds, tagNames);
+	}
+
+	protected AssetEntryQuery getAssetEntryQuery(
+		long[] groupIds, long[] classNameIds, String keywords, String userName,
+		String title, String description, boolean advancedSearch,
+		boolean andOperator, int start, int end, String orderByCol1,
+		String orderByCol2, String orderByType1, String orderByType2) {
+
+		AssetEntryQuery assetEntryQuery = new AssetEntryQuery();
+
+		if (advancedSearch) {
+			assetEntryQuery.setAndOperator(andOperator);
+			assetEntryQuery.setDescription(description);
+			assetEntryQuery.setTitle(title);
+			assetEntryQuery.setUserName(userName);
+		}
+		else {
+			assetEntryQuery.setKeywords(keywords);
+		}
+
+		assetEntryQuery.setClassNameIds(classNameIds);
+		assetEntryQuery.setEnd(end);
+		assetEntryQuery.setGroupIds(groupIds);
+		assetEntryQuery.setOrderByCol1(orderByCol1);
+		assetEntryQuery.setOrderByCol2(orderByCol2);
+		assetEntryQuery.setOrderByType1(orderByType1);
+		assetEntryQuery.setOrderByType2(orderByType2);
+		assetEntryQuery.setStart(start);
+
+		return assetEntryQuery;
 	}
 
 	protected long[] getClassNameIds(long companyId, String className) {

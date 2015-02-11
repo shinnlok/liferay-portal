@@ -68,7 +68,7 @@ public class BackgroundTaskImpl extends BackgroundTaskBaseImpl {
 
 	@Override
 	public List<FileEntry> getAttachmentsFileEntries(int start, int end) {
-		List<FileEntry> fileEntries = new ArrayList<FileEntry>();
+		List<FileEntry> fileEntries = new ArrayList<>();
 
 		long attachmentsFolderId = getAttachmentsFolderId();
 
@@ -120,9 +120,9 @@ public class BackgroundTaskImpl extends BackgroundTaskBaseImpl {
 
 		try {
 			Folder folder = PortletFileRepositoryUtil.getPortletFolder(
-				getUserId(), repository.getRepositoryId(),
+				repository.getRepositoryId(),
 				DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
-				String.valueOf(getBackgroundTaskId()), serviceContext);
+				String.valueOf(getBackgroundTaskId()));
 
 			_attachmentsFolderId = folder.getFolderId();
 		}

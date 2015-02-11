@@ -16,8 +16,8 @@ package com.liferay.portal.servlet.filters.aggregate;
 
 import com.liferay.portal.kernel.servlet.ServletContextUtil;
 import com.liferay.portal.kernel.test.CaptureHandler;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.SystemProperties;
@@ -158,10 +158,10 @@ public class ServletPathsTest {
 
 		Assert.assertNull(servletPaths.getContent());
 
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			ServletPaths.class.getName(), Level.SEVERE);
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					ServletPaths.class.getName(), Level.SEVERE)) {
 
-		try {
 			List<LogRecord> logRecords = captureHandler.getLogRecords();
 
 			servletPaths = new ServletPaths(servletContext, file1.getName());
@@ -179,9 +179,6 @@ public class ServletPathsTest {
 			servletPaths = new ServletPaths(servletContext, file2.getName());
 
 			Assert.assertEquals(testContent, servletPaths.getContent());
-		}
-		finally {
-			captureHandler.close();
 		}
 	}
 

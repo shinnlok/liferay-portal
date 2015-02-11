@@ -129,7 +129,13 @@
 
 		<script classpathref="project.classpath" language="beanshell">
 			<![CDATA[
+				import java.io.File;
+
 				import java.util.concurrent.TimeUnit;
+				import java.util.regex.Matcher;
+				import java.util.regex.Pattern;
+
+				import org.apache.commons.io.FileUtils;
 
 				import org.json.JSONObject;
 
@@ -140,6 +146,7 @@
 					json = json.replaceAll("<", "&#60;");
 					json = json.replaceAll(">", "&#62;");
 					json = json.replaceAll("\\[", "&#91;");
+					json = json.replaceAll("\\\\", "&#92;");
 					json = json.replaceAll("\\]", "&#93;");
 					json = json.replaceAll("\\{", "&#123;");
 					json = json.replaceAll("\\}", "&#125;");
@@ -168,6 +175,42 @@
 					return url;
 				}
 
+				public String getConsoleErrorMessage(String githubJenkinsFailureURL) {
+					String consoleOutput = toString(githubJenkinsFailureURL + "/logText/progressiveText");
+
+					Pattern pattern = Pattern.compile("\\n[a-z\\-\\.]+\\:\\n");
+
+					Matcher matcher = pattern.matcher(consoleOutput);
+
+					int x = 0;
+
+					while (matcher.find()) {
+						x = matcher.start() + 1;
+					}
+
+					String errorMessage = consoleOutput.substring(x);
+
+					StringBuilder sb = new StringBuilder();
+
+					if (errorMessage.length() > 20000) {
+						sb.append(fixJSON(errorMessage.substring(0, 2000)));
+						sb.append("<br />...</pre>");
+						sb.append("<pre>...<br />");
+						sb.append(fixJSON(errorMessage.substring(errorMessage.length() - 2000)));
+					}
+					else {
+						sb.append(fixJSON(errorMessage));
+					}
+
+					return sb.toString();
+				}
+
+				public String getDeprecatedMethodErrorMessage(File file) {
+					String errorMessage = FileUtils.readFileToString(file);
+
+					return fixJSON(errorMessage);
+				}
+
 				public String getRebaseErrorMessage(String githubJenkinsFailureURL) {
 					String consoleOutput = toString(githubJenkinsFailureURL + "/logText/progressiveText");
 
@@ -177,6 +220,48 @@
 					String errorMessage = consoleOutput.substring(x, y + 9);
 
 					return fixJSON(errorMessage);
+				}
+
+				public String getRemoteGithubJenkinsURL() {
+					JSONObject jsonObject = toJSONObject(project.getProperty("github.jenkins.url") + "/api/json");
+
+					JSONObject primaryViewJSONObject = jsonObject.get("primaryView");
+
+					return primaryViewJSONObject.get("url");
+				}
+
+				public String getTestErrorMessage(JSONObject jsonObject) {
+					StringBuilder sb = new StringBuilder();
+
+					if (!jsonObject.isNull("errorDetails")) {
+						sb.append(fixJSON(jsonObject.get("errorDetails")));
+						sb.append("<br /><br />");
+					}
+
+					sb.append(fixJSON(jsonObject.get("errorStackTrace")));
+
+					String errorMessage = sb.toString();
+
+					sb = new StringBuilder();
+
+					sb.append("<pre>");
+
+					if (errorMessage.length() > 20000) {
+						int x = errorMessage.indexOf("<br />", 2000);
+						int y = errorMessage.indexOf("<br />", errorMessage.length() - 2000);
+
+						sb.append(errorMessage.substring(0, x));
+						sb.append("<br />...</pre>");
+						sb.append("<pre>...<br />");
+						sb.append(errorMessage.substring(y));
+					}
+					else {
+						sb.append(errorMessage);
+					}
+
+					sb.append("</pre>");
+
+					return sb.toString();
 				}
 
 				public String toFormattedBuildTime(String githubJenkinsBuildTime) {
@@ -257,49 +342,72 @@
 					sb.append("</p>");
 				}
 
-				String githubJenkinsResultsURL = project.getProperty("github.jenkins.results.url");
+				sb.append("<h1>See the following links for more information.</h1>");
+				sb.append("<ul>");
 
-				if (githubJenkinsResultsURL != null) {
-					sb.append("<p>Click <a href=\\\"");
-					sb.append(githubJenkinsResultsURL);
-					sb.append("\\\">here</a> for more information.</p>");
+				String githubJenkinsJobInvocationURLPathsString = project.getProperty("github.jenkins.job.invocation.url.paths");
+
+				String[] githubJenkinsJobInvocationURLPaths = githubJenkinsJobInvocationURLPathsString.split(" ");
+
+				for (String githubJenkinsJobInvocationURLPath : githubJenkinsJobInvocationURLPaths) {
+					String remoteGithubJenkinsJobInvocationURL = getRemoteGithubJenkinsURL() + githubJenkinsJobInvocationURLPath;
+
+					sb.append("<li><a href=\\\"");
+					sb.append(remoteGithubJenkinsJobInvocationURL);
+					sb.append("\\\">");
+					sb.append(remoteGithubJenkinsJobInvocationURL);
+					sb.append("</a></li>");
+				}
+
+				sb.append("</ul>");
+
+				String githubJenkinsFailureCount = project.getProperty("github.jenkins.failure.count");
+
+				if (githubJenkinsFailureCount == null) {
+					githubJenkinsFailureCount = "0";
 				}
 
 				sb.append("<h1>");
+				sb.append(githubJenkinsFailureCount);
+				sb.append(" Failure");
+
+				if (!githubJenkinsFailureCount.equals("1")) {
+					sb.append("s");
+				}
+
+				sb.append(".</h1>");
 
 				String githubJenkinsFailureURLPathsString = project.getProperty("github.jenkins.failure.url.paths");
 
 				String[] githubJenkinsFailureURLPaths = githubJenkinsFailureURLPathsString.split(" ");
 
-				sb.append(githubJenkinsFailureURLPaths.length);
-				sb.append(" Failure");
-
-				if (githubJenkinsFailureURLPaths.length != 1) {
-					sb.append("s");
-				}
-
-				sb.append(":</h1>");
 				sb.append("<ul>");
 
 				for (String githubJenkinsFailureURLPath : githubJenkinsFailureURLPaths) {
-					String githubJenkinsFailureURL = project.getProperty("github.jenkins.url") + githubJenkinsFailureURLPath;
+					String localGithubJenkinsFailureURL = project.getProperty("github.jenkins.url") + githubJenkinsFailureURLPath;
+					String remoteGithubJenkinsFailureURL = getRemoteGithubJenkinsURL() + githubJenkinsFailureURLPath;
 
-					JSONObject jsonObject = toJSONObject(githubJenkinsFailureURL + "/api/json");
+					JSONObject jsonObject = toJSONObject(localGithubJenkinsFailureURL + "/api/json");
 
 					if (jsonObject.has("result")) {
 						sb.append("<li>");
 						sb.append("<a href=\\\"");
-						sb.append(githubJenkinsFailureURL);
+						sb.append(remoteGithubJenkinsFailureURL);
 						sb.append("\\\">");
 						sb.append(jsonObject.get("fullDisplayName"));
 						sb.append("</a>");
 						sb.append("<pre>RESULT: ");
 
-						if (githubJenkinsFailureURL.contains("source")) {
-							sb.append(getRebaseErrorMessage(githubJenkinsFailureURL));
+						File file = new File(project.getProperty("github.jenkins.shared.dir") + "/javac.output.txt");
+
+						if (file.exists()) {
+							sb.append(getDeprecatedMethodErrorMessage(file));
+						}
+						else if (localGithubJenkinsFailureURL.contains("source")) {
+							sb.append(getRebaseErrorMessage(localGithubJenkinsFailureURL));
 						}
 						else {
-							sb.append(jsonObject.get("result"));
+							sb.append(getConsoleErrorMessage(localGithubJenkinsFailureURL));
 						}
 
 						sb.append("</pre>");
@@ -308,21 +416,13 @@
 					else {
 						sb.append("<li>");
 						sb.append("<a href=\\\"");
-						sb.append(githubJenkinsFailureURL);
+						sb.append(remoteGithubJenkinsFailureURL);
 						sb.append("\\\">");
 						sb.append(jsonObject.get("className"));
 						sb.append(".");
 						sb.append(jsonObject.get("name"));
 						sb.append("</a>");
-						sb.append("<pre>");
-
-						if (!jsonObject.isNull("errorDetails")) {
-							sb.append(fixJSON(jsonObject.get("errorDetails")));
-							sb.append("<br /><br />");
-						}
-
-						sb.append(fixJSON(jsonObject.get("errorStackTrace")));
-						sb.append("</pre>");
+						sb.append(getTestErrorMessage(jsonObject));
 						sb.append("</li>");
 					}
 				}
@@ -342,6 +442,36 @@
 		<script classpathref="project.classpath" language="beanshell">
 			<![CDATA[
 				import java.util.concurrent.TimeUnit;
+
+				import org.json.JSONObject;
+
+				public String fixURL(String url) {
+					if (url.contains("(")) {
+						url = url.replace("(", "%28");
+					}
+
+					if (url.contains(")")) {
+						url = url.replace(")", "%29");
+					}
+
+					if (url.contains("[")) {
+						url = url.replace("[", "%5B");
+					}
+
+					if (url.contains("]")) {
+						url = url.replace("]", "%5D");
+					}
+
+					return url;
+				}
+
+				public String getRemoteGithubJenkinsURL() {
+					JSONObject jsonObject = toJSONObject(project.getProperty("github.jenkins.url") + "/api/json");
+
+					JSONObject primaryViewJSONObject = jsonObject.get("primaryView");
+
+					return primaryViewJSONObject.get("url");
+				}
 
 				public String toFormattedBuildTime(String githubJenkinsBuildTime) {
 					int milliseconds = Integer.parseInt(githubJenkinsBuildTime);
@@ -384,6 +514,31 @@
 					return sb.toString();
 				}
 
+				public JSONObject toJSONObject(String url) {
+					return new JSONObject(toString(url));
+				}
+
+				public String toString(String url) {
+					StringBuilder sb = new StringBuilder();
+
+					URL urlObject = new URL(fixURL(url));
+
+					InputStreamReader inputStreamReader = new InputStreamReader(urlObject.openStream());
+
+					BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+					String line = null;
+
+					while ((line = bufferedReader.readLine()) != null) {
+						sb.append(line);
+						sb.append("\n");
+					}
+
+					bufferedReader.close();
+
+					return sb.toString();
+				}
+
 				StringBuilder sb = new StringBuilder();
 
 				sb.append("<h1>All tests PASSED!</h1>");
@@ -396,13 +551,24 @@
 					sb.append("</p>");
 				}
 
-				String githubJenkinsResultsURL = project.getProperty("github.jenkins.results.url");
+				sb.append("<h1>See the following links for more information.</h1>");
+				sb.append("<ul>");
 
-				if (githubJenkinsResultsURL != null) {
-					sb.append("<p>Click <a href=\\\"");
-					sb.append(githubJenkinsResultsURL);
-					sb.append("\\\">here</a> for more information.</p>");
+				String githubJenkinsJobInvocationURLPathsString = project.getProperty("github.jenkins.job.invocation.url.paths");
+
+				String[] githubJenkinsJobInvocationURLPaths = githubJenkinsJobInvocationURLPathsString.split(" ");
+
+				for (String githubJenkinsJobInvocationURLPath : githubJenkinsJobInvocationURLPaths) {
+					String remoteGithubJenkinsJobInvocationURL = getRemoteGithubJenkinsURL() + githubJenkinsJobInvocationURLPath;
+
+					sb.append("<li><a href=\\\"");
+					sb.append(remoteGithubJenkinsJobInvocationURL);
+					sb.append("\\\">");
+					sb.append(remoteGithubJenkinsJobInvocationURL);
+					sb.append("</a></li>");
 				}
+
+				sb.append("</ul>");
 
 				project.setProperty("github.post.comment.body", sb.toString());
 			]]>

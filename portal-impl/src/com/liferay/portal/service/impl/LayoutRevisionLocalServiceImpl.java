@@ -630,8 +630,7 @@ public class LayoutRevisionLocalServiceImpl
 	protected LayoutRevision updateMajor(LayoutRevision layoutRevision)
 		throws PortalException {
 
-		List<LayoutRevision> parentLayoutRevisions =
-			new ArrayList<LayoutRevision>();
+		List<LayoutRevision> parentLayoutRevisions = new ArrayList<>();
 
 		long parentLayoutRevisionId =
 			layoutRevision.getParentLayoutRevisionId();
@@ -674,7 +673,7 @@ public class LayoutRevisionLocalServiceImpl
 	}
 
 	private static final ThreadLocal<Long> _layoutRevisionId =
-		new AutoResetThreadLocal<Long>(
+		new AutoResetThreadLocal<>(
 			LayoutRevisionLocalServiceImpl.class + "._layoutRevisionId", 0L);
 
 }

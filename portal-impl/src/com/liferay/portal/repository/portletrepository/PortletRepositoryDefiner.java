@@ -14,9 +14,7 @@
 
 package com.liferay.portal.repository.portletrepository;
 
-import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.repository.LocalRepository;
-import com.liferay.portal.kernel.repository.Repository;
+import com.liferay.portal.kernel.repository.DocumentRepository;
 import com.liferay.portal.kernel.repository.RepositoryFactory;
 import com.liferay.portal.kernel.repository.capabilities.TrashCapability;
 import com.liferay.portal.kernel.repository.capabilities.WorkflowCapability;
@@ -25,17 +23,17 @@ import com.liferay.portal.kernel.repository.registry.CapabilityRegistry;
 import com.liferay.portal.kernel.repository.registry.RepositoryFactoryRegistry;
 import com.liferay.portal.repository.capabilities.LiferayTrashCapability;
 import com.liferay.portal.repository.capabilities.MinimalWorkflowCapability;
-import com.liferay.portal.repository.liferayrepository.LiferayWorkflowLocalRepositoryWrapper;
-import com.liferay.portal.repository.liferayrepository.LiferayWorkflowRepositoryWrapper;
 
 /**
  * @author Adolfo Pérez
  */
 public class PortletRepositoryDefiner extends BaseRepositoryDefiner {
 
+	public static final String CLASS_NAME = PortletRepository.class.getName();
+
 	@Override
 	public String getClassName() {
-		return PortletRepository.class.getName();
+		return CLASS_NAME;
 	}
 
 	@Override
@@ -44,7 +42,9 @@ public class PortletRepositoryDefiner extends BaseRepositoryDefiner {
 	}
 
 	@Override
-	public void registerCapabilities(CapabilityRegistry capabilityRegistry) {
+	public void registerCapabilities(
+		CapabilityRegistry<DocumentRepository> capabilityRegistry) {
+
 		capabilityRegistry.addSupportedCapability(
 			WorkflowCapability.class, _workflowCapability);
 
@@ -60,39 +60,11 @@ public class PortletRepositoryDefiner extends BaseRepositoryDefiner {
 	}
 
 	public void setRepositoryFactory(RepositoryFactory repositoryFactory) {
-		_repositoryFactory = new PortletRepositoryFactory(repositoryFactory);
+		_repositoryFactory = repositoryFactory;
 	}
 
 	private RepositoryFactory _repositoryFactory;
 	private final WorkflowCapability _workflowCapability =
 		new MinimalWorkflowCapability();
-
-	private class PortletRepositoryFactory implements RepositoryFactory {
-
-		public PortletRepositoryFactory(RepositoryFactory repositoryFactory) {
-			_repositoryFactory = repositoryFactory;
-		}
-
-		@Override
-		public LocalRepository createLocalRepository(long repositoryId)
-			throws PortalException {
-
-			return new LiferayWorkflowLocalRepositoryWrapper(
-				_repositoryFactory.createLocalRepository(repositoryId),
-				_workflowCapability);
-		}
-
-		@Override
-		public Repository createRepository(long repositoryId)
-			throws PortalException {
-
-			return new LiferayWorkflowRepositoryWrapper(
-				_repositoryFactory.createRepository(repositoryId),
-				_workflowCapability);
-		}
-
-		private final RepositoryFactory _repositoryFactory;
-
-	}
 
 }

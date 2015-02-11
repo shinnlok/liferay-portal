@@ -24,7 +24,7 @@ import javax.servlet.jsp.JspException;
  * @author Julio Camarero
  * @generated
  */
-public class BaseSelectTag extends com.liferay.taglib.util.IncludeTag {
+public abstract class BaseSelectTag extends com.liferay.taglib.util.IncludeTag {
 
 	@Override
 	public int doStartTag() throws JspException {
@@ -325,6 +325,8 @@ public class BaseSelectTag extends com.liferay.taglib.util.IncludeTag {
 
 	@Override
 	protected void cleanUp() {
+		super.cleanUp();
+
 		_bean = null;
 		_changesContext = false;
 		_cssClass = null;

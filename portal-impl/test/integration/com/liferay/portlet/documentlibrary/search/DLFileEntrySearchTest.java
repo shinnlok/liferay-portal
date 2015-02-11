@@ -19,7 +19,13 @@ import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.SearchContext;
-import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.Sync;
+import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.SearchContextTestUtil;
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -28,16 +34,10 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.BaseModel;
 import com.liferay.portal.model.Group;
-import com.liferay.portal.search.BaseSearchTestCase;
+import com.liferay.portal.search.test.BaseSearchTestCase;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.test.Sync;
-import com.liferay.portal.test.SynchronousDestinationTestRule;
-import com.liferay.portal.util.test.RandomTestUtil;
-import com.liferay.portal.util.test.SearchContextTestUtil;
-import com.liferay.portal.util.test.ServiceContextTestUtil;
-import com.liferay.portal.util.test.TestPropsValues;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.MainServletTestRule;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryType;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
@@ -49,11 +49,15 @@ import com.liferay.portlet.documentlibrary.service.DLFileEntryTypeLocalServiceUt
 import com.liferay.portlet.documentlibrary.util.test.DLAppTestUtil;
 import com.liferay.portlet.dynamicdatamapping.io.DDMFormXSDDeserializerUtil;
 import com.liferay.portlet.dynamicdatamapping.model.DDMForm;
+import com.liferay.portlet.dynamicdatamapping.model.DDMFormLayout;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalServiceUtil;
+import com.liferay.portlet.dynamicdatamapping.storage.DDMFormValues;
 import com.liferay.portlet.dynamicdatamapping.storage.Field;
 import com.liferay.portlet.dynamicdatamapping.storage.Fields;
 import com.liferay.portlet.dynamicdatamapping.util.DDMIndexerUtil;
+import com.liferay.portlet.dynamicdatamapping.util.DDMUtil;
+import com.liferay.portlet.dynamicdatamapping.util.FieldsToDDMFormValuesConverterUtil;
 import com.liferay.portlet.dynamicdatamapping.util.test.DDMStructureTestUtil;
 
 import java.io.File;
@@ -156,12 +160,18 @@ public class DLFileEntrySearchTest extends BaseSearchTestCase {
 		Field textField = new Field(
 			_ddmStructure.getStructureId(), "name", getSearchKeywords());
 
+		textField.setDefaultLocale(LocaleUtil.US);
+
 		fields.put(textField);
+
+		DDMFormValues ddmFormValues =
+			FieldsToDDMFormValuesConverterUtil.convert(_ddmStructure, fields);
 
 		serviceContext.setAttribute(
 			"fileEntryTypeId",dlFileEntryType.getFileEntryTypeId());
 		serviceContext.setAttribute(
-			Fields.class.getName() + _ddmStructure.getStructureId(), fields);
+			DDMFormValues.class.getName() + _ddmStructure.getStructureId(),
+			ddmFormValues);
 
 		FileEntry fileEntry = DLAppTestUtil.addFileEntry(
 			serviceContext.getScopeGroupId(),
@@ -314,10 +324,13 @@ public class DLFileEntrySearchTest extends BaseSearchTestCase {
 
 		DDMForm ddmForm = DDMFormXSDDeserializerUtil.deserialize(definition);
 
+		DDMFormLayout ddmFormLayout = DDMUtil.getDefaultDDMFormLayout(ddmForm);
+
 		DDMStructureLocalServiceUtil.updateStructure(
 			_ddmStructure.getStructureId(),
 			_ddmStructure.getParentStructureId(), _ddmStructure.getNameMap(),
-			_ddmStructure.getDescriptionMap(), ddmForm, serviceContext);
+			_ddmStructure.getDescriptionMap(), ddmForm, ddmFormLayout,
+			serviceContext);
 	}
 
 	private static final int _FOLDER_NAME_MAX_LENGTH = 100;

@@ -14,18 +14,21 @@
 
 package com.liferay.portlet.messageboards.lar;
 
+import com.liferay.portal.kernel.lar.ManifestSummary;
 import com.liferay.portal.kernel.lar.PortletDataHandler;
-import com.liferay.portal.kernel.test.AggregateTestRule;
-import com.liferay.portal.lar.BasePortletDataHandlerTestCase;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.util.LongWrapper;
+import com.liferay.portal.lar.test.BasePortletDataHandlerTestCase;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.service.GroupLocalServiceUtil;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.MainServletTestRule;
 import com.liferay.portal.util.PortletKeys;
-import com.liferay.portal.util.test.GroupTestUtil;
-import com.liferay.portal.util.test.TestPropsValues;
 import com.liferay.portlet.messageboards.model.MBCategory;
 import com.liferay.portlet.messageboards.model.MBMessage;
+import com.liferay.portlet.messageboards.model.MBThread;
 import com.liferay.portlet.messageboards.service.MBCategoryLocalServiceUtil;
 import com.liferay.portlet.messageboards.util.test.MBTestUtil;
 
@@ -94,6 +97,18 @@ public class MBPortletDataHandlerTest extends BasePortletDataHandlerTestCase {
 			stagingGroup.getGroupId(), message.getThread());
 
 		MBTestUtil.addBan(stagingGroup.getGroupId());
+	}
+
+	@Override
+	protected void checkManifestSummary(
+		Map<String, LongWrapper> expectedModelAdditionCounters) {
+
+		String manifestSummaryKey = ManifestSummary.getManifestSummaryKey(
+			MBThread.class.getName(), null);
+
+		expectedModelAdditionCounters.remove(manifestSummaryKey);
+
+		super.checkManifestSummary(expectedModelAdditionCounters);
 	}
 
 	@Override

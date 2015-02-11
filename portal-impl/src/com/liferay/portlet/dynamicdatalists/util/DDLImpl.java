@@ -14,6 +14,7 @@
 
 package com.liferay.portlet.dynamicdatalists.util;
 
+import com.liferay.portal.kernel.io.unsync.UnsyncStringWriter;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -173,7 +174,7 @@ public class DDLImpl implements DDL {
 
 	@Override
 	public List<DDLRecord> getRecords(Hits hits) throws Exception {
-		List<DDLRecord> records = new ArrayList<DDLRecord>();
+		List<DDLRecord> records = new ArrayList<>();
 
 		List<com.liferay.portal.kernel.search.Document> documents =
 			hits.toList();
@@ -225,10 +226,6 @@ public class DDLImpl implements DDL {
 
 		for (DDMFormField ddmFormField : ddmFormFields) {
 			String name = ddmFormField.getName();
-
-			if (ddmStructure.isFieldPrivate(name)) {
-				continue;
-			}
 
 			JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
@@ -308,7 +305,7 @@ public class DDLImpl implements DDL {
 			RenderResponse renderResponse)
 		throws Exception {
 
-		Map<String, Object> contextObjects = new HashMap<String, Object>();
+		Map<String, Object> contextObjects = new HashMap<>();
 
 		contextObjects.put(
 			DDLConstants.RESERVED_DDM_STRUCTURE_ID,
@@ -325,10 +322,11 @@ public class DDLImpl implements DDL {
 			recordSet.getName(themeDisplay.getLocale()));
 		contextObjects.put(TemplateConstants.TEMPLATE_ID, ddmTemplateId);
 
-		String viewMode = ParamUtil.getString(renderRequest, "viewMode");
+		String viewMode = Constants.VIEW;
 
-		if (Validator.isNull(viewMode)) {
-			viewMode = Constants.VIEW;
+		if (renderRequest != null) {
+			viewMode = ParamUtil.getString(
+				renderRequest, "viewMode", Constants.VIEW);
 		}
 
 		contextObjects.put("viewMode", viewMode);
@@ -341,7 +339,7 @@ public class DDLImpl implements DDL {
 
 		return _transformer.transform(
 			themeDisplay, contextObjects, ddmTemplate.getScript(),
-			ddmTemplate.getLanguage());
+			ddmTemplate.getLanguage(), new UnsyncStringWriter());
 	}
 
 	/**

@@ -14,6 +14,7 @@
 
 package com.liferay.portal.wab.extender.internal;
 
+import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.wab.extender.internal.definition.FilterDefinition;
 import com.liferay.portal.wab.extender.internal.definition.ListenerDefinition;
 import com.liferay.portal.wab.extender.internal.definition.ServletDefinition;
@@ -24,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.EventListener;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -96,7 +96,7 @@ public class WabBundleProcessor implements ServletContextListener {
 		servletContext.setAttribute("osgi-bundlecontext", _bundleContext);
 		servletContext.setAttribute("osgi-runtime-vendor", _VENDOR);
 
-		Dictionary<String, Object> properties = new Hashtable<>();
+		Dictionary<String, Object> properties = new HashMapDictionary<>();
 
 		properties.put("osgi.web.symbolicname", _bundle.getSymbolicName());
 		properties.put("osgi.web.version", _bundle.getVersion());
@@ -171,7 +171,7 @@ public class WabBundleProcessor implements ServletContextListener {
 	}
 
 	protected ServiceRegistration<Servlet> createDefaultServlet() {
-		Dictionary<String, Object> properties = new Hashtable<String, Object>();
+		Dictionary<String, Object> properties = new HashMapDictionary<>();
 
 		properties.put(
 			HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT,
@@ -190,7 +190,7 @@ public class WabBundleProcessor implements ServletContextListener {
 
 		try {
 			Class<?> clazz = Class.forName(
-				"com.liferay.portal.servlet.jsp.JspServlet");
+				"com.liferay.portal.servlet.jsp.compiler.JspServlet");
 
 			servlet = (Servlet)clazz.newInstance();
 		}
@@ -203,7 +203,7 @@ public class WabBundleProcessor implements ServletContextListener {
 			return null;
 		}
 
-		Dictionary<String, Object> properties = new Hashtable<String, Object>();
+		Dictionary<String, Object> properties = new HashMapDictionary<>();
 
 		properties.put(
 			HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT,
@@ -225,8 +225,8 @@ public class WabBundleProcessor implements ServletContextListener {
 		Map<String, FilterDefinition> filterDefinitions =
 			_webXMLDefinition.getFilterDefinitions();
 
-		List<FilterDefinition> filterDefinitionsList =
-			new ArrayList<FilterDefinition>(filterDefinitions.values());
+		List<FilterDefinition> filterDefinitionsList = new ArrayList<>(
+			filterDefinitions.values());
 
 		Collections.reverse(filterDefinitionsList);
 
@@ -266,8 +266,8 @@ public class WabBundleProcessor implements ServletContextListener {
 		Map<String, ServletDefinition> servletDefinitions =
 			_webXMLDefinition.getServletDefinitions();
 
-		List<ServletDefinition> servletDefinitionsList =
-			new ArrayList<ServletDefinition>(servletDefinitions.values());
+		List<ServletDefinition> servletDefinitionsList = new ArrayList<>(
+			servletDefinitions.values());
 
 		Collections.reverse(servletDefinitionsList);
 
@@ -289,7 +289,7 @@ public class WabBundleProcessor implements ServletContextListener {
 
 		_wabServletContextHelper = new WabServletContextHelper(_bundle);
 
-		Dictionary<String, Object> properties = new Hashtable<String, Object>();
+		Dictionary<String, Object> properties = new HashMapDictionary<>();
 
 		properties.put(
 			HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME, _contextName);
@@ -380,7 +380,7 @@ public class WabBundleProcessor implements ServletContextListener {
 	}
 
 	protected void registerThisAsEventListener() {
-		Dictionary<String, Object> properties = new Hashtable<>();
+		Dictionary<String, Object> properties = new HashMapDictionary<>();
 
 		properties.put(
 			HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT,

@@ -109,10 +109,7 @@ public class EditExportConfigurationAction extends PortletAction {
 
 			SessionErrors.add(actionRequest, e.getClass());
 
-			String pagesRedirect = ParamUtil.getString(
-				actionRequest, "pagesRedirect");
-
-			sendRedirect(actionRequest, actionResponse, pagesRedirect);
+			sendRedirect(actionRequest, actionResponse);
 		}
 	}
 
@@ -207,7 +204,7 @@ public class EditExportConfigurationAction extends PortletAction {
 					actionRequest, "deleteExportImportConfigurationIds"), 0L);
 		}
 
-		List<TrashedModel> trashedModels = new ArrayList<TrashedModel>();
+		List<TrashedModel> trashedModels = new ArrayList<>();
 
 		for (long deleteExportImportConfigurationId :
 				deleteExportImportConfigurationIds) {

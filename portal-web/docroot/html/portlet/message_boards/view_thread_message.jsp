@@ -53,12 +53,12 @@ MBThread thread = (MBThread)request.getAttribute("edit_message.jsp-thread");
 						%>
 
 						<c:if test="<%= Validator.isNotNull(ranks[1]) %>">
-							<div class="thread-user-role thread-user-role-<%= StringUtil.toLowerCase(ranks[1]) %>"><%= ranks[1] %></div>
+							<div class="thread-user-role thread-user-role-<%= HtmlUtil.escapeAttribute(StringUtil.toLowerCase(ranks[1])) %>"><%= HtmlUtil.escape(ranks[1]) %></div>
 						</c:if>
 
 						<c:if test="<%= Validator.isNotNull(ranks[0]) %>">
 							<div class="thread-user-rank">
-								<span><liferay-ui:message key="rank" />:</span> <%= ranks[0] %>
+								<span><liferay-ui:message key="rank" />:</span> <%= HtmlUtil.escape(ranks[0]) %>
 							</div>
 						</c:if>
 
@@ -394,7 +394,7 @@ MBThread thread = (MBThread)request.getAttribute("edit_message.jsp-thread");
 					<liferay-ui:ratings
 						className="<%= MBMessage.class.getName() %>"
 						classPK="<%= message.getMessageId() %>"
-						type="thumbs"
+						type="<%= PortletRatingsDefinition.RatingsType.THUMBS.getValue() %>"
 					/>
 				</c:if>
 
