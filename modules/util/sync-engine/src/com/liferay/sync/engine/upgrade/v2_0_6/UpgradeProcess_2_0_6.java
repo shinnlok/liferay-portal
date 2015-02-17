@@ -40,12 +40,15 @@ public class UpgradeProcess_2_0_6 extends UpgradeProcess {
 
 	@Override
 	public void upgrade() throws Exception {
+		SyncFilePersistence syncFilePersistence =
+			SyncFileService.getSyncFilePersistence();
+
+		syncFilePersistence.executeRaw(
+			"alter table SyncFile add versionId long before state");
+
 		if (OSDetector.isWindows()) {
 			return;
 		}
-
-		SyncFilePersistence syncFilePersistence =
-			SyncFileService.getSyncFilePersistence();
 
 		List<SyncFile> syncFiles = syncFilePersistence.queryForAll();
 

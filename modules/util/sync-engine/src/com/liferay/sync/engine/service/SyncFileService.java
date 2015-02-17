@@ -452,7 +452,7 @@ public class SyncFileService {
 
 		String name = _getName(filePath, syncFile);
 		String sourceFileName = syncFile.getName();
-		String sourceVersion = syncFile.getVersion();
+		long sourceVersionId = syncFile.getVersionId();
 
 		syncFile.setFilePathName(filePath.toString());
 		syncFile.setName(name);
@@ -466,7 +466,7 @@ public class SyncFileService {
 
 			FileEventUtil.updateFile(
 				filePath, syncAccountId, syncFile, null, name,
-				syncFile.getChecksum(), sourceFileName, sourceVersion,
+				syncFile.getChecksum(), sourceFileName, sourceVersionId,
 				syncFile.getChecksum());
 		}
 
@@ -565,7 +565,7 @@ public class SyncFileService {
 		String name = _getName(filePath, syncFile);
 		String sourceChecksum = syncFile.getChecksum();
 		String sourceFileName = syncFile.getName();
-		String sourceVersion = syncFile.getVersion();
+		long sourceVersionId = syncFile.getVersionId();
 		String targetChecksum = FileUtil.getChecksum(filePath);
 
 		if (!FileUtil.checksumsEqual(sourceChecksum, targetChecksum) &&
@@ -594,7 +594,8 @@ public class SyncFileService {
 
 			FileEventUtil.updateFile(
 				filePath, syncAccountId, syncFile, deltaFilePath, name,
-				sourceChecksum, sourceFileName, sourceVersion, targetChecksum);
+				sourceChecksum, sourceFileName, sourceVersionId,
+				targetChecksum);
 		}
 
 		return syncFile;
