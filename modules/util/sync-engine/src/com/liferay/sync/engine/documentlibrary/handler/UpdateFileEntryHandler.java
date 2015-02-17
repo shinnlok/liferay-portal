@@ -82,6 +82,7 @@ public class UpdateFileEntryHandler extends BaseSyncDLObjectHandler {
 		}
 
 		localSyncFile.setVersion(remoteSyncFile.getVersion());
+		localSyncFile.setVersionId(remoteSyncFile.getVersionId());
 
 		SyncFileService.update(localSyncFile);
 

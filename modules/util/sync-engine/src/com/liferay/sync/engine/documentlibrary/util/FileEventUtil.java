@@ -199,15 +199,15 @@ public class FileEventUtil {
 	}
 
 	public static void downloadPatch(
-		String sourceVersion, long syncAccountId, SyncFile syncFile,
-		String targetVersion) {
+		long sourceVersionId, long syncAccountId, SyncFile syncFile,
+		long targetVersionId) {
 
 		Map<String, Object> parameters = new HashMap<>();
 
 		parameters.put("patch", true);
-		parameters.put("sourceVersion", sourceVersion);
+		parameters.put("sourceVersionId", sourceVersionId);
 		parameters.put("syncFile", syncFile);
-		parameters.put("targetVersion", targetVersion);
+		parameters.put("targetVersionId", targetVersionId);
 
 		DownloadFileEvent downloadFileEvent = new DownloadFileEvent(
 			syncAccountId, parameters);
@@ -329,7 +329,7 @@ public class FileEventUtil {
 			if (uploadingSyncFile.getTypePK() > 0) {
 				updateFile(
 					filePath, syncAccountId, uploadingSyncFile, null,
-					uploadingSyncFile.getName(), "", null, null, checksum);
+					uploadingSyncFile.getName(), "", null, 0, checksum);
 			}
 			else {
 				addFile(
@@ -344,7 +344,7 @@ public class FileEventUtil {
 	public static void updateFile(
 			Path filePath, long syncAccountId, SyncFile syncFile,
 			Path deltaFilePath, String name, String sourceChecksum,
-			String sourceFileName, String sourceVersion, String targetChecksum)
+			String sourceFileName, long sourceVersionId, String targetChecksum)
 		throws IOException {
 
 		Map<String, Object> parameters = new HashMap<>();
@@ -369,7 +369,7 @@ public class FileEventUtil {
 
 				parameters.put("deltaFilePath", deltaFilePath);
 				parameters.put("sourceFileName", sourceFileName);
-				parameters.put("sourceVersion", sourceVersion);
+				parameters.put("sourceVersionId", sourceVersionId);
 
 				PatchFileEntryEvent patchFileEntryEvent =
 					new PatchFileEntryEvent(syncAccountId, parameters);
