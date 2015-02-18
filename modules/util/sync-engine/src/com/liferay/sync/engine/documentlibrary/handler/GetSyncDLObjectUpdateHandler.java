@@ -176,7 +176,8 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 
 		if (patch && !sourceVersion.equals("PWC") &&
 			!targetVersion.equals("PWC") &&
-			(Double.valueOf(sourceVersion) < Double.valueOf(targetVersion))) {
+			(Double.valueOf(sourceVersion) < Double.valueOf(targetVersion)) &&
+			(sourceVersionId != 0)) {
 
 			FileEventUtil.downloadPatch(
 				sourceVersionId, getSyncAccountId(), syncFile,

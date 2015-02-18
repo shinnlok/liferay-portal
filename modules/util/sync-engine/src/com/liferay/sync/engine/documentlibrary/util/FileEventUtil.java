@@ -364,8 +364,9 @@ public class FileEventUtil {
 		}
 		else {
 			if ((deltaFilePath != null) &&
-				(Files.size(filePath) / Files.size(deltaFilePath)) >=
-					PropsValues.SYNC_FILE_PATCHING_THRESHOLD_SIZE_RATIO) {
+				((Files.size(filePath) / Files.size(deltaFilePath)) >=
+					PropsValues.SYNC_FILE_PATCHING_THRESHOLD_SIZE_RATIO) &&
+				(sourceVersionId != 0)) {
 
 				parameters.put("deltaFilePath", deltaFilePath);
 				parameters.put("sourceFileName", sourceFileName);
