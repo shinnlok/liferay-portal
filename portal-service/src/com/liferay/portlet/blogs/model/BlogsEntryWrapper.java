@@ -330,6 +330,13 @@ public class BlogsEntryWrapper implements BlogsEntry, ModelWrapper<BlogsEntry> {
 		return _blogsEntry.getCoverImageURL();
 	}
 
+	@Override
+	public java.lang.String getCoverImageURL(
+		com.liferay.portal.theme.ThemeDisplay themeDisplay)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _blogsEntry.getCoverImageURL(themeDisplay);
+	}
+
 	/**
 	* Returns the create date of this blogs entry.
 	*
@@ -370,6 +377,11 @@ public class BlogsEntryWrapper implements BlogsEntry, ModelWrapper<BlogsEntry> {
 		return _blogsEntry.getEntryId();
 	}
 
+	/**
+	* @deprecated As of 7.0.0, replaced by {@link #getSmallImageURL(
+	ThemeDisplay)}
+	*/
+	@Deprecated
 	@Override
 	public java.lang.String getEntryImageURL(
 		com.liferay.portal.theme.ThemeDisplay themeDisplay) {
@@ -389,11 +401,6 @@ public class BlogsEntryWrapper implements BlogsEntry, ModelWrapper<BlogsEntry> {
 	@Override
 	public long getGroupId() {
 		return _blogsEntry.getGroupId();
-	}
-
-	@Override
-	public long getImagesFolderId() {
-		return _blogsEntry.getImagesFolderId();
 	}
 
 	/**
@@ -465,6 +472,13 @@ public class BlogsEntryWrapper implements BlogsEntry, ModelWrapper<BlogsEntry> {
 	@Override
 	public java.lang.String getSmallImageURL() {
 		return _blogsEntry.getSmallImageURL();
+	}
+
+	@Override
+	public java.lang.String getSmallImageURL(
+		com.liferay.portal.theme.ThemeDisplay themeDisplay)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _blogsEntry.getSmallImageURL(themeDisplay);
 	}
 
 	/**

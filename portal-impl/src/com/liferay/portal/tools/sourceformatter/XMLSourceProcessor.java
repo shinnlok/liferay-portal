@@ -189,7 +189,7 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 			File file, String fileName, String absolutePath, String content)
 		throws Exception {
 
-		if (isExcluded(_xmlExclusions, absolutePath)) {
+		if (isExcludedFile(_xmlExclusionFiles, absolutePath)) {
 			return content;
 		}
 
@@ -483,11 +483,11 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 			"**\\*.xml"
 		};
 
-		_friendlyUrlRoutesSortExclusions = getPropertyList(
+		_friendlyUrlRoutesSortExclusionFiles = getPropertyList(
 			"friendly.url.routes.sort.excludes.files");
-		_numericalPortletNameElementExclusions = getPropertyList(
+		_numericalPortletNameElementExclusionFiles = getPropertyList(
 			"numerical.portlet.name.element.excludes.files");
-		_xmlExclusions = getPropertyList("xml.excludes.files");
+		_xmlExclusionFiles = getPropertyList("xml.excludes.files");
 
 		List<String> fileNames = getFileNames(excludes, includes);
 
@@ -503,7 +503,7 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 
 		newContent = fixAntXMLProjectName(fileName, newContent);
 
-		Document document = saxReaderUtil.read(newContent);
+		Document document = saxReader.read(newContent);
 
 		Element rootElement = document.getRootElement();
 
@@ -551,7 +551,7 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 	}
 
 	protected String formatDDLStructuresXML(String content) throws Exception {
-		Document document = saxReaderUtil.read(content);
+		Document document = saxReader.read(content);
 
 		Element rootElement = document.getRootElement();
 
@@ -585,11 +585,13 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 			String absolutePath, String content)
 		throws Exception {
 
-		if (isExcluded(_friendlyUrlRoutesSortExclusions, absolutePath)) {
+		if (isExcludedFile(
+				_friendlyUrlRoutesSortExclusionFiles, absolutePath)) {
+
 			return content;
 		}
 
-		Document document = saxReaderUtil.read(content);
+		Document document = saxReader.read(content);
 
 		Element rootElement = document.getRootElement();
 
@@ -722,14 +724,14 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 			String fileName, String absolutePath, String content)
 		throws Exception {
 
-		Document document = saxReaderUtil.read(content);
+		Document document = saxReader.read(content);
 
 		Element rootElement = document.getRootElement();
 
 		rootElement.sortAttributes(true);
 
-		boolean checkNumericalPortletNameElement = !isExcluded(
-			_numericalPortletNameElementExclusions, absolutePath);
+		boolean checkNumericalPortletNameElement = !isExcludedFile(
+			_numericalPortletNameElementExclusionFiles, absolutePath);
 
 		List<Element> portletElements = rootElement.elements("portlet");
 
@@ -793,7 +795,7 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 	protected void formatServiceXML(String fileName, String content)
 		throws Exception {
 
-		Document document = saxReaderUtil.read(content);
+		Document document = saxReader.read(content);
 
 		Element rootElement = document.getRootElement();
 
@@ -823,7 +825,7 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 	protected void formatStrutsConfigXML(String fileName, String content)
 		throws Exception {
 
-		Document document = saxReaderUtil.read(content);
+		Document document = saxReader.read(content);
 
 		Element rootElement = document.getRootElement();
 
@@ -851,7 +853,7 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 	protected void formatTilesDefsXML(String fileName, String content)
 		throws Exception {
 
-		Document document = saxReaderUtil.read(content);
+		Document document = saxReader.read(content);
 
 		Element rootElement = document.getRootElement();
 
@@ -1199,8 +1201,8 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 		"[\t ]-->\n[\t<]");
 
 	private List<String> _columnNames;
-	private List<String> _friendlyUrlRoutesSortExclusions;
-	private List<String> _numericalPortletNameElementExclusions;
+	private List<String> _friendlyUrlRoutesSortExclusionFiles;
+	private List<String> _numericalPortletNameElementExclusionFiles;
 	private Pattern _poshiClosingTagPattern = Pattern.compile("</[^>/]*>");
 	private Pattern _poshiCommandsPattern = Pattern.compile(
 		"\\<command.*name=\\\"([^\\\"]*)\\\".*\\>[\\s\\S]*?\\</command\\>" +
@@ -1233,7 +1235,7 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 	private String _tablesContent;
 	private Pattern _whereNotInSQLPattern = Pattern.compile(
 		"WHERE[ \t\n]+\\(*[a-zA-z0-9.]+ NOT IN");
-	private List<String> _xmlExclusions;
+	private List<String> _xmlExclusionFiles;
 
 	private class FinderElementComparator implements Comparator<Element> {
 

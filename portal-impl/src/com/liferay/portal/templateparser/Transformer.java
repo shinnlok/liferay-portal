@@ -55,8 +55,6 @@ import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.xsl.XSLTemplateResource;
 import com.liferay.portal.xsl.XSLURIResolver;
 import com.liferay.portlet.journal.util.JournalXSLURIResolver;
-import com.liferay.portlet.portletdisplaytemplate.util.PortletDisplayTemplateConstants;
-import com.liferay.taglib.util.VelocityTaglib;
 
 import java.io.IOException;
 
@@ -132,7 +130,8 @@ public class Transformer {
 
 	public String transform(
 			ThemeDisplay themeDisplay, Map<String, Object> contextObjects,
-			String script, String langType)
+			String script, String langType,
+			UnsyncStringWriter unsyncStringWriter)
 		throws Exception {
 
 		if (Validator.isNull(langType)) {
@@ -157,8 +156,6 @@ public class Transformer {
 			templateId, companyId, companyGroupId, scopeGroupId);
 
 		Template template = getTemplate(templateId, script, langType);
-
-		UnsyncStringWriter unsyncStringWriter = new UnsyncStringWriter();
 
 		try {
 			prepareTemplate(themeDisplay, template);
@@ -544,10 +541,9 @@ public class Transformer {
 			ThemeDisplay themeDisplay, Element element)
 		throws Exception {
 
-		List<TemplateNode> templateNodes = new ArrayList<TemplateNode>();
+		List<TemplateNode> templateNodes = new ArrayList<>();
 
-		Map<String, TemplateNode> prototypeTemplateNodes =
-			new HashMap<String, TemplateNode>();
+		Map<String, TemplateNode> prototypeTemplateNodes = new HashMap<>();
 
 		List<Element> dynamicElementElements = element.elements(
 			"dynamic-element");
@@ -573,7 +569,7 @@ public class Transformer {
 			String type = dynamicElementElement.attributeValue(
 				"type", StringPool.BLANK);
 
-			Map<String, String> attributes = new HashMap<String, String>();
+			Map<String, String> attributes = new HashMap<>();
 
 			if (dynamicContentElement != null) {
 				for (Attribute attribute : dynamicContentElement.attributes()) {
@@ -635,7 +631,7 @@ public class Transformer {
 	}
 
 	protected Map<String, Object> insertRequestVariables(Element element) {
-		Map<String, Object> map = new HashMap<String, Object>();
+		Map<String, Object> map = new HashMap<>();
 
 		if (element == null) {
 			return map;
@@ -661,7 +657,7 @@ public class Transformer {
 					map.put(nameElement.getText(), valueElement.getText());
 				}
 				else {
-					List<String> values = new ArrayList<String>();
+					List<String> values = new ArrayList<>();
 
 					for (Element valueElement : valueElements) {
 						values.add(valueElement.getText());
@@ -689,13 +685,6 @@ public class Transformer {
 			Template template, UnsyncStringWriter unsyncStringWriter,
 			boolean propagateException)
 		throws Exception {
-
-		VelocityTaglib velocityTaglib = (VelocityTaglib)template.get(
-			PortletDisplayTemplateConstants.TAGLIB_LIFERAY);
-
-		if (velocityTaglib != null) {
-			velocityTaglib.setTemplate(template);
-		}
 
 		if (propagateException) {
 			template.doProcessTemplate(unsyncStringWriter);
@@ -736,10 +725,9 @@ public class Transformer {
 	private static final Log _logXmlBeforeListener = LogFactoryUtil.getLog(
 		Transformer.class.getName() + ".XmlBeforeListener");
 
-	private final Map<String, String> _errorTemplateIds =
-		new HashMap<String, String>();
+	private final Map<String, String> _errorTemplateIds = new HashMap<>();
 	private final boolean _restricted;
 	private final Set<TransformerListener> _transformerListeners =
-		new HashSet<TransformerListener>();
+		new HashSet<>();
 
 }

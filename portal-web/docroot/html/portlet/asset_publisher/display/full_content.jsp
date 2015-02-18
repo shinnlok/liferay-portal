@@ -28,7 +28,7 @@ List results = (List)request.getAttribute("view.jsp-results");
 if (Validator.isNull(redirect) && results.isEmpty()) {
 	PortletURL portletURL = renderResponse.createRenderURL();
 
-	portletURL.setParameter("struts_action", "/asset_publisher/view");
+	portletURL.setParameter("mvcPath", "/html/portlet/asset_publisher/view.jsp");
 
 	redirect = portletURL.toString();
 }
@@ -124,7 +124,7 @@ request.setAttribute("view.jsp-showIconLabel", true);
 
 	PortletURL viewFullContentURL = renderResponse.createRenderURL();
 
-	viewFullContentURL.setParameter("struts_action", "/asset_publisher/view_content");
+	viewFullContentURL.setParameter("mvcPath", "/html/portlet/asset_publisher/view_content.jsp");
 	viewFullContentURL.setParameter("type", assetRendererFactory.getType());
 	viewFullContentURL.setParameter("viewMode", print ? Constants.PRINT : Constants.VIEW);
 
@@ -162,6 +162,7 @@ request.setAttribute("view.jsp-showIconLabel", true);
 		%>
 
 		<liferay-util:include page="<%= path %>" portletId="<%= assetRendererFactory.getPortletId() %>">
+			<liferay-util:param name="showComments" value="<%= Boolean.FALSE.toString() %>" />
 			<liferay-util:param name="showExtraInfo" value="<%= String.valueOf(assetPublisherDisplayContext.isShowExtraInfo()) %>" />
 			<liferay-util:param name="showHeader" value="<%= Boolean.FALSE.toString() %>" />
 		</liferay-util:include>
@@ -192,17 +193,17 @@ request.setAttribute("view.jsp-showIconLabel", true);
 				<%
 				String assetEntryClassName = assetEntry.getClassName();
 
-				String ratingsType = "stars";
+				RatingsType ratingsType = RatingsType.STARS;
 
 				if (assetEntryClassName.equals(MBDiscussion.class.getName()) || assetEntryClassName.equals(MBMessage.class.getName())) {
-					ratingsType = "thumbs";
+					ratingsType = RatingsType.THUMBS;
 				}
 				%>
 
 				<liferay-ui:ratings
 					className="<%= assetEntry.getClassName() %>"
 					classPK="<%= assetEntry.getClassPK() %>"
-					type="<%= ratingsType %>"
+					type="<%= ratingsType.getValue() %>"
 				/>
 			</div>
 		</c:if>
@@ -224,15 +225,18 @@ request.setAttribute("view.jsp-showIconLabel", true);
 		<c:if test="<%= Validator.isNotNull(assetRenderer.getDiscussionPath()) && assetPublisherDisplayContext.isEnableComments() %>">
 			<br />
 
-			<portlet:actionURL var="discussionURL">
-				<portlet:param name="struts_action" value='<%= "/asset_publisher/" + assetRenderer.getDiscussionPath() %>' />
-			</portlet:actionURL>
+			<portlet:actionURL name="invokeTaglibDiscussion" var="discussionURL" />
+
+			<portlet:resourceURL var="discussionPaginationURL">
+				<portlet:param name="invokeTaglibDiscussion" value="<%= Boolean.TRUE.toString() %>" />
+			</portlet:resourceURL>
 
 			<liferay-ui:discussion
 				className="<%= assetEntry.getClassName() %>"
 				classPK="<%= assetEntry.getClassPK() %>"
 				formAction="<%= discussionURL %>"
 				formName='<%= "fm" + assetEntry.getClassPK() %>'
+				paginationURL="<%= discussionPaginationURL %>"
 				ratingsEnabled="<%= assetPublisherDisplayContext.isEnableCommentRatings() %>"
 				redirect="<%= currentURL %>"
 				userId="<%= assetRenderer.getUserId() %>"
@@ -241,16 +245,12 @@ request.setAttribute("view.jsp-showIconLabel", true);
 	</div>
 
 	<c:if test="<%= show %>">
-		<div class="asset-metadata">
-
-			<%
-			boolean filterByMetadata = true;
-
-			String[] metadataFields = assetPublisherDisplayContext.getMetadataFields();
-			%>
-
-			<%@ include file="/html/portlet/asset_publisher/asset_metadata.jspf" %>
-		</div>
+		<liferay-ui:asset-metadata
+			className="<%= assetEntry.getClassName() %>"
+			classPK="<%= assetEntry.getClassPK() %>"
+			filterByMetadata="<%= true %>"
+			metadataFields="<%= assetPublisherDisplayContext.getMetadataFields() %>"
+		/>
 	</c:if>
 </div>
 

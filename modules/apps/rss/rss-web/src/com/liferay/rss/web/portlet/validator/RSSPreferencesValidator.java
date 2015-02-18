@@ -15,6 +15,7 @@
 package com.liferay.rss.web.portlet.validator;
 
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.rss.web.constants.RSSPortletKeys;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +32,7 @@ import org.osgi.service.component.annotations.Component;
 @Component(
 	immediate = true,
 	property = {
-		"javax.portlet.name=com_liferay_rss_web_portlet_RSSPortlet"
+		"javax.portlet.name=" + RSSPortletKeys.RSS
 	}
 )
 public class RSSPreferencesValidator implements PreferencesValidator {
@@ -40,7 +41,7 @@ public class RSSPreferencesValidator implements PreferencesValidator {
 	public void validate(PortletPreferences preferences)
 		throws ValidatorException {
 
-		List<String> badURLs = new ArrayList<String>();
+		List<String> badURLs = new ArrayList<>();
 
 		String[] urls = preferences.getValues("urls", new String[0]);
 

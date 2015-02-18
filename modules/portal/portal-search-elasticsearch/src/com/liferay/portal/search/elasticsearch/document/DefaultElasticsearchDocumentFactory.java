@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.search.DocumentImpl;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.search.elasticsearch.spi.document.ElasticsearchDocumentFactory;
 
 import java.io.IOException;
 
@@ -68,7 +69,7 @@ public class DefaultElasticsearchDocumentFactory
 		if (!field.isLocalized()) {
 			String[] values = field.getValues();
 
-			List<String> valuesList = new ArrayList<String>(values.length);
+			List<String> valuesList = new ArrayList<>(values.length);
 
 			for (String value : values) {
 				if (Validator.isNull(value)) {

@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
+import com.liferay.portal.kernel.xml.SAXReader;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.microsofttranslator.MicrosoftTranslatorFactoryImpl;
 import com.liferay.portal.model.ModelHintsImpl;
@@ -36,6 +37,8 @@ import com.liferay.portal.security.auth.DefaultFullNameGenerator;
 import com.liferay.portal.security.auth.FullNameGenerator;
 import com.liferay.portal.security.permission.ResourceActionsImpl;
 import com.liferay.portal.security.permission.ResourceActionsUtil;
+import com.liferay.portal.security.xml.SecureXMLFactoryProviderImpl;
+import com.liferay.portal.security.xml.SecureXMLFactoryProviderUtil;
 import com.liferay.portal.service.permission.PortletPermissionImpl;
 import com.liferay.portal.service.permission.PortletPermissionUtil;
 import com.liferay.portal.util.DigesterImpl;
@@ -111,9 +114,9 @@ public class ToolDependencies {
 
 		ModelHintsImpl modelHintsImpl = new ModelHintsImpl();
 
-		SAXReaderImpl saxReaderImpl = new SAXReaderImpl();
+		SAXReader saxReader = new SAXReaderImpl();
 
-		modelHintsImpl.setSAXReader(saxReaderImpl);
+		modelHintsImpl.setSAXReader(saxReader);
 
 		modelHintsImpl.afterPropertiesSet();
 
@@ -128,7 +131,13 @@ public class ToolDependencies {
 
 		SAXReaderUtil saxReaderUtil = new SAXReaderUtil();
 
-		saxReaderUtil.setSAXReader(saxReaderImpl);
+		saxReaderUtil.setSecureSAXReader(saxReader);
+
+		SecureXMLFactoryProviderUtil secureXMLFactoryProviderUtil =
+			new SecureXMLFactoryProviderUtil();
+
+		secureXMLFactoryProviderUtil.setSecureXMLFactoryProvider(
+			new SecureXMLFactoryProviderImpl());
 
 		SingleVMPoolImpl singleVMPoolImpl = new SingleVMPoolImpl();
 

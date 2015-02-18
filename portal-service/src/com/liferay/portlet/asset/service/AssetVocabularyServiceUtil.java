@@ -97,6 +97,12 @@ public class AssetVocabularyServiceUtil {
 		getService().deleteVocabulary(vocabularyId);
 	}
 
+	public static com.liferay.portlet.asset.model.AssetVocabulary fetchVocabulary(
+		long vocabularyId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().fetchVocabulary(vocabularyId);
+	}
+
 	/**
 	* Returns the Spring bean ID for this bean.
 	*
@@ -216,7 +222,7 @@ public class AssetVocabularyServiceUtil {
 
 	/**
 	* @deprecated As of 7.0.0, replaced by {@link
-	#AssetUtil.filterVocabularyIds(PermissionChecker, long[])}
+	AssetUtil#filterVocabularyIds(PermissionChecker, long[])}
 	*/
 	@Deprecated
 	public static java.util.List<com.liferay.portlet.asset.model.AssetVocabulary> getVocabularies(

@@ -16,15 +16,12 @@ package com.liferay.portlet.dynamicdatamapping.model.impl;
 
 import com.liferay.portal.LocaleException;
 import com.liferay.portal.kernel.bean.BeanPropertiesUtil;
-import com.liferay.portal.kernel.configuration.Filter;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PredicateFilter;
-import com.liferay.portal.kernel.util.PropsKeys;
-import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
@@ -40,10 +37,15 @@ import com.liferay.portlet.dynamicdatamapping.io.DDMFormXSDDeserializerUtil;
 import com.liferay.portlet.dynamicdatamapping.io.DDMFormXSDSerializerUtil;
 import com.liferay.portlet.dynamicdatamapping.model.DDMForm;
 import com.liferay.portlet.dynamicdatamapping.model.DDMFormField;
+import com.liferay.portlet.dynamicdatamapping.model.DDMFormLayout;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
+import com.liferay.portlet.dynamicdatamapping.model.DDMStructureLayout;
+import com.liferay.portlet.dynamicdatamapping.model.DDMStructureVersion;
 import com.liferay.portlet.dynamicdatamapping.model.DDMTemplate;
 import com.liferay.portlet.dynamicdatamapping.model.LocalizedValue;
+import com.liferay.portlet.dynamicdatamapping.service.DDMStructureLayoutLocalServiceUtil;
 import com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalServiceUtil;
+import com.liferay.portlet.dynamicdatamapping.service.DDMStructureVersionLocalServiceUtil;
 import com.liferay.portlet.dynamicdatamapping.service.DDMTemplateLocalServiceUtil;
 import com.liferay.portlet.dynamicdatamapping.util.DDMXMLUtil;
 
@@ -103,15 +105,13 @@ public class DDMStructureImpl extends DDMStructureBaseImpl {
 			try {
 				_ddmForm = DDMFormXSDDeserializerUtil.deserialize(
 					getDefinition());
-
-				addDDMFormPrivateDDMFormFields(_ddmForm);
 			}
 			catch (Exception e) {
 				_log.error(e, e);
 			}
 		}
 
-		return _ddmForm;
+		return new DDMForm(_ddmForm);
 	}
 
 	@Override
@@ -135,7 +135,7 @@ public class DDMStructureImpl extends DDMStructureBaseImpl {
 		Map<String, DDMFormField> ddmFormFieldsMap =
 			getFullHierarchyDDMFormFieldsMap(true);
 
-		List<DDMFormField> ddmFormFields = new ArrayList<DDMFormField>(
+		List<DDMFormField> ddmFormFields = new ArrayList<>(
 			ddmFormFieldsMap.values());
 
 		if (includeTransientFields) {
@@ -143,6 +143,18 @@ public class DDMStructureImpl extends DDMStructureBaseImpl {
 		}
 
 		return filterTransientDDMFormFields(ddmFormFields);
+	}
+
+	@Override
+	public DDMFormLayout getDDMFormLayout() throws PortalException {
+		DDMStructureVersion structureVersion = getStructureVersion();
+
+		DDMStructureLayout ddmStructureLayout =
+			DDMStructureLayoutLocalServiceUtil.
+				getStructureLayoutByStructureVersionId(
+					structureVersion.getStructureVersionId());
+
+		return ddmStructureLayout.getDDMFormLayout();
 	}
 
 	@Override
@@ -239,15 +251,13 @@ public class DDMStructureImpl extends DDMStructureBaseImpl {
 		if (_fullHierarchyDDMForm == null) {
 			try {
 				_fullHierarchyDDMForm = createFullHierarchyDDMForm();
-
-				addDDMFormPrivateDDMFormFields(_fullHierarchyDDMForm);
 			}
 			catch (Exception e) {
 				_log.error(e, e);
 			}
 		}
 
-		return _fullHierarchyDDMForm;
+		return new DDMForm(_fullHierarchyDDMForm);
 	}
 
 	@Override
@@ -264,6 +274,12 @@ public class DDMStructureImpl extends DDMStructureBaseImpl {
 		DDMForm ddmForm = getFullHierarchyDDMForm();
 
 		return getDDMFormFieldNames(ddmForm.getDDMFormFields());
+	}
+
+	@Override
+	public DDMStructureVersion getStructureVersion() throws PortalException {
+		return DDMStructureVersionLocalServiceUtil.getStructureVersion(
+			getStructureId(), getVersion());
 	}
 
 	@Override
@@ -361,15 +377,6 @@ public class DDMStructureImpl extends DDMStructureBaseImpl {
 	}
 
 	@Override
-	public boolean isFieldPrivate(String fieldName) {
-		if (fieldName.startsWith(StringPool.UNDERLINE)) {
-			return true;
-		}
-
-		return false;
-	}
-
-	@Override
 	public boolean isFieldRepeatable(String fieldName) throws PortalException {
 		DDMFormField ddmFormField = getDDMFormField(fieldName);
 
@@ -430,39 +437,6 @@ public class DDMStructureImpl extends DDMStructureBaseImpl {
 		setDefinition(DDMFormXSDSerializerUtil.serialize(ddmForm));
 	}
 
-	protected void addDDMFormPrivateDDMFormFields(DDMForm ddmForm) {
-		List<DDMFormField> ddmFormFields = ddmForm.getDDMFormFields();
-
-		String[] privateFieldNames =
-			PropsValues.DYNAMIC_DATA_MAPPING_STRUCTURE_PRIVATE_FIELD_NAMES;
-
-		for (String privateFieldName : privateFieldNames) {
-			DDMFormField privateDDMFormField = createPrivateDDMFormField(
-				privateFieldName);
-
-			ddmFormFields.add(privateDDMFormField);
-		}
-	}
-
-	protected DDMFormField createPrivateDDMFormField(String privateFieldName) {
-		DDMFormField privateDDMFormField = new DDMFormField(
-			privateFieldName, "text");
-
-		String dataType = PropsUtil.get(
-			PropsKeys.DYNAMIC_DATA_MAPPING_STRUCTURE_PRIVATE_FIELD_DATATYPE,
-			new Filter(privateFieldName));
-
-		privateDDMFormField.setDataType(dataType);
-
-		String repeatable = PropsUtil.get(
-			PropsKeys.DYNAMIC_DATA_MAPPING_STRUCTURE_PRIVATE_FIELD_REPEATABLE,
-			new Filter(privateFieldName));
-
-		privateDDMFormField.setRepeatable(Boolean.valueOf(repeatable));
-
-		return privateDDMFormField;
-	}
-
 	protected List<DDMFormField> filterTransientDDMFormFields(
 		List<DDMFormField> ddmFormFields) {
 
@@ -485,7 +459,7 @@ public class DDMStructureImpl extends DDMStructureBaseImpl {
 	protected List<String> getDDMFormFieldNames(
 		List<DDMFormField> ddmFormFields) {
 
-		List<String> fieldNames = new ArrayList<String>();
+		List<String> fieldNames = new ArrayList<>();
 
 		for (DDMFormField ddmFormField : ddmFormFields) {
 			fieldNames.add(ddmFormField.getName());

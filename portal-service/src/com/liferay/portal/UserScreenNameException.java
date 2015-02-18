@@ -17,6 +17,7 @@ package com.liferay.portal;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.ClassUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.security.auth.ScreenNameValidator;
@@ -71,6 +72,10 @@ public class UserScreenNameException extends PortalException {
 			this.userId = userId;
 			this.screenName = screenName;
 			this.validSpecialChars = validSpecialChars;
+		}
+
+		public String getValidSpecialCharsAsString() {
+			return StringUtil.merge(this.validSpecialChars, StringPool.SPACE);
 		}
 
 		public final String screenName;
@@ -132,6 +137,28 @@ public class UserScreenNameException extends PortalException {
 			this.screenName = screenName;
 		}
 
+		public final String screenName;
+		public final long userId;
+
+	}
+
+	public static class MustNotBeReserved extends UserScreenNameException {
+
+		public MustNotBeReserved(
+			long userId, String screenName, String[] reservedScreenNames) {
+
+			super(
+				String.format(
+					"Screen name %s for user %s must not be a reserved name " +
+						"such as: %s",
+					screenName, userId, StringUtil.merge(reservedScreenNames)));
+
+			this.userId = userId;
+			this.screenName = screenName;
+			this.reservedScreenNames = reservedScreenNames;
+		}
+
+		public final String[] reservedScreenNames;
 		public final String screenName;
 		public final long userId;
 

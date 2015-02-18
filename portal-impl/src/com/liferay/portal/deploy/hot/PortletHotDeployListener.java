@@ -263,34 +263,27 @@ public class PortletHotDeployListener extends BaseHotDeployListener {
 
 			PortletBag portletBag = portletBagFactory.create(portlet);
 
-			if (portletBag == null) {
-				itr.remove();
+			if (!portletAppInitialized) {
+				initPortletApp(
+					servletContextName, servletContext, classLoader, portlet);
+
+				portletAppInitialized = true;
 			}
-			else {
-				if (!portletAppInitialized) {
-					initPortletApp(
-						servletContextName, servletContext, classLoader,
-						portlet);
 
-					portletAppInitialized = true;
-				}
+			javax.portlet.Portlet portletInstance =
+				portletBag.getPortletInstance();
 
-				javax.portlet.Portlet portletInstance =
-					portletBag.getPortletInstance();
+			if (ClassUtil.isSubclass(
+					portletInstance.getClass(), PHPPortlet.class.getName())) {
 
-				if (ClassUtil.isSubclass(
-						portletInstance.getClass(),
-						PHPPortlet.class.getName())) {
+				phpPortlet = true;
+			}
 
-					phpPortlet = true;
-				}
+			if (ClassUtil.isSubclass(
+					portletInstance.getClass(),
+					StrutsPortlet.class.getName())) {
 
-				if (ClassUtil.isSubclass(
-						portletInstance.getClass(),
-						StrutsPortlet.class.getName())) {
-
-					strutsBridges = true;
-				}
+				strutsBridges = true;
 			}
 		}
 
@@ -413,7 +406,7 @@ public class PortletHotDeployListener extends BaseHotDeployListener {
 			return;
 		}
 
-		Set<String> portletIds = new HashSet<String>();
+		Set<String> portletIds = new HashSet<>();
 
 		if (portlets != null) {
 			if (_log.isInfoEnabled()) {
@@ -636,8 +629,7 @@ public class PortletHotDeployListener extends BaseHotDeployListener {
 		PortletHotDeployListener.class);
 
 	private static final Map<String, Boolean> _dataSourceBindStates =
-		new HashMap<String, Boolean>();
-	private static final Map<String, List<Portlet>> _portlets =
-		new HashMap<String, List<Portlet>>();
+		new HashMap<>();
+	private static final Map<String, List<Portlet>> _portlets = new HashMap<>();
 
 }

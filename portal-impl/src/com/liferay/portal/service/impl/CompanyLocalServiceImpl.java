@@ -1105,7 +1105,7 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 				}
 			}
 
-			List<String> resetKeys = new ArrayList<String>();
+			List<String> resetKeys = new ArrayList<>();
 
 			for (Map.Entry<String, String> entry : properties.entrySet()) {
 				String key = entry.getKey();
@@ -1336,7 +1336,10 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 		PasswordPolicy defaultPasswordPolicy =
 			passwordPolicyLocalService.getDefaultPasswordPolicy(companyId);
 
-		passwordPolicyLocalService.deletePasswordPolicy(defaultPasswordPolicy);
+		if (defaultPasswordPolicy != null) {
+			passwordPolicyLocalService.deletePasswordPolicy(
+				defaultPasswordPolicy);
+		}
 
 		// Portal preferences
 
@@ -1588,7 +1591,7 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 
 						Group group = (Group)object;
 
-						if (!PortalUtil.isSystemGroup(group.getName()) &&
+						if (!PortalUtil.isSystemGroup(group.getGroupKey()) &&
 							!group.isCompany()) {
 
 							deleteGroup(group);

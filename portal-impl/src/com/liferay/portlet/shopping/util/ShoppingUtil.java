@@ -29,6 +29,7 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.model.Company;
+import com.liferay.portal.theme.PortletDisplay;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.WebKeys;
@@ -185,14 +186,14 @@ public class ShoppingUtil {
 
 		String[] categoryNames = StringUtil.split(coupon.getLimitCategories());
 
-		Set<Long> categoryIds = new HashSet<Long>();
+		Set<Long> categoryIds = new HashSet<>();
 
 		for (String categoryName : categoryNames) {
 			ShoppingCategory category =
 				ShoppingCategoryLocalServiceUtil.getCategory(
 					coupon.getGroupId(), categoryName);
 
-			List<Long> subcategoryIds = new ArrayList<Long>();
+			List<Long> subcategoryIds = new ArrayList<>();
 
 			ShoppingCategoryLocalServiceUtil.getSubcategoryIds(
 				subcategoryIds, category.getGroupId(),
@@ -205,14 +206,13 @@ public class ShoppingUtil {
 		String[] skus = StringUtil.split(coupon.getLimitSkus());
 
 		if ((categoryIds.size() > 0) || (skus.length > 0)) {
-			Set<String> skusSet = new HashSet<String>();
+			Set<String> skusSet = new HashSet<>();
 
 			for (String sku : skus) {
 				skusSet.add(sku);
 			}
 
-			Map<ShoppingCartItem, Integer> newItems =
-				new HashMap<ShoppingCartItem, Integer>();
+			Map<ShoppingCartItem, Integer> newItems = new HashMap<>();
 
 			for (Map.Entry<ShoppingCartItem, Integer> entry :
 					items.entrySet()) {
@@ -730,8 +730,7 @@ public class ShoppingUtil {
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		Map<String, String> definitionTerms =
-			new LinkedHashMap<String, String>();
+		Map<String, String> definitionTerms = new LinkedHashMap<>();
 
 		definitionTerms.put(
 			"[$FROM_ADDRESS$]", HtmlUtil.escape(emailFromAddress));
@@ -758,8 +757,11 @@ public class ShoppingUtil {
 
 		definitionTerms.put("[$PORTAL_URL$]", company.getVirtualHostname());
 
+		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
+
 		definitionTerms.put(
-			"[$PORTLET_NAME$]", PortalUtil.getPortletTitle(portletRequest));
+			"[$PORTLET_NAME$]", HtmlUtil.escape(portletDisplay.getTitle()));
+
 		definitionTerms.put(
 			"[$TO_ADDRESS$]",
 			LanguageUtil.get(
@@ -777,7 +779,7 @@ public class ShoppingUtil {
 		ShoppingItem item, ShoppingItemField[] itemFields,
 		String[] fieldsArray) {
 
-		Set<String> fieldsValues = new HashSet<String>();
+		Set<String> fieldsValues = new HashSet<>();
 
 		for (String fields : fieldsArray) {
 			int pos = fields.indexOf("=");
@@ -787,8 +789,8 @@ public class ShoppingUtil {
 			fieldsValues.add(fieldValue.trim());
 		}
 
-		List<String> names = new ArrayList<String>();
-		List<String[]> values = new ArrayList<String[]>();
+		List<String> names = new ArrayList<>();
+		List<String[]> values = new ArrayList<>();
 
 		for (int i = 0; i < itemFields.length; i++) {
 			names.add(itemFields[i].getName());

@@ -24,9 +24,9 @@ import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.search.SpellCheckIndexWriter;
 import com.liferay.portal.search.elasticsearch.connection.ElasticsearchConnectionManager;
+import com.liferay.portal.search.elasticsearch.spi.ElasticsearchUpdateDocumentCommand;
 import com.liferay.portal.search.elasticsearch.util.DocumentTypes;
 import com.liferay.portal.search.elasticsearch.util.LogUtil;
-import com.liferay.portal.util.PortletKeys;
 
 import java.util.Collection;
 import java.util.concurrent.Future;
@@ -121,8 +121,8 @@ public class ElasticsearchSpellCheckIndexWriter
 
 		document.addKeyword(localizedName, keywords);
 
-		document.addKeyword(Field.PORTLET_ID, PortletKeys.SEARCH);
 		document.addKeyword(Field.PRIORITY, String.valueOf(weight));
+		document.addKeyword(Field.SPELL_CHECK_WORD, true);
 		document.addKeyword(Field.UID, getUID(companyId, languageId, keywords));
 
 		return document;

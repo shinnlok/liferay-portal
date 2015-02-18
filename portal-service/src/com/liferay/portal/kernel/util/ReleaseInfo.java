@@ -85,6 +85,10 @@ public class ReleaseInfo {
 
 	public static final int RELEASE_6_2_0_BUILD_NUMBER = 6200;
 
+	public static final int RELEASE_6_2_1_BUILD_NUMBER = 6201;
+
+	public static final int RELEASE_6_2_2_BUILD_NUMBER = 6202;
+
 	public static final int RELEASE_6_2_10_BUILD_NUMBER = 6210;
 
 	public static final int RELEASE_7_0_0_BUILD_NUMBER = 7000;
@@ -146,7 +150,7 @@ public class ReleaseInfo {
 
 	private static final String _CODE_NAME = "Wilberforce";
 
-	private static final String _DATE = "October 15, 2014";
+	private static final String _DATE = "December 17, 2014";
 
 	private static final String _NAME = "Liferay Portal Community Edition";
 
@@ -162,7 +166,7 @@ public class ReleaseInfo {
 
 	private static final String _VERSION = "7.0.0";
 
-	private static final String _VERSION_DISPLAY_NAME = "7.0.0 CE M2";
+	private static final String _VERSION_DISPLAY_NAME = "7.0.0 CE M3";
 
 	private static String _releaseInfo;
 	private static String _serverInfo;

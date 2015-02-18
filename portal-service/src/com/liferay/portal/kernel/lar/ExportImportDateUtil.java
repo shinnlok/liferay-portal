@@ -234,6 +234,12 @@ public class ExportImportDateUtil {
 				return null;
 			}
 
+			// This is a valid scenario in case of group level portlets
+
+			if (portletDataContext.getStartDate() == null) {
+				return portletLastPublishDate;
+			}
+
 			if (portletLastPublishDate.before(
 					portletDataContext.getStartDate())) {
 
@@ -441,6 +447,7 @@ public class ExportImportDateUtil {
 
 	private static final String _LAST_PUBLISH_DATE = "last-publish-date";
 
-	private static Log _log = LogFactoryUtil.getLog(ExportImportDateUtil.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		ExportImportDateUtil.class);
 
 }

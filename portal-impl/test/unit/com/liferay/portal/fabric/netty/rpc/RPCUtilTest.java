@@ -21,9 +21,9 @@ import com.liferay.portal.kernel.concurrent.DefaultNoticeableFuture;
 import com.liferay.portal.kernel.concurrent.NoticeableFuture;
 import com.liferay.portal.kernel.process.ProcessException;
 import com.liferay.portal.kernel.test.CaptureHandler;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 import com.liferay.portal.kernel.util.StringPool;
 
 import io.netty.channel.ChannelHandlerContext;
@@ -154,15 +154,15 @@ public class RPCUtilTest {
 				public NoticeableFuture<String> post(Long key) {
 					keyRef.set(key);
 
-					return new DefaultNoticeableFuture<String>();
+					return new DefaultNoticeableFuture<>();
 				}
 
 			});
 
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			RPCUtil.class.getName(), Level.SEVERE);
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					RPCUtil.class.getName(), Level.SEVERE)) {
 
-		try {
 			RPCUtil.execute(
 				_embeddedChannel, new ResultRPCCallable(StringPool.BLANK));
 
@@ -181,9 +181,6 @@ public class RPCUtilTest {
 
 			Assert.assertSame(
 				ClosedChannelException.class, throwable.getClass());
-		}
-		finally {
-			captureHandler.close();
 		}
 	}
 
@@ -213,7 +210,7 @@ public class RPCUtilTest {
 		@Override
 		public NoticeableFuture<Serializable> call() {
 			DefaultNoticeableFuture<Serializable> defaultNoticeableFuture =
-				new DefaultNoticeableFuture<Serializable>();
+				new DefaultNoticeableFuture<>();
 
 			defaultNoticeableFuture.setException(_throwable);
 
@@ -235,7 +232,7 @@ public class RPCUtilTest {
 		@Override
 		public NoticeableFuture<String> call() {
 			DefaultNoticeableFuture<String> defaultNoticeableFuture =
-				new DefaultNoticeableFuture<String>();
+				new DefaultNoticeableFuture<>();
 
 			defaultNoticeableFuture.set(_result);
 

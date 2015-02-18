@@ -88,6 +88,11 @@ public interface AssetVocabularyService extends BaseService {
 	public void deleteVocabulary(long vocabularyId)
 		throws com.liferay.portal.kernel.exception.PortalException;
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portlet.asset.model.AssetVocabulary fetchVocabulary(
+		long vocabularyId)
+		throws com.liferay.portal.kernel.exception.PortalException;
+
 	/**
 	* Returns the Spring bean ID for this bean.
 	*
@@ -180,7 +185,7 @@ public interface AssetVocabularyService extends BaseService {
 
 	/**
 	* @deprecated As of 7.0.0, replaced by {@link
-	#AssetUtil.filterVocabularyIds(PermissionChecker, long[])}
+	AssetUtil#filterVocabularyIds(PermissionChecker, long[])}
 	*/
 	@java.lang.Deprecated
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)

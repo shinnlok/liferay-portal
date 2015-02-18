@@ -16,6 +16,8 @@ package com.liferay.sync.engine.documentlibrary.event;
 
 import com.liferay.sync.engine.documentlibrary.handler.DownloadFileHandler;
 import com.liferay.sync.engine.documentlibrary.handler.Handler;
+import com.liferay.sync.engine.documentlibrary.util.BatchDownloadEvent;
+import com.liferay.sync.engine.documentlibrary.util.BatchEventManager;
 import com.liferay.sync.engine.model.SyncFile;
 import com.liferay.sync.engine.service.SyncFileService;
 
@@ -48,6 +50,13 @@ public class DownloadFileEvent extends BaseEvent {
 
 		SyncFileService.update(syncFile);
 
+		BatchDownloadEvent batchDownloadEvent =
+			BatchEventManager.getBatchDownloadEvent(getSyncAccountId());
+
+		if (batchDownloadEvent.addEvent(this)) {
+			return;
+		}
+
 		StringBuilder sb = new StringBuilder();
 
 		sb.append(_URL_PATH);
@@ -57,10 +66,10 @@ public class DownloadFileEvent extends BaseEvent {
 		sb.append(syncFile.getTypeUuid());
 
 		if ((Boolean)getParameterValue("patch")) {
-			sb.append("?patch=true&sourceVersion=");
-			sb.append(getParameterValue("sourceVersion"));
-			sb.append("&targetVersion=");
-			sb.append(getParameterValue("targetVersion"));
+			sb.append("?patch=true&sourceVersionId=");
+			sb.append(getParameterValue("sourceVersionId"));
+			sb.append("&targetVersionId=");
+			sb.append(getParameterValue("targetVersionId"));
 		}
 		else {
 			sb.append("?version=");

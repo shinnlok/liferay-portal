@@ -30,6 +30,8 @@ import com.liferay.portal.kernel.xml.SAXReader;
 import com.liferay.portal.kernel.xml.Text;
 import com.liferay.portal.kernel.xml.XMLSchema;
 import com.liferay.portal.kernel.xml.XPath;
+import com.liferay.portal.security.xml.SecureXMLFactoryProvider;
+import com.liferay.portal.security.xml.SecureXMLFactoryProviderImpl;
 import com.liferay.portal.util.ClassLoaderUtil;
 import com.liferay.portal.util.EntityResolver;
 import com.liferay.portal.util.PropsValues;
@@ -47,8 +49,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.xerces.parsers.SAXParser;
-
 import org.dom4j.DocumentFactory;
 
 /**
@@ -57,53 +57,44 @@ import org.dom4j.DocumentFactory;
 @DoPrivileged
 public class SAXReaderImpl implements SAXReader {
 
-	public static SAXReaderImpl getInstance() {
-		return _instance;
-	}
-
 	public static List<Attribute> toNewAttributes(
 		List<org.dom4j.Attribute> oldAttributes) {
 
-		List<Attribute> newAttributes = new ArrayList<Attribute>(
-			oldAttributes.size());
+		List<Attribute> newAttributes = new ArrayList<>(oldAttributes.size());
 
 		for (org.dom4j.Attribute oldAttribute : oldAttributes) {
 			newAttributes.add(new AttributeImpl(oldAttribute));
 		}
 
-		return new NodeList<Attribute, org.dom4j.Attribute>(
-			newAttributes, oldAttributes);
+		return new NodeList<>(newAttributes, oldAttributes);
 	}
 
 	public static List<Element> toNewElements(
 		List<org.dom4j.Element> oldElements) {
 
-		List<Element> newElements = new ArrayList<Element>(oldElements.size());
+		List<Element> newElements = new ArrayList<>(oldElements.size());
 
 		for (org.dom4j.Element oldElement : oldElements) {
 			newElements.add(new ElementImpl(oldElement));
 		}
 
-		return new NodeList<Element, org.dom4j.Element>(
-			newElements, oldElements);
+		return new NodeList<>(newElements, oldElements);
 	}
 
 	public static List<Namespace> toNewNamespaces(
 		List<org.dom4j.Namespace> oldNamespaces) {
 
-		List<Namespace> newNamespaces = new ArrayList<Namespace>(
-			oldNamespaces.size());
+		List<Namespace> newNamespaces = new ArrayList<>(oldNamespaces.size());
 
 		for (org.dom4j.Namespace oldNamespace : oldNamespaces) {
 			newNamespaces.add(new NamespaceImpl(oldNamespace));
 		}
 
-		return new NodeList<Namespace, org.dom4j.Namespace>(
-			newNamespaces, oldNamespaces);
+		return new NodeList<>(newNamespaces, oldNamespaces);
 	}
 
 	public static List<Node> toNewNodes(List<org.dom4j.Node> oldNodes) {
-		List<Node> newNodes = new ArrayList<Node>(oldNodes.size());
+		List<Node> newNodes = new ArrayList<>(oldNodes.size());
 
 		for (org.dom4j.Node oldNode : oldNodes) {
 			if (oldNode instanceof org.dom4j.Element) {
@@ -114,15 +105,14 @@ public class SAXReaderImpl implements SAXReader {
 			}
 		}
 
-		return new NodeList<Node, org.dom4j.Node>(newNodes, oldNodes);
+		return new NodeList<>(newNodes, oldNodes);
 	}
 
 	public static List<ProcessingInstruction> toNewProcessingInstructions(
 		List<org.dom4j.ProcessingInstruction> oldProcessingInstructions) {
 
-		List<ProcessingInstruction> newProcessingInstructions =
-			new ArrayList<ProcessingInstruction>(
-				oldProcessingInstructions.size());
+		List<ProcessingInstruction> newProcessingInstructions = new ArrayList<>(
+			oldProcessingInstructions.size());
 
 		for (org.dom4j.ProcessingInstruction oldProcessingInstruction :
 				oldProcessingInstructions) {
@@ -139,8 +129,8 @@ public class SAXReaderImpl implements SAXReader {
 	public static List<org.dom4j.Attribute> toOldAttributes(
 		List<Attribute> newAttributes) {
 
-		List<org.dom4j.Attribute> oldAttributes =
-			new ArrayList<org.dom4j.Attribute>(newAttributes.size());
+		List<org.dom4j.Attribute> oldAttributes = new ArrayList<>(
+			newAttributes.size());
 
 		for (Attribute newAttribute : newAttributes) {
 			AttributeImpl newAttributeImpl = (AttributeImpl)newAttribute;
@@ -152,8 +142,7 @@ public class SAXReaderImpl implements SAXReader {
 	}
 
 	public static List<org.dom4j.Node> toOldNodes(List<Node> newNodes) {
-		List<org.dom4j.Node> oldNodes = new ArrayList<org.dom4j.Node>(
-			newNodes.size());
+		List<org.dom4j.Node> oldNodes = new ArrayList<>(newNodes.size());
 
 		for (Node newNode : newNodes) {
 			NodeImpl newNodeImpl = (NodeImpl)newNode;
@@ -169,8 +158,7 @@ public class SAXReaderImpl implements SAXReader {
 			List<ProcessingInstruction> newProcessingInstructions) {
 
 		List<org.dom4j.ProcessingInstruction> oldProcessingInstructions =
-			new ArrayList<org.dom4j.ProcessingInstruction>(
-				newProcessingInstructions.size());
+			new ArrayList<>(newProcessingInstructions.size());
 
 		for (ProcessingInstruction newProcessingInstruction :
 				newProcessingInstructions) {
@@ -322,7 +310,7 @@ public class SAXReaderImpl implements SAXReader {
 	public XPath createXPath(
 		String xPathExpression, String prefix, String namespace) {
 
-		Map<String, String> namespaceContextMap = new HashMap<String, String>();
+		Map<String, String> namespaceContextMap = new HashMap<>();
 
 		namespaceContextMap.put(prefix, namespace);
 
@@ -533,6 +521,16 @@ public class SAXReaderImpl implements SAXReader {
 		return toNewNodes(xPath.selectNodes(nodeImpl.getWrappedNode()));
 	}
 
+	public void setSecure(boolean secure) {
+		_secure = secure;
+	}
+
+	public void setSecureXMLFactoryProvider(
+		SecureXMLFactoryProvider secureXMLFactoryProvider) {
+
+		_secureXMLFactoryProvider = secureXMLFactoryProvider;
+	}
+
 	@Override
 	public void sort(List<Node> nodes, String xPathExpression) {
 		org.dom4j.XPath xPath = _documentFactory.createXPath(xPathExpression);
@@ -557,18 +555,21 @@ public class SAXReaderImpl implements SAXReader {
 		}
 
 		try {
-			reader = new org.dom4j.io.SAXReader(new SAXParser(), validate);
+			reader = new org.dom4j.io.SAXReader(
+				_secureXMLFactoryProvider.newXMLReader(), validate);
 
 			reader.setEntityResolver(new EntityResolver());
-
 			reader.setFeature(_FEATURES_DYNAMIC, validate);
-			reader.setFeature(_FEATURES_EXTERNAL_GENERAL_ENTITIES, validate);
-			reader.setFeature(_FEATURES_LOAD_DTD_GRAMMAR, validate);
-			reader.setFeature(_FEATURES_LOAD_EXTERNAL_DTD, validate);
 			reader.setFeature(_FEATURES_VALIDATION, validate);
 			reader.setFeature(_FEATURES_VALIDATION_SCHEMA, validate);
 			reader.setFeature(
 				_FEATURES_VALIDATION_SCHEMA_FULL_CHECKING, validate);
+
+			if (!_secure) {
+				reader.setFeature(_FEATURES_DISALLOW_DOCTYPE_DECL, false);
+				reader.setFeature(_FEATURES_LOAD_DTD_GRAMMAR, validate);
+				reader.setFeature(_FEATURES_LOAD_EXTERNAL_DTD, validate);
+			}
 		}
 		catch (Exception e) {
 			if (_log.isWarnEnabled()) {
@@ -576,7 +577,8 @@ public class SAXReaderImpl implements SAXReader {
 					"XSD validation is disabled because " + e.getMessage());
 			}
 
-			reader = new org.dom4j.io.SAXReader(false);
+			reader = new org.dom4j.io.SAXReader(
+				_secureXMLFactoryProvider.newXMLReader(), false);
 
 			reader.setEntityResolver(new EntityResolver());
 		}
@@ -613,11 +615,11 @@ public class SAXReaderImpl implements SAXReader {
 		return saxReader;
 	}
 
+	private static final String _FEATURES_DISALLOW_DOCTYPE_DECL =
+		"http://apache.org/xml/features/disallow-doctype-decl";
+
 	private static final String _FEATURES_DYNAMIC =
 		"http://apache.org/xml/features/validation/dynamic";
-
-	private static final String _FEATURES_EXTERNAL_GENERAL_ENTITIES =
-		"http://xml.org/sax/features/external-general-entities";
 
 	private static final String _FEATURES_LOAD_DTD_GRAMMAR =
 		"http://apache.org/xml/features/nonvalidating/load-dtd-grammar";
@@ -642,9 +644,10 @@ public class SAXReaderImpl implements SAXReader {
 
 	private static final Log _log = LogFactoryUtil.getLog(SAXReaderImpl.class);
 
-	private static final SAXReaderImpl _instance = new SAXReaderImpl();
-
 	private final DocumentFactory _documentFactory =
 		DocumentFactory.getInstance();
+	private boolean _secure;
+	private SecureXMLFactoryProvider _secureXMLFactoryProvider =
+		new SecureXMLFactoryProviderImpl();
 
 }

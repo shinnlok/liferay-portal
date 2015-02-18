@@ -9,11 +9,11 @@ AUI.add(
 
 		var STATUS_CODE = Liferay.STATUS_CODE;
 
+		var STRINGS = 'strings';
+
 		var STR_BLANK = '';
 
 		var STR_PARAM_FALLBACK = 'uploader=fallback';
-
-		var STRINGS = 'strings';
 
 		var TPL_ERROR_MESSAGE = '<div class="alert alert-danger">{0}</div>';
 
@@ -66,7 +66,7 @@ AUI.add(
 				'</tpl>',
 				'<tpl if="values.warningMessages && (values.warningMessages.length > 0)">',
 					'<li class="alert upload-error" data-fileId="{id}" id="{id}">',
-						'<span class="error-message" title="{[ LString.escapeHTML(values.error) ]}">{[ values.error ? this.strings.warningFailureText : this.strings.warningText ]}</span>',
+						'<span class="error-message" title="{[ LString.escapeHTML(values.error ? this.strings.warningFailureText : this.strings.warningText) ]}">{[ values.error ? this.strings.warningFailureText : this.strings.warningText ]}</span>',
 						'<ul class="error-list-items">',
 							'<tpl for="warningMessages">',
 								'<li>{[ LString.escapeHTML(values.type) ]} <strong>({size})</strong>:',
@@ -183,8 +183,8 @@ AUI.add(
 							cancelUploadsText: Liferay.Language.get('cancel-all-uploads'),
 							clearRecentUploadsText: Liferay.Language.get('clear-documents-already-saved'),
 							deleteFileText: Liferay.Language.get('delete-file'),
-							dropFileText: Liferay.Language.get('drop-file-here-to-upload'),
 							dropFilesText: Liferay.Language.get('drop-files-here-to-upload'),
+							dropFileText: Liferay.Language.get('drop-file-here-to-upload'),
 							fileCannotBeSavedText: Liferay.Language.get('the-file-x-cannot-be-saved'),
 							invalidFileNameText: Liferay.Language.get('please-enter-a-file-with-a-valid-file-name'),
 							invalidFileSizeText: Liferay.Language.get('please-enter-a-file-with-a-valid-file-size-no-larger-than-x'),
@@ -192,8 +192,8 @@ AUI.add(
 							notAvailableText: Liferay.Language.get('multiple-file-uploading-is-not-available'),
 							orText: Liferay.Language.get('or'),
 							pendingFileText: Liferay.Language.get('these-files-have-been-previously-uploaded-but-not-actually-saved.-please-save-or-delete-them-before-they-are-removed'),
-							selectFileText: Liferay.Language.get('select-file'),
 							selectFilesText: Liferay.Language.get('select-files'),
+							selectFileText: Liferay.Language.get('select-file'),
 							unexpectedErrorOnDeleteText: Liferay.Language.get('an-unexpected-error-occurred-while-deleting-the-file'),
 							unexpectedErrorOnUploadText: Liferay.Language.get('an-unexpected-error-occurred-while-uploading-your-file'),
 							uploadingFileXofXText: Liferay.Language.get('uploading-file-x-of-x'),
@@ -783,7 +783,7 @@ AUI.add(
 						try {
 							data = A.JSON.parse(data);
 						}
-						catch (err) {
+						catch (e) {
 						}
 
 						if (data.status && (data.status >= STATUS_CODE.SC_DUPLICATE_FILE_EXCEPTION && data.status < STATUS_CODE.INTERNAL_SERVER_ERROR)) {

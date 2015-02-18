@@ -148,10 +148,6 @@ public class SyncFile extends StateAwareModel {
 		return extraSettings;
 	}
 
-	public String getFileKey() {
-		return fileKey;
-	}
-
 	public String getFilePathName() {
 		return filePathName;
 	}
@@ -220,6 +216,10 @@ public class SyncFile extends StateAwareModel {
 		return version;
 	}
 
+	public long getVersionId() {
+		return versionId;
+	}
+
 	@Override
 	public int hashCode() {
 		return (int)(syncFileId ^ (syncFileId >>> 32));
@@ -267,10 +267,6 @@ public class SyncFile extends StateAwareModel {
 
 	public void setExtraSettings(String extraSettings) {
 		this.extraSettings = extraSettings;
-	}
-
-	public void setFileKey(String fileKey) {
-		this.fileKey = fileKey;
 	}
 
 	public void setFilePathName(String filePathName) {
@@ -341,6 +337,10 @@ public class SyncFile extends StateAwareModel {
 		this.version = version;
 	}
 
+	public void setVersionId(long versionId) {
+		this.versionId = versionId;
+	}
+
 	@DatabaseField(defaultValue = "", useGetSet = true)
 	protected String changeLog;
 
@@ -364,9 +364,6 @@ public class SyncFile extends StateAwareModel {
 
 	@DatabaseField(useGetSet = true, width = 16777216)
 	protected String extraSettings;
-
-	@DatabaseField(uniqueIndex = true, useGetSet = true)
-	protected String fileKey;
 
 	@DatabaseField(uniqueIndex = true, useGetSet = true, width = 16777216)
 	protected String filePathName;
@@ -418,5 +415,8 @@ public class SyncFile extends StateAwareModel {
 
 	@DatabaseField(useGetSet = true)
 	protected String version;
+
+	@DatabaseField(useGetSet = true)
+	protected long versionId;
 
 }

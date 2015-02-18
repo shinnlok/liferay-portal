@@ -142,7 +142,9 @@ private String _checkViewURL(ThemeDisplay themeDisplay, String viewURL, String c
 	return viewURL;
 }
 
-private PortletURL _getViewFullContentURL(HttpServletRequest request, ThemeDisplay themeDisplay, String portletId, Document document) throws Exception {
+private PortletURL _getViewFullContentURL(HttpServletRequest request, ThemeDisplay themeDisplay, String className, Document document) throws Exception {
+	String portletId = PortletProviderUtil.getPortletId(className, PortletProvider.Action.VIEW);
+
 	long groupId = GetterUtil.getLong(document.get(Field.GROUP_ID));
 
 	if (groupId == 0) {

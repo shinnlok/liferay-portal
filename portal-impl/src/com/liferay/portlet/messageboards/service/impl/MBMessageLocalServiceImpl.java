@@ -883,17 +883,6 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 			int status)
 		throws PortalException {
 
-		return getDiscussionMessageDisplay(
-			userId, groupId, className, classPK, status,
-			MBThreadConstants.THREAD_VIEW_COMBINATION);
-	}
-
-	@Override
-	public MBMessageDisplay getDiscussionMessageDisplay(
-			long userId, long groupId, String className, long classPK,
-			int status, String threadView)
-		throws PortalException {
-
 		long classNameId = classNameLocalService.getClassNameId(className);
 
 		MBMessage message = null;
@@ -902,11 +891,9 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 			classNameId, classPK);
 
 		if (discussion != null) {
-			List<MBMessage> messages = mbMessagePersistence.findByT_P(
+			message = mbMessagePersistence.findByT_P_First(
 				discussion.getThreadId(),
-				MBMessageConstants.DEFAULT_PARENT_MESSAGE_ID);
-
-			message = messages.get(0);
+				MBMessageConstants.DEFAULT_PARENT_MESSAGE_ID, null);
 		}
 		else {
 			boolean workflowEnabled = WorkflowThreadLocal.isEnabled();
@@ -929,21 +916,36 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 							MBMessageConstants.DEFAULT_PARENT_MESSAGE_ID + "}");
 				}
 
-				List<MBMessage> messages = mbMessagePersistence.findByT_P(
-					0, MBMessageConstants.DEFAULT_PARENT_MESSAGE_ID);
+				message = mbMessagePersistence.fetchByT_P_First(
+					0, MBMessageConstants.DEFAULT_PARENT_MESSAGE_ID, null);
 
-				if (messages.isEmpty()) {
+				if (message == null) {
 					throw se;
 				}
-
-				message = messages.get(0);
 			}
 			finally {
 				WorkflowThreadLocal.setEnabled(workflowEnabled);
 			}
 		}
 
-		return getMessageDisplay(userId, message, status, threadView, false);
+		return getMessageDisplay(
+			userId, message, status, MBThreadConstants.THREAD_VIEW_COMBINATION,
+			false);
+	}
+
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             #getDiscussionMessageDisplay(long, long, String, long, int)}
+	 */
+	@Deprecated
+	@Override
+	public MBMessageDisplay getDiscussionMessageDisplay(
+			long userId, long groupId, String className, long classPK,
+			int status, String threadView)
+		throws PortalException {
+
+		return getDiscussionMessageDisplay(
+			userId, groupId, className, classPK, status);
 	}
 
 	@Override
@@ -1438,7 +1440,7 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 
 		List<ObjectValuePair<String, InputStream>> inputStreamOVPs =
 			Collections.emptyList();
-		List<String> existingFiles = new ArrayList<String>();
+		List<String> existingFiles = new ArrayList<>();
 		double priority = 0.0;
 		boolean allowPingbacks = false;
 
@@ -1556,6 +1558,9 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 					moveMessageAttachmentToTrash(
 						userId, messageId, fileEntry.getTitle());
 				}
+			}
+			else {
+				deleteMessageAttachments(message.getMessageId());
 			}
 		}
 
@@ -1767,7 +1772,7 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 			// Subscriptions
 
 			notifySubscribers(
-				(MBMessage)message.clone(),
+				userId, (MBMessage)message.clone(),
 				(String)workflowContext.get(WorkflowConstants.CONTEXT_URL),
 				serviceContext);
 
@@ -1905,7 +1910,8 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 	}
 
 	protected void notifyDiscussionSubscribers(
-			MBMessage message, ServiceContext serviceContext)
+			long contextUserId, MBMessage message,
+			ServiceContext serviceContext)
 		throws PortalException {
 
 		if (!PrefsPropsUtil.getBoolean(
@@ -1951,6 +1957,7 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 		subscriptionSender.setContextAttributes(
 			"[$COMMENTS_USER_ADDRESS$]", userAddress, "[$COMMENTS_USER_NAME$]",
 			userName, "[$CONTENT_URL$]", contentURL);
+		subscriptionSender.setContextUserId(contextUserId);
 		subscriptionSender.setEntryTitle(message.getBody());
 		subscriptionSender.setEntryURL(contentURL);
 		subscriptionSender.setFrom(fromAddress, fromName);
@@ -1988,7 +1995,8 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 	}
 
 	protected void notifySubscribers(
-			MBMessage message, String messageURL, ServiceContext serviceContext)
+			long contextUserId, MBMessage message, String messageURL,
+			ServiceContext serviceContext)
 		throws PortalException {
 
 		if (!message.isApproved() || Validator.isNull(messageURL)) {
@@ -1997,7 +2005,8 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 
 		if (message.isDiscussion()) {
 			try {
-				notifyDiscussionSubscribers(message, serviceContext);
+				notifyDiscussionSubscribers(
+					contextUserId, message, serviceContext);
 			}
 			catch (Exception e) {
 				_log.error(e, e);
@@ -2045,7 +2054,7 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 			categoryName += " - " + group.getDescriptiveName();
 		}
 
-		List<Long> categoryIds = new ArrayList<Long>();
+		List<Long> categoryIds = new ArrayList<>();
 
 		categoryIds.add(message.getCategoryId());
 
@@ -2176,6 +2185,7 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 			(SubscriptionSender)SerializableUtil.clone(
 				subscriptionSenderPrototype);
 
+		subscriptionSender.setContextUserId(contextUserId);
 		subscriptionSender.addPersistedSubscribers(
 			MBCategory.class.getName(), message.getGroupId());
 
@@ -2248,8 +2258,7 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 			long userId, MBMessage message, ServiceContext serviceContext)
 		throws PortalException {
 
-		Map<String, Serializable> workflowContext =
-			new HashMap<String, Serializable>();
+		Map<String, Serializable> workflowContext = new HashMap<>();
 
 		workflowContext.put(
 			WorkflowConstants.CONTEXT_URL,
@@ -2393,7 +2402,7 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		MBMessageLocalServiceImpl.class);
 
 }

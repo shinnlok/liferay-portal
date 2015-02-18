@@ -35,6 +35,16 @@ public class SyncWatchEventPersistence
 		super(SyncWatchEvent.class);
 	}
 
+	public long countBySyncAccountId(long syncAccountId) throws SQLException {
+		QueryBuilder<SyncWatchEvent, Long> queryBuilder = queryBuilder();
+
+		Where<SyncWatchEvent, Long> where = queryBuilder.where();
+
+		where.eq("syncAccountId", syncAccountId);
+
+		return where.countOf();
+	}
+
 	public void deleteBySyncAccountId(long syncAccountId) throws SQLException {
 		DeleteBuilder<SyncWatchEvent, Long> deleteBuilder = deleteBuilder();
 
@@ -54,14 +64,31 @@ public class SyncWatchEventPersistence
 		Where<SyncWatchEvent, Long> where = queryBuilder.where();
 
 		where.eq("eventType", eventType);
-
-		where.and();
-
 		where.eq("filePathName", new SelectArg(filePathName));
-
-		where.and();
-
 		where.between("timestamp", timestamp - 1000, timestamp + 1000);
+
+		where.and(3);
+
+		List<SyncWatchEvent> syncWatchEvents = query(queryBuilder.prepare());
+
+		if ((syncWatchEvents == null) || syncWatchEvents.isEmpty()) {
+			return null;
+		}
+
+		return syncWatchEvents.get(0);
+	}
+
+	public SyncWatchEvent fetchBySyncAccountId_Last(long syncAccountId)
+		throws SQLException {
+
+		QueryBuilder<SyncWatchEvent, Long> queryBuilder = queryBuilder();
+
+		Where<SyncWatchEvent, Long> where = queryBuilder.where();
+
+		where.eq("syncAccountId", syncAccountId);
+
+		queryBuilder.limit(1L);
+		queryBuilder.orderBy("timestamp", false);
 
 		List<SyncWatchEvent> syncWatchEvents = query(queryBuilder.prepare());
 
@@ -86,27 +113,6 @@ public class SyncWatchEventPersistence
 		queryBuilder.orderBy(orderByColumn, ascending);
 
 		return query(queryBuilder.prepare());
-	}
-
-	public SyncWatchEvent findBySyncAccountId_Last(long syncAccountId)
-		throws SQLException {
-
-		QueryBuilder<SyncWatchEvent, Long> queryBuilder = queryBuilder();
-
-		Where<SyncWatchEvent, Long> where = queryBuilder.where();
-
-		where.eq("syncAccountId", syncAccountId);
-
-		queryBuilder.limit(1L);
-		queryBuilder.orderBy("timestamp", false);
-
-		List<SyncWatchEvent> syncWatchEvents = query(queryBuilder.prepare());
-
-		if ((syncWatchEvents == null) || syncWatchEvents.isEmpty()) {
-			return null;
-		}
-
-		return syncWatchEvents.get(0);
 	}
 
 }

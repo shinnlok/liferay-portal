@@ -57,7 +57,6 @@ import java.util.List;
 import javax.portlet.PortletPreferences;
 
 /**
- * <p>
  * Provides the Journal portlet export and import functionality, which is to
  * clone all articles, structures, and templates associated with the layout's
  * group. Upon import, new instances of the corresponding articles, structures,
@@ -66,13 +65,18 @@ import javax.portlet.PortletPreferences;
  * JournalCreationStrategy class defined in <i>portal.properties</i>. That
  * strategy also allows the text of the journal article to be modified prior to
  * import.
- * </p>
  *
  * <p>
  * This <code>PortletDataHandler</code> differs from
  * <code>JournalContentPortletDataHandlerImpl</code> in that it exports all
  * articles owned by the group whether or not they are actually displayed in a
  * portlet in the layout set.
+ * </p>
+ *
+ * <p>
+ * For a better understanding of this class, see
+ * <code>com.liferay.journal.content.web.lar.JournalContentPortletDataHandler</code>
+ * located in Liferay Portal's external <code>modules</code> directory.
  * </p>
  *
  * @author Raymond Augé
@@ -85,7 +89,6 @@ import javax.portlet.PortletPreferences;
  * @author Daniel Kocsis
  * @author László Csontos
  * @see    com.liferay.portal.kernel.lar.PortletDataHandler
- * @see    com.liferay.portlet.journal.lar.JournalContentPortletDataHandler
  * @see    com.liferay.portlet.journal.lar.JournalCreationStrategy
  */
 public class JournalPortletDataHandler extends BasePortletDataHandler {
@@ -179,7 +182,7 @@ public class JournalPortletDataHandler extends BasePortletDataHandler {
 		}
 
 		if (portletDataContext.getBooleanParameter(NAMESPACE, "structures")) {
-			List<DDMTemplate> ddmTemplates = new ArrayList<DDMTemplate>();
+			List<DDMTemplate> ddmTemplates = new ArrayList<>();
 
 			ActionableDynamicQuery ddmStructureActionableDynamicQuery =
 				getDDMStructureActionableDynamicQuery(
@@ -187,19 +190,18 @@ public class JournalPortletDataHandler extends BasePortletDataHandler {
 
 			ddmStructureActionableDynamicQuery.performActions();
 
+			ActionableDynamicQuery ddmTemplateActionableDynamicQuery =
+				getDDMTemplateActionableDynamicQuery(
+					portletDataContext, ddmTemplates, true);
+
+			ddmTemplateActionableDynamicQuery.performActions();
+
 			// Export templates that belong to structures
 
 			for (DDMTemplate ddmTemplate : ddmTemplates) {
 				StagedModelDataHandlerUtil.exportStagedModel(
 					portletDataContext, ddmTemplate);
 			}
-
-			// Export templates that do not belong to structures
-
-			ActionableDynamicQuery ddmTemplateActionableDynamicQuery =
-				getDDMTemplateActionableDynamicQuery(portletDataContext);
-
-			ddmTemplateActionableDynamicQuery.performActions();
 		}
 
 		if (portletDataContext.getBooleanParameter(NAMESPACE, "web-content")) {
@@ -301,7 +303,7 @@ public class JournalPortletDataHandler extends BasePortletDataHandler {
 
 		articleActionableDynamicQuery.performCount();
 
-		List<DDMTemplate> ddmTemplates = new ArrayList<DDMTemplate>();
+		List<DDMTemplate> ddmTemplates = new ArrayList<>();
 
 		ActionableDynamicQuery ddmStructureActionableDynamicQuery =
 			getDDMStructureActionableDynamicQuery(
@@ -315,7 +317,10 @@ public class JournalPortletDataHandler extends BasePortletDataHandler {
 			portletDataContext.getManifestSummary();
 
 		ActionableDynamicQuery ddmTemplateActionableDynamicQuery =
-			getDDMTemplateActionableDynamicQuery(portletDataContext);
+			getDDMTemplateActionableDynamicQuery(
+				portletDataContext, ddmTemplates, false);
+
+		ddmTemplateActionableDynamicQuery.performActions();
 
 		manifestSummary.addModelAdditionCount(
 			new StagedModelType(DDMTemplate.class, DDMStructure.class),
@@ -452,7 +457,8 @@ public class JournalPortletDataHandler extends BasePortletDataHandler {
 	}
 
 	protected ActionableDynamicQuery getDDMTemplateActionableDynamicQuery(
-		final PortletDataContext portletDataContext) {
+		final PortletDataContext portletDataContext,
+		final List<DDMTemplate> ddmTemplates, final boolean export) {
 
 		ExportActionableDynamicQuery exportActionableDynamicQuery =
 			DDMTemplateLocalServiceUtil.getExportActionableDynamicQuery(
@@ -475,11 +481,39 @@ public class JournalPortletDataHandler extends BasePortletDataHandler {
 						DDMStructure.class);
 
 					dynamicQuery.add(classNameIdProperty.eq(classNameId));
+				}
 
-					Property classPKProperty = PropertyFactoryUtil.forName(
-						"classPK");
+			});
+		exportActionableDynamicQuery.setPerformActionMethod(
+			new ActionableDynamicQuery.PerformActionMethod() {
 
-					dynamicQuery.add(classPKProperty.eq(-1L));
+				@Override
+				public void performAction(Object object)
+					throws PortalException {
+
+					DDMTemplate ddmTemplate = (DDMTemplate)object;
+
+					if (ddmTemplate.getClassPK() != 0) {
+						DDMStructure ddmStructure =
+							DDMStructureLocalServiceUtil.fetchDDMStructure(
+								ddmTemplate.getClassPK());
+
+						long classNameId = PortalUtil.getClassNameId(
+							JournalArticle.class);
+
+						if ((ddmStructure != null) &&
+							(ddmStructure.getClassNameId() != classNameId)) {
+
+							return;
+						}
+					}
+
+					if (export) {
+						StagedModelDataHandlerUtil.exportStagedModel(
+							portletDataContext, ddmTemplate);
+					}
+
+					ddmTemplates.remove(ddmTemplate);
 				}
 
 			});

@@ -41,7 +41,6 @@ import com.liferay.portal.service.ServiceContextFactory;
 import com.liferay.portal.struts.PortletAction;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.WebKeys;
-import com.liferay.portlet.assetpublisher.util.AssetPublisherUtil;
 import com.liferay.portlet.documentlibrary.DuplicateFileException;
 import com.liferay.portlet.documentlibrary.DuplicateFolderNameException;
 import com.liferay.portlet.documentlibrary.FolderNameException;
@@ -209,7 +208,7 @@ public class EditFolderAction extends PortletAction {
 				ParamUtil.getString(actionRequest, "folderIds"), 0L);
 		}
 
-		List<TrashedModel> trashedModels = new ArrayList<TrashedModel>();
+		List<TrashedModel> trashedModels = new ArrayList<>();
 
 		for (long deleteFolderId : deleteFolderIds) {
 			if (moveToTrash) {
@@ -223,9 +222,6 @@ public class EditFolderAction extends PortletAction {
 			else {
 				DLAppServiceUtil.deleteFolder(deleteFolderId);
 			}
-
-			AssetPublisherUtil.removeRecentFolderId(
-				actionRequest, DLFileEntry.class.getName(), deleteFolderId);
 		}
 
 		if (moveToTrash && (deleteFolderIds.length > 0)) {

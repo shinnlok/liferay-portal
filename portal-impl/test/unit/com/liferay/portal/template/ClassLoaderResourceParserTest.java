@@ -16,8 +16,8 @@ package com.liferay.portal.template;
 
 import com.liferay.portal.kernel.template.TemplateConstants;
 import com.liferay.portal.kernel.test.CaptureHandler;
-import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -59,10 +59,10 @@ public class ClassLoaderResourceParserTest {
 
 		Assert.assertNull(classLoaderResourceParser.getURL(templateId));
 
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			ClassLoaderResourceParser.class.getName(), Level.FINEST);
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					ClassLoaderResourceParser.class.getName(), Level.FINEST)) {
 
-		try {
 			Assert.assertNull(classLoaderResourceParser.getURL(templateId));
 
 			List<LogRecord> logRecords = captureHandler.getLogRecords();
@@ -73,9 +73,6 @@ public class ClassLoaderResourceParserTest {
 
 			Assert.assertEquals(
 				"Loading " + templateId, logRecord.getMessage());
-		}
-		finally {
-			captureHandler.close();
 		}
 	}
 

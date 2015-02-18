@@ -59,6 +59,8 @@ import com.liferay.portal.model.LayoutStagingHandler;
 import com.liferay.portal.model.LayoutTemplate;
 import com.liferay.portal.model.LayoutTypePortlet;
 import com.liferay.portal.model.LayoutTypePortletConstants;
+import com.liferay.portal.model.adapter.StagedTheme;
+import com.liferay.portal.model.adapter.impl.StagedThemeImpl;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.ImageLocalServiceUtil;
 import com.liferay.portal.service.LayoutFriendlyURLLocalServiceUtil;
@@ -143,7 +145,7 @@ public class LayoutStagedModelDataHandler
 	public Map<String, String> getReferenceAttributes(
 		PortletDataContext portletDataContext, Layout layout) {
 
-		Map<String, String> referenceAttributes = new HashMap<String, String>();
+		Map<String, String> referenceAttributes = new HashMap<>();
 
 		referenceAttributes.put(
 			"private-layout", String.valueOf(layout.isPrivateLayout()));
@@ -1331,10 +1333,10 @@ public class LayoutStagedModelDataHandler
 	private static final String _SAME_GROUP_FRIENDLY_URL =
 		"/[$SAME_GROUP_FRIENDLY_URL$]";
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		LayoutStagedModelDataHandler.class);
 
-	private LayoutLocalServiceHelper _layoutLocalServiceHelper =
+	private final LayoutLocalServiceHelper _layoutLocalServiceHelper =
 		(LayoutLocalServiceHelper)PortalBeanLocatorUtil.locate(
 			LayoutLocalServiceHelper.class.getName());
 

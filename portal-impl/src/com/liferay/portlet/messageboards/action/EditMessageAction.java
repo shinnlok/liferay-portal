@@ -383,8 +383,7 @@ public class EditMessageAction extends PortletAction {
 				}
 
 				ObjectValuePair<String, InputStream> inputStreamOVP =
-					new ObjectValuePair<String, InputStream>(
-						fileName, inputStream);
+					new ObjectValuePair<>(fileName, inputStream);
 
 				inputStreamOVPs.add(inputStreamOVP);
 			}
@@ -437,7 +436,7 @@ public class EditMessageAction extends PortletAction {
 				}
 			}
 			else {
-				List<String> existingFiles = new ArrayList<String>();
+				List<String> existingFiles = new ArrayList<>();
 
 				for (int i = 1; i <= 5; i++) {
 					String path = ParamUtil.getString(

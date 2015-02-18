@@ -209,7 +209,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		Map<Locale, String> friendlyURLMap = new HashMap<Locale, String>();
+		Map<Locale, String> friendlyURLMap = new HashMap<>();
 
 		friendlyURLMap.put(LocaleUtil.getSiteDefault(), friendlyURL);
 
@@ -371,6 +371,14 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 
 		layoutPersistence.update(layout);
 
+		// Layout friendly URLs
+
+		layoutFriendlyURLLocalService.updateLayoutFriendlyURLs(
+			user.getUserId(), user.getCompanyId(), groupId, plid, privateLayout,
+			friendlyURLMap, serviceContext);
+
+		// Layout prototype
+
 		if (Validator.isNotNull(layoutPrototypeUuid) &&
 			!layoutPrototypeLinkEnabled) {
 
@@ -408,6 +416,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 
 		if (!privateLayout ||
 			type.equals(LayoutConstants.TYPE_CONTROL_PANEL) ||
+			type.equals(LayoutConstants.TYPE_USER_PERSONAL_PANEL) ||
 			group.isLayoutSetPrototype()) {
 
 			addGuestPermissions = true;
@@ -421,12 +430,6 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		// Group
 
 		groupLocalService.updateSite(groupId, true);
-
-		// Layout friendly URLs
-
-		layoutFriendlyURLLocalService.updateLayoutFriendlyURLs(
-			user.getUserId(), user.getCompanyId(), groupId, plid, privateLayout,
-			friendlyURLMap, serviceContext);
 
 		// Layout set
 
@@ -519,19 +522,19 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 
 		Locale locale = LocaleUtil.getSiteDefault();
 
-		Map<Locale, String> nameMap = new HashMap<Locale, String>();
+		Map<Locale, String> nameMap = new HashMap<>();
 
 		nameMap.put(locale, name);
 
-		Map<Locale, String> titleMap = new HashMap<Locale, String>();
+		Map<Locale, String> titleMap = new HashMap<>();
 
 		titleMap.put(locale, title);
 
-		Map<Locale, String> descriptionMap = new HashMap<Locale, String>();
+		Map<Locale, String> descriptionMap = new HashMap<>();
 
 		descriptionMap.put(locale, description);
 
-		Map<Locale, String> friendlyURLMap = new HashMap<Locale, String>();
+		Map<Locale, String> friendlyURLMap = new HashMap<>();
 
 		friendlyURLMap.put(LocaleUtil.getSiteDefault(), friendlyURL);
 
@@ -554,7 +557,8 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 	@Override
 	@SystemEvent(
 		action = SystemEventConstants.ACTION_SKIP,
-		type = SystemEventConstants.TYPE_DELETE)
+		type = SystemEventConstants.TYPE_DELETE
+	)
 	public void deleteLayout(
 			Layout layout, boolean updateLayoutSet,
 			ServiceContext serviceContext)
@@ -907,8 +911,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 			throw new LARFileNameException(exportImportConfiguration.getName());
 		}
 
-		Map<String, Serializable> taskContextMap =
-			new HashMap<String, Serializable>();
+		Map<String, Serializable> taskContextMap = new HashMap<>();
 
 		taskContextMap.put(Constants.CMD, Constants.EXPORT);
 		taskContextMap.put(
@@ -1431,7 +1434,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 			long groupId, boolean privateLayout, long[] layoutIds)
 		throws PortalException {
 
-		List<Layout> layouts = new ArrayList<Layout>();
+		List<Layout> layouts = new ArrayList<>();
 
 		for (long layoutId : layoutIds) {
 			Layout layout = getLayout(groupId, privateLayout, layoutId);
@@ -2205,13 +2208,13 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 			}
 		}
 
-		Set<Long> layoutIdsSet = new LinkedHashSet<Long>();
+		Set<Long> layoutIdsSet = new LinkedHashSet<>();
 
 		for (long layoutId : layoutIds) {
 			layoutIdsSet.add(layoutId);
 		}
 
-		Set<Long> newLayoutIdsSet = new HashSet<Long>();
+		Set<Long> newLayoutIdsSet = new HashSet<>();
 
 		List<Layout> layouts = layoutPersistence.findByG_P_P(
 			groupId, privateLayout, parentLayoutId);
@@ -2535,7 +2538,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 	 *             exception occurred
 	 * @deprecated As of 6.2.0, replaced by {@link #updateLayout(long, boolean,
 	 *             long, long, Map, Map, Map, Map, Map, String, boolean, Map,
-	 *             Boolean, byte[], ServiceContext)}
+	 *             boolean, byte[], ServiceContext)}
 	 */
 	@Deprecated
 	@Override
@@ -2548,7 +2551,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 			byte[] iconBytes, ServiceContext serviceContext)
 		throws PortalException {
 
-		Map<Locale, String> friendlyURLMap = new HashMap<Locale, String>();
+		Map<Locale, String> friendlyURLMap = new HashMap<>();
 
 		friendlyURLMap.put(LocaleUtil.getSiteDefault(), friendlyURL);
 
@@ -2915,9 +2918,13 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		layouts = ListUtil.sort(
 			layouts, new LayoutPriorityComparator(layout, lessThan));
 
-		Layout firstLayout = layouts.get(0);
+		if (layout.getParentLayoutId() ==
+				LayoutConstants.DEFAULT_PARENT_LAYOUT_ID) {
 
-		layoutLocalServiceHelper.validateFirstLayout(firstLayout);
+			Layout firstLayout = layouts.get(0);
+
+			layoutLocalServiceHelper.validateFirstLayout(firstLayout);
+		}
 
 		int newPriority = LayoutConstants.FIRST_PRIORITY;
 

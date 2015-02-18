@@ -26,7 +26,6 @@ import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.search.SuggestionConstants;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.util.PortletKeys;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -129,12 +128,12 @@ public class LuceneSpellCheckIndexWriter extends BaseSpellCheckIndexWriter {
 			languageId, Field.Store.YES, FieldInfo.IndexOptions.DOCS_ONLY,
 			true);
 		addField(
-			document, com.liferay.portal.kernel.search.Field.PORTLET_ID,
-			PortletKeys.SEARCH, Field.Store.YES,
-			FieldInfo.IndexOptions.DOCS_ONLY, true);
-		addField(
 			document, com.liferay.portal.kernel.search.Field.PRIORITY,
 			String.valueOf(weight), Field.Store.YES,
+			FieldInfo.IndexOptions.DOCS_ONLY, true);
+		addField(
+			document, com.liferay.portal.kernel.search.Field.SPELL_CHECK_WORD,
+			Boolean.TRUE.toString(), Field.Store.YES,
 			FieldInfo.IndexOptions.DOCS_ONLY, true);
 		addField(
 			document, com.liferay.portal.kernel.search.Field.TYPE,
@@ -183,7 +182,7 @@ public class LuceneSpellCheckIndexWriter extends BaseSpellCheckIndexWriter {
 		IndexSearcher indexSearcher = null;
 
 		try {
-			List<IndexReader> indexReaders = new ArrayList<IndexReader>();
+			List<IndexReader> indexReaders = new ArrayList<>();
 
 			indexSearcher = LuceneHelperUtil.getIndexSearcher(
 				searchContext.getCompanyId());
@@ -246,14 +245,14 @@ public class LuceneSpellCheckIndexWriter extends BaseSpellCheckIndexWriter {
 			indexSearcher = LuceneHelperUtil.getIndexSearcher(
 				searchContext.getCompanyId());
 
-			List<IndexReader> indexReaders = new ArrayList<IndexReader>();
+			List<IndexReader> indexReaders = new ArrayList<>();
 
 			if (indexSearcher.maxDoc() > 0) {
 				ReaderUtil.gatherSubReaders(
 					indexReaders, indexSearcher.getIndexReader());
 			}
 
-			Collection<Document> documents = new ArrayList<Document>();
+			Collection<Document> documents = new ArrayList<>();
 
 			DictionaryReader dictionaryReader = new DictionaryReader(
 				inputStream, StringPool.UTF8);

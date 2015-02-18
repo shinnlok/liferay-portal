@@ -76,6 +76,8 @@ import com.liferay.portal.lar.backgroundtask.BackgroundTaskContextMapFactory;
 import com.liferay.portal.lar.backgroundtask.LayoutRemoteStagingBackgroundTaskExecutor;
 import com.liferay.portal.lar.backgroundtask.LayoutStagingBackgroundTaskExecutor;
 import com.liferay.portal.lar.backgroundtask.PortletStagingBackgroundTaskExecutor;
+import com.liferay.portal.model.ClassName;
+import com.liferay.portal.model.Company;
 import com.liferay.portal.model.ExportImportConfiguration;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.GroupConstants;
@@ -87,6 +89,7 @@ import com.liferay.portal.model.Portlet;
 import com.liferay.portal.model.StagedModel;
 import com.liferay.portal.model.User;
 import com.liferay.portal.model.WorkflowInstanceLink;
+import com.liferay.portal.model.adapter.StagedTheme;
 import com.liferay.portal.security.auth.HttpPrincipal;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.security.auth.RemoteAuthException;
@@ -107,11 +110,11 @@ import com.liferay.portal.service.ServiceContextThreadLocal;
 import com.liferay.portal.service.StagingLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.service.WorkflowInstanceLinkLocalServiceUtil;
+import com.liferay.portal.service.http.ClassNameServiceHttp;
 import com.liferay.portal.service.http.GroupServiceHttp;
 import com.liferay.portal.service.permission.GroupPermissionUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.SessionClicks;
@@ -122,7 +125,6 @@ import com.liferay.portlet.documentlibrary.DuplicateFileException;
 import com.liferay.portlet.documentlibrary.FileExtensionException;
 import com.liferay.portlet.documentlibrary.FileNameException;
 import com.liferay.portlet.documentlibrary.FileSizeException;
-import com.liferay.portlet.layoutsadmin.lar.StagedTheme;
 
 import java.io.Serializable;
 
@@ -205,9 +207,9 @@ public class StagingImpl implements Staging {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, replaced by {@link StagingLocalServiceUtil#
-	 *             checkDefaultLayoutSetBranches(long, Group, boolean, boolean,
-	 *             boolean, ServiceContext))}
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             StagingLocalServiceUtil#checkDefaultLayoutSetBranches(long,
+	 *             Group, boolean, boolean, boolean, ServiceContext)}
 	 */
 	@Deprecated
 	@Override
@@ -386,7 +388,7 @@ public class StagingImpl implements Staging {
 			UnicodeProperties typeSettingsProperties =
 				layout.getTypeSettingsProperties();
 
-			Set<String> keys = new HashSet<String>();
+			Set<String> keys = new HashSet<>();
 
 			for (String key : typeSettingsProperties.keySet()) {
 				if (key.startsWith("last-import-")) {
@@ -1004,8 +1006,7 @@ public class StagingImpl implements Staging {
 
 	@Override
 	public Map<String, String[]> getStagingParameters() {
-		Map<String, String[]> parameterMap =
-			new LinkedHashMap<String, String[]>();
+		Map<String, String[]> parameterMap = new LinkedHashMap<>();
 
 		parameterMap.put(
 			PortletDataHandlerKeys.DATA_STRATEGY,
@@ -1042,10 +1043,6 @@ public class StagingImpl implements Staging {
 			PortletDataHandlerKeys.PORTLET_DATA,
 			new String[] {Boolean.TRUE.toString()});
 		parameterMap.put(
-			PortletDataHandlerKeys.PORTLET_DATA + StringPool.UNDERLINE +
-				PortletKeys.ASSET_CATEGORIES_ADMIN,
-			new String[] {Boolean.TRUE.toString()});
-		parameterMap.put(
 			PortletDataHandlerKeys.PORTLET_DATA_ALL,
 			new String[] {Boolean.TRUE.toString()});
 		parameterMap.put(
@@ -1068,9 +1065,8 @@ public class StagingImpl implements Staging {
 	public Map<String, String[]> getStagingParameters(
 		PortletRequest portletRequest) {
 
-		Map<String, String[]> parameterMap =
-			new LinkedHashMap<String, String[]>(
-				portletRequest.getParameterMap());
+		Map<String, String[]> parameterMap = new LinkedHashMap<>(
+			portletRequest.getParameterMap());
 
 		if (!parameterMap.containsKey(PortletDataHandlerKeys.DATA_STRATEGY)) {
 			parameterMap.put(
@@ -1283,10 +1279,6 @@ public class StagingImpl implements Staging {
 
 	@Override
 	public void lockGroup(long userId, long groupId) throws PortalException {
-		if (!PropsValues.STAGING_LOCK_ENABLED) {
-			return;
-		}
-
 		if (LockLocalServiceUtil.isLocked(Staging.class.getName(), groupId)) {
 			Lock lock = LockLocalServiceUtil.getLock(
 				Staging.class.getName(), groupId);
@@ -1313,7 +1305,7 @@ public class StagingImpl implements Staging {
 
 		Layout layout = LayoutLocalServiceUtil.getLayout(plid);
 
-		List<Layout> layouts = new ArrayList<Layout>();
+		List<Layout> layouts = new ArrayList<>();
 
 		layouts.add(layout);
 
@@ -1338,8 +1330,7 @@ public class StagingImpl implements Staging {
 			long userId, ExportImportConfiguration exportImportConfiguration)
 		throws PortalException {
 
-		Map<String, Serializable> taskContextMap =
-			new HashMap<String, Serializable>();
+		Map<String, Serializable> taskContextMap = new HashMap<>();
 
 		taskContextMap.put(Constants.CMD, Constants.PUBLISH_TO_LIVE);
 		taskContextMap.put(
@@ -1434,7 +1425,7 @@ public class StagingImpl implements Staging {
 
 		long groupId = ParamUtil.getLong(portletRequest, "groupId");
 
-		Group liveGroup = GroupLocalServiceUtil.getGroup(groupId);
+		Group liveGroup = getLiveGroup(groupId);
 
 		Map<String, String[]> parameterMap = getStagingParameters(
 			portletRequest);
@@ -1447,8 +1438,8 @@ public class StagingImpl implements Staging {
 				Group stagingGroup = liveGroup.getStagingGroup();
 
 				publishLayouts(
-					portletRequest, stagingGroup.getGroupId(), groupId,
-					parameterMap, false);
+					portletRequest, stagingGroup.getGroupId(),
+					liveGroup.getGroupId(), parameterMap, false);
 			}
 		}
 	}
@@ -1629,10 +1620,6 @@ public class StagingImpl implements Staging {
 
 	@Override
 	public void unlockGroup(long groupId) {
-		if (!PropsValues.STAGING_LOCK_ENABLED) {
-			return;
-		}
-
 		LockLocalServiceUtil.unlock(Staging.class.getName(), groupId);
 	}
 
@@ -1916,8 +1903,7 @@ public class StagingImpl implements Staging {
 			boolean secureConnection, boolean remotePrivateLayout)
 		throws PortalException {
 
-		Map<String, Serializable> taskContextMap =
-			new HashMap<String, Serializable>();
+		Map<String, Serializable> taskContextMap = new HashMap<>();
 
 		taskContextMap.put(Constants.CMD, Constants.PUBLISH_TO_REMOTE);
 		taskContextMap.put(
@@ -2093,6 +2079,19 @@ public class StagingImpl implements Staging {
 		return ParamUtil.getString(
 			portletRequest, param,
 			GetterUtil.getString(group.getTypeSettingsProperty(param)));
+	}
+
+	protected boolean isCompanyGroup(HttpPrincipal httpPrincipal, Group group) {
+		ClassName className = ClassNameServiceHttp.fetchClassName(
+			httpPrincipal, String.valueOf(group.getClassNameId()));
+
+		if (Validator.equals(
+				className.getClassName(), Company.class.getName())) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	protected void publishLayouts(
@@ -2364,13 +2363,11 @@ public class StagingImpl implements Staging {
 
 			Group group = GroupLocalServiceUtil.getGroup(groupId);
 
-			String groupUuid = group.getUuid();
-
 			Group remoteGroup = GroupServiceHttp.getGroup(
 				httpPrincipal, remoteGroupId);
 
-			if ((group.isCompany() ^ remoteGroup.isCompany()) ||
-				groupUuid.equals(remoteGroup.getUuid())) {
+			if (group.isCompany() ^
+				isCompanyGroup(httpPrincipal, remoteGroup)) {
 
 				RemoteExportException ree = new RemoteExportException(
 					RemoteExportException.INVALID_GROUP);

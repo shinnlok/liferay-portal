@@ -75,8 +75,8 @@ public class ServiceContext implements Cloneable, Serializable {
 	 * optional service context parameters.
 	 */
 	public ServiceContext() {
-		_attributes = new LinkedHashMap<String, Serializable>();
-		_expandoBridgeAttributes = new LinkedHashMap<String, Serializable>();
+		_attributes = new LinkedHashMap<>();
+		_expandoBridgeAttributes = new LinkedHashMap<>();
 	}
 
 	/**
@@ -147,8 +147,8 @@ public class ServiceContext implements Cloneable, Serializable {
 		Role defaultGroupRole = RoleLocalServiceUtil.getDefaultGroupRole(
 			siteGroupId);
 
-		List<String> groupPermissions = new ArrayList<String>();
-		List<String> guestPermissions = new ArrayList<String>();
+		List<String> groupPermissions = new ArrayList<>();
+		List<String> guestPermissions = new ArrayList<>();
 
 		String[] roleNames = {RoleConstants.GUEST, defaultGroupRole.getName()};
 
@@ -773,7 +773,8 @@ public class ServiceContext implements Cloneable, Serializable {
 	public boolean isCommandAdd() {
 		if (Validator.equals(_command, Constants.ADD) ||
 			Validator.equals(_command, Constants.ADD_DYNAMIC) ||
-			Validator.equals(_command, Constants.ADD_MULTIPLE)) {
+			Validator.equals(_command, Constants.ADD_MULTIPLE) ||
+			Validator.equals(_command, Constants.ADD_WEBDAV)) {
 
 			return true;
 		}
@@ -791,7 +792,9 @@ public class ServiceContext implements Cloneable, Serializable {
 	 *         command; <code>false</code> otherwise
 	 */
 	public boolean isCommandUpdate() {
-		if (Validator.equals(_command, Constants.UPDATE)) {
+		if (Validator.equals(_command, Constants.UPDATE) ||
+			Validator.equals(_command, Constants.UPDATE_WEBDAV)) {
+
 			return true;
 		}
 		else {
@@ -866,6 +869,8 @@ public class ServiceContext implements Cloneable, Serializable {
 			setAssetCategoryIds(serviceContext.getAssetCategoryIds());
 		}
 
+		setAssetEntryVisible(serviceContext.isAssetEntryVisible());
+
 		if (serviceContext.getAssetLinkEntryIds() != null) {
 			setAssetLinkEntryIds(serviceContext.getAssetLinkEntryIds());
 		}
@@ -894,10 +899,15 @@ public class ServiceContext implements Cloneable, Serializable {
 			setCurrentURL(serviceContext.getCurrentURL());
 		}
 
+		setDeriveDefaultPermissions(
+			serviceContext.isDeriveDefaultPermissions());
+
 		if (serviceContext.getExpandoBridgeAttributes() != null) {
 			setExpandoBridgeAttributes(
 				serviceContext.getExpandoBridgeAttributes());
 		}
+
+		setFailOnPortalException(serviceContext.isFailOnPortalException());
 
 		if (serviceContext.getGroupPermissions() != null) {
 			setGroupPermissions(serviceContext.getGroupPermissions());
@@ -911,7 +921,7 @@ public class ServiceContext implements Cloneable, Serializable {
 			setHeaders(serviceContext.getHeaders());
 		}
 
-		setFailOnPortalException(serviceContext.isFailOnPortalException());
+		setIndexingEnabled(serviceContext.isIndexingEnabled());
 		setLanguageId(serviceContext.getLanguageId());
 
 		if (Validator.isNotNull(serviceContext.getLayoutFullURL())) {
@@ -924,6 +934,24 @@ public class ServiceContext implements Cloneable, Serializable {
 
 		if (serviceContext.getModifiedDate() != null) {
 			setModifiedDate(serviceContext.getModifiedDate());
+		}
+
+		if (Validator.isNotNull(
+				serviceContext.getPathFriendlyURLPrivateGroup())) {
+
+			setPathFriendlyURLPrivateGroup(
+				serviceContext.getPathFriendlyURLPrivateGroup());
+		}
+
+		if (Validator.isNotNull(
+				serviceContext.getPathFriendlyURLPrivateUser())) {
+
+			setPathFriendlyURLPrivateUser(
+				serviceContext.getPathFriendlyURLPrivateUser());
+		}
+
+		if (Validator.isNotNull(serviceContext.getPathFriendlyURLPublic())) {
+			setPathFriendlyURLPublic(serviceContext.getPathFriendlyURLPublic());
 		}
 
 		if (Validator.isNotNull(serviceContext.getPathMain())) {
@@ -956,6 +984,10 @@ public class ServiceContext implements Cloneable, Serializable {
 
 		setSignedIn(serviceContext.isSignedIn());
 
+		if (serviceContext.getTimeZone() != null) {
+			setTimeZone(serviceContext.getTimeZone());
+		}
+
 		if (Validator.isNotNull(serviceContext.getUserDisplayURL())) {
 			setUserDisplayURL(serviceContext.getUserDisplayURL());
 		}
@@ -964,8 +996,11 @@ public class ServiceContext implements Cloneable, Serializable {
 			setUserId(serviceContext.getUserId());
 		}
 
-		if (Validator.isNotNull(serviceContext.getUuid())) {
-			setUuid(serviceContext.getUuid());
+		// Refrence serviceContext#_uuid directly because calling
+		// serviceContext#getUuid() would set it to null
+
+		if (Validator.isNotNull(serviceContext._uuid)) {
+			setUuid(serviceContext._uuid);
 		}
 
 		if (serviceContext.getWorkflowAction() > 0) {

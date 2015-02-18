@@ -4,10 +4,16 @@
 <project>
 	<path id="plugins.includes.path">
 		<dirset dir="apps/amazon-rankings" includes="*" />
+		<dirset dir="apps/asset" includes="*" />
+		<dirset dir="apps/blogs" includes="*" />
 		<dirset dir="apps/bookmarks" includes="*" />
+		<dirset dir="apps/breadcrumb" includes="*" />
+		<dirset dir="apps/configuration-admin" includes="*" />
 		<dirset dir="apps/currency-converter" includes="*" />
 		<dirset dir="apps/dictionary" includes="*" />
+		<dirset dir="apps/document-library" includes="*" />
 		<dirset dir="apps/document-selector" includes="*" />
+		<dirset dir="apps/dynamic-data-mapping" includes="*" />
 		<dirset dir="apps/hello-velocity" includes="*" />
 		<dirset dir="apps/iframe" includes="*" />
 		<dirset dir="apps/invitation" includes="*" />
@@ -19,15 +25,19 @@
 		<dirset dir="apps/polls" includes="*" />
 		<dirset dir="apps/quick-note" includes="*" />
 		<dirset dir="apps/rss" includes="*" />
+		<dirset dir="apps/site" includes="*" />
 		<dirset dir="apps/social" includes="*" />
+		<dirset dir="apps/translator" includes="*" />
 		<dirset dir="apps/unit-converter" includes="*" />
 		<dirset dir="apps/web-proxy" includes="*" />
+		<dirset dir="apps/wiki" includes="*" />
 		<dirset dir="apps/xsl-content" includes="*" />
 		<dirset dir="core" includes="*" />
 		<dirset dir="portal" excludes="portal-taglib-aui-form-extension-sample" includes="*" />
+		<dirset dir="util" includes="pmd,portal-tools,sass-compiler" />
 	</path>
 
 	<pathconvert pathsep="," property="plugins.includes.path" refid="plugins.includes.path" targetos="unix" />
 
-	<import file="../tools/sdk/build-common.xml" />
+	<import file="../tools/sdk/build-common-plugins.xml" />
 </project>

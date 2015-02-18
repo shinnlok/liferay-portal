@@ -646,6 +646,46 @@ public class Table {
 		_selectSQL = selectSQL;
 	}
 
+	public void updateColumnValue(
+		String columnName, String oldValue, String newValue) {
+
+		Connection con = null;
+		PreparedStatement ps = null;
+
+		StringBundler sb = new StringBundler(7);
+
+		sb.append("update ");
+		sb.append(_tableName);
+		sb.append(" set ");
+		sb.append(columnName);
+		sb.append(" = ? where ");
+		sb.append(columnName);
+		sb.append(" = ?");
+
+		String sql = sb.toString();
+
+		try {
+			con = DataAccess.getUpgradeOptimizedConnection();
+
+			ps = con.prepareStatement(sql);
+
+			ps.setString(1, newValue);
+			ps.setString(2, oldValue);
+
+			ps.executeUpdate();
+		}
+		catch (SQLException sqle) {
+			if (_log.isErrorEnabled()) {
+				_log.error(sqle, sqle);
+			}
+
+			throw new RuntimeException("Unable to execute " + sql, sqle);
+		}
+		finally {
+			DataAccess.cleanUp(con, ps);
+		}
+	}
+
 	private static final int _BATCH_SIZE = GetterUtil.getInteger(
 		PropsUtil.get("hibernate.jdbc.batch_size"));
 
@@ -667,13 +707,13 @@ public class Table {
 	private static final String _SAFE_TABLE_RETURN_CHARACTER =
 		"_SAFE_TABLE_RETURN_CHARACTER_";
 
-	private static Log _log = LogFactoryUtil.getLog(Table.class);
+	private static final Log _log = LogFactoryUtil.getLog(Table.class);
 
 	private Object[][] _columns;
 	private String _createSQL;
 	private int[] _order;
 	private String _selectSQL;
-	private String _tableName;
+	private final String _tableName;
 	private String _tempFileName;
 	private long _totalRows;
 
