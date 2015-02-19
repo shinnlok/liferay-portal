@@ -16,7 +16,6 @@ package com.liferay.sync.engine.service.persistence;
 
 import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.stmt.QueryBuilder;
-import com.j256.ormlite.stmt.SelectArg;
 import com.j256.ormlite.stmt.Where;
 
 import com.liferay.sync.engine.model.SyncWatchEvent;
@@ -35,6 +34,16 @@ public class SyncWatchEventPersistence
 		super(SyncWatchEvent.class);
 	}
 
+	public long countBySyncAccountId(long syncAccountId) throws SQLException {
+		QueryBuilder<SyncWatchEvent, Long> queryBuilder = queryBuilder();
+
+		Where<SyncWatchEvent, Long> where = queryBuilder.where();
+
+		where.eq("syncAccountId", syncAccountId);
+
+		return where.countOf();
+	}
+
 	public void deleteBySyncAccountId(long syncAccountId) throws SQLException {
 		DeleteBuilder<SyncWatchEvent, Long> deleteBuilder = deleteBuilder();
 
@@ -45,23 +54,17 @@ public class SyncWatchEventPersistence
 		delete(deleteBuilder.prepare());
 	}
 
-	public SyncWatchEvent fetchByE_F_T(
-			String eventType, String filePathName, long timestamp)
+	public SyncWatchEvent fetchBySyncAccountId_Last(long syncAccountId)
 		throws SQLException {
 
 		QueryBuilder<SyncWatchEvent, Long> queryBuilder = queryBuilder();
 
 		Where<SyncWatchEvent, Long> where = queryBuilder.where();
 
-		where.eq("eventType", eventType);
+		where.eq("syncAccountId", syncAccountId);
 
-		where.and();
-
-		where.eq("filePathName", new SelectArg(filePathName));
-
-		where.and();
-
-		where.between("timestamp", timestamp - 1000, timestamp + 1000);
+		queryBuilder.limit(1L);
+		queryBuilder.orderBy("timestamp", false);
 
 		List<SyncWatchEvent> syncWatchEvents = query(queryBuilder.prepare());
 
@@ -86,27 +89,6 @@ public class SyncWatchEventPersistence
 		queryBuilder.orderBy(orderByColumn, ascending);
 
 		return query(queryBuilder.prepare());
-	}
-
-	public SyncWatchEvent findBySyncAccountId_Last(long syncAccountId)
-		throws SQLException {
-
-		QueryBuilder<SyncWatchEvent, Long> queryBuilder = queryBuilder();
-
-		Where<SyncWatchEvent, Long> where = queryBuilder.where();
-
-		where.eq("syncAccountId", syncAccountId);
-
-		queryBuilder.limit(1L);
-		queryBuilder.orderBy("timestamp", false);
-
-		List<SyncWatchEvent> syncWatchEvents = query(queryBuilder.prepare());
-
-		if ((syncWatchEvents == null) || syncWatchEvents.isEmpty()) {
-			return null;
-		}
-
-		return syncWatchEvents.get(0);
 	}
 
 }

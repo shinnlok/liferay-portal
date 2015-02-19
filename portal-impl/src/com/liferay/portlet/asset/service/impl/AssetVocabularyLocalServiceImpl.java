@@ -16,6 +16,7 @@ package com.liferay.portlet.asset.service.impl;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.search.BaseModelSearchResult;
+import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.Indexable;
@@ -26,6 +27,7 @@ import com.liferay.portal.kernel.search.QueryConfig;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringPool;
@@ -42,7 +44,6 @@ import com.liferay.portlet.asset.model.AssetCategoryConstants;
 import com.liferay.portlet.asset.model.AssetVocabulary;
 import com.liferay.portlet.asset.service.base.AssetVocabularyLocalServiceBaseImpl;
 import com.liferay.portlet.asset.util.AssetUtil;
-import com.liferay.portlet.asset.util.AssetVocabularyUtil;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -72,7 +73,7 @@ public class AssetVocabularyLocalServiceImpl
 		long defaultUserId = userLocalService.getDefaultUserId(
 			group.getCompanyId());
 
-		Map<Locale, String> titleMap = new HashMap<Locale, String>();
+		Map<Locale, String> titleMap = new HashMap<>();
 
 		titleMap.put(
 			LocaleUtil.getSiteDefault(), PropsValues.ASSET_VOCABULARY_DEFAULT);
@@ -169,13 +170,13 @@ public class AssetVocabularyLocalServiceImpl
 			long userId, String title, ServiceContext serviceContext)
 		throws PortalException {
 
-		Map<Locale, String> titleMap = new HashMap<Locale, String>();
+		Map<Locale, String> titleMap = new HashMap<>();
 
 		Locale locale = LocaleUtil.getSiteDefault();
 
 		titleMap.put(locale, title);
 
-		Map<Locale, String> descriptionMap = new HashMap<Locale, String>();
+		Map<Locale, String> descriptionMap = new HashMap<>();
 
 		descriptionMap.put(locale, StringPool.BLANK);
 
@@ -222,7 +223,8 @@ public class AssetVocabularyLocalServiceImpl
 	@Override
 	@SystemEvent(
 		action = SystemEventConstants.ACTION_SKIP,
-		type = SystemEventConstants.TYPE_DELETE)
+		type = SystemEventConstants.TYPE_DELETE
+	)
 	public void deleteVocabulary(AssetVocabulary vocabulary)
 		throws PortalException {
 
@@ -304,7 +306,7 @@ public class AssetVocabularyLocalServiceImpl
 
 		AssetVocabulary vocabulary = addDefaultVocabulary(groupId);
 
-		vocabularies = new ArrayList<AssetVocabulary>();
+		vocabularies = new ArrayList<>();
 
 		vocabularies.add(vocabulary);
 
@@ -337,10 +339,43 @@ public class AssetVocabularyLocalServiceImpl
 	}
 
 	@Override
+	public List<AssetVocabulary> getVocabularies(Hits hits)
+		throws PortalException {
+
+		List<Document> documents = hits.toList();
+
+		List<AssetVocabulary> vocabularies = new ArrayList<>(documents.size());
+
+		for (Document document : documents) {
+			long vocabularyId = GetterUtil.getLong(
+				document.get(Field.ASSET_VOCABULARY_ID));
+
+			AssetVocabulary vocabulary = fetchAssetVocabulary(vocabularyId);
+
+			if (vocabulary == null) {
+				vocabularies = null;
+
+				Indexer indexer = IndexerRegistryUtil.getIndexer(
+					AssetVocabulary.class);
+
+				long companyId = GetterUtil.getLong(
+					document.get(Field.COMPANY_ID));
+
+				indexer.delete(companyId, document.getUID());
+			}
+			else if (vocabularies != null) {
+				vocabularies.add(vocabulary);
+			}
+		}
+
+		return vocabularies;
+	}
+
+	@Override
 	public List<AssetVocabulary> getVocabularies(long[] vocabularyIds)
 		throws PortalException {
 
-		List<AssetVocabulary> vocabularies = new ArrayList<AssetVocabulary>();
+		List<AssetVocabulary> vocabularies = new ArrayList<>();
 
 		for (long vocabularyId : vocabularyIds) {
 			AssetVocabulary vocabulary = getVocabulary(vocabularyId);
@@ -458,11 +493,10 @@ public class AssetVocabularyLocalServiceImpl
 		for (int i = 0; i < 10; i++) {
 			Hits hits = indexer.search(searchContext);
 
-			List<AssetVocabulary> vocabularies =
-				AssetVocabularyUtil.getVocabularies(hits);
+			List<AssetVocabulary> vocabularies = getVocabularies(hits);
 
 			if (vocabularies != null) {
-				return new BaseModelSearchResult<AssetVocabulary>(
+				return new BaseModelSearchResult<>(
 					vocabularies, hits.getLength());
 			}
 		}

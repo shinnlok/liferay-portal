@@ -231,6 +231,7 @@ if (ddmFields != null) {
 			'ddm.classPK': <%= ddmStructure.getPrimaryKey() %>,
 			'ddm.groupId': <%= groupId %>,
 			'ddm.refererPortletName': '<%= PortletKeys.JOURNAL %>',
+			'ddm.sourceClassNameId': '<%= ddmStructure.getClassNameId() %>',
 			'ddm.templateId': <%= (ddmTemplate != null) ? ddmTemplate.getTemplateId() : 0 %>,
 			descriptionInputLocalized: Liferay.component('<portlet:namespace />description'),
 			editStructure: '#<portlet:namespace />editDDMStructure',
@@ -245,5 +246,5 @@ if (ddmFields != null) {
 		}
 	);
 
-	Liferay.Util.disableToggleBoxes('<portlet:namespace />autoArticleId','<portlet:namespace />newArticleId', true);
+	Liferay.Util.disableToggleBoxes('<portlet:namespace />autoArticleId', '<portlet:namespace />newArticleId', true);
 </aui:script>

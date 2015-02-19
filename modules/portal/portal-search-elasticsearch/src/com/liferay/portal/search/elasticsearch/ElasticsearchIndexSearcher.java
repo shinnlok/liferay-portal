@@ -24,10 +24,11 @@ import com.liferay.portal.kernel.search.DocumentImpl;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.HitsImpl;
-import com.liferay.portal.kernel.search.IndexSearcher;
+import com.liferay.portal.kernel.search.ParseException;
 import com.liferay.portal.kernel.search.Query;
 import com.liferay.portal.kernel.search.QueryConfig;
 import com.liferay.portal.kernel.search.QuerySuggester;
+import com.liferay.portal.kernel.search.QueryTranslator;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.search.Sort;
@@ -40,7 +41,7 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.search.elasticsearch.connection.ElasticsearchConnectionManager;
 import com.liferay.portal.search.elasticsearch.facet.ElasticsearchFacetFieldCollector;
-import com.liferay.portal.search.elasticsearch.facet.FacetProcessor;
+import com.liferay.portal.search.elasticsearch.spi.facet.FacetProcessor;
 import com.liferay.portal.search.elasticsearch.util.DocumentTypes;
 
 import java.util.ArrayList;
@@ -61,7 +62,6 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHitField;
 import org.elasticsearch.search.SearchHits;
@@ -80,7 +80,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Michael C. Han
  * @author Milen Dyankov
  */
-@Component(immediate = true, service = IndexSearcher.class)
+@Component(immediate = true, service = ElasticsearchIndexSearcher.class)
 public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 
 	@Override
@@ -198,6 +198,13 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 	@Reference
 	public void setQuerySuggester(QuerySuggester querySuggester) {
 		super.setQuerySuggester(querySuggester);
+	}
+
+	@Reference
+	public void setQueryTranslator(
+		QueryTranslator<QueryBuilder> queryTranslator) {
+
+		_queryTranslator = queryTranslator;
 	}
 
 	public void setSwallowException(boolean swallowException) {
@@ -334,7 +341,7 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 			return;
 		}
 
-		Set<String> sortFieldNames = new HashSet<String>();
+		Set<String> sortFieldNames = new HashSet<>(sorts.length);
 
 		for (Sort sort : sorts) {
 			if (sort == null) {
@@ -378,23 +385,33 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 
 	protected SearchResponse doSearch(
 			SearchContext searchContext, Query query, int start, int end)
-		throws Exception {
+		throws ParseException {
 
 		return doSearch(searchContext, query, start, end, false);
 	}
 
 	protected SearchResponse doSearch(
-		SearchContext searchContext, Query query, int start, int end,
-		boolean count) {
+			SearchContext searchContext, Query query, int start, int end,
+			boolean count)
+		throws ParseException {
 
 		Client client = _elasticsearchConnectionManager.getClient();
 
-		SearchRequestBuilder searchRequestBuilder = client.prepareSearch(
-			String.valueOf(searchContext.getCompanyId()));
+		SearchRequestBuilder searchRequestBuilder = null;
+
+		QueryConfig queryConfig = query.getQueryConfig();
+
+		String[] selectedIndexNames = queryConfig.getSelectedIndexNames();
+
+		if (ArrayUtil.isEmpty(selectedIndexNames)) {
+			searchRequestBuilder = client.prepareSearch(
+				String.valueOf(searchContext.getCompanyId()));
+		}
+		else {
+			searchRequestBuilder = client.prepareSearch(selectedIndexNames);
+		}
 
 		if (!count) {
-			QueryConfig queryConfig = query.getQueryConfig();
-
 			addFacets(searchRequestBuilder, searchContext);
 			addHighlights(searchRequestBuilder, queryConfig);
 			addPagination(searchRequestBuilder, start, end);
@@ -407,11 +424,18 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 			searchRequestBuilder.setSize(0);
 		}
 
-		QueryBuilder queryBuilder = QueryBuilders.queryString(query.toString());
+		QueryBuilder queryBuilder = _queryTranslator.translate(query);
 
 		searchRequestBuilder.setQuery(queryBuilder);
 
-		searchRequestBuilder.setTypes(DocumentTypes.LIFERAY);
+		String[] selectedTypes = queryConfig.getSelectedTypes();
+
+		if (ArrayUtil.isEmpty(selectedTypes)) {
+			searchRequestBuilder.setTypes(DocumentTypes.LIFERAY);
+		}
+		else {
+			searchRequestBuilder.setTypes(selectedTypes);
+		}
 
 		SearchRequest searchRequest = searchRequestBuilder.request();
 
@@ -428,10 +452,12 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 		return searchResponse;
 	}
 
-	protected Document processSearchHit(SearchHit hit) {
+	protected Document processSearchHit(
+		SearchHit searchHit, QueryConfig queryConfig) {
+
 		Document document = new DocumentImpl();
 
-		Map<String, SearchHitField> searchHitFields = hit.getFields();
+		Map<String, SearchHitField> searchHitFields = searchHit.getFields();
 
 		for (Map.Entry<String, SearchHitField> entry :
 				searchHitFields.entrySet()) {
@@ -448,6 +474,8 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 			document.add(field);
 		}
 
+		populateUID(document, queryConfig);
+
 		return document;
 	}
 
@@ -461,15 +489,16 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 
 		Hits hits = new HitsImpl();
 
-		List<Document> documents = new ArrayList<Document>();
-		Set<String> queryTerms = new HashSet<String>();
-		List<Float> scores = new ArrayList<Float>();
+		List<Document> documents = new ArrayList<>();
+		Set<String> queryTerms = new HashSet<>();
+		List<Float> scores = new ArrayList<>();
 
 		if (searchHits.totalHits() > 0) {
 			SearchHit[] searchHitsArray = searchHits.getHits();
 
 			for (SearchHit searchHit : searchHitsArray) {
-				Document document = processSearchHit(searchHit);
+				Document document = processSearchHit(
+					searchHit, query.getQueryConfig());
 
 				documents.add(document);
 
@@ -525,6 +554,7 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 
 	private ElasticsearchConnectionManager _elasticsearchConnectionManager;
 	private FacetProcessor<SearchRequestBuilder> _facetProcessor;
+	private QueryTranslator<QueryBuilder> _queryTranslator;
 	private boolean _swallowException;
 
 }

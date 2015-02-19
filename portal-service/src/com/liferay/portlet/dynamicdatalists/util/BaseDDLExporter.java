@@ -86,25 +86,23 @@ public abstract class BaseDDLExporter implements DDLExporter {
 			OrderByComparator<DDLRecord> orderByComparator)
 		throws Exception;
 
-	protected List<DDMFormField> getDDMFormFields(long recordSetId)
+	protected List<DDMFormField> getDDMFormFields(DDMStructure ddmStructure)
 		throws Exception {
 
-		List<DDMFormField> ddmFormFields = new ArrayList<DDMFormField>();
-
-		DDLRecordSet recordSet = DDLRecordSetServiceUtil.getRecordSet(
-			recordSetId);
-
-		DDMStructure ddmStructure = recordSet.getDDMStructure();
+		List<DDMFormField> ddmFormFields = new ArrayList<>();
 
 		for (DDMFormField ddmFormField : ddmStructure.getDDMFormFields(false)) {
-			if (ddmStructure.isFieldPrivate(ddmFormField.getName())) {
-				continue;
-			}
-
 			ddmFormFields.add(ddmFormField);
 		}
 
 		return ddmFormFields;
+	}
+
+	protected DDMStructure getDDMStructure(long recordSetId) throws Exception {
+		DDLRecordSet recordSet = DDLRecordSetServiceUtil.getRecordSet(
+			recordSetId);
+
+		return recordSet.getDDMStructure();
 	}
 
 	protected String getStatusMessage(int status) {

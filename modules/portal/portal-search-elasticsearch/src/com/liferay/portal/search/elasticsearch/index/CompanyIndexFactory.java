@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.search.elasticsearch.spi.index.IndexFactory;
 import com.liferay.portal.search.elasticsearch.util.LogUtil;
 
 import java.util.HashMap;
@@ -130,7 +131,7 @@ public class CompanyIndexFactory implements IndexFactory {
 		setIndexConfigFileName(
 			MapUtil.getString(properties, "indexConfigFileName"));
 
-		Map<String, String> typeMappings = new HashMap<String, String>();
+		Map<String, String> typeMappings = new HashMap<>();
 
 		for (String key : properties.keySet()) {
 			if (key.startsWith(_PREFIX)) {
@@ -164,6 +165,6 @@ public class CompanyIndexFactory implements IndexFactory {
 		CompanyIndexFactory.class);
 
 	private String _indexConfigFileName;
-	private Map<String, String> _typeMappings = new HashMap<String, String>();
+	private Map<String, String> _typeMappings = new HashMap<>();
 
 }

@@ -73,7 +73,7 @@ public class ShoppingSettings {
 		String[] ids = null;
 
 		try {
-			Set<String> set = new TreeSet<String>();
+			Set<String> set = new TreeSet<>();
 
 			Locale[] locales = Locale.getAvailableLocales();
 
@@ -348,9 +348,9 @@ public class ShoppingSettings {
 
 		settingsFactory.registerSettingsMetadata(
 			ShoppingConstants.SERVICE_NAME, _getFallbackKeys(),
-			_MULTI_VALUED_KEYS, _resourceManager);
+			_MULTI_VALUED_KEYS, null, _resourceManager);
 	}
 
-	private TypedSettings _typedSettings;
+	private final TypedSettings _typedSettings;
 
 }

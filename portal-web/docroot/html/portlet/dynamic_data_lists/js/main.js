@@ -9,13 +9,13 @@ AUI.add(
 
 		var Lang = A.Lang;
 
+		var AJSON = A.JSON;
+
 		var EMPTY_FN = A.Lang.emptyFn;
 
 		var FIELDS_DISPLAY_INSTANCE_SEPARATOR = '_INSTANCE_';
 
 		var FIELDS_DISPLAY_NAME = '_fieldsDisplay';
-
-		var AJSON = A.JSON;
 
 		var STR_EMPTY = '';
 
@@ -345,6 +345,7 @@ AUI.add(
 						columns,
 						function(item, index) {
 							var dataType = item.dataType;
+							var label = item.label;
 							var name = item.name;
 							var type = item.type;
 
@@ -364,8 +365,12 @@ AUI.add(
 							var structureField;
 
 							if (required) {
-								item.label += ' (' + Liferay.Language.get('required') + ')';
+								label += ' (' + Liferay.Language.get('required') + ')';
 							}
+
+							label = A.Escape.html(label);
+
+							item.label = label;
 
 							if (type === 'checkbox') {
 								config.options = {

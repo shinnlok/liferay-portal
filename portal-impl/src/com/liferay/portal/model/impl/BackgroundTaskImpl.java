@@ -15,14 +15,19 @@
 package com.liferay.portal.model.impl;
 
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskConstants;
+import com.liferay.portal.kernel.backgroundtask.BackgroundTaskExecutor;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.util.InstanceFactory;
+import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Repository;
 import com.liferay.portal.portletfilerepository.PortletFileRepositoryUtil;
 import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.util.ClassLoaderUtil;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 
@@ -68,7 +73,7 @@ public class BackgroundTaskImpl extends BackgroundTaskBaseImpl {
 
 	@Override
 	public List<FileEntry> getAttachmentsFileEntries(int start, int end) {
-		List<FileEntry> fileEntries = new ArrayList<FileEntry>();
+		List<FileEntry> fileEntries = new ArrayList<>();
 
 		long attachmentsFolderId = getAttachmentsFolderId();
 
@@ -120,9 +125,9 @@ public class BackgroundTaskImpl extends BackgroundTaskBaseImpl {
 
 		try {
 			Folder folder = PortletFileRepositoryUtil.getPortletFolder(
-				getUserId(), repository.getRepositoryId(),
+				repository.getRepositoryId(),
 				DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
-				String.valueOf(getBackgroundTaskId()), serviceContext);
+				String.valueOf(getBackgroundTaskId()));
 
 			_attachmentsFolderId = folder.getFolderId();
 		}
@@ -130,6 +135,30 @@ public class BackgroundTaskImpl extends BackgroundTaskBaseImpl {
 		}
 
 		return _attachmentsFolderId;
+	}
+
+	@Override
+	public BackgroundTaskExecutor getBackgroundTaskExecutor() {
+		ClassLoader classLoader = ClassLoaderUtil.getPortalClassLoader();
+
+		String servletContextNames = getServletContextNames();
+
+		if (Validator.isNotNull(servletContextNames)) {
+			classLoader = ClassLoaderUtil.getAggregatePluginsClassLoader(
+				StringUtil.split(servletContextNames), false);
+		}
+
+		BackgroundTaskExecutor backgroundTaskExecutor = null;
+
+		try {
+			backgroundTaskExecutor =
+				(BackgroundTaskExecutor)InstanceFactory.newInstance(
+					classLoader, getTaskExecutorClassName());
+		}
+		catch (Exception e) {
+		}
+
+		return backgroundTaskExecutor;
 	}
 
 	@Override

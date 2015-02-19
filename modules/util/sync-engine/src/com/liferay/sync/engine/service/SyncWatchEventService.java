@@ -32,7 +32,7 @@ public class SyncWatchEventService {
 
 	public static SyncWatchEvent addSyncWatchEvent(
 			String eventType, String filePathName, String fileType,
-			long syncAccountId)
+			String previousFilePathName, long syncAccountId)
 		throws Exception {
 
 		SyncWatchEvent syncWatchEvent = new SyncWatchEvent();
@@ -40,6 +40,7 @@ public class SyncWatchEventService {
 		syncWatchEvent.setEventType(eventType);
 		syncWatchEvent.setFilePathName(filePathName);
 		syncWatchEvent.setFileType(fileType);
+		syncWatchEvent.setPreviousFilePathName(previousFilePathName);
 		syncWatchEvent.setSyncAccountId(syncAccountId);
 		syncWatchEvent.setTimestamp(System.currentTimeMillis());
 
@@ -72,7 +73,7 @@ public class SyncWatchEventService {
 
 	public static SyncWatchEvent fetchLastSyncWatchEvent(long syncAccountId) {
 		try {
-			return _syncWatchEventPersistence.findBySyncAccountId_Last(
+			return _syncWatchEventPersistence.fetchBySyncAccountId_Last(
 				syncAccountId);
 		}
 		catch (SQLException sqle) {
@@ -94,35 +95,6 @@ public class SyncWatchEventService {
 			}
 
 			return null;
-		}
-	}
-
-	public static SyncWatchEvent fetchSyncWatchEvent(
-		String eventType, String filePathName, long timestamp) {
-
-		try {
-			return _syncWatchEventPersistence.fetchByE_F_T(
-				eventType, filePathName, timestamp);
-		}
-		catch (SQLException sqle) {
-			if (_logger.isDebugEnabled()) {
-				_logger.debug(sqle.getMessage(), sqle);
-			}
-
-			return null;
-		}
-	}
-
-	public static List<SyncWatchEvent> findAll() {
-		try {
-			return _syncWatchEventPersistence.queryForAll();
-		}
-		catch (SQLException sqle) {
-			if (_logger.isDebugEnabled()) {
-				_logger.debug(sqle.getMessage(), sqle);
-			}
-
-			return Collections.emptyList();
 		}
 	}
 
@@ -157,6 +129,20 @@ public class SyncWatchEventService {
 		}
 
 		return _syncWatchEventPersistence;
+	}
+
+	public static long getSyncWatchEventsCount(long syncAccountId) {
+		try {
+			return _syncWatchEventPersistence.countBySyncAccountId(
+				syncAccountId);
+		}
+		catch (SQLException sqle) {
+			if (_logger.isDebugEnabled()) {
+				_logger.debug(sqle.getMessage(), sqle);
+			}
+
+			return 0;
+		}
 	}
 
 	private static final Logger _logger = LoggerFactory.getLogger(

@@ -53,37 +53,15 @@ public class GoogleDocsDLFileEntryTypeHelper {
 			DLFileEntryMetadata.class);
 	}
 
-	public DLFileEntryType addGoogleDocsDLFileEntryType()
-		throws PortalException {
-
-		DDMStructure ddmStructure = _ddmStructureLocalService.fetchStructure(
-			_company.getGroupId(), _dlFileEntryMetadataClassNameId,
-			GoogleDocsConstants.DDM_STRUCTURE_KEY_GOOGLE_DOCS);
-
-		if (ddmStructure == null) {
-			ddmStructure = addGoogleDocsDDMStructure();
-		}
-
-		List<DLFileEntryType> dlFileEntryTypes =
-			_dlFileEntryTypeLocalService.getDDMStructureDLFileEntryTypes(
-				ddmStructure.getStructureId());
-
-		if (!dlFileEntryTypes.isEmpty()) {
-			return dlFileEntryTypes.get(0);
-		}
-
-		return addGoogleDocsDLFileEntryType(ddmStructure.getStructureId());
-	}
-
-	protected DDMStructure addGoogleDocsDDMStructure() throws PortalException {
+	public DDMStructure addGoogleDocsDDMStructure() throws PortalException {
 		long defaultUserId = _userLocalService.getDefaultUserId(
 			_company.getCompanyId());
 
-		Map<Locale, String> nameMap = new HashMap<Locale, String>();
+		Map<Locale, String> nameMap = new HashMap<>();
 
 		nameMap.put(LocaleUtil.getDefault(), "Google Docs Metadata");
 
-		Map<Locale, String> descriptionMap = new HashMap<Locale, String>();
+		Map<Locale, String> descriptionMap = new HashMap<>();
 
 		descriptionMap.put(LocaleUtil.getDefault(), "Google Docs Metadata");
 
@@ -106,17 +84,39 @@ public class GoogleDocsDLFileEntryTypeHelper {
 			DDMStructureConstants.TYPE_DEFAULT, serviceContext);
 	}
 
+	public DLFileEntryType addGoogleDocsDLFileEntryType()
+		throws PortalException {
+
+		DDMStructure ddmStructure = _ddmStructureLocalService.fetchStructure(
+			_company.getGroupId(), _dlFileEntryMetadataClassNameId,
+			GoogleDocsConstants.DDM_STRUCTURE_KEY_GOOGLE_DOCS);
+
+		if (ddmStructure == null) {
+			ddmStructure = addGoogleDocsDDMStructure();
+		}
+
+		List<DLFileEntryType> dlFileEntryTypes =
+			_dlFileEntryTypeLocalService.getDDMStructureDLFileEntryTypes(
+				ddmStructure.getStructureId());
+
+		if (!dlFileEntryTypes.isEmpty()) {
+			return dlFileEntryTypes.get(0);
+		}
+
+		return addGoogleDocsDLFileEntryType(ddmStructure.getStructureId());
+	}
+
 	protected DLFileEntryType addGoogleDocsDLFileEntryType(long ddmStructureId)
 		throws PortalException {
 
 		long defaultUserId = _userLocalService.getDefaultUserId(
 			_company.getCompanyId());
 
-		Map<Locale, String> nameMap = new HashMap<Locale, String>();
+		Map<Locale, String> nameMap = new HashMap<>();
 
 		nameMap.put(LocaleUtil.getDefault(), "Google Docs");
 
-		Map<Locale, String> descriptionMap = new HashMap<Locale, String>();
+		Map<Locale, String> descriptionMap = new HashMap<>();
 
 		descriptionMap.put(LocaleUtil.getDefault(), "Google Docs");
 
@@ -129,8 +129,8 @@ public class GoogleDocsDLFileEntryTypeHelper {
 
 		return _dlFileEntryTypeLocalService.addFileEntryType(
 			defaultUserId, _company.getGroupId(),
-			GoogleDocsConstants.DDM_STRUCTURE_KEY_GOOGLE_DOCS, nameMap,
-			descriptionMap, new long[] {ddmStructureId}, serviceContext);
+			GoogleDocsConstants.DL_FILE_ENTRY_TYPE_KEY, nameMap, descriptionMap,
+			new long[] {ddmStructureId}, serviceContext);
 	}
 
 	private final ClassNameLocalService _classNameLocalService;

@@ -20,7 +20,7 @@ feature or API will be dropped in an upcoming version.
 replaces an old API, in spite of the old API being kept in Liferay Portal for
 backwards compatibility.
 
-*This document has been reviewed through commit `87c168f`.*
+*This document has been reviewed through commit `7763533`.*
 
 ## Breaking Changes Contribution Guidelines
 
@@ -72,6 +72,72 @@ The remaining content of this document consists of the breaking changes listed
 in ascending chronological order.
 
 ## Breaking Changes List
+
+### The `liferay-ui:logo-selector` Tag Requires Parameter Changes
+- **Date:** 2013-Dec-05
+- **JIRA Ticket:** LPS-42645
+
+#### What changed?
+The Logo Selector tag now supports uploading an image, storing it as a temporary
+file, cropping it, and canceling edits. The tag no longer requires creating a UI
+to include the image. Consequently, the `editLogoURL` parameter is no longer
+needed and has been removed. The tag now uses the following parameters to
+support the new features:
+
+- `currentLogoURL`: the URL to display the image being stored
+- `hasUpdateLogoPermission`: `true` if the current user can update the logo
+- `maxFileSize`: the size limit for the logo to be uploaded
+- `tempImageFileName`: the unique identifier to store the temporary image on
+upload
+
+#### Who is affected?
+Plugins or templates that are using the `liferay-ui:logo-selector` tag need
+to update their usage of the tag.
+
+#### How should I update my code?
+You should remove the parameter `editLogoURL` and include (if neccessary) the
+parameters `currentLogoURL`, `hasUpdateLogoPermission`, `maxFileSize`, and/or
+`tempImageFileName`.
+
+**Example**
+
+Replace:
+```
+<portlet:renderURL var="editUserPortraitURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
+    <portlet:param name="struts_action" value="/users_admin/edit_user_portrait" />
+    <portlet:param name="redirect" value="<%= currentURL %>" />
+    <portlet:param name="p_u_i_d" value="<%= String.valueOf(selUser.getUserId()) %>" />
+    <portlet:param name="portrait_id" value="<%= String.valueOf(selUser.getPortraitId()) %>" />
+</portlet:renderURL>
+
+<liferay-ui:logo-selector
+    defaultLogoURL="<%= UserConstants.getPortraitURL(themeDisplay.getPathImage(), selUser.isMale(), 0) %>"
+    editLogoURL="<%= editUserPortraitURL %>"
+    imageId="<%= selUser.getPortraitId() %>"
+    logoDisplaySelector=".user-logo"
+/>
+```
+
+With:
+```
+<liferay-ui:logo-selector
+    currentLogoURL="<%= selUser.getPortraitURL(themeDisplay) %>"
+    defaultLogoURL="<%= UserConstants.getPortraitURL(themeDisplay.getPathImage(), selUser.isMale(), 0) %>"
+    hasUpdateLogoPermission='<%= UsersAdminUtil.hasUpdateFieldPermission(selUser, "portrait") %>'
+    imageId="<%= selUser.getPortraitId() %>"
+    logoDisplaySelector=".user-logo"
+    maxFileSize="<%= PrefsPropsUtil.getLong(PropsKeys.USERS_IMAGE_MAX_SIZE) / 1024 %>"
+    tempImageFileName="<%= String.valueOf(selUser.getUserId()) %>"
+/>
+```
+
+#### Why was this change made?
+This change helps keep a unified UI and consistent experience for uploading
+logos in the portal. The logos can be customized from a single location and used
+throughout the portal. In addition, the change adds new features such as image
+cropping and support for canceling image upload.
+
+---------------------------------------
 
 ### Merged Configured Email Signature Field into the Body of Email Messages from Message Boards and Wiki
 - **Date:** 2014-Feb-28
@@ -293,12 +359,12 @@ of data.
 
 ---------------------------------------
 
-### The `aui:input` Taglib for Type `checkbox` No Longer Creates a Hidden Input
+### The `aui:input` Tag for Type `checkbox` No Longer Creates a Hidden Input
 - **Date:** 2014-Jun-16
 - **JIRA Ticket:** LPS-44228
 
 #### What changed?
-Whenever the aui:input taglib is used to generate an input of type checkbox,
+Whenever the aui:input tag is used to generate an input of type checkbox,
 only an input tag will be generated, instead of the checkbox and hidden field it
 was generating before.
 
@@ -546,7 +612,7 @@ system. Duplication can cause `ClassCastException`s.
 
 #### What changed?
 
-The implementation class `com.liferay.portal.convert.ConvertProcess` was renamed 
+The implementation class `com.liferay.portal.convert.ConvertProcess` was renamed
 `com.liferay.portal.convert.BaseConvertProcess`. An interface named
 `com.liferay.portal.convert.ConvertProcess` was created for it.
 
@@ -573,7 +639,7 @@ should see your convert process in the configuration UI.
 #### Why was this change made?
 
 This change was made as a part of the ongoing strategy to modularize Liferay
-Portal by means of an OSGi container. 
+Portal by means of an OSGi container.
 
 ---------------------------------------
 
@@ -663,5 +729,334 @@ the RSS portlet.
 The support for ADTs in the RSS portlet not only covers this use case, but also
 covers many other use cases, providing a much simpler way to create custom
 preferences.
+
+---------------------------------------
+
+### Removed the `createFlyouts` Method from `liferay/util.js` and Related Resources
+- **Date:** 2014-Dec-18
+- **JIRA Ticket:** LPS-52275
+
+#### What changed?
+
+The `Liferay.Util.createFlyouts` method has been completely removed from core
+files.
+
+#### Who is affected?
+
+This only affects third party developers who are explicitly calling
+`Liferay.Util.createFlyouts` for the creation of flyout menus. It will not
+affect any menus in core files.
+
+#### How should I update my code?
+
+If you are using the method, you can achieve the same behavior with CSS.
+
+#### Why was this change made?
+
+This method was removed due to there being no working use cases in Portal, and
+its overall lack of functionality.
+
+---------------------------------------
+
+### Removed Support for *Flat* Thread View in Discussion Comments
+- **Date:** 2014-Dec-30
+- **JIRA Ticket:** LPS-51876
+
+#### What changed?
+
+Discussion comments are now displayed using the *Combination* thread view, and
+the number of levels displayed in the tree is limited.
+
+#### Who is affected?
+
+This affects installations that specify portal property setting
+`discussion.thread.view=flat`, which was the default setting.
+
+#### How should I update my code?
+
+There is no need to update anything since the portal property has been removed
+and the `combination` thread view is now hard-coded.
+
+#### Why was this change made?
+
+Flat view comments were originally implemented as an option to tree view
+comments, which were having performance issues with comment pagination.
+
+Portal now uses a new pagination implementation that performs well. It allows
+comments to display in a hierarchical view, making it easier to see reply
+history. Therefore, the `flat` thread view is no longer needed.
+
+---------------------------------------
+
+### Removed *Asset Tag Properties*
+- **Date:** 2015-Jan-13
+- **JIRA Ticket:** LPS-52588
+
+#### What changed?
+
+The *Asset Tag Properties* have been removed. The service no longer exists and
+the Asset Tag Service API no longer has this parameter. The behavior associated
+with tag properties in the Asset Publisher and XSL portlets has also been
+removed.
+
+#### Who is affected?
+
+This affects any plugin that uses the Asset Tag Properties service.
+
+#### How should I update my code?
+
+If you are using this functionality, you can achieve the same behavior with
+*Asset Category Properties*. If you are using the Asset Tag Service, remove the
+`String[]` tag properties parameter from your calls to the service's methods.
+
+#### Why was this change made?
+
+The Asset Tag Properties were deprecated for the 6.2 version of Liferay Portal.
+
+---------------------------------------
+
+### Removed the `asset.publisher.asset.entry.query.processors` Property
+- **Date:** 2015-Jan-22
+- **JIRA Ticket:** LPS-52966
+
+#### What changed?
+
+The `asset.publisher.asset.entry.query.processors` property has been removed
+from `portal.properties`.
+
+#### Who is affected?
+
+This affects any hook that uses the
+`asset.publisher.asset.entry.query.processors` property.
+
+#### How should I update my code?
+
+If you are using this property to register Asset Entry Query Processors, your
+Asset Entry Query Processor must implement the
+`com.liferay.portlet.assetpublisher.util.AssetEntryQueryProcessor` interface and
+must specify the `@Component(service=AssetEntryQueryProcessor.class)`
+annotation.
+
+#### Why was this change made?
+
+This change was made as a part of the ongoing strategy to modularize Liferay
+Portal.
+
+---------------------------------------
+
+### Replaced the `ReservedUserScreenNameException` with `UserScreenNameException.MustNotBeReserved` in `UserLocalService`
+- **Date:** 2015-Jan-29
+- **JIRA Ticket:** LPS-53113
+
+#### What changed?
+
+Previous to Liferay 7, several methods of `UserLocalService` could throw a
+`ReservedUserScreenNameException` when a user set a screen name that was not
+allowed. That exception has been deprecated and replaced with
+`UserScreenNameException.MustNotBeReserved`.
+
+#### Who is affected?
+
+This affects developers who have written code that catches the
+`ReservedUserScreenNameException` while calling the affected methods.
+
+#### How should I update my code?
+
+You should replace catching exception `ReservedUserScreenNameException` with
+catching exception `UserScreenNameException.MustNotBeReserved`.
+
+#### Why was this change made?
+
+A new pattern has been defined for exceptions that provides higher expressivity
+in their names and also more information regarding why the exception was thrown.
+
+The new exception `UserScreenNameException.MustNotBeReserved` has all the
+necessary information about why the exception was thrown and its context. In
+particular, it contains the user ID, the problematic screen name, and the list
+of reserved screen names.
+
+---------------------------------------
+
+### Replaced the `ReservedUserEmailAddressException` with `UserEmailAddressException` Inner Classes in User Services
+- **Date:** 2015-Feb-03
+- **JIRA Ticket:** LPS-53279
+
+#### What changed?
+
+Previous to Liferay 7, several methods of `UserLocalService` and `UserService`
+could throw a `ReservedUserEmailAddressException` when a user set an email 
+address that was not allowed. That exception has been deprecated and replaced
+with `UserEmailAddressException.MustNotUseCompanyMx`,
+`UserEmailAddressException.MustNotBePOP3User`, and
+`UserEmailAddressException.MustNotBeReserved`.
+
+#### Who is affected?
+
+This affects developers who have written code that catches the
+`ReservedUserEmailAddressException` while calling the affected methods.
+
+#### How should I update my code?
+
+Depending on the method you're calling and the context in which you're calling
+it, you should replace catching exception `ReservedUserEmailAddressException`
+with catching exception `UserEmailAddressException.MustNotUseCompanyMx`,
+`UserEmailAddressException.MustNotBePOP3User`, or
+`UserEmailAddressException.MustNotBeReserved`.
+
+#### Why was this change made?
+
+A new pattern has been defined for exceptions. This pattern requires using
+higher expressivity in exception names and requires that each exception provide
+more information regarding why it was thrown.
+
+Each new exception provides its context and has all the necessary information
+about why the exception was thrown. For example, the
+`UserEmailAddressException.MustNotBeReserved` exception contains the problematic
+email address and the list of reserved email addresses.
+
+---------------------------------------
+
+### Added Required Attribute `paginationURL` to the Tag `liferay-ui:discussion`
+- **Date:** 2015-Feb-05
+- **JIRA Ticket:** LPS-53313
+
+#### What changed?
+
+The `liferay-ui:discussion` tag now contains a new required attribute
+`paginationURL`.
+
+#### Who is affected?
+
+This affects all developers who are using this tag in their plugins.
+
+#### How should I update my code?
+
+You should include the new attribute `paginationURL` in the tag. This attribute
+holds a URL that returns an HTML fragment containing the next comments for
+portlets such as Asset Publisher, Blogs, Document Library, etc.
+
+If you are using the Liferay `MVCPortlet` class, you can use the following URL:
+
+    <portlet:resourceURL var="discussionPaginationURL">
+        <portlet:param name="invokeTaglibDiscussion"
+            value="<%= Boolean.TRUE.toString() %>" />
+    </portlet:resourceURL>
+
+#### Why was this change made?
+
+This change was made to support comment pagination.
+
+---------------------------------------
+
+### Replaced `ReservedUserIdException` with `UserIdException` Inner Classes
+- **Date:** 2015-Feb-10
+- **JIRA Ticket:** LPS-53487
+
+#### What changed?
+
+The `ReservedUserIdException` has been deprecated and replaced with
+`UserIdException.MustNotBeReserved`.
+
+#### Who is affected?
+
+This affects developers who have written code that catches the
+`ReservedUserIdException` while calling the affected methods.
+
+#### How should I update my code?
+
+You should replace catching exception `ReservedUserIdException` with
+catching exception `UserIdException.MustNotBeReserved`.
+
+#### Why was this change made?
+
+A new pattern has been defined for exceptions that provides higher expressivity
+in their names and also more information regarding why the exception was thrown.
+
+The new exception `UserIdException.MustNotBeReserved` provides its context and
+has all the necessary information about why the exception was thrown. In
+particular, it contains the problematic user ID and the list of reserved user
+IDs.
+
+------------------------------------------------------------------------------
+
+### Moved the `AssetPublisherUtil` Class and Removed It from the Public API
+- **Date:** 2015-Feb-11
+- **JIRA Ticket:** LPS-52744
+
+#### What changed?
+
+The class `AssetPublisherUtil` from the `portal-service` module has been moved
+to the module `AssetPublisher` and it is no longer a part of the public API.
+
+#### Who is affected?
+
+This affects developers who have written code that uses the `AssetPublisherUtil`
+class.
+
+#### How should I update my code?
+
+This `AssetPublisherUtil` class should no longer be used from other modules
+since it contains utility methods for the Asset Publisher portlet. If needed,
+you can define a dependency with the Asset Publisher module and use the new
+class.
+
+#### Why was this change made?
+
+This change has been made as part of the modularization efforts to decouple the
+different parts of the portal.
+
+---------------------------------------
+
+### Removed Operations That Used the `Fields` Class from the `StorageAdapter` Interface
+- **Date:** 2015-Feb-11
+- **JIRA Ticket:** LPS-53021
+
+#### What changed?
+
+All operations that used the `Fields` class have been removed from the
+`StorageAdapter` interface.
+
+#### Who is affected?
+
+This affects developers who have written code that directly calls these 
+operations. 
+
+#### How should I update my code?
+
+You should update your code to use the `DDMFormValues` class instead of the
+`Fields` class.
+
+#### Why was this change made?
+
+This change has been made due to the deprecation of the `Fields` class. 
+
+---------------------------------------
+
+### DLProcessor needs to implement a new method getType()
+- **Date:** 2015-Feb-17
+- **JIRA Ticket:** LPS-53574
+
+#### What changed?
+
+DLProcessor has a new method getType()
+
+#### Who is affected?
+
+All developers who have created DLProcessor
+
+#### How should I update my code?
+
+You need to implement the method in the DLProcessor and return the type of
+Processor. You can check the class DLProcessorConstants to see the types.
+class.
+
+#### Why was this change made?
+
+Before we were forcing developers to extend one of the existing DLProcessors and
+we were checking the instance of the class to determine what type of processor
+was.
+
+With the new change developers don't need to extend any particular class to
+create their own DLProcessor.
 
 ---------------------------------------

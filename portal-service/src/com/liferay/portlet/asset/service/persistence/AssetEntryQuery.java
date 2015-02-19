@@ -22,7 +22,6 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -59,8 +58,7 @@ public class AssetEntryQuery {
 	public static String checkOrderByCol(String orderByCol) {
 		if (ArrayUtil.contains(ORDER_BY_COLUMNS, orderByCol) ||
 			((orderByCol != null) &&
-			 orderByCol.startsWith(
-				DDMIndexer.DDM_FIELD_NAMESPACE + StringPool.FORWARD_SLASH))) {
+			 orderByCol.startsWith(DDMIndexer.DDM_FIELD_PREFIX))) {
 
 			return orderByCol;
 		}
@@ -104,6 +102,7 @@ public class AssetEntryQuery {
 		setKeywords(assetEntryQuery.getKeywords());
 		setLayout(assetEntryQuery.getLayout());
 		setLinkedAssetEntryId(assetEntryQuery.getLinkedAssetEntryId());
+		setListable(assetEntryQuery.isListable());
 		setNotAllCategoryIds(assetEntryQuery.getNotAllCategoryIds());
 		setNotAllTagIdsArray(assetEntryQuery.getNotAllTagIdsArray());
 		setNotAnyCategoryIds(assetEntryQuery.getNotAnyCategoryIds());
@@ -334,6 +333,10 @@ public class AssetEntryQuery {
 		return _excludeZeroViewCount;
 	}
 
+	public Boolean isListable() {
+		return _listable;
+	}
+
 	public Boolean isVisible() {
 		return _visible;
 	}
@@ -382,7 +385,7 @@ public class AssetEntryQuery {
 
 	public void setAttributes(Map<String, Serializable> attributes) {
 		if (_attributes == null) {
-			_attributes = new HashMap<String, Serializable>();
+			_attributes = new HashMap<>();
 		}
 		else {
 			_attributes = attributes;
@@ -455,6 +458,10 @@ public class AssetEntryQuery {
 		_linkedAssetEntryId = linkedAssetEntryId;
 
 		_toString = null;
+	}
+
+	public void setListable(boolean listable) {
+		_listable = listable;
 	}
 
 	public void setNotAllCategoryIds(long[] notAllCategoryIds) {
@@ -589,6 +596,8 @@ public class AssetEntryQuery {
 		sb.append(_keywords);
 		sb.append(", linkedAssetEntryId=");
 		sb.append(_linkedAssetEntryId);
+		sb.append(", listable=");
+		sb.append(_listable);
 		sb.append(", notAllCategoryIds=");
 		sb.append(StringUtil.merge(_notAllCategoryIds));
 		sb.append(", notAllTagIds=");
@@ -635,7 +644,7 @@ public class AssetEntryQuery {
 	}
 
 	private long[] _flattenTagIds(long[][] tagIdsArray) {
-		List<Long> tagIdsList = new ArrayList<Long>();
+		List<Long> tagIdsList = new ArrayList<>();
 
 		for (int i = 0; i < tagIdsArray.length; i++) {
 			long[] tagIds = tagIdsArray[i];
@@ -675,7 +684,8 @@ public class AssetEntryQuery {
 		return leftRightIds;
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(AssetEntryQuery.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		AssetEntryQuery.class);
 
 	private long[] _allCategoryIds = new long[0];
 	private long[] _allTagIds = new long[0];
@@ -683,8 +693,7 @@ public class AssetEntryQuery {
 	private boolean _andOperator;
 	private long[] _anyCategoryIds = new long[0];
 	private long[] _anyTagIds = new long[0];
-	private Map<String, Serializable> _attributes =
-		new HashMap<String, Serializable>();
+	private Map<String, Serializable> _attributes = new HashMap<>();
 	private long[] _classNameIds = new long[0];
 	private long[] _classTypeIds = new long[0];
 	private String _description;
@@ -696,6 +705,7 @@ public class AssetEntryQuery {
 	private String _keywords;
 	private Layout _layout;
 	private long _linkedAssetEntryId = 0;
+	private boolean _listable = true;
 	private long[] _notAllCategoryIds = new long[0];
 	private long[] _notAllTagIds = new long[0];
 	private long[][] _notAllTagIdsArray = new long[0][];

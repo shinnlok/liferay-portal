@@ -17,7 +17,7 @@ package com.liferay.taglib.util;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.servlet.DirectRequestDispatcherFactoryUtil;
 import com.liferay.portal.kernel.servlet.JSPSupportServlet;
-import com.liferay.portal.kernel.template.Template;
+import com.liferay.portal.kernel.servlet.taglib.ui.Menu;
 import com.liferay.portal.kernel.template.TemplateConstants;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -60,6 +60,7 @@ import com.liferay.taglib.ui.IconTag;
 import com.liferay.taglib.ui.JournalArticleTag;
 import com.liferay.taglib.ui.JournalContentSearchTag;
 import com.liferay.taglib.ui.LanguageTag;
+import com.liferay.taglib.ui.MenuTag;
 import com.liferay.taglib.ui.MySitesTag;
 import com.liferay.taglib.ui.PngImageTag;
 import com.liferay.taglib.ui.QuickAccessTag;
@@ -92,14 +93,20 @@ import javax.servlet.jsp.PageContext;
  */
 public class VelocityTaglibImpl implements VelocityTaglib {
 
-	public VelocityTaglibImpl() {
-	}
-
 	public VelocityTaglibImpl(
 		ServletContext servletContext, HttpServletRequest request,
-		HttpServletResponse response, Template template) {
+		HttpServletResponse response, Map<String, Object> contextObjects) {
 
-		init(servletContext, request, response, template);
+		_servletContext = servletContext;
+		_request = request;
+		_response = response;
+		_contextObjects = contextObjects;
+
+		JspFactory jspFactory = JspFactory.getDefaultFactory();
+
+		_pageContext = jspFactory.getPageContext(
+			new JSPSupportServlet(_servletContext), _request, _response, null,
+			false, 0, false);
 	}
 
 	@Override
@@ -442,6 +449,15 @@ public class VelocityTaglibImpl implements VelocityTaglib {
 	}
 
 	@Override
+	public MenuTag getMenuTag() throws Exception {
+		MenuTag menuTag = new MenuTag();
+
+		setUp(menuTag);
+
+		return menuTag;
+	}
+
+	@Override
 	public MySitesTag getMySitesTag() throws Exception {
 		MySitesTag mySitesTag = new MySitesTag();
 
@@ -765,6 +781,17 @@ public class VelocityTaglibImpl implements VelocityTaglib {
 	@Override
 	public void layoutIcon(Layout layout) throws Exception {
 		LayoutIconTag.doTag(layout, _servletContext, _request, _response);
+	}
+
+	@Override
+	public void menu(Menu menu) throws Exception {
+		MenuTag menuTag = new MenuTag();
+
+		setUp(menuTag);
+
+		menuTag.setMenu(menu);
+
+		menuTag.runTag();
 	}
 
 	@Override
@@ -1147,11 +1174,6 @@ public class VelocityTaglibImpl implements VelocityTaglib {
 	}
 
 	@Override
-	public void setTemplate(Template template) {
-		_template = template;
-	}
-
-	@Override
 	public void sitesDirectory() throws Exception {
 		SitesDirectoryTag sitesDirectoryTag = new SitesDirectoryTag();
 
@@ -1220,29 +1242,11 @@ public class VelocityTaglibImpl implements VelocityTaglib {
 			wrapPage, portletPage, _servletContext, _request, _response);
 	}
 
-	protected VelocityTaglibImpl init(
-		ServletContext servletContext, HttpServletRequest request,
-		HttpServletResponse response, Template template) {
-
-		_servletContext = servletContext;
-		_request = request;
-		_response = response;
-		_template = template;
-
-		JspFactory jspFactory = JspFactory.getDefaultFactory();
-
-		_pageContext = jspFactory.getPageContext(
-			new JSPSupportServlet(_servletContext), _request, _response, null,
-			false, 0, false);
-
-		return this;
-	}
-
 	protected void setUp(TagSupport tagSupport) throws Exception {
 		Writer writer = null;
 
-		if (_template != null) {
-			writer = (Writer)_template.get(TemplateConstants.WRITER);
+		if (_contextObjects != null) {
+			writer = (Writer)_contextObjects.get(TemplateConstants.WRITER);
 		}
 
 		if (writer == null) {
@@ -1252,10 +1256,10 @@ public class VelocityTaglibImpl implements VelocityTaglib {
 		tagSupport.setPageContext(new PipingPageContext(_pageContext, writer));
 	}
 
-	private PageContext _pageContext;
-	private HttpServletRequest _request;
-	private HttpServletResponse _response;
-	private ServletContext _servletContext;
-	private Template _template;
+	private final Map<String, Object> _contextObjects;
+	private final PageContext _pageContext;
+	private final HttpServletRequest _request;
+	private final HttpServletResponse _response;
+	private final ServletContext _servletContext;
 
 }

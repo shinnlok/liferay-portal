@@ -88,9 +88,7 @@ public class ActionUtil {
 			ActionRequest actionRequest, String deleteArticleId)
 		throws Exception {
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
+		long groupId = ParamUtil.getLong(actionRequest, "groupId");
 		String articleId = deleteArticleId;
 		String articleURL = ParamUtil.getString(actionRequest, "articleURL");
 		double version = 0;
@@ -103,8 +101,7 @@ public class ActionUtil {
 
 		if (pos == -1) {
 			JournalArticleServiceUtil.deleteArticle(
-				themeDisplay.getScopeGroupId(), articleId, articleURL,
-				serviceContext);
+				groupId, articleId, articleURL, serviceContext);
 		}
 		else {
 			articleId = articleId.substring(0, pos);
@@ -113,8 +110,7 @@ public class ActionUtil {
 					pos + EditArticleAction.VERSION_SEPARATOR.length()));
 
 			JournalArticleServiceUtil.deleteArticle(
-				themeDisplay.getScopeGroupId(), articleId, version, articleURL,
-				serviceContext);
+				groupId, articleId, version, articleURL, serviceContext);
 		}
 
 		JournalUtil.removeRecentArticle(actionRequest, articleId, version);
@@ -124,9 +120,7 @@ public class ActionUtil {
 			ActionRequest actionRequest, String expireArticleId)
 		throws Exception {
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
+		long groupId = ParamUtil.getLong(actionRequest, "groupId");
 		String articleId = expireArticleId;
 		String articleURL = ParamUtil.getString(actionRequest, "articleURL");
 		double version = 0;
@@ -139,8 +133,7 @@ public class ActionUtil {
 
 		if (pos == -1) {
 			JournalArticleServiceUtil.expireArticle(
-				themeDisplay.getScopeGroupId(), articleId, articleURL,
-				serviceContext);
+				groupId, articleId, articleURL, serviceContext);
 		}
 		else {
 			articleId = articleId.substring(0, pos);
@@ -149,8 +142,7 @@ public class ActionUtil {
 					pos + EditArticleAction.VERSION_SEPARATOR.length()));
 
 			JournalArticleServiceUtil.expireArticle(
-				themeDisplay.getScopeGroupId(), articleId, version, articleURL,
-				serviceContext);
+				groupId, articleId, version, articleURL, serviceContext);
 		}
 
 		JournalUtil.removeRecentArticle(actionRequest, articleId, version);
@@ -261,7 +253,7 @@ public class ActionUtil {
 		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		List<JournalArticle> articles = new ArrayList<JournalArticle>();
+		List<JournalArticle> articles = new ArrayList<>();
 
 		String[] articleIds = StringUtil.split(
 			ParamUtil.getString(request, "articleIds"));
@@ -363,7 +355,7 @@ public class ActionUtil {
 		long[] folderIds = StringUtil.split(
 			ParamUtil.getString(request, "folderIds"), 0L);
 
-		List<JournalFolder> folders = new ArrayList<JournalFolder>();
+		List<JournalFolder> folders = new ArrayList<>();
 
 		for (long folderId : folderIds) {
 			try {
@@ -474,7 +466,7 @@ public class ActionUtil {
 			String content, Fields fields, Locale locale)
 		throws Exception {
 
-		Map<String, byte[]> images = new HashMap<String, byte[]>();
+		Map<String, byte[]> images = new HashMap<>();
 
 		for (Field field : fields) {
 			String dataType = field.getDataType();

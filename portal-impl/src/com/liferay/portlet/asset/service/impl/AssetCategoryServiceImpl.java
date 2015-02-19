@@ -103,7 +103,7 @@ public class AssetCategoryServiceImpl extends AssetCategoryServiceBaseImpl {
 			long[] categoryIds, ServiceContext serviceContext)
 		throws PortalException {
 
-		List<AssetCategory> failedCategories = new ArrayList<AssetCategory>();
+		List<AssetCategory> failedCategories = new ArrayList<>();
 
 		for (long categoryId : categoryIds) {
 			try {
@@ -141,6 +141,14 @@ public class AssetCategoryServiceImpl extends AssetCategoryServiceBaseImpl {
 			getPermissionChecker(), categoryId, ActionKeys.DELETE);
 
 		assetCategoryLocalService.deleteCategory(categoryId);
+	}
+
+	@Override
+	public AssetCategory fetchCategory(long categoryId) throws PortalException {
+		AssetCategoryPermission.check(
+			getPermissionChecker(), categoryId, ActionKeys.VIEW);
+
+		return assetCategoryLocalService.fetchCategory(categoryId);
 	}
 
 	@Override

@@ -79,8 +79,8 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
 		_rejectedExecutionHandler = rejectedExecutionHandler;
 		_threadFactory = threadFactory;
 		_threadPoolHandler = threadPoolHandler;
-		_taskQueue = new TaskQueue<Runnable>(maxQueueSize);
-		_workerTasks = new HashSet<WorkerTask>();
+		_taskQueue = new TaskQueue<>(maxQueueSize);
+		_workerTasks = new HashSet<>();
 	}
 
 	public void adjustPoolSize(int newCorePoolSize, int newMaxPoolSize) {
@@ -392,7 +392,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
 				workerTask._thread.interrupt();
 			}
 
-			List<Runnable> runnables = new ArrayList<Runnable>();
+			List<Runnable> runnables = new ArrayList<>();
 
 			_taskQueue.drainTo(runnables);
 
@@ -457,14 +457,14 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
 
 	@Override
 	protected <T> DefaultNoticeableFuture<T> newTaskFor(Callable<T> callable) {
-		return new DefaultNoticeableFuture<T>(callable);
+		return new DefaultNoticeableFuture<>(callable);
 	}
 
 	@Override
 	protected <T> DefaultNoticeableFuture<T> newTaskFor(
 		Runnable runnable, T value) {
 
-		return new DefaultNoticeableFuture<T>(runnable, value);
+		return new DefaultNoticeableFuture<>(runnable, value);
 	}
 
 	private void _addWorkerThread() {

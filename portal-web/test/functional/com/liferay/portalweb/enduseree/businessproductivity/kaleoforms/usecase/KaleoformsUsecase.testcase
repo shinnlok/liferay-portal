@@ -137,16 +137,16 @@
 
 		<var name="key_kfProcessName" value="${kfProcessName}" />
 
-		<execute action="PGKaleoforms#assertClick" locator-key1="ASSIGNED_TO_MY_ROLES_TABLE_NAME" value1="${kfProcessName}" />
+		<execute function="AssertClick" locator1="PGKaleoforms#ASSIGNED_TO_MY_ROLES_TABLE_NAME" value1="${kfProcessName}" />
 
-		<execute action="PGKaleoformsInboxProcess#assertTextEquals" locator-key1="ASSIGNED_TO_LABEL" value1="Assigned to" />
-		<execute action="PGKaleoformsInboxProcess#assertTextEquals" locator-key1="ASSIGNED_TO" value1="Assigned to Nobody - Assign to Me" />
-		<execute action="PGKaleoformsInboxProcess#assertTextEquals" locator-key1="ASSIGNED_TO_ASSIGN_TO_ME_LINK" value1="Assign to Me" />
-		<execute action="PGKaleoformsInboxProcess#assertTextEquals" locator-key1="STATE_LABEL" value1="State" />
-		<execute action="PGKaleoformsInboxProcess#assertTextEquals" locator-key1="STATE_STATUS" value1="State ${kfProcessStatus}" />
-		<execute action="PGKaleoformsInboxProcess#assertTextEquals" locator-key1="DUE_DATE_LABEL" value1="Due Date" />
-		<execute action="PGKaleoformsInboxProcess#assertTextEquals" locator-key1="DUE_DATE_DATE" value1="Due Date Never - (Change)" />
-		<execute action="PGKaleoformsInboxProcess#assertTextEquals" locator-key1="WORKFLOW_STATUS" value1="${kfProcessStatus}" />
+		<execute function="AssertTextEquals" locator1="PGKaleoformsInboxProcess#ASSIGNED_TO_LABEL" value1="Assigned to" />
+		<execute function="AssertTextEquals" locator1="PGKaleoformsInboxProcess#ASSIGNED_TO" value1="Assigned to Nobody - Assign to Me" />
+		<execute function="AssertTextEquals" locator1="PGKaleoformsInboxProcess#ASSIGNED_TO_ASSIGN_TO_ME_LINK" value1="Assign to Me" />
+		<execute function="AssertTextEquals" locator1="PGKaleoformsInboxProcess#STATE_LABEL" value1="State" />
+		<execute function="AssertTextEquals" locator1="PGKaleoformsInboxProcess#STATE_STATUS" value1="State ${kfProcessStatus}" />
+		<execute function="AssertTextEquals" locator1="PGKaleoformsInboxProcess#DUE_DATE_LABEL" value1="Due Date" />
+		<execute function="AssertTextEquals" locator1="PGKaleoformsInboxProcess#DUE_DATE_DATE" value1="Due Date Never - (Change)" />
+		<execute function="AssertTextEquals" locator1="PGKaleoformsInboxProcess#WORKFLOW_STATUS" value1="${kfProcessStatus}" />
 	</command>
 
 	<command name="AssertEditFormNotUsedAsCreateForm" priority="5">
@@ -269,7 +269,7 @@
 			<var name="kfProcessFieldData" value="4" />
 		</execute>
 
-		<execute action="PGKaleoformsSubmitnew#assertElementNotPresent" locator-key1="NEW_PROCESS_FIELDS_SEPARATOR" />
+		<execute function="AssertElementNotPresent" locator1="PGKaleoformsSubmitnew#NEW_PROCESS_FIELDS_SEPARATOR" />
 
 		<execute macro="KaleoFormsPortlet#saveProcessRecord" />
 
@@ -525,8 +525,8 @@
 			<var name="userLoginFullName" value="userfn userln" />
 		</execute>
 
-		<execute action="Dockbar#assertClick" locator-key1="ADMIN" value1="Admin" />
-		<execute action="Dockbar#assertClick" locator-key1="ADMIN_SITE_ADMINISTRATION_CONTENT" value1="Content" />
+		<execute function="AssertClick#assertTextClickAtClickDockbar" locator1="Dockbar#ADMIN" value1="Admin" />
+		<execute function="AssertClick" locator1="Dockbar#ADMIN_SITE_ADMINISTRATION_CONTENT" value1="Content" />
 
 		<execute macro="KaleoFormsAdmin#addProcess" />
 
@@ -947,7 +947,7 @@
 			<var name="pageName" value="Kaleo Forms" />
 		</execute>
 
-		<execute macro="KaleoFormsPortlet#completeFormForTask">
+		<execute macro="KaleoFormsPortlet#completeFormForTaskViaTable">
 			<var name="kfProcessName" value="Kaleo Forms Process" />
 			<var name="workflowTask" value="review" />
 		</execute>
@@ -1441,6 +1441,239 @@
 		</execute>
 	</command>
 
+	<command name="CompleteFormWithMultipleAssignedProcessRecordsAndViewChanges" priority="4">
+		<description message="This is a use case for LPS-43482." />
+
+		<var name="kfFieldSetName" value="Field Set Data Definition" />
+		<var name="kfProcessDescription" value="Kaleo Forms Process Description" />
+		<var name="kfProcessName" value="Kaleo Forms Process" />
+
+		<execute macro="Page#gotoContentCP">
+			<var name="portletName" value="Kaleo Forms Admin" />
+		</execute>
+
+		<execute macro="KaleoFormsAdmin#addProcess" />
+
+		<execute macro="KaleoFormsAdmin#addProcessDetails">
+			<var name="kfProcessDescription" value="${kfProcessDescription}" />
+			<var name="kfProcessName" value="${kfProcessName}" />
+		</execute>
+
+		<execute macro="KaleoFormsAdmin#next" />
+
+		<execute macro="KaleoFormsAdmin#addFieldSet">
+			<var name="kfFieldSetName" value="${kfFieldSetName}" />
+			<var name="kfProcessName" value="${kfProcessName}" />
+		</execute>
+
+		<execute macro="DynamicDataMapping#addField">
+			<var name="field" value="Text" />
+			<var name="fieldFieldLabel" value="Text" />
+			<var name="fieldName" value="Text" />
+		</execute>
+
+		<execute macro="KaleoFormsAdmin#saveFieldSet">
+			<var name="kfFieldSetName" value="${kfFieldSetName}" />
+		</execute>
+
+		<execute macro="KaleoFormsAdmin#chooseFieldSet">
+			<var name="kfFieldSetName" value="${kfFieldSetName}" />
+			<var name="kfProcessName" value="${kfProcessName}" />
+		</execute>
+
+		<execute macro="KaleoFormsAdmin#next" />
+
+		<execute macro="KaleoFormsAdmin#chooseWorkflow">
+			<var name="kfProcessName" value="${kfProcessName}" />
+			<var name="workflowDefinitionTitle" value="Single Approver" />
+		</execute>
+
+		<execute macro="KaleoFormsAdmin#next" />
+
+		<execute macro="KaleoFormsAdmin#assignForm">
+			<var name="kfProcessName" value="${kfProcessName}" />
+			<var name="workflowTask" value="create" />
+		</execute>
+
+		<execute macro="KaleoFormsAdmin#addForm">
+			<var name="kfFormName" value="Created Task Form" />
+		</execute>
+
+		<execute macro="KaleoFormsAdmin#saveForm" />
+
+		<execute macro="KaleoFormsAdmin#chooseForm">
+			<var name="kfFormName" value="Created Task Form" />
+		</execute>
+
+		<execute macro="KaleoFormsAdmin#saveProcess">
+			<var name="kfProcessName" value="${kfProcessName}" />
+		</execute>
+
+		<execute macro="KaleoFormsAdmin#viewProcess">
+			<var name="kfProcessName" value="${kfProcessName}" />
+		</execute>
+
+		<execute macro="Page#addPG">
+			<var name="pageName" value="Kaleo Forms Page" />
+		</execute>
+
+		<execute macro="Portlet#addPG">
+			<var name="portletName" value="Kaleo Forms" />
+		</execute>
+
+		<execute macro="KaleoFormsPortlet#viewNoTasks" />
+
+		<execute macro="KaleoFormsPortlet#submitNewProcess">
+			<var name="kfProcessName" value="${kfProcessName}" />
+		</execute>
+
+		<execute macro="KaleoFormsPortlet#populateFieldText">
+			<var name="fieldName" value="Text" />
+			<var name="kfProcessFieldData" value="Test 1" />
+		</execute>
+
+		<execute macro="KaleoFormsPortlet#saveProcessRecord" />
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Kaleo Forms Page" />
+		</execute>
+
+		<execute macro="KaleoFormsPortlet#submitNewProcess">
+			<var name="kfProcessName" value="${kfProcessName}" />
+		</execute>
+
+		<execute macro="KaleoFormsPortlet#populateFieldText">
+			<var name="fieldName" value="Text" />
+			<var name="kfProcessFieldData" value="Test 2" />
+		</execute>
+
+		<execute macro="KaleoFormsPortlet#saveProcessRecord" />
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Kaleo Forms Page" />
+		</execute>
+
+		<execute macro="KaleoFormsPortlet#assignProcessToMe">
+			<var name="kfProcessName" value="Kaleo Forms Process" />
+			<var name="workflowTask" value="review" />
+		</execute>
+
+		<execute macro="KaleoFormsPortlet#assignProcessToMe">
+			<var name="kfProcessName" value="Kaleo Forms Process" />
+			<var name="workflowTask" value="review" />
+		</execute>
+
+		<execute macro="KaleoFormsPortlet#completeFormForTaskViaTable">
+			<var name="kfProcessName" value="Kaleo Forms Process" />
+			<var name="workflowTask" value="review" />
+		</execute>
+
+		<execute macro="KaleoFormsPortlet#viewCompleteFormFieldText">
+			<var name="fieldName" value="Text" />
+			<var name="kfProcessFieldData" value="Test 1" />
+		</execute>
+
+		<execute macro="KaleoFormsPortlet#populateFieldText">
+			<var name="fieldName" value="Text" />
+			<var name="kfProcessFieldData" value="Test 1 EDIT" />
+		</execute>
+
+		<execute macro="KaleoFormsPortlet#saveProcessRecord" />
+
+		<execute macro="KaleoFormsPortlet#viewProcessAssignedToMe">
+			<var name="kfProcessName" value="Kaleo Forms Process" />
+		</execute>
+
+		<execute macro="KaleoFormsPortlet#viewProcessEntryField">
+			<var name="fieldName" value="Text" />
+			<var name="kfProcessFieldData" value="Test 1 EDIT" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Kaleo Forms Page" />
+		</execute>
+
+		<execute macro="KaleoFormsPortlet#completeFormForSecondProcessTaskViaTable">
+			<var name="kfProcessName" value="Kaleo Forms Process" />
+			<var name="workflowTask" value="review" />
+		</execute>
+
+		<execute macro="KaleoFormsPortlet#viewCompleteFormFieldText">
+			<var name="fieldName" value="Text" />
+			<var name="kfProcessFieldData" value="Test 2" />
+		</execute>
+
+		<execute macro="KaleoFormsPortlet#populateFieldText">
+			<var name="fieldName" value="Text" />
+			<var name="kfProcessFieldData" value="Test 2 EDIT" />
+		</execute>
+
+		<execute macro="KaleoFormsPortlet#saveProcessRecord" />
+
+		<execute macro="KaleoFormsPortlet#viewSecondProcessAssignedToMe">
+			<var name="kfProcessName" value="Kaleo Forms Process" />
+		</execute>
+
+		<execute macro="KaleoFormsPortlet#viewProcessEntryField">
+			<var name="fieldName" value="Text" />
+			<var name="kfProcessFieldData" value="Test 2 EDIT" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Kaleo Forms Page" />
+		</execute>
+
+		<execute macro="KaleoFormsPortlet#viewProcessAssignedToMe">
+			<var name="kfProcessName" value="Kaleo Forms Process" />
+		</execute>
+
+		<execute macro="KaleoFormsPortlet#viewProcessEntryField">
+			<var name="fieldName" value="Text" />
+			<var name="kfProcessFieldData" value="Test 1 EDIT" />
+		</execute>
+
+		<execute macro="KaleoFormsPortlet#completeFormForTaskViaRecordView" />
+
+		<execute macro="KaleoFormsPortlet#populateFieldText">
+			<var name="fieldName" value="Text" />
+			<var name="kfProcessFieldData" value="Test 1 EDIT new edit" />
+		</execute>
+
+		<execute macro="KaleoFormsPortlet#saveProcessRecord" />
+
+		<execute macro="KaleoFormsPortlet#viewProcessEntryField">
+			<var name="fieldName" value="Text" />
+			<var name="kfProcessFieldData" value="Test 1 EDIT new edit" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Kaleo Forms Page" />
+		</execute>
+
+		<execute macro="KaleoFormsPortlet#viewSecondProcessAssignedToMe">
+			<var name="kfProcessName" value="Kaleo Forms Process" />
+		</execute>
+
+		<execute macro="KaleoFormsPortlet#viewProcessEntryField">
+			<var name="fieldName" value="Text" />
+			<var name="kfProcessFieldData" value="Test 2 EDIT" />
+		</execute>
+
+		<execute macro="KaleoFormsPortlet#completeFormForTaskViaRecordView" />
+
+		<execute macro="KaleoFormsPortlet#populateFieldText">
+			<var name="fieldName" value="Text" />
+			<var name="kfProcessFieldData" value="Test 2 EDIT new edit" />
+		</execute>
+
+		<execute macro="KaleoFormsPortlet#saveProcessRecord" />
+
+		<execute macro="KaleoFormsPortlet#viewProcessEntryField">
+			<var name="fieldName" value="Text" />
+			<var name="kfProcessFieldData" value="Test 2 EDIT new edit" />
+		</execute>
+	</command>
+
 	<command name="CompleteProcessAndAssertFieldOrder" priority="4">
 		<var name="kfFieldSetName" value="Field Set Data Definition" />
 		<var name="kfProcessName" value="Kaleo Forms Process" />
@@ -1570,9 +1803,9 @@
 			<var name="kfProcessFieldData" value="option 2" />
 		</execute>
 
-		<execute action="PGKaleoformsSubmitnew#assertTextEquals" locator1="//div[contains(@class,'control-group field-wrapper')][1]/label" value1="Text" />
-		<execute action="PGKaleoformsSubmitnew#assertTextEquals" locator1="//div[contains(@class,'control-group field-wrapper')][2]/label" value1="Text Box" />
-		<execute action="PGKaleoformsSubmitnew#assertTextEquals" locator1="//div[contains(@class,'control-group field-wrapper')][3]/div/label" value1="Select" />
+		<execute function="AssertTextEquals" locator1="//div[contains(@class,'control-group field-wrapper')][1]/label" value1="Text" />
+		<execute function="AssertTextEquals" locator1="//div[contains(@class,'control-group field-wrapper')][2]/label" value1="Text Box" />
+		<execute function="AssertTextEquals" locator1="//div[contains(@class,'control-group field-wrapper')][3]/div/label" value1="Select" />
 
 		<execute macro="KaleoFormsPortlet#saveProcessRecord" />
 
@@ -1585,7 +1818,7 @@
 			<var name="workflowTask" value="review" />
 		</execute>
 
-		<execute macro="KaleoFormsPortlet#completeFormForTask">
+		<execute macro="KaleoFormsPortlet#completeFormForTaskViaTable">
 			<var name="kfProcessName" value="Kaleo Forms Process" />
 			<var name="workflowTask" value="review" />
 		</execute>
@@ -1604,8 +1837,8 @@
 			<var name="fieldName" value="Text Box" />
 		</execute>
 
-		<execute action="PGKaleoformsMycompletedrequestsProcess#assertTextEquals" locator1="//div[contains(@class,'control-group field-wrapper')][1]/label" value1="Text" />
-		<execute action="PGKaleoformsMycompletedrequestsProcess#assertTextEquals" locator1="//div[contains(@class,'control-group field-wrapper')][2]/div/label" value1="Select" />
+		<execute function="AssertTextEquals" locator1="//div[contains(@class,'control-group field-wrapper')][1]/label" value1="Text" />
+		<execute function="AssertTextEquals" locator1="//div[contains(@class,'control-group field-wrapper')][2]/div/label" value1="Select" />
 
 		<execute macro="KaleoFormsPortlet#saveProcessRecord" />
 
@@ -1638,9 +1871,9 @@
 			<var name="kfProcessFieldData" value="option 2" />
 		</execute>
 
-		<execute action="PGKaleoformsMycompletedrequestsProcess#assertTextEquals" locator1="//div[contains(@class,'field-wrapper-content')][1]/label" value1="Text" />
-		<execute action="PGKaleoformsMycompletedrequestsProcess#assertTextEquals" locator1="//div[contains(@class,'field-wrapper-content')][2]/label" value1="Text Box" />
-		<execute action="PGKaleoformsMycompletedrequestsProcess#assertTextEquals" locator1="//div[contains(@class,'field-wrapper-content')][3]/label" value1="Select" />
+		<execute function="AssertTextEquals" locator1="//div[contains(@class,'field-wrapper-content')][1]/label" value1="Text" />
+		<execute function="AssertTextEquals" locator1="//div[contains(@class,'field-wrapper-content')][2]/label" value1="Text Box" />
+		<execute function="AssertTextEquals" locator1="//div[contains(@class,'field-wrapper-content')][3]/label" value1="Select" />
 
 		<execute macro="KaleoFormsPortlet#viewMyCompletedRequestsTasks" />
 	</command>
@@ -1928,7 +2161,7 @@
 
 		<execute macro="KaleoFormsPortlet#saveProcessRecord" />
 
-		<execute action="BaseLiferay#pause" locator1="30000" />
+		<execute function="Pause" locator1="30000" />
 
 		<execute macro="Gmail#login">
 			<var name="userEmailAddress" value="${user2EmailAddress}" />
@@ -1952,7 +2185,7 @@
 			<var name="userPassword" value="${user2EmailPassword}" />
 		</execute>
 
-		<execute action="Home#open" locator1="http://localhost:8080" />
+		<execute function="Open" locator1="http://localhost:8080" />
 
 		<execute macro="User#logoutAndLoginPG">
 			<var name="userLoginEmailAddress" value="${user2EmailAddress}" />
@@ -1968,7 +2201,7 @@
 			<var name="workflowTask" value="review" />
 		</execute>
 
-		<execute action="BaseLiferay#pause" locator1="30000" />
+		<execute function="Pause" locator1="30000" />
 
 		<execute macro="Gmail#login">
 			<var name="userEmailAddress" value="${user2EmailAddress}" />
@@ -1980,10 +2213,10 @@
 		<execute macro="Gmail#viewMail">
 			<var name="emailFromUserName" value="Liferay Portal Workflow ." />
 			<var name="gmailAssetType" value="Review Notification Description" />
-			<var name="gmailMailTableMessageTitle" value="Review Notification Description - ${user1FirstName} ${user1LastName} sent you a Kaleo Process for review in the workflow." />
-			<var name="gmailMessageBody" value="${user1FirstName} ${user1LastName} sent you a Kaleo Process for review in the workflow." />
-			<var name="gmailMessageBodyClosing" value="${user1FirstName} ${user1LastName} sent you a Kaleo Process for review in the workflow." />
-			<var name="gmailMessageBodyGreeting" value="${user1FirstName} ${user1LastName} sent you a Kaleo Process for review in the workflow." />
+			<var name="gmailMailTableMessageTitle" value="Review Notification Description - ${user1FirstName} ${user1LastName} sent you a Kaleo Forms Process for review in the workflow." />
+			<var name="gmailMessageBody" value="${user1FirstName} ${user1LastName} sent you a Kaleo Forms Process for review in the workflow." />
+			<var name="gmailMessageBodyClosing" value="${user1FirstName} ${user1LastName} sent you a Kaleo Forms Process for review in the workflow." />
+			<var name="gmailMessageBodyGreeting" value="${user1FirstName} ${user1LastName} sent you a Kaleo Forms Process for review in the workflow." />
 			<var name="gmailMessageTitle" value="Review Notification Description" />
 		</execute>
 
@@ -1992,7 +2225,7 @@
 			<var name="userPassword" value="${user2EmailPassword}" />
 		</execute>
 
-		<execute action="Home#open" locator1="http://localhost:8080" />
+		<execute function="Open" locator1="http://localhost:8080" />
 
 		<execute macro="Page#gotoPG">
 			<var name="pageName" value="${pageName}" />
@@ -2005,7 +2238,7 @@
 
 		<execute macro="KaleoFormsPortlet#viewNoTasks" />
 
-		<execute action="BaseLiferay#pause" locator1="30000" />
+		<execute function="Pause" locator1="30000" />
 
 		<execute macro="Gmail#logoutAndLogin">
 			<var name="userEmailAddress" value="${user3EmailAddress}" />
@@ -2028,7 +2261,7 @@
 			<var name="userPassword" value="${user3EmailPassword}" />
 		</execute>
 
-		<execute action="Home#open" locator1="http://localhost:8080" />
+		<execute function="Open" locator1="http://localhost:8080" />
 
 		<execute macro="User#logoutAndLoginPG">
 			<var name="userLoginEmailAddress" value="${user3EmailAddress}" />
@@ -2049,7 +2282,7 @@
 			<var name="workflowTask" value="update" />
 		</execute>
 
-		<execute action="BaseLiferay#pause" locator1="30000" />
+		<execute function="Pause" locator1="30000" />
 
 		<execute macro="Gmail#logoutAndLogin">
 			<var name="userEmailAddress" value="${user2EmailAddress}" />
@@ -2073,7 +2306,7 @@
 			<var name="userPassword" value="${user2EmailPassword}" />
 		</execute>
 
-		<execute action="Home#open" locator1="http://localhost:8080" />
+		<execute function="Open" locator1="http://localhost:8080" />
 
 		<execute macro="User#logoutAndLoginPG">
 			<var name="userLoginEmailAddress" value="${user2EmailAddress}" />
@@ -3971,8 +4204,8 @@
 
 		<var name="key_kfProcessName" value="${kfProcessName}" />
 
-		<execute action="PGKaleoforms#click" locator-key1="ASSIGNED_TO_ME_TABLE_ACTIONS" />
-		<execute action="PGKaleoforms#assertElementNotPresent" locator-key1="ASSIGNED_TO_ME_MENULIST_REJECT" />
+		<execute function="Click" locator1="PGKaleoforms#ASSIGNED_TO_ME_TABLE_ACTIONS_1" />
+		<execute function="AssertElementNotPresent" locator1="PGKaleoforms#ASSIGNED_TO_ME_MENULIST_REJECT" />
 
 		<execute macro="KaleoFormsPortlet#approveProcess">
 			<var name="kfProcessName" value="${kfProcessName}" />
@@ -4469,7 +4702,7 @@
 			<var name="workflowTask" value="review" />
 		</execute>
 
-		<execute macro="KaleoFormsPortlet#completeFormForTask">
+		<execute macro="KaleoFormsPortlet#completeFormForTaskViaTable">
 			<var name="kfProcessName" value="${kfProcessName}" />
 			<var name="workflowTask" value="review" />
 		</execute>
@@ -4517,7 +4750,7 @@
 			<var name="pageName" value="Kaleo Forms Page" />
 		</execute>
 
-		<execute macro="KaleoFormsPortlet#completeFormForTask">
+		<execute macro="KaleoFormsPortlet#completeFormForTaskViaTable">
 			<var name="kfProcessName" value="${kfProcessName}" />
 			<var name="workflowTask" value="review" />
 		</execute>
@@ -4529,7 +4762,7 @@
 
 		<var name="key_fieldName" value="Fieldset" />
 
-		<execute action="PGKaleoformsSubmitnew#assertElementNotPresent" locator-key1="NEW_PROCESS_FIELDS_FIELDSET" />
+		<execute function="AssertElementNotPresent" locator1="PGKaleoformsSubmitnew#NEW_PROCESS_FIELDS_FIELDSET" />
 
 		<execute macro="Page#gotoPG">
 			<var name="pageName" value="Kaleo Forms Page" />
@@ -5747,7 +5980,7 @@
 			<var name="workflowTask" value="review" />
 		</execute>
 
-		<execute macro="KaleoFormsPortlet#completeFormForTask">
+		<execute macro="KaleoFormsPortlet#completeFormForTaskViaTable">
 			<var name="kfProcessName" value="${kfProcessName}" />
 			<var name="workflowTask" value="review" />
 		</execute>
@@ -5794,7 +6027,7 @@
 			<var name="pageName" value="Kaleo Forms Page" />
 		</execute>
 
-		<execute macro="KaleoFormsPortlet#completeFormForTask">
+		<execute macro="KaleoFormsPortlet#completeFormForTaskViaTable">
 			<var name="kfProcessName" value="${kfProcessName}" />
 			<var name="workflowTask" value="review" />
 		</execute>
@@ -6005,7 +6238,7 @@
 			<var name="workflowTask" value="review" />
 		</execute>
 
-		<execute macro="KaleoFormsPortlet#completeFormForTask">
+		<execute macro="KaleoFormsPortlet#completeFormForTaskViaTable">
 			<var name="kfProcessName" value="${kfProcessName}" />
 			<var name="workflowTask" value="review" />
 		</execute>
@@ -6037,7 +6270,7 @@
 
 		<var name="key_fieldName" value="quantity" />
 
-		<execute action="PGKaleoformsSubmitnew#assertElementNotPresent" locator-key1="NEW_PROCESS_FIELDS_TEXT_FIELD" />
+		<execute function="AssertElementNotPresent" locator1="PGKaleoformsSubmitnew#NEW_PROCESS_FIELDS_TEXT_FIELD" />
 
 		<execute macro="Page#gotoContentCP">
 			<var name="portletName" value="Dynamic Data Lists" />
@@ -6052,7 +6285,7 @@
 			<var name="pageName" value="Kaleo Forms Page" />
 		</execute>
 
-		<execute macro="KaleoFormsPortlet#completeFormForTask">
+		<execute macro="KaleoFormsPortlet#completeFormForTaskViaTable">
 			<var name="kfProcessName" value="${kfProcessName}" />
 			<var name="workflowTask" value="review" />
 		</execute>
@@ -6244,7 +6477,7 @@
 			<var name="workflowTask" value="review" />
 		</execute>
 
-		<execute macro="KaleoFormsPortlet#completeFormForTask">
+		<execute macro="KaleoFormsPortlet#completeFormForTaskViaTable">
 			<var name="kfProcessName" value="${kfProcessName}" />
 			<var name="workflowTask" value="review" />
 		</execute>
@@ -6409,7 +6642,7 @@
 			<var name="workflowTask" value="review" />
 		</execute>
 
-		<execute macro="KaleoFormsPortlet#completeFormForTask">
+		<execute macro="KaleoFormsPortlet#completeFormForTaskViaTable">
 			<var name="kfProcessName" value="${kfProcessName}" />
 			<var name="workflowTask" value="review" />
 		</execute>
@@ -6934,6 +7167,149 @@
 		</execute>
 	</command>
 
+	<command name="ViewApprovedProcessNotificationWithComments" priority="5">
+		<property name="portlet.plugins.includes" value="kaleo-designer-portlet,kaleo-forms-portlet,notifications-portlet" />
+
+		<var name="comment" value="Process is approved" />
+		<var name="kfFieldSetName" value="Field Set Data Definition" />
+		<var name="kfProcessDescription" value="Kaleo Forms Process Description" />
+		<var name="kfProcessName" value="Kaleo Forms Process" />
+		<var name="nodeNotificationsTemplate"><![CDATA[Submission reviewed. The reviewer left the following: $taskComments.]]></var>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Workflow" />
+		</execute>
+
+		<execute macro="KaleoDesigner#editWorkflowDefinitionViaWorkflowCP">
+			<var name="workflowDefinitionTitle" value="Single Approver" />
+		</execute>
+
+		<execute macro="KaleoDesigner#editWorkflowDefinitionTitleViaWorkflowCP">
+			<var name="workflowDefinitionTitle" value="Edited Workflow Definition" />
+		</execute>
+
+		<execute macro="KaleoDesigner#selectNode">
+			<var name="nodeNodeLabel" value="review" />
+		</execute>
+
+		<execute macro="KaleoDesigner#editNodeNotifications">
+			<var name="nodeNotificationsDescription" value="Review Notification Description" />
+			<var name="nodeNotificationsExecutionType" value="On Exit" />
+			<var name="nodeNotificationsName" value="Review Completed With Comments User Notification" />
+			<var name="nodeNotificationsTemplate" value="${nodeNotificationsTemplate}" />
+			<var name="nodeNotificationsTemplateLanguage" value="Velocity" />
+			<var name="nodeNotificationsType" value="User Notification" />
+		</execute>
+
+		<execute macro="KaleoDesigner#publishWorkflowDefinitionViaWorkflowCP" />
+
+		<execute macro="Page#gotoContentCP">
+			<var name="portletName" value="Kaleo Forms Admin" />
+		</execute>
+
+		<execute macro="KaleoFormsAdmin#addProcess" />
+
+		<execute macro="KaleoFormsAdmin#addProcessDetails">
+			<var name="kfProcessDescription" value="${kfProcessDescription}" />
+			<var name="kfProcessName" value="${kfProcessName}" />
+		</execute>
+
+		<execute macro="KaleoFormsAdmin#next" />
+
+		<execute macro="KaleoFormsAdmin#addFieldSet">
+			<var name="kfFieldSetName" value="${kfFieldSetName}" />
+			<var name="kfProcessName" value="${kfProcessName}" />
+		</execute>
+
+		<execute macro="DynamicDataMapping#addField">
+			<var name="field" value="Text" />
+			<var name="fieldFieldLabel" value="Text" />
+			<var name="fieldName" value="Text" />
+		</execute>
+
+		<execute macro="KaleoFormsAdmin#saveFieldSet">
+			<var name="kfFieldSetName" value="${kfFieldSetName}" />
+		</execute>
+
+		<execute macro="KaleoFormsAdmin#chooseFieldSet">
+			<var name="kfFieldSetName" value="${kfFieldSetName}" />
+			<var name="kfProcessName" value="${kfProcessName}" />
+		</execute>
+
+		<execute macro="KaleoFormsAdmin#next" />
+
+		<execute macro="KaleoFormsAdmin#chooseWorkflow">
+			<var name="kfProcessName" value="${kfProcessName}" />
+			<var name="workflowDefinitionTitleEdit" value="Edited Workflow Definition" />
+		</execute>
+
+		<execute macro="KaleoFormsAdmin#next" />
+
+		<execute macro="KaleoFormsAdmin#assignForm">
+			<var name="kfProcessName" value="${kfProcessName}" />
+			<var name="workflowTask" value="create" />
+		</execute>
+
+		<execute macro="KaleoFormsAdmin#addForm">
+			<var name="kfFormName" value="Created Task Form" />
+		</execute>
+
+		<execute macro="KaleoFormsAdmin#saveForm" />
+
+		<execute macro="KaleoFormsAdmin#chooseForm">
+			<var name="kfFormName" value="Created Task Form" />
+		</execute>
+
+		<execute macro="KaleoFormsAdmin#saveProcess">
+			<var name="kfProcessName" value="${kfProcessName}" />
+		</execute>
+
+		<execute macro="KaleoFormsAdmin#viewProcess">
+			<var name="kfProcessName" value="${kfProcessName}" />
+		</execute>
+
+		<execute macro="Page#addPG">
+			<var name="pageName" value="Kaleo Forms Page" />
+		</execute>
+
+		<execute macro="Portlet#addPG">
+			<var name="portletName" value="Kaleo Forms" />
+		</execute>
+
+		<execute macro="KaleoFormsPortlet#viewNoTasks" />
+
+		<execute macro="KaleoFormsPortlet#submitNewProcess">
+			<var name="kfProcessName" value="${kfProcessName}" />
+		</execute>
+
+		<execute macro="KaleoFormsPortlet#populateFieldText">
+			<var name="fieldName" value="Text" />
+			<var name="kfProcessFieldData" value="Test 1" />
+		</execute>
+
+		<execute macro="KaleoFormsPortlet#saveProcessRecord" />
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Kaleo Forms Page" />
+		</execute>
+
+		<execute macro="KaleoFormsPortlet#assignProcessToMe">
+			<var name="kfProcessName" value="${kfProcessName}" />
+			<var name="workflowTask" value="review" />
+		</execute>
+
+		<execute macro="KaleoFormsPortlet#approveProcess">
+			<var name="comment" value="${comment}" />
+			<var name="kfProcessName" value="${kfProcessName}" />
+			<var name="workflowTask" value="review" />
+		</execute>
+
+		<execute macro="Notifications#viewNotification">
+			<var name="notificationContent" value="Submission reviewed. The reviewer left the following: ${comment}." />
+			<var name="notificationCount" value="1" />
+		</execute>
+	</command>
+
 	<command name="ViewApprovedProcessRecords" priority="5">
 		<var name="kfFieldSetName" value="Field Set Data Definition" />
 		<var name="kfProcessName" value="Kaleo Forms Process" />
@@ -7353,6 +7729,557 @@
 		</execute>
 	</command>
 
+	<command name="ViewEmailNotificationSentToTaskAssignees" priority="5">
+		<description message="This is a use case for LPS-50688 and LPS-35263." />
+
+		<property name="test.assert.javascript.errors" value="false" />
+
+		<var name="field" value="Text" />
+		<var name="fieldFieldLabel" value="Text" />
+		<var name="fieldName" value="Text" />
+		<var name="kfFieldSetName" value="Field Set Data Definition" />
+		<var name="kfProcessDescription" value="Kaleo Forms Process Description" />
+		<var name="kfProcessFieldData" value="Test" />
+		<var name="kfProcessName" value="Kaleo Forms Process" />
+		<var name="pageName" value="Kaleo Forms" />
+		<var name="role1Name" value="KaleoSubmitRole Name" />
+		<var name="role2Name" value="KaleoReviewRole Name" />
+		<var name="role3Name" value="Administrator" />
+		<var name="user1EmailAddress" property-value="email.address.2" />
+		<var name="user1EmailPassword" property-value="email.password.2" />
+		<var name="user1FirstName" value="userfn1" />
+		<var name="user1LastName" value="Submitter" />
+		<var name="user1ScreenName" value="kaloesubmitter" />
+		<var name="user2EmailAddress" property-value="email.address.3" />
+		<var name="user2EmailPassword" property-value="email.password.3" />
+		<var name="user2FirstName" value="userfn2" />
+		<var name="user2LastName" value="Updater" />
+		<var name="user2ScreenName" value="kaleoupdater" />
+		<var name="user3EmailAddress" property-value="email.address.4" />
+		<var name="user3EmailPassword" property-value="email.password.4" />
+		<var name="user3FirstName" value="userfn3" />
+		<var name="user3LastName" value="Administrator" />
+		<var name="user3ScreenName" value="admin" />
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Server Administration" />
+		</execute>
+
+		<execute macro="ServerAdministration#configureMailServerSettings">
+			<var name="userName" property-value="email.address.1" />
+			<var name="userPassword" property-value="email.password.1" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Roles" />
+		</execute>
+
+		<execute macro="Role#addCP">
+			<var name="roleName" value="${role1Name}" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Roles" />
+		</execute>
+
+		<execute macro="Role#addCP">
+			<var name="roleName" value="${role2Name}" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Roles" />
+		</execute>
+
+		<execute macro="Role#definePermissionCmdCP">
+			<var name="permissionDefinitionKey" value="SITE_ADMIN_APPLICATIONS_KALEO_FORMS_APPLICATION_PERMISSIONS_VIEW" />
+			<var name="permissionDefinitionValue" value="View" />
+			<var name="permissionNavigationKey" value="SITE_ADMIN_APPLICATIONS_KALEO_FORMS" />
+			<var name="permissionNavigationValue" value="Kaleo Forms" />
+			<var name="roleName" value="${role1Name}" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Roles" />
+		</execute>
+
+		<execute macro="Role#definePermissionCmdCP">
+			<var name="permissionDefinitionKey" value="SITE_ADMIN_APPLICATIONS_KALEO_FORMS_RESOURCE_PERMISSIONS_KALEO_FORMS_PROCESS_SUBMIT" />
+			<var name="permissionDefinitionValue" value="Submit" />
+			<var name="permissionNavigationKey" value="SITE_ADMIN_APPLICATIONS_KALEO_FORMS" />
+			<var name="permissionNavigationValue" value="Kaleo Forms" />
+			<var name="roleName" value="${role1Name}" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Roles" />
+		</execute>
+
+		<execute macro="Role#definePermissionCmdCP">
+			<var name="permissionDefinitionKey" value="SITE_ADMIN_APPLICATIONS_KALEO_FORMS_RESOURCE_PERMISSIONS_KALEO_FORMS_PROCESS_VIEW" />
+			<var name="permissionDefinitionValue" value="View" />
+			<var name="permissionNavigationKey" value="SITE_ADMIN_APPLICATIONS_KALEO_FORMS" />
+			<var name="permissionNavigationValue" value="Kaleo Forms" />
+			<var name="roleName" value="${role1Name}" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Workflow" />
+		</execute>
+
+		<execute macro="KaleoDesigner#editWorkflowDefinitionViaWorkflowCP">
+			<var name="workflowDefinitionTitle" value="Single Approver" />
+		</execute>
+
+		<execute macro="KaleoDesigner#editWorkflowDefinitionTitleViaWorkflowCP">
+			<var name="workflowDefinitionTitle" value="Edited Workflow Definition" />
+		</execute>
+
+		<execute macro="KaleoDesigner#selectNode">
+			<var name="nodeNodeLabel" value="update" />
+		</execute>
+
+		<execute macro="KaleoDesigner#editNodeAssignments">
+			<var name="nodeAssignmentType" value="Role" />
+			<var name="roleName" value="${role2Name}" />
+		</execute>
+
+		<execute macro="KaleoDesigner#editNodeNotifications">
+			<var name="nodeNotificationsDescription" value="Update Notification Description" />
+			<var name="nodeNotificationsName" value="Update Notification" />
+			<var name="nodeNotificationsRecipientType" value="Task Assignees" />
+			<var name="nodeNotificationsType" value="Email" />
+		</execute>
+
+		<execute macro="KaleoDesigner#publishWorkflowDefinitionViaWorkflowCP" />
+
+		<execute macro="Page#addPG">
+			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute macro="Portlet#addPG">
+			<var name="portletName" value="Kaleo Forms" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#addCP">
+			<var name="userEmailAddress" value="${user1EmailAddress}" />
+			<var name="userFirstName" value="${user1FirstName}" />
+			<var name="userLastName" value="${user1LastName}" />
+			<var name="userScreenName" value="${user1ScreenName}" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#editPasswordCP">
+			<var name="userEmailAddress" value="${user1EmailAddress}" />
+			<var name="userScreenName" value="${user1ScreenName}" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Roles" />
+		</execute>
+
+		<execute macro="Role#assignRegRoleCP">
+			<var name="roleName" value="${role1Name}" />
+			<var name="userScreenName" value="${user1ScreenName}" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#addCP">
+			<var name="userEmailAddress" value="${user2EmailAddress}" />
+			<var name="userFirstName" value="${user2FirstName}" />
+			<var name="userLastName" value="${user2LastName}" />
+			<var name="userScreenName" value="${user2ScreenName}" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#editPasswordCP">
+			<var name="userEmailAddress" value="${user2EmailAddress}" />
+			<var name="userScreenName" value="${user2ScreenName}" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Roles" />
+		</execute>
+
+		<execute macro="Role#assignRegRoleCP">
+			<var name="roleName" value="${role3Name}" />
+			<var name="userScreenName" value="${user2ScreenName}" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Roles" />
+		</execute>
+
+		<execute macro="Role#assignRegRoleCP">
+			<var name="roleName" value="${role2Name}" />
+			<var name="userScreenName" value="${user2ScreenName}" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#addCP">
+			<var name="userEmailAddress" value="${user3EmailAddress}" />
+			<var name="userFirstName" value="${user3FirstName}" />
+			<var name="userLastName" value="${user3LastName}" />
+			<var name="userScreenName" value="${user3ScreenName}" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#editPasswordCP">
+			<var name="userEmailAddress" value="${user3EmailAddress}" />
+			<var name="userScreenName" value="${user3ScreenName}" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Roles" />
+		</execute>
+
+		<execute macro="Role#assignRegRoleCP">
+			<var name="roleName" value="${role3Name}" />
+			<var name="userScreenName" value="${user3ScreenName}" />
+		</execute>
+
+		<execute macro="Page#gotoContentCP">
+			<var name="portletName" value="Kaleo Forms Admin" />
+		</execute>
+
+		<execute macro="KaleoFormsAdmin#addProcess" />
+
+		<execute macro="KaleoFormsAdmin#addProcessDetails">
+			<var name="kfProcessDescription" value="${kfProcessDescription}" />
+			<var name="kfProcessName" value="${kfProcessName}" />
+		</execute>
+
+		<execute macro="KaleoFormsAdmin#next" />
+
+		<execute macro="KaleoFormsAdmin#addFieldSet">
+			<var name="kfFieldSetName" value="${kfFieldSetName}" />
+			<var name="kfProcessName" value="${kfProcessName}" />
+		</execute>
+
+		<execute macro="DynamicDataMapping#addField">
+			<var name="field" value="${field}" />
+			<var name="fieldFieldLabel" value="${fieldFieldLabel}" />
+			<var name="fieldName" value="${fieldName}" />
+		</execute>
+
+		<execute macro="KaleoFormsAdmin#saveFieldSet">
+			<var name="kfFieldSetName" value="${kfFieldSetName}" />
+		</execute>
+
+		<execute macro="KaleoFormsAdmin#chooseFieldSet">
+			<var name="kfFieldSetName" value="${kfFieldSetName}" />
+			<var name="kfProcessName" value="${kfProcessName}" />
+		</execute>
+
+		<execute macro="KaleoFormsAdmin#next" />
+
+		<execute macro="KaleoFormsAdmin#chooseWorkflow">
+			<var name="kfProcessName" value="${kfProcessName}" />
+			<var name="workflowDefinitionTitleEdit" value="Edited Workflow Definition" />
+		</execute>
+
+		<execute macro="KaleoFormsAdmin#next" />
+
+		<execute macro="KaleoFormsAdmin#assignForm">
+			<var name="kfProcessName" value="${kfProcessName}" />
+			<var name="workflowTask" value="create" />
+		</execute>
+
+		<execute macro="KaleoFormsAdmin#addForm">
+			<var name="kfFormName" value="Created Task Form" />
+		</execute>
+
+		<execute macro="KaleoFormsAdmin#saveForm" />
+
+		<execute macro="KaleoFormsAdmin#chooseForm">
+			<var name="kfFormName" value="Created Task Form" />
+		</execute>
+
+		<execute macro="KaleoFormsAdmin#saveProcess">
+			<var name="kfProcessName" value="${kfProcessName}" />
+		</execute>
+
+		<execute macro="KaleoFormsAdmin#viewProcess">
+			<var name="kfProcessName" value="${kfProcessName}" />
+		</execute>
+
+		<execute macro="User#logoutAndLoginPG">
+			<var name="userLoginEmailAddress" value="${user1EmailAddress}" />
+			<var name="userLoginFullName" value="${user1FirstName} ${user1LastName}" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Kaleo Forms" />
+		</execute>
+
+		<execute macro="KaleoFormsPortlet#viewNoTasks" />
+
+		<execute macro="KaleoFormsPortlet#submitNewProcess">
+			<var name="kfProcessName" value="${kfProcessName}" />
+		</execute>
+
+		<execute macro="KaleoFormsPortlet#populateFieldText">
+			<var name="fieldName" value="${fieldName}" />
+			<var name="kfProcessFieldData" value="${kfProcessFieldData}" />
+		</execute>
+
+		<execute macro="KaleoFormsPortlet#saveProcessRecord" />
+
+		<execute macro="KaleoFormsPortlet#viewMyPendingRequests">
+			<var name="kfProcessName" value="${kfProcessName}" />
+			<var name="kfProcessStatus" value="Review" />
+			<var name="workflowDefinitionTitle" value="Single Approver" />
+		</execute>
+
+		<execute macro="User#logoutAndLoginPG">
+			<var name="userLoginEmailAddress" value="${user3EmailAddress}" />
+			<var name="userLoginFullName" value="${user3FirstName} ${user3FirstName}" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute macro="KaleoFormsPortlet#assignProcessToMe">
+			<var name="kfProcessName" value="${kfProcessName}" />
+			<var name="workflowTask" value="review" />
+		</execute>
+
+		<execute macro="KaleoFormsPortlet#rejectProcess">
+			<var name="kfProcessName" value="${kfProcessName}" />
+			<var name="workflowTask" value="review" />
+		</execute>
+
+		<execute macro="Gmail#login">
+			<var name="userEmailAddress" value="${user2EmailAddress}" />
+			<var name="userPassword" value="${user2EmailPassword}" />
+		</execute>
+
+		<execute macro="Gmail#gotoHtmlMode" />
+
+		<execute macro="Gmail#viewMail">
+			<var name="emailFromUserName" value="Liferay Portal Workflow ." />
+			<var name="gmailAssetType" value="Update Notification Description" />
+			<var name="gmailMailTableMessageTitle" value="Update Notification Description" />
+			<var name="gmailMessageBody" value="Your submission was rejected by ${user3FirstName} ${user3LastName}, please modify and resubmit." />
+			<var name="gmailMessageTitle" value="Update Notification Description" />
+		</execute>
+
+		<execute macro="Gmail#tearDown">
+			<var name="userEmailAddress" value="${user2EmailAddress}" />
+			<var name="userPassword" value="${user2EmailPassword}" />
+		</execute>
+
+		<execute macro="Gmail#logoutAndLogin">
+			<var name="userEmailAddress" value="${user1EmailAddress}" />
+			<var name="userPassword" value="${user1EmailPassword}" />
+		</execute>
+
+		<execute macro="Gmail#gotoHtmlMode" />
+
+		<execute macro="Gmail#viewMailNotPresent">
+			<var name="gmailAssetType" value="Update Notification Description" />
+		</execute>
+
+		<execute macro="Gmail#logoutAndLogin">
+			<var name="userEmailAddress" value="${user3EmailAddress}" />
+			<var name="userPassword" value="${user3EmailPassword}" />
+		</execute>
+
+		<execute macro="Gmail#gotoHtmlMode" />
+
+		<execute macro="Gmail#viewMailNotPresent">
+			<var name="gmailAssetType" value="Update Notification Description" />
+		</execute>
+	</command>
+
+	<command name="ViewKaleoProcessNameOpenedViaNotifications" priority="4">
+		<description message="This is a use case for LPS-51098." />
+
+		<property name="portlet.plugins.includes" value="kaleo-designer-portlet,kaleo-forms-portlet,notifications-portlet" />
+
+		<var name="kfFieldSetName" value="Field Set Data Definition" />
+		<var name="kfProcessDescription" value="Kaleo Forms Process Description" />
+		<var name="kfProcessFieldData" value="Test" />
+		<var name="kfProcessName" value="Kaleo Forms Process" />
+		<var name="pageName" value="Kaleo Forms" />
+		<var name="workflowDefinitionTitle" value="Single Approver" />
+
+		<execute macro="Page#gotoContentCP">
+			<var name="portletName" value="Kaleo Forms Admin" />
+		</execute>
+
+		<execute macro="KaleoFormsAdmin#addProcess" />
+
+		<execute macro="KaleoFormsAdmin#addProcessDetails">
+			<var name="kfProcessDescription" value="${kfProcessDescription}" />
+			<var name="kfProcessName" value="${kfProcessName}" />
+		</execute>
+
+		<execute macro="KaleoFormsAdmin#next" />
+
+		<execute macro="KaleoFormsAdmin#addFieldSet">
+			<var name="kfFieldSetName" value="${kfFieldSetName}" />
+			<var name="kfProcessName" value="${kfProcessName}" />
+		</execute>
+
+		<execute macro="DynamicDataMapping#addField">
+			<var name="field" value="Text" />
+			<var name="fieldFieldLabel" value="Text" />
+			<var name="fieldName" value="Text" />
+		</execute>
+
+		<execute macro="KaleoFormsAdmin#saveFieldSet">
+			<var name="kfFieldSetName" value="${kfFieldSetName}" />
+		</execute>
+
+		<execute macro="KaleoFormsAdmin#chooseFieldSet">
+			<var name="kfFieldSetName" value="${kfFieldSetName}" />
+			<var name="kfProcessName" value="${kfProcessName}" />
+		</execute>
+
+		<execute macro="KaleoFormsAdmin#next" />
+
+		<execute macro="KaleoFormsAdmin#chooseWorkflow">
+			<var name="kfProcessName" value="${kfProcessName}" />
+			<var name="workflowDefinitionTitle" value="${workflowDefinitionTitle}" />
+		</execute>
+
+		<execute macro="KaleoFormsAdmin#next" />
+
+		<execute macro="KaleoFormsAdmin#assignForm">
+			<var name="kfProcessName" value="${kfProcessName}" />
+			<var name="workflowTask" value="create" />
+		</execute>
+
+		<execute macro="KaleoFormsAdmin#addForm">
+			<var name="kfFormName" value="Created Task Form" />
+		</execute>
+
+		<execute macro="KaleoFormsAdmin#saveForm" />
+
+		<execute macro="KaleoFormsAdmin#chooseForm">
+			<var name="kfFormName" value="Created Task Form" />
+		</execute>
+
+		<execute macro="KaleoFormsAdmin#saveProcess">
+			<var name="kfProcessName" value="${kfProcessName}" />
+		</execute>
+
+		<execute macro="KaleoFormsAdmin#viewProcess">
+			<var name="kfProcessName" value="${kfProcessName}" />
+		</execute>
+
+		<execute macro="Page#addPG">
+			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute macro="Portlet#addPG">
+			<var name="portletName" value="Kaleo Forms" />
+		</execute>
+
+		<execute macro="KaleoFormsPortlet#viewNoTasks" />
+
+		<execute macro="KaleoFormsPortlet#submitNewProcess">
+			<var name="kfProcessName" value="${kfProcessName}" />
+		</execute>
+
+		<execute macro="KaleoFormsPortlet#populateFieldText">
+			<var name="fieldName" value="Text" />
+			<var name="kfProcessFieldData" value="${kfProcessFieldData}" />
+		</execute>
+
+		<execute macro="KaleoFormsPortlet#saveProcessRecord" />
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute macro="Notifications#viewNotification">
+			<var name="notificationContent" value="Test Test sent you a Kaleo Forms Process for review in the workflow." />
+			<var name="notificationCount" value="1" />
+		</execute>
+
+		<execute macro="Notifications#navigateToContent">
+			<var name="contentBody" value="Test Test sent you a Kaleo Forms Process for review in the workflow." />
+		</execute>
+
+		<execute macro="KaleoFormsPortlet#viewInboxProcessName">
+			<var name="kfProcessName" value="${kfProcessName}" />
+			<var name="workflowTask" value="Review" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute macro="KaleoFormsPortlet#assignProcessToMe">
+			<var name="kfProcessName" value="${kfProcessName}" />
+			<var name="workflowTask" value="review" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute macro="Notifications#viewNotification">
+			<var name="notificationContent" value="Test Test sent you a Kaleo Forms Process for review in the workflow." />
+			<var name="notificationCount" value="1" />
+		</execute>
+
+		<execute macro="Notifications#navigateToContent">
+			<var name="contentBody" value="Test Test sent you a Kaleo Forms Process for review in the workflow." />
+		</execute>
+
+		<execute macro="KaleoFormsPortlet#viewInboxProcessName">
+			<var name="kfProcessName" value="${kfProcessName}" />
+			<var name="workflowTask" value="Review" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute macro="KaleoFormsPortlet#approveProcess">
+			<var name="kfProcessName" value="${kfProcessName}" />
+			<var name="workflowTask" value="review" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute macro="KaleoFormsPortlet#viewMyCompletedRequests">
+			<var name="kfProcessName" value="${kfProcessName}" />
+			<var name="workflowDefinitionTitle" value="${workflowDefinitionTitle}" />
+		</execute>
+
+		<execute macro="KaleoFormsPortlet#viewMyCompletedRequestsProcessName">
+			<var name="kfProcessName" value="${kfProcessName}" />
+			<var name="workflowDefinitionTitle" value="${workflowDefinitionTitle}" />
+		</execute>
+
+		<execute macro="KaleoFormsPortlet#viewMyCompletedRequestsTasks" />
+	</command>
+
 	<command name="ViewMultipleProcessRecords" priority="5">
 		<var name="kfFieldSetName" value="Field Set Data Definition" />
 		<var name="kfProcessName" value="Kaleo Forms Process" />
@@ -7561,8 +8488,8 @@
 
 		<var name="key_kfFormName" value="Created Task Form" />
 
-		<execute action="CPKaleoformsadminNewprocessSelectform#assertTextEquals" locator-key1="FORM_TABLE_NAME" value1="Created Task Form" />
-		<execute action="CPKaleoformsadminNewprocessSelectform#assertElementNotPresent" locator-key1="FORM_TABLE_NAME_2" />
+		<execute function="AssertTextEquals" locator1="CPKaleoformsadminNewprocessSelectform#FORM_TABLE_NAME" value1="Created Task Form" />
+		<execute function="AssertElementNotPresent" locator1="CPKaleoformsadminNewprocessSelectform#FORM_TABLE_NAME_2" />
 	</command>
 
 	<command name="ViewProcessWithComments" priority="4">

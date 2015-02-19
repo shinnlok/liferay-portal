@@ -93,7 +93,7 @@ public class SubscriptionSender implements Serializable {
 		}
 
 		if (fileAttachments == null) {
-			fileAttachments = new ArrayList<FileAttachment>();
+			fileAttachments = new ArrayList<>();
 		}
 
 		FileAttachment attachment = new FileAttachment(file, fileName);
@@ -102,15 +102,15 @@ public class SubscriptionSender implements Serializable {
 	}
 
 	public void addPersistedSubscribers(String className, long classPK) {
-		ObjectValuePair<String, Long> ovp = new ObjectValuePair<String, Long>(
+		ObjectValuePair<String, Long> ovp = new ObjectValuePair<>(
 			className, classPK);
 
 		_persistestedSubscribersOVPs.add(ovp);
 	}
 
 	public void addRuntimeSubscribers(String toAddress, String toName) {
-		ObjectValuePair<String, String> ovp =
-			new ObjectValuePair<String, String>(toAddress, toName);
+		ObjectValuePair<String, String> ovp = new ObjectValuePair<>(
+			toAddress, toName);
 
 		_runtimeSubscribersOVPs.add(ovp);
 	}
@@ -147,16 +147,6 @@ public class SubscriptionSender implements Serializable {
 						_log.error(
 							"Unable to process subscription: " + subscription);
 					}
-				}
-
-				if (bulk) {
-					Locale locale = LocaleUtil.getDefault();
-
-					InternetAddress to = new InternetAddress(
-						replaceContent(replyToAddress, locale),
-						replaceContent(replyToAddress, locale));
-
-					sendEmail(to, locale);
 				}
 			}
 
@@ -196,6 +186,16 @@ public class SubscriptionSender implements Serializable {
 			}
 
 			_runtimeSubscribersOVPs.clear();
+
+			if (bulk) {
+				Locale locale = LocaleUtil.getDefault();
+
+				InternetAddress to = new InternetAddress(
+					replaceContent(replyToAddress, locale),
+					replaceContent(replyToAddress, locale));
+
+				sendEmail(to, locale);
+			}
 		}
 		finally {
 			if ((_classLoader != null) &&
@@ -228,6 +228,10 @@ public class SubscriptionSender implements Serializable {
 
 	public Object getContextAttribute(String key) {
 		return _context.get(key);
+	}
+
+	public long getContextUserId() {
+		return contextUserId;
 	}
 
 	public String getMailId() {
@@ -314,6 +318,10 @@ public class SubscriptionSender implements Serializable {
 		for (int i = 0; i < values.length; i += 2) {
 			setContextAttribute(String.valueOf(values[i]), values[i + 1]);
 		}
+	}
+
+	public void setContextUserId(long contextUserId) {
+		this.contextUserId = contextUserId;
 	}
 
 	public void setContextUserPrefix(String contextUserPrefix) {
@@ -553,27 +561,7 @@ public class SubscriptionSender implements Serializable {
 			return;
 		}
 
-		if (bulk) {
-			if (UserNotificationManagerUtil.isDeliver(
-					user.getUserId(), portletId, _notificationClassNameId,
-					_notificationType,
-					UserNotificationDeliveryConstants.TYPE_EMAIL)) {
-
-				InternetAddress bulkAddress = new InternetAddress(
-					user.getEmailAddress(), user.getFullName());
-
-				if (_bulkAddresses == null) {
-					_bulkAddresses = new ArrayList<InternetAddress>();
-				}
-
-				_bulkAddresses.add(bulkAddress);
-			}
-
-			sendUserNotification(user);
-		}
-		else {
-			sendNotification(user);
-		}
+		sendNotification(user);
 	}
 
 	protected void notifyRuntimeSubscriber(InternetAddress to, Locale locale)
@@ -589,6 +577,16 @@ public class SubscriptionSender implements Serializable {
 				_log.info(
 					"User with email address " + emailAddress +
 						" does not exist for company " + companyId);
+			}
+
+			if (bulk) {
+				if (_bulkAddresses == null) {
+					_bulkAddresses = new ArrayList<>();
+				}
+
+				_bulkAddresses.add(to);
+
+				return;
 			}
 
 			sendEmail(to, locale);
@@ -809,11 +807,29 @@ public class SubscriptionSender implements Serializable {
 			InternetAddress to = new InternetAddress(
 				user.getEmailAddress(), user.getFullName());
 
+			if (bulk) {
+				if (_bulkAddresses == null) {
+					_bulkAddresses = new ArrayList<>();
+				}
+
+				_bulkAddresses.add(to);
+
+				return;
+			}
+
 			sendEmail(to, user.getLocale());
 		}
 	}
 
 	protected void sendNotification(User user) throws Exception {
+		if (contextUserId == user.getUserId() ) {
+			if (_log.isDebugEnabled()) {
+				_log.debug("Skip context user " + contextUserId);
+			}
+
+			return;
+		}
+
 		sendEmailNotification(user);
 		sendUserNotification(user);
 	}
@@ -855,8 +871,8 @@ public class SubscriptionSender implements Serializable {
 	protected String body;
 	protected boolean bulk;
 	protected long companyId;
-	protected List<FileAttachment> fileAttachments =
-		new ArrayList<FileAttachment>();
+	protected long contextUserId;
+	protected List<FileAttachment> fileAttachments = new ArrayList<>();
 	protected String fromAddress;
 	protected String fromName;
 	protected long groupId;
@@ -900,14 +916,15 @@ public class SubscriptionSender implements Serializable {
 		objectOutputStream.writeUTF(servletContextName);
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(SubscriptionSender.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		SubscriptionSender.class);
 
 	private List<InternetAddress> _bulkAddresses;
 	private transient ClassLoader _classLoader;
 	private String _className;
 	private long _classPK;
-	private Map<String, EscapableObject<String>> _context =
-		new HashMap<String, EscapableObject<String>>();
+	private final Map<String, EscapableObject<String>> _context =
+		new HashMap<>();
 	private String _contextUserPrefix;
 	private String _entryTitle;
 	private String _entryURL;
@@ -916,10 +933,10 @@ public class SubscriptionSender implements Serializable {
 	private String _mailIdPopPortletPrefix;
 	private long _notificationClassNameId;
 	private int _notificationType;
-	private List<ObjectValuePair<String, Long>> _persistestedSubscribersOVPs =
-		new ArrayList<ObjectValuePair<String, Long>>();
-	private List<ObjectValuePair<String, String>> _runtimeSubscribersOVPs =
-		new ArrayList<ObjectValuePair<String, String>>();
-	private Set<String> _sentEmailAddresses = new HashSet<String>();
+	private final List<ObjectValuePair<String, Long>>
+		_persistestedSubscribersOVPs = new ArrayList<>();
+	private final List<ObjectValuePair<String, String>>
+		_runtimeSubscribersOVPs = new ArrayList<>();
+	private final Set<String> _sentEmailAddresses = new HashSet<>();
 
 }

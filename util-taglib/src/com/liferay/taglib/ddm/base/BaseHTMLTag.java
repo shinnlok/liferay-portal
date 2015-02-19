@@ -21,7 +21,7 @@ import javax.servlet.jsp.JspException;
  * @author Bruno Basto
  * @generated
  */
-public class BaseHTMLTag extends com.liferay.taglib.util.IncludeTag {
+public abstract class BaseHTMLTag extends com.liferay.taglib.util.IncludeTag {
 
 	@Override
 	public int doStartTag() throws JspException {
@@ -122,6 +122,8 @@ public class BaseHTMLTag extends com.liferay.taglib.util.IncludeTag {
 
 	@Override
 	protected void cleanUp() {
+		super.cleanUp();
+
 		_checkRequired = true;
 		_classNameId = 0;
 		_classPK = 0;

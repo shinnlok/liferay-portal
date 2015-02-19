@@ -79,6 +79,7 @@ AUI.add(
 								{
 									duplicateEntryId: responseData.duplicateEntryId,
 									oldName: responseData.oldName,
+									overridable: responseData.overridable,
 									overrideMessage: instance.get('overrideMessage'),
 									renameMessage: instance.get('renameMessage'),
 									trashEntryId: responseData.trashEntryId
@@ -212,8 +213,8 @@ AUI.add(
 									'arguments': form,
 									data: instance.ns(
 										{
-											trashEntryId: trashEntryId.val(),
-											newName: newName.val()
+											newName: newName.val(),
+											trashEntryId: trashEntryId.val()
 										}
 									),
 									dataType: 'JSON'

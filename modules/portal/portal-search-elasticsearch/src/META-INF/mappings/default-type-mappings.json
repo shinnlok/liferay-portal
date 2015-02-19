@@ -2,7 +2,18 @@
 	"_default_": {
 		"dynamic_templates": [
 			{
-				"template__sortable": {
+				"template_long_sortable": {
+					"match": "*_sortable",
+					"match_mapping_type": "long",
+					"mapping": {
+						"index": "not_analyzed",
+						"store": "true",
+						"type": "long"
+					}
+				}
+			},
+			{
+				"template_string_sortable": {
 					"match": "*_sortable",
 					"match_mapping_type": "string",
 					"mapping": {
@@ -539,11 +550,6 @@
 				"index": "not_analyzed",
 				"store": "yes",
 				"type": "date"
-			},
-			"portletId": {
-				"index": "not_analyzed",
-				"store": "yes",
-				"type": "string"
 			},
 			"properties": {
 				"index": "not_analyzed",

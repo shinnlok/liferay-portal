@@ -70,7 +70,8 @@ public class AssetPublisherDisplayContext {
 	public int getAbstractLength() {
 		if (_abstractLength == null) {
 			_abstractLength = GetterUtil.getInteger(
-				_portletPreferences.getValue("abstractLength", null), 200);
+				_portletPreferences.getValue("abstractLength", null),
+				AssetUtil.ASSET_ENTRY_ABSTRACT_LENGTH);
 		}
 
 		return _abstractLength;
@@ -650,6 +651,16 @@ public class AssetPublisherDisplayContext {
 		return _enableRSS;
 	}
 
+	public boolean isEnableSetAsDefaultAssetPublisher() {
+		String rootPortletId = getRootPortletId();
+
+		if (rootPortletId.equals(PortletKeys.ASSET_PUBLISHER)) {
+			return true;
+		}
+
+		return false;
+	}
+
 	public boolean isEnableSocialBookmarks() {
 		if (_enableSocialBookmarks == null) {
 			_enableSocialBookmarks = GetterUtil.getBoolean(
@@ -898,6 +909,10 @@ public class AssetPublisherDisplayContext {
 		}
 
 		return _subtypeFieldsFilterEnabled;
+	}
+
+	public void setDisplayStyle(String displayStyle) {
+		_displayStyle = displayStyle;
 	}
 
 	public void setSelectionStyle(String selectionStyle) {

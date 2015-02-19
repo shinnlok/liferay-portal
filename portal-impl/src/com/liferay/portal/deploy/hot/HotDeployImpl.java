@@ -57,9 +57,9 @@ public class HotDeployImpl implements HotDeploy {
 			_log.debug("Initializing hot deploy manager " + this.hashCode());
 		}
 
-		_dependentHotDeployEvents = new ArrayList<HotDeployEvent>();
-		_deployedServletContextNames = new HashSet<String>();
-		_hotDeployListeners = new ArrayList<HotDeployListener>();
+		_dependentHotDeployEvents = new ArrayList<>();
+		_deployedServletContextNames = new HashSet<>();
+		_hotDeployListeners = new ArrayList<>();
 	}
 
 	@Override
@@ -244,8 +244,8 @@ public class HotDeployImpl implements HotDeploy {
 			try {
 				setContextClassLoader(ClassLoaderUtil.getPortalClassLoader());
 
-				List<HotDeployEvent> dependentEvents =
-					new ArrayList<HotDeployEvent>(_dependentHotDeployEvents);
+				List<HotDeployEvent> dependentEvents = new ArrayList<>(
+					_dependentHotDeployEvents);
 
 				for (HotDeployEvent dependentEvent : dependentEvents) {
 					setContextClassLoader(
@@ -302,7 +302,7 @@ public class HotDeployImpl implements HotDeploy {
 	protected String getRequiredServletContextNames(
 		HotDeployEvent hotDeployEvent) {
 
-		List<String> requiredServletContextNames = new ArrayList<String>();
+		List<String> requiredServletContextNames = new ArrayList<>();
 
 		for (String dependentServletContextName :
 				hotDeployEvent.getDependentServletContextNames()) {
@@ -323,9 +323,9 @@ public class HotDeployImpl implements HotDeploy {
 		ClassLoaderUtil.setContextClassLoader(contextClassLoader);
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(HotDeployImpl.class);
+	private static final Log _log = LogFactoryUtil.getLog(HotDeployImpl.class);
 
-	private static PACL _pacl = new NoPACL();
+	private static final PACL _pacl = new NoPACL();
 
 	private boolean _capturePrematureEvents = true;
 	private final List<HotDeployEvent> _dependentHotDeployEvents;
@@ -380,8 +380,8 @@ public class HotDeployImpl implements HotDeploy {
 				properties);
 		}
 
-		private ClassLoader _classLoader;
-		private ServletContext _servletContext;
+		private final ClassLoader _classLoader;
+		private final ServletContext _servletContext;
 
 	}
 

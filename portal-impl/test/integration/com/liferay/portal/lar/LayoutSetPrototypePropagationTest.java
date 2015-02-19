@@ -17,7 +17,13 @@ package com.liferay.portal.lar;
 import com.liferay.portal.LayoutParentLayoutIdException;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.staging.MergeLayoutPrototypesThreadLocal;
-import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.rule.Sync;
+import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Time;
@@ -41,16 +47,9 @@ import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
 import com.liferay.portal.service.ResourcePermissionServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.servlet.filters.cache.CacheUtil;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.test.ResetDatabaseTestRule;
-import com.liferay.portal.test.Sync;
-import com.liferay.portal.test.SynchronousDestinationTestRule;
-import com.liferay.portal.util.PortletKeys;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.MainServletTestRule;
 import com.liferay.portal.util.test.LayoutTestUtil;
-import com.liferay.portal.util.test.RandomTestUtil;
-import com.liferay.portal.util.test.ServiceContextTestUtil;
-import com.liferay.portal.util.test.TestPropsValues;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portlet.dynamicdatamapping.util.test.DDMStructureTestUtil;
 import com.liferay.portlet.journal.model.JournalArticle;
@@ -58,9 +57,11 @@ import com.liferay.portlet.journal.service.JournalArticleLocalServiceUtil;
 import com.liferay.portlet.journal.util.test.JournalTestUtil;
 import com.liferay.portlet.sites.util.Sites;
 import com.liferay.portlet.sites.util.SitesUtil;
+import com.liferay.portlet.util.test.PortletKeys;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.portlet.PortletPreferences;
@@ -83,7 +84,6 @@ public class LayoutSetPrototypePropagationTest
 	public static final AggregateTestRule aggregateTestRule =
 		new AggregateTestRule(
 			new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE,
-			ResetDatabaseTestRule.INSTANCE,
 			SynchronousDestinationTestRule.INSTANCE);
 
 	@Test
@@ -177,6 +177,34 @@ public class LayoutSetPrototypePropagationTest
 	}
 
 	@Test
+	public void testLayoutPropagationWithFriendlyURLConflict()
+		throws Exception {
+
+		LayoutSet layoutSet = group.getPublicLayoutSet();
+
+		List<Layout> initialMergeFailFriendlyURLLayouts =
+			SitesUtil.getMergeFailFriendlyURLLayouts(layoutSet);
+
+		setLinkEnabled(true);
+
+		LayoutTestUtil.addLayout(group.getGroupId(), "test", false);
+		LayoutTestUtil.addLayout(
+			_layoutSetPrototypeGroup.getGroupId(), "test", true);
+
+		propagateChanges(group);
+
+		layoutSet = LayoutSetLocalServiceUtil.getLayoutSet(
+			layoutSet.getLayoutSetId());
+
+		List<Layout> mergeFailFriendlyURLLayouts =
+			SitesUtil.getMergeFailFriendlyURLLayouts(layoutSet);
+
+		Assert.assertEquals(
+			initialMergeFailFriendlyURLLayouts.size() + 1,
+			mergeFailFriendlyURLLayouts.size());
+	}
+
+	@Test
 	public void testLayoutPropagationWithLayoutPrototypeLinkDisabled()
 		throws Exception {
 
@@ -229,59 +257,67 @@ public class LayoutSetPrototypePropagationTest
 		throws Exception {
 
 		Portlet portlet = PortletLocalServiceUtil.getPortletById(
-			TestPropsValues.getCompanyId(), PortletKeys.NAVIGATION);
+			TestPropsValues.getCompanyId(), PortletKeys.TEST);
 
-		portlet.setPreferencesUniquePerLayout(false);
+		boolean preferencesUniquePerLayout =
+			portlet.getPreferencesUniquePerLayout();
 
-		Layout layoutSetPrototypeLayout = LayoutTestUtil.addLayout(
-			_layoutSetPrototypeGroup, true, layoutPrototype, true);
+		try {
+			portlet.setPreferencesUniquePerLayout(false);
 
-		Map<String, String[]> preferenceMap = new HashMap<String, String[]>();
+			_layoutSetPrototypeLayout = LayoutTestUtil.addLayout(
+				_layoutSetPrototypeGroup, true, layoutPrototype, true);
 
-		preferenceMap.put("bulletStyle", new String[] {"Dots"});
+			Map<String, String[]> preferenceMap = new HashMap<>();
 
-		String navigationPortletId1 = LayoutTestUtil.addPortletToLayout(
-			TestPropsValues.getUserId(), layoutSetPrototypeLayout,
-			PortletKeys.NAVIGATION, "column-1", preferenceMap);
+			preferenceMap.put("bulletStyle", new String[]{"Dots"});
 
-		preferenceMap.put("bulletStyle", new String[] {"Arrows"});
+			String testPortletId1 = LayoutTestUtil.addPortletToLayout(
+				TestPropsValues.getUserId(), _layoutSetPrototypeLayout,
+				PortletKeys.TEST, "column-1", preferenceMap);
 
-		String navigationPortletId2 = LayoutTestUtil.addPortletToLayout(
-			TestPropsValues.getUserId(), layoutSetPrototypeLayout,
-			PortletKeys.NAVIGATION, "column-2", preferenceMap);
+			preferenceMap.put("bulletStyle", new String[]{"Arrows"});
 
-		propagateChanges(group);
+			String testPortletId2 = LayoutTestUtil.addPortletToLayout(
+				TestPropsValues.getUserId(), _layoutSetPrototypeLayout,
+				PortletKeys.TEST, "column-2", preferenceMap);
 
-		Layout layout = LayoutLocalServiceUtil.getFriendlyURLLayout(
-			group.getGroupId(), false,
-			layoutSetPrototypeLayout.getFriendlyURL());
+			propagateChanges(group);
 
-		PortletPreferences navigationPortletIdPortletPreferences =
-			PortletPreferencesFactoryUtil.getPortletSetup(
-				group.getGroupId(), layout, PortletKeys.NAVIGATION, null);
+			Layout layout = LayoutLocalServiceUtil.getFriendlyURLLayout(
+				group.getGroupId(), false,
+				_layoutSetPrototypeLayout.getFriendlyURL());
 
-		Assert.assertEquals(
-			"Arrows",
-			navigationPortletIdPortletPreferences.getValue(
-				"bulletStyle", StringPool.BLANK));
+			PortletPreferences testPortletIdPortletPreferences =
+				PortletPreferencesFactoryUtil.getPortletSetup(
+					group.getGroupId(), layout, PortletKeys.TEST, null);
 
-		PortletPreferences navigationPortletId1PortletPreferences =
-			PortletPreferencesFactoryUtil.getPortletSetup(
-				layout, navigationPortletId1, null);
+			Assert.assertEquals(
+				"Arrows",
+				testPortletIdPortletPreferences.getValue(
+					"bulletStyle", StringPool.BLANK));
 
-		Assert.assertEquals(
-			"Arrows",
-			navigationPortletId1PortletPreferences.getValue(
-				"bulletStyle", StringPool.BLANK));
+			PortletPreferences testPortletId1PortletPreferences =
+				PortletPreferencesFactoryUtil.getPortletSetup(
+					layout, testPortletId1, null);
 
-		PortletPreferences navigationPortletId2PortletPreferences =
-			PortletPreferencesFactoryUtil.getPortletSetup(
-				layout, navigationPortletId2, null);
+			Assert.assertEquals(
+				"Arrows",
+				testPortletId1PortletPreferences.getValue(
+					"bulletStyle", StringPool.BLANK));
 
-		Assert.assertEquals(
-			"Arrows",
-			navigationPortletId2PortletPreferences.getValue(
-				"bulletStyle", StringPool.BLANK));
+			PortletPreferences testPortletId2PortletPreferences =
+				PortletPreferencesFactoryUtil.getPortletSetup(
+					layout, testPortletId2, null);
+
+			Assert.assertEquals(
+				"Arrows",
+				testPortletId2PortletPreferences.getValue(
+					"bulletStyle", StringPool.BLANK));
+		}
+		finally {
+			portlet.setPreferencesUniquePerLayout(preferencesUniquePerLayout);
+		}
 	}
 
 	@Test
@@ -493,17 +529,17 @@ public class LayoutSetPrototypePropagationTest
 
 		MergeLayoutPrototypesThreadLocal.clearMergeComplete();
 
-		Layout layoutSetPrototypeLayout = LayoutTestUtil.addLayout(
+		_layoutSetPrototypeLayout = LayoutTestUtil.addLayout(
 			_layoutSetPrototypeGroup, true, layoutPrototype,
 			layoutSetLayoutLinkEnabled);
 
-		layoutSetPrototypeLayout = propagateChanges(layoutSetPrototypeLayout);
+		_layoutSetPrototypeLayout = propagateChanges(_layoutSetPrototypeLayout);
 
 		propagateChanges(group);
 
 		Layout layout = LayoutLocalServiceUtil.getFriendlyURLLayout(
 			group.getGroupId(), false,
-			layoutSetPrototypeLayout.getFriendlyURL());
+			_layoutSetPrototypeLayout.getFriendlyURL());
 
 		LayoutTestUtil.updateLayoutTemplateId(
 			layoutPrototypeLayout, "1_column");
@@ -667,9 +703,18 @@ public class LayoutSetPrototypePropagationTest
 	private int _initialLayoutCount;
 	private int _initialPrototypeLayoutCount;
 	private Layout _layout;
+
+	@DeleteAfterTestRun
 	private LayoutSetPrototype _layoutSetPrototype;
+
 	private Group _layoutSetPrototypeGroup;
+
+	@DeleteAfterTestRun
 	private JournalArticle _layoutSetPrototypeJournalArticle;
+
+	@DeleteAfterTestRun
+	private Layout _layoutSetPrototypeLayout;
+
 	private String _portletId;
 	private Layout _prototypeLayout;
 

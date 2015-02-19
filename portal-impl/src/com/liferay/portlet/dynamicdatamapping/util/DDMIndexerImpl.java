@@ -14,6 +14,7 @@
 
 package com.liferay.portlet.dynamicdatamapping.util;
 
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -22,6 +23,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
@@ -30,10 +32,13 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
+import com.liferay.portlet.dynamicdatamapping.storage.DDMFormValues;
 import com.liferay.portlet.dynamicdatamapping.storage.Field;
 import com.liferay.portlet.dynamicdatamapping.storage.Fields;
 
 import java.io.Serializable;
+
+import java.math.BigDecimal;
 
 import java.text.Format;
 
@@ -47,7 +52,15 @@ public class DDMIndexerImpl implements DDMIndexer {
 
 	@Override
 	public void addAttributes(
-		Document document, DDMStructure ddmStructure, Fields fields) {
+		Document document, DDMStructure ddmStructure,
+		DDMFormValues ddmFormValues) {
+
+		long groupId = GetterUtil.getLong(
+			document.get(com.liferay.portal.kernel.search.Field.GROUP_ID));
+
+		Locale[] locales = LanguageUtil.getAvailableLocales(groupId);
+
+		Fields fields = toFields(ddmStructure, ddmFormValues);
 
 		for (Field field : fields) {
 			try {
@@ -58,13 +71,19 @@ public class DDMIndexerImpl implements DDMIndexer {
 					continue;
 				}
 
-				for (Locale locale : LanguageUtil.getAvailableLocales()) {
+				for (Locale locale : locales) {
 					String name = encodeName(
 						ddmStructure.getStructureId(), field.getName(), locale);
 
 					Serializable value = field.getValue(locale);
 
-					if (value instanceof Boolean) {
+					if (value instanceof BigDecimal) {
+						document.addNumber(name, (BigDecimal)value);
+					}
+					else if (value instanceof BigDecimal[]) {
+						document.addNumber(name, (BigDecimal[])value);
+					}
+					else if (value instanceof Boolean) {
 						document.addKeyword(name, (Boolean)value);
 					}
 					else if (value instanceof Boolean[]) {
@@ -166,10 +185,9 @@ public class DDMIndexerImpl implements DDMIndexer {
 
 		StringBundler sb = new StringBundler(7);
 
-		sb.append(DDM_FIELD_NAMESPACE);
-		sb.append(StringPool.DOUBLE_UNDERLINE);
+		sb.append(DDM_FIELD_PREFIX);
 		sb.append(ddmStructureId);
-		sb.append(StringPool.DOUBLE_UNDERLINE);
+		sb.append(DDM_FIELD_SEPARATOR);
 		sb.append(fieldName);
 
 		if (locale != null) {
@@ -182,12 +200,14 @@ public class DDMIndexerImpl implements DDMIndexer {
 
 	@Override
 	public String extractIndexableAttributes(
-		DDMStructure ddmStructure, Fields fields, Locale locale) {
+		DDMStructure ddmStructure, DDMFormValues ddmFormValues, Locale locale) {
 
 		Format dateFormat = FastDateFormatFactoryUtil.getSimpleDateFormat(
 			PropsUtil.get(PropsKeys.INDEX_DATE_FORMAT_PATTERN));
 
 		StringBundler sb = new StringBundler();
+
+		Fields fields = toFields(ddmStructure, ddmFormValues);
 
 		for (Field field : fields) {
 			try {
@@ -262,6 +282,25 @@ public class DDMIndexerImpl implements DDMIndexer {
 		}
 
 		return sb.toString();
+	}
+
+	@Override
+	public boolean isSortableFieldName(String fieldName) {
+		return fieldName.startsWith(DDMIndexer.DDM_FIELD_PREFIX);
+	}
+
+	protected Fields toFields(
+		DDMStructure ddmStructure, DDMFormValues ddmFormValues) {
+
+		try {
+			return DDMFormValuesToFieldsConverterUtil.convert(
+				ddmStructure, ddmFormValues);
+		}
+		catch (PortalException pe) {
+			_log.error("Unable to convert DDMFormValues to Fields", pe);
+		}
+
+		return new Fields();
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(DDMIndexerImpl.class);

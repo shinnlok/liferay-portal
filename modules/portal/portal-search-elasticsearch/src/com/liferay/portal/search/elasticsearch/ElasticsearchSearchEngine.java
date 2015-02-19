@@ -29,7 +29,7 @@ import com.liferay.portal.kernel.util.SystemProperties;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.elasticsearch.connection.ElasticsearchConnectionManager;
-import com.liferay.portal.search.elasticsearch.index.IndexFactory;
+import com.liferay.portal.search.elasticsearch.spi.index.IndexFactory;
 import com.liferay.portal.search.elasticsearch.util.LogUtil;
 
 import java.util.Map;
@@ -69,7 +69,7 @@ import org.osgi.service.component.annotations.Reference;
 @Component(
 	immediate = true,
 	property = {
-		"clusteredWrite=false", "luceneBased=true",
+		"clusteredWrite=false", "luceneBased=false",
 		"search.engine.id=SYSTEM_ENGINE", "vendor=Elasticsearch"
 	},
 	service = {ElasticsearchSearchEngine.class, SearchEngine.class}
@@ -268,13 +268,13 @@ public class ElasticsearchSearchEngine extends BaseSearchEngine {
 	}
 
 	@Override
-	@Reference
+	@Reference(service = ElasticsearchIndexSearcher.class)
 	public void setIndexSearcher(IndexSearcher indexSearcher) {
 		super.setIndexSearcher(indexSearcher);
 	}
 
 	@Override
-	@Reference
+	@Reference(service = ElasticsearchIndexWriter.class)
 	public void setIndexWriter(IndexWriter indexWriter) {
 		super.setIndexWriter(indexWriter);
 	}

@@ -15,8 +15,11 @@
 package com.liferay.portal.kernel.lar;
 
 /**
- * @author Raymond Augé
+ * @author     Raymond Augé
+ * @deprecated As of 7.0.0, see {@link
+ *             com.liferay.portal.kernel.lar.lifecycle.ExportImportLifecycleEvent}
  */
+@Deprecated
 public interface PortletDataContextListener {
 
 	public void onAddZipEntry(String path);

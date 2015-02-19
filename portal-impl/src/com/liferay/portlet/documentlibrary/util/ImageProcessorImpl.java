@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.documentlibrary.NoSuchFileEntryException;
+import com.liferay.portlet.documentlibrary.model.DLProcessorConstants;
 import com.liferay.portlet.documentlibrary.store.DLStoreUtil;
 
 import java.awt.image.ColorModel;
@@ -129,6 +130,11 @@ public class ImageProcessorImpl
 	@Override
 	public String getThumbnailType(FileVersion fileVersion) {
 		return _getType(fileVersion);
+	}
+
+	@Override
+	public String getType() {
+		return DLProcessorConstants.IMAGE_PROCESSOR;
 	}
 
 	@Override
@@ -457,7 +463,7 @@ public class ImageProcessorImpl
 	private static final Log _log = LogFactoryUtil.getLog(
 		ImageProcessorImpl.class);
 
-	private final List<Long> _fileVersionIds = new Vector<Long>();
+	private final List<Long> _fileVersionIds = new Vector<>();
 	private final Set<String> _imageMimeTypes = SetUtil.fromArray(
 		PropsValues.DL_FILE_ENTRY_PREVIEW_IMAGE_MIME_TYPES);
 

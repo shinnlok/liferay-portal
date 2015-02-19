@@ -424,7 +424,8 @@ public class JSONServiceAction extends JSONAction {
 	}
 
 	/**
-	 * @see JSONWebServiceServiceAction#getCSRFOrigin(HttpServletRequest)
+	 * @see com.liferay.portal.jsonwebservice.JSONWebServiceServiceAction#getCSRFOrigin(
+	 *      HttpServletRequest)
 	 */
 	@Override
 	protected String getCSRFOrigin(HttpServletRequest request) {
@@ -651,14 +652,14 @@ public class JSONServiceAction extends JSONAction {
 
 	private static final String _REROUTE_PATH = "/api/json";
 
-	private static Log _log = LogFactoryUtil.getLog(JSONServiceAction.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		JSONServiceAction.class);
 
-	private static Pattern _fieldDescriptorPattern = Pattern.compile(
+	private static final Pattern _fieldDescriptorPattern = Pattern.compile(
 		"^(.*?)((\\[\\])*)$", Pattern.DOTALL);
 
-	private Set<String> _invalidClassNames;
-	private Set<String> _invalidMethodNames;
-	private Map<String, Object[]> _methodCache =
-		new HashMap<String, Object[]>();
+	private final Set<String> _invalidClassNames;
+	private final Set<String> _invalidMethodNames;
+	private final Map<String, Object[]> _methodCache = new HashMap<>();
 
 }

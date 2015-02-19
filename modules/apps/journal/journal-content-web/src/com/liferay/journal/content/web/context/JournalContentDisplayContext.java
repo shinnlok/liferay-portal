@@ -128,16 +128,12 @@ public class JournalContentDisplayContext {
 			return _articleGroupId;
 		}
 
-		_articleGroupId = ParamUtil.getLong(_request, "articleGroupId");
+		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
+			WebKeys.THEME_DISPLAY);
 
-		if (_articleGroupId <= 0) {
-			ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
-				WebKeys.THEME_DISPLAY);
-
-			_articleGroupId = GetterUtil.getLong(
-				_portletPreferences.getValue(
-					"groupId", String.valueOf(themeDisplay.getScopeGroupId())));
-		}
+		_articleGroupId = PrefsParamUtil.getLong(
+			_portletPreferences, _request, "groupId",
+			themeDisplay.getScopeGroupId());
 
 		return _articleGroupId;
 	}
@@ -173,7 +169,7 @@ public class JournalContentDisplayContext {
 
 		Arrays.sort(extensions);
 
-		List<KeyValuePair> availableExtensions = new ArrayList<KeyValuePair>();
+		List<KeyValuePair> availableExtensions = new ArrayList<>();
 
 		for (String conversion : getConversions()) {
 			if (Arrays.binarySearch(extensions, conversion) < 0) {
@@ -200,7 +196,7 @@ public class JournalContentDisplayContext {
 	public List<KeyValuePair> getCurrentExtensions() {
 		String[] extensions = getExtensions();
 
-		List<KeyValuePair> currentExtensions = new ArrayList<KeyValuePair>();
+		List<KeyValuePair> currentExtensions = new ArrayList<>();
 
 		if (extensions == null) {
 			extensions = new String[0];

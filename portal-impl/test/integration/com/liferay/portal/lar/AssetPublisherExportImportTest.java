@@ -16,7 +16,13 @@ package com.liferay.portal.lar;
 
 import com.liferay.portal.kernel.lar.ExportImportHelperUtil;
 import com.liferay.portal.kernel.lar.PortletDataHandlerKeys;
-import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.Sync;
+import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
+import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -24,6 +30,7 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.lar.test.BasePortletExportImportTestCase;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
@@ -32,23 +39,17 @@ import com.liferay.portal.service.CompanyLocalServiceUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.test.Sync;
-import com.liferay.portal.test.SynchronousDestinationTestRule;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.MainServletTestRule;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PortletKeys;
-import com.liferay.portal.util.test.GroupTestUtil;
 import com.liferay.portal.util.test.LayoutTestUtil;
-import com.liferay.portal.util.test.RandomTestUtil;
-import com.liferay.portal.util.test.ServiceContextTestUtil;
-import com.liferay.portal.util.test.TestPropsValues;
 import com.liferay.portlet.asset.model.AssetCategory;
 import com.liferay.portlet.asset.model.AssetVocabulary;
 import com.liferay.portlet.asset.service.AssetCategoryLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetVocabularyLocalServiceUtil;
 import com.liferay.portlet.asset.util.test.AssetTestUtil;
-import com.liferay.portlet.assetpublisher.util.AssetPublisher;
+import com.liferay.portlet.assetpublisher.util.AssetPublisherUtil;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryType;
 import com.liferay.portlet.documentlibrary.util.test.DLAppTestUtil;
@@ -90,7 +91,7 @@ public class AssetPublisherExportImportTest
 
 	@Test
 	public void testAnyDLFileEntryType() throws Exception {
-		Map<String, String[]> preferenceMap = new HashMap<String, String[]>();
+		Map<String, String[]> preferenceMap = new HashMap<>();
 
 		long dlFileEntryClassNameId = PortalUtil.getClassNameId(
 			DLFileEntry.class);
@@ -123,7 +124,7 @@ public class AssetPublisherExportImportTest
 
 	@Test
 	public void testAnyJournalStructure() throws Exception {
-		Map<String, String[]> preferenceMap = new HashMap<String, String[]>();
+		Map<String, String[]> preferenceMap = new HashMap<>();
 
 		long journalArticleClassNameId = PortalUtil.getClassNameId(
 			JournalArticle.class);
@@ -162,7 +163,7 @@ public class AssetPublisherExportImportTest
 		AssetCategory assetCategory = AssetTestUtil.addCategory(
 			group.getGroupId(), assetVocabulary.getVocabularyId());
 
-		Map<String, String[]> preferenceMap = new HashMap<String, String[]>();
+		Map<String, String[]> preferenceMap = new HashMap<>();
 
 		preferenceMap.put("queryName0", new String[] {"assetCategories"});
 
@@ -192,14 +193,14 @@ public class AssetPublisherExportImportTest
 
 	@Test
 	public void testChildLayoutScopeIds() throws Exception {
-		Map<String, String[]> preferenceMap = new HashMap<String, String[]>();
+		Map<String, String[]> preferenceMap = new HashMap<>();
 
 		Group childGroup = GroupTestUtil.addGroup(group.getGroupId());
 
 		preferenceMap.put(
 			"scopeIds",
 			new String[] {
-				AssetPublisher.SCOPE_ID_CHILD_GROUP_PREFIX +
+				AssetPublisherUtil.SCOPE_ID_CHILD_GROUP_PREFIX +
 					childGroup.getGroupId()
 			});
 
@@ -221,7 +222,7 @@ public class AssetPublisherExportImportTest
 
 	@Test
 	public void testDisplayStyle() throws Exception {
-		Map<String, String[]> preferenceMap = new HashMap<String, String[]>();
+		Map<String, String[]> preferenceMap = new HashMap<>();
 
 		String displayStyle = RandomTestUtil.randomString();
 
@@ -246,7 +247,7 @@ public class AssetPublisherExportImportTest
 
 	@Test
 	public void testGlobalScopeId() throws Exception {
-		Map<String, String[]> preferenceMap = new HashMap<String, String[]>();
+		Map<String, String[]> preferenceMap = new HashMap<>();
 
 		Company company = CompanyLocalServiceUtil.getCompany(
 			layout.getCompanyId());
@@ -256,35 +257,38 @@ public class AssetPublisherExportImportTest
 		preferenceMap.put(
 			"scopeIds",
 			new String[] {
-				AssetPublisher.SCOPE_ID_GROUP_PREFIX + companyGroup.getGroupId()
+				AssetPublisherUtil.SCOPE_ID_GROUP_PREFIX +
+					companyGroup.getGroupId()
 			});
 
 		PortletPreferences portletPreferences = getImportedPortletPreferences(
 			preferenceMap);
 
 		Assert.assertEquals(
-			AssetPublisher.SCOPE_ID_GROUP_PREFIX + companyGroup.getGroupId(),
+			AssetPublisherUtil.SCOPE_ID_GROUP_PREFIX +
+				companyGroup.getGroupId(),
 			portletPreferences.getValue("scopeIds", null));
 		Assert.assertEquals(null, portletPreferences.getValue("scopeId", null));
 	}
 
 	@Test
 	public void testLayoutScopeId() throws Exception {
-		Map<String, String[]> preferenceMap = new HashMap<String, String[]>();
+		Map<String, String[]> preferenceMap = new HashMap<>();
 
 		GroupTestUtil.addGroup(TestPropsValues.getUserId(), layout);
 
 		preferenceMap.put(
 			"scopeIds",
 			new String[] {
-				AssetPublisher.SCOPE_ID_LAYOUT_UUID_PREFIX + layout.getUuid()
+				AssetPublisherUtil.SCOPE_ID_LAYOUT_UUID_PREFIX +
+					layout.getUuid()
 			});
 
 		PortletPreferences portletPreferences = getImportedPortletPreferences(
 			preferenceMap);
 
 		Assert.assertEquals(
-			AssetPublisher.SCOPE_ID_LAYOUT_UUID_PREFIX +
+			AssetPublisherUtil.SCOPE_ID_LAYOUT_UUID_PREFIX +
 				importedLayout.getUuid(),
 			portletPreferences.getValue("scopeIds", null));
 		Assert.assertEquals(null, portletPreferences.getValue("scopeId", null));
@@ -292,20 +296,20 @@ public class AssetPublisherExportImportTest
 
 	@Test
 	public void testLegacyLayoutScopeId() throws Exception {
-		Map<String, String[]> preferenceMap = new HashMap<String, String[]>();
+		Map<String, String[]> preferenceMap = new HashMap<>();
 
 		GroupTestUtil.addGroup(TestPropsValues.getUserId(), layout);
 
 		preferenceMap.put(
 			"scopeIds", new String[] {
-				AssetPublisher.SCOPE_ID_LAYOUT_PREFIX + layout.getLayoutId()
+				AssetPublisherUtil.SCOPE_ID_LAYOUT_PREFIX + layout.getLayoutId()
 			});
 
 		PortletPreferences portletPreferences = getImportedPortletPreferences(
 			preferenceMap);
 
 		Assert.assertEquals(
-			AssetPublisher.SCOPE_ID_LAYOUT_UUID_PREFIX +
+			AssetPublisherUtil.SCOPE_ID_LAYOUT_UUID_PREFIX +
 				importedLayout.getUuid(),
 			portletPreferences.getValue("scopeIds", null));
 		Assert.assertEquals(null, portletPreferences.getValue("scopeId", null));
@@ -338,7 +342,7 @@ public class AssetPublisherExportImportTest
 				new long[] {importedDDMStructure.getStructureId()},
 				serviceContext);
 
-		Map<String, String[]> preferenceMap = new HashMap<String, String[]>();
+		Map<String, String[]> preferenceMap = new HashMap<>();
 
 		long dlFileEntryClassNameId = PortalUtil.getClassNameId(
 			DLFileEntry.class);
@@ -395,7 +399,7 @@ public class AssetPublisherExportImportTest
 			ddmStructure.getDefinition(), LocaleUtil.getDefault(),
 			serviceContext);
 
-		Map<String, String[]> preferenceMap = new HashMap<String, String[]>();
+		Map<String, String[]> preferenceMap = new HashMap<>();
 
 		long journalArticleClassNameId = PortalUtil.getClassNameId(
 			JournalArticle.class);
@@ -485,7 +489,7 @@ public class AssetPublisherExportImportTest
 				new long[] {importedDDMStructure2.getStructureId()},
 				serviceContext);
 
-		Map<String, String[]> preferenceMap = new HashMap<String, String[]>();
+		Map<String, String[]> preferenceMap = new HashMap<>();
 
 		preferenceMap.put(
 			"anyClassTypeDLFileEntryAssetRendererFactory",
@@ -536,7 +540,7 @@ public class AssetPublisherExportImportTest
 			ddmStructure1.getDefinition(), LocaleUtil.getDefault(),
 			serviceContext);
 
-		Map<String, String[]> preferenceMap = new HashMap<String, String[]>();
+		Map<String, String[]> preferenceMap = new HashMap<>();
 
 		preferenceMap.put(
 			"anyClassTypeJournalArticleAssetRendererFactory",
@@ -571,7 +575,7 @@ public class AssetPublisherExportImportTest
 
 		GroupTestUtil.addGroup(TestPropsValues.getUserId(), secondLayout);
 
-		Map<String, String[]> preferenceMap = new HashMap<String, String[]>();
+		Map<String, String[]> preferenceMap = new HashMap<>();
 
 		GroupTestUtil.addGroup(TestPropsValues.getUserId(), layout);
 
@@ -580,10 +584,11 @@ public class AssetPublisherExportImportTest
 		preferenceMap.put(
 			"scopeIds",
 			new String[] {
-				AssetPublisher.SCOPE_ID_GROUP_PREFIX +
+				AssetPublisherUtil.SCOPE_ID_GROUP_PREFIX +
 					companyGroup.getGroupId(),
-				AssetPublisher.SCOPE_ID_LAYOUT_UUID_PREFIX + layout.getUuid(),
-				AssetPublisher.SCOPE_ID_LAYOUT_UUID_PREFIX +
+				AssetPublisherUtil.SCOPE_ID_LAYOUT_UUID_PREFIX +
+					layout.getUuid(),
+				AssetPublisherUtil.SCOPE_ID_LAYOUT_UUID_PREFIX +
 					secondLayout.getUuid()
 			});
 
@@ -599,13 +604,13 @@ public class AssetPublisherExportImportTest
 
 		StringBundler sb = new StringBundler(8);
 
-		sb.append(AssetPublisher.SCOPE_ID_GROUP_PREFIX);
+		sb.append(AssetPublisherUtil.SCOPE_ID_GROUP_PREFIX);
 		sb.append(companyGroup.getGroupId());
 		sb.append(StringPool.COMMA);
-		sb.append(AssetPublisher.SCOPE_ID_LAYOUT_UUID_PREFIX);
+		sb.append(AssetPublisherUtil.SCOPE_ID_LAYOUT_UUID_PREFIX);
 		sb.append(importedLayout.getUuid());
 		sb.append(StringPool.COMMA);
-		sb.append(AssetPublisher.SCOPE_ID_LAYOUT_UUID_PREFIX);
+		sb.append(AssetPublisherUtil.SCOPE_ID_LAYOUT_UUID_PREFIX);
 		sb.append(importedSecondLayout.getUuid());
 
 		Assert.assertEquals(
@@ -619,15 +624,16 @@ public class AssetPublisherExportImportTest
 
 		GroupTestUtil.addGroup(TestPropsValues.getUserId(), secondLayout);
 
-		Map<String, String[]> preferenceMap = new HashMap<String, String[]>();
+		Map<String, String[]> preferenceMap = new HashMap<>();
 
 		GroupTestUtil.addGroup(TestPropsValues.getUserId(), layout);
 
 		preferenceMap.put(
 			"scopeIds",
 			new String[] {
-				AssetPublisher.SCOPE_ID_LAYOUT_PREFIX + layout.getLayoutId(),
-				AssetPublisher.SCOPE_ID_LAYOUT_PREFIX +
+				AssetPublisherUtil.SCOPE_ID_LAYOUT_PREFIX +
+					layout.getLayoutId(),
+				AssetPublisherUtil.SCOPE_ID_LAYOUT_PREFIX +
 					secondLayout.getLayoutId()
 			});
 
@@ -643,10 +649,10 @@ public class AssetPublisherExportImportTest
 
 		StringBundler sb = new StringBundler(5);
 
-		sb.append(AssetPublisher.SCOPE_ID_LAYOUT_UUID_PREFIX);
+		sb.append(AssetPublisherUtil.SCOPE_ID_LAYOUT_UUID_PREFIX);
 		sb.append(importedLayout.getUuid());
 		sb.append(StringPool.COMMA);
-		sb.append(AssetPublisher.SCOPE_ID_LAYOUT_UUID_PREFIX);
+		sb.append(AssetPublisherUtil.SCOPE_ID_LAYOUT_UUID_PREFIX);
 		sb.append(importedSecondLayout.getUuid());
 
 		Assert.assertEquals(
@@ -701,10 +707,6 @@ public class AssetPublisherExportImportTest
 			PortletDataHandlerKeys.PORTLET_DATA,
 			new String[] {Boolean.TRUE.toString()});
 		parameterMap.put(
-			PortletDataHandlerKeys.PORTLET_DATA + StringPool.UNDERLINE +
-				PortletKeys.ASSET_CATEGORIES_ADMIN,
-			new String[] {Boolean.TRUE.toString()});
-		parameterMap.put(
 			PortletDataHandlerKeys.PORTLET_SETUP_ALL,
 			new String[] {Boolean.TRUE.toString()});
 
@@ -733,7 +735,7 @@ public class AssetPublisherExportImportTest
 				TestPropsValues.getUserId(), RandomTestUtil.randomString(),
 				ServiceContextTestUtil.getServiceContext(groupId));
 
-		Map<String, String[]> preferenceMap = new HashMap<String, String[]>();
+		Map<String, String[]> preferenceMap = new HashMap<>();
 
 		preferenceMap.put(
 			"assetVocabularyId",

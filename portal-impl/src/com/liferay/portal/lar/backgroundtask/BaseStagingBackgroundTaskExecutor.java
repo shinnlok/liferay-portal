@@ -53,6 +53,9 @@ public abstract class BaseStagingBackgroundTaskExecutor
 		setBackgroundTaskStatusMessageTranslator(
 			new DefaultExportImportBackgroundTaskStatusMessageTranslator());
 
+		// Isolation level guarantees this will be serial in a group
+
+		setIsolationLevel(BackgroundTaskConstants.ISOLATION_LEVEL_GROUP);
 		setSerial(true);
 	}
 
@@ -111,7 +114,7 @@ public abstract class BaseStagingBackgroundTaskExecutor
 			backgroundTask.getTaskContextMap();
 
 		if (taskContextMap == null) {
-			taskContextMap = new HashMap<String, Serializable>();
+			taskContextMap = new HashMap<>();
 		}
 
 		taskContextMap.put(backgroundTaskState, Boolean.TRUE);

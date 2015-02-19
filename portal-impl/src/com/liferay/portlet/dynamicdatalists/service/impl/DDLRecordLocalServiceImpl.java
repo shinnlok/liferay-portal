@@ -50,6 +50,7 @@ import com.liferay.portlet.dynamicdatamapping.storage.DDMFormValues;
 import com.liferay.portlet.dynamicdatamapping.storage.Field;
 import com.liferay.portlet.dynamicdatamapping.storage.Fields;
 import com.liferay.portlet.dynamicdatamapping.storage.StorageEngineUtil;
+import com.liferay.portlet.dynamicdatamapping.util.DDMFormValuesToFieldsConverterUtil;
 import com.liferay.portlet.dynamicdatamapping.util.DDMUtil;
 import com.liferay.portlet.dynamicdatamapping.util.FieldsToDDMFormValuesConverterUtil;
 import com.liferay.portlet.expando.model.ExpandoBridge;
@@ -175,7 +176,8 @@ public class DDLRecordLocalServiceImpl extends DDLRecordLocalServiceBaseImpl {
 	@Override
 	@SystemEvent(
 		action = SystemEventConstants.ACTION_SKIP,
-		type = SystemEventConstants.TYPE_DELETE)
+		type = SystemEventConstants.TYPE_DELETE
+	)
 	public DDLRecord deleteRecord(DDLRecord record) throws PortalException {
 
 		// Record
@@ -223,7 +225,13 @@ public class DDLRecordLocalServiceImpl extends DDLRecordLocalServiceBaseImpl {
 
 		DDLRecord record = ddlRecordPersistence.findByPrimaryKey(recordId);
 
-		Fields fields = StorageEngineUtil.getFields(record.getDDMStorageId());
+		DDLRecordSet recordSet = record.getRecordSet();
+
+		DDMFormValues ddmFormValues = StorageEngineUtil.getDDMFormValues(
+			record.getDDMStorageId());
+
+		Fields fields = DDMFormValuesToFieldsConverterUtil.convert(
+			recordSet.getDDMStructure(), ddmFormValues);
 
 		for (Field field : fields) {
 			Map<Locale, List<Serializable>> valuesMap = field.getValuesMap();
@@ -268,7 +276,7 @@ public class DDLRecordLocalServiceImpl extends DDLRecordLocalServiceBaseImpl {
 
 	/**
 	 * @deprecated As of 7.0.0, replaced by {@link
-	 *             DDLRecordVersionLocalServiceImpl#getLatestRecordVersion(
+	 *             com.liferay.portlet.dynamicdatalists.service.DDLRecordVersionLocalService#getLatestRecordVersion(
 	 *             long)}
 	 */
 	@Deprecated
@@ -326,7 +334,8 @@ public class DDLRecordLocalServiceImpl extends DDLRecordLocalServiceBaseImpl {
 
 	/**
 	 * @deprecated As of 7.0.0, replaced by {@link
-	 *             DDLRecordVersionLocalServiceImpl#getRecordVersion(long)}
+	 *             com.liferay.portlet.dynamicdatalists.service.DDLRecordVersionLocalService#getRecordVersion(
+	 *             long)}
 	 */
 	@Deprecated
 	@Override
@@ -338,8 +347,8 @@ public class DDLRecordLocalServiceImpl extends DDLRecordLocalServiceBaseImpl {
 
 	/**
 	 * @deprecated As of 7.0.0, replaced by {@link
-	 *             DDLRecordVersionLocalServiceImpl#getRecordVersion(long,
-	 *             String)}
+	 *             com.liferay.portlet.dynamicdatalists.service.DDLRecordVersionLocalService#getRecordVersion(
+	 *             long, String)}
 	 */
 	@Deprecated
 	@Override
@@ -351,8 +360,8 @@ public class DDLRecordLocalServiceImpl extends DDLRecordLocalServiceBaseImpl {
 
 	/**
 	 * @deprecated As of 7.0.0, replaced by {@link
-	 *             DDLRecordVersionLocalServiceImpl#getRecordVersions(long, int,
-	 *             int, OrderByComparator)}
+	 *             com.liferay.portlet.dynamicdatalists.service.DDLRecordVersionLocalService#getRecordVersions(
+	 *             long, int, int, OrderByComparator)}
 	 */
 	@Deprecated
 	@Override
@@ -366,7 +375,7 @@ public class DDLRecordLocalServiceImpl extends DDLRecordLocalServiceBaseImpl {
 
 	/**
 	 * @deprecated As of 7.0.0, replaced by {@link
-	 *             DDLRecordVersionLocalServiceImpl#getRecordVersionsCount(
+	 *             com.liferay.portlet.dynamicdatalists.service.DDLRecordVersionLocalService#getRecordVersionsCount(
 	 *             long)}
 	 */
 	@Deprecated
@@ -388,14 +397,14 @@ public class DDLRecordLocalServiceImpl extends DDLRecordLocalServiceBaseImpl {
 			return;
 		}
 
-		Fields fields = StorageEngineUtil.getFields(
+		DDMFormValues ddmFormValues = StorageEngineUtil.getDDMFormValues(
 			recordVersion.getDDMStorageId());
 
 		serviceContext.setCommand(Constants.REVERT);
 
 		ddlRecordLocalService.updateRecord(
-			userId, recordId, true, recordVersion.getDisplayIndex(), fields,
-			false, serviceContext);
+			userId, recordId, true, recordVersion.getDisplayIndex(),
+			ddmFormValues, serviceContext);
 	}
 
 	/**
@@ -437,8 +446,7 @@ public class DDLRecordLocalServiceImpl extends DDLRecordLocalServiceBaseImpl {
 
 			List<DDLRecord> ddlRecords = DDLUtil.getRecords(hits);
 
-			return new BaseModelSearchResult<DDLRecord>(
-				ddlRecords, hits.getLength());
+			return new BaseModelSearchResult<>(ddlRecords, hits.getLength());
 		}
 		catch (Exception e) {
 			throw new SystemException(e);
@@ -584,8 +592,12 @@ public class DDLRecordLocalServiceImpl extends DDLRecordLocalServiceBaseImpl {
 		DDLRecordVersion recordVersion = record.getLatestRecordVersion();
 
 		if (mergeFields) {
-			Fields existingFields = StorageEngineUtil.getFields(
-				recordVersion.getDDMStorageId());
+			DDMFormValues existingDDMFormValues =
+				StorageEngineUtil.getDDMFormValues(
+					recordVersion.getDDMStorageId());
+
+			Fields existingFields = DDMFormValuesToFieldsConverterUtil.convert(
+				recordSet.getDDMStructure(), existingDDMFormValues);
 
 			fields = DDMUtil.mergeFields(fields, existingFields);
 		}
@@ -687,6 +699,14 @@ public class DDLRecordLocalServiceImpl extends DDLRecordLocalServiceBaseImpl {
 			}
 		}
 
+		// Asset
+
+		Locale locale = serviceContext.getLocale();
+
+		updateAsset(
+			userId, record, recordVersion, serviceContext.getAssetCategoryIds(),
+			serviceContext.getAssetTagNames(), locale);
+
 		return record;
 	}
 
@@ -741,7 +761,10 @@ public class DDLRecordLocalServiceImpl extends DDLRecordLocalServiceBaseImpl {
 
 	/**
 	 * @see com.liferay.portlet.documentlibrary.service.impl.DLFileEntryLocalServiceImpl#isKeepFileVersionLabel(
-	 *      DLFileEntry, DLFileVersion, DLFileVersion, ServiceContext)
+	 *      com.liferay.portlet.documentlibrary.model.DLFileEntry,
+	 *      com.liferay.portlet.documentlibrary.model.DLFileVersion,
+	 *      com.liferay.portlet.documentlibrary.model.DLFileVersion,
+	 *      ServiceContext)
 	 */
 	protected boolean isKeepRecordVersionLabel(
 			DDLRecordVersion lastRecordVersion,
@@ -765,12 +788,12 @@ public class DDLRecordLocalServiceImpl extends DDLRecordLocalServiceBaseImpl {
 			return false;
 		}
 
-		Fields lastFields = StorageEngineUtil.getFields(
+		DDMFormValues lastDDMFormValues = StorageEngineUtil.getDDMFormValues(
 			lastRecordVersion.getDDMStorageId());
-		Fields latestFields = StorageEngineUtil.getFields(
+		DDMFormValues latestDDMFormValues = StorageEngineUtil.getDDMFormValues(
 			latestRecordVersion.getDDMStorageId());
 
-		if (!lastFields.equals(latestFields, false)) {
+		if (!lastDDMFormValues.equals(latestDDMFormValues)) {
 			return false;
 		}
 

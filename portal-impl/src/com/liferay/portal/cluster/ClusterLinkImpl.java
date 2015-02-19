@@ -24,8 +24,6 @@ import com.liferay.portal.kernel.security.pacl.DoPrivileged;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.util.PropsUtil;
 
-import java.net.InetAddress;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -48,40 +46,6 @@ public class ClusterLinkImpl extends ClusterBase implements ClusterLink {
 		for (JChannel jChannel : _transportJChannels) {
 			jChannel.close();
 		}
-	}
-
-	@Override
-	public InetAddress getBindInetAddress() {
-		JChannel jChannel = _transportJChannels.get(0);
-
-		return getBindInetAddress(jChannel);
-	}
-
-	@Override
-	public List<Address> getLocalTransportAddresses() {
-		if (!isEnabled()) {
-			return Collections.emptyList();
-		}
-
-		List<Address> addresses = new ArrayList<Address>(
-			_localTransportAddresses.size());
-
-		for (org.jgroups.Address address : _localTransportAddresses) {
-			addresses.add(new AddressImpl(address));
-		}
-
-		return addresses;
-	}
-
-	@Override
-	public List<Address> getTransportAddresses(Priority priority) {
-		if (!isEnabled()) {
-			return Collections.emptyList();
-		}
-
-		JChannel jChannel = getChannel(priority);
-
-		return getAddresses(jChannel);
 	}
 
 	@Override
@@ -169,11 +133,10 @@ public class ClusterLinkImpl extends ClusterBase implements ClusterLink {
 				"Channel count must be between 1 and " + MAX_CHANNEL_COUNT);
 		}
 
-		_localTransportAddresses = new ArrayList<org.jgroups.Address>(
-			_channelCount);
-		_transportJChannels = new ArrayList<JChannel>(_channelCount);
+		_localTransportAddresses = new ArrayList<>(_channelCount);
+		_transportJChannels = new ArrayList<>(_channelCount);
 
-		List<String> keys = new ArrayList<String>(_channelCount);
+		List<String> keys = new ArrayList<>(_channelCount);
 
 		for (Object key : transportProperties.keySet()) {
 			keys.add((String)key);
@@ -198,7 +161,8 @@ public class ClusterLinkImpl extends ClusterBase implements ClusterLink {
 	private static final String _LIFERAY_TRANSPORT_CHANNEL =
 		"LIFERAY-TRANSPORT-CHANNEL-";
 
-	private static Log _log = LogFactoryUtil.getLog(ClusterLinkImpl.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		ClusterLinkImpl.class);
 
 	private int _channelCount;
 	private List<org.jgroups.Address> _localTransportAddresses;
