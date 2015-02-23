@@ -19,6 +19,8 @@ import com.liferay.portal.kernel.cache.SingleVMPoolUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringReader;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletMode;
 import com.liferay.portal.kernel.security.pacl.DoPrivileged;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -501,8 +503,23 @@ public class PortletPreferencesFactoryImpl
 		long siteGroupId, Layout layout, String portletId,
 		String defaultPreferences) {
 
+		try {
+			LayoutTypePortlet layoutTypePortlet =
+				(LayoutTypePortlet)layout.getLayoutType();
+
+			if (layoutTypePortlet.hasPortletId(portletId)) {
+				return getPortletSetup(
+					siteGroupId, layout, portletId, defaultPreferences, false);
+			}
+		}
+		catch (PortalException pe) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(pe, pe);
+			}
+		}
+
 		return getPortletSetup(
-			siteGroupId, layout, portletId, defaultPreferences, false);
+			siteGroupId, layout, portletId, defaultPreferences, true);
 	}
 
 	@Override
@@ -534,8 +551,7 @@ public class PortletPreferencesFactoryImpl
 		long companyId, long groupId, long ownerId, int ownerType,
 		String portletId, boolean privateLayout) {
 
-		Map<Long, PortletPreferences> portletSetupMap =
-			new HashMap<Long, PortletPreferences>();
+		Map<Long, PortletPreferences> portletSetupMap = new HashMap<>();
 
 		List<com.liferay.portal.model.PortletPreferences>
 			portletPreferencesList =
@@ -720,7 +736,7 @@ public class PortletPreferencesFactoryImpl
 		throws XMLStreamException {
 
 		String name = null;
-		List<String> values = new ArrayList<String>();
+		List<String> values = new ArrayList<>();
 		boolean readOnly = false;
 
 		while (xmlEventReader.hasNext()) {
@@ -793,7 +809,7 @@ public class PortletPreferencesFactoryImpl
 						Preference preference = readPreference(xmlEventReader);
 
 						if (preferencesMap == null) {
-							preferencesMap = new HashMap<String, Preference>();
+							preferencesMap = new HashMap<>();
 						}
 
 						preferencesMap.put(preference.getName(), preference);
@@ -810,6 +826,9 @@ public class PortletPreferencesFactoryImpl
 					xmlEventReader.close();
 				}
 				catch (XMLStreamException xse) {
+					if (_log.isDebugEnabled()) {
+						_log.debug(xse, xse);
+					}
 				}
 			}
 		}
@@ -823,6 +842,8 @@ public class PortletPreferencesFactoryImpl
 		return preferencesMap;
 	}
 
+	private final Log _log = LogFactoryUtil.getLog(
+		PortletPreferencesFactoryImpl.class);
 	private final PortalCache<String, Map<String, Preference>>
 		_preferencesMapPortalCache = SingleVMPoolUtil.getCache(
 			PortletPreferencesFactoryImpl.class.getName());

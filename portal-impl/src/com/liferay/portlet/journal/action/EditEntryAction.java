@@ -158,7 +158,7 @@ public class EditEntryAction extends PortletAction {
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		List<TrashedModel> trashedModels = new ArrayList<TrashedModel>();
+		List<TrashedModel> trashedModels = new ArrayList<>();
 
 		long[] deleteFolderIds = StringUtil.split(
 			ParamUtil.getString(actionRequest, "folderIds"), 0L);
@@ -238,7 +238,7 @@ public class EditEntryAction extends PortletAction {
 				folderId, newFolderId, serviceContext);
 		}
 
-		List<String> invalidArticleIds = new ArrayList<String>();
+		List<String> invalidArticleIds = new ArrayList<>();
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
@@ -250,7 +250,7 @@ public class EditEntryAction extends PortletAction {
 			try {
 				JournalArticleServiceUtil.moveArticle(
 					themeDisplay.getScopeGroupId(),
-					HtmlUtil.unescape(articleId), newFolderId);
+					HtmlUtil.unescape(articleId), newFolderId, serviceContext);
 			}
 			catch (InvalidDDMStructureException idse) {
 				invalidArticleIds.add(articleId);

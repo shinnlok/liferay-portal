@@ -68,6 +68,8 @@ import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
 import javax.portlet.PreferencesValidator;
 import javax.portlet.RenderRequest;
+import javax.portlet.ResourceRequest;
+import javax.portlet.ResourceResponse;
 import javax.portlet.ValidatorException;
 import javax.portlet.WindowState;
 
@@ -711,10 +713,22 @@ public class PortalUtil {
 		return getPortal().getCurrentAndAncestorSiteGroupIds(groupId);
 	}
 
+	public static long[] getCurrentAndAncestorSiteGroupIds(long[] groupIds)
+		throws PortalException {
+
+		return getPortal().getCurrentAndAncestorSiteGroupIds(groupIds);
+	}
+
 	public static List<Group> getCurrentAndAncestorSiteGroups(long groupId)
 		throws PortalException {
 
 		return getPortal().getCurrentAndAncestorSiteGroups(groupId);
+	}
+
+	public static List<Group> getCurrentAndAncestorSiteGroups(long[] groupIds)
+		throws PortalException {
+
+		return getPortal().getCurrentAndAncestorSiteGroups(groupIds);
 	}
 
 	public static String getCurrentCompleteURL(HttpServletRequest request) {
@@ -2036,6 +2050,15 @@ public class PortalUtil {
 			portletConfig, actionRequest, actionResponse);
 	}
 
+	public static void invokeTaglibDiscussionPagination(
+			PortletConfig portletConfig, ResourceRequest resourceRequest,
+			ResourceResponse resourceResponse)
+		throws IOException, PortletException {
+
+		getPortal().invokeTaglibDiscussionPagination(
+			portletConfig, resourceRequest, resourceResponse);
+	}
+
 	/**
 	 * @deprecated As of 6.2.0, with no direct replacement
 	 */
@@ -2398,7 +2421,7 @@ public class PortalUtil {
 
 	/**
 	 * @deprecated As of 7.0.0, replaced by {@link
-	 *             #removePortalInetSocketAddressEventListener(
+	 *             #removePortalEventListener(
 	 *             PortalInetSocketAddressEventListener)}
 	 */
 	@Deprecated

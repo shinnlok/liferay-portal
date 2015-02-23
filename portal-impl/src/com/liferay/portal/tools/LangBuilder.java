@@ -18,7 +18,9 @@ import com.liferay.portal.kernel.io.OutputStreamWriter;
 import com.liferay.portal.kernel.io.unsync.UnsyncBufferedReader;
 import com.liferay.portal.kernel.io.unsync.UnsyncBufferedWriter;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringReader;
+import com.liferay.portal.kernel.microsofttranslator.MicrosoftTranslator;
 import com.liferay.portal.kernel.microsofttranslator.MicrosoftTranslatorException;
+import com.liferay.portal.kernel.microsofttranslator.MicrosoftTranslatorFactoryUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.NaturalOrderStringComparator;
@@ -27,9 +29,6 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.webcache.WebCacheItem;
-import com.liferay.portlet.translator.model.Translation;
-import com.liferay.portlet.translator.util.TranslationWebCacheItem;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -38,8 +37,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.TreeMap;
 
 /**
@@ -83,6 +84,8 @@ public class LangBuilder {
 		_langFile = langFile;
 		_langTranslate = langTranslate;
 
+		_initKeysWithUpdatedValues();
+
 		if (langPlugin) {
 			_portalLanguageProperties = new Properties();
 
@@ -95,11 +98,17 @@ public class LangBuilder {
 
 			_portalLanguageProperties.load(inputStream);
 		}
+		else {
+			_portalLanguageProperties = null;
+		}
 
 		File renameKeysFile = new File(_langDir + "/rename.properties");
 
 		if (renameKeysFile.exists()) {
 			_renameKeys = PropertiesUtil.load(FileUtil.read(renameKeysFile));
+		}
+		else {
+			_renameKeys = null;
 		}
 
 		String content = _orderProperties(
@@ -233,8 +242,13 @@ public class LangBuilder {
 
 					String translatedText = properties.getProperty(key);
 
-					if ((translatedText == null) && (parentProperties != null))
-					{
+					if (_keysWithUpdatedValues.contains(key)) {
+						translatedText = null;
+					}
+
+					if ((translatedText == null) &&
+						(parentProperties != null)) {
+
 						translatedText = parentProperties.getProperty(key);
 					}
 
@@ -291,6 +305,9 @@ public class LangBuilder {
 						}
 						else if (key.equals("lang.line.end")) {
 							translatedText = "right";
+						}
+						else if (key.startsWith("lang.user.name.")) {
+							translatedText = "";
 						}
 						else if (languageId.equals("el") &&
 								 (key.equals("enabled") || key.equals("on") ||
@@ -477,6 +494,35 @@ public class LangBuilder {
 		return value;
 	}
 
+	private void _initKeysWithUpdatedValues() throws Exception {
+		File backupLanguageFile = new File(
+			_langDir + "/" + _langFile + "_en.properties");
+
+		if (!backupLanguageFile.exists()) {
+			return;
+		}
+
+		Properties backupLanguageProperties = PropertiesUtil.load(
+			FileUtil.read(backupLanguageFile));
+
+		File languageFile = new File(
+			_langDir + "/" + _langFile + ".properties");
+
+		Properties languageProperties = PropertiesUtil.load(
+			FileUtil.read(languageFile));
+
+		Set<Map.Entry<Object, Object>> set = languageProperties.entrySet();
+
+		for (Map.Entry<Object, Object> entry : set) {
+			String key = (String)entry.getKey();
+			String value = (String)entry.getValue();
+
+			if (!value.equals(backupLanguageProperties.get(key))) {
+				_keysWithUpdatedValues.add(key);
+			}
+		}
+	}
+
 	private String _orderProperties(File propertiesFile) throws IOException {
 		if (!propertiesFile.exists()) {
 			return null;
@@ -489,7 +535,7 @@ public class LangBuilder {
 			UnsyncBufferedWriter unsyncBufferedWriter =
 				new UnsyncBufferedWriter(new FileWriter(propertiesFile))) {
 
-			Map<String, String> messages = new TreeMap<String, String>(
+			Map<String, String> messages = new TreeMap<>(
 				new NaturalOrderStringComparator(true, true));
 
 			boolean begin = false;
@@ -647,12 +693,11 @@ public class LangBuilder {
 
 			System.out.println(sb.toString());
 
-			WebCacheItem wci = new TranslationWebCacheItem(
+			MicrosoftTranslator microsoftTranslator =
+				MicrosoftTranslatorFactoryUtil.getMicrosoftTranslator();
+
+			toText = microsoftTranslator.translate(
 				fromLanguageId, toLanguageId, fromText);
-
-			Translation translation = (Translation)wci.convert("");
-
-			toText = translation.getToText();
 		}
 		catch (Exception e) {
 			Throwable cause = e.getCause();
@@ -676,10 +721,11 @@ public class LangBuilder {
 		return toText;
 	}
 
-	private String _langDir;
-	private String _langFile;
-	private boolean _langTranslate;
-	private Properties _portalLanguageProperties;
-	private Properties _renameKeys;
+	private final Set<String> _keysWithUpdatedValues = new HashSet<>();
+	private final String _langDir;
+	private final String _langFile;
+	private final boolean _langTranslate;
+	private final Properties _portalLanguageProperties;
+	private final Properties _renameKeys;
 
 }

@@ -1,5 +1,5 @@
 <definition component-name="portal-wcm">
-	<property name="testray.main.component.name" value="WCM" />
+	<property name="testray.main.component.name" value="Content and Application Templates" />
 
 	<var name="siteName" value="Test Site Name" />
 
@@ -228,7 +228,7 @@
 		</execute>
 	</command>
 
-	<command known-issues="LPS-51070" name="ADTDMMediaGallery" priority="3">
+	<command known-issues="LIFERAYQA-9807" name="ADTDMMediaGallery" priority="3">
 		<var name="siteName" value="${siteName}" />
 
 		<execute macro="Page#gotoConfigurationCP">

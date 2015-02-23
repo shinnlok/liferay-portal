@@ -31,6 +31,7 @@ import com.liferay.portal.model.LocalizedModel;
 import com.liferay.portal.model.StagedModel;
 import com.liferay.portal.model.TrashedModel;
 import com.liferay.portal.model.WorkflowedModel;
+import com.liferay.portal.model.adapter.StagedGroup;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portlet.asset.model.AssetCategory;
 import com.liferay.portlet.asset.service.AssetCategoryLocalServiceUtil;
@@ -40,7 +41,6 @@ import com.liferay.portlet.messageboards.service.MBDiscussionLocalServiceUtil;
 import com.liferay.portlet.messageboards.service.MBMessageLocalServiceUtil;
 import com.liferay.portlet.ratings.model.RatingsEntry;
 import com.liferay.portlet.ratings.service.RatingsEntryLocalServiceUtil;
-import com.liferay.portlet.sitesadmin.lar.StagedGroup;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -211,7 +211,7 @@ public abstract class BaseStagedModelDataHandler<T extends StagedModel>
 	public Map<String, String> getReferenceAttributes(
 		PortletDataContext portletDataContext, T stagedModel) {
 
-		return new HashMap<String, String>();
+		return new HashMap<>();
 	}
 
 	/**
@@ -527,8 +527,7 @@ public abstract class BaseStagedModelDataHandler<T extends StagedModel>
 			portletDataContext.getReferenceElements(
 				stagedModel, AssetCategory.class);
 
-		List<Long> assetCategoryIds = new ArrayList<Long>(
-			referenceElements.size());
+		List<Long> assetCategoryIds = new ArrayList<>(referenceElements.size());
 
 		for (Element referenceElement : referenceElements) {
 			long classPK = GetterUtil.getLong(
@@ -696,7 +695,7 @@ public abstract class BaseStagedModelDataHandler<T extends StagedModel>
 		return true;
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		BaseStagedModelDataHandler.class);
 
 }

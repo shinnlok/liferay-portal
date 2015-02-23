@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.dynamicdatamapping.util.test;
 
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
@@ -30,13 +32,13 @@ import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.kernel.xml.XPath;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portal.util.test.ServiceContextTestUtil;
-import com.liferay.portal.util.test.TestPropsValues;
 import com.liferay.portlet.dynamicdatamapping.io.DDMFormXSDDeserializerUtil;
 import com.liferay.portlet.dynamicdatamapping.model.DDMForm;
+import com.liferay.portlet.dynamicdatamapping.model.DDMFormLayout;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructureConstants;
 import com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalServiceUtil;
+import com.liferay.portlet.dynamicdatamapping.util.DDMUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -82,11 +84,12 @@ public class DDMStructureTestUtil {
 			ServiceContext serviceContext)
 		throws Exception {
 
-		Map<Locale, String> nameMap = new HashMap<Locale, String>();
+		Map<Locale, String> nameMap = new HashMap<>();
 
 		nameMap.put(defaultLocale, "Test Structure");
 
 		DDMForm ddmForm = DDMFormXSDDeserializerUtil.deserialize(definition);
+		DDMFormLayout ddmFormLayout = DDMUtil.getDefaultDDMFormLayout(ddmForm);
 		String ddlStorageType = GetterUtil.getString(
 			PropsUtil.get(PropsKeys.DYNAMIC_DATA_LISTS_STORAGE_TYPE));
 
@@ -96,7 +99,8 @@ public class DDMStructureTestUtil {
 		return DDMStructureLocalServiceUtil.addStructure(
 			TestPropsValues.getUserId(), groupId, parentStructureId,
 			PortalUtil.getClassNameId(className), null, nameMap, null, ddmForm,
-			ddlStorageType, DDMStructureConstants.TYPE_DEFAULT, serviceContext);
+			ddmFormLayout, ddlStorageType, DDMStructureConstants.TYPE_DEFAULT,
+			serviceContext);
 	}
 
 	public static DDMStructure addStructure(
@@ -219,7 +223,7 @@ public class DDMStructureTestUtil {
 	public static String getSampleStructuredContent(
 		String name, String keywords) {
 
-		Map<Locale, String> contents = new HashMap<Locale, String>();
+		Map<Locale, String> contents = new HashMap<>();
 
 		contents.put(Locale.US, keywords);
 
@@ -245,6 +249,14 @@ public class DDMStructureTestUtil {
 	public static String getSampleStructureDefinition(
 		String name, Locale[] availableLocales, Locale defaultLocale) {
 
+		return getSampleStructureDefinition(
+			name, "string", true, "text", availableLocales, defaultLocale);
+	}
+
+	public static String getSampleStructureDefinition(
+		String name, String dataType, boolean repeatable, String type,
+		Locale[] availableLocales, Locale defaultLocale) {
+
 		Document document = createDocumentStructure(
 			availableLocales, defaultLocale);
 
@@ -253,12 +265,13 @@ public class DDMStructureTestUtil {
 		Element dynamicElementElement = rootElement.addElement(
 			"dynamic-element");
 
-		dynamicElementElement.addAttribute("dataType", "string");
+		dynamicElementElement.addAttribute("dataType", dataType);
 		dynamicElementElement.addAttribute("indexType", "text");
 		dynamicElementElement.addAttribute("name", name);
-		dynamicElementElement.addAttribute("repeatable", "true");
+		dynamicElementElement.addAttribute(
+			"repeatable", Boolean.toString(repeatable));
 		dynamicElementElement.addAttribute("required", "false");
-		dynamicElementElement.addAttribute("type", "text");
+		dynamicElementElement.addAttribute("type", type);
 
 		Element metaDataElement = dynamicElementElement.addElement("meta-data");
 
@@ -276,8 +289,7 @@ public class DDMStructureTestUtil {
 	public static Map<String, Map<String, String>> getXSDMap(String xsd)
 		throws Exception {
 
-		Map<String, Map<String, String>> map =
-			new HashMap<String, Map<String, String>>();
+		Map<String, Map<String, String>> map = new HashMap<>();
 
 		Document document = SAXReaderUtil.read(xsd);
 
@@ -327,7 +339,7 @@ public class DDMStructureTestUtil {
 	}
 
 	protected static Map<String, String> getElementMap(Element element) {
-		Map<String, String> elementMap = new HashMap<String, String>();
+		Map<String, String> elementMap = new HashMap<>();
 
 		// Attributes
 

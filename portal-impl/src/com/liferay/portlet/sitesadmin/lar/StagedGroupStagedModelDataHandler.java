@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.model.Group;
+import com.liferay.portal.model.adapter.StagedGroup;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 
 import java.util.Map;
@@ -105,18 +106,12 @@ public class StagedGroupStagedModelDataHandler
 
 	@Override
 	protected void doExportStagedModel(
-			PortletDataContext portletDataContext, StagedGroup stagedGroup)
-		throws Exception {
-
-		return;
+		PortletDataContext portletDataContext, StagedGroup stagedGroup) {
 	}
 
 	@Override
 	protected void doImportStagedModel(
-			PortletDataContext portletDataContext, StagedGroup stagedGroup)
-		throws Exception {
-
-		return;
+		PortletDataContext portletDataContext, StagedGroup stagedGroup) {
 	}
 
 	protected Group fetchExistingGroup(

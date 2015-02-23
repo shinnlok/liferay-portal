@@ -69,8 +69,8 @@ public class AddDefaultLayoutSetPrototypesAction
 			}
 		}
 
-		Map<Locale, String> nameMap = new HashMap<Locale, String>();
-		Map<Locale, String> descriptionMap = new HashMap<Locale, String>();
+		Map<Locale, String> nameMap = new HashMap<>();
+		Map<Locale, String> descriptionMap = new HashMap<>();
 
 		Locale[] locales = LanguageUtil.getAvailableLocales();
 
@@ -117,24 +117,16 @@ public class AddDefaultLayoutSetPrototypesAction
 
 		String portletId = addPortletId(layout, PortletKeys.SEARCH, "column-2");
 
-		Map<String, String> preferences = new HashMap<String, String>();
+		Map<String, String> preferences = new HashMap<>();
 
 		preferences.put("portletSetupShowBorders", Boolean.FALSE.toString());
-
-		updatePortletSetup(layout, portletId, preferences);
-
-		portletId = addPortletId(layout, PortletKeys.LANGUAGE, "column-2");
-
-		preferences = new HashMap<String, String>();
-
-		preferences.put("displayStyle", "3");
 
 		updatePortletSetup(layout, portletId, preferences);
 
 		portletId = addPortletId(
 			layout, PortletKeys.ASSET_PUBLISHER, "column-2");
 
-		preferences = new HashMap<String, String>();
+		preferences = new HashMap<>();
 
 		Locale[] locales = LanguageUtil.getAvailableLocales();
 
@@ -156,7 +148,7 @@ public class AddDefaultLayoutSetPrototypesAction
 		portletId = addPortletId(
 			layout, PortletKeys.DOCUMENT_LIBRARY, "column-1");
 
-		preferences = new HashMap<String, String>();
+		preferences = new HashMap<>();
 
 		preferences.put("portletSetupShowBorders", Boolean.FALSE.toString());
 
@@ -165,7 +157,7 @@ public class AddDefaultLayoutSetPrototypesAction
 		portletId = addPortletId(
 			layout, PortletKeys.ASSET_PUBLISHER, "column-2");
 
-		preferences = new HashMap<String, String>();
+		preferences = new HashMap<>();
 
 		preferences.put("anyAssetType", Boolean.FALSE.toString());
 
@@ -203,7 +195,7 @@ public class AddDefaultLayoutSetPrototypesAction
 
 		String portletId = addPortletId(layout, PortletKeys.SEARCH, "column-2");
 
-		Map<String, String> preferences = new HashMap<String, String>();
+		Map<String, String> preferences = new HashMap<>();
 
 		preferences.put("portletSetupShowBorders", Boolean.FALSE.toString());
 
@@ -214,7 +206,7 @@ public class AddDefaultLayoutSetPrototypesAction
 		portletId = addPortletId(
 			layout, PortletKeys.ASSET_PUBLISHER, "column-2");
 
-		preferences = new HashMap<String, String>();
+		preferences = new HashMap<>();
 
 		preferences.put("anyAssetType", Boolean.FALSE.toString());
 
@@ -233,11 +225,6 @@ public class AddDefaultLayoutSetPrototypesAction
 		// Wiki layout
 
 		layout = addLayout(layoutSet, "wiki", "/wiki", "2_columns_iii");
-
-		addPortletId(layout, PortletKeys.WIKI, "column-1");
-		addPortletId(
-			layout, PortletKeys.ASSET_CATEGORIES_NAVIGATION, "column-2");
-		addPortletId(layout, PortletKeys.TAGS_CLOUD, "column-2");
 	}
 
 	protected void doRun(long companyId) throws Exception {

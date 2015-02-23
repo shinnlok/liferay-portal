@@ -39,7 +39,7 @@ public class SyncSitePersistence extends BasePersistenceImpl<SyncSite, Long> {
 	public SyncSite fetchByF_S(String filePathName, long syncAccountId)
 		throws SQLException {
 
-		Map<String, Object> fieldValues = new HashMap<String, Object>();
+		Map<String, Object> fieldValues = new HashMap<>();
 
 		fieldValues.put("filePathName", filePathName);
 		fieldValues.put("syncAccountId", syncAccountId);
@@ -56,7 +56,7 @@ public class SyncSitePersistence extends BasePersistenceImpl<SyncSite, Long> {
 	public SyncSite fetchByG_S(long groupId, long syncAccountId)
 		throws SQLException {
 
-		Map<String, Object> fieldValues = new HashMap<String, Object>();
+		Map<String, Object> fieldValues = new HashMap<>();
 
 		fieldValues.put("groupId", groupId);
 		fieldValues.put("syncAccountId", syncAccountId);
@@ -86,10 +86,9 @@ public class SyncSitePersistence extends BasePersistenceImpl<SyncSite, Long> {
 		Where<SyncSite, Long> where = queryBuilder.where();
 
 		where.eq("active", active);
-
-		where.and();
-
 		where.eq("syncAccountId", syncAccountId);
+
+		where.and(2);
 
 		GenericRawResults<Long> genericRawResults = queryRaw(
 			queryBuilder.prepareStatementString(),

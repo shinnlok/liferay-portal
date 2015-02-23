@@ -3235,7 +3235,7 @@ public class StringUtil {
 			return splitLines(s);
 		}
 
-		List<String> nodeValues = new ArrayList<String>();
+		List<String> nodeValues = new ArrayList<>();
 
 		int offset = 0;
 		int pos = s.indexOf(delimiter, offset);
@@ -3369,7 +3369,7 @@ public class StringUtil {
 			return split(s, delimiter.charAt(0));
 		}
 
-		List<String> nodeValues = new ArrayList<String>();
+		List<String> nodeValues = new ArrayList<>();
 
 		int offset = 0;
 		int pos = s.indexOf(delimiter, offset);
@@ -3602,7 +3602,7 @@ public class StringUtil {
 
 		s = s.trim();
 
-		List<String> lines = new ArrayList<String>();
+		List<String> lines = new ArrayList<>();
 
 		int lastIndex = 0;
 
@@ -4819,8 +4819,8 @@ public class StringUtil {
 		'u', 'v', 'w', 'x', 'y', 'z'
 	};
 
-	private static Log _log = LogFactoryUtil.getLog(StringUtil.class);
+	private static final Log _log = LogFactoryUtil.getLog(StringUtil.class);
 
-	private static String[] _emptyStringArray = new String[0];
+	private static final String[] _emptyStringArray = new String[0];
 
 }

@@ -18,7 +18,15 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.security.RandomUtil;
-import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.rule.Sync;
+import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.SearchContextTestUtil;
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -27,18 +35,10 @@ import com.liferay.portal.model.BaseModel;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.test.DeleteAfterTestRun;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.test.Sync;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.MainServletTestRule;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.portal.util.test.GroupTestUtil;
-import com.liferay.portal.util.test.RandomTestUtil;
-import com.liferay.portal.util.test.SearchContextTestUtil;
-import com.liferay.portal.util.test.ServiceContextTestUtil;
-import com.liferay.portal.util.test.TestPropsValues;
-import com.liferay.portal.util.test.UserTestUtil;
 import com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil;
 import com.liferay.portlet.asset.model.AssetCategory;
 import com.liferay.portlet.asset.model.AssetEntry;
@@ -56,7 +56,10 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -140,21 +143,19 @@ public abstract class BaseAssetSearchTestCase {
 
 		for (ServiceContext serviceContext : serviceContexts) {
 			AssetTagLocalServiceUtil.addTag(
-				TestPropsValues.getUserId(), "liferay", null, serviceContext);
+				TestPropsValues.getUserId(), "liferay", serviceContext);
 
 			AssetTagLocalServiceUtil.addTag(
-				TestPropsValues.getUserId(), "architecture", null,
-				serviceContext);
+				TestPropsValues.getUserId(), "architecture", serviceContext);
 
 			AssetTagLocalServiceUtil.addTag(
-				TestPropsValues.getUserId(), "modularity", null,
-				serviceContext);
+				TestPropsValues.getUserId(), "modularity", serviceContext);
 
 			AssetTagLocalServiceUtil.addTag(
-				TestPropsValues.getUserId(), "osgi", null, serviceContext);
+				TestPropsValues.getUserId(), "osgi", serviceContext);
 
 			AssetTagLocalServiceUtil.addTag(
-				TestPropsValues.getUserId(), "services", null, serviceContext);
+				TestPropsValues.getUserId(), "services", serviceContext);
 		}
 
 		_assetTagsNames1 =
@@ -956,15 +957,54 @@ public abstract class BaseAssetSearchTestCase {
 			AssetEntryQueryTestUtil.createAssetEntryQuery(
 				_group1.getGroupId(), new String[]{getBaseModelClassName()});
 
-		String[] titles = {
-			"open", "liferay", "social", "osgi", "content", "life"
+		String[] defaultTitles = {
+			"open", "liferay", "content", "social", "osgi", "life"
 		};
 
-		String[] orderedTitles = {
+		String[] frenchTitles = {
+			"ouvert", "liferay", "content", "social", "osgi", "vie"
+		};
+
+		List<Map<Locale, String>> titleMaps = new ArrayList<>();
+
+		for (int i = 0; i < defaultTitles.length; i++) {
+			Map<Locale, String> titleMap = new HashMap<>();
+
+			titleMap.put(LocaleUtil.getDefault(), defaultTitles[i]);
+			titleMap.put(LocaleUtil.FRANCE, frenchTitles[i]);
+
+			titleMaps.add(titleMap);
+		}
+
+		String[] defaultOrderedTitles = {
 			"content", "life", "liferay", "open", "osgi", "social"
 		};
 
-		testOrderByTitle(assetEntryQuery, "asc", titles, orderedTitles);
+		String[] frenchOrderedTitles = {
+			"content", "liferay", "osgi", "ouvert", "social", "vie"
+		};
+
+		List<Map<Locale, String>> orderedTitleMaps = new ArrayList<>();
+
+		for (int i = 0; i < defaultOrderedTitles.length; i++) {
+			Map<Locale, String> titleMap = new HashMap<>();
+
+			titleMap.put(LocaleUtil.getDefault(), defaultOrderedTitles[i]);
+
+			String orderedTitle = frenchOrderedTitles[i];
+
+			if (!isLocalizableTitle()) {
+				orderedTitle = defaultOrderedTitles[i];
+			}
+
+			titleMap.put(LocaleUtil.FRANCE, orderedTitle);
+
+			orderedTitleMaps.add(titleMap);
+		}
+
+		testOrderByTitle(
+			assetEntryQuery, "asc", titleMaps, orderedTitleMaps,
+			new Locale[] {LocaleUtil.getDefault(), LocaleUtil.FRANCE});
 	}
 
 	@Test
@@ -973,15 +1013,54 @@ public abstract class BaseAssetSearchTestCase {
 			AssetEntryQueryTestUtil.createAssetEntryQuery(
 				_group1.getGroupId(), new String[]{getBaseModelClassName()});
 
-		String[] titles = {
-			"open", "liferay", "social", "osgi", "content", "life"
+		String[] defaultTitles = {
+			"open", "liferay", "content", "social", "osgi", "life"
 		};
 
-		String[] orderedTitles = {
+		String[] frenchTitles = {
+			"ouvert", "liferay", "content", "social", "osgi", "vie"
+		};
+
+		List<Map<Locale, String>> titleMaps = new ArrayList<>();
+
+		for (int i = 0; i < defaultTitles.length; i++) {
+			Map<Locale, String> titleMap = new HashMap<>();
+
+			titleMap.put(LocaleUtil.getDefault(), defaultTitles[i]);
+			titleMap.put(LocaleUtil.FRANCE, frenchTitles[i]);
+
+			titleMaps.add(titleMap);
+		}
+
+		String[] defaultOrderedTitles = {
 			"social", "osgi", "open", "liferay", "life", "content"
 		};
 
-		testOrderByTitle(assetEntryQuery, "desc", titles, orderedTitles);
+		String[] frenchOrderedTitles = {
+			"vie", "social", "ouvert", "osgi", "liferay", "content"
+		};
+
+		List<Map<Locale, String>> orderedTitleMaps = new ArrayList<>();
+
+		for (int i = 0; i < defaultOrderedTitles.length; i++) {
+			Map<Locale, String> titleMap = new HashMap<>();
+
+			titleMap.put(LocaleUtil.getDefault(), defaultOrderedTitles[i]);
+
+			String orderedTitle = frenchOrderedTitles[i];
+
+			if (!isLocalizableTitle()) {
+				orderedTitle = defaultOrderedTitles[i];
+			}
+
+			titleMap.put(LocaleUtil.FRANCE, orderedTitle);
+
+			orderedTitleMaps.add(titleMap);
+		}
+
+		testOrderByTitle(
+			assetEntryQuery, "desc", titleMaps, orderedTitleMaps,
+			new Locale[] {LocaleUtil.getDefault(), LocaleUtil.FRANCE});
 	}
 
 	@Test
@@ -1016,6 +1095,11 @@ public abstract class BaseAssetSearchTestCase {
 
 		testPaginationType(assetEntryQuery, 5);
 	}
+
+	protected abstract BaseModel<?> addBaseModel(
+			BaseModel<?> parentBaseModel, Map<Locale, String> titleMap,
+			ServiceContext serviceContext)
+		throws Exception;
 
 	protected BaseModel<?> addBaseModel(
 			BaseModel<?> parentBaseModel, String keywords, Date expirationDate,
@@ -1109,6 +1193,10 @@ public abstract class BaseAssetSearchTestCase {
 	}
 
 	protected abstract String getSearchKeywords();
+
+	protected boolean isLocalizableTitle() {
+		return true;
+	}
 
 	protected AssetEntry[] search(
 			AssetEntryQuery assetEntryQuery, SearchContext searchContext)
@@ -1269,9 +1357,9 @@ public abstract class BaseAssetSearchTestCase {
 		for (int i = 0; i < assetEntries.length; i++) {
 			AssetEntry assetEntry = assetEntries[i];
 
-			String field = assetEntry.getTitle(LocaleUtil.getDefault());
+			String title = assetEntry.getTitle(LocaleUtil.getDefault());
 
-			Assert.assertEquals(field, orderedTitles[i]);
+			Assert.assertEquals(title, orderedTitles[i]);
 		}
 	}
 
@@ -1325,7 +1413,8 @@ public abstract class BaseAssetSearchTestCase {
 
 	protected void testOrderByTitle(
 			AssetEntryQuery assetEntryQuery, String orderByType,
-			String[] titles, String[] orderedTitles)
+			List<Map<Locale, String>> titleMaps,
+			List<Map<Locale, String>> orderedTitleMaps, Locale[] locales)
 		throws Exception {
 
 		ServiceContext serviceContext =
@@ -1334,25 +1423,31 @@ public abstract class BaseAssetSearchTestCase {
 		BaseModel<?> parentBaseModel = getParentBaseModel(
 			_group1, serviceContext);
 
-		SearchContext searchContext = SearchContextTestUtil.getSearchContext();
-
-		searchContext.setGroupIds(assetEntryQuery.getGroupIds());
-
-		for (String title : titles) {
-			addBaseModel(parentBaseModel, title, serviceContext);
+		for (Map<Locale, String> titleMap : titleMaps) {
+			addBaseModel(parentBaseModel, titleMap, serviceContext);
 		}
 
 		assetEntryQuery.setOrderByCol1("title");
 		assetEntryQuery.setOrderByType1(orderByType);
 
-		AssetEntry[] assetEntries = search(assetEntryQuery, searchContext);
+		SearchContext searchContext = SearchContextTestUtil.getSearchContext();
 
-		for (int i = 0; i < assetEntries.length; i++) {
-			AssetEntry assetEntry = assetEntries[i];
+		searchContext.setGroupIds(assetEntryQuery.getGroupIds());
 
-			String field = assetEntry.getTitle(LocaleUtil.getDefault());
+		for (Locale locale : locales) {
+			searchContext.setLocale(locale);
 
-			Assert.assertEquals(field, orderedTitles[i]);
+			AssetEntry[] assetEntries = search(assetEntryQuery, searchContext);
+
+			for (int i = 0; i < assetEntries.length; i++) {
+				AssetEntry assetEntry = assetEntries[i];
+
+				String title = assetEntry.getTitle(locale);
+
+				Map<Locale, String> orderedTitleMap = orderedTitleMaps.get(i);
+
+				Assert.assertEquals(orderedTitleMap.get(locale), title);
+			}
 		}
 	}
 

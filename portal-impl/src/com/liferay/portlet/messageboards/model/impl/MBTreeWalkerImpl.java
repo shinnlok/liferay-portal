@@ -31,17 +31,17 @@ import java.util.Map;
 public class MBTreeWalkerImpl implements MBTreeWalker {
 
 	public MBTreeWalkerImpl(
-		MBMessage message, int status,
-		MBMessageLocalService messageLocalService) {
+		long threadId, int status, MBMessageLocalService messageLocalService) {
 
-		_messageIdsMap = new HashMap<Long, Integer>();
+		_messageIdsMap = new HashMap<>();
+
+		List<MBMessage> messages = null;
 
 		try {
-			_messages = messageLocalService.getThreadMessages(
-				message.getThreadId(), status);
+			messages = messageLocalService.getThreadMessages(threadId, status);
 
-			for (int i = 0; i < _messages.size(); i++) {
-				MBMessage curMessage = _messages.get(i);
+			for (int i = 0; i < messages.size(); i++) {
+				MBMessage curMessage = messages.get(i);
 
 				long parentMessageId = curMessage.getParentMessageId();
 
@@ -55,11 +55,25 @@ public class MBTreeWalkerImpl implements MBTreeWalker {
 		catch (Exception e) {
 			_log.error(e);
 		}
+
+		_messages = messages;
+	}
+
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #MBTreeWalkerImpl(long, int,
+	 *             MBMessageLocalService)}
+	 */
+	@Deprecated
+	public MBTreeWalkerImpl(
+		MBMessage message, int status,
+		MBMessageLocalService messageLocalService) {
+
+		this(message.getThreadId(), status, messageLocalService);
 	}
 
 	@Override
 	public List<MBMessage> getChildren(MBMessage message) {
-		List<MBMessage> children = new ArrayList<MBMessage>();
+		List<MBMessage> children = new ArrayList<>();
 
 		int[] range = getChildrenRange(message);
 
@@ -126,10 +140,11 @@ public class MBTreeWalkerImpl implements MBTreeWalker {
 		return _odd;
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(MBTreeWalkerImpl.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		MBTreeWalkerImpl.class);
 
-	private Map<Long, Integer> _messageIdsMap;
-	private List<MBMessage> _messages;
+	private final Map<Long, Integer> _messageIdsMap;
+	private final List<MBMessage> _messages;
 	private boolean _odd;
 
 }

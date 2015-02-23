@@ -113,7 +113,7 @@ public class PortalRequestProcessor extends TilesRequestProcessor {
 
 		// auth.forward.last.path.
 
-		_lastPaths = new HashSet<String>();
+		_lastPaths = new HashSet<>();
 
 		_lastPaths.add(_PATH_PORTAL_LAYOUT);
 
@@ -121,7 +121,7 @@ public class PortalRequestProcessor extends TilesRequestProcessor {
 
 		// auth.public.path.
 
-		_publicPaths = new HashSet<String>();
+		_publicPaths = new HashSet<>();
 
 		_publicPaths.add(_PATH_C);
 		_publicPaths.add(_PATH_PORTAL_API_JSONWS);
@@ -133,11 +133,12 @@ public class PortalRequestProcessor extends TilesRequestProcessor {
 		_publicPaths.add(_PATH_PORTAL_RENDER_PORTLET);
 		_publicPaths.add(_PATH_PORTAL_RESILIENCY);
 		_publicPaths.add(_PATH_PORTAL_TCK);
+		_publicPaths.add(_PATH_PORTAL_UPDATE_LANGUAGE);
 		_publicPaths.add(_PATH_PORTAL_UPDATE_PASSWORD);
 		_publicPaths.add(_PATH_PORTAL_VERIFY_EMAIL_ADDRESS);
 		_publicPaths.add(PropsValues.AUTH_LOGIN_DISABLED_PATH);
 
-		_trackerIgnorePaths = new HashSet<String>();
+		_trackerIgnorePaths = new HashSet<>();
 
 		addPaths(_trackerIgnorePaths, PropsKeys.SESSION_TRACKER_IGNORE_PATHS);
 	}
@@ -869,8 +870,8 @@ public class PortalRequestProcessor extends TilesRequestProcessor {
 
 		Map<String, String[]> oldParameterMap = request.getParameterMap();
 
-		Map<String, String[]> newParameterMap =
-			new LinkedHashMap<String, String[]>(oldParameterMap.size());
+		Map<String, String[]> newParameterMap = new LinkedHashMap<>(
+			oldParameterMap.size());
 
 		for (Map.Entry<String, String[]> entry : oldParameterMap.entrySet()) {
 			String name = entry.getKey();
@@ -1046,6 +1047,9 @@ public class PortalRequestProcessor extends TilesRequestProcessor {
 
 	private static final String _PATH_PORTAL_UPDATE_EMAIL_ADDRESS =
 		"/portal/update_email_address";
+
+	private static final String _PATH_PORTAL_UPDATE_LANGUAGE =
+		"/portal/update_language";
 
 	private static final String _PATH_PORTAL_UPDATE_PASSWORD =
 		"/portal/update_password";

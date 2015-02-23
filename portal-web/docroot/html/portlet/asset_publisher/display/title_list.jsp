@@ -35,7 +35,7 @@ request.setAttribute("view.jsp-showIconLabel", false);
 
 boolean viewInContext = ((Boolean)request.getAttribute("view.jsp-viewInContext")).booleanValue();
 
-String viewURL = AssetPublisherHelperUtil.getAssetViewURL(liferayPortletRequest, liferayPortletResponse, assetEntry, viewInContext);
+String viewURL = AssetPublisherHelper.getAssetViewURL(liferayPortletRequest, liferayPortletResponse, assetEntry, viewInContext);
 %>
 
 	<c:if test="<%= assetEntryIndex == 0 %>">
@@ -53,16 +53,12 @@ String viewURL = AssetPublisherHelperUtil.getAssetViewURL(liferayPortletRequest,
 
 		<liferay-util:include page="/html/portlet/asset_publisher/asset_actions.jsp" />
 
-		<div class="asset-metadata">
-
-			<%
-			boolean filterByMetadata = true;
-
-			String[] metadataFields = assetPublisherDisplayContext.getMetadataFields();
-			%>
-
-			<%@ include file="/html/portlet/asset_publisher/asset_metadata.jspf" %>
-		</div>
+		<liferay-ui:asset-metadata
+			className="<%= assetEntry.getClassName() %>"
+			classPK="<%= assetEntry.getClassPK() %>"
+			filterByMetadata="<%= true %>"
+			metadataFields="<%= assetPublisherDisplayContext.getMetadataFields() %>"
+		/>
 	</li>
 
 	<c:if test="<%= (assetEntryIndex + 1) == results.size() %>">

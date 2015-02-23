@@ -18,8 +18,6 @@ import com.liferay.portal.bean.BeanLocatorImpl;
 import com.liferay.portal.dao.jdbc.DataSourceFactoryImpl;
 import com.liferay.portal.dao.orm.hibernate.DynamicQueryFactoryImpl;
 import com.liferay.portal.deploy.hot.HotDeployImpl;
-import com.liferay.portal.freemarker.FreeMarkerTemplate;
-import com.liferay.portal.freemarker.LiferayTemplateCache;
 import com.liferay.portal.kernel.bean.BeanLocator;
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.concurrent.ConcurrentIdentityHashMap;
@@ -78,9 +76,6 @@ import com.liferay.portal.template.TemplateContextHelper;
 import com.liferay.portal.template.TemplateControlContext;
 import com.liferay.portal.util.ClassLoaderUtil;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.portal.velocity.LiferayResourceManager;
-import com.liferay.portal.velocity.VelocityTemplate;
-import com.liferay.portal.xsl.XSLTemplate;
 import com.liferay.portlet.PortletRequestImpl;
 import com.liferay.portlet.PortletResponseImpl;
 import com.liferay.portlet.PortletURLImpl;
@@ -216,6 +211,10 @@ public class PortalSecurityManagerImpl extends SecurityManager
 		}
 	}
 
+	/**
+	 * @deprecated As of 7.0.0
+	 */
+	@Deprecated
 	@Override
 	public void checkMemberAccess(Class<?> clazz, int accessibility) {
 		if (clazz == null) {
@@ -395,12 +394,9 @@ public class PortalSecurityManagerImpl extends SecurityManager
 		initClass(DynamicQueryFactoryImpl.class);
 		initClass(EqualityWeakReference.class);
 		initClass(FinalizeManager.class);
-		initClass(FreeMarkerTemplate.class);
 		initClass(GeneratingPACLPolicy.class);
 		initClass(InactivePACLPolicy.class);
 		initClass(LenientPermissionCollection.class);
-		initClass(LiferayResourceManager.class);
-		initClass(LiferayTemplateCache.class);
 		initClass(PACLAdvice.class);
 		initClass(PACLBeanHandler.class);
 		initClass(PACLClassLoaderUtil.class);
@@ -430,10 +426,8 @@ public class PortalSecurityManagerImpl extends SecurityManager
 		initClass(SchemeAwareContextWrapper.class);
 		initClass(TemplateContextHelper.class);
 		initClass(URLWrapper.class);
-		initClass(VelocityTemplate.class);
 		initClass(
 			com.liferay.portal.kernel.util.WeakValueConcurrentHashMap.class);
-		initClass(XSLTemplate.class);
 	}
 
 	protected void initInitialContextFactoryBuilder() throws Exception {
@@ -637,7 +631,7 @@ public class PortalSecurityManagerImpl extends SecurityManager
 		}
 
 		private static final Map<Object, Object> _doPrivilegedBeans =
-			new IdentityHashMap<Object, Object>();
+			new IdentityHashMap<>();
 
 	}
 
@@ -1302,8 +1296,7 @@ public class PortalSecurityManagerImpl extends SecurityManager
 					PortletClassLoaderUtil.getClassLoader(), _classes));
 		}
 
-		private static final Map<String, Class<?>> _classes =
-			new HashMap<String, Class<?>>();
+		private static final Map<String, Class<?>> _classes = new HashMap<>();
 
 		static {
 			for (String className :

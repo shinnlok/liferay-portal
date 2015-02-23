@@ -59,7 +59,6 @@ import com.liferay.portlet.PortletURLImpl;
 import com.liferay.portlet.asset.AssetCategoryException;
 import com.liferay.portlet.asset.AssetTagException;
 import com.liferay.portlet.asset.model.AssetVocabulary;
-import com.liferay.portlet.assetpublisher.util.AssetPublisherUtil;
 import com.liferay.portlet.documentlibrary.DLPortletInstanceSettings;
 import com.liferay.portlet.documentlibrary.DuplicateFileException;
 import com.liferay.portlet.documentlibrary.DuplicateFolderNameException;
@@ -303,8 +302,8 @@ public class EditFileEntryAction extends PortletAction {
 			ActionResponse actionResponse)
 		throws Exception {
 
-		List<KeyValuePair> validFileNameKVPs = new ArrayList<KeyValuePair>();
-		List<KeyValuePair> invalidFileNameKVPs = new ArrayList<KeyValuePair>();
+		List<KeyValuePair> validFileNameKVPs = new ArrayList<>();
+		List<KeyValuePair> invalidFileNameKVPs = new ArrayList<>();
 
 		String[] selectedFileNames = ParamUtil.getParameterValues(
 			actionRequest, "selectedFileName", new String[0], false);
@@ -383,17 +382,10 @@ public class EditFileEntryAction extends PortletAction {
 			ServiceContext serviceContext = ServiceContextFactory.getInstance(
 				DLFileEntry.class.getName(), actionRequest);
 
-			FileEntry fileEntry = DLAppServiceUtil.addFileEntry(
+			DLAppServiceUtil.addFileEntry(
 				repositoryId, folderId, selectedFileName, mimeType,
 				selectedFileName, description, changeLog, inputStream, size,
 				serviceContext);
-
-			AssetPublisherUtil.addAndStoreSelection(
-				actionRequest, DLFileEntry.class.getName(),
-				fileEntry.getFileEntryId(), -1);
-
-			AssetPublisherUtil.addRecentFolderId(
-				actionRequest, DLFileEntry.class.getName(), folderId);
 
 			validFileNameKVPs.add(
 				new KeyValuePair(selectedFileName, originalSelectedFileName));
@@ -717,7 +709,7 @@ public class EditFileEntryAction extends PortletAction {
 				DLPortletInstanceSettings.getInstance(
 					themeDisplay.getLayout(), portletDisplay.getId());
 
-			Set<String> extensions = new HashSet<String>();
+			Set<String> extensions = new HashSet<>();
 
 			String[] mimeTypes = dlPortletInstanceSettings.getMimeTypes();
 
@@ -1024,10 +1016,6 @@ public class EditFileEntryAction extends PortletAction {
 					repositoryId, folderId, sourceFileName, contentType, title,
 					description, changeLog, inputStream, size, serviceContext);
 
-				AssetPublisherUtil.addAndStoreSelection(
-					actionRequest, DLFileEntry.class.getName(),
-					fileEntry.getFileEntryId(), -1);
-
 				if (cmd.equals(Constants.ADD_DYNAMIC)) {
 					JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
@@ -1054,9 +1042,6 @@ public class EditFileEntryAction extends PortletAction {
 					description, changeLog, majorVersion, inputStream, size,
 					serviceContext);
 			}
-
-			AssetPublisherUtil.addRecentFolderId(
-				actionRequest, DLFileEntry.class.getName(), folderId);
 
 			return fileEntry;
 		}

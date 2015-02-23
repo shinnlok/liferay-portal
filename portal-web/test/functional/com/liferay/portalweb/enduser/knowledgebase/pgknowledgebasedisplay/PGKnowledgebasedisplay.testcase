@@ -55,7 +55,6 @@
 
 		<execute macro="KBArticle#addCP">
 			<var name="kbArticleContent" value="Knowledge Base Article Content" />
-			<var name="kbArticleSection" value="Development" />
 			<var name="kbArticleTitle" value="Knowledge Base Article Title" />
 		</execute>
 
@@ -63,7 +62,11 @@
 			<var name="pageName" value="Knowledge Base Display Page" />
 		</execute>
 
-		<execute macro="KBArticleSuggestion#addPG">
+		<execute macro="KBArticle#gotoViaKBDisplayPG">
+			<var name="kbArticleTitle" value="Knowledge Base Article Title" />
+		</execute>
+
+		<execute macro="KBArticleSuggestion#add">
 			<var name="kbArticleTitle" value="Knowledge Base Article Title" />
 			<var name="kbSuggestionBody" value="Knowledge Base Article Suggestion" />
 		</execute>
@@ -72,8 +75,15 @@
 			<var name="pageName" value="Knowledge Base Display Page" />
 		</execute>
 
-		<execute macro="KBArticleSuggestion#viewNewPG">
+		<execute macro="KBArticle#gotoSuggestionsNavigationPG" />
+
+		<execute macro="KBArticleSuggestion#goToSuggestionStatusNew">
+			<var name="suggestionCount" value="1" />
+		</execute>
+
+		<execute macro="KBArticleSuggestion#viewPG">
 			<var name="kbSuggestionBody" value="Knowledge Base Article Suggestion" />
+			<var name="status" value="New" />
 			<var name="userName" value="Test Test" />
 		</execute>
 	</command>
@@ -97,6 +107,57 @@
 		<execute macro="KBArticle#viewNoViaKBDisplayPG">
 			<var name="kbArticleTitle" value="Knowledge Base Article Content" />
 		</execute>
+	</command>
+
+	<command name="AddMultipleKBArticleSuggestions" priority="5">
+		<var name="kbArticleCounterList" value="1,2" />
+		<var name="kbSuggestionCounterList" value="1,2,3" />
+
+		<execute macro="Page#gotoContentCP">
+			<var name="portletName" value="Knowledge Base" />
+		</execute>
+
+		<for list="${kbArticleCounterList}" param="articleCount" >
+			<execute macro="KBArticle#addCP">
+				<var name="kbArticleContent" value="Knowledge Base Article${articleCount} Content" />
+				<var name="kbArticleTitle" value="Knowledge Base Article${articleCount} Title" />
+			</execute>
+		</for>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Knowledge Base Display Page" />
+		</execute>
+
+		<execute macro="KBArticle#gotoViaKBDisplayPG">
+			<var name="kbArticleTitle" value="Knowledge Base Article1 Title" />
+		</execute>
+
+		<for list="${kbSuggestionCounterList}" param="suggestionCount" >
+			<execute macro="KBArticleSuggestion#add">
+				<var name="kbArticleTitle" value="Knowledge Base Article1 Title" />
+				<var name="kbSuggestionBody" value="Knowledge Base Article1 Suggestion${suggestionCount}" />
+			</execute>
+		</for>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Knowledge Base Display Page" />
+		</execute>
+
+		<execute macro="KBArticle#gotoViaKBDisplayPG">
+			<var name="kbArticleTitle" value="Knowledge Base Article1 Title" />
+		</execute>
+
+		<execute function="AssertTextEquals" locator1="PGKnowledgebasedisplay#ARTICLE_THERE_ARE_SUGGESTIONS_LINK" value1="There are 3 suggestions. (3 Pending)" />
+
+		<for list="${kbSuggestionCounterList}" param="suggestionCount" >
+			<execute macro="KBArticle#gotoSuggestionsNavigationPG" />
+
+			<execute macro="KBArticleSuggestion#viewPG">
+				<var name="kbSuggestionBody" value="Knowledge Base Article1 Suggestion${suggestionCount}" />
+				<var name="status" value="New" />
+				<var name="userName" value="Test Test" />
+			</execute>
+		</for>
 	</command>
 
 	<command name="CannotViewDuplicateBreadcrumbsWhenAddingParentArticle" priority="5" >
@@ -130,9 +191,9 @@
 			<var name="kbArticleTitle" value="Knowledge Base Article Title Child" />
 		</execute>
 
-		<execute action="PGKnowledgebasedisplaySelectParentArticle#selectFrame" locator-key1="SELECT_PARENT_IFRAME" />
-		<execute action="PGKnowledgebasedisplaySelectParentArticle#assertElementPresent" locator-key1="BREADCRUMB_HOME" />
-		<execute action="PGKnowledgebasedisplaySelectParentArticle#assertElementNotPresent" locator1="//ul[contains(@class,'breadcrumb')]//a[contains(.,'Home')]/following-sibling::ul[contains(@class,'breadcrumb')]" />
+		<execute function="SelectFrame" locator1="PGKnowledgebasedisplaySelectParentArticle#SELECT_PARENT_IFRAME" />
+		<execute function="AssertElementPresent" locator1="PGKnowledgebasedisplaySelectParentArticle#BREADCRUMB_HOME" />
+		<execute function="AssertElementNotPresent" locator1="//ul[contains(@class,'breadcrumb')]//a[contains(.,'Home')]/following-sibling::ul[contains(@class,'breadcrumb')]" />
 	</command>
 
 	<command name="DeleteKBArticleViaKBDisplay" priority="4">
@@ -231,6 +292,27 @@
 		</execute>
 	</command>
 
+	<command name="RateKBArticleWithoutSuggestions" priority="5">
+		<execute macro="Page#gotoContentCP">
+			<var name="portletName" value="Knowledge Base" />
+		</execute>
+
+		<execute macro="KBArticle#addCP">
+			<var name="kbArticleContent" value="Knowledge Base Article Content" />
+			<var name="kbArticleTitle" value="Knowledge Base Article Title" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Knowledge Base Display Page" />
+		</execute>
+
+		<execute macro="KBArticle#rateArticlePG">
+			<var name="articleVoteCount" value="1" />
+			<var name="kbArticleTitle" value="Knowledge Base Article Title" />
+			<var name="rateUp" value="true" />
+		</execute>
+	</command>
+
 	<command name="SelectParentArticleViaKBDisplay" priority="5">
 		<execute macro="Page#gotoContentCP">
 			<var name="portletName" value="Knowledge Base" />
@@ -262,13 +344,48 @@
 			<var name="kbArticleTitle" value="Knowledge Base Article Title Child" />
 		</execute>
 
-		<execute macro="KBArticle#selectParentPGViaKBDisplayPG">
+		<execute macro="KBArticle#selectParentViaKBDisplayPG">
 			<var name="kbArticleTitle" value="Knowledge Base Article Title Parent" />
 		</execute>
 
 		<execute macro="KBArticle#viewHierarchyViaKBDisplayPG">
 			<var name="kbArticle1ChildArticleTitle1" value="Knowledge Base Article Title Child" />
 			<var name="kbArticleTitle1" value="Knowledge Base Article Title Parent" />
+		</execute>
+	</command>
+
+	<command name="ViewEditedKBArticleTitleHistory" priority="5">
+		<execute macro="Page#gotoContentCP">
+			<var name="portletName" value="Knowledge Base" />
+		</execute>
+
+		<execute macro="KBArticle#addCP">
+			<var name="kbArticleContent" value="KB Article Content" />
+			<var name="kbArticleTitle" value="KB Article Title" />
+		</execute>
+
+		<execute macro="Page#gotoContentCP">
+			<var name="portletName" value="Knowledge Base" />
+		</execute>
+
+		<execute macro="KBArticle#editCP">
+			<var name="kbArticleContentEdit" value="KB Article Content Edit" />
+			<var name="kbArticleTitle" value="KB Article Title" />
+			<var name="kbArticleTitleEdit" value="KB Article Title Edit" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Knowledge Base Display Page" />
+		</execute>
+
+		<execute macro="KBArticle#viewArticleHistoryPG">
+			<var name="kbArticleContent" value="KB Article Content Edit" />
+			<var name="kbArticleContentAddedDiff" value="Edit" />
+			<var name="kbArticleHistorySource" value="1 (Source)" />
+			<var name="kbArticleHistoryTarget" value="2 (Target)" />
+			<var name="kbArticleTitle" value="KB Article Title Edit" />
+			<var name="kbArticleTitleAddedDiff" value="Edit" />
+			<var name="viewNoXMLInTitle" value="true" />
 		</execute>
 	</command>
 
@@ -309,6 +426,85 @@
 		</execute>
 	</command>
 
+	<command name="ViewKBArticleSuggestionsWorkflow" priority="5">
+		<execute macro="Page#gotoContentCP">
+			<var name="portletName" value="Knowledge Base" />
+		</execute>
+
+		<execute macro="KBArticle#addCP">
+			<var name="kbArticleContent" value="Knowledge Base Article1 Content" />
+			<var name="kbArticleTitle" value="Knowledge Base Article1 Title" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Knowledge Base Display Page" />
+		</execute>
+
+		<execute macro="KBArticleSuggestion#add">
+			<var name="kbArticleTitle" value="Knowledge Base Article1 Title" />
+			<var name="kbSuggestionBody" value="Knowledge Base Article1 Suggestion" />
+		</execute>
+
+		<execute macro="KBArticle#gotoSuggestionsNavigationPG" />
+
+		<execute macro="KBArticleSuggestion#goToSuggestionStatusNew">
+			<var name="kbSuggestionBody" value="Knowledge Base Article1 Suggestion" />
+			<var name="suggestionCount" value="1" />
+		</execute>
+
+		<execute macro="KBArticleSuggestion#moveToInProgressStatus">
+			<var name="kbArticleTitle" value="Knowledge Base Article1 Title" />
+			<var name="kbSuggestionBody" value="Knowledge Base Article1 Suggestion" />
+		</execute>
+
+		<execute macro="KBArticle#gotoSuggestionsNavigationPG" />
+
+		<execute macro="KBArticleSuggestion#goToSuggestionStatusInProgress">
+			<var name="kbSuggestionBody" value="Knowledge Base Article1 Suggestion" />
+			<var name="suggestionCount" value="1" />
+		</execute>
+
+		<execute macro="KBArticleSuggestion#moveToResolvedStatus">
+			<var name="kbArticleTitle" value="Knowledge Base Article1 Title" />
+			<var name="kbSuggestionBody" value="Knowledge Base Article1 Suggestion" />
+		</execute>
+
+		<execute macro="KBArticle#gotoSuggestionsNavigationPG" />
+
+		<execute macro="KBArticleSuggestion#goToSuggestionStatusResolved">
+			<var name="kbSuggestionBody" value="Knowledge Base Article1 Suggestion" />
+			<var name="suggestionCount" value="1" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Knowledge Base Display Page" />
+		</execute>
+
+		<execute macro="KBArticle#gotoSuggestionsNavigationPG" />
+
+		<execute macro="KBArticleSuggestion#goToSuggestionStatusNew">
+			<var name="suggestionCount" value="0" />
+		</execute>
+
+		<execute macro="KBArticleSuggestion#viewDefaultNew" />
+
+		<execute macro="KBArticleSuggestion#goToSuggestionStatusInProgress">
+			<var name="suggestionCount" value="0" />
+		</execute>
+
+		<execute macro="KBArticleSuggestion#viewDefaultInProgress" />
+
+		<execute macro="KBArticleSuggestion#goToSuggestionStatusResolved">
+			<var name="suggestionCount" value="1" />
+		</execute>
+
+		<execute macro="KBArticleSuggestion#viewPG">
+			<var name="kbSuggestionBody" value="Knowledge Base Article1 Suggestion" />
+			<var name="status" value="Resolved" />
+			<var name="userName" value="Test Test" />
+		</execute>
+	</command>
+
 	<command name="ViewKBArticleViaDefaultFriendlyURL" priority="5">
 		<execute macro="Page#gotoContentCP">
 			<var name="portletName" value="Knowledge Base" />
@@ -334,7 +530,7 @@
 			<var name="pageName" value="Welcome" />
 		</execute>
 
-		<execute action="Home#open" locator1="${kbAricleFriendlyURL}" />
+		<execute function="Open" locator1="${kbAricleFriendlyURL}" />
 
 		<execute macro="KBArticle#viewViaKBDisplayPG">
 			<var name="kbArticleContent" value="Knowledge Base Article2 Content" />
@@ -360,33 +556,58 @@
 			<var name="pageName" value="Knowledge Base Display Page" />
 		</execute>
 
+		<execute macro="KBArticle#viewViaKBDisplayPG">
+			<var name="kbArticleContent" value="Knowledge Base Article Content 1" />
+			<var name="kbArticleTitle" value="Knowledge Base Article Title 1" />
+		</execute>
+
 		<execute macro="KBArticle#viewNavigationLinksPG">
 			<var name="next" value="true" />
 			<var name="previous" value="false" />
 		</execute>
 
-		<execute action="PGKnowledgebasedisplay#assertClick" locator-key1="ARTICLE_NEXT" value1="Knowledge Base Article Title 2" />
+		<execute function="Click" locator1="PGKnowledgebasedisplay#ARTICLE_NEXT" />
+
+		<execute macro="KBArticle#viewViaKBDisplayPG">
+			<var name="kbArticleContent" value="Knowledge Base Article Content 2" />
+			<var name="kbArticleTitle" value="Knowledge Base Article Title 2" />
+		</execute>
 
 		<execute macro="KBArticle#viewNavigationLinksPG">
 			<var name="next" value="true" />
 			<var name="previous" value="true" />
 		</execute>
 
-		<execute action="PGKnowledgebasedisplay#assertClick" locator-key1="ARTICLE_NEXT" value1="Knowledge Base Article Title 3" />
+		<execute function="Click" locator1="PGKnowledgebasedisplay#ARTICLE_NEXT" />
+
+		<execute macro="KBArticle#viewViaKBDisplayPG">
+			<var name="kbArticleContent" value="Knowledge Base Article Content 3" />
+			<var name="kbArticleTitle" value="Knowledge Base Article Title 3" />
+		</execute>
 
 		<execute macro="KBArticle#viewNavigationLinksPG">
 			<var name="next" value="false" />
 			<var name="previous" value="true" />
 		</execute>
 
-		<execute action="PGKnowledgebasedisplay#assertClick" locator-key1="ARTICLE_PREVIOUS" value1="Knowledge Base Article Title 2" />
+		<execute function="Click" locator1="PGKnowledgebasedisplay#ARTICLE_PREVIOUS" />
+
+		<execute macro="KBArticle#viewViaKBDisplayPG">
+			<var name="kbArticleContent" value="Knowledge Base Article Content 2" />
+			<var name="kbArticleTitle" value="Knowledge Base Article Title 2" />
+		</execute>
 
 		<execute macro="KBArticle#viewNavigationLinksPG">
 			<var name="next" value="true" />
 			<var name="previous" value="true" />
 		</execute>
 
-		<execute action="PGKnowledgebasedisplay#assertClick" locator-key1="ARTICLE_PREVIOUS" value1="Knowledge Base Article Title 1" />
+		<execute function="Click" locator1="PGKnowledgebasedisplay#ARTICLE_PREVIOUS" />
+
+		<execute macro="KBArticle#viewViaKBDisplayPG">
+			<var name="kbArticleContent" value="Knowledge Base Article Content 1" />
+			<var name="kbArticleTitle" value="Knowledge Base Article Title 1" />
+		</execute>
 
 		<execute macro="KBArticle#viewNavigationLinksPG">
 			<var name="next" value="true" />
@@ -420,7 +641,7 @@
 			<var name="pageName" value="Welcome" />
 		</execute>
 
-		<execute action="Home#open" locator1="${kbAricleFriendlyURL}" />
+		<execute function="Open" locator1="${kbAricleFriendlyURL}" />
 
 		<execute macro="KBArticle#viewViaKBDisplayPG">
 			<var name="kbArticleContent" value="Knowledge Base Article2 Content" />
@@ -545,6 +766,68 @@
 		<execute macro="KBArticle#viewViaKBDisplayPG">
 			<var name="kbArticleContent" value="Knowledge Base Article Content" />
 			<var name="kbArticleTitle" value="Knowledge Base Article Title" />
+		</execute>
+	</command>
+
+	<command name="ViewKBArticleWithXSSCodeInjectedTitle" priority="5">
+		<execute macro="Page#gotoContentCP">
+			<var name="portletName" value="Knowledge Base" />
+		</execute>
+
+		<execute macro="KBArticle#addCP">
+			<var name="kbArticleContent" value="Knowledge Base Article Content" />
+			<var name="kbArticleFriendlyURL" value="Title" />
+			<var name="kbArticleTitle"><![CDATA[><img onerror="alert('xss')" src="xx" /><]]></var>
+		</execute>
+
+		<execute macro="Page#gotoContentCP">
+			<var name="portletName" value="Knowledge Base" />
+		</execute>
+
+		<execute macro="KBArticle#addCP">
+			<var name="kbArticleContent" value="Knowledge Base Article Content" />
+			<var name="kbArticleTitle" value="Knowledge Base Article Title" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Knowledge Base Display Page" />
+		</execute>
+
+		<execute function="AssertAlertNotPresent" />
+
+		<execute macro="KBArticle#viewViaKBDisplayPG">
+			<var name="kbArticleContent" value="Knowledge Base Article Content" />
+			<var name="kbArticleTitle"><![CDATA[><img onerror="alert('xss')" src="xx" /><]]></var>
+		</execute>
+	</command>
+
+	<command name="ViewKBChildArticleViaReadMoreLink" priority="5">
+		<execute macro="Page#gotoContentCP">
+			<var name="portletName" value="Knowledge Base" />
+		</execute>
+
+		<execute macro="KBArticle#addCP">
+			<var name="kbArticleContent" value="Knowledge Base Article1 Content" />
+			<var name="kbArticleTitle" value="Knowledge Base Article1 Title" />
+		</execute>
+
+		<execute macro="KBArticle#addChildPGViaKBAdmin">
+			<var name="kbArticleTitle" value="Knowledge Base Article1 Title" />
+			<var name="kbChildArticleContent" value="This is a child article. Lengthy articles are summarized on the KB Display portlet. When an article is summarized, a Read More link is present, which, when clicked, directs the reader to the rest of the article. This last sentence of the child article should only be visible after clicking on Read More." />
+			<var name="kbChildArticleTitle" value="Knowledge Base Child Article1 Title" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Knowledge Base Display Page" />
+		</execute>
+
+		<execute macro="KBArticle#viewHierarchyViaKBDisplayPG">
+			<var name="kbArticle1ChildArticleTitle1" value="Knowledge Base Child Article1 Title" />
+			<var name="kbArticleTitle1" value="Knowledge Base Article1 Title" />
+		</execute>
+
+		<execute macro="KBArticle#viewViaReadMoreLinkPG">
+			<var name="kbArticleTitle" value="Knowledge Base Article1 Title" />
 		</execute>
 	</command>
 </definition>

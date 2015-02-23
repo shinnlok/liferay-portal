@@ -15,17 +15,17 @@
 package com.liferay.portlet.dynamicdatalists.service;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.Sync;
+import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.test.Sync;
-import com.liferay.portal.test.SynchronousDestinationTestRule;
-import com.liferay.portal.util.test.TestPropsValues;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.MainServletTestRule;
 import com.liferay.portlet.dynamicdatalists.model.DDLRecord;
 import com.liferay.portlet.dynamicdatalists.model.DDLRecordConstants;
 import com.liferay.portlet.dynamicdatalists.model.DDLRecordSet;
@@ -43,6 +43,7 @@ import com.liferay.portlet.dynamicdatamapping.model.Value;
 import com.liferay.portlet.dynamicdatamapping.storage.DDMFormFieldValue;
 import com.liferay.portlet.dynamicdatamapping.storage.DDMFormValues;
 import com.liferay.portlet.dynamicdatamapping.storage.StorageType;
+import com.liferay.portlet.dynamicdatamapping.util.test.DDMFormValuesTestUtil;
 
 import java.util.HashSet;
 import java.util.Locale;
@@ -84,7 +85,7 @@ public class DDLRecordServiceTest extends BaseDDLServiceTestCase {
 		DDMFormValues expectedDDMFormValues = createDDMFormValues(ddmForm);
 
 		expectedDDMFormValues.addDDMFormFieldValue(
-			createLocalizedTextDDMFormFieldValue("Name", "Joe Bloggs"));
+			createLocalizedDDMFormFieldValue("Name", "Joe Bloggs"));
 
 		assertRecordDDMFormValues(ddmForm, expectedDDMFormValues);
 	}
@@ -109,7 +110,7 @@ public class DDLRecordServiceTest extends BaseDDLServiceTestCase {
 			createSeparatorDDMFormFieldValue("Separator");
 
 		separatorDDMFormFieldValue.addNestedDDMFormFieldValue(
-			createLocalizedTextDDMFormFieldValue("Name", "Joe Bloggs"));
+			createLocalizedDDMFormFieldValue("Name", "Joe Bloggs"));
 
 		expectedDDMFormValues.addDDMFormFieldValue(separatorDDMFormFieldValue);
 
@@ -133,24 +134,24 @@ public class DDLRecordServiceTest extends BaseDDLServiceTestCase {
 		DDMFormValues expectedDDMFormValues = createDDMFormValues(ddmForm);
 
 		DDMFormFieldValue scottDDMFormFieldValue =
-			createLocalizedTextDDMFormFieldValue("Name", "Scott Joplin");
+			createLocalizedDDMFormFieldValue("Name", "Scott Joplin");
 
 		scottDDMFormFieldValue.addNestedDDMFormFieldValue(
-			createUnlocalizedTextDDMFormFieldValue("Phone", "12"));
+			createUnlocalizedDDMFormFieldValue("Phone", "12"));
 
 		scottDDMFormFieldValue.addNestedDDMFormFieldValue(
-			createUnlocalizedTextDDMFormFieldValue("Phone", "34"));
+			createUnlocalizedDDMFormFieldValue("Phone", "34"));
 
 		expectedDDMFormValues.addDDMFormFieldValue(scottDDMFormFieldValue);
 
 		DDMFormFieldValue louisDDMFormFieldValue =
-			createLocalizedTextDDMFormFieldValue("Name", "Louis Armstrong");
+			createLocalizedDDMFormFieldValue("Name", "Louis Armstrong");
 
 		louisDDMFormFieldValue.addNestedDDMFormFieldValue(
-			createUnlocalizedTextDDMFormFieldValue("Phone", "56"));
+			createUnlocalizedDDMFormFieldValue("Phone", "56"));
 
 		louisDDMFormFieldValue.addNestedDDMFormFieldValue(
-			createUnlocalizedTextDDMFormFieldValue("Phone", "78"));
+			createUnlocalizedDDMFormFieldValue("Phone", "78"));
 
 		expectedDDMFormValues.addDDMFormFieldValue(louisDDMFormFieldValue);
 
@@ -166,13 +167,13 @@ public class DDLRecordServiceTest extends BaseDDLServiceTestCase {
 		DDMFormValues expectedDDMFormValues = createDDMFormValues(ddmForm);
 
 		expectedDDMFormValues.addDDMFormFieldValue(
-			createLocalizedTextDDMFormFieldValue("Name", "Joe Bloggs I"));
+			createLocalizedDDMFormFieldValue("Name", "Joe Bloggs I"));
 
 		expectedDDMFormValues.addDDMFormFieldValue(
-			createLocalizedTextDDMFormFieldValue("Name", "Joe Bloggs II"));
+			createLocalizedDDMFormFieldValue("Name", "Joe Bloggs II"));
 
 		expectedDDMFormValues.addDDMFormFieldValue(
-			createLocalizedTextDDMFormFieldValue("Name", "Joe Bloggs III"));
+			createLocalizedDDMFormFieldValue("Name", "Joe Bloggs III"));
 
 		assertRecordDDMFormValues(ddmForm, expectedDDMFormValues);
 	}
@@ -188,7 +189,7 @@ public class DDLRecordServiceTest extends BaseDDLServiceTestCase {
 		DDMFormValues expectedDDMFormValues = createDDMFormValues(ddmForm);
 
 		expectedDDMFormValues.addDDMFormFieldValue(
-			createUnlocalizedTextDDMFormFieldValue("Name", "Joe Bloggs"));
+			createUnlocalizedDDMFormFieldValue("Name", "Joe Bloggs"));
 
 		assertRecordDDMFormValues(ddmForm, expectedDDMFormValues);
 	}
@@ -207,7 +208,7 @@ public class DDLRecordServiceTest extends BaseDDLServiceTestCase {
 		DDMFormValues ddmFormValues = createDDMFormValues(ddmForm);
 
 		ddmFormValues.addDDMFormFieldValue(
-			createLocalizedTextDDMFormFieldValue("Name", "Joe Bloggs"));
+			createLocalizedDDMFormFieldValue("Name", "Joe Bloggs"));
 
 		DDLRecord record = recordTestHelper.addRecord(
 			ddmFormValues, WorkflowConstants.ACTION_SAVE_DRAFT);
@@ -278,7 +279,7 @@ public class DDLRecordServiceTest extends BaseDDLServiceTestCase {
 	protected DDMForm createDDMForm() {
 		DDMForm ddmForm = new DDMForm();
 
-		Set<Locale> availableLocales = new HashSet<Locale>();
+		Set<Locale> availableLocales = new HashSet<>();
 
 		availableLocales.add(LocaleUtil.US);
 
@@ -288,16 +289,24 @@ public class DDLRecordServiceTest extends BaseDDLServiceTestCase {
 		return ddmForm;
 	}
 
-	protected DDMFormValues createDDMFormValues(DDMForm ddmForm) {
-		return DDLRecordTestUtil.createDDMFormValues(
-			ddmForm, DDLRecordTestUtil.createAvailableLocales(LocaleUtil.US),
-			LocaleUtil.US);
+	protected DDMFormFieldValue createDDMFormFieldValue(
+		String name, Value value) {
+
+		return DDMFormValuesTestUtil.createDDMFormFieldValue(name, value);
 	}
 
-	protected DDMFormFieldValue createLocalizedTextDDMFormFieldValue(
+	protected DDMFormValues createDDMFormValues(DDMForm ddmForm) {
+		Set<Locale> availableLocales =
+			DDMFormValuesTestUtil.createAvailableLocales(LocaleUtil.US);
+
+		return DDMFormValuesTestUtil.createDDMFormValues(
+			ddmForm, availableLocales, LocaleUtil.US);
+	}
+
+	protected DDMFormFieldValue createLocalizedDDMFormFieldValue(
 		String name, String enValue) {
 
-		return DDLRecordTestUtil.createLocalizedTextDDMFormFieldValue(
+		return DDMFormValuesTestUtil.createLocalizedDDMFormFieldValue(
 			name, enValue);
 	}
 
@@ -338,16 +347,10 @@ public class DDLRecordServiceTest extends BaseDDLServiceTestCase {
 		return ddmFormField;
 	}
 
-	protected DDMFormFieldValue createTextDDMFormFieldValue(
-		String name, Value value) {
-
-		return DDLRecordTestUtil.createTextDDMFormFieldValue(name, value);
-	}
-
-	protected DDMFormFieldValue createUnlocalizedTextDDMFormFieldValue(
+	protected DDMFormFieldValue createUnlocalizedDDMFormFieldValue(
 		String name, String value) {
 
-		return DDLRecordTestUtil.createUnlocalizedTextDDMFormFieldValue(
+		return DDMFormValuesTestUtil.createUnlocalizedDDMFormFieldValue(
 			name, value);
 	}
 

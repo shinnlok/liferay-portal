@@ -65,22 +65,6 @@ public class ClusterRequest implements Serializable {
 	}
 
 	public static ClusterRequest createUnicastRequest(
-		MethodHandler methodHandler, Address... targetClusterNodeAddresses) {
-
-		ClusterRequest clusterRequest = new ClusterRequest();
-
-		clusterRequest.addTargetClusterNodeAddresses(
-			targetClusterNodeAddresses);
-		clusterRequest.setClusterMessageType(ClusterMessageType.EXECUTE);
-		clusterRequest.setMethodHandler(methodHandler);
-		clusterRequest.setMulticast(false);
-		clusterRequest.setSkipLocal(false);
-		clusterRequest.setUuid(PortalUUIDUtil.generate());
-
-		return clusterRequest;
-	}
-
-	public static ClusterRequest createUnicastRequest(
 		MethodHandler methodHandler, String... targetClusterNodeIds) {
 
 		ClusterRequest clusterRequest = new ClusterRequest();
@@ -95,23 +79,9 @@ public class ClusterRequest implements Serializable {
 		return clusterRequest;
 	}
 
-	public void addTargetClusterNodeAddresses(
-		Address... targetClusterNodeAddresses) {
-
-		if (_targetClusterNodeAddresses == null) {
-			_targetClusterNodeAddresses = new HashSet<Address>(
-				targetClusterNodeAddresses.length);
-		}
-
-		for (Address targetClusterNodeAddress : targetClusterNodeAddresses) {
-			_targetClusterNodeAddresses.add(targetClusterNodeAddress);
-		}
-	}
-
 	public void addTargetClusterNodeIds(String... targetClusterNodeIds) {
 		if (_targetClusterNodeIds == null) {
-			_targetClusterNodeIds = new HashSet<String>(
-				targetClusterNodeIds.length);
+			_targetClusterNodeIds = new HashSet<>(targetClusterNodeIds.length);
 		}
 
 		for (String targetClusterNodeId : targetClusterNodeIds) {
@@ -129,10 +99,6 @@ public class ClusterRequest implements Serializable {
 
 	public ClusterNode getOriginatingClusterNode() {
 		return _originatingClusterNode;
-	}
-
-	public Collection<Address> getTargetClusterNodeAddresses() {
-		return _targetClusterNodeAddresses;
 	}
 
 	public Collection<String> getTargetClusterNodeIds() {
@@ -229,7 +195,6 @@ public class ClusterRequest implements Serializable {
 	private boolean _multicast;
 	private ClusterNode _originatingClusterNode;
 	private boolean _skipLocal;
-	private Set<Address> _targetClusterNodeAddresses;
 	private Set<String> _targetClusterNodeIds;
 	private String _uuid;
 

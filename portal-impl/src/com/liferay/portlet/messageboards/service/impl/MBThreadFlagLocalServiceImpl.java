@@ -28,6 +28,7 @@ import com.liferay.portlet.messageboards.model.MBThreadFlag;
 import com.liferay.portlet.messageboards.service.base.MBThreadFlagLocalServiceBaseImpl;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author Brian Wing Shun Chan
@@ -37,14 +38,14 @@ public class MBThreadFlagLocalServiceImpl
 	extends MBThreadFlagLocalServiceBaseImpl {
 
 	@Override
-	public void addThreadFlag(
+	public MBThreadFlag addThreadFlag(
 			long userId, MBThread thread, ServiceContext serviceContext)
 		throws PortalException {
 
 		User user = userPersistence.findByPrimaryKey(userId);
 
 		if (user.isDefaultUser()) {
-			return;
+			return null;
 		}
 
 		long threadId = thread.getThreadId();
@@ -93,6 +94,8 @@ public class MBThreadFlagLocalServiceImpl
 
 			mbThreadFlagPersistence.update(threadFlag);
 		}
+
+		return threadFlag;
 	}
 
 	@Override
@@ -111,12 +114,22 @@ public class MBThreadFlagLocalServiceImpl
 
 	@Override
 	public void deleteThreadFlagsByThreadId(long threadId) {
-		mbThreadFlagPersistence.removeByThreadId(threadId);
+		List<MBThreadFlag> threadFlags = mbThreadFlagPersistence.findByThreadId(
+			threadId);
+
+		for (MBThreadFlag threadFlag : threadFlags) {
+			mbThreadFlagLocalService.deleteThreadFlag(threadFlag);
+		}
 	}
 
 	@Override
 	public void deleteThreadFlagsByUserId(long userId) {
-		mbThreadFlagPersistence.removeByUserId(userId);
+		List<MBThreadFlag> threadFlags = mbThreadFlagPersistence.findByUserId(
+			userId);
+
+		for (MBThreadFlag threadFlag : threadFlags) {
+			mbThreadFlagLocalService.deleteThreadFlag(threadFlag);
+		}
 	}
 
 	@Override

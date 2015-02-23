@@ -16,6 +16,7 @@ package com.liferay.portal.webserver;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.flash.FlashMagicBytesUtil;
 import com.liferay.portal.kernel.image.ImageBag;
 import com.liferay.portal.kernel.image.ImageToolUtil;
 import com.liferay.portal.kernel.log.Log;
@@ -805,7 +806,7 @@ public class WebServerServlet extends HttpServlet {
 			}
 		}
 
-		List<WebServerEntry> webServerEntries = new ArrayList<WebServerEntry>();
+		List<WebServerEntry> webServerEntries = new ArrayList<>();
 
 		webServerEntries.add(new WebServerEntry(path, "../"));
 
@@ -1016,6 +1017,15 @@ public class WebServerServlet extends HttpServlet {
 			}
 		}
 
+		FlashMagicBytesUtil.Result flashMagicBytesUtilResult =
+			FlashMagicBytesUtil.check(inputStream);
+
+		inputStream = flashMagicBytesUtilResult.getInputStream();
+
+		if (flashMagicBytesUtilResult.isFlash()) {
+			fileName = FileUtil.stripExtension(fileName) + ".swf";
+		}
+
 		// Determine proper content type
 
 		String contentType = null;
@@ -1132,7 +1142,7 @@ public class WebServerServlet extends HttpServlet {
 			return;
 		}
 
-		List<WebServerEntry> webServerEntries = new ArrayList<WebServerEntry>();
+		List<WebServerEntry> webServerEntries = new ArrayList<>();
 
 		List<Group> groups = WebDAVUtil.getGroups(user);
 
@@ -1344,11 +1354,12 @@ public class WebServerServlet extends HttpServlet {
 		StringUtil.equalsIgnoreCase(
 			PropsValues.WEB_SERVER_SERVLET_VERSION_VERBOSITY, "partial");
 
-	private static Log _log = LogFactoryUtil.getLog(WebServerServlet.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		WebServerServlet.class);
 
-	private static Set<String> _acceptRangesMimeTypes = SetUtil.fromArray(
+	private static final Set<String> _acceptRangesMimeTypes = SetUtil.fromArray(
 		PropsValues.WEB_SERVER_SERVLET_ACCEPT_RANGES_MIME_TYPES);
-	private static Format _dateFormat =
+	private static final Format _dateFormat =
 		FastDateFormatFactoryUtil.getSimpleDateFormat("d MMM yyyy HH:mm z");
 
 	private boolean _lastModified = true;

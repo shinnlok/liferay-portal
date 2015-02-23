@@ -9,17 +9,17 @@ AUI.add(
 
 		var STR_DDM = 'ddm';
 
+		var STR_DESCRIPTION_INPUT_LOCALIZED = 'descriptionInputLocalized';
+
 		var STR_SELECT_STRUCTURE = 'selectStructure';
 
 		var STR_SELECT_TEMPLATE = 'selectTemplate';
 
 		var STR_STRINGS = 'strings';
 
-		var STR_TRANSLATION_MANAGER = 'translationManager';
-
-		var STR_DESCRIPTION_INPUT_LOCALIZED = 'descriptionInputLocalized';
-
 		var STR_TITLE_INPUT_LOCALIZED = 'titleInputLocalized';
+
+		var STR_TRANSLATION_MANAGER = 'translationManager';
 
 		var STR_URLS = 'urls';
 
@@ -56,10 +56,10 @@ AUI.add(
 						validator: Lang.isObject,
 						value: {
 							draft: Liferay.Language.get('draft'),
-							editStructure: Liferay.Language.get('editing-the-current-structure-will-delete-all-unsaved-content'),
-							editTemplate: Liferay.Language.get('editing-the-current-template-will-delete-all-unsaved-content'),
-							selectStructure: Liferay.Language.get('selecting-a-new-structure-will-change-the-available-input-fields-and-available-templates'),
-							selectTemplate: Liferay.Language.get('selecting-a-new-template-will-delete-all-unsaved-content'),
+							editStructure: Liferay.Language.get('editing-the-current-structure-deletes-all-unsaved-content'),
+							editTemplate: Liferay.Language.get('editing-the-current-template-deletes-all-unsaved-content'),
+							selectStructure: Liferay.Language.get('selecting-a-new-structure-changes-the-available-input-fields-and-available-templates'),
+							selectTemplate: Liferay.Language.get('selecting-a-new-template-deletes-all-unsaved-content'),
 							structures: Liferay.Language.get('structures'),
 							templates: Liferay.Language.get('templates')
 						}
@@ -95,6 +95,26 @@ AUI.add(
 						var instance = this;
 
 						(new A.EventHandle(instance._eventHandles)).detach();
+					},
+
+					_afterEditingLocaleChange: function(event) {
+						var instance = this;
+
+						var descriptionInputLocalized = instance.get(STR_DESCRIPTION_INPUT_LOCALIZED);
+
+						var titleInputLocalized = instance.get(STR_TITLE_INPUT_LOCALIZED);
+
+						var items = descriptionInputLocalized.get('items');
+
+						var editingLocale = event.newVal;
+
+						var selectedIndex = AArray.indexOf(items, editingLocale);
+
+						descriptionInputLocalized.set('selected', selectedIndex);
+						descriptionInputLocalized.selectFlag(editingLocale);
+
+						titleInputLocalized.set('selected', selectedIndex);
+						titleInputLocalized.selectFlag(editingLocale);
 					},
 
 					_bindUI: function() {
@@ -145,33 +165,6 @@ AUI.add(
 						instance._eventHandles = eventHandles;
 					},
 
-					_renderUI: function() {
-						var instance = this;
-
-						instance.get(STR_DESCRIPTION_INPUT_LOCALIZED).render();
-						instance.get(STR_TITLE_INPUT_LOCALIZED).render();
-					},
-
-					_afterEditingLocaleChange: function(event) {
-						var instance = this;
-
-						var descriptionInputLocalized = instance.get(STR_DESCRIPTION_INPUT_LOCALIZED);
-
-						var titleInputLocalized = instance.get(STR_TITLE_INPUT_LOCALIZED);
-
-						var items = descriptionInputLocalized.get('items');
-
-						var editingLocale = event.newVal;
-
-						var selectedIndex = AArray.indexOf(items, editingLocale);
-
-						descriptionInputLocalized.set('selected', selectedIndex);
-						descriptionInputLocalized.selectFlag(editingLocale);
-
-						titleInputLocalized.set('selected', selectedIndex);
-						titleInputLocalized.selectFlag(editingLocale);
-					},
-
 					_editStructure: function(event) {
 						var instance = this;
 
@@ -202,6 +195,7 @@ AUI.add(
 							Liferay.Util.openWindow(
 								{
 									id: A.guid(),
+									refreshWindow: WIN,
 									title: strings.templates,
 									uri: urls.editTemplate
 								}
@@ -273,6 +267,7 @@ AUI.add(
 								groupId: ddm.groupId,
 								refererPortletName: ddm.refererPortletName,
 								showAncestorScopes: true,
+								sourceClassNameId: ddm.sourceClassNameId,
 								struts_action: '/dynamic_data_mapping/select_template',
 								templateId: ddm.templateId,
 								title: strings.templates
@@ -289,6 +284,13 @@ AUI.add(
 								}
 							}
 						);
+					},
+
+					_renderUI: function() {
+						var instance = this;
+
+						instance.get(STR_DESCRIPTION_INPUT_LOCALIZED).render();
+						instance.get(STR_TITLE_INPUT_LOCALIZED).render();
 					}
 				}
 			}

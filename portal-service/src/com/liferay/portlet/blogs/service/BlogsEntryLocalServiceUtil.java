@@ -40,6 +40,11 @@ public class BlogsEntryLocalServiceUtil {
 	 *
 	 * Never modify this class directly. Add custom service methods to {@link com.liferay.portlet.blogs.service.impl.BlogsEntryLocalServiceImpl} and rerun ServiceBuilder to regenerate this class.
 	 */
+	public static com.liferay.portal.kernel.repository.model.Folder addAttachmentsFolder(
+		long userId, long groupId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().addAttachmentsFolder(userId, groupId);
+	}
 
 	/**
 	* Adds the blogs entry to the database. Also notifies the appropriate model listeners.
@@ -52,10 +57,26 @@ public class BlogsEntryLocalServiceUtil {
 		return getService().addBlogsEntry(blogsEntry);
 	}
 
+	public static com.liferay.portlet.blogs.model.BlogsEntry addEntry(
+		long userId, java.lang.String title, java.lang.String content,
+		java.util.Date displayDate,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService()
+				   .addEntry(userId, title, content, displayDate, serviceContext);
+	}
+
+	public static com.liferay.portlet.blogs.model.BlogsEntry addEntry(
+		long userId, java.lang.String title, java.lang.String content,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().addEntry(userId, title, content, serviceContext);
+	}
+
 	/**
 	* @deprecated As of 7.0.0, replaced by {@link #addEntry(long, String,
 	String, String, String, int, int, int, int, int, boolean,
-	boolean, String[], boolean, String, String, InputStream,
+	boolean, String[], ImageSelector, ImageSelector,
 	ServiceContext)}
 	*/
 	@Deprecated
@@ -75,6 +96,21 @@ public class BlogsEntryLocalServiceUtil {
 			displayDateMinute, allowPingbacks, allowTrackbacks, trackbacks,
 			smallImage, smallImageURL, smallImageFileName,
 			smallImageInputStream, serviceContext);
+	}
+
+	public static com.liferay.portlet.blogs.model.BlogsEntry addEntry(
+		long userId, java.lang.String title, java.lang.String subtitle,
+		java.lang.String description, java.lang.String content,
+		java.util.Date displayDate, boolean allowPingbacks,
+		boolean allowTrackbacks, java.lang.String[] trackbacks,
+		com.liferay.portal.kernel.servlet.taglib.ui.ImageSelector coverImageImageSelector,
+		com.liferay.portal.kernel.servlet.taglib.ui.ImageSelector smallImageImageSelector,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService()
+				   .addEntry(userId, title, subtitle, description, content,
+			displayDate, allowPingbacks, allowTrackbacks, trackbacks,
+			coverImageImageSelector, smallImageImageSelector, serviceContext);
 	}
 
 	public static com.liferay.portlet.blogs.model.BlogsEntry addEntry(
@@ -779,10 +815,19 @@ public class BlogsEntryLocalServiceUtil {
 		return getService().updateBlogsEntry(blogsEntry);
 	}
 
+	public static com.liferay.portlet.blogs.model.BlogsEntry updateEntry(
+		long userId, long entryId, java.lang.String title,
+		java.lang.String content,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService()
+				   .updateEntry(userId, entryId, title, content, serviceContext);
+	}
+
 	/**
 	* @deprecated As of 7.0.0, replaced by {@link #updateEntry(long, long,
 	String, String, String, String, int, int, int, int, int,
-	boolean, boolean, String[], boolean, String, long,
+	boolean, boolean, String[], ImageSelector, ImageSelector,
 	ServiceContext)}
 	*/
 	@Deprecated
@@ -803,6 +848,22 @@ public class BlogsEntryLocalServiceUtil {
 			displayDateMinute, allowPingbacks, allowTrackbacks, trackbacks,
 			smallImage, smallImageURL, smallImageFileName,
 			smallImageInputStream, serviceContext);
+	}
+
+	public static com.liferay.portlet.blogs.model.BlogsEntry updateEntry(
+		long userId, long entryId, java.lang.String title,
+		java.lang.String subtitle, java.lang.String description,
+		java.lang.String content, java.util.Date displayDate,
+		boolean allowPingbacks, boolean allowTrackbacks,
+		java.lang.String[] trackbacks,
+		com.liferay.portal.kernel.servlet.taglib.ui.ImageSelector coverImageImageSelector,
+		com.liferay.portal.kernel.servlet.taglib.ui.ImageSelector smallImageImageSelector,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService()
+				   .updateEntry(userId, entryId, title, subtitle, description,
+			content, displayDate, allowPingbacks, allowTrackbacks, trackbacks,
+			coverImageImageSelector, smallImageImageSelector, serviceContext);
 	}
 
 	public static com.liferay.portlet.blogs.model.BlogsEntry updateEntry(

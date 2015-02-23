@@ -17,9 +17,7 @@
 <%@ include file="/html/portlet/document_library/init.jsp" %>
 
 <%
-DLEntryListDisplayContext dlEntriesListDisplayContext = new DLEntryListDisplayContext(request, dlPortletInstanceSettings);
-
-DLActionsDisplayContext dlActionsDisplayContext = dlEntriesListDisplayContext.getDLActionsDisplayContext();
+DLPortletInstanceSettingsHelper dlPortletInstanceSettingsHelper = new DLPortletInstanceSettingsHelper(dlRequestHelper);
 
 String strutsAction = ParamUtil.getString(request, "struts_action");
 
@@ -109,7 +107,7 @@ request.setAttribute("view.jsp-orderByType", orderByType);
 			<liferay-util:include page="/html/portlet/document_library/view_folders.jsp" />
 		</aui:col>
 
-		<aui:col cssClass="context-pane" width="<%= dlActionsDisplayContext.isFolderMenuVisible() ? 75 : 100 %>">
+		<aui:col cssClass="context-pane" width="<%= dlPortletInstanceSettingsHelper.isFolderMenuVisible() ? 75 : 100 %>">
 			<liferay-ui:app-view-toolbar
 				includeDisplayStyle="<%= true %>"
 				includeSelectAll="<%= showSelectAll %>"
@@ -117,33 +115,15 @@ request.setAttribute("view.jsp-orderByType", orderByType);
 				<liferay-util:include page="/html/portlet/document_library/toolbar.jsp" />
 			</liferay-ui:app-view-toolbar>
 
-			<%
-			boolean showSyncMessage = GetterUtil.getBoolean(SessionClicks.get(request, liferayPortletResponse.getNamespace() + "show-sync-message", "true"));
-
-			String cssClass = "show-sync-message-icon-container";
-
-			if (showSyncMessage || !PropsValues.DL_SHOW_LIFERAY_SYNC_MESSAGE) {
-				cssClass += " hide";
-			}
-			%>
-
-			<div class="<%= cssClass %>" id="<portlet:namespace />showSyncMessageIconContainer">
-				<img alt="<liferay-ui:message escapeAttribute="<%= true %>" key="show-liferay-sync-tip" />" class="show-sync-message" id="<portlet:namespace />showSyncMessageIcon" src='<%= themeDisplay.getPathThemeImages() + "/common/liferay_sync.png" %>' title='<%= LanguageUtil.get(request, "liferay-sync") %>' />
-			</div>
-
 			<div class="document-library-breadcrumb" id="<portlet:namespace />breadcrumbContainer">
 				<c:if test='<%= !navigation.equals("recent") && !navigation.equals("mine") && Validator.isNull(browseBy) %>'>
 					<liferay-util:include page="/html/portlet/document_library/breadcrumb.jsp" />
 				</c:if>
 			</div>
 
-			<div class="hide" id="<portlet:namespace />syncNotification">
-				<div class="alert alert-info sync-notification" id="<portlet:namespace />syncNotificationContent">
-					<a href="http://www.liferay.com/products/liferay-sync" target="_blank">
-						<liferay-ui:message key="access-these-files-offline-using-liferay-sync" />
-					</a>
-				</div>
-			</div>
+			<c:if test="<%= portletDisplay.isWebDAVEnabled() && BrowserSnifferUtil.isIeOnWin32(request) %>">
+				<div class="alert alert-danger hide" id="<portlet:namespace />openMSOfficeError"></div>
+			</c:if>
 
 			<liferay-portlet:renderURL varImpl="editFileEntryURL">
 				<portlet:param name="struts_action" value="/document_library/edit_file_entry" />
@@ -197,7 +177,7 @@ if (!defaultFolderView && (folder != null) && (portletName.equals(PortletKeys.DO
 <aui:script use="liferay-document-library">
 
 	<%
-	String[] entryColumns = dlEntriesListDisplayContext.getEntryColumns();
+	String[] entryColumns = dlPortletInstanceSettingsHelper.getEntryColumns();
 	String[] escapedEntryColumns = new String[entryColumns.length];
 
 	for (int i = 0; i < entryColumns.length; i++) {
@@ -273,8 +253,6 @@ if (!defaultFolderView && (folder != null) && (portletName.equals(PortletKeys.DO
 			select: {
 				displayViews: ['<%= StringUtil.merge(escapedDisplayViews, "','") %>']
 			},
-			syncMessageDisabled: <%= !PropsValues.DL_SHOW_LIFERAY_SYNC_MESSAGE %>,
-			syncMessageSuppressed: <%= !GetterUtil.getBoolean(SessionClicks.get(request, liferayPortletResponse.getNamespace() + "show-sync-message", "true")) %>,
 			trashEnabled: <%= (scopeGroupId == repositoryId) && TrashUtil.isTrashEnabled(scopeGroupId) %>,
 			updateable: <%= DLFolderPermission.contains(permissionChecker, scopeGroupId, folderId, ActionKeys.UPDATE) %>,
 			uploadURL: '<%= uploadURL %>',

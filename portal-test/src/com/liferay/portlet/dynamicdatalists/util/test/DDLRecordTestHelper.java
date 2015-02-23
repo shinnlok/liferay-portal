@@ -14,12 +14,12 @@
 
 package com.liferay.portlet.dynamicdatalists.util.test;
 
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.util.test.RandomTestUtil;
-import com.liferay.portal.util.test.TestPropsValues;
 import com.liferay.portlet.dynamicdatalists.model.DDLRecord;
 import com.liferay.portlet.dynamicdatalists.model.DDLRecordConstants;
 import com.liferay.portlet.dynamicdatalists.model.DDLRecordSet;
@@ -27,7 +27,9 @@ import com.liferay.portlet.dynamicdatalists.service.DDLRecordLocalServiceUtil;
 import com.liferay.portlet.dynamicdatamapping.model.DDMForm;
 import com.liferay.portlet.dynamicdatamapping.model.DDMFormField;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
+import com.liferay.portlet.dynamicdatamapping.storage.DDMFormFieldValue;
 import com.liferay.portlet.dynamicdatamapping.storage.DDMFormValues;
+import com.liferay.portlet.dynamicdatamapping.util.test.DDMFormValuesTestUtil;
 
 /**
  * @author Marcellus Tavares
@@ -47,23 +49,20 @@ public class DDLRecordTestHelper {
 
 		DDMForm ddmForm = ddmStructure.getDDMForm();
 
-		DDMFormValues ddmFormValues = DDLRecordTestUtil.createDDMFormValues(
-			ddmForm, DDLRecordTestUtil.createAvailableLocales(LocaleUtil.US),
+		DDMFormValues ddmFormValues = DDMFormValuesTestUtil.createDDMFormValues(
+			ddmForm,
+			DDMFormValuesTestUtil.createAvailableLocales(LocaleUtil.US),
 			LocaleUtil.US);
 
 		for (DDMFormField ddmFormField : ddmForm.getDDMFormFields()) {
-			if (ddmStructure.isFieldPrivate(ddmFormField.getName())) {
-				continue;
-			}
-
 			if (ddmFormField.isLocalizable()) {
 				ddmFormValues.addDDMFormFieldValue(
-					DDLRecordTestUtil.createLocalizedTextDDMFormFieldValue(
+					createLocalizedDDMFormFieldValue(
 						ddmFormField.getName(), RandomTestUtil.randomString()));
 			}
 			else {
 				ddmFormValues.addDDMFormFieldValue(
-					DDLRecordTestUtil.createUnlocalizedTextDDMFormFieldValue(
+					createUnlocalizedDDMFormFieldValue(
 						ddmFormField.getName(), RandomTestUtil.randomString()));
 			}
 		}
@@ -86,6 +85,20 @@ public class DDLRecordTestHelper {
 
 	public DDLRecordSet getRecordSet() {
 		return _recordSet;
+	}
+
+	protected DDMFormFieldValue createLocalizedDDMFormFieldValue(
+		String name, String enValue) {
+
+		return DDMFormValuesTestUtil.createLocalizedDDMFormFieldValue(
+			name, enValue);
+	}
+
+	protected DDMFormFieldValue createUnlocalizedDDMFormFieldValue(
+		String name, String value) {
+
+		return DDMFormValuesTestUtil.createUnlocalizedDDMFormFieldValue(
+			name, value);
 	}
 
 	private final Group _group;

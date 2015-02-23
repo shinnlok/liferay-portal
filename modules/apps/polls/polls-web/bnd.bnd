@@ -13,7 +13,6 @@ Import-Package: \
 	com.liferay.portal.lar,\
 	com.liferay.portal.model,\
 	com.liferay.portal.security.permission,\
-	com.liferay.portal.servlet.jsp.compiler.jsp,\
 	com.liferay.portal.service,\
 	com.liferay.portal.service.permission,\
 	com.liferay.portal.struts,\
@@ -32,14 +31,24 @@ Import-Package: \
 	\
 	javax.portlet,\
 	javax.portlet.filter,\
+	javax.servlet,\
+	javax.servlet.http,\
 	*
 Include-Resource:\
 	WEB-INF/classes/portlet.properties=docroot/WEB-INF/src/portlet.properties,\
-	WEB-INF/classes/resource-actions=docroot/WEB-INF/src/resource-actions
+	WEB-INF/classes/resource-actions=docroot/WEB-INF/src/resource-actions,\
+	WEB-INF/classes/=@docroot/WEB-INF/lib/util-java.jar!/com/liferay/util/bean/PortletBeanLocatorUtil.class
+Require-Capability:\
+	osgi.extender;filter:="(&(osgi.extender=jsp.taglib)(uri=http://java.sun.com/portlet_2_0))",\
+	osgi.extender;filter:="(&(osgi.extender=jsp.taglib)(uri=http://liferay.com/tld/aui))",\
+	osgi.extender;filter:="(&(osgi.extender=jsp.taglib)(uri=http://liferay.com/tld/portlet))",\
+	osgi.extender;filter:="(&(osgi.extender=jsp.taglib)(uri=http://liferay.com/tld/security))",\
+	osgi.extender;filter:="(&(osgi.extender=jsp.taglib)(uri=http://liferay.com/tld/theme))",\
+	osgi.extender;filter:="(&(osgi.extender=jsp.taglib)(uri=http://liferay.com/tld/ui))"
 Web-ContextPath: /polls-web
 
--donotcopy=(docroot/WEB-INF/src|.*\.jar|.*\.java)
+-donotcopy: (docroot/WEB-INF/src|.*\.jar|.*\.java)
 -wab: docroot
 -wablib:\
-	${app.server.lib.portal.dir}/util-java.jar,\
-	${app.server.lib.portal.dir}/util-taglib.jar
+	../../../../lib/portal/jcommon.jar,\
+	../../../../lib/portal/jfreechart.jar

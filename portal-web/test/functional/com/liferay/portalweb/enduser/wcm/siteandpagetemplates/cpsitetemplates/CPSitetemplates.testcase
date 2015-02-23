@@ -1,5 +1,5 @@
 <definition component-name="portal-wcm">
-	<property name="testray.main.component.name" value="WCM" />
+	<property name="testray.main.component.name" value="Site and Page Templates" />
 
 	<var name="portletName" value="Site Templates" />
 	<var name="siteName" value="Site Name" />
@@ -120,7 +120,7 @@
 			<var name="successMessage" value="Su petición ha terminado con éxito." />
 		</execute>
 
-		<execute action="Home#refresh" />
+		<execute function="Refresh" />
 
 		<execute macro="SiteTemplates#viewDefaultDataLocalizedCP">
 			<var name="communitySiteDescriptionTranslation" value="Sitio con foros y Wiki" />

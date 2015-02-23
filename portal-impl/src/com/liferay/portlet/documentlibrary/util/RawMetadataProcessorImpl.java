@@ -27,17 +27,20 @@ import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.security.pacl.DoPrivileged;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.repository.liferayrepository.model.LiferayFileEntry;
 import com.liferay.portal.repository.liferayrepository.model.LiferayFileVersion;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.util.PortalUtil;
+import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryConstants;
+import com.liferay.portlet.documentlibrary.model.DLProcessorConstants;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryMetadataLocalServiceUtil;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalServiceUtil;
-import com.liferay.portlet.dynamicdatamapping.storage.Fields;
+import com.liferay.portlet.dynamicdatamapping.storage.DDMFormValues;
 
 import java.io.File;
 import java.io.InputStream;
@@ -73,11 +76,8 @@ public class RawMetadataProcessorImpl
 
 	@Override
 	public void exportGeneratedFiles(
-			PortletDataContext portletDataContext, FileEntry fileEntry,
-			Element fileEntryElement)
-		throws Exception {
-
-		return;
+		PortletDataContext portletDataContext, FileEntry fileEntry,
+		Element fileEntryElement) {
 	}
 
 	@Override
@@ -93,27 +93,32 @@ public class RawMetadataProcessorImpl
 	}
 
 	@Override
-	public void importGeneratedFiles(
-			PortletDataContext portletDataContext, FileEntry fileEntry,
-			FileEntry importedFileEntry, Element fileEntryElement)
-		throws Exception {
+	public String getType() {
+		return DLProcessorConstants.RAW_METADATA_PROCESSOR;
+	}
 
-		return;
+	@Override
+	public void importGeneratedFiles(
+		PortletDataContext portletDataContext, FileEntry fileEntry,
+		FileEntry importedFileEntry, Element fileEntryElement) {
 	}
 
 	@Override
 	public boolean isSupported(FileVersion fileVersion) {
-		return true;
+		return isSupported(fileVersion.getMimeType());
 	}
 
 	@Override
 	public boolean isSupported(String mimeType) {
-		return true;
+		return !ArrayUtil.contains(
+			PropsValues.
+				DL_FILE_ENTRY_RAW_METADATA_PROCESSOR_EXCLUDED_MIME_TYPES,
+			mimeType);
 	}
 
 	@Override
 	public void saveMetadata(FileVersion fileVersion) throws PortalException {
-		Map<String, Fields> rawMetadataMap = null;
+		Map<String, DDMFormValues> rawMetadataMap = null;
 
 		if (fileVersion instanceof LiferayFileVersion) {
 			try {

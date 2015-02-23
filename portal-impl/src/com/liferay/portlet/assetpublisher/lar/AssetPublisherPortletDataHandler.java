@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.lar.DataLevel;
 import com.liferay.portal.kernel.lar.DefaultConfigurationPortletDataHandler;
 import com.liferay.portal.kernel.lar.ExportImportHelperUtil;
 import com.liferay.portal.kernel.lar.PortletDataContext;
+import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -36,7 +37,8 @@ import com.liferay.portal.service.PortletLocalServiceUtil;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.asset.model.AssetCategory;
 import com.liferay.portlet.asset.model.AssetVocabulary;
-import com.liferay.portlet.assetpublisher.util.AssetPublisher;
+import com.liferay.portlet.asset.service.AssetCategoryLocalServiceUtil;
+import com.liferay.portlet.asset.service.AssetVocabularyLocalServiceUtil;
 import com.liferay.portlet.assetpublisher.util.AssetPublisherUtil;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryType;
@@ -175,6 +177,17 @@ public class AssetPublisherPortletDataHandler
 					DDMStructure.class.getName());
 			}
 			else if (name.equals("assetVocabularyId")) {
+				long assetVocabularyId = GetterUtil.getLong(value);
+
+				AssetVocabulary assetVocabulary =
+					AssetVocabularyLocalServiceUtil.fetchAssetVocabulary(
+						assetVocabularyId);
+
+				if (assetVocabulary != null) {
+					StagedModelDataHandlerUtil.exportReferenceStagedModel(
+						portletDataContext, portletId, assetVocabulary);
+				}
+
 				ExportImportHelperUtil.updateExportPortletPreferencesClassPKs(
 					portletDataContext, portlet, portletPreferences, name,
 					AssetVocabulary.class.getName());
@@ -183,6 +196,18 @@ public class AssetPublisherPortletDataHandler
 					 StringUtil.equalsIgnoreCase(value, "assetCategories")) {
 
 				String index = name.substring(9);
+
+				long assetCategoryId = GetterUtil.getLong(
+					portletPreferences.getValue("queryValues" + index, null));
+
+				AssetCategory assetCategory =
+					AssetCategoryLocalServiceUtil.fetchAssetCategory(
+						assetCategoryId);
+
+				if (assetCategory != null) {
+					StagedModelDataHandlerUtil.exportReferenceStagedModel(
+						portletDataContext, portletId, assetCategory);
+				}
 
 				ExportImportHelperUtil.updateExportPortletPreferencesClassPKs(
 					portletDataContext, portlet, portletPreferences,
@@ -212,7 +237,7 @@ public class AssetPublisherPortletDataHandler
 		Layout layout = LayoutLocalServiceUtil.getLayout(plid);
 
 		String companyGroupScopeId =
-			AssetPublisher.SCOPE_ID_GROUP_PREFIX +
+			AssetPublisherUtil.SCOPE_ID_GROUP_PREFIX +
 				portletDataContext.getCompanyGroupId();
 
 		String[] newValues = new String[oldValues.length];
@@ -220,18 +245,18 @@ public class AssetPublisherPortletDataHandler
 		for (int i = 0; i < oldValues.length; i++) {
 			String oldValue = oldValues[i];
 
-			if (oldValue.startsWith(AssetPublisher.SCOPE_ID_GROUP_PREFIX)) {
+			if (oldValue.startsWith(AssetPublisherUtil.SCOPE_ID_GROUP_PREFIX)) {
 				newValues[i] = StringUtil.replace(
 					oldValue, companyGroupScopeId,
 					"[$COMPANY_GROUP_SCOPE_ID$]");
 			}
 			else if (oldValue.startsWith(
-						AssetPublisher.SCOPE_ID_LAYOUT_PREFIX)) {
+						AssetPublisherUtil.SCOPE_ID_LAYOUT_PREFIX)) {
 
 				// Legacy preferences
 
 				String scopeIdSuffix = oldValue.substring(
-					AssetPublisher.SCOPE_ID_LAYOUT_PREFIX.length());
+					AssetPublisherUtil.SCOPE_ID_LAYOUT_PREFIX.length());
 
 				long scopeIdLayoutId = GetterUtil.getLong(scopeIdSuffix);
 
@@ -240,7 +265,7 @@ public class AssetPublisherPortletDataHandler
 					scopeIdLayoutId);
 
 				newValues[i] =
-					AssetPublisher.SCOPE_ID_LAYOUT_UUID_PREFIX +
+					AssetPublisherUtil.SCOPE_ID_LAYOUT_UUID_PREFIX +
 						scopeIdLayout.getUuid();
 			}
 			else {
@@ -295,6 +320,12 @@ public class AssetPublisherPortletDataHandler
 			PortletDataContext portletDataContext, String portletId,
 			PortletPreferences portletPreferences)
 		throws Exception {
+
+		StagedModelDataHandlerUtil.importReferenceStagedModels(
+			portletDataContext, AssetVocabulary.class);
+
+		StagedModelDataHandlerUtil.importReferenceStagedModels(
+			portletDataContext, AssetCategory.class);
 
 		Company company = CompanyLocalServiceUtil.getCompanyById(
 			portletDataContext.getCompanyId());
@@ -378,9 +409,9 @@ public class AssetPublisherPortletDataHandler
 		Layout layout = LayoutLocalServiceUtil.getLayout(plid);
 
 		String companyGroupScopeId =
-			AssetPublisher.SCOPE_ID_GROUP_PREFIX + companyGroupId;
+			AssetPublisherUtil.SCOPE_ID_GROUP_PREFIX + companyGroupId;
 
-		List<String> newValues = new ArrayList<String>(oldValues.length);
+		List<String> newValues = new ArrayList<>(oldValues.length);
 
 		for (String oldValue : oldValues) {
 			String newValue = StringUtil.replace(
@@ -417,7 +448,7 @@ public class AssetPublisherPortletDataHandler
 			key, newValues.toArray(new String[newValues.size()]));
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		AssetPublisherPortletDataHandler.class);
 
 }

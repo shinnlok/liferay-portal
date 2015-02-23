@@ -18,26 +18,26 @@ import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchEngine;
 import com.liferay.portal.kernel.search.SearchEngineUtil;
-import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.rule.Sync;
+import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
+import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.SearchContextTestUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Group;
-import com.liferay.portal.test.DeleteAfterTestRun;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.MainServletTestRule;
-import com.liferay.portal.test.Sync;
-import com.liferay.portal.test.SynchronousDestinationTestRule;
-import com.liferay.portal.util.test.GroupTestUtil;
-import com.liferay.portal.util.test.RandomTestUtil;
-import com.liferay.portal.util.test.SearchContextTestUtil;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.MainServletTestRule;
 import com.liferay.portlet.dynamicdatalists.model.DDLRecordSet;
 import com.liferay.portlet.dynamicdatalists.service.DDLRecordLocalServiceUtil;
 import com.liferay.portlet.dynamicdatalists.util.test.DDLRecordSetTestHelper;
 import com.liferay.portlet.dynamicdatalists.util.test.DDLRecordTestHelper;
-import com.liferay.portlet.dynamicdatalists.util.test.DDLRecordTestUtil;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.storage.DDMFormFieldValue;
 import com.liferay.portlet.dynamicdatamapping.storage.DDMFormValues;
+import com.liferay.portlet.dynamicdatamapping.util.test.DDMFormValuesTestUtil;
 import com.liferay.portlet.dynamicdatamapping.util.test.DDMStructureTestHelper;
 
 import org.junit.Assert;
@@ -203,12 +203,12 @@ public class DDLRecordSearchTest {
 		DDMFormValues ddmFormValues = createDDMFormValues();
 
 		DDMFormFieldValue nameDDMFormFieldValue =
-			createLocalizedTextDDMFormFieldValue("name", name);
+			createLocalizedDDMFormFieldValue("name", name);
 
 		ddmFormValues.addDDMFormFieldValue(nameDDMFormFieldValue);
 
 		DDMFormFieldValue descriptionDDMFormFieldValue =
-			createLocalizedTextDDMFormFieldValue("description", description);
+			createLocalizedDDMFormFieldValue("description", description);
 
 		ddmFormValues.addDDMFormFieldValue(descriptionDDMFormFieldValue);
 
@@ -240,16 +240,16 @@ public class DDLRecordSearchTest {
 
 		DDMStructure ddmStructure = recordSet.getDDMStructure();
 
-		return DDLRecordTestUtil.createDDMFormValues(
+		return DDMFormValuesTestUtil.createDDMFormValues(
 			ddmStructure.getDDMForm(),
-			DDLRecordTestUtil.createAvailableLocales(LocaleUtil.US),
+			DDMFormValuesTestUtil.createAvailableLocales(LocaleUtil.US),
 			LocaleUtil.US);
 	}
 
-	protected DDMFormFieldValue createLocalizedTextDDMFormFieldValue(
+	protected DDMFormFieldValue createLocalizedDDMFormFieldValue(
 		String name, String enValue) {
 
-		return DDLRecordTestUtil.createLocalizedTextDDMFormFieldValue(
+		return DDMFormValuesTestUtil.createLocalizedDDMFormFieldValue(
 			name, enValue);
 	}
 

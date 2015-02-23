@@ -3,7 +3,36 @@
 <project name="portal-test-plugins" basedir="." default="test" xmlns:antelope="antlib:ise.antelope.tasks">
 	<import file="build-test.xml" />
 
+	<macrodef name="get-auto-deploy-dir">
+		<sequential>
+			<var name="auto.deploy.dir" unset="true" />
+
+			<get-testcase-property property.name="plugins.deployment.type" />
+
+			<if>
+				<equals arg1="${plugins.deployment.type}" arg2="osgi" />
+				<then>
+					<var name="auto.deploy.dir" value="${liferay.home}/osgi/modules" />
+				</then>
+				<else>
+					<var name="auto.deploy.dir" value="${liferay.home}/deploy" />
+				</else>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<target name="deploy-extra-apps">
+		<fail message="Please set the property ${extra.apps.zip.file.name}" unless="extra.apps.zip.file.name" />
+
+		<unzip
+			dest="${liferay.home}/deploy"
+			src="${extra.apps.zip.file.name}"
+		/>
+	</target>
+
 	<target name="deploy-simple-server-plugins">
+		<get-auto-deploy-dir />
+
 		<if>
 			<equals arg1="${app.server.type}" arg2="jboss" />
 			<then>
@@ -11,7 +40,7 @@
 app.server.type=${app.server.type}
 app.server.jboss.dir=${app.server.dir}
 
-auto.deploy.dir=${liferay.home}/deploy
+auto.deploy.dir=${auto.deploy.dir}
 
 plugins.includes=${plugins.includes}</echo>
 			</then>
@@ -19,7 +48,7 @@ plugins.includes=${plugins.includes}</echo>
 				<echo file="${lp.plugins.dir}/build.${user.name}.properties">app.server.parent.dir=${app.server.parent.dir}
 app.server.type=${app.server.type}
 
-auto.deploy.dir=${liferay.home}/deploy
+auto.deploy.dir=${auto.deploy.dir}
 
 plugins.includes=${plugins.includes}</echo>
 			</else>
@@ -79,20 +108,6 @@ app.server.tomcat.dir=${app.server.parent.dir}/tomcat-7.0.27</echo>
 				</if>
 			</sequential>
 		</for>
-
-		<if>
-			<and>
-				<isset property="jenkins.shared.user.content.dir" />
-				<isset property="top.level.build.number" />
-				<isset property="top.level.job.name" />
-			</and>
-			<then>
-				<unzip
-					dest="${liferay.home}/deploy"
-					src="${jenkins.shared.user.content.dir}/jobs/${top.level.job.name}/builds/${top.level.build.number}/downloads/extraapps.zip"
-				/>
-			</then>
-		</if>
 
 		<if>
 			<matches pattern="http" string="${test.build.plugins.war.zip.url}" />
@@ -164,5 +179,78 @@ app.server.tomcat.dir=${app.server.parent.dir}/tomcat-7.0.27</echo>
 
 		<delete dir="${lp.plugins.dir}/dist" />
 		<mkdir dir="${lp.plugins.dir}/dist" />
+	</target>
+
+	<target name="test-plugin">
+		<if>
+			<contains string="${test.plugin}" substring="layouttpl" />
+			<then>
+				<var name="select" value="\2" />
+			</then>
+			<else>
+				<var name="select" value="\2s" />
+			</else>
+		</if>
+
+		<propertyregex
+			input="${test.plugin}"
+			override="true"
+			property="test.plugin.type"
+			regexp="(\w+-)+(\w+)"
+			select="${select}"
+		/>
+
+		<get-auto-deploy-dir />
+
+		<echo file="${lp.plugins.dir}/build.${user.name}.properties">app.server.parent.dir=${app.server.parent.dir}
+app.server.type=${app.server.type}
+
+auto.deploy.dir=${auto.deploy.dir}
+
+plugins.includes=${test.plugin}</echo>
+
+		<ant-execute
+			ant.dir="${lp.plugins.dir}/${test.plugin.type}/${test.plugin}"
+			ant.target="clean"
+		/>
+
+		<if>
+			<contains string="${test.plugin}" substring="portlet" />
+			<then>
+				<ant-execute
+					ant.dir="${lp.plugins.dir}/${test.plugin.type}/${test.plugin}"
+					ant.target="compile-jsp"
+				/>
+			</then>
+			<else>
+				<ant-execute
+					ant.dir="${lp.plugins.dir}/${test.plugin.type}/${test.plugin}"
+					ant.target="compile"
+				/>
+			</else>
+		</if>
+	</target>
+
+	<target name="test-plugin-group">
+		<if>
+			<not>
+				<isset property="test.plugin.group.index" />
+			</not>
+			<then>
+				<fail>Use "ant test-plugin-group -Dtest.plugin.group.index=0".</fail>
+			</then>
+		</if>
+
+		<property file="${project.dir}/test.plugin.names.properties" />
+
+		<propertycopy from="TEST_PLUGIN_GROUP_${test.plugin.group.index}" name="test.plugins" />
+
+		<for list="${test.plugins}" param="test.plugin">
+			<sequential>
+				<antcall target="test-plugin">
+					<param name="test.plugin" value="@{test.plugin}" />
+				</antcall>
+			</sequential>
+		</for>
 	</target>
 </project>

@@ -620,7 +620,8 @@ public class ClusterSchedulerEngine
 	}
 
 	@BeanReference(
-		name = "com.liferay.portal.scheduler.ClusterSchedulerEngineService")
+		name = "com.liferay.portal.scheduler.ClusterSchedulerEngineService"
+	)
 	protected SchedulerEngine schedulerEngine;
 
 	private static final String _PLUGIN_READY = "plugin.ready";
@@ -635,8 +636,7 @@ public class ClusterSchedulerEngine
 
 	private String _beanIdentifier;
 	private final Map<String, ObjectValuePair<SchedulerResponse, TriggerState>>
-		_memoryClusteredJobs = new ConcurrentHashMap
-			<String, ObjectValuePair<SchedulerResponse, TriggerState>>();
+		_memoryClusteredJobs = new ConcurrentHashMap<>();
 	private boolean _portalReady;
 	private final java.util.concurrent.locks.Lock _readLock;
 	private ClusterMasterTokenTransitionListener
@@ -649,7 +649,7 @@ public class ClusterSchedulerEngine
 
 		@Override
 		public boolean accept(Map<String, Serializable> context) {
-			if (!ClusterInvokeThreadLocal.isEnabled()) {
+			if (ClusterInvokeThreadLocal.isEnabled()) {
 				return false;
 			}
 

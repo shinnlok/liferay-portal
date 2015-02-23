@@ -14,12 +14,13 @@
 
 package com.liferay.poshi.runner;
 
-import java.io.File;
+import com.liferay.poshi.runner.selenium.SeleniumUtil;
+
+import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.dom4j.Document;
-import org.dom4j.io.SAXReader;
+import org.dom4j.Element;
 
 /**
  * @author Brian Wing Shun Chan
@@ -28,31 +29,56 @@ import org.dom4j.io.SAXReader;
  */
 public class PoshiRunner extends TestCase {
 
+	@Override
+	public void setUp() throws Exception {
+		SeleniumUtil.startSelenium();
+
+		Element testcaseRootElement = PoshiRunnerContext.getTestcaseRootElement(
+			_CLASS_NAME);
+
+		List<Element> rootVarElements = testcaseRootElement.elements("var");
+
+		for (Element rootVarElement : rootVarElements) {
+			String name = rootVarElement.attributeValue("name");
+			String value = rootVarElement.attributeValue("value");
+
+			PoshiRunnerVariablesUtil.putIntoExecuteMap(name, value);
+		}
+
+		PoshiRunnerVariablesUtil.pushCommandMap();
+
+		Element setUpElement = PoshiRunnerContext.getTestcaseCommandElement(
+			_CLASS_NAME + "#set-up");
+
+		if (setUpElement != null) {
+			PoshiRunnerExecutor.parseElement(setUpElement);
+		}
+	}
+
+	@Override
+	public void tearDown() throws Exception {
+		Element tearDownElement = PoshiRunnerContext.getTestcaseCommandElement(
+			_CLASS_NAME + "#tear-down");
+
+		if (tearDownElement != null) {
+			PoshiRunnerExecutor.parseElement(tearDownElement);
+		}
+
+		SeleniumUtil.stopSelenium();
+	}
+
 	public void testPoshiRunner() throws Exception {
-		File file = new File(
-			"../../../portal-web/test/functional/com/liferay/portalweb" +
-				"/development/tools/testinginfrastructure");
+		Element commandElement = PoshiRunnerContext.getTestcaseCommandElement(
+			_CLASS_COMMAND_NAME);
 
-		_findFiles(file);
-
-		System.out.println("Test " + file.exists());
+		PoshiRunnerExecutor.parseElement(commandElement);
 	}
 
-	private void _findFiles(File file) throws Exception {
-		if (file.isDirectory()) {
-			for (File childFile : file.listFiles()) {
-				_findFiles(childFile);
-			}
-		}
-		else {
-			_parseFile(file);
-		}
-	}
+	private static final String _CLASS_COMMAND_NAME = System.getProperty(
+		"test.case.name");
 
-	private void _parseFile(File file) throws Exception {
-		SAXReader saxReader = new SAXReader();
-
-		Document document = saxReader.read(file);
-	}
+	private static final String _CLASS_NAME =
+		PoshiRunnerGetterUtil.getClassNameFromClassCommandName(
+			_CLASS_COMMAND_NAME);
 
 }

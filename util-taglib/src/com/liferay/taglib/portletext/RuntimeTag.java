@@ -38,7 +38,6 @@ import com.liferay.portal.util.PortletKeys;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.taglib.servlet.PipingServletResponse;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -89,9 +88,8 @@ public class RuntimeTag extends TagSupport {
 		Map<String, String[]> parameterMap = request.getParameterMap();
 
 		if (!portletId.equals(request.getParameter("p_p_id"))) {
-			parameterMap = MapUtil.filter(
-				parameterMap, new HashMap<String, String[]>(),
-				new PrefixPredicateFilter("p_p_"));
+			parameterMap = MapUtil.filterByKeys(
+				parameterMap, new PrefixPredicateFilter("p_p_"));
 		}
 
 		request = DynamicServletRequest.addQueryString(
@@ -121,6 +119,8 @@ public class RuntimeTag extends TagSupport {
 			Portlet portlet = getPortlet(
 				themeDisplay.getCompanyId(), portletId);
 
+			JSONObject jsonObject = null;
+
 			if ((PortletPreferencesLocalServiceUtil.getPortletPreferencesCount(
 					PortletKeys.PREFS_OWNER_TYPE_LAYOUT, themeDisplay.getPlid(),
 					portletId) < 1) ||
@@ -139,18 +139,22 @@ public class RuntimeTag extends TagSupport {
 					portletLayoutListener.onAddToLayout(
 						portletId, themeDisplay.getPlid());
 				}
+
+				jsonObject = JSONFactoryUtil.createJSONObject();
+
+				PortletJSONUtil.populatePortletJSONObject(
+					request, StringPool.BLANK, portlet, jsonObject);
 			}
 
-			JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
-
-			PortletJSONUtil.populatePortletJSONObject(
-				request, StringPool.BLANK, portlet, jsonObject);
-
-			PortletJSONUtil.writeHeaderPaths(response, jsonObject);
+			if (jsonObject != null) {
+				PortletJSONUtil.writeHeaderPaths(response, jsonObject);
+			}
 
 			PortletContainerUtil.render(request, response, portlet);
 
-			PortletJSONUtil.writeFooterPaths(response, jsonObject);
+			if (jsonObject != null) {
+				PortletJSONUtil.writeFooterPaths(response, jsonObject);
+			}
 		}
 		finally {
 			restrictPortletServletRequest.mergeSharedAttributes();

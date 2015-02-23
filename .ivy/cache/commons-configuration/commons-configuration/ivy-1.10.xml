@@ -13,8 +13,8 @@
 		<m:properties__commons.binary.suffix>-bin</m:properties__commons.binary.suffix>
 		<m:properties__commons.osgi.symbolicName>org.apache.commons.${commons.componentid}</m:properties__commons.osgi.symbolicName>
 		<m:properties__project.reporting.outputEncoding>${commons.encoding}</m:properties__project.reporting.outputEncoding>
-		<m:properties__commons.clirr.version>2.5</m:properties__commons.clirr.version>
 		<m:properties__commons.rc.version>RC1</m:properties__commons.rc.version>
+		<m:properties__commons.clirr.version>2.5</m:properties__commons.clirr.version>
 		<m:properties__commons.osgi.export>org.apache.commons.*;version=${project.version};-noimport:=true</m:properties__commons.osgi.export>
 		<m:properties__maven.compiler.target>1.5</m:properties__maven.compiler.target>
 		<m:properties__commons.componentid>configuration</m:properties__commons.componentid>
@@ -27,9 +27,9 @@
 		<m:properties__commons.jacoco.classRatio>100</m:properties__commons.jacoco.classRatio>
 		<m:properties__commons.release.3.binary.suffix>-bin</m:properties__commons.release.3.binary.suffix>
 		<m:properties__commons.project-info.version>2.7</m:properties__commons.project-info.version>
-		<m:properties__commons.surefire-report.aggregate>false</m:properties__commons.surefire-report.aggregate>
 		<m:properties__commons.surefire.version>2.15</m:properties__commons.surefire.version>
 		<m:properties__commons.jacoco.methodRatio>95</m:properties__commons.jacoco.methodRatio>
+		<m:properties__commons.surefire-report.aggregate>false</m:properties__commons.surefire-report.aggregate>
 		<m:properties__project.build.sourceEncoding>${commons.encoding}</m:properties__project.build.sourceEncoding>
 		<m:properties__commons.osgi.import>
       org.apache.commons.beanutils.*;resolution:=optional,
@@ -61,8 +61,8 @@
 		<m:properties__commons.wagon-ssh.version>2.3</m:properties__commons.wagon-ssh.version>
 		<m:properties__maven.compiler.source>1.5</m:properties__maven.compiler.source>
 		<m:properties__commons.jdepend.version>2.0-beta-2</m:properties__commons.jdepend.version>
-		<m:properties__maven.build.timestamp.format>yyyy-MM-dd HH:mm:ssZ</m:properties__maven.build.timestamp.format>
 		<m:properties__gpg.useagent>true</m:properties__gpg.useagent>
+		<m:properties__maven.build.timestamp.format>yyyy-MM-dd HH:mm:ssZ</m:properties__maven.build.timestamp.format>
 		<m:maven.plugins>org.apache.maven.plugins__maven-remote-resources-plugin__null|org.apache.maven.plugins__maven-remote-resources-plugin__null|org.apache.maven.plugins__maven-antrun-plugin__null|org.apache.maven.plugins__maven-compiler-plugin__null|org.apache.maven.plugins__maven-jar-plugin__null|org.apache.maven.plugins__maven-surefire-plugin__null|org.apache.commons__commons-build-plugin__null|org.apache.felix__maven-bundle-plugin__null|org.apache.rat__apache-rat-plugin__0.9|org.apache.maven.plugins__maven-scm-publish-plugin__1.0-beta-2|org.apache.maven.plugins__maven-remote-resources-plugin__null|org.apache.maven.plugins__maven-remote-resources-plugin__null|org.apache.maven.plugins__maven-antrun-plugin__null|org.apache.maven.plugins__maven-compiler-plugin__null|org.apache.maven.plugins__maven-jar-plugin__null|org.apache.maven.plugins__maven-surefire-plugin__null|org.apache.commons__commons-build-plugin__null|org.apache.felix__maven-bundle-plugin__null|org.apache.rat__apache-rat-plugin__0.9|org.apache.maven.plugins__maven-scm-publish-plugin__1.0-beta-2|null__maven-assembly-plugin__null|org.apache.maven.plugins__maven-surefire-plugin__null|org.apache.maven.plugins__maven-source-plugin__null|org.codehaus.mojo__javacc-maven-plugin__2.6</m:maven.plugins>
 		<m:properties__commons.release.2.binary.suffix>-bin</m:properties__commons.release.2.binary.suffix>
 		<m:properties__minSeverity>info</m:properties__minSeverity>
@@ -74,8 +74,8 @@
 		<m:properties__commons.jacoco.lineRatio>90</m:properties__commons.jacoco.lineRatio>
 		<m:properties__implementation.build>${scmBranch}@r${buildNumber}; ${maven.build.timestamp}</m:properties__implementation.build>
 		<m:properties__commons.release.version>1.10</m:properties__commons.release.version>
-		<m:properties__commons.encoding>iso-8859-1</m:properties__commons.encoding>
 		<m:properties__sonar.host.url>https://analysis.apache.org/</m:properties__sonar.host.url>
+		<m:properties__commons.encoding>iso-8859-1</m:properties__commons.encoding>
 		<m:properties__commons.surefire-report.version>2.15</m:properties__commons.surefire-report.version>
 		<m:properties__commons.manifestfile>${project.build.directory}/osgi/MANIFEST.MF</m:properties__commons.manifestfile>
 		<m:properties__commons.site-plugin.version>3.3</m:properties__commons.site-plugin.version>

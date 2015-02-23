@@ -14,6 +14,7 @@
 
 package com.liferay.portal.search;
 
+import com.liferay.portal.kernel.lar.ExportImportThreadLocal;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.Indexable;
@@ -21,6 +22,7 @@ import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.model.BaseModel;
+import com.liferay.portal.model.StagedModel;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.spring.aop.AnnotationChainableMethodAdvice;
 
@@ -62,6 +64,17 @@ public class IndexableAdvice
 			return;
 		}
 
+		if (StagedModel.class.isAssignableFrom(returnType)) {
+			if (ExportImportThreadLocal.isImportInProcess()) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(
+						"Skipping indexing until the import is finished");
+				}
+
+				return;
+			}
+		}
+
 		Object[] arguments = methodInvocation.getArguments();
 
 		ServiceContext serviceContext = null;
@@ -99,9 +112,10 @@ public class IndexableAdvice
 		return _nullIndexable;
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(IndexableAdvice.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		IndexableAdvice.class);
 
-	private static Indexable _nullIndexable = new Indexable() {
+	private static final Indexable _nullIndexable = new Indexable() {
 
 		@Override
 		public Class<? extends Annotation> annotationType() {

@@ -31,7 +31,6 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.service.GroupLocalServiceUtil;
-import com.liferay.portal.util.PortletKeys;
 
 import java.io.InputStream;
 
@@ -187,8 +186,8 @@ public abstract class BaseSpellCheckIndexWriter
 
 		uidSB.append(String.valueOf(companyId));
 		uidSB.append(StringPool.UNDERLINE);
-		uidSB.append(PortletKeys.SEARCH);
-		uidSB.append(_PORTLET_SEPARATOR);
+		uidSB.append(Field.SPELL_CHECK_WORD);
+		uidSB.append(StringPool.UNDERLINE);
 
 		int length = 4;
 
@@ -322,12 +321,10 @@ public abstract class BaseSpellCheckIndexWriter
 		}
 	}
 
-	private static final String _PORTLET_SEPARATOR = "_PORTLET_";
-
 	private static final String[] _SUPPORTED_LOCALES = StringUtil.split(
 		PropsUtil.get(PropsKeys.INDEX_SEARCH_SPELL_CHECKER_SUPPORTED_LOCALES));
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		BaseSpellCheckIndexWriter.class);
 
 	private int _querySuggestionMaxNGramLength = 50;

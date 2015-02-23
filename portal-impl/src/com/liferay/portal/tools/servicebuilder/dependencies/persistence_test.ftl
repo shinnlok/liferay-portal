@@ -12,7 +12,7 @@
 	<#assign parentPKColumn = entity.getColumn("parent" + pkColumn.methodName)>
 </#if>
 
-package ${packagePath}.service.persistence;
+package ${packagePath}.service.persistence.test;
 
 <#assign noSuchEntity = serviceBuilder.getNoSuchEntityException(entity)>
 
@@ -23,10 +23,15 @@ package ${packagePath}.service.persistence;
 </#if>
 
 import ${packagePath}.model.${entity.name};
-import ${packagePath}.model.impl.${entity.name}ModelImpl;
 import ${packagePath}.service.${entity.name}LocalServiceUtil;
+import ${packagePath}.service.persistence.${entity.name}PK;
+import ${packagePath}.service.persistence.${entity.name}Persistence;
+import ${packagePath}.service.persistence.${entity.name}Util;
 
 import ${beanLocatorUtil};
+
+import com.liferay.arquillian.bridge.junit.Arquillian;
+
 import com.liferay.portal.kernel.dao.jdbc.OutputBlob;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
@@ -36,7 +41,10 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
 import com.liferay.portal.kernel.test.AssertUtils;
-import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.test.ReflectionTestUtil;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.TransactionalTestRule;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.util.IntegerWrapper;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -44,11 +52,9 @@ import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.test.LiferayIntegrationTestRule;
-import com.liferay.portal.test.PersistenceTestRule;
-import com.liferay.portal.test.TransactionalTestRule;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.PersistenceTestRule;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.portal.util.test.RandomTestUtil;
 
 import java.sql.Blob;
 import java.sql.Connection;
@@ -65,8 +71,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.jboss.arquillian.junit.Arquillian;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -85,10 +89,16 @@ public class ${entity.name}PersistenceTest {
 
 	@Rule
 	public final AggregateTestRule aggregateTestRule = new AggregateTestRule(
-		<#if !osgiModule>
-			new LiferayIntegrationTestRule(),
-		</#if>
-		PersistenceTestRule.INSTANCE, new TransactionalTestRule(Propagation.REQUIRED));
+		new LiferayIntegrationTestRule(), PersistenceTestRule.INSTANCE, new TransactionalTestRule(Propagation.REQUIRED));
+
+	@Before
+	public void setUp() {
+		_persistence = ${entity.name}Util.getPersistence();
+
+		Class<?> clazz = _persistence.getClass();
+
+		_dynamicQueryClassLoader = clazz.getClassLoader();
+	}
 
 	@After
 	public void tearDown() throws Exception {
@@ -747,7 +757,7 @@ public class ${entity.name}PersistenceTest {
 	public void testDynamicQueryByPrimaryKeyExisting() throws Exception {
 		${entity.name} new${entity.name} = add${entity.name}();
 
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(${entity.name}.class, ${entity.name}.class.getClassLoader());
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(${entity.name}.class, _dynamicQueryClassLoader);
 
 		<#if entity.hasCompoundPK()>
 			<#list entity.PKList as column>
@@ -770,7 +780,7 @@ public class ${entity.name}PersistenceTest {
 
 	@Test
 	public void testDynamicQueryByPrimaryKeyMissing() throws Exception {
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(${entity.name}.class, ${entity.name}.class.getClassLoader());
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(${entity.name}.class, _dynamicQueryClassLoader);
 
 		<#if entity.hasCompoundPK()>
 			<#list entity.PKList as column>
@@ -811,7 +821,7 @@ public class ${entity.name}PersistenceTest {
 	public void testDynamicQueryByProjectionExisting() throws Exception {
 		${entity.name} new${entity.name} = add${entity.name}();
 
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(${entity.name}.class, ${entity.name}.class.getClassLoader());
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(${entity.name}.class, _dynamicQueryClassLoader);
 
 		<#assign column = entity.PKList[0]>
 
@@ -838,7 +848,7 @@ public class ${entity.name}PersistenceTest {
 
 	@Test
 	public void testDynamicQueryByProjectionMissing() throws Exception {
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(${entity.name}.class, ${entity.name}.class.getClassLoader());
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(${entity.name}.class, _dynamicQueryClassLoader);
 
 		<#assign column = entity.PKList[0]>
 
@@ -880,18 +890,18 @@ public class ${entity.name}PersistenceTest {
 
 			_persistence.clearCache();
 
-			${entity.name}ModelImpl existing${entity.name}ModelImpl = (${entity.name}ModelImpl)_persistence.findByPrimaryKey(new${entity.name}.getPrimaryKey());
+			${entity.name} existing${entity.name} = _persistence.findByPrimaryKey(new${entity.name}.getPrimaryKey());
 
 			<#list uniqueFinderList as finder>
 				<#assign finderColsList = finder.getColumns()>
 
 				<#list finderColsList as finderCol>
 					<#if finderCol.type == "double">
-						AssertUtils.assertEquals(existing${entity.name}ModelImpl.get${finderCol.methodName}(), existing${entity.name}ModelImpl.getOriginal${finderCol.methodName}());
+						AssertUtils.assertEquals(existing${entity.name}.get${finderCol.methodName}(), ReflectionTestUtil.<Double>invoke(existing${entity.name}, "getOriginal${finderCol.methodName}", new Class<?>[0]));
 					<#elseif finderCol.isPrimitiveType()>
-						Assert.assertEquals(existing${entity.name}ModelImpl.get${finderCol.methodName}(), existing${entity.name}ModelImpl.getOriginal${finderCol.methodName}());
+						Assert.assertEquals(existing${entity.name}.get${finderCol.methodName}(), ReflectionTestUtil.invoke(existing${entity.name}, "getOriginal${finderCol.methodName}", new Class<?>[0]));
 					<#else>
-						Assert.assertTrue(Validator.equals(existing${entity.name}ModelImpl.get${finderCol.methodName}(), existing${entity.name}ModelImpl.getOriginal${finderCol.methodName}()));
+						Assert.assertTrue(Validator.equals(existing${entity.name}.get${finderCol.methodName}(), ReflectionTestUtil.invoke(existing${entity.name}, "getOriginal${finderCol.methodName}", new Class<?>[0])));
 					</#if>
 				</#list>
 			</#list>
@@ -1228,6 +1238,7 @@ public class ${entity.name}PersistenceTest {
 	</#if>
 
 	private List<${entity.name}> _${entity.varNames} = new ArrayList<${entity.name}>();
-	private ${entity.name}Persistence _persistence = ${entity.name}Util.getPersistence();
+	private ${entity.name}Persistence _persistence;
+	private ClassLoader _dynamicQueryClassLoader;
 
 }

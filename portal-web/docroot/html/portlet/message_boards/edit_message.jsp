@@ -293,7 +293,7 @@ else {
 
 				<%
 				for (int i = 0; i < priorities.length; i++) {
-					String[] priority = StringUtil.split(priorities[i]);
+					String[] priority = StringUtil.split(priorities[i], StringPool.PIPE);
 
 					try {
 						String priorityName = priority[0];
@@ -519,7 +519,7 @@ else {
 
 	function <portlet:namespace />previewMessage() {
 		<c:if test="<%= ((message != null) && !message.isDraft()) %>">
-			if (!confirm('<liferay-ui:message key="in-order-to-preview-your-changes,-the-message-will-be-saved-as-a-draft-and-other-users-may-not-be-able-to-see-it" />')) {
+			if (!confirm('<liferay-ui:message key="in-order-to-preview-your-changes,-the-message-is-saved-as-a-draft-and-other-users-may-not-be-able-to-see-it" />')) {
 				return false;
 			}
 		</c:if>

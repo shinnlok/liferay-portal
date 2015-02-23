@@ -135,6 +135,9 @@ public class HttpImpl implements Http {
 
 			_nonProxyHostsPattern = Pattern.compile(nonProxyHostsRegEx);
 		}
+		else {
+			_nonProxyHostsPattern = null;
+		}
 
 		MultiThreadedHttpConnectionManager httpConnectionManager =
 			new MultiThreadedHttpConnectionManager();
@@ -153,10 +156,12 @@ public class HttpImpl implements Http {
 		_proxyHttpClient.setHttpConnectionManager(httpConnectionManager);
 
 		if (!hasProxyConfig() || Validator.isNull(_PROXY_USERNAME)) {
+			_proxyCredentials = null;
+
 			return;
 		}
 
-		List<String> authPrefs = new ArrayList<String>();
+		List<String> authPrefs = new ArrayList<>();
 
 		if (_PROXY_AUTH_TYPE.equals("username-password")) {
 			_proxyCredentials = new UsernamePasswordCredentials(
@@ -174,6 +179,9 @@ public class HttpImpl implements Http {
 			authPrefs.add(AuthPolicy.NTLM);
 			authPrefs.add(AuthPolicy.BASIC);
 			authPrefs.add(AuthPolicy.DIGEST);
+		}
+		else {
+			_proxyCredentials = null;
 		}
 
 		HttpClientParams httpClientParams = _proxyHttpClient.getParams();
@@ -723,16 +731,75 @@ public class HttpImpl implements Http {
 	}
 
 	@Override
+	public String normalizePath(String uri) {
+		if (Validator.isNull(uri)) {
+			return uri;
+		}
+
+		uri = removePathParameters(uri);
+
+		String path = null;
+		String queryString = null;
+
+		int pos = uri.indexOf('?');
+
+		if (pos != -1) {
+			path = uri.substring(0, pos);
+			queryString = uri.substring(pos + 1);
+		}
+		else {
+			path = uri;
+		}
+
+		String[] uriParts = StringUtil.split(
+			path.substring(1), StringPool.SLASH);
+
+		List<String> parts = new ArrayList<>(uriParts.length);
+
+		for (int i = 0; i < uriParts.length; i++) {
+			String curUriPart = URLCodec.decodeURL(uriParts[i]);
+			String prevUriPart = null;
+
+			if (i > 0) {
+				prevUriPart = URLCodec.decodeURL(uriParts[i - 1]);
+			}
+
+			if (curUriPart.equals(StringPool.DOUBLE_PERIOD)) {
+				if (!prevUriPart.equals(StringPool.PERIOD)) {
+					parts.remove(parts.size() - 1);
+				}
+			}
+			else if ((curUriPart.length() > 0) &&
+					 !curUriPart.equals(StringPool.PERIOD)) {
+
+				parts.add(URLCodec.encodeURL(curUriPart));
+			}
+		}
+
+		StringBundler sb = new StringBundler(parts.size() * 2 + 2);
+
+		for (String part : parts) {
+			sb.append(StringPool.SLASH);
+			sb.append(part);
+		}
+
+		if (Validator.isNotNull(queryString)) {
+			sb.append(StringPool.QUESTION);
+			sb.append(queryString);
+		}
+
+		return sb.toString();
+	}
+
+	@Override
 	public Map<String, String[]> parameterMapFromString(String queryString) {
-		Map<String, String[]> parameterMap =
-			new LinkedHashMap<String, String[]>();
+		Map<String, String[]> parameterMap = new LinkedHashMap<>();
 
 		if (Validator.isNull(queryString)) {
 			return parameterMap;
 		}
 
-		Map<String, List<String>> tempParameterMap =
-			new LinkedHashMap<String, List<String>>();
+		Map<String, List<String>> tempParameterMap = new LinkedHashMap<>();
 
 		String[] parameters = StringUtil.split(queryString, CharPool.AMPERSAND);
 
@@ -767,7 +834,7 @@ public class HttpImpl implements Http {
 				List<String> values = tempParameterMap.get(key);
 
 				if (values == null) {
-					values = new ArrayList<String>();
+					values = new ArrayList<>();
 
 					tempParameterMap.put(key, values);
 				}
@@ -991,10 +1058,17 @@ public class HttpImpl implements Http {
 				sb.append(StringPool.SLASH);
 				sb.append(uriPart);
 			}
+			else if (pos == 0) {
+				continue;
+			}
 			else {
 				sb.append(StringPool.SLASH);
 				sb.append(uriPart.substring(0, pos));
 			}
+		}
+
+		if (sb.length() == 0) {
+			return StringPool.SLASH;
 		}
 
 		return sb.toString();
@@ -1293,7 +1367,7 @@ public class HttpImpl implements Http {
 			}
 		}
 		else {
-			List<Part> partsList = new ArrayList<Part>();
+			List<Part> partsList = new ArrayList<>();
 
 			if (parts != null) {
 				for (Map.Entry<String, String> entry : parts.entrySet()) {
@@ -1712,14 +1786,14 @@ public class HttpImpl implements Http {
 	private static final int _TIMEOUT = GetterUtil.getInteger(
 		PropsUtil.get(HttpImpl.class.getName() + ".timeout"), 5000);
 
-	private static Log _log = LogFactoryUtil.getLog(HttpImpl.class);
+	private static final Log _log = LogFactoryUtil.getLog(HttpImpl.class);
 
-	private static ThreadLocal<Cookie[]> _cookies = new ThreadLocal<Cookie[]>();
+	private static final ThreadLocal<Cookie[]> _cookies = new ThreadLocal<>();
 
-	private HttpClient _httpClient = new HttpClient();
-	private Pattern _nonProxyHostsPattern;
-	private Credentials _proxyCredentials;
-	private HttpClient _proxyHttpClient = new HttpClient();
+	private final HttpClient _httpClient = new HttpClient();
+	private final Pattern _nonProxyHostsPattern;
+	private final Credentials _proxyCredentials;
+	private final HttpClient _proxyHttpClient = new HttpClient();
 
 	private class FastProtocolSocketFactory
 		extends DefaultProtocolSocketFactory {
