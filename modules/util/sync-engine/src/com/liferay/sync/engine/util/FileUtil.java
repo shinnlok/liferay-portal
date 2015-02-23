@@ -282,6 +282,12 @@ public class FileUtil {
 			return true;
 		}
 
+		File file = filePath.toFile();
+
+		if (!file.exists()) {
+			return true;
+		}
+
 		try {
 			if ((syncFile.getSize() > 0) &&
 				(syncFile.getSize() != Files.size(filePath))) {

@@ -392,7 +392,7 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 
 		Path filePath = Paths.get(targetSyncFile.getFilePathName());
 
-		if (filePathChanged && !Files.exists(filePath)) {
+		if (!Files.exists(filePath)) {
 			if (targetSyncFile.isFolder()) {
 				Path targetFilePath = Paths.get(filePathName);
 
