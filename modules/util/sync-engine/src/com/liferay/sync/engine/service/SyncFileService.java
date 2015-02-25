@@ -311,7 +311,7 @@ public class SyncFileService {
 		String filePathName, long localSyncTime) {
 
 		try {
-			return _syncFilePersistence.findByF_L(filePathName, localSyncTime);
+			return _syncFilePersistence.findByPF_L(filePathName, localSyncTime);
 		}
 		catch (SQLException sqle) {
 			if (_logger.isDebugEnabled()) {

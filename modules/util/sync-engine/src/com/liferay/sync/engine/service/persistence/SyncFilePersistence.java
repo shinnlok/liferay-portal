@@ -83,20 +83,22 @@ public class SyncFilePersistence extends BasePersistenceImpl<SyncFile, Long> {
 		return syncFiles.get(0);
 	}
 
-	public List<SyncFile> findByParentFilePathName(String filePathName)
+	public List<SyncFile> findByParentFilePathName(String parentFilePathName)
 		throws SQLException {
 
 		QueryBuilder<SyncFile, Long> queryBuilder = queryBuilder();
 
 		Where<SyncFile, Long> where = queryBuilder.where();
 
-		filePathName = StringUtils.replace(filePathName, "\\", "\\\\");
+		parentFilePathName = StringUtils.replace(
+			parentFilePathName, "\\", "\\\\");
 
 		FileSystem fileSystem = FileSystems.getDefault();
 
 		where.like(
 			"filePathName",
-			new SelectArg(filePathName + fileSystem.getSeparator() + "%"));
+			new SelectArg(
+				parentFilePathName + fileSystem.getSeparator() + "%"));
 
 		return query(queryBuilder.prepare());
 	}
@@ -126,20 +128,23 @@ public class SyncFilePersistence extends BasePersistenceImpl<SyncFile, Long> {
 		return queryForEq("syncAccountId", syncAccountId);
 	}
 
-	public List<SyncFile> findByF_L(String filePathName, long localSyncTime)
+	public List<SyncFile> findByPF_L(
+			String parentFilePathName, long localSyncTime)
 		throws SQLException {
 
 		QueryBuilder<SyncFile, Long> queryBuilder = queryBuilder();
 
 		Where<SyncFile, Long> where = queryBuilder.where();
 
-		filePathName = StringUtils.replace(filePathName, "\\", "\\\\");
+		parentFilePathName = StringUtils.replace(
+			parentFilePathName, "\\", "\\\\");
 
 		FileSystem fileSystem = FileSystems.getDefault();
 
 		where.like(
 			"filePathName",
-			new SelectArg(filePathName + fileSystem.getSeparator() + "%"));
+			new SelectArg(
+				parentFilePathName + fileSystem.getSeparator() + "%"));
 		where.lt("localSyncTime", localSyncTime);
 		where.or(
 			where.eq("state", SyncFile.STATE_SYNCED),
