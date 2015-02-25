@@ -227,6 +227,16 @@ public class FileEventUtil {
 	public static void moveFile(
 		long folderId, long syncAccountId, SyncFile syncFile) {
 
+		SyncFile parentSyncFile = SyncFileService.fetchSyncFile(
+			syncFile.getRepositoryId(), syncAccountId,
+			syncFile.getParentFolderId());
+
+		if ((parentSyncFile == null) ||
+			(parentSyncFile.getUiEvent() == SyncFile.UI_EVENT_MOVED_LOCAL)) {
+
+			return;
+		}
+
 		Map<String, Object> parameters = new HashMap<>();
 
 		parameters.put("fileEntryId", syncFile.getTypePK());
@@ -243,6 +253,16 @@ public class FileEventUtil {
 
 	public static void moveFolder(
 		long parentFolderId, long syncAccountId, SyncFile syncFile) {
+
+		SyncFile parentSyncFile = SyncFileService.fetchSyncFile(
+			syncFile.getRepositoryId(), syncAccountId,
+			syncFile.getParentFolderId());
+
+		if ((parentSyncFile == null) ||
+			(parentSyncFile.getUiEvent() == SyncFile.UI_EVENT_MOVED_LOCAL)) {
+
+			return;
+		}
 
 		Map<String, Object> parameters = new HashMap<>();
 
