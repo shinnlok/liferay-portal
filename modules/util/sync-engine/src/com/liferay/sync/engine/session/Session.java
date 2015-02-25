@@ -402,11 +402,6 @@ public class Session {
 				CountingOutputStream output = new CountingOutputStream(out) {
 
 					@Override
-					protected void afterWrite(int n) throws IOException {
-						super.afterWrite(n);
-					}
-
-					@Override
 					protected void beforeWrite(int n) {
 						incrementUploadedBytes(n);
 
