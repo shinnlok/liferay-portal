@@ -15,8 +15,10 @@
 package com.liferay.sync.engine.service;
 
 import com.liferay.sync.engine.BaseTestCase;
+import com.liferay.sync.engine.model.SyncAccount;
 import com.liferay.sync.engine.model.SyncFile;
 import com.liferay.sync.engine.model.SyncSite;
+import com.liferay.sync.engine.util.FileKeyUtil;
 import com.liferay.sync.engine.util.FileUtil;
 import com.liferay.sync.engine.util.test.SyncFileTestUtil;
 import com.liferay.sync.engine.util.test.SyncSiteTestUtil;
@@ -34,10 +36,25 @@ public class SyncAccountServiceTest extends BaseTestCase {
 
 	@Test
 	public void testAddAccount() throws Exception {
-		syncAccount = SyncAccountService.fetchSyncAccount(
-			syncAccount.getSyncAccountId());
+		String targetFilePathName = FileUtil.getFilePathName(
+			System.getProperty("user.home"), "liferay-sync-test3");
 
-		Assert.assertNotNull(syncAccount);
+		SyncAccount syncAccount2 = SyncAccountService.addSyncAccount(
+			targetFilePathName, "test3@liferay.com", 1, "test", 5, null, null,
+			false, "http://localhost:8080");
+
+		syncAccount2 = SyncAccountService.fetchSyncAccount(
+			syncAccount2.getSyncAccountId());
+
+		Assert.assertNotNull(syncAccount2);
+
+		SyncFile syncFile = SyncFileService.fetchSyncFile(targetFilePathName);
+
+		Assert.assertTrue(
+			FileKeyUtil.hasFileKey(
+				Paths.get(targetFilePathName), syncFile.getSyncFileId()));
+
+		SyncAccountService.deleteSyncAccount(syncAccount2.getSyncAccountId());
 	}
 
 	@Test
