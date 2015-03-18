@@ -106,12 +106,6 @@ public class FileKeyUtil {
 			return;
 		}
 
-		if (Files.isDirectory(filePath)) {
-			doWriteFileKey(filePath, fileKey);
-
-			return;
-		}
-
 		PathCallable pathCallable = new PathCallable(filePath) {
 
 			@Override
