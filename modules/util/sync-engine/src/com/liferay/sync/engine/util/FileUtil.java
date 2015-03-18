@@ -64,11 +64,25 @@ public class FileUtil {
 		return checksum1.equals(checksum2);
 	}
 
-	public static void deleteFile(final Path filePath) {
+	public static void deleteFile(Path filePath) {
+		try {
+			deleteFile(filePath, true);
+		}
+		catch (Exception e) {
+		}
+	}
+
+	public static void deleteFile(final Path filePath, boolean retry)
+		throws IOException {
+
 		try {
 			Files.deleteIfExists(filePath);
 		}
 		catch (Exception e) {
+			if (!retry) {
+				throw e;
+			}
+
 			PathCallable pathCallable = new PathCallable(filePath) {
 
 				@Override
@@ -348,8 +362,7 @@ public class FileUtil {
 			}
 
 			if ((fileTime.toMillis() <= modifiedTime) &&
-				(FileKeyUtil.getFileKey(filePath) ==
-					syncFile.getSyncFileId())) {
+				FileKeyUtil.hasFileKey(filePath, syncFile.getSyncFileId())) {
 
 				return false;
 			}
@@ -433,8 +446,17 @@ public class FileUtil {
 		return true;
 	}
 
+	public static void moveFile(Path sourceFilePath, Path targetFilePath) {
+		try {
+			moveFile(sourceFilePath, targetFilePath, true);
+		}
+		catch (Exception e) {
+		}
+	}
+
 	public static void moveFile(
-		final Path sourceFilePath, final Path targetFilePath) {
+			final Path sourceFilePath, final Path targetFilePath, boolean retry)
+		throws IOException {
 
 		try {
 			checkFilePath(sourceFilePath);
@@ -444,6 +466,10 @@ public class FileUtil {
 				StandardCopyOption.REPLACE_EXISTING);
 		}
 		catch (Exception e) {
+			if (!retry) {
+				throw e;
+			}
+
 			PathCallable pathCallable = new PathCallable(sourceFilePath) {
 
 				@Override

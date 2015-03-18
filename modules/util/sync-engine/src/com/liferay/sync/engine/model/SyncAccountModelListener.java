@@ -125,8 +125,8 @@ public class SyncAccountModelListener implements ModelListener<SyncAccount> {
 				SyncFile syncFile = SyncFileService.fetchSyncFile(
 					syncAccount.getFilePathName());
 
-				if (FileKeyUtil.getFileKey(filePath) ==
-						syncFile.getSyncFileId()) {
+				if (FileKeyUtil.hasFileKey(
+						filePath, syncFile.getSyncFileId())) {
 
 					syncAccount.setActive(true);
 					syncAccount.setUiEvent(SyncAccount.UI_EVENT_NONE);

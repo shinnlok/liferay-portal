@@ -16,6 +16,9 @@ package com.liferay.sync.engine.util;
 
 import ch.securityvision.xattrj.Xattrj;
 
+import com.liferay.sync.engine.model.SyncFile;
+import com.liferay.sync.engine.service.SyncFileService;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -31,8 +34,6 @@ import java.nio.file.attribute.UserDefinedFileAttributeView;
 
 import java.util.List;
 
-import com.liferay.sync.engine.model.SyncFile;
-import com.liferay.sync.engine.service.SyncFileService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,17 +93,23 @@ public class FileKeyUtil {
 		}
 	}
 
-	public static boolean writeFileKey(
-		final Path filePath, final String fileKey) {
+	public static boolean hasFileKey(Path filePath, long fileKey) {
+		if (getFileKey(filePath) == fileKey) {
+			return true;
+		}
 
-		if (getFileKey(filePath) == Long.parseLong(fileKey)) {
-			return false;
+		return false;
+	}
+
+	public static void writeFileKey(final Path filePath, final String fileKey) {
+		if (hasFileKey(filePath, Long.parseLong(fileKey))) {
+			return;
 		}
 
 		if (Files.isDirectory(filePath)) {
 			doWriteFileKey(filePath, fileKey);
 
-			return true;
+			return;
 		}
 
 		PathCallable pathCallable = new PathCallable(filePath) {
@@ -117,12 +124,53 @@ public class FileKeyUtil {
 		};
 
 		FileLockRetryUtil.registerPathCallable(pathCallable);
+	}
 
-		return true;
+	public static void writeFileKeys(final Path filePath) throws IOException {
+		Files.walkFileTree(
+			filePath,
+			new SimpleFileVisitor<Path>() {
+
+				@Override
+				public FileVisitResult preVisitDirectory(
+						Path filePath, BasicFileAttributes basicFileAttributes)
+					throws IOException {
+
+					SyncFile syncFile = SyncFileService.fetchSyncFile(
+						filePath.toString());
+
+					if (syncFile == null) {
+						return FileVisitResult.SKIP_SUBTREE;
+					}
+
+					doWriteFileKey(
+						filePath, String.valueOf(syncFile.getSyncFileId()));
+
+					return super.preVisitDirectory(
+						filePath, basicFileAttributes);
+				}
+
+				@Override
+				public FileVisitResult visitFile(
+						Path filePath, BasicFileAttributes basicFileAttributes)
+					throws IOException {
+
+					SyncFile syncFile = SyncFileService.fetchSyncFile(
+						filePath.toString());
+
+					if (syncFile != null) {
+						doWriteFileKey(
+							filePath, String.valueOf(syncFile.getSyncFileId()));
+					}
+
+					return FileVisitResult.CONTINUE;
+				}
+
+			});
 	}
 
 	protected static void doWriteFileKey(Path filePath, String fileKey) {
-		if (getFileKey(filePath) == Long.parseLong(fileKey)) {
+		if (hasFileKey(filePath, Long.parseLong(fileKey))) {
 			return;
 		}
 

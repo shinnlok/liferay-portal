@@ -177,7 +177,7 @@ public class SyncEngine {
 		SyncFile syncFile = SyncFileService.fetchSyncFile(
 			syncAccount.getFilePathName());
 
-		if (FileKeyUtil.getFileKey(filePath) != syncFile.getSyncFileId()) {
+		if (!FileKeyUtil.hasFileKey(filePath, syncFile.getSyncFileId())) {
 			syncAccount.setActive(false);
 			syncAccount.setUiEvent(
 				SyncAccount.UI_EVENT_SYNC_ACCOUNT_FOLDER_MISSING);
