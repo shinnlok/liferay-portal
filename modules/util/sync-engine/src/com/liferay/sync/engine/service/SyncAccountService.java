@@ -22,6 +22,7 @@ import com.liferay.sync.engine.model.SyncSite;
 import com.liferay.sync.engine.model.SyncUser;
 import com.liferay.sync.engine.service.persistence.SyncAccountPersistence;
 import com.liferay.sync.engine.util.Encryptor;
+import com.liferay.sync.engine.util.FileKeyUtil;
 import com.liferay.sync.engine.util.FileUtil;
 import com.liferay.sync.engine.util.OSDetector;
 
@@ -344,7 +345,7 @@ public class SyncAccountService {
 			SyncFile syncFile = SyncFileService.fetchSyncFile(
 				syncAccount.getFilePathName());
 
-			if (syncFile.getSyncFileId() != FileUtil.getFileKey(filePath)) {
+			if (syncFile.getSyncFileId() != FileKeyUtil.getFileKey(filePath)) {
 				throw new Exception(
 					"Target folder is not the moved sync data folder");
 			}
