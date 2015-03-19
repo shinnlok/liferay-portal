@@ -410,8 +410,20 @@ public class VerifyProperties extends VerifyProcess {
 		// Breadcrumb
 
 		new String[] {
+			"breadcrumb.display.style.default", "ddm.template.key.default",
+			"com.liferay.site.navigation.breadcrumb.web"
+		},
+		new String[] {
 			"breadcrumb.display.templates.config", "display.templates.config",
-			"com.liferay.breadcrumb.web"
+			"com.liferay.site.navigation.breadcrumb.web"
+		},
+		new String[] {
+			"breadcrumb.show.guest.group", "show.guest.group",
+			"com.liferay.site.navigation.breadcrumb.web"
+		},
+		new String[] {
+			"breadcrumb.show.parent.groups", "show.parent.groups",
+			"com.liferay.site.navigation.breadcrumb.web"
 		},
 
 		// CAS
@@ -514,11 +526,16 @@ public class VerifyProperties extends VerifyProcess {
 			"publish.to.live.by.default", "com.liferay.journal.content.web"
 		},
 
+		new String[] {
+			"journal.content.search.show.listed", "show.listed",
+			"com.liferay.journal.content.search.web"
+		},
+
 		// Language
 
 		new String[] {
 			"language.display.templates.config", "display.templates.config",
-			"com.liferay.language.web"
+			"com.liferay.site.navigation.language.web"
 		},
 
 		// LDAP
@@ -609,19 +626,46 @@ public class VerifyProperties extends VerifyProcess {
 			"com.liferay.portal.ldap"
 		},
 
+		// Monitoring
+
+		new String[] {
+			"monitoring.portal.request", "monitor.portal.request",
+			"com.liferay.portal.monitoring"
+		},
+		new String[] {
+			"monitoring.portlet.action.request",
+			"monitor.portlet.action.request", "com.liferay.portal.monitoring"
+		},
+		new String[] {
+			"monitoring.portlet.event.request", "monitor.portlet.event.request",
+			"com.liferay.portal.monitoring"
+		},
+		new String[] {
+			"monitoring.portlet.render.request",
+			"monitor.portlet.render.request", "com.liferay.portal.monitoring"
+		},
+		new String[] {
+			"monitoring.portlet.resource.request",
+			"monitor.portlet.resource.request", "com.liferay.portal.monitoring"
+		},
+		new String[] {
+			"monitoring.show.per.request.data.sample",
+			"show.per.request.data.sample", "com.liferay.portal.monitoring"
+		},
+
 		// Navigation
 
 		new String[] {
 			"navigation.display.style", "display.style",
-			"com.liferay.navigation.web"
+			"com.liferay.site.navigation.menu.web"
 		},
 		new String[] {
 			"navigation.display.style.default", "display.style.default",
-			"com.liferay.navigation.web"
+			"com.liferay.site.navigation.menu.web"
 		},
 		new String[] {
 			"navigation.display.style.options", "display.style.options",
-			"com.liferay.navigation.web"
+			"com.liferay.site.navigation.menu.web"
 		},
 
 		// Nested Portlets
@@ -828,6 +872,7 @@ public class VerifyProperties extends VerifyProcess {
 		"asset.publisher.filter.unlistable.entries",
 		"asset.tag.permissions.enabled", "asset.tag.properties.default",
 		"asset.tag.properties.enabled", "auth.max.failures.limit",
+		"breadcrumb.display.style.options",
 		"buffered.increment.parallel.queue.size",
 		"buffered.increment.serial.queue.size", "cas.validate.url",
 		"cluster.executor.heartbeat.interval",
@@ -835,6 +880,7 @@ public class VerifyProperties extends VerifyProcess {
 		"com.liferay.portal.servlet.filters.doubleclick.DoubleClickFilter",
 		"com.liferay.portal.servlet.filters.charbufferpool." +
 			"CharBufferPoolFilter",
+		"com.liferay.portal.servlet.filters.monitoring.MonitoringFilter",
 		"com.liferay.portal.servlet.filters.validhtml.ValidHtmlFilter",
 		"commons.pool.enabled", "convert.processes", "discussion.thread.view",
 		"dl.file.entry.read.count.enabled",
@@ -921,6 +967,9 @@ public class VerifyProperties extends VerifyProcess {
 		},
 		new String[] {
 			"cdn.host", "cdn.host.http"
+		},
+		new String[] {
+			"cluster.executor.debug.enabled", "cluster.link.debug.enabled"
 		},
 		new String[] {
 			"com.liferay.portal.servlet.filters.compression.CompressionFilter",
@@ -1096,7 +1145,7 @@ public class VerifyProperties extends VerifyProcess {
 			"com.liferay.portal.kernel.util.StringBundler.unsafe.create." +
 				"threshold",
 			"com.liferay.portal.kernel.util.StringBundler.threadlocal.buffer." +
-				"limit",
+				"limit"
 		}
 	};
 

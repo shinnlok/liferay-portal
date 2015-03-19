@@ -40,12 +40,12 @@
 </tr>
 <tr>
 	<td>ALL_VOCABULARIES_CHECKBOX</td>
-	<td>//th[contains(@id,'_147_assetVocabularies')]/input</td>
+	<td>//input[contains(@name,'allRowIds')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>ALL_CATEGORIES_CHECKBOX</td>
-	<td>//input[@name='_147_allRowIds']</td>
+	<td>//input[contains(@name,'AssetCategories')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -66,6 +66,11 @@
 <tr>
 	<td>CONFIRMATION</td>
 	<td></td>
+	<td></td>
+</tr>
+<tr>
+	<td>VOCABULARIES_BREADCRUMB_LINK</td>
+	<td>//div[contains(@class,'breadcrumb')]/ul/li/a</td>
 	<td></td>
 </tr>
 <tr>

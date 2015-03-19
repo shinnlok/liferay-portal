@@ -18,7 +18,7 @@
 			</library>
 			<library>
 				<file-name>lib/development/alloy-taglib.jar</file-name>
-				<version>1.1.1</version>
+				<version>1.1.2</version>
 				<project-name>Alloy TagLibs</project-name>
 				<project-url>https://github.com/liferay/alloy-taglibs</project-url>
 				<licenses>
@@ -768,14 +768,14 @@
 			</library>
 			<library>
 				<file-name>lib/development/qdox.jar</file-name>
-				<version>1.12 (Snapshot 20100502)</version>
+				<version>1.12.1</version>
 				<project-name>QDox</project-name>
 				<project-url>http://qdox.codehaus.org</project-url>
 				<licenses>
 					<license>
 						<license-name>Apache License 2.0</license-name>
 						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
-						<copyright-notice>Copyright (c) 2002-2006 Joe Walnes and QDox Project Team</copyright-notice>
+						<copyright-notice>Copyright (c) 2002-2009 Joe Walnes and QDox Project Team</copyright-notice>
 					</license>
 				</licenses>
 			</library>

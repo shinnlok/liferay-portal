@@ -279,14 +279,6 @@ public interface PropsKeys {
 
 	public static final String BLOGS_TRACKBACK_ENABLED = "blogs.trackback.enabled";
 
-	public static final String BREADCRUMB_DISPLAY_STYLE_DEFAULT = "breadcrumb.display.style.default";
-
-	public static final String BREADCRUMB_DISPLAY_STYLE_OPTIONS = "breadcrumb.display.style.options";
-
-	public static final String BREADCRUMB_SHOW_GUEST_GROUP = "breadcrumb.show.guest.group";
-
-	public static final String BREADCRUMB_SHOW_PARENT_GROUPS = "breadcrumb.show.parent.groups";
-
 	public static final String BROWSER_CACHE_DISABLED = "browser.cache.disabled";
 
 	public static final String BROWSER_CACHE_SIGNED_IN_DISABLED = "browser.cache.signed.in.disabled";
@@ -391,15 +383,17 @@ public interface PropsKeys {
 
 	public static final String CDN_HOST_HTTPS = "cdn.host.https";
 
-	public static final String CLUSTER_EXECUTOR_DEBUG_ENABLED = "cluster.executor.debug.enabled";
-
 	public static final String CLUSTER_LINK_AUTODETECT_ADDRESS = "cluster.link.autodetect.address";
+
+	public static final String CLUSTER_LINK_CHANNEL_NAME_PREFIX = "cluster.link.channel.name.prefix";
 
 	public static final String CLUSTER_LINK_CHANNEL_PROPERTIES_CONTROL = "cluster.link.channel.properties.control";
 
 	public static final String CLUSTER_LINK_CHANNEL_PROPERTIES_TRANSPORT = "cluster.link.channel.properties.transport";
 
 	public static final String CLUSTER_LINK_CHANNEL_SYSTEM_PROPERTIES = "cluster.link.channel.system.properties";
+
+	public static final String CLUSTER_LINK_DEBUG_ENABLED = "cluster.link.debug.enabled";
 
 	public static final String CLUSTER_LINK_ENABLED = "cluster.link.enabled";
 
@@ -600,6 +594,8 @@ public interface PropsKeys {
 	public static final String DISCUSSION_EMAIL_COMMENTS_ADDED_ENABLED = "discussion.email.comments.added.enabled";
 
 	public static final String DISCUSSION_EMAIL_SUBJECT = "discussion.email.subject";
+
+	public static final String DISCUSSION_MAX_COMMENTS = "discussion.max.comments";
 
 	public static final String DISCUSSION_SUBSCRIBE_BY_DEFAULT = "discussion.subscribe.by.default";
 
@@ -925,6 +921,8 @@ public interface PropsKeys {
 
 	public static final String HIBERNATE_JDBC_BATCH_SIZE = "hibernate.jdbc.batch_size";
 
+	public static final String HOT_DEPLOY_DEPENDENCY_MANAGEMENT_ENABLED = "hot.deploy.dependency.management.enabled";
+
 	public static final String HOT_DEPLOY_LISTENERS = "hot.deploy.listeners";
 
 	public static final String HOT_UNDEPLOY_ENABLED = "hot.undeploy.enabled";
@@ -1144,8 +1142,6 @@ public interface PropsKeys {
 	public static final String JOURNAL_ARTICLES_SEARCH_WITH_INDEX = "journal.articles.search.with.index";
 
 	public static final String JOURNAL_CHAR_BLACKLIST = "journal.char.blacklist";
-
-	public static final String JOURNAL_CONTENT_SEARCH_SHOW_LISTED = "journal.content.search.show.listed";
 
 	public static final String JOURNAL_DEFAULT_DISPLAY_VIEW = "journal.default.display.view";
 
@@ -1738,18 +1734,6 @@ public interface PropsKeys {
 	public static final String MODULE_FRAMEWORK_WEB_GENERATOR_HEADERS = "module.framework.web.generator.headers.";
 
 	public static final String MODULE_FRAMEWORK_WEB_GENERATOR_JSP_COMPILER_DEPENDENCIES = "module.framework.web.generator.jsp.compiler.dependencies";
-
-	public static final String MONITORING_PORTAL_REQUEST = "monitoring.portal.request";
-
-	public static final String MONITORING_PORTLET_ACTION_REQUEST = "monitoring.portlet.action.request";
-
-	public static final String MONITORING_PORTLET_EVENT_REQUEST = "monitoring.portlet.event.request";
-
-	public static final String MONITORING_PORTLET_RENDER_REQUEST = "monitoring.portlet.render.request";
-
-	public static final String MONITORING_PORTLET_RESOURCE_REQUEST = "monitoring.portlet.resource.request";
-
-	public static final String MONITORING_SHOW_PER_REQUEST_DATA_SAMPLE = "monitoring.show.per.request.data.sample";
 
 	public static final String MSN_LOGIN = "msn.login";
 
@@ -2493,8 +2477,6 @@ public interface PropsKeys {
 
 	public static final String STAGING_LIVE_GROUP_REMOTE_STAGING_ENABLED = "staging.live.group.remote.staging.enabled";
 
-	public static final String STAGING_LOCK_ENABLED = "staging.lock.enabled";
-
 	public static final String STAGING_REMOTE_TRANSFER_BUFFER_SIZE = "staging.remote.transfer.buffer.size";
 
 	public static final String STRIP_CSS_SASS_ENABLED = "strip.css.sass.enabled";
@@ -2752,6 +2734,8 @@ public interface PropsKeys {
 	public static final String WIDGET_SERVLET_MAPPING = "widget.servlet.mapping";
 
 	public static final String XML_SECURITY_ENABLED = "xml.security.enabled";
+
+	public static final String XML_SECURITY_WHITELIST = "xml.security.whitelist";
 
 	public static final String XML_VALIDATION_ENABLED = "xml.validation.enabled";
 
