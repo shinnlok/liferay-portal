@@ -23,15 +23,24 @@ import com.liferay.sync.engine.util.FileUtil;
 import com.liferay.sync.engine.util.test.SyncFileTestUtil;
 import com.liferay.sync.engine.util.test.SyncSiteTestUtil;
 
+import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * @author Shinn Lok
  */
+@PrepareForTest(FileUtil.class)
+@RunWith(PowerMockRunner.class)
 public class SyncAccountServiceTest extends BaseTestCase {
 
 	@Test
@@ -90,6 +99,36 @@ public class SyncAccountServiceTest extends BaseTestCase {
 			syncFile.getFilePathName());
 
 		Files.deleteIfExists(Paths.get(targetFilePathName));
+	}
+
+	@Test
+	public void testUpdateSyncAccountSyncFile() throws Exception {
+		String targetFilePathName = FileUtil.getFilePathName(
+			System.getProperty("user.home"), "liferay-sync-test2");
+
+		PowerMockito.stub(
+			PowerMockito.method(
+				FileUtil.class, "moveFile", Path.class, Path.class,
+				Boolean.class)
+		).toThrow(
+
+			// DirectoryNotEmptyException is thrown when a file is moved across
+			// file system drives. For cleaner tests, we can just simulate this
+			// behavior by mocking it.
+
+			new DirectoryNotEmptyException(targetFilePathName)
+		);
+
+		SyncAccountService.updateSyncAccountSyncFile(
+			Paths.get(targetFilePathName), syncAccount.getSyncAccountId(),
+			true);
+
+		SyncFile syncFile = SyncFileService.fetchSyncFile(targetFilePathName);
+
+		Assert.assertTrue(
+			FileKeyUtil.hasFileKey(
+				Paths.get(syncFile.getFilePathName()),
+				syncFile.getSyncFileId()));
 	}
 
 }
