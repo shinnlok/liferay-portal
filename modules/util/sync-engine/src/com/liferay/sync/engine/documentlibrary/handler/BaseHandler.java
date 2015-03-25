@@ -72,31 +72,29 @@ public class BaseHandler implements Handler<Void> {
 			_logger.debug("Handling exception {}", e.toString());
 		}
 
-		if (e instanceof ClientProtocolException) {
-			if (e instanceof HttpResponseException) {
-				HttpResponseException hre = (HttpResponseException)e;
+		if (e instanceof HttpResponseException) {
+			HttpResponseException hre = (HttpResponseException)e;
 
-				int statusCode = hre.getStatusCode();
+			int statusCode = hre.getStatusCode();
 
-				if (statusCode == HttpStatus.SC_UNAUTHORIZED) {
-					syncAccount.setState(SyncAccount.STATE_DISCONNECTED);
-					syncAccount.setUiEvent(
-						SyncAccount.UI_EVENT_AUTHENTICATION_EXCEPTION);
+			if (statusCode == HttpStatus.SC_UNAUTHORIZED) {
+				syncAccount.setState(SyncAccount.STATE_DISCONNECTED);
+				syncAccount.setUiEvent(
+					SyncAccount.UI_EVENT_AUTHENTICATION_EXCEPTION);
 
-					SyncAccountService.update(syncAccount);
+				SyncAccountService.update(syncAccount);
 
-					return;
-				}
+				return;
 			}
-
-			retryServerConnection(SyncAccount.UI_EVENT_CONNECTION_EXCEPTION);
 		}
-		else if ((e instanceof ConnectTimeoutException) ||
-				 (e instanceof HttpHostConnectException) ||
-				 (e instanceof NoHttpResponseException) ||
-				 (e instanceof SocketException) ||
-				 (e instanceof SocketTimeoutException) ||
-				 (e instanceof UnknownHostException)) {
+
+		if ((e instanceof ClientProtocolException) ||
+			(e instanceof ConnectTimeoutException) ||
+			(e instanceof HttpHostConnectException) ||
+			(e instanceof NoHttpResponseException) ||
+			(e instanceof SocketException) ||
+			(e instanceof SocketTimeoutException) ||
+			(e instanceof UnknownHostException)) {
 
 			retryServerConnection(SyncAccount.UI_EVENT_CONNECTION_EXCEPTION);
 		}
