@@ -249,21 +249,24 @@ public class BaseHandler implements Handler<Void> {
 		SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
 			getSyncAccountId());
 
-		syncAccount.setState(SyncAccount.STATE_DISCONNECTED);
-		syncAccount.setUiEvent(uiEvent);
+		int retryCount = ConnectionRetryUtil.getRetryCount(getSyncAccountId());
 
-		SyncAccountService.update(syncAccount);
+		if (retryCount > 0) {
+			syncAccount.setState(SyncAccount.STATE_DISCONNECTED);
+			syncAccount.setUiEvent(uiEvent);
+
+			SyncAccountService.update(syncAccount);
+
+			if (_logger.isDebugEnabled()) {
+				_logger.debug(
+					"Attempting to reconnect to {}. Retry #{}.",
+					syncAccount.getUrl(), retryCount);
+			}
+		}
 
 		ServerEventUtil.retryServerConnection(
 			getSyncAccountId(),
 			ConnectionRetryUtil.incrementRetryDelay(getSyncAccountId()));
-
-		if (_logger.isDebugEnabled()) {
-			_logger.debug(
-				"Attempting to reconnect to {}. Retry #{}.",
-				syncAccount.getUrl(),
-				ConnectionRetryUtil.getRetryCount(getSyncAccountId()));
-		}
 	}
 
 	private static final Logger _logger = LoggerFactory.getLogger(
