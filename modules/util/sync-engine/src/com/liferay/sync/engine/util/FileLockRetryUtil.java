@@ -32,16 +32,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class FileLockRetryUtil {
 
-	public static void registerPathCallable(PathCallable pathCallable) {
-		_pathCallables.add(pathCallable);
-	}
-
-	private static final List<PathCallable> _pathCallables = new ArrayList<>();
-
-	static {
-		ScheduledExecutorService scheduledExecutorService =
-			Executors.newSingleThreadScheduledExecutor();
-
+	public static void init() {
 		Runnable runnable = new Runnable() {
 
 			@Override
@@ -49,54 +40,72 @@ public class FileLockRetryUtil {
 				Iterator<PathCallable> iterator = _pathCallables.iterator();
 
 				while (iterator.hasNext()) {
-					PathCallable pathCallable = iterator.next();
-
-					FileChannel fileChannel = null;
-
-					FileLock fileLock = null;
-
-					try {
-						Path filePath = pathCallable.getPath();
-
-						if (Files.notExists(filePath)) {
-							iterator.remove();
-
-							continue;
-						}
-
-						if (Files.isDirectory(filePath)) {
-							pathCallable.call();
-
-							iterator.remove();
-						}
-						else {
-							fileChannel = FileChannel.open(
-								filePath, StandardOpenOption.READ,
-								StandardOpenOption.WRITE);
-
-							fileLock = FileUtil.getFileLock(fileChannel);
-						}
-
-						if (fileLock != null) {
-							pathCallable.call();
-
-							iterator.remove();
-						}
-					}
-					catch (Exception e) {
-					}
-					finally {
-						FileUtil.releaseFileLock(fileLock);
-
-						StreamUtil.cleanUp(fileChannel);
+					if (processPathCallable(iterator.next())) {
+						iterator.remove();
 					}
 				}
 			}
 
 		};
 
-		scheduledExecutorService.scheduleAtFixedRate(
+		_scheduledExecutorService.scheduleAtFixedRate(
 			runnable, 0, 5, TimeUnit.SECONDS);
 	}
+
+	public static boolean processPathCallable(PathCallable pathCallable) {
+		FileChannel fileChannel = null;
+
+		FileLock fileLock = null;
+
+		try {
+			Path filePath = pathCallable.getPath();
+
+			if (Files.notExists(filePath)) {
+				return true;
+			}
+
+			if (Files.isDirectory(filePath)) {
+				pathCallable.call();
+
+				return true;
+			}
+			else {
+				fileChannel = FileChannel.open(
+					filePath, StandardOpenOption.READ,
+					StandardOpenOption.WRITE);
+
+				fileLock = FileUtil.getFileLock(fileChannel);
+			}
+
+			if (fileLock != null) {
+				pathCallable.call();
+
+				return true;
+			}
+		}
+		catch (Exception e) {
+		}
+		finally {
+			FileUtil.releaseFileLock(fileLock);
+
+			StreamUtil.cleanUp(fileChannel);
+		}
+
+		return false;
+	}
+
+	public static void registerPathCallable(PathCallable pathCallable) {
+		if (!processPathCallable(pathCallable)) {
+			_pathCallables.add(pathCallable);
+		}
+	}
+
+	public static void shutdown() {
+		_scheduledExecutorService.shutdownNow();
+	}
+
+	private static final List<PathCallable> _pathCallables = new ArrayList<>();
+	private static final ScheduledExecutorService _scheduledExecutorService =
+		Executors.newSingleThreadScheduledExecutor();
 
 }
