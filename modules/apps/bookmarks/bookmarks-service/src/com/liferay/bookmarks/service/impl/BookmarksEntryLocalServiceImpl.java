@@ -20,7 +20,7 @@ import com.liferay.bookmarks.model.BookmarksEntry;
 import com.liferay.bookmarks.model.BookmarksFolder;
 import com.liferay.bookmarks.model.BookmarksFolderConstants;
 import com.liferay.bookmarks.service.base.BookmarksEntryLocalServiceBaseImpl;
-import com.liferay.bookmarks.service.permission.BookmarksPermission;
+import com.liferay.bookmarks.service.permission.BookmarksResourcePermissionChecker;
 import com.liferay.bookmarks.settings.BookmarksGroupServiceSettings;
 import com.liferay.bookmarks.social.BookmarksActivityKeys;
 import com.liferay.bookmarks.util.comparator.EntryModifiedDateComparator;
@@ -49,6 +49,7 @@ import com.liferay.portal.kernel.settings.LocalizedValuesMap;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
@@ -702,8 +703,7 @@ public class BookmarksEntryLocalServiceImpl
 	}
 
 	protected void notifySubscribers(
-			long creatorUserId, BookmarksEntry entry,
-			ServiceContext serviceContext)
+			long userId, BookmarksEntry entry, ServiceContext serviceContext)
 		throws PortalException {
 
 		String layoutFullURL = serviceContext.getLayoutFullURL();
@@ -763,7 +763,7 @@ public class BookmarksEntryLocalServiceImpl
 
 		SubscriptionSender subscriptionSender =
 			new GroupSubscriptionCheckSubscriptionSender(
-				BookmarksPermission.RESOURCE_NAME);
+				BookmarksResourcePermissionChecker.RESOURCE_NAME);
 
 		subscriptionSender.setClassName(entry.getModelClassName());
 		subscriptionSender.setClassPK(entry.getEntryId());
@@ -771,14 +771,24 @@ public class BookmarksEntryLocalServiceImpl
 		subscriptionSender.setContextAttributes(
 			"[$BOOKMARKS_ENTRY_STATUS_BY_USER_NAME$]", statusByUserName,
 			"[$BOOKMARKS_ENTRY_URL$]", entryURL);
-		subscriptionSender.setCreatorUserId(creatorUserId);
-		subscriptionSender.setContextUserPrefix("BOOKMARKS_ENTRY");
+		subscriptionSender.setContextCreatorUserPrefix("BOOKMARKS_ENTRY");
+		subscriptionSender.setCreatorUserId(entry.getUserId());
+		subscriptionSender.setCurrentUserId(userId);
 		subscriptionSender.setEntryTitle(entryTitle);
 		subscriptionSender.setEntryURL(entryURL);
 		subscriptionSender.setFrom(fromAddress, fromName);
 		subscriptionSender.setHtmlFormat(true);
-		subscriptionSender.setLocalizedBodyMap(bodyLocalizedValuesMap);
-		subscriptionSender.setLocalizedSubjectMap(subjectLocalizedValuesMap);
+
+		if (bodyLocalizedValuesMap != null) {
+			subscriptionSender.setLocalizedBodyMap(
+				LocalizationUtil.getMap(bodyLocalizedValuesMap));
+		}
+
+		if (subjectLocalizedValuesMap != null) {
+			subscriptionSender.setLocalizedSubjectMap(
+				LocalizationUtil.getMap(subjectLocalizedValuesMap));
+		}
+
 		subscriptionSender.setMailId("bookmarks_entry", entry.getEntryId());
 
 		int notificationType =
@@ -795,7 +805,6 @@ public class BookmarksEntryLocalServiceImpl
 		subscriptionSender.setReplyToAddress(fromAddress);
 		subscriptionSender.setScopeGroupId(entry.getGroupId());
 		subscriptionSender.setServiceContext(serviceContext);
-		subscriptionSender.setUserId(entry.getUserId());
 
 		BookmarksFolder folder = entry.getFolder();
 

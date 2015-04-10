@@ -17,7 +17,8 @@
 <%@ include file="/html/taglib/ui/discussion/init.jsp" %>
 
 <%
-boolean hideControls = GetterUtil.getBoolean((String)request.getAttribute("liferay-ui:discussion:hideControls"));
+boolean hideControls = GetterUtil.getBoolean((String) request.getAttribute("liferay-ui:discussion:hideControls"));
+MBMessageDisplay messageDisplay = (MBMessageDisplay)request.getAttribute("liferay-ui:discussion:messageDisplay");
 String permissionClassName = (String)request.getAttribute("liferay-ui:discussion:permissionClassName");
 long permissionClassPK = GetterUtil.getLong((String)request.getAttribute("liferay-ui:discussion:permissionClassPK"));
 boolean ratingsEnabled = GetterUtil.getBoolean((String)request.getAttribute("liferay-ui:discussion:ratingsEnabled"));
@@ -81,9 +82,15 @@ Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZo
 						</c:if>
 					</aui:a>
 
+					<%
+					Date createDate = message.getCreateDate();
+
+					String createDateDescription = LanguageUtil.getTimeDescription(request, System.currentTimeMillis() - createDate.getTime(), true);
+					%>
+
 					<c:choose>
 						<c:when test="<%= message.getParentMessageId() == rootMessage.getMessageId() %>">
-							<liferay-ui:message arguments="<%= LanguageUtil.getTimeDescription(request, System.currentTimeMillis() - message.getModifiedDate().getTime(), true) %>" key="x-ago" translateArguments="<%= false %>" />
+							<liferay-ui:message arguments="<%= createDateDescription %>" key="x-ago" translateArguments="<%= false %>" />
 						</c:when>
 						<c:otherwise>
 
@@ -128,9 +135,19 @@ Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZo
 							sb.append("</a>");
 							%>
 
-							<%= LanguageUtil.format(request, "x-ago-in-reply-to-x", new Object[] {LanguageUtil.getTimeDescription(request, System.currentTimeMillis() - message.getModifiedDate().getTime(), true), sb.toString()}, false) %>
+							<%= LanguageUtil.format(request, "x-ago-in-reply-to-x", new Object[] {createDateDescription, sb.toString()}, false) %>
 						</c:otherwise>
 					</c:choose>
+
+					<%
+					Date modifiedDate = message.getModifiedDate();
+					%>
+
+					<c:if test="<%= createDate.before(modifiedDate) %>">
+						<strong onmouseover="Liferay.Portal.ToolTip.show(this, '<%= HtmlUtil.escapeJS(dateFormatDateTime.format(modifiedDate)) %>');">
+							- <liferay-ui:message key="edited" />
+						</strong>
+					</c:if>
 				</header>
 
 				<%
@@ -145,27 +162,9 @@ Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZo
 					<%= msgBody %>
 				</div>
 
-				<%
-				Map<String, Object> data = new HashMap<String, Object>();
-
-				JSONObject editorConfigJSONObject = JSONFactoryUtil.createJSONObject();
-
-				editorConfigJSONObject.put("allowedContent", "p strong em u");
-				editorConfigJSONObject.put("toolbars", JSONFactoryUtil.createJSONObject());
-
-				data.put("editorConfig", editorConfigJSONObject);
-
-				JSONObject editorOptionsJSONObject = JSONFactoryUtil.createJSONObject();
-
-				editorOptionsJSONObject.put("showSource", Boolean.FALSE);
-				editorOptionsJSONObject.put("textMode", Boolean.FALSE);
-
-				data.put("editorOptions", editorOptionsJSONObject);
-				%>
-
 				<c:if test="<%= !hideControls && MBDiscussionPermission.contains(permissionChecker, company.getCompanyId(), scopeGroupId, permissionClassName, permissionClassPK, message.getMessageId(), message.getUserId(), ActionKeys.UPDATE_DISCUSSION) %>">
 					<div class="lfr-discussion-form lfr-discussion-form-edit" id="<%= namespace + randomNamespace %>editForm<%= index %>" style='<%= "display: none; max-width: " + ModelHintsConstants.TEXTAREA_DISPLAY_WIDTH + "px;" %>'>
-						<liferay-ui:input-editor autoCreate="<%= false %>" contents="<%= message.getBody() %>" data="<%= data %>" editorImpl="<%= EDITOR_TEXT_IMPL_KEY %>" name='<%= randomNamespace + "editReplyBody" + index %>' />
+						<liferay-ui:input-editor autoCreate="<%= false %>" configKey="commentsEditor" contents="<%= message.getBody() %>" editorName='<%= PropsUtil.get("editor.wysiwyg.portal-web.docroot.html.taglib.ui.discussion.jsp") %>' name='<%= randomNamespace + "editReplyBody" + index %>' />
 
 						<aui:input name='<%= "editReplyBody" + index %>' type="hidden" value="<%= message.getBody() %>" />
 
@@ -222,22 +221,24 @@ Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZo
 							+ randomNamespace + "hideEditor('" + namespace + randomNamespace + "editReplyBody" + index + "','" + namespace + randomNamespace + "editForm" + index + "');" + randomNamespace + "showEl('" + namespace + randomNamespace + "discussionMessage" + index + "')";
 						%>
 
-						<c:choose>
-							<c:when test="<%= themeDisplay.isSignedIn() || !SSOUtil.isLoginRedirectRequired(themeDisplay.getCompanyId()) %>">
-								<liferay-ui:icon
-									label="<%= true %>"
-									message="reply"
-									url="<%= taglibPostReplyURL %>"
-								/>
-							</c:when>
-							<c:otherwise>
-								<liferay-ui:icon
-									label="<%= true %>"
-									message="please-sign-in-to-reply"
-									url="<%= themeDisplay.getURLSignIn() %>"
-								/>
-							</c:otherwise>
-						</c:choose>
+						<c:if test="<%= !messageDisplay.isDiscussionMaxComments() %>">
+							<c:choose>
+								<c:when test="<%= themeDisplay.isSignedIn() || !SSOUtil.isLoginRedirectRequired(themeDisplay.getCompanyId()) %>">
+									<liferay-ui:icon
+										label="<%= true %>"
+										message="reply"
+										url="<%= taglibPostReplyURL %>"
+										/>
+								</c:when>
+								<c:otherwise>
+									<liferay-ui:icon
+										label="<%= true %>"
+										message="please-sign-in-to-reply"
+										url="<%= themeDisplay.getURLSignIn() %>"
+										/>
+								</c:otherwise>
+							</c:choose>
+						</c:if>
 					</c:if>
 
 					<ul class="lfr-discussion-actions">
@@ -291,7 +292,7 @@ Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZo
 				</div>
 
 				<div class="lfr-discussion-body">
-					<liferay-ui:input-editor autoCreate="<%= false %>" contents="" data="<%= data %>" editorImpl="<%= EDITOR_TEXT_IMPL_KEY %>" name='<%= randomNamespace + "postReplyBody" + index %>' onChangeMethod='<%= randomNamespace + index + "OnChange" %>' placeholder="type-your-comment-here" />
+					<liferay-ui:input-editor autoCreate="<%= false %>" configKey="commentsEditor" contents="" editorName='<%= PropsUtil.get("editor.wysiwyg.portal-web.docroot.html.taglib.ui.discussion.jsp") %>' name='<%= randomNamespace + "postReplyBody" + index %>' onChangeMethod='<%= randomNamespace + index + "OnChange" %>' placeholder="type-your-comment-here" />
 
 					<aui:input name='<%= "postReplyBody" + index %>' type="hidden" />
 
@@ -335,8 +336,6 @@ Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZo
 </c:if>
 
 <%!
-public static final String EDITOR_TEXT_IMPL_KEY = "editor.wysiwyg.portal-web.docroot.html.taglib.ui.discussion.jsp";
-
 private RatingsEntry _getRatingsEntry(List<RatingsEntry> ratingEntries, long classPK) {
 	for (RatingsEntry ratingsEntry : ratingEntries) {
 		if (ratingsEntry.getClassPK() == classPK) {

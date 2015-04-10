@@ -532,9 +532,12 @@
 			<var name="siteURL" value="true" />
 		</execute>
 
-		<execute macro="CalendarEvent#viewEventDetailsWithTagPG">
+		<execute macro="CalendarEvent#viewEventDetails">
 			<var name="calendarName" value="${siteName}" />
 			<var name="eventTitle" value="${eventTitle}" />
+		</execute>
+
+		<execute macro="CalendarEvent#viewEventDetailsTags">
 			<var name="tagText" value="tag1" />
 		</execute>
 	</command>
@@ -578,7 +581,11 @@
 			<var name="siteURL" value="true" />
 		</execute>
 
-		<execute macro="CalendarEvent#viewEventDetailsPG">
+		<execute macro="CalendarEvent#changeViewPG">
+			<var name="viewType" value="Week" />
+		</execute>
+
+		<execute macro="CalendarEvent#viewEventDetails">
 			<var name="calendarName" value="${siteName}" />
 			<var name="eventTitle" value="${eventTitle}" />
 		</execute>
@@ -1159,7 +1166,11 @@
 			<var name="siteURL" value="true" />
 		</execute>
 
-		<execute macro="CalendarEvent#viewEventDetailsPG">
+		<execute macro="CalendarEvent#changeViewPG">
+			<var name="viewType" value="Week" />
+		</execute>
+
+		<execute macro="CalendarEvent#viewEventDetails">
 			<var name="calendarName" value="${siteName}" />
 			<var name="eventTitle" value="${eventTitleEdit}" />
 		</execute>
@@ -1198,7 +1209,7 @@
 		</execute>
 	</command>
 
-	<command known-issues="LPS-46786, LPS-46845" name="ImportLarSOCalendarSite" priority="4">
+	<command name="ImportLarSOCalendarSite" priority="4">
 		<var name="eventComment1" value="Calendar Event Comment 1" />
 		<var name="eventComment2" value="Calendar Event Comment 2" />
 		<var name="eventTitle1" value="Calendar Event Title 1" />
@@ -1415,9 +1426,12 @@
 			<var name="siteURL" value="true" />
 		</execute>
 
-		<execute macro="CalendarEvent#viewEventDetailsWithTagPG">
+		<execute macro="CalendarEvent#viewEventDetails">
 			<var name="calendarName" value="${siteName}" />
-			<var name="eventTitle" value="${eventTitle2}" />
+			<var name="eventTitle" value="${eventTitle}" />
+		</execute>
+
+		<execute macro="CalendarEvent#viewEventDetailsTags">
 			<var name="tagTextList" value="${tagText1},${tagText2}" />
 		</execute>
 

@@ -108,7 +108,7 @@ if ((exception != null) && fieldName.equals(focusField)) {
 				contents="<%= mainLanguageValue %>"
 				contentsLanguageId="<%= languageId %>"
 				cssClass='<%= \"language-value \" + cssClass %>'
-				editorImpl="ckeditor"
+				editorName="ckeditor"
 				name="<%= fieldName %>"
 				onBlurMethod='<%= randomNamespace + \"OnBlurEditor\" %>'
 				onChangeMethod='<%= randomNamespace + \"OnChangeEditor\" %>'
@@ -196,6 +196,10 @@ if ((exception != null) && fieldName.equals(focusField)) {
 
 			if (!ignoreRequestValue) {
 				languageValue = ParamUtil.getString(request, name + StringPool.UNDERLINE + curLanguageId, languageValue);
+			}
+
+			if (curLanguageId.equals(defaultLanguageId) && Validator.isNull(languageValue)) {
+				languageValue = LocalizationUtil.getLocalization(xml, defaultLanguageId, true);
 			}
 		%>
 

@@ -6,7 +6,6 @@
 		<portlet id="20" />
 		<portlet id="31" />
 		<portlet id="64" />
-		<portlet id="77" />
 		<portlet id="110" />
 	</category>
 	<category name="category.collaboration">
@@ -21,7 +20,6 @@
 		<portlet id="186" />
 		<portlet id="187" />
 		<portlet id="188" />
-		<portlet id="29" />
 		<portlet id="107" />
 		<portlet id="108" />
 		<portlet id="143" />
@@ -30,7 +28,6 @@
 	<category name="category.finance" />
 	<category name="category.hidden">
 		<portlet id="9" />
-		<portlet id="15" />
 		<portlet id="104" />
 		<portlet id="111" />
 		<portlet id="125" />
@@ -62,7 +59,6 @@
 		<portlet id="176" />
 		<portlet id="178" />
 		<portlet id="179" />
-		<portlet id="182" />
 		<portlet id="183" />
 		<portlet id="195" />
 		<portlet id="196" />

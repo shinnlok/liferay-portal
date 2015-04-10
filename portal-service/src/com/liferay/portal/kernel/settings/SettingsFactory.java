@@ -14,8 +14,7 @@
 
 package com.liferay.portal.kernel.settings;
 
-import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.model.Layout;
+import com.liferay.portal.kernel.settings.definition.SettingsDefinition;
 
 import java.util.List;
 
@@ -25,30 +24,28 @@ import java.util.List;
  */
 public interface SettingsFactory {
 
-	public void clearCache();
-
-	public Settings getCompanyServiceSettings(
-		long companyId, String serviceName);
-
-	public Settings getGroupServiceSettings(long groupId, String serviceName)
-		throws PortalException;
-
 	public ArchivedSettings getPortletInstanceArchivedSettings(
 			long groupId, String portletId, String name)
-		throws PortalException;
+		throws SettingsException;
 
 	public List<ArchivedSettings> getPortletInstanceArchivedSettingsList(
 		long groupId, String portletId);
 
-	public Settings getPortletInstanceSettings(Layout layout, String portletId)
-		throws PortalException;
-
 	public Settings getServerSettings(String settingsId);
 
-	public SettingsDescriptor<?> getSettingsDescriptor(String settingsId);
+	public Settings getSettings(SettingsLocator settingsLocator)
+		throws SettingsException;
+
+	public SettingsDescriptor getSettingsDescriptor(String settingsId);
+
+	public void registerSettingsDefinition(
+		SettingsDefinition<?, ?> settingsDefinition, Object configurationBean);
 
 	public void registerSettingsMetadata(
-		Class<?> settingsClass, Object serviceConfigurationBean,
+		Class<?> settingsClass, Object configurationBean,
 		FallbackKeys fallbackKeys);
+
+	public void unregisterSettingsDefinition(
+		SettingsDefinition<?, ?> settingsDefinition);
 
 }

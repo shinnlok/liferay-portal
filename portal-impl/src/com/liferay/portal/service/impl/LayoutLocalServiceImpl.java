@@ -413,8 +413,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 
 		boolean addGuestPermissions = false;
 
-		if (!privateLayout ||
-			type.equals(LayoutConstants.TYPE_CONTROL_PANEL) ||
+		if (!privateLayout || type.equals(LayoutConstants.TYPE_CONTROL_PANEL) ||
 			type.equals(LayoutConstants.TYPE_USER_PERSONAL_PANEL) ||
 			group.isLayoutSetPrototype()) {
 
@@ -952,7 +951,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		Map<String, Serializable> settingsMap =
 			ExportImportConfigurationSettingsMapFactory.buildSettingsMap(
 				userId, groupId, privateLayout, layoutIds, parameterMap,
-				startDate, endDate, user.getLocale(), user.getTimeZone());
+				user.getLocale(), user.getTimeZone());
 
 		ServiceContext serviceContext = new ServiceContext();
 
@@ -1151,8 +1150,8 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		Map<String, Serializable> settingsMap =
 			ExportImportConfigurationSettingsMapFactory.buildExportSettingsMap(
 				userId, plid, groupId, portletId, parameterMap,
-				Constants.EXPORT, startDate, endDate, user.getLocale(),
-				user.getTimeZone(), fileName);
+				Constants.EXPORT, user.getLocale(), user.getTimeZone(),
+				fileName);
 
 		ServiceContext serviceContext = new ServiceContext();
 
@@ -1339,8 +1338,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 				layoutFriendlyURL.getPlid());
 		}
 
-		if ((layout == null) &&
-			friendlyURL.startsWith(StringPool.SLASH) &&
+		if ((layout == null) && friendlyURL.startsWith(StringPool.SLASH) &&
 			Validator.isNumber(friendlyURL.substring(1))) {
 
 			long layoutId = GetterUtil.getLong(friendlyURL.substring(1));
@@ -1921,6 +1919,35 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 	}
 
 	@Override
+	public void importLayoutsDataDeletions(
+			long userId, long groupId, boolean privateLayout,
+			Map<String, String[]> parameterMap, File file)
+		throws PortalException {
+
+		try {
+			LayoutImporter layoutImporter = LayoutImporter.getInstance();
+
+			layoutImporter.importLayoutsDataDeletions(
+				userId, groupId, privateLayout, parameterMap, file);
+		}
+		catch (PortalException pe) {
+			Throwable cause = pe.getCause();
+
+			if (cause instanceof LocaleException) {
+				throw (PortalException)cause;
+			}
+
+			throw pe;
+		}
+		catch (SystemException se) {
+			throw se;
+		}
+		catch (Exception e) {
+			throw new SystemException(e);
+		}
+	}
+
+	@Override
 	public long importLayoutsInBackground(
 			long userId, ExportImportConfiguration exportImportConfiguration,
 			File file)
@@ -1970,8 +1997,8 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		Map<String, Serializable> settingsMap =
 			ExportImportConfigurationSettingsMapFactory.buildImportSettingsMap(
 				userId, groupId, privateLayout, null, parameterMap,
-				Constants.IMPORT, null, null, user.getLocale(),
-				user.getTimeZone(), file.getName());
+				Constants.IMPORT, user.getLocale(), user.getTimeZone(),
+				file.getName());
 
 		ServiceContext serviceContext = new ServiceContext();
 
@@ -2006,6 +2033,35 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		}
 		finally {
 			FileUtil.delete(file);
+		}
+	}
+
+	@Override
+	public void importPortletDataDeletions(
+			long userId, long plid, long groupId, String portletId,
+			Map<String, String[]> parameterMap, File file)
+		throws PortalException {
+
+		try {
+			PortletImporter portletImporter = PortletImporter.getInstance();
+
+			portletImporter.importPortletDataDeletions(
+				userId, plid, groupId, portletId, parameterMap, file);
+		}
+		catch (PortalException pe) {
+			Throwable cause = pe.getCause();
+
+			if (cause instanceof LocaleException) {
+				throw (PortalException)cause;
+			}
+
+			throw pe;
+		}
+		catch (SystemException se) {
+			throw se;
+		}
+		catch (Exception e) {
+			throw new SystemException(e);
 		}
 	}
 
@@ -2208,8 +2264,8 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		Map<String, Serializable> settingsMap =
 			ExportImportConfigurationSettingsMapFactory.buildImportSettingsMap(
 				userId, plid, groupId, portletId, parameterMap,
-				Constants.IMPORT, null, null, user.getLocale(),
-				user.getTimeZone(), file.getName());
+				Constants.IMPORT, user.getLocale(), user.getTimeZone(),
+				file.getName());
 
 		ServiceContext serviceContext = new ServiceContext();
 

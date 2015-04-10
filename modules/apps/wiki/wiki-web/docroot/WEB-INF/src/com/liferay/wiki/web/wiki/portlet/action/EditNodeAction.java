@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
@@ -28,6 +29,7 @@ import com.liferay.portal.struts.PortletAction;
 import com.liferay.portal.theme.PortletDisplay;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.WebKeys;
+import com.liferay.portlet.trash.service.TrashEntryServiceUtil;
 import com.liferay.portlet.trash.util.TrashUtil;
 import com.liferay.wiki.exception.DuplicateNodeNameException;
 import com.liferay.wiki.exception.NoSuchNodeException;
@@ -36,9 +38,9 @@ import com.liferay.wiki.exception.RequiredNodeException;
 import com.liferay.wiki.model.WikiNode;
 import com.liferay.wiki.service.WikiNodeLocalServiceUtil;
 import com.liferay.wiki.service.WikiNodeServiceUtil;
-import com.liferay.wiki.settings.WikiPortletInstanceSettings;
 import com.liferay.wiki.util.WikiCacheThreadLocal;
 import com.liferay.wiki.util.WikiCacheUtil;
+import com.liferay.wiki.web.settings.WikiPortletInstanceSettings;
 import com.liferay.wiki.web.settings.WikiWebSettingsProvider;
 
 import javax.portlet.ActionRequest;
@@ -74,6 +76,9 @@ public class EditNodeAction extends PortletAction {
 			}
 			else if (cmd.equals(Constants.MOVE_TO_TRASH)) {
 				deleteNode(actionRequest, true);
+			}
+			else if (cmd.equals(Constants.RESTORE)) {
+				restoreTrashEntries(actionRequest);
 			}
 			else if (cmd.equals(Constants.SUBSCRIBE)) {
 				subscribeNode(actionRequest);
@@ -205,6 +210,17 @@ public class EditNodeAction extends PortletAction {
 		return wikiPortletInstanceSettings;
 	}
 
+	protected void restoreTrashEntries(ActionRequest actionRequest)
+		throws Exception {
+
+		long[] restoreTrashEntryIds = StringUtil.split(
+			ParamUtil.getString(actionRequest, "restoreTrashEntryIds"), 0L);
+
+		for (long restoreTrashEntryId : restoreTrashEntryIds) {
+			TrashEntryServiceUtil.restoreEntry(restoreTrashEntryId);
+		}
+	}
+
 	protected void subscribeNode(ActionRequest actionRequest) throws Exception {
 		long nodeId = ParamUtil.getLong(actionRequest, "nodeId");
 
@@ -257,13 +273,13 @@ public class EditNodeAction extends PortletAction {
 			String oldName, String newName)
 		throws Exception {
 
-		String[] hiddenNodes = wikiPortletInstanceSettings.getHiddenNodes();
+		String[] hiddenNodes = wikiPortletInstanceSettings.hiddenNodes();
 
 		ArrayUtil.replace(hiddenNodes, oldName, newName);
 
 		wikiPortletInstanceSettings.setHiddenNodes(hiddenNodes);
 
-		String[] visibleNodes = wikiPortletInstanceSettings.getVisibleNodes();
+		String[] visibleNodes = wikiPortletInstanceSettings.visibleNodes();
 
 		ArrayUtil.replace(visibleNodes, oldName, newName);
 

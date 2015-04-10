@@ -138,7 +138,10 @@
 
 					<execute function="Uncheck" locator1="BasePortletExport#APPLICATION_CONFIGURATION_CHOOSE_APPLICATIONS_APPLICATION_CHECKBOX" />
 				</for>
-			</then>os
+			</then>
+		</if>
+
+		<if>
 			<isset var="checkContentNameList" />
 			<then>
 				<execute function="Check" locator1="BasePortletExport#CONTENT_CHOOSE_CONTENT_RADIO" />
@@ -172,7 +175,7 @@
 				<var name="key_contentName" value="${contentName}" />
 
 				<execute function="Check" locator1="BasePortletExport#CONTENT_CHOOSE_CONTENT_CONTENT_CHECKBOX" />
-				<execute function="AssertClick" locator1="BasePortletExport#CONTENT_CHOOSE_CONTENT_CONTENT_CHANGE_CHECKBOX" value1="Change" />
+				<execute function="AssertClick" locator1="BasePortletExport#CONTENT_CHOOSE_CONTENT_CONTENT_CHANGE_LINK" value1="Change" />
 
 				<var name="key_subContent" value="${uncheckSubContent}" />
 
@@ -189,7 +192,7 @@
 				<var name="key_contentName" value="${contentName}" />
 
 				<execute function="Check" locator1="BasePortletExport#CONTENT_CHOOSE_CONTENT_CONTENT_CHECKBOX" />
-				<execute function="AssertClick" locator1="BasePortletExport#CONTENT_CHOOSE_CONTENT_CONTENT_CHANGE_CHECKBOX" value1="Change" />
+				<execute function="AssertClick" locator1="BasePortletExport#CONTENT_CHOOSE_CONTENT_CONTENT_CHANGE_LINK" value1="Change" />
 
 				<var name="key_subContent" value="${subContent}" />
 				<var name="key_subSubContent" value="${uncheckSubSubContent}" />
@@ -276,6 +279,9 @@
 	<command name="exportPortlet">
 		<execute macro="LAR#gotoExportImportCmd" />
 
+		<execute function="SelectFrameTop" value1="relative=top" />
+		<execute function="SelectFrame" locator1="BasePortletExport#EXPORT_IMPORT_IFRAME" />
+
 		<execute macro="LAR#exportCmd">
 			<var name="larFileName" value="${larFileName}" />
 		</execute>
@@ -343,8 +349,6 @@
 		</execute>
 
 		<execute function="AssertClick" locator1="CPSitepages#TOOLBAR_IMPORT" value1="Import" />
-
-		<execute action="BasePortletImport#selectFrame" locator-key1="IMPORT_IFRAME" />
 	</command>
 
 	<command name="importDDL">
@@ -359,6 +363,9 @@
 
 	<command name="importPortlet">
 		<execute macro="LAR#gotoExportImportCmd" />
+
+		<execute function="SelectFrameTop" value1="relative=top" />
+		<execute function="SelectFrame" locator1="BasePortletExport#EXPORT_IMPORT_IFRAME" />
 
 		<execute macro="LAR#selectImportFileCmd">
 			<var name="larFileName" value="${larFileName}" />
@@ -509,8 +516,11 @@
 			</then>
 			<else>
 				<execute function="AssertTextEquals" locator1="CPSitepagesImport#FILE_TITLE" value1="${larFileName}" />
-				<execute function="AssertClick" locator1="CPSitepagesImport#CONTINUE_BUTTON" value1="Continue" />
-				<execute function="AssertClick" locator1="CPSitepagesImport#CONTINUE_BUTTON" value1="Continue" />
+				<execute function="AssertClickNoError" locator1="CPSitepagesImport#CONTINUE_BUTTON" value1="Continue" />
+				<execute function="Pause" locator1="1000" />
+				<execute function="AssertClickNoError" locator1="CPSitepagesImport#CONTINUE_BUTTON" value1="Continue" />
+				<execute function="AssertClickNoError" locator1="CPSitepagesImport#IMPORT_BUTTON" value1="Import" />
+				<execute function="Pause" locator1="5000" />
 				<execute function="AssertTextEquals" locator1="CPSitepagesImport#FILE_NAME" value1="${larFileName}" />
 			</else>
 		</if>
@@ -566,11 +576,24 @@
 			<var name="webContentTitle" value="Web Content Title" />
 		</execute>
 
-		<execute macro="Page#gotoPG">
-			<var name="pageName" value="Test Page Name" />
-			<var name="siteName" value="Site Name" />
-			<var name="siteURL" value="true" />
-		</execute>
+		<if>
+			<equals arg1="${stagingSetup}" arg2="true" />
+			<then>
+				<execute macro="Page#gotoPG">
+					<var name="pageName" value="Test Page Name" />
+					<var name="pageStaging" value="true" />
+					<var name="siteName" value="Site Name" />
+					<var name="siteURL" value="true" />
+				</execute>
+			</then>
+			<else>
+				<execute macro="Page#gotoPG">
+					<var name="pageName" value="Test Page Name" />
+					<var name="siteName" value="Site Name" />
+					<var name="siteURL" value="true" />
+				</execute>
+			</else>
+		</if>
 
 		<execute macro="Portlet#addPG">
 			<var name="portletName" value="User Segment Content Display" />
@@ -593,11 +616,24 @@
 
 		<execute macro="UserSegmentContentDisplayPortlet#savePG" />
 
-		<execute macro="Page#gotoPG">
-			<var name="pageName" value="Test Page Name" />
-			<var name="siteName" value="Site Name" />
-			<var name="siteURL" value="true" />
-		</execute>
+		<if>
+			<equals arg1="${stagingSetup}" arg2="true" />
+			<then>
+				<execute macro="Page#gotoPG">
+					<var name="pageName" value="Test Page Name" />
+					<var name="pageStaging" value="true" />
+					<var name="siteName" value="Site Name" />
+					<var name="siteURL" value="true" />
+				</execute>
+			</then>
+			<else>
+				<execute macro="Page#gotoPG">
+					<var name="pageName" value="Test Page Name" />
+					<var name="siteName" value="Site Name" />
+					<var name="siteURL" value="true" />
+				</execute>
+			</else>
+		</if>
 
 		<execute macro="Portlet#addPG">
 			<var name="portletName" value="Campaign Content Display" />
@@ -618,11 +654,24 @@
 
 		<execute macro="CampaignDisplayPortlet#savePG" />
 
-		<execute macro="Page#gotoPG">
-			<var name="pageName" value="Test Page Name" />
-			<var name="siteName" value="Site Name" />
-			<var name="siteURL" value="true" />
-		</execute>
+		<if>
+			<equals arg1="${stagingSetup}" arg2="true" />
+			<then>
+				<execute macro="Page#gotoPG">
+					<var name="pageName" value="Test Page Name" />
+					<var name="pageStaging" value="true" />
+					<var name="siteName" value="Site Name" />
+					<var name="siteURL" value="true" />
+				</execute>
+			</then>
+			<else>
+				<execute macro="Page#gotoPG">
+					<var name="pageName" value="Test Page Name" />
+					<var name="siteName" value="Site Name" />
+					<var name="siteURL" value="true" />
+				</execute>
+			</else>
+		</if>
 
 		<execute macro="Portlet#addPG">
 			<var name="portletName" value="User Segment Content List" />

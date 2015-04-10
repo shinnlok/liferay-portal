@@ -14,17 +14,18 @@
 
 package com.liferay.productivity.center.service.util;
 
+import com.liferay.osgi.service.tracker.map.ServiceReferenceMapper;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.productivity.center.panel.PanelEntry;
-import com.liferay.registry.ServiceReference;
-import com.liferay.registry.collections.ServiceReferenceMapper;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osgi.framework.ServiceReference;
+
 /**
-* @author Adolfo Pérez
-*/
+ * @author Adolfo Pérez
+ */
 public class PanelEntryServiceReferenceMapper<T extends PanelEntry>
 	implements ServiceReferenceMapper<String, T> {
 

@@ -22,6 +22,7 @@ import com.liferay.sync.engine.model.SyncSite;
 import com.liferay.sync.engine.model.SyncUser;
 import com.liferay.sync.engine.service.persistence.SyncAccountPersistence;
 import com.liferay.sync.engine.util.Encryptor;
+import com.liferay.sync.engine.util.FileKeyUtil;
 import com.liferay.sync.engine.util.FileUtil;
 import com.liferay.sync.engine.util.OSDetector;
 
@@ -32,7 +33,6 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 
 import java.sql.SQLException;
 
@@ -81,6 +81,19 @@ public class SyncAccountService {
 			SyncUser syncUser, boolean trustSelfSigned, String url)
 		throws Exception {
 
+		return addSyncAccount(
+			filePathName, login, maxConnections, "", "", false, password,
+			pollInterval, syncSites, syncUser, trustSelfSigned, url);
+	}
+
+	public static SyncAccount addSyncAccount(
+			String filePathName, String login, int maxConnections,
+			String oAuthConsumerKey, String oAuthConsumerSecret,
+			boolean oAuthEnabled, String password, int pollInterval,
+			SyncSite[] syncSites, SyncUser syncUser, boolean trustSelfSigned,
+			String url)
+		throws Exception {
+
 		// Sync account
 
 		SyncAccount syncAccount = new SyncAccount();
@@ -88,6 +101,9 @@ public class SyncAccountService {
 		syncAccount.setFilePathName(filePathName);
 		syncAccount.setLogin(login);
 		syncAccount.setMaxConnections(maxConnections);
+		syncAccount.setOAuthConsumerKey(oAuthConsumerKey);
+		syncAccount.setOAuthConsumerSecret(oAuthConsumerSecret);
+		syncAccount.setOAuthEnabled(oAuthEnabled);
 		syncAccount.setPassword(Encryptor.encrypt(password));
 		syncAccount.setPollInterval(pollInterval);
 		syncAccount.setTrustSelfSigned(trustSelfSigned);
@@ -334,7 +350,7 @@ public class SyncAccountService {
 	}
 
 	public static void updateSyncAccountSyncFile(
-			Path filePath, long syncAccountId, boolean moveFile)
+			Path targetFilePath, long syncAccountId, boolean moveFile)
 		throws Exception {
 
 		SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
@@ -344,7 +360,9 @@ public class SyncAccountService {
 			SyncFile syncFile = SyncFileService.fetchSyncFile(
 				syncAccount.getFilePathName());
 
-			if (syncFile.getSyncFileId() != FileUtil.getFileKey(filePath)) {
+			if (!FileKeyUtil.hasFileKey(
+					targetFilePath, syncFile.getSyncFileId())) {
+
 				throw new Exception(
 					"Target folder is not the moved sync data folder");
 			}
@@ -354,24 +372,36 @@ public class SyncAccountService {
 
 		SyncAccountService.update(syncAccount);
 
+		boolean resetFileKeys = false;
+
 		if (moveFile) {
+			Path sourceFilePath = Paths.get(syncAccount.getFilePathName());
+
 			try {
-				Files.createDirectories(filePath);
-
-				Files.move(
-					Paths.get(syncAccount.getFilePathName()), filePath,
-					StandardCopyOption.REPLACE_EXISTING);
+				FileUtil.moveFile(sourceFilePath, targetFilePath, false);
 			}
-			catch (Exception e) {
-				syncAccount.setActive(true);
+			catch (Exception e1) {
+				try {
+					FileUtils.moveDirectory(
+						sourceFilePath.toFile(), targetFilePath.toFile());
 
-				SyncAccountService.update(syncAccount);
+					resetFileKeys = true;
+				}
+				catch (Exception e2) {
+					syncAccount.setActive(true);
 
-				throw e;
+					SyncAccountService.update(syncAccount);
+
+					throw e2;
+				}
 			}
 		}
 
-		syncAccount = setFilePathName(syncAccountId, filePath.toString());
+		syncAccount = setFilePathName(syncAccountId, targetFilePath.toString());
+
+		if (resetFileKeys) {
+			FileKeyUtil.writeFileKeys(targetFilePath);
+		}
 
 		syncAccount.setActive(true);
 		syncAccount.setUiEvent(SyncAccount.UI_EVENT_NONE);
