@@ -50,11 +50,11 @@ public class ReleaseInfo {
 		return true;
 	}
 
-	private static final String _BUILD = "3006";
+	private static final String _BUILD = "3007";
 
 	private static final int _BUILD_NUMBER = Integer.parseInt(_BUILD);
 
-	private static final String _VERSION = "3.0.6";
+	private static final String _VERSION = "3.0.7";
 
 	private static final Pattern _pattern = Pattern.compile(
 		"(?:[0-9]+\\.){3}([0-9]+)");
