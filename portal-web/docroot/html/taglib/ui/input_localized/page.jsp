@@ -21,7 +21,7 @@ String randomNamespace = PortalUtil.generateRandomKey(request, "taglib_ui_input_
 
 boolean autoFocus = GetterUtil.getBoolean((String)request.getAttribute("liferay-ui:input-localized:autoFocus"));
 boolean autoSize = GetterUtil.getBoolean((String)request.getAttribute("liferay-ui:input-localized:autoSize"));
-Locale[] availableLocales = (Locale[])request.getAttribute("liferay-ui:input-localized:availableLocales");
+Set<Locale> availableLocales = (Set<Locale>)request.getAttribute("liferay-ui:input-localized:availableLocales");
 String cssClass = GetterUtil.getString((String)request.getAttribute("liferay-ui:input-localized:cssClass"));
 String defaultLanguageId = (String)request.getAttribute("liferay-ui:input-localized:defaultLanguageId");
 boolean disabled = GetterUtil.getBoolean((String)request.getAttribute("liferay-ui:input-localized:disabled"));
@@ -108,7 +108,7 @@ if ((exception != null) && fieldName.equals(focusField)) {
 				contents="<%= mainLanguageValue %>"
 				contentsLanguageId="<%= languageId %>"
 				cssClass='<%= \"language-value \" + cssClass %>'
-				editorImpl="ckeditor"
+				editorName="ckeditor"
 				name="<%= fieldName %>"
 				onBlurMethod='<%= randomNamespace + \"OnBlurEditor\" %>'
 				onChangeMethod='<%= randomNamespace + \"OnChangeEditor\" %>'
@@ -158,13 +158,13 @@ if ((exception != null) && fieldName.equals(focusField)) {
 
 	<div class="hide-accessible" id="<portlet:namespace /><%= HtmlUtil.escapeAttribute(id + fieldSuffix) %>_desc"><%= defaultLocale.getDisplayName(LocaleUtil.fromLanguageId(LanguageUtil.getLanguageId(request))) %> <liferay-ui:message key="translation" /></div>
 
-	<c:if test="<%= (availableLocales.length > 0) && Validator.isNull(languageId) %>">
+	<c:if test="<%= !availableLocales.isEmpty() && Validator.isNull(languageId) %>">
 
 		<%
 		languageIds.add(defaultLanguageId);
 
-		for (int i = 0; i < availableLocales.length; i++) {
-			String curLanguageId = LocaleUtil.toLanguageId(availableLocales[i]);
+		for (Locale availableLocale : availableLocales) {
+			String curLanguageId = LocaleUtil.toLanguageId(availableLocale);
 
 			if (curLanguageId.equals(defaultLanguageId)) {
 				continue;
@@ -197,6 +197,10 @@ if ((exception != null) && fieldName.equals(focusField)) {
 			if (!ignoreRequestValue) {
 				languageValue = ParamUtil.getString(request, name + StringPool.UNDERLINE + curLanguageId, languageValue);
 			}
+
+			if (curLanguageId.equals(defaultLanguageId) && Validator.isNull(languageValue)) {
+				languageValue = LocalizationUtil.getLocalization(xml, defaultLanguageId, true);
+			}
 		%>
 
 			<aui:input dir="<%= curLanguageDir %>" disabled="<%= disabled %>" id="<%= HtmlUtil.escapeAttribute(id + StringPool.UNDERLINE + curLanguageId) %>" name="<%= HtmlUtil.escapeAttribute(fieldNamePrefix + name + StringPool.UNDERLINE + curLanguageId + fieldNameSuffix) %>" type="hidden" value="<%= languageValue %>" />
@@ -214,8 +218,8 @@ if ((exception != null) && fieldName.equals(focusField)) {
 
 					uniqueLanguageIds.add(defaultLanguageId);
 
-					for (int i = 0; i < availableLocales.length; i++) {
-						String curLanguageId = LocaleUtil.toLanguageId(availableLocales[i]);
+					for (Locale availableLocale : availableLocales) {
+						String curLanguageId = LocaleUtil.toLanguageId(availableLocale);
 
 						uniqueLanguageIds.add(curLanguageId);
 					}
@@ -269,7 +273,7 @@ if ((exception != null) && fieldName.equals(focusField)) {
 </c:if>
 
 <c:choose>
-	<c:when test="<%= (availableLocales.length > 0) && Validator.isNull(languageId) %>">
+	<c:when test="<%= !availableLocales.isEmpty() && Validator.isNull(languageId) %>">
 		<aui:script use="liferay-input-localized">
 			var defaultLanguageId = '<%= defaultLanguageId %>';
 

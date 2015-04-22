@@ -9,16 +9,6 @@
 </thead>
 <tbody>
 <tr>
-	<td>PAGE_NAME</td>
-	<td></td>
-	<td>CPSitepages</td>
-</tr>
-<tr>
-	<td></td>
-	<td></td>
-	<td></td>
-</tr>
-<tr>
 	<td>SITE_NAME</td>
 	<td>//a[contains(@title,'${key_siteName}')]</td>
 	<td></td>
@@ -51,11 +41,6 @@
 <tr>
 	<td>CANCEL_BUTTON</td>
 	<td>//a[contains(@class,'btn-cancel')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>CONFIRMATION</td>
-	<td></td>
 	<td></td>
 </tr>
 <tr>
@@ -341,12 +326,12 @@
 </tr>
 <tr>
 	<td>STAGING_BUTTON</td>
-	<td>//div/ul/li[contains(.,'Staging')]/a</td>
+	<td>//a[contains(.,'Staging')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>STAGING_MENULIST_PUBLISH_TO_LIVE</td>
-	<td>//li[@class='publish-link-container']/a[contains(.,'Publish to Live')]</td>
+	<td>//a[contains(.,'Publish to Live')]</td>
 	<td></td>
 </tr>
 <tr>

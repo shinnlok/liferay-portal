@@ -128,7 +128,7 @@ AssetRendererFactory assetRendererFactory = AssetRendererFactoryRegistryUtil.get
 										</c:if>
 
 										<div class="locale-actions">
-											<liferay-ui:language displayStyle="<%= 0 %>" formAction="<%= currentURL %>" languageId="<%= LanguageUtil.getLanguageId(request) %>" languageIds="<%= availableLocales %>" />
+											<liferay-ui:language formAction="<%= currentURL %>" languageId="<%= LanguageUtil.getLanguageId(request) %>" languageIds="<%= availableLocales %>" />
 										</div>
 									</c:if>
 								</c:if>
@@ -236,7 +236,8 @@ AssetRendererFactory assetRendererFactory = AssetRendererFactoryRegistryUtil.get
 					<portlet:param name="struts_action" value="/dynamic_data_mapping/edit_template" />
 					<portlet:param name="redirect" value="<%= redirectURL.toString() %>" />
 					<portlet:param name="showBackURL" value="<%= Boolean.FALSE.toString() %>" />
-					<portlet:param name="refererPortletName" value="<%= PortletKeys.JOURNAL %>" />
+					<portlet:param name="showHeader" value="<%= Boolean.FALSE.toString() %>" />
+					<portlet:param name="refererPortletName" value="<%= PortletProviderUtil.getPortletId(JournalArticle.class.getName(), PortletProvider.Action.EDIT) %>" />
 					<portlet:param name="groupId" value="<%= String.valueOf(ddmTemplate.getGroupId()) %>" />
 					<portlet:param name="templateId" value="<%= String.valueOf(ddmTemplate.getTemplateId()) %>" />
 					<portlet:param name="showCacheableInput" value="<%= Boolean.TRUE.toString() %>" />
@@ -279,10 +280,13 @@ AssetRendererFactory assetRendererFactory = AssetRendererFactoryRegistryUtil.get
 				>
 
 					<%
-					PortletURL addArticleURL = assetRendererFactory.getURLAdd(liferayPortletRequest, liferayPortletResponse);
+					PortletURL addArticleURL = assetRendererFactory.getURLAdd(liferayPortletRequest, liferayPortletResponse, 0);
 
 					addArticleURL.setParameter("redirect", redirectURL.toString());
 					addArticleURL.setParameter("showHeader", Boolean.FALSE.toString());
+					addArticleURL.setParameter("portletResource", portletDisplay.getId());
+					addArticleURL.setParameter("groupId", String.valueOf(scopeGroupId));
+
 					addArticleURL.setWindowState(LiferayWindowState.POP_UP);
 
 					List<DDMStructure> ddmStructures = DDMStructureServiceUtil.getStructures(PortalUtil.getCurrentAndAncestorSiteGroupIds(scopeGroupId), PortalUtil.getClassNameId(JournalArticle.class));

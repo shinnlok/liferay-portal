@@ -14,10 +14,23 @@
 
 package com.liferay.asset.categories.navigation.web.portlet;
 
+import com.liferay.asset.categories.navigation.web.configuration.AssetCategoriesNavigationPortletInstanceConfiguration;
 import com.liferay.asset.categories.navigation.web.upgrade.AssetCategoriesNavigationWebUpgrade;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
+import com.liferay.portal.kernel.settings.PortletInstanceSettingsLocator;
+import com.liferay.portal.kernel.settings.SettingsFactory;
+import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.theme.PortletDisplay;
+import com.liferay.portal.theme.ThemeDisplay;
+
+import java.io.IOException;
 
 import javax.portlet.Portlet;
+import javax.portlet.PortletException;
+import javax.portlet.RenderRequest;
+import javax.portlet.RenderResponse;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -46,17 +59,54 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.resource-bundle=content.Language",
 		"javax.portlet.security-role-ref=guest,power-user,user",
 		"javax.portlet.supported-public-render-parameter=categoryId",
-		"javax.portlet.supported-public-render-parameter=resetCur",
 		"javax.portlet.supports.mime-type=text/html"
 	},
 	service = Portlet.class
 )
 public class AssetCategoriesNavigationPortlet extends MVCPortlet {
 
+	@Override
+	public void doView(
+			RenderRequest renderRequest, RenderResponse renderResponse)
+		throws IOException, PortletException {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
+
+		try {
+			AssetCategoriesNavigationPortletInstanceConfiguration
+				assetCategoriesNavigationPortletInstanceConfiguration =
+					_settingsFactory.getSettings(
+						AssetCategoriesNavigationPortletInstanceConfiguration.
+							class,
+						new PortletInstanceSettingsLocator(
+							themeDisplay.getLayout(), portletDisplay.getId()));
+
+			renderRequest.setAttribute(
+				AssetCategoriesNavigationPortletInstanceConfiguration.
+					class.getName(),
+				assetCategoriesNavigationPortletInstanceConfiguration);
+		}
+		catch (PortalException pe) {
+			throw new SystemException(pe);
+		}
+
+		super.doView(renderRequest, renderResponse);
+	}
+
 	@Reference(unbind = "-")
 	protected void setAssetCategoriesNavigationUpgrade(
 		AssetCategoriesNavigationWebUpgrade
 			assetCategoriesNavigationWebUpgrade) {
 	}
+
+	@Reference(unbind = "-")
+	protected void setSettingsFactory(SettingsFactory settingsFactory) {
+		_settingsFactory = settingsFactory;
+	}
+
+	private SettingsFactory _settingsFactory;
 
 }

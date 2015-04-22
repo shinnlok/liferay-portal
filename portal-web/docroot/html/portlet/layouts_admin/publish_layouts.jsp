@@ -178,7 +178,51 @@ else if (!quickPublish) {
 }
 %>
 
-<liferay-ui:trash-undo />
+<portlet:actionURL var="restoreTrashEntriesURL">
+	<portlet:param name="struts_action" value="/layouts_admin/edit_export_configuration" />
+	<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.RESTORE %>" />
+</portlet:actionURL>
+
+<liferay-ui:trash-undo
+	portletURL="<%= restoreTrashEntriesURL %>"
+/>
+
+<c:if test="<%= !quickPublish %>">
+	<div class="export-dialog-tree">
+		<portlet:renderURL var="simplePublishRedirectURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
+			<portlet:param name="struts_action" value="/staging_bar/publish_layouts" />
+			<portlet:param name="tabs2" value="current-and-previous" />
+			<portlet:param name="groupId" value="<%= String.valueOf(groupId) %>" />
+			<portlet:param name="privateLayout" value="<%= String.valueOf(privateLayout) %>" />
+			<portlet:param name="quickPublish" value="<%= Boolean.TRUE.toString() %>" />
+		</portlet:renderURL>
+
+		<portlet:renderURL var="simplePublishURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
+			<portlet:param name="struts_action" value="/staging_bar/publish_layouts_simple" />
+			<portlet:param name="redirect" value="<%= simplePublishRedirectURL %>" />
+			<portlet:param name="backURL" value="<%= currentURL %>" />
+			<portlet:param name="localPublishing" value="<%= String.valueOf(localPublishing) %>" />
+			<portlet:param name="privateLayout" value="<%= String.valueOf(privateLayout) %>" />
+			<portlet:param name="quickPublish" value="<%= Boolean.FALSE.toString() %>" />
+			<portlet:param name="remoteAddress" value='<%= liveGroupTypeSettings.getProperty("remoteAddress") %>' />
+			<portlet:param name="remotePort" value='<%= liveGroupTypeSettings.getProperty("remotePort") %>' />
+			<portlet:param name="remotePathContext" value='<%= liveGroupTypeSettings.getProperty("remotePathContext") %>' />
+			<portlet:param name="remoteGroupId" value='<%= liveGroupTypeSettings.getProperty("remoteGroupId") %>' />
+			<portlet:param name="secureConnection" value='<%= liveGroupTypeSettings.getProperty("secureConnection") %>' />
+			<portlet:param name="sourceGroupId" value="<%= String.valueOf(stagingGroupId) %>" />
+			<portlet:param name="targetGroupId" value="<%= String.valueOf(liveGroupId) %>" />
+		</portlet:renderURL>
+
+		<liferay-ui:icon
+			cssClass="label label-submit publish-mode-switch"
+			iconCssClass="icon-cog"
+			label="<%= true %>"
+			message="switch-to-simple-publication"
+			method="post"
+			url="<%= simplePublishURL %>"
+		/>
+	</div>
+</c:if>
 
 <liferay-ui:tabs
 	names="<%= tabs2Names %>"
@@ -338,7 +382,11 @@ else if (!quickPublish) {
 								</aui:fieldset>
 							</c:if>
 
-							<liferay-staging:content parameterMap="<%= parameterMap %>" type="<%= localPublishing ? Constants.PUBLISH_TO_LIVE : Constants.PUBLISH_TO_REMOTE %>" />
+							<liferay-staging:content cmd="<%= cmd %>" parameterMap="<%= parameterMap %>" type="<%= localPublishing ? Constants.PUBLISH_TO_LIVE : Constants.PUBLISH_TO_REMOTE %>" />
+
+							<c:if test="<%= !quickPublish %>">
+								<liferay-staging:deletions cmd="<%= Constants.PUBLISH %>" />
+							</c:if>
 
 							<aui:fieldset cssClass="options-group" label="permissions">
 								<%@ include file="/html/portlet/layouts_admin/export_configuration/permissions.jspf" %>
@@ -452,11 +500,11 @@ else if (!quickPublish) {
 		{
 			commentsNode: '#<%= PortletDataHandlerKeys.COMMENTS %>',
 			deleteMissingLayoutsNode: '#<%= PortletDataHandlerKeys.DELETE_MISSING_LAYOUTS %>',
-			deletePortletDataNode: '#<%= PortletDataHandlerKeys.DELETE_PORTLET_DATA %>',
 			deletionsNode: '#<%= PortletDataHandlerKeys.DELETIONS %>',
 			form: document.<portlet:namespace />exportPagesFm,
 			incompleteProcessMessageNode: '#<portlet:namespace />incompleteProcessMessage',
 			layoutSetSettingsNode: '#<%= PortletDataHandlerKeys.LAYOUT_SET_SETTINGS %>',
+			locale: '<%= locale.toLanguageTag() %>',
 			logoNode: '#<%= PortletDataHandlerKeys.LOGO %>',
 			namespace: '<portlet:namespace />',
 			pageTreeId: '<%= treeId %>',
@@ -468,13 +516,13 @@ else if (!quickPublish) {
 			rangeLastPublishNode: '#rangeLastPublish',
 			ratingsNode: '#<%= PortletDataHandlerKeys.RATINGS %>',
 			remoteAddressNode: '#<portlet:namespace />remoteAddress',
-			remoteDeletePortletDataNode: '#remoteDeletePortletData',
 			remoteGroupIdNode: '#<portlet:namespace />remoteGroupId',
 			remotePathContextNode: '#<portlet:namespace />remotePathContext',
 			remotePortNode: '#<portlet:namespace />remotePort',
 			secureConnectionNode: '#secureConnection',
 			setupNode: '#<%= PortletDataHandlerKeys.PORTLET_SETUP_ALL %>',
 			themeReferenceNode: '#<%= PortletDataHandlerKeys.THEME_REFERENCE %>',
+			timeZone: '<%= timeZone.getID() %>',
 			userPreferencesNode: '#<%= PortletDataHandlerKeys.PORTLET_USER_PREFERENCES_ALL %>'
 		}
 	);

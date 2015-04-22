@@ -16,6 +16,7 @@ package com.liferay.journal.content.web.portlet;
 
 import com.liferay.journal.content.web.constants.JournalContentPortletKeys;
 import com.liferay.journal.content.web.upgrade.JournalContentWebUpgrade;
+import com.liferay.journal.web.util.ExportArticleUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.PortletRequestModel;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
@@ -29,7 +30,6 @@ import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portlet.journal.model.JournalArticle;
 import com.liferay.portlet.journal.model.JournalArticleDisplay;
 import com.liferay.portlet.journal.service.JournalArticleLocalService;
-import com.liferay.portlet.journal.util.ExportArticleUtil;
 import com.liferay.portlet.journal.util.JournalContentUtil;
 import com.liferay.util.log4j.Log4JUtil;
 
@@ -177,7 +177,7 @@ public class JournalContentPortlet extends MVCPortlet {
 
 	protected void initLogger(ClassLoader classLoader) {
 		Log4JUtil.configureLog4J(
-			classLoader.getResource("META-INF/portlet-log4j.xml"));
+			classLoader.getResource("META-INF/portal-log4j.xml"));
 	}
 
 	@Reference

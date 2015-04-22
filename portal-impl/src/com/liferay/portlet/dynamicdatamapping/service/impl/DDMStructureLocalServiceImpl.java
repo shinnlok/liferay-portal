@@ -22,7 +22,6 @@ import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.transaction.TransactionCommitCallbackRegistryUtil;
-import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GroupThreadLocal;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.SetUtil;
@@ -42,8 +41,8 @@ import com.liferay.portlet.dynamicdatamapping.StructureDefinitionException;
 import com.liferay.portlet.dynamicdatamapping.StructureDuplicateElementException;
 import com.liferay.portlet.dynamicdatamapping.StructureDuplicateStructureKeyException;
 import com.liferay.portlet.dynamicdatamapping.StructureNameException;
+import com.liferay.portlet.dynamicdatamapping.io.DDMFormJSONSerializerUtil;
 import com.liferay.portlet.dynamicdatamapping.io.DDMFormXSDDeserializerUtil;
-import com.liferay.portlet.dynamicdatamapping.io.DDMFormXSDSerializerUtil;
 import com.liferay.portlet.dynamicdatamapping.model.DDMForm;
 import com.liferay.portlet.dynamicdatamapping.model.DDMFormField;
 import com.liferay.portlet.dynamicdatamapping.model.DDMFormLayout;
@@ -60,6 +59,7 @@ import com.liferay.portlet.journal.model.JournalArticle;
 import com.liferay.portlet.journal.model.JournalFolderConstants;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -139,7 +139,7 @@ public class DDMStructureLocalServiceImpl
 		structure.setVersion(DDMStructureConstants.VERSION_DEFAULT);
 		structure.setNameMap(nameMap);
 		structure.setDescriptionMap(descriptionMap);
-		structure.setDefinition(DDMFormXSDSerializerUtil.serialize(ddmForm));
+		structure.setDefinition(DDMFormJSONSerializerUtil.serialize(ddmForm));
 		structure.setStorageType(storageType);
 		structure.setType(type);
 
@@ -465,15 +465,17 @@ public class DDMStructureLocalServiceImpl
 			if (ddmStructureLinkPersistence.countByStructureId(
 					structure.getStructureId()) > 0) {
 
-				throw new RequiredStructureException(
-					RequiredStructureException.REFERENCED_STRUCTURE_LINK);
+				throw new RequiredStructureException.
+					MustNotDeleteStructureReferencedByStructureLinks(
+						structure.getStructureId());
 			}
 
 			if (ddmStructurePersistence.countByParentStructureId(
 					structure.getStructureId()) > 0) {
 
-				throw new RequiredStructureException(
-					RequiredStructureException.REFERENCED_STRUCTURE);
+				throw new RequiredStructureException.
+					MustNotDeleteStructureThatHasChild(
+						structure.getStructureId());
 			}
 
 			long classNameId = classNameLocalService.getClassNameId(
@@ -483,8 +485,9 @@ public class DDMStructureLocalServiceImpl
 					structure.getGroupId(), classNameId,
 					structure.getPrimaryKey()) > 0) {
 
-				throw new RequiredStructureException(
-					RequiredStructureException.REFERENCED_TEMPLATE);
+				throw new RequiredStructureException.
+					MustNotDeleteStructureReferencedByTemplates(
+						structure.getStructureId());
 			}
 		}
 
@@ -1502,7 +1505,7 @@ public class DDMStructureLocalServiceImpl
 		structure.setVersion(version);
 		structure.setNameMap(nameMap);
 		structure.setDescriptionMap(descriptionMap);
-		structure.setDefinition(DDMFormXSDSerializerUtil.serialize(ddmForm));
+		structure.setDefinition(DDMFormJSONSerializerUtil.serialize(ddmForm));
 
 		ddmStructurePersistence.update(structure);
 
@@ -1718,9 +1721,7 @@ public class DDMStructureLocalServiceImpl
 			throw new StructureNameException();
 		}
 
-		Locale[] availableLocales = LanguageUtil.getAvailableLocales();
-
-		if (!ArrayUtil.contains(availableLocales, contentDefaultLocale)) {
+		if (!LanguageUtil.isAvailableLocale(contentDefaultLocale)) {
 			Long companyId = CompanyThreadLocal.getCompanyId();
 
 			LocaleException le = new LocaleException(
@@ -1728,8 +1729,9 @@ public class DDMStructureLocalServiceImpl
 				"The locale " + contentDefaultLocale +
 					" is not available in company " + companyId);
 
-			le.setSourceAvailableLocales(new Locale[] {contentDefaultLocale});
-			le.setTargetAvailableLocales(availableLocales);
+			le.setSourceAvailableLocales(
+				Collections.singleton(contentDefaultLocale));
+			le.setTargetAvailableLocales(LanguageUtil.getAvailableLocales());
 
 			throw le;
 		}

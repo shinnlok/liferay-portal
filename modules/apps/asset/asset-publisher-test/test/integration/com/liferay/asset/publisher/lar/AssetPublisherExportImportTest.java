@@ -94,6 +94,7 @@ public class AssetPublisherExportImportTest
 	}
 
 	@Before
+	@Override
 	public void setUp() throws Exception {
 		super.setUp();
 
@@ -112,9 +113,7 @@ public class AssetPublisherExportImportTest
 			new String[] {String.valueOf(dlFileEntryClassNameId)});
 		preferenceMap.put(
 			"anyClassTypeDLFileEntryAssetRendererFactory",
-			new String[] {
-				String.valueOf(Boolean.TRUE)
-			});
+			new String[] {String.valueOf(Boolean.TRUE)});
 
 		PortletPreferences portletPreferences = getImportedPortletPreferences(
 			preferenceMap);
@@ -145,9 +144,7 @@ public class AssetPublisherExportImportTest
 			new String[] {String.valueOf(journalArticleClassNameId)});
 		preferenceMap.put(
 			"anyClassTypeJournalArticleAssetRendererFactory",
-			new String[] {
-				String.valueOf(Boolean.TRUE)
-			});
+			new String[] {String.valueOf(Boolean.TRUE)});
 
 		PortletPreferences portletPreferences = getImportedPortletPreferences(
 			preferenceMap);
@@ -342,8 +339,7 @@ public class AssetPublisherExportImportTest
 
 		DDMStructure importedDDMStructure = DDMStructureTestUtil.addStructure(
 			importedGroup.getGroupId(), DLFileEntryType.class.getName(), 0,
-			ddmStructure.getDefinition(), LocaleUtil.getDefault(),
-			serviceContext);
+			ddmStructure.getDDMForm(), LocaleUtil.getDefault(), serviceContext);
 
 		serviceContext.setUuid(dlFileEntryType.getUuid());
 
@@ -405,8 +401,7 @@ public class AssetPublisherExportImportTest
 
 		DDMStructure importedDDMStructure = DDMStructureTestUtil.addStructure(
 			importedGroup.getGroupId(), JournalArticle.class.getName(), 0,
-			ddmStructure.getDefinition(), LocaleUtil.getDefault(),
-			serviceContext);
+			ddmStructure.getDDMForm(), LocaleUtil.getDefault(), serviceContext);
 
 		Map<String, String[]> preferenceMap = new HashMap<>();
 
@@ -418,9 +413,7 @@ public class AssetPublisherExportImportTest
 			new String[] {String.valueOf(journalArticleClassNameId)});
 		preferenceMap.put(
 			"anyClassTypeJournalArticleAssetRendererFactory",
-			new String[] {
-				String.valueOf(ddmStructure.getStructureId())
-			});
+			new String[] {String.valueOf(ddmStructure.getStructureId())});
 		preferenceMap.put(
 			"classTypeIds",
 			new String[] {String.valueOf(ddmStructure.getStructureId())});
@@ -465,7 +458,7 @@ public class AssetPublisherExportImportTest
 
 		DDMStructure importedDDMStructure1 = DDMStructureTestUtil.addStructure(
 			importedGroup.getGroupId(), DLFileEntryType.class.getName(), 0,
-			ddmStructure1.getDefinition(), LocaleUtil.getDefault(),
+			ddmStructure1.getDDMForm(), LocaleUtil.getDefault(),
 			serviceContext);
 
 		serviceContext.setUuid(dlFileEntryType1.getUuid());
@@ -486,7 +479,7 @@ public class AssetPublisherExportImportTest
 
 		DDMStructure importedDDMStructure2 = DDMStructureTestUtil.addStructure(
 			importedGroup.getGroupId(), DLFileEntryType.class.getName(), 0,
-			ddmStructure2.getDefinition(), LocaleUtil.getDefault(),
+			ddmStructure2.getDDMForm(), LocaleUtil.getDefault(),
 			serviceContext);
 
 		serviceContext.setUuid(dlFileEntryType2.getUuid());
@@ -499,9 +492,7 @@ public class AssetPublisherExportImportTest
 
 		preferenceMap.put(
 			"anyClassTypeDLFileEntryAssetRendererFactory",
-			new String[] {
-				String.valueOf(Boolean.FALSE)
-			});
+			new String[] {String.valueOf(Boolean.FALSE)});
 
 		preferenceMap.put(
 			"classTypeIdsDLFileEntryAssetRendererFactory",
@@ -533,7 +524,7 @@ public class AssetPublisherExportImportTest
 
 		DDMStructure importedDDMStructure1 = DDMStructureTestUtil.addStructure(
 			importedGroup.getGroupId(), JournalArticle.class.getName(), 0,
-			ddmStructure1.getDefinition(), LocaleUtil.getDefault(),
+			ddmStructure1.getDDMForm(), LocaleUtil.getDefault(),
 			serviceContext);
 
 		DDMStructure ddmStructure2 = DDMStructureTestUtil.addStructure(
@@ -543,16 +534,14 @@ public class AssetPublisherExportImportTest
 
 		DDMStructure importedDDMStructure2 = DDMStructureTestUtil.addStructure(
 			importedGroup.getGroupId(), JournalArticle.class.getName(), 0,
-			ddmStructure1.getDefinition(), LocaleUtil.getDefault(),
+			ddmStructure1.getDDMForm(), LocaleUtil.getDefault(),
 			serviceContext);
 
 		Map<String, String[]> preferenceMap = new HashMap<>();
 
 		preferenceMap.put(
 			"anyClassTypeJournalArticleAssetRendererFactory",
-			new String[] {
-				String.valueOf(Boolean.FALSE)
-			});
+			new String[] {String.valueOf(Boolean.FALSE)});
 
 		preferenceMap.put(
 			"classTypeIdsJournalArticleAssetRendererFactory",
@@ -748,7 +737,8 @@ public class AssetPublisherExportImportTest
 
 		AssetVocabulary assetVocabulary =
 			AssetVocabularyLocalServiceUtil.addVocabulary(
-				TestPropsValues.getUserId(), RandomTestUtil.randomString(),
+				TestPropsValues.getUserId(), groupId,
+				RandomTestUtil.randomString(),
 				ServiceContextTestUtil.getServiceContext(groupId));
 
 		Map<String, String[]> preferenceMap = new HashMap<>();

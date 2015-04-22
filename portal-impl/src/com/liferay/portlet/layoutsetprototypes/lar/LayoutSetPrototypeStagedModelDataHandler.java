@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.lar.ExportImportPathUtil;
 import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.lar.PortletDataException;
 import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
+import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.kernel.util.StringPool;
@@ -45,11 +46,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author Daniela Zapata Riesco
  */
+@OSGiBeanProperties
 public class LayoutSetPrototypeStagedModelDataHandler
 	extends BaseStagedModelDataHandler<LayoutSetPrototype> {
 
@@ -73,11 +76,16 @@ public class LayoutSetPrototypeStagedModelDataHandler
 	}
 
 	@Override
-	public LayoutSetPrototype fetchStagedModelByUuidAndCompanyId(
+	public List<LayoutSetPrototype> fetchStagedModelsByUuidAndCompanyId(
 		String uuid, long companyId) {
 
-		return LayoutSetPrototypeLocalServiceUtil.
-			fetchLayoutSetPrototypeByUuidAndCompanyId(uuid, companyId);
+		List<LayoutSetPrototype> layoutSetPrototypes = new ArrayList<>();
+
+		layoutSetPrototypes.add(
+			LayoutSetPrototypeLocalServiceUtil.
+				fetchLayoutSetPrototypeByUuidAndCompanyId(uuid, companyId));
+
+		return layoutSetPrototypes;
 	}
 
 	@Override
@@ -129,9 +137,10 @@ public class LayoutSetPrototypeStagedModelDataHandler
 
 		if (portletDataContext.isDataStrategyMirror()) {
 			LayoutSetPrototype existingLayoutSetPrototype =
-				fetchStagedModelByUuidAndCompanyId(
-					layoutSetPrototype.getUuid(),
-					portletDataContext.getCompanyId());
+				LayoutSetPrototypeLocalServiceUtil.
+					fetchLayoutSetPrototypeByUuidAndCompanyId(
+						layoutSetPrototype.getUuid(),
+						portletDataContext.getCompanyId());
 
 			if (existingLayoutSetPrototype == null) {
 				serviceContext.setUuid(layoutSetPrototype.getUuid());
@@ -199,7 +208,7 @@ public class LayoutSetPrototypeStagedModelDataHandler
 			dynamicQuery);
 
 		boolean exportLayoutPrototypes = portletDataContext.getBooleanParameter(
-			LayoutSetPrototypePortletDataHandler.NAMESPACE, "page-templates");
+			"layout_set_prototypes", "page-templates");
 
 		for (Layout layout : layouts) {
 			String layoutPrototypeUuid = layout.getLayoutPrototypeUuid();
