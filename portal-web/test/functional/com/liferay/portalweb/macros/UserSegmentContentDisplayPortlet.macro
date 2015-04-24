@@ -2,7 +2,7 @@
 	<command name="configureDisplayContent">
 		<execute function="SelectFrame" locator1="PGUsersegmentcontentdisplay#USER_SEGMENT_CONTENT_DISPLAY_CONFIGURATION_IFRAME" />
 
-		<var method="selenium#getNumberDecrement(${rowNumber})" name="rowIndexNumber" />
+		<var method="selenium#getNumberDecrement('${rowNumber}')" name="rowIndexNumber" />
 
 		<if>
 			<not>
@@ -229,5 +229,9 @@
 				<execute function="AssertTextEquals" locator1="PGUsersegmentcontentdisplay#INFO_MESSAGE" value1="There are no matching rules" />
 			</then>
 		</if>
+	</command>
+
+	<command name="viewNoContentPG">
+		<execute function="AssertTextEquals" locator1="PGUsersegmentcontentdisplay#INFO_MESSAGE" value1="There are no matching rules" />
 	</command>
 </definition>

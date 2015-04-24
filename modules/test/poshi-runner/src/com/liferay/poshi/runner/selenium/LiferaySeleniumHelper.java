@@ -463,6 +463,19 @@ public class LiferaySeleniumHelper {
 		}
 	}
 
+	public static void assertPartialConfirmation(
+			LiferaySelenium liferaySelenium, String pattern)
+		throws Exception {
+
+		String confirmation = liferaySelenium.getConfirmation();
+
+		if (!confirmation.contains(pattern)) {
+			throw new Exception(
+				"\"" + confirmation + "\" does not contain \"" + pattern +
+					"\"");
+		}
+	}
+
 	public static void assertPartialText(
 			LiferaySelenium liferaySelenium, String locator, String pattern)
 		throws Exception {
@@ -750,7 +763,7 @@ public class LiferaySeleniumHelper {
 				return true;
 			}
 
-			if (line.matches(".*[TrueZIP InputStream Reader].*")) {
+			if (line.matches(".*\\[TrueZIP InputStream Reader\\].*")) {
 				return true;
 			}
 		}
@@ -770,7 +783,7 @@ public class LiferaySeleniumHelper {
 		if (line.contains(
 				"Exception sending context destroyed event to listener " +
 					"instance of class com.liferay.portal.spring.context." +
-					"PortalContextLoaderListener")) {
+						"PortalContextLoaderListener")) {
 
 			return true;
 		}
@@ -1051,7 +1064,11 @@ public class LiferaySeleniumHelper {
 	}
 
 	public static boolean isMobileDeviceEnabled() {
-		return PropsValues.MOBILE_DEVICE_ENABLED;
+		if (Validator.isNull(PropsValues.MOBILE_DEVICE_TYPE)) {
+			return false;
+		}
+
+		return true;
 	}
 
 	public static boolean isNotChecked(

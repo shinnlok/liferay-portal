@@ -25,12 +25,8 @@
 	<!-- Proxy -->
 
 	<bean id="com.liferay.portal.mobile.device.DeviceRecognitionProviderProxyBean" class="com.liferay.portal.mobile.device.DeviceRecognitionProviderProxyBean">
-		<property name="singleDestinationSynchronousMessageSender">
-			<bean class="com.liferay.portal.kernel.messaging.sender.DefaultSingleDestinationSynchronousMessageSender">
-				<property name="destinationName" value="liferay/device_recognition_provider" />
-				<property name="synchronousMessageSender" ref="com.liferay.portal.kernel.messaging.sender.DirectSynchronousMessageSender" />
-			</bean>
-		</property>
+		<property name="synchronousDestinationName" value="liferay/device_recognition_provider" />
+		<property name="synchronousMessageSenderMode" value="DIRECT" />
 	</bean>
 
 	<!-- Util -->
@@ -69,15 +65,7 @@
 		<property name="name" value="liferay/device_recognition_provider" />
 	</bean>
 	<bean id="messagingConfigurator.device_recognition" class="com.liferay.portal.kernel.messaging.config.DefaultMessagingConfigurator">
-		<property name="destinations">
-			<list>
-				<ref bean="destination.device_recognition_provider" />
-			</list>
-		</property>
-		<property name="messageBus">
-			<ref bean="com.liferay.portal.kernel.messaging.MessageBus" />
-		</property>
-		<property name="specificDestinationEventListener">
+		<property name="destinationEventListeners">
 			<map>
 				<entry key="liferay/device_recognition_provider">
 					<list>
@@ -88,6 +76,11 @@
 					</list>
 				</entry>
 			</map>
+		</property>
+		<property name="destinations">
+			<list>
+				<ref bean="destination.device_recognition_provider" />
+			</list>
 		</property>
 	</bean>
 </beans>

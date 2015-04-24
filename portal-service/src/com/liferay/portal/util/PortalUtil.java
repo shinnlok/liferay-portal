@@ -330,17 +330,6 @@ public class PortalUtil {
 	}
 
 	/**
-	 * @deprecated As of 6.2.0, replaced by {@link
-	 *             com.liferay.portal.kernel.language.LanguageUtil#getAvailableLocales}
-	 */
-	@Deprecated
-	public static Locale[] getAlternateLocales(HttpServletRequest request)
-		throws PortalException {
-
-		return getPortal().getAlternateLocales(request);
-	}
-
-	/**
 	 * Returns the alternate URL for the requested canonical URL in the given
 	 * locale.
 	 *
@@ -1354,9 +1343,7 @@ public class PortalUtil {
 	 * @deprecated As of 6.2.0 renamed to {@link #getSiteGroupId(long)}
 	 */
 	@Deprecated
-	public static long getParentGroupId(long scopeGroupId)
-		throws PortalException {
-
+	public static long getParentGroupId(long scopeGroupId) {
 		return getPortal().getParentGroupId(scopeGroupId);
 	}
 
@@ -1859,9 +1846,7 @@ public class PortalUtil {
 		return getPortal().getSiteDefaultLocale(groupId);
 	}
 
-	public static long getSiteGroupId(long scopeGroupId)
-		throws PortalException {
-
+	public static long getSiteGroupId(long scopeGroupId) {
 		return getPortal().getSiteGroupId(scopeGroupId);
 	}
 

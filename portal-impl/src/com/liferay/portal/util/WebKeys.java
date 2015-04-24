@@ -113,15 +113,7 @@ public class WebKeys implements com.liferay.portal.kernel.util.WebKeys {
 
 	public static final String EXPORT_IMPORT_CONFIGURATION_ID = "EXPORT_IMPORT_CONFIGURATION_ID";
 
-	public static final String FACEBOOK_ACCESS_TOKEN = "FACEBOOK_ACCESS_TOKEN";
-
 	public static final String FACEBOOK_CANVAS_PAGE_URL = "FACEBOOK_CANVAS_PAGE_URL";
-
-	public static final String FACEBOOK_INCOMPLETE_USER_ID = "FACEBOOK_INCOMPLETE_USER_ID";
-
-	public static final String FACEBOOK_USER_EMAIL_ADDRESS = "FACEBOOK_USER_EMAIL_ADDRESS";
-
-	public static final String FACEBOOK_USER_ID = "FACEBOOK_USER_ID";
 
 	public static final String FORM_NAME = "FORM_NAME";
 
@@ -136,6 +128,8 @@ public class WebKeys implements com.liferay.portal.kernel.util.WebKeys {
 	public static final String GOOGLE_GADGET = "GOOGLE_GADGET";
 
 	public static final String HTTPS_INITIAL = "HTTPS_INITIAL";
+
+	public static final String I18N_LANGUAGE_CODE = "I18N_LANGUAGE_CODE";
 
 	public static final String I18N_LANGUAGE_ID = "I18N_LANGUAGE_ID";
 
@@ -285,14 +279,6 @@ public class WebKeys implements com.liferay.portal.kernel.util.WebKeys {
 
 	public static final String NOTES_LIST = "NOTES_LIST";
 
-	public static final String OPEN_ID_DISCO = "openid-disco";
-
-	public static final String OPEN_ID_LOGIN = "OPEN_ID_LOGIN";
-
-	public static final String OPEN_ID_LOGIN_PENDING = "OPEN_ID_LOGIN_PENDING";
-
-	public static final String OPEN_SSO_LOGIN = "OPEN_SSO_LOGIN";
-
 	public static final String ORG_LABOR = "ORG_LABOR";
 
 	public static final String ORGANIZATION = "ORGANIZATION";
@@ -304,8 +290,6 @@ public class WebKeys implements com.liferay.portal.kernel.util.WebKeys {
 	public static final String PHONE = "PHONE";
 
 	public static final String PORTAL_PREFERENCES = "PORTAL_PREFERENCES";
-
-	public static final String PORTAL_REQUEST_DATA_SAMPLE = "PORTAL_REQUEST_DATA_SAMPLE";
 
 	public static final String PORTAL_RESILIENCY_ACTION = "PORTAL_RESILIENCY_ACTION";
 
@@ -445,8 +429,6 @@ public class WebKeys implements com.liferay.portal.kernel.util.WebKeys {
 	public static final String WIDGET = "WIDGET";
 
 	public static final String WORDS_LIST = "WORDS_LIST";
-
-	public static final String WORKFLOW_ASSET_PREVIEW = "WORKFLOW_ASSET_PREVIEW";
 
 	public static final String WORKFLOW_DEFINITION = "WORKFLOW_DEFINITION";
 

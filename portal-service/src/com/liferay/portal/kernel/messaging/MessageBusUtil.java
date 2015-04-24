@@ -14,7 +14,6 @@
 
 package com.liferay.portal.kernel.messaging;
 
-import com.liferay.portal.kernel.messaging.sender.MessageSender;
 import com.liferay.portal.kernel.messaging.sender.SynchronousMessageSender;
 import com.liferay.portal.kernel.security.pacl.permission.PortalMessageBusPermission;
 import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
@@ -49,6 +48,10 @@ public class MessageBusUtil {
 		return responseMessage;
 	}
 
+	public static Destination getDestination(String destinationName) {
+		return getInstance()._getDestination(destinationName);
+	}
+
 	public static MessageBusUtil getInstance() {
 		PortalRuntimePermission.checkGetBeanProperty(MessageBusUtil.class);
 
@@ -56,23 +59,11 @@ public class MessageBusUtil {
 	}
 
 	public static MessageBus getMessageBus() {
-		return getInstance()._messageBus;
-	}
-
-	public static MessageSender getMessageSender() {
-		return getInstance()._messageSender;
+		return _messageBus;
 	}
 
 	public static boolean hasMessageListener(String destination) {
 		return getInstance()._hasMessageListener(destination);
-	}
-
-	public static void init(
-		MessageBus messageBus, MessageSender messageSender,
-		SynchronousMessageSender synchronousMessageSender) {
-
-		getInstance()._init(
-			messageBus, messageSender, synchronousMessageSender);
 	}
 
 	public static void registerMessageListener(
@@ -158,7 +149,14 @@ public class MessageBusUtil {
 			destinationName, messageListener);
 	}
 
-	private MessageBusUtil() {
+	public void setMessageBus(MessageBus messageBus) {
+		_messageBus = messageBus;
+	}
+
+	public void setSynchronousMessageSender(
+		SynchronousMessageSender synchronousMessageSender) {
+
+		_synchronousMessageSender = synchronousMessageSender;
 	}
 
 	private void _addDestination(Destination destination) {
@@ -167,19 +165,14 @@ public class MessageBusUtil {
 		_messageBus.addDestination(destination);
 	}
 
+	private Destination _getDestination(String destinationName) {
+		return _messageBus.getDestination(destinationName);
+	}
+
 	private boolean _hasMessageListener(String destinationName) {
 		PortalMessageBusPermission.checkListen(destinationName);
 
 		return _messageBus.hasMessageListener(destinationName);
-	}
-
-	private void _init(
-		MessageBus messageBus, MessageSender messageSender,
-		SynchronousMessageSender synchronousMessageSender) {
-
-		_messageBus = messageBus;
-		_messageSender = messageSender;
-		_synchronousMessageSender = synchronousMessageSender;
 	}
 
 	private void _registerMessageListener(
@@ -278,8 +271,7 @@ public class MessageBusUtil {
 
 	private static final MessageBusUtil _instance = new MessageBusUtil();
 
-	private MessageBus _messageBus;
-	private MessageSender _messageSender;
-	private SynchronousMessageSender _synchronousMessageSender;
+	private static MessageBus _messageBus;
+	private static SynchronousMessageSender _synchronousMessageSender;
 
 }

@@ -57,11 +57,15 @@ import com.liferay.portlet.blogs.model.BlogsEntry;
 import com.liferay.portlet.blogs.service.BlogsEntryLocalServiceUtil;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -74,7 +78,7 @@ import org.junit.Test;
  * @author Roberto Díaz
  * @author Sergio González
  */
-@Sync
+@Sync(cleanTransaction = true)
 public class GroupServiceTest {
 
 	@ClassRule
@@ -192,15 +196,14 @@ public class GroupServiceTest {
 			group.getGroupId());
 
 		AssetTagLocalServiceUtil.addTag(
-			TestPropsValues.getUserId(), RandomTestUtil.randomString(),
-			serviceContext);
+			TestPropsValues.getUserId(), group.getGroupId(),
+			RandomTestUtil.randomString(), serviceContext);
 
 		Assert.assertEquals(
 			initialTagsCount + 1,
 			AssetTagLocalServiceUtil.getGroupTagsCount(group.getGroupId()));
 
-		User user = UserTestUtil.addUser(
-			RandomTestUtil.randomString(), group.getGroupId());
+		User user = UserTestUtil.addUser(group.getGroupId());
 
 		BlogsEntry blogsEntry = BlogsEntryLocalServiceUtil.addEntry(
 			user.getUserId(), RandomTestUtil.randomString(),
@@ -535,27 +538,23 @@ public class GroupServiceTest {
 		Group group = GroupTestUtil.addGroup();
 
 		Assert.assertTrue(LanguageUtil.isInheritLocales(group.getGroupId()));
-
-		Locale[] portalAvailableLocales = LanguageUtil.getAvailableLocales();
-
-		Locale[] groupAvailableLocales = LanguageUtil.getAvailableLocales(
-			group.getGroupId());
-
-		Assert.assertArrayEquals(portalAvailableLocales, groupAvailableLocales);
+		Assert.assertEquals(
+			LanguageUtil.getAvailableLocales(),
+			LanguageUtil.getAvailableLocales(group.getGroupId()));
 	}
 
 	@Test
 	public void testInvalidChangeAvailableLanguageIds() throws Exception {
 		testUpdateDisplaySettings(
-			new Locale[] {LocaleUtil.SPAIN, LocaleUtil.US},
-			new Locale[] {LocaleUtil.GERMANY, LocaleUtil.US}, null, true);
+			Arrays.asList(LocaleUtil.SPAIN, LocaleUtil.US),
+			Arrays.asList(LocaleUtil.GERMANY, LocaleUtil.US), null, true);
 	}
 
 	@Test
 	public void testInvalidChangeDefaultLanguageId() throws Exception {
 		testUpdateDisplaySettings(
-			new Locale[] {LocaleUtil.SPAIN, LocaleUtil.US},
-			new Locale[] {LocaleUtil.SPAIN, LocaleUtil.US}, LocaleUtil.GERMANY,
+			Arrays.asList(LocaleUtil.SPAIN, LocaleUtil.US),
+			Arrays.asList(LocaleUtil.SPAIN, LocaleUtil.US), LocaleUtil.GERMANY,
 			true);
 	}
 
@@ -594,29 +593,21 @@ public class GroupServiceTest {
 		testSelectableParentSites(true);
 	}
 
-	@Test
+	@Test(expected = GroupParentException.MustNotHaveChildParent.class)
 	public void testSelectFirstChildGroupAsParentSite() throws Exception {
 		Group group1 = GroupTestUtil.addGroup();
 
 		Group group11 = GroupTestUtil.addGroup(group1.getGroupId());
 
-		try {
-			GroupLocalServiceUtil.updateGroup(
-				group1.getGroupId(), group11.getGroupId(), group1.getNameMap(),
-				group1.getDescriptionMap(), group1.getType(),
-				group1.isManualMembership(), group1.getMembershipRestriction(),
-				group1.getFriendlyURL(), group1.isInheritContent(),
-				group1.isActive(), ServiceContextTestUtil.getServiceContext());
-
-			Assert.fail("A child group cannot be its parent group");
-		}
-		catch (GroupParentException gpe) {
-			Assert.assertEquals(
-				GroupParentException.CHILD_DESCENDANT, gpe.getType());
-		}
+		GroupLocalServiceUtil.updateGroup(
+			group1.getGroupId(), group11.getGroupId(), group1.getNameMap(),
+			group1.getDescriptionMap(), group1.getType(),
+			group1.isManualMembership(), group1.getMembershipRestriction(),
+			group1.getFriendlyURL(), group1.isInheritContent(),
+			group1.isActive(), ServiceContextTestUtil.getServiceContext());
 	}
 
-	@Test
+	@Test(expected = GroupParentException.MustNotHaveChildParent.class)
 	public void testSelectLastChildGroupAsParentSite() throws Exception {
 		Group group1 = GroupTestUtil.addGroup();
 
@@ -626,24 +617,15 @@ public class GroupServiceTest {
 
 		Group group1111 = GroupTestUtil.addGroup(group111.getGroupId());
 
-		try {
-			GroupLocalServiceUtil.updateGroup(
-				group1.getGroupId(), group1111.getGroupId(),
-				group1.getNameMap(), group1.getDescriptionMap(),
-				group1.getType(), group1.isManualMembership(),
-				group1.getMembershipRestriction(), group1.getFriendlyURL(),
-				group1.isInheritContent(), group1.isActive(),
-				ServiceContextTestUtil.getServiceContext());
-
-			Assert.fail("A child group cannot be its parent group");
-		}
-		catch (GroupParentException gpe) {
-			Assert.assertEquals(
-				GroupParentException.CHILD_DESCENDANT, gpe.getType());
-		}
+		GroupLocalServiceUtil.updateGroup(
+			group1.getGroupId(), group1111.getGroupId(), group1.getNameMap(),
+			group1.getDescriptionMap(), group1.getType(),
+			group1.isManualMembership(), group1.getMembershipRestriction(),
+			group1.getFriendlyURL(), group1.isInheritContent(),
+			group1.isActive(), ServiceContextTestUtil.getServiceContext());
 	}
 
-	@Test
+	@Test(expected = GroupParentException.MustNotHaveStagingParent.class)
 	public void testSelectLiveGroupAsParentSite() throws Exception {
 		Group group = GroupTestUtil.addGroup();
 
@@ -651,44 +633,28 @@ public class GroupServiceTest {
 
 		Assert.assertTrue(group.hasStagingGroup());
 
-		try {
-			Group stagingGroup = group.getStagingGroup();
+		Group stagingGroup = group.getStagingGroup();
 
-			GroupLocalServiceUtil.updateGroup(
-				stagingGroup.getGroupId(), group.getGroupId(),
-				stagingGroup.getNameMap(), stagingGroup.getDescriptionMap(),
-				stagingGroup.getType(), stagingGroup.isManualMembership(),
-				stagingGroup.getMembershipRestriction(),
-				stagingGroup.getFriendlyURL(), stagingGroup.isInheritContent(),
-				stagingGroup.isActive(),
-				ServiceContextTestUtil.getServiceContext());
-
-			Assert.fail("A group cannot have its live group as parent");
-		}
-		catch (GroupParentException gpe) {
-			Assert.assertEquals(
-				GroupParentException.STAGING_DESCENDANT, gpe.getType());
-		}
+		GroupLocalServiceUtil.updateGroup(
+			stagingGroup.getGroupId(), group.getGroupId(),
+			stagingGroup.getNameMap(), stagingGroup.getDescriptionMap(),
+			stagingGroup.getType(), stagingGroup.isManualMembership(),
+			stagingGroup.getMembershipRestriction(),
+			stagingGroup.getFriendlyURL(), stagingGroup.isInheritContent(),
+			stagingGroup.isActive(),
+			ServiceContextTestUtil.getServiceContext());
 	}
 
-	@Test
+	@Test(expected = GroupParentException.MustNotBeOwnParent.class)
 	public void testSelectOwnGroupAsParentSite() throws Exception {
 		Group group = GroupTestUtil.addGroup();
 
-		try {
-			GroupLocalServiceUtil.updateGroup(
-				group.getGroupId(), group.getGroupId(), group.getNameMap(),
-				group.getDescriptionMap(), group.getType(),
-				group.isManualMembership(), group.getMembershipRestriction(),
-				group.getFriendlyURL(), group.isInheritContent(),
-				group.isActive(), ServiceContextTestUtil.getServiceContext());
-
-			Assert.fail("A group cannot be its own parent");
-		}
-		catch (GroupParentException gpe) {
-			Assert.assertEquals(
-				GroupParentException.SELF_DESCENDANT, gpe.getType());
-		}
+		GroupLocalServiceUtil.updateGroup(
+			group.getGroupId(), group.getGroupId(), group.getNameMap(),
+			group.getDescriptionMap(), group.getType(),
+			group.isManualMembership(), group.getMembershipRestriction(),
+			group.getFriendlyURL(), group.isInheritContent(), group.isActive(),
+			ServiceContextTestUtil.getServiceContext());
 	}
 
 	@Test
@@ -710,14 +676,14 @@ public class GroupServiceTest {
 	public void testUpdateAvailableLocales() throws Exception {
 		Group group = GroupTestUtil.addGroup();
 
-		Locale[] availableLocales =
-			new Locale[] {LocaleUtil.GERMANY, LocaleUtil.SPAIN, LocaleUtil.US};
+		List<Locale> availableLocales = Arrays.asList(
+			LocaleUtil.GERMANY, LocaleUtil.SPAIN, LocaleUtil.US);
 
 		group = GroupTestUtil.updateDisplaySettings(
 			group.getGroupId(), availableLocales, null);
 
-		Assert.assertArrayEquals(
-			availableLocales,
+		Assert.assertEquals(
+			new HashSet<>(availableLocales),
 			LanguageUtil.getAvailableLocales(group.getGroupId()));
 	}
 
@@ -803,15 +769,15 @@ public class GroupServiceTest {
 	@Test
 	public void testValidChangeAvailableLanguageIds() throws Exception {
 		testUpdateDisplaySettings(
-			new Locale[] {LocaleUtil.GERMANY, LocaleUtil.SPAIN, LocaleUtil.US},
-			new Locale[] {LocaleUtil.SPAIN, LocaleUtil.US}, null, false);
+			Arrays.asList(LocaleUtil.GERMANY, LocaleUtil.SPAIN, LocaleUtil.US),
+			Arrays.asList(LocaleUtil.SPAIN, LocaleUtil.US), null, false);
 	}
 
 	@Test
 	public void testValidChangeDefaultLanguageId() throws Exception {
 		testUpdateDisplaySettings(
-			new Locale[] {LocaleUtil.GERMANY, LocaleUtil.SPAIN, LocaleUtil.US},
-			new Locale[] {LocaleUtil.GERMANY, LocaleUtil.SPAIN, LocaleUtil.US},
+			Arrays.asList(LocaleUtil.GERMANY, LocaleUtil.SPAIN, LocaleUtil.US),
+			Arrays.asList(LocaleUtil.GERMANY, LocaleUtil.SPAIN, LocaleUtil.US),
 			LocaleUtil.GERMANY, false);
 	}
 
@@ -925,40 +891,40 @@ public class GroupServiceTest {
 			try {
 				GroupTestUtil.addGroup(group1.getGroupId(), serviceContext);
 
-				if (!hasManageSubsitePermisionOnGroup1 && !hasManageSite1) {
-					Assert.fail("The user should not be able to add this site");
-				}
+				Assert.assertTrue(
+					"The user should not be able to add this site",
+					hasManageSubsitePermisionOnGroup1 || hasManageSite1);
 			}
 			catch (PrincipalException pe) {
-				if (hasManageSubsitePermisionOnGroup1 || hasManageSite1) {
-					Assert.fail("The user should be able to add this site");
-				}
+				Assert.assertFalse(
+					"The user should be able to add this site",
+					hasManageSubsitePermisionOnGroup1 || hasManageSite1);
 			}
 
 			try {
 				GroupTestUtil.addGroup(group11.getGroupId(), serviceContext);
 
-				if (!hasManageSubsitePermisionOnGroup11 && !hasManageSite1) {
-					Assert.fail("The user should not be able to add this site");
-				}
+				Assert.assertTrue(
+					"The user should not be able to add this site",
+					hasManageSubsitePermisionOnGroup11 || hasManageSite1);
 			}
 			catch (PrincipalException pe) {
-				if (hasManageSubsitePermisionOnGroup11 || hasManageSite1) {
-					Assert.fail("The user should be able to add this site");
-				}
+				Assert.assertFalse(
+					"The user should be able to add this site",
+					hasManageSubsitePermisionOnGroup11 || hasManageSite1);
 			}
 
 			try {
 				GroupTestUtil.addGroup(group111.getGroupId(), serviceContext);
 
-				if (!hasManageSubsitePermisionOnGroup111 && !hasManageSite1) {
-					Assert.fail("The user should not be able to add this site");
-				}
+				Assert.assertTrue(
+					"The user should not be able to add this site",
+					hasManageSubsitePermisionOnGroup111 || hasManageSite1);
 			}
 			catch (PrincipalException pe) {
-				if (hasManageSubsitePermisionOnGroup111 || hasManageSite1) {
-					Assert.fail("The user should be able to add this site");
-				}
+				Assert.assertFalse(
+					"The user should be able to add this site",
+					hasManageSubsitePermisionOnGroup111 || hasManageSite1);
 			}
 		}
 
@@ -966,47 +932,42 @@ public class GroupServiceTest {
 			try {
 				GroupServiceUtil.updateGroup(group1.getGroupId(), "");
 
-				if (!hasManageSite1) {
-					Assert.fail(
-						"The user should not be able to update this site");
-				}
+				Assert.assertTrue(
+					"The user should not be able to update this site",
+					hasManageSite1);
 			}
 			catch (PrincipalException pe) {
-				if (hasManageSite1) {
-					Assert.fail("The user should be able to update this site");
-				}
+				Assert.assertFalse(
+					"The user should be able to update this site",
+					hasManageSite1);
 			}
 
 			try {
 				GroupServiceUtil.updateGroup(group11.getGroupId(), "");
 
-				if (!hasManageSubsitePermisionOnGroup1 && !hasManageSite1 &&
-					!hasManageSite11) {
-
-					Assert.fail(
-						"The user should not be able to update this site");
-				}
+				Assert.assertTrue(
+					"The user should not be able to update this site",
+					hasManageSubsitePermisionOnGroup1 || hasManageSite1 ||
+						hasManageSite11);
 			}
 			catch (PrincipalException pe) {
-				if (hasManageSubsitePermisionOnGroup1 || hasManageSite1 ||
-					hasManageSite11) {
-
-					Assert.fail("The user should be able to update this site");
-				}
+				Assert.assertFalse(
+					"The user should be able to update this site",
+					hasManageSubsitePermisionOnGroup1 || hasManageSite1 ||
+						hasManageSite11);
 			}
 
 			try {
 				GroupServiceUtil.updateGroup(group111.getGroupId(), "");
 
-				if (!hasManageSubsitePermisionOnGroup11 && !hasManageSite1) {
-					Assert.fail(
-						"The user should not be able to update this site");
-				}
+				Assert.assertTrue(
+					"The user should not be able to update this site",
+					hasManageSubsitePermisionOnGroup11 || hasManageSite1);
 			}
 			catch (PrincipalException pe) {
-				if (hasManageSubsitePermisionOnGroup1 || hasManageSite1) {
-					Assert.fail("The user should be able to update this site");
-				}
+				Assert.assertFalse(
+					"The user should be able to update this site",
+					hasManageSubsitePermisionOnGroup1 || hasManageSite1);
 			}
 		}
 	}
@@ -1041,23 +1002,25 @@ public class GroupServiceTest {
 		for (Group selectableGroup : selectableGroups) {
 			long selectableGroupId = selectableGroup.getGroupId();
 
-			if (selectableGroupId == group.getGroupId()) {
-				Assert.fail("A group cannot be its own parent");
-			}
-			else if (staging) {
-				if (selectableGroupId == group.getLiveGroupId()) {
-					Assert.fail("A group cannot have its live group as parent");
-				}
+			Assert.assertNotEquals(
+				"A group cannot be its own parent", group.getGroupId(),
+				selectableGroupId);
+
+			if (staging) {
+				Assert.assertNotEquals(
+					"A group cannot have its live group as parent",
+					group.getLiveGroupId(), selectableGroupId);
 			}
 		}
 	}
 
 	protected void testUpdateDisplaySettings(
-			Locale[] portalAvailableLocales, Locale[] groupAvailableLocales,
-			Locale groupDefaultLocale, boolean expectFailure)
+			Collection<Locale> portalAvailableLocales,
+			Collection<Locale> groupAvailableLocales, Locale groupDefaultLocale,
+			boolean expectFailure)
 		throws Exception {
 
-		Locale[] availableLocales = LanguageUtil.getAvailableLocales();
+		Set<Locale> availableLocales = LanguageUtil.getAvailableLocales();
 
 		CompanyTestUtil.resetCompanyLocales(
 			TestPropsValues.getCompanyId(), portalAvailableLocales,
@@ -1070,14 +1033,10 @@ public class GroupServiceTest {
 			GroupTestUtil.updateDisplaySettings(
 				group.getGroupId(), groupAvailableLocales, groupDefaultLocale);
 
-			if (expectFailure) {
-				Assert.fail();
-			}
+			Assert.assertFalse(expectFailure);
 		}
 		catch (LocaleException le) {
-			if (!expectFailure) {
-				Assert.fail();
-			}
+			Assert.assertTrue(expectFailure);
 		}
 		finally {
 			CompanyTestUtil.resetCompanyLocales(

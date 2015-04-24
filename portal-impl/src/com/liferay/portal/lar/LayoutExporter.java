@@ -14,6 +14,15 @@
 
 package com.liferay.portal.lar;
 
+import static com.liferay.portal.kernel.lar.lifecycle.ExportImportLifecycleConstants.EVENT_LAYOUT_EXPORT_FAILED;
+import static com.liferay.portal.kernel.lar.lifecycle.ExportImportLifecycleConstants.EVENT_LAYOUT_EXPORT_STARTED;
+import static com.liferay.portal.kernel.lar.lifecycle.ExportImportLifecycleConstants.EVENT_LAYOUT_EXPORT_SUCCEEDED;
+import static com.liferay.portal.kernel.lar.lifecycle.ExportImportLifecycleConstants.EVENT_PORTLET_EXPORT_FAILED;
+import static com.liferay.portal.kernel.lar.lifecycle.ExportImportLifecycleConstants.EVENT_PORTLET_EXPORT_STARTED;
+import static com.liferay.portal.kernel.lar.lifecycle.ExportImportLifecycleConstants.EVENT_PORTLET_EXPORT_SUCCEEDED;
+import static com.liferay.portal.kernel.lar.lifecycle.ExportImportLifecycleConstants.PROCESS_FLAG_LAYOUT_EXPORT_IN_PROCESS;
+import static com.liferay.portal.kernel.lar.lifecycle.ExportImportLifecycleConstants.PROCESS_FLAG_LAYOUT_STAGING_IN_PROCESS;
+
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskThreadLocal;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -29,11 +38,11 @@ import com.liferay.portal.kernel.lar.PortletDataHandlerKeys;
 import com.liferay.portal.kernel.lar.PortletDataHandlerStatusMessageSenderUtil;
 import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.portal.kernel.lar.StagedModelType;
-import com.liferay.portal.kernel.lar.lifecycle.ExportImportLifecycleConstants;
 import com.liferay.portal.kernel.lar.lifecycle.ExportImportLifecycleManager;
 import com.liferay.portal.kernel.lar.xstream.XStreamAliasRegistryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.settings.PortletInstanceSettingsLocator;
 import com.liferay.portal.kernel.settings.Settings;
 import com.liferay.portal.kernel.settings.SettingsFactoryUtil;
 import com.liferay.portal.kernel.staging.LayoutStagingUtil;
@@ -195,30 +204,31 @@ public class LayoutExporter {
 				groupId, privateLayout, parameterMap, startDate, endDate);
 
 			ExportImportLifecycleManager.fireExportImportLifecycleEvent(
-				ExportImportLifecycleConstants.EVENT_LAYOUT_EXPORT_STARTED,
+				EVENT_LAYOUT_EXPORT_STARTED, getProcessFlag(),
 				PortletDataContextFactoryUtil.clonePortletDataContext(
 					portletDataContext));
 
 			File file = doExportLayoutsAsFile(portletDataContext, layoutIds);
 
+			ExportImportThreadLocal.setLayoutExportInProcess(false);
+
 			ExportImportLifecycleManager.fireExportImportLifecycleEvent(
-				ExportImportLifecycleConstants.EVENT_LAYOUT_EXPORT_SUCCEEDED,
+				EVENT_LAYOUT_EXPORT_SUCCEEDED, getProcessFlag(),
 				PortletDataContextFactoryUtil.clonePortletDataContext(
 					portletDataContext));
 
 			return file;
 		}
 		catch (Throwable t) {
+			ExportImportThreadLocal.setLayoutExportInProcess(false);
+
 			ExportImportLifecycleManager.fireExportImportLifecycleEvent(
-				ExportImportLifecycleConstants.EVENT_LAYOUT_EXPORT_FAILED,
+				EVENT_LAYOUT_EXPORT_FAILED, getProcessFlag(),
 				PortletDataContextFactoryUtil.clonePortletDataContext(
 					portletDataContext),
 				t);
 
 			throw t;
-		}
-		finally {
-			ExportImportThreadLocal.setLayoutExportInProcess(false);
 		}
 	}
 
@@ -550,7 +560,7 @@ public class LayoutExporter {
 
 			try {
 				ExportImportLifecycleManager.fireExportImportLifecycleEvent(
-					ExportImportLifecycleConstants.EVENT_PORTLET_EXPORT_STARTED,
+					EVENT_PORTLET_EXPORT_STARTED, getProcessFlag(),
 					PortletDataContextFactoryUtil.clonePortletDataContext(
 						portletDataContext));
 
@@ -571,14 +581,13 @@ public class LayoutExporter {
 						PortletDataHandlerKeys.PORTLET_SETUP));
 
 				ExportImportLifecycleManager.fireExportImportLifecycleEvent(
-					ExportImportLifecycleConstants.
-						EVENT_PORTLET_EXPORT_SUCCEEDED,
+					EVENT_PORTLET_EXPORT_SUCCEEDED, getProcessFlag(),
 					PortletDataContextFactoryUtil.clonePortletDataContext(
 						portletDataContext));
 			}
 			catch (Throwable t) {
 				ExportImportLifecycleManager.fireExportImportLifecycleEvent(
-					ExportImportLifecycleConstants.EVENT_PORTLET_EXPORT_FAILED,
+					EVENT_PORTLET_EXPORT_FAILED, getProcessFlag(),
 					PortletDataContextFactoryUtil.clonePortletDataContext(
 						portletDataContext),
 					t);
@@ -590,7 +599,6 @@ public class LayoutExporter {
 		portletDataContext.setScopeGroupId(previousScopeGroupId);
 
 		_portletExporter.exportAssetLinks(portletDataContext);
-		_portletExporter.exportAssetTags(portletDataContext);
 		_portletExporter.exportExpandoTables(portletDataContext);
 		_portletExporter.exportLocks(portletDataContext);
 
@@ -688,9 +696,8 @@ public class LayoutExporter {
 		for (Portlet portlet : layoutTypePortlet.getAllPortlets(false)) {
 			String portletId = portlet.getPortletId();
 
-			Settings portletInstanceSettings =
-				SettingsFactoryUtil.getPortletInstanceSettings(
-					layout, portletId);
+			Settings portletInstanceSettings = SettingsFactoryUtil.getSettings(
+				new PortletInstanceSettingsLocator(layout, portletId));
 
 			String scopeType = portletInstanceSettings.getValue(
 				"lfrScopeType", null);
@@ -760,6 +767,14 @@ public class LayoutExporter {
 		return portletDataContext;
 	}
 
+	protected int getProcessFlag() {
+		if (ExportImportThreadLocal.isLayoutStagingInProcess()) {
+			return PROCESS_FLAG_LAYOUT_STAGING_IN_PROCESS;
+		}
+
+		return PROCESS_FLAG_LAYOUT_EXPORT_IN_PROCESS;
+	}
+
 	private LayoutExporter() {
 		XStreamAliasRegistryUtil.register(LayoutImpl.class, "Layout");
 	}
@@ -790,10 +805,6 @@ public class LayoutExporter {
 		@Override
 		public Void call() throws PortalException {
 			Group group = GroupLocalServiceUtil.getGroup(_groupId);
-
-			if (group.isStagedRemotely()) {
-				return null;
-			}
 
 			Date endDate = null;
 

@@ -38,8 +38,8 @@ import com.liferay.portal.model.CompanyConstants;
 import com.liferay.portal.model.EventDefinition;
 import com.liferay.portal.model.PortletApp;
 import com.liferay.portal.model.PortletCategory;
-import com.liferay.portal.model.PortletConstants;
 import com.liferay.portal.model.PortletInfo;
+import com.liferay.portal.model.PortletInstance;
 import com.liferay.portal.model.PublicRenderParameter;
 import com.liferay.portal.security.permission.ResourceActions;
 import com.liferay.portal.security.permission.ResourceActionsUtil;
@@ -60,7 +60,6 @@ import java.net.URL;
 
 import java.util.ArrayList;
 import java.util.Dictionary;
-import java.util.EventListener;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -76,7 +75,7 @@ import javax.portlet.WindowState;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServlet;
+import javax.servlet.ServletContextListener;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -126,10 +125,13 @@ public class PortletTracker
 		String portletId = StringUtil.replace(
 			portletName, new String[] {".", "$"}, new String[] {"_", "_"});
 
-		if (portletId.length() > _PORTLET_ID_MAX_LENGTH) {
+		if (portletId.length() >
+				PortletInstance.PORTLET_INSTANCE_KEY_MAX_LENGTH) {
+
 			_log.error(
-				"Portlet id " + portletId + " has more than " +
-					_PORTLET_ID_MAX_LENGTH + " characters");
+				"Portlet ID " + portletId + " has more than " +
+					PortletInstance.PORTLET_INSTANCE_KEY_MAX_LENGTH +
+						" characters");
 
 			bundleContext.ungetService(serviceReference);
 
@@ -932,10 +934,13 @@ public class PortletTracker
 		properties.put(
 			HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT,
 			bundlePortletApp.getServletContextName());
+		properties.put(
+			HttpWhiteboardConstants.HTTP_WHITEBOARD_LISTENER,
+			Boolean.TRUE.toString());
 
 		serviceRegistrations.addServiceRegistration(
 			bundleContext.registerService(
-				EventListener.class, bundlePortletApp, properties));
+				ServletContextListener.class, bundlePortletApp, properties));
 
 		return bundlePortletApp;
 	}
@@ -964,7 +969,7 @@ public class PortletTracker
 				ServletContextHelper.class, servletContextHelper, properties));
 	}
 
-	protected ServiceRegistration<Servlet> createDefaultServlet(
+	protected ServiceRegistration<?> createDefaultServlet(
 		BundleContext bundleContext, String contextName) {
 
 		Dictionary<String, Object> properties = new HashMapDictionary<>();
@@ -976,10 +981,10 @@ public class PortletTracker
 			HttpWhiteboardConstants.HTTP_WHITEBOARD_RESOURCE_PREFIX,
 			"/META-INF/resources");
 		properties.put(
-			HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_PATTERN, "/*");
+			HttpWhiteboardConstants.HTTP_WHITEBOARD_RESOURCE_PATTERN, "/*");
 
 		return bundleContext.registerService(
-			Servlet.class, new HttpServlet() {}, properties);
+			Object.class, new Object(), properties);
 	}
 
 	protected ServiceRegistration<Servlet> createJspServlet(
@@ -1197,10 +1202,6 @@ public class PortletTracker
 	}
 
 	private static final String _NAMESPACE = "com.liferay.portlet.";
-
-	private static final int _PORTLET_ID_MAX_LENGTH =
-		255 - PortletConstants.INSTANCE_SEPARATOR.length() +
-			PortletConstants.USER_SEPARATOR.length() + 39;
 
 	private static final Log _log = LogFactoryUtil.getLog(PortletTracker.class);
 

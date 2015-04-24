@@ -16,12 +16,7 @@
 	<bean id="com.liferay.portal.kernel.lar.PortletDataHandlerStatusMessageSenderUtil" class="com.liferay.portal.kernel.lar.PortletDataHandlerStatusMessageSenderUtil">
 		<property name="portletDataHandlerStatusMessageSender">
 			<bean class="com.liferay.portal.lar.PortletDataHandlerStatusMessageSenderImpl">
-				<property name="singleDestinationMessageSender">
-					<bean class="com.liferay.portal.kernel.messaging.sender.DefaultSingleDestinationMessageSender">
-						<property name="destinationName" value="liferay/background_task_status" />
-						<property name="messageSender" ref="com.liferay.portal.kernel.messaging.sender.MessageSender" />
-					</bean>
-				</property>
+				<property name="destinationName" value="liferay/background_task_status" />
 			</bean>
 		</property>
 	</bean>
@@ -57,4 +52,5 @@
 		<aop:advisor advice-ref="com.liferay.portal.service.impl.LayoutSetLocalServiceStagingAdvice" pointcut="bean(com.liferay.portal.service.LayoutSetLocalService)" />
 		<aop:advisor advice-ref="com.liferay.portal.service.impl.PortletPreferencesLocalServiceStagingAdvice" pointcut="bean(com.liferay.portal.service.PortletPreferencesLocalService)" />
 	</aop:config>
+	<bean id="com.liferay.portlet.asset.model.adapter.builder.StagedAssetTagModelAdapterBuilder" class="com.liferay.portlet.asset.model.adapter.builder.StagedAssetTagModelAdapterBuilder" />
 </beans>

@@ -64,14 +64,15 @@
 			<var name="sitePagePrivacy" value="Public" />
 		</execute>
 
-		<execute macro="Page#gotoCP">
-			<var name="portletName" value="Users and Organizations" />
+		<execute macro="Page#gotoConfigurationCP">
+			<var name="portletName" value="Site Settings" />
+			<var name="siteName" value="Organization Name" />
+			<var name="siteURL" value="true" />
 		</execute>
 
 		<execute macro="Organization#addPrivatePageToSiteViaSiteTemplateCP">
 			<var name="organizationSite" value="Intranet Site" />
 			<var name="orgName" value="Organization Name" />
-			<var name="sitePagePrivacy" value="Private" />
 		</execute>
 
 		<execute macro="Page#gotoCP">
@@ -104,6 +105,7 @@
 		</execute>
 
 		<execute macro="User#firstLoginPG">
+			<var name="loginViaDockbar" value="true" />
 			<var name="password" value="test" />
 			<var name="userEmailAddress" value="test@liferay.com" />
 			<var name="virtualHostsURL" value="http://www.baker.com:8080" />
@@ -112,7 +114,7 @@
 		<for list="Home,Documents and Media,News" param="pageName">
 			<var name="key_pageName" value="Asset Publisher Page" />
 
-			<execute function="AssertElementPresent" locator1="Home#PAGE" value1="Asset Publisher Page" />
+			<execute function="AssertElementNotPresent" locator1="Home#PAGE" value1="Asset Publisher Page" />
 		</for>
 
 		<execute macro="Page#openURL">
@@ -121,12 +123,10 @@
 			<var name="virtualHostsURL" value="http://www.able.com:8080" />
 		</execute>
 
-		<execute function="AssertElementPresent" locator1="Home#PAGE" value1="Home" />
-
 		<for list="Documents and Media,News" param="pageName">
 			<var name="key_pageName" value="Asset Publisher Page" />
 
-			<execute function="AssertElementNotPresent" locator1="Home#PAGE" value1="Asset Publisher Page" />
+			<execute function="AssertElementPresent" locator1="Home#PAGE" value1="Asset Publisher Page" />
 		</for>
 
 		<execute macro="Page#addPG">
@@ -178,7 +178,7 @@
 
 		<execute function="AssertClick#assertPartialTextClickAtAndWait" locator1="PGAssetpublisher#DISPLAY_ICON_EDIT" value1="Edit" />
 
-		<execute function="AssertTextNotEquals" locator1="PGSignin#PORTLET_TITLE" value1="Sign In" />
+		<execute function="AssertElementNotPresent" locator1="PGSignin#PORTLET_TITLE" value1="Sign" />
 
 		<execute macro="Page#gotoPG">
 			<var name="pageName" value="Web Content Page" />
@@ -188,6 +188,7 @@
 		</execute>
 
 		<execute macro="WebContent#editPGViaAP">
+			<var name="assetTitle" value="WC WebContent Title" />
 			<var name="webContentContentEdit" value="WC WebContent Content Edit" />
 			<var name="webContentTitleEdit" value="WC WebContent Title Edit" />
 		</execute>
@@ -213,6 +214,17 @@
 
 		<execute macro="WebContent#viewPGViaWCD">
 			<var name="webContentContent" value="WC WebContent Content Edit" />
+		</execute>
+
+		<execute macro="User#firstLoginPG" />
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Web Content Page" />
+		</execute>
+
+		<execute macro="WebContent#viewPGViaAP">
+			<var name="webContentContent" value="WC WebContent Content Edit" />
+			<var name="webContentTitle" value="WC WebContent Title Edit" />
 		</execute>
 	</command>
 
@@ -416,7 +428,7 @@
 		</execute>
 	</command>
 
-	<command name="AssetPublisherCategoriesNavigation" priority="3">
+	<command known-issues="LPS-54822" name="AssetPublisherCategoriesNavigation" priority="3">
 		<var name="siteName" value="Liferay" />
 
 		<execute macro="Page#gotoContentCP">
@@ -824,6 +836,7 @@
 
 		<execute macro="WebContent#viewConversionLinksPGViaAP">
 			<var name="documentTypes" value="doc,odt,pdf,rtf,sxw,txt" />
+			<var name="webContentContent" value="WC WebContent Content" />
 			<var name="webContentTitle" value="WC WebContent Title" />
 		</execute>
 
@@ -851,6 +864,7 @@
 
 		<execute macro="WebContent#viewConversionLinksPGViaAP">
 			<var name="documentTypes" value="doc,pdf,txt" />
+			<var name="webContentContent" value="WC WebContent Content" />
 			<var name="webContentTitle" value="WC WebContent Title" />
 		</execute>
 
@@ -860,6 +874,7 @@
 
 		<execute macro="WebContent#viewNoConversionLinksPGViaAP">
 			<var name="documentTypes" value="odt,rtf,sxw" />
+			<var name="webContentContent" value="WC WebContent Content" />
 			<var name="webContentTitle" value="WC WebContent Title" />
 		</execute>
 
@@ -878,6 +893,7 @@
 
 		<execute macro="WebContent#viewNoConversionLinksPGViaAP">
 			<var name="documentTypes" value="doc,odt,pdf,rtf,sxw,txt" />
+			<var name="webContentContent" value="WC WebContent Content" />
 			<var name="webContentTitle" value="WC WebContent Title" />
 		</execute>
 	</command>
@@ -1127,7 +1143,7 @@
 		</execute>
 	</command>
 
-	<command name="ValidateRelatedAssetsAdvancedSearchFunction" priority="3">
+	<command known-issues="LPS-55060,LPS-55061" name="ValidateRelatedAssetsAdvancedSearchFunction" priority="3">
 		<execute macro="Page#gotoContentCP">
 			<var name="portletName" value="Documents and Media" />
 		</execute>
@@ -1330,7 +1346,7 @@
 		</execute>
 	</command>
 
-	<command name="ViewAPPortletAsNewUserSiteAdministratorViaUserSite" priority="4">
+	<command known-issues="LPS-54823" name="ViewAPPortletAsNewUserSiteAdministratorViaUserSite" priority="4">
 		<execute macro="Page#gotoCP">
 			<var name="portletName" value="Sites" />
 		</execute>
@@ -1428,7 +1444,7 @@
 		</execute>
 	</command>
 
-	<command name="ViewAuthorChangeViaAP" priority="3">
+	<command known-issues="LPS-54712" name="ViewAuthorChangeViaAP" priority="3">
 		<execute macro="AssetPublisherPortlet#configureShowMetadataFieldsPG">
 			<var name="addMetadata" value="true" />
 			<var name="metadataField" value="Author" />
@@ -1447,7 +1463,7 @@
 		</execute>
 
 		<execute macro="Role#definePermissionsCP">
-			<var name="permissionDefinitionKeys" value="SITE_ADMIN_CONTENT_WEB_CONTENT_GENERAL_PERMISSIONS_ACTION_CHECKBOX,SITE_ADMIN_CONTENT_WEB_CONTENT_RESOURCE_PERMISSIONS_WEB_CONTENT_ACTION_CHECKBOX,SITE_ADMIN_CONTENT_WEB_CONTENT_RESOURCE_PERMISSIONS_WEB_CONTENT_ARTICLE_ACTION_CHECKBOX" />
+			<var name="permissionDefinitionKeys" value="SITE_ADMIN_CONTENT_WEB_CONTENT_GENERAL_PERMISSIONS_ACTION_CHECKBOX" />
 			<var name="roleName" value="WC Author" />
 		</execute>
 
@@ -1542,7 +1558,7 @@
 		</execute>
 	</command>
 
-	<command name="ViewBlogsEntriesViaRelatedAssets" priority="4">
+	<command known-issues="LPS-51696" name="ViewBlogsEntriesViaRelatedAssets" priority="4">
 		<execute macro="Page#addPG">
 			<var name="pageName" value="Blogs Page" />
 		</execute>
@@ -1698,7 +1714,7 @@
 		<execute macro="User#loginPG" />
 	</command>
 
-	<command name="ViewRelatedAssetsViaRelatedAssetsPortlet" priority="3">
+	<command known-issues="LPS-51696" name="ViewRelatedAssetsViaRelatedAssetsPortlet" priority="3">
 		<execute macro="Page#gotoPG">
 			<var name="pageName" value="Asset Publisher Page" />
 		</execute>
@@ -1817,7 +1833,7 @@
 		<execute macro="User#loginPG" />
 	</command>
 
-	<command name="ViewRelatedAssetViaDMPortlet" priority="3">
+	<command known-issues="LPS-51696" name="ViewRelatedAssetViaDMPortlet" priority="3">
 		<execute macro="Page#addPG">
 			<var name="pageName" value="Blogs Page" />
 		</execute>

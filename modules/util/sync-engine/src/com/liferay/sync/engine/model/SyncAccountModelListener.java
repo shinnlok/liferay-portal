@@ -19,7 +19,7 @@ import com.liferay.sync.engine.documentlibrary.util.ServerEventUtil;
 import com.liferay.sync.engine.service.SyncAccountService;
 import com.liferay.sync.engine.service.SyncFileService;
 import com.liferay.sync.engine.session.SessionManager;
-import com.liferay.sync.engine.util.FileUtil;
+import com.liferay.sync.engine.util.FileKeyUtil;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -30,9 +30,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Shinn Lok
@@ -101,12 +98,7 @@ public class SyncAccountModelListener implements ModelListener<SyncAccount> {
 
 		activeSyncAccountIds.remove(syncAccount.getSyncAccountId());
 
-		try {
-			SyncEngine.cancelSyncAccountTasks(syncAccount.getSyncAccountId());
-		}
-		catch (Exception e) {
-			_logger.error(e.getMessage(), e);
-		}
+		SyncEngine.cancelSyncAccountTasks(syncAccount.getSyncAccountId());
 	}
 
 	protected void retryMissingSyncAccountFolder(
@@ -125,7 +117,9 @@ public class SyncAccountModelListener implements ModelListener<SyncAccount> {
 				SyncFile syncFile = SyncFileService.fetchSyncFile(
 					syncAccount.getFilePathName());
 
-				if (FileUtil.getFileKey(filePath) == syncFile.getSyncFileId()) {
+				if (FileKeyUtil.hasFileKey(
+						filePath, syncFile.getSyncFileId())) {
+
 					syncAccount.setActive(true);
 					syncAccount.setUiEvent(SyncAccount.UI_EVENT_NONE);
 
@@ -138,9 +132,6 @@ public class SyncAccountModelListener implements ModelListener<SyncAccount> {
 		_scheduledFuture = _scheduledExecutorService.scheduleAtFixedRate(
 			runnable, 0, 5, TimeUnit.SECONDS);
 	}
-
-	private static final Logger _logger = LoggerFactory.getLogger(
-		SyncEngine.class);
 
 	private static final ScheduledExecutorService _scheduledExecutorService =
 		Executors.newScheduledThreadPool(5);

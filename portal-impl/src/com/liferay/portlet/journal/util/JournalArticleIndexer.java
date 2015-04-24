@@ -49,7 +49,6 @@ import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.portlet.dynamicdatamapping.StructureFieldException;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalServiceUtil;
 import com.liferay.portlet.dynamicdatamapping.storage.DDMFormValues;
@@ -168,11 +167,9 @@ public class JournalArticleIndexer extends BaseIndexer {
 					LocaleUtil.toLanguageId(searchContext.getLocale())),
 				StringPool.BLANK);
 
-			try {
+			if (structure.hasField(fieldName)) {
 				ddmStructureFieldValue = DDMUtil.getIndexedFieldValue(
 					ddmStructureFieldValue, structure.getFieldType(fieldName));
-			}
-			catch (StructureFieldException sfe) {
 			}
 
 			contextQuery.addRequiredTerm(
@@ -514,9 +511,8 @@ public class JournalArticleIndexer extends BaseIndexer {
 			JournalArticleLocalServiceUtil.fetchJournalArticle(classPK);
 
 		if (article == null) {
-			article =
-				JournalArticleLocalServiceUtil.fetchLatestIndexableArticle(
-					classPK);
+			article = JournalArticleLocalServiceUtil.fetchLatestArticle(
+				classPK);
 		}
 
 		if (article != null) {
@@ -681,7 +677,8 @@ public class JournalArticleIndexer extends BaseIndexer {
 				article.getResourcePrimKey(),
 				new int[] {
 					WorkflowConstants.STATUS_APPROVED,
-					WorkflowConstants.STATUS_IN_TRASH});
+					WorkflowConstants.STATUS_IN_TRASH
+				});
 
 		if ((latestArticle != null) && !latestArticle.isIndexable()) {
 			return false;

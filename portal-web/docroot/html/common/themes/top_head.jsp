@@ -16,9 +16,7 @@
 
 <%@ include file="/html/common/themes/init.jsp" %>
 
-<c:if test="<%= PropsValues.MONITORING_PORTAL_REQUEST %>">
-	<%@ include file="/html/common/themes/top_monitoring.jspf" %>
-</c:if>
+<liferay-util:dynamic-include key="/html/common/themes/top_head-ext.jsp" />
 
 <%@ include file="/html/common/themes/top_meta.jspf" %>
 <%@ include file="/html/common/themes/top_meta-ext.jsp" %>
@@ -37,9 +35,9 @@ if (!themeDisplay.isSignedIn() && layout.isPublicLayout()) {
 	<link href="<%= HtmlUtil.escapeAttribute(canonicalURL) %>" rel="canonical" />
 
 	<%
-	Locale[] availableLocales = LanguageUtil.getAvailableLocales(themeDisplay.getSiteGroupId());
+	Set<Locale> availableLocales = LanguageUtil.getAvailableLocales(themeDisplay.getSiteGroupId());
 
-	if (availableLocales.length > 1) {
+	if (availableLocales.size() > 1) {
 		for (Locale availableLocale : availableLocales) {
 	%>
 

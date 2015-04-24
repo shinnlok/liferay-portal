@@ -23,15 +23,14 @@
 <%@ taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %>
 <%@ taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
 
-<%@ page import="com.liferay.portal.kernel.template.TemplateHandler" %><%@
-page import="com.liferay.portal.kernel.template.TemplateHandlerRegistryUtil" %><%@
-page import="com.liferay.portal.kernel.util.Constants" %><%@
+<%@ page import="com.liferay.portal.kernel.util.Constants" %><%@
 page import="com.liferay.portal.kernel.util.FastDateFormatFactoryUtil" %><%@
 page import="com.liferay.portal.kernel.util.HtmlUtil" %><%@
 page import="com.liferay.portal.kernel.util.StringPool" %><%@
 page import="com.liferay.portal.kernel.util.Validator" %><%@
-page import="com.liferay.portal.util.PortalUtil" %><%@
-page import="com.liferay.rss.web.context.RSSDisplayContext" %><%@
+page import="com.liferay.rss.web.configuration.RSSPortletInstanceConfiguration" %><%@
+page import="com.liferay.rss.web.configuration.RSSWebConfiguration" %><%@
+page import="com.liferay.rss.web.display.context.RSSDisplayContext" %><%@
 page import="com.liferay.rss.web.util.RSSFeed" %><%@
 page import="com.liferay.rss.web.util.RSSFeedEntry" %>
 
@@ -50,7 +49,10 @@ page import="java.util.List" %>
 <portlet:defineObjects />
 
 <%
-RSSDisplayContext rssDisplayContext = new RSSDisplayContext(request, portletPreferences);
+RSSPortletInstanceConfiguration rssPortletInstanceConfiguration = (RSSPortletInstanceConfiguration)renderRequest.getAttribute(RSSPortletInstanceConfiguration.class.getName());
+RSSWebConfiguration rssWebConfiguration = (RSSWebConfiguration)renderRequest.getAttribute(RSSWebConfiguration.class.getName());
+
+RSSDisplayContext rssDisplayContext = new RSSDisplayContext(rssPortletInstanceConfiguration, rssWebConfiguration);
 
 Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);
 %>

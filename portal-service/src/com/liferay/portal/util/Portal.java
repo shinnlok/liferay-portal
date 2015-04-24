@@ -272,20 +272,6 @@ public interface Portal {
 		throws PortalException;
 
 	/**
-	 * Returns an array with the alternate locales, considering if the page is
-	 * showing just a content and the translations of this content.
-	 *
-	 * @param      request the servlet request for the page
-	 * @return     the array of alternate locales
-	 * @throws     PortalException if a portal exception occurred
-	 * @deprecated As of 6.2.0, replaced by {@link
-	 *             com.liferay.portal.kernel.language.LanguageUtil#getAvailableLocales}
-	 */
-	@Deprecated
-	public Locale[] getAlternateLocales(HttpServletRequest request)
-		throws PortalException;
-
-	/**
 	 * Returns the alternate URL for the requested canonical URL in the given
 	 * locale.
 	 *
@@ -547,7 +533,7 @@ public interface Portal {
 		throws PortalException;
 
 	public long[] getCurrentAndAncestorSiteGroupIds(
-			long[] groupId, boolean checkContentSharingWithChildrenEnabled)
+			long[] groupIds, boolean checkContentSharingWithChildrenEnabled)
 		throws PortalException;
 
 	public List<Group> getCurrentAndAncestorSiteGroups(long groupId)
@@ -891,7 +877,7 @@ public interface Portal {
 	 * @deprecated As of 6.2.0 renamed to {@link #getSiteGroupId(long)}
 	 */
 	@Deprecated
-	public long getParentGroupId(long scopeGroupId) throws PortalException;
+	public long getParentGroupId(long scopeGroupId);
 
 	public String getPathContext();
 
@@ -1147,7 +1133,7 @@ public interface Portal {
 
 	public Locale getSiteDefaultLocale(long groupId) throws PortalException;
 
-	public long getSiteGroupId(long groupId) throws PortalException;
+	public long getSiteGroupId(long groupId);
 
 	/**
 	 * Returns the URL of the login page for the current site if one is
