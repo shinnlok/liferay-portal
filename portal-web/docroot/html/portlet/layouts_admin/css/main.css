@@ -1,4 +1,4 @@
-.portlet-communities, .portlet-users-admin {
+.portlet-users-admin {
 	.lfr-theme-list {
 		li {
 			float: left;
@@ -346,6 +346,10 @@
 		}
 	}
 
+	.options ul.portlet-list > li.tree-item {
+		padding-left: 0;
+	}
+
 	.page-not-exportable {
 		color: #933;
 	}
@@ -359,8 +363,21 @@
 		}
 	}
 
-	.options ul.portlet-list > li.tree-item {
-		padding-left: 0;
+	.portlet-list-simple {
+		margin-left: 20px;
+	}
+
+	.publish-mode-switch {
+		position: absolute;
+		right: 10px;
+
+		a {
+			color: #FFF;
+		}
+
+		span {
+			text-decoration: none !important;
+		}
 	}
 
 	.selected-labels {
@@ -457,18 +474,4 @@
 
 .lfr-tree-controls-item {
 	padding: 0 0 6px 6px;
-}
-
-.ie6 {
-	.theme-thumbnail, .no-png-fix {
-		behavior: none;
-	}
-
-	.lfr-available-themes h3 {
-		height: 1%;
-	}
-
-	.lfr-page-layouts .lfr-layout-template-column {
-		width: 30%;
-	}
 }

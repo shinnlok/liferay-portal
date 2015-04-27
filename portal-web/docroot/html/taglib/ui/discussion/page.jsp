@@ -19,22 +19,13 @@
 <%
 String randomNamespace = StringUtil.randomId() + StringPool.UNDERLINE;
 
-boolean assetEntryVisible = GetterUtil.getBoolean((String)request.getAttribute("liferay-ui:discussion:assetEntryVisible"));
-String className = (String)request.getAttribute("liferay-ui:discussion:className");
-long classPK = GetterUtil.getLong((String)request.getAttribute("liferay-ui:discussion:classPK"));
-String formAction = (String)request.getAttribute("liferay-ui:discussion:formAction");
-String formName = (String)request.getAttribute("liferay-ui:discussion:formName");
-boolean hideControls = GetterUtil.getBoolean((String)request.getAttribute("liferay-ui:discussion:hideControls"));
-String paginationURL = (String)request.getAttribute("liferay-ui:discussion:paginationURL");
-String permissionClassName = (String)request.getAttribute("liferay-ui:discussion:permissionClassName");
-long permissionClassPK = GetterUtil.getLong((String)request.getAttribute("liferay-ui:discussion:permissionClassPK"));
-boolean ratingsEnabled = GetterUtil.getBoolean((String) request.getAttribute("liferay-ui:discussion:ratingsEnabled"));
-String redirect = (String)request.getAttribute("liferay-ui:discussion:redirect");
-long userId = GetterUtil.getLong((String)request.getAttribute("liferay-ui:discussion:userId"));
+DiscussionTaglibHelper discussionTaglibHelper = new DiscussionTaglibHelper(request);
+DiscussionRequestHelper discussionRequestHelper = new DiscussionRequestHelper(request);
 
-MBMessageDisplay messageDisplay = MBMessageLocalServiceUtil.getDiscussionMessageDisplay(userId, scopeGroupId, className, classPK, WorkflowConstants.STATUS_ANY, new MessageThreadComparator());
+CommentSectionDisplayContext commentSectionDisplayContext = new MBCommentSectionDisplayContext(discussionTaglibHelper, discussionRequestHelper);
 
-MBThread thread = messageDisplay.getThread();
+MBMessageDisplay messageDisplay = MBMessageLocalServiceUtil.getDiscussionMessageDisplay(discussionTaglibHelper.getUserId(), scopeGroupId, discussionTaglibHelper.getClassName(), discussionTaglibHelper.getClassPK(), WorkflowConstants.STATUS_ANY, new MessageThreadComparator());
+
 MBTreeWalker treeWalker = messageDisplay.getTreeWalker();
 MBMessage rootMessage = treeWalker.getRoot();
 List<MBMessage> messages = treeWalker.getMessages();
@@ -44,21 +35,27 @@ int messagesCount = messages.size();
 <section>
 	<div class="hide lfr-message-response" id="<portlet:namespace />discussionStatusMessages"></div>
 
-	<c:if test="<%= (messagesCount > 1) || MBDiscussionPermission.contains(permissionChecker, company.getCompanyId(), scopeGroupId, permissionClassName, permissionClassPK, userId, ActionKeys.VIEW) %>">
+	<c:if test="<%= commentSectionDisplayContext.isDiscussionMaxComments() %>">
+		<div class="alert alert-warning">
+			<liferay-ui:message key="maximum-number-of-comments-has-been-reached" />
+		</div>
+	</c:if>
+
+	<c:if test="<%= commentSectionDisplayContext.isDiscussionVisible() %>">
 		<div class="taglib-discussion" id="<portlet:namespace />discussionContainer">
-			<aui:form action="<%= formAction %>" method="post" name="<%= formName %>">
+			<aui:form action="<%= discussionTaglibHelper.getFormAction() %>" method="post" name="<%= discussionTaglibHelper.getFormName() %>">
 				<aui:input name="randomNamespace" type="hidden" value="<%= randomNamespace %>" />
 				<aui:input id="<%= randomNamespace + Constants.CMD %>" name="<%= Constants.CMD %>" type="hidden" />
-				<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
-				<aui:input name="contentURL" type="hidden" value="<%= PortalUtil.getCanonicalURL(redirect, themeDisplay, layout) %>" />
-				<aui:input name="assetEntryVisible" type="hidden" value="<%= assetEntryVisible %>" />
-				<aui:input name="className" type="hidden" value="<%= className %>" />
-				<aui:input name="classPK" type="hidden" value="<%= classPK %>" />
-				<aui:input name="permissionClassName" type="hidden" value="<%= permissionClassName %>" />
-				<aui:input name="permissionClassPK" type="hidden" value="<%= permissionClassPK %>" />
-				<aui:input name="permissionOwnerId" type="hidden" value="<%= String.valueOf(userId) %>" />
+				<aui:input name="redirect" type="hidden" value="<%= discussionTaglibHelper.getRedirect() %>" />
+				<aui:input name="contentURL" type="hidden" value="<%= PortalUtil.getCanonicalURL(discussionTaglibHelper.getRedirect(), themeDisplay, layout) %>" />
+				<aui:input name="assetEntryVisible" type="hidden" value="<%= discussionTaglibHelper.isAssetEntryVisible() %>" />
+				<aui:input name="className" type="hidden" value="<%= discussionTaglibHelper.getClassName() %>" />
+				<aui:input name="classPK" type="hidden" value="<%= discussionTaglibHelper.getClassPK() %>" />
+				<aui:input name="permissionClassName" type="hidden" value="<%= discussionTaglibHelper.getPermissionClassName() %>" />
+				<aui:input name="permissionClassPK" type="hidden" value="<%= discussionTaglibHelper.getPermissionClassPK() %>" />
+				<aui:input name="permissionOwnerId" type="hidden" value="<%= String.valueOf(discussionTaglibHelper.getUserId()) %>" />
 				<aui:input name="messageId" type="hidden" />
-				<aui:input name="threadId" type="hidden" value="<%= thread.getThreadId() %>" />
+				<aui:input name="threadId" type="hidden" value="<%= commentSectionDisplayContext.getThreadId() %>" />
 				<aui:input name="parentMessageId" type="hidden" />
 				<aui:input name="body" type="hidden" />
 				<aui:input name="workflowAction" type="hidden" value="<%= String.valueOf(WorkflowConstants.ACTION_PUBLISH) %>" />
@@ -68,30 +65,17 @@ int messagesCount = messages.size();
 				MBMessage message = rootMessage;
 				%>
 
-				<c:if test="<%= !hideControls && MBDiscussionPermission.contains(permissionChecker, company.getCompanyId(), scopeGroupId, permissionClassName, permissionClassPK, userId, ActionKeys.ADD_DISCUSSION) %>">
+				<c:if test="<%= commentSectionDisplayContext.isControlsVisible() %>">
 					<aui:fieldset cssClass="add-comment" id='<%= randomNamespace + "messageScroll0" %>'>
-						<div id="<%= randomNamespace %>messageScroll<%= message.getMessageId() %>">
-							<aui:input name="messageId0" type="hidden" value="<%= message.getMessageId() %>" />
-							<aui:input name="parentMessageId0" type="hidden" value="<%= message.getMessageId() %>" />
-						</div>
-
-						<%
-						String taglibPostReplyURL = "javascript:" + randomNamespace + "showEl('" + randomNamespace + "postReplyForm0');";
-						%>
-
-						<c:if test="<%= messagesCount == 1 %>">
-							<c:choose>
-								<c:when test="<%= themeDisplay.isSignedIn() || !SSOUtil.isLoginRedirectRequired(themeDisplay.getCompanyId()) %>">
-									<liferay-ui:message key="no-comments-yet" /> <a href="<%= taglibPostReplyURL %>"><liferay-ui:message key="be-the-first" /></a>
-								</c:when>
-								<c:otherwise>
-									<liferay-ui:message key="no-comments-yet" /> <a href="<%= themeDisplay.getURLSignIn() %>"><liferay-ui:message key="please-sign-in-to-comment" /></a>
-								</c:otherwise>
-							</c:choose>
+						<c:if test="<%= !commentSectionDisplayContext.isDiscussionMaxComments() %>">
+							<div id="<%= randomNamespace %>messageScroll<%= commentSectionDisplayContext.getRootMessageId() %>">
+								<aui:input name="messageId0" type="hidden" value="<%= commentSectionDisplayContext.getRootMessageId() %>" />
+								<aui:input name="parentMessageId0" type="hidden" value="<%= commentSectionDisplayContext.getRootMessageId() %>" />
+							</div>
 						</c:if>
 
 						<%
-						boolean subscribed = SubscriptionLocalServiceUtil.isSubscribed(company.getCompanyId(), user.getUserId(), className, classPK);
+						boolean subscribed = SubscriptionLocalServiceUtil.isSubscribed(company.getCompanyId(), user.getUserId(), discussionTaglibHelper.getClassName(), discussionTaglibHelper.getClassPK());
 
 						String subscriptionURL = "javascript:" + randomNamespace + "subscribeToComments(" + !subscribed + ");";
 						%>
@@ -119,57 +103,41 @@ int messagesCount = messages.size();
 							</c:choose>
 						</c:if>
 
-						<aui:input name="emailAddress" type="hidden" />
+						<c:if test="<%= !commentSectionDisplayContext.isDiscussionMaxComments() %>">
+							<aui:input name="emailAddress" type="hidden" />
 
-						<c:choose>
-							<c:when test="<%= themeDisplay.isSignedIn() || !SSOUtil.isLoginRedirectRequired(themeDisplay.getCompanyId()) %>">
-								<aui:row fluid="<%= true %>">
-									<div class="lfr-discussion-details">
-										<liferay-ui:user-display
-											displayStyle="2"
-											showUserName="<%= false %>"
-											userId="<%= user.getUserId() %>"
-										/>
-									</div>
+							<c:choose>
+								<c:when test="<%= themeDisplay.isSignedIn() || !SSOUtil.isLoginRedirectRequired(discussionRequestHelper.getCompanyId()) %>">
+									<aui:row fluid="<%= true %>">
+										<div class="lfr-discussion-details">
+											<liferay-ui:user-display
+												displayStyle="2"
+												showUserName="<%= false %>"
+												userId="<%= discussionTaglibHelper.getUserId() %>"
+											/>
+										</div>
 
-									<div class="lfr-discussion-body">
+										<div class="lfr-discussion-body">
+											<liferay-ui:input-editor configKey="commentsEditor" contents="" editorName='<%= PropsUtil.get("editor.wysiwyg.portal-web.docroot.html.taglib.ui.discussion.jsp") %>' name='<%= randomNamespace + "postReplyBody0" %>' onChangeMethod='<%= randomNamespace + "0OnChange" %>' placeholder="type-your-comment-here" />
 
-										<%
-										Map<String, Object> data = new HashMap<String, Object>();
+											<aui:input name="postReplyBody0" type="hidden" />
 
-										JSONObject editorConfigJSONObject = JSONFactoryUtil.createJSONObject();
-
-										editorConfigJSONObject.put("allowedContent", PropsValues.DISCUSSION_COMMENTS_ALLOWED_CONTENT);
-										editorConfigJSONObject.put("toolbars", JSONFactoryUtil.createJSONObject());
-
-										data.put("editorConfig", editorConfigJSONObject);
-
-										JSONObject editorOptionsJSONObject = JSONFactoryUtil.createJSONObject();
-
-										editorOptionsJSONObject.put("textMode", Boolean.FALSE);
-
-										data.put("editorOptions", editorOptionsJSONObject);
-										%>
-
-										<liferay-ui:input-editor contents="" data="<%= data %>" editorImpl="<%= EDITOR_IMPL_KEY %>" name='<%= randomNamespace + "postReplyBody0" %>' onChangeMethod='<%= randomNamespace + "0OnChange" %>' placeholder="type-your-comment-here" showSource="<%= false %>" />
-
-										<aui:input name="postReplyBody0" type="hidden" />
-
-										<aui:button-row>
-											<aui:button cssClass="btn-comment btn-primary" disabled="<%= true %>" id='<%= randomNamespace + "postReplyButton0" %>' onClick='<%= randomNamespace + "postReply(0);" %>' value='<%= LanguageUtil.get(request, "reply") %>' />
-										</aui:button-row>
-									</div>
-								</aui:row>
-							</c:when>
-							<c:otherwise>
-								<liferay-ui:icon
-									iconCssClass="icon-reply"
-									label="<%= true %>"
-									message="please-sign-in-to-comment"
-									url="<%= themeDisplay.getURLSignIn() %>"
-								/>
-							</c:otherwise>
-						</c:choose>
+											<aui:button-row>
+												<aui:button cssClass="btn-comment btn-primary" disabled="<%= true %>" id='<%= randomNamespace + "postReplyButton0" %>' onClick='<%= randomNamespace + "postReply(0);" %>' value='<%= themeDisplay.isSignedIn() ? "reply" : "reply-as" %>' />
+											</aui:button-row>
+										</div>
+									</aui:row>
+								</c:when>
+								<c:otherwise>
+									<liferay-ui:icon
+										iconCssClass="icon-reply"
+										label="<%= true %>"
+										message="please-sign-in-to-comment"
+										url="<%= themeDisplay.getURLSignIn() %>"
+									/>
+								</c:otherwise>
+							</c:choose>
+						</c:if>
 					</aui:fieldset>
 				</c:if>
 
@@ -187,7 +155,7 @@ int messagesCount = messages.size();
 							}
 						}
 
-						List<RatingsEntry> ratingsEntries = RatingsEntryLocalServiceUtil.getEntries(themeDisplay.getUserId(), MBDiscussion.class.getName(), classPKs);
+						List<RatingsEntry> ratingsEntries = RatingsEntryLocalServiceUtil.getEntries(discussionTaglibHelper.getUserId(), MBDiscussion.class.getName(), classPKs);
 						List<RatingsStats> ratingsStatsList = RatingsStatsLocalServiceUtil.getStats(MBDiscussion.class.getName(), classPKs);
 
 						int[] range = treeWalker.getChildrenRange(rootMessage);
@@ -212,6 +180,7 @@ int messagesCount = messages.size();
 							request.setAttribute(WebKeys.MESSAGE_BOARDS_TREE_WALKER, treeWalker);
 							request.setAttribute(WebKeys.MESSAGE_BOARDS_TREE_WALKER_CUR_MESSAGE, message);
 
+							request.setAttribute("liferay-ui:discussion:messageDisplay", messageDisplay);
 							request.setAttribute("liferay-ui:discussion:randomNamespace", randomNamespace);
 							request.setAttribute("liferay-ui:discussion:ratingsEntries", ratingsEntries);
 							request.setAttribute("liferay-ui:discussion:ratingsStatsList", ratingsStatsList);
@@ -252,7 +221,7 @@ int messagesCount = messages.size();
 			}
 
 			function <%= randomNamespace %>afterLogin(emailAddress, anonymousAccount) {
-				var form = AUI.$('#<%= namespace %><%= HtmlUtil.escapeJS(formName) %>');
+				var form = AUI.$('#<%= namespace %><%= HtmlUtil.escapeJS(discussionTaglibHelper.getFormName()) %>');
 
 				form.fm('emailAddress').val(emailAddress);
 
@@ -260,7 +229,7 @@ int messagesCount = messages.size();
 			}
 
 			function <%= randomNamespace %>deleteMessage(i) {
-				var form = AUI.$('#<%= namespace %><%= HtmlUtil.escapeJS(formName) %>');
+				var form = AUI.$('#<%= namespace %><%= HtmlUtil.escapeJS(discussionTaglibHelper.getFormName()) %>');
 
 				var messageId = form.fm('messageId' + i).val();
 
@@ -301,7 +270,7 @@ int messagesCount = messages.size();
 			}
 
 			function <%= randomNamespace %>postReply(i) {
-				var form = AUI.$('#<%= namespace %><%= HtmlUtil.escapeJS(formName) %>');
+				var form = AUI.$('#<%= namespace %><%= HtmlUtil.escapeJS(discussionTaglibHelper.getFormName()) %>');
 
 				var editorInstance = window['<%= namespace + randomNamespace %>postReplyBody' + i];
 
@@ -372,7 +341,10 @@ int messagesCount = messages.size();
 							else {
 								var errorKey = '<%= UnicodeLanguageUtil.get(request, "your-request-failed-to-complete") %>';
 
-								if (exception.indexOf('MessageBodyException') > -1) {
+								if (exception.indexOf('DiscussionMaxCommentsException') > -1) {
+									errorKey = '<%= UnicodeLanguageUtil.get(request, "maximum-number-of-comments-has-been-reached") %>';
+								}
+								else if (exception.indexOf('MessageBodyException') > -1) {
 									errorKey = '<%= UnicodeLanguageUtil.get(request, "please-enter-a-valid-message") %>';
 								}
 								else if (exception.indexOf('NoSuchMessageException') > -1) {
@@ -419,7 +391,7 @@ int messagesCount = messages.size();
 			}
 
 			function <%= randomNamespace %>subscribeToComments(subscribe) {
-				var form = AUI.$('#<%= namespace %><%= HtmlUtil.escapeJS(formName) %>');
+				var form = AUI.$('#<%= namespace %><%= HtmlUtil.escapeJS(discussionTaglibHelper.getFormName()) %>');
 
 				var cmd = '<%= Constants.UNSUBSCRIBE_FROM_COMMENTS %>';
 
@@ -433,7 +405,7 @@ int messagesCount = messages.size();
 			}
 
 			function <%= randomNamespace %>updateMessage(i, pending) {
-				var form = AUI.$('#<%= namespace %><%= HtmlUtil.escapeJS(formName) %>');
+				var form = AUI.$('#<%= namespace %><%= HtmlUtil.escapeJS(discussionTaglibHelper.getFormName()) %>');
 
 				var editorInstance = window['<%= namespace + randomNamespace %>editReplyBody' + i];
 
@@ -457,26 +429,26 @@ int messagesCount = messages.size();
 			$('#<%= namespace %>moreComments').on(
 				'click',
 				function(event) {
-					var form = $('#<%= namespace %><%= HtmlUtil.escapeJS(formName) %>');
+					var form = $('#<%= namespace %><%= HtmlUtil.escapeJS(discussionTaglibHelper.getFormName()) %>');
 
 					var data = Liferay.Util.ns(
 						'<portlet:namespace />',
 						{
-							className: '<%= className %>',
-							classPK: <%= classPK %>,
-							hideControls: '<%= hideControls %>',
+							className: '<%= discussionTaglibHelper.getClassName() %>',
+							classPK: <%= discussionTaglibHelper.getClassPK() %>,
+							hideControls: '<%= discussionTaglibHelper.isHideControls() %>',
 							index: form.fm('index').val(),
-							permissionClassName: '<%= permissionClassName %>',
-							permissionClassPK: '<%= permissionClassPK %>',
+							permissionClassName: '<%= discussionTaglibHelper.getPermissionClassName() %>',
+							permissionClassPK: '<%= discussionTaglibHelper.getPermissionClassPK() %>',
 							randomNamespace: '<%= randomNamespace %>',
-							ratingsEnabled: '<%= ratingsEnabled %>',
+							ratingsEnabled: '<%= discussionTaglibHelper.isRatingsEnabled() %>',
 							rootIndexPage: form.fm('rootIndexPage').val(),
-							userId: '<%= userId %>'
+							userId: '<%= discussionTaglibHelper.getUserId() %>'
 						}
 					);
 
 					$.ajax(
-						'<%= paginationURL %>',
+						'<%= discussionTaglibHelper.getPaginationURL() %>',
 						{
 							data: data,
 							error: function() {
@@ -537,7 +509,3 @@ int messagesCount = messages.size();
 		</aui:script>
 	</c:if>
 </section>
-
-<%!
-public static final String EDITOR_IMPL_KEY = "editor.wysiwyg.portal-web.docroot.html.taglib.ui.discussion.jsp";
-%>

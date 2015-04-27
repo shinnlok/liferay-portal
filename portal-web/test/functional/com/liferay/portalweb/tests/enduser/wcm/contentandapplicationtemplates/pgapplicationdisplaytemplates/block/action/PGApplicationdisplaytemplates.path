@@ -9,16 +9,6 @@
 </thead>
 <tbody>
 <tr>
-	<td>PAGE_NAME</td>
-	<td></td>
-	<td>PGApplicationdisplaytemplates</td>
-</tr>
-<tr>
-	<td></td>
-	<td></td>
-	<td></td>
-</tr>
-<tr>
 	<td>ADT_IFRAME</td>
 	<td>//iframe[contains(@src,'Application%20Display%20Templates')]</td>
 	<td></td>
@@ -61,11 +51,6 @@
 <tr>
 	<td>DELETE_BUTTON</td>
 	<td>//div[@class='button-holder ']/button[contains(.,'Delete')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>CONFIRMATION</td>
-	<td></td>
 	<td></td>
 </tr>
 <tr>

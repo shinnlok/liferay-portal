@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.process.log.ProcessOutputStream;
 import com.liferay.portal.kernel.test.CaptureHandler;
 import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
+import com.liferay.portal.kernel.test.SyncThrowableThread;
 import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.InetAddressUtil;
@@ -495,34 +496,33 @@ public class LocalProcessExecutorTest {
 		final AtomicReference<ExecutorService> atomicReference =
 			new AtomicReference<>();
 
-		Thread thread = new Thread() {
+		SyncThrowableThread<Void> syncThrowableThread =
+			new SyncThrowableThread<>(
+				new Callable<Void>() {
 
-			@Override
-			public void run() {
-				try {
-					ExecutorService executorService =
-						_invokeGetThreadPoolExecutor();
+					@Override
+					public Void call() throws Exception {
+						ExecutorService executorService =
+							_invokeGetThreadPoolExecutor();
 
-					atomicReference.set(executorService);
-				}
-				catch (Exception e) {
-					Assert.fail();
-				}
-			}
+						atomicReference.set(executorService);
 
-		};
+						return null;
+					}
+
+				});
 
 		ExecutorService executorService = null;
 
 		synchronized (_localProcessExecutor) {
-			thread.start();
+			syncThrowableThread.start();
 
-			while (thread.getState() != Thread.State.BLOCKED);
+			while (syncThrowableThread.getState() != Thread.State.BLOCKED);
 
 			executorService = _invokeGetThreadPoolExecutor();
 		}
 
-		thread.join();
+		syncThrowableThread.sync();
 
 		Assert.assertSame(executorService, atomicReference.get());
 	}
@@ -2384,9 +2384,9 @@ public class LocalProcessExecutorTest {
 
 			int code = inputStream.read();
 
-			if (code != _CODE_NULL_OUT_OOS) {
-				Assert.fail("Unable to null out OOS because of code " + code);
-			}
+			Assert.assertEquals(
+				"Unable to null out OOS because of code " + code,
+				_CODE_NULL_OUT_OOS, code);
 		}
 
 		public ServerThread(Thread mainThread, String name, int serverPort)

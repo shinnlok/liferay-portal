@@ -26,13 +26,13 @@
 
 	<aui:fieldset>
 		<aui:select label="vocabularies" name="preferences--allAssetVocabularies--">
-			<aui:option label="all" selected="<%= assetCategoriesNavigationDisplayContext.isAllAssetVocabularies() %>" value="<%= true %>" />
-			<aui:option label="filter[action]" selected="<%= !assetCategoriesNavigationDisplayContext.isAllAssetVocabularies() %>" value="<%= false %>" />
+			<aui:option label="all" selected="<%= assetCategoriesNavigationPortletInstanceConfiguration.allAssetVocabularies() %>" value="<%= true %>" />
+			<aui:option label="filter[action]" selected="<%= !assetCategoriesNavigationPortletInstanceConfiguration.allAssetVocabularies() %>" value="<%= false %>" />
 		</aui:select>
 
 		<aui:input name="preferences--assetVocabularyIds--" type="hidden" />
 
-		<div class="<%= assetCategoriesNavigationDisplayContext.isAllAssetVocabularies() ? "hide" : "" %>" id="<portlet:namespace />assetVocabulariesBoxes">
+		<div class="<%= assetCategoriesNavigationPortletInstanceConfiguration.allAssetVocabularies() ? "hide" : "" %>" id="<portlet:namespace />assetVocabulariesBoxes">
 			<liferay-ui:input-move-boxes
 				leftBoxName="currentAssetVocabularyIds"
 				leftList="<%= assetCategoriesNavigationDisplayContext.getCurrentVocabularyNames() %>"
@@ -45,15 +45,10 @@
 		</div>
 
 		<div class="display-template">
-
-			<%
-			TemplateHandler templateHandler = TemplateHandlerRegistryUtil.getTemplateHandler(AssetCategory.class.getName());
-			%>
-
 			<liferay-ui:ddm-template-selector
-				classNameId="<%= PortalUtil.getClassNameId(templateHandler.getClassName()) %>"
-				displayStyle="<%= assetCategoriesNavigationDisplayContext.getDisplayStyle() %>"
-				displayStyleGroupId="<%= assetCategoriesNavigationDisplayContext.getDisplayStyleGroupId() %>"
+				className="<%= AssetCategory.class.getName() %>"
+				displayStyle="<%= assetCategoriesNavigationPortletInstanceConfiguration.displayStyle() %>"
+				displayStyleGroupId="<%= assetCategoriesNavigationPortletInstanceConfiguration.displayStyleGroupId(themeDisplay.getScopeGroupId()) %>"
 				refreshURL="<%= configurationRenderURL %>"
 				showEmptyOption="<%= true %>"
 			/>

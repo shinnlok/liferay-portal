@@ -14,6 +14,7 @@
 
 package com.liferay.taglib;
 
+import com.liferay.portal.kernel.servlet.PortalWebResourcesUtil;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -61,7 +62,9 @@ public class FileAvailabilityUtil {
 		catch (Exception e) {
 		}
 
-		if (url == null) {
+		if ((url == null) &&
+			!PortalWebResourcesUtil.isResourceAvailable(path)) {
+
 			available = Boolean.FALSE;
 		}
 		else {

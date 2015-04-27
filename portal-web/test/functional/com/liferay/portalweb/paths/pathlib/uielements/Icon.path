@@ -9,16 +9,6 @@
 </thead>
 <tbody>
 <tr>
-	<td>PAGE_NAME</td>
-	<td></td>
-	<td>Icon</td>
-</tr>
-<tr>
-	<td></td>
-	<td></td>
-	<td></td>
-</tr>
-<tr>
 	<td>ADVANCED_SEARCH</td>
 	<td>//a[contains(@class,'toggle-advanced') and i[@class='icon-search']]</td>
 	<td></td>
@@ -29,8 +19,13 @@
 	<td></td>
 </tr>
 <tr>
+	<td>CLOSE</td>
+	<td>//button[contains(@class,'close-content')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>COG</td>
-	<td>//i[contains(@class,'icon-cog') and contains(@class,'lfr-icon-menu-icon')]</td>
+	<td>//div[@id='main-content']//i[contains(@class,'icon-cog') and contains(@class,'lfr-icon-menu-icon')]</td>
 	<td></td>
 </tr>
 </tbody>

@@ -1,5 +1,5 @@
 <definition component-name="portal-tools">
-	<property name="portal.url" value="http://the-internet.herokuapp.com/status_codes" />
+	<property name="testcase.url" value="http://the-internet.herokuapp.com/status_codes" />
 	<property name="testray.main.component.name" value="Tools" />
 
 	<command name="EchoStatement" priority="5">
@@ -128,7 +128,7 @@
 				<equals arg1="${number}" arg2="4" />
 			</not>
 			<then>
-				<var method="MathUtil#sum(&quot;1&quot;, ${number})" name="number" />
+				<var method="MathUtil#sum('1', '${number}')" name="number" />
 			</then>
 		</while>
 

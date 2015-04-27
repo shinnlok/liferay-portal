@@ -9,16 +9,6 @@
 </thead>
 <tbody>
 <tr>
-	<td>PAGE_NAME</td>
-	<td></td>
-	<td>CPKaleoformsadminNewprocessSelectformNewform</td>
-</tr>
-<tr>
-	<td></td>
-	<td></td>
-	<td></td>
-</tr>
-<tr>
 	<td>FORM_IFRAME</td>
 	<td>//iframe[contains(@id,'ddmDialog_iframe_')]</td>
 	<td></td>

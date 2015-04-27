@@ -50,6 +50,7 @@ import com.liferay.portal.model.Group;
 import com.liferay.portal.model.GroupConstants;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.PortletConstants;
+import com.liferay.portal.model.PortletInstance;
 import com.liferay.portal.model.User;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.security.auth.PrincipalThreadLocal;
@@ -83,11 +84,6 @@ import com.liferay.portlet.asset.service.persistence.AssetEntryQuery;
 import com.liferay.portlet.asset.util.AssetEntryQueryProcessor;
 import com.liferay.portlet.expando.model.ExpandoBridge;
 import com.liferay.portlet.sites.util.SitesUtil;
-import com.liferay.registry.Registry;
-import com.liferay.registry.RegistryUtil;
-import com.liferay.registry.ServiceReference;
-import com.liferay.registry.ServiceTracker;
-import com.liferay.registry.ServiceTrackerCustomizer;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -107,10 +103,21 @@ import javax.portlet.PortletException;
 import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
 
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
+
 /**
+ * Provides utility methods for managing the configuration, managing scopes of
+ * content, and obtaining lists of assets for the Asset Publisher portlet.
+ *
  * @author Raymond Augé
  * @author Julio Camarero
  */
+@Component
 public class AssetPublisherUtil {
 
 	public static final String SCOPE_ID_CHILD_GROUP_PREFIX = "ChildGroup_";
@@ -288,12 +295,12 @@ public class AssetPublisherUtil {
 					Property property = PropertyFactoryUtil.forName(
 						"portletId");
 
-					String portletId =
-						AssetPublisherPortletKeys.ASSET_PUBLISHER +
-							PortletConstants.INSTANCE_SEPARATOR +
-								StringPool.PERCENT;
+					PortletInstance portletInstance = new PortletInstance(
+						AssetPublisherPortletKeys.ASSET_PUBLISHER,
+						StringPool.PERCENT);
 
-					dynamicQuery.add(property.like(portletId));
+					dynamicQuery.add(
+						property.like(portletInstance.getPortletInstanceKey()));
 				}
 
 			});
@@ -545,10 +552,8 @@ public class AssetPublisherUtil {
 	}
 
 	public static AssetEntryQuery getAssetEntryQuery(
-			PortletPreferences portletPreferences, long[] scopeGroupIds,
-			long[] overrideAllAssetCategoryIds,
-			String[] overrideAllAssetTagNames)
-		throws PortalException {
+		PortletPreferences portletPreferences, long[] scopeGroupIds,
+		long[] overrideAllAssetCategoryIds, String[] overrideAllAssetTagNames) {
 
 		AssetEntryQuery assetEntryQuery = new AssetEntryQuery();
 
@@ -1096,7 +1101,7 @@ public class AssetPublisherUtil {
 			if (!PrefsPropsUtil.getBoolean(
 					layout.getCompanyId(),
 					PropsKeys.
-					SITES_CONTENT_SHARING_THROUGH_ADMINISTRATORS_ENABLED)) {
+						SITES_CONTENT_SHARING_THROUGH_ADMINISTRATORS_ENABLED)) {
 
 				return false;
 			}
@@ -1152,7 +1157,6 @@ public class AssetPublisherUtil {
 			"[$ASSET_ENTRIES$]",
 			ListUtil.toString(
 				assetEntries, _titleAccessor, StringPool.COMMA_AND_SPACE));
-		subscriptionSender.setContextUserPrefix("ASSET_PUBLISHER");
 		subscriptionSender.setFrom(fromAddress, fromName);
 		subscriptionSender.setHtmlFormat(true);
 		subscriptionSender.setLocalizedBodyMap(localizedBodyMap);
@@ -1175,7 +1179,7 @@ public class AssetPublisherUtil {
 		throws Exception {
 
 		for (AssetEntryQueryProcessor assetEntryQueryProcessor :
-				_assetEntryQueryProcessors) {
+				_instance._assetEntryQueryProcessors) {
 
 			assetEntryQueryProcessor.processAssetEntryQuery(
 				user, portletPreferences, assetEntryQuery);
@@ -1232,8 +1236,11 @@ public class AssetPublisherUtil {
 			String portletId)
 		throws PortalException {
 
+		Layout layout = LayoutLocalServiceUtil.fetchLayout(plid);
+
 		PortletPermissionUtil.check(
-			permissionChecker, plid, portletId, ActionKeys.SUBSCRIBE);
+			permissionChecker, 0, layout, portletId, ActionKeys.SUBSCRIBE,
+			false, false);
 
 		SubscriptionLocalServiceUtil.addSubscription(
 			permissionChecker.getUserId(), groupId,
@@ -1253,8 +1260,11 @@ public class AssetPublisherUtil {
 			PermissionChecker permissionChecker, long plid, String portletId)
 		throws PortalException {
 
+		Layout layout = LayoutLocalServiceUtil.fetchLayout(plid);
+
 		PortletPermissionUtil.check(
-			permissionChecker, plid, portletId, ActionKeys.SUBSCRIBE);
+			permissionChecker, 0, layout, portletId, ActionKeys.SUBSCRIBE,
+			false, false);
 
 		SubscriptionLocalServiceUtil.deleteSubscription(
 			permissionChecker.getUserId(),
@@ -1262,9 +1272,7 @@ public class AssetPublisherUtil {
 			getSubscriptionClassPK(plid, portletId));
 	}
 
-	protected static long[] getSiteGroupIds(long[] groupIds)
-		throws PortalException {
-
+	protected static long[] getSiteGroupIds(long[] groupIds) {
 		Set<Long> siteGroupIds = new HashSet<>();
 
 		for (long groupId : groupIds) {
@@ -1272,6 +1280,28 @@ public class AssetPublisherUtil {
 		}
 
 		return ArrayUtil.toLongArray(siteGroupIds);
+	}
+
+	@Activate
+	protected void activate() {
+		_instance = this;
+	}
+
+	@Reference(
+		cardinality = ReferenceCardinality.MULTIPLE,
+		policy = ReferencePolicy.DYNAMIC,
+		policyOption = ReferencePolicyOption.GREEDY
+	)
+	protected void setAssetEntryQueryProcessor(
+		AssetEntryQueryProcessor assetEntryQueryProcessor) {
+
+		_assetEntryQueryProcessors.add(assetEntryQueryProcessor);
+	}
+
+	protected void unsetAssetEntryQueryProcessor(
+		AssetEntryQueryProcessor assetEntryQueryProcessor) {
+
+		_assetEntryQueryProcessors.remove(assetEntryQueryProcessor);
 	}
 
 	private static void _checkAssetEntries(
@@ -1415,11 +1445,7 @@ public class AssetPublisherUtil {
 	private static final Log _log = LogFactoryUtil.getLog(
 		AssetPublisherUtil.class);
 
-	private static final List<AssetEntryQueryProcessor>
-		_assetEntryQueryProcessors = new CopyOnWriteArrayList<>();
-	private static final
-		ServiceTracker<AssetEntryQueryProcessor, AssetEntryQueryProcessor>
-			_serviceTracker;
+	private static AssetPublisherUtil _instance;
 
 	private static final Accessor<AssetEntry, String> _titleAccessor =
 		new Accessor<AssetEntry, String>() {
@@ -1441,52 +1467,7 @@ public class AssetPublisherUtil {
 
 		};
 
-	static {
-		Registry registry = RegistryUtil.getRegistry();
-
-		_serviceTracker = registry.trackServices(
-			AssetEntryQueryProcessor.class,
-			new AssetEntryQueryServiceTrackerCustomizer());
-
-		_serviceTracker.open();
-	}
-
-	private static class AssetEntryQueryServiceTrackerCustomizer
-		implements ServiceTrackerCustomizer
-			<AssetEntryQueryProcessor, AssetEntryQueryProcessor> {
-
-		@Override
-		public AssetEntryQueryProcessor addingService(
-			ServiceReference<AssetEntryQueryProcessor> serviceReference) {
-
-			Registry registry = RegistryUtil.getRegistry();
-
-			AssetEntryQueryProcessor assetEntryQueryProcessor =
-				registry.getService(serviceReference);
-
-			_assetEntryQueryProcessors.add(assetEntryQueryProcessor);
-
-			return assetEntryQueryProcessor;
-		}
-
-		@Override
-		public void modifiedService(
-			ServiceReference<AssetEntryQueryProcessor> serviceReference,
-			AssetEntryQueryProcessor assetEntryQueryProcessor) {
-		}
-
-		@Override
-		public void removedService(
-			ServiceReference<AssetEntryQueryProcessor> serviceReference,
-			AssetEntryQueryProcessor assetEntryQueryProcessor) {
-
-			Registry registry = RegistryUtil.getRegistry();
-
-			registry.ungetService(serviceReference);
-
-			_assetEntryQueryProcessors.remove(assetEntryQueryProcessor);
-		}
-
-	}
+	private final List<AssetEntryQueryProcessor>
+		_assetEntryQueryProcessors = new CopyOnWriteArrayList<>();
 
 }

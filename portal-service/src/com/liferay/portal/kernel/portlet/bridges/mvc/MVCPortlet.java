@@ -190,7 +190,7 @@ public class MVCPortlet extends LiferayPortlet {
 		clearRequestParameters = GetterUtil.getBoolean(
 			getInitParameter("clear-request-parameters"));
 		copyRequestParameters = GetterUtil.getBoolean(
-			getInitParameter("copy-request-parameters"));
+			getInitParameter("copy-request-parameters"), true);
 
 		String packagePrefix = getInitParameter(
 			ActionCommandCache.ACTION_PACKAGE_NAME);
@@ -396,6 +396,13 @@ public class MVCPortlet extends LiferayPortlet {
 		}
 
 		return mvcPath;
+	}
+
+	protected void hideDefaultErrorMessage(PortletRequest portletRequest) {
+		SessionMessages.add(
+			portletRequest,
+			PortalUtil.getPortletId(portletRequest) +
+				SessionMessages.KEY_SUFFIX_HIDE_DEFAULT_ERROR_MESSAGE);
 	}
 
 	protected void hideDefaultSuccessMessage(PortletRequest portletRequest) {

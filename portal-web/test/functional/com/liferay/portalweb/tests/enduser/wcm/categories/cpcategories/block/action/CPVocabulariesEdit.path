@@ -9,16 +9,6 @@
 </thead>
 <tbody>
 <tr>
-	<td>PAGE_NAME</td>
-	<td></td>
-	<td>CPVocabulariesEdit</td>
-</tr>
-<tr>
-	<td></td>
-	<td></td>
-	<td></td>
-</tr>
-<tr>
 	<td>EXTEND_ACTION_PATH</td>
 	<td>CPVocabulariesAdd</td>
 	<td></td>
@@ -29,28 +19,23 @@
 	<td></td>
 </tr>
 <tr>
-	<td>CONFIRMATION</td>
-	<td></td>
-	<td></td>
-</tr>
-<tr>
 	<td>EDIT_ICON</td>
 	<td>//li[@data-vocabulary='${key_vocabularyName}']/a/span[@class='vocabulary-item-actions-trigger']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>NAME_FIELD</td>
-	<td>//input[@id='_147_title']</td>
+	<td>//input[contains(@id,'title')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>DESCRIPTION_FIELD</td>
-	<td>//textarea[@id='_147_description']</td>
+	<td>//span[contains(@id,'description')]/textarea</td>
 	<td></td>
 </tr>
 <tr>
 	<td>ALLOW_MULTIPLE_CATEGORIES_CHECKBOX</td>
-	<td>//input[@id='_147_multiValued']</td>
+	<td>//input[contains(@id,'multiValued')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -86,12 +71,12 @@
 </tr>
 <tr>
 	<td>ASSOCIATED_ASSET_TYPES_SELECT</td>
-	<td>//select[contains(@id,'_147_classNameId')]</td>
+	<td>//select[contains(@class,'vocabulary-asset-type-select')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>ASSOCIATED_ASSET_TYPES_SELECT_2</td>
-	<td>xpath=(//select[contains(@id,'_147_classNameId')])[2]</td>
+	<td>xpath=(//select[contains(@class,'vocabulary-asset-type-select')])[2]</td>
 	<td></td>
 </tr>
 <tr>

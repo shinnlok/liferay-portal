@@ -24,7 +24,6 @@ import com.liferay.portal.service.LayoutLocalServiceUtil;
 import java.io.File;
 import java.io.Serializable;
 
-import java.util.Date;
 import java.util.Map;
 
 /**
@@ -53,17 +52,8 @@ public class PortletExportBackgroundTaskExecutor
 		long userId = MapUtil.getLong(settingsMap, "userId");
 		String fileName = MapUtil.getString(settingsMap, "fileName");
 
-		long sourcePlid = MapUtil.getLong(settingsMap, "sourcePlid");
-		long sourceGroupId = MapUtil.getLong(settingsMap, "sourceGroupId");
-		String portletId = MapUtil.getString(settingsMap, "portletId");
-		Map<String, String[]> parameterMap =
-			(Map<String, String[]>)settingsMap.get("parameterMap");
-		Date startDate = (Date)settingsMap.get("startDate");
-		Date endDate = (Date)settingsMap.get("endDate");
-
 		File larFile = LayoutLocalServiceUtil.exportPortletInfoAsFile(
-			sourcePlid, sourceGroupId, portletId, parameterMap, startDate,
-			endDate);
+			exportImportConfiguration);
 
 		BackgroundTaskLocalServiceUtil.addBackgroundTaskAttachment(
 			userId, backgroundTask.getBackgroundTaskId(), fileName, larFile);

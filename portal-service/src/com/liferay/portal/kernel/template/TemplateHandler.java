@@ -35,6 +35,8 @@ public interface TemplateHandler {
 	 */
 	public String getClassName();
 
+	public Map<String, Object> getCustomContextObjects();
+
 	/**
 	 * Returns the elements containing the information of the portlet display
 	 * templates to be installed by default.
@@ -46,6 +48,13 @@ public interface TemplateHandler {
 	 *         template elements
 	 */
 	public List<Element> getDefaultTemplateElements() throws Exception;
+
+	/**
+	 * Returns the key of the template handler's default template.
+	 *
+	 * @return the key of the template handler's default template
+	 */
+	public String getDefaultTemplateKey();
 
 	/**
 	 * Returns the template handler's name.

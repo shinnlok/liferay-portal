@@ -16,7 +16,7 @@ package com.liferay.portlet.messageboards;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.settings.FallbackKeys;
-import com.liferay.portal.kernel.settings.GroupServiceSettings;
+import com.liferay.portal.kernel.settings.GroupServiceSettingsLocator;
 import com.liferay.portal.kernel.settings.LocalizedValuesMap;
 import com.liferay.portal.kernel.settings.ParameterMapSettings;
 import com.liferay.portal.kernel.settings.Settings;
@@ -24,10 +24,10 @@ import com.liferay.portal.kernel.settings.SettingsFactoryUtil;
 import com.liferay.portal.kernel.settings.TypedSettings;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.RSSUtil;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.messageboards.util.MBConstants;
 import com.liferay.portlet.messageboards.util.MBUtil;
-import com.liferay.util.RSSUtil;
 
 import java.util.Map;
 
@@ -35,16 +35,15 @@ import java.util.Map;
  * @author Jorge Ferrer
  */
 @Settings.Config(settingsIds = MBConstants.SERVICE_NAME)
-public class MBGroupServiceSettings implements GroupServiceSettings {
+public class MBGroupServiceSettings {
 
-	public static final String[] ALL_KEYS = {
-	};
+	public static final String[] ALL_KEYS = {};
 
 	public static MBGroupServiceSettings getInstance(long groupId)
 		throws PortalException {
 
-		Settings settings = SettingsFactoryUtil.getGroupServiceSettings(
-			groupId, MBConstants.SERVICE_NAME);
+		Settings settings = SettingsFactoryUtil.getSettings(
+			new GroupServiceSettingsLocator(groupId, MBConstants.SERVICE_NAME));
 
 		return new MBGroupServiceSettings(settings);
 	}
@@ -53,8 +52,8 @@ public class MBGroupServiceSettings implements GroupServiceSettings {
 			long groupId, Map<String, String[]> parameterMap)
 		throws PortalException {
 
-		Settings settings = SettingsFactoryUtil.getGroupServiceSettings(
-			groupId, MBConstants.SERVICE_NAME);
+		Settings settings = SettingsFactoryUtil.getSettings(
+			new GroupServiceSettingsLocator(groupId, MBConstants.SERVICE_NAME));
 
 		ParameterMapSettings parameterMapSettings = new ParameterMapSettings(
 			parameterMap, settings);
@@ -79,9 +78,8 @@ public class MBGroupServiceSettings implements GroupServiceSettings {
 	}
 
 	public String getEmailMessageAddedBodyXml() {
-		LocalizedValuesMap emailMessageBodyMap = getEmailMessageAddedBody();
-
-		return emailMessageBodyMap.getLocalizationXml();
+		return LocalizationUtil.getXml(
+			getEmailMessageAddedBody(), "emailMessageAddedBody");
 	}
 
 	public LocalizedValuesMap getEmailMessageAddedSubject() {
@@ -89,10 +87,8 @@ public class MBGroupServiceSettings implements GroupServiceSettings {
 	}
 
 	public String getEmailMessageAddedSubjectXml() {
-		LocalizedValuesMap emailMessageAddedSubjectMap =
-			getEmailMessageAddedSubject();
-
-		return emailMessageAddedSubjectMap.getLocalizationXml();
+		return LocalizationUtil.getXml(
+			getEmailMessageAddedSubject(), "emailMessageAddedSubject");
 	}
 
 	public LocalizedValuesMap getEmailMessageUpdatedBody() {
@@ -100,10 +96,8 @@ public class MBGroupServiceSettings implements GroupServiceSettings {
 	}
 
 	public String getEmailMessageUpdatedBodyXml() {
-		LocalizedValuesMap emailMessageUpdatedBodyMap =
-			getEmailMessageUpdatedBody();
-
-		return emailMessageUpdatedBodyMap.getLocalizationXml();
+		return LocalizationUtil.getXml(
+			getEmailMessageUpdatedBody(), "emailMessageUpdatedBody");
 	}
 
 	public LocalizedValuesMap getEmailMessageUpdatedSubject() {
@@ -112,10 +106,8 @@ public class MBGroupServiceSettings implements GroupServiceSettings {
 	}
 
 	public String getEmailMessageUpdatedSubjectXml() {
-		LocalizedValuesMap emailMessageUpdatedSubjectMap =
-			getEmailMessageUpdatedSubject();
-
-		return emailMessageUpdatedSubjectMap.getLocalizationXml();
+		return LocalizationUtil.getXml(
+			getEmailMessageUpdatedSubject(), "emailMessageUpdatedSubject");
 	}
 
 	public String getMessageFormat() {

@@ -24,6 +24,7 @@ import com.liferay.sync.engine.service.SyncAccountService;
 import com.liferay.sync.engine.service.SyncFileService;
 import com.liferay.sync.engine.session.Session;
 import com.liferay.sync.engine.session.SessionManager;
+import com.liferay.sync.engine.util.FileKeyUtil;
 import com.liferay.sync.engine.util.FileUtil;
 import com.liferay.sync.engine.util.IODeltaUtil;
 import com.liferay.sync.engine.util.StreamUtil;
@@ -100,18 +101,18 @@ public class DownloadFileHandler extends BaseHandler {
 	public boolean handlePortalException(String exception) throws Exception {
 		SyncFile syncFile = getLocalSyncFile();
 
+		if (_logger.isDebugEnabled()) {
+			_logger.debug(
+				"Handling exception {} file path {}", exception,
+				syncFile.getFilePathName());
+		}
+
 		if (exception.equals(
 				"com.liferay.portlet.documentlibrary." +
 					"NoSuchFileVersionException") &&
 			(Boolean)getParameterValue("patch")) {
 
-			if (_logger.isDebugEnabled()) {
-				_logger.debug(
-					"Handling exception {} file path {}", exception,
-					syncFile.getFilePathName());
-			}
-
-			FileEventUtil.downloadFile(getSyncAccountId(), syncFile);
+			FileEventUtil.downloadFile(getSyncAccountId(), syncFile, false);
 
 			return true;
 		}
@@ -121,12 +122,6 @@ public class DownloadFileHandler extends BaseHandler {
 					"NoSuchFileEntryException") ||
 			exception.equals(
 				"com.liferay.portlet.documentlibrary.NoSuchFileException")) {
-
-			if (_logger.isDebugEnabled()) {
-				_logger.debug(
-					"Handling exception {} file path {}", exception,
-					syncFile.getFilePathName());
-			}
 
 			SyncFileService.deleteSyncFile(syncFile, false);
 
@@ -144,8 +139,6 @@ public class DownloadFileHandler extends BaseHandler {
 
 		List<String> downloadedFilePathNames =
 			watcher.getDownloadedFilePathNames();
-
-		downloadedFilePathNames.add(filePath.toString());
 
 		try {
 			SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
@@ -181,12 +174,14 @@ public class DownloadFileHandler extends BaseHandler {
 				syncFile.setUiEvent(SyncFile.UI_EVENT_DOWNLOADED_NEW);
 			}
 
-			FileUtil.writeFileKey(
-				tempFilePath, String.valueOf(syncFile.getSyncFileId()));
+			FileKeyUtil.writeFileKey(
+				tempFilePath, String.valueOf(syncFile.getSyncFileId()), false);
 
 			FileUtil.setModifiedTime(tempFilePath, syncFile.getModifiedTime());
 
-			FileUtil.moveFile(tempFilePath, filePath);
+			Files.move(
+				tempFilePath, filePath, StandardCopyOption.ATOMIC_MOVE,
+				StandardCopyOption.REPLACE_EXISTING);
 
 			syncFile.setState(SyncFile.STATE_SYNCED);
 

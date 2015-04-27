@@ -14,7 +14,9 @@
 
 package com.liferay.portal.kernel.search;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
+import com.liferay.registry.Registry;
+import com.liferay.registry.RegistryUtil;
+import com.liferay.registry.ServiceTracker;
 
 import java.util.List;
 
@@ -24,9 +26,13 @@ import java.util.List;
 public class TokenizerUtil {
 
 	public static Tokenizer getTokenizer() {
-		PortalRuntimePermission.checkGetBeanProperty(TokenizerUtil.class);
+		Tokenizer tokenizer = _instance._serviceTracker.getService();
 
-		return _tokenizer;
+		if (tokenizer == null) {
+			tokenizer = _defaultTokenizer;
+		}
+
+		return tokenizer;
 	}
 
 	public static List<String> tokenize(
@@ -36,12 +42,16 @@ public class TokenizerUtil {
 		return getTokenizer().tokenize(fieldName, input, languageId);
 	}
 
-	public void setTokenizer(Tokenizer tokenizer) {
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
+	private TokenizerUtil() {
+		Registry registry = RegistryUtil.getRegistry();
 
-		_tokenizer = tokenizer;
+		_serviceTracker = registry.trackServices(Tokenizer.class);
 	}
 
-	private static Tokenizer _tokenizer;
+	private static final TokenizerUtil _instance = new TokenizerUtil();
+
+	private static final Tokenizer _defaultTokenizer = new SimpleTokenizer();
+
+	private final ServiceTracker<Tokenizer, Tokenizer> _serviceTracker;
 
 }

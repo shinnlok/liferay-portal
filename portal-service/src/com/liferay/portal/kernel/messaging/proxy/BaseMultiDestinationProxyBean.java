@@ -15,7 +15,8 @@
 package com.liferay.portal.kernel.messaging.proxy;
 
 import com.liferay.portal.kernel.messaging.Message;
-import com.liferay.portal.kernel.messaging.sender.MessageSender;
+import com.liferay.portal.kernel.messaging.MessageBus;
+import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.messaging.sender.SynchronousMessageSender;
 
 /**
@@ -27,12 +28,15 @@ public abstract class BaseMultiDestinationProxyBean {
 	public abstract String getDestinationName(ProxyRequest proxyRequest);
 
 	public void send(ProxyRequest proxyRequest) {
-		_messageSender.send(
+		MessageBusUtil.sendMessage(
 			getDestinationName(proxyRequest), buildMessage(proxyRequest));
 	}
 
-	public void setMessageSender(MessageSender messageSender) {
-		_messageSender = messageSender;
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link MessageBusUtil#getMessageBus)
+	 */
+	@Deprecated
+	public void setMessageBus(MessageBus messageBus) {
 	}
 
 	public void setSynchronousMessageSender(
@@ -67,7 +71,6 @@ public abstract class BaseMultiDestinationProxyBean {
 		return message;
 	}
 
-	private MessageSender _messageSender;
 	private SynchronousMessageSender _synchronousMessageSender;
 
 }

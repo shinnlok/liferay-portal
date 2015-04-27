@@ -235,12 +235,6 @@
 		<column name="clusterNodeIds" type="String" />
 		<column name="wholeCluster" type="boolean" />
 	</entity>
-	<entity name="CMISRepository" local-service="true" remote-service="false">
-
-		<!-- References -->
-
-		<reference package-path="com.liferay.portal" entity="Repository" />
-	</entity>
 	<entity name="Company" local-service="true" remote-service="true">
 
 		<!-- PK fields -->
@@ -676,6 +670,7 @@
 		<reference package-path="com.liferay.portlet.social" entity="SocialRequest" />
 		<reference package-path="com.liferay.portlet.softwarecatalog" entity="SCFrameworkVersion" />
 		<reference package-path="com.liferay.portlet.softwarecatalog" entity="SCProductEntry" />
+		<reference package-path="com.liferay.portlet.trash" entity="TrashEntry" />
 	</entity>
 	<entity name="Image" local-service="true" remote-service="true">
 
@@ -828,12 +823,6 @@
 		<reference package-path="com.liferay.portlet.asset" entity="AssetEntry" />
 		<reference package-path="com.liferay.portlet.asset" entity="AssetTag" />
 		<reference package-path="com.liferay.portlet.expando" entity="ExpandoRow" />
-		<reference package-path="com.liferay.portlet.journal" entity="JournalArticle" />
-		<reference package-path="com.liferay.portlet.journal" entity="JournalContentSearch" />
-		<reference package-path="com.liferay.portlet.messageboards" entity="MBMessage" />
-		<reference package-path="com.liferay.portlet.mobiledevicerules" entity="MDRRule" />
-		<reference package-path="com.liferay.portlet.mobiledevicerules" entity="MDRRuleGroup" />
-		<reference package-path="com.liferay.portlet.mobiledevicerules" entity="MDRRuleGroupInstance" />
 		<reference package-path="com.liferay.portlet.ratings" entity="RatingsStats" />
 	</entity>
 	<entity name="LayoutBranch" local-service="true" remote-service="true">

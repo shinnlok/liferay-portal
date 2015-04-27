@@ -16,9 +16,6 @@ package com.liferay.portal.action;
 
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.CharPool;
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.HttpUtil;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
@@ -34,7 +31,6 @@ import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.admin.util.AdminUtil;
 
-import java.util.List;
 import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
@@ -67,10 +63,9 @@ public class UpdateLanguageAction extends Action {
 
 		Locale locale = LocaleUtil.fromLanguageId(languageId);
 
-		List<Locale> availableLocales = ListUtil.fromArray(
-			LanguageUtil.getAvailableLocales(themeDisplay.getSiteGroupId()));
+		if (LanguageUtil.isAvailableLocale(
+				themeDisplay.getSiteGroupId(), locale)) {
 
-		if (availableLocales.contains(locale)) {
 			boolean persistState = ParamUtil.getBoolean(
 				request, "persistState", true);
 
@@ -101,7 +96,6 @@ public class UpdateLanguageAction extends Action {
 		String redirect = ParamUtil.getString(request, "redirect");
 
 		String layoutURL = StringPool.BLANK;
-		String queryString = StringPool.BLANK;
 
 		int pos = redirect.indexOf(Portal.FRIENDLY_URL_SEPARATOR);
 
@@ -111,7 +105,6 @@ public class UpdateLanguageAction extends Action {
 
 		if (pos != -1) {
 			layoutURL = redirect.substring(0, pos);
-			queryString = redirect.substring(pos);
 		}
 		else {
 			layoutURL = redirect;
@@ -142,13 +135,6 @@ public class UpdateLanguageAction extends Action {
 				redirect = PortalUtil.getLayoutFriendlyURL(
 					layout, themeDisplay, locale);
 			}
-		}
-
-		int lifecycle = GetterUtil.getInteger(
-			HttpUtil.getParameter(queryString, "p_p_lifecycle", false));
-
-		if (lifecycle == 0) {
-			redirect = redirect + queryString;
 		}
 
 		response.sendRedirect(redirect);
