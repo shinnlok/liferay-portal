@@ -293,6 +293,13 @@ public class VerifyJournal extends VerifyProcess {
 				articleImageId);
 
 		if (articleImage == null) {
+			if ((articleImageId != 0) && _log.isWarnEnabled()) {
+				_log.warn(
+					"Unable to update image element since " +
+						"JournalArticleImage " + articleImageId + " does not " +
+						"exist");
+			}
+
 			return;
 		}
 
