@@ -15,8 +15,8 @@
 package com.liferay.cobertura.agent;
 
 import com.liferay.cobertura.coveragedata.ProjectData;
+import com.liferay.cobertura.coveragedata.ProjectDataUtil;
 import com.liferay.cobertura.instrument.CoberturaClassFileTransformer;
-import com.liferay.cobertura.instrument.ProjectDataUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,7 +50,7 @@ public class InstrumentationAgent {
 		_coberturaClassFileTransformer = null;
 
 		try {
-			ProjectData projectData = ProjectDataUtil.captureProjectData();
+			ProjectData projectData = ProjectDataUtil.captureProjectData(false);
 
 			List<AssertionError> assertionErrors = new ArrayList<>();
 
@@ -141,6 +141,38 @@ public class InstrumentationAgent {
 			excludes = _excludes;
 		}
 
+		String agentLine = System.getProperty("junit.cobertura.agent");
+
+		int index = agentLine.indexOf('=');
+
+		if (index != -1) {
+			StringBuilder sb = new StringBuilder();
+
+			sb.append(agentLine, 0, index + 1);
+
+			for (String include : includes) {
+				sb.append(include);
+				sb.append(',');
+			}
+
+			if (includes.length > 0) {
+				sb.setLength(sb.length() - 1);
+			}
+
+			sb.append(';');
+
+			for (String exclude : excludes) {
+				sb.append(exclude);
+				sb.append(',');
+			}
+
+			if (excludes.length > 0) {
+				sb.setLength(sb.length() - 1);
+			}
+
+			System.setProperty("junit.cobertura.agent", sb.toString());
+		}
+
 		if (_coberturaClassFileTransformer == null) {
 			_coberturaClassFileTransformer = new CoberturaClassFileTransformer(
 				includes, excludes);
@@ -198,7 +230,7 @@ public class InstrumentationAgent {
 
 					@Override
 					public void run() {
-						ProjectDataUtil.runMergeHooks();
+						ProjectDataUtil.captureProjectData(true);
 					}
 
 				});
