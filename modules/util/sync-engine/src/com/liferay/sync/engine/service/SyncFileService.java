@@ -203,8 +203,10 @@ public class SyncFileService {
 						_syncFilePersistence.findByParentFilePathName(
 							syncFile.getFilePathName());
 
-					for (SyncFile syncFile : syncFiles) {
-						doDeleteSyncFile(syncFile, notify);
+					for (SyncFile childSyncFile : syncFiles) {
+						childSyncFile.setUiEvent(syncFile.getUiEvent());
+
+						doDeleteSyncFile(childSyncFile, notify);
 					}
 
 					return null;
