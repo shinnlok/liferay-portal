@@ -18,7 +18,6 @@ import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 
 import org.apache.commons.lang.StringEscapeUtils;
@@ -151,13 +150,17 @@ public class FileUtilTest {
 	public void testRenameFile() throws Exception {
 		Path sourceFilePath = Files.createTempFile("test", null);
 
-		String sourceFilePathName = sourceFilePath.toString();
+		Path parentFilePath = sourceFilePath.getParent();
 
-		Path targetFilePath = Paths.get(sourceFilePathName.toUpperCase());
+		String sourceFilePathFileName = String.valueOf(
+			sourceFilePath.getFileName());
+
+		Path targetFilePath = parentFilePath.resolve(
+			sourceFilePathFileName.toUpperCase());
 
 		FileUtil.moveFile(sourceFilePath, targetFilePath);
 
-		Path realFilePath = sourceFilePath.toRealPath();
+		Path realFilePath = targetFilePath.toRealPath();
 
 		Path realFilePathFileName = realFilePath.getFileName();
 
