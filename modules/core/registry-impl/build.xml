@@ -2,6 +2,9 @@
 <!DOCTYPE project>
 
 <project>
+	<property name="javac.source" value="1.7" />
+	<property name="javac.target" value="1.7" />
+
 	<property name="import.shared" value="osgi-service-tracker-map,registry-api" />
 	<property name="osgi.runtime.dependencies" value="com.liferay.osgi.service.tracker.map.jar,org.eclipse.osgi.jar" />
 
