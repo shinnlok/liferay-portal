@@ -266,7 +266,10 @@ public class SyncFilePersistence extends BasePersistenceImpl<SyncFile, Long> {
 
 		Where<SyncFile, Long> where = updateBuilder.where();
 
-		filePathName = StringUtils.replace(filePathName, "\\", "\\\\");
+		FileSystem fileSystem = FileSystems.getDefault();
+
+		filePathName = StringUtils.replace(
+			filePathName + fileSystem.getSeparator(), "\\", "\\\\");
 
 		where.like("filePathName", new SelectArg(filePathName + "%"));
 

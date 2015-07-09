@@ -304,7 +304,10 @@ public class SyncAccountService {
 
 		// Sync files
 
-		SyncFileService.renameSyncFiles(sourceFilePathName, targetFilePathName);
+		if (!syncFile.isFile()) {
+			SyncFileService.renameSyncFiles(
+				sourceFilePathName, targetFilePathName);
+		}
 
 		// Sync sites
 

@@ -588,8 +588,15 @@ public class SyncFileService {
 		SyncFile parentSyncFile, int state, int uiEvent) {
 
 		try {
-			_syncFilePersistence.updateByFilePathName(
-				parentSyncFile.getFilePathName(), state, uiEvent);
+			parentSyncFile.setState(state);
+			parentSyncFile.setUiEvent(uiEvent);
+
+			update(parentSyncFile);
+
+			if (!parentSyncFile.isFile()) {
+				_syncFilePersistence.updateByFilePathName(
+					parentSyncFile.getFilePathName(), state, uiEvent);
+			}
 		}
 		catch (SQLException sqle) {
 			if (_logger.isDebugEnabled()) {
