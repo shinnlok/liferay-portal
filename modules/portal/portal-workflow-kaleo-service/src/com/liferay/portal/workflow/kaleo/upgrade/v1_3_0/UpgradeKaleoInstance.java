@@ -58,10 +58,10 @@ public class UpgradeKaleoInstance extends UpgradeProcess {
 
 			if (StringUtil.matches(columnName, "classNameId")) {
 				columnValue = GetterUtil.getString(
-					PortalUtil.getClassNameId(_KALEOPROCESS_CLASS_NAME));
+					PortalUtil.getClassNameId(_KALEO_PROCESS_CLASS_NAME));
 			}
 			else {
-				columnValue = _KALEOPROCESS_CLASS_NAME;
+				columnValue = _KALEO_PROCESS_CLASS_NAME;
 			}
 
 			if (Validator.isNotNull(columnValue)) {
@@ -71,7 +71,7 @@ public class UpgradeKaleoInstance extends UpgradeProcess {
 		}
 	}
 
-	private static final String _KALEOPROCESS_CLASS_NAME =
+	private static final String _KALEO_PROCESS_CLASS_NAME =
 		"com.liferay.portal.workflow.kaleo.forms.model.KaleoProcess";
 
 	private static final String[][] _WORKFLOW_INSTANCE_TABLE_DATA = {
