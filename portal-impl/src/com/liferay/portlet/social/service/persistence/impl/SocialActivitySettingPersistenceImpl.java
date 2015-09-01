@@ -2779,7 +2779,7 @@ public class SocialActivitySettingPersistenceImpl extends BasePersistenceImpl<So
 				socialActivitySetting.setNew(false);
 			}
 			else {
-				session.merge(socialActivitySetting);
+				socialActivitySetting = (SocialActivitySetting)session.merge(socialActivitySetting);
 			}
 		}
 		catch (Exception e) {
@@ -2883,8 +2883,9 @@ public class SocialActivitySettingPersistenceImpl extends BasePersistenceImpl<So
 			SocialActivitySettingImpl.class,
 			socialActivitySetting.getPrimaryKey(), socialActivitySetting, false);
 
-		clearUniqueFindersCache(socialActivitySetting);
-		cacheUniqueFindersCache(socialActivitySetting, isNew);
+		clearUniqueFindersCache((SocialActivitySetting)socialActivitySettingModelImpl);
+		cacheUniqueFindersCache((SocialActivitySetting)socialActivitySettingModelImpl,
+			isNew);
 
 		socialActivitySetting.resetOriginalValues();
 

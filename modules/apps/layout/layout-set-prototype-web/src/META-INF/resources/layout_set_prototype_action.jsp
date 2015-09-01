@@ -34,11 +34,7 @@ Group group = layoutSetPrototype.getGroup();
 	<c:if test="<%= LayoutSetPrototypePermissionUtil.contains(permissionChecker, layoutSetPrototypeId, ActionKeys.UPDATE) %>">
 
 		<%
-		ThemeDisplay siteThemeDisplay = (ThemeDisplay)themeDisplay.clone();
-
-		siteThemeDisplay.setScopeGroupId(group.getGroupId());
-
-		PortletURL siteAdministrationURL = PortalUtil.getSiteAdministrationURL(request, siteThemeDisplay);
+		PortletURL siteAdministrationURL = group.getAdministrationURL(themeDisplay);
 		%>
 
 		<c:if test="<%= siteAdministrationURL != null %>">

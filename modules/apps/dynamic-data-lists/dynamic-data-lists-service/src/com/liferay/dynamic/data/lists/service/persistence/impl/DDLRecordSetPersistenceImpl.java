@@ -3282,7 +3282,7 @@ public class DDLRecordSetPersistenceImpl extends BasePersistenceImpl<DDLRecordSe
 				ddlRecordSet.setNew(false);
 			}
 			else {
-				session.merge(ddlRecordSet);
+				ddlRecordSet = (DDLRecordSet)session.merge(ddlRecordSet);
 			}
 		}
 		catch (Exception e) {
@@ -3359,8 +3359,8 @@ public class DDLRecordSetPersistenceImpl extends BasePersistenceImpl<DDLRecordSe
 			DDLRecordSetImpl.class, ddlRecordSet.getPrimaryKey(), ddlRecordSet,
 			false);
 
-		clearUniqueFindersCache(ddlRecordSet);
-		cacheUniqueFindersCache(ddlRecordSet, isNew);
+		clearUniqueFindersCache((DDLRecordSet)ddlRecordSetModelImpl);
+		cacheUniqueFindersCache((DDLRecordSet)ddlRecordSetModelImpl, isNew);
 
 		ddlRecordSet.resetOriginalValues();
 

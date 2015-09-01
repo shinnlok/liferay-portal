@@ -83,6 +83,40 @@ public class ReleaseLocalServiceImpl extends ReleaseLocalServiceBaseImpl {
 	}
 
 	@Override
+	public Release addRelease(String servletContextName, String version) {
+		Release release = null;
+
+		if (servletContextName.equals(
+				ReleaseConstants.DEFAULT_SERVLET_CONTEXT_NAME)) {
+
+			release = releasePersistence.create(ReleaseConstants.DEFAULT_ID);
+		}
+
+		else {
+			long releaseId = counterLocalService.increment();
+
+			release = releasePersistence.create(releaseId);
+		}
+
+		Date now = new Date();
+
+		release.setCreateDate(now);
+		release.setModifiedDate(now);
+		release.setServletContextName(servletContextName);
+		release.setVersion(version);
+
+		if (servletContextName.equals(
+				ReleaseConstants.DEFAULT_SERVLET_CONTEXT_NAME)) {
+
+			release.setTestString(ReleaseConstants.TEST_STRING);
+		}
+
+		releasePersistence.update(release);
+
+		return release;
+	}
+
+	@Override
 	public void createTablesAndPopulate() {
 		try {
 			if (_log.isInfoEnabled()) {
@@ -132,6 +166,21 @@ public class ReleaseLocalServiceImpl extends ReleaseLocalServiceBaseImpl {
 	@Override
 	public int getBuildNumberOrCreate() throws PortalException {
 
+		// Gracefully add version column
+
+		DB db = DBFactoryUtil.getDB();
+
+		try {
+			db.runSQL("alter table Release_ add version VARCHAR(75) null");
+
+			populateVersion();
+		}
+		catch (Exception e) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(e.getMessage());
+			}
+		}
+
 		// Get release build number
 
 		Connection con = null;
@@ -154,7 +203,7 @@ public class ReleaseLocalServiceImpl extends ReleaseLocalServiceBaseImpl {
 					_log.debug("Build number " + buildNumber);
 				}
 
-				DB db = DBFactoryUtil.getDB();
+				// Gracefully add state_ column
 
 				try {
 					db.runSQL("alter table Release_ add state_ INTEGER");
@@ -278,6 +327,42 @@ public class ReleaseLocalServiceImpl extends ReleaseLocalServiceBaseImpl {
 		updateRelease(
 			servletContextName, upgradeProcesses, buildNumber,
 			previousBuildNumber, indexOnUpgrade);
+	}
+
+	@Override
+	public void updateRelease(
+		String servletContextName, String version, String previousVersion) {
+
+		Release release = releaseLocalService.fetchRelease(servletContextName);
+
+		if (release == null) {
+			if (previousVersion.equals("0.0.0")) {
+				release = releaseLocalService.addRelease(
+					servletContextName, previousVersion);
+			}
+			else {
+				throw new IllegalStateException(
+					"Unable to update release because it does not exist");
+			}
+		}
+
+		if (!previousVersion.equals(release.getVersion())) {
+			throw new IllegalStateException(
+				"Unable to update release because the previous version " +
+					previousVersion + " does not match the expected version " +
+						release.getVersion());
+		}
+
+		release.setVersion(version);
+
+		releasePersistence.update(release);
+	}
+
+	protected void populateVersion() {
+
+		// This method is called if and only if the version column did not
+		// previously exist and was safely added to the database
+
 	}
 
 	protected void testSupportsStringCaseSensitiveQuery() {

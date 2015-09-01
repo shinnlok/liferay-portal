@@ -115,10 +115,6 @@ public abstract class BaseMobileDriverImpl
 
 	@Override
 	public void assertLiferayErrors() throws Exception {
-		if (!PropsValues.TEST_ASSERT_LIFERAY_ERRORS) {
-			return;
-		}
-
 		LiferaySeleniumHelper.assertLiferayErrors();
 	}
 
@@ -419,7 +415,7 @@ public abstract class BaseMobileDriverImpl
 
 	@Override
 	public boolean isPartialText(String locator, String value) {
-		throw new UnsupportedOperationException();
+		return WebDriverHelper.isPartialText(this, locator, value);
 	}
 
 	@Override

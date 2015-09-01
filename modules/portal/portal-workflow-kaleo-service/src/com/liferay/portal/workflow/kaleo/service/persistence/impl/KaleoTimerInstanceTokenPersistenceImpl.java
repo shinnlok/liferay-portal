@@ -2223,7 +2223,7 @@ public class KaleoTimerInstanceTokenPersistenceImpl extends BasePersistenceImpl<
 				kaleoTimerInstanceToken.setNew(false);
 			}
 			else {
-				session.merge(kaleoTimerInstanceToken);
+				kaleoTimerInstanceToken = (KaleoTimerInstanceToken)session.merge(kaleoTimerInstanceToken);
 			}
 		}
 		catch (Exception e) {
@@ -2311,8 +2311,9 @@ public class KaleoTimerInstanceTokenPersistenceImpl extends BasePersistenceImpl<
 			kaleoTimerInstanceToken.getPrimaryKey(), kaleoTimerInstanceToken,
 			false);
 
-		clearUniqueFindersCache(kaleoTimerInstanceToken);
-		cacheUniqueFindersCache(kaleoTimerInstanceToken, isNew);
+		clearUniqueFindersCache((KaleoTimerInstanceToken)kaleoTimerInstanceTokenModelImpl);
+		cacheUniqueFindersCache((KaleoTimerInstanceToken)kaleoTimerInstanceTokenModelImpl,
+			isNew);
 
 		kaleoTimerInstanceToken.resetOriginalValues();
 

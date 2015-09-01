@@ -2836,7 +2836,7 @@ public class KaleoDefinitionPersistenceImpl extends BasePersistenceImpl<KaleoDef
 				kaleoDefinition.setNew(false);
 			}
 			else {
-				session.merge(kaleoDefinition);
+				kaleoDefinition = (KaleoDefinition)session.merge(kaleoDefinition);
 			}
 		}
 		catch (Exception e) {
@@ -2942,8 +2942,8 @@ public class KaleoDefinitionPersistenceImpl extends BasePersistenceImpl<KaleoDef
 			KaleoDefinitionImpl.class, kaleoDefinition.getPrimaryKey(),
 			kaleoDefinition, false);
 
-		clearUniqueFindersCache(kaleoDefinition);
-		cacheUniqueFindersCache(kaleoDefinition, isNew);
+		clearUniqueFindersCache((KaleoDefinition)kaleoDefinitionModelImpl);
+		cacheUniqueFindersCache((KaleoDefinition)kaleoDefinitionModelImpl, isNew);
 
 		kaleoDefinition.resetOriginalValues();
 

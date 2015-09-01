@@ -2844,7 +2844,7 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 				journalFeed.setNew(false);
 			}
 			else {
-				session.merge(journalFeed);
+				journalFeed = (JournalFeed)session.merge(journalFeed);
 			}
 		}
 		catch (Exception e) {
@@ -2921,8 +2921,8 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 			JournalFeedImpl.class, journalFeed.getPrimaryKey(), journalFeed,
 			false);
 
-		clearUniqueFindersCache(journalFeed);
-		cacheUniqueFindersCache(journalFeed, isNew);
+		clearUniqueFindersCache((JournalFeed)journalFeedModelImpl);
+		cacheUniqueFindersCache((JournalFeed)journalFeedModelImpl, isNew);
 
 		journalFeed.resetOriginalValues();
 

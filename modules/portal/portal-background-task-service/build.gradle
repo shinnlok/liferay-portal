@@ -1,6 +1,5 @@
 buildService {
 	apiDirName = "../portal-background-task-api/src"
-	autoNamespaceTables = false
 	testDirName = "../portal-background-task-test/test/integration"
 }
 

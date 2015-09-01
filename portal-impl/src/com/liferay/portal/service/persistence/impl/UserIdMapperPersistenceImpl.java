@@ -1406,7 +1406,7 @@ public class UserIdMapperPersistenceImpl extends BasePersistenceImpl<UserIdMappe
 				userIdMapper.setNew(false);
 			}
 			else {
-				session.merge(userIdMapper);
+				userIdMapper = (UserIdMapper)session.merge(userIdMapper);
 			}
 		}
 		catch (Exception e) {
@@ -1445,8 +1445,8 @@ public class UserIdMapperPersistenceImpl extends BasePersistenceImpl<UserIdMappe
 			UserIdMapperImpl.class, userIdMapper.getPrimaryKey(), userIdMapper,
 			false);
 
-		clearUniqueFindersCache(userIdMapper);
-		cacheUniqueFindersCache(userIdMapper, isNew);
+		clearUniqueFindersCache((UserIdMapper)userIdMapperModelImpl);
+		cacheUniqueFindersCache((UserIdMapper)userIdMapperModelImpl, isNew);
 
 		userIdMapper.resetOriginalValues();
 

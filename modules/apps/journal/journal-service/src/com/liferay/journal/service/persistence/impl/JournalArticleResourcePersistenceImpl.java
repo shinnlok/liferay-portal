@@ -1945,7 +1945,7 @@ public class JournalArticleResourcePersistenceImpl extends BasePersistenceImpl<J
 				journalArticleResource.setNew(false);
 			}
 			else {
-				session.merge(journalArticleResource);
+				journalArticleResource = (JournalArticleResource)session.merge(journalArticleResource);
 			}
 		}
 		catch (Exception e) {
@@ -2002,8 +2002,9 @@ public class JournalArticleResourcePersistenceImpl extends BasePersistenceImpl<J
 			journalArticleResource.getPrimaryKey(), journalArticleResource,
 			false);
 
-		clearUniqueFindersCache(journalArticleResource);
-		cacheUniqueFindersCache(journalArticleResource, isNew);
+		clearUniqueFindersCache((JournalArticleResource)journalArticleResourceModelImpl);
+		cacheUniqueFindersCache((JournalArticleResource)journalArticleResourceModelImpl,
+			isNew);
 
 		journalArticleResource.resetOriginalValues();
 

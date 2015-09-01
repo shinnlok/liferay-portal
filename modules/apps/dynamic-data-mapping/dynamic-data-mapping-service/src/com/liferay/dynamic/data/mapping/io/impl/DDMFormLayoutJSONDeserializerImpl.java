@@ -15,16 +15,16 @@
 package com.liferay.dynamic.data.mapping.io.impl;
 
 import com.liferay.dynamic.data.mapping.io.DDMFormLayoutJSONDeserializer;
+import com.liferay.dynamic.data.mapping.model.DDMFormLayout;
+import com.liferay.dynamic.data.mapping.model.DDMFormLayoutColumn;
+import com.liferay.dynamic.data.mapping.model.DDMFormLayoutPage;
+import com.liferay.dynamic.data.mapping.model.DDMFormLayoutRow;
+import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portlet.dynamicdatamapping.model.DDMFormLayout;
-import com.liferay.portlet.dynamicdatamapping.model.DDMFormLayoutColumn;
-import com.liferay.portlet.dynamicdatamapping.model.DDMFormLayoutPage;
-import com.liferay.portlet.dynamicdatamapping.model.DDMFormLayoutRow;
-import com.liferay.portlet.dynamicdatamapping.model.LocalizedValue;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -50,6 +50,8 @@ public class DDMFormLayoutJSONDeserializerImpl
 			jsonObject.getString("defaultLanguageId"), ddmFormLayout);
 		setDDMFormLayoutPages(jsonObject.getJSONArray("pages"), ddmFormLayout);
 		setDDMFormLayoutPageTitlesDefaultLocale(ddmFormLayout);
+		setDDMFormLayoutPaginationMode(
+			jsonObject.getString("paginationMode"), ddmFormLayout);
 
 		return ddmFormLayout;
 	}
@@ -261,6 +263,12 @@ public class DDMFormLayoutJSONDeserializerImpl
 		}
 
 		return description;
+	}
+
+	private void setDDMFormLayoutPaginationMode(
+		String paginationMode, DDMFormLayout ddmFormLayout) {
+
+		ddmFormLayout.setPaginationMode(paginationMode);
 	}
 
 }

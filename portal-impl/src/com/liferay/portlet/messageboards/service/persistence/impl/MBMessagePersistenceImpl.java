@@ -18423,7 +18423,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 				mbMessage.setNew(false);
 			}
 			else {
-				session.merge(mbMessage);
+				mbMessage = (MBMessage)session.merge(mbMessage);
 			}
 		}
 		catch (Exception e) {
@@ -18994,8 +18994,8 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		EntityCacheUtil.putResult(MBMessageModelImpl.ENTITY_CACHE_ENABLED,
 			MBMessageImpl.class, mbMessage.getPrimaryKey(), mbMessage, false);
 
-		clearUniqueFindersCache(mbMessage);
-		cacheUniqueFindersCache(mbMessage, isNew);
+		clearUniqueFindersCache((MBMessage)mbMessageModelImpl);
+		cacheUniqueFindersCache((MBMessage)mbMessageModelImpl, isNew);
 
 		mbMessage.resetOriginalValues();
 

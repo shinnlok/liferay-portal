@@ -5870,7 +5870,7 @@ public class LayoutRevisionPersistenceImpl extends BasePersistenceImpl<LayoutRev
 				layoutRevision.setNew(false);
 			}
 			else {
-				session.merge(layoutRevision);
+				layoutRevision = (LayoutRevision)session.merge(layoutRevision);
 			}
 		}
 		catch (Exception e) {
@@ -6083,8 +6083,8 @@ public class LayoutRevisionPersistenceImpl extends BasePersistenceImpl<LayoutRev
 			LayoutRevisionImpl.class, layoutRevision.getPrimaryKey(),
 			layoutRevision, false);
 
-		clearUniqueFindersCache(layoutRevision);
-		cacheUniqueFindersCache(layoutRevision, isNew);
+		clearUniqueFindersCache((LayoutRevision)layoutRevisionModelImpl);
+		cacheUniqueFindersCache((LayoutRevision)layoutRevisionModelImpl, isNew);
 
 		layoutRevision.resetOriginalValues();
 

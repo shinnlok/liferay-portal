@@ -15,11 +15,11 @@
 package com.liferay.dynamic.data.mapping.io;
 
 import com.liferay.dynamic.data.mapping.BaseDDMTestCase;
+import com.liferay.dynamic.data.mapping.model.DDMForm;
+import com.liferay.dynamic.data.mapping.model.DDMFormField;
+import com.liferay.dynamic.data.mapping.model.DDMFormFieldOptions;
+import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portlet.dynamicdatamapping.model.DDMForm;
-import com.liferay.portlet.dynamicdatamapping.model.DDMFormField;
-import com.liferay.portlet.dynamicdatamapping.model.DDMFormFieldOptions;
-import com.liferay.portlet.dynamicdatamapping.model.LocalizedValue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -133,6 +133,14 @@ public abstract class BaseDDMFormSerializerTestCase extends BaseDDMTestCase {
 		return parentDDMFormField;
 	}
 
+	protected void createNotEmptyValidation(DDMFormField ddmFormField) {
+		ddmFormField.setValidationExpression(
+			"!" + ddmFormField.getName() + ".isEmpty()");
+
+		ddmFormField.setValidationMessage(
+			"Field " + ddmFormField.getName() + " must not be empty.");
+	}
+
 	protected DDMFormField createRadioDDMFormField(String name) {
 		DDMFormField ddmFormField = new DDMFormField(name, "radio");
 
@@ -144,6 +152,8 @@ public abstract class BaseDDMFormSerializerTestCase extends BaseDDMTestCase {
 		ddmFormField.setRequired(true);
 		ddmFormField.setShowLabel(false);
 		ddmFormField.setVisibilityExpression("false");
+
+		createNotEmptyValidation(ddmFormField);
 
 		return ddmFormField;
 	}
@@ -160,6 +170,8 @@ public abstract class BaseDDMFormSerializerTestCase extends BaseDDMTestCase {
 		ddmFormField.setRequired(false);
 		ddmFormField.setShowLabel(true);
 		ddmFormField.setVisibilityExpression("true");
+
+		createNotEmptyValidation(ddmFormField);
 
 		DDMFormFieldOptions ddmFormFieldOptions = createDDMFormFieldOptions();
 
@@ -183,6 +195,8 @@ public abstract class BaseDDMFormSerializerTestCase extends BaseDDMTestCase {
 		ddmFormField.setRequired(false);
 		ddmFormField.setShowLabel(true);
 		ddmFormField.setVisibilityExpression("true");
+
+		createNotEmptyValidation(ddmFormField);
 
 		return ddmFormField;
 	}

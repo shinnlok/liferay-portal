@@ -3088,7 +3088,7 @@ public class AssetLinkPersistenceImpl extends BasePersistenceImpl<AssetLink>
 				assetLink.setNew(false);
 			}
 			else {
-				session.merge(assetLink);
+				assetLink = (AssetLink)session.merge(assetLink);
 			}
 		}
 		catch (Exception e) {
@@ -3206,8 +3206,8 @@ public class AssetLinkPersistenceImpl extends BasePersistenceImpl<AssetLink>
 		EntityCacheUtil.putResult(AssetLinkModelImpl.ENTITY_CACHE_ENABLED,
 			AssetLinkImpl.class, assetLink.getPrimaryKey(), assetLink, false);
 
-		clearUniqueFindersCache(assetLink);
-		cacheUniqueFindersCache(assetLink, isNew);
+		clearUniqueFindersCache((AssetLink)assetLinkModelImpl);
+		cacheUniqueFindersCache((AssetLink)assetLinkModelImpl, isNew);
 
 		assetLink.resetOriginalValues();
 

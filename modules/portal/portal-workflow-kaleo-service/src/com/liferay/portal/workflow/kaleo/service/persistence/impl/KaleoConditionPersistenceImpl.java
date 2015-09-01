@@ -1547,7 +1547,7 @@ public class KaleoConditionPersistenceImpl extends BasePersistenceImpl<KaleoCond
 				kaleoCondition.setNew(false);
 			}
 			else {
-				session.merge(kaleoCondition);
+				kaleoCondition = (KaleoCondition)session.merge(kaleoCondition);
 			}
 		}
 		catch (Exception e) {
@@ -1609,8 +1609,8 @@ public class KaleoConditionPersistenceImpl extends BasePersistenceImpl<KaleoCond
 			KaleoConditionImpl.class, kaleoCondition.getPrimaryKey(),
 			kaleoCondition, false);
 
-		clearUniqueFindersCache(kaleoCondition);
-		cacheUniqueFindersCache(kaleoCondition, isNew);
+		clearUniqueFindersCache((KaleoCondition)kaleoConditionModelImpl);
+		cacheUniqueFindersCache((KaleoCondition)kaleoConditionModelImpl, isNew);
 
 		kaleoCondition.resetOriginalValues();
 

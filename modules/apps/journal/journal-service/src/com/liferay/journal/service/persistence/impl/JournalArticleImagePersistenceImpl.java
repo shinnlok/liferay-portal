@@ -2406,7 +2406,7 @@ public class JournalArticleImagePersistenceImpl extends BasePersistenceImpl<Jour
 				journalArticleImage.setNew(false);
 			}
 			else {
-				session.merge(journalArticleImage);
+				journalArticleImage = (JournalArticleImage)session.merge(journalArticleImage);
 			}
 		}
 		catch (Exception e) {
@@ -2487,8 +2487,9 @@ public class JournalArticleImagePersistenceImpl extends BasePersistenceImpl<Jour
 			JournalArticleImageImpl.class, journalArticleImage.getPrimaryKey(),
 			journalArticleImage, false);
 
-		clearUniqueFindersCache(journalArticleImage);
-		cacheUniqueFindersCache(journalArticleImage, isNew);
+		clearUniqueFindersCache((JournalArticleImage)journalArticleImageModelImpl);
+		cacheUniqueFindersCache((JournalArticleImage)journalArticleImageModelImpl,
+			isNew);
 
 		journalArticleImage.resetOriginalValues();
 

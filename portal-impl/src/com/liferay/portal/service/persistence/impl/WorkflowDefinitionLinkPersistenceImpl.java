@@ -2388,7 +2388,7 @@ public class WorkflowDefinitionLinkPersistenceImpl extends BasePersistenceImpl<W
 				workflowDefinitionLink.setNew(false);
 			}
 			else {
-				session.merge(workflowDefinitionLink);
+				workflowDefinitionLink = (WorkflowDefinitionLink)session.merge(workflowDefinitionLink);
 			}
 		}
 		catch (Exception e) {
@@ -2478,8 +2478,9 @@ public class WorkflowDefinitionLinkPersistenceImpl extends BasePersistenceImpl<W
 			workflowDefinitionLink.getPrimaryKey(), workflowDefinitionLink,
 			false);
 
-		clearUniqueFindersCache(workflowDefinitionLink);
-		cacheUniqueFindersCache(workflowDefinitionLink, isNew);
+		clearUniqueFindersCache((WorkflowDefinitionLink)workflowDefinitionLinkModelImpl);
+		cacheUniqueFindersCache((WorkflowDefinitionLink)workflowDefinitionLinkModelImpl,
+			isNew);
 
 		workflowDefinitionLink.resetOriginalValues();
 

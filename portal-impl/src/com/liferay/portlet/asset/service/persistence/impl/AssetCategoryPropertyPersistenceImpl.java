@@ -2180,7 +2180,7 @@ public class AssetCategoryPropertyPersistenceImpl extends BasePersistenceImpl<As
 				assetCategoryProperty.setNew(false);
 			}
 			else {
-				session.merge(assetCategoryProperty);
+				assetCategoryProperty = (AssetCategoryProperty)session.merge(assetCategoryProperty);
 			}
 		}
 		catch (Exception e) {
@@ -2265,8 +2265,9 @@ public class AssetCategoryPropertyPersistenceImpl extends BasePersistenceImpl<As
 			AssetCategoryPropertyImpl.class,
 			assetCategoryProperty.getPrimaryKey(), assetCategoryProperty, false);
 
-		clearUniqueFindersCache(assetCategoryProperty);
-		cacheUniqueFindersCache(assetCategoryProperty, isNew);
+		clearUniqueFindersCache((AssetCategoryProperty)assetCategoryPropertyModelImpl);
+		cacheUniqueFindersCache((AssetCategoryProperty)assetCategoryPropertyModelImpl,
+			isNew);
 
 		assetCategoryProperty.resetOriginalValues();
 

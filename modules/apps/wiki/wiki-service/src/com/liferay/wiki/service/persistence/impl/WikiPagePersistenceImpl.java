@@ -21431,7 +21431,7 @@ public class WikiPagePersistenceImpl extends BasePersistenceImpl<WikiPage>
 				wikiPage.setNew(false);
 			}
 			else {
-				session.merge(wikiPage);
+				wikiPage = (WikiPage)session.merge(wikiPage);
 			}
 		}
 		catch (Exception e) {
@@ -22072,8 +22072,8 @@ public class WikiPagePersistenceImpl extends BasePersistenceImpl<WikiPage>
 		EntityCacheUtil.putResult(WikiPageModelImpl.ENTITY_CACHE_ENABLED,
 			WikiPageImpl.class, wikiPage.getPrimaryKey(), wikiPage, false);
 
-		clearUniqueFindersCache(wikiPage);
-		cacheUniqueFindersCache(wikiPage, isNew);
+		clearUniqueFindersCache((WikiPage)wikiPageModelImpl);
+		cacheUniqueFindersCache((WikiPage)wikiPageModelImpl, isNew);
 
 		wikiPage.resetOriginalValues();
 

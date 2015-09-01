@@ -169,7 +169,7 @@
 		</execute>
 	</command>
 
-	<command name="AddCategoryViewableByAnyone" priority="4">
+	<command known-issues="LPS-57664" name="AddCategoryViewableByAnyone" priority="4">
 		<execute macro="Page#gotoContentCP">
 			<var name="portletName" value="Categories" />
 		</execute>
@@ -195,7 +195,7 @@
 		</execute>
 	</command>
 
-	<command name="AddCategoryViewableByOwner" priority="4">
+	<command known-issues="LPS-57664" name="AddCategoryViewableByOwner" priority="4">
 		<execute macro="Page#gotoContentCP">
 			<var name="portletName" value="Categories" />
 		</execute>
@@ -221,7 +221,7 @@
 		</execute>
 	</command>
 
-	<command name="AddCategoryViewableBySiteMembers" priority="4">
+	<command known-issues="LPS-57664" name="AddCategoryViewableBySiteMembers" priority="4">
 		<execute macro="Page#gotoContentCP">
 			<var name="portletName" value="Categories" />
 		</execute>
@@ -357,7 +357,7 @@
 		</execute>
 	</command>
 
-	<command name="AddVocabularies" priority="4">
+	<command known-issues="LPS-56754" name="AddVocabularies" priority="4">
 		<execute macro="Page#gotoContentCP">
 			<var name="portletName" value="Categories" />
 		</execute>
@@ -405,7 +405,7 @@
 		</execute>
 	</command>
 
-	<command name="AddVocabularyAssetTypeAllAssetTypes" priority="4">
+	<command known-issues="LPS-56754" name="AddVocabularyAssetTypeAllAssetTypes" priority="4">
 		<execute macro="Page#gotoContentCP">
 			<var name="portletName" value="Categories" />
 		</execute>
@@ -567,7 +567,7 @@
 		</execute>
 	</command>
 
-	<command name="AddVocabularyViewableByGuest" priority="4">
+	<command known-issues="LPS-57664" name="AddVocabularyViewableByGuest" priority="4">
 		<execute macro="Page#gotoContentCP">
 			<var name="portletName" value="Categories" />
 		</execute>
@@ -587,7 +587,7 @@
 		</execute>
 	</command>
 
-	<command name="AddVocabularyViewableByOwner" priority="4">
+	<command known-issues="LPS-57664" name="AddVocabularyViewableByOwner" priority="4">
 		<execute macro="Page#gotoContentCP">
 			<var name="portletName" value="Categories" />
 		</execute>
@@ -607,7 +607,7 @@
 		</execute>
 	</command>
 
-	<command name="AddVocabularyViewableBySiteMembers" priority="4">
+	<command known-issues="LPS-57664" name="AddVocabularyViewableBySiteMembers" priority="4">
 		<execute macro="Page#gotoContentCP">
 			<var name="portletName" value="Categories" />
 		</execute>
@@ -805,8 +805,8 @@
 			<var name="vocabularyName" value="Vocabulary Name" />
 		</execute>
 
-		<execute function="AssertTextNotPresent" locator1="CPCategories#CATEGORY_DETAILS_PROPERTY_KEY" value1="Category Property 2 Key" />
-		<execute function="AssertTextNotPresent" locator1="CPCategories#CATEGORY_DETAILS_PROPERTY_VALUE" value1="Category Property 2 Value" />
+		<execute function="AssertTextNotPresent" locator1="Categories#CATEGORY_DETAILS_PROPERTY_KEY" value1="Category Property 2 Key" />
+		<execute function="AssertTextNotPresent" locator1="Categories#CATEGORY_DETAILS_PROPERTY_VALUE" value1="Category Property 2 Value" />
 	</command>
 
 	<command name="DeleteSubcategoryViaActions" priority="3">
@@ -1026,7 +1026,7 @@
 		</execute>
 	</command>
 
-	<command name="EditVocabulary" priority="5">
+	<command known-issues="LPS-56754" name="EditVocabulary" priority="5">
 		<execute macro="Page#gotoContentCP">
 			<var name="portletName" value="Categories" />
 		</execute>
@@ -1092,9 +1092,9 @@
 			<var name="portletName" value="Categories" />
 		</execute>
 
-		<execute function="AssertClick" locator1="CPCategories#ADD_VOCABULARY_BUTTON" value1="Add Vocabulary" />
-		<execute function="Type" locator1="CPVocabulariesAdd#NAME_FIELD" value1="Vocabulary Name" />
-		<execute function="Click" locator1="CPVocabulariesAdd#CANCEL_BUTTON" />
+		<execute function="AssertClick" locator1="Categories#ADD_VOCABULARY_BUTTON" value1="Add Vocabulary" />
+		<execute function="Type" locator1="TextInput#NAME" value1="Vocabulary Name" />
+		<execute function="Click" locator1="Button#CANCEL" />
 
 		<execute macro="Page#gotoContentCP">
 			<var name="portletName" value="Categories" />

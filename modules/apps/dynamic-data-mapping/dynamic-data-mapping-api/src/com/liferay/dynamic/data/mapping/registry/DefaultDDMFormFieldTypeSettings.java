@@ -14,10 +14,10 @@
 
 package com.liferay.dynamic.data.mapping.registry;
 
+import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.dynamic.data.mapping.registry.annotations.DDMForm;
 import com.liferay.dynamic.data.mapping.registry.annotations.DDMFormField;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portlet.dynamicdatamapping.model.LocalizedValue;
 
 /**
  * @author Marcellus Tavares
@@ -63,7 +63,16 @@ public interface DefaultDDMFormFieldTypeSettings
 	@DDMFormField(label = "%tip", type = "text")
 	public LocalizedValue tip();
 
-	@DDMFormField(visibilityExpression = "false")
+	@DDMFormField(
+		label = "%validation", type = "validation",
+		visibilityExpression = "true"
+	)
+	public String validationExpression();
+
+	@DDMFormField(label = "%validation-message", visibilityExpression = "true")
+	public String validationMessage();
+
+	@DDMFormField(label = "%visibility", visibilityExpression = "true")
 	public String visibilityExpression();
 
 }

@@ -1195,7 +1195,7 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 				userNotificationDelivery.setNew(false);
 			}
 			else {
-				session.merge(userNotificationDelivery);
+				userNotificationDelivery = (UserNotificationDelivery)session.merge(userNotificationDelivery);
 			}
 		}
 		catch (Exception e) {
@@ -1237,8 +1237,9 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 			userNotificationDelivery.getPrimaryKey(), userNotificationDelivery,
 			false);
 
-		clearUniqueFindersCache(userNotificationDelivery);
-		cacheUniqueFindersCache(userNotificationDelivery, isNew);
+		clearUniqueFindersCache((UserNotificationDelivery)userNotificationDeliveryModelImpl);
+		cacheUniqueFindersCache((UserNotificationDelivery)userNotificationDeliveryModelImpl,
+			isNew);
 
 		userNotificationDelivery.resetOriginalValues();
 

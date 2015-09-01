@@ -1095,7 +1095,7 @@ public class AnnouncementsDeliveryPersistenceImpl extends BasePersistenceImpl<An
 				announcementsDelivery.setNew(false);
 			}
 			else {
-				session.merge(announcementsDelivery);
+				announcementsDelivery = (AnnouncementsDelivery)session.merge(announcementsDelivery);
 			}
 		}
 		catch (Exception e) {
@@ -1134,8 +1134,9 @@ public class AnnouncementsDeliveryPersistenceImpl extends BasePersistenceImpl<An
 			AnnouncementsDeliveryImpl.class,
 			announcementsDelivery.getPrimaryKey(), announcementsDelivery, false);
 
-		clearUniqueFindersCache(announcementsDelivery);
-		cacheUniqueFindersCache(announcementsDelivery, isNew);
+		clearUniqueFindersCache((AnnouncementsDelivery)announcementsDeliveryModelImpl);
+		cacheUniqueFindersCache((AnnouncementsDelivery)announcementsDeliveryModelImpl,
+			isNew);
 
 		announcementsDelivery.resetOriginalValues();
 

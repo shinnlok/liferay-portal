@@ -2493,7 +2493,7 @@ public class PollsChoicePersistenceImpl extends BasePersistenceImpl<PollsChoice>
 				pollsChoice.setNew(false);
 			}
 			else {
-				session.merge(pollsChoice);
+				pollsChoice = (PollsChoice)session.merge(pollsChoice);
 			}
 		}
 		catch (Exception e) {
@@ -2572,8 +2572,8 @@ public class PollsChoicePersistenceImpl extends BasePersistenceImpl<PollsChoice>
 			PollsChoiceImpl.class, pollsChoice.getPrimaryKey(), pollsChoice,
 			false);
 
-		clearUniqueFindersCache(pollsChoice);
-		cacheUniqueFindersCache(pollsChoice, isNew);
+		clearUniqueFindersCache((PollsChoice)pollsChoiceModelImpl);
+		cacheUniqueFindersCache((PollsChoice)pollsChoiceModelImpl, isNew);
 
 		pollsChoice.resetOriginalValues();
 

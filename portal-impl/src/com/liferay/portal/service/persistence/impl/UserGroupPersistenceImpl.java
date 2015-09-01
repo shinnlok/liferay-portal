@@ -4258,7 +4258,7 @@ public class UserGroupPersistenceImpl extends BasePersistenceImpl<UserGroup>
 				userGroup.setNew(false);
 			}
 			else {
-				session.merge(userGroup);
+				userGroup = (UserGroup)session.merge(userGroup);
 			}
 		}
 		catch (Exception e) {
@@ -4357,8 +4357,8 @@ public class UserGroupPersistenceImpl extends BasePersistenceImpl<UserGroup>
 		EntityCacheUtil.putResult(UserGroupModelImpl.ENTITY_CACHE_ENABLED,
 			UserGroupImpl.class, userGroup.getPrimaryKey(), userGroup, false);
 
-		clearUniqueFindersCache(userGroup);
-		cacheUniqueFindersCache(userGroup, isNew);
+		clearUniqueFindersCache((UserGroup)userGroupModelImpl);
+		cacheUniqueFindersCache((UserGroup)userGroupModelImpl, isNew);
 
 		userGroup.resetOriginalValues();
 

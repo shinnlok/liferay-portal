@@ -473,6 +473,8 @@ public interface PropsKeys {
 
 	public static final String DATABASE_MYSQL_ENGINE = "database.mysql.engine";
 
+	public static final String DATABASE_ORDER_BY_MAX_COLUMNS = "database.order.by.max.columns";
+
 	public static final String DEFAULT_ADMIN_EMAIL_ADDRESS_PREFIX = "default.admin.email.address.prefix";
 
 	public static final String DEFAULT_ADMIN_FIRST_NAME = "default.admin.first.name";
@@ -1033,6 +1035,8 @@ public interface PropsKeys {
 
 	public static final String LAYOUT_AJAX_RENDER_ENABLE = "layout.ajax.render.enable";
 
+	public static final String LAYOUT_BROWSABLE = "layout.browsable";
+
 	public static final String LAYOUT_CLONE_IMPL = "layout.clone.impl";
 
 	public static final String LAYOUT_COMMENTS_ENABLED = "layout.comments.enabled";
@@ -1208,6 +1212,8 @@ public interface PropsKeys {
 	public static final String LDAP_IMPORT_USER_PASSWORD_ENABLED = "ldap.import.user.password.enabled";
 
 	public static final String LDAP_IMPORT_USER_SEARCH_FILTER = "ldap.import.user.search.filter";
+
+	public static final String LDAP_IMPORT_USER_SYNC_STRATEGY = "ldap.import.user.sync.strategy";
 
 	public static final String LDAP_PAGE_SIZE = "ldap.page.size";
 

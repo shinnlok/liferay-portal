@@ -1762,7 +1762,7 @@ public class ResourceTypePermissionPersistenceImpl extends BasePersistenceImpl<R
 				resourceTypePermission.setNew(false);
 			}
 			else {
-				session.merge(resourceTypePermission);
+				resourceTypePermission = (ResourceTypePermission)session.merge(resourceTypePermission);
 			}
 		}
 		catch (Exception e) {
@@ -1825,8 +1825,9 @@ public class ResourceTypePermissionPersistenceImpl extends BasePersistenceImpl<R
 			resourceTypePermission.getPrimaryKey(), resourceTypePermission,
 			false);
 
-		clearUniqueFindersCache(resourceTypePermission);
-		cacheUniqueFindersCache(resourceTypePermission, isNew);
+		clearUniqueFindersCache((ResourceTypePermission)resourceTypePermissionModelImpl);
+		cacheUniqueFindersCache((ResourceTypePermission)resourceTypePermissionModelImpl,
+			isNew);
 
 		resourceTypePermission.resetOriginalValues();
 

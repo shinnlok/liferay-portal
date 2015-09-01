@@ -1152,7 +1152,7 @@ public class ResourceActionPersistenceImpl extends BasePersistenceImpl<ResourceA
 				resourceAction.setNew(false);
 			}
 			else {
-				session.merge(resourceAction);
+				resourceAction = (ResourceAction)session.merge(resourceAction);
 			}
 		}
 		catch (Exception e) {
@@ -1191,8 +1191,8 @@ public class ResourceActionPersistenceImpl extends BasePersistenceImpl<ResourceA
 			ResourceActionImpl.class, resourceAction.getPrimaryKey(),
 			resourceAction, false);
 
-		clearUniqueFindersCache(resourceAction);
-		cacheUniqueFindersCache(resourceAction, isNew);
+		clearUniqueFindersCache((ResourceAction)resourceActionModelImpl);
+		cacheUniqueFindersCache((ResourceAction)resourceActionModelImpl, isNew);
 
 		resourceAction.resetOriginalValues();
 

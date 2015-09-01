@@ -8260,7 +8260,7 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 				layout.setNew(false);
 			}
 			else {
-				session.merge(layout);
+				layout = (Layout)session.merge(layout);
 			}
 		}
 		catch (Exception e) {
@@ -8460,8 +8460,8 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 		EntityCacheUtil.putResult(LayoutModelImpl.ENTITY_CACHE_ENABLED,
 			LayoutImpl.class, layout.getPrimaryKey(), layout, false);
 
-		clearUniqueFindersCache(layout);
-		cacheUniqueFindersCache(layout, isNew);
+		clearUniqueFindersCache((Layout)layoutModelImpl);
+		cacheUniqueFindersCache((Layout)layoutModelImpl, isNew);
 
 		layout.resetOriginalValues();
 

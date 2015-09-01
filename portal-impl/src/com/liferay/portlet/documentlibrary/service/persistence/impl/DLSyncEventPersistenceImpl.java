@@ -989,6 +989,8 @@ public class DLSyncEventPersistenceImpl extends BasePersistenceImpl<DLSyncEvent>
 
 		boolean isNew = dlSyncEvent.isNew();
 
+		DLSyncEventModelImpl dlSyncEventModelImpl = (DLSyncEventModelImpl)dlSyncEvent;
+
 		Session session = null;
 
 		try {
@@ -1000,7 +1002,7 @@ public class DLSyncEventPersistenceImpl extends BasePersistenceImpl<DLSyncEvent>
 				dlSyncEvent.setNew(false);
 			}
 			else {
-				session.merge(dlSyncEvent);
+				dlSyncEvent = (DLSyncEvent)session.merge(dlSyncEvent);
 			}
 		}
 		catch (Exception e) {
@@ -1020,8 +1022,8 @@ public class DLSyncEventPersistenceImpl extends BasePersistenceImpl<DLSyncEvent>
 			DLSyncEventImpl.class, dlSyncEvent.getPrimaryKey(), dlSyncEvent,
 			false);
 
-		clearUniqueFindersCache(dlSyncEvent);
-		cacheUniqueFindersCache(dlSyncEvent, isNew);
+		clearUniqueFindersCache((DLSyncEvent)dlSyncEventModelImpl);
+		cacheUniqueFindersCache((DLSyncEvent)dlSyncEventModelImpl, isNew);
 
 		dlSyncEvent.resetOriginalValues();
 

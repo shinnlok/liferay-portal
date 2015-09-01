@@ -57,7 +57,8 @@ public abstract class BaseControlPanelEntryPanelApp implements PanelApp {
 		throws PortalException {
 
 		return PortalUtil.getControlPanelPortletURL(
-			request, getPortletId(), 0, PortletRequest.RENDER_PHASE);
+			request, getGroup(request), getPortletId(), 0,
+			PortletRequest.RENDER_PHASE);
 	}
 
 	@Override
@@ -86,13 +87,21 @@ public abstract class BaseControlPanelEntryPanelApp implements PanelApp {
 	protected ControlPanelEntry getControlPanelEntry() {
 		Portlet portlet = getPortlet();
 
+		if (portlet == null) {
+			return null;
+		}
+
 		return portlet.getControlPanelEntryInstance();
 	}
 
-	protected Portlet getPortlet() {
-		return _portletLocalService.getPortletById(getPortletId());
+	protected Group getGroup(HttpServletRequest request) {
+		return null;
 	}
 
-	protected PortletLocalService _portletLocalService;
+	protected Portlet getPortlet() {
+		return portletLocalService.getPortletById(getPortletId());
+	}
+
+	protected PortletLocalService portletLocalService;
 
 }

@@ -7401,7 +7401,7 @@ public class JournalFolderPersistenceImpl extends BasePersistenceImpl<JournalFol
 				journalFolder.setNew(false);
 			}
 			else {
-				session.merge(journalFolder);
+				journalFolder = (JournalFolder)session.merge(journalFolder);
 			}
 		}
 		catch (Exception e) {
@@ -7541,8 +7541,8 @@ public class JournalFolderPersistenceImpl extends BasePersistenceImpl<JournalFol
 			JournalFolderImpl.class, journalFolder.getPrimaryKey(),
 			journalFolder, false);
 
-		clearUniqueFindersCache(journalFolder);
-		cacheUniqueFindersCache(journalFolder, isNew);
+		clearUniqueFindersCache((JournalFolder)journalFolderModelImpl);
+		cacheUniqueFindersCache((JournalFolder)journalFolderModelImpl, isNew);
 
 		journalFolder.resetOriginalValues();
 

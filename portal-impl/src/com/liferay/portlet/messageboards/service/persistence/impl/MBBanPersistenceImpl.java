@@ -3368,7 +3368,7 @@ public class MBBanPersistenceImpl extends BasePersistenceImpl<MBBan>
 				mbBan.setNew(false);
 			}
 			else {
-				session.merge(mbBan);
+				mbBan = (MBBan)session.merge(mbBan);
 			}
 		}
 		catch (Exception e) {
@@ -3473,8 +3473,8 @@ public class MBBanPersistenceImpl extends BasePersistenceImpl<MBBan>
 		EntityCacheUtil.putResult(MBBanModelImpl.ENTITY_CACHE_ENABLED,
 			MBBanImpl.class, mbBan.getPrimaryKey(), mbBan, false);
 
-		clearUniqueFindersCache(mbBan);
-		cacheUniqueFindersCache(mbBan, isNew);
+		clearUniqueFindersCache((MBBan)mbBanModelImpl);
+		cacheUniqueFindersCache((MBBan)mbBanModelImpl, isNew);
 
 		mbBan.resetOriginalValues();
 

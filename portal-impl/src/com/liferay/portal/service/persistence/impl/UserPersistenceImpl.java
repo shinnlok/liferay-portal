@@ -7341,7 +7341,7 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 				user.setNew(false);
 			}
 			else {
-				session.merge(user);
+				user = (User)session.merge(user);
 			}
 		}
 		catch (Exception e) {
@@ -7543,8 +7543,8 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 		EntityCacheUtil.putResult(UserModelImpl.ENTITY_CACHE_ENABLED,
 			UserImpl.class, user.getPrimaryKey(), user, false);
 
-		clearUniqueFindersCache(user);
-		cacheUniqueFindersCache(user, isNew);
+		clearUniqueFindersCache((User)userModelImpl);
+		cacheUniqueFindersCache((User)userModelImpl, isNew);
 
 		user.resetOriginalValues();
 

@@ -5449,7 +5449,7 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 				calEvent.setNew(false);
 			}
 			else {
-				session.merge(calEvent);
+				calEvent = (CalEvent)session.merge(calEvent);
 			}
 		}
 		catch (Exception e) {
@@ -5607,8 +5607,8 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 		EntityCacheUtil.putResult(CalEventModelImpl.ENTITY_CACHE_ENABLED,
 			CalEventImpl.class, calEvent.getPrimaryKey(), calEvent, false);
 
-		clearUniqueFindersCache(calEvent);
-		cacheUniqueFindersCache(calEvent, isNew);
+		clearUniqueFindersCache((CalEvent)calEventModelImpl);
+		cacheUniqueFindersCache((CalEvent)calEventModelImpl, isNew);
 
 		calEvent.resetOriginalValues();
 

@@ -6059,7 +6059,7 @@ public class DLFileShortcutPersistenceImpl extends BasePersistenceImpl<DLFileSho
 				dlFileShortcut.setNew(false);
 			}
 			else {
-				session.merge(dlFileShortcut);
+				dlFileShortcut = (DLFileShortcut)session.merge(dlFileShortcut);
 			}
 		}
 		catch (Exception e) {
@@ -6226,8 +6226,8 @@ public class DLFileShortcutPersistenceImpl extends BasePersistenceImpl<DLFileSho
 			DLFileShortcutImpl.class, dlFileShortcut.getPrimaryKey(),
 			dlFileShortcut, false);
 
-		clearUniqueFindersCache(dlFileShortcut);
-		cacheUniqueFindersCache(dlFileShortcut, isNew);
+		clearUniqueFindersCache((DLFileShortcut)dlFileShortcutModelImpl);
+		cacheUniqueFindersCache((DLFileShortcut)dlFileShortcutModelImpl, isNew);
 
 		dlFileShortcut.resetOriginalValues();
 

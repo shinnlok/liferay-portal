@@ -16,6 +16,7 @@ package com.liferay.gradle.plugins;
 
 import aQute.bnd.osgi.Constants;
 
+import com.liferay.gradle.plugins.alloy.taglib.BuildTaglibsTask;
 import com.liferay.gradle.plugins.css.builder.BuildCSSTask;
 import com.liferay.gradle.plugins.extensions.LiferayExtension;
 import com.liferay.gradle.plugins.extensions.LiferayOSGiExtension;
@@ -29,6 +30,8 @@ import com.liferay.gradle.plugins.xsd.builder.XSDBuilderPlugin;
 import com.liferay.gradle.util.FileUtil;
 import com.liferay.gradle.util.GradleUtil;
 import com.liferay.gradle.util.Validator;
+import com.liferay.gradle.util.copy.ExcludeExistingFileAction;
+import com.liferay.gradle.util.copy.RenameDependencyClosure;
 
 import groovy.lang.Closure;
 
@@ -59,6 +62,7 @@ import org.gradle.api.specs.Spec;
 import org.gradle.api.tasks.Copy;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.SourceSetOutput;
+import org.gradle.api.tasks.TaskContainer;
 import org.gradle.api.tasks.TaskInputs;
 import org.gradle.api.tasks.TaskOutputs;
 import org.gradle.api.tasks.bundling.Jar;
@@ -87,6 +91,7 @@ public class LiferayOSGiPlugin extends LiferayJavaPlugin {
 		configureJspCExtension(project);
 
 		configureArchivesBaseName(project);
+		configureTasksBuildTaglibs(project);
 		configureVersion(project);
 
 		project.afterEvaluate(
@@ -363,11 +368,15 @@ public class LiferayOSGiPlugin extends LiferayJavaPlugin {
 		Copy copy = GradleUtil.addTask(
 			project, COPY_LIBS_TASK_NAME, Copy.class);
 
+		File libDir = getLibDir(project);
+
+		copy.eachFile(new ExcludeExistingFileAction(libDir));
+
 		Configuration configuration = GradleUtil.getConfiguration(
 			project, JavaPlugin.RUNTIME_CONFIGURATION_NAME);
 
 		copy.from(configuration);
-		copy.into(getLibDir(project));
+		copy.into(libDir);
 
 		Closure<String> closure = new RenameDependencyClosure(
 			project, configuration.getName());
@@ -630,6 +639,47 @@ public class LiferayOSGiPlugin extends LiferayJavaPlugin {
 		buildServiceTask.setSqlDirName(project.relativePath(sqlDir));
 	}
 
+	protected void configureTaskBuildTaglibsJspParentDir(
+		BuildTaglibsTask buildTaglibsTask) {
+
+		if (buildTaglibsTask.getJspParentDir() != null) {
+			return;
+		}
+
+		File jspParentDir = new File(
+			getResourcesDir(buildTaglibsTask.getProject()),
+			"META-INF/resources");
+
+		buildTaglibsTask.setJspParentDir(jspParentDir);
+	}
+
+	protected void configureTaskBuildTaglibsOsgiModuleSymbolicName(
+		BuildTaglibsTask buildTaglibsTask) {
+
+		if (Validator.isNotNull(buildTaglibsTask.getOsgiModuleSymbolicName())) {
+			return;
+		}
+
+		String bundleSymbolicName = getBundleInstruction(
+			buildTaglibsTask.getProject(), Constants.BUNDLE_SYMBOLICNAME);
+
+		buildTaglibsTask.setOsgiModuleSymbolicName(bundleSymbolicName);
+	}
+
+	protected void configureTaskBuildTaglibsTldDir(
+		BuildTaglibsTask buildTaglibsTask) {
+
+		if (buildTaglibsTask.getTldDir() != null) {
+			return;
+		}
+
+		File tldDir = new File(
+			getResourcesDir(buildTaglibsTask.getProject()),
+			"META-INF/resources");
+
+		buildTaglibsTask.setTldDir(tldDir);
+	}
+
 	@Override
 	protected void configureTaskBuildXSD(Project project) {
 		Zip zip = (Zip)GradleUtil.getTask(
@@ -705,6 +755,24 @@ public class LiferayOSGiPlugin extends LiferayJavaPlugin {
 		configureTaskBuildXSD(project);
 
 		configureTaskAutoUpdateXml(project);
+	}
+
+	protected void configureTasksBuildTaglibs(Project project) {
+		TaskContainer taskContainer = project.getTasks();
+
+		taskContainer.withType(
+			BuildTaglibsTask.class,
+			new Action<BuildTaglibsTask>() {
+
+				@Override
+				public void execute(BuildTaglibsTask buildTaglibsTask) {
+					configureTaskBuildTaglibsJspParentDir(buildTaglibsTask);
+					configureTaskBuildTaglibsOsgiModuleSymbolicName(
+						buildTaglibsTask);
+					configureTaskBuildTaglibsTldDir(buildTaglibsTask);
+				}
+
+			});
 	}
 
 	protected void configureTaskUnzipJar(Project project) {

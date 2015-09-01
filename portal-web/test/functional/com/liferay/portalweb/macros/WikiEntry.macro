@@ -1,0 +1,31 @@
+<definition>
+	<command name="addMediaWikiDescription">
+		<execute function="Type" locator1="TextArea#WEB_EDITOR" value1="${wikiPageContent}" />
+	</command>
+
+	<command name="addPageContent">
+		<execute function="SelectFrame" locator1="CKEditor#BODY_FIELD_IFRAME" />
+
+		<execute function="Type#sendKeys" locator1="CKEditor#BODY" value1="${wikiPageContent}" />
+
+		<execute function="SelectFrame" value1="relative=top" />
+	</command>
+
+	<command name="addPageTitle">
+		<execute function="Type" locator1="TextInput#TITLE" value1="${wikiPageTitle}" />
+	</command>
+
+	<command name="confirmMediaWiki">
+		<execute function="Confirm" value1="You may lose some formatting when switching from Creole to MediaWiki. Do you want to continue?" />
+	</command>
+
+	<command name="publish">
+		<execute function="AssertClick" locator1="Button#PUBLISH" value1="Publish" />
+
+		<execute function="AssertTextEquals" locator1="Message#SUCCESS" value1="Your request has completed successfully." />
+	</command>
+
+	<command name="selectPageFormat">
+		<execute function="SelectNoError#pauseSelect" locator1="Wiki#ADD_PAGE_FORMAT_DROPDOWN" value1="${pageFormat}" />
+	</command>
+</definition>

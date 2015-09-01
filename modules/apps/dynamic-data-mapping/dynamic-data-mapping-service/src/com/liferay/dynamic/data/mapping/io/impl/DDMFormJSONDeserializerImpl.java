@@ -15,9 +15,13 @@
 package com.liferay.dynamic.data.mapping.io.impl;
 
 import com.liferay.dynamic.data.mapping.io.DDMFormJSONDeserializer;
+import com.liferay.dynamic.data.mapping.model.DDMForm;
+import com.liferay.dynamic.data.mapping.model.DDMFormField;
+import com.liferay.dynamic.data.mapping.model.DDMFormFieldOptions;
+import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.dynamic.data.mapping.registry.DDMFormFactory;
 import com.liferay.dynamic.data.mapping.registry.DDMFormFieldType;
-import com.liferay.dynamic.data.mapping.registry.DDMFormFieldTypeRegistryUtil;
+import com.liferay.dynamic.data.mapping.registry.DDMFormFieldTypeServicesTrackerUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONException;
@@ -25,10 +29,6 @@ import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portlet.dynamicdatamapping.model.DDMForm;
-import com.liferay.portlet.dynamicdatamapping.model.DDMFormField;
-import com.liferay.portlet.dynamicdatamapping.model.DDMFormFieldOptions;
-import com.liferay.portlet.dynamicdatamapping.model.LocalizedValue;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -207,11 +207,11 @@ public class DDMFormJSONDeserializerImpl implements DDMFormJSONDeserializer {
 
 	protected DDMForm getDDMFormFieldTypeSettingsDDMForm(String type) {
 		DDMFormFieldType ddmFormFieldType =
-			DDMFormFieldTypeRegistryUtil.getDDMFormFieldType(type);
+			DDMFormFieldTypeServicesTrackerUtil.getDDMFormFieldType(type);
 
 		if (ddmFormFieldType == null) {
-			ddmFormFieldType = DDMFormFieldTypeRegistryUtil.getDDMFormFieldType(
-				"text");
+			ddmFormFieldType =
+				DDMFormFieldTypeServicesTrackerUtil.getDDMFormFieldType("text");
 		}
 
 		return DDMFormFactory.create(

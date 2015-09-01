@@ -3309,7 +3309,7 @@ public class DLFileEntryTypePersistenceImpl extends BasePersistenceImpl<DLFileEn
 				dlFileEntryType.setNew(false);
 			}
 			else {
-				session.merge(dlFileEntryType);
+				dlFileEntryType = (DLFileEntryType)session.merge(dlFileEntryType);
 			}
 		}
 		catch (Exception e) {
@@ -3386,8 +3386,8 @@ public class DLFileEntryTypePersistenceImpl extends BasePersistenceImpl<DLFileEn
 			DLFileEntryTypeImpl.class, dlFileEntryType.getPrimaryKey(),
 			dlFileEntryType, false);
 
-		clearUniqueFindersCache(dlFileEntryType);
-		cacheUniqueFindersCache(dlFileEntryType, isNew);
+		clearUniqueFindersCache((DLFileEntryType)dlFileEntryTypeModelImpl);
+		cacheUniqueFindersCache((DLFileEntryType)dlFileEntryTypeModelImpl, isNew);
 
 		dlFileEntryType.resetOriginalValues();
 

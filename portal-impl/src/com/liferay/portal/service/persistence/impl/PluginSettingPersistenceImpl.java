@@ -1149,7 +1149,7 @@ public class PluginSettingPersistenceImpl extends BasePersistenceImpl<PluginSett
 				pluginSetting.setNew(false);
 			}
 			else {
-				session.merge(pluginSetting);
+				pluginSetting = (PluginSetting)session.merge(pluginSetting);
 			}
 		}
 		catch (Exception e) {
@@ -1190,8 +1190,8 @@ public class PluginSettingPersistenceImpl extends BasePersistenceImpl<PluginSett
 			PluginSettingImpl.class, pluginSetting.getPrimaryKey(),
 			pluginSetting, false);
 
-		clearUniqueFindersCache(pluginSetting);
-		cacheUniqueFindersCache(pluginSetting, isNew);
+		clearUniqueFindersCache((PluginSetting)pluginSettingModelImpl);
+		cacheUniqueFindersCache((PluginSetting)pluginSettingModelImpl, isNew);
 
 		pluginSetting.resetOriginalValues();
 

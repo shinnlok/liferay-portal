@@ -8714,7 +8714,7 @@ public class DDMStructurePersistenceImpl extends BasePersistenceImpl<DDMStructur
 				ddmStructure.setNew(false);
 			}
 			else {
-				session.merge(ddmStructure);
+				ddmStructure = (DDMStructure)session.merge(ddmStructure);
 			}
 		}
 		catch (Exception e) {
@@ -8934,8 +8934,8 @@ public class DDMStructurePersistenceImpl extends BasePersistenceImpl<DDMStructur
 			DDMStructureImpl.class, ddmStructure.getPrimaryKey(), ddmStructure,
 			false);
 
-		clearUniqueFindersCache(ddmStructure);
-		cacheUniqueFindersCache(ddmStructure, isNew);
+		clearUniqueFindersCache((DDMStructure)ddmStructureModelImpl);
+		cacheUniqueFindersCache((DDMStructure)ddmStructureModelImpl, isNew);
 
 		ddmStructure.resetOriginalValues();
 
