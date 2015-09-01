@@ -14,6 +14,8 @@
 
 package com.liferay.dynamic.data.mapping.registry;
 
+import com.liferay.dynamic.data.mapping.model.DDMFormFieldOptions;
+import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.dynamic.data.mapping.registry.annotations.DDMForm;
 import com.liferay.dynamic.data.mapping.registry.annotations.DDMFormField;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -24,8 +26,6 @@ import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portlet.dynamicdatamapping.model.DDMFormFieldOptions;
-import com.liferay.portlet.dynamicdatamapping.model.LocalizedValue;
 
 import java.lang.reflect.Method;
 
@@ -147,6 +147,22 @@ public class DDMFormFactoryHelper {
 		}
 
 		return "text";
+	}
+
+	public String getDDMFormFieldValidationExpression() {
+		if (Validator.isNotNull(_ddmFormField.validationExpression())) {
+			return _ddmFormField.validationExpression();
+		}
+
+		return StringPool.TRUE;
+	}
+
+	public String getDDMFormFieldValidationMessage() {
+		if (Validator.isNotNull(_ddmFormField.validationMessage())) {
+			return _ddmFormField.validationMessage();
+		}
+
+		return StringPool.BLANK;
 	}
 
 	public String getDDMFormFieldVisibilityExpression() {

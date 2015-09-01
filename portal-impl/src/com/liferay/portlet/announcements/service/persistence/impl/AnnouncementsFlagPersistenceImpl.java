@@ -1086,7 +1086,7 @@ public class AnnouncementsFlagPersistenceImpl extends BasePersistenceImpl<Announ
 				announcementsFlag.setNew(false);
 			}
 			else {
-				session.merge(announcementsFlag);
+				announcementsFlag = (AnnouncementsFlag)session.merge(announcementsFlag);
 			}
 		}
 		catch (Exception e) {
@@ -1125,8 +1125,9 @@ public class AnnouncementsFlagPersistenceImpl extends BasePersistenceImpl<Announ
 			AnnouncementsFlagImpl.class, announcementsFlag.getPrimaryKey(),
 			announcementsFlag, false);
 
-		clearUniqueFindersCache(announcementsFlag);
-		cacheUniqueFindersCache(announcementsFlag, isNew);
+		clearUniqueFindersCache((AnnouncementsFlag)announcementsFlagModelImpl);
+		cacheUniqueFindersCache((AnnouncementsFlag)announcementsFlagModelImpl,
+			isNew);
 
 		announcementsFlag.resetOriginalValues();
 

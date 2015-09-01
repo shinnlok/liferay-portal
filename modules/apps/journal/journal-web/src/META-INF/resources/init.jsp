@@ -20,6 +20,7 @@
 
 <%@ taglib uri="http://liferay.com/tld/aui" prefix="aui" %><%@
 taglib uri="http://liferay.com/tld/ddm" prefix="liferay-ddm" %><%@
+taglib uri="http://liferay.com/tld/frontend" prefix="liferay-frontend" %><%@
 taglib uri="http://liferay.com/tld/portlet" prefix="liferay-portlet" %><%@
 taglib uri="http://liferay.com/tld/security" prefix="liferay-security" %><%@
 taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %><%@
@@ -29,16 +30,22 @@ taglib uri="http://liferay.com/tld/util" prefix="liferay-util" %>
 <%@ page import="com.liferay.dynamic.data.mapping.exception.NoSuchStructureException" %><%@
 page import="com.liferay.dynamic.data.mapping.exception.NoSuchTemplateException" %><%@
 page import="com.liferay.dynamic.data.mapping.exception.StorageFieldRequiredException" %><%@
+page import="com.liferay.dynamic.data.mapping.model.DDMForm" %><%@
+page import="com.liferay.dynamic.data.mapping.model.DDMFormField" %><%@
+page import="com.liferay.dynamic.data.mapping.model.DDMFormFieldOptions" %><%@
 page import="com.liferay.dynamic.data.mapping.model.DDMStructure" %><%@
 page import="com.liferay.dynamic.data.mapping.model.DDMTemplate" %><%@
+page import="com.liferay.dynamic.data.mapping.model.LocalizedValue" %><%@
 page import="com.liferay.dynamic.data.mapping.service.DDMStructureLocalServiceUtil" %><%@
 page import="com.liferay.dynamic.data.mapping.service.DDMStructureServiceUtil" %><%@
 page import="com.liferay.dynamic.data.mapping.service.DDMTemplateLocalServiceUtil" %><%@
 page import="com.liferay.dynamic.data.mapping.service.DDMTemplateServiceUtil" %><%@
 page import="com.liferay.dynamic.data.mapping.service.permission.DDMStructurePermission" %><%@
 page import="com.liferay.dynamic.data.mapping.service.permission.DDMTemplatePermission" %><%@
+page import="com.liferay.dynamic.data.mapping.storage.DDMFormValues" %><%@
 page import="com.liferay.dynamic.data.mapping.storage.Fields" %><%@
 page import="com.liferay.dynamic.data.mapping.util.FieldsToDDMFormValuesConverterUtil" %><%@
+page import="com.liferay.frontend.taglib.servlet.taglib.AddMenuItem" %><%@
 page import="com.liferay.item.selector.ItemSelector" %><%@
 page import="com.liferay.item.selector.ItemSelectorReturnType" %><%@
 page import="com.liferay.item.selector.criteria.UUIDItemSelectorReturnType" %><%@
@@ -109,6 +116,7 @@ page import="com.liferay.journal.web.util.JournalSearcher" %><%@
 page import="com.liferay.portal.LocaleException" %><%@
 page import="com.liferay.portal.NoSuchWorkflowDefinitionLinkException" %><%@
 page import="com.liferay.portal.kernel.bean.BeanParamUtil" %><%@
+page import="com.liferay.portal.kernel.dao.orm.QueryUtil" %><%@
 page import="com.liferay.portal.kernel.dao.search.DisplayTerms" %><%@
 page import="com.liferay.portal.kernel.dao.search.RowChecker" %><%@
 page import="com.liferay.portal.kernel.dao.search.SearchContainer" %><%@
@@ -148,6 +156,7 @@ page import="com.liferay.portal.kernel.util.StringUtil" %><%@
 page import="com.liferay.portal.kernel.util.TextFormatter" %><%@
 page import="com.liferay.portal.kernel.util.UnicodeFormatter" %><%@
 page import="com.liferay.portal.kernel.util.Validator" %><%@
+page import="com.liferay.portal.kernel.webdav.WebDAVUtil" %><%@
 page import="com.liferay.portal.kernel.workflow.WorkflowConstants" %><%@
 page import="com.liferay.portal.kernel.workflow.WorkflowDefinition" %><%@
 page import="com.liferay.portal.kernel.workflow.WorkflowDefinitionManagerUtil" %><%@
@@ -178,11 +187,6 @@ page import="com.liferay.portlet.asset.util.AssetUtil" %><%@
 page import="com.liferay.portlet.documentlibrary.DuplicateFileException" %><%@
 page import="com.liferay.portlet.documentlibrary.FileSizeException" %><%@
 page import="com.liferay.portlet.documentlibrary.model.DLFileEntry" %><%@
-page import="com.liferay.portlet.dynamicdatamapping.model.DDMForm" %><%@
-page import="com.liferay.portlet.dynamicdatamapping.model.DDMFormField" %><%@
-page import="com.liferay.portlet.dynamicdatamapping.model.DDMFormFieldOptions" %><%@
-page import="com.liferay.portlet.dynamicdatamapping.model.LocalizedValue" %><%@
-page import="com.liferay.portlet.dynamicdatamapping.storage.DDMFormValues" %><%@
 page import="com.liferay.portlet.trash.model.TrashEntry" %><%@
 page import="com.liferay.portlet.trash.util.TrashUtil" %><%@
 page import="com.liferay.taglib.search.ResultRow" %><%@

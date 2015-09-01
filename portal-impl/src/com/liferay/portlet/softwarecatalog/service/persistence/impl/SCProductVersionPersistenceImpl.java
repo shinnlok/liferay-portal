@@ -1118,7 +1118,7 @@ public class SCProductVersionPersistenceImpl extends BasePersistenceImpl<SCProdu
 				scProductVersion.setNew(false);
 			}
 			else {
-				session.merge(scProductVersion);
+				scProductVersion = (SCProductVersion)session.merge(scProductVersion);
 			}
 		}
 		catch (Exception e) {
@@ -1161,8 +1161,9 @@ public class SCProductVersionPersistenceImpl extends BasePersistenceImpl<SCProdu
 			SCProductVersionImpl.class, scProductVersion.getPrimaryKey(),
 			scProductVersion, false);
 
-		clearUniqueFindersCache(scProductVersion);
-		cacheUniqueFindersCache(scProductVersion, isNew);
+		clearUniqueFindersCache((SCProductVersion)scProductVersionModelImpl);
+		cacheUniqueFindersCache((SCProductVersion)scProductVersionModelImpl,
+			isNew);
 
 		scProductVersion.resetOriginalValues();
 

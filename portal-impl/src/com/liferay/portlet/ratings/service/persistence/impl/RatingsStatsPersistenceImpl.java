@@ -552,6 +552,8 @@ public class RatingsStatsPersistenceImpl extends BasePersistenceImpl<RatingsStat
 
 		boolean isNew = ratingsStats.isNew();
 
+		RatingsStatsModelImpl ratingsStatsModelImpl = (RatingsStatsModelImpl)ratingsStats;
+
 		Session session = null;
 
 		try {
@@ -563,7 +565,7 @@ public class RatingsStatsPersistenceImpl extends BasePersistenceImpl<RatingsStat
 				ratingsStats.setNew(false);
 			}
 			else {
-				session.merge(ratingsStats);
+				ratingsStats = (RatingsStats)session.merge(ratingsStats);
 			}
 		}
 		catch (Exception e) {
@@ -583,8 +585,8 @@ public class RatingsStatsPersistenceImpl extends BasePersistenceImpl<RatingsStat
 			RatingsStatsImpl.class, ratingsStats.getPrimaryKey(), ratingsStats,
 			false);
 
-		clearUniqueFindersCache(ratingsStats);
-		cacheUniqueFindersCache(ratingsStats, isNew);
+		clearUniqueFindersCache((RatingsStats)ratingsStatsModelImpl);
+		cacheUniqueFindersCache((RatingsStats)ratingsStatsModelImpl, isNew);
 
 		ratingsStats.resetOriginalValues();
 

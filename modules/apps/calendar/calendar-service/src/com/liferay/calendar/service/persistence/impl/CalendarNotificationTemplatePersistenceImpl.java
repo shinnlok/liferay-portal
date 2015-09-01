@@ -2658,7 +2658,7 @@ public class CalendarNotificationTemplatePersistenceImpl
 				calendarNotificationTemplate.setNew(false);
 			}
 			else {
-				session.merge(calendarNotificationTemplate);
+				calendarNotificationTemplate = (CalendarNotificationTemplate)session.merge(calendarNotificationTemplate);
 			}
 		}
 		catch (Exception e) {
@@ -2743,8 +2743,9 @@ public class CalendarNotificationTemplatePersistenceImpl
 			calendarNotificationTemplate.getPrimaryKey(),
 			calendarNotificationTemplate, false);
 
-		clearUniqueFindersCache(calendarNotificationTemplate);
-		cacheUniqueFindersCache(calendarNotificationTemplate, isNew);
+		clearUniqueFindersCache((CalendarNotificationTemplate)calendarNotificationTemplateModelImpl);
+		cacheUniqueFindersCache((CalendarNotificationTemplate)calendarNotificationTemplateModelImpl,
+			isNew);
 
 		calendarNotificationTemplate.resetOriginalValues();
 

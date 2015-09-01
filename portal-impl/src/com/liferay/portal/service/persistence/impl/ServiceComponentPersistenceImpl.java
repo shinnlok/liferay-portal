@@ -1148,7 +1148,7 @@ public class ServiceComponentPersistenceImpl extends BasePersistenceImpl<Service
 				serviceComponent.setNew(false);
 			}
 			else {
-				session.merge(serviceComponent);
+				serviceComponent = (ServiceComponent)session.merge(serviceComponent);
 			}
 		}
 		catch (Exception e) {
@@ -1191,8 +1191,9 @@ public class ServiceComponentPersistenceImpl extends BasePersistenceImpl<Service
 			ServiceComponentImpl.class, serviceComponent.getPrimaryKey(),
 			serviceComponent, false);
 
-		clearUniqueFindersCache(serviceComponent);
-		cacheUniqueFindersCache(serviceComponent, isNew);
+		clearUniqueFindersCache((ServiceComponent)serviceComponentModelImpl);
+		cacheUniqueFindersCache((ServiceComponent)serviceComponentModelImpl,
+			isNew);
 
 		serviceComponent.resetOriginalValues();
 

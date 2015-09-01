@@ -1832,7 +1832,7 @@ public class PortletItemPersistenceImpl extends BasePersistenceImpl<PortletItem>
 				portletItem.setNew(false);
 			}
 			else {
-				session.merge(portletItem);
+				portletItem = (PortletItem)session.merge(portletItem);
 			}
 		}
 		catch (Exception e) {
@@ -1898,8 +1898,8 @@ public class PortletItemPersistenceImpl extends BasePersistenceImpl<PortletItem>
 			PortletItemImpl.class, portletItem.getPrimaryKey(), portletItem,
 			false);
 
-		clearUniqueFindersCache(portletItem);
-		cacheUniqueFindersCache(portletItem, isNew);
+		clearUniqueFindersCache((PortletItem)portletItemModelImpl);
+		cacheUniqueFindersCache((PortletItem)portletItemModelImpl, isNew);
 
 		portletItem.resetOriginalValues();
 

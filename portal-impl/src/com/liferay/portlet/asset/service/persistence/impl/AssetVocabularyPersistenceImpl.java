@@ -4746,7 +4746,7 @@ public class AssetVocabularyPersistenceImpl extends BasePersistenceImpl<AssetVoc
 				assetVocabulary.setNew(false);
 			}
 			else {
-				session.merge(assetVocabulary);
+				assetVocabulary = (AssetVocabulary)session.merge(assetVocabulary);
 			}
 		}
 		catch (Exception e) {
@@ -4842,8 +4842,8 @@ public class AssetVocabularyPersistenceImpl extends BasePersistenceImpl<AssetVoc
 			AssetVocabularyImpl.class, assetVocabulary.getPrimaryKey(),
 			assetVocabulary, false);
 
-		clearUniqueFindersCache(assetVocabulary);
-		cacheUniqueFindersCache(assetVocabulary, isNew);
+		clearUniqueFindersCache((AssetVocabulary)assetVocabularyModelImpl);
+		cacheUniqueFindersCache((AssetVocabulary)assetVocabularyModelImpl, isNew);
 
 		assetVocabulary.resetOriginalValues();
 

@@ -1583,7 +1583,7 @@ public class SCProductScreenshotPersistenceImpl extends BasePersistenceImpl<SCPr
 				scProductScreenshot.setNew(false);
 			}
 			else {
-				session.merge(scProductScreenshot);
+				scProductScreenshot = (SCProductScreenshot)session.merge(scProductScreenshot);
 			}
 		}
 		catch (Exception e) {
@@ -1626,8 +1626,9 @@ public class SCProductScreenshotPersistenceImpl extends BasePersistenceImpl<SCPr
 			SCProductScreenshotImpl.class, scProductScreenshot.getPrimaryKey(),
 			scProductScreenshot, false);
 
-		clearUniqueFindersCache(scProductScreenshot);
-		cacheUniqueFindersCache(scProductScreenshot, isNew);
+		clearUniqueFindersCache((SCProductScreenshot)scProductScreenshotModelImpl);
+		cacheUniqueFindersCache((SCProductScreenshot)scProductScreenshotModelImpl,
+			isNew);
 
 		scProductScreenshot.resetOriginalValues();
 

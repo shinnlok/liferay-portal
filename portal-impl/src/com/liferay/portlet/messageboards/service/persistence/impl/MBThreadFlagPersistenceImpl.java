@@ -2933,7 +2933,7 @@ public class MBThreadFlagPersistenceImpl extends BasePersistenceImpl<MBThreadFla
 				mbThreadFlag.setNew(false);
 			}
 			else {
-				session.merge(mbThreadFlag);
+				mbThreadFlag = (MBThreadFlag)session.merge(mbThreadFlag);
 			}
 		}
 		catch (Exception e) {
@@ -3027,8 +3027,8 @@ public class MBThreadFlagPersistenceImpl extends BasePersistenceImpl<MBThreadFla
 			MBThreadFlagImpl.class, mbThreadFlag.getPrimaryKey(), mbThreadFlag,
 			false);
 
-		clearUniqueFindersCache(mbThreadFlag);
-		cacheUniqueFindersCache(mbThreadFlag, isNew);
+		clearUniqueFindersCache((MBThreadFlag)mbThreadFlagModelImpl);
+		cacheUniqueFindersCache((MBThreadFlag)mbThreadFlagModelImpl, isNew);
 
 		mbThreadFlag.resetOriginalValues();
 

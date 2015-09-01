@@ -567,6 +567,8 @@ public class PortalPreferencesPersistenceImpl extends BasePersistenceImpl<Portal
 
 		boolean isNew = portalPreferences.isNew();
 
+		PortalPreferencesModelImpl portalPreferencesModelImpl = (PortalPreferencesModelImpl)portalPreferences;
+
 		Session session = null;
 
 		try {
@@ -578,7 +580,7 @@ public class PortalPreferencesPersistenceImpl extends BasePersistenceImpl<Portal
 				portalPreferences.setNew(false);
 			}
 			else {
-				session.merge(portalPreferences);
+				portalPreferences = (PortalPreferences)session.merge(portalPreferences);
 			}
 		}
 		catch (Exception e) {
@@ -598,8 +600,9 @@ public class PortalPreferencesPersistenceImpl extends BasePersistenceImpl<Portal
 			PortalPreferencesImpl.class, portalPreferences.getPrimaryKey(),
 			portalPreferences, false);
 
-		clearUniqueFindersCache(portalPreferences);
-		cacheUniqueFindersCache(portalPreferences, isNew);
+		clearUniqueFindersCache((PortalPreferences)portalPreferencesModelImpl);
+		cacheUniqueFindersCache((PortalPreferences)portalPreferencesModelImpl,
+			isNew);
 
 		portalPreferences.resetOriginalValues();
 

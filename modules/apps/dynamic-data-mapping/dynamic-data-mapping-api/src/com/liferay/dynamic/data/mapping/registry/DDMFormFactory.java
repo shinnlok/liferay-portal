@@ -14,8 +14,8 @@
 
 package com.liferay.dynamic.data.mapping.registry;
 
-import com.liferay.portlet.dynamicdatamapping.model.DDMForm;
-import com.liferay.portlet.dynamicdatamapping.model.DDMFormField;
+import com.liferay.dynamic.data.mapping.model.DDMForm;
+import com.liferay.dynamic.data.mapping.model.DDMFormField;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -83,6 +83,10 @@ public class DDMFormFactory {
 			ddmFormFactoryHelper.isDDMFormFieldLocalizable(method));
 		ddmFormField.setDDMFormFieldOptions(
 			ddmFormFactoryHelper.getDDMFormFieldOptions());
+		ddmFormField.setValidationExpression(
+			ddmFormFactoryHelper.getDDMFormFieldValidationExpression());
+		ddmFormField.setValidationMessage(
+			ddmFormFactoryHelper.getDDMFormFieldValidationMessage());
 		ddmFormField.setVisibilityExpression(
 			ddmFormFactoryHelper.getDDMFormFieldVisibilityExpression());
 

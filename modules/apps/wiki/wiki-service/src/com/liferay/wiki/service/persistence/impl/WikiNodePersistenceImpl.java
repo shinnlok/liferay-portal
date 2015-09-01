@@ -4710,7 +4710,7 @@ public class WikiNodePersistenceImpl extends BasePersistenceImpl<WikiNode>
 				wikiNode.setNew(false);
 			}
 			else {
-				session.merge(wikiNode);
+				wikiNode = (WikiNode)session.merge(wikiNode);
 			}
 		}
 		catch (Exception e) {
@@ -4845,8 +4845,8 @@ public class WikiNodePersistenceImpl extends BasePersistenceImpl<WikiNode>
 		EntityCacheUtil.putResult(WikiNodeModelImpl.ENTITY_CACHE_ENABLED,
 			WikiNodeImpl.class, wikiNode.getPrimaryKey(), wikiNode, false);
 
-		clearUniqueFindersCache(wikiNode);
-		cacheUniqueFindersCache(wikiNode, isNew);
+		clearUniqueFindersCache((WikiNode)wikiNodeModelImpl);
+		cacheUniqueFindersCache((WikiNode)wikiNodeModelImpl, isNew);
 
 		wikiNode.resetOriginalValues();
 

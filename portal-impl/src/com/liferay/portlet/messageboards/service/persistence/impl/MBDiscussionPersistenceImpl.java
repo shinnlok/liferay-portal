@@ -2699,7 +2699,7 @@ public class MBDiscussionPersistenceImpl extends BasePersistenceImpl<MBDiscussio
 				mbDiscussion.setNew(false);
 			}
 			else {
-				session.merge(mbDiscussion);
+				mbDiscussion = (MBDiscussion)session.merge(mbDiscussion);
 			}
 		}
 		catch (Exception e) {
@@ -2778,8 +2778,8 @@ public class MBDiscussionPersistenceImpl extends BasePersistenceImpl<MBDiscussio
 			MBDiscussionImpl.class, mbDiscussion.getPrimaryKey(), mbDiscussion,
 			false);
 
-		clearUniqueFindersCache(mbDiscussion);
-		cacheUniqueFindersCache(mbDiscussion, isNew);
+		clearUniqueFindersCache((MBDiscussion)mbDiscussionModelImpl);
+		cacheUniqueFindersCache((MBDiscussion)mbDiscussionModelImpl, isNew);
 
 		mbDiscussion.resetOriginalValues();
 

@@ -2513,7 +2513,7 @@ public class RepositoryEntryPersistenceImpl extends BasePersistenceImpl<Reposito
 				repositoryEntry.setNew(false);
 			}
 			else {
-				session.merge(repositoryEntry);
+				repositoryEntry = (RepositoryEntry)session.merge(repositoryEntry);
 			}
 		}
 		catch (Exception e) {
@@ -2592,8 +2592,8 @@ public class RepositoryEntryPersistenceImpl extends BasePersistenceImpl<Reposito
 			RepositoryEntryImpl.class, repositoryEntry.getPrimaryKey(),
 			repositoryEntry, false);
 
-		clearUniqueFindersCache(repositoryEntry);
-		cacheUniqueFindersCache(repositoryEntry, isNew);
+		clearUniqueFindersCache((RepositoryEntry)repositoryEntryModelImpl);
+		cacheUniqueFindersCache((RepositoryEntry)repositoryEntryModelImpl, isNew);
 
 		repositoryEntry.resetOriginalValues();
 

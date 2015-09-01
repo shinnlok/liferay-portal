@@ -2187,7 +2187,7 @@ public class LayoutBranchPersistenceImpl extends BasePersistenceImpl<LayoutBranc
 				layoutBranch.setNew(false);
 			}
 			else {
-				session.merge(layoutBranch);
+				layoutBranch = (LayoutBranch)session.merge(layoutBranch);
 			}
 		}
 		catch (Exception e) {
@@ -2272,8 +2272,8 @@ public class LayoutBranchPersistenceImpl extends BasePersistenceImpl<LayoutBranc
 			LayoutBranchImpl.class, layoutBranch.getPrimaryKey(), layoutBranch,
 			false);
 
-		clearUniqueFindersCache(layoutBranch);
-		cacheUniqueFindersCache(layoutBranch, isNew);
+		clearUniqueFindersCache((LayoutBranch)layoutBranchModelImpl);
+		cacheUniqueFindersCache((LayoutBranch)layoutBranchModelImpl, isNew);
 
 		layoutBranch.resetOriginalValues();
 

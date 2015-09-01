@@ -29147,7 +29147,7 @@ public class JournalArticlePersistenceImpl extends BasePersistenceImpl<JournalAr
 				journalArticle.setNew(false);
 			}
 			else {
-				session.merge(journalArticle);
+				journalArticle = (JournalArticle)session.merge(journalArticle);
 			}
 		}
 		catch (Exception e) {
@@ -29820,8 +29820,8 @@ public class JournalArticlePersistenceImpl extends BasePersistenceImpl<JournalAr
 			JournalArticleImpl.class, journalArticle.getPrimaryKey(),
 			journalArticle, false);
 
-		clearUniqueFindersCache(journalArticle);
-		cacheUniqueFindersCache(journalArticle, isNew);
+		clearUniqueFindersCache((JournalArticle)journalArticleModelImpl);
+		cacheUniqueFindersCache((JournalArticle)journalArticleModelImpl, isNew);
 
 		journalArticle.resetOriginalValues();
 

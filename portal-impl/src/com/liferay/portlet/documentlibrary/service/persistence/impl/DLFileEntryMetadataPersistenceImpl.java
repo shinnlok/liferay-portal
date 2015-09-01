@@ -2098,7 +2098,7 @@ public class DLFileEntryMetadataPersistenceImpl extends BasePersistenceImpl<DLFi
 				dlFileEntryMetadata.setNew(false);
 			}
 			else {
-				session.merge(dlFileEntryMetadata);
+				dlFileEntryMetadata = (DLFileEntryMetadata)session.merge(dlFileEntryMetadata);
 			}
 		}
 		catch (Exception e) {
@@ -2179,8 +2179,9 @@ public class DLFileEntryMetadataPersistenceImpl extends BasePersistenceImpl<DLFi
 			DLFileEntryMetadataImpl.class, dlFileEntryMetadata.getPrimaryKey(),
 			dlFileEntryMetadata, false);
 
-		clearUniqueFindersCache(dlFileEntryMetadata);
-		cacheUniqueFindersCache(dlFileEntryMetadata, isNew);
+		clearUniqueFindersCache((DLFileEntryMetadata)dlFileEntryMetadataModelImpl);
+		cacheUniqueFindersCache((DLFileEntryMetadata)dlFileEntryMetadataModelImpl,
+			isNew);
 
 		dlFileEntryMetadata.resetOriginalValues();
 

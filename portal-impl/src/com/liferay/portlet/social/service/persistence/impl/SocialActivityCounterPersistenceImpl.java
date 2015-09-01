@@ -2767,7 +2767,7 @@ public class SocialActivityCounterPersistenceImpl extends BasePersistenceImpl<So
 				socialActivityCounter.setNew(false);
 			}
 			else {
-				session.merge(socialActivityCounter);
+				socialActivityCounter = (SocialActivityCounter)session.merge(socialActivityCounter);
 			}
 		}
 		catch (Exception e) {
@@ -2852,8 +2852,9 @@ public class SocialActivityCounterPersistenceImpl extends BasePersistenceImpl<So
 			SocialActivityCounterImpl.class,
 			socialActivityCounter.getPrimaryKey(), socialActivityCounter, false);
 
-		clearUniqueFindersCache(socialActivityCounter);
-		cacheUniqueFindersCache(socialActivityCounter, isNew);
+		clearUniqueFindersCache((SocialActivityCounter)socialActivityCounterModelImpl);
+		cacheUniqueFindersCache((SocialActivityCounter)socialActivityCounterModelImpl,
+			isNew);
 
 		socialActivityCounter.resetOriginalValues();
 

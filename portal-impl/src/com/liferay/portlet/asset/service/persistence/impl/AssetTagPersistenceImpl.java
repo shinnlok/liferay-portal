@@ -4750,7 +4750,7 @@ public class AssetTagPersistenceImpl extends BasePersistenceImpl<AssetTag>
 				assetTag.setNew(false);
 			}
 			else {
-				session.merge(assetTag);
+				assetTag = (AssetTag)session.merge(assetTag);
 			}
 		}
 		catch (Exception e) {
@@ -4824,8 +4824,8 @@ public class AssetTagPersistenceImpl extends BasePersistenceImpl<AssetTag>
 		EntityCacheUtil.putResult(AssetTagModelImpl.ENTITY_CACHE_ENABLED,
 			AssetTagImpl.class, assetTag.getPrimaryKey(), assetTag, false);
 
-		clearUniqueFindersCache(assetTag);
-		cacheUniqueFindersCache(assetTag, isNew);
+		clearUniqueFindersCache((AssetTag)assetTagModelImpl);
+		cacheUniqueFindersCache((AssetTag)assetTagModelImpl, isNew);
 
 		assetTag.resetOriginalValues();
 

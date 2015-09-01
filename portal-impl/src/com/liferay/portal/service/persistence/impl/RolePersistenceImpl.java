@@ -8570,7 +8570,7 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 				role.setNew(false);
 			}
 			else {
-				session.merge(role);
+				role = (Role)session.merge(role);
 			}
 		}
 		catch (Exception e) {
@@ -8730,8 +8730,8 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 		EntityCacheUtil.putResult(RoleModelImpl.ENTITY_CACHE_ENABLED,
 			RoleImpl.class, role.getPrimaryKey(), role, false);
 
-		clearUniqueFindersCache(role);
-		cacheUniqueFindersCache(role, isNew);
+		clearUniqueFindersCache((Role)roleModelImpl);
+		cacheUniqueFindersCache((Role)roleModelImpl, isNew);
 
 		role.resetOriginalValues();
 

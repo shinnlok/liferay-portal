@@ -17922,7 +17922,7 @@ public class BlogsEntryPersistenceImpl extends BasePersistenceImpl<BlogsEntry>
 				blogsEntry.setNew(false);
 			}
 			else {
-				session.merge(blogsEntry);
+				blogsEntry = (BlogsEntry)session.merge(blogsEntry);
 			}
 		}
 		catch (Exception e) {
@@ -18126,8 +18126,8 @@ public class BlogsEntryPersistenceImpl extends BasePersistenceImpl<BlogsEntry>
 		EntityCacheUtil.putResult(BlogsEntryModelImpl.ENTITY_CACHE_ENABLED,
 			BlogsEntryImpl.class, blogsEntry.getPrimaryKey(), blogsEntry, false);
 
-		clearUniqueFindersCache(blogsEntry);
-		cacheUniqueFindersCache(blogsEntry, isNew);
+		clearUniqueFindersCache((BlogsEntry)blogsEntryModelImpl);
+		cacheUniqueFindersCache((BlogsEntry)blogsEntryModelImpl, isNew);
 
 		blogsEntry.resetOriginalValues();
 

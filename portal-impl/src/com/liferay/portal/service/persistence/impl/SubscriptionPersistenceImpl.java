@@ -3033,7 +3033,7 @@ public class SubscriptionPersistenceImpl extends BasePersistenceImpl<Subscriptio
 				subscription.setNew(false);
 			}
 			else {
-				session.merge(subscription);
+				subscription = (Subscription)session.merge(subscription);
 			}
 		}
 		catch (Exception e) {
@@ -3162,8 +3162,8 @@ public class SubscriptionPersistenceImpl extends BasePersistenceImpl<Subscriptio
 			SubscriptionImpl.class, subscription.getPrimaryKey(), subscription,
 			false);
 
-		clearUniqueFindersCache(subscription);
-		cacheUniqueFindersCache(subscription, isNew);
+		clearUniqueFindersCache((Subscription)subscriptionModelImpl);
+		cacheUniqueFindersCache((Subscription)subscriptionModelImpl, isNew);
 
 		subscription.resetOriginalValues();
 

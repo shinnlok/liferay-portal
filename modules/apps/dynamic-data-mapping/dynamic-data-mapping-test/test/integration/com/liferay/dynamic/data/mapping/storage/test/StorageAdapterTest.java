@@ -19,6 +19,7 @@ import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMStructureConstants;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalServiceUtil;
 import com.liferay.dynamic.data.mapping.service.test.BaseDDMServiceTestCase;
+import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.dynamic.data.mapping.storage.Field;
 import com.liferay.dynamic.data.mapping.storage.Fields;
 import com.liferay.dynamic.data.mapping.storage.StorageAdapter;
@@ -45,7 +46,6 @@ import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
-import com.liferay.portlet.dynamicdatamapping.storage.DDMFormValues;
 
 import java.io.Serializable;
 
@@ -219,8 +219,7 @@ public class StorageAdapterTest extends BaseDDMServiceTestCase {
 			TestPropsValues.getUserId(), TestPropsValues.getGroupId(),
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, "Test 1.txt",
 			ContentTypes.TEXT_PLAIN,
-			RandomTestUtil.randomBytes(
-				TikaSafeRandomizerBumper.TEXT_PLAIN_INSTANCE),
+			RandomTestUtil.randomBytes(TikaSafeRandomizerBumper.INSTANCE),
 			serviceContext);
 
 		String file1Value = getDocLibraryFieldValue(file1);
@@ -229,8 +228,7 @@ public class StorageAdapterTest extends BaseDDMServiceTestCase {
 			TestPropsValues.getUserId(), TestPropsValues.getGroupId(),
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, "Test 2.txt",
 			ContentTypes.TEXT_PLAIN,
-			RandomTestUtil.randomBytes(
-				TikaSafeRandomizerBumper.TEXT_PLAIN_INSTANCE),
+			RandomTestUtil.randomBytes(TikaSafeRandomizerBumper.INSTANCE),
 			serviceContext);
 
 		String file2Value = getDocLibraryFieldValue(file2);

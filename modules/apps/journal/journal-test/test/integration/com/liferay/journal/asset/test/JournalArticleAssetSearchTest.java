@@ -28,7 +28,6 @@ import com.liferay.portal.kernel.test.rule.Sync;
 import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.PortalRunMode;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.BaseModel;
 import com.liferay.portal.service.ServiceContext;
@@ -40,7 +39,6 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -63,18 +61,9 @@ public class JournalArticleAssetSearchTest extends BaseAssetSearchTestCase {
 	@Before
 	@Override
 	public void setUp() throws Exception {
-		_testMode = PortalRunMode.isTestMode();
-
-		PortalRunMode.setTestMode(true);
-
 		ServiceTestUtil.setUser(TestPropsValues.getUser());
 
 		super.setUp();
-	}
-
-	@After
-	public void tearDown() throws Exception {
-		PortalRunMode.setTestMode(_testMode);
 	}
 
 	@Override
@@ -125,23 +114,23 @@ public class JournalArticleAssetSearchTest extends BaseAssetSearchTestCase {
 			ServiceContext serviceContext)
 		throws Exception {
 
-		if (_ddmStructure == null) {
-			_ddmStructure = DDMStructureTestUtil.addStructure(
+		if (ddmStructure == null) {
+			ddmStructure = DDMStructureTestUtil.addStructure(
 				serviceContext.getScopeGroupId(),
 				JournalArticle.class.getName());
 		}
 
-		if (_ddmTemplate == null) {
-			_ddmTemplate = DDMTemplateTestUtil.addTemplate(
+		if (ddmTemplate == null) {
+			ddmTemplate = DDMTemplateTestUtil.addTemplate(
 				serviceContext.getScopeGroupId(),
-				_ddmStructure.getStructureId());
+				ddmStructure.getStructureId());
 		}
 
 		String content = DDMStructureTestUtil.getSampleStructuredContent();
 
 		return JournalTestUtil.addArticleWithXMLContent(
 			serviceContext.getScopeGroupId(), content,
-			_ddmStructure.getStructureKey(), _ddmTemplate.getTemplateKey());
+			ddmStructure.getStructureKey(), ddmTemplate.getTemplateKey());
 	}
 
 	@Override
@@ -151,11 +140,11 @@ public class JournalArticleAssetSearchTest extends BaseAssetSearchTestCase {
 
 	@Override
 	protected long[] getClassTypeIds() {
-		if (_ddmStructure == null) {
+		if (ddmStructure == null) {
 			return null;
 		}
 
-		return new long[] {_ddmStructure.getStructureId()};
+		return new long[] {ddmStructure.getStructureId()};
 	}
 
 	@Override
@@ -163,9 +152,7 @@ public class JournalArticleAssetSearchTest extends BaseAssetSearchTestCase {
 		return "title";
 	}
 
-	protected DDMStructure _ddmStructure;
-	protected DDMTemplate _ddmTemplate;
-
-	private boolean _testMode;
+	protected DDMStructure ddmStructure;
+	protected DDMTemplate ddmTemplate;
 
 }

@@ -2224,7 +2224,7 @@ public class SocialActivityLimitPersistenceImpl extends BasePersistenceImpl<Soci
 				socialActivityLimit.setNew(false);
 			}
 			else {
-				session.merge(socialActivityLimit);
+				socialActivityLimit = (SocialActivityLimit)session.merge(socialActivityLimit);
 			}
 		}
 		catch (Exception e) {
@@ -2301,8 +2301,9 @@ public class SocialActivityLimitPersistenceImpl extends BasePersistenceImpl<Soci
 			SocialActivityLimitImpl.class, socialActivityLimit.getPrimaryKey(),
 			socialActivityLimit, false);
 
-		clearUniqueFindersCache(socialActivityLimit);
-		cacheUniqueFindersCache(socialActivityLimit, isNew);
+		clearUniqueFindersCache((SocialActivityLimit)socialActivityLimitModelImpl);
+		cacheUniqueFindersCache((SocialActivityLimit)socialActivityLimitModelImpl,
+			isNew);
 
 		socialActivityLimit.resetOriginalValues();
 

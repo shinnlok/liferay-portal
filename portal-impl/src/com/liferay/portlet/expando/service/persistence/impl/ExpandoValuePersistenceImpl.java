@@ -4963,7 +4963,7 @@ public class ExpandoValuePersistenceImpl extends BasePersistenceImpl<ExpandoValu
 				expandoValue.setNew(false);
 			}
 			else {
-				session.merge(expandoValue);
+				expandoValue = (ExpandoValue)session.merge(expandoValue);
 			}
 		}
 		catch (Exception e) {
@@ -5143,8 +5143,8 @@ public class ExpandoValuePersistenceImpl extends BasePersistenceImpl<ExpandoValu
 			ExpandoValueImpl.class, expandoValue.getPrimaryKey(), expandoValue,
 			false);
 
-		clearUniqueFindersCache(expandoValue);
-		cacheUniqueFindersCache(expandoValue, isNew);
+		clearUniqueFindersCache((ExpandoValue)expandoValueModelImpl);
+		cacheUniqueFindersCache((ExpandoValue)expandoValueModelImpl, isNew);
 
 		expandoValue.resetOriginalValues();
 

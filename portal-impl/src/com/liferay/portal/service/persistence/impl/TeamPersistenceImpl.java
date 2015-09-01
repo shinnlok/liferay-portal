@@ -2812,7 +2812,7 @@ public class TeamPersistenceImpl extends BasePersistenceImpl<Team>
 				team.setNew(false);
 			}
 			else {
-				session.merge(team);
+				team = (Team)session.merge(team);
 			}
 		}
 		catch (Exception e) {
@@ -2883,8 +2883,8 @@ public class TeamPersistenceImpl extends BasePersistenceImpl<Team>
 		EntityCacheUtil.putResult(TeamModelImpl.ENTITY_CACHE_ENABLED,
 			TeamImpl.class, team.getPrimaryKey(), team, false);
 
-		clearUniqueFindersCache(team);
-		cacheUniqueFindersCache(team, isNew);
+		clearUniqueFindersCache((Team)teamModelImpl);
+		cacheUniqueFindersCache((Team)teamModelImpl, isNew);
 
 		team.resetOriginalValues();
 

@@ -2626,7 +2626,7 @@ public class AppPersistenceImpl extends BasePersistenceImpl<App>
 				app.setNew(false);
 			}
 			else {
-				session.merge(app);
+				app = (App)session.merge(app);
 			}
 		}
 		catch (Exception e) {
@@ -2714,8 +2714,8 @@ public class AppPersistenceImpl extends BasePersistenceImpl<App>
 		EntityCacheUtil.putResult(AppModelImpl.ENTITY_CACHE_ENABLED,
 			AppImpl.class, app.getPrimaryKey(), app, false);
 
-		clearUniqueFindersCache(app);
-		cacheUniqueFindersCache(app, isNew);
+		clearUniqueFindersCache((App)appModelImpl);
+		cacheUniqueFindersCache((App)appModelImpl, isNew);
 
 		app.resetOriginalValues();
 

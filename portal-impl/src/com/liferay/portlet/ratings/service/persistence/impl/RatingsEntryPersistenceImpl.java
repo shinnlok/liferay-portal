@@ -2779,7 +2779,7 @@ public class RatingsEntryPersistenceImpl extends BasePersistenceImpl<RatingsEntr
 				ratingsEntry.setNew(false);
 			}
 			else {
-				session.merge(ratingsEntry);
+				ratingsEntry = (RatingsEntry)session.merge(ratingsEntry);
 			}
 		}
 		catch (Exception e) {
@@ -2883,8 +2883,8 @@ public class RatingsEntryPersistenceImpl extends BasePersistenceImpl<RatingsEntr
 			RatingsEntryImpl.class, ratingsEntry.getPrimaryKey(), ratingsEntry,
 			false);
 
-		clearUniqueFindersCache(ratingsEntry);
-		cacheUniqueFindersCache(ratingsEntry, isNew);
+		clearUniqueFindersCache((RatingsEntry)ratingsEntryModelImpl);
+		cacheUniqueFindersCache((RatingsEntry)ratingsEntryModelImpl, isNew);
 
 		ratingsEntry.resetOriginalValues();
 

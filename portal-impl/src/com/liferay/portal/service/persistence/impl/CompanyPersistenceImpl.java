@@ -1547,7 +1547,7 @@ public class CompanyPersistenceImpl extends BasePersistenceImpl<Company>
 				company.setNew(false);
 			}
 			else {
-				session.merge(company);
+				company = (Company)session.merge(company);
 			}
 		}
 		catch (Exception e) {
@@ -1585,8 +1585,8 @@ public class CompanyPersistenceImpl extends BasePersistenceImpl<Company>
 		EntityCacheUtil.putResult(CompanyModelImpl.ENTITY_CACHE_ENABLED,
 			CompanyImpl.class, company.getPrimaryKey(), company, false);
 
-		clearUniqueFindersCache(company);
-		cacheUniqueFindersCache(company, isNew);
+		clearUniqueFindersCache((Company)companyModelImpl);
+		cacheUniqueFindersCache((Company)companyModelImpl, isNew);
 
 		company.resetOriginalValues();
 

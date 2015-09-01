@@ -5685,7 +5685,7 @@ public class SocialRelationPersistenceImpl extends BasePersistenceImpl<SocialRel
 				socialRelation.setNew(false);
 			}
 			else {
-				session.merge(socialRelation);
+				socialRelation = (SocialRelation)session.merge(socialRelation);
 			}
 		}
 		catch (Exception e) {
@@ -5899,8 +5899,8 @@ public class SocialRelationPersistenceImpl extends BasePersistenceImpl<SocialRel
 			SocialRelationImpl.class, socialRelation.getPrimaryKey(),
 			socialRelation, false);
 
-		clearUniqueFindersCache(socialRelation);
-		cacheUniqueFindersCache(socialRelation, isNew);
+		clearUniqueFindersCache((SocialRelation)socialRelationModelImpl);
+		cacheUniqueFindersCache((SocialRelation)socialRelationModelImpl, isNew);
 
 		socialRelation.resetOriginalValues();
 

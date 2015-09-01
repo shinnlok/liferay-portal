@@ -523,6 +523,8 @@ public class BrowserTrackerPersistenceImpl extends BasePersistenceImpl<BrowserTr
 
 		boolean isNew = browserTracker.isNew();
 
+		BrowserTrackerModelImpl browserTrackerModelImpl = (BrowserTrackerModelImpl)browserTracker;
+
 		Session session = null;
 
 		try {
@@ -534,7 +536,7 @@ public class BrowserTrackerPersistenceImpl extends BasePersistenceImpl<BrowserTr
 				browserTracker.setNew(false);
 			}
 			else {
-				session.merge(browserTracker);
+				browserTracker = (BrowserTracker)session.merge(browserTracker);
 			}
 		}
 		catch (Exception e) {
@@ -554,8 +556,8 @@ public class BrowserTrackerPersistenceImpl extends BasePersistenceImpl<BrowserTr
 			BrowserTrackerImpl.class, browserTracker.getPrimaryKey(),
 			browserTracker, false);
 
-		clearUniqueFindersCache(browserTracker);
-		cacheUniqueFindersCache(browserTracker, isNew);
+		clearUniqueFindersCache((BrowserTracker)browserTrackerModelImpl);
+		cacheUniqueFindersCache((BrowserTracker)browserTrackerModelImpl, isNew);
 
 		browserTracker.resetOriginalValues();
 

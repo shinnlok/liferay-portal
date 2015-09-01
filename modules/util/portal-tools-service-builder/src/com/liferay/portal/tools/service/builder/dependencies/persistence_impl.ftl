@@ -496,8 +496,7 @@ public class ${entity.name}PersistenceImpl extends BasePersistenceImpl<${entity.
 			</#if>
 
 			if (!session.contains(${entity.varName})) {
-				${entity.varName} = (${entity.name})session.get(
-					${entity.name}Impl.class, ${entity.varName}.getPrimaryKeyObj());
+				${entity.varName} = (${entity.name})session.get(${entity.name}Impl.class, ${entity.varName}.getPrimaryKeyObj());
 			}
 
 			if (${entity.varName} != null) {
@@ -538,6 +537,12 @@ public class ${entity.name}PersistenceImpl extends BasePersistenceImpl<${entity.
 					<#assign castEntityModelImpl = true>
 				</#if>
 			</#list>
+		</#if>
+
+		<#assign uniqueFinderList = entity.getUniqueFinderList()>
+
+		<#if uniqueFinderList?size &gt; 0>
+			<#assign castEntityModelImpl = true>
 		</#if>
 
 		<#if entity.hasColumn("createDate", "Date") && entity.hasColumn("modifiedDate", "Date")>
@@ -676,7 +681,7 @@ public class ${entity.name}PersistenceImpl extends BasePersistenceImpl<${entity.
 					session.evict(${entity.varName});
 					session.saveOrUpdate(${entity.varName});
 				<#else>
-					session.merge(${entity.varName});
+					${entity.varName} = (${entity.name})session.merge(${entity.varName});
 				</#if>
 			}
 
@@ -770,11 +775,9 @@ public class ${entity.name}PersistenceImpl extends BasePersistenceImpl<${entity.
 
 		EntityCacheUtil.putResult(${entity.name}ModelImpl.ENTITY_CACHE_ENABLED, ${entity.name}Impl.class, ${entity.varName}.getPrimaryKey(), ${entity.varName}, false);
 
-		<#assign uniqueFinderList = entity.getUniqueFinderList()>
-
 		<#if uniqueFinderList?size &gt; 0>
-			clearUniqueFindersCache(${entity.varName});
-			cacheUniqueFindersCache(${entity.varName}, isNew);
+			clearUniqueFindersCache((${entity.name})${entity.varName}ModelImpl);
+			cacheUniqueFindersCache((${entity.name})${entity.varName}ModelImpl, isNew);
 		</#if>
 
 		${entity.varName}.resetOriginalValues();

@@ -2631,7 +2631,7 @@ public class DLFileRankPersistenceImpl extends BasePersistenceImpl<DLFileRank>
 				dlFileRank.setNew(false);
 			}
 			else {
-				session.merge(dlFileRank);
+				dlFileRank = (DLFileRank)session.merge(dlFileRank);
 			}
 		}
 		catch (Exception e) {
@@ -2732,8 +2732,8 @@ public class DLFileRankPersistenceImpl extends BasePersistenceImpl<DLFileRank>
 		EntityCacheUtil.putResult(DLFileRankModelImpl.ENTITY_CACHE_ENABLED,
 			DLFileRankImpl.class, dlFileRank.getPrimaryKey(), dlFileRank, false);
 
-		clearUniqueFindersCache(dlFileRank);
-		cacheUniqueFindersCache(dlFileRank, isNew);
+		clearUniqueFindersCache((DLFileRank)dlFileRankModelImpl);
+		cacheUniqueFindersCache((DLFileRank)dlFileRankModelImpl, isNew);
 
 		dlFileRank.resetOriginalValues();
 

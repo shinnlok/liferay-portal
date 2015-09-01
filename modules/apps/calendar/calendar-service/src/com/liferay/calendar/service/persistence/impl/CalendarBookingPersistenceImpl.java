@@ -5584,7 +5584,7 @@ public class CalendarBookingPersistenceImpl extends BasePersistenceImpl<Calendar
 				calendarBooking.setNew(false);
 			}
 			else {
-				session.merge(calendarBooking);
+				calendarBooking = (CalendarBooking)session.merge(calendarBooking);
 			}
 		}
 		catch (Exception e) {
@@ -5768,8 +5768,8 @@ public class CalendarBookingPersistenceImpl extends BasePersistenceImpl<Calendar
 			CalendarBookingImpl.class, calendarBooking.getPrimaryKey(),
 			calendarBooking, false);
 
-		clearUniqueFindersCache(calendarBooking);
-		cacheUniqueFindersCache(calendarBooking, isNew);
+		clearUniqueFindersCache((CalendarBooking)calendarBookingModelImpl);
+		cacheUniqueFindersCache((CalendarBooking)calendarBookingModelImpl, isNew);
 
 		calendarBooking.resetOriginalValues();
 
