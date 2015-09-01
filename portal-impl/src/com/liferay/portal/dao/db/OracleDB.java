@@ -151,6 +151,57 @@ public class OracleDB extends BaseDB {
 	}
 
 	@Override
+	protected String[] buildColumnTypeTokens(String line) {
+
+		Matcher matcher = _varchar2CharPattern.matcher(line);
+
+		StringBuffer sb = new StringBuffer();
+
+		boolean fixVarchar2CharSpace = false;
+
+		while (matcher.find()) {
+			fixVarchar2CharSpace = true;
+
+			matcher.appendReplacement(
+				sb, matcher.group().replace(" CHAR)", "#CHAR)"));
+		}
+
+		matcher.appendTail(sb);
+
+		if (fixVarchar2CharSpace) {
+			line = sb.toString();
+		}
+
+		String[] words = StringUtil.split(line, ' ');
+
+		if (fixVarchar2CharSpace) {
+			for (int i = 0; i < words.length; i++) {
+				words[i] = words[i].replace("#CHAR)", " CHAR)");
+			}
+		}
+
+		String nullable = "";
+
+		if (words.length == 6) {
+			nullable = "not null;";
+		}
+		else if (words.length == 5) {
+			nullable = words[4];
+		}
+		else if (words.length == 4) {
+			nullable = "not null;";
+
+			if (words[3].endsWith(";")) {
+				words[3] = words[3].substring(0, words[3].length() - 1);
+			}
+		}
+
+		String[] template = {words[1], words[2], "", words[3], nullable};
+
+		return template;
+	}
+
+	@Override
 	protected String buildCreateFileContent(
 			String sqlDir, String databaseName, int population)
 		throws IOException {
@@ -306,6 +357,9 @@ public class OracleDB extends BaseDB {
 	private static final boolean _SUPPORTS_INLINE_DISTINCT = false;
 
 	private static final OracleDB _instance = new OracleDB();
+
+	private static final Pattern _varchar2CharPattern = Pattern.compile(
+			"VARCHAR2\\(\\d+ CHAR\\)");
 
 	private static final Pattern _varcharPattern = Pattern.compile(
 		"VARCHAR\\((\\d+)\\)");
