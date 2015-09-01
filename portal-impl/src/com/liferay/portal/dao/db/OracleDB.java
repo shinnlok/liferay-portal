@@ -152,7 +152,6 @@ public class OracleDB extends BaseDB {
 
 	@Override
 	protected String[] buildColumnTypeTokens(String line) {
-
 		Matcher matcher = _varchar2CharPattern.matcher(line);
 
 		StringBuffer sb = new StringBuffer();
@@ -359,8 +358,7 @@ public class OracleDB extends BaseDB {
 	private static final OracleDB _instance = new OracleDB();
 
 	private static final Pattern _varchar2CharPattern = Pattern.compile(
-			"VARCHAR2\\(\\d+ CHAR\\)");
-
+		"VARCHAR2\\(\\d+ CHAR\\)");
 	private static final Pattern _varcharPattern = Pattern.compile(
 		"VARCHAR\\((\\d+)\\)");
 
