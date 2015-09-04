@@ -18,6 +18,7 @@ import com.liferay.calendar.constants.CalendarPortletKeys;
 import com.liferay.calendar.model.Calendar;
 import com.liferay.calendar.model.CalendarResource;
 import com.liferay.calendar.service.CalendarLocalServiceUtil;
+import com.liferay.exportimport.lar.BaseStagedModelDataHandler;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -26,7 +27,6 @@ import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portlet.exportimport.lar.BaseStagedModelDataHandler;
 import com.liferay.portlet.exportimport.lar.ExportImportPathUtil;
 import com.liferay.portlet.exportimport.lar.PortletDataContext;
 import com.liferay.portlet.exportimport.lar.StagedModelDataHandler;
@@ -178,10 +178,10 @@ public class CalendarStagedModelDataHandler
 			PortletDataContext portletDataContext, Calendar calendar)
 		throws Exception {
 
-		String calendarName = calendar.getName(LocaleUtil.getDefault());
-
 		Group sourceGroup = GroupLocalServiceUtil.fetchGroup(
 			portletDataContext.getSourceGroupId());
+
+		String calendarName = calendar.getName(LocaleUtil.getDefault());
 
 		if ((sourceGroup == null) ||
 			!calendarName.equals(sourceGroup.getDescriptiveName())) {
@@ -194,7 +194,8 @@ public class CalendarStagedModelDataHandler
 		Group scopeGroup = GroupLocalServiceUtil.getGroup(
 			portletDataContext.getScopeGroupId());
 
-		calendarNameMap.put(LocaleUtil.getDefault(), scopeGroup.getName());
+		calendarNameMap.put(
+			LocaleUtil.getDefault(), scopeGroup.getDescriptiveName());
 
 		return calendarNameMap;
 	}

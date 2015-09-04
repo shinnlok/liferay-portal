@@ -16,7 +16,8 @@ package com.liferay.portal.events;
 
 import com.liferay.portal.fabric.server.FabricServerUtil;
 import com.liferay.portal.jericho.CachedLoggerProvider;
-import com.liferay.portal.kernel.cache.bootstrap.ClusterLinkBootstrapLoaderHelperUtil;
+import com.liferay.portal.kernel.backgroundtask.BackgroundTaskManager;
+import com.liferay.portal.kernel.backgroundtask.BackgroundTaskManagerUtil;
 import com.liferay.portal.kernel.cluster.ClusterExecutor;
 import com.liferay.portal.kernel.cluster.ClusterMasterExecutor;
 import com.liferay.portal.kernel.events.ActionException;
@@ -42,7 +43,6 @@ import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.util.PortalLifecycle;
 import com.liferay.portal.kernel.util.ReleaseInfo;
 import com.liferay.portal.plugin.PluginPackageIndexer;
-import com.liferay.portal.service.BackgroundTaskLocalServiceUtil;
 import com.liferay.portal.tools.DBUpgrader;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.WebKeys;
@@ -137,10 +137,6 @@ public class StartupAction extends SimpleAction {
 
 		DBUpgrader.upgrade();
 
-		// Ehache bootstrap
-
-		ClusterLinkBootstrapLoaderHelperUtil.start();
-
 		// Scheduler
 
 		if (_log.isDebugEnabled()) {
@@ -201,8 +197,7 @@ public class StartupAction extends SimpleAction {
 							registry.getService(ClusterMasterExecutor.class);
 
 						if (!clusterMasterExecutor.isEnabled()) {
-							BackgroundTaskLocalServiceUtil.
-								cleanUpBackgroundTasks();
+							BackgroundTaskManagerUtil.cleanUpBackgroundTasks();
 						}
 						else {
 							clusterMasterExecutor.
@@ -217,7 +212,8 @@ public class StartupAction extends SimpleAction {
 				});
 
 		clusterMasterExecutorServiceDependencyManager.registerDependencies(
-			ClusterExecutor.class, ClusterMasterExecutor.class);
+			BackgroundTaskManager.class, ClusterExecutor.class,
+			ClusterMasterExecutor.class);
 
 		// Liferay JspFactory
 

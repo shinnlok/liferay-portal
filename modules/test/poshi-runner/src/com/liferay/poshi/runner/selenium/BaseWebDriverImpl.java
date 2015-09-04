@@ -160,10 +160,6 @@ public abstract class BaseWebDriverImpl
 
 	@Override
 	public void assertLiferayErrors() throws Exception {
-		if (!PropsValues.TEST_ASSERT_LIFERAY_ERRORS) {
-			return;
-		}
-
 		LiferaySeleniumHelper.assertLiferayErrors();
 	}
 
@@ -505,11 +501,7 @@ public abstract class BaseWebDriverImpl
 
 	@Override
 	public boolean isPartialText(String locator, String value) {
-		WebElement webElement = getWebElement(locator, "1");
-
-		String text = webElement.getText();
-
-		return text.contains(value);
+		return WebDriverHelper.isPartialText(this, locator, value);
 	}
 
 	@Override
@@ -548,12 +540,12 @@ public abstract class BaseWebDriverImpl
 
 	@Override
 	public void javaScriptMouseDown(String locator) {
-		throw new UnsupportedOperationException();
+		WebDriverHelper.executeJavaScriptMouseEvent(this, locator, "mousedown");
 	}
 
 	@Override
 	public void javaScriptMouseUp(String locator) {
-		throw new UnsupportedOperationException();
+		WebDriverHelper.executeJavaScriptMouseEvent(this, locator, "mouseup");
 	}
 
 	@Override

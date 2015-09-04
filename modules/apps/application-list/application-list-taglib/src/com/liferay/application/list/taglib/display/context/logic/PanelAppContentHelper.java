@@ -25,6 +25,7 @@ import com.liferay.portal.model.Theme;
 import com.liferay.portal.service.LayoutTemplateLocalServiceUtil;
 import com.liferay.portal.service.PortletLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
+import com.liferay.portal.util.PortalUtil;
 
 import java.io.Writer;
 
@@ -72,8 +73,11 @@ public class PanelAppContentHelper {
 		if (Validator.isNotNull(velocityTemplateId) &&
 			Validator.isNotNull(content)) {
 
+			HttpServletRequest request = PortalUtil.getOriginalServletRequest(
+				_request);
+
 			StringBundler sb = RuntimePageUtil.getProcessedTemplate(
-				_request, _response, getPortletId(),
+				request, _response, getPortletId(),
 				new StringTemplateResource(velocityTemplateId, content));
 
 			if (sb != null) {

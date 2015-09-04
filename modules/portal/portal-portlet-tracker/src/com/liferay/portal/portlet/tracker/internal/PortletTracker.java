@@ -25,10 +25,13 @@ import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.PortletBag;
 import com.liferay.portal.kernel.portlet.PortletBagPool;
+import com.liferay.portal.kernel.portlet.RestrictPortletServletRequest;
+import com.liferay.portal.kernel.servlet.PortletServlet;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapDictionary;
+import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.SetUtil;
@@ -50,11 +53,15 @@ import com.liferay.portal.security.permission.ResourceActionsUtil;
 import com.liferay.portal.service.CompanyLocalService;
 import com.liferay.portal.service.PortletLocalService;
 import com.liferay.portal.service.ResourceActionLocalService;
+import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PortletCategoryKeys;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.WebAppPool;
 import com.liferay.portal.util.WebKeys;
+import com.liferay.portlet.InvokerPortlet;
 import com.liferay.portlet.PortletBagFactory;
+import com.liferay.portlet.PortletContextBag;
+import com.liferay.portlet.PortletContextBagPool;
 import com.liferay.portlet.PortletInstanceFactory;
 import com.liferay.registry.util.StringPlus;
 import com.liferay.util.log4j.Log4JUtil;
@@ -79,10 +86,21 @@ import java.util.concurrent.ConcurrentMap;
 
 import javax.portlet.Portlet;
 import javax.portlet.PortletMode;
+import javax.portlet.PortletRequest;
 import javax.portlet.WindowState;
 
+import javax.servlet.DispatcherType;
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
 import javax.servlet.Servlet;
 import javax.servlet.ServletContextListener;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -280,13 +298,19 @@ public class PortletTracker
 		collectJxPortletFeatures(serviceReference, portletModel);
 		collectLiferayFeatures(serviceReference, portletModel);
 
+		PortletContextBag portletContextBag = new PortletContextBag(
+			bundlePortletApp.getServletContextName());
+
+		PortletContextBagPool.put(
+			bundlePortletApp.getServletContextName(), portletContextBag);
+
 		PortletBagFactory portletBagFactory = new BundlePortletBagFactory(
 			portlet);
 
 		portletBagFactory.setClassLoader(bundleWiring.getClassLoader());
 		portletBagFactory.setServletContext(
 			bundlePortletApp.getServletContext());
-		portletBagFactory.setWARFile(false);
+		portletBagFactory.setWARFile(true);
 
 		try {
 			portletBagFactory.create(portletModel);
@@ -317,7 +341,10 @@ public class PortletTracker
 			return portletModel;
 		}
 		catch (Exception e) {
-			_log.error(e, e);
+			_log.error(
+				"Portlet " + portletId + " from " + bundle +
+					" failed to initialize",
+				e);
 
 			return null;
 		}
@@ -408,6 +435,11 @@ public class PortletTracker
 			createDefaultServlet(bundleContext, contextName));
 		serviceRegistrations.addServiceRegistration(
 			createJspServlet(bundleContext, contextName, classLoader));
+		serviceRegistrations.addServiceRegistration(
+			createPortletServlet(bundleContext, contextName, classLoader));
+		serviceRegistrations.addServiceRegistration(
+			createRestrictPortletServletRequestFilter(
+				bundleContext, contextName, classLoader));
 	}
 
 	protected void collectCacheScope(
@@ -441,6 +473,9 @@ public class PortletTracker
 				GetterUtil.getString(
 					serviceReference.getProperty(initParamKey)));
 		}
+
+		initParams.put(
+			InvokerPortlet.INIT_INVOKER_PORTLET_NAME, "portlet-servlet");
 
 		portletModel.setInitParams(initParams);
 	}
@@ -542,6 +577,10 @@ public class PortletTracker
 			GetterUtil.getString(
 				get(serviceReference, "friendly-url-routes"),
 				portletModel.getFriendlyURLRoutes()));
+		portletModel.setFullPageDisplayable(
+			GetterUtil.getBoolean(
+				get(serviceReference, "full-page-displayable"),
+				portletModel.isFullPageDisplayable()));
 		portletModel.setHeaderPortalCss(
 			StringPlus.asList(get(serviceReference, "header-portal-css")));
 		portletModel.setHeaderPortalJavaScript(
@@ -777,6 +816,13 @@ public class PortletTracker
 
 		List<String> roleRefs = StringPlus.asList(
 			serviceReference.getProperty("javax.portlet.security-role-ref"));
+
+		if (roleRefs.isEmpty()) {
+			roleRefs.add("administrator");
+			roleRefs.add("guest");
+			roleRefs.add("power-user");
+			roleRefs.add("user");
+		}
 
 		for (String roleRef : roleRefs) {
 			for (String curRoleRef : StringUtil.split(roleRef)) {
@@ -1092,6 +1138,54 @@ public class PortletTracker
 			Servlet.class, servlet, properties);
 	}
 
+	protected ServiceRegistration<Servlet> createPortletServlet(
+		BundleContext bundleContext, String contextName,
+		ClassLoader classLoader) {
+
+		Dictionary<String, Object> properties = new HashMapDictionary<>();
+
+		properties.put(
+			HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT,
+			contextName);
+		properties.put(
+			HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_NAME,
+			"Portlet Servlet");
+		properties.put(
+			HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_PATTERN,
+			"/portlet-servlet/*");
+
+		return bundleContext.registerService(
+			Servlet.class, new PortletServletWrapper(), properties);
+	}
+
+	protected ServiceRegistration<?> createRestrictPortletServletRequestFilter(
+		BundleContext bundleContext, String contextName,
+		ClassLoader classLoader) {
+
+		Dictionary<String, Object> properties = new HashMapDictionary<>();
+
+		properties.put(
+			HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT,
+			contextName);
+		properties.put(
+			HttpWhiteboardConstants.HTTP_WHITEBOARD_FILTER_ASYNC_SUPPORTED,
+			Boolean.TRUE);
+		properties.put(
+			HttpWhiteboardConstants.HTTP_WHITEBOARD_FILTER_DISPATCHER,
+			new String[] {
+				DispatcherType.ASYNC.toString(),
+				DispatcherType.FORWARD.toString(),
+				DispatcherType.INCLUDE.toString(),
+				DispatcherType.REQUEST.toString()
+			});
+		properties.put(
+			HttpWhiteboardConstants.HTTP_WHITEBOARD_FILTER_PATTERN, "/*");
+
+		return bundleContext.registerService(
+			Filter.class, new RestrictPortletServletRequestFilter(),
+			properties);
+	}
+
 	@Deactivate
 	protected void deactivate() {
 		_serviceTracker.close();
@@ -1298,6 +1392,75 @@ public class PortletTracker
 		_serviceRegistrations = new ConcurrentHashMap<>();
 	private ServiceTracker<Portlet, com.liferay.portal.model.Portlet>
 		_serviceTracker;
+
+	private class PortletServletWrapper extends HttpServlet {
+
+		@Override
+		protected void service(
+				HttpServletRequest httpServletRequest,
+				HttpServletResponse httpServletResponse)
+			throws IOException, ServletException {
+
+			_servlet.service(httpServletRequest, httpServletResponse);
+		}
+
+		private final Servlet _servlet = new PortletServlet();
+
+	}
+
+	private class RestrictPortletServletRequestFilter implements Filter {
+
+		@Override
+		public void destroy() {
+		}
+
+		@Override
+		public void doFilter(
+				ServletRequest servletRequest, ServletResponse servletResponse,
+				FilterChain filterChain)
+			throws IOException, ServletException {
+
+			try {
+				filterChain.doFilter(servletRequest, servletResponse);
+			}
+			finally {
+				PortletRequest portletRequest =
+					(PortletRequest)servletRequest.getAttribute(
+						JavaConstants.JAVAX_PORTLET_REQUEST);
+
+				if (portletRequest == null) {
+					return;
+				}
+
+				RestrictPortletServletRequest restrictPortletServletRequest =
+					new RestrictPortletServletRequest(
+						PortalUtil.getHttpServletRequest(portletRequest));
+
+				Enumeration<String> enumeration =
+					servletRequest.getAttributeNames();
+
+				while (enumeration.hasMoreElements()) {
+					String name = enumeration.nextElement();
+
+					if (!RestrictPortletServletRequest.isSharedRequestAttribute(
+							name)) {
+
+						continue;
+					}
+
+					restrictPortletServletRequest.setAttribute(
+						name, servletRequest.getAttribute(name));
+				}
+
+				restrictPortletServletRequest.mergeSharedAttributes();
+			}
+		}
+
+		@Override
+		public void init(FilterConfig filterConfig) throws ServletException {
+		}
+
+	}
 
 	private class ServiceRegistrations {
 

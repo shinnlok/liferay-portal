@@ -48,7 +48,7 @@ LPS-30525.
 <#macro css
 	file_name
 >
-	<#if file_name = css_main_file>
+	<#if file_name == css_main_file>
 		<link class="lfr-css-file" href="${file_name}" id="mainLiferayThemeCSS" rel="stylesheet" type="text/css" />
 	<#else>
 		<link class="lfr-css-file" href="${file_name}" rel="stylesheet" type="text/css" />
@@ -96,6 +96,18 @@ ${languageUtil.format(locale, key, arguments)}</#macro>
 <#macro product_menu>
 	<#if $is_setup_complete && $is_signed_in>
 		${theme.runtime("com.liferay.portlet.admin.util.PortalProductMenuApplicationType$ProductMenu", portletProviderAction.VIEW)}
+	</#if>
+</#macro>
+
+<#macro product_menu_sidebar
+	state
+>
+	<#if $is_setup_complete && $is_signed_in>
+		<div class="${state} lfr-product-menu-panel sidenav-fixed sidenav-menu-slider" id="sidenavSliderId">
+			<div class="product-menu sidebar sidebar-inverse sidenav-menu">
+				<@liferay.product_menu() />
+			</div>
+		</div>
 	</#if>
 </#macro>
 

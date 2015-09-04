@@ -20,7 +20,7 @@ feature or API will be dropped in an upcoming version.
 replaces an old API, in spite of the old API being kept in Liferay Portal for
 backwards compatibility.
 
-*This document has been reviewed through commit `bfabcf8`.*
+*This document has been reviewed through commit `c68e01c`.*
 
 ## Breaking Changes Contribution Guidelines
 
@@ -2168,6 +2168,32 @@ is now extracted to its own module, the old name no longer resembles its usage.
 
 ---------------------------------------
 
+### Removed Support for filterFindBy Generation or InlinePermissionUtil Usage for Tables When the Primary Key Type Is Not long
+- **Date:** 2015-Jul-21
+- **JIRA Ticket:** LPS-54590
+
+#### What changed?
+
+ServiceBuilder and inline permission filter support has been removed for
+non-`long` primary key types.
+
+#### Who is affected?
+
+This affects code that is using `int`, `float`, `double`, `boolean`, or `short`
+type primary keys in the `service.xml` with inline permissions.
+
+#### How should I update my code?
+
+You should change the primary key type to `long`.
+
+#### Why was this change made?
+
+Inline permissioning was using the `join` method between two different data
+types and that caused significant performance degradation with `filterFindBy`
+queries.
+
+---------------------------------------
+
 ### Removed Vaadin 6 from Liferay Core
 - **Date:** 2015-Jul-31
 - **JIRA Ticket:** LPS-57525
@@ -2183,7 +2209,7 @@ Portal.
 
 #### How should I update my code?
 
-You should upgrade to Vaadin 7, bundle your `vaadin.jar` with your plugin, or 
+You should upgrade to Vaadin 7, bundle your `vaadin.jar` with your plugin, or
 deploy Vaadin libraries to Liferay's OSGi container.
 
 #### Why was this change made?
@@ -2191,7 +2217,7 @@ deploy Vaadin libraries to Liferay's OSGi container.
 Vaadin 6.x is outdated and there are no plans for any new projects to be
 created with it. Therefore, developers should begin using Vaadin 7.x.
 
-------------------------------------------------------------------------------
+---------------------------------------
 
 ### Replaced the Navigation Menu Portlet's Display Styles with ADTs
 - **Date:** 2015-Jul-31
@@ -2204,14 +2230,14 @@ They have been replaced by Application Display Templates (ADT).
 
 #### Who is affected?
 
-This affects developers that use the following portlet properties:
+This affects developers that use portlet properties with the following prefix:
 
     navigation.display.style
 
 This also affects developers that use the following attribute in the navigation
-taglib:
+tag:
 
-     displayStyleDefinition
+    displayStyleDefinition
 
 #### How should I update my code?
 
@@ -2221,10 +2247,11 @@ to *Site Settings* &rarr; *Application Display Templates*. ADTs can also be
 created programatically.
 
 Developers should use the `ddmTemplateGroupId` and `ddmTemplateKey` attributes
-of the navigation taglib to set the ADT that defines the style of the
-navigation.
+of the navigation tag to set the ADT that defines the style of the navigation.
 
 #### Why was this change made?
 
 ADTs allow you to change an application's look and feel without changing its JSP
 code.
+
+---------------------------------------

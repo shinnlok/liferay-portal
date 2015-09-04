@@ -17,25 +17,12 @@
 <%@ include file="/init.jsp" %>
 
 <%
-String redirect = ParamUtil.getString(request, "redirect");
-
-String backURL = ParamUtil.getString(request, "backURL", redirect);
-
 Group group = GroupLocalServiceUtil.getGroup(scopeGroupId);
 
 PortletURL portletURL = renderResponse.createRenderURL();
 
 pageContext.setAttribute("portletURL", portletURL);
 %>
-
-<c:if test="<%= !layout.isTypeControlPanel() %>">
-	<liferay-ui:header
-		backURL="<%= backURL %>"
-		escapeXml="<%= false %>"
-		localizeTitle="<%= false %>"
-		title='<%= HtmlUtil.escape(group.getDescriptiveName(locale)) + StringPool.COLON + StringPool.SPACE + LanguageUtil.get(request, "manage-memberships") %>'
-	/>
-</c:if>
 
 <aui:form action="<%= portletURL.toString() %>" cssClass="form-search" method="get" name="fm">
 	<liferay-portlet:renderURLParams varImpl="portletURL" />
@@ -55,16 +42,6 @@ pageContext.setAttribute("portletURL", portletURL);
 		%>
 
 		<aui:nav-bar>
-			<aui:nav cssClass="navbar-nav">
-				<c:if test="<%= GroupPermissionUtil.contains(permissionChecker, group, ActionKeys.MANAGE_TEAMS) %>">
-					<portlet:renderURL var="addTeamURL">
-						<portlet:param name="mvcPath" value="/edit_team.jsp" />
-					</portlet:renderURL>
-
-					<aui:nav-item href="<%= addTeamURL %>" iconCssClass="icon-plus" label="add-team" />
-				</c:if>
-			</aui:nav>
-
 			<aui:nav-bar-search>
 				<div class="form-search">
 					<liferay-ui:input-search autoFocus="<%= windowState.equals(WindowState.MAXIMIZED) %>" name="<%= searchTerms.NAME %>" />
@@ -114,6 +91,19 @@ pageContext.setAttribute("portletURL", portletURL);
 		<liferay-ui:search-iterator searchContainer="<%= searchContainer %>" />
 	</liferay-ui:search-container>
 </aui:form>
+
+<c:if test="<%= GroupPermissionUtil.contains(permissionChecker, group, ActionKeys.MANAGE_TEAMS) %>">
+
+	<%
+	PortletURL addTeamURL = renderResponse.createRenderURL();
+
+	addTeamURL.setParameter("mvcPath", "/edit_team.jsp");
+	%>
+
+	<liferay-frontend:add-menu>
+		<liferay-frontend:add-menu-item title='<%= LanguageUtil.get(request, "add-team") %>' url="<%= addTeamURL.toString() %>" />
+	</liferay-frontend:add-menu>
+</c:if>
 
 <%
 if (group.isOrganization()) {

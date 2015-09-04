@@ -84,7 +84,8 @@ public class PortletKeys {
 
 	public static final String MONITORING = "131";
 
-	public static final String MY_ACCOUNT = "2";
+	public static final String MY_ACCOUNT =
+		"com_liferay_my_account_web_portlet_MyAccountPortlet";
 
 	public static final String MY_PAGES =
 		"com_liferay_layout_admin_web_portlet_MyPagesPortlet";
@@ -100,11 +101,13 @@ public class PortletKeys {
 	public static final String NESTED_PORTLETS =
 		"com_liferay_nested_portlets_web_portlet_NestedPortletsPortlet";
 
-	public static final String PLUGINS_ADMIN = "132";
+	public static final String PLUGINS_ADMIN =
+		"com_liferay_plugins_admin_web_portlet_PluginsAdminPortlet";
 
 	public static final String PORTAL = "90";
 
-	public static final String PORTAL_SETTINGS = "130";
+	public static final String PORTAL_SETTINGS =
+		"com_liferay_portal_settings_web_portlet_PortalSettingsPortlet";
 
 	public static final String PORTLET_DISPLAY_TEMPLATE =
 		"com_liferay_dynamic_data_mapping_web_portlet_" +
@@ -153,7 +156,8 @@ public class PortletKeys {
 	public static final String USER_GROUPS_ADMIN =
 		"com_liferay_user_groups_admin_web_portlet_UserGroupsAdminPortlet";
 
-	public static final String USERS_ADMIN = "125";
+	public static final String USERS_ADMIN =
+		"com_liferay_users_admin_web_portlet_UsersAdminPortlet";
 
 	public static final String WORKFLOW_DEFINITION =
 		"com_liferay_workflow_definition_web_portlet_WorkflowDefinitionPortlet";

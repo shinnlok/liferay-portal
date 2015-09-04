@@ -14,6 +14,8 @@
 
 package com.liferay.taglib.ui;
 
+import com.liferay.portal.kernel.util.Validator;
+
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -21,8 +23,22 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class SearchIteratorTag<R> extends SearchPaginatorTag<R> {
 
+	public static final String DEFAULT_DISPLAY_STYPE = "list";
+
+	public String getDisplayStyle() {
+		return _displayStyle;
+	}
+
+	public void setDisplayStyle(String displayStyle) {
+		_displayStyle = displayStyle;
+	}
+
 	public void setPaginate(boolean paginate) {
 		_paginate = paginate;
+	}
+
+	public void setView(String view) {
+		_view = view;
 	}
 
 	@Override
@@ -34,7 +50,18 @@ public class SearchIteratorTag<R> extends SearchPaginatorTag<R> {
 
 	@Override
 	protected String getPage() {
-		return _PAGE;
+		String displayStyle = _displayStyle;
+
+		if (Validator.isNull(displayStyle)) {
+			displayStyle = DEFAULT_DISPLAY_STYPE;
+		}
+
+		if (Validator.isNotNull(_view)) {
+			return "/html/taglib/ui/search_iterator/" + _view + "/" +
+				displayStyle + ".jsp";
+		}
+
+		return "/html/taglib/ui/search_iterator/" + displayStyle + ".jsp";
 	}
 
 	@Override
@@ -45,9 +72,8 @@ public class SearchIteratorTag<R> extends SearchPaginatorTag<R> {
 			"liferay-ui:search-iterator:paginate", String.valueOf(_paginate));
 	}
 
-	private static final String _PAGE =
-		"/html/taglib/ui/search_iterator/page.jsp";
-
+	private String _displayStyle = DEFAULT_DISPLAY_STYPE;
 	private boolean _paginate = true;
+	private String _view;
 
 }

@@ -14,6 +14,7 @@
 
 package com.liferay.gradle.plugins;
 
+import com.liferay.gradle.plugins.alloy.taglib.AlloyTaglibPlugin;
 import com.liferay.gradle.plugins.css.builder.BuildCSSTask;
 import com.liferay.gradle.plugins.css.builder.CSSBuilderPlugin;
 import com.liferay.gradle.plugins.extensions.AppServer;
@@ -21,12 +22,17 @@ import com.liferay.gradle.plugins.extensions.LiferayExtension;
 import com.liferay.gradle.plugins.extensions.TomcatAppServer;
 import com.liferay.gradle.plugins.jasper.jspc.JspCPlugin;
 import com.liferay.gradle.plugins.javadoc.formatter.JavadocFormatterPlugin;
+import com.liferay.gradle.plugins.js.module.config.generator.ConfigJSModulesTask;
+import com.liferay.gradle.plugins.js.module.config.generator.JSModuleConfigGeneratorPlugin;
+import com.liferay.gradle.plugins.js.transpiler.JSTranspilerPlugin;
+import com.liferay.gradle.plugins.js.transpiler.TranspileJSTask;
 import com.liferay.gradle.plugins.lang.builder.BuildLangTask;
 import com.liferay.gradle.plugins.lang.builder.LangBuilderPlugin;
 import com.liferay.gradle.plugins.patcher.PatchTask;
 import com.liferay.gradle.plugins.service.builder.BuildServiceTask;
 import com.liferay.gradle.plugins.service.builder.ServiceBuilderPlugin;
 import com.liferay.gradle.plugins.source.formatter.SourceFormatterPlugin;
+import com.liferay.gradle.plugins.soy.SoyPlugin;
 import com.liferay.gradle.plugins.tasks.AppServerTask;
 import com.liferay.gradle.plugins.tasks.DirectDeployTask;
 import com.liferay.gradle.plugins.tasks.InitGradleTask;
@@ -83,12 +89,8 @@ import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.artifacts.Dependency;
 import org.gradle.api.artifacts.DependencyResolveDetails;
-import org.gradle.api.artifacts.ModuleVersionIdentifier;
 import org.gradle.api.artifacts.ModuleVersionSelector;
 import org.gradle.api.artifacts.ResolutionStrategy;
-import org.gradle.api.artifacts.ResolvedArtifact;
-import org.gradle.api.artifacts.ResolvedConfiguration;
-import org.gradle.api.artifacts.ResolvedModuleVersion;
 import org.gradle.api.artifacts.dsl.ArtifactHandler;
 import org.gradle.api.artifacts.maven.Conf2ScopeMapping;
 import org.gradle.api.artifacts.maven.Conf2ScopeMappingContainer;
@@ -185,6 +187,8 @@ public class LiferayJavaPlugin implements Plugin<Project> {
 		configureTaskBuildWSDD(project);
 		configureTaskBuildWSDL(project);
 		configureTaskBuildXSD(project);
+		configureTaskConfigJSModules(project);
+		configureTaskTranspileJS(project);
 		configureTasksTest(project);
 
 		project.afterEvaluate(
@@ -288,6 +292,10 @@ public class LiferayJavaPlugin implements Plugin<Project> {
 		Copy copy = GradleUtil.addTask(project, DEPLOY_TASK_NAME, Copy.class);
 
 		copy.setDescription("Assembles the project and deploys it to Liferay.");
+
+		Jar jar = (Jar)GradleUtil.getTask(project, JavaPlugin.JAR_TASK_NAME);
+
+		copy.from(jar);
 
 		GradleUtil.setProperty(copy, AUTO_CLEAN_PROPERTY_NAME, false);
 
@@ -871,12 +879,16 @@ public class LiferayJavaPlugin implements Plugin<Project> {
 		GradleUtil.applyPlugin(project, OptionalBasePlugin.class);
 		GradleUtil.applyPlugin(project, ProvidedBasePlugin.class);
 
+		GradleUtil.applyPlugin(project, AlloyTaglibPlugin.class);
 		GradleUtil.applyPlugin(project, CSSBuilderPlugin.class);
 		GradleUtil.applyPlugin(project, JavadocFormatterPlugin.class);
+		GradleUtil.applyPlugin(project, JSModuleConfigGeneratorPlugin.class);
 		GradleUtil.applyPlugin(project, JspCPlugin.class);
+		GradleUtil.applyPlugin(project, JSTranspilerPlugin.class);
 		GradleUtil.applyPlugin(project, LangBuilderPlugin.class);
 		GradleUtil.applyPlugin(project, ServiceBuilderPlugin.class);
 		GradleUtil.applyPlugin(project, SourceFormatterPlugin.class);
+		GradleUtil.applyPlugin(project, SoyPlugin.class);
 		GradleUtil.applyPlugin(project, TLDFormatterPlugin.class);
 		GradleUtil.applyPlugin(project, UpgradeTableBuilderPlugin.class);
 		GradleUtil.applyPlugin(project, WSDDBuilderPlugin.class);
@@ -894,10 +906,20 @@ public class LiferayJavaPlugin implements Plugin<Project> {
 
 		artifactHandler.add(Dependency.ARCHIVES_CONFIGURATION, jarSourcesTask);
 
-		Task zipJavadocTask = GradleUtil.getTask(
-			project, ZIP_JAVADOC_TASK_NAME);
+		Map<String, Object> args = new HashMap<>();
 
-		artifactHandler.add(Dependency.ARCHIVES_CONFIGURATION, zipJavadocTask);
+		args.put("dir", project.getProjectDir());
+		args.put("include", "**/*.java");
+
+		FileTree javaFileTree = project.fileTree(args);
+
+		if (!javaFileTree.isEmpty()) {
+			Task zipJavadocTask = GradleUtil.getTask(
+				project, ZIP_JAVADOC_TASK_NAME);
+
+			artifactHandler.add(
+				Dependency.ARCHIVES_CONFIGURATION, zipJavadocTask);
+		}
 	}
 
 	protected void configureConf2ScopeMappings(Project project) {
@@ -1065,6 +1087,7 @@ public class LiferayJavaPlugin implements Plugin<Project> {
 			project, CSSBuilderPlugin.BUILD_CSS_TASK_NAME);
 
 		configureTaskBuildCSSDocrootDirName(buildCSSTask);
+		configureTaskBuildCSSSassCompilerClassName(buildCSSTask);
 	}
 
 	protected void configureTaskBuildCSSDocrootDirName(
@@ -1085,11 +1108,27 @@ public class LiferayJavaPlugin implements Plugin<Project> {
 		buildCSSTask.setDocrootDirName(project.relativePath(resourcesDir));
 	}
 
+	protected void configureTaskBuildCSSSassCompilerClassName(
+		BuildCSSTask buildCSSTask) {
+
+		if (Validator.isNotNull(buildCSSTask.getSassCompilerClassName())) {
+			return;
+		}
+
+		String sassCompilerClassName = GradleUtil.getProperty(
+			buildCSSTask.getProject(), "sass.compiler.class.name",
+			(String)null);
+
+		buildCSSTask.setSassCompilerClassName(sassCompilerClassName);
+	}
+
 	protected void configureTaskBuildLang(Project project) {
 		BuildLangTask buildLangTask = (BuildLangTask)GradleUtil.getTask(
 			project, LangBuilderPlugin.BUILD_LANG_TASK_NAME);
 
 		configureTaskBuildLangLangDirName(buildLangTask);
+		configureTaskBuildLangTranslateClientId(buildLangTask);
+		configureTaskBuildLangTranslateClientSecret(buildLangTask);
 	}
 
 	protected void configureTaskBuildLangLangDirName(
@@ -1100,6 +1139,34 @@ public class LiferayJavaPlugin implements Plugin<Project> {
 		File langDir = new File(getResourcesDir(project), "content");
 
 		buildLangTask.setLangDirName(project.relativePath(langDir));
+	}
+
+	protected void configureTaskBuildLangTranslateClientId(
+		BuildLangTask buildLangTask) {
+
+		if (Validator.isNotNull(buildLangTask.getTranslateClientId())) {
+			return;
+		}
+
+		String translateClientId = GradleUtil.getProperty(
+			buildLangTask.getProject(), "microsoft.translator.client.id",
+			(String)null);
+
+		buildLangTask.setTranslateClientId(translateClientId);
+	}
+
+	protected void configureTaskBuildLangTranslateClientSecret(
+		BuildLangTask buildLangTask) {
+
+		if (Validator.isNotNull(buildLangTask.getTranslateClientSecret())) {
+			return;
+		}
+
+		String translateClientSecret = GradleUtil.getProperty(
+			buildLangTask.getProject(), "microsoft.translator.client.secret",
+			(String)null);
+
+		buildLangTask.setTranslateClientSecret(translateClientSecret);
 	}
 
 	protected void configureTaskBuildService(Project project) {
@@ -1318,7 +1385,8 @@ public class LiferayJavaPlugin implements Plugin<Project> {
 
 		Project project = buildUpgradeTableTask.getProject();
 
-		File file = getFileProperty(project, "upgrade.table.dir");
+		File file = GradleUtil.getProperty(
+			project, "upgrade.table.dir", (File)null);
 
 		if (file != null) {
 			buildUpgradeTableTask.setUpgradeTableDirName(
@@ -1433,13 +1501,85 @@ public class LiferayJavaPlugin implements Plugin<Project> {
 
 			cleanTask.dependsOn(taskName);
 		}
+	}
 
-		Configuration compileConfiguration = GradleUtil.getConfiguration(
-			project, JavaPlugin.COMPILE_CONFIGURATION_NAME);
+	protected void configureTaskConfigJSModules(Project project) {
+		ConfigJSModulesTask configJSModulesTask =
+			(ConfigJSModulesTask)GradleUtil.getTask(
+				project,
+				JSModuleConfigGeneratorPlugin.CONFIG_JS_MODULES_TASK_NAME);
 
-		cleanTask.dependsOn(
-			compileConfiguration.getTaskDependencyFromProjectDependency(
-				true, BasePlugin.CLEAN_TASK_NAME));
+		configureTaskConfigJSModulesConfigVariable(configJSModulesTask);
+		configureTaskConfigJSModulesDependsOn(configJSModulesTask);
+		configureTaskConfigJSModulesIgnorePath(configJSModulesTask);
+		configureTaskConfigJSModulesIncludes(configJSModulesTask);
+		configureTaskConfigJSModulesModuleExtension(configJSModulesTask);
+		configureTaskConfigJSModulesModuleFormat(configJSModulesTask);
+		configureTaskConfigJSModulesMustRunAfter(configJSModulesTask);
+		configureTaskConfigJSModulesSourceDir(configJSModulesTask);
+	}
+
+	protected void configureTaskConfigJSModulesConfigVariable(
+		ConfigJSModulesTask configJSModulesTask) {
+
+		configJSModulesTask.setConfigVariable("");
+	}
+
+	protected void configureTaskConfigJSModulesDependsOn(
+		ConfigJSModulesTask configJSModulesTask) {
+
+		configJSModulesTask.dependsOn(JavaPlugin.PROCESS_RESOURCES_TASK_NAME);
+	}
+
+	protected void configureTaskConfigJSModulesIgnorePath(
+		ConfigJSModulesTask configJSModulesTask) {
+
+		configJSModulesTask.setIgnorePath(true);
+	}
+
+	protected void configureTaskConfigJSModulesIncludes(
+		ConfigJSModulesTask configJSModulesTask) {
+
+		configJSModulesTask.setIncludes(Collections.singleton("**/*.es.js"));
+	}
+
+	protected void configureTaskConfigJSModulesModuleExtension(
+		ConfigJSModulesTask configJSModulesTask) {
+
+		configJSModulesTask.setModuleExtension("");
+	}
+
+	protected void configureTaskConfigJSModulesModuleFormat(
+		ConfigJSModulesTask configJSModulesTask) {
+
+		configJSModulesTask.setModuleFormat("/_/g,-");
+	}
+
+	protected void configureTaskConfigJSModulesMustRunAfter(
+		ConfigJSModulesTask configJSModulesTask) {
+
+		configJSModulesTask.mustRunAfter(
+			JSTranspilerPlugin.TRANSPILE_JS_TASK_NAME);
+	}
+
+	protected void configureTaskConfigJSModulesSourceDir(
+		final ConfigJSModulesTask configJSModulesTask) {
+
+		configJSModulesTask.setSourceDir(
+			new Callable<File>() {
+
+				@Override
+				public File call() throws Exception {
+					TranspileJSTask transpileJSTask =
+						(TranspileJSTask)GradleUtil.getTask(
+							configJSModulesTask.getProject(),
+							JSTranspilerPlugin.TRANSPILE_JS_TASK_NAME);
+
+					return new File(
+						transpileJSTask.getOutputDir(), "META-INF/resources");
+				}
+
+			});
 	}
 
 	protected void configureTaskDeploy(
@@ -1462,8 +1602,6 @@ public class LiferayJavaPlugin implements Plugin<Project> {
 		Project project = copy.getProject();
 
 		Jar jar = (Jar)GradleUtil.getTask(project, JavaPlugin.JAR_TASK_NAME);
-
-		copy.from(jar);
 
 		addCleanDeployedFile(project, jar.getArchivePath());
 	}
@@ -1851,13 +1989,25 @@ public class LiferayJavaPlugin implements Plugin<Project> {
 	}
 
 	protected void configureTaskTestJvmArgs(Test test) {
-		List<String> jvmArgs = new ArrayList<>();
+		test.jvmArgs("-Djava.net.preferIPv4Stack=true");
+		test.jvmArgs("-Dliferay.mode=test");
+		test.jvmArgs("-Duser.timezone=GMT");
 
-		jvmArgs.add("-Djava.net.preferIPv4Stack=true");
-		jvmArgs.add("-Dliferay.mode=test");
-		jvmArgs.add("-Duser.timezone=GMT");
+		String name = test.getName();
 
-		test.jvmArgs(jvmArgs);
+		if (name.equals(JavaPlugin.TEST_TASK_NAME)) {
+			name = "junit.java.unit.gc";
+		}
+		else if (name.equals(TEST_INTEGRATION_TASK_NAME)) {
+			name = "junit.java.integration.gc";
+		}
+
+		String value = GradleUtil.getProperty(
+			test.getProject(), name, (String)null);
+
+		if (Validator.isNotNull(value)) {
+			test.jvmArgs((Object[])value.split("\\s+"));
+		}
 	}
 
 	protected void configureTaskTestSystemProperties(
@@ -1885,6 +2035,34 @@ public class LiferayJavaPlugin implements Plugin<Project> {
 		whipTaskExtension.includes("com/liferay/.*");
 	}
 
+	protected void configureTaskTranspileJS(Project project) {
+		TranspileJSTask transpileJSTask = (TranspileJSTask)GradleUtil.getTask(
+			project, JSTranspilerPlugin.TRANSPILE_JS_TASK_NAME);
+
+		configureTaskTranspileJSDependsOn(transpileJSTask);
+		configureTaskTranspileJSSourceDir(transpileJSTask);
+		configureTaskTranspileJSIncludes(transpileJSTask);
+	}
+
+	protected void configureTaskTranspileJSDependsOn(
+		TranspileJSTask transpileJSTask) {
+
+		transpileJSTask.dependsOn(JavaPlugin.PROCESS_RESOURCES_TASK_NAME);
+	}
+
+	protected void configureTaskTranspileJSIncludes(
+		TranspileJSTask transpileJSTask) {
+
+		transpileJSTask.setIncludes(Collections.singleton("**/*.es.js"));
+	}
+
+	protected void configureTaskTranspileJSSourceDir(
+		TranspileJSTask transpileJSTask) {
+
+		transpileJSTask.setSourceDir(
+			getResourcesDir(transpileJSTask.getProject()));
+	}
+
 	protected void configureTestResultsDir(Project project) {
 		JavaPluginConvention javaPluginConvention = GradleUtil.getConvention(
 			project, JavaPluginConvention.class);
@@ -1904,20 +2082,6 @@ public class LiferayJavaPlugin implements Plugin<Project> {
 
 	protected String getDeployedFileName(Project project, File sourceFile) {
 		return sourceFile.getName();
-	}
-
-	protected File getFileProperty(Project project, String name) {
-		if (!project.hasProperty(name)) {
-			return null;
-		}
-
-		Object value = project.property(name);
-
-		if ((value instanceof String) && Validator.isNull((String)value)) {
-			return null;
-		}
-
-		return project.file(value);
 	}
 
 	protected File getJavaDir(Project project) {
@@ -1981,86 +2145,6 @@ public class LiferayJavaPlugin implements Plugin<Project> {
 		"javax.mail:mail:1.4", "javax.servlet.jsp:jsp-api:2.1",
 		"javax.servlet:javax.servlet-api:3.0.1", "log4j:log4j:1.2.17"
 	};
-
-	protected static class RenameDependencyClosure extends Closure<String> {
-
-		public RenameDependencyClosure(
-			Project project, String ... configurationNames) {
-
-			super(null);
-
-			_project = project;
-			_configurationNames = configurationNames;
-		}
-
-		public String doCall(String name) {
-			Map<String, String> newDependencyNames = _getNewDependencyNames();
-
-			String newDependencyName = newDependencyNames.get(name);
-
-			if (Validator.isNotNull(newDependencyName)) {
-				return newDependencyName;
-			}
-
-			return name;
-		}
-
-		private Map<String, String> _getNewDependencyNames() {
-			if (_newDependencyNames != null) {
-				return _newDependencyNames;
-			}
-
-			_newDependencyNames = new HashMap<>();
-
-			for (String configurationName : _configurationNames) {
-				Configuration configuration = GradleUtil.getConfiguration(
-					_project, configurationName);
-
-				ResolvedConfiguration resolvedConfiguration =
-					configuration.getResolvedConfiguration();
-
-				for (ResolvedArtifact resolvedArtifact :
-						resolvedConfiguration.getResolvedArtifacts()) {
-
-					ResolvedModuleVersion resolvedModuleVersion =
-						resolvedArtifact.getModuleVersion();
-
-					ModuleVersionIdentifier moduleVersionIdentifier =
-						resolvedModuleVersion.getId();
-
-					File file = resolvedArtifact.getFile();
-
-					String oldDependencyName = file.getName();
-
-					String newDependencyName = null;
-
-					String suffix =
-						"-" + moduleVersionIdentifier.getVersion() + ".jar";
-
-					if (oldDependencyName.endsWith(suffix)) {
-						newDependencyName = oldDependencyName.substring(
-							0, oldDependencyName.length() - suffix.length());
-
-						newDependencyName += ".jar";
-					}
-					else {
-						newDependencyName =
-							moduleVersionIdentifier.getName() + ".jar";
-					}
-
-					_newDependencyNames.put(
-						oldDependencyName, newDependencyName);
-				}
-			}
-
-			return _newDependencyNames;
-		}
-
-		private final String[] _configurationNames;
-		private Map<String, String> _newDependencyNames;
-		private final Project _project;
-
-	}
 
 	private int _updateStartedAppServerStopCounters(
 		File appServerBinDir, boolean increment) {
