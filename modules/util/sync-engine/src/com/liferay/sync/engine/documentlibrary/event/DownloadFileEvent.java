@@ -24,10 +24,13 @@ import com.liferay.sync.engine.service.SyncAccountService;
 import com.liferay.sync.engine.service.SyncFileService;
 import com.liferay.sync.engine.util.FileUtil;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import java.util.Map;
+
+import org.apache.http.client.methods.HttpGet;
 
 /**
  * @author Shinn Lok
@@ -93,7 +96,18 @@ public class DownloadFileEvent extends BaseEvent {
 			sb.append(syncFile.getVersion());
 		}
 
-		executeAsynchronousGet(sb.toString());
+		HttpGet httpGet = new HttpGet(sb.toString());
+
+		Path tempFilePath = FileUtil.getFilePath(
+			syncAccount.getFilePathName(), ".data",
+			String.valueOf(syncFile.getSyncFileId()));
+
+		if (Files.exists(tempFilePath)) {
+			httpGet.setHeader(
+				"Range", "bytes=" + Files.size(tempFilePath) + "-");
+		}
+
+		executeAsynchronousGet(httpGet);
 	}
 
 	private static final String _URL_PATH = "/sync-web/download";
