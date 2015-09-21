@@ -94,6 +94,8 @@ public class DownloadFileEvent extends BaseEvent {
 		else {
 			sb.append("?version=");
 			sb.append(syncFile.getVersion());
+			sb.append("&versionId=");
+			sb.append(syncFile.getVersionId());
 		}
 
 		HttpGet httpGet = new HttpGet(sb.toString());
