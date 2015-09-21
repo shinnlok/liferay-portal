@@ -100,9 +100,7 @@ public class DownloadFileEvent extends BaseEvent {
 
 		HttpGet httpGet = new HttpGet(sb.toString());
 
-		Path tempFilePath = FileUtil.getFilePath(
-			syncAccount.getFilePathName(), ".data",
-			String.valueOf(syncFile.getSyncFileId()));
+		Path tempFilePath = FileUtil.getTempFilePath(syncFile);
 
 		if (Files.exists(tempFilePath)) {
 			httpGet.setHeader(

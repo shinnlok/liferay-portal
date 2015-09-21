@@ -168,12 +168,7 @@ public class DownloadFileHandler extends BaseHandler {
 			watcher.getDownloadedFilePathNames();
 
 		try {
-			SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
-				getSyncAccountId());
-
-			Path tempFilePath = FileUtil.getFilePath(
-				syncAccount.getFilePathName(), ".data",
-				String.valueOf(syncFile.getSyncFileId()));
+			Path tempFilePath = FileUtil.getTempFilePath(syncFile);
 
 			boolean exists = Files.exists(filePath);
 
