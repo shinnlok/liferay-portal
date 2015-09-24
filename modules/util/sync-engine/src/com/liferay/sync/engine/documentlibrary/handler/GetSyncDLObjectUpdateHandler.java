@@ -209,8 +209,7 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 
 			if (_syncDLObjectUpdate.getResultsTotal() > syncFiles.size()) {
 				FileEventUtil.getUpdates(
-					syncSite.getCompanyId(), syncSite.getGroupId(),
-					getSyncAccountId(), syncSite);
+					syncSite.getGroupId(), getSyncAccountId(), syncSite);
 			}
 		}
 	}
@@ -575,20 +574,18 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 
 			processDependentSyncFiles(targetSyncFile);
 		}
+		catch (FileSystemException fse) {
+			String message = fse.getMessage();
+
+			if (message.contains("File name too long")) {
+				targetSyncFile.setState(SyncFile.STATE_ERROR);
+				targetSyncFile.setUiEvent(SyncFile.UI_EVENT_FILE_NAME_TOO_LONG);
+
+				SyncFileService.update(targetSyncFile);
+			}
+		}
 		catch (Exception e) {
 			_logger.error(e.getMessage(), e);
-
-			if (e instanceof FileSystemException) {
-				String message = e.getMessage();
-
-				if (message.contains("File name too long")) {
-					targetSyncFile.setState(SyncFile.STATE_ERROR);
-					targetSyncFile.setUiEvent(
-						SyncFile.UI_EVENT_FILE_NAME_TOO_LONG);
-
-					SyncFileService.update(targetSyncFile);
-				}
-			}
 		}
 	}
 
