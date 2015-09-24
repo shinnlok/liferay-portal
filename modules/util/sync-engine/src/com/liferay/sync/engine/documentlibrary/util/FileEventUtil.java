@@ -303,7 +303,7 @@ public class FileEventUtil {
 	public static void resyncFolder(long syncAccountId, SyncFile syncFile) {
 		Map<String, Object> parameters = new HashMap<>();
 
-		parameters.put("lastAccessTime", 0);
+		parameters.put("lastAccessTime", -1);
 		parameters.put("parentFolderId", syncFile.getTypePK());
 		parameters.put("repositoryId", syncFile.getRepositoryId());
 		parameters.put("syncFile", syncFile);
