@@ -166,6 +166,23 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 	}
 
 	@Override
+	public void processFinally() {
+		_scheduledFuture.cancel(false);
+
+		SyncEngineUtil.fireSyncEngineStateChanged(
+			getSyncAccountId(), SyncEngineUtil.SYNC_ENGINE_STATE_PROCESSED);
+
+		SyncSite syncSite = (SyncSite)getParameterValue("syncSite");
+
+		syncSite = SyncSiteService.fetchSyncSite(
+			syncSite.getGroupId(), syncSite.getSyncAccountId());
+
+		syncSite.setState(SyncSite.STATE_SYNCED);
+
+		SyncSiteService.update(syncSite);
+	}
+
+	@Override
 	public void processResponse(String response) throws Exception {
 		if (_syncDLObjectUpdate == null) {
 			if (response.startsWith("\"")) {
@@ -471,14 +488,6 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 		for (SyncFile dependentSyncFile : dependentSyncFiles) {
 			processSyncFile(dependentSyncFile);
 		}
-	}
-
-	@Override
-	protected void processFinally() {
-		_scheduledFuture.cancel(false);
-
-		SyncEngineUtil.fireSyncEngineStateChanged(
-			getSyncAccountId(), SyncEngineUtil.SYNC_ENGINE_STATE_PROCESSED);
 	}
 
 	protected void processSyncFile(SyncFile targetSyncFile) {
