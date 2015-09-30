@@ -21,6 +21,7 @@ import com.liferay.poshi.runner.logger.XMLLoggerHandler;
 import com.liferay.poshi.runner.selenium.LiferaySelenium;
 import com.liferay.poshi.runner.selenium.SeleniumUtil;
 import com.liferay.poshi.runner.util.GetterUtil;
+import com.liferay.poshi.runner.util.PropsUtil;
 import com.liferay.poshi.runner.util.PropsValues;
 import com.liferay.poshi.runner.util.RegexUtil;
 import com.liferay.poshi.runner.util.Validator;
@@ -380,10 +381,10 @@ public class PoshiRunnerExecutor {
 
 				PoshiRunnerStackTraceUtil.setCurrentElement(executeElement);
 
-				CommandLoggerHandler.failCommand(_functionExecuteElement);
-
 				SummaryLoggerHandler.failSummary(
 					_functionExecuteElement, t.getMessage());
+
+				CommandLoggerHandler.failCommand(_functionExecuteElement);
 
 				throw t;
 			}
@@ -395,15 +396,15 @@ public class PoshiRunnerExecutor {
 
 		if (_functionExecuteElement == executeElement) {
 			if (_functionWarningMessage != null) {
-				CommandLoggerHandler.warnCommand(_functionExecuteElement);
-
 				SummaryLoggerHandler.warnSummary(
 					_functionExecuteElement, _functionWarningMessage);
+
+				CommandLoggerHandler.warnCommand(_functionExecuteElement);
 			}
 			else {
-				CommandLoggerHandler.passCommand(executeElement);
-
 				SummaryLoggerHandler.passSummary(executeElement);
+
+				CommandLoggerHandler.passCommand(executeElement);
 			}
 
 			_functionExecuteElement = null;
@@ -793,6 +794,14 @@ public class PoshiRunnerExecutor {
 
 				varValue = PoshiRunnerGetterUtil.getVarMethodValue(
 					classCommandName);
+			}
+			else if (element.attributeValue("property-value") != null) {
+				varValue = PropsUtil.get(
+					element.attributeValue("property-value"));
+
+				if (varValue == null) {
+					varValue = "";
+				}
 			}
 			else {
 				varValue = element.getText();
