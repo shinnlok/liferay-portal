@@ -105,7 +105,7 @@ that may or may not be enforced with a unique index at the database level. Case
 			${finderCol.name},
 		</#list>
 
-		QueryUtil.ALL_POS, QueryUtil.ALL_POS, null, true);
+		QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -164,7 +164,7 @@ that may or may not be enforced with a unique index at the database level. Case
 			${finderCol.name},
 		</#list>
 
-		start, end, null, true);
+		start, end, null);
 	}
 
 	/**
@@ -228,7 +228,7 @@ that may or may not be enforced with a unique index at the database level. Case
 			${finderCol.name},
 		</#list>
 
-		start, end, orderByComparator, true);
+		start, end, orderByComparator);
 	}
 
 	/**
@@ -1500,7 +1500,7 @@ that may or may not be enforced with a unique index at the database level. Case
 				</#if>
 			</#list>
 
-			start, end, null, true);
+			start, end, null,);
 		}
 
 		/**
