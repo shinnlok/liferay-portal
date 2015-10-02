@@ -1413,7 +1413,7 @@ that may or may not be enforced with a unique index at the database level. Case
 				</#if>
 			</#list>
 
-			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null, true);
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 		}
 
 		/**
