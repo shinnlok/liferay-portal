@@ -105,7 +105,7 @@ that may or may not be enforced with a unique index at the database level. Case
 			${finderCol.name},
 		</#list>
 
-		QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		QueryUtil.ALL_POS, QueryUtil.ALL_POS, null, true);
 	}
 
 	/**
