@@ -1429,8 +1429,8 @@ that may or may not be enforced with a unique index at the database level. Case
 			<#else>
 		 * @param ${finderCol.name} the ${finderCol.humanName}
 			</#if>
-		 * @param retrieveFromCache whether to use the finder cache
 		</#list>
+		 * @param retrieveFromCache whether to use the finder cache
 		 * @return the matching ${entity.humanNames}
 		 */
 		@Override
