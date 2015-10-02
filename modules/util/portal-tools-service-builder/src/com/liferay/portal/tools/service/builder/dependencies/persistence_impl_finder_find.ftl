@@ -1476,7 +1476,6 @@ that may or may not be enforced with a unique index at the database level. Case
 		</#list>
 		 * @param start the lower bound of the range of ${entity.humanNames}
 		 * @param end the upper bound of the range of ${entity.humanNames} (not inclusive)
-		 * @param retrieveFromCache whether to use the finder cache
 		 * @return the range of matching ${entity.humanNames}
 		 */
 		@Override
