@@ -1500,7 +1500,7 @@ that may or may not be enforced with a unique index at the database level. Case
 				</#if>
 			</#list>
 
-			start, end, null);
+			start, end, null, true);
 		}
 
 		/**
