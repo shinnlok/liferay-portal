@@ -114,7 +114,7 @@ that may or may not be enforced with a unique index at the database level. Case
 	<#list finderColsList as finderCol>
 	 * @param ${finderCol.name} the ${finderCol.humanName}
 	</#list>
-	 * @param retrieveFromCache whether to use the finder cache 1
+	 * @param retrieveFromCache whether to use the finder cache
 	 * @return the matching ${entity.humanNames}
 	 */
 	@Override
@@ -179,7 +179,7 @@ that may or may not be enforced with a unique index at the database level. Case
 	</#list>
 	 * @param start the lower bound of the range of ${entity.humanNames}
 	 * @param end the upper bound of the range of ${entity.humanNames} (not inclusive)
-	 * @param retrieveFromCache whether to use the finder cache 2
+	 * @param retrieveFromCache whether to use the finder cache
 	 * @return the range of matching ${entity.humanNames}
 	 */
 	@Override
@@ -244,7 +244,7 @@ that may or may not be enforced with a unique index at the database level. Case
 	 * @param start the lower bound of the range of ${entity.humanNames}
 	 * @param end the upper bound of the range of ${entity.humanNames} (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to use the finder cache 3
+	 * @param retrieveFromCache whether to use the finder cache
 	 * @return the ordered range of matching ${entity.humanNames}
 	 */
 	@Override
@@ -1475,7 +1475,7 @@ that may or may not be enforced with a unique index at the database level. Case
 		</#list>
 		 * @param start the lower bound of the range of ${entity.humanNames}
 		 * @param end the upper bound of the range of ${entity.humanNames} (not inclusive)
-		 * @param retrieveFromCache whether to use the finder cache 4
+		 * @param retrieveFromCache whether to use the finder cache
 		 * @return the range of matching ${entity.humanNames}
 		 */
 		@Override
@@ -1519,7 +1519,7 @@ that may or may not be enforced with a unique index at the database level. Case
 		</#list>
 		 * @param start the lower bound of the range of ${entity.humanNames}
 		 * @param end the upper bound of the range of ${entity.humanNames} (not inclusive)
-		 * @param retrieveFromCache whether to use the finder cache 5
+		 * @param retrieveFromCache whether to use the finder cache
 		 * @return the range of matching ${entity.humanNames}
 		 */
 		@Override
@@ -1600,7 +1600,7 @@ that may or may not be enforced with a unique index at the database level. Case
 		 * @param start the lower bound of the range of ${entity.humanNames}
 		 * @param end the upper bound of the range of ${entity.humanNames} (not inclusive)
 		 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-		 * @param retrieveFromCache whether to use the finder cache 6
+		 * @param retrieveFromCache whether to use the finder cache
 		 * @return the ordered range of matching ${entity.humanNames}
 		 */
 		@Override
