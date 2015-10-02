@@ -1504,7 +1504,7 @@ that may or may not be enforced with a unique index at the database level. Case
 		}
 
 		/**
-		 * Returns a range of all the ${entity.humanNames} where ${finder.getHumanConditions(true)}, optionally using the finder cache.
+		 * Returns an ordered range of all the ${entity.humanNames} where ${finder.getHumanConditions(true)}, optionally using the finder cache.
 		 *
 		 * <p>
 		 * <#include "range_comment.ftl">
