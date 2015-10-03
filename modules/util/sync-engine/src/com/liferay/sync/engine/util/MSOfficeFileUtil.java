@@ -14,8 +14,6 @@
 
 package com.liferay.sync.engine.util;
 
-import java.io.IOException;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -36,21 +34,22 @@ import org.apache.poi.poifs.filesystem.NPOIFSFileSystem;
  */
 public class MSOfficeFileUtil {
 
-	public static Date getLastSavedDate(Path filePath) throws IOException {
-		NPOIFSFileSystem npoifsFileSystem = new NPOIFSFileSystem(
-			filePath.toFile());
+	public static Date getLastSavedDate(Path filePath) {
+		try {
+			NPOIFSFileSystem npoifsFileSystem = new NPOIFSFileSystem(
+				filePath.toFile());
 
-		HPSFPropertiesOnlyDocument hpsfPropertiesOnlyDocument =
-			new HPSFPropertiesOnlyDocument(npoifsFileSystem);
+			HPSFPropertiesOnlyDocument hpsfPropertiesOnlyDocument =
+				new HPSFPropertiesOnlyDocument(npoifsFileSystem);
 
-		SummaryInformation summaryInformation =
-			hpsfPropertiesOnlyDocument.getSummaryInformation();
+			SummaryInformation summaryInformation =
+				hpsfPropertiesOnlyDocument.getSummaryInformation();
 
-		if (summaryInformation == null) {
+			return summaryInformation.getLastSaveDateTime();
+		}
+		catch (Exception e) {
 			return null;
 		}
-
-		return summaryInformation.getLastSaveDateTime();
 	}
 
 	public static boolean isExcelFile(Path filePath) {
