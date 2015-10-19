@@ -49,7 +49,11 @@ import org.slf4j.LoggerFactory;
  */
 public class SyncSiteService {
 
-	public static SyncSite activateSyncSite(long syncSiteId, boolean reset) {
+	public static SyncSite activateSyncSite(long syncSiteId, boolean reset)
+		throws Exception {
+
+		// Sync site
+
 		SyncSite syncSite = fetchSyncSite(syncSiteId);
 
 		if (syncSite.isActive()) {
@@ -65,6 +69,14 @@ public class SyncSiteService {
 		}
 
 		update(syncSite);
+
+		// Sync file
+
+		String filePathName = syncSite.getFilePathName();
+
+		if (!Files.exists(Paths.get(filePathName))) {
+			Files.createDirectories(Paths.get(filePathName));
+		}
 
 		return syncSite;
 	}
