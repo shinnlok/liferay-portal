@@ -60,6 +60,10 @@ public class GetSyncDLObjectUpdateEvent extends BaseEvent {
 		syncSite = SyncSiteService.fetchSyncSite(
 			syncSite.getGroupId(), syncSite.getSyncAccountId());
 
+		if (!syncSite.getActive()) {
+			return;
+		}
+
 		syncSite.setState(SyncSite.STATE_IN_PROGRESS);
 
 		SyncSiteService.update(syncSite);
