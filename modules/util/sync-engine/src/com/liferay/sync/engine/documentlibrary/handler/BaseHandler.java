@@ -193,7 +193,7 @@ public class BaseHandler implements Handler<Void> {
 		finally {
 			processFinally();
 
-			FileEventManager.removeEvent(_event);
+			removeEvent();
 		}
 
 		return null;
@@ -251,6 +251,14 @@ public class BaseHandler implements Handler<Void> {
 
 			SyncSiteService.deleteSyncSite(syncSite.getSyncSiteId());
 		}
+	}
+
+	protected boolean isEventCancelled() {
+		return _event.isCancelled();
+	}
+
+	protected void removeEvent() {
+		FileEventManager.removeEvent(_event);
 	}
 
 	protected void retryServerConnection(int uiEvent) {
