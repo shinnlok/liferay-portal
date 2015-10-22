@@ -266,27 +266,9 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 				filePath, String.valueOf(syncFile.getSyncFileId()), false);
 		}
 		else {
-			String checksum = syncFile.getChecksum();
-
-			if (checksum.isEmpty() || (syncFile.getSize() <= 0)) {
-				downloadFile(syncFile, null, 0, false);
-
-				return;
-			}
-
-			SyncFile sourceSyncFile = SyncFileService.fetchSyncFile(
-				checksum, SyncFile.STATE_SYNCED);
-
 			SyncFileService.update(syncFile);
 
-			if ((sourceSyncFile != null) &&
-				Files.exists(Paths.get(sourceSyncFile.getFilePathName()))) {
-
-				copyFile(sourceSyncFile, syncFile);
-			}
-			else {
-				downloadFile(syncFile, null, 0, false);
-			}
+			downloadFile(syncFile, null, 0, false);
 		}
 	}
 
@@ -317,6 +299,9 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 
 		downloadedFilePathNames.add(targetSyncFile.getFilePathName());
 
+		boolean exists = Files.exists(
+			Paths.get(targetSyncFile.getFilePathName()));
+
 		Files.move(
 			tempFilePath, Paths.get(targetSyncFile.getFilePathName()),
 			StandardCopyOption.ATOMIC_MOVE,
@@ -330,6 +315,9 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 			targetSyncFile.unsetLocalExtraSetting("restoreEvent");
 
 			targetSyncFile.setUiEvent(SyncFile.UI_EVENT_RESTORED_REMOTE);
+		}
+		else if (exists) {
+			targetSyncFile.setUiEvent(SyncFile.UI_EVENT_DOWNLOADED_UPDATE);
 		}
 		else {
 			targetSyncFile.setUiEvent(SyncFile.UI_EVENT_DOWNLOADED_NEW);
@@ -407,8 +395,24 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 	}
 
 	protected void downloadFile(
-		SyncFile syncFile, String sourceVersion, long sourceVersionId,
-		boolean patch) {
+			SyncFile syncFile, String sourceVersion, long sourceVersionId,
+			boolean patch)
+		throws Exception {
+
+		String checksum = syncFile.getChecksum();
+
+		if (!checksum.isEmpty() && (syncFile.getSize() > 0)) {
+			SyncFile sourceSyncFile = SyncFileService.fetchSyncFile(
+				checksum, SyncFile.STATE_SYNCED);
+
+			if ((sourceSyncFile != null) &&
+				Files.exists(Paths.get(sourceSyncFile.getFilePathName()))) {
+
+				copyFile(sourceSyncFile, syncFile);
+
+				return;
+			}
+		}
 
 		String targetVersion = syncFile.getVersion();
 
