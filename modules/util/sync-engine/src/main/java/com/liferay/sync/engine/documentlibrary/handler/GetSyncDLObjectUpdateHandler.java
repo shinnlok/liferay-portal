@@ -540,8 +540,7 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 			String event = targetSyncFile.getEvent();
 
 			if (event.equals(SyncFile.EVENT_ADD) ||
-				event.equals(SyncFile.EVENT_GET) ||
-				event.equals(SyncFile.EVENT_RESTORE)) {
+				event.equals(SyncFile.EVENT_GET)) {
 
 				if (sourceSyncFile != null) {
 					updateFile(sourceSyncFile, targetSyncFile, filePathName);
@@ -570,6 +569,21 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 				}
 
 				moveFile(sourceSyncFile, targetSyncFile, filePathName);
+			}
+			else if (event.equals(SyncFile.EVENT_RESTORE)) {
+				if (sourceSyncFile != null) {
+					updateFile(sourceSyncFile, targetSyncFile, filePathName);
+
+					processDependentSyncFiles(sourceSyncFile);
+
+					return;
+				}
+
+				targetSyncFile.setLocalExtraSetting("restoreEvent", true);
+
+				SyncFileService.update(targetSyncFile);
+
+				addFile(targetSyncFile, filePathName);
 			}
 			else if (event.equals(SyncFile.EVENT_TRASH)) {
 				if (sourceSyncFile == null) {
