@@ -25,6 +25,10 @@ AUI.add(
 						value: ''
 					},
 
+					indexType: {
+						value: 'keyword'
+					},
+
 					instanceId: {
 						valueFn: '_valueInstanceId'
 					},
@@ -74,7 +78,7 @@ AUI.add(
 					},
 
 					tip: {
-						value: {}
+						value: ''
 					},
 
 					type: {

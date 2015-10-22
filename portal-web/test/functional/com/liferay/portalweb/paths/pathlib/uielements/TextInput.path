@@ -145,7 +145,7 @@
 </tr>
 <tr>
 	<td>GOOGLE_ANALYTICS_ID</td>
-	<td>//input[contains(@id,'_165_googleAnalyticsId')]</td>
+	<td>//input[contains(@id,'googleAnalyticsId')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -461,11 +461,6 @@
 <tr>
 	<td>WEB_ID</td>
 	<td>//input[contains(@id,'webId') and contains(@class,'input-text')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>WINDOWS_LIVE_MESSENGER</td>
-	<td>//div[label[contains(.,'Windows Live Messenger')]]//input[@type='text']</td>
 	<td></td>
 </tr>
 <tr>

@@ -78,6 +78,9 @@ if (ddlDisplayContext.isAdminPortlet()) {
 
 	renderResponse.setTitle((record != null) ? LanguageUtil.format(request, "edit-x", ddmStructure.getName(locale), false) : LanguageUtil.format(request, "new-x", ddmStructure.getName(locale), false));
 }
+else {
+	renderResponse.setTitle(recordSet.getName(locale));
+}
 %>
 
 <portlet:actionURL name="addRecord" var="addRecordURL">
@@ -97,7 +100,7 @@ if (ddlDisplayContext.isAdminPortlet()) {
 	<aui:input name="languageId" type="hidden" value="<%= languageId %>" />
 	<aui:input name="workflowAction" type="hidden" value="<%= WorkflowConstants.ACTION_PUBLISH %>" />
 
-	<liferay-ui:error exception="<%= DuplicateFileException.class %>" message="a-file-with-that-name-already-exists" />
+	<liferay-ui:error exception="<%= DuplicateFileEntryException.class %>" message="a-file-with-that-name-already-exists" />
 
 	<liferay-ui:error exception="<%= FileSizeException.class %>">
 
