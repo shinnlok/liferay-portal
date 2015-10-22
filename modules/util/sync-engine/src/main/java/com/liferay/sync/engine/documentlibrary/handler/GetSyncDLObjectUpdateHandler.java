@@ -323,7 +323,17 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 			StandardCopyOption.REPLACE_EXISTING);
 
 		targetSyncFile.setState(SyncFile.STATE_SYNCED);
-		targetSyncFile.setUiEvent(SyncFile.UI_EVENT_DOWNLOADED_NEW);
+
+		if (GetterUtil.getBoolean(
+				targetSyncFile.getLocalExtraSettingValue("restoreEvent"))) {
+
+			targetSyncFile.unsetLocalExtraSetting("restoreEvent");
+
+			targetSyncFile.setUiEvent(SyncFile.UI_EVENT_RESTORED_REMOTE);
+		}
+		else {
+			targetSyncFile.setUiEvent(SyncFile.UI_EVENT_DOWNLOADED_NEW);
+		}
 
 		SyncFileService.update(targetSyncFile);
 	}
