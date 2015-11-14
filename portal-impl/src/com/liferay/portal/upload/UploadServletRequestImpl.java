@@ -209,6 +209,7 @@ public class UploadServletRequestImpl
 			}
 		}
 		catch (Exception e) {
+			e.printStackTrace();
 			UploadException uploadException = new UploadException(e);
 
 			if (e instanceof FileUploadBase.FileSizeLimitExceededException ||
