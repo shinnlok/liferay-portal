@@ -82,11 +82,6 @@ public class UploadServletRequestImplTest extends PowerMockito {
 		UploadServletRequestImpl uploadServletRequest =
 			new UploadServletRequestImpl(new MockHttpServletRequest());
 
-		if (true) {
-			throw new RuntimeException(
-				uploadServletRequest.getTempDir().getPath());
-		}
-
 		List<FileItem> sortedFileItems = uploadServletRequest.sort(_fileItems);
 
 		FileItem fileItem1 = sortedFileItems.get(1);
