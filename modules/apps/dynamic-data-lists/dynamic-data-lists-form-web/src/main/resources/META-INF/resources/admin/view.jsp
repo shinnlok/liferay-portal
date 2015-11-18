@@ -18,7 +18,10 @@
 
 <%
 String displayStyle = ddlFormAdminDisplayContext.getDisplayStyle();
+
 PortletURL portletURL = ddlFormAdminDisplayContext.getPortletURL();
+
+portletURL.setParameter("displayStyle", displayStyle);
 
 RecordSetSearch recordSetSearch = new RecordSetSearch(renderRequest, portletURL);
 
@@ -162,3 +165,5 @@ recordSetSearch.setOrderByType(orderByType);
 		<liferay-frontend:add-menu-item title='<%= LanguageUtil.get(request, "new-form") %>' url="<%= addRecordSetURL.toString() %>" />
 	</liferay-frontend:add-menu>
 </c:if>
+
+<%@ include file="/admin/export_record_set.jspf" %>

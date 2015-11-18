@@ -19,7 +19,6 @@ import com.liferay.dynamic.data.mapping.service.DDMStructureServiceUtil;
 import com.liferay.dynamic.data.mapping.storage.Field;
 import com.liferay.dynamic.data.mapping.storage.FieldConstants;
 import com.liferay.dynamic.data.mapping.storage.Fields;
-import com.liferay.dynamic.data.mapping.util.DDMUtil;
 import com.liferay.journal.exception.NoSuchArticleException;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.model.JournalArticleConstants;
@@ -31,7 +30,6 @@ import com.liferay.journal.service.JournalArticleServiceUtil;
 import com.liferay.journal.service.JournalFeedServiceUtil;
 import com.liferay.journal.service.JournalFolderServiceUtil;
 import com.liferay.journal.service.permission.JournalPermission;
-import com.liferay.journal.util.JournalConverterUtil;
 import com.liferay.journal.util.comparator.ArticleVersionComparator;
 import com.liferay.journal.util.impl.JournalUtil;
 import com.liferay.journal.web.portlet.JournalPortlet;
@@ -51,6 +49,7 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
@@ -62,12 +61,10 @@ import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 
 import java.io.Serializable;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -254,7 +251,7 @@ public class ActionUtil {
 	}
 
 	public static JournalArticle getArticle(HttpServletRequest request)
-		throws Exception {
+		throws PortalException {
 
 		String actionName = ParamUtil.getString(
 			request, ActionRequest.ACTION_NAME);
@@ -343,53 +340,6 @@ public class ActionUtil {
 		return article;
 	}
 
-	public static List<JournalArticle> getArticles(HttpServletRequest request)
-		throws Exception {
-
-		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
-		List<JournalArticle> articles = new ArrayList<>();
-
-		String[] articleIds = StringUtil.split(
-			ParamUtil.getString(request, "articleIds"));
-
-		for (String articleId : articleIds) {
-			JournalArticle article = JournalArticleServiceUtil.fetchArticle(
-				themeDisplay.getScopeGroupId(), articleId);
-
-			if (article != null) {
-				articles.add(article);
-			}
-		}
-
-		return articles;
-	}
-
-	public static List<JournalArticle> getArticles(
-			PortletRequest portletRequest)
-		throws Exception {
-
-		HttpServletRequest request = PortalUtil.getHttpServletRequest(
-			portletRequest);
-
-		return getArticles(request);
-	}
-
-	public static Object[] getContentAndImages(
-			DDMStructure ddmStructure, ServiceContext serviceContext)
-		throws Exception {
-
-		Fields fields = DDMUtil.getFields(
-			ddmStructure.getStructureId(), serviceContext);
-
-		String content = JournalConverterUtil.getContent(ddmStructure, fields);
-
-		Map<String, byte[]> images = getImages(content, fields);
-
-		return new Object[] {content, images};
-	}
-
 	public static JournalFeed getFeed(HttpServletRequest request)
 		throws Exception {
 
@@ -447,33 +397,55 @@ public class ActionUtil {
 		return getFolder(request);
 	}
 
-	public static List<JournalFolder> getFolders(HttpServletRequest request)
-		throws PortalException {
+	public static Map<String, byte[]> getImages(String content, Fields fields)
+		throws Exception {
 
-		long[] folderIds = StringUtil.split(
-			ParamUtil.getString(request, "folderIds"), 0L);
+		Map<String, byte[]> images = new HashMap<>();
 
-		List<JournalFolder> folders = new ArrayList<>();
+		for (Field field : fields) {
+			String dataType = field.getDataType();
 
-		for (long folderId : folderIds) {
-			JournalFolder folder = JournalFolderServiceUtil.fetchFolder(
-				folderId);
+			if (!dataType.equals(FieldConstants.IMAGE)) {
+				continue;
+			}
 
-			if (folder != null) {
-				folders.add(folder);
+			Map<Locale, List<Serializable>> valuesMap = field.getValuesMap();
+
+			for (Locale locale : valuesMap.keySet()) {
+				List<Serializable> values = valuesMap.get(locale);
+
+				for (int i = 0; i < values.size(); i++) {
+					StringBundler sb = new StringBundler(6);
+
+					sb.append(
+						getElementInstanceId(content, field.getName(), i));
+					sb.append(StringPool.UNDERLINE);
+					sb.append(field.getName());
+					sb.append(StringPool.UNDERLINE);
+					sb.append(i);
+					sb.append(StringPool.UNDERLINE);
+					sb.append(LanguageUtil.getLanguageId(locale));
+					JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
+						(String)values.get(i));
+
+					String uuid = jsonObject.getString("uuid");
+					long groupId = jsonObject.getLong("groupId");
+
+					if (Validator.isNotNull(uuid) && (groupId > 0)) {
+						FileEntry fileEntry =
+							DLAppLocalServiceUtil.getFileEntryByUuidAndGroupId(
+								uuid, groupId);
+
+						byte[] bytes = FileUtil.getBytes(
+							fileEntry.getContentStream());
+
+						images.put(sb.toString(), bytes);
+					}
+				}
 			}
 		}
 
-		return folders;
-	}
-
-	public static List<JournalFolder> getFolders(PortletRequest portletRequest)
-		throws PortalException {
-
-		HttpServletRequest request = PortalUtil.getHttpServletRequest(
-			portletRequest);
-
-		return getFolders(request);
+		return images;
 	}
 
 	public static JournalArticle getPreviewArticle(
@@ -549,58 +521,6 @@ public class ActionUtil {
 		Element dynamicElementElement = (Element)nodes.get(index);
 
 		return dynamicElementElement.attributeValue("instance-id");
-	}
-
-	protected static Map<String, byte[]> getImages(
-			String content, Fields fields)
-		throws Exception {
-
-		Map<String, byte[]> images = new HashMap<>();
-
-		for (Field field : fields) {
-			String dataType = field.getDataType();
-
-			if (!dataType.equals(FieldConstants.IMAGE)) {
-				continue;
-			}
-
-			Map<Locale, List<Serializable>> valuesMap = field.getValuesMap();
-
-			for (Locale locale : valuesMap.keySet()) {
-				List<Serializable> values = valuesMap.get(locale);
-
-				for (int i = 0; i < values.size(); i++) {
-					StringBundler sb = new StringBundler(6);
-
-					sb.append(
-						getElementInstanceId(content, field.getName(), i));
-					sb.append(StringPool.UNDERLINE);
-					sb.append(field.getName());
-					sb.append(StringPool.UNDERLINE);
-					sb.append(i);
-					sb.append(StringPool.UNDERLINE);
-					sb.append(LanguageUtil.getLanguageId(locale));
-					JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-						(String)values.get(i));
-
-					String uuid = jsonObject.getString("uuid");
-					long groupId = jsonObject.getLong("groupId");
-
-					if (Validator.isNotNull(uuid) && (groupId > 0)) {
-						FileEntry fileEntry =
-							DLAppLocalServiceUtil.getFileEntryByUuidAndGroupId(
-								uuid, groupId);
-
-						byte[] bytes = FileUtil.getBytes(
-							fileEntry.getContentStream());
-
-						images.put(sb.toString(), bytes);
-					}
-				}
-			}
-		}
-
-		return images;
 	}
 
 	protected static String getLanguageId(

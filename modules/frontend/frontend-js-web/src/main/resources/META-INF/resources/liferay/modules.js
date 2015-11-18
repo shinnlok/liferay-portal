@@ -55,21 +55,6 @@
 				combine: COMBINE,
 				filter: filterConfig,
 				modules: {
-					'liferay-alloy-editor': {
-						path: 'alloyeditor.js',
-						requires: [
-							'alloy-editor',
-							'aui-component',
-							'liferay-portlet-base'
-						]
-					},
-					'liferay-alloy-editor-source': {
-						path: 'alloyeditor_source.js',
-						requires: [
-							'liferay-fullscreen-source-editor',
-							'liferay-source-editor'
-						]
-					},
 					'liferay-app-view-move': {
 						path: 'app_view_move.js',
 						plugins: {
@@ -531,6 +516,7 @@
 					'liferay-management-bar': {
 						path: 'management_bar.js',
 						requires: [
+							'aui-component',
 							'liferay-portlet-base'
 						]
 					},
@@ -614,6 +600,8 @@
 							}
 						},
 						requires: [
+							'aui-base',
+							'aui-component',
 							'event-mouseenter',
 							'node-focusmanager',
 							'plugin'

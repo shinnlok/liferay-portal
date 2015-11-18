@@ -94,12 +94,15 @@ import javax.portlet.PortletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.osgi.service.component.annotations.Component;
+
 /**
  * @author Eduardo Lundgren
  * @author Brian Wing Shun Chan
  * @author Eduardo Garcia
  * @author Marcellus Tavares
  */
+@Component(immediate = true)
 @DoPrivileged
 public class DDMImpl implements DDM {
 
@@ -516,9 +519,13 @@ public class DDMImpl implements DDM {
 
 			Field existingField = existingFields.get(newField.getName());
 
-			if ((existingField == null) || newField.isPrivate()) {
+			if (existingField == null) {
 				existingFields.put(newField);
 
+				continue;
+			}
+
+			if (newField.isPrivate()) {
 				continue;
 			}
 

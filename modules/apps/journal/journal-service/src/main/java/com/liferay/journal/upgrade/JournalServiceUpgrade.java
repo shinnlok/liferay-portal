@@ -15,6 +15,7 @@
 package com.liferay.journal.upgrade;
 
 import com.liferay.journal.upgrade.v1_0_0.UpgradeClassNames;
+import com.liferay.journal.upgrade.v1_0_0.UpgradeCompanyId;
 import com.liferay.journal.upgrade.v1_0_0.UpgradeJournal;
 import com.liferay.journal.upgrade.v1_0_0.UpgradeJournalArticleType;
 import com.liferay.journal.upgrade.v1_0_0.UpgradeJournalDisplayPreferences;
@@ -40,14 +41,15 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Eduardo Garcia
  */
-@Component(immediate = true)
+@Component(immediate = true, service = JournalServiceUpgrade.class)
 public class JournalServiceUpgrade implements UpgradeStepRegistrator {
 
 	@Override
 	public void register(Registry registry) {
 		registry.register(
 			"com.liferay.journal.service", "0.0.1", "1.0.0",
-			new UpgradeSchema(), new UpgradeClassNames(), new UpgradeJournal(),
+			new UpgradeSchema(), new UpgradeClassNames(),
+			new UpgradeCompanyId(), new UpgradeJournal(),
 			new UpgradeJournalArticleType(),
 			new UpgradeJournalDisplayPreferences(),
 			new UpgradeLastPublishDate(),

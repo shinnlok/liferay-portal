@@ -191,7 +191,7 @@ AUI.add(
 
 						var qualifiedName = instance.getQualifiedName().replace(/\$/ig, '\\$');
 
-						return '[name=' + qualifiedName + ']';
+						return '[name="' + qualifiedName + '"]';
 					},
 
 					getLabel: function() {
@@ -211,6 +211,16 @@ AUI.add(
 						var instance = this;
 
 						return instance.get('container').one('label');
+					},
+
+					getLocalizedValue: function(localizedValue) {
+						var instance = this;
+
+						if (Lang.isObject(localizedValue)) {
+							localizedValue = localizedValue[instance.get('locale')];
+						}
+
+						return localizedValue;
 					},
 
 					getQualifiedName: function() {
@@ -280,6 +290,7 @@ AUI.add(
 								childElementsHTML: instance.getChildElementsHTML(),
 								label: instance.getLabel(),
 								name: instance.getQualifiedName(),
+								readOnly: instance.get('readOnly'),
 								value: value || '',
 								visible: instance.get('visible')
 							}

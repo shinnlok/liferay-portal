@@ -14,17 +14,17 @@
 
 package com.liferay.layout.admin.web.application.list;
 
-import com.liferay.application.list.BaseControlPanelEntryPanelApp;
+import com.liferay.application.list.BasePanelApp;
 import com.liferay.application.list.PanelApp;
 import com.liferay.application.list.constants.PanelCategoryKeys;
 import com.liferay.layout.admin.web.constants.LayoutAdminPortletKeys;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.Portlet;
 import com.liferay.portal.theme.ThemeDisplay;
-import com.liferay.portal.util.WebKeys;
 
 import javax.portlet.PortletURL;
 
@@ -44,7 +44,7 @@ import org.osgi.service.component.annotations.Reference;
 	},
 	service = PanelApp.class
 )
-public class GroupPagesPanelApp extends BaseControlPanelEntryPanelApp {
+public class GroupPagesPanelApp extends BasePanelApp {
 
 	@Override
 	public String getPortletId() {
@@ -75,6 +75,7 @@ public class GroupPagesPanelApp extends BaseControlPanelEntryPanelApp {
 		return portletURL;
 	}
 
+	@Override
 	@Reference(
 		target = "(javax.portlet.name=" + LayoutAdminPortletKeys.GROUP_PAGES + ")",
 		unbind = "-"

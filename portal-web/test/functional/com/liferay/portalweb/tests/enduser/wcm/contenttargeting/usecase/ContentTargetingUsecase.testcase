@@ -1109,7 +1109,7 @@
 
 		<execute macro="ContentTargetingCampaign#saveCP" />
 
-		<execute macro="LAR#gotoExportSite">
+		<execute macro="LAR#gotoExportSiteCmd">
 			<var name="siteScopeName" value="Site Name" />
 		</execute>
 
@@ -1119,7 +1119,7 @@
 
 		<execute function="AssertTextEquals" locator1="SitePagesExport#CURRENT_AND_PREVIOUS_STATUS" value1="Successful" />
 
-		<var method="selenium#getText('//tr/td[5]/span/a')" name="valueName" />
+		<var method="selenium#getElementText('//tr/td[5]/span/a')" name="valueName" />
 
 		<echo message="value name ${valueName}" />
 
@@ -1158,7 +1158,7 @@
 
 		<execute macro="ContentTargetingCampaign#deleteAllCP" />
 
-		<execute macro="LAR#gotoExportSite">
+		<execute macro="LAR#gotoExportSiteCmd">
 			<var name="siteScopeName" value="Site Name" />
 		</execute>
 
@@ -1173,7 +1173,7 @@
 
 		<execute function="AssertTextEquals" locator1="SitePagesExport#CURRENT_AND_PREVIOUS_STATUS" value1="Successful" />
 
-		<var method="selenium#getText('//tr/td[5]/span/a')" name="valueName" />
+		<var method="selenium#getElementText('//tr/td[5]/span/a')" name="valueName" />
 
 		<echo message="value name ${valueName}" />
 
@@ -1219,7 +1219,7 @@
 	<command name="ExportImportSmoke" priority="4">
 		<execute macro="LAR#setupContentTargeting" />
 
-		<execute macro="LAR#gotoExportSite">
+		<execute macro="LAR#gotoExportSiteCmd">
 			<var name="siteScopeName" value="Site Name" />
 		</execute>
 
@@ -1229,7 +1229,7 @@
 
 		<execute function="AssertTextEquals" locator1="SitePagesExport#CURRENT_AND_PREVIOUS_STATUS" value1="Successful" />
 
-		<var method="selenium#getText('//tr/td[5]/span/a')" name="valueName" />
+		<var method="selenium#getElementText('//tr/td[5]/span/a')" name="valueName" />
 
 		<echo message="value name ${valueName}" />
 
@@ -1343,7 +1343,7 @@
 
 		<execute macro="ContentTargetingCampaign#saveCP" />
 
-		<execute macro="LAR#gotoExportSite">
+		<execute macro="LAR#gotoExportSiteCmd">
 			<var name="siteScopeName" value="Site Name" />
 		</execute>
 
@@ -1369,7 +1369,7 @@
 
 		<execute function="AssertTextEquals" locator1="SitePagesExport#CURRENT_AND_PREVIOUS_STATUS" value1="Successful" />
 
-		<var method="selenium#getText('//tr/td[5]/span/a')" name="valueName" />
+		<var method="selenium#getElementText('//tr/td[5]/span/a')" name="valueName" />
 
 		<echo message="value name ${valueName}" />
 
@@ -1426,7 +1426,7 @@
 	<command name="ExportImportUncheckAppCTRefAllAndContentAll" priority="4">
 		<execute macro="LAR#setupContentTargeting" />
 
-		<execute macro="LAR#gotoExportSite">
+		<execute macro="LAR#gotoExportSiteCmd">
 			<var name="siteScopeName" value="Site Name" />
 		</execute>
 
@@ -1454,7 +1454,7 @@
 
 		<execute function="AssertTextEquals" locator1="SitePagesExport#CURRENT_AND_PREVIOUS_STATUS" value1="Successful" />
 
-		<var method="selenium#getText('//tr/td[5]/span/a')" name="valueName" />
+		<var method="selenium#getElementText('//tr/td[5]/span/a')" name="valueName" />
 
 		<echo message="value name ${valueName}" />
 
@@ -1484,7 +1484,7 @@
 	<command name="ExportImportUncheckAppCTRefAllAndContentAT" priority="4">
 		<execute macro="LAR#setupContentTargeting" />
 
-		<execute macro="LAR#gotoExportSite">
+		<execute macro="LAR#gotoExportSiteCmd">
 			<var name="siteScopeName" value="Site Name" />
 		</execute>
 
@@ -1508,7 +1508,7 @@
 
 		<execute function="AssertTextEquals" locator1="SitePagesExport#CURRENT_AND_PREVIOUS_STATUS" value1="Successful" />
 
-		<var method="selenium#getText('//tr/td[5]/span/a')" name="valueName" />
+		<var method="selenium#getElementText('//tr/td[5]/span/a')" name="valueName" />
 
 		<echo message="value name ${valueName}" />
 
@@ -1538,7 +1538,7 @@
 	<command name="ExportImportUncheckAppCTRefAllAndContentWC" priority="4">
 		<execute macro="LAR#setupContentTargeting" />
 
-		<execute macro="LAR#gotoExportSite">
+		<execute macro="LAR#gotoExportSiteCmd">
 			<var name="siteScopeName" value="Site Name" />
 		</execute>
 
@@ -1562,7 +1562,7 @@
 
 		<execute function="AssertTextEquals" locator1="SitePagesExport#CURRENT_AND_PREVIOUS_STATUS" value1="Successful" />
 
-		<var method="selenium#getText('//tr/td[5]/span/a')" name="valueName" />
+		<var method="selenium#getElementText('//tr/td[5]/span/a')" name="valueName" />
 
 		<echo message="value name ${valueName}" />
 
@@ -1666,7 +1666,7 @@
 
 		<execute macro="ContentTargetingCampaign#saveCP" />
 
-		<execute macro="LAR#gotoExportSite">
+		<execute macro="LAR#gotoExportSiteCmd">
 			<var name="siteScopeName" value="Site Name" />
 		</execute>
 
@@ -1684,7 +1684,7 @@
 
 		<execute function="AssertTextEquals" locator1="SitePagesExport#CURRENT_AND_PREVIOUS_STATUS" value1="Successful" />
 
-		<var method="selenium#getText('//tr/td[5]/span/a')" name="valueName" />
+		<var method="selenium#getElementText('//tr/td[5]/span/a')" name="valueName" />
 
 		<echo message="value name ${valueName}" />
 
@@ -1783,7 +1783,7 @@
 			<var name="webContentTitle" value="WC Title Unreferenced" />
 		</execute>
 
-		<execute macro="LAR#gotoExportSite">
+		<execute macro="LAR#gotoExportSiteCmd">
 			<var name="siteScopeName" value="Site Name" />
 		</execute>
 
@@ -1797,7 +1797,7 @@
 
 		<execute function="AssertTextEquals" locator1="SitePagesExport#CURRENT_AND_PREVIOUS_STATUS" value1="Successful" />
 
-		<var method="selenium#getText('//tr/td[5]/span/a')" name="valueName" />
+		<var method="selenium#getElementText('//tr/td[5]/span/a')" name="valueName" />
 
 		<echo message="value name ${valueName}" />
 

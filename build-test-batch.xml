@@ -1016,7 +1016,7 @@
 		</sequential>
 	</macrodef>
 
-	<target name="functional-release-tomcat-mysql">
+	<target name="functional-bundle-tomcat-mysql">
 		<set-tomcat-version-number liferay.portal.bundle="${test.portal.bundle.version}" />
 
 		<run-functional-test
@@ -1108,7 +1108,7 @@
 		</run-batch-test>
 	</target>
 
-	<target name="plugins">
+	<target name="plugins-compile">
 		<property name="testray.main.component.name" value="Plugins" />
 		<property name="testray.testcase.priority" value="4" />
 
@@ -1123,6 +1123,22 @@
 				<prepare-test-build />
 			</test-set-up>
 		</run-batch-test>
+	</target>
+
+	<target name="plugins-functional-bundle-tomcat-mysql">
+		<set-tomcat-version-number liferay.portal.bundle="${test.portal.bundle.version}" />
+
+		<run-functional-test
+			app.server.type="tomcat"
+			database.type="mysql"
+			test.license.xml.url="${test.license.xml.url}"
+			test.portal.bundle.zip.url="${test.portal.bundle.zip.url}"
+			test.release.bundle="true"
+		/>
+	</target>
+
+	<target name="plugins-functional-tomcat-mysql">
+		<run-functional-test app.server.type="tomcat" database.type="mysql" />
 	</target>
 
 	<target name="portal-web">
@@ -1284,6 +1300,7 @@ ${output.content}</echo>
 				<if>
 					<or>
 						<contains string="${output.content}" substring="Database 'lportal' already exists" />
+						<contains string="${output.content}" substring="sp_dboption" />
 						<contains string="${output.content}" substring="The model database is unavailable. It is being used to create a new database." />
 					</or>
 					<then>

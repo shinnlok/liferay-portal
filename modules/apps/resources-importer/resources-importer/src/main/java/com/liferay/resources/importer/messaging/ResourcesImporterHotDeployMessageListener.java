@@ -101,7 +101,7 @@ public class ResourcesImporterHotDeployMessageListener
 		initialize(message);
 	}
 
-	@Reference
+	@Reference(unbind = "-")
 	protected void setCompanyLocalService(
 		CompanyLocalService companyLocalService) {
 
@@ -115,6 +115,11 @@ public class ResourcesImporterHotDeployMessageListener
 	protected void setDestination(Destination destination) {
 	}
 
+	@Reference(unbind = "-")
+	protected void setImporterFactory(ImporterFactory importerFactory) {
+		_importerFactory = importerFactory;
+	}
+
 	private void importResources(
 			Company company, ServletContext servletContext,
 			PluginPackageProperties pluginPackageProperties,
@@ -126,9 +131,7 @@ public class ResourcesImporterHotDeployMessageListener
 		try {
 			CompanyThreadLocal.setCompanyId(company.getCompanyId());
 
-			ImporterFactory importerFactory = ImporterFactory.getInstance();
-
-			Importer importer = importerFactory.createImporter(
+			Importer importer = _importerFactory.createImporter(
 				company.getCompanyId(), servletContext,
 				pluginPackageProperties);
 
@@ -205,5 +208,6 @@ public class ResourcesImporterHotDeployMessageListener
 		ResourcesImporterHotDeployMessageListener.class);
 
 	private CompanyLocalService _companyLocalService;
+	private ImporterFactory _importerFactory;
 
 }

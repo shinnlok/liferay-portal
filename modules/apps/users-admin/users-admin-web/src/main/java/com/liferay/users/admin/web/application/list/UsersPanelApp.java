@@ -14,7 +14,7 @@
 
 package com.liferay.users.admin.web.application.list;
 
-import com.liferay.application.list.BaseControlPanelEntryPanelApp;
+import com.liferay.application.list.BasePanelApp;
 import com.liferay.application.list.PanelApp;
 import com.liferay.application.list.constants.PanelCategoryKeys;
 import com.liferay.portal.model.Portlet;
@@ -34,13 +34,14 @@ import org.osgi.service.component.annotations.Reference;
 	},
 	service = PanelApp.class
 )
-public class UsersPanelApp extends BaseControlPanelEntryPanelApp {
+public class UsersPanelApp extends BasePanelApp {
 
 	@Override
 	public String getPortletId() {
 		return UsersAdminPortletKeys.USERS_ADMIN;
 	}
 
+	@Override
 	@Reference(
 		target = "(javax.portlet.name=" + UsersAdminPortletKeys.USERS_ADMIN + ")",
 		unbind = "-"

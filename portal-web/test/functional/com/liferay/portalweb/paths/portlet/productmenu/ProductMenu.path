@@ -95,8 +95,8 @@
 	<td></td>
 </tr>
 <tr>
-	<td>PRODUCT_MENU_TABS_MY_SPACE_NAVIGATION</td>
-	<td>//div[contains(.,'My Space')]/../div[contains(@class,'tab-text')]</td>
+	<td>PRODUCT_MENU_TABS_USER_NAVIGATION</td>
+	<td>//div[contains(@class,'user-tab')]//div[contains(@class,'user-icon')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -128,6 +128,16 @@
 <tr>
 	<td>PRODUCT_MENU_PANEL_CONTROL_PANEL_PANEL_TITLE</td>
 	<td>//div[contains(@class,'active') and contains(@id,'control_panel')]/div/a[contains(.,'${key_portletCategoryName}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PRODUCT_MENU_PANEL_SCOPE</td>
+	<td>//div[contains(@class,'nav-equal-height-heading')]/span</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PRODUCT_MENU_PANEL_SCOPE_COG</td>
+	<td>//div[contains(@class,'nav-equal-height-heading')]//i[contains(@class,'icon-cog')]</td>
 	<td></td>
 </tr>
 <tr>

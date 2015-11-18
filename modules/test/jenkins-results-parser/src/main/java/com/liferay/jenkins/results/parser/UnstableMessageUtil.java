@@ -19,8 +19,9 @@ import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-/*
- * @author Peter Yoo
+
+/**
+ * @author Brian Wing Shun Chan
  */
 public class UnstableMessageUtil {
 
@@ -71,7 +72,7 @@ public class UnstableMessageUtil {
 				String runBuildURL = runJSONObject.getString("url");
 
 				if (!runBuildURL.endsWith(
-						"/" + jsonObject.getString("number") + "/")) {
+						"/" + jsonObject.getInt("number") + "/")) {
 
 					continue;
 				}
