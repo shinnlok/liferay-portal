@@ -149,7 +149,7 @@ portletURL.setWindowState(LiferayWindowState.POP_UP);
 
 		Attribute attribute = attributes.get(userMappings.getProperty("group"));
 
-		if (Validator.isNull(emailAddress) || Validator.isNull(firstName) || Validator.isNull(lastName) || Validator.isNull(password) || Validator.isNull(screenName)) {
+		if ((PropsValues.USERS_EMAIL_ADDRESS_REQUIRED && Validator.isNull(emailAddress)) || Validator.isNull(firstName) || (fullNameDefinition.isFieldRequired("last-name") && Validator.isNull(lastName)) || Validator.isNull(password) || Validator.isNull(screenName)) {
 			showMissingAttributeMessage = true;
 		}
 		%>
