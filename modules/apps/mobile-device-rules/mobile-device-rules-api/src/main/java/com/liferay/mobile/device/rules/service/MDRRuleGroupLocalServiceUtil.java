@@ -16,8 +16,7 @@ package com.liferay.mobile.device.rules.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
+import com.liferay.osgi.util.ServiceTrackerFactory;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -243,6 +242,10 @@ public class MDRRuleGroupLocalServiceUtil {
 	public static com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
 		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext) {
 		return getService().getExportActionableDynamicQuery(portletDataContext);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
 	}
 
 	/**
@@ -478,14 +481,6 @@ public class MDRRuleGroupLocalServiceUtil {
 	public void setService(MDRRuleGroupLocalService service) {
 	}
 
-	private static ServiceTracker<MDRRuleGroupLocalService, MDRRuleGroupLocalService> _serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(MDRRuleGroupLocalServiceUtil.class);
-
-		_serviceTracker = new ServiceTracker<MDRRuleGroupLocalService, MDRRuleGroupLocalService>(bundle.getBundleContext(),
-				MDRRuleGroupLocalService.class, null);
-
-		_serviceTracker.open();
-	}
+	private static ServiceTracker<MDRRuleGroupLocalService, MDRRuleGroupLocalService> _serviceTracker =
+		ServiceTrackerFactory.open(MDRRuleGroupLocalService.class);
 }

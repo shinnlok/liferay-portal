@@ -23,7 +23,6 @@ long groupId = ParamUtil.getLong(request, "groupId", themeDisplay.getSiteGroupId
 
 PortletURL portletURL = renderResponse.createRenderURL();
 
-portletURL.setParameter(ActionRequest.ACTION_NAME, "deleteStructure");
 portletURL.setParameter("mvcPath", "/view.jsp");
 portletURL.setParameter("tabs1", tabs1);
 portletURL.setParameter("groupId", String.valueOf(groupId));
@@ -58,15 +57,18 @@ portletURL.setParameter("groupId", String.valueOf(groupId));
 			<liferay-util:param name="groupId" value="<%= String.valueOf(groupId) %>" />
 		</liferay-util:include>
 
-		<liferay-util:include page="/toolbar.jsp" servletContext="<%= application %>" />
+		<liferay-util:include page="/toolbar.jsp" servletContext="<%= application %>">
+			<liferay-util:param name="searchContainerId" value="ddmStructures" />
+		</liferay-util:include>
 	</c:if>
 
 	<div class="container-fluid-1280" id="<portlet:namespace />entriesContainer">
 		<liferay-ui:search-container
+			id="ddmStructures"
 			orderByCol="<%= orderByCol %>"
 			orderByComparator="<%= orderByComparator %>"
 			orderByType="<%= orderByType %>"
-			rowChecker="<%= new RowChecker(renderResponse) %>"
+			rowChecker="<%= new EmptyOnClickRowChecker(renderResponse) %>"
 			searchContainer="<%= new StructureSearch(renderRequest, portletURL) %>"
 		>
 
@@ -81,14 +83,18 @@ portletURL.setParameter("groupId", String.valueOf(groupId));
 			>
 
 				<%
-				PortletURL rowURL = renderResponse.createRenderURL();
+				String rowHREF = StringPool.BLANK;
 
-				rowURL.setParameter("mvcPath", "/edit_structure.jsp");
-				rowURL.setParameter("redirect", currentURL);
-				rowURL.setParameter("classNameId", String.valueOf(PortalUtil.getClassNameId(DDMStructure.class)));
-				rowURL.setParameter("classPK", String.valueOf(structure.getStructureId()));
+				if (DDMStructurePermission.contains(permissionChecker, structure, refererPortletName, ActionKeys.UPDATE)) {
+					PortletURL rowURL = renderResponse.createRenderURL();
 
-				String rowHREF = rowURL.toString();
+					rowURL.setParameter("mvcPath", "/edit_structure.jsp");
+					rowURL.setParameter("redirect", currentURL);
+					rowURL.setParameter("classNameId", String.valueOf(PortalUtil.getClassNameId(DDMStructure.class)));
+					rowURL.setParameter("classPK", String.valueOf(structure.getStructureId()));
+
+					rowHREF = rowURL.toString();
+				}
 				%>
 
 				<liferay-ui:search-container-column-text

@@ -16,8 +16,7 @@ package com.liferay.dynamic.data.mapping.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
+import com.liferay.osgi.util.ServiceTrackerFactory;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -223,6 +222,10 @@ public class DDMStructureVersionLocalServiceUtil {
 		return getService().getDDMStructureVersionsCount();
 	}
 
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
 	public static com.liferay.dynamic.data.mapping.model.DDMStructureVersion getLatestStructureVersion(
 		long structureId)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -295,14 +298,6 @@ public class DDMStructureVersionLocalServiceUtil {
 	public void setService(DDMStructureVersionLocalService service) {
 	}
 
-	private static ServiceTracker<DDMStructureVersionLocalService, DDMStructureVersionLocalService> _serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(DDMStructureVersionLocalServiceUtil.class);
-
-		_serviceTracker = new ServiceTracker<DDMStructureVersionLocalService, DDMStructureVersionLocalService>(bundle.getBundleContext(),
-				DDMStructureVersionLocalService.class, null);
-
-		_serviceTracker.open();
-	}
+	private static ServiceTracker<DDMStructureVersionLocalService, DDMStructureVersionLocalService> _serviceTracker =
+		ServiceTrackerFactory.open(DDMStructureVersionLocalService.class);
 }

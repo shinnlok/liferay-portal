@@ -19,7 +19,7 @@
 <aui:fieldset label="configure-the-file-upload-settings">
 	<liferay-ui:panel-container extended="<%= true %>" id="adminGeneralUploadPanelContainer" persistState="<%= true %>">
 		<liferay-ui:panel collapsible="<%= true %>" extended="<%= true %>" id="adminGeneralUploadPanel" persistState="<%= true %>" title="general">
-			<aui:input cssClass="lfr-input-text-container" label="overall-maximum-file-size" name="uploadServletRequestImplMaxSize" type="text" value="<%= PrefsPropsUtil.getLong(PropsKeys.UPLOAD_SERVLET_REQUEST_IMPL_MAX_SIZE) %>" />
+			<aui:input cssClass="lfr-input-text-container" label="overall-maximum-upload-request-size" name="uploadServletRequestImplMaxSize" type="text" value="<%= PrefsPropsUtil.getLong(PropsKeys.UPLOAD_SERVLET_REQUEST_IMPL_MAX_SIZE) %>" />
 
 			<aui:input cssClass="lfr-input-text-container" label="temporary-storage-directory" name="uploadServletRequestImplTempDir" type="text" value="<%= PrefsPropsUtil.getString(PropsKeys.UPLOAD_SERVLET_REQUEST_IMPL_TEMP_DIR, StringPool.BLANK) %>" />
 		</liferay-ui:panel>
@@ -56,16 +56,6 @@
 			<aui:input cssClass="lfr-input-text-container" label='<%= LanguageUtil.get(request, "maximum-file-size") + "(" + LanguageUtil.get(request, "small-image") + ")" %>' name="shoppingImageSmallMaxSize" type="text" value="<%= PrefsPropsUtil.getLong(PropsKeys.SHOPPING_IMAGE_SMALL_MAX_SIZE) %>" />
 
 			<aui:input cssClass="lfr-input-text-container" label="allowed-file-extensions" name="shoppingImageExtensions" type="text" value="<%= PrefsPropsUtil.getString(PropsKeys.SHOPPING_IMAGE_EXTENSIONS) %>" />
-		</liferay-ui:panel>
-	</liferay-ui:panel-container>
-
-	<liferay-ui:panel-container extended="<%= true %>" id="adminSoftwareCatalogImagesPanelContainer" persistState="<%= true %>">
-		<liferay-ui:panel collapsible="<%= true %>" extended="<%= true %>" id="adminSoftwareCatalogImagesPanel" persistState="<%= true %>" title="software-catalog-images">
-			<aui:input cssClass="lfr-input-text-container" label="maximum-file-size" name="scImageMaxSize" type="text" value="<%= PrefsPropsUtil.getLong(PropsKeys.SC_IMAGE_MAX_SIZE) %>" />
-
-			<aui:input cssClass="lfr-input-text-container" label="maximum-thumbnail-height" name="scImageThumbnailMaxHeight" type="text" value="<%= PrefsPropsUtil.getLong(PropsKeys.SC_IMAGE_THUMBNAIL_MAX_HEIGHT) %>" />
-
-			<aui:input cssClass="lfr-input-text-container" label="maximum-thumbnail-width" name="scImageThumbnailMaxWidth" type="text" value="<%= PrefsPropsUtil.getLong(PropsKeys.SC_IMAGE_THUMBNAIL_MAX_WIDTH) %>" />
 		</liferay-ui:panel>
 	</liferay-ui:panel-container>
 

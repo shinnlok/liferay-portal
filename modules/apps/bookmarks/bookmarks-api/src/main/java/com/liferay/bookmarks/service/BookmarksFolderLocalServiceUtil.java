@@ -16,8 +16,7 @@ package com.liferay.bookmarks.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
+import com.liferay.osgi.util.ServiceTrackerFactory;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -391,6 +390,10 @@ public class BookmarksFolderLocalServiceUtil {
 		return getService().getFoldersCount(groupId, parentFolderId, status);
 	}
 
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
 	public static java.util.List<com.liferay.bookmarks.model.BookmarksFolder> getNoAssetFolders() {
 		return getService().getNoAssetFolders();
 	}
@@ -531,14 +534,6 @@ public class BookmarksFolderLocalServiceUtil {
 	public void setService(BookmarksFolderLocalService service) {
 	}
 
-	private static ServiceTracker<BookmarksFolderLocalService, BookmarksFolderLocalService> _serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(BookmarksFolderLocalServiceUtil.class);
-
-		_serviceTracker = new ServiceTracker<BookmarksFolderLocalService, BookmarksFolderLocalService>(bundle.getBundleContext(),
-				BookmarksFolderLocalService.class, null);
-
-		_serviceTracker.open();
-	}
+	private static ServiceTracker<BookmarksFolderLocalService, BookmarksFolderLocalService> _serviceTracker =
+		ServiceTrackerFactory.open(BookmarksFolderLocalService.class);
 }

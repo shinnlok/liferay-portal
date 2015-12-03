@@ -16,8 +16,7 @@ package com.liferay.dynamic.data.mapping.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
+import com.liferay.osgi.util.ServiceTrackerFactory;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -218,6 +217,11 @@ public class DDMDataProviderInstanceLocalServiceUtil {
 				   .fetchDDMDataProviderInstanceByUuidAndGroupId(uuid, groupId);
 	}
 
+	public static com.liferay.dynamic.data.mapping.model.DDMDataProviderInstance fetchDataProviderInstance(
+		long dataProviderInstanceId) {
+		return getService().fetchDataProviderInstance(dataProviderInstanceId);
+	}
+
 	public static com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery() {
 		return getService().getActionableDynamicQuery();
 	}
@@ -313,9 +317,18 @@ public class DDMDataProviderInstanceLocalServiceUtil {
 		return getService().getDataProviderInstance(dataProviderInstanceId);
 	}
 
+	public static java.util.List<com.liferay.dynamic.data.mapping.model.DDMDataProviderInstance> getDataProviderInstances(
+		long[] groupIds) {
+		return getService().getDataProviderInstances(groupIds);
+	}
+
 	public static com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
 		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext) {
 		return getService().getExportActionableDynamicQuery(portletDataContext);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
 	}
 
 	/**
@@ -398,14 +411,6 @@ public class DDMDataProviderInstanceLocalServiceUtil {
 	public void setService(DDMDataProviderInstanceLocalService service) {
 	}
 
-	private static ServiceTracker<DDMDataProviderInstanceLocalService, DDMDataProviderInstanceLocalService> _serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(DDMDataProviderInstanceLocalServiceUtil.class);
-
-		_serviceTracker = new ServiceTracker<DDMDataProviderInstanceLocalService, DDMDataProviderInstanceLocalService>(bundle.getBundleContext(),
-				DDMDataProviderInstanceLocalService.class, null);
-
-		_serviceTracker.open();
-	}
+	private static ServiceTracker<DDMDataProviderInstanceLocalService, DDMDataProviderInstanceLocalService> _serviceTracker =
+		ServiceTrackerFactory.open(DDMDataProviderInstanceLocalService.class);
 }

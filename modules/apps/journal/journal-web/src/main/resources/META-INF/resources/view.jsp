@@ -16,12 +16,6 @@
 
 <%@ include file="/init.jsp" %>
 
-<%
-String browseBy = ParamUtil.getString(request, "browseBy");
-
-String keywords = ParamUtil.getString(request, "keywords");
-%>
-
 <portlet:actionURL name="restoreTrashEntries" var="restoreTrashEntriesURL" />
 
 <liferay-ui:trash-undo
@@ -30,19 +24,23 @@ String keywords = ParamUtil.getString(request, "keywords");
 
 <liferay-util:include page="/navigation.jsp" servletContext="<%= application %>" />
 
-<liferay-util:include page="/toolbar.jsp" servletContext="<%= application %>" />
+<liferay-util:include page="/toolbar.jsp" servletContext="<%= application %>">
+	<liferay-util:param name="searchContainerId" value="articles" />
+</liferay-util:include>
 
 <div id="<portlet:namespace />journalContainer">
 	<div class="closed container-fluid-1280 sidenav-container sidenav-right" id="<portlet:namespace />infoPanelId">
 		<div class="sidenav-menu-slider">
 			<div class="sidebar sidebar-default sidenav-menu">
-				<liferay-util:include page="/info_panel.jsp" servletContext="<%= application %>" />
+				<c:if test="<%= journalDisplayContext.isShowInfoPanel() %>">
+					<liferay-util:include page="/info_panel.jsp" servletContext="<%= application %>" />
+				</c:if>
 			</div>
 		</div>
 
 		<div class="sidenav-content">
 			<div class="journal-breadcrumb" id="<portlet:namespace />breadcrumbContainer">
-				<c:if test="<%= !journalDisplayContext.isNavigationRecent() && !journalDisplayContext.isNavigationMine() && Validator.isNull(browseBy) %>">
+				<c:if test="<%= journalDisplayContext.isShowBreadcrumb() %>">
 					<liferay-util:include page="/breadcrumb.jsp" servletContext="<%= application %>" />
 				</c:if>
 			</div>
@@ -55,17 +53,17 @@ String keywords = ParamUtil.getString(request, "keywords");
 				<aui:input name="<%= ActionRequest.ACTION_NAME %>" type="hidden" />
 				<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
 				<aui:input name="groupId" type="hidden" value="<%= scopeGroupId %>" />
-				<aui:input name="folderIds" type="hidden" />
-				<aui:input name="articleIds" type="hidden" />
 				<aui:input name="newFolderId" type="hidden" />
 
 				<div class="journal-container" id="<portlet:namespace />entriesContainer">
 					<c:choose>
-						<c:when test="<%= Validator.isNotNull(keywords) %>">
+						<c:when test="<%= journalDisplayContext.isSearch() %>">
 							<liferay-util:include page="/search_resources.jsp" servletContext="<%= application %>" />
 						</c:when>
 						<c:otherwise>
-							<liferay-util:include page="/view_entries.jsp" servletContext="<%= application %>" />
+							<liferay-util:include page="/view_entries.jsp" servletContext="<%= application %>">
+								<liferay-util:param name="searchContainerId" value="articles" />
+							</liferay-util:include>
 						</c:otherwise>
 					</c:choose>
 				</div>
@@ -74,7 +72,7 @@ String keywords = ParamUtil.getString(request, "keywords");
 	</div>
 </div>
 
-<c:if test="<%= Validator.isNull(keywords) %>">
+<c:if test="<%= !journalDisplayContext.isSearch() %>">
 	<liferay-util:include page="/add_button.jsp" servletContext="<%= application %>" />
 </c:if>
 
@@ -94,24 +92,14 @@ String keywords = ParamUtil.getString(request, "keywords");
 <aui:script use="liferay-journal-navigation">
 	var journalNavigation = new Liferay.Portlet.JournalNavigation(
 		{
-			displayStyle: '<%= HtmlUtil.escapeJS(journalDisplayContext.getDisplayStyle()) %>',
-			move: {
-				allRowIds: '<%= RowChecker.ALL_ROW_IDS %>',
-				editEntryUrl: '<portlet:actionURL />',
-				folderIdHashRegEx: /#.*&?<portlet:namespace />folderId=([\d]+)/i,
-				folderIdRegEx: /&?<portlet:namespace />folderId=([\d]+)/i,
-				form: {
+			editEntryUrl: '<portlet:actionURL />',
+			form: {
 					method: 'POST',
 					node: A.one(document.<portlet:namespace />fm)
-				},
-				moveEntryRenderUrl: '<portlet:renderURL><portlet:param name="mvcPath" value="/move_entries.jsp" /><portlet:param name="redirect" value="<%= currentURL %>" /></portlet:renderURL>',
-				selectedCSSClass: 'active',
-				trashLinkId: '<%= TrashUtil.isTrashEnabled(scopeGroupId) ? ("_" + PortletProviderUtil.getPortletId(PortalProductMenuApplicationType.ProductMenu.CLASS_NAME, PortletProvider.Action.VIEW) + "_portlet_" + PortletProviderUtil.getPortletId(TrashEntry.class.getName(), PortletProvider.Action.VIEW)) : StringPool.BLANK %>',
-				updateable: true
 			},
+			moveEntryUrl: '<portlet:renderURL><portlet:param name="mvcPath" value="/move_entries.jsp" /><portlet:param name="redirect" value="<%= currentURL %>" /></portlet:renderURL>',
 			namespace: '<portlet:namespace />',
-			portletId: '<%= portletDisplay.getId() %>',
-			rowIds: '<portlet:namespace /><%= RowChecker.ROW_IDS %>'
+			searchContainerId: 'articles'
 		}
 	);
 

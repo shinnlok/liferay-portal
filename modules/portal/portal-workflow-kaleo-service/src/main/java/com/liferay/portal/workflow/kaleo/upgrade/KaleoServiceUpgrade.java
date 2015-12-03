@@ -26,17 +26,17 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Marcellus Tavares
  */
-@Component(immediate = true)
+@Component(immediate = true, service = UpgradeStepRegistrator.class)
 public class KaleoServiceUpgrade implements UpgradeStepRegistrator {
 
 	@Override
 	public void register(Registry registry) {
 		registry.register(
-			"com.liferay.portal.workflow.kaleo.service", "0.0.1", "1.0.0",
+			"com.liferay.portal.workflow.kaleo.service", "1.0.0", "1.0.1",
 			new UpgradeKaleoTaskInstanceToken());
 
 		registry.register(
-			"com.liferay.portal.workflow.kaleo.service", "1.0.0", "1.1.0",
+			"com.liferay.portal.workflow.kaleo.service", "1.0.1", "1.1.0",
 			new UpgradeWorkflowContext());
 
 		registry.register(

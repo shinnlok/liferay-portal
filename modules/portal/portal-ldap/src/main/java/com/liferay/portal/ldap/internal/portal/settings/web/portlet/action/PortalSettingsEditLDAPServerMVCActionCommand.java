@@ -227,8 +227,8 @@ public class PortalSettingsEditLDAPServerMVCActionCommand
 		Object propertyValue = dictionary.get(property);
 
 		if (propertyValue instanceof String) {
-			String[] propertyValues = StringUtil.split(
-				(String)propertyValue, StringPool.COMMA);
+			String propertyValues = StringUtil.replace(
+				(String)propertyValue, StringPool.COMMA, StringPool.PIPE);
 
 			dictionary.put(property, propertyValues);
 		}
@@ -237,6 +237,6 @@ public class PortalSettingsEditLDAPServerMVCActionCommand
 	private static ConfigurationProvider<LDAPServerConfiguration>
 		_ldapServerConfigurationProvider;
 
-	private CounterLocalService _counterLocalService;
+	private volatile CounterLocalService _counterLocalService;
 
 }

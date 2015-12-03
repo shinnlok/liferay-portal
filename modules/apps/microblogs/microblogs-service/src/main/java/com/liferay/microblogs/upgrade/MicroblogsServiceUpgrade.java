@@ -26,21 +26,21 @@ import org.osgi.service.component.annotations.Reference;
  * @author Ryan Park
  * @author Manuel de la Peña
  */
-@Component(immediate = true)
+@Component(immediate = true, service = UpgradeStepRegistrator.class)
 public class MicroblogsServiceUpgrade implements UpgradeStepRegistrator {
 
 	@Override
 	public void register(Registry registry) {
 		registry.register(
-			"com.liferay.microblogs.service", "0.0.1", "1.0.0",
+			"com.liferay.microblogs.service", "1.0.0", "1.0.1",
 			new com.liferay.microblogs.upgrade.v1_0_0.UpgradeMicroblogsEntry());
 
 		registry.register(
-			"com.liferay.microblogs.service", "1.0.0", "1.0.1",
+			"com.liferay.microblogs.service", "1.0.1", "1.0.2",
 			new UpgradeUserNotificationEvent());
 
 		registry.register(
-			"com.liferay.microblogs.service", "1.0.1", "1.0.2",
+			"com.liferay.microblogs.service", "1.0.2", "1.0.3",
 			new com.liferay.microblogs.upgrade.v1_0_2.UpgradeMicroblogsEntry(),
 			new UpgradeSocial());
 	}

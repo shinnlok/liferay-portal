@@ -14,6 +14,9 @@
 
 package com.liferay.control.menu.web.portlet;
 
+import com.liferay.application.list.PanelAppRegistry;
+import com.liferay.application.list.PanelCategoryRegistry;
+import com.liferay.application.list.constants.ApplicationListWebKeys;
 import com.liferay.control.menu.ControlMenuCategory;
 import com.liferay.control.menu.constants.ControlMenuCategoryKeys;
 import com.liferay.control.menu.constants.ControlMenuWebKeys;
@@ -59,6 +62,7 @@ import org.osgi.service.component.annotations.Reference;
 		"com.liferay.portlet.use-default-template=false",
 		"javax.portlet.init-param.view-template=/view.jsp",
 		"javax.portlet.name=" + ControlMenuPortletKeys.CONTROL_MENU,
+		"javax.portlet.resource-bundle=content.Language",
 		"javax.portlet.supports.mime-type=text/html"
 	},
 	service = Portlet.class
@@ -123,6 +127,11 @@ public class ControlMenuPortlet extends MVCPortlet {
 		renderRequest.setAttribute(
 			ControlMenuWebKeys.CONTROL_MENU_ENTRY_REGISTRY,
 			_controlMenuEntryRegistry);
+		renderRequest.setAttribute(
+			ApplicationListWebKeys.PANEL_APP_REGISTRY, _panelAppRegistry);
+		renderRequest.setAttribute(
+			ApplicationListWebKeys.PANEL_CATEGORY_REGISTRY,
+			_panelCategoryRegistry);
 
 		super.doDispatch(renderRequest, renderResponse);
 	}
@@ -152,7 +161,21 @@ public class ControlMenuPortlet extends MVCPortlet {
 		_controlMenuEntryRegistry = controlMenuEntryRegistry;
 	}
 
-	private ControlMenuCategoryRegistry _controlMenuCategoryRegistry;
-	private ControlMenuEntryRegistry _controlMenuEntryRegistry;
+	@Reference(unbind = "-")
+	protected void setPanelAppRegistry(PanelAppRegistry panelAppRegistry) {
+		_panelAppRegistry = panelAppRegistry;
+	}
+
+	@Reference(unbind = "-")
+	protected void setPanelCategoryRegistry(
+		PanelCategoryRegistry panelCategoryRegistry) {
+
+		_panelCategoryRegistry = panelCategoryRegistry;
+	}
+
+	private volatile ControlMenuCategoryRegistry _controlMenuCategoryRegistry;
+	private volatile ControlMenuEntryRegistry _controlMenuEntryRegistry;
+	private volatile PanelAppRegistry _panelAppRegistry;
+	private volatile PanelCategoryRegistry _panelCategoryRegistry;
 
 }

@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -245,19 +246,32 @@ public abstract class PollsVoteLocalServiceBaseImpl extends BaseLocalServiceImpl
 		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
 
 		actionableDynamicQuery.setBaseLocalService(com.liferay.polls.service.PollsVoteLocalServiceUtil.getService());
-		actionableDynamicQuery.setClass(PollsVote.class);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
+		actionableDynamicQuery.setModelClass(PollsVote.class);
 
 		actionableDynamicQuery.setPrimaryKeyPropertyName("voteId");
 
 		return actionableDynamicQuery;
 	}
 
+	@Override
+	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		IndexableActionableDynamicQuery indexableActionableDynamicQuery = new IndexableActionableDynamicQuery();
+
+		indexableActionableDynamicQuery.setBaseLocalService(com.liferay.polls.service.PollsVoteLocalServiceUtil.getService());
+		indexableActionableDynamicQuery.setClassLoader(getClassLoader());
+		indexableActionableDynamicQuery.setModelClass(PollsVote.class);
+
+		indexableActionableDynamicQuery.setPrimaryKeyPropertyName("voteId");
+
+		return indexableActionableDynamicQuery;
+	}
+
 	protected void initActionableDynamicQuery(
 		ActionableDynamicQuery actionableDynamicQuery) {
 		actionableDynamicQuery.setBaseLocalService(com.liferay.polls.service.PollsVoteLocalServiceUtil.getService());
-		actionableDynamicQuery.setClass(PollsVote.class);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
+		actionableDynamicQuery.setModelClass(PollsVote.class);
 
 		actionableDynamicQuery.setPrimaryKeyPropertyName("voteId");
 	}
@@ -433,25 +447,6 @@ public abstract class PollsVoteLocalServiceBaseImpl extends BaseLocalServiceImpl
 	}
 
 	/**
-	 * Returns the polls vote remote service.
-	 *
-	 * @return the polls vote remote service
-	 */
-	public com.liferay.polls.service.PollsVoteService getPollsVoteService() {
-		return pollsVoteService;
-	}
-
-	/**
-	 * Sets the polls vote remote service.
-	 *
-	 * @param pollsVoteService the polls vote remote service
-	 */
-	public void setPollsVoteService(
-		com.liferay.polls.service.PollsVoteService pollsVoteService) {
-		this.pollsVoteService = pollsVoteService;
-	}
-
-	/**
 	 * Returns the polls vote persistence.
 	 *
 	 * @return the polls vote persistence
@@ -509,25 +504,6 @@ public abstract class PollsVoteLocalServiceBaseImpl extends BaseLocalServiceImpl
 	}
 
 	/**
-	 * Returns the polls choice remote service.
-	 *
-	 * @return the polls choice remote service
-	 */
-	public com.liferay.polls.service.PollsChoiceService getPollsChoiceService() {
-		return pollsChoiceService;
-	}
-
-	/**
-	 * Sets the polls choice remote service.
-	 *
-	 * @param pollsChoiceService the polls choice remote service
-	 */
-	public void setPollsChoiceService(
-		com.liferay.polls.service.PollsChoiceService pollsChoiceService) {
-		this.pollsChoiceService = pollsChoiceService;
-	}
-
-	/**
 	 * Returns the polls choice persistence.
 	 *
 	 * @return the polls choice persistence
@@ -566,25 +542,6 @@ public abstract class PollsVoteLocalServiceBaseImpl extends BaseLocalServiceImpl
 	}
 
 	/**
-	 * Returns the polls question remote service.
-	 *
-	 * @return the polls question remote service
-	 */
-	public com.liferay.polls.service.PollsQuestionService getPollsQuestionService() {
-		return pollsQuestionService;
-	}
-
-	/**
-	 * Sets the polls question remote service.
-	 *
-	 * @param pollsQuestionService the polls question remote service
-	 */
-	public void setPollsQuestionService(
-		com.liferay.polls.service.PollsQuestionService pollsQuestionService) {
-		this.pollsQuestionService = pollsQuestionService;
-	}
-
-	/**
 	 * Returns the polls question persistence.
 	 *
 	 * @return the polls question persistence
@@ -620,25 +577,6 @@ public abstract class PollsVoteLocalServiceBaseImpl extends BaseLocalServiceImpl
 	public void setUserLocalService(
 		com.liferay.portal.service.UserLocalService userLocalService) {
 		this.userLocalService = userLocalService;
-	}
-
-	/**
-	 * Returns the user remote service.
-	 *
-	 * @return the user remote service
-	 */
-	public com.liferay.portal.service.UserService getUserService() {
-		return userService;
-	}
-
-	/**
-	 * Sets the user remote service.
-	 *
-	 * @param userService the user remote service
-	 */
-	public void setUserService(
-		com.liferay.portal.service.UserService userService) {
-		this.userService = userService;
 	}
 
 	/**
@@ -713,28 +651,20 @@ public abstract class PollsVoteLocalServiceBaseImpl extends BaseLocalServiceImpl
 
 	@BeanReference(type = com.liferay.polls.service.PollsVoteLocalService.class)
 	protected PollsVoteLocalService pollsVoteLocalService;
-	@BeanReference(type = com.liferay.polls.service.PollsVoteService.class)
-	protected com.liferay.polls.service.PollsVoteService pollsVoteService;
 	@BeanReference(type = PollsVotePersistence.class)
 	protected PollsVotePersistence pollsVotePersistence;
 	@BeanReference(type = com.liferay.counter.service.CounterLocalService.class)
 	protected com.liferay.counter.service.CounterLocalService counterLocalService;
 	@BeanReference(type = com.liferay.polls.service.PollsChoiceLocalService.class)
 	protected com.liferay.polls.service.PollsChoiceLocalService pollsChoiceLocalService;
-	@BeanReference(type = com.liferay.polls.service.PollsChoiceService.class)
-	protected com.liferay.polls.service.PollsChoiceService pollsChoiceService;
 	@BeanReference(type = PollsChoicePersistence.class)
 	protected PollsChoicePersistence pollsChoicePersistence;
 	@BeanReference(type = com.liferay.polls.service.PollsQuestionLocalService.class)
 	protected com.liferay.polls.service.PollsQuestionLocalService pollsQuestionLocalService;
-	@BeanReference(type = com.liferay.polls.service.PollsQuestionService.class)
-	protected com.liferay.polls.service.PollsQuestionService pollsQuestionService;
 	@BeanReference(type = PollsQuestionPersistence.class)
 	protected PollsQuestionPersistence pollsQuestionPersistence;
 	@BeanReference(type = com.liferay.portal.service.UserLocalService.class)
 	protected com.liferay.portal.service.UserLocalService userLocalService;
-	@BeanReference(type = com.liferay.portal.service.UserService.class)
-	protected com.liferay.portal.service.UserService userService;
 	@BeanReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)

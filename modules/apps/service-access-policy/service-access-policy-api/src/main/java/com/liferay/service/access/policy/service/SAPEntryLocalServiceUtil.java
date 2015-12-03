@@ -16,8 +16,7 @@ package com.liferay.service.access.policy.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
+import com.liferay.osgi.util.ServiceTrackerFactory;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -246,6 +245,10 @@ public class SAPEntryLocalServiceUtil {
 		return getService().getExportActionableDynamicQuery(portletDataContext);
 	}
 
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -352,14 +355,6 @@ public class SAPEntryLocalServiceUtil {
 	public void setService(SAPEntryLocalService service) {
 	}
 
-	private static ServiceTracker<SAPEntryLocalService, SAPEntryLocalService> _serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(SAPEntryLocalServiceUtil.class);
-
-		_serviceTracker = new ServiceTracker<SAPEntryLocalService, SAPEntryLocalService>(bundle.getBundleContext(),
-				SAPEntryLocalService.class, null);
-
-		_serviceTracker.open();
-	}
+	private static ServiceTracker<SAPEntryLocalService, SAPEntryLocalService> _serviceTracker =
+		ServiceTrackerFactory.open(SAPEntryLocalService.class);
 }

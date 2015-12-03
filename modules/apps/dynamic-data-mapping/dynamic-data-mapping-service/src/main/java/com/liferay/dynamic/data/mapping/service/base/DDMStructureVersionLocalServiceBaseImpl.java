@@ -29,6 +29,7 @@ import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -229,19 +230,33 @@ public abstract class DDMStructureVersionLocalServiceBaseImpl
 		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
 
 		actionableDynamicQuery.setBaseLocalService(com.liferay.dynamic.data.mapping.service.DDMStructureVersionLocalServiceUtil.getService());
-		actionableDynamicQuery.setClass(DDMStructureVersion.class);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
+		actionableDynamicQuery.setModelClass(DDMStructureVersion.class);
 
 		actionableDynamicQuery.setPrimaryKeyPropertyName("structureVersionId");
 
 		return actionableDynamicQuery;
 	}
 
+	@Override
+	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		IndexableActionableDynamicQuery indexableActionableDynamicQuery = new IndexableActionableDynamicQuery();
+
+		indexableActionableDynamicQuery.setBaseLocalService(com.liferay.dynamic.data.mapping.service.DDMStructureVersionLocalServiceUtil.getService());
+		indexableActionableDynamicQuery.setClassLoader(getClassLoader());
+		indexableActionableDynamicQuery.setModelClass(DDMStructureVersion.class);
+
+		indexableActionableDynamicQuery.setPrimaryKeyPropertyName(
+			"structureVersionId");
+
+		return indexableActionableDynamicQuery;
+	}
+
 	protected void initActionableDynamicQuery(
 		ActionableDynamicQuery actionableDynamicQuery) {
 		actionableDynamicQuery.setBaseLocalService(com.liferay.dynamic.data.mapping.service.DDMStructureVersionLocalServiceUtil.getService());
-		actionableDynamicQuery.setClass(DDMStructureVersion.class);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
+		actionableDynamicQuery.setModelClass(DDMStructureVersion.class);
 
 		actionableDynamicQuery.setPrimaryKeyPropertyName("structureVersionId");
 	}
@@ -317,25 +332,6 @@ public abstract class DDMStructureVersionLocalServiceBaseImpl
 	public void setDDMStructureVersionLocalService(
 		DDMStructureVersionLocalService ddmStructureVersionLocalService) {
 		this.ddmStructureVersionLocalService = ddmStructureVersionLocalService;
-	}
-
-	/**
-	 * Returns the d d m structure version remote service.
-	 *
-	 * @return the d d m structure version remote service
-	 */
-	public com.liferay.dynamic.data.mapping.service.DDMStructureVersionService getDDMStructureVersionService() {
-		return ddmStructureVersionService;
-	}
-
-	/**
-	 * Sets the d d m structure version remote service.
-	 *
-	 * @param ddmStructureVersionService the d d m structure version remote service
-	 */
-	public void setDDMStructureVersionService(
-		com.liferay.dynamic.data.mapping.service.DDMStructureVersionService ddmStructureVersionService) {
-		this.ddmStructureVersionService = ddmStructureVersionService;
 	}
 
 	/**
@@ -430,8 +426,6 @@ public abstract class DDMStructureVersionLocalServiceBaseImpl
 
 	@BeanReference(type = com.liferay.dynamic.data.mapping.service.DDMStructureVersionLocalService.class)
 	protected DDMStructureVersionLocalService ddmStructureVersionLocalService;
-	@BeanReference(type = com.liferay.dynamic.data.mapping.service.DDMStructureVersionService.class)
-	protected com.liferay.dynamic.data.mapping.service.DDMStructureVersionService ddmStructureVersionService;
 	@BeanReference(type = DDMStructureVersionPersistence.class)
 	protected DDMStructureVersionPersistence ddmStructureVersionPersistence;
 	@BeanReference(type = com.liferay.counter.service.CounterLocalService.class)

@@ -3,6 +3,8 @@ AUI.add(
 	function(A) {
 		var AArray = A.Array;
 
+		var DateMath = A.DataType.DateMath;
+
 		var Lang = A.Lang;
 
 		var INSTANCE_ID_PREFIX = '_INSTANCE_';
@@ -65,12 +67,28 @@ AUI.add(
 			mode: {
 			},
 
+			translationManager: {
+				getter: '_getTranslationManager'
+			},
+
 			values: {
 				value: {}
 			}
 		};
 
 		FieldsSupport.prototype = {
+			eachParent: function(fn) {
+				var instance = this;
+
+				var parent = instance.get('parent');
+
+				while (parent !== undefined) {
+					fn.call(instance, parent);
+
+					parent = parent.get('parent');
+				}
+			},
+
 			extractInstanceId: function(fieldNode) {
 				var instance = this;
 
@@ -114,8 +132,24 @@ AUI.add(
 				return instance.get('container').all('> .field-wrapper');
 			},
 
+			getRoot: function() {
+				var instance = this;
+
+				var root;
+
+				instance.eachParent(
+					function(parent) {
+						root = parent;
+					}
+				);
+
+				return root;
+			},
+
 			_getField: function(fieldNode) {
 				var instance = this;
+
+				var displayLocale = instance.get('displayLocale');
 
 				var fieldInstanceId = instance.extractInstanceId(fieldNode);
 
@@ -134,7 +168,7 @@ AUI.add(
 							container: fieldNode,
 							dataType: fieldDefinition.dataType,
 							definition: definition,
-							displayLocale: instance.get('displayLocale'),
+							displayLocale: displayLocale,
 							instanceId: fieldInstanceId,
 							name: fieldName,
 							parent: instance,
@@ -142,8 +176,6 @@ AUI.add(
 						}
 					)
 				);
-
-				field.addTarget(instance);
 
 				var translationManager = instance.get('translationManager');
 
@@ -183,7 +215,7 @@ AUI.add(
 				portletURL.setDoAsGroupId(instance.get('doAsGroupId'));
 				portletURL.setParameter('fieldName', instance.get('name'));
 				portletURL.setParameter('mode', instance.get('mode'));
-				portletURL.setParameter('namespace', instance.get('namespace'));
+				portletURL.setParameter('namespace', instance.get('fieldsNamespace'));
 				portletURL.setParameter('p_p_isolated', true);
 				portletURL.setParameter('portletNamespace', instance.get('portletNamespace'));
 				portletURL.setParameter('readOnly', instance.get('readOnly'));
@@ -193,6 +225,18 @@ AUI.add(
 				portletURL.setWindowState('pop_up');
 
 				return portletURL.toString();
+			},
+
+			_getTranslationManager: function(translationManager) {
+				var instance = this;
+
+				if (!A.instanceOf(instance, Liferay.DDM.Form)) {
+					var form = instance.getRoot();
+
+					translationManager = form.get('translationManager');
+				}
+
+				return translationManager;
 			},
 
 			_valueFields: function() {
@@ -314,6 +358,20 @@ AUI.add(
 						field.set('parent', parent);
 
 						return field;
+					},
+
+					getDefaulLocale: function() {
+						var instance = this;
+
+						var defaultLocale = themeDisplay.getDefaultLanguageId();
+
+						var definition = instance.get('definition');
+
+						if (definition) {
+							defaultLocale = definition.defaultLanguageId;
+						}
+
+						return defaultLocale;
 					},
 
 					getFieldDefinition: function() {
@@ -442,8 +500,26 @@ AUI.add(
 
 						var labelNode = instance.getLabelNode();
 
+						var tipNode = labelNode.one('.taglib-icon-help');
+
 						if (Lang.isValue(label) && Lang.isNode(labelNode)) {
 							labelNode.html(A.Escape.html(label));
+						}
+
+						if (tipNode) {
+							var defaultLocale = instance.getDefaulLocale();
+
+							var fieldDefinition = instance.getFieldDefinition();
+
+							var tipsMap = fieldDefinition.tip;
+
+							if (Lang.isObject(tipsMap)) {
+								var tip = tipsMap[instance.get('displayLocale')] || tipsMap[defaultLocale];
+
+								tipNode.one('.tooltip-text').html(A.Escape.html(tip));
+							}
+
+							labelNode.append(tipNode);
 						}
 					},
 
@@ -454,17 +530,23 @@ AUI.add(
 
 						if (Lang.isValue(value)) {
 							inputNode.val(value);
+
+							inputNode.set('defaultValue', value);
 						}
 					},
 
 					syncLabelUI: function() {
 						var instance = this;
 
+						var defaultLocale = instance.getDefaulLocale();
+
 						var fieldDefinition = instance.getFieldDefinition();
 
 						var labelsMap = fieldDefinition.label;
 
-						instance.setLabel(labelsMap[instance.get('displayLocale')]);
+						var label = labelsMap[instance.get('displayLocale')] || labelsMap[defaultLocale];
+
+						instance.setLabel(label);
 					},
 
 					syncReadOnlyUI: function() {
@@ -702,8 +784,6 @@ AUI.add(
 			}
 		);
 
-		FieldTypes.field = Field;
-
 		var CheckboxField = A.Component.create(
 			{
 				EXTENDS: Field,
@@ -764,11 +844,13 @@ AUI.add(
 
 						var datePicker = instance.getDatePicker();
 
-						var timestamp = datePicker.getDate().getTime();
+						var selectedDate = datePicker.getDate();
+
+						var formattedDate = A.DataType.Date.format(selectedDate);
 
 						var inputNode = instance.getInputNode();
 
-						return inputNode.val() ? String(timestamp) : '';
+						return inputNode.val() ? formattedDate : '';
 					},
 
 					repeat: function() {
@@ -802,7 +884,11 @@ AUI.add(
 						datePicker.deselectDates();
 
 						if (value) {
-							datePicker.selectDates(new Date(Lang.toInt(value)));
+							var date = A.DataType.Date.parse(value);
+
+							date = DateMath.add(date, DateMath.MINUTES, date.getTimezoneOffset());
+
+							datePicker.selectDates(date);
 						}
 					}
 				}
@@ -1013,6 +1099,24 @@ AUI.add(
 		);
 
 		FieldTypes['ddm-documentlibrary'] = DocumentLibraryField;
+
+		FieldTypes.field = Field;
+
+		var FieldsetField = A.Component.create(
+			{
+				EXTENDS: Field,
+
+				prototype: {
+					getFieldNodes: function() {
+						var instance = this;
+
+						return instance.get('container').all('.field-wrapper');
+					}
+				}
+			}
+		);
+
+		FieldTypes.fieldset = FieldsetField;
 
 		var ImageField = A.Component.create(
 			{

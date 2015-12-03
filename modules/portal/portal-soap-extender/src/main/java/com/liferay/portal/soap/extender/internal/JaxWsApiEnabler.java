@@ -16,8 +16,11 @@ package com.liferay.portal.soap.extender.internal;
 
 import aQute.bnd.annotation.metatype.Configurable;
 
+import com.liferay.osgi.util.ServiceTrackerFactory;
 import com.liferay.portal.soap.extender.configuration.JaxWsApiConfiguration;
 
+import java.util.Dictionary;
+import java.util.Hashtable;
 import java.util.Map;
 
 import javax.xml.ws.spi.Provider;
@@ -27,7 +30,6 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxws22.spi.ProviderImpl;
 
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
@@ -58,25 +60,27 @@ public class JaxWsApiEnabler {
 
 		String contextPath = jaxWsApiConfiguration.contextPath();
 
-		Filter filter = bundleContext.createFilter(
+		_serviceTracker = ServiceTrackerFactory.open(
+			bundleContext,
 			"(&(objectClass=org.apache.cxf.Bus)(" +
 				HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_PATH + "=" +
 					contextPath + "))");
 
-		_serviceTracker = new ServiceTracker<>(bundleContext, filter, null);
+		_bus = _serviceTracker.waitForService(jaxWsApiConfiguration.timeout());
 
-		_serviceTracker.open();
-
-		Bus bus = _serviceTracker.waitForService(
-			jaxWsApiConfiguration.timeout());
-
-		if (bus != null) {
-			BusFactory.setDefaultBus(bus);
+		if (_bus != null) {
+			BusFactory.setDefaultBus(_bus);
 
 			ProviderImpl providerImpl = new ProviderImpl();
 
+			Dictionary<String, Object> providerProperties = new Hashtable<>();
+
+			providerProperties.put(
+				HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_PATH,
+				contextPath);
+
 			_serviceRegistration = bundleContext.registerService(
-				Provider.class, providerImpl, null);
+				Provider.class, providerImpl, providerProperties);
 		}
 	}
 
@@ -96,9 +100,12 @@ public class JaxWsApiEnabler {
 
 		deactivate();
 
+		BusFactory.clearDefaultBusForAnyThread(_bus);
+
 		activate(bundleContext, properties);
 	}
 
+	private Bus _bus;
 	private ServiceRegistration<Provider> _serviceRegistration;
 	private ServiceTracker<Bus, Bus> _serviceTracker;
 

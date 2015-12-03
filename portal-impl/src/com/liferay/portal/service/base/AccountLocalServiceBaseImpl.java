@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -220,19 +221,32 @@ public abstract class AccountLocalServiceBaseImpl extends BaseLocalServiceImpl
 		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
 
 		actionableDynamicQuery.setBaseLocalService(com.liferay.portal.service.AccountLocalServiceUtil.getService());
-		actionableDynamicQuery.setClass(Account.class);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
+		actionableDynamicQuery.setModelClass(Account.class);
 
 		actionableDynamicQuery.setPrimaryKeyPropertyName("accountId");
 
 		return actionableDynamicQuery;
 	}
 
+	@Override
+	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		IndexableActionableDynamicQuery indexableActionableDynamicQuery = new IndexableActionableDynamicQuery();
+
+		indexableActionableDynamicQuery.setBaseLocalService(com.liferay.portal.service.AccountLocalServiceUtil.getService());
+		indexableActionableDynamicQuery.setClassLoader(getClassLoader());
+		indexableActionableDynamicQuery.setModelClass(Account.class);
+
+		indexableActionableDynamicQuery.setPrimaryKeyPropertyName("accountId");
+
+		return indexableActionableDynamicQuery;
+	}
+
 	protected void initActionableDynamicQuery(
 		ActionableDynamicQuery actionableDynamicQuery) {
 		actionableDynamicQuery.setBaseLocalService(com.liferay.portal.service.AccountLocalServiceUtil.getService());
-		actionableDynamicQuery.setClass(Account.class);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
+		actionableDynamicQuery.setModelClass(Account.class);
 
 		actionableDynamicQuery.setPrimaryKeyPropertyName("accountId");
 	}
@@ -306,25 +320,6 @@ public abstract class AccountLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 */
 	public void setAccountLocalService(AccountLocalService accountLocalService) {
 		this.accountLocalService = accountLocalService;
-	}
-
-	/**
-	 * Returns the account remote service.
-	 *
-	 * @return the account remote service
-	 */
-	public com.liferay.portal.service.AccountService getAccountService() {
-		return accountService;
-	}
-
-	/**
-	 * Sets the account remote service.
-	 *
-	 * @param accountService the account remote service
-	 */
-	public void setAccountService(
-		com.liferay.portal.service.AccountService accountService) {
-		this.accountService = accountService;
 	}
 
 	/**
@@ -418,8 +413,6 @@ public abstract class AccountLocalServiceBaseImpl extends BaseLocalServiceImpl
 
 	@BeanReference(type = com.liferay.portal.service.AccountLocalService.class)
 	protected AccountLocalService accountLocalService;
-	@BeanReference(type = com.liferay.portal.service.AccountService.class)
-	protected com.liferay.portal.service.AccountService accountService;
 	@BeanReference(type = AccountPersistence.class)
 	protected AccountPersistence accountPersistence;
 	@BeanReference(type = com.liferay.counter.service.CounterLocalService.class)

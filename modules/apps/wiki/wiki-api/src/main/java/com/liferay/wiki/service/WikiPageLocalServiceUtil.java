@@ -16,8 +16,7 @@ package com.liferay.wiki.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
+import com.liferay.osgi.util.ServiceTrackerFactory;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -446,6 +445,10 @@ public class WikiPageLocalServiceUtil {
 		long nodeId, java.lang.String title)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getIncomingLinks(nodeId, title);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
 	}
 
 	public static com.liferay.wiki.model.WikiPage getLatestPage(long nodeId,
@@ -998,14 +1001,6 @@ public class WikiPageLocalServiceUtil {
 	public void setService(WikiPageLocalService service) {
 	}
 
-	private static ServiceTracker<WikiPageLocalService, WikiPageLocalService> _serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(WikiPageLocalServiceUtil.class);
-
-		_serviceTracker = new ServiceTracker<WikiPageLocalService, WikiPageLocalService>(bundle.getBundleContext(),
-				WikiPageLocalService.class, null);
-
-		_serviceTracker.open();
-	}
+	private static ServiceTracker<WikiPageLocalService, WikiPageLocalService> _serviceTracker =
+		ServiceTrackerFactory.open(WikiPageLocalService.class);
 }

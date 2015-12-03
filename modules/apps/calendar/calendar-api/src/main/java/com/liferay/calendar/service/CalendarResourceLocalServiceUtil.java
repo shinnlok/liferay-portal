@@ -16,8 +16,7 @@ package com.liferay.calendar.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
+import com.liferay.osgi.util.ServiceTrackerFactory;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -319,6 +318,10 @@ public class CalendarResourceLocalServiceUtil {
 		return getService().getExportActionableDynamicQuery(portletDataContext);
 	}
 
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -412,14 +415,6 @@ public class CalendarResourceLocalServiceUtil {
 	public void setService(CalendarResourceLocalService service) {
 	}
 
-	private static ServiceTracker<CalendarResourceLocalService, CalendarResourceLocalService> _serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(CalendarResourceLocalServiceUtil.class);
-
-		_serviceTracker = new ServiceTracker<CalendarResourceLocalService, CalendarResourceLocalService>(bundle.getBundleContext(),
-				CalendarResourceLocalService.class, null);
-
-		_serviceTracker.open();
-	}
+	private static ServiceTracker<CalendarResourceLocalService, CalendarResourceLocalService> _serviceTracker =
+		ServiceTrackerFactory.open(CalendarResourceLocalService.class);
 }

@@ -16,8 +16,7 @@ package com.liferay.journal.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
+import com.liferay.osgi.util.ServiceTrackerFactory;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -344,6 +343,10 @@ public class JournalFolderLocalServiceUtil {
 		return getService().getFoldersCount(groupId, parentFolderId, status);
 	}
 
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
 	public static long getInheritedWorkflowFolderId(long folderId)
 		throws com.liferay.journal.exception.NoSuchFolderException {
 		return getService().getInheritedWorkflowFolderId(folderId);
@@ -584,14 +587,6 @@ public class JournalFolderLocalServiceUtil {
 	public void setService(JournalFolderLocalService service) {
 	}
 
-	private static ServiceTracker<JournalFolderLocalService, JournalFolderLocalService> _serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(JournalFolderLocalServiceUtil.class);
-
-		_serviceTracker = new ServiceTracker<JournalFolderLocalService, JournalFolderLocalService>(bundle.getBundleContext(),
-				JournalFolderLocalService.class, null);
-
-		_serviceTracker.open();
-	}
+	private static ServiceTracker<JournalFolderLocalService, JournalFolderLocalService> _serviceTracker =
+		ServiceTrackerFactory.open(JournalFolderLocalService.class);
 }

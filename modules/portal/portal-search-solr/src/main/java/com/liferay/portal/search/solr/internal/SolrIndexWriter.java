@@ -69,6 +69,20 @@ public class SolrIndexWriter extends BaseIndexWriter {
 	}
 
 	@Override
+	public void commit(long companyId) throws SearchException {
+		SolrClient solrClient = _solrClientManager.getSolrClient();
+
+		try {
+			solrClient.commit();
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new SearchException(e.getMessage());
+		}
+	}
+
+	@Override
 	public void deleteDocument(SearchContext searchContext, String uid)
 		throws SearchException {
 
@@ -209,7 +223,7 @@ public class SolrIndexWriter extends BaseIndexWriter {
 	private static final Log _log = LogFactoryUtil.getLog(
 		SolrIndexWriter.class);
 
-	private SolrClientManager _solrClientManager;
-	private SolrUpdateDocumentCommand _solrUpdateDocumentCommand;
+	private volatile SolrClientManager _solrClientManager;
+	private volatile SolrUpdateDocumentCommand _solrUpdateDocumentCommand;
 
 }
