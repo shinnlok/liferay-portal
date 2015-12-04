@@ -25,8 +25,6 @@ String principal = ParamUtil.getString(request, "principal");
 
 String credentials = request.getParameter("credentials");
 
-FullNameDefinition fullNameDefinition = FullNameDefinitionFactory.getInstance(LocaleUtil.getDefault());
-
 if (credentials.equals(Portal.TEMP_OBFUSCATION_VALUE)) {
 	LDAPServerConfiguration ldapServerConfiguration = ldapServerConfigurationProvider.getConfiguration(themeDisplay.getCompanyId(), ldapServerId, true);
 
@@ -44,6 +42,8 @@ if (ldapContext == null) {
 <%
 	return;
 }
+
+FullNameDefinition fullNameDefinition = FullNameDefinitionFactory.getInstance(locale);
 
 if (Validator.isNull(ParamUtil.getString(request, "userMappingScreenName")) ||
 	Validator.isNull(ParamUtil.getString(request, "userMappingPassword")) ||
