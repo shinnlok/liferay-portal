@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -230,19 +231,32 @@ public abstract class TrashVersionLocalServiceBaseImpl
 		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
 
 		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.trash.service.TrashVersionLocalServiceUtil.getService());
-		actionableDynamicQuery.setClass(TrashVersion.class);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
+		actionableDynamicQuery.setModelClass(TrashVersion.class);
 
 		actionableDynamicQuery.setPrimaryKeyPropertyName("versionId");
 
 		return actionableDynamicQuery;
 	}
 
+	@Override
+	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		IndexableActionableDynamicQuery indexableActionableDynamicQuery = new IndexableActionableDynamicQuery();
+
+		indexableActionableDynamicQuery.setBaseLocalService(com.liferay.portlet.trash.service.TrashVersionLocalServiceUtil.getService());
+		indexableActionableDynamicQuery.setClassLoader(getClassLoader());
+		indexableActionableDynamicQuery.setModelClass(TrashVersion.class);
+
+		indexableActionableDynamicQuery.setPrimaryKeyPropertyName("versionId");
+
+		return indexableActionableDynamicQuery;
+	}
+
 	protected void initActionableDynamicQuery(
 		ActionableDynamicQuery actionableDynamicQuery) {
 		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.trash.service.TrashVersionLocalServiceUtil.getService());
-		actionableDynamicQuery.setClass(TrashVersion.class);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
+		actionableDynamicQuery.setModelClass(TrashVersion.class);
 
 		actionableDynamicQuery.setPrimaryKeyPropertyName("versionId");
 	}
@@ -317,25 +331,6 @@ public abstract class TrashVersionLocalServiceBaseImpl
 	public void setTrashEntryLocalService(
 		com.liferay.portlet.trash.service.TrashEntryLocalService trashEntryLocalService) {
 		this.trashEntryLocalService = trashEntryLocalService;
-	}
-
-	/**
-	 * Returns the trash entry remote service.
-	 *
-	 * @return the trash entry remote service
-	 */
-	public com.liferay.portlet.trash.service.TrashEntryService getTrashEntryService() {
-		return trashEntryService;
-	}
-
-	/**
-	 * Sets the trash entry remote service.
-	 *
-	 * @param trashEntryService the trash entry remote service
-	 */
-	public void setTrashEntryService(
-		com.liferay.portlet.trash.service.TrashEntryService trashEntryService) {
-		this.trashEntryService = trashEntryService;
 	}
 
 	/**
@@ -434,25 +429,6 @@ public abstract class TrashVersionLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the class name remote service.
-	 *
-	 * @return the class name remote service
-	 */
-	public com.liferay.portal.service.ClassNameService getClassNameService() {
-		return classNameService;
-	}
-
-	/**
-	 * Sets the class name remote service.
-	 *
-	 * @param classNameService the class name remote service
-	 */
-	public void setClassNameService(
-		com.liferay.portal.service.ClassNameService classNameService) {
-		this.classNameService = classNameService;
-	}
-
-	/**
 	 * Returns the class name persistence.
 	 *
 	 * @return the class name persistence
@@ -507,25 +483,6 @@ public abstract class TrashVersionLocalServiceBaseImpl
 	public void setUserLocalService(
 		com.liferay.portal.service.UserLocalService userLocalService) {
 		this.userLocalService = userLocalService;
-	}
-
-	/**
-	 * Returns the user remote service.
-	 *
-	 * @return the user remote service
-	 */
-	public com.liferay.portal.service.UserService getUserService() {
-		return userService;
-	}
-
-	/**
-	 * Sets the user remote service.
-	 *
-	 * @param userService the user remote service
-	 */
-	public void setUserService(
-		com.liferay.portal.service.UserService userService) {
-		this.userService = userService;
 	}
 
 	/**
@@ -618,8 +575,6 @@ public abstract class TrashVersionLocalServiceBaseImpl
 
 	@BeanReference(type = com.liferay.portlet.trash.service.TrashEntryLocalService.class)
 	protected com.liferay.portlet.trash.service.TrashEntryLocalService trashEntryLocalService;
-	@BeanReference(type = com.liferay.portlet.trash.service.TrashEntryService.class)
-	protected com.liferay.portlet.trash.service.TrashEntryService trashEntryService;
 	@BeanReference(type = TrashEntryPersistence.class)
 	protected TrashEntryPersistence trashEntryPersistence;
 	@BeanReference(type = com.liferay.portlet.trash.service.TrashVersionLocalService.class)
@@ -630,16 +585,12 @@ public abstract class TrashVersionLocalServiceBaseImpl
 	protected com.liferay.counter.service.CounterLocalService counterLocalService;
 	@BeanReference(type = com.liferay.portal.service.ClassNameLocalService.class)
 	protected com.liferay.portal.service.ClassNameLocalService classNameLocalService;
-	@BeanReference(type = com.liferay.portal.service.ClassNameService.class)
-	protected com.liferay.portal.service.ClassNameService classNameService;
 	@BeanReference(type = ClassNamePersistence.class)
 	protected ClassNamePersistence classNamePersistence;
 	@BeanReference(type = com.liferay.portal.service.ResourceLocalService.class)
 	protected com.liferay.portal.service.ResourceLocalService resourceLocalService;
 	@BeanReference(type = com.liferay.portal.service.UserLocalService.class)
 	protected com.liferay.portal.service.UserLocalService userLocalService;
-	@BeanReference(type = com.liferay.portal.service.UserService.class)
-	protected com.liferay.portal.service.UserService userService;
 	@BeanReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
 	@BeanReference(type = UserFinder.class)

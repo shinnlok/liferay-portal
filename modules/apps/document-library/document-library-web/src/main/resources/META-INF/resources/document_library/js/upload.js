@@ -78,8 +78,6 @@ AUI.add(
 
 		var SELECTOR_ENTRY_LINK = STR_DOT + CSS_ENTRY_LINK;
 
-		var SELECTOR_ENTRY_SELECTOR = STR_DOT + CSS_ENTRY_SELECTOR;
-
 		var SELECTOR_ENTRY_TITLE_TEXT = STR_DOT + CSS_ENTRY_TITLE_TEXT;
 
 		var SELECTOR_IMAGE_ICON = 'img.icon';
@@ -156,10 +154,6 @@ AUI.add(
 				ATTRS: {
 					appViewEntryTemplates: {
 						validator: A.one,
-						value: {}
-					},
-
-					appViewMove: {
 						value: {}
 					},
 
@@ -352,14 +346,6 @@ AUI.add(
 							},
 							500
 						);
-
-						var appViewMove = instance.get('appViewMove');
-
-						if (appViewMove.get('updateable')) {
-							var dd = appViewMove._ddHandler.dd;
-
-							dd.addInvalid(STR_DOT + CSS_UPLOAD_ERROR);
-						}
 
 						var onDragOverHandle = docElement.on(
 							'dragover',
@@ -1170,8 +1156,6 @@ AUI.add(
 					_startNextUpload: function(event) {
 						var instance = this;
 
-						instance._detachSubscriptions();
-
 						instance._destroyEntry();
 
 						var dataSet = instance._getDataSet();
@@ -1344,6 +1328,6 @@ AUI.add(
 	},
 	'',
 	{
-		requires: ['aui-component', 'aui-data-set-deprecated', 'aui-overlay-manager-deprecated', 'aui-overlay-mask-deprecated', 'aui-parse-content', 'aui-progressbar', 'aui-template-deprecated', 'aui-tooltip', 'liferay-app-view-move', 'liferay-app-view-select', 'liferay-search-container', 'liferay-storage-formatter', 'querystring-parse-simple', 'uploader']
+		requires: ['aui-component', 'aui-data-set-deprecated', 'aui-overlay-manager-deprecated', 'aui-overlay-mask-deprecated', 'aui-parse-content', 'aui-progressbar', 'aui-template-deprecated', 'aui-tooltip', 'liferay-search-container', 'liferay-storage-formatter', 'querystring-parse-simple', 'uploader']
 	}
 );

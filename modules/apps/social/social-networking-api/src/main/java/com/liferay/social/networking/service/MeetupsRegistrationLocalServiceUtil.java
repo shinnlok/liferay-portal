@@ -16,8 +16,7 @@ package com.liferay.social.networking.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
+import com.liferay.osgi.util.ServiceTrackerFactory;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -185,6 +184,10 @@ public class MeetupsRegistrationLocalServiceUtil {
 		return getService().getActionableDynamicQuery();
 	}
 
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the meetups registration with the primary key.
 	*
@@ -285,14 +288,6 @@ public class MeetupsRegistrationLocalServiceUtil {
 	public void setService(MeetupsRegistrationLocalService service) {
 	}
 
-	private static ServiceTracker<MeetupsRegistrationLocalService, MeetupsRegistrationLocalService> _serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(MeetupsRegistrationLocalServiceUtil.class);
-
-		_serviceTracker = new ServiceTracker<MeetupsRegistrationLocalService, MeetupsRegistrationLocalService>(bundle.getBundleContext(),
-				MeetupsRegistrationLocalService.class, null);
-
-		_serviceTracker.open();
-	}
+	private static ServiceTracker<MeetupsRegistrationLocalService, MeetupsRegistrationLocalService> _serviceTracker =
+		ServiceTrackerFactory.open(MeetupsRegistrationLocalService.class);
 }

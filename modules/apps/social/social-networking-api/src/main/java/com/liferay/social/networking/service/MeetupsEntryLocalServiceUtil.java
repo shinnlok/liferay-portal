@@ -16,8 +16,7 @@ package com.liferay.social.networking.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
+import com.liferay.osgi.util.ServiceTrackerFactory;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -199,6 +198,10 @@ public class MeetupsEntryLocalServiceUtil {
 		return getService().getActionableDynamicQuery();
 	}
 
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns a range of all the meetups entries.
 	*
@@ -300,14 +303,6 @@ public class MeetupsEntryLocalServiceUtil {
 	public void setService(MeetupsEntryLocalService service) {
 	}
 
-	private static ServiceTracker<MeetupsEntryLocalService, MeetupsEntryLocalService> _serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(MeetupsEntryLocalServiceUtil.class);
-
-		_serviceTracker = new ServiceTracker<MeetupsEntryLocalService, MeetupsEntryLocalService>(bundle.getBundleContext(),
-				MeetupsEntryLocalService.class, null);
-
-		_serviceTracker.open();
-	}
+	private static ServiceTracker<MeetupsEntryLocalService, MeetupsEntryLocalService> _serviceTracker =
+		ServiceTrackerFactory.open(MeetupsEntryLocalService.class);
 }

@@ -18,14 +18,19 @@
 
 <%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
 
-<%@ taglib uri="http://liferay.com/tld/aui" prefix="aui" %><%@
+<%@ taglib uri="http://liferay.com/tld/application-list" prefix="liferay-application-list" %><%@
+taglib uri="http://liferay.com/tld/aui" prefix="aui" %><%@
 taglib uri="http://liferay.com/tld/portlet" prefix="liferay-portlet" %><%@
 taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %><%@
 taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %><%@
 taglib uri="http://liferay.com/tld/util" prefix="liferay-util" %>
 
-<%@ page import="com.liferay.control.menu.ControlMenuCategory" %><%@
+<%@ page import="com.liferay.application.list.PanelCategory" %><%@
+page import="com.liferay.application.list.PanelCategoryRegistry" %><%@
+page import="com.liferay.application.list.constants.ApplicationListWebKeys" %><%@
+page import="com.liferay.control.menu.ControlMenuCategory" %><%@
 page import="com.liferay.control.menu.ControlMenuEntry" %><%@
+page import="com.liferay.control.menu.application.list.SimulationPanelCategory" %><%@
 page import="com.liferay.control.menu.constants.ControlMenuWebKeys" %><%@
 page import="com.liferay.control.menu.util.ControlMenuEntryRegistry" %><%@
 page import="com.liferay.control.menu.web.InformationMessagesControlMenuEntry" %><%@
@@ -51,7 +56,6 @@ page import="com.liferay.portal.kernel.util.StringUtil" %><%@
 page import="com.liferay.portal.kernel.util.Validator" %><%@
 page import="com.liferay.portal.kernel.util.WebKeys" %><%@
 page import="com.liferay.portal.model.Group" %><%@
-page import="com.liferay.portal.model.Layout" %><%@
 page import="com.liferay.portal.model.LayoutConstants" %><%@
 page import="com.liferay.portal.model.LayoutTypeController" %><%@
 page import="com.liferay.portal.model.Portlet" %><%@
@@ -81,7 +85,6 @@ page import="com.liferay.portlet.asset.model.AssetRenderer" %><%@
 page import="com.liferay.portlet.asset.model.AssetRendererFactory" %><%@
 page import="com.liferay.portlet.asset.service.persistence.AssetEntryQuery" %><%@
 page import="com.liferay.portlet.asset.util.AssetUtil" %><%@
-page import="com.liferay.portlet.layoutsadmin.display.context.GroupDisplayContextHelper" %><%@
 page import="com.liferay.portlet.sites.util.SitesUtil" %><%@
 page import="com.liferay.taglib.aui.AUIUtil" %><%@
 page import="com.liferay.taglib.servlet.PipingServletResponse" %>
@@ -108,6 +111,4 @@ page import="javax.portlet.WindowState" %>
 PortletURL currentURLObj = PortletURLUtil.getCurrent(liferayPortletRequest, liferayPortletResponse);
 
 String currentURL = currentURLObj.toString();
-
-GroupDisplayContextHelper groupDisplayContextHelper = new GroupDisplayContextHelper(request);
 %>

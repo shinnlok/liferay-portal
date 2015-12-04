@@ -16,8 +16,8 @@ package com.liferay.dynamic.data.mapping.validator.internal;
 
 import com.liferay.dynamic.data.mapping.exception.StorageException;
 import com.liferay.dynamic.data.mapping.exception.StorageFieldNameException;
-import com.liferay.dynamic.data.mapping.exception.StorageFieldRequiredException;
 import com.liferay.dynamic.data.mapping.exception.StorageFieldValueException;
+import com.liferay.dynamic.data.mapping.exception.StorageFieldValueException.RequiredValue;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.Value;
@@ -111,9 +111,18 @@ public class DDMFormValuesValidatorImpl implements DDMFormValuesValidator {
 		throws StorageException {
 
 		for (DDMFormFieldValue ddmFormFieldValue : ddmFormFieldValues) {
-			validateDDMFormFieldValue(
-				ddmFormFieldsMap.get(ddmFormFieldValue.getName()),
-				ddmFormFieldValue);
+			DDMFormField ddmFormField = ddmFormFieldsMap.get(
+				ddmFormFieldValue.getName());
+
+			if (Validator.isNotNull(ddmFormField)) {
+				validateDDMFormFieldValue(
+					ddmFormFieldsMap.get(ddmFormFieldValue.getName()),
+					ddmFormFieldValue);
+
+				traverseDDMFormFieldValues(
+					ddmFormFieldValue.getNestedDDMFormFieldValues(),
+					ddmFormField.getNestedDDMFormFieldsMap());
+			}
 		}
 	}
 
@@ -154,8 +163,7 @@ public class DDMFormValuesValidatorImpl implements DDMFormValuesValidator {
 			if ((value == null) ||
 				(ddmFormField.isRequired() && isNull(value))) {
 
-				throw new StorageFieldValueException(
-					"No value defined for field " + ddmFormField.getName());
+				throw new RequiredValue(ddmFormField.getName());
 			}
 
 			if ((ddmFormField.isLocalizable() && !value.isLocalized()) ||
@@ -198,8 +206,7 @@ public class DDMFormValuesValidatorImpl implements DDMFormValuesValidator {
 		throws StorageException {
 
 		if (ddmFormField.isRequired() && (ddmFormFieldValues.size() == 0)) {
-			throw new StorageFieldRequiredException(
-				"No value defined for field " + ddmFormField.getName());
+			throw new RequiredValue(ddmFormField.getName());
 		}
 
 		if (!ddmFormField.isRepeatable() && (ddmFormFieldValues.size() > 1)) {

@@ -16,8 +16,7 @@ package com.liferay.portal.workflow.kaleo.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
+import com.liferay.osgi.util.ServiceTrackerFactory;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -204,6 +203,10 @@ public class KaleoNotificationLocalServiceUtil {
 		return getService().getActionableDynamicQuery();
 	}
 
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the kaleo notification with the primary key.
 	*
@@ -292,14 +295,6 @@ public class KaleoNotificationLocalServiceUtil {
 	public void setService(KaleoNotificationLocalService service) {
 	}
 
-	private static ServiceTracker<KaleoNotificationLocalService, KaleoNotificationLocalService> _serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(KaleoNotificationLocalServiceUtil.class);
-
-		_serviceTracker = new ServiceTracker<KaleoNotificationLocalService, KaleoNotificationLocalService>(bundle.getBundleContext(),
-				KaleoNotificationLocalService.class, null);
-
-		_serviceTracker.open();
-	}
+	private static ServiceTracker<KaleoNotificationLocalService, KaleoNotificationLocalService> _serviceTracker =
+		ServiceTrackerFactory.open(KaleoNotificationLocalService.class);
 }

@@ -16,8 +16,7 @@ package com.liferay.social.networking.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
+import com.liferay.osgi.util.ServiceTrackerFactory;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -198,6 +197,10 @@ public class WallEntryLocalServiceUtil {
 		return getService().getActionableDynamicQuery();
 	}
 
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -303,14 +306,6 @@ public class WallEntryLocalServiceUtil {
 	public void setService(WallEntryLocalService service) {
 	}
 
-	private static ServiceTracker<WallEntryLocalService, WallEntryLocalService> _serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(WallEntryLocalServiceUtil.class);
-
-		_serviceTracker = new ServiceTracker<WallEntryLocalService, WallEntryLocalService>(bundle.getBundleContext(),
-				WallEntryLocalService.class, null);
-
-		_serviceTracker.open();
-	}
+	private static ServiceTracker<WallEntryLocalService, WallEntryLocalService> _serviceTracker =
+		ServiceTrackerFactory.open(WallEntryLocalService.class);
 }

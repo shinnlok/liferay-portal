@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -230,19 +231,32 @@ public abstract class ShoppingItemPriceLocalServiceBaseImpl
 		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
 
 		actionableDynamicQuery.setBaseLocalService(com.liferay.shopping.service.ShoppingItemPriceLocalServiceUtil.getService());
-		actionableDynamicQuery.setClass(ShoppingItemPrice.class);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
+		actionableDynamicQuery.setModelClass(ShoppingItemPrice.class);
 
 		actionableDynamicQuery.setPrimaryKeyPropertyName("itemPriceId");
 
 		return actionableDynamicQuery;
 	}
 
+	@Override
+	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		IndexableActionableDynamicQuery indexableActionableDynamicQuery = new IndexableActionableDynamicQuery();
+
+		indexableActionableDynamicQuery.setBaseLocalService(com.liferay.shopping.service.ShoppingItemPriceLocalServiceUtil.getService());
+		indexableActionableDynamicQuery.setClassLoader(getClassLoader());
+		indexableActionableDynamicQuery.setModelClass(ShoppingItemPrice.class);
+
+		indexableActionableDynamicQuery.setPrimaryKeyPropertyName("itemPriceId");
+
+		return indexableActionableDynamicQuery;
+	}
+
 	protected void initActionableDynamicQuery(
 		ActionableDynamicQuery actionableDynamicQuery) {
 		actionableDynamicQuery.setBaseLocalService(com.liferay.shopping.service.ShoppingItemPriceLocalServiceUtil.getService());
-		actionableDynamicQuery.setClass(ShoppingItemPrice.class);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
+		actionableDynamicQuery.setModelClass(ShoppingItemPrice.class);
 
 		actionableDynamicQuery.setPrimaryKeyPropertyName("itemPriceId");
 	}
@@ -378,25 +392,6 @@ public abstract class ShoppingItemPriceLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the shopping item remote service.
-	 *
-	 * @return the shopping item remote service
-	 */
-	public com.liferay.shopping.service.ShoppingItemService getShoppingItemService() {
-		return shoppingItemService;
-	}
-
-	/**
-	 * Sets the shopping item remote service.
-	 *
-	 * @param shoppingItemService the shopping item remote service
-	 */
-	public void setShoppingItemService(
-		com.liferay.shopping.service.ShoppingItemService shoppingItemService) {
-		this.shoppingItemService = shoppingItemService;
-	}
-
-	/**
 	 * Returns the shopping item persistence.
 	 *
 	 * @return the shopping item persistence
@@ -493,8 +488,6 @@ public abstract class ShoppingItemPriceLocalServiceBaseImpl
 	protected com.liferay.counter.service.CounterLocalService counterLocalService;
 	@BeanReference(type = com.liferay.shopping.service.ShoppingItemLocalService.class)
 	protected com.liferay.shopping.service.ShoppingItemLocalService shoppingItemLocalService;
-	@BeanReference(type = com.liferay.shopping.service.ShoppingItemService.class)
-	protected com.liferay.shopping.service.ShoppingItemService shoppingItemService;
 	@BeanReference(type = ShoppingItemPersistence.class)
 	protected ShoppingItemPersistence shoppingItemPersistence;
 	@BeanReference(type = ShoppingItemFinder.class)

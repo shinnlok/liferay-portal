@@ -16,8 +16,7 @@ package com.liferay.dynamic.data.mapping.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
+import com.liferay.osgi.util.ServiceTrackerFactory;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -257,6 +256,10 @@ public class DDMStructureLinkLocalServiceUtil {
 		return getService().getDDMStructureLinksCount();
 	}
 
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -335,14 +338,6 @@ public class DDMStructureLinkLocalServiceUtil {
 	public void setService(DDMStructureLinkLocalService service) {
 	}
 
-	private static ServiceTracker<DDMStructureLinkLocalService, DDMStructureLinkLocalService> _serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(DDMStructureLinkLocalServiceUtil.class);
-
-		_serviceTracker = new ServiceTracker<DDMStructureLinkLocalService, DDMStructureLinkLocalService>(bundle.getBundleContext(),
-				DDMStructureLinkLocalService.class, null);
-
-		_serviceTracker.open();
-	}
+	private static ServiceTracker<DDMStructureLinkLocalService, DDMStructureLinkLocalService> _serviceTracker =
+		ServiceTrackerFactory.open(DDMStructureLinkLocalService.class);
 }

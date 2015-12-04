@@ -16,8 +16,7 @@ package com.liferay.wiki.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
+import com.liferay.osgi.util.ServiceTrackerFactory;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -226,6 +225,10 @@ public class WikiPageResourceLocalServiceUtil {
 		return getService().getActionableDynamicQuery();
 	}
 
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -373,14 +376,6 @@ public class WikiPageResourceLocalServiceUtil {
 	public void setService(WikiPageResourceLocalService service) {
 	}
 
-	private static ServiceTracker<WikiPageResourceLocalService, WikiPageResourceLocalService> _serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(WikiPageResourceLocalServiceUtil.class);
-
-		_serviceTracker = new ServiceTracker<WikiPageResourceLocalService, WikiPageResourceLocalService>(bundle.getBundleContext(),
-				WikiPageResourceLocalService.class, null);
-
-		_serviceTracker.open();
-	}
+	private static ServiceTracker<WikiPageResourceLocalService, WikiPageResourceLocalService> _serviceTracker =
+		ServiceTrackerFactory.open(WikiPageResourceLocalService.class);
 }

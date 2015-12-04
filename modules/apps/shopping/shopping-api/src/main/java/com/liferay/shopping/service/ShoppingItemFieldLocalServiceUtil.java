@@ -16,8 +16,7 @@ package com.liferay.shopping.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
+import com.liferay.osgi.util.ServiceTrackerFactory;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -185,6 +184,10 @@ public class ShoppingItemFieldLocalServiceUtil {
 		return getService().getActionableDynamicQuery();
 	}
 
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
 	public static java.util.List<com.liferay.shopping.model.ShoppingItemField> getItemFields(
 		long itemId) {
 		return getService().getItemFields(itemId);
@@ -265,14 +268,6 @@ public class ShoppingItemFieldLocalServiceUtil {
 	public void setService(ShoppingItemFieldLocalService service) {
 	}
 
-	private static ServiceTracker<ShoppingItemFieldLocalService, ShoppingItemFieldLocalService> _serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(ShoppingItemFieldLocalServiceUtil.class);
-
-		_serviceTracker = new ServiceTracker<ShoppingItemFieldLocalService, ShoppingItemFieldLocalService>(bundle.getBundleContext(),
-				ShoppingItemFieldLocalService.class, null);
-
-		_serviceTracker.open();
-	}
+	private static ServiceTracker<ShoppingItemFieldLocalService, ShoppingItemFieldLocalService> _serviceTracker =
+		ServiceTrackerFactory.open(ShoppingItemFieldLocalService.class);
 }

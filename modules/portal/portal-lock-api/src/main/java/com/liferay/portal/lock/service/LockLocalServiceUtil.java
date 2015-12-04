@@ -16,8 +16,7 @@ package com.liferay.portal.lock.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
+import com.liferay.osgi.util.ServiceTrackerFactory;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -198,6 +197,10 @@ public class LockLocalServiceUtil {
 		return getService().getActionableDynamicQuery();
 	}
 
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
 	public static com.liferay.portal.lock.model.Lock getLock(
 		java.lang.String className, java.lang.String key)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -365,14 +368,6 @@ public class LockLocalServiceUtil {
 	public void setService(LockLocalService service) {
 	}
 
-	private static ServiceTracker<LockLocalService, LockLocalService> _serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(LockLocalServiceUtil.class);
-
-		_serviceTracker = new ServiceTracker<LockLocalService, LockLocalService>(bundle.getBundleContext(),
-				LockLocalService.class, null);
-
-		_serviceTracker.open();
-	}
+	private static ServiceTracker<LockLocalService, LockLocalService> _serviceTracker =
+		ServiceTrackerFactory.open(LockLocalService.class);
 }

@@ -60,7 +60,6 @@ import com.liferay.portal.model.LayoutPrototype;
 import com.liferay.portal.model.LayoutSet;
 import com.liferay.portal.model.LayoutSetPrototype;
 import com.liferay.portal.model.Portlet;
-import com.liferay.portal.model.impl.LayoutImpl;
 import com.liferay.portal.service.GroupLocalService;
 import com.liferay.portal.service.LayoutLocalService;
 import com.liferay.portal.service.LayoutPrototypeLocalService;
@@ -90,7 +89,6 @@ import com.liferay.portlet.exportimport.lar.StagedModelDataHandlerUtil;
 import com.liferay.portlet.exportimport.lar.UserIdStrategy;
 import com.liferay.portlet.exportimport.lifecycle.ExportImportLifecycleManager;
 import com.liferay.portlet.exportimport.model.ExportImportConfiguration;
-import com.liferay.portlet.exportimport.xstream.XStreamAliasRegistryUtil;
 import com.liferay.portlet.sites.util.Sites;
 import com.liferay.portlet.sites.util.SitesUtil;
 
@@ -108,7 +106,6 @@ import java.util.Set;
 
 import org.apache.commons.lang.time.StopWatch;
 
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -294,11 +291,6 @@ public class LayoutImportController implements ImportController {
 				zipReader.close();
 			}
 		}
-	}
-
-	@Activate
-	protected void activate() {
-		XStreamAliasRegistryUtil.register(LayoutImpl.class, "Layout");
 	}
 
 	protected void deleteMissingLayouts(
@@ -861,7 +853,7 @@ public class LayoutImportController implements ImportController {
 
 		// Asset links
 
-		_portletImportController.readAssetLinks(portletDataContext);
+		_portletImportController.importAssetLinks(portletDataContext);
 
 		// Delete missing layouts
 
@@ -1456,16 +1448,17 @@ public class LayoutImportController implements ImportController {
 
 	private final DeletionSystemEventImporter _deletionSystemEventImporter =
 		DeletionSystemEventImporter.getInstance();
-	private ExportImportLifecycleManager _exportImportLifecycleManager;
-	private GroupLocalService _groupLocalService;
-	private LayoutLocalService _layoutLocalService;
-	private LayoutPrototypeLocalService _layoutPrototypeLocalService;
-	private LayoutSetLocalService _layoutSetLocalService;
-	private LayoutSetPrototypeLocalService _layoutSetPrototypeLocalService;
+	private volatile ExportImportLifecycleManager _exportImportLifecycleManager;
+	private volatile GroupLocalService _groupLocalService;
+	private volatile LayoutLocalService _layoutLocalService;
+	private volatile LayoutPrototypeLocalService _layoutPrototypeLocalService;
+	private volatile LayoutSetLocalService _layoutSetLocalService;
+	private volatile LayoutSetPrototypeLocalService
+		_layoutSetPrototypeLocalService;
 	private final PermissionImporter _permissionImporter =
 		PermissionImporter.getInstance();
-	private PortletImportController _portletImportController;
-	private PortletLocalService _portletLocalService;
+	private volatile PortletImportController _portletImportController;
+	private volatile PortletLocalService _portletLocalService;
 	private final ThemeImporter _themeImporter = ThemeImporter.getInstance();
 
 }

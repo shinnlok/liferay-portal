@@ -16,6 +16,7 @@ package com.liferay.portlet.usersadmin.util;
 
 import com.liferay.portal.NoSuchContactException;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -69,7 +70,6 @@ public class UserIndexer extends BaseIndexer<User> {
 	}
 
 	public UserIndexer() {
-		setCommitImmediately(true);
 		setDefaultSelectedFieldNames(
 			Field.ASSET_TAG_NAMES, Field.COMPANY_ID, Field.ENTRY_CLASS_NAME,
 			Field.ENTRY_CLASS_PK, Field.GROUP_ID, Field.MODIFIED_DATE,
@@ -387,11 +387,11 @@ public class UserIndexer extends BaseIndexer<User> {
 	}
 
 	protected void reindexUsers(long companyId) throws PortalException {
-		final ActionableDynamicQuery actionableDynamicQuery =
-			UserLocalServiceUtil.getActionableDynamicQuery();
+		final IndexableActionableDynamicQuery indexableActionableDynamicQuery =
+			UserLocalServiceUtil.getIndexableActionableDynamicQuery();
 
-		actionableDynamicQuery.setCompanyId(companyId);
-		actionableDynamicQuery.setPerformActionMethod(
+		indexableActionableDynamicQuery.setCompanyId(companyId);
+		indexableActionableDynamicQuery.setPerformActionMethod(
 			new ActionableDynamicQuery.PerformActionMethod<User>() {
 
 				@Override
@@ -400,7 +400,8 @@ public class UserIndexer extends BaseIndexer<User> {
 						try {
 							Document document = getDocument(user);
 
-							actionableDynamicQuery.addDocument(document);
+							indexableActionableDynamicQuery.addDocument(
+								document);
 						}
 						catch (PortalException pe) {
 							if (_log.isWarnEnabled()) {
@@ -413,9 +414,9 @@ public class UserIndexer extends BaseIndexer<User> {
 				}
 
 			});
-		actionableDynamicQuery.setSearchEngineId(getSearchEngineId());
+		indexableActionableDynamicQuery.setSearchEngineId(getSearchEngineId());
 
-		actionableDynamicQuery.performActions();
+		indexableActionableDynamicQuery.performActions();
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(UserIndexer.class);

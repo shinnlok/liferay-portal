@@ -15,6 +15,7 @@
 package com.liferay.portlet.usersadmin.util;
 
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -58,7 +59,6 @@ public class OrganizationIndexer extends BaseIndexer<Organization> {
 	public static final String CLASS_NAME = Organization.class.getName();
 
 	public OrganizationIndexer() {
-		setCommitImmediately(true);
 		setDefaultSelectedFieldNames(
 			Field.COMPANY_ID, Field.ORGANIZATION_ID, Field.UID);
 		setPermissionAware(true);
@@ -231,11 +231,11 @@ public class OrganizationIndexer extends BaseIndexer<Organization> {
 	}
 
 	protected void reindexOrganizations(long companyId) throws Exception {
-		final ActionableDynamicQuery actionableDynamicQuery =
-			OrganizationLocalServiceUtil.getActionableDynamicQuery();
+		final IndexableActionableDynamicQuery indexableActionableDynamicQuery =
+			OrganizationLocalServiceUtil.getIndexableActionableDynamicQuery();
 
-		actionableDynamicQuery.setCompanyId(companyId);
-		actionableDynamicQuery.setPerformActionMethod(
+		indexableActionableDynamicQuery.setCompanyId(companyId);
+		indexableActionableDynamicQuery.setPerformActionMethod(
 			new ActionableDynamicQuery.PerformActionMethod<Organization>() {
 
 				@Override
@@ -243,7 +243,7 @@ public class OrganizationIndexer extends BaseIndexer<Organization> {
 					try {
 						Document document = getDocument(organization);
 
-						actionableDynamicQuery.addDocument(document);
+						indexableActionableDynamicQuery.addDocument(document);
 					}
 					catch (PortalException pe) {
 						if (_log.isWarnEnabled()) {
@@ -256,9 +256,9 @@ public class OrganizationIndexer extends BaseIndexer<Organization> {
 				}
 
 			});
-		actionableDynamicQuery.setSearchEngineId(getSearchEngineId());
+		indexableActionableDynamicQuery.setSearchEngineId(getSearchEngineId());
 
-		actionableDynamicQuery.performActions();
+		indexableActionableDynamicQuery.performActions();
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

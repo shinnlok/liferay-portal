@@ -50,9 +50,9 @@
 
 		<execute function="Type" locator1="Search#SEARCH_FIELD" value1="${assetTitle}" />
 
-		<execute function="AssertClick" locator1="Button#SEARCH" value1="Search" />
+		<execute function="Click" locator1="Icon#BASIC_SEARCH" />
 
-		<execute function="Click" locator1="Button#CHOOSE" value1="Choose" />
+		<execute function="AssertClick" locator1="AssetRelatedAssets#ASSET_TABLE_CHOOSE" value1="${assetTitle}" />
 
 		<execute function="SelectFrameTop" />
 
@@ -107,7 +107,7 @@
 		<if>
 			<equals arg1="${assetTypeConfigured}" arg2="true" />
 			<then>
-				<execute function="Click" locator1="AP#ADD_BASIC_WEB_CONTENT_BUTTON" />
+				<execute function="Click" locator1="AP#ADD_BASIC_WEB_CONTENT_MENU_ITEM" />
 			</then>
 			<else>
 				<execute function="AssertClick" locator1="AP#ADD_NEW_DROPDOWN" value1="Add New" />
@@ -697,7 +697,7 @@
 
 		<execute function="Check" locator1="WC#ENTRY_DESCRIPTIVE_CHECKBOX" />
 
-		<var name="key_descriptiveEntry" value="${webContentTitle}" />
+		<var name="key_assetEntry" value="${webContentTitle}" />
 
 		<execute function="Click" locator1="Icon#DESCRIPTIVE_VERTICAL_ELLIPSIS" />
 		<execute function="AssertClick" locator1="MenuItem#COPY" value1="Copy" />
@@ -705,8 +705,10 @@
 		<execute function="AssertClick" locator1="Button#COPY" value1="Copy" />
 		<execute function="AssertTextEquals" locator1="Message#SUCCESS" value1="Your request completed successfully." />
 
-		<execute macro="Page#gotoContentCP">
-			<var name="portletName" value="Web Content" />
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Web Content" />
 		</execute>
 
 		<execute macro="WebContent#viewTitle">
@@ -728,21 +730,25 @@
 			<var name="webContentTitleEscapeCharacter" value="${webContentTitleEscapeCharacter}" />
 		</execute>
 
-		<execute macro="Page#gotoContentCP">
-			<var name="portletName" value="Recycle Bin" />
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Recycle Bin" />
 		</execute>
 
 		<execute macro="RecycleBin#emptyCP" />
 
-		<execute macro="Page#gotoContentCP">
-			<var name="portletName" value="Web Content" />
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Web Content" />
 		</execute>
 
 		<execute function="AssertTextNotPresent" value1="${webContentTitle}" />
 	</command>
 
 	<command name="deleteWithDisabledRB">
-		<var name="key_descriptiveEntry" value="${entryTitle}" />
+		<var name="key_assetEntry" value="${entryTitle}" />
 
 		<execute function="Click" locator1="Icon#DESCRIPTIVE_VERTICAL_ELLIPSIS" />
 
@@ -907,7 +913,7 @@
 	</command>
 
 	<command name="expireSpecificVersionCP">
-		<var name="key_descriptiveEntry" value="${webContentTitle}" />
+		<var name="key_assetEntry" value="${webContentTitle}" />
 
 		<execute function="Click" locator1="Icon#DESCRIPTIVE_VERTICAL_ELLIPSIS" />
 
@@ -1002,7 +1008,7 @@
 
 		<execute function="SelectFrame" locator1="AssetRelatedAssets#SELECT_ASSET_IFRAME" />
 
-		<execute function="AssertClick#assertPartialTextClickAt" locator1="Pagination#ITEMS_PER_PAGE_SELECT" value1="Items per Page" />
+		<execute function="AssertClick#assertPartialTextClickAt" locator1="Pagination#ITEMS_PER_PAGE_SELECT" value1="20 Entries" />
 
 		<var name="key_itemsPerPage" value="${itemsPerPage}" />
 
@@ -1085,8 +1091,10 @@
 	</command>
 
 	<command name="tearDownCP">
-		<execute macro="Page#gotoContentCP">
-			<var name="portletName" value="Web Content" />
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Web Content" />
 		</execute>
 
 		<execute macro="Portlet#changeDisplayStyle">
@@ -1102,8 +1110,10 @@
 			</then>
 		</while>
 
-		<execute macro="Page#gotoContentCP">
-			<var name="portletName" value="Recycle Bin" />
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Recycle Bin" />
 		</execute>
 
 		<execute macro="RecycleBin#emptyCP" />
@@ -1299,6 +1309,14 @@
 		</if>
 	</command>
 
+	<command name="viewEntryAsWorkflowAsset">
+		<execute function="AssertTextEquals" locator1="Home#SITE_ADMINISTRATION_PORTLET_TITLE" value1="${webContentTitle}" />
+
+		<var name="key_webContentContent" value="${webContentContent}" />
+
+		<execute function="AssertTextEquals" locator1="WCD#WEB_CONTENT_CONTENT" value1="${webContentContent}" />
+	</command>
+
 	<command name="viewExpirationDateCP">
 		<execute function="AssertClick" locator1="WCEditWebContent#MENU_SCHEDULE" value1="Schedule" />
 		<execute function="AssertNotChecked" locator1="Checkbox#NEVER_EXPIRE" value1="Never Expire" />
@@ -1400,7 +1418,7 @@
 		<execute function="AssertClick" locator1="AP#ASSET_ABSTRACT_TITLE" value1="${webContentTitle}" />
 
 		<execute function="AssertTextEquals" locator1="APAsset#ASSET_TITLE_HEADER" value1="${webContentTitle}" />
-		<execute function="AssertTextEquals#assertPartialText" locator1="APAsset#ASSET_CONTENT" value1="${webContentContent}" />
+		<execute function="AssertTextEquals#assertPartialText" locator1="APAsset#ASSET_VIEW_CONTENT" value1="${webContentContent}" />
 	</command>
 
 	<command name="viewPGViaWCD">
@@ -1622,19 +1640,6 @@
 		<execute function="AssertClick" locator1="WC#ENTRY_DESCRIPTIVE_TITLE" value1="${webContentTitle}" />
 
 		<execute function="AssertTextEquals" locator1="TextInput#TITLE" value1="${webContentTitle}" />
-	</command>
-
-	<command name="viewWithTagCP">
-		<execute macro="WebContent#viewTitle">
-			<var name="webContentTitle" value="${webContentTitle}" />
-		</execute>
-
-		<for list="${tagNameList}" param="tagName">
-			<var name="key_tagName" value="${tagName}" />
-			<var name="key_webContentTitle" value="${webContentTitle}" />
-
-			<execute function="AssertTextEquals#assertPartialText" locator1="WC#ENTRY_DESCRIPTIVE_TAG" value1="${tagName}" />
-		</for>
 	</command>
 
 	<command name="viewWithWorkflowCP">

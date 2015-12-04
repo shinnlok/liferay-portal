@@ -22,6 +22,7 @@ import com.liferay.dynamic.data.lists.service.DDLRecordSetService;
 import com.liferay.dynamic.data.mapping.constants.DDMWebKeys;
 import com.liferay.dynamic.data.mapping.exception.NoSuchStructureException;
 import com.liferay.dynamic.data.mapping.exception.NoSuchStructureLayoutException;
+import com.liferay.dynamic.data.mapping.exception.StorageFieldValueException;
 import com.liferay.dynamic.data.mapping.form.renderer.DDMFormRenderer;
 import com.liferay.dynamic.data.mapping.form.renderer.DDMFormRenderingContext;
 import com.liferay.dynamic.data.mapping.form.renderer.DDMFormRenderingException;
@@ -46,6 +47,7 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PrefsParamUtil;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.util.PortalUtil;
+import com.liferay.portlet.PortletPreferencesFactoryUtil;
 
 import java.io.IOException;
 
@@ -71,6 +73,7 @@ import org.osgi.service.component.annotations.Reference;
 		"com.liferay.portlet.application-type=widget",
 		"com.liferay.portlet.css-class-wrapper=portlet-forms-display",
 		"com.liferay.portlet.display-category=category.collaboration",
+		"com.liferay.portlet.friendly-url-mapping=form",
 		"com.liferay.portlet.header-portlet-css=/admin/css/main.css",
 		"com.liferay.portlet.instanceable=true",
 		"com.liferay.portlet.layout-cacheable=true",
@@ -272,7 +275,8 @@ public class DDLFormPortlet extends MVCPortlet {
 			cause instanceof NoSuchStructureException ||
 			cause instanceof NoSuchStructureLayoutException ||
 			cause instanceof PortletPreferencesException ||
-			cause instanceof PrincipalException) {
+			cause instanceof PrincipalException ||
+			cause instanceof StorageFieldValueException) {
 
 			return true;
 		}
@@ -297,7 +301,8 @@ public class DDLFormPortlet extends MVCPortlet {
 		throws PortalException {
 
 		long recordSetId = PrefsParamUtil.getLong(
-			renderRequest.getPreferences(), renderRequest, "recordSetId");
+			PortletPreferencesFactoryUtil.getPortletSetup(renderRequest),
+			renderRequest, "recordSetId");
 
 		if (recordSetId == 0) {
 			return;
@@ -319,7 +324,7 @@ public class DDLFormPortlet extends MVCPortlet {
 
 	private static final Log _log = LogFactoryUtil.getLog(DDLFormPortlet.class);
 
-	private DDLRecordSetService _ddlRecordSetService;
-	private DDMFormRenderer _ddmFormRenderer;
+	private volatile DDLRecordSetService _ddlRecordSetService;
+	private volatile DDMFormRenderer _ddmFormRenderer;
 
 }

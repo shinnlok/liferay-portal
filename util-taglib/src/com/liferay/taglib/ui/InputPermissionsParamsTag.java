@@ -141,12 +141,10 @@ public class InputPermissionsParamsTag extends TagSupport {
 
 		Layout layout = themeDisplay.getLayout();
 
-		Group layoutGroup = layout.getGroup();
-
 		List<String> guestDefaultActions =
 			ResourceActionsUtil.getModelResourceGuestDefaultActions(modelName);
 
-		if (layoutGroup.isControlPanel()) {
+		if (layout.isTypeControlPanel()) {
 			Group group = themeDisplay.getScopeGroup();
 
 			if (!group.hasPrivateLayouts() &&

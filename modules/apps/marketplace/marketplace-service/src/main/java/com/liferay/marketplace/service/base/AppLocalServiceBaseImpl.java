@@ -31,6 +31,7 @@ import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -243,19 +244,32 @@ public abstract class AppLocalServiceBaseImpl extends BaseLocalServiceImpl
 		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
 
 		actionableDynamicQuery.setBaseLocalService(com.liferay.marketplace.service.AppLocalServiceUtil.getService());
-		actionableDynamicQuery.setClass(App.class);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
+		actionableDynamicQuery.setModelClass(App.class);
 
 		actionableDynamicQuery.setPrimaryKeyPropertyName("appId");
 
 		return actionableDynamicQuery;
 	}
 
+	@Override
+	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		IndexableActionableDynamicQuery indexableActionableDynamicQuery = new IndexableActionableDynamicQuery();
+
+		indexableActionableDynamicQuery.setBaseLocalService(com.liferay.marketplace.service.AppLocalServiceUtil.getService());
+		indexableActionableDynamicQuery.setClassLoader(getClassLoader());
+		indexableActionableDynamicQuery.setModelClass(App.class);
+
+		indexableActionableDynamicQuery.setPrimaryKeyPropertyName("appId");
+
+		return indexableActionableDynamicQuery;
+	}
+
 	protected void initActionableDynamicQuery(
 		ActionableDynamicQuery actionableDynamicQuery) {
 		actionableDynamicQuery.setBaseLocalService(com.liferay.marketplace.service.AppLocalServiceUtil.getService());
-		actionableDynamicQuery.setClass(App.class);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
+		actionableDynamicQuery.setModelClass(App.class);
 
 		actionableDynamicQuery.setPrimaryKeyPropertyName("appId");
 	}
@@ -396,25 +410,6 @@ public abstract class AppLocalServiceBaseImpl extends BaseLocalServiceImpl
 	}
 
 	/**
-	 * Returns the app remote service.
-	 *
-	 * @return the app remote service
-	 */
-	public com.liferay.marketplace.service.AppService getAppService() {
-		return appService;
-	}
-
-	/**
-	 * Sets the app remote service.
-	 *
-	 * @param appService the app remote service
-	 */
-	public void setAppService(
-		com.liferay.marketplace.service.AppService appService) {
-		this.appService = appService;
-	}
-
-	/**
 	 * Returns the app persistence.
 	 *
 	 * @return the app persistence
@@ -508,25 +503,6 @@ public abstract class AppLocalServiceBaseImpl extends BaseLocalServiceImpl
 	}
 
 	/**
-	 * Returns the class name remote service.
-	 *
-	 * @return the class name remote service
-	 */
-	public com.liferay.portal.service.ClassNameService getClassNameService() {
-		return classNameService;
-	}
-
-	/**
-	 * Sets the class name remote service.
-	 *
-	 * @param classNameService the class name remote service
-	 */
-	public void setClassNameService(
-		com.liferay.portal.service.ClassNameService classNameService) {
-		this.classNameService = classNameService;
-	}
-
-	/**
 	 * Returns the class name persistence.
 	 *
 	 * @return the class name persistence
@@ -581,25 +557,6 @@ public abstract class AppLocalServiceBaseImpl extends BaseLocalServiceImpl
 	public void setUserLocalService(
 		com.liferay.portal.service.UserLocalService userLocalService) {
 		this.userLocalService = userLocalService;
-	}
-
-	/**
-	 * Returns the user remote service.
-	 *
-	 * @return the user remote service
-	 */
-	public com.liferay.portal.service.UserService getUserService() {
-		return userService;
-	}
-
-	/**
-	 * Sets the user remote service.
-	 *
-	 * @param userService the user remote service
-	 */
-	public void setUserService(
-		com.liferay.portal.service.UserService userService) {
-		this.userService = userService;
 	}
 
 	/**
@@ -674,8 +631,6 @@ public abstract class AppLocalServiceBaseImpl extends BaseLocalServiceImpl
 
 	@BeanReference(type = com.liferay.marketplace.service.AppLocalService.class)
 	protected AppLocalService appLocalService;
-	@BeanReference(type = com.liferay.marketplace.service.AppService.class)
-	protected com.liferay.marketplace.service.AppService appService;
 	@BeanReference(type = AppPersistence.class)
 	protected AppPersistence appPersistence;
 	@BeanReference(type = com.liferay.marketplace.service.ModuleLocalService.class)
@@ -686,16 +641,12 @@ public abstract class AppLocalServiceBaseImpl extends BaseLocalServiceImpl
 	protected com.liferay.counter.service.CounterLocalService counterLocalService;
 	@BeanReference(type = com.liferay.portal.service.ClassNameLocalService.class)
 	protected com.liferay.portal.service.ClassNameLocalService classNameLocalService;
-	@BeanReference(type = com.liferay.portal.service.ClassNameService.class)
-	protected com.liferay.portal.service.ClassNameService classNameService;
 	@BeanReference(type = ClassNamePersistence.class)
 	protected ClassNamePersistence classNamePersistence;
 	@BeanReference(type = com.liferay.portal.service.ResourceLocalService.class)
 	protected com.liferay.portal.service.ResourceLocalService resourceLocalService;
 	@BeanReference(type = com.liferay.portal.service.UserLocalService.class)
 	protected com.liferay.portal.service.UserLocalService userLocalService;
-	@BeanReference(type = com.liferay.portal.service.UserService.class)
-	protected com.liferay.portal.service.UserService userService;
 	@BeanReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)

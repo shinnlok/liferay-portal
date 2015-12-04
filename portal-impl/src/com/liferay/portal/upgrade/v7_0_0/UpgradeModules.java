@@ -19,7 +19,6 @@ import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.model.ReleaseConstants;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
@@ -31,13 +30,10 @@ public class UpgradeModules extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
 		try {
-			con = DataAccess.getUpgradeOptimizedConnection();
-
 			StringBundler sb = new StringBundler(5);
 
 			sb.append("insert into Release_ (mvccVersion, releaseId, ");
@@ -48,7 +44,7 @@ public class UpgradeModules extends UpgradeProcess {
 
 			String sql = sb.toString();
 
-			ps = con.prepareStatement(sql);
+			ps = connection.prepareStatement(sql);
 
 			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
@@ -61,7 +57,7 @@ public class UpgradeModules extends UpgradeProcess {
 				ps.setString(6, "0.0.1");
 				ps.setInt(7, 001);
 				ps.setTimestamp(8, timestamp);
-				ps.setBoolean(9, true);
+				ps.setBoolean(9, false);
 				ps.setInt(10, 0);
 				ps.setString(11, ReleaseConstants.TEST_STRING);
 
@@ -71,7 +67,7 @@ public class UpgradeModules extends UpgradeProcess {
 			ps.executeBatch();
 		}
 		finally {
-			DataAccess.cleanUp(con, ps, rs);
+			DataAccess.cleanUp(ps, rs);
 		}
 	}
 
@@ -85,7 +81,6 @@ public class UpgradeModules extends UpgradeProcess {
 		"com.liferay.asset.tags.navigation.web",
 		"com.liferay.blogs.recent.bloggers.web", "com.liferay.blogs.web",
 		"com.liferay.bookmarks.service", "com.liferay.bookmarks.web",
-		"com.liferay.calendar.service", "com.liferay.calendar.web",
 		"com.liferay.comment.page.comments.web",
 		"com.liferay.currency.converter.web", "com.liferay.dictionary.web",
 		"com.liferay.document.library.web",
@@ -101,8 +96,7 @@ public class UpgradeModules extends UpgradeProcess {
 		"com.liferay.layout.prototype.web",
 		"com.liferay.layout.set.prototype.web",
 		"com.liferay.loan.calculator.web", "com.liferay.marketplace.service",
-		"com.liferay.message.boards.web", "com.liferay.microblogs.service",
-		"com.liferay.microblogs.web", "com.liferay.mobile.device.rules.web",
+		"com.liferay.message.boards.web", "com.liferay.mobile.device.rules.web",
 		"com.liferay.my.account.web", "com.liferay.nested.portlets.web",
 		"com.liferay.network.utilities.web",
 		"com.liferay.password.generator.web",
@@ -110,7 +104,6 @@ public class UpgradeModules extends UpgradeProcess {
 		"com.liferay.plugins.admin.web", "com.liferay.polls.service",
 		"com.liferay.portal.instances.web", "com.liferay.portal.lock.service",
 		"com.liferay.portal.settings.web",
-		"com.liferay.portal.workflow.kaleo.service",
 		"com.liferay.portlet.configuration.web", "com.liferay.portlet.css.web",
 		"com.liferay.quick.note.web.uprade;",
 		"com.liferay.ratings.page.ratings.web", "com.liferay.roles.admin.web",
@@ -127,7 +120,6 @@ public class UpgradeModules extends UpgradeProcess {
 		"com.liferay.site.teams.web", "com.liferay.social.activities.web",
 		"com.liferay.social.activity.web",
 		"com.liferay.social.group.statistics.web",
-		"com.liferay.social.networking.service",
 		"com.liferay.social.requests.web",
 		"com.liferay.social.user.statistics.web", "com.liferay.staging.bar.web",
 		"com.liferay.translator.web", "com.liferay.trash.web",

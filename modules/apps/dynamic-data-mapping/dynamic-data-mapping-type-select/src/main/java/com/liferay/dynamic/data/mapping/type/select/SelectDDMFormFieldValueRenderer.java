@@ -22,6 +22,7 @@ import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Locale;
 
@@ -52,10 +53,17 @@ public class SelectDDMFormFieldValueRenderer
 				sb.append(StringPool.COMMA_AND_SPACE);
 			}
 
-			LocalizedValue optionLabel = ddmFormFieldOptions.getOptionLabels(
-				optionsValuesJSONArray.getString(i));
+			String optionValue = optionsValuesJSONArray.getString(i);
 
-			sb.append(optionLabel.getString(locale));
+			if (isManualDataSourceType(ddmFormFieldValue.getDDMFormField())) {
+				LocalizedValue optionLabel =
+					ddmFormFieldOptions.getOptionLabels(optionValue);
+
+				sb.append(optionLabel.getString(locale));
+			}
+			else {
+				sb.append(optionValue);
+			}
 		}
 
 		return sb.toString();
@@ -69,6 +77,17 @@ public class SelectDDMFormFieldValueRenderer
 		return ddmFormField.getDDMFormFieldOptions();
 	}
 
+	protected boolean isManualDataSourceType(DDMFormField ddmFormField) {
+		String dataSourceType = (String)ddmFormField.getProperty(
+			"dataSourceType");
+
+		if (Validator.equals(dataSourceType, "manual")) {
+			return true;
+		}
+
+		return false;
+	}
+
 	@Reference(unbind = "-")
 	protected void setSelectDDMFormFieldValueAccessor(
 		SelectDDMFormFieldValueAccessor selectDDMFormFieldValueAccessor) {
@@ -76,6 +95,7 @@ public class SelectDDMFormFieldValueRenderer
 		_selectDDMFormFieldValueAccessor = selectDDMFormFieldValueAccessor;
 	}
 
-	private SelectDDMFormFieldValueAccessor _selectDDMFormFieldValueAccessor;
+	private volatile SelectDDMFormFieldValueAccessor
+		_selectDDMFormFieldValueAccessor;
 
 }

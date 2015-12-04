@@ -16,8 +16,7 @@ package com.liferay.shopping.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
+import com.liferay.osgi.util.ServiceTrackerFactory;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -185,6 +184,10 @@ public class ShoppingItemPriceLocalServiceUtil {
 		return getService().getActionableDynamicQuery();
 	}
 
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
 	public static java.util.List<com.liferay.shopping.model.ShoppingItemPrice> getItemPrices(
 		long itemId) throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getItemPrices(itemId);
@@ -265,14 +268,6 @@ public class ShoppingItemPriceLocalServiceUtil {
 	public void setService(ShoppingItemPriceLocalService service) {
 	}
 
-	private static ServiceTracker<ShoppingItemPriceLocalService, ShoppingItemPriceLocalService> _serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(ShoppingItemPriceLocalServiceUtil.class);
-
-		_serviceTracker = new ServiceTracker<ShoppingItemPriceLocalService, ShoppingItemPriceLocalService>(bundle.getBundleContext(),
-				ShoppingItemPriceLocalService.class, null);
-
-		_serviceTracker.open();
-	}
+	private static ServiceTracker<ShoppingItemPriceLocalService, ShoppingItemPriceLocalService> _serviceTracker =
+		ServiceTrackerFactory.open(ShoppingItemPriceLocalService.class);
 }
