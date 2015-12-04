@@ -124,10 +124,7 @@ public class SyncFileService {
 		syncFile.setName(name);
 		syncFile.setParentFolderId(parentFolderId);
 		syncFile.setRepositoryId(repositoryId);
-
-		Path filePath = Paths.get(filePathName);
-
-		syncFile.setSize(Files.size(filePath));
+		syncFile.setSize(Files.size(Paths.get(filePathName)));
 		syncFile.setState(state);
 		syncFile.setSyncAccountId(syncAccountId);
 		syncFile.setType(type);
@@ -135,7 +132,8 @@ public class SyncFileService {
 		_syncFilePersistence.create(syncFile);
 
 		FileKeyUtil.writeFileKey(
-			filePath, String.valueOf(syncFile.getSyncFileId()), true);
+			Paths.get(filePathName), String.valueOf(syncFile.getSyncFileId()),
+			true);
 
 		if (createChecksums) {
 			IODeltaUtil.checksums(syncFile);
