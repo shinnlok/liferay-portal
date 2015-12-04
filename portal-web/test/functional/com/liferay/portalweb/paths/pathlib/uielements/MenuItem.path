@@ -49,6 +49,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>ADD_FILE_ENTRY</td>
+	<td>//a[@role='menuitem' and contains(.,'Add File Entry')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>ADD_FOLDER</td>
 	<td>//a[@role='menuitem' and contains(.,'Add Folder')]</td>
 	<td></td>
@@ -79,8 +84,23 @@
 	<td></td>
 </tr>
 <tr>
+	<td>ADD_SITE_ROLES_TO_USERS</td>
+	<td>//a[@role='menuitem' and contains(.,'Add Site Roles to Users')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ADD_SITE_ROLES_TO_USER_GROUPS</td>
+	<td>//a[@role='menuitem' and contains(.,'Add Site Roles to User Groups')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>ADD_SUBCATEGORY</td>
 	<td>//div[contains(@class,'open')]//a[contains(.,'Add Subcategory')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ADD_SUBFOLDER</td>
+	<td>//a[@role='menuitem' and contains(.,'Add Subfolder')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -190,7 +210,7 @@
 </tr>
 <tr>
 	<td>CONTRACT</td>
-	<td>//li[contains(@class,'open')]//a[@role='menuitem' and contains(.,'Contract')]</td>
+	<td>//a[@role='menuitem' and contains(.,'Contract')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -245,12 +265,12 @@
 </tr>
 <tr>
 	<td>DOCUMENT_TYPE</td>
-	<td>//a[@role='menuitem' and contains(.,'${key_dmDocumentTypeName}')]</td>
+	<td>//div[contains(@class,'open')]//a[contains(.,'${key_dmDocumentTypeName}')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>DOCUMENT_TYPES</td>
-	<td>//li[contains(@class,'open')]//a[@role='menuitem' and contains(.,'Document Types')]</td>
+	<td>//a[@role='menuitem']//span[contains(.,'Document Types')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -320,7 +340,7 @@
 </tr>
 <tr>
 	<td>ITEMS_PER_PAGE</td>
-	<td>//ul[contains(@class,'dropdown-menu')]/li/a/span[contains(.,'${key_itemsPerPage}')]</td>
+	<td>//ul[contains(@class,'dropdown-menu')]/li/a[contains(.,'${key_itemsPerPage}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -380,7 +400,7 @@
 </tr>
 <tr>
 	<td>MARKETING_BANNER</td>
-	<td>//li[contains(@class,'open')]//a[@role='menuitem' and contains(.,'Marketing Banner')]</td>
+	<td>//a[@role='menuitem' and contains(.,'Marketing Banner')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -395,7 +415,7 @@
 </tr>
 <tr>
 	<td>METADATA_SETS</td>
-	<td>//li[contains(@class,'open')]//a[@role='menuitem' and contains(.,'Metadata Sets')]</td>
+	<td>//a[@role='menuitem']//span[contains(.,'Metadata Sets')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -415,12 +435,12 @@
 </tr>
 <tr>
 	<td>MULTIPLE_DOCUMENTS</td>
-	<td>//li[contains(@class,'open')]//a[@role='menuitem' and contains(.,'Multiple Documents')]</td>
+	<td>//a[@role='menuitem' and contains(.,'Multiple Documents')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>ONLINE_TRAINING</td>
-	<td>//li[contains(@class,'open')]//a[@role='menuitem' and @title='Online Training']</td>
+	<td>//a[@role='menuitem' and contains(.,'Online Training')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -451,6 +471,11 @@
 <tr>
 	<td>PERMISSIONS_LEXICON</td>
 	<td>//div[contains(@class,'dropdown') and contains(@class,'open')]//a[contains(.,'Permissions')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PLATFORM</td>
+	<td>//a[@role='menuitem' and contains(.,'Platform')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -520,7 +545,7 @@
 </tr>
 <tr>
 	<td>SALES_PRESENTATION</td>
-	<td>//li[contains(@class,'open')]//a[@role='menuitem' and contains(.,'Sales Presentation')]</td>
+	<td>//a[@role='menuitem' and contains(.,'Sales Presentation')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -696,6 +721,11 @@
 <tr>
 	<td>WITHDRAW_SUBMISSION</td>
 	<td>//a[@role='menuitem' and contains(.,'Withdraw Submission')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>VIEW_MEMBERSHIP_REQUESTS</td>
+	<td>//a[@role='menuitem' and contains(.,'View Membership Requests')]</td>
 	<td></td>
 </tr>
 </tbody>

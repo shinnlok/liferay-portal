@@ -16,8 +16,7 @@ package com.liferay.wiki.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
+import com.liferay.osgi.util.ServiceTrackerFactory;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -280,6 +279,10 @@ public class WikiNodeLocalServiceUtil {
 		return getService().getExportActionableDynamicQuery(portletDataContext);
 	}
 
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
 	public static com.liferay.wiki.model.WikiNode getNode(long groupId,
 		java.lang.String nodeName)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -489,14 +492,6 @@ public class WikiNodeLocalServiceUtil {
 	public void setService(WikiNodeLocalService service) {
 	}
 
-	private static ServiceTracker<WikiNodeLocalService, WikiNodeLocalService> _serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(WikiNodeLocalServiceUtil.class);
-
-		_serviceTracker = new ServiceTracker<WikiNodeLocalService, WikiNodeLocalService>(bundle.getBundleContext(),
-				WikiNodeLocalService.class, null);
-
-		_serviceTracker.open();
-	}
+	private static ServiceTracker<WikiNodeLocalService, WikiNodeLocalService> _serviceTracker =
+		ServiceTrackerFactory.open(WikiNodeLocalService.class);
 }

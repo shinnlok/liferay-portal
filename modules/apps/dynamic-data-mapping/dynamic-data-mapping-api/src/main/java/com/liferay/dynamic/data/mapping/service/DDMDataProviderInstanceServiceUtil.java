@@ -16,8 +16,7 @@ package com.liferay.dynamic.data.mapping.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
+import com.liferay.osgi.util.ServiceTrackerFactory;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -58,6 +57,12 @@ public class DDMDataProviderInstanceServiceUtil {
 	public static void deleteDataProviderInstance(long dataProviderInstanceId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		getService().deleteDataProviderInstance(dataProviderInstanceId);
+	}
+
+	public static com.liferay.dynamic.data.mapping.model.DDMDataProviderInstance fetchDataProviderInstance(
+		long dataProviderInstanceId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().fetchDataProviderInstance(dataProviderInstanceId);
 	}
 
 	public static com.liferay.dynamic.data.mapping.model.DDMDataProviderInstance getDataProviderInstance(
@@ -128,14 +133,6 @@ public class DDMDataProviderInstanceServiceUtil {
 	public void setService(DDMDataProviderInstanceService service) {
 	}
 
-	private static ServiceTracker<DDMDataProviderInstanceService, DDMDataProviderInstanceService> _serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(DDMDataProviderInstanceServiceUtil.class);
-
-		_serviceTracker = new ServiceTracker<DDMDataProviderInstanceService, DDMDataProviderInstanceService>(bundle.getBundleContext(),
-				DDMDataProviderInstanceService.class, null);
-
-		_serviceTracker.open();
-	}
+	private static ServiceTracker<DDMDataProviderInstanceService, DDMDataProviderInstanceService> _serviceTracker =
+		ServiceTrackerFactory.open(DDMDataProviderInstanceService.class);
 }

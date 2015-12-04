@@ -431,6 +431,10 @@ public class UserNotificationEventLocalServiceUtil {
 			deliveryType, delivered, actionRequired);
 	}
 
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -444,6 +448,11 @@ public class UserNotificationEventLocalServiceUtil {
 		java.io.Serializable primaryKeyObj)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getPersistedModel(primaryKeyObj);
+	}
+
+	public static java.util.List<com.liferay.portal.model.UserNotificationEvent> getTypeNotificationEvents(
+		java.lang.String type) {
+		return getService().getTypeNotificationEvents(type);
 	}
 
 	/**
@@ -558,6 +567,13 @@ public class UserNotificationEventLocalServiceUtil {
 	public static int getUserNotificationEventsCount(long userId,
 		int deliveryType) {
 		return getService().getUserNotificationEventsCount(userId, deliveryType);
+	}
+
+	public static int getUserNotificationEventsCount(long userId,
+		java.lang.String type, int deliveryType, boolean archived) {
+		return getService()
+				   .getUserNotificationEventsCount(userId, type, deliveryType,
+			archived);
 	}
 
 	public static com.liferay.portal.model.UserNotificationEvent sendUserNotificationEvents(

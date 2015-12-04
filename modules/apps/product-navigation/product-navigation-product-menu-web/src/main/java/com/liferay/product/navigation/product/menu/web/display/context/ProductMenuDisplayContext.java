@@ -46,6 +46,9 @@ public class ProductMenuDisplayContext {
 
 		_panelAppRegistry = (PanelAppRegistry)_portletRequest.getAttribute(
 			ApplicationListWebKeys.PANEL_APP_REGISTRY);
+		_panelCategoryHelper =
+			(PanelCategoryHelper)_portletRequest.getAttribute(
+				ApplicationListWebKeys.PANEL_CATEGORY_HELPER);
 		_panelCategoryRegistry =
 			(PanelCategoryRegistry)_portletRequest.getAttribute(
 				ApplicationListWebKeys.PANEL_CATEGORY_REGISTRY);
@@ -65,6 +68,12 @@ public class ProductMenuDisplayContext {
 		return _childPanelCategories;
 	}
 
+	public int getNotificationsCount(PanelCategory panelCategory) {
+		return _panelCategoryHelper.getNotificationsCount(
+			panelCategory.getKey(), _themeDisplay.getPermissionChecker(),
+			_themeDisplay.getScopeGroup(), _themeDisplay.getUser());
+	}
+
 	public String getRootPanelCategoryKey() {
 		if (_rootPanelCategoryKey != null) {
 			return _rootPanelCategoryKey;
@@ -75,9 +84,10 @@ public class ProductMenuDisplayContext {
 		List<PanelCategory> childPanelCategories = getChildPanelCategories();
 
 		if (!childPanelCategories.isEmpty()) {
-			PanelCategory firstChildPanelCategory = childPanelCategories.get(0);
+			PanelCategory lastChildPanelCategory = childPanelCategories.get(
+				childPanelCategories.size() - 1);
 
-			_rootPanelCategoryKey = firstChildPanelCategory.getKey();
+			_rootPanelCategoryKey = lastChildPanelCategory.getKey();
 
 			if (Validator.isNotNull(_themeDisplay.getPpid())) {
 				PanelCategoryHelper panelCategoryHelper =
@@ -123,6 +133,7 @@ public class ProductMenuDisplayContext {
 
 	private List<PanelCategory> _childPanelCategories;
 	private final PanelAppRegistry _panelAppRegistry;
+	private final PanelCategoryHelper _panelCategoryHelper;
 	private final PanelCategoryRegistry _panelCategoryRegistry;
 	private final PortletRequest _portletRequest;
 	private final PortletResponse _portletResponse;

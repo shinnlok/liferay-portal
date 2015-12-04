@@ -21,32 +21,38 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.liveusers.LiveUsers;
 import com.liferay.portal.model.MembershipRequest;
 import com.liferay.portal.model.MembershipRequestConstants;
 import com.liferay.portal.model.User;
+import com.liferay.portal.model.UserGroupGroupRole;
+import com.liferay.portal.model.UserGroupRole;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.security.membershippolicy.MembershipPolicyException;
 import com.liferay.portal.service.MembershipRequestService;
 import com.liferay.portal.service.OrganizationService;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
+import com.liferay.portal.service.UserGroupGroupRoleLocalService;
 import com.liferay.portal.service.UserGroupGroupRoleService;
+import com.liferay.portal.service.UserGroupRoleLocalService;
 import com.liferay.portal.service.UserGroupRoleService;
 import com.liferay.portal.service.UserGroupService;
 import com.liferay.portal.service.UserLocalService;
 import com.liferay.portal.service.UserService;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
+import com.liferay.portlet.usersadmin.util.UsersAdmin;
 import com.liferay.site.memberships.web.constants.SiteMembershipsPortletKeys;
 
 import java.io.IOException;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.portlet.ActionRequest;
@@ -87,57 +93,35 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class SiteMembershipsPortlet extends MVCPortlet {
 
-	public void editGroupOrganizations(
+	public void addGroupOrganizations(
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		long[] addOrganizationIds = StringUtil.split(
-			ParamUtil.getString(actionRequest, "addOrganizationIds"), 0L);
-		long[] removeOrganizationIds = StringUtil.split(
-			ParamUtil.getString(actionRequest, "removeOrganizationIds"), 0L);
+		long[] addOrganizationIds = ParamUtil.getLongValues(
+			actionRequest, "rowIds");
 
 		_organizationService.addGroupOrganizations(
 			themeDisplay.getSiteGroupId(), addOrganizationIds);
-		_organizationService.unsetGroupOrganizations(
-			themeDisplay.getSiteGroupId(), removeOrganizationIds);
-
-		String redirect = ParamUtil.getString(
-			actionRequest, "assignmentsRedirect");
-
-		if (Validator.isNotNull(redirect)) {
-			actionRequest.setAttribute(WebKeys.REDIRECT, redirect);
-		}
 	}
 
-	public void editGroupUserGroups(
+	public void addGroupUserGroups(
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		long[] addUserGroupIds = StringUtil.split(
-			ParamUtil.getString(actionRequest, "addUserGroupIds"), 0L);
-		long[] removeUserGroupIds = StringUtil.split(
-			ParamUtil.getString(actionRequest, "removeUserGroupIds"), 0L);
+		long[] addUserGroupIds = ParamUtil.getLongValues(
+			actionRequest, "rowIds");
 
 		_userGroupService.addGroupUserGroups(
 			themeDisplay.getSiteGroupId(), addUserGroupIds);
-		_userGroupService.unsetGroupUserGroups(
-			themeDisplay.getSiteGroupId(), removeUserGroupIds);
-
-		String redirect = ParamUtil.getString(
-			actionRequest, "assignmentsRedirect");
-
-		if (Validator.isNotNull(redirect)) {
-			actionRequest.setAttribute(WebKeys.REDIRECT, redirect);
-		}
 	}
 
-	public void editGroupUsers(
+	public void addGroupUsers(
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
@@ -146,32 +130,95 @@ public class SiteMembershipsPortlet extends MVCPortlet {
 
 		long groupId = themeDisplay.getSiteGroupId();
 
-		long[] addUserIds = StringUtil.split(
-			ParamUtil.getString(actionRequest, "addUserIds"), 0L);
+		long[] addUserIds = ParamUtil.getLongValues(actionRequest, "rowIds");
 
 		addUserIds = filterAddUserIds(groupId, addUserIds);
 
-		long[] removeUserIds = StringUtil.split(
-			ParamUtil.getString(actionRequest, "removeUserIds"), 0L);
+		ServiceContext serviceContext = ServiceContextFactory.getInstance(
+			actionRequest);
+
+		_userService.addGroupUsers(groupId, addUserIds, serviceContext);
+
+		LiveUsers.joinGroup(themeDisplay.getCompanyId(), groupId, addUserIds);
+	}
+
+	public void deleteGroupOrganizations(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws Exception {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		long[] removeOrganizationIds = null;
+
+		long removeOrganizationId = ParamUtil.getLong(
+			actionRequest, "removeOrganizationId");
+
+		if (removeOrganizationId > 0) {
+			removeOrganizationIds = new long[] {removeOrganizationId};
+		}
+		else {
+			removeOrganizationIds = ParamUtil.getLongValues(
+				actionRequest, "rowIds");
+		}
+
+		_organizationService.unsetGroupOrganizations(
+			themeDisplay.getSiteGroupId(), removeOrganizationIds);
+	}
+
+	public void deleteGroupUserGroups(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws Exception {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		long[] removeUserGroupIds = null;
+
+		long removeUserGroupId = ParamUtil.getLong(
+			actionRequest, "removeUserGroupId");
+
+		if (removeUserGroupId > 0) {
+			removeUserGroupIds = new long[] {removeUserGroupId};
+		}
+		else {
+			removeUserGroupIds = ParamUtil.getLongValues(
+				actionRequest, "rowIds");
+		}
+
+		_userGroupService.unsetGroupUserGroups(
+			themeDisplay.getSiteGroupId(), removeUserGroupIds);
+	}
+
+	public void deleteGroupUsers(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws Exception {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		long groupId = themeDisplay.getSiteGroupId();
+
+		long[] removeUserIds = null;
+
+		long removeUserId = ParamUtil.getLong(actionRequest, "removeUserId");
+
+		if (removeUserId > 0) {
+			removeUserIds = new long[] {removeUserId};
+		}
+		else {
+			removeUserIds = ParamUtil.getLongValues(actionRequest, "rowIds");
+		}
 
 		removeUserIds = filterRemoveUserIds(groupId, removeUserIds);
 
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			actionRequest);
 
-		_userService.addGroupUsers(groupId, addUserIds, serviceContext);
 		_userService.unsetGroupUsers(groupId, removeUserIds, serviceContext);
 
-		LiveUsers.joinGroup(themeDisplay.getCompanyId(), groupId, addUserIds);
 		LiveUsers.leaveGroup(
 			themeDisplay.getCompanyId(), groupId, removeUserIds);
-
-		String redirect = ParamUtil.getString(
-			actionRequest, "assignmentsRedirect");
-
-		if (Validator.isNotNull(redirect)) {
-			actionRequest.setAttribute(WebKeys.REDIRECT, redirect);
-		}
 	}
 
 	public void editUserGroupGroupRole(
@@ -183,22 +230,28 @@ public class SiteMembershipsPortlet extends MVCPortlet {
 
 		long userGroupId = ParamUtil.getLong(actionRequest, "userGroupId");
 
-		long[] addRoleIds = StringUtil.split(
-			ParamUtil.getString(actionRequest, "addRoleIds"), 0L);
-		long[] removeRoleIds = StringUtil.split(
-			ParamUtil.getString(actionRequest, "removeRoleIds"), 0L);
+		long[] roleIds = ParamUtil.getLongValues(actionRequest, "rowIds");
+
+		List<UserGroupGroupRole> userGroupGroupRoles =
+			_userGroupGroupRoleLocalService.getUserGroupGroupRoles(
+				userGroupId, themeDisplay.getSiteGroupId());
+
+		List<Long> curRoleIds = ListUtil.toList(
+			userGroupGroupRoles, UsersAdmin.USER_GROUP_GROUP_ROLE_ID_ACCESSOR);
+
+		List<Long> removeRoleIds = new ArrayList<>();
+
+		for (long roleId : curRoleIds) {
+			if (!ArrayUtil.contains(roleIds, roleId)) {
+				removeRoleIds.add(roleId);
+			}
+		}
 
 		_userGroupGroupRoleService.addUserGroupGroupRoles(
-			userGroupId, themeDisplay.getSiteGroupId(), addRoleIds);
+			userGroupId, themeDisplay.getSiteGroupId(), roleIds);
 		_userGroupGroupRoleService.deleteUserGroupGroupRoles(
-			userGroupId, themeDisplay.getSiteGroupId(), removeRoleIds);
-
-		String redirect = ParamUtil.getString(
-			actionRequest, "assignmentsRedirect");
-
-		if (Validator.isNotNull(redirect)) {
-			actionRequest.setAttribute(WebKeys.REDIRECT, redirect);
-		}
+			userGroupId, themeDisplay.getSiteGroupId(),
+			ArrayUtil.toLongArray(removeRoleIds));
 	}
 
 	public void editUserGroupRole(
@@ -214,22 +267,28 @@ public class SiteMembershipsPortlet extends MVCPortlet {
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		long[] addRoleIds = StringUtil.split(
-			ParamUtil.getString(actionRequest, "addRoleIds"), 0L);
-		long[] removeRoleIds = StringUtil.split(
-			ParamUtil.getString(actionRequest, "removeRoleIds"), 0L);
+		long[] roleIds = ParamUtil.getLongValues(actionRequest, "rowIds");
+
+		List<UserGroupRole> userGroupRoles =
+			_userGroupRoleLocalService.getUserGroupRoles(
+				user.getUserId(), themeDisplay.getSiteGroupId());
+
+		List<Long> curRoleIds = ListUtil.toList(
+			userGroupRoles, UsersAdmin.USER_GROUP_ROLE_ID_ACCESSOR);
+
+		List<Long> removeRoleIds = new ArrayList<>();
+
+		for (long roleId : curRoleIds) {
+			if (!ArrayUtil.contains(roleIds, roleId)) {
+				removeRoleIds.add(roleId);
+			}
+		}
 
 		_userGroupRoleService.addUserGroupRoles(
-			user.getUserId(), themeDisplay.getSiteGroupId(), addRoleIds);
+			user.getUserId(), themeDisplay.getSiteGroupId(), roleIds);
 		_userGroupRoleService.deleteUserGroupRoles(
-			user.getUserId(), themeDisplay.getSiteGroupId(), removeRoleIds);
-
-		String redirect = ParamUtil.getString(
-			actionRequest, "assignmentsRedirect");
-
-		if (Validator.isNotNull(redirect)) {
-			actionRequest.setAttribute(WebKeys.REDIRECT, redirect);
-		}
+			user.getUserId(), themeDisplay.getSiteGroupId(),
+			ArrayUtil.toLongArray(removeRoleIds));
 	}
 
 	public void replyMembershipRequest(
@@ -346,10 +405,24 @@ public class SiteMembershipsPortlet extends MVCPortlet {
 	}
 
 	@Reference(unbind = "-")
+	protected void setUserGroupGroupRoleLocalService(
+		UserGroupGroupRoleLocalService userGroupGroupRoleLocalService) {
+
+		_userGroupGroupRoleLocalService = userGroupGroupRoleLocalService;
+	}
+
+	@Reference(unbind = "-")
 	protected void setUserGroupGroupRoleService(
 		UserGroupGroupRoleService userGroupGroupRoleService) {
 
 		_userGroupGroupRoleService = userGroupGroupRoleService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setUserGroupRoleLocalService(
+		UserGroupRoleLocalService userGroupRoleLocalService) {
+
+		_userGroupRoleLocalService = userGroupRoleLocalService;
 	}
 
 	@Reference(unbind = "-")
@@ -374,12 +447,15 @@ public class SiteMembershipsPortlet extends MVCPortlet {
 		_userService = userService;
 	}
 
-	private MembershipRequestService _membershipRequestService;
-	private OrganizationService _organizationService;
-	private UserGroupGroupRoleService _userGroupGroupRoleService;
-	private UserGroupRoleService _userGroupRoleService;
-	private UserGroupService _userGroupService;
-	private UserLocalService _userLocalService;
-	private UserService _userService;
+	private volatile MembershipRequestService _membershipRequestService;
+	private volatile OrganizationService _organizationService;
+	private volatile UserGroupGroupRoleLocalService
+		_userGroupGroupRoleLocalService;
+	private volatile UserGroupGroupRoleService _userGroupGroupRoleService;
+	private volatile UserGroupRoleLocalService _userGroupRoleLocalService;
+	private volatile UserGroupRoleService _userGroupRoleService;
+	private volatile UserGroupService _userGroupService;
+	private volatile UserLocalService _userLocalService;
+	private volatile UserService _userService;
 
 }

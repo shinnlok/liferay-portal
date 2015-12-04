@@ -52,7 +52,7 @@ public class JGroupsClusterChannelFactory implements ClusterChannelFactory {
 		ClusterReceiver clusterReceiver) {
 
 		return new JGroupsClusterChannel(
-			channelProperties, clusterName, clusterReceiver);
+			channelProperties, clusterName, clusterReceiver, _bindInetAddress);
 	}
 
 	@Override
@@ -148,11 +148,6 @@ public class JGroupsClusterChannelFactory implements ClusterChannelFactory {
 			}
 		}
 
-		System.setProperty(
-			"jgroups.bind_addr", _bindInetAddress.getHostAddress());
-		System.setProperty(
-			"jgroups.bind_interface", _bindNetworkInterface.getName());
-
 		if (_log.isInfoEnabled()) {
 			String hostAddress = _bindInetAddress.getHostAddress();
 			String name = _bindNetworkInterface.getName();
@@ -194,6 +189,6 @@ public class JGroupsClusterChannelFactory implements ClusterChannelFactory {
 
 	private InetAddress _bindInetAddress;
 	private NetworkInterface _bindNetworkInterface;
-	private Props _props;
+	private volatile Props _props;
 
 }

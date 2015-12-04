@@ -14,6 +14,7 @@
 
 package com.liferay.portal.portlet.tracker.internal;
 
+import com.liferay.osgi.util.ServiceTrackerFactory;
 import com.liferay.portal.kernel.application.type.ApplicationType;
 import com.liferay.portal.kernel.configuration.Configuration;
 import com.liferay.portal.kernel.configuration.ConfigurationFactoryUtil;
@@ -256,10 +257,8 @@ public class PortletTracker
 
 		BundleContext bundleContext = _componentContext.getBundleContext();
 
-		_serviceTracker = new ServiceTracker<>(
+		_serviceTracker = ServiceTrackerFactory.open(
 			bundleContext, Portlet.class, this);
-
-		_serviceTracker.open();
 
 		if (_log.isInfoEnabled()) {
 			_log.info("Activated");
@@ -1371,16 +1370,16 @@ public class PortletTracker
 
 	private static final Log _log = LogFactoryUtil.getLog(PortletTracker.class);
 
-	private CompanyLocalService _companyLocalService;
+	private volatile CompanyLocalService _companyLocalService;
 	private ComponentContext _componentContext;
 	private String _httpServiceEndpoint = StringPool.BLANK;
-	private PortletInstanceFactory _portletInstanceFactory;
-	private PortletLocalService _portletLocalService;
+	private volatile PortletInstanceFactory _portletInstanceFactory;
+	private volatile PortletLocalService _portletLocalService;
 	private final PortletPropertyValidator _portletPropertyValidator =
 		new PortletPropertyValidator();
-	private ResourceActionLocalService _resourceActionLocalService;
-	private ResourceActions _resourceActions;
-	private SAXReader _saxReader;
+	private volatile ResourceActionLocalService _resourceActionLocalService;
+	private volatile ResourceActions _resourceActions;
+	private volatile SAXReader _saxReader;
 	private final ConcurrentMap<Bundle, ServiceRegistrations>
 		_serviceRegistrations = new ConcurrentHashMap<>();
 	private ServiceTracker<Portlet, com.liferay.portal.model.Portlet>

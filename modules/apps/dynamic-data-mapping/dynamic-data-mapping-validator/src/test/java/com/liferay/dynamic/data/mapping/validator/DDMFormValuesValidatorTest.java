@@ -14,9 +14,8 @@
 
 package com.liferay.dynamic.data.mapping.validator;
 
-import com.liferay.dynamic.data.mapping.exception.StorageFieldNameException;
-import com.liferay.dynamic.data.mapping.exception.StorageFieldRequiredException;
 import com.liferay.dynamic.data.mapping.exception.StorageFieldValueException;
+import com.liferay.dynamic.data.mapping.exception.StorageFieldValueException.RequiredValue;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
@@ -40,7 +39,7 @@ import org.junit.Test;
  */
 public class DDMFormValuesValidatorTest {
 
-	@Test(expected = StorageFieldNameException.class)
+	@Test
 	public void testValidationWithInvalidFieldName() throws Exception {
 		DDMForm ddmForm = DDMFormTestUtil.createDDMForm("firstName");
 
@@ -53,7 +52,7 @@ public class DDMFormValuesValidatorTest {
 		_ddmFormValuesValidator.validate(ddmFormValues);
 	}
 
-	@Test(expected = StorageFieldNameException.class)
+	@Test
 	public void testValidationWithInvalidNestedFieldName() throws Exception {
 		DDMForm ddmForm = DDMFormTestUtil.createDDMForm();
 
@@ -106,7 +105,7 @@ public class DDMFormValuesValidatorTest {
 		_ddmFormValuesValidator.validate(ddmFormValues);
 	}
 
-	@Test(expected = StorageFieldRequiredException.class)
+	@Test(expected = RequiredValue.class)
 	public void testValidationWithMissingNestedRequiredField()
 		throws Exception {
 
@@ -134,7 +133,7 @@ public class DDMFormValuesValidatorTest {
 		_ddmFormValuesValidator.validate(ddmFormValues);
 	}
 
-	@Test(expected = StorageFieldValueException.class)
+	@Test(expected = RequiredValue.class)
 	public void testValidationWithMissingNestedRequiredFieldValue()
 		throws Exception {
 
@@ -168,7 +167,7 @@ public class DDMFormValuesValidatorTest {
 		_ddmFormValuesValidator.validate(ddmFormValues);
 	}
 
-	@Test(expected = StorageFieldRequiredException.class)
+	@Test(expected = RequiredValue.class)
 	public void testValidationWithMissingRequiredField() throws Exception {
 		DDMForm ddmForm = DDMFormTestUtil.createDDMForm();
 
@@ -185,7 +184,7 @@ public class DDMFormValuesValidatorTest {
 		_ddmFormValuesValidator.validate(ddmFormValues);
 	}
 
-	@Test(expected = StorageFieldValueException.class)
+	@Test(expected = RequiredValue.class)
 	public void testValidationWithMissingRequiredFieldValue() throws Exception {
 		DDMForm ddmForm = DDMFormTestUtil.createDDMForm();
 
@@ -346,7 +345,7 @@ public class DDMFormValuesValidatorTest {
 		_ddmFormValuesValidator.validate(ddmFormValues);
 	}
 
-	@Test(expected = StorageFieldRequiredException.class)
+	@Test(expected = RequiredValue.class)
 	public void testValidationWithRequiredFieldAndWithNoValue()
 		throws Exception {
 

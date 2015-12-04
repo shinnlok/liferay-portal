@@ -29,7 +29,7 @@ import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.lock.Lock;
-import com.liferay.portal.kernel.lock.LockManagerUtil;
+import com.liferay.portal.kernel.lock.LockManager;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -132,8 +132,10 @@ import jodd.bean.BeanUtil;
  */
 public class PortletDataContextImpl implements PortletDataContext {
 
-	public PortletDataContextImpl() {
+	public PortletDataContextImpl(LockManager lockManager) {
 		initXStream();
+
+		_lockManager = lockManager;
 	}
 
 	/**
@@ -162,33 +164,11 @@ public class PortletDataContextImpl implements PortletDataContext {
 			return;
 		}
 
-		List<AssetLink> directAssetLinks =
-			AssetLinkLocalServiceUtil.getDirectLinks(assetEntry.getEntryId());
+		List<AssetLink> assetLinks = AssetLinkLocalServiceUtil.getLinks(
+			assetEntry.getEntryId());
 
-		if (directAssetLinks.isEmpty()) {
-			return;
-		}
-
-		Map<Integer, List<AssetLink>> assetLinksMap = new HashMap<>();
-
-		for (AssetLink assetLink : directAssetLinks) {
-			List<AssetLink> assetLinks = assetLinksMap.get(assetLink.getType());
-
-			if (assetLinks == null) {
-				assetLinks = new ArrayList<>();
-
-				assetLinksMap.put(assetLink.getType(), assetLinks);
-			}
-
-			assetLinks.add(assetLink);
-		}
-
-		for (Map.Entry<Integer, List<AssetLink>> entry :
-				assetLinksMap.entrySet()) {
-
-			_assetLinksMap.put(
-				getPrimaryKeyString(assetEntry.getClassUuid(), entry.getKey()),
-				entry.getValue());
+		for (AssetLink assetLink : assetLinks) {
+			_assetLinkIds.add(assetLink.getLinkId());
 		}
 	}
 
@@ -352,9 +332,9 @@ public class PortletDataContextImpl implements PortletDataContext {
 	@Override
 	public void addLocks(Class<?> clazz, String key) throws PortalException {
 		if (!_locksMap.containsKey(getPrimaryKeyString(clazz, key)) &&
-			LockManagerUtil.isLocked(clazz.getName(), key)) {
+			_lockManager.isLocked(clazz.getName(), key)) {
 
-			Lock lock = LockManagerUtil.getLock(clazz.getName(), key);
+			Lock lock = _lockManager.getLock(clazz.getName(), key);
 
 			addLocks(clazz.getName(), key, lock);
 		}
@@ -753,8 +733,17 @@ public class PortletDataContextImpl implements PortletDataContext {
 	}
 
 	@Override
+	public Set<Long> getAssetLinkIds() {
+		return _assetLinkIds;
+	}
+
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #getAssetLinkIds()}
+	 */
+	@Deprecated
+	@Override
 	public Map<String, List<AssetLink>> getAssetLinksMap() {
-		return _assetLinksMap;
+		return Collections.emptyMap();
 	}
 
 	@Override
@@ -1588,7 +1577,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 			expirationTime = expirationDate.getTime();
 		}
 
-		LockManagerUtil.lock(
+		_lockManager.lock(
 			userId, clazz.getName(), newKey, lock.getOwner(),
 			lock.isInheritable(), expirationTime);
 	}
@@ -2577,7 +2566,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 		PortletDataContextImpl.class);
 
 	private final Map<String, long[]> _assetCategoryIdsMap = new HashMap<>();
-	private final Map<String, List<AssetLink>> _assetLinksMap = new HashMap<>();
+	private final Set<Long> _assetLinkIds = new HashSet<>();
 	private final Map<String, String[]> _assetTagNamesMap = new HashMap<>();
 	private long _companyGroupId;
 	private long _companyId;
@@ -2590,6 +2579,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 	private transient Element _exportDataRootElement;
 	private long _groupId;
 	private transient Element _importDataRootElement;
+	private transient final LockManager _lockManager;
 	private transient final Map<String, Lock> _locksMap = new HashMap<>();
 	private transient ManifestSummary _manifestSummary = new ManifestSummary();
 	private transient final Set<String> _missingReferences = new HashSet<>();
