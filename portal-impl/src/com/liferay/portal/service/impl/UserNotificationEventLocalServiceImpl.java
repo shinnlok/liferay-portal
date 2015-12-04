@@ -89,7 +89,7 @@ public class UserNotificationEventLocalServiceImpl
 		userNotificationEvent.setTimestamp(timestamp);
 		userNotificationEvent.setDeliveryType(deliveryType);
 		userNotificationEvent.setDeliverBy(deliverBy);
-		userNotificationEvent.setDelivered(false);
+		userNotificationEvent.setDelivered(true);
 		userNotificationEvent.setPayload(payload);
 		userNotificationEvent.setActionRequired(actionRequired);
 		userNotificationEvent.setArchived(archived);
@@ -357,6 +357,11 @@ public class UserNotificationEventLocalServiceImpl
 	}
 
 	@Override
+	public List<UserNotificationEvent> getTypeNotificationEvents(String type) {
+		return userNotificationEventPersistence.findByType(type);
+	}
+
+	@Override
 	public List<UserNotificationEvent> getUserNotificationEvents(long userId) {
 		return userNotificationEventPersistence.findByUserId(userId);
 	}
@@ -428,6 +433,14 @@ public class UserNotificationEventLocalServiceImpl
 	public int getUserNotificationEventsCount(long userId, int deliveryType) {
 		return userNotificationEventPersistence.countByU_DT(
 			userId, deliveryType);
+	}
+
+	@Override
+	public int getUserNotificationEventsCount(
+		long userId, String type, int deliveryType, boolean archived) {
+
+		return userNotificationEventPersistence.countByU_T_DT_D(
+			userId, type, deliveryType, archived);
 	}
 
 	@Override

@@ -16,8 +16,7 @@ package com.liferay.portal.workflow.kaleo.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
+import com.liferay.osgi.util.ServiceTrackerFactory;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -204,6 +203,10 @@ public class KaleoTaskAssignmentLocalServiceUtil {
 		return getService().getActionableDynamicQuery();
 	}
 
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the kaleo task assignment with the primary key.
 	*
@@ -305,14 +308,6 @@ public class KaleoTaskAssignmentLocalServiceUtil {
 	public void setService(KaleoTaskAssignmentLocalService service) {
 	}
 
-	private static ServiceTracker<KaleoTaskAssignmentLocalService, KaleoTaskAssignmentLocalService> _serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(KaleoTaskAssignmentLocalServiceUtil.class);
-
-		_serviceTracker = new ServiceTracker<KaleoTaskAssignmentLocalService, KaleoTaskAssignmentLocalService>(bundle.getBundleContext(),
-				KaleoTaskAssignmentLocalService.class, null);
-
-		_serviceTracker.open();
-	}
+	private static ServiceTracker<KaleoTaskAssignmentLocalService, KaleoTaskAssignmentLocalService> _serviceTracker =
+		ServiceTrackerFactory.open(KaleoTaskAssignmentLocalService.class);
 }

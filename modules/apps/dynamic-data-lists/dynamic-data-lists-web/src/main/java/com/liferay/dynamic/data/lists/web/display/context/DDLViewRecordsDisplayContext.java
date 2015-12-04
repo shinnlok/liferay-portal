@@ -22,7 +22,9 @@ import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
+import com.liferay.portal.kernel.util.Validator;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -52,15 +54,23 @@ public class DDLViewRecordsDisplayContext {
 		if (_ddmFormFields == null) {
 			DDMForm ddmForm = _ddmStructure.getDDMForm();
 
-			List<DDMFormField> ddmFormfields = ddmForm.getDDMFormFields();
+			List<DDMFormField> ddmFormFields = new ArrayList<>();
+
+			for (DDMFormField ddmFormField : ddmForm.getDDMFormFields()) {
+				if (isDDMFormFieldTransient(ddmFormField)) {
+					continue;
+				}
+
+				ddmFormFields.add(ddmFormField);
+			}
 
 			int totalColumns = _TOTAL_COLUMNS;
 
-			if (ddmFormfields.size() < totalColumns) {
-				totalColumns = ddmFormfields.size();
+			if (ddmFormFields.size() < totalColumns) {
+				totalColumns = ddmFormFields.size();
 			}
 
-			_ddmFormFields = ddmFormfields.subList(0, totalColumns);
+			_ddmFormFields = ddmFormFields.subList(0, totalColumns);
 		}
 
 		return _ddmFormFields;
@@ -72,6 +82,14 @@ public class DDLViewRecordsDisplayContext {
 
 	public String getDisplayStyle() {
 		return "list";
+	}
+
+	protected boolean isDDMFormFieldTransient(DDMFormField ddmFormField) {
+		if (Validator.isNull(ddmFormField.getDataType())) {
+			return true;
+		}
+
+		return false;
 	}
 
 	private static final int _TOTAL_COLUMNS = 5;

@@ -29,6 +29,7 @@ import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -228,19 +229,33 @@ public abstract class DDLRecordVersionLocalServiceBaseImpl
 		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
 
 		actionableDynamicQuery.setBaseLocalService(com.liferay.dynamic.data.lists.service.DDLRecordVersionLocalServiceUtil.getService());
-		actionableDynamicQuery.setClass(DDLRecordVersion.class);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
+		actionableDynamicQuery.setModelClass(DDLRecordVersion.class);
 
 		actionableDynamicQuery.setPrimaryKeyPropertyName("recordVersionId");
 
 		return actionableDynamicQuery;
 	}
 
+	@Override
+	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		IndexableActionableDynamicQuery indexableActionableDynamicQuery = new IndexableActionableDynamicQuery();
+
+		indexableActionableDynamicQuery.setBaseLocalService(com.liferay.dynamic.data.lists.service.DDLRecordVersionLocalServiceUtil.getService());
+		indexableActionableDynamicQuery.setClassLoader(getClassLoader());
+		indexableActionableDynamicQuery.setModelClass(DDLRecordVersion.class);
+
+		indexableActionableDynamicQuery.setPrimaryKeyPropertyName(
+			"recordVersionId");
+
+		return indexableActionableDynamicQuery;
+	}
+
 	protected void initActionableDynamicQuery(
 		ActionableDynamicQuery actionableDynamicQuery) {
 		actionableDynamicQuery.setBaseLocalService(com.liferay.dynamic.data.lists.service.DDLRecordVersionLocalServiceUtil.getService());
-		actionableDynamicQuery.setClass(DDLRecordVersion.class);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
+		actionableDynamicQuery.setModelClass(DDLRecordVersion.class);
 
 		actionableDynamicQuery.setPrimaryKeyPropertyName("recordVersionId");
 	}
@@ -316,25 +331,6 @@ public abstract class DDLRecordVersionLocalServiceBaseImpl
 	public void setDDLRecordVersionLocalService(
 		DDLRecordVersionLocalService ddlRecordVersionLocalService) {
 		this.ddlRecordVersionLocalService = ddlRecordVersionLocalService;
-	}
-
-	/**
-	 * Returns the d d l record version remote service.
-	 *
-	 * @return the d d l record version remote service
-	 */
-	public com.liferay.dynamic.data.lists.service.DDLRecordVersionService getDDLRecordVersionService() {
-		return ddlRecordVersionService;
-	}
-
-	/**
-	 * Sets the d d l record version remote service.
-	 *
-	 * @param ddlRecordVersionService the d d l record version remote service
-	 */
-	public void setDDLRecordVersionService(
-		com.liferay.dynamic.data.lists.service.DDLRecordVersionService ddlRecordVersionService) {
-		this.ddlRecordVersionService = ddlRecordVersionService;
 	}
 
 	/**
@@ -429,8 +425,6 @@ public abstract class DDLRecordVersionLocalServiceBaseImpl
 
 	@BeanReference(type = com.liferay.dynamic.data.lists.service.DDLRecordVersionLocalService.class)
 	protected DDLRecordVersionLocalService ddlRecordVersionLocalService;
-	@BeanReference(type = com.liferay.dynamic.data.lists.service.DDLRecordVersionService.class)
-	protected com.liferay.dynamic.data.lists.service.DDLRecordVersionService ddlRecordVersionService;
 	@BeanReference(type = DDLRecordVersionPersistence.class)
 	protected DDLRecordVersionPersistence ddlRecordVersionPersistence;
 	@BeanReference(type = com.liferay.counter.service.CounterLocalService.class)

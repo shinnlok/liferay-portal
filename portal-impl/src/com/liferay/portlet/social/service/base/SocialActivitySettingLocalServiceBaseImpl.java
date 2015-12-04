@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -233,19 +234,33 @@ public abstract class SocialActivitySettingLocalServiceBaseImpl
 		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
 
 		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.social.service.SocialActivitySettingLocalServiceUtil.getService());
-		actionableDynamicQuery.setClass(SocialActivitySetting.class);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
+		actionableDynamicQuery.setModelClass(SocialActivitySetting.class);
 
 		actionableDynamicQuery.setPrimaryKeyPropertyName("activitySettingId");
 
 		return actionableDynamicQuery;
 	}
 
+	@Override
+	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		IndexableActionableDynamicQuery indexableActionableDynamicQuery = new IndexableActionableDynamicQuery();
+
+		indexableActionableDynamicQuery.setBaseLocalService(com.liferay.portlet.social.service.SocialActivitySettingLocalServiceUtil.getService());
+		indexableActionableDynamicQuery.setClassLoader(getClassLoader());
+		indexableActionableDynamicQuery.setModelClass(SocialActivitySetting.class);
+
+		indexableActionableDynamicQuery.setPrimaryKeyPropertyName(
+			"activitySettingId");
+
+		return indexableActionableDynamicQuery;
+	}
+
 	protected void initActionableDynamicQuery(
 		ActionableDynamicQuery actionableDynamicQuery) {
 		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.social.service.SocialActivitySettingLocalServiceUtil.getService());
-		actionableDynamicQuery.setClass(SocialActivitySetting.class);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
+		actionableDynamicQuery.setModelClass(SocialActivitySetting.class);
 
 		actionableDynamicQuery.setPrimaryKeyPropertyName("activitySettingId");
 	}
@@ -325,25 +340,6 @@ public abstract class SocialActivitySettingLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the social activity setting remote service.
-	 *
-	 * @return the social activity setting remote service
-	 */
-	public com.liferay.portlet.social.service.SocialActivitySettingService getSocialActivitySettingService() {
-		return socialActivitySettingService;
-	}
-
-	/**
-	 * Sets the social activity setting remote service.
-	 *
-	 * @param socialActivitySettingService the social activity setting remote service
-	 */
-	public void setSocialActivitySettingService(
-		com.liferay.portlet.social.service.SocialActivitySettingService socialActivitySettingService) {
-		this.socialActivitySettingService = socialActivitySettingService;
-	}
-
-	/**
 	 * Returns the social activity setting persistence.
 	 *
 	 * @return the social activity setting persistence
@@ -401,25 +397,6 @@ public abstract class SocialActivitySettingLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the class name remote service.
-	 *
-	 * @return the class name remote service
-	 */
-	public com.liferay.portal.service.ClassNameService getClassNameService() {
-		return classNameService;
-	}
-
-	/**
-	 * Sets the class name remote service.
-	 *
-	 * @param classNameService the class name remote service
-	 */
-	public void setClassNameService(
-		com.liferay.portal.service.ClassNameService classNameService) {
-		this.classNameService = classNameService;
-	}
-
-	/**
 	 * Returns the class name persistence.
 	 *
 	 * @return the class name persistence
@@ -455,25 +432,6 @@ public abstract class SocialActivitySettingLocalServiceBaseImpl
 	public void setGroupLocalService(
 		com.liferay.portal.service.GroupLocalService groupLocalService) {
 		this.groupLocalService = groupLocalService;
-	}
-
-	/**
-	 * Returns the group remote service.
-	 *
-	 * @return the group remote service
-	 */
-	public com.liferay.portal.service.GroupService getGroupService() {
-		return groupService;
-	}
-
-	/**
-	 * Sets the group remote service.
-	 *
-	 * @param groupService the group remote service
-	 */
-	public void setGroupService(
-		com.liferay.portal.service.GroupService groupService) {
-		this.groupService = groupService;
 	}
 
 	/**
@@ -566,22 +524,16 @@ public abstract class SocialActivitySettingLocalServiceBaseImpl
 
 	@BeanReference(type = com.liferay.portlet.social.service.SocialActivitySettingLocalService.class)
 	protected SocialActivitySettingLocalService socialActivitySettingLocalService;
-	@BeanReference(type = com.liferay.portlet.social.service.SocialActivitySettingService.class)
-	protected com.liferay.portlet.social.service.SocialActivitySettingService socialActivitySettingService;
 	@BeanReference(type = SocialActivitySettingPersistence.class)
 	protected SocialActivitySettingPersistence socialActivitySettingPersistence;
 	@BeanReference(type = com.liferay.counter.service.CounterLocalService.class)
 	protected com.liferay.counter.service.CounterLocalService counterLocalService;
 	@BeanReference(type = com.liferay.portal.service.ClassNameLocalService.class)
 	protected com.liferay.portal.service.ClassNameLocalService classNameLocalService;
-	@BeanReference(type = com.liferay.portal.service.ClassNameService.class)
-	protected com.liferay.portal.service.ClassNameService classNameService;
 	@BeanReference(type = ClassNamePersistence.class)
 	protected ClassNamePersistence classNamePersistence;
 	@BeanReference(type = com.liferay.portal.service.GroupLocalService.class)
 	protected com.liferay.portal.service.GroupLocalService groupLocalService;
-	@BeanReference(type = com.liferay.portal.service.GroupService.class)
-	protected com.liferay.portal.service.GroupService groupService;
 	@BeanReference(type = GroupPersistence.class)
 	protected GroupPersistence groupPersistence;
 	@BeanReference(type = GroupFinder.class)

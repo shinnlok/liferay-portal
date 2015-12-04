@@ -30,6 +30,8 @@ import org.osgi.service.component.annotations.Reference;
 	immediate = true,
 	property = {
 		"com.liferay.portlet.add-default-resource=true",
+		"com.liferay.portlet.application-type=full-page-application",
+		"com.liferay.portlet.application-type=widget",
 		"com.liferay.portlet.css-class-wrapper=portlet-wiki",
 		"com.liferay.portlet.display-category=category.wiki",
 		"com.liferay.portlet.header-portlet-css=/wiki/css/main.css",
@@ -42,6 +44,7 @@ import org.osgi.service.component.annotations.Reference;
 		"com.liferay.portlet.struts-path=wiki",
 		"com.liferay.portlet.use-default-template=true",
 		"javax.portlet.display-name=Wiki", "javax.portlet.expiration-cache=0",
+		"javax.portlet.init-param.portlet-title-based-navigation=false",
 		"javax.portlet.init-param.template-path=/",
 		"javax.portlet.init-param.view-template=/wiki/view.jsp",
 		"javax.portlet.name=" + WikiPortletKeys.WIKI,

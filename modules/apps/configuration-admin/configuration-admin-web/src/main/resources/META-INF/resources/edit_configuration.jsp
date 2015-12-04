@@ -17,13 +17,13 @@
 <%@ include file="/init.jsp" %>
 
 <%
+String redirect = ParamUtil.getString(request, "redirect");
+
 ConfigurationModel configurationModel = (ConfigurationModel)request.getAttribute(ConfigurationAdminWebKeys.CONFIGURATION_MODEL);
 String ddmFormHTML = (String)request.getAttribute(DDMWebKeys.DYNAMIC_DATA_MAPPING_FORM_HTML);
 
-PortletURL portletURL = renderResponse.createRenderURL();
-
 portletDisplay.setShowBackIcon(true);
-portletDisplay.setURLBack(portletURL.toString());
+portletDisplay.setURLBack(redirect);
 
 renderResponse.setTitle(configurationModel.getName());
 %>
@@ -33,12 +33,20 @@ renderResponse.setTitle(configurationModel.getName());
 
 <div class="container-fluid-1280">
 	<aui:form action="<%= bindConfigurationActionURL %>" method="post" name="fm">
-		<aui:input name="redirect" type="hidden" value="<%= portletURL %>" />
+		<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 		<aui:input name="factoryPid" type="hidden" value="<%= configurationModel.getFactoryPid() %>" />
 		<aui:input name="pid" type="hidden" value="<%= configurationModel.getID() %>" />
 
 		<div class="lfr-ddm-container" id="lfr-ddm-container">
-			<%= ddmFormHTML %>
+			<aui:fieldset-group>
+				<c:if test="<%= configurationModel.getConfiguration() == null %>">
+					<aui:alert closeable="<%= false %>" id="errorAlert" type="info">
+						<liferay-ui:message key="this-configuration-was-not-saved-yet" />
+					</aui:alert>
+				</c:if>
+
+				<%= ddmFormHTML %>
+			</aui:fieldset-group>
 		</div>
 
 		<aui:button-row>
@@ -53,7 +61,7 @@ renderResponse.setTitle(configurationModel.getName());
 				</c:otherwise>
 			</c:choose>
 
-			<aui:button href="<%= portletURL.toString() %>" type="cancel" />
+			<aui:button href="<%= redirect %>" type="cancel" />
 		</aui:button-row>
 	</aui:form>
 </div>

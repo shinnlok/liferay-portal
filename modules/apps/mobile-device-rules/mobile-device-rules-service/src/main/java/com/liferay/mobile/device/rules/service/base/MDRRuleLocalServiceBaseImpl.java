@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -244,19 +245,32 @@ public abstract class MDRRuleLocalServiceBaseImpl extends BaseLocalServiceImpl
 		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
 
 		actionableDynamicQuery.setBaseLocalService(com.liferay.mobile.device.rules.service.MDRRuleLocalServiceUtil.getService());
-		actionableDynamicQuery.setClass(MDRRule.class);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
+		actionableDynamicQuery.setModelClass(MDRRule.class);
 
 		actionableDynamicQuery.setPrimaryKeyPropertyName("ruleId");
 
 		return actionableDynamicQuery;
 	}
 
+	@Override
+	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		IndexableActionableDynamicQuery indexableActionableDynamicQuery = new IndexableActionableDynamicQuery();
+
+		indexableActionableDynamicQuery.setBaseLocalService(com.liferay.mobile.device.rules.service.MDRRuleLocalServiceUtil.getService());
+		indexableActionableDynamicQuery.setClassLoader(getClassLoader());
+		indexableActionableDynamicQuery.setModelClass(MDRRule.class);
+
+		indexableActionableDynamicQuery.setPrimaryKeyPropertyName("ruleId");
+
+		return indexableActionableDynamicQuery;
+	}
+
 	protected void initActionableDynamicQuery(
 		ActionableDynamicQuery actionableDynamicQuery) {
 		actionableDynamicQuery.setBaseLocalService(com.liferay.mobile.device.rules.service.MDRRuleLocalServiceUtil.getService());
-		actionableDynamicQuery.setClass(MDRRule.class);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
+		actionableDynamicQuery.setModelClass(MDRRule.class);
 
 		actionableDynamicQuery.setPrimaryKeyPropertyName("ruleId");
 	}
@@ -431,25 +445,6 @@ public abstract class MDRRuleLocalServiceBaseImpl extends BaseLocalServiceImpl
 	}
 
 	/**
-	 * Returns the m d r rule remote service.
-	 *
-	 * @return the m d r rule remote service
-	 */
-	public com.liferay.mobile.device.rules.service.MDRRuleService getMDRRuleService() {
-		return mdrRuleService;
-	}
-
-	/**
-	 * Sets the m d r rule remote service.
-	 *
-	 * @param mdrRuleService the m d r rule remote service
-	 */
-	public void setMDRRuleService(
-		com.liferay.mobile.device.rules.service.MDRRuleService mdrRuleService) {
-		this.mdrRuleService = mdrRuleService;
-	}
-
-	/**
 	 * Returns the m d r rule persistence.
 	 *
 	 * @return the m d r rule persistence
@@ -544,25 +539,6 @@ public abstract class MDRRuleLocalServiceBaseImpl extends BaseLocalServiceImpl
 	}
 
 	/**
-	 * Returns the user remote service.
-	 *
-	 * @return the user remote service
-	 */
-	public com.liferay.portal.service.UserService getUserService() {
-		return userService;
-	}
-
-	/**
-	 * Sets the user remote service.
-	 *
-	 * @param userService the user remote service
-	 */
-	public void setUserService(
-		com.liferay.portal.service.UserService userService) {
-		this.userService = userService;
-	}
-
-	/**
 	 * Returns the user persistence.
 	 *
 	 * @return the user persistence
@@ -597,25 +573,6 @@ public abstract class MDRRuleLocalServiceBaseImpl extends BaseLocalServiceImpl
 	public void setMDRRuleGroupLocalService(
 		com.liferay.mobile.device.rules.service.MDRRuleGroupLocalService mdrRuleGroupLocalService) {
 		this.mdrRuleGroupLocalService = mdrRuleGroupLocalService;
-	}
-
-	/**
-	 * Returns the m d r rule group remote service.
-	 *
-	 * @return the m d r rule group remote service
-	 */
-	public com.liferay.mobile.device.rules.service.MDRRuleGroupService getMDRRuleGroupService() {
-		return mdrRuleGroupService;
-	}
-
-	/**
-	 * Sets the m d r rule group remote service.
-	 *
-	 * @param mdrRuleGroupService the m d r rule group remote service
-	 */
-	public void setMDRRuleGroupService(
-		com.liferay.mobile.device.rules.service.MDRRuleGroupService mdrRuleGroupService) {
-		this.mdrRuleGroupService = mdrRuleGroupService;
 	}
 
 	/**
@@ -709,8 +666,6 @@ public abstract class MDRRuleLocalServiceBaseImpl extends BaseLocalServiceImpl
 
 	@BeanReference(type = com.liferay.mobile.device.rules.service.MDRRuleLocalService.class)
 	protected MDRRuleLocalService mdrRuleLocalService;
-	@BeanReference(type = com.liferay.mobile.device.rules.service.MDRRuleService.class)
-	protected com.liferay.mobile.device.rules.service.MDRRuleService mdrRuleService;
 	@BeanReference(type = MDRRulePersistence.class)
 	protected MDRRulePersistence mdrRulePersistence;
 	@BeanReference(type = com.liferay.counter.service.CounterLocalService.class)
@@ -721,14 +676,10 @@ public abstract class MDRRuleLocalServiceBaseImpl extends BaseLocalServiceImpl
 	protected SystemEventPersistence systemEventPersistence;
 	@BeanReference(type = com.liferay.portal.service.UserLocalService.class)
 	protected com.liferay.portal.service.UserLocalService userLocalService;
-	@BeanReference(type = com.liferay.portal.service.UserService.class)
-	protected com.liferay.portal.service.UserService userService;
 	@BeanReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
 	@BeanReference(type = com.liferay.mobile.device.rules.service.MDRRuleGroupLocalService.class)
 	protected com.liferay.mobile.device.rules.service.MDRRuleGroupLocalService mdrRuleGroupLocalService;
-	@BeanReference(type = com.liferay.mobile.device.rules.service.MDRRuleGroupService.class)
-	protected com.liferay.mobile.device.rules.service.MDRRuleGroupService mdrRuleGroupService;
 	@BeanReference(type = MDRRuleGroupPersistence.class)
 	protected MDRRuleGroupPersistence mdrRuleGroupPersistence;
 	@BeanReference(type = MDRRuleGroupFinder.class)

@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -232,19 +233,32 @@ public abstract class ExpandoColumnLocalServiceBaseImpl
 		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
 
 		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.expando.service.ExpandoColumnLocalServiceUtil.getService());
-		actionableDynamicQuery.setClass(ExpandoColumn.class);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
+		actionableDynamicQuery.setModelClass(ExpandoColumn.class);
 
 		actionableDynamicQuery.setPrimaryKeyPropertyName("columnId");
 
 		return actionableDynamicQuery;
 	}
 
+	@Override
+	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		IndexableActionableDynamicQuery indexableActionableDynamicQuery = new IndexableActionableDynamicQuery();
+
+		indexableActionableDynamicQuery.setBaseLocalService(com.liferay.portlet.expando.service.ExpandoColumnLocalServiceUtil.getService());
+		indexableActionableDynamicQuery.setClassLoader(getClassLoader());
+		indexableActionableDynamicQuery.setModelClass(ExpandoColumn.class);
+
+		indexableActionableDynamicQuery.setPrimaryKeyPropertyName("columnId");
+
+		return indexableActionableDynamicQuery;
+	}
+
 	protected void initActionableDynamicQuery(
 		ActionableDynamicQuery actionableDynamicQuery) {
 		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.expando.service.ExpandoColumnLocalServiceUtil.getService());
-		actionableDynamicQuery.setClass(ExpandoColumn.class);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
+		actionableDynamicQuery.setModelClass(ExpandoColumn.class);
 
 		actionableDynamicQuery.setPrimaryKeyPropertyName("columnId");
 	}
@@ -319,25 +333,6 @@ public abstract class ExpandoColumnLocalServiceBaseImpl
 	public void setExpandoColumnLocalService(
 		ExpandoColumnLocalService expandoColumnLocalService) {
 		this.expandoColumnLocalService = expandoColumnLocalService;
-	}
-
-	/**
-	 * Returns the expando column remote service.
-	 *
-	 * @return the expando column remote service
-	 */
-	public com.liferay.portlet.expando.service.ExpandoColumnService getExpandoColumnService() {
-		return expandoColumnService;
-	}
-
-	/**
-	 * Sets the expando column remote service.
-	 *
-	 * @param expandoColumnService the expando column remote service
-	 */
-	public void setExpandoColumnService(
-		com.liferay.portlet.expando.service.ExpandoColumnService expandoColumnService) {
-		this.expandoColumnService = expandoColumnService;
 	}
 
 	/**
@@ -455,25 +450,6 @@ public abstract class ExpandoColumnLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the expando value remote service.
-	 *
-	 * @return the expando value remote service
-	 */
-	public com.liferay.portlet.expando.service.ExpandoValueService getExpandoValueService() {
-		return expandoValueService;
-	}
-
-	/**
-	 * Sets the expando value remote service.
-	 *
-	 * @param expandoValueService the expando value remote service
-	 */
-	public void setExpandoValueService(
-		com.liferay.portlet.expando.service.ExpandoValueService expandoValueService) {
-		this.expandoValueService = expandoValueService;
-	}
-
-	/**
 	 * Returns the expando value persistence.
 	 *
 	 * @return the expando value persistence
@@ -531,25 +507,6 @@ public abstract class ExpandoColumnLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the class name remote service.
-	 *
-	 * @return the class name remote service
-	 */
-	public com.liferay.portal.service.ClassNameService getClassNameService() {
-		return classNameService;
-	}
-
-	/**
-	 * Sets the class name remote service.
-	 *
-	 * @param classNameService the class name remote service
-	 */
-	public void setClassNameService(
-		com.liferay.portal.service.ClassNameService classNameService) {
-		this.classNameService = classNameService;
-	}
-
-	/**
 	 * Returns the class name persistence.
 	 *
 	 * @return the class name persistence
@@ -604,25 +561,6 @@ public abstract class ExpandoColumnLocalServiceBaseImpl
 	public void setUserLocalService(
 		com.liferay.portal.service.UserLocalService userLocalService) {
 		this.userLocalService = userLocalService;
-	}
-
-	/**
-	 * Returns the user remote service.
-	 *
-	 * @return the user remote service
-	 */
-	public com.liferay.portal.service.UserService getUserService() {
-		return userService;
-	}
-
-	/**
-	 * Sets the user remote service.
-	 *
-	 * @param userService the user remote service
-	 */
-	public void setUserService(
-		com.liferay.portal.service.UserService userService) {
-		this.userService = userService;
 	}
 
 	/**
@@ -715,8 +653,6 @@ public abstract class ExpandoColumnLocalServiceBaseImpl
 
 	@BeanReference(type = com.liferay.portlet.expando.service.ExpandoColumnLocalService.class)
 	protected ExpandoColumnLocalService expandoColumnLocalService;
-	@BeanReference(type = com.liferay.portlet.expando.service.ExpandoColumnService.class)
-	protected com.liferay.portlet.expando.service.ExpandoColumnService expandoColumnService;
 	@BeanReference(type = ExpandoColumnPersistence.class)
 	protected ExpandoColumnPersistence expandoColumnPersistence;
 	@BeanReference(type = com.liferay.portlet.expando.service.ExpandoRowLocalService.class)
@@ -729,24 +665,18 @@ public abstract class ExpandoColumnLocalServiceBaseImpl
 	protected ExpandoTablePersistence expandoTablePersistence;
 	@BeanReference(type = com.liferay.portlet.expando.service.ExpandoValueLocalService.class)
 	protected com.liferay.portlet.expando.service.ExpandoValueLocalService expandoValueLocalService;
-	@BeanReference(type = com.liferay.portlet.expando.service.ExpandoValueService.class)
-	protected com.liferay.portlet.expando.service.ExpandoValueService expandoValueService;
 	@BeanReference(type = ExpandoValuePersistence.class)
 	protected ExpandoValuePersistence expandoValuePersistence;
 	@BeanReference(type = com.liferay.counter.service.CounterLocalService.class)
 	protected com.liferay.counter.service.CounterLocalService counterLocalService;
 	@BeanReference(type = com.liferay.portal.service.ClassNameLocalService.class)
 	protected com.liferay.portal.service.ClassNameLocalService classNameLocalService;
-	@BeanReference(type = com.liferay.portal.service.ClassNameService.class)
-	protected com.liferay.portal.service.ClassNameService classNameService;
 	@BeanReference(type = ClassNamePersistence.class)
 	protected ClassNamePersistence classNamePersistence;
 	@BeanReference(type = com.liferay.portal.service.ResourceLocalService.class)
 	protected com.liferay.portal.service.ResourceLocalService resourceLocalService;
 	@BeanReference(type = com.liferay.portal.service.UserLocalService.class)
 	protected com.liferay.portal.service.UserLocalService userLocalService;
-	@BeanReference(type = com.liferay.portal.service.UserService.class)
-	protected com.liferay.portal.service.UserService userService;
 	@BeanReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
 	@BeanReference(type = UserFinder.class)

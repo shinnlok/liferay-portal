@@ -16,8 +16,7 @@ package com.liferay.polls.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
+import com.liferay.osgi.util.ServiceTrackerFactory;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -224,6 +223,10 @@ public class PollsChoiceLocalServiceUtil {
 		return getService().getExportActionableDynamicQuery(portletDataContext);
 	}
 
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -353,14 +356,6 @@ public class PollsChoiceLocalServiceUtil {
 	public void setService(PollsChoiceLocalService service) {
 	}
 
-	private static ServiceTracker<PollsChoiceLocalService, PollsChoiceLocalService> _serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(PollsChoiceLocalServiceUtil.class);
-
-		_serviceTracker = new ServiceTracker<PollsChoiceLocalService, PollsChoiceLocalService>(bundle.getBundleContext(),
-				PollsChoiceLocalService.class, null);
-
-		_serviceTracker.open();
-	}
+	private static ServiceTracker<PollsChoiceLocalService, PollsChoiceLocalService> _serviceTracker =
+		ServiceTrackerFactory.open(PollsChoiceLocalService.class);
 }

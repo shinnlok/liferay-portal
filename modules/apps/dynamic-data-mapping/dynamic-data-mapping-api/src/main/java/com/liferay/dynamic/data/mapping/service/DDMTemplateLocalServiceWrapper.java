@@ -468,6 +468,12 @@ public class DDMTemplateLocalServiceWrapper implements DDMTemplateLocalService,
 	}
 
 	@Override
+	public com.liferay.dynamic.data.mapping.model.DDMTemplate fetchTemplate(
+		long templateId) {
+		return _ddmTemplateLocalService.fetchTemplate(templateId);
+	}
+
+	@Override
 	public com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery() {
 		return _ddmTemplateLocalService.getActionableDynamicQuery();
 	}
@@ -565,6 +571,11 @@ public class DDMTemplateLocalServiceWrapper implements DDMTemplateLocalService,
 	public com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
 		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext) {
 		return _ddmTemplateLocalService.getExportActionableDynamicQuery(portletDataContext);
+	}
+
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _ddmTemplateLocalService.getIndexableActionableDynamicQuery();
 	}
 
 	/**

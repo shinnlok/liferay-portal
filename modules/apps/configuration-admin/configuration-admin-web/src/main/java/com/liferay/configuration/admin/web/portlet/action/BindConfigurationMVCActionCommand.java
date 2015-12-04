@@ -84,8 +84,15 @@ public class BindConfigurationMVCActionCommand implements MVCActionCommand {
 			_bundleContext, _configurationAdmin, _extendedMetaTypeService,
 			themeDisplay.getLanguageId());
 
-		ConfigurationModel configurationModel =
-			configurationHelper.getConfigurationModel(pid);
+		ConfigurationModel configurationModel = null;
+
+		if (Validator.isNotNull(factoryPid)) {
+			configurationModel = configurationHelper.getConfigurationModel(
+				factoryPid);
+		}
+		else {
+			configurationModel = configurationHelper.getConfigurationModel(pid);
+		}
 
 		Configuration configuration = configurationHelper.getConfiguration(pid);
 
@@ -219,9 +226,9 @@ public class BindConfigurationMVCActionCommand implements MVCActionCommand {
 		BindConfigurationMVCActionCommand.class);
 
 	private BundleContext _bundleContext;
-	private ConfigurationAdmin _configurationAdmin;
-	private DDMFormValuesFactory _ddmFormValuesFactory;
-	private ExtendedMetaTypeService _extendedMetaTypeService;
-	private JSONFactory _jsonFactory;
+	private volatile ConfigurationAdmin _configurationAdmin;
+	private volatile DDMFormValuesFactory _ddmFormValuesFactory;
+	private volatile ExtendedMetaTypeService _extendedMetaTypeService;
+	private volatile JSONFactory _jsonFactory;
 
 }

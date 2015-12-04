@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
@@ -31,7 +32,6 @@ import com.liferay.portal.model.LayoutConstants;
 import com.liferay.portal.model.LayoutRevision;
 import com.liferay.portal.model.LayoutSetBranch;
 import com.liferay.portal.model.LayoutType;
-import com.liferay.portal.model.User;
 import com.liferay.portal.model.impl.VirtualLayout;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
@@ -209,6 +209,13 @@ public class LayoutsTreeUtil {
 					request, groupId, privateLayout, parentLayoutId, layouts,
 					treeId)) {
 
+			boolean hide = GetterUtil.getBoolean(
+				layout.getTypeSettingsProperty("hide"));
+
+			if (hide) {
+				continue;
+			}
+
 			LayoutTreeNode layoutTreeNode = new LayoutTreeNode(layout);
 
 			LayoutTreeNodes childLayoutTreeNodes = null;
@@ -245,7 +252,7 @@ public class LayoutsTreeUtil {
 			layoutTreeNodes.add(layoutTreeNode);
 		}
 
-		return new LayoutTreeNodes(layoutTreeNodes, layouts.size());
+		return new LayoutTreeNodes(layoutTreeNodes, layoutTreeNodes.size());
 	}
 
 	private static int _getLoadedLayoutsCount(
@@ -444,17 +451,11 @@ public class LayoutsTreeUtil {
 				layout);
 
 			if (layoutRevision != null) {
-				User user = themeDisplay.getUser();
+				long layoutSetBranchId = layoutRevision.getLayoutSetBranchId();
 
-				long recentLayoutSetBranchId =
-					StagingUtil.getRecentLayoutSetBranchId(
-						user, layout.getLayoutSet().getLayoutSetId());
-
-				if (StagingUtil.isIncomplete(layout, recentLayoutSetBranchId)) {
+				if (StagingUtil.isIncomplete(layout, layoutSetBranchId)) {
 					jsonObject.put("incomplete", true);
 				}
-
-				long layoutSetBranchId = layoutRevision.getLayoutSetBranchId();
 
 				LayoutSetBranch layoutSetBranch =
 					LayoutSetBranchLocalServiceUtil.getLayoutSetBranch(

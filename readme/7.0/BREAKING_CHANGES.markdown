@@ -20,7 +20,7 @@ feature or API will be dropped in an upcoming version.
 replaces an old API, in spite of the old API being kept in Liferay Portal for
 backwards compatibility.
 
-*This document has been reviewed through commit `5504915e`.*
+*This document has been reviewed through commit `252b72b`.*
 
 ## Breaking Changes Contribution Guidelines
 
@@ -1555,7 +1555,7 @@ exceptions wherever possible. For example, instead of using
 
 This change was made in accordance with the new exceptions pattern being applied
 throughout Portal. It also allows the new localized user name configuration
-feature to be thoroughly covered by exceptions for different configurations.  
+feature to be thoroughly covered by exceptions for different configurations.
 
 ---------------------------------------
 
@@ -2834,3 +2834,149 @@ method to generate the UI.
 
 This change was made as a part of the ongoing strategy to modularize Liferay
 Portal.
+
+---------------------------------------
+
+### Software Catalog portlet and services are no longer available
+- **Date:** 2015-Nov-21
+- **JIRA Ticket:** LPS-60705
+
+#### What changed?
+
+The Software Catalog portlet and its associated services are no longer part
+of Liferay's source code or binaries.
+
+#### Who is affected?
+
+This affects portals which were making use of the Software Catalog portlet to
+manage a catalog of their software. Also developers who were making use of the
+software catalog services from their custom code.
+
+#### How should I update my code?
+
+There is no direct replacement for invocations to the Software Catalog services.
+In cases where it is really needed it is possible to obtain the code from a
+previous release and include it in the custom product (subject to the licensing)
+
+#### Why was this change made?
+
+The Software Catalog was developed to implement the very first versions of what
+later become Liferay's Marketplace. It was later replaced and has not been in
+use by Liferay since then. We have also detected very small to no usage outside
+of Liferay. We made the decision to remove it to make Liferay more lightweight
+and free time to focus on other areas of the product that add more value.
+---------------------------------------
+
+### Removed Hover and Alternate Style Features of Search Container Tag
+- **Date:** 2015-Nov-03
+- **JIRA Ticket:** LPS-58854
+
+#### What changed?
+
+The following attributes and methods have been removed:
+
+- The attribute `hover` of the `liferay-ui:search-container` tag.
+- The method `isHover()` of the `SearchContainerTag` class.
+- The attributes `classNameHover`, `hover`, `rowClassNameAlternate`,
+`rowClassNameAlternateHover`, `rowClassNameBody`, `rowClassNameBodyHover` of the
+`liferay-search-container` JavaScript module.
+
+#### Who is affected?
+
+This affects developers that use the `hover` attribute of the
+`liferay-ui:search-container` tag.
+
+#### How should I update my code?
+
+You should update your code changing the CSS selector that defines how rows look
+on hover to use the `:hover` and `:nth-of-type` CSS pseudo selectors instead.
+
+#### Why was this change made?
+
+Browsers support better ways to style content on hover in a way that doesn't
+penalize performance. Therefore, this change was made to increase the
+performance of hovering over content in Liferay.
+
+---------------------------------------
+
+### Removed AppViewMove and AppViewSelect JavaScript Modules
+- **Date:** 2015-Nov-03
+- **JIRA Ticket:** LPS-58854
+
+#### What changed?
+
+The JavaScript modules `AppViewMove` and `AppViewSelect` have been removed.
+
+#### Who is affected?
+
+This affects developers that use these modules to configure *select* and *move*
+actions inside their applications.
+
+#### How should I update my code?
+
+If you are using any of these modules, you can make use of the following
+`SearchContainer` APIs:
+
+- Listen to the `rowToggled` event of the search container to be notified about
+changes to the search container state.
+- Configure your search container *move* options creating a `RowMover` and
+define the allowed *move* targets and associated actions.
+- Use the `registerAction` method of the search container to execute your *move*
+logic when the user completes a *move* action.
+
+#### Why was this change made?
+
+The removed JavaScript modules contained too much logic and were difficult to
+decipher. It was also difficult to add this to an existing app. With this
+change, every app using a search container can use this functionality much
+easier.
+
+---------------------------------------
+
+### Removed the mergeLayoutTags Preference from Asset Publisher
+- **Date:** 2015-Nov-20
+- **JIRA Ticket:** LPS-60677
+
+#### What changed?
+
+The `mergeLayoutTags` preference has been removed from the Asset Publisher.
+
+#### Who is affected?
+
+This affects any Asset Publisher portlet that uses this preference.
+
+#### How should I update my code?
+
+There is nothing to update since this functionality is no longer used.
+
+#### Why was this change made?
+
+In previous versions of Liferay, some applications such as Blogs and Wiki shared
+the tags of their entries within the page. The Asset Publisher was able to use
+them to show other assets with the same tags. This functionality has changed, so
+the preference is no longer used.
+
+---------------------------------------
+
+### Removed the getPageOrderByComparator method from WikiUtil
+- **Date:** 2015-Dec-1
+- **JIRA Ticket:** LPS-60843
+
+#### What changed?
+
+The `getPageOrderByComparator` method has been removed from the WikiUtil.
+
+#### Who is affected?
+
+This affects developers that use this method in their own developments.
+
+#### How should I update my code?
+
+You should update your code to invoke:
+
+- `WikiPortletUtil.getPageOrderByComparator(String, String)`:
+
+#### Why was this change made?
+
+As part of the modularization efforts it has been considered that that this
+logic belongs to wiki-web module.

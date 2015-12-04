@@ -26,7 +26,9 @@ import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.PropertiesParamUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StreamUtil;
@@ -75,6 +77,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -282,12 +285,15 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 			"branchingPrivate", String.valueOf(branchingPrivate));
 		typeSettingsProperties.setProperty(
 			"branchingPublic", String.valueOf(branchingPublic));
-		typeSettingsProperties.setProperty("staged", Boolean.TRUE.toString());
-		typeSettingsProperties.setProperty(
-			"stagedRemotely", String.valueOf(false));
 
-		setCommonStagingOptions(
-			liveGroup, typeSettingsProperties, serviceContext);
+		if (!hasStagingGroup) {
+			typeSettingsProperties.setProperty(
+				"staged", Boolean.TRUE.toString());
+			typeSettingsProperties.setProperty(
+				"stagedRemotely", String.valueOf(false));
+
+			setCommonStagingOptions(typeSettingsProperties, serviceContext);
+		}
 
 		groupLocalService.updateGroup(
 			liveGroup.getGroupId(), typeSettingsProperties.toString());
@@ -331,15 +337,16 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 			disableStaging(stagingGroup, serviceContext);
 		}
 
-		String remoteURL = StagingUtil.buildRemoteURL(
-			remoteAddress, remotePort, remotePathContext, secureConnection,
-			GroupConstants.DEFAULT_LIVE_GROUP_ID, false);
+		boolean stagedRemotely = stagingGroup.isStagedRemotely();
+
+		boolean oldStagedRemotely = stagedRemotely;
 
 		UnicodeProperties typeSettingsProperties =
 			stagingGroup.getTypeSettingsProperties();
 
-		boolean stagedRemotely = GetterUtil.getBoolean(
-			typeSettingsProperties.getProperty("stagedRemotely"));
+		String remoteURL = StagingUtil.buildRemoteURL(
+			remoteAddress, remotePort, remotePathContext, secureConnection,
+			GroupConstants.DEFAULT_LIVE_GROUP_ID, false);
 
 		if (stagedRemotely) {
 			long oldRemoteGroupId = GetterUtil.getLong(
@@ -378,12 +385,15 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 			"remotePort", String.valueOf(remotePort));
 		typeSettingsProperties.setProperty(
 			"secureConnection", String.valueOf(secureConnection));
-		typeSettingsProperties.setProperty("staged", Boolean.TRUE.toString());
-		typeSettingsProperties.setProperty(
-			"stagedRemotely", Boolean.TRUE.toString());
 
-		setCommonStagingOptions(
-			stagingGroup, typeSettingsProperties, serviceContext);
+		if (!oldStagedRemotely) {
+			typeSettingsProperties.setProperty(
+				"staged", Boolean.TRUE.toString());
+			typeSettingsProperties.setProperty(
+				"stagedRemotely", Boolean.TRUE.toString());
+
+			setCommonStagingOptions(typeSettingsProperties, serviceContext);
+		}
 
 		groupLocalService.updateGroup(
 			stagingGroup.getGroupId(), typeSettingsProperties.toString());
@@ -413,6 +423,8 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 
 		File file = null;
 
+		Locale siteDefaultLocale = LocaleThreadLocal.getSiteDefaultLocale();
+
 		try {
 			ExportImportThreadLocal.setLayoutImportInProcess(true);
 			ExportImportThreadLocal.setLayoutStagingInProcess(true);
@@ -432,6 +444,11 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 
 			settingsMap.put("userId", userId);
 
+			long targetGroupId = MapUtil.getLong(settingsMap, "targetGroupId");
+
+			LocaleThreadLocal.setSiteDefaultLocale(
+				PortalUtil.getSiteDefaultLocale(targetGroupId));
+
 			exportImportLocalService.importLayoutsDataDeletions(
 				exportImportConfiguration, file);
 
@@ -450,6 +467,8 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 		finally {
 			ExportImportThreadLocal.setLayoutImportInProcess(false);
 			ExportImportThreadLocal.setLayoutStagingInProcess(false);
+
+			LocaleThreadLocal.setSiteDefaultLocale(siteDefaultLocale);
 		}
 	}
 
@@ -842,12 +861,8 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 	}
 
 	protected void setCommonStagingOptions(
-		Group liveGroup, UnicodeProperties typeSettingsProperties,
+		UnicodeProperties typeSettingsProperties,
 		ServiceContext serviceContext) {
-
-		if (liveGroup.hasRemoteStagingGroup()) {
-			return;
-		}
 
 		typeSettingsProperties.putAll(
 			PropertiesParamUtil.getProperties(

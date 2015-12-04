@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileShortcut;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.repository.model.RepositoryEntry;
 import com.liferay.portal.kernel.repository.util.RepositoryTrashUtil;
 import com.liferay.portal.kernel.systemevent.SystemEventHierarchyEntryThreadLocal;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -1278,8 +1279,10 @@ public class DLAppLocalServiceImpl extends DLAppLocalServiceBaseImpl {
 		FileVersion latestFileVersion = fileVersions.get(
 			fileVersions.size() - 1);
 
+		String sourceFileName = DLAppUtil.getSourceFileName(latestFileVersion);
+
 		FileEntry destinationFileEntry = toLocalRepository.addFileEntry(
-			userId, newFolderId, fileEntry.getTitle(),
+			userId, newFolderId, sourceFileName,
 			latestFileVersion.getMimeType(), latestFileVersion.getTitle(),
 			latestFileVersion.getDescription(), StringPool.BLANK,
 			latestFileVersion.getContentStream(false),
@@ -1288,12 +1291,14 @@ public class DLAppLocalServiceImpl extends DLAppLocalServiceBaseImpl {
 		for (int i = fileVersions.size() - 2; i >= 0; i--) {
 			FileVersion fileVersion = fileVersions.get(i);
 
+			sourceFileName = DLAppUtil.getSourceFileName(fileVersion);
+
 			FileVersion previousFileVersion = fileVersions.get(i + 1);
 
 			try {
 				destinationFileEntry = toLocalRepository.updateFileEntry(
 					userId, destinationFileEntry.getFileEntryId(),
-					fileEntry.getTitle(), destinationFileEntry.getMimeType(),
+					sourceFileName, destinationFileEntry.getMimeType(),
 					destinationFileEntry.getTitle(),
 					destinationFileEntry.getDescription(), StringPool.BLANK,
 					DLAppUtil.isMajorVersion(fileVersion, previousFileVersion),
@@ -1485,22 +1490,21 @@ public class DLAppLocalServiceImpl extends DLAppLocalServiceBaseImpl {
 		dlAppHelperLocalService.addFolder(
 			userId, destinationFolder, serviceContext);
 
-		List<Object> foldersAndFileEntriesAndFileShortcuts =
-			dlAppService.getFoldersAndFileEntriesAndFileShortcuts(
-				sourceLocalRepository.getRepositoryId(), folderId,
-				WorkflowConstants.STATUS_ANY, true, QueryUtil.ALL_POS,
-				QueryUtil.ALL_POS);
+		List<RepositoryEntry> foldersAndFileEntriesAndFileShortcuts =
+			sourceLocalRepository.getFoldersAndFileEntriesAndFileShortcuts(
+				folderId, WorkflowConstants.STATUS_ANY, true, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS, null);
 
 		try {
-			for (Object folderAndFileEntryAndFileShortcut :
+			for (RepositoryEntry folderAndFileEntryAndFileShortcut :
 					foldersAndFileEntriesAndFileShortcuts) {
 
 				if (folderAndFileEntryAndFileShortcut instanceof FileEntry) {
 					FileEntry fileEntry =
 						(FileEntry)folderAndFileEntryAndFileShortcut;
 
-					copyFileEntry(
-						userId, destinationLocalRepository, fileEntry,
+					moveFileEntry(
+						userId, fileEntry.getFileEntryId(),
 						destinationFolder.getFolderId(), serviceContext);
 				}
 				else if (folderAndFileEntryAndFileShortcut instanceof Folder) {
@@ -1526,8 +1530,15 @@ public class DLAppLocalServiceImpl extends DLAppLocalServiceBaseImpl {
 			}
 		}
 		catch (PortalException pe) {
-			destinationLocalRepository.deleteFolder(
-				destinationFolder.getFolderId());
+			int fileEntriesAndFileShortcutsCount =
+				destinationLocalRepository.getFileEntriesAndFileShortcutsCount(
+					destinationFolder.getFolderId(),
+					WorkflowConstants.STATUS_ANY);
+
+			if (fileEntriesAndFileShortcutsCount == 0) {
+				destinationLocalRepository.deleteFolder(
+					destinationFolder.getFolderId());
+			}
 
 			throw pe;
 		}

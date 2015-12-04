@@ -48,8 +48,8 @@ RowChecker rowChecker = new EmptyOnClickRowChecker(renderResponse);
 
 <c:if test="<%= userGroupsCount > 0 %>">
 	<liferay-frontend:management-bar
-		checkBoxContainerId="userGroupsSearchContainer"
 		includeCheckBox="<%= true %>"
+		searchContainerId="userGroups"
 	>
 		<liferay-frontend:management-bar-filters>
 			<liferay-frontend:management-bar-navigation
@@ -74,7 +74,7 @@ RowChecker rowChecker = new EmptyOnClickRowChecker(renderResponse);
 		</liferay-frontend:management-bar-buttons>
 
 		<liferay-frontend:management-bar-action-buttons>
-			<liferay-frontend:management-bar-button href="javascript:;" iconCssClass="icon-trash" id="deleteUserGroups" />
+			<liferay-frontend:management-bar-button href="javascript:;" iconCssClass="icon-trash" id="deleteUserGroups" label="delete" />
 		</liferay-frontend:management-bar-action-buttons>
 	</liferay-frontend:management-bar>
 </c:if>
@@ -83,15 +83,12 @@ RowChecker rowChecker = new EmptyOnClickRowChecker(renderResponse);
 	<aui:button cssClass="btn-lg btn-primary" id="addUserGroups" value="add-team-members" />
 </aui:button-row>
 
-<portlet:actionURL name="editTeamUserGroups" var="editTeamUserGroupsURL" />
+<portlet:actionURL name="deleteTeamUserGroups" var="deleteTeamUserGroupsURL" />
 
-<aui:form action="<%= editTeamUserGroupsURL %>" cssClass="container-fluid-1280" method="post" name="fm">
+<aui:form action="<%= deleteTeamUserGroupsURL %>" cssClass="container-fluid-1280" method="post" name="fm">
 	<aui:input name="tabs1" type="hidden" value="<%= tabs1 %>" />
 	<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
-	<aui:input name="assignmentsRedirect" type="hidden" />
 	<aui:input name="teamId" type="hidden" value="<%= String.valueOf(team.getTeamId()) %>" />
-	<aui:input name="addUserGroupIds" type="hidden" />
-	<aui:input name="removeUserGroupIds" type="hidden" />
 
 	<liferay-ui:search-container
 		emptyResultsMessage="there-are-no-members.-you-can-add-a-member-by-clicking-the-button-on-the-top-of-this-box"
@@ -118,6 +115,14 @@ RowChecker rowChecker = new EmptyOnClickRowChecker(renderResponse);
 	</liferay-ui:search-container>
 </aui:form>
 
+<portlet:actionURL name="addTeamUserGroups" var="addTeamUserGroupsURL" />
+
+<aui:form action="<%= addTeamUserGroupsURL %>" cssClass="hide" name="addTeamUserGroupsFm">
+	<aui:input name="tabs1" type="hidden" value="<%= tabs1 %>" />
+	<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
+	<aui:input name="teamId" type="hidden" value="<%= String.valueOf(team.getTeamId()) %>" />
+</aui:form>
+
 <aui:script use="liferay-item-selector-dialog">
 	var Util = Liferay.Util;
 
@@ -142,11 +147,11 @@ RowChecker rowChecker = new EmptyOnClickRowChecker(renderResponse);
 							var selectedItem = event.newVal;
 
 							if (selectedItem) {
-								var form = AUI.$(document.<portlet:namespace />fm);
+								var addTeamUserGroupsFm = $(document.<portlet:namespace />addTeamUserGroupsFm);
 
-								form.fm('addUserGroupIds').val(selectedItem.value);
+								addTeamUserGroupsFm.append(selectedItem);
 
-								submitForm(form);
+								submitForm(addTeamUserGroupsFm);
 							}
 						}
 					},
@@ -163,8 +168,6 @@ RowChecker rowChecker = new EmptyOnClickRowChecker(renderResponse);
 		'click',
 		function() {
 			if (confirm('<liferay-ui:message key="are-you-sure-you-want-to-delete-this" />')) {
-				form.fm('removeUserGroupIds').val(Util.listCheckedExcept(form, '<portlet:namespace />allRowIds'));
-
 				submitForm(form);
 			}
 		}

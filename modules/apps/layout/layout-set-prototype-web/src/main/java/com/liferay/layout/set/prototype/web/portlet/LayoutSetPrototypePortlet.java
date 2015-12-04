@@ -18,7 +18,7 @@ import com.liferay.application.list.PanelAppRegistry;
 import com.liferay.application.list.PanelCategoryRegistry;
 import com.liferay.application.list.constants.ApplicationListWebKeys;
 import com.liferay.application.list.display.context.logic.PanelCategoryHelper;
-import com.liferay.layout.set.prototype.web.constants.LayoutSetPrototypePortletKeys;
+import com.liferay.layout.set.prototype.constants.LayoutSetPrototypePortletKeys;
 import com.liferay.portal.NoSuchLayoutSetPrototypeException;
 import com.liferay.portal.RequiredLayoutSetPrototypeException;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
@@ -26,7 +26,6 @@ import com.liferay.portal.kernel.servlet.MultiSessionMessages;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.LayoutSetPrototype;
@@ -86,12 +85,22 @@ public class LayoutSetPrototypePortlet extends MVCPortlet {
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
-		long[] layoutSetPrototypeIds = StringUtil.split(
-			ParamUtil.getString(actionRequest, "layoutSetPrototypeIds"), 0L);
+		long[] layoutSetPrototypeIds = null;
 
-		for (long layoutSetPrototypeId : layoutSetPrototypeIds) {
+		long layoutSetPrototypeId = ParamUtil.getLong(
+			actionRequest, "layoutSetPrototypeId");
+
+		if (layoutSetPrototypeId > 0) {
+			layoutSetPrototypeIds = new long[] {layoutSetPrototypeId};
+		}
+		else {
+			layoutSetPrototypeIds = ParamUtil.getLongValues(
+				actionRequest, "rowIds");
+		}
+
+		for (long curLayoutSetPrototypeId : layoutSetPrototypeIds) {
 			layoutSetPrototypeService.deleteLayoutSetPrototype(
-				layoutSetPrototypeId);
+				curLayoutSetPrototypeId);
 		}
 	}
 
@@ -233,7 +242,7 @@ public class LayoutSetPrototypePortlet extends MVCPortlet {
 
 	protected LayoutSetPrototypeService layoutSetPrototypeService;
 
-	private PanelAppRegistry _panelAppRegistry;
-	private PanelCategoryRegistry _panelCategoryRegistry;
+	private volatile PanelAppRegistry _panelAppRegistry;
+	private volatile PanelCategoryRegistry _panelCategoryRegistry;
 
 }

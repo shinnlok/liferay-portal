@@ -6,6 +6,15 @@
 	<var name="portletName" value="Knowledge Base Display" />
 
 	<set-up>
+		<var method="TestPropsUtil#get('test.portal.instance')" name="testPortalInstance" />
+
+		<if>
+			<equals arg1="${testPortalInstance}" arg2="true" />
+			<then>
+				<execute macro="SignIn#signInPortalInstanceSetUp" />
+			</then>
+		</if>
+
 		<execute macro="User#firstLoginPG" />
 
 		<execute macro="Page#addPG">
@@ -22,11 +31,21 @@
 	</set-up>
 
 	<tear-down>
-		<execute macro="BlogsEntry#tearDownCP" />
+		<var method="TestPropsUtil#get('test.portal.instance')" name="testPortalInstance" />
 
-		<execute macro="KBArticle#tearDownCP" />
+		<if>
+			<equals arg1="${testPortalInstance}" arg2="true" />
+			<then>
+				<execute macro="PortalInstances#tearDownCP" />
+			</then>
+			<else>
+				<execute macro="BlogsEntry#tearDownCP" />
 
-		<execute macro="Page#tearDownPG" />
+				<execute macro="KBArticle#tearDownCP" />
+
+				<execute macro="Page#tearDownPG" />
+			</else>
+		</if>
 	</tear-down>
 
 	<command name="AddChildArticle" priority="4">
@@ -867,8 +886,10 @@
 	</command>
 
 	<command name="ViewKBArticleWithBlogsEntryRelatedAsset" priority="3">
-		<execute macro="Page#gotoContentCP">
-			<var name="portletName" value="Blogs" />
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Blogs" />
 		</execute>
 
 		<execute macro="Blogs#addEntry">
@@ -897,14 +918,12 @@
 			<var name="kbArticleTitle" value="Knowledge Base Article Title" />
 		</execute>
 
-		<execute macro="KBArticle#gotoRelatedAssetViaKBDisplayPG">
-			<var name="kbArticleRelatedAssetTitle" value="Blogs Entry Title" />
-		</execute>
+		<var name="kbArticleRelatedAssetTitle" value="Blogs Entry Title" />
+		<var name="key_kbArticleRelatedAssetTitle" value="${kbArticleRelatedAssetTitle}" />
 
-		<execute macro="KBArticle#viewBlogsEntryRelatedAssetViaKBDisplayPG">
-			<var name="RelatedAssetContent" value="Blogs Entry Content" />
-			<var name="RelatedAssetTitle" value="Blogs Entry Title" />
-		</execute>
+		<execute function="AssertClick#assertTextClickAtAndWait" locator1="AssetRelatedAssets#KB_RELATED_ASSETS_LINKS" value1="${kbArticleRelatedAssetTitle}" />
+
+		<execute macro="KBArticle#viewBlogsEntryRelatedAsset" />
 	</command>
 
 	<command name="ViewKBArticleWithEditedStarRatings" priority="3">

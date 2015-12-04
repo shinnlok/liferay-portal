@@ -16,8 +16,7 @@ package com.liferay.shopping.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
+import com.liferay.osgi.util.ServiceTrackerFactory;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -265,6 +264,10 @@ public class ShoppingCategoryLocalServiceUtil {
 		return getService().getCategory(groupId, categoryName);
 	}
 
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -374,14 +377,6 @@ public class ShoppingCategoryLocalServiceUtil {
 	public void setService(ShoppingCategoryLocalService service) {
 	}
 
-	private static ServiceTracker<ShoppingCategoryLocalService, ShoppingCategoryLocalService> _serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(ShoppingCategoryLocalServiceUtil.class);
-
-		_serviceTracker = new ServiceTracker<ShoppingCategoryLocalService, ShoppingCategoryLocalService>(bundle.getBundleContext(),
-				ShoppingCategoryLocalService.class, null);
-
-		_serviceTracker.open();
-	}
+	private static ServiceTracker<ShoppingCategoryLocalService, ShoppingCategoryLocalService> _serviceTracker =
+		ServiceTrackerFactory.open(ShoppingCategoryLocalService.class);
 }

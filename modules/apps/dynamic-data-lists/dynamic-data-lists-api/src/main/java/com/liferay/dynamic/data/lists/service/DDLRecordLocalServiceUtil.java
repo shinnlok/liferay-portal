@@ -16,8 +16,7 @@ package com.liferay.dynamic.data.lists.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
+import com.liferay.osgi.util.ServiceTrackerFactory;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -355,6 +354,10 @@ public class DDLRecordLocalServiceUtil {
 		return getService().getExportActionableDynamicQuery(portletDataContext);
 	}
 
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* @deprecated As of 7.0.0, replaced by {@link
 	com.liferay.dynamic.data.lists.service.DDLRecordVersionLocalService#getLatestRecordVersion(
@@ -574,14 +577,6 @@ public class DDLRecordLocalServiceUtil {
 	public void setService(DDLRecordLocalService service) {
 	}
 
-	private static ServiceTracker<DDLRecordLocalService, DDLRecordLocalService> _serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(DDLRecordLocalServiceUtil.class);
-
-		_serviceTracker = new ServiceTracker<DDLRecordLocalService, DDLRecordLocalService>(bundle.getBundleContext(),
-				DDLRecordLocalService.class, null);
-
-		_serviceTracker.open();
-	}
+	private static ServiceTracker<DDLRecordLocalService, DDLRecordLocalService> _serviceTracker =
+		ServiceTrackerFactory.open(DDLRecordLocalService.class);
 }

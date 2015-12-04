@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -222,19 +223,32 @@ public abstract class ListTypeLocalServiceBaseImpl extends BaseLocalServiceImpl
 		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
 
 		actionableDynamicQuery.setBaseLocalService(com.liferay.portal.service.ListTypeLocalServiceUtil.getService());
-		actionableDynamicQuery.setClass(ListType.class);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
+		actionableDynamicQuery.setModelClass(ListType.class);
 
 		actionableDynamicQuery.setPrimaryKeyPropertyName("listTypeId");
 
 		return actionableDynamicQuery;
 	}
 
+	@Override
+	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		IndexableActionableDynamicQuery indexableActionableDynamicQuery = new IndexableActionableDynamicQuery();
+
+		indexableActionableDynamicQuery.setBaseLocalService(com.liferay.portal.service.ListTypeLocalServiceUtil.getService());
+		indexableActionableDynamicQuery.setClassLoader(getClassLoader());
+		indexableActionableDynamicQuery.setModelClass(ListType.class);
+
+		indexableActionableDynamicQuery.setPrimaryKeyPropertyName("listTypeId");
+
+		return indexableActionableDynamicQuery;
+	}
+
 	protected void initActionableDynamicQuery(
 		ActionableDynamicQuery actionableDynamicQuery) {
 		actionableDynamicQuery.setBaseLocalService(com.liferay.portal.service.ListTypeLocalServiceUtil.getService());
-		actionableDynamicQuery.setClass(ListType.class);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
+		actionableDynamicQuery.setModelClass(ListType.class);
 
 		actionableDynamicQuery.setPrimaryKeyPropertyName("listTypeId");
 	}
@@ -312,25 +326,6 @@ public abstract class ListTypeLocalServiceBaseImpl extends BaseLocalServiceImpl
 	}
 
 	/**
-	 * Returns the list type remote service.
-	 *
-	 * @return the list type remote service
-	 */
-	public com.liferay.portal.service.ListTypeService getListTypeService() {
-		return listTypeService;
-	}
-
-	/**
-	 * Sets the list type remote service.
-	 *
-	 * @param listTypeService the list type remote service
-	 */
-	public void setListTypeService(
-		com.liferay.portal.service.ListTypeService listTypeService) {
-		this.listTypeService = listTypeService;
-	}
-
-	/**
 	 * Returns the list type persistence.
 	 *
 	 * @return the list type persistence
@@ -384,25 +379,6 @@ public abstract class ListTypeLocalServiceBaseImpl extends BaseLocalServiceImpl
 	public void setClassNameLocalService(
 		com.liferay.portal.service.ClassNameLocalService classNameLocalService) {
 		this.classNameLocalService = classNameLocalService;
-	}
-
-	/**
-	 * Returns the class name remote service.
-	 *
-	 * @return the class name remote service
-	 */
-	public com.liferay.portal.service.ClassNameService getClassNameService() {
-		return classNameService;
-	}
-
-	/**
-	 * Sets the class name remote service.
-	 *
-	 * @param classNameService the class name remote service
-	 */
-	public void setClassNameService(
-		com.liferay.portal.service.ClassNameService classNameService) {
-		this.classNameService = classNameService;
 	}
 
 	/**
@@ -478,16 +454,12 @@ public abstract class ListTypeLocalServiceBaseImpl extends BaseLocalServiceImpl
 
 	@BeanReference(type = com.liferay.portal.service.ListTypeLocalService.class)
 	protected ListTypeLocalService listTypeLocalService;
-	@BeanReference(type = com.liferay.portal.service.ListTypeService.class)
-	protected com.liferay.portal.service.ListTypeService listTypeService;
 	@BeanReference(type = ListTypePersistence.class)
 	protected ListTypePersistence listTypePersistence;
 	@BeanReference(type = com.liferay.counter.service.CounterLocalService.class)
 	protected com.liferay.counter.service.CounterLocalService counterLocalService;
 	@BeanReference(type = com.liferay.portal.service.ClassNameLocalService.class)
 	protected com.liferay.portal.service.ClassNameLocalService classNameLocalService;
-	@BeanReference(type = com.liferay.portal.service.ClassNameService.class)
-	protected com.liferay.portal.service.ClassNameService classNameService;
 	@BeanReference(type = ClassNamePersistence.class)
 	protected ClassNamePersistence classNamePersistence;
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)

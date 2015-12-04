@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -230,19 +231,32 @@ public abstract class DLFileRankLocalServiceBaseImpl
 		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
 
 		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.documentlibrary.service.DLFileRankLocalServiceUtil.getService());
-		actionableDynamicQuery.setClass(DLFileRank.class);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
+		actionableDynamicQuery.setModelClass(DLFileRank.class);
 
 		actionableDynamicQuery.setPrimaryKeyPropertyName("fileRankId");
 
 		return actionableDynamicQuery;
 	}
 
+	@Override
+	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		IndexableActionableDynamicQuery indexableActionableDynamicQuery = new IndexableActionableDynamicQuery();
+
+		indexableActionableDynamicQuery.setBaseLocalService(com.liferay.portlet.documentlibrary.service.DLFileRankLocalServiceUtil.getService());
+		indexableActionableDynamicQuery.setClassLoader(getClassLoader());
+		indexableActionableDynamicQuery.setModelClass(DLFileRank.class);
+
+		indexableActionableDynamicQuery.setPrimaryKeyPropertyName("fileRankId");
+
+		return indexableActionableDynamicQuery;
+	}
+
 	protected void initActionableDynamicQuery(
 		ActionableDynamicQuery actionableDynamicQuery) {
 		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.documentlibrary.service.DLFileRankLocalServiceUtil.getService());
-		actionableDynamicQuery.setClass(DLFileRank.class);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
+		actionableDynamicQuery.setModelClass(DLFileRank.class);
 
 		actionableDynamicQuery.setPrimaryKeyPropertyName("fileRankId");
 	}
@@ -395,25 +409,6 @@ public abstract class DLFileRankLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the layout remote service.
-	 *
-	 * @return the layout remote service
-	 */
-	public com.liferay.portal.service.LayoutService getLayoutService() {
-		return layoutService;
-	}
-
-	/**
-	 * Sets the layout remote service.
-	 *
-	 * @param layoutService the layout remote service
-	 */
-	public void setLayoutService(
-		com.liferay.portal.service.LayoutService layoutService) {
-		this.layoutService = layoutService;
-	}
-
-	/**
 	 * Returns the layout persistence.
 	 *
 	 * @return the layout persistence
@@ -466,25 +461,6 @@ public abstract class DLFileRankLocalServiceBaseImpl
 	public void setDLFolderLocalService(
 		com.liferay.portlet.documentlibrary.service.DLFolderLocalService dlFolderLocalService) {
 		this.dlFolderLocalService = dlFolderLocalService;
-	}
-
-	/**
-	 * Returns the document library folder remote service.
-	 *
-	 * @return the document library folder remote service
-	 */
-	public com.liferay.portlet.documentlibrary.service.DLFolderService getDLFolderService() {
-		return dlFolderService;
-	}
-
-	/**
-	 * Sets the document library folder remote service.
-	 *
-	 * @param dlFolderService the document library folder remote service
-	 */
-	public void setDLFolderService(
-		com.liferay.portlet.documentlibrary.service.DLFolderService dlFolderService) {
-		this.dlFolderService = dlFolderService;
 	}
 
 	/**
@@ -585,16 +561,12 @@ public abstract class DLFileRankLocalServiceBaseImpl
 	protected com.liferay.counter.service.CounterLocalService counterLocalService;
 	@BeanReference(type = com.liferay.portal.service.LayoutLocalService.class)
 	protected com.liferay.portal.service.LayoutLocalService layoutLocalService;
-	@BeanReference(type = com.liferay.portal.service.LayoutService.class)
-	protected com.liferay.portal.service.LayoutService layoutService;
 	@BeanReference(type = LayoutPersistence.class)
 	protected LayoutPersistence layoutPersistence;
 	@BeanReference(type = LayoutFinder.class)
 	protected LayoutFinder layoutFinder;
 	@BeanReference(type = com.liferay.portlet.documentlibrary.service.DLFolderLocalService.class)
 	protected com.liferay.portlet.documentlibrary.service.DLFolderLocalService dlFolderLocalService;
-	@BeanReference(type = com.liferay.portlet.documentlibrary.service.DLFolderService.class)
-	protected com.liferay.portlet.documentlibrary.service.DLFolderService dlFolderService;
 	@BeanReference(type = DLFolderPersistence.class)
 	protected DLFolderPersistence dlFolderPersistence;
 	@BeanReference(type = DLFolderFinder.class)

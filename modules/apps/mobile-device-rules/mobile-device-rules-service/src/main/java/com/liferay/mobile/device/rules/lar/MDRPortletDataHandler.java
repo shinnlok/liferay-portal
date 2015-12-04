@@ -20,10 +20,6 @@ import com.liferay.mobile.device.rules.model.MDRAction;
 import com.liferay.mobile.device.rules.model.MDRRule;
 import com.liferay.mobile.device.rules.model.MDRRuleGroup;
 import com.liferay.mobile.device.rules.model.MDRRuleGroupInstance;
-import com.liferay.mobile.device.rules.model.impl.MDRActionImpl;
-import com.liferay.mobile.device.rules.model.impl.MDRRuleGroupImpl;
-import com.liferay.mobile.device.rules.model.impl.MDRRuleGroupInstanceImpl;
-import com.liferay.mobile.device.rules.model.impl.MDRRuleImpl;
 import com.liferay.mobile.device.rules.service.MDRActionLocalService;
 import com.liferay.mobile.device.rules.service.MDRRuleGroupInstanceLocalService;
 import com.liferay.mobile.device.rules.service.MDRRuleGroupLocalService;
@@ -41,7 +37,6 @@ import com.liferay.portlet.exportimport.lar.PortletDataHandler;
 import com.liferay.portlet.exportimport.lar.PortletDataHandlerBoolean;
 import com.liferay.portlet.exportimport.lar.StagedModelDataHandlerUtil;
 import com.liferay.portlet.exportimport.lar.StagedModelType;
-import com.liferay.portlet.exportimport.xstream.XStreamAliasRegistryUtil;
 
 import java.util.List;
 
@@ -81,13 +76,6 @@ public class MDRPortletDataHandler extends BasePortletDataHandler {
 		setImportControls(getExportControls());
 		setPublishToLiveByDefault(
 			PropsValues.MOBILE_DEVICE_RULES_PUBLISH_TO_LIVE_BY_DEFAULT);
-
-		XStreamAliasRegistryUtil.register(MDRActionImpl.class, "MDRAction");
-		XStreamAliasRegistryUtil.register(MDRRuleImpl.class, "MDRRule");
-		XStreamAliasRegistryUtil.register(
-			MDRRuleGroupImpl.class, "MDRRuleGroup");
-		XStreamAliasRegistryUtil.register(
-			MDRRuleGroupInstanceImpl.class, "MDRRuleGroupInstance");
 	}
 
 	@Override
@@ -250,9 +238,10 @@ public class MDRPortletDataHandler extends BasePortletDataHandler {
 		ModuleServiceLifecycle moduleServiceLifecycle) {
 	}
 
-	private MDRActionLocalService _mdrActionLocalService;
-	private MDRRuleGroupInstanceLocalService _mdrRuleGroupInstanceLocalService;
-	private MDRRuleGroupLocalService _mdrRuleGroupLocalService;
-	private MDRRuleLocalService _mdrRuleLocalService;
+	private volatile MDRActionLocalService _mdrActionLocalService;
+	private volatile MDRRuleGroupInstanceLocalService
+		_mdrRuleGroupInstanceLocalService;
+	private volatile MDRRuleGroupLocalService _mdrRuleGroupLocalService;
+	private volatile MDRRuleLocalService _mdrRuleLocalService;
 
 }

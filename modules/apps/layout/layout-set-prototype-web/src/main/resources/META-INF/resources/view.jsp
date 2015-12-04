@@ -47,8 +47,8 @@ PortletURL portletURL = renderResponse.createRenderURL();
 
 <c:if test='<%= (layoutSetPrototypesCount > 0) || !navigation.equals("all") %>'>
 	<liferay-frontend:management-bar
-		checkBoxContainerId="layoutSetPrototypeSearchContainer"
 		includeCheckBox="<%= true %>"
+		searchContainerId="layoutSetPrototype"
 	>
 		<liferay-frontend:management-bar-filters>
 			<liferay-frontend:management-bar-navigation
@@ -73,12 +73,16 @@ PortletURL portletURL = renderResponse.createRenderURL();
 		</liferay-frontend:management-bar-buttons>
 
 		<liferay-frontend:management-bar-action-buttons>
-			<liferay-frontend:management-bar-button href="javascript:;" iconCssClass="icon-trash" id="deleteSelectedLayoutSetPrototypes" />
+			<liferay-frontend:management-bar-button href="javascript:;" iconCssClass="icon-trash" id="deleteSelectedLayoutSetPrototypes" label="delete" />
 		</liferay-frontend:management-bar-action-buttons>
 	</liferay-frontend:management-bar>
 </c:if>
 
-<aui:form cssClass="container-fluid-1280" name="fm">
+<portlet:actionURL name="deleteLayoutSetPrototypes" var="deleteLayoutSetPrototypesURL">
+	<portlet:param name="redirect" value="<%= currentURL %>" />
+</portlet:actionURL>
+
+<aui:form action="<%= deleteLayoutSetPrototypesURL %>" cssClass="container-fluid-1280" name="fm">
 	<aui:input name="redirect" type="hidden" value="<%= portletURL.toString() %>" />
 
 	<liferay-ui:search-container
@@ -89,7 +93,6 @@ PortletURL portletURL = renderResponse.createRenderURL();
 		rowChecker="<%= new EmptyOnClickRowChecker(renderResponse) %>"
 		total="<%= layoutSetPrototypesCount %>"
 	>
-		<aui:input name="layoutSetPrototypeIds" type="hidden" />
 
 		<%
 		boolean orderByAsc = false;
@@ -184,21 +187,11 @@ PortletURL portletURL = renderResponse.createRenderURL();
 </c:if>
 
 <aui:script sandbox="<%= true %>">
-	var Util = Liferay.Util;
-
-	var form = $(document.<portlet:namespace />fm);
-
 	$('#<portlet:namespace />deleteSelectedLayoutSetPrototypes').on(
 		'click',
 		function() {
 			if (confirm('<liferay-ui:message key="are-you-sure-you-want-to-delete-this" />')) {
-				<portlet:actionURL name="deleteLayoutSetPrototypes" var="deleteURL">
-					<portlet:param name="redirect" value="<%= currentURL %>" />
-				</portlet:actionURL>
-
-				form.fm('layoutSetPrototypeIds').val(Util.listCheckedExcept(form, '<portlet:namespace />allRowIds'));
-
-				submitForm(form, '<%= deleteURL %>');
+				submitForm($(document.<portlet:namespace />fm));
 			}
 		}
 	);

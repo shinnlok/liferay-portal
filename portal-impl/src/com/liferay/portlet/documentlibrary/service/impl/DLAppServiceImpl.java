@@ -2997,8 +2997,10 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 		FileVersion latestFileVersion = fileVersions.get(
 			fileVersions.size() - 1);
 
+		String sourceFileName = DLAppUtil.getSourceFileName(latestFileVersion);
+
 		FileEntry destinationFileEntry = toRepository.addFileEntry(
-			getUserId(), newFolderId, fileEntry.getTitle(),
+			getUserId(), newFolderId, sourceFileName,
 			latestFileVersion.getMimeType(), latestFileVersion.getTitle(),
 			latestFileVersion.getDescription(), StringPool.BLANK,
 			latestFileVersion.getContentStream(false),
@@ -3007,12 +3009,14 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 		for (int i = fileVersions.size() - 2; i >= 0; i--) {
 			FileVersion fileVersion = fileVersions.get(i);
 
+			sourceFileName = DLAppUtil.getSourceFileName(fileVersion);
+
 			FileVersion previousFileVersion = fileVersions.get(i + 1);
 
 			try {
 				destinationFileEntry = toRepository.updateFileEntry(
 					getUserId(), destinationFileEntry.getFileEntryId(),
-					fileVersion.getTitle(), fileVersion.getMimeType(),
+					sourceFileName, fileVersion.getMimeType(),
 					fileVersion.getTitle(), fileVersion.getDescription(),
 					StringPool.BLANK,
 					DLAppUtil.isMajorVersion(previousFileVersion, fileVersion),
@@ -3291,8 +3295,8 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 				if (repositoryEntry instanceof FileEntry) {
 					FileEntry fileEntry = (FileEntry)repositoryEntry;
 
-					copyFileEntry(
-						toRepository, fileEntry, newFolder.getFolderId(),
+					moveFileEntry(
+						fileEntry.getFileEntryId(), newFolder.getFolderId(),
 						serviceContext);
 				}
 				else if (repositoryEntry instanceof Folder) {
@@ -3315,7 +3319,14 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 			}
 		}
 		catch (PortalException pe) {
-			toRepository.deleteFolder(newFolder.getFolderId());
+			int foldersAndFileEntriesAndFileShortcutsCount =
+				getFoldersAndFileEntriesAndFileShortcutsCount(
+					newFolder.getRepositoryId(), newFolder.getFolderId(),
+					WorkflowConstants.STATUS_ANY, true);
+
+			if (foldersAndFileEntriesAndFileShortcutsCount == 0) {
+				toRepository.deleteFolder(newFolder.getFolderId());
+			}
 
 			throw pe;
 		}
