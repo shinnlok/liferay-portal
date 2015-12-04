@@ -416,6 +416,7 @@ public class FileEventUtil {
 			String checksum = FileUtil.getChecksum(filePath);
 
 			uploadingSyncFile.setChecksum(checksum);
+			uploadingSyncFile.setSize(Files.size(filePath));
 
 			SyncFileService.update(uploadingSyncFile);
 
