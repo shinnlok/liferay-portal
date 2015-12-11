@@ -405,14 +405,6 @@ public class SyncWatchEventProcessor implements Runnable {
 
 			return;
 		}
-		else if (syncFile.getState() == SyncFile.STATE_IN_PROGRESS) {
-			Set<Event> events = FileEventManager.getEvents(
-				syncFile.getSyncFileId());
-
-			for (Event event : events) {
-				event.cancel();
-			}
-		}
 		else if ((syncFile.getState() == SyncFile.STATE_ERROR) ||
 				 (syncFile.getState() == SyncFile.STATE_UNSYNCED)) {
 
