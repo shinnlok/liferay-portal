@@ -21,23 +21,14 @@ import java.util.Comparator;
 /**
  * @author Shinn Lok
  */
-public class SyncFileComparator implements Comparator<SyncFile> {
+public class SyncFileFilePathNameComparator implements Comparator<SyncFile> {
 
 	@Override
 	public int compare(SyncFile syncFile1, SyncFile syncFile2) {
-		int value = 0;
+		String filePathName1 = syncFile1.getFilePathName();
+		String filePathName2 = syncFile2.getFilePathName();
 
-		long size1 = syncFile1.getSize();
-		long size2 = syncFile2.getSize();
-
-		if (size1 < size2) {
-			value = -1;
-		}
-		else if (size1 > size2) {
-			value = 1;
-		}
-
-		return value;
+		return filePathName1.compareTo(filePathName2);
 	}
 
 }

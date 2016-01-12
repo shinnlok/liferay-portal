@@ -168,7 +168,7 @@ public class SyncFilePersistence extends BasePersistenceImpl<SyncFile, Long> {
 			parentFilePathName + fileSystem.getSeparator(), "\\", "\\\\");
 
 		where.like("filePathName", new SelectArg(parentFilePathName + "%"));
-		where.lt("localSyncTime", localSyncTime);
+		where.between("localSyncTime", 1, localSyncTime);
 		where.or(
 			where.eq("state", SyncFile.STATE_SYNCED),
 			where.eq("uiEvent", SyncFile.UI_EVENT_DELETED_LOCAL),
@@ -211,6 +211,19 @@ public class SyncFilePersistence extends BasePersistenceImpl<SyncFile, Long> {
 		fieldValues.put("repositoryId", repositoryId);
 		fieldValues.put("state", state);
 		fieldValues.put("syncAccountId", syncAccountId);
+
+		return queryForFieldValues(fieldValues);
+	}
+
+	public List<SyncFile> findByR_S_T(
+			long repositoryId, long syncAccountId, String type)
+		throws SQLException {
+
+		Map<String, Object> fieldValues = new HashMap<>();
+
+		fieldValues.put("repositoryId", repositoryId);
+		fieldValues.put("syncAccountId", syncAccountId);
+		fieldValues.put("type", type);
 
 		return queryForFieldValues(fieldValues);
 	}
