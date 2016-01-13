@@ -50,10 +50,27 @@ public class SyncFileTestUtil {
 	}
 
 	public static SyncFile addFolderSyncFile(
+			String filePathName, int state, long syncAccountId)
+		throws Exception {
+
+		return addFolderSyncFile(filePathName, 0, state, syncAccountId);
+	}
+
+	public static SyncFile addFolderSyncFile(
 			String filePathName, long syncAccountId)
 		throws Exception {
 
-		return addFolderSyncFile(filePathName, 0, syncAccountId);
+		return addFolderSyncFile(
+			filePathName, SyncFile.STATE_SYNCED, syncAccountId);
+	}
+
+	public static SyncFile addFolderSyncFile(
+			String filePathName, long parentFolderId, int state,
+			long syncAccountId)
+		throws Exception {
+
+		return addFolderSyncFile(
+			filePathName, parentFolderId, 0, state, syncAccountId, 0);
 	}
 
 	public static SyncFile addFolderSyncFile(
@@ -61,18 +78,17 @@ public class SyncFileTestUtil {
 		throws Exception {
 
 		return addFolderSyncFile(
-			filePathName, parentFolderId, 0, syncAccountId, 0);
+			filePathName, parentFolderId, SyncFile.STATE_SYNCED, syncAccountId);
 	}
 
 	public static SyncFile addFolderSyncFile(
 			String filePathName, long parentFolderId, long repositoryId,
-			long syncAccountId, long typePK)
+			int state, long syncAccountId, long typePK)
 		throws Exception {
 
 		SyncFile syncFile = SyncFileService.addSyncFile(
 			null, null, null, filePathName, null, null, parentFolderId,
-			repositoryId, SyncFile.STATE_SYNCED, syncAccountId,
-			SyncFile.TYPE_FOLDER, false);
+			repositoryId, state, syncAccountId, SyncFile.TYPE_FOLDER, false);
 
 		if (typePK == 0) {
 			syncFile.setTypePK(syncFile.getSyncFileId());
