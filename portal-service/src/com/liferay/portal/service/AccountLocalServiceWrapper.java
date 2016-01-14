@@ -229,6 +229,11 @@ public class AccountLocalServiceWrapper implements AccountLocalService,
 		return _accountLocalService.getActionableDynamicQuery();
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _accountLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -256,23 +261,6 @@ public class AccountLocalServiceWrapper implements AccountLocalService,
 	public com.liferay.portal.model.Account updateAccount(
 		com.liferay.portal.model.Account account) {
 		return _accountLocalService.updateAccount(account);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public AccountLocalService getWrappedAccountLocalService() {
-		return _accountLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedAccountLocalService(
-		AccountLocalService accountLocalService) {
-		_accountLocalService = accountLocalService;
 	}
 
 	@Override

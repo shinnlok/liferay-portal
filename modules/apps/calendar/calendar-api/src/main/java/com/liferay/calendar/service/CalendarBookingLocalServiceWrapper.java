@@ -449,6 +449,11 @@ public class CalendarBookingLocalServiceWrapper
 		return _calendarBookingLocalService.getExportActionableDynamicQuery(portletDataContext);
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _calendarBookingLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -542,10 +547,10 @@ public class CalendarBookingLocalServiceWrapper
 	public void updateAsset(long userId,
 		com.liferay.calendar.model.CalendarBooking calendarBooking,
 		long[] assetCategoryIds, java.lang.String[] assetTagNames,
-		long[] assetLinkEntryIds)
+		long[] assetLinkEntryIds, java.lang.Double priority)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		_calendarBookingLocalService.updateAsset(userId, calendarBooking,
-			assetCategoryIds, assetTagNames, assetLinkEntryIds);
+			assetCategoryIds, assetTagNames, assetLinkEntryIds, priority);
 	}
 
 	/**
@@ -652,23 +657,6 @@ public class CalendarBookingLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _calendarBookingLocalService.updateStatus(userId,
 			calendarBookingId, status, serviceContext);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public CalendarBookingLocalService getWrappedCalendarBookingLocalService() {
-		return _calendarBookingLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedCalendarBookingLocalService(
-		CalendarBookingLocalService calendarBookingLocalService) {
-		_calendarBookingLocalService = calendarBookingLocalService;
 	}
 
 	@Override

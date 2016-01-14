@@ -209,6 +209,11 @@ public class KaleoTaskLocalServiceWrapper implements KaleoTaskLocalService,
 	}
 
 	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _kaleoTaskLocalService.getIndexableActionableDynamicQuery();
+	}
+
+	@Override
 	public com.liferay.portal.workflow.kaleo.model.KaleoTask getKaleoNodeKaleoTask(
 		long kaleoNodeId)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -283,23 +288,6 @@ public class KaleoTaskLocalServiceWrapper implements KaleoTaskLocalService,
 	public com.liferay.portal.workflow.kaleo.model.KaleoTask updateKaleoTask(
 		com.liferay.portal.workflow.kaleo.model.KaleoTask kaleoTask) {
 		return _kaleoTaskLocalService.updateKaleoTask(kaleoTask);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public KaleoTaskLocalService getWrappedKaleoTaskLocalService() {
-		return _kaleoTaskLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedKaleoTaskLocalService(
-		KaleoTaskLocalService kaleoTaskLocalService) {
-		_kaleoTaskLocalService = kaleoTaskLocalService;
 	}
 
 	@Override

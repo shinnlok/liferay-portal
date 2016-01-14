@@ -773,7 +773,7 @@ public class AssetPublisherExportImportPortletPreferencesProcessor
 			try {
 				if (!AssetPublisherUtil.isScopeIdSelectable(
 						PermissionThreadLocal.getPermissionChecker(), newValue,
-						companyGroupId, layout)) {
+						companyGroupId, layout, false)) {
 
 					continue;
 				}
@@ -801,7 +801,7 @@ public class AssetPublisherExportImportPortletPreferencesProcessor
 					_log.info(
 						"Ignoring scope " + newValue + " because the " +
 							"referenced parent group no longer allows " +
-							"sharing content with child sites",
+								"sharing content with child sites",
 						pe);
 				}
 			}

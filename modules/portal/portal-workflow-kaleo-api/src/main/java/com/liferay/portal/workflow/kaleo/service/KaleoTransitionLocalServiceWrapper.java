@@ -222,6 +222,11 @@ public class KaleoTransitionLocalServiceWrapper
 	}
 
 	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _kaleoTransitionLocalService.getIndexableActionableDynamicQuery();
+	}
+
+	@Override
 	public java.util.List<com.liferay.portal.workflow.kaleo.model.KaleoTransition> getKaleoDefinitionKaleoTransitions(
 		long kaleoDefinitionId) {
 		return _kaleoTransitionLocalService.getKaleoDefinitionKaleoTransitions(kaleoDefinitionId);
@@ -313,23 +318,6 @@ public class KaleoTransitionLocalServiceWrapper
 	public com.liferay.portal.workflow.kaleo.model.KaleoTransition updateKaleoTransition(
 		com.liferay.portal.workflow.kaleo.model.KaleoTransition kaleoTransition) {
 		return _kaleoTransitionLocalService.updateKaleoTransition(kaleoTransition);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public KaleoTransitionLocalService getWrappedKaleoTransitionLocalService() {
-		return _kaleoTransitionLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedKaleoTransitionLocalService(
-		KaleoTransitionLocalService kaleoTransitionLocalService) {
-		_kaleoTransitionLocalService = kaleoTransitionLocalService;
 	}
 
 	@Override

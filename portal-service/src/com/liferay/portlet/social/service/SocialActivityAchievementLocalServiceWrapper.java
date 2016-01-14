@@ -241,6 +241,11 @@ public class SocialActivityAchievementLocalServiceWrapper
 		return _socialActivityAchievementLocalService.getGroupFirstAchievementsCount(groupId);
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _socialActivityAchievementLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -323,23 +328,6 @@ public class SocialActivityAchievementLocalServiceWrapper
 	public com.liferay.portlet.social.model.SocialActivityAchievement updateSocialActivityAchievement(
 		com.liferay.portlet.social.model.SocialActivityAchievement socialActivityAchievement) {
 		return _socialActivityAchievementLocalService.updateSocialActivityAchievement(socialActivityAchievement);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public SocialActivityAchievementLocalService getWrappedSocialActivityAchievementLocalService() {
-		return _socialActivityAchievementLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedSocialActivityAchievementLocalService(
-		SocialActivityAchievementLocalService socialActivityAchievementLocalService) {
-		_socialActivityAchievementLocalService = socialActivityAchievementLocalService;
 	}
 
 	@Override

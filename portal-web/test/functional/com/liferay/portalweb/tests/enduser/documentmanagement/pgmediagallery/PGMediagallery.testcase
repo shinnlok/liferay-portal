@@ -5,9 +5,18 @@
 	<var name="portletName" value="Media Gallery" />
 
 	<set-up>
+		<var method="TestPropsUtil#get('test.portal.instance')" name="testPortalInstance" />
+
+		<if>
+			<equals arg1="${testPortalInstance}" arg2="true" />
+			<then>
+				<execute macro="SignIn#signInPortalInstanceSetUp" />
+			</then>
+		</if>
+
 		<execute macro="User#firstLoginPG" />
 
-		<execute macro="Page#addPG">
+		<execute macro="Page#add">
 			<var name="pageName" value="${pageName}" />
 		</execute>
 
@@ -17,6 +26,12 @@
 
 		<execute macro="Portlet#addPG">
 			<var name="portletName" value="${portletName}" />
+		</execute>
+
+		<execute macro="Portlet#dragAndDropPortletToColumnPG">
+			<var name="columnNumberFrom" value="1" />
+			<var name="columnNumberTo" value="2" />
+			<var name="portletName" value="Media Gallery" />
 		</execute>
 
 		<execute macro="Page#gotoPG">
@@ -29,13 +44,23 @@
 	</set-up>
 
 	<tear-down>
-		<execute macro="DMFolder#tearDownPGViaMG">
-			<var name="pageName" value="${pageName}" />
-		</execute>
+		<var method="TestPropsUtil#get('test.portal.instance')" name="testPortalInstance" />
 
-		<execute macro="Page#tearDownPG">
-			<var name="pageName" value="${pageName}" />
-		</execute>
+		<if>
+			<equals arg1="${testPortalInstance}" arg2="true" />
+			<then>
+				<execute macro="PortalInstances#tearDownCP" />
+			</then>
+			<else>
+				<execute macro="DMFolder#tearDownPGViaMG">
+					<var name="pageName" value="${pageName}" />
+				</execute>
+
+				<execute macro="Page#tearDownPG">
+					<var name="pageName" value="${pageName}" />
+				</execute>
+			</else>
+		</if>
 	</tear-down>
 
 	<command name="AddFolder" priority="5">
@@ -80,6 +105,10 @@
 			<var name="mgDocumentDescription" value="${mgDocumentDescription}" />
 			<var name="mgDocumentFile" value="${mgDocumentFile}" />
 			<var name="mgDocumentTitle" value="${mgDocumentTitle}" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
 		</execute>
 
 		<execute macro="DMFolder#gotoPGViaMG">
@@ -245,6 +274,8 @@
 	</command>
 
 	<command name="DeleteFolderDocument" priority="5">
+		<property name="portal.acceptance" value="true" />
+
 		<var name="mgDocumentDescription" value="DM Document Description" />
 		<var name="mgDocumentFile" value="Document_1.jpg" />
 		<var name="mgDocumentTitle" value="DM Document Title" />
@@ -284,6 +315,8 @@
 	</command>
 
 	<command name="EditFolder" priority="5">
+		<property name="portal.acceptance" value="true" />
+
 		<var name="mgFolderDescription" value="DM Folder Description" />
 		<var name="mgFolderDescriptionEdit" value="DM Folder Description Edit" />
 		<var name="mgFolderName" value="DM Folder Name" />
@@ -344,10 +377,6 @@
 			<var name="mgDocumentDescription" value="${mgDocumentDescription}" />
 			<var name="mgDocumentFile" value="${mgDocumentFile}" />
 			<var name="mgDocumentTitle" value="${mgDocumentTitle}" />
-		</execute>
-
-		<execute macro="DMFolder#gotoPGViaMG">
-			<var name="mgFolderName" value="${mgFolderName}" />
 		</execute>
 
 		<execute macro="DMDocument#editPGViaMG">

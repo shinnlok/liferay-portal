@@ -24,6 +24,7 @@ taglib uri="http://liferay.com/tld/frontend" prefix="liferay-frontend" %><%@
 taglib uri="http://liferay.com/tld/portlet" prefix="liferay-portlet" %><%@
 taglib uri="http://liferay.com/tld/security" prefix="liferay-security" %><%@
 taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %><%@
+taglib uri="http://liferay.com/tld/trash" prefix="liferay-trash" %><%@
 taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %><%@
 taglib uri="http://liferay.com/tld/util" prefix="liferay-util" %>
 
@@ -37,8 +38,9 @@ page import="com.liferay.document.library.web.display.context.logic.DLVisualizat
 page import="com.liferay.document.library.web.display.context.util.DLRequestHelper" %><%@
 page import="com.liferay.document.library.web.display.context.util.IGRequestHelper" %><%@
 page import="com.liferay.document.library.web.portlet.action.EditFileEntryMVCActionCommand" %><%@
-page import="com.liferay.document.library.web.portlet.toolbar.item.DLPortletToolbarContributor" %><%@
+page import="com.liferay.document.library.web.portlet.toolbar.contributor.DLPortletToolbarContributor" %><%@
 page import="com.liferay.document.library.web.search.EntriesChecker" %><%@
+page import="com.liferay.document.library.web.search.EntriesMover" %><%@
 page import="com.liferay.document.library.web.settings.internal.DLPortletInstanceSettings" %><%@
 page import="com.liferay.document.library.web.util.DLBreadcrumbUtil" %><%@
 page import="com.liferay.document.library.web.util.DLWebComponentProvider" %><%@
@@ -94,6 +96,7 @@ page import="com.liferay.portal.kernel.servlet.taglib.ui.MenuItem" %><%@
 page import="com.liferay.portal.kernel.servlet.taglib.ui.ToolbarItem" %><%@
 page import="com.liferay.portal.kernel.servlet.taglib.ui.URLMenuItem" %><%@
 page import="com.liferay.portal.kernel.upload.LiferayFileItemException" %><%@
+page import="com.liferay.portal.kernel.upload.UploadRequestSizeException" %><%@
 page import="com.liferay.portal.kernel.util.ArrayUtil" %><%@
 page import="com.liferay.portal.kernel.util.Constants" %><%@
 page import="com.liferay.portal.kernel.util.FastDateFormatFactoryUtil" %><%@
@@ -108,6 +111,7 @@ page import="com.liferay.portal.kernel.util.PrefsPropsUtil" %><%@
 page import="com.liferay.portal.kernel.util.PropsKeys" %><%@
 page import="com.liferay.portal.kernel.util.StringPool" %><%@
 page import="com.liferay.portal.kernel.util.StringUtil" %><%@
+page import="com.liferay.portal.kernel.util.TempFileEntryUtil" %><%@
 page import="com.liferay.portal.kernel.util.TextFormatter" %><%@
 page import="com.liferay.portal.kernel.util.Time" %><%@
 page import="com.liferay.portal.kernel.util.UnicodeFormatter" %><%@
@@ -147,7 +151,6 @@ page import="com.liferay.portlet.PortalPreferences" %><%@
 page import="com.liferay.portlet.PortletPreferencesFactoryUtil" %><%@
 page import="com.liferay.portlet.PortletURLFactoryUtil" %><%@
 page import="com.liferay.portlet.PortletURLUtil" %><%@
-page import="com.liferay.portlet.admin.util.PortalProductMenuApplicationType" %><%@
 page import="com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil" %><%@
 page import="com.liferay.portlet.asset.model.AssetEntry" %><%@
 page import="com.liferay.portlet.asset.model.AssetRenderer" %><%@
@@ -162,6 +165,7 @@ page import="com.liferay.portlet.documentlibrary.DuplicateFileEntryException" %>
 page import="com.liferay.portlet.documentlibrary.DuplicateFileEntryTypeException" %><%@
 page import="com.liferay.portlet.documentlibrary.DuplicateFolderNameException" %><%@
 page import="com.liferay.portlet.documentlibrary.DuplicateRepositoryNameException" %><%@
+page import="com.liferay.portlet.documentlibrary.FileEntryLockException" %><%@
 page import="com.liferay.portlet.documentlibrary.FileExtensionException" %><%@
 page import="com.liferay.portlet.documentlibrary.FileMimeTypeException" %><%@
 page import="com.liferay.portlet.documentlibrary.FileNameException" %><%@
@@ -202,7 +206,6 @@ page import="com.liferay.portlet.documentlibrary.service.permission.DLFileShortc
 page import="com.liferay.portlet.documentlibrary.service.permission.DLFolderPermission" %><%@
 page import="com.liferay.portlet.documentlibrary.service.permission.DLPermission" %><%@
 page import="com.liferay.portlet.documentlibrary.util.AudioProcessorUtil" %><%@
-page import="com.liferay.portlet.documentlibrary.util.DL" %><%@
 page import="com.liferay.portlet.documentlibrary.util.DLProcessorRegistryUtil" %><%@
 page import="com.liferay.portlet.documentlibrary.util.DLUtil" %><%@
 page import="com.liferay.portlet.documentlibrary.util.DocumentConversionUtil" %><%@
@@ -235,6 +238,7 @@ page import="com.liferay.taglib.util.PortalIncludeUtil" %>
 page import="java.text.Format" %>
 
 <%@ page import="java.util.ArrayList" %><%@
+page import="java.util.Arrays" %><%@
 page import="java.util.Date" %><%@
 page import="java.util.HashMap" %><%@
 page import="java.util.LinkedHashMap" %><%@
@@ -246,6 +250,8 @@ page import="javax.portlet.PortletURL" %><%@
 page import="javax.portlet.WindowState" %>
 
 <portlet:defineObjects />
+
+<liferay-frontend:defineObjects />
 
 <liferay-theme:defineObjects />
 

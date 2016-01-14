@@ -18,17 +18,17 @@ import com.liferay.journal.model.JournalFolder;
 import com.liferay.journal.service.JournalFolderLocalService;
 import com.liferay.journal.service.permission.JournalFolderPermission;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.BaseIndexer;
 import com.liferay.portal.kernel.search.Document;
-import com.liferay.portal.kernel.search.DocumentImpl;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.FolderIndexer;
+import com.liferay.portal.kernel.search.IndexWriterHelperUtil;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.SearchContext;
-import com.liferay.portal.kernel.search.SearchEngineUtil;
 import com.liferay.portal.kernel.search.Summary;
 import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.util.CharPool;
@@ -95,13 +95,8 @@ public class JournalFolderIndexer
 
 	@Override
 	protected void doDelete(JournalFolder journalFolder) throws Exception {
-		Document document = new DocumentImpl();
-
-		document.addUID(CLASS_NAME, journalFolder.getFolderId());
-
-		SearchEngineUtil.deleteDocument(
-			getSearchEngineId(), journalFolder.getCompanyId(),
-			document.get(Field.UID), isCommitImmediately());
+		deleteDocument(
+			journalFolder.getCompanyId(), journalFolder.getFolderId());
 	}
 
 	@Override
@@ -145,7 +140,7 @@ public class JournalFolderIndexer
 	protected void doReindex(JournalFolder journalFolder) throws Exception {
 		Document document = getDocument(journalFolder);
 
-		SearchEngineUtil.updateDocument(
+		IndexWriterHelperUtil.updateDocument(
 			getSearchEngineId(), journalFolder.getCompanyId(), document,
 			isCommitImmediately());
 	}
@@ -165,11 +160,11 @@ public class JournalFolderIndexer
 	}
 
 	protected void reindexFolders(long companyId) throws PortalException {
-		final ActionableDynamicQuery actionableDynamicQuery =
-			_journalFolderLocalService.getActionableDynamicQuery();
+		final IndexableActionableDynamicQuery indexableActionableDynamicQuery =
+			_journalFolderLocalService.getIndexableActionableDynamicQuery();
 
-		actionableDynamicQuery.setCompanyId(companyId);
-		actionableDynamicQuery.setPerformActionMethod(
+		indexableActionableDynamicQuery.setCompanyId(companyId);
+		indexableActionableDynamicQuery.setPerformActionMethod(
 			new ActionableDynamicQuery.PerformActionMethod<JournalFolder>() {
 
 				@Override
@@ -178,7 +173,8 @@ public class JournalFolderIndexer
 						Document document = getDocument(folder);
 
 						if (document != null) {
-							actionableDynamicQuery.addDocument(document);
+							indexableActionableDynamicQuery.addDocuments(
+								document);
 						}
 					}
 					catch (PortalException pe) {
@@ -192,9 +188,9 @@ public class JournalFolderIndexer
 				}
 
 			});
-		actionableDynamicQuery.setSearchEngineId(getSearchEngineId());
+		indexableActionableDynamicQuery.setSearchEngineId(getSearchEngineId());
 
-		actionableDynamicQuery.performActions();
+		indexableActionableDynamicQuery.performActions();
 	}
 
 	@Reference(unbind = "-")

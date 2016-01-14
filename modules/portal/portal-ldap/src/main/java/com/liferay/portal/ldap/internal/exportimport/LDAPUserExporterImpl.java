@@ -52,6 +52,8 @@ import javax.naming.directory.ModificationItem;
 import javax.naming.directory.SchemaViolationException;
 import javax.naming.ldap.LdapContext;
 
+import org.apache.commons.lang.time.StopWatch;
+
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -62,10 +64,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Wesley Gong
  * @author Vilmos Papp
  */
-@Component(
-	configurationPid = "com.liferay.portal.authenticator.ldap.configuration.LDAPAuthConfiguration",
-	immediate = true, service = UserExporter.class
-)
+@Component(immediate = true, service = UserExporter.class)
 public class LDAPUserExporterImpl implements UserExporter {
 
 	@Override
@@ -75,12 +74,15 @@ public class LDAPUserExporterImpl implements UserExporter {
 
 		long companyId = contact.getCompanyId();
 
-		LDAPAuthConfiguration ldapAuthConfiguration =
-			_ldapAuthConfigurationProvider.getConfiguration(companyId);
+		StopWatch stopWatch = new StopWatch();
 
-		if (!ldapAuthConfiguration.enabled() ||
-			!_ldapSettings.isExportEnabled(companyId)) {
+		if (_log.isDebugEnabled()) {
+			stopWatch.start();
 
+			_log.debug("Exporting contact " + contact);
+		}
+
+		if (!_ldapSettings.isExportEnabled(companyId)) {
 			return;
 		}
 
@@ -145,6 +147,12 @@ public class LDAPUserExporterImpl implements UserExporter {
 			if (ldapContext != null) {
 				ldapContext.close();
 			}
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					"Finished exporting contact " + contact + " in " +
+						stopWatch.getTime() + "ms");
+			}
 		}
 	}
 
@@ -157,11 +165,16 @@ public class LDAPUserExporterImpl implements UserExporter {
 
 		long companyId = user.getCompanyId();
 
-		LDAPAuthConfiguration ldapAuthConfiguration =
-			_ldapAuthConfigurationProvider.getConfiguration(companyId);
+		StopWatch stopWatch = new StopWatch();
 
-		if (!ldapAuthConfiguration.enabled() ||
-			!_ldapSettings.isExportEnabled(companyId) ||
+		if (_log.isDebugEnabled()) {
+			stopWatch.start();
+
+			_log.debug(
+				"Exporting user " + user + " in user group " + userGroupId);
+		}
+
+		if (!_ldapSettings.isExportEnabled(companyId) ||
 			!_ldapSettings.isExportGroupEnabled(companyId)) {
 
 			return;
@@ -231,6 +244,12 @@ public class LDAPUserExporterImpl implements UserExporter {
 			if (ldapContext != null) {
 				ldapContext.close();
 			}
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					"Finished exporting user " + user + " in user group " +
+						userGroupId + " in " + stopWatch.getTime() + "ms");
+			}
 		}
 	}
 
@@ -247,12 +266,7 @@ public class LDAPUserExporterImpl implements UserExporter {
 
 		long companyId = user.getCompanyId();
 
-		LDAPAuthConfiguration ldapAuthConfiguration =
-			_ldapAuthConfigurationProvider.getConfiguration(companyId);
-
-		if (!ldapAuthConfiguration.enabled() ||
-			!_ldapSettings.isExportEnabled(companyId)) {
-
+		if (!_ldapSettings.isExportEnabled(companyId)) {
 			return;
 		}
 
@@ -348,6 +362,9 @@ public class LDAPUserExporterImpl implements UserExporter {
 			}
 		}
 		catch (NameNotFoundException nnfe) {
+			LDAPAuthConfiguration ldapAuthConfiguration =
+				_ldapAuthConfigurationProvider.getConfiguration(companyId);
+
 			if (ldapAuthConfiguration.required()) {
 				throw nnfe;
 			}

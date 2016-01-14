@@ -1,4 +1,8 @@
 buildscript {
+	dependencies {
+		classpath group: "com.liferay", name: "com.liferay.gradle.plugins.jasper.jspc", version: "+"
+	}
+
 	repositories {
 		mavenLocal()
 
@@ -6,14 +10,9 @@ buildscript {
 			url "http://cdn.repository.liferay.com/nexus/content/groups/public"
 		}
 	}
-
-	dependencies {
-		classpath group: "com.liferay", name: "com.liferay.gradle.plugins.jasper.jspc", version: "+"
-	}
 }
 
 apply plugin: "com.liferay.jasper.jspc"
-apply plugin: "java"
 
 File liferayHome = file("../../../../../bundles")
 String tomcatVersion = "7.0.62"

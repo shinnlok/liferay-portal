@@ -338,6 +338,11 @@ public class TeamLocalServiceWrapper implements TeamLocalService,
 		return _teamLocalService.getGroupTeams(groupId);
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _teamLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -596,22 +601,6 @@ public class TeamLocalServiceWrapper implements TeamLocalService,
 		java.lang.String name, java.lang.String description)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _teamLocalService.updateTeam(teamId, name, description);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public TeamLocalService getWrappedTeamLocalService() {
-		return _teamLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedTeamLocalService(TeamLocalService teamLocalService) {
-		_teamLocalService = teamLocalService;
 	}
 
 	@Override

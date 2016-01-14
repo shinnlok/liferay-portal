@@ -259,6 +259,11 @@ public class MBBanLocalServiceWrapper implements MBBanLocalService,
 		return _mbBanLocalService.getExportActionableDynamicQuery(portletDataContext);
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _mbBanLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the message boards ban with the primary key.
 	*
@@ -377,22 +382,6 @@ public class MBBanLocalServiceWrapper implements MBBanLocalService,
 	public com.liferay.portlet.messageboards.model.MBBan updateMBBan(
 		com.liferay.portlet.messageboards.model.MBBan mbBan) {
 		return _mbBanLocalService.updateMBBan(mbBan);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public MBBanLocalService getWrappedMBBanLocalService() {
-		return _mbBanLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedMBBanLocalService(MBBanLocalService mbBanLocalService) {
-		_mbBanLocalService = mbBanLocalService;
 	}
 
 	@Override

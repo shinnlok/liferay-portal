@@ -16,6 +16,8 @@
 
 <%@ include file="/init.jsp" %>
 
+<liferay-util:dynamic-include key="com.liferay.journal.content.web#/view.jsp#pre" />
+
 <%
 JournalArticle article = journalContentDisplayContext.getArticle();
 JournalArticleDisplay articleDisplay = journalContentDisplayContext.getArticleDisplay();
@@ -132,6 +134,7 @@ AssetRendererFactory<JournalArticle> assetRendererFactory = AssetRendererFactory
 
 				PortletURL latestArticleEditURL = latestArticleAssetRenderer.getURLEdit(liferayPortletRequest, liferayPortletResponse, LiferayWindowState.POP_UP, redirectURL);
 
+				latestArticleEditURL.setParameter("hideDefaultSuccessMessage", Boolean.TRUE.toString());
 				latestArticleEditURL.setParameter("showHeader", Boolean.FALSE.toString());
 
 				Map<String, Object> data = new HashMap<String, Object>();
@@ -144,8 +147,9 @@ AssetRendererFactory<JournalArticle> assetRendererFactory = AssetRendererFactory
 				<liferay-ui:icon
 					cssClass="lfr-icon-action"
 					data="<%= data %>"
-					iconCssClass="icon-pencil"
+					icon="pencil"
 					label="<%= true %>"
+					markupView="lexicon"
 					message="edit"
 					method="get"
 					url="<%= latestArticleEditURL.toString() %>"
@@ -180,8 +184,9 @@ AssetRendererFactory<JournalArticle> assetRendererFactory = AssetRendererFactory
 				<liferay-ui:icon
 					cssClass="lfr-icon-action"
 					data="<%= data %>"
-					iconCssClass="icon-edit"
+					icon="pencil"
 					label="<%= true %>"
+					markupView="lexicon"
 					message="edit-template"
 					method="get"
 					url="<%= editTemplateURL.toString() %>"
@@ -192,8 +197,9 @@ AssetRendererFactory<JournalArticle> assetRendererFactory = AssetRendererFactory
 			<c:if test="<%= journalContentDisplayContext.isShowSelectArticleIcon() %>">
 				<liferay-ui:icon
 					cssClass="lfr-icon-action"
-					iconCssClass="icon-cog"
+					icon="cog"
 					label="<%= true %>"
+					markupView="lexicon"
 					message="select-web-content"
 					method="get"
 					onClick="<%= portletDisplay.getURLConfigurationJS() %>"
@@ -206,7 +212,8 @@ AssetRendererFactory<JournalArticle> assetRendererFactory = AssetRendererFactory
 					cssClass="lfr-icon-action lfr-icon-action-add"
 					direction="down"
 					extended="<%= false %>"
-					icon="../aui/plus"
+					icon="plus"
+					markupView="lexicon"
 					message="add"
 					showArrow="<%= false %>"
 					showWhenSingleIcon="<%= true %>"
@@ -215,6 +222,7 @@ AssetRendererFactory<JournalArticle> assetRendererFactory = AssetRendererFactory
 					<%
 					PortletURL addArticleURL = assetRendererFactory.getURLAdd(liferayPortletRequest, liferayPortletResponse, 0);
 
+					addArticleURL.setParameter("hideDefaultSuccessMessage", Boolean.TRUE.toString());
 					addArticleURL.setParameter("redirect", redirectURL.toString());
 					addArticleURL.setParameter("showHeader", Boolean.FALSE.toString());
 					addArticleURL.setParameter("portletResource", portletDisplay.getId());
@@ -237,7 +245,6 @@ AssetRendererFactory<JournalArticle> assetRendererFactory = AssetRendererFactory
 						<liferay-ui:icon
 							cssClass="lfr-icon-action lfr-icon-action-add"
 							data="<%= data %>"
-							iconCssClass="<%= assetRendererFactory.getIconCssClass() %>"
 							label="<%= true %>"
 							message="<%= ddmStructure.getName(locale) %>"
 							method="get"
@@ -260,3 +267,5 @@ AssetRendererFactory<JournalArticle> assetRendererFactory = AssetRendererFactory
 		<liferay-ui:asset-addon-entry-display assetAddonEntries="<%= journalContentDisplayContext.getSelectedContentMetadataAssetAddonEntries() %>" />
 	</div>
 </c:if>
+
+<liferay-util:dynamic-include key="com.liferay.journal.content.web#/view.jsp#post" />

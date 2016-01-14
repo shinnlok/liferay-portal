@@ -17,7 +17,7 @@
 <%@ include file="/content/init.jsp" %>
 
 <c:if test="<%= !dataSiteLevelPortlets.isEmpty() %>">
-	<aui:fieldset cssClass="options-group" label="content">
+	<aui:fieldset collapsible="<%= true %>" cssClass="options-group" label="content" markupView="lexicon">
 		<ul class="lfr-tree list-unstyled">
 			<li class="tree-item">
 				<aui:input disabled="<%= disableInputs %>" name="<%= PortletDataHandlerKeys.PORTLET_DATA %>" type="hidden" value="<%= MapUtil.getBoolean(parameterMap, PortletDataHandlerKeys.PORTLET_DATA, true) %>" />
@@ -166,7 +166,7 @@
 					</li>
 
 					<li class="options">
-						<liferay-staging:portlet-list dateRange="<%= dateRange %>" disableInputs="<%= disableInputs %>" parameterMap="<%= parameterMap %>" portlets="<%= dataSiteLevelPortlets %>" type="<%= type %>" />
+						<liferay-staging:portlet-list disableInputs="<%= disableInputs %>" parameterMap="<%= parameterMap %>" portlets="<%= dataSiteLevelPortlets %>" type="<%= type %>" />
 					</li>
 				</ul>
 			</li>

@@ -205,6 +205,11 @@ public class WallEntryLocalServiceWrapper implements WallEntryLocalService,
 		return _wallEntryLocalService.getActionableDynamicQuery();
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _wallEntryLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -306,23 +311,6 @@ public class WallEntryLocalServiceWrapper implements WallEntryLocalService,
 		long wallEntryId, java.lang.String comments)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _wallEntryLocalService.updateWallEntry(wallEntryId, comments);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public WallEntryLocalService getWrappedWallEntryLocalService() {
-		return _wallEntryLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedWallEntryLocalService(
-		WallEntryLocalService wallEntryLocalService) {
-		_wallEntryLocalService = wallEntryLocalService;
 	}
 
 	@Override

@@ -16,11 +16,16 @@ package com.liferay.product.navigation.user.application.list;
 
 import com.liferay.application.list.BaseJSPPanelCategory;
 import com.liferay.application.list.PanelCategory;
+import com.liferay.application.list.constants.ApplicationListWebKeys;
 import com.liferay.application.list.constants.PanelCategoryKeys;
+
+import java.io.IOException;
 
 import java.util.Locale;
 
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -40,17 +45,12 @@ public class UserPanelCategory extends BaseJSPPanelCategory {
 
 	@Override
 	public String getHeaderJspPath() {
-		return "/user.jsp";
-	}
-
-	@Override
-	public String getIconCssClass() {
-		return "icon-user";
+		return "/user_header.jsp";
 	}
 
 	@Override
 	public String getJspPath() {
-		return null;
+		return "/user_body.jsp";
 	}
 
 	@Override
@@ -61,6 +61,26 @@ public class UserPanelCategory extends BaseJSPPanelCategory {
 	@Override
 	public String getLabel(Locale locale) {
 		return null;
+	}
+
+	@Override
+	public boolean include(
+			HttpServletRequest request, HttpServletResponse response)
+		throws IOException {
+
+		request.setAttribute(ApplicationListWebKeys.PANEL_CATEGORY, this);
+
+		return super.include(request, response);
+	}
+
+	@Override
+	public boolean includeHeader(
+			HttpServletRequest request, HttpServletResponse response)
+		throws IOException {
+
+		request.setAttribute(ApplicationListWebKeys.PANEL_CATEGORY, this);
+
+		return super.includeHeader(request, response);
 	}
 
 	@Override

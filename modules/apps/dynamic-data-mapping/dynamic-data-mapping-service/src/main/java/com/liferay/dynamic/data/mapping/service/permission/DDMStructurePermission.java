@@ -18,7 +18,7 @@ import com.liferay.dynamic.data.mapping.constants.DDMActionKeys;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.dynamic.data.mapping.util.DDMStructurePermissionSupport;
-import com.liferay.osgi.service.tracker.map.ServiceTrackerCustomizerFactory.ServiceWrapper;
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerCustomizerFactory.ServiceWrapper;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -85,7 +85,8 @@ public class DDMStructurePermission {
 			ServiceWrapper<DDMStructurePermissionSupport>
 				structurePermissionSupportServiceWrapper =
 					_ddmPermissionSupportTracker.
-					getDDMStructurePermissionSupportServiceWrapper(classNameId);
+						getDDMStructurePermissionSupportServiceWrapper(
+							classNameId);
 
 			throw new PrincipalException.MustHavePermission(
 				permissionChecker,
@@ -172,7 +173,7 @@ public class DDMStructurePermission {
 		ServiceWrapper<DDMStructurePermissionSupport>
 			structurePermissionSupportServiceWrapper =
 				_ddmPermissionSupportTracker.
-				getDDMStructurePermissionSupportServiceWrapper(classNameId);
+					getDDMStructurePermissionSupportServiceWrapper(classNameId);
 
 		return permissionChecker.hasPermission(
 			groupId, getResourceName(structurePermissionSupportServiceWrapper),

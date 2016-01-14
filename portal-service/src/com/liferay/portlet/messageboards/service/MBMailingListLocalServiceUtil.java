@@ -246,6 +246,10 @@ public class MBMailingListLocalServiceUtil {
 		return getService().getExportActionableDynamicQuery(portletDataContext);
 	}
 
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the message boards mailing list with the primary key.
 	*
@@ -382,13 +386,6 @@ public class MBMailingListLocalServiceUtil {
 		}
 
 		return _service;
-	}
-
-	/**
-	 * @deprecated As of 6.2.0
-	 */
-	@Deprecated
-	public void setService(MBMailingListLocalService service) {
 	}
 
 	private static MBMailingListLocalService _service;

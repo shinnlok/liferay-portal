@@ -259,6 +259,11 @@ public class DDMTemplateLinkLocalServiceWrapper
 		return _ddmTemplateLinkLocalService.getDDMTemplateLinksCount();
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _ddmTemplateLinkLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -321,23 +326,6 @@ public class DDMTemplateLinkLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _ddmTemplateLinkLocalService.updateTemplateLink(templateLinkId,
 			templateId);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public DDMTemplateLinkLocalService getWrappedDDMTemplateLinkLocalService() {
-		return _ddmTemplateLinkLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedDDMTemplateLinkLocalService(
-		DDMTemplateLinkLocalService ddmTemplateLinkLocalService) {
-		_ddmTemplateLinkLocalService = ddmTemplateLinkLocalService;
 	}
 
 	@Override

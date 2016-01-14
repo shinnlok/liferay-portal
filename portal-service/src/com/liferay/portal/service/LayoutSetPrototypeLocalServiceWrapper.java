@@ -254,6 +254,11 @@ public class LayoutSetPrototypeLocalServiceWrapper
 		return _layoutSetPrototypeLocalService.getExportActionableDynamicQuery(portletDataContext);
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _layoutSetPrototypeLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the layout set prototype with the primary key.
 	*
@@ -407,23 +412,6 @@ public class LayoutSetPrototypeLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _layoutSetPrototypeLocalService.updateLayoutSetPrototype(layoutSetPrototypeId,
 			settings);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public LayoutSetPrototypeLocalService getWrappedLayoutSetPrototypeLocalService() {
-		return _layoutSetPrototypeLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedLayoutSetPrototypeLocalService(
-		LayoutSetPrototypeLocalService layoutSetPrototypeLocalService) {
-		_layoutSetPrototypeLocalService = layoutSetPrototypeLocalService;
 	}
 
 	@Override

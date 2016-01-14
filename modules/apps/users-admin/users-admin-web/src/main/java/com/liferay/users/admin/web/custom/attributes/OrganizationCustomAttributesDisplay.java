@@ -15,10 +15,9 @@
 package com.liferay.users.admin.web.custom.attributes;
 
 import com.liferay.portal.model.Organization;
-import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portlet.expando.model.BaseCustomAttributesDisplay;
 import com.liferay.portlet.expando.model.CustomAttributesDisplay;
-import com.liferay.users.admin.web.constants.UsersAdminPortletKeys;
+import com.liferay.users.admin.constants.UsersAdminPortletKeys;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -40,13 +39,7 @@ public class OrganizationCustomAttributesDisplay
 
 	@Override
 	public String getIconCssClass() {
-		return "icon-globe";
-	}
-
-	@Override
-	public String getIconPath(ThemeDisplay themeDisplay) {
-		return
-			themeDisplay.getPathThemeImages() + "/common/organization_icon.png";
+		return "sites";
 	}
 
 }

@@ -15,10 +15,9 @@
 package com.liferay.roles.admin.web.custom.attributes;
 
 import com.liferay.portal.model.Role;
-import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portlet.expando.model.BaseCustomAttributesDisplay;
 import com.liferay.portlet.expando.model.CustomAttributesDisplay;
-import com.liferay.roles.admin.web.constants.RolesAdminPortletKeys;
+import com.liferay.roles.admin.constants.RolesAdminPortletKeys;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -39,12 +38,7 @@ public class RoleCustomAttributesDisplay extends BaseCustomAttributesDisplay {
 
 	@Override
 	public String getIconCssClass() {
-		return "icon-user";
-	}
-
-	@Override
-	public String getIconPath(ThemeDisplay themeDisplay) {
-		return themeDisplay.getPathThemeImages() + "/common/guest_icon.png";
+		return "user";
 	}
 
 }

@@ -38,7 +38,6 @@ import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.InstanceFactory;
-import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalLifecycleUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
@@ -779,50 +778,23 @@ public class MainServlet extends ActionServlet {
 	}
 
 	protected void initCompanies() throws Exception {
-		ServiceDependencyManager serviceDependencyManager =
-			new ServiceDependencyManager();
+		if (_log.isDebugEnabled()) {
+			_log.debug("Initialize companies");
+		}
 
-		serviceDependencyManager.addServiceDependencyListener(
-			new ServiceDependencyListener() {
+		ServletContext servletContext = getServletContext();
 
-				@Override
-				public void dependenciesFulfilled() {
-					try {
-						if (_log.isDebugEnabled()) {
-							_log.debug("Initialize companies");
-						}
+		try {
+			String[] webIds = PortalInstances.getWebIds();
 
-						ServletContext servletContext = getServletContext();
-
-						try {
-							String[] webIds = PortalInstances.getWebIds();
-
-							for (String webId : webIds) {
-								PortalInstances.initCompany(
-									servletContext, webId);
-							}
-						}
-						finally {
-							CompanyThreadLocal.setCompanyId(
-								PortalInstances.getDefaultCompanyId());
-						}
-					}
-					catch (Exception e) {
-						_log.error(e, e);
-					}
-				}
-
-				@Override
-				public void destroy() {
-				}
-
-			});
-
-		Registry registry = RegistryUtil.getRegistry();
-
-		Filter filter = registry.getFilter("(search.engine.id=SYSTEM_ENGINE)");
-
-		serviceDependencyManager.registerDependencies(filter);
+			for (String webId : webIds) {
+				PortalInstances.initCompany(servletContext, webId);
+			}
+		}
+		finally {
+			CompanyThreadLocal.setCompanyId(
+				PortalInstances.getDefaultCompanyId());
+		}
 	}
 
 	protected void initExt() throws Exception {
@@ -1148,7 +1120,7 @@ public class MainServlet extends ActionServlet {
 
 		response.setContentType(ContentTypes.TEXT_HTML_UTF8);
 
-		Locale locale = LocaleUtil.getDefault();
+		Locale locale = PortalUtil.getLocale(request);
 
 		String message = LanguageUtil.get(locale, messageKey);
 

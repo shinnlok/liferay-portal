@@ -327,6 +327,11 @@ public class CalendarLocalServiceWrapper implements CalendarLocalService,
 		return _calendarLocalService.getExportActionableDynamicQuery(portletDataContext);
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _calendarLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -434,23 +439,6 @@ public class CalendarLocalServiceWrapper implements CalendarLocalService,
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _calendarLocalService.updateColor(calendarId, color,
 			serviceContext);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public CalendarLocalService getWrappedCalendarLocalService() {
-		return _calendarLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedCalendarLocalService(
-		CalendarLocalService calendarLocalService) {
-		_calendarLocalService = calendarLocalService;
 	}
 
 	@Override

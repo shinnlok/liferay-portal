@@ -218,6 +218,11 @@ public class MBStatsUserLocalServiceWrapper implements MBStatsUserLocalService,
 	}
 
 	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _mbStatsUserLocalService.getIndexableActionableDynamicQuery();
+	}
+
+	@Override
 	public java.util.Date getLastPostDateByUserId(long groupId, long userId) {
 		return _mbStatsUserLocalService.getLastPostDateByUserId(groupId, userId);
 	}
@@ -346,23 +351,6 @@ public class MBStatsUserLocalServiceWrapper implements MBStatsUserLocalService,
 		long groupId, long userId, int messageCount, java.util.Date lastPostDate) {
 		return _mbStatsUserLocalService.updateStatsUser(groupId, userId,
 			messageCount, lastPostDate);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public MBStatsUserLocalService getWrappedMBStatsUserLocalService() {
-		return _mbStatsUserLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedMBStatsUserLocalService(
-		MBStatsUserLocalService mbStatsUserLocalService) {
-		_mbStatsUserLocalService = mbStatsUserLocalService;
 	}
 
 	@Override

@@ -261,6 +261,11 @@ public class SAPEntryLocalServiceWrapper implements SAPEntryLocalService,
 		return _sapEntryLocalService.getExportActionableDynamicQuery(portletDataContext);
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _sapEntryLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -364,23 +369,6 @@ public class SAPEntryLocalServiceWrapper implements SAPEntryLocalService,
 		return _sapEntryLocalService.updateSAPEntry(sapEntryId,
 			allowedServiceSignatures, defaultSAPEntry, enabled, name, titleMap,
 			serviceContext);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public SAPEntryLocalService getWrappedSAPEntryLocalService() {
-		return _sapEntryLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedSAPEntryLocalService(
-		SAPEntryLocalService sapEntryLocalService) {
-		_sapEntryLocalService = sapEntryLocalService;
 	}
 
 	@Override

@@ -275,6 +275,11 @@ public class DDMStructureLinkLocalServiceWrapper
 		return _ddmStructureLinkLocalService.getDDMStructureLinksCount();
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _ddmStructureLinkLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -353,23 +358,6 @@ public class DDMStructureLinkLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _ddmStructureLinkLocalService.updateStructureLink(structureLinkId,
 			classNameId, classPK, structureId);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public DDMStructureLinkLocalService getWrappedDDMStructureLinkLocalService() {
-		return _ddmStructureLinkLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedDDMStructureLinkLocalService(
-		DDMStructureLinkLocalService ddmStructureLinkLocalService) {
-		_ddmStructureLinkLocalService = ddmStructureLinkLocalService;
 	}
 
 	@Override

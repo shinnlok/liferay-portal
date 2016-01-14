@@ -277,6 +277,11 @@ public class PollsQuestionLocalServiceWrapper
 		return _pollsQuestionLocalService.getExportActionableDynamicQuery(portletDataContext);
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _pollsQuestionLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -432,23 +437,6 @@ public class PollsQuestionLocalServiceWrapper
 			titleMap, descriptionMap, expirationDateMonth, expirationDateDay,
 			expirationDateYear, expirationDateHour, expirationDateMinute,
 			neverExpire, choices, serviceContext);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public PollsQuestionLocalService getWrappedPollsQuestionLocalService() {
-		return _pollsQuestionLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedPollsQuestionLocalService(
-		PollsQuestionLocalService pollsQuestionLocalService) {
-		_pollsQuestionLocalService = pollsQuestionLocalService;
 	}
 
 	@Override

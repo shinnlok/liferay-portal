@@ -99,19 +99,21 @@ renderResponse.setTitle(((category == null) ? LanguageUtil.get(request, "add-new
 	<aui:input name="parentCategoryId" type="hidden" value="<%= parentCategoryId %>" />
 
 	<liferay-ui:error exception="<%= AssetCategoryNameException.class %>" message="please-enter-a-valid-name" />
+	<liferay-ui:error exception="<%= CategoryPropertyKeyException.class %>" message="please-enter-a-valid-property-key" />
+	<liferay-ui:error exception="<%= CategoryPropertyValueException.class %>" message="please-enter-a-valid-property-value" />
 	<liferay-ui:error exception="<%= DuplicateCategoryException.class %>" message="please-enter-a-unique-name" />
 	<liferay-ui:error exception="<%= DuplicateCategoryPropertyException.class %>" message="please-enter-a-unique-property-key" />
 
 	<aui:model-context bean="<%= category %>" model="<%= AssetCategory.class %>" />
 
-	<aui:fieldset-group>
+	<aui:fieldset-group markupView="lexicon">
 		<aui:fieldset>
 			<aui:input autoFocus="<%= true %>" label="name" name="title" />
 
 			<aui:input name="description" />
 		</aui:fieldset>
 
-		<aui:fieldset id="categoryPropertiesId" label="properties">
+		<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" id="categoryPropertiesId" label="properties">
 			<p class="text-muted">
 				<liferay-ui:message key="properties-are-a-way-to-add-more-detailed-information-to-a-specific-category" />
 			</p>
@@ -141,7 +143,7 @@ renderResponse.setTitle(((category == null) ? LanguageUtil.get(request, "add-new
 		</aui:fieldset>
 
 		<c:if test="<%= category == null %>">
-			<aui:fieldset label="permissions">
+			<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="permissions">
 				<liferay-ui:input-permissions
 					modelName="<%= AssetCategory.class.getName() %>"
 				/>
@@ -159,13 +161,13 @@ renderResponse.setTitle(((category == null) ? LanguageUtil.get(request, "add-new
 <aui:script use="liferay-auto-fields">
 	var autoFields = new Liferay.AutoFields(
 		{
-			contentBox: 'fieldset#<portlet:namespace />categoryPropertiesId',
+			contentBox: '#<portlet:namespace />categoryPropertiesId',
 			fieldIndexes: '<portlet:namespace />categoryPropertiesIndexes',
 			namespace: '<portlet:namespace />'
 		}
 	).render();
 
-	var categoryPropertiesTrigger = A.one('fieldset#<portlet:namespace />categoryPropertiesId');
+	var categoryPropertiesTrigger = A.one('#<portlet:namespace />categoryPropertiesId');
 
 	if (categoryPropertiesTrigger) {
 		categoryPropertiesTrigger.setData('autoFieldsInstance', autoFields);

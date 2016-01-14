@@ -445,6 +445,11 @@ public class CompanyLocalServiceWrapper implements CompanyLocalService,
 		return _companyLocalService.getCompanyIdByUserId(userId);
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _companyLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -737,23 +742,6 @@ public class CompanyLocalServiceWrapper implements CompanyLocalService,
 		boolean strangersWithMx, boolean strangersVerify, boolean siteLogo) {
 		_companyLocalService.updateSecurity(companyId, authType, autoLogin,
 			sendPassword, strangers, strangersWithMx, strangersVerify, siteLogo);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public CompanyLocalService getWrappedCompanyLocalService() {
-		return _companyLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedCompanyLocalService(
-		CompanyLocalService companyLocalService) {
-		_companyLocalService = companyLocalService;
 	}
 
 	@Override

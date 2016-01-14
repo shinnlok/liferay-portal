@@ -23,6 +23,7 @@ import com.liferay.dynamic.data.lists.model.DDLRecordVersion;
 import com.liferay.dynamic.data.lists.service.DDLRecordLocalServiceUtil;
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesTrackerUtil;
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldValueRenderer;
+import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
@@ -53,9 +54,7 @@ import com.liferay.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portlet.PortletURLUtil;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import javax.portlet.PortletURL;
 
@@ -87,30 +86,22 @@ public class DDLFormViewRecordsDisplayContext {
 		createRecordSearchContainer(ddlRecordSet.getDDMStructure());
 	}
 
-	public String getColumnName(int index, DDMFormValues ddmFormValues) {
-		DDMFormField ddmFormField = _ddmFormFields.get(index);
-
+	public String getColumnName(DDMFormField ddmFormField) {
 		LocalizedValue label = ddmFormField.getLabel();
 
 		return label.getString(_liferayPortletRequest.getLocale());
 	}
 
-	public String getColumnValue(int index, DDMFormValues ddmFormValues) {
-		DDMFormField ddmFormField = _ddmFormFields.get(index);
+	public String getColumnValue(
+		DDMFormField ddmFormField, List<DDMFormFieldValue> ddmFormFieldValues) {
 
-		Map<String, List<DDMFormFieldValue>> ddmFormFieldValuesMap =
-			ddmFormValues.getDDMFormFieldValuesMap();
+		if (ddmFormFieldValues == null) {
+			return StringPool.BLANK;
+		}
 
 		final DDMFormFieldValueRenderer ddmFieldValueRenderer =
 			DDMFormFieldTypeServicesTrackerUtil.getDDMFormFieldValueRenderer(
 				ddmFormField.getType());
-
-		List<DDMFormFieldValue> ddmFormFieldValues = ddmFormFieldValuesMap.get(
-			ddmFormField.getName());
-
-		if (ddmFormFieldValues == null) {
-			ddmFormFieldValues = Collections.emptyList();
-		}
 
 		List<String> renderedDDMFormFielValues = ListUtil.toList(
 			ddmFormFieldValues,
@@ -130,6 +121,10 @@ public class DDLFormViewRecordsDisplayContext {
 
 	public DDLRecordSet getDDLRecordSet() {
 		return _ddlRecordSet;
+	}
+
+	public List<DDMFormField> getDDMFormFields() {
+		return _ddmFormFields;
 	}
 
 	public DDMFormValues getDDMFormValues(DDLRecord ddlRecord)
@@ -155,14 +150,11 @@ public class DDLFormViewRecordsDisplayContext {
 		return recordVersion.getStatus();
 	}
 
-	public int getTotalColumns() {
-		return _ddmFormFields.size();
-	}
-
 	protected void createRecordSearchContainer(DDMStructure ddmStructure) {
 		List<String> headerNames = new ArrayList<>();
 
-		List<DDMFormField> ddmFormfields = ddmStructure.getDDMFormFields(false);
+		List<DDMFormField> ddmFormfields = getNontransientDDMFormFields(
+			ddmStructure.getDDMForm());
 
 		int totalColumns = _MAX_COLUMNS;
 
@@ -222,6 +214,20 @@ public class DDLFormViewRecordsDisplayContext {
 		_recordSearchContainer.setOrderByType(orderByType);
 
 		updateSearchContainerResults();
+	}
+
+	protected List<DDMFormField> getNontransientDDMFormFields(DDMForm ddmForm) {
+		List<DDMFormField> ddmFormfields = new ArrayList<>();
+
+		for (DDMFormField ddmFormField : ddmForm.getDDMFormFields()) {
+			if (ddmFormField.isTransient()) {
+				continue;
+			}
+
+			ddmFormfields.add(ddmFormField);
+		}
+
+		return ddmFormfields;
 	}
 
 	protected void updateSearchContainerResults() {

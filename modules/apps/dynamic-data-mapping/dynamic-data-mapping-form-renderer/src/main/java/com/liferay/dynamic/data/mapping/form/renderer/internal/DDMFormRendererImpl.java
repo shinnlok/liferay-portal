@@ -26,7 +26,9 @@ import com.liferay.dynamic.data.mapping.io.DDMFormJSONSerializerUtil;
 import com.liferay.dynamic.data.mapping.io.DDMFormLayoutJSONSerializerUtil;
 import com.liferay.dynamic.data.mapping.io.DDMFormValuesJSONSerializerUtil;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
+import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMFormLayout;
+import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.dynamic.data.mapping.util.DDM;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -42,6 +44,7 @@ import com.liferay.portal.kernel.template.TemplateManagerUtil;
 import com.liferay.portal.kernel.template.TemplateResource;
 import com.liferay.portal.kernel.template.URLTemplateResource;
 import com.liferay.portal.kernel.util.AggregateResourceBundle;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
@@ -52,7 +55,9 @@ import java.io.Writer;
 
 import java.net.URL;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -112,6 +117,21 @@ public class DDMFormRendererImpl implements DDMFormRenderer {
 		_templateResource = getTemplateResource(templatePath);
 	}
 
+	protected void collectResourceBundles(
+		Class<?> clazz, List<ResourceBundle> resourceBundles, Locale locale) {
+
+		for (Class<?> interfaceClass : clazz.getInterfaces()) {
+			collectResourceBundles(interfaceClass, resourceBundles, locale);
+		}
+
+		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
+			"content.Language", locale, clazz.getClassLoader());
+
+		if (resourceBundle != null) {
+			resourceBundles.add(resourceBundle);
+		}
+	}
+
 	protected String doRender(
 			DDMForm ddmForm, DDMFormLayout ddmFormLayout,
 			DDMFormRenderingContext ddmFormRenderingContext)
@@ -133,18 +153,24 @@ public class DDMFormRendererImpl implements DDMFormRenderer {
 	protected Map<String, String> getLanguageStringsMap(Locale locale) {
 		Map<String, String> stringsMap = new HashMap<>();
 
+		List<ResourceBundle> resourceBundles = new ArrayList<>();
+
 		ResourceBundle portalResourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", locale, PortalClassLoaderUtil.getClassLoader());
 
+		resourceBundles.add(portalResourceBundle);
+
+		collectResourceBundles(getClass(), resourceBundles, locale);
+
+		ResourceBundle[] resourceBundlesArray = resourceBundles.toArray(
+			new ResourceBundle[resourceBundles.size()]);
+
 		ResourceBundle resourceBundle = new AggregateResourceBundle(
-			portalResourceBundle,
-			ResourceBundleUtil.getBundle(
-				"content.Language", locale, getClass()));
+			resourceBundlesArray);
 
 		stringsMap.put("next", LanguageUtil.get(resourceBundle, "next"));
 		stringsMap.put(
 			"previous", LanguageUtil.get(resourceBundle, "previous"));
-		stringsMap.put("submit", LanguageUtil.get(resourceBundle, "submit"));
 
 		return stringsMap;
 	}
@@ -207,9 +233,25 @@ public class DDMFormRendererImpl implements DDMFormRenderer {
 			DDMFormRenderingContext ddmFormRenderingContext)
 		throws PortalException {
 
-		template.put("containerId", StringUtil.randomId());
+		String containerId = ddmFormRenderingContext.getContainerId();
+
+		if (Validator.isNull(containerId)) {
+			containerId = StringUtil.randomId();
+		}
+
+		template.put("containerId", containerId);
+
 		template.put(
 			"definition", DDMFormJSONSerializerUtil.serialize(ddmForm));
+
+		DDMFormValues ddmFormValues =
+			ddmFormRenderingContext.getDDMFormValues();
+
+		if (ddmFormValues != null) {
+			removeStaleDDMFormFieldValues(
+				ddmForm.getDDMFormFieldsMap(true),
+				ddmFormValues.getDDMFormFieldValues());
+		}
 
 		Locale locale = ddmFormRenderingContext.getLocale();
 
@@ -241,10 +283,14 @@ public class DDMFormRendererImpl implements DDMFormRenderer {
 			"portletNamespace", ddmFormRenderingContext.getPortletNamespace());
 		template.put("readOnly", ddmFormRenderingContext.isReadOnly());
 		template.put("strings", getLanguageStringsMap(locale));
-		template.put("templateNamespace", getTemplateNamespace(ddmFormLayout));
 
-		DDMFormValues ddmFormValues =
-			ddmFormRenderingContext.getDDMFormValues();
+		String submitLabel = GetterUtil.getString(
+			ddmFormRenderingContext.getSubmitLabel(),
+			LanguageUtil.get(locale, "submit"));
+
+		template.put("submitLabel", submitLabel);
+
+		template.put("templateNamespace", getTemplateNamespace(ddmFormLayout));
 
 		if (ddmFormValues != null) {
 			template.put(
@@ -253,6 +299,25 @@ public class DDMFormRendererImpl implements DDMFormRenderer {
 		}
 		else {
 			template.put("values", JSONFactoryUtil.getNullJSON());
+		}
+	}
+
+	protected void removeStaleDDMFormFieldValues(
+		Map<String, DDMFormField> ddmFormFieldsMap,
+		List<DDMFormFieldValue> ddmFormFieldValues) {
+
+		Iterator<DDMFormFieldValue> iterator = ddmFormFieldValues.iterator();
+
+		while (iterator.hasNext()) {
+			DDMFormFieldValue ddmFormFieldValue = iterator.next();
+
+			if (!ddmFormFieldsMap.containsKey(ddmFormFieldValue.getName())) {
+				iterator.remove();
+			}
+
+			removeStaleDDMFormFieldValues(
+				ddmFormFieldsMap,
+				ddmFormFieldValue.getNestedDDMFormFieldValues());
 		}
 	}
 

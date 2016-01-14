@@ -322,6 +322,11 @@ public class DDMStructureLayoutLocalServiceWrapper
 		return _ddmStructureLayoutLocalService.getExportActionableDynamicQuery(portletDataContext);
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _ddmStructureLayoutLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -373,23 +378,6 @@ public class DDMStructureLayoutLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _ddmStructureLayoutLocalService.updateStructureLayout(structureLayoutId,
 			ddmFormLayout, serviceContext);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public DDMStructureLayoutLocalService getWrappedDDMStructureLayoutLocalService() {
-		return _ddmStructureLayoutLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedDDMStructureLayoutLocalService(
-		DDMStructureLayoutLocalService ddmStructureLayoutLocalService) {
-		_ddmStructureLayoutLocalService = ddmStructureLayoutLocalService;
 	}
 
 	@Override

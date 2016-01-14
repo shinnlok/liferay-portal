@@ -7,12 +7,11 @@
 		<if>
 			<equals arg1="${testPortalInstance}" arg2="true" />
 			<then>
-				<execute macro="SignIn#signInPortalInstance" />
+				<execute macro="SignIn#signInPortalInstanceSetUp" />
 			</then>
-			<else>
-				<execute macro="User#firstLoginPG" />
-			</else>
 		</if>
+
+		<execute macro="User#firstLoginPG" />
 	</set-up>
 
 	<tear-down>
@@ -29,7 +28,7 @@
 	<command description="Ensure that a user can access portlet options and drag and drop portlets." name="Smoke" priority="5">
 		<property name="portal.acceptance" value="true" />
 
-		<execute macro="Page#addPG">
+		<execute macro="Page#add">
 			<var name="pageName" value="Test Page" />
 		</execute>
 
@@ -49,7 +48,7 @@
 
 			<execute function="SelectFrame" locator1="IFrame#CONFIGURATION" />
 
-			<execute function="AssertTextEquals" locator1="NavPill#PERMISSIONS" value1="Permissions" />
+			<execute function="AssertTextEquals" locator1="NavBar#PERMISSIONS" value1="Permissions" />
 
 			<execute function="SelectFrame" value1="relative=top" />
 

@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.struts.StrutsActionRegistryUtil;
 import com.liferay.portlet.tck.bridge.configuration.PortletTCKBridgeConfiguration;
+import com.liferay.portlet.tck.bridge.struts.PortletTCKStrutsAction;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -123,7 +124,8 @@ public class PortletTCKBridge {
 
 				while (!Thread.interrupted()) {
 					try (Socket socket = serverSocket.accept();
-						OutputStream outputStream = socket.getOutputStream()) {
+							OutputStream outputStream =
+								socket.getOutputStream()) {
 
 						outputStream.write(
 							"Portlet TCK Bridge is ready".getBytes(

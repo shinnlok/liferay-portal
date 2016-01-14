@@ -196,6 +196,11 @@ public class PortletItemLocalServiceWrapper implements PortletItemLocalService,
 		return _portletItemLocalService.getActionableDynamicQuery();
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _portletItemLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -295,23 +300,6 @@ public class PortletItemLocalServiceWrapper implements PortletItemLocalService,
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _portletItemLocalService.updatePortletItem(userId, groupId,
 			name, portletId, className);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public PortletItemLocalService getWrappedPortletItemLocalService() {
-		return _portletItemLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedPortletItemLocalService(
-		PortletItemLocalService portletItemLocalService) {
-		_portletItemLocalService = portletItemLocalService;
 	}
 
 	@Override

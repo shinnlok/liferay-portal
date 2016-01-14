@@ -268,6 +268,11 @@ public class JournalArticleImageLocalServiceWrapper
 		return _journalArticleImageLocalService.getArticleImagesCount(groupId);
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _journalArticleImageLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the journal article image with the primary key.
 	*
@@ -337,23 +342,6 @@ public class JournalArticleImageLocalServiceWrapper
 	public com.liferay.journal.model.JournalArticleImage updateJournalArticleImage(
 		com.liferay.journal.model.JournalArticleImage journalArticleImage) {
 		return _journalArticleImageLocalService.updateJournalArticleImage(journalArticleImage);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public JournalArticleImageLocalService getWrappedJournalArticleImageLocalService() {
-		return _journalArticleImageLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedJournalArticleImageLocalService(
-		JournalArticleImageLocalService journalArticleImageLocalService) {
-		_journalArticleImageLocalService = journalArticleImageLocalService;
 	}
 
 	@Override

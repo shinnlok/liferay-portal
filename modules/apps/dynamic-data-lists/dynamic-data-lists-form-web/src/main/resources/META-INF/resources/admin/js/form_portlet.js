@@ -9,6 +9,9 @@ AUI.add(
 		var DDLPortlet = A.Component.create(
 			{
 				ATTRS: {
+					dataProviders: {
+					},
+
 					definition: {
 					},
 
@@ -20,6 +23,12 @@ AUI.add(
 					},
 
 					layout: {
+					},
+
+					publishRecordSetURL: {
+					},
+
+					recordSetId: {
 					}
 				},
 
@@ -28,6 +37,20 @@ AUI.add(
 				EXTENDS: A.Base,
 
 				NAME: 'liferay-ddl-portlet',
+
+				openDDMDataProvider: function(dataProviderURL) {
+					Liferay.Util.openWindow(
+						{
+							dialog: {
+								cssClass: 'dynamic-data-mapping-data-providers-modal',
+								destroyOnHide: true
+							},
+							id: 'ddmDataProvider',
+							title: Liferay.Language.get('data-providers'),
+							uri: dataProviderURL
+						}
+					);
+				},
 
 				prototype: {
 					initializer: function() {
@@ -41,8 +64,9 @@ AUI.add(
 							}
 						);
 
-						instance.bindUI();
 						instance.renderUI();
+
+						instance.bindUI();
 					},
 
 					renderUI: function() {
@@ -51,6 +75,8 @@ AUI.add(
 						instance.one('#loader').remove();
 
 						instance.get('formBuilder').render(instance.one('#formBuilder'));
+
+						instance.enableButtons();
 					},
 
 					bindUI: function() {
@@ -61,6 +87,7 @@ AUI.add(
 						editForm.set('onSubmit', A.bind('_onSubmitEditForm', instance));
 
 						instance._eventHandlers = [
+							instance.one('#publishCheckbox').on('change', A.bind('_onChangePublishCheckbox', instance)),
 							Liferay.on('destroyPortlet', A.bind('_onDestroyPortlet', instance))
 						];
 					},
@@ -73,13 +100,40 @@ AUI.add(
 						(new A.EventHandle(instance._eventHandlers)).detach();
 					},
 
-					_onDestroyPortlet: function(event) {
+					enableButtons: function() {
 						var instance = this;
 
-						instance.destroy();
+						var buttons = instance.all('.ddl-button');
+
+						Liferay.Util.toggleDisabled(buttons, false);
 					},
 
-					_onSubmitEditForm: function() {
+					openPublishModal: function() {
+						var instance = this;
+
+						Liferay.Util.openWindow(
+							{
+								dialog: {
+									height: 360,
+									resizable: false,
+									width: 720
+								},
+								id: instance.ns('publishModalContainer'),
+								title: Liferay.Language.get('publish')
+							},
+							function(dialogWindow) {
+								var publishNode = instance.byId(instance.ns('publishModal'));
+
+								if (publishNode) {
+									publishNode.show();
+
+									dialogWindow.bodyNode.append(publishNode);
+								}
+							}
+						);
+					},
+
+					serializeFormBuilder: function() {
 						var instance = this;
 
 						var description = window[instance.ns('descriptionEditor')].getHTML();
@@ -106,11 +160,65 @@ AUI.add(
 
 						instance.one('#name').val(name);
 
+						var settingsInput = instance.one('#serializedSettingsDDMFormValues');
+
+						var settings = Liferay.component('settingsDDMForm').toJSON();
+
+						settingsInput.val(JSON.stringify(settings));
+					},
+
+					submitForm: function() {
+						var instance = this;
+
+						instance.serializeFormBuilder();
+
 						var submitButton = instance.one('#submit');
 
 						submitButton.html(Liferay.Language.get('saving'));
 
 						submitButton.append(TPL_BUTTON_SPINNER);
+
+						var editForm = instance.get('editForm');
+
+						submitForm(editForm.form);
+					},
+
+					_onChangePublishCheckbox: function(event) {
+						var instance = this;
+
+						var publishCheckbox = event.currentTarget;
+
+						var payload = instance.ns(
+							{
+								published: publishCheckbox.attr('checked'),
+								recordSetId: instance.get('recordSetId')
+							}
+						);
+
+						A.io.request(
+							instance.get('publishRecordSetURL'),
+							{
+								data: payload,
+								dataType: 'JSON',
+								method: 'POST'
+							}
+						);
+					},
+
+					_onDestroyPortlet: function(event) {
+						var instance = this;
+
+						instance.destroy();
+					},
+
+					_onSubmitEditForm: function(event) {
+						var instance = this;
+
+						event.preventDefault();
+
+						instance.serializeFormBuilder();
+
+						instance.submitForm();
 					},
 
 					_valueFormBuilder: function() {
@@ -120,6 +228,7 @@ AUI.add(
 
 						return new Liferay.DDL.FormBuilder(
 							{
+								dataProviders: instance.get('dataProviders'),
 								definition: instance.get('definition'),
 								pagesJSON: layout.pages,
 								portletNamespace: instance.get('namespace')

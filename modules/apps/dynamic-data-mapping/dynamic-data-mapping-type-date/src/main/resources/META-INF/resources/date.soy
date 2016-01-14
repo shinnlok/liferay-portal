@@ -7,6 +7,7 @@
  * @param displayValue
  * @param label
  * @param name
+ * @param readOnly
  * @param required
  * @param showLabel
  * @param value
@@ -19,13 +20,13 @@
 				{$label}
 
 				{if $required}
-					<b>*</b>
+					<span class="icon-asterisk text-warning"></span>
 				{/if}
 			</label>
 		{/if}
 
 		<div class="input-group input-group-container">
-			<input aria-label="{$label}" class="form-control trigger" type="text" value="{$displayValue}" />
+			<input aria-label="{$label}" class="form-control trigger" {if $readOnly}disabled{/if} type="text" value="{$displayValue}" />
 
 			<input name="{$name}" type="hidden" value="{$value}" />
 

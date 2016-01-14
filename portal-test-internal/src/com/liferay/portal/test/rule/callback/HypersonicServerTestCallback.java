@@ -20,11 +20,18 @@ import com.liferay.portal.kernel.util.ReflectionUtil;
 import com.liferay.portal.util.PropsValues;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
+
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.sql.Statement;
 
 import java.util.concurrent.CountDownLatch;
@@ -51,7 +58,7 @@ public class HypersonicServerTestCallback
 
 	@Override
 	public void afterClass(Description description, Server server)
-		throws SQLException {
+		throws Exception {
 
 		try (Connection connection = DriverManager.getConnection(
 				DATABASE_URL_BASE + _databaseName, "sa", "");
@@ -61,6 +68,8 @@ public class HypersonicServerTestCallback
 		}
 
 		server.stop();
+
+		deleteFolder(Paths.get(_HYPERSONIC_TEMP_DIR_NAME));
 	}
 
 	@Override
@@ -72,7 +81,7 @@ public class HypersonicServerTestCallback
 			@Override
 			public int stop() {
 				try (PrintWriter logPrintWriter = getLogWriter();
-					PrintWriter errPrintWriter = getErrWriter()) {
+						PrintWriter errPrintWriter = getErrWriter()) {
 
 					int state = super.stop();
 
@@ -105,19 +114,26 @@ public class HypersonicServerTestCallback
 
 		};
 
-		File hsqlHomeDir = new File(_HSQL_HOME);
+		try (Connection connection = DriverManager.getConnection(
+				PropsValues.JDBC_DEFAULT_URL, "sa", "");
+			Statement statement = connection.createStatement()) {
 
-		hsqlHomeDir.mkdirs();
+			statement.execute(
+				"BACKUP DATABASE TO '" + _HYPERSONIC_TEMP_DIR_NAME +
+					"' BLOCKING AS FILES");
+		}
 
 		server.setErrWriter(
 			new UnsyncPrintWriter(
-				new File(hsqlHomeDir, _databaseName + ".err.log")));
+				new File(
+					_HYPERSONIC_TEMP_DIR_NAME, _databaseName + ".err.log")));
 		server.setLogWriter(
 			new UnsyncPrintWriter(
-				new File(hsqlHomeDir, _databaseName + ".std.log")));
+				new File(
+					_HYPERSONIC_TEMP_DIR_NAME, _databaseName + ".std.log")));
 
 		server.setDatabaseName(0, _databaseName);
-		server.setDatabasePath(0, _HSQL_HOME + _databaseName);
+		server.setDatabasePath(0, _HYPERSONIC_TEMP_DIR_NAME + _databaseName);
 
 		server.start();
 
@@ -129,8 +145,57 @@ public class HypersonicServerTestCallback
 		return server;
 	}
 
-	private static final String _HSQL_HOME =
-		PropsValues.LIFERAY_HOME + "/data/hypersonic/";
+	protected void copyFile(
+			String fileName, Path fromFolderPath, Path toFolderPath)
+		throws IOException {
+
+		Path filePath = fromFolderPath.resolve(fileName);
+
+		if (Files.exists(filePath)) {
+			Files.createDirectories(toFolderPath);
+
+			Files.copy(filePath, toFolderPath.resolve(fileName));
+		}
+	}
+
+	protected void deleteFolder(Path folderPath) throws IOException {
+		if (!Files.exists(folderPath)) {
+			return;
+		}
+
+		Files.walkFileTree(
+			folderPath,
+			new SimpleFileVisitor<Path>() {
+
+				@Override
+				public FileVisitResult postVisitDirectory(
+						Path dirPath, IOException ioe)
+					throws IOException {
+
+					if (ioe != null) {
+						throw ioe;
+					}
+
+					Files.delete(dirPath);
+
+					return FileVisitResult.CONTINUE;
+				}
+
+				@Override
+				public FileVisitResult visitFile(
+						Path filePath, BasicFileAttributes basicFileAttributes)
+					throws IOException {
+
+					Files.delete(filePath);
+
+					return FileVisitResult.CONTINUE;
+				}
+
+			});
+	}
+
+	private static final String _HYPERSONIC_TEMP_DIR_NAME =
+		PropsValues.LIFERAY_HOME + "/data/hypersonic_temp/";
 
 	private final String _databaseName;
 

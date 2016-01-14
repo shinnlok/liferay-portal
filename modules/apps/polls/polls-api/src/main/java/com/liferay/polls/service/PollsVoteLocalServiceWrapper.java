@@ -225,6 +225,11 @@ public class PollsVoteLocalServiceWrapper implements PollsVoteLocalService,
 		return _pollsVoteLocalService.getExportActionableDynamicQuery(portletDataContext);
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _pollsVoteLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -356,23 +361,6 @@ public class PollsVoteLocalServiceWrapper implements PollsVoteLocalService,
 	public com.liferay.polls.model.PollsVote updatePollsVote(
 		com.liferay.polls.model.PollsVote pollsVote) {
 		return _pollsVoteLocalService.updatePollsVote(pollsVote);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public PollsVoteLocalService getWrappedPollsVoteLocalService() {
-		return _pollsVoteLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedPollsVoteLocalService(
-		PollsVoteLocalService pollsVoteLocalService) {
-		_pollsVoteLocalService = pollsVoteLocalService;
 	}
 
 	@Override

@@ -37,16 +37,11 @@ import org.osgi.service.component.annotations.Reference;
 	immediate = true,
 	property = {
 		"panel.category.key=" + PanelCategoryKeys.ROOT,
-		"service.ranking:Integer=300"
+		"service.ranking:Integer=100"
 	},
 	service = PanelCategory.class
 )
 public class ControlPanelCategory extends BasePanelCategory {
-
-	@Override
-	public String getIconCssClass() {
-		return "icon-tasks";
-	}
 
 	@Override
 	public String getKey() {
@@ -59,8 +54,7 @@ public class ControlPanelCategory extends BasePanelCategory {
 	}
 
 	@Override
-	public boolean hasAccessPermission(
-			PermissionChecker permissionChecker, Group group)
+	public boolean isShow(PermissionChecker permissionChecker, Group group)
 		throws PortalException {
 
 		if (PortalPermissionUtil.contains(

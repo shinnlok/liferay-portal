@@ -22,10 +22,10 @@ import com.liferay.portal.kernel.module.configuration.ConfigurationFactory;
 import com.liferay.portal.kernel.settings.CompanyServiceSettingsLocator;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.security.sso.token.configuration.TokenConfiguration;
+import com.liferay.portal.security.sso.token.constants.TokenConstants;
 import com.liferay.portal.security.sso.token.events.LogoutProcessor;
 import com.liferay.portal.security.sso.token.events.LogoutProcessorType;
-import com.liferay.portal.security.sso.token.internal.constants.TokenConstants;
-import com.liferay.portal.security.sso.token.internal.module.configuration.TokenConfiguration;
 import com.liferay.portal.util.PortalUtil;
 
 import java.util.Map;
@@ -42,10 +42,30 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
+ * Participates in the user logout process.
+ *
+ * <p>
+ * <code>TokenLogoutAction</code> carries out two tasks:
+ * </p>
+ *
+ * <ol>
+ * <li>
+ * If authentication cookies are configured, all named cookies are deleted by
+ * the <code>@Component</code> defined in the class
+ * {@link CookieLogoutProcessor} (which implements {@link LogoutProcessor})
+ * </li>
+ * <li>
+ * If a logout redirect URL is set, then an HTTP redirect response to the
+ * specified URL is issued by the <code>@Component</code> defined in the class
+ * {@link RedirectLogoutProcessor} (which implements {@link
+ * com.liferay.portal.security.sso.token.auto.events.LogoutProcessor})
+ * </li>
+ * </ol>
+ *
  * @author Michael C. Han
  */
 @Component(
-	configurationPid = "com.liferay.portal.security.sso.token.internal.module.configuration.TokenConfiguration",
+	configurationPid = "com.liferay.portal.security.sso.token.configuration.TokenConfiguration",
 	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
 	property = {"key=logout.events.post"}, service = LifecycleAction.class
 )
@@ -121,7 +141,7 @@ public class TokenLogoutAction extends Action {
 	private static final Log _log = LogFactoryUtil.getLog(
 		TokenLogoutAction.class);
 
-	private volatile ConfigurationFactory _configurationFactory;
+	private ConfigurationFactory _configurationFactory;
 	private final Map<LogoutProcessorType, LogoutProcessor> _logoutProcessors =
 		new ConcurrentHashMap<>();
 

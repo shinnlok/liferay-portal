@@ -17,6 +17,7 @@
 <%
 String p_u_i_d = ParamUtil.getString(request, "p_u_i_d");
 String eventName = ParamUtil.getString(request, "eventName", liferayPortletResponse.getNamespace() + "selectRegularRole");
+String syncEntitiesEventName = ParamUtil.getString(request, "syncEntitiesEventName", liferayPortletResponse.getNamespace() + "syncRegularRoles");
 
 User selUser = PortalUtil.getSelectedUser(request);
 
@@ -31,7 +32,7 @@ if (selUser != null) {
 portletURL.setParameter("eventName", eventName);
 %>
 
-<aui:form action="<%= portletURL.toString() %>" method="post" name="selectRegularRoleFm">
+<aui:form action="<%= portletURL.toString() %>" cssClass="container-fluid-1280" method="post" name="selectRegularRoleFm">
 	<liferay-ui:header
 		title="roles"
 	/>
@@ -118,7 +119,7 @@ portletURL.setParameter("eventName", eventName);
 			</liferay-ui:search-container-column-text>
 		</liferay-ui:search-container-row>
 
-		<liferay-ui:search-iterator />
+		<liferay-ui:search-iterator markupView="lexicon" />
 	</liferay-ui:search-container>
 </aui:form>
 
@@ -128,7 +129,7 @@ portletURL.setParameter("eventName", eventName);
 	var openingLiferay = Util.getOpener().Liferay;
 
 	openingLiferay.fire(
-		'<portlet:namespace />enableRemovedRegularRoles',
+		'<%= HtmlUtil.escape(syncEntitiesEventName) %>',
 		{
 			selectors: A.all('.selector-button:disabled')
 		}

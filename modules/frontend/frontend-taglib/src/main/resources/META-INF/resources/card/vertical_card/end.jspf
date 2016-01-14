@@ -48,5 +48,9 @@
 				</div>
 			</c:if>
 		</div>
+
+		<c:if test="<%= showCheckbox %>">
+			</label>
+		</c:if>
 	</div>
 </div>

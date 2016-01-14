@@ -243,6 +243,11 @@ public class ImageLocalServiceWrapper implements ImageLocalService,
 		return _imageLocalService.getImagesCount();
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _imageLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -311,22 +316,6 @@ public class ImageLocalServiceWrapper implements ImageLocalService,
 		java.io.InputStream is, boolean cleanUpStream)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _imageLocalService.updateImage(imageId, is, cleanUpStream);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public ImageLocalService getWrappedImageLocalService() {
-		return _imageLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedImageLocalService(ImageLocalService imageLocalService) {
-		_imageLocalService = imageLocalService;
 	}
 
 	@Override

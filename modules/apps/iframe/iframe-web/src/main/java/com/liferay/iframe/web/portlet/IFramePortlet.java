@@ -14,10 +14,8 @@
 
 package com.liferay.iframe.web.portlet;
 
-import aQute.bnd.annotation.metatype.Configurable;
-
-import com.liferay.iframe.web.configuration.IFrameConfiguration;
 import com.liferay.iframe.web.configuration.IFramePortletInstanceConfiguration;
+import com.liferay.iframe.web.constants.IFramePortletKeys;
 import com.liferay.iframe.web.constants.IFrameWebKeys;
 import com.liferay.iframe.web.display.context.IFrameDisplayContext;
 import com.liferay.iframe.web.util.IFrameUtil;
@@ -31,18 +29,13 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.IOException;
 
-import java.util.Map;
-
 import javax.portlet.Portlet;
 import javax.portlet.PortletException;
 import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.ConfigurationPolicy;
-import org.osgi.service.component.annotations.Modified;
 
 /**
  * @author Brian Wing Shun Chan
@@ -50,8 +43,7 @@ import org.osgi.service.component.annotations.Modified;
  * @author Peter Fellwock
  */
 @Component(
-	configurationPid = "com.liferay.iframe.web.configuration.IFrameConfiguration",
-	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
+	immediate = true,
 	property = {
 		"com.liferay.portlet.css-class-wrapper=portlet-iframe",
 		"com.liferay.portlet.display-category=category.sample",
@@ -65,6 +57,7 @@ import org.osgi.service.component.annotations.Modified;
 		"javax.portlet.display-name=IFrame", "javax.portlet.expiration-cache=0",
 		"javax.portlet.init-param.template-path=/",
 		"javax.portlet.init-param.view-template=/view.jsp",
+		"javax.portlet.name=" + IFramePortletKeys.IFRAME,
 		"javax.portlet.resource-bundle=content.Language",
 		"javax.portlet.security-role-ref=power-user,user"
 	},
@@ -76,9 +69,6 @@ public class IFramePortlet extends MVCPortlet {
 	public void doView(
 			RenderRequest renderRequest, RenderResponse renderResponse)
 		throws IOException, PortletException {
-
-		renderRequest.setAttribute(
-			IFrameConfiguration.class.getName(), _iFrameConfiguration);
 
 		String src = null;
 
@@ -101,19 +91,12 @@ public class IFramePortlet extends MVCPortlet {
 		}
 	}
 
-	@Activate
-	@Modified
-	protected void activate(Map<String, Object> properties) {
-		_iFrameConfiguration = Configurable.createConfigurable(
-			IFrameConfiguration.class, properties);
-	}
-
 	protected String transformSrc(
 			RenderRequest renderRequest, RenderResponse renderResponse)
 		throws PortalException {
 
 		IFrameDisplayContext iFrameDisplayContext = new IFrameDisplayContext(
-			_iFrameConfiguration, renderRequest);
+			renderRequest);
 
 		IFramePortletInstanceConfiguration iFramePortletInstanceConfiguration =
 			iFrameDisplayContext.getIFramePortletInstanceConfiguration();
@@ -154,7 +137,5 @@ public class IFramePortlet extends MVCPortlet {
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(IFramePortlet.class);
-
-	private volatile IFrameConfiguration _iFrameConfiguration;
 
 }

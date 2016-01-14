@@ -62,6 +62,11 @@ public class TestLDAPSettings implements LDAPSettings {
 	}
 
 	@Override
+	public String[] getErrorPasswordHistoryKeywords(long companyId) {
+		return new String[] {"history"};
+	}
+
+	@Override
 	public Properties getGroupMappings(long ldapServerId, long companyId)
 		throws Exception {
 

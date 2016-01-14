@@ -233,6 +233,11 @@ public class DDLRecordVersionLocalServiceWrapper
 	}
 
 	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _ddlRecordVersionLocalService.getIndexableActionableDynamicQuery();
+	}
+
+	@Override
 	public com.liferay.dynamic.data.lists.model.DDLRecordVersion getLatestRecordVersion(
 		long recordId)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -293,23 +298,6 @@ public class DDLRecordVersionLocalServiceWrapper
 	public com.liferay.dynamic.data.lists.model.DDLRecordVersion updateDDLRecordVersion(
 		com.liferay.dynamic.data.lists.model.DDLRecordVersion ddlRecordVersion) {
 		return _ddlRecordVersionLocalService.updateDDLRecordVersion(ddlRecordVersion);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public DDLRecordVersionLocalService getWrappedDDLRecordVersionLocalService() {
-		return _ddlRecordVersionLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedDDLRecordVersionLocalService(
-		DDLRecordVersionLocalService ddlRecordVersionLocalService) {
-		_ddlRecordVersionLocalService = ddlRecordVersionLocalService;
 	}
 
 	@Override

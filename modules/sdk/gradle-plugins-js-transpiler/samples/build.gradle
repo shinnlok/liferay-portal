@@ -1,4 +1,8 @@
 buildscript {
+	dependencies {
+		classpath group: "com.liferay", name: "com.liferay.gradle.plugins.js.transpiler", version: "latest.release"
+	}
+
 	repositories {
 		mavenLocal()
 
@@ -6,17 +10,7 @@ buildscript {
 			url "http://cdn.repository.liferay.com/nexus/content/groups/public"
 		}
 	}
-
-	dependencies {
-		classpath group: "com.liferay", name: "com.liferay.gradle.plugins.js.transpiler", version: "latest.release"
-	}
 }
-
-apply plugin: "java"
 
 apply plugin: "com.liferay.js.transpiler"
-
-transpileJS {
-	include "**/*.es.js"
-	sourceDir = "src/main/resources"
-}
+apply plugin: "java"

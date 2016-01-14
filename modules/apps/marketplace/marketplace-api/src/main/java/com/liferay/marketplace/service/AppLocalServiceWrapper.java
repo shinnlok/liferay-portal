@@ -275,6 +275,11 @@ public class AppLocalServiceWrapper implements AppLocalService,
 	}
 
 	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _appLocalService.getIndexableActionableDynamicQuery();
+	}
+
+	@Override
 	public java.util.List<com.liferay.marketplace.model.App> getInstalledApps() {
 		return _appLocalService.getInstalledApps();
 	}
@@ -352,22 +357,6 @@ public class AppLocalServiceWrapper implements AppLocalService,
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _appLocalService.updateApp(userId, remoteAppId, title,
 			description, category, iconURL, version, file);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public AppLocalService getWrappedAppLocalService() {
-		return _appLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedAppLocalService(AppLocalService appLocalService) {
-		_appLocalService = appLocalService;
 	}
 
 	@Override

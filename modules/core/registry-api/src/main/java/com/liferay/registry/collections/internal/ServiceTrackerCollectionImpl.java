@@ -67,8 +67,6 @@ public class ServiceTrackerCollectionImpl<S> implements ServiceTrackerList<S> {
 				clazz,
 				new DefaultServiceTrackerCustomizer(serviceTrackerCustomizer));
 		}
-
-		_serviceTracker.open();
 	}
 
 	@Override
@@ -214,6 +212,11 @@ public class ServiceTrackerCollectionImpl<S> implements ServiceTrackerList<S> {
 	}
 
 	@Override
+	public void open() {
+		_serviceTracker.open();
+	}
+
+	@Override
 	public S remove(int index) {
 		throw new UnsupportedOperationException();
 	}
@@ -293,9 +296,9 @@ public class ServiceTrackerCollectionImpl<S> implements ServiceTrackerList<S> {
 	}
 
 	private Filter _getFilter(Filter filter, Class<S> clazz) {
-		Map<String, Object> properties = new HashMap<>();
-
-		properties.put("objectClass", clazz.getName());
+		Map<String, Object> properties =
+			Collections.<String, Object>singletonMap(
+				"objectClass", clazz.getName());
 
 		if (filter.matches(properties)) {
 			return filter;

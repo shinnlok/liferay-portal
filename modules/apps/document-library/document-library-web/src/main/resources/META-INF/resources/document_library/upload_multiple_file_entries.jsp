@@ -42,7 +42,7 @@ if (portletTitleBasedNavigation) {
 }
 %>
 
-<div <%= portletName.equals(DLPortletKeys.DOCUMENT_LIBRARY_ADMIN) ? "class=\"container-fluid-1280\"" : StringPool.BLANK %>>
+<div <%= portletTitleBasedNavigation ? "class=\"container-fluid-1280\"" : StringPool.BLANK %>>
 	<c:if test="<%= !portletTitleBasedNavigation %>">
 		<liferay-ui:header
 			backURL="<%= redirect %>"
@@ -92,7 +92,7 @@ if (portletTitleBasedNavigation) {
 										groupId: <%= scopeGroupId %>
 									}
 								},
-								tempRandomSuffix: '<%= DL.TEMP_RANDOM_SUFFIX %>',
+								tempRandomSuffix: '<%= TempFileEntryUtil.TEMP_RANDOM_SUFFIX %>',
 								uploadFile: '<liferay-portlet:actionURL doAsUserId="<%= user.getUserId() %>" name="/document_library/upload_multiple_file_entries"><portlet:param name="<%= Constants.CMD %>" value="<%= Constants.ADD_TEMP %>" /><portlet:param name="folderId" value="<%= String.valueOf(folderId) %>" /></liferay-portlet:actionURL>&ticketKey=<%= ticket.getKey() %><liferay-ui:input-permissions-params modelName="<%= DLFileEntryConstants.getClassName() %>" />'
 							}
 						);
@@ -178,7 +178,7 @@ if (portletTitleBasedNavigation) {
 
 														var originalFileName = item.originalFileName;
 
-														var pos = originalFileName.indexOf('<%= DL.TEMP_RANDOM_SUFFIX %>');
+														var pos = originalFileName.indexOf('<%= TempFileEntryUtil.TEMP_RANDOM_SUFFIX %>');
 
 														if (pos != -1) {
 															originalFileName = originalFileName.substr(0, pos);

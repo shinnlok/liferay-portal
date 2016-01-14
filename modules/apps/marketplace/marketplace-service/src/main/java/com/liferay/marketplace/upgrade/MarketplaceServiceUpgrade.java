@@ -30,18 +30,24 @@ import org.osgi.service.component.annotations.Reference;
  * @author Joan Kim
  * @author Ryan Park
  */
-@Component(immediate = true)
+@Component(immediate = true, service = UpgradeStepRegistrator.class)
 public class MarketplaceServiceUpgrade implements UpgradeStepRegistrator {
 
 	@Override
 	public void register(Registry registry) {
 		registry.register(
 			"com.liferay.marketplace.service", "0.0.1", "1.0.0",
-			new UpgradeCompanyId(),
 			new UpgradeExpando(
 				_expandoColumnLocalService, _expandoTableLocalService,
-				_expandoValueLocalService),
+				_expandoValueLocalService));
+
+		registry.register(
+			"com.liferay.marketplace.service", "1.0.0", "1.0.1",
 			new UpgradeModule());
+
+		registry.register(
+			"com.liferay.marketplace.service", "1.0.1", "1.0.2",
+			new UpgradeCompanyId());
 	}
 
 	@Reference(unbind = "-")

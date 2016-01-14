@@ -194,6 +194,11 @@ public class OrgLaborLocalServiceWrapper implements OrgLaborLocalService,
 		return _orgLaborLocalService.getActionableDynamicQuery();
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _orgLaborLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -278,23 +283,6 @@ public class OrgLaborLocalServiceWrapper implements OrgLaborLocalService,
 		return _orgLaborLocalService.updateOrgLabor(orgLaborId, typeId,
 			sunOpen, sunClose, monOpen, monClose, tueOpen, tueClose, wedOpen,
 			wedClose, thuOpen, thuClose, friOpen, friClose, satOpen, satClose);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public OrgLaborLocalService getWrappedOrgLaborLocalService() {
-		return _orgLaborLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedOrgLaborLocalService(
-		OrgLaborLocalService orgLaborLocalService) {
-		_orgLaborLocalService = orgLaborLocalService;
 	}
 
 	@Override

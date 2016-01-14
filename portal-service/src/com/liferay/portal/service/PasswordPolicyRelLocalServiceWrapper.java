@@ -235,6 +235,11 @@ public class PasswordPolicyRelLocalServiceWrapper
 		return _passwordPolicyRelLocalService.getActionableDynamicQuery();
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _passwordPolicyRelLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -326,23 +331,6 @@ public class PasswordPolicyRelLocalServiceWrapper
 	public com.liferay.portal.model.PasswordPolicyRel updatePasswordPolicyRel(
 		com.liferay.portal.model.PasswordPolicyRel passwordPolicyRel) {
 		return _passwordPolicyRelLocalService.updatePasswordPolicyRel(passwordPolicyRel);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public PasswordPolicyRelLocalService getWrappedPasswordPolicyRelLocalService() {
-		return _passwordPolicyRelLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedPasswordPolicyRelLocalService(
-		PasswordPolicyRelLocalService passwordPolicyRelLocalService) {
-		_passwordPolicyRelLocalService = passwordPolicyRelLocalService;
 	}
 
 	@Override

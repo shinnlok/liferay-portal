@@ -194,6 +194,11 @@ public class PasswordTrackerLocalServiceWrapper
 		return _passwordTrackerLocalService.getActionableDynamicQuery();
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _passwordTrackerLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -283,23 +288,6 @@ public class PasswordTrackerLocalServiceWrapper
 	public com.liferay.portal.model.PasswordTracker updatePasswordTracker(
 		com.liferay.portal.model.PasswordTracker passwordTracker) {
 		return _passwordTrackerLocalService.updatePasswordTracker(passwordTracker);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public PasswordTrackerLocalService getWrappedPasswordTrackerLocalService() {
-		return _passwordTrackerLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedPasswordTrackerLocalService(
-		PasswordTrackerLocalService passwordTrackerLocalService) {
-		_passwordTrackerLocalService = passwordTrackerLocalService;
 	}
 
 	@Override

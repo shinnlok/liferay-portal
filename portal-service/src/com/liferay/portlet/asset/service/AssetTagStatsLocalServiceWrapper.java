@@ -287,6 +287,11 @@ public class AssetTagStatsLocalServiceWrapper
 		return _assetTagStatsLocalService.getAssetTagStatsesCount();
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _assetTagStatsLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -369,23 +374,6 @@ public class AssetTagStatsLocalServiceWrapper
 		long tagId, long classNameId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _assetTagStatsLocalService.updateTagStats(tagId, classNameId);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public AssetTagStatsLocalService getWrappedAssetTagStatsLocalService() {
-		return _assetTagStatsLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedAssetTagStatsLocalService(
-		AssetTagStatsLocalService assetTagStatsLocalService) {
-		_assetTagStatsLocalService = assetTagStatsLocalService;
 	}
 
 	@Override

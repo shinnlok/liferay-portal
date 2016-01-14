@@ -56,7 +56,6 @@ String message = "add";
 					title="<%= LanguageUtil.get(request, message) %>"
 					url="<%= addTemplateURL %>"
 				/>
-
 			</c:if>
 
 			<c:if test="<%= DDMTemplatePermission.containsAddTemplatePermission(permissionChecker, groupId, classNameId, scopeClassNameId) && (Validator.isNull(templateTypeValue) || templateTypeValue.equals(DDMTemplateConstants.TEMPLATE_TYPE_DISPLAY)) %>">
@@ -96,9 +95,7 @@ String message = "add";
 					}
 				}
 				else {
-					PortletDisplayTemplate portletDisplayTemplate = _getPortletDisplayTemplate();
-
-					templateHandlers = portletDisplayTemplate.getPortletDisplayTemplateHandlers();
+					templateHandlers = PortletDisplayTemplateUtil.getPortletDisplayTemplateHandlers();
 
 					Iterator<TemplateHandler> itr = templateHandlers.iterator();
 

@@ -659,6 +659,10 @@ public class DLFolderLocalServiceUtil {
 		getService().getGroupSubfolderIds(folderIds, groupId, folderId);
 	}
 
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
 	public static com.liferay.portlet.documentlibrary.model.DLFolder getMountFolder(
 		long repositoryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -736,6 +740,11 @@ public class DLFolderLocalServiceUtil {
 
 	public static boolean hasFolderLock(long userId, long folderId) {
 		return getService().hasFolderLock(userId, folderId);
+	}
+
+	public static boolean hasInheritableLock(long folderId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().hasInheritableLock(folderId);
 	}
 
 	public static com.liferay.portal.kernel.lock.Lock lockFolder(long userId,
@@ -907,6 +916,12 @@ public class DLFolderLocalServiceUtil {
 			serviceContext);
 	}
 
+	public static boolean verifyInheritableLock(long folderId,
+		java.lang.String lockUuid)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().verifyInheritableLock(folderId, lockUuid);
+	}
+
 	public static DLFolderLocalService getService() {
 		if (_service == null) {
 			_service = (DLFolderLocalService)PortalBeanLocatorUtil.locate(DLFolderLocalService.class.getName());
@@ -916,13 +931,6 @@ public class DLFolderLocalServiceUtil {
 		}
 
 		return _service;
-	}
-
-	/**
-	 * @deprecated As of 6.2.0
-	 */
-	@Deprecated
-	public void setService(DLFolderLocalService service) {
 	}
 
 	private static DLFolderLocalService _service;
