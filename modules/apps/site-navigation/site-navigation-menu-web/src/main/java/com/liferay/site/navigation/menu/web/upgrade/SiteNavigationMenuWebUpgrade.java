@@ -16,8 +16,8 @@ package com.liferay.site.navigation.menu.web.upgrade;
 
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
-import com.liferay.portal.upgrade.util.UpgradePortletId;
-import com.liferay.site.navigation.menu.web.constants.SiteNavigationMenuPortletKeys;
+import com.liferay.site.navigation.menu.web.upgrade.v1_0_0.UpgradePortletId;
+import com.liferay.site.navigation.menu.web.upgrade.v1_0_0.UpgradePortletPreferences;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -25,27 +25,14 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Eudaldo Alonso
  */
-@Component(immediate = true)
+@Component(immediate = true, service = UpgradeStepRegistrator.class)
 public class SiteNavigationMenuWebUpgrade implements UpgradeStepRegistrator {
 
 	@Override
 	public void register(Registry registry) {
 		registry.register(
 			"com.liferay.site.navigation.menu.web", "0.0.1", "1.0.0",
-			new UpgradePortletId() {
-
-				@Override
-				protected String[][] getRenamePortletIdsArray() {
-					return new String[][] {
-						new String[] {
-							"71",
-							SiteNavigationMenuPortletKeys.
-								SITE_NAVIGATION_MENU
-						}
-					};
-				}
-
-			});
+			new UpgradePortletId(), new UpgradePortletPreferences());
 	}
 
 	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind = "-")

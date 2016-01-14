@@ -313,6 +313,10 @@ public class TeamLocalServiceUtil {
 		return getService().getGroupTeams(groupId);
 	}
 
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -551,13 +555,6 @@ public class TeamLocalServiceUtil {
 		}
 
 		return _service;
-	}
-
-	/**
-	 * @deprecated As of 6.2.0
-	 */
-	@Deprecated
-	public void setService(TeamLocalService service) {
 	}
 
 	private static TeamLocalService _service;

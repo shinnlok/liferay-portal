@@ -16,7 +16,7 @@ package com.liferay.portal.store.file.system;
 
 import aQute.bnd.annotation.metatype.Configurable;
 
-import com.liferay.portal.convert.FileSystemStoreRootDirException;
+import com.liferay.portal.convert.documentlibrary.FileSystemStoreRootDirException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FileUtil;
@@ -327,6 +327,11 @@ public class FileSystemStore extends BaseStore {
 			String fileName)
 		throws DuplicateFileException, NoSuchFileException {
 
+		if (repositoryId == newRepositoryId) {
+			throw new DuplicateFileException(
+				companyId, newRepositoryId, fileName);
+		}
+
 		File fileNameDir = getFileNameDir(companyId, repositoryId, fileName);
 
 		if (!fileNameDir.exists()) {
@@ -359,6 +364,11 @@ public class FileSystemStore extends BaseStore {
 			long companyId, long repositoryId, String fileName,
 			String newFileName)
 		throws DuplicateFileException, NoSuchFileException {
+
+		if (fileName.equals(newFileName)) {
+			throw new DuplicateFileException(
+				companyId, repositoryId, newFileName);
+		}
 
 		File fileNameDir = getFileNameDir(companyId, repositoryId, fileName);
 

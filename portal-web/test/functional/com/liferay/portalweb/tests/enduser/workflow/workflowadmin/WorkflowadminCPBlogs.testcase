@@ -4,35 +4,56 @@
 	<var name="workflowAssetType" value="Blogs Entry" />
 
 	<set-up>
+		<var method="TestPropsUtil#get('test.portal.instance')" name="testPortalInstance" />
+
+		<if>
+			<equals arg1="${testPortalInstance}" arg2="true" />
+			<then>
+				<execute macro="SignIn#signInPortalInstanceSetUp" />
+			</then>
+		</if>
+
 		<execute macro="User#firstLoginPG" />
 
-		<execute macro="Page#gotoConfigurationCP">
-			<var name="portletName" value="Workflow Configuration" />
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesConfiguration">
+			<var name="portlet" value="Workflow Configuration" />
 		</execute>
 
 		<execute macro="Workflow#configureWorkflow">
 			<var name="workflowDefinition" value="Single Approver (Version 1)" />
-			<var name="workflowResourceKey" value="RESOURCE_TABLE_BLOGS_ENTRY_SELECT" />
+			<var name="workflowResourceValue" value="Blogs Entry" />
 		</execute>
 	</set-up>
 
 	<tear-down>
-		<execute macro="BlogsEntry#tearDownCP" />
+		<var method="TestPropsUtil#get('test.portal.instance')" name="testPortalInstance" />
 
-		<execute macro="Workflow#tearDownPortalWorkflow" />
+		<if>
+			<equals arg1="${testPortalInstance}" arg2="true" />
+			<then>
+				<execute macro="PortalInstances#tearDownCP" />
+			</then>
+			<else>
+				<execute macro="BlogsEntry#tearDownCP" />
 
-		<execute macro="Workflow#tearDownSiteWorkflow" />
+				<execute macro="Workflow#tearDownPortalWorkflow" />
 
-		<execute macro="Workflow#tearDownSpecificWorkflowDefinition">
-			<var name="workflowDefinitionTitle" value="Join Xor" />
-		</execute>
+				<execute macro="Workflow#tearDownSiteWorkflow" />
+
+				<execute macro="Workflow#tearDownSpecificWorkflowDefinition">
+					<var name="workflowDefinitionTitle" value="Join Xor" />
+				</execute>
+			</else>
+		</if>
 	</tear-down>
 
 	<command name="ApproveBlogsEntriesCPJoinXORNodeWorkflowDefinition" priority="4">
 		<description message="This is a use case for LPS-35577." />
 
-		<execute macro="Page#gotoCP">
-			<var name="portletName" value="Workflow Definition" />
+		<execute macro="ProductMenu#gotoControlPanelConfiguration">
+			<var name="portlet" value="Workflow Definition" />
 		</execute>
 
 		<execute macro="Workflow#uploadDefinition">
@@ -40,17 +61,21 @@
 			<var name="workflowDefinitionTitle" value="Join Xor" />
 		</execute>
 
-		<execute macro="Page#gotoConfigurationCP">
-			<var name="portletName" value="Workflow Configuration" />
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesConfiguration">
+			<var name="portlet" value="Workflow Configuration" />
 		</execute>
 
 		<execute macro="Workflow#configureWorkflow">
 			<var name="workflowDefinition" value="Join Xor (Version 1)" />
-			<var name="workflowResourceKey" value="RESOURCE_TABLE_BLOGS_ENTRY_SELECT" />
+			<var name="workflowResourceValue" value="Blogs Entry" />
 		</execute>
 
-		<execute macro="Page#gotoContentCP">
-			<var name="portletName" value="Blogs" />
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Blogs" />
 		</execute>
 
 		<execute macro="Blogs#addWithWorkflow">
@@ -59,8 +84,10 @@
 			<var name="entryTitle" value="Blogs Entry 1" />
 		</execute>
 
-		<execute macro="Page#gotoContentCP">
-			<var name="portletName" value="Blogs" />
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Blogs" />
 		</execute>
 
 		<execute macro="BlogsEntry#viewWithWorkflowCP">
@@ -78,8 +105,10 @@
 			<var name="workflowTask" value="task2" />
 		</execute>
 
-		<execute macro="Page#gotoContentCP">
-			<var name="portletName" value="Blogs" />
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Blogs" />
 		</execute>
 
 		<execute macro="BlogsEntry#viewWithWorkflowCP">
@@ -98,8 +127,10 @@
 			<var name="workflowTask" value="task2" />
 		</execute>
 
-		<execute macro="Page#gotoContentCP">
-			<var name="portletName" value="Blogs" />
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Blogs" />
 		</execute>
 
 		<execute macro="BlogsEntry#viewEntryTable">
@@ -115,8 +146,10 @@
 			<var name="entryTitle" value="Blogs Entry 1" />
 		</execute>
 
-		<execute macro="Page#gotoContentCP">
-			<var name="portletName" value="Blogs" />
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Blogs" />
 		</execute>
 
 		<execute macro="Blogs#addWithWorkflow">
@@ -125,8 +158,10 @@
 			<var name="entryTitle" value="Blogs Entry 2" />
 		</execute>
 
-		<execute macro="Page#gotoContentCP">
-			<var name="portletName" value="Blogs" />
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Blogs" />
 		</execute>
 
 		<execute macro="BlogsEntry#viewWithWorkflowCP">
@@ -144,8 +179,10 @@
 			<var name="workflowTask" value="task2" />
 		</execute>
 
-		<execute macro="Page#gotoContentCP">
-			<var name="portletName" value="Blogs" />
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Blogs" />
 		</execute>
 
 		<execute macro="BlogsEntry#viewWithWorkflowCP">
@@ -164,8 +201,10 @@
 			<var name="workflowTask" value="task2" />
 		</execute>
 
-		<execute macro="Page#gotoContentCP">
-			<var name="portletName" value="Blogs" />
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Blogs" />
 		</execute>
 
 		<execute macro="BlogsEntry#viewEntryTable">
@@ -181,8 +220,10 @@
 			<var name="entryTitle" value="Blogs Entry 2" />
 		</execute>
 
-		<execute macro="Page#gotoContentCP">
-			<var name="portletName" value="Blogs" />
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Blogs" />
 		</execute>
 
 		<execute macro="Blogs#addWithWorkflow">
@@ -191,8 +232,10 @@
 			<var name="entryTitle" value="Blogs Entry 3" />
 		</execute>
 
-		<execute macro="Page#gotoContentCP">
-			<var name="portletName" value="Blogs" />
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Blogs" />
 		</execute>
 
 		<execute macro="BlogsEntry#viewWithWorkflowCP">
@@ -242,8 +285,10 @@
 			<var name="workflowTask" value="task1" />
 		</execute>
 
-		<execute macro="Page#gotoContentCP">
-			<var name="portletName" value="Blogs" />
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Blogs" />
 		</execute>
 
 		<execute macro="BlogsEntry#viewEntryTable">
@@ -261,11 +306,15 @@
 	</command>
 
 	<command name="ApproveBlogsEntryCP" priority="5">
+		<property name="portal.acceptance" value="true" />
+
 		<var name="entryContent" value="Blogs Entry Content" />
 		<var name="entryTitle" value="Blogs Entry Title" />
 
-		<execute macro="Page#gotoContentCP">
-			<var name="portletName" value="Blogs" />
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Blogs" />
 		</execute>
 
 		<execute macro="Blogs#addWithWorkflow">
@@ -274,8 +323,10 @@
 			<var name="entryTitle" value="${entryTitle}" />
 		</execute>
 
-		<execute macro="Page#gotoContentCP">
-			<var name="portletName" value="Blogs" />
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Blogs" />
 		</execute>
 
 		<execute macro="BlogsEntry#viewWithWorkflowCP">
@@ -293,8 +344,10 @@
 			<var name="workflowTask" value="Review" />
 		</execute>
 
-		<execute macro="Page#gotoContentCP">
-			<var name="portletName" value="Blogs" />
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Blogs" />
 		</execute>
 
 		<execute macro="BlogsEntry#viewWithWorkflowCP">
@@ -312,8 +365,10 @@
 			<var name="workflowTask" value="Review" />
 		</execute>
 
-		<execute macro="Page#gotoContentCP">
-			<var name="portletName" value="Blogs" />
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Blogs" />
 		</execute>
 
 		<execute macro="BlogsEntry#viewEntryTable">
@@ -332,14 +387,29 @@
 			<var name="entryContent" value="${entryContent}" />
 			<var name="entryTitle" value="${entryTitle}" />
 		</execute>
+
+		<execute macro="Page#gotoMyAccount">
+			<var name="portletName" value="My Submissions" />
+		</execute>
+
+		<execute macro="Workflow#gotoViewCompletedAssetViaMySubmissions">
+			<var name="workflowAssetTitle" value="${entryTitle}" />
+		</execute>
+
+		<execute macro="BlogsEntry#viewEntryAsWorkflowAsset">
+			<var name="entryContent" value="${entryContent}" />
+			<var name="entryTitle" value="${entryTitle}" />
+		</execute>
 	</command>
 
 	<command name="RejectBlogsEntryCP" priority="4">
 		<var name="entryContent" value="Blogs Entry Content" />
 		<var name="entryTitle" value="Blogs Entry Title" />
 
-		<execute macro="Page#gotoContentCP">
-			<var name="portletName" value="Blogs" />
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Blogs" />
 		</execute>
 
 		<execute macro="Blogs#addWithWorkflow">
@@ -377,8 +447,10 @@
 			<var name="workflowAssetType" value="${workflowAssetType}" />
 		</execute>
 
-		<execute macro="Page#gotoContentCP">
-			<var name="portletName" value="Blogs" />
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Blogs" />
 		</execute>
 
 		<execute macro="BlogsEntry#viewWithWorkflowCP">

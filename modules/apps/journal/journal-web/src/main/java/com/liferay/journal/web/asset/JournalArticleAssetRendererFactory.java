@@ -35,7 +35,6 @@ import com.liferay.portal.kernel.portlet.LiferayPortletURL;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
-import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.asset.model.AssetRenderer;
 import com.liferay.portlet.asset.model.AssetRendererFactory;
@@ -111,11 +110,9 @@ public class JournalArticleAssetRendererFactory
 		}
 
 		JournalArticleAssetRenderer journalArticleAssetRenderer =
-			new JournalArticleAssetRenderer(article);
+			getJournalArticleAssetRenderer(article);
 
 		journalArticleAssetRenderer.setAssetRendererType(type);
-		journalArticleAssetRenderer.setJournalContent(_journalContent);
-		journalArticleAssetRenderer.setJournalConverter(_journalConverter);
 		journalArticleAssetRenderer.setServletContext(_servletContext);
 
 		return journalArticleAssetRenderer;
@@ -130,7 +127,7 @@ public class JournalArticleAssetRendererFactory
 			_journalArticleService.getDisplayArticleByUrlTitle(
 				groupId, urlTitle);
 
-		return new JournalArticleAssetRenderer(article);
+		return getJournalArticleAssetRenderer(article);
 	}
 
 	@Override
@@ -145,7 +142,7 @@ public class JournalArticleAssetRendererFactory
 
 	@Override
 	public String getIconCssClass() {
-		return "icon-file-2";
+		return "web-content";
 	}
 
 	@Override
@@ -260,9 +257,16 @@ public class JournalArticleAssetRendererFactory
 		_servletContext = servletContext;
 	}
 
-	@Override
-	protected String getIconPath(ThemeDisplay themeDisplay) {
-		return themeDisplay.getPathThemeImages() + "/common/history.png";
+	protected JournalArticleAssetRenderer getJournalArticleAssetRenderer(
+		JournalArticle article) {
+
+		JournalArticleAssetRenderer journalArticleAssetRenderer =
+			new JournalArticleAssetRenderer(article);
+
+		journalArticleAssetRenderer.setJournalContent(_journalContent);
+		journalArticleAssetRenderer.setJournalConverter(_journalConverter);
+
+		return journalArticleAssetRenderer;
 	}
 
 	@Reference(unbind = "-")

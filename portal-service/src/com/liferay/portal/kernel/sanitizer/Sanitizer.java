@@ -26,7 +26,7 @@ import java.util.Map;
  * (CSS). Multiple implementations can be deployed in a hook plugin and
  * specified in a comma separated list of values for the
  * <code>sanitizer.impl</code> portal property (see <a
- * href="http://docs.liferay.com/portal/6.2/propertiesdoc/portal.properties.html#Sanitizer">Sanitizer</a>).
+ * href="http://docs.liferay.com/portal/7.0/propertiesdoc/portal.properties.html#Sanitizer">Sanitizer</a>).
  * All installed sanitizers are chained.
  *
  * @author Zsolt Balogh
@@ -58,7 +58,9 @@ public interface Sanitizer {
 	 * @param  options a map of options for the sanitizer
 	 * @return the sanitized content
 	 * @throws SanitizerException if a sanitizer exception occurred
+	 * @deprecated As of 7.0.0, replaced by {@link #sanitize(long, long, long, String, long, String, String[], String, Map)}
 	 */
+	@Deprecated
 	public byte[] sanitize(
 			long companyId, long groupId, long userId, String className,
 			long classPK, String contentType, String[] modes, byte[] bytes,
@@ -83,7 +85,9 @@ public interface Sanitizer {
 	 * @param  outputStream the result of the sanitizing process
 	 * @param  options a map of options for the sanitizer
 	 * @throws SanitizerException if a sanitizer exception occurred
+	 * @deprecated As of 7.0.0, replaced by {@link #sanitize(long, long, long, String, long, String, String[], String, Map)}
 	 */
+	@Deprecated
 	public void sanitize(
 			long companyId, long groupId, long userId, String className,
 			long classPK, String contentType, String[] modes,
@@ -104,14 +108,14 @@ public interface Sanitizer {
 	 *         com.liferay.portal.kernel.util.ContentTypes}.
 	 * @param  modes ways in which to run the sanitizer, such as {@link
 	 *         #MODE_ALL}, {@link #MODE_BAD_WORDS}, and/or {@link #MODE_XSS}
-	 * @param  s the content to sanitize
+	 * @param  content the content to sanitize
 	 * @param  options the options map
 	 * @return the sanitized content
 	 * @throws SanitizerException if a sanitizer exception occurred
 	 */
 	public String sanitize(
 			long companyId, long groupId, long userId, String className,
-			long classPK, String contentType, String[] modes, String s,
+			long classPK, String contentType, String[] modes, String content,
 			Map<String, Object> options)
 		throws SanitizerException;
 

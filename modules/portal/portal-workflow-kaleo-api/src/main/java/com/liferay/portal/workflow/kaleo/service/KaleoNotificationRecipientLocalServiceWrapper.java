@@ -212,6 +212,11 @@ public class KaleoNotificationRecipientLocalServiceWrapper
 		return _kaleoNotificationRecipientLocalService.getActionableDynamicQuery();
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _kaleoNotificationRecipientLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the kaleo notification recipient with the primary key.
 	*
@@ -287,23 +292,6 @@ public class KaleoNotificationRecipientLocalServiceWrapper
 	public com.liferay.portal.workflow.kaleo.model.KaleoNotificationRecipient updateKaleoNotificationRecipient(
 		com.liferay.portal.workflow.kaleo.model.KaleoNotificationRecipient kaleoNotificationRecipient) {
 		return _kaleoNotificationRecipientLocalService.updateKaleoNotificationRecipient(kaleoNotificationRecipient);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public KaleoNotificationRecipientLocalService getWrappedKaleoNotificationRecipientLocalService() {
-		return _kaleoNotificationRecipientLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedKaleoNotificationRecipientLocalService(
-		KaleoNotificationRecipientLocalService kaleoNotificationRecipientLocalService) {
-		_kaleoNotificationRecipientLocalService = kaleoNotificationRecipientLocalService;
 	}
 
 	@Override

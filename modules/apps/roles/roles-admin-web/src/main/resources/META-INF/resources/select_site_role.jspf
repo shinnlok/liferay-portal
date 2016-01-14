@@ -18,6 +18,7 @@
 String p_u_i_d = ParamUtil.getString(request, "p_u_i_d");
 int step = ParamUtil.getInteger(request, "step");
 String eventName = ParamUtil.getString(request, "eventName", liferayPortletResponse.getNamespace() + "selectSiteRole");
+String syncEntitiesEventName = ParamUtil.getString(request, "syncEntitiesEventName", liferayPortletResponse.getNamespace() + "syncSiteRoles");
 
 User selUser = PortalUtil.getSelectedUser(request);
 
@@ -51,7 +52,7 @@ if (step == 1) {
 }
 %>
 
-<aui:form action="<%= portletURL.toString() %>" method="post" name="selectSiteRoleFm">
+<aui:form action="<%= portletURL.toString() %>" cssClass="container-fluid-1280" method="post" name="selectSiteRoleFm">
 	<c:choose>
 		<c:when test="<%= step == 1 %>">
 			<aui:input name="groupId" type="hidden" />
@@ -106,7 +107,7 @@ if (step == 1) {
 					</liferay-ui:search-container-column-text>
 				</liferay-ui:search-container-row>
 
-				<liferay-ui:search-iterator />
+				<liferay-ui:search-iterator markupView="lexicon" />
 			</liferay-ui:search-container>
 
 			<aui:script sandbox="<%= true %>">
@@ -267,7 +268,7 @@ if (step == 1) {
 					</liferay-ui:search-container-column-text>
 				</liferay-ui:search-container-row>
 
-				<liferay-ui:search-iterator />
+				<liferay-ui:search-iterator markupView="lexicon" />
 			</liferay-ui:search-container>
 
 			<aui:script use="aui-base">
@@ -276,7 +277,7 @@ if (step == 1) {
 				var openingLiferay = Util.getOpener().Liferay;
 
 				openingLiferay.fire(
-					'<portlet:namespace />syncSiteRoles',
+					'<%= HtmlUtil.escape(syncEntitiesEventName) %>',
 					{
 						selectors: A.all('.selector-button')
 					}

@@ -306,6 +306,10 @@ public class DLFileEntryMetadataLocalServiceUtil {
 		return getService().getFileVersionFileEntryMetadatasCount(fileVersionId);
 	}
 
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
 	public static java.util.List<com.liferay.portlet.documentlibrary.model.DLFileEntryMetadata> getMismatchedCompanyIdFileEntryMetadatas() {
 		return getService().getMismatchedCompanyIdFileEntryMetadatas();
 	}
@@ -370,13 +374,6 @@ public class DLFileEntryMetadataLocalServiceUtil {
 		}
 
 		return _service;
-	}
-
-	/**
-	 * @deprecated As of 6.2.0
-	 */
-	@Deprecated
-	public void setService(DLFileEntryMetadataLocalService service) {
 	}
 
 	private static DLFileEntryMetadataLocalService _service;

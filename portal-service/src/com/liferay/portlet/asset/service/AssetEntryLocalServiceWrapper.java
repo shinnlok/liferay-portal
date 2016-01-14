@@ -537,6 +537,11 @@ public class AssetEntryLocalServiceWrapper implements AssetEntryLocalService,
 	}
 
 	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _assetEntryLocalService.getIndexableActionableDynamicQuery();
+	}
+
+	@Override
 	public com.liferay.portlet.asset.model.AssetEntry getNextEntry(long entryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _assetEntryLocalService.getNextEntry(entryId);
@@ -937,23 +942,6 @@ public class AssetEntryLocalServiceWrapper implements AssetEntryLocalService,
 		throws com.liferay.portal.kernel.exception.PortalException {
 		_assetEntryLocalService.validate(groupId, className, classTypePK,
 			categoryIds, tagNames);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public AssetEntryLocalService getWrappedAssetEntryLocalService() {
-		return _assetEntryLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedAssetEntryLocalService(
-		AssetEntryLocalService assetEntryLocalService) {
-		_assetEntryLocalService = assetEntryLocalService;
 	}
 
 	@Override

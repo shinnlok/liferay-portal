@@ -331,6 +331,28 @@ public class MBCategoryLocalServiceUtil {
 		return getService().getCategoriesAndThreads(groupId, categoryId);
 	}
 
+	public static java.util.List<java.lang.Object> getCategoriesAndThreads(
+		long groupId, long categoryId, int status) {
+		return getService().getCategoriesAndThreads(groupId, categoryId, status);
+	}
+
+	public static java.util.List<java.lang.Object> getCategoriesAndThreads(
+		long groupId, long categoryId, int status, int start, int end) {
+		return getService()
+				   .getCategoriesAndThreads(groupId, categoryId, status, start,
+			end);
+	}
+
+	public static int getCategoriesAndThreadsCount(long groupId, long categoryId) {
+		return getService().getCategoriesAndThreadsCount(groupId, categoryId);
+	}
+
+	public static int getCategoriesAndThreadsCount(long groupId,
+		long categoryId, int status) {
+		return getService()
+				   .getCategoriesAndThreadsCount(groupId, categoryId, status);
+	}
+
 	public static int getCategoriesCount(long groupId) {
 		return getService().getCategoriesCount(groupId);
 	}
@@ -390,6 +412,10 @@ public class MBCategoryLocalServiceUtil {
 	public static com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
 		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext) {
 		return getService().getExportActionableDynamicQuery(portletDataContext);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
 	}
 
 	/**
@@ -610,13 +636,6 @@ public class MBCategoryLocalServiceUtil {
 		}
 
 		return _service;
-	}
-
-	/**
-	 * @deprecated As of 6.2.0
-	 */
-	@Deprecated
-	public void setService(MBCategoryLocalService service) {
 	}
 
 	private static MBCategoryLocalService _service;

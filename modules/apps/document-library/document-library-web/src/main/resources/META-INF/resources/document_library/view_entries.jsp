@@ -48,6 +48,7 @@ String displayStyle = GetterUtil.getString((String)request.getAttribute("view.js
 PortletURL portletURL = liferayPortletResponse.createRenderURL();
 
 portletURL.setParameter("mvcRenderCommandName", "/document_library/view");
+portletURL.setParameter("navigation", navigation);
 portletURL.setParameter("curFolder", currentFolder);
 portletURL.setParameter("deltaFolder", deltaFolder);
 portletURL.setParameter("folderId", String.valueOf(folderId));
@@ -57,6 +58,8 @@ SearchContainer dlSearchContainer = new SearchContainer(liferayPortletRequest, n
 EntriesChecker entriesChecker = new EntriesChecker(liferayPortletRequest, liferayPortletResponse);
 
 entriesChecker.setCssClass("entry-selector");
+
+EntriesMover entriesMover = new EntriesMover(scopeGroupId);
 
 String orderByCol = GetterUtil.getString((String)request.getAttribute("view.jsp-orderByCol"));
 String orderByType = GetterUtil.getString((String)request.getAttribute("view.jsp-orderByType"));
@@ -182,6 +185,8 @@ else {
 
 dlSearchContainer.setResults(results);
 
+dlSearchContainer.setEmptyResultsMessage(fileEntryTypeId >= 0 ? LanguageUtil.format(request, "there-are-no-documents-or-media-files-of-type-x", HtmlUtil.escape(dlFileEntryTypeName)) : "there-are-no-documents-or-media-files-in-this-folder");
+
 boolean portletTitleBasedNavigation = GetterUtil.getBoolean(portletConfig.getInitParameter("portlet-title-based-navigation"));
 
 if (portletTitleBasedNavigation && (folderId != DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) && (folderId != rootFolderId)) {
@@ -198,26 +203,16 @@ if (portletTitleBasedNavigation && (folderId != DLFolderConstants.DEFAULT_PARENT
 }
 %>
 
-<c:if test="<%= results.isEmpty() %>">
-	<div class="alert alert-info entries-empty">
-		<c:choose>
-			<c:when test="<%= (fileEntryTypeId >= 0) %>">
-				<liferay-ui:message arguments="<%= HtmlUtil.escape(dlFileEntryTypeName) %>" key="there-are-no-documents-or-media-files-of-type-x" translateArguments="<%= false %>" />
-			</c:when>
-			<c:otherwise>
-				<liferay-ui:message key="there-are-no-documents-or-media-files-in-this-folder" />
-			</c:otherwise>
-		</c:choose>
-	</div>
-</c:if>
-
 <div class="document-container" id="<portlet:namespace />entriesContainer">
 
 	<%
 	String[] entryColumns = dlPortletInstanceSettingsHelper.getEntryColumns();
+
+	String searchContainerId = ParamUtil.getString(request, "searchContainerId");
 	%>
 
 	<liferay-ui:search-container
+		id="<%= searchContainerId %>"
 		searchContainer="<%= dlSearchContainer %>"
 		total="<%= total %>"
 		totalVar="dlSearchContainerTotal"
@@ -229,7 +224,7 @@ if (portletTitleBasedNavigation && (folderId != DLFolderConstants.DEFAULT_PARENT
 
 		<liferay-ui:search-container-row
 			className="Object"
-			cssClass="app-view-entry-taglib entry-display-style selectable"
+			cssClass="app-view-entry-taglib entry-display-style"
 			modelVar="result"
 		>
 
@@ -263,8 +258,12 @@ if (portletTitleBasedNavigation && (folderId != DLFolderConstants.DEFAULT_PARENT
 					if (DLFileEntryPermission.contains(permissionChecker, fileEntry, ActionKeys.DELETE) || DLFileEntryPermission.contains(permissionChecker, fileEntry, ActionKeys.UPDATE)) {
 						draggable = true;
 
-						if (Validator.isNull(dlSearchContainer.getRowChecker())) {
+						if (dlSearchContainer.getRowChecker() == null) {
 							dlSearchContainer.setRowChecker(entriesChecker);
+						}
+
+						if (dlSearchContainer.getRowMover() == null) {
+							dlSearchContainer.setRowMover(entriesMover);
 						}
 					}
 
@@ -427,8 +426,12 @@ if (portletTitleBasedNavigation && (folderId != DLFolderConstants.DEFAULT_PARENT
 					if (DLFolderPermission.contains(permissionChecker, curFolder, ActionKeys.DELETE) || DLFolderPermission.contains(permissionChecker, curFolder, ActionKeys.UPDATE)) {
 						draggable = true;
 
-						if (Validator.isNull(dlSearchContainer.getRowChecker())) {
+						if (dlSearchContainer.getRowChecker() == null) {
 							dlSearchContainer.setRowChecker(entriesChecker);
+						}
+
+						if (dlSearchContainer.getRowMover() == null) {
+							dlSearchContainer.setRowMover(entriesMover);
 						}
 					}
 
@@ -446,7 +449,7 @@ if (portletTitleBasedNavigation && (folderId != DLFolderConstants.DEFAULT_PARENT
 					<c:choose>
 						<c:when test='<%= displayStyle.equals("descriptive") %>'>
 							<liferay-ui:search-container-column-icon
-								icon='<%= curFolder.isMountPoint() ? "icon-hdd" : "icon-folder-close" %>'
+								icon='<%= curFolder.isMountPoint() ? "repository" : "folder" %>'
 								toggleRowChecker="<%= true %>"
 							/>
 

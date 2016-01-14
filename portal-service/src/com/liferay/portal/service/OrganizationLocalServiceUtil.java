@@ -478,6 +478,10 @@ public class OrganizationLocalServiceUtil {
 		return getService().getGroupUserOrganizations(groupId, userId);
 	}
 
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
 	public static java.util.List<com.liferay.portal.model.Organization> getNoAssetOrganizations() {
 		return getService().getNoAssetOrganizations();
 	}
@@ -1474,13 +1478,6 @@ public class OrganizationLocalServiceUtil {
 		}
 
 		return _service;
-	}
-
-	/**
-	 * @deprecated As of 6.2.0
-	 */
-	@Deprecated
-	public void setService(OrganizationLocalService service) {
 	}
 
 	private static OrganizationLocalService _service;

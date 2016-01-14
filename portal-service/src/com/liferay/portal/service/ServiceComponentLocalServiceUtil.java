@@ -190,6 +190,10 @@ public class ServiceComponentLocalServiceUtil {
 		return getService().getActionableDynamicQuery();
 	}
 
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
 	public static java.util.List<com.liferay.portal.model.ServiceComponent> getLatestServiceComponents() {
 		return getService().getLatestServiceComponents();
 	}
@@ -294,13 +298,6 @@ public class ServiceComponentLocalServiceUtil {
 		}
 
 		return _service;
-	}
-
-	/**
-	 * @deprecated As of 6.2.0
-	 */
-	@Deprecated
-	public void setService(ServiceComponentLocalService service) {
 	}
 
 	private static ServiceComponentLocalService _service;

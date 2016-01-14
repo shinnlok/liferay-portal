@@ -257,6 +257,8 @@ public class MVCPortlet extends LiferayPortlet {
 			RenderRequest renderRequest, RenderResponse renderResponse)
 		throws IOException, PortletException {
 
+		invokeHideDefaultSuccessMessage(renderRequest);
+
 		String mvcRenderCommandName = ParamUtil.getString(
 			renderRequest, "mvcRenderCommandName", "/");
 
@@ -274,6 +276,10 @@ public class MVCPortlet extends LiferayPortlet {
 					renderRequest, renderResponse);
 			}
 
+			if (mvcPath == MVCRenderCommand.MVC_PATH_SKIP_DISPATCH) {
+				return;
+			}
+
 			renderRequest.setAttribute(
 				getMVCPathAttributeName(renderResponse.getNamespace()),
 				mvcPath);
@@ -286,6 +292,8 @@ public class MVCPortlet extends LiferayPortlet {
 	public void serveResource(
 			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
 		throws IOException, PortletException {
+
+		invokeHideDefaultSuccessMessage(resourceRequest);
 
 		String path = getPath(resourceRequest, resourceResponse);
 
@@ -569,6 +577,17 @@ public class MVCPortlet extends LiferayPortlet {
 		include(
 			path, resourceRequest, resourceResponse,
 			PortletRequest.RESOURCE_PHASE);
+	}
+
+	protected void invokeHideDefaultSuccessMessage(
+		PortletRequest portletRequest) {
+
+		boolean hideDefaultSuccessMessage = ParamUtil.getBoolean(
+			portletRequest, "hideDefaultSuccessMessage");
+
+		if (hideDefaultSuccessMessage) {
+			hideDefaultSuccessMessage(portletRequest);
+		}
 	}
 
 	protected String aboutTemplate;

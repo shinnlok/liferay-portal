@@ -219,6 +219,11 @@ public class UserNotificationDeliveryLocalServiceWrapper
 		return _userNotificationDeliveryLocalService.getActionableDynamicQuery();
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _userNotificationDeliveryLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -304,23 +309,6 @@ public class UserNotificationDeliveryLocalServiceWrapper
 		long userNotificationDeliveryId, boolean deliver) {
 		return _userNotificationDeliveryLocalService.updateUserNotificationDelivery(userNotificationDeliveryId,
 			deliver);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public UserNotificationDeliveryLocalService getWrappedUserNotificationDeliveryLocalService() {
-		return _userNotificationDeliveryLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedUserNotificationDeliveryLocalService(
-		UserNotificationDeliveryLocalService userNotificationDeliveryLocalService) {
-		_userNotificationDeliveryLocalService = userNotificationDeliveryLocalService;
 	}
 
 	@Override

@@ -306,6 +306,11 @@ public class WikiNodeLocalServiceWrapper implements WikiNodeLocalService,
 	}
 
 	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _wikiNodeLocalService.getIndexableActionableDynamicQuery();
+	}
+
+	@Override
 	public com.liferay.wiki.model.WikiNode getNode(long groupId,
 		java.lang.String nodeName)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -529,23 +534,6 @@ public class WikiNodeLocalServiceWrapper implements WikiNodeLocalService,
 	public com.liferay.wiki.model.WikiNode updateWikiNode(
 		com.liferay.wiki.model.WikiNode wikiNode) {
 		return _wikiNodeLocalService.updateWikiNode(wikiNode);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public WikiNodeLocalService getWrappedWikiNodeLocalService() {
-		return _wikiNodeLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedWikiNodeLocalService(
-		WikiNodeLocalService wikiNodeLocalService) {
-		_wikiNodeLocalService = wikiNodeLocalService;
 	}
 
 	@Override

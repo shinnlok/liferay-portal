@@ -260,6 +260,11 @@ public class AnnouncementsFlagLocalServiceWrapper
 		return _announcementsFlagLocalService.getFlag(userId, entryId, value);
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _announcementsFlagLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -287,23 +292,6 @@ public class AnnouncementsFlagLocalServiceWrapper
 	public com.liferay.portlet.announcements.model.AnnouncementsFlag updateAnnouncementsFlag(
 		com.liferay.portlet.announcements.model.AnnouncementsFlag announcementsFlag) {
 		return _announcementsFlagLocalService.updateAnnouncementsFlag(announcementsFlag);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public AnnouncementsFlagLocalService getWrappedAnnouncementsFlagLocalService() {
-		return _announcementsFlagLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedAnnouncementsFlagLocalService(
-		AnnouncementsFlagLocalService announcementsFlagLocalService) {
-		_announcementsFlagLocalService = announcementsFlagLocalService;
 	}
 
 	@Override

@@ -213,6 +213,11 @@ public class KaleoTaskAssignmentLocalServiceWrapper
 		return _kaleoTaskAssignmentLocalService.getActionableDynamicQuery();
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _kaleoTaskAssignmentLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the kaleo task assignment with the primary key.
 	*
@@ -314,23 +319,6 @@ public class KaleoTaskAssignmentLocalServiceWrapper
 	public com.liferay.portal.workflow.kaleo.model.KaleoTaskAssignment updateKaleoTaskAssignment(
 		com.liferay.portal.workflow.kaleo.model.KaleoTaskAssignment kaleoTaskAssignment) {
 		return _kaleoTaskAssignmentLocalService.updateKaleoTaskAssignment(kaleoTaskAssignment);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public KaleoTaskAssignmentLocalService getWrappedKaleoTaskAssignmentLocalService() {
-		return _kaleoTaskAssignmentLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedKaleoTaskAssignmentLocalService(
-		KaleoTaskAssignmentLocalService kaleoTaskAssignmentLocalService) {
-		_kaleoTaskAssignmentLocalService = kaleoTaskAssignmentLocalService;
 	}
 
 	@Override

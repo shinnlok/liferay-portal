@@ -204,6 +204,10 @@ public class MembershipRequestLocalServiceUtil {
 		return getService().getActionableDynamicQuery();
 	}
 
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the membership request with the primary key.
 	*
@@ -306,13 +310,6 @@ public class MembershipRequestLocalServiceUtil {
 		}
 
 		return _service;
-	}
-
-	/**
-	 * @deprecated As of 6.2.0
-	 */
-	@Deprecated
-	public void setService(MembershipRequestLocalService service) {
 	}
 
 	private static MembershipRequestLocalService _service;

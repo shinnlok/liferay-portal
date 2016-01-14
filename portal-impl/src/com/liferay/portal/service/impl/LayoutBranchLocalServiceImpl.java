@@ -87,7 +87,7 @@ public class LayoutBranchLocalServiceImpl
 			layoutRevision.getLayoutSetBranchId(), layoutRevision.getPlid(),
 			name, description, master, serviceContext);
 
-		layoutRevisionService.addLayoutRevision(
+		layoutRevisionLocalService.addLayoutRevision(
 			layoutBranch.getUserId(), layoutRevision.getLayoutSetBranchId(),
 			layoutBranch.getLayoutBranchId(),
 			LayoutRevisionConstants.DEFAULT_PARENT_LAYOUT_REVISION_ID, false,
@@ -114,6 +114,9 @@ public class LayoutBranchLocalServiceImpl
 		layoutRevisionLocalService.deleteLayoutRevisions(
 			layoutBranch.getLayoutSetBranchId(), layoutBranchId,
 			layoutBranch.getPlid());
+
+		recentLayoutBranchLocalService.deleteRecentLayoutBranches(
+			layoutBranch.getLayoutBranchId());
 
 		return deleteLayoutBranch(layoutBranch);
 	}

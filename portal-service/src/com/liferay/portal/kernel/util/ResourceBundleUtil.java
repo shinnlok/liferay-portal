@@ -18,7 +18,12 @@ import com.liferay.portal.kernel.language.UTF8Control;
 
 import java.text.MessageFormat;
 
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
@@ -86,6 +91,72 @@ public class ResourceBundleUtil {
 		catch (MissingResourceException mre) {
 			return null;
 		}
+	}
+
+	public static void loadResourceBundles(
+		Map<String, ResourceBundle> resourceBundles, Locale locale,
+		ResourceBundleLoader resourceBundleLoader) {
+
+		String languageId = LocaleUtil.toLanguageId(locale);
+
+		loadResourceBundles(resourceBundles, languageId, resourceBundleLoader);
+	}
+
+	public static void loadResourceBundles(
+		Map<String, ResourceBundle> resourceBundles, String languageId,
+		ResourceBundleLoader resourceBundleLoader) {
+
+		Deque<ResourceBundle> currentResourceBundles = new LinkedList<>();
+
+		for (String currentLanguageId : _getLanguageIds(languageId)) {
+			ResourceBundle resourceBundle =
+				resourceBundleLoader.loadResourceBundle(currentLanguageId);
+
+			if (resourceBundle != null) {
+				currentResourceBundles.addFirst(resourceBundle);
+			}
+			else if (currentResourceBundles.isEmpty()) {
+				continue;
+			}
+
+			if (currentResourceBundles.size() == 1) {
+				resourceBundles.put(
+					currentLanguageId, currentResourceBundles.peek());
+			}
+			else {
+				int size = currentResourceBundles.size();
+
+				resourceBundles.put(
+					currentLanguageId,
+					new AggregateResourceBundle(
+						currentResourceBundles.toArray(
+							new ResourceBundle[size])));
+			}
+		}
+	}
+
+	public interface ResourceBundleLoader {
+
+		public ResourceBundle loadResourceBundle(String languageId);
+
+	}
+
+	private static List<String> _getLanguageIds(String languageId) {
+		List<String> languageIds = new ArrayList<>();
+
+		languageIds.add(StringPool.BLANK);
+
+		int index = 0;
+
+		while ((index = languageId.indexOf(CharPool.UNDERLINE, index + 1)) !=
+					-1) {
+
+			languageIds.add(languageId.substring(0, index));
+		}
+
+		languageIds.add(languageId);
+
+		return languageIds;
 	}
 
 }

@@ -26,6 +26,8 @@ import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
 import com.liferay.portlet.asset.AssetCategoryNameException;
+import com.liferay.portlet.asset.CategoryPropertyKeyException;
+import com.liferay.portlet.asset.CategoryPropertyValueException;
 import com.liferay.portlet.asset.DuplicateCategoryException;
 import com.liferay.portlet.asset.DuplicateCategoryPropertyException;
 import com.liferay.portlet.asset.DuplicateVocabularyException;
@@ -92,8 +94,8 @@ public class AssetCategoryAdminPortlet extends MVCPortlet {
 			deleteCategoryIds = new long[] {categoryId};
 		}
 		else {
-			deleteCategoryIds = StringUtil.split(
-				ParamUtil.getString(actionRequest, "deleteCategoryIds"), 0L);
+			deleteCategoryIds = ParamUtil.getLongValues(
+				actionRequest, "rowIds");
 		}
 
 		_assetCategoryService.deleteCategories(deleteCategoryIds);
@@ -111,8 +113,8 @@ public class AssetCategoryAdminPortlet extends MVCPortlet {
 			deleteVocabularyIds = new long[] {vocabularyId};
 		}
 		else {
-			deleteVocabularyIds = StringUtil.split(
-				ParamUtil.getString(actionRequest, "deleteVocabularyIds"), 0L);
+			deleteVocabularyIds = ParamUtil.getLongValues(
+				actionRequest, "rowIds");
 		}
 
 		for (long deleteVocabularyId : deleteVocabularyIds) {
@@ -293,6 +295,8 @@ public class AssetCategoryAdminPortlet extends MVCPortlet {
 	@Override
 	protected boolean isSessionErrorException(Throwable cause) {
 		if (cause instanceof AssetCategoryNameException ||
+			cause instanceof CategoryPropertyKeyException ||
+			cause instanceof CategoryPropertyValueException ||
 			cause instanceof DuplicateCategoryException ||
 			cause instanceof DuplicateCategoryPropertyException ||
 			cause instanceof DuplicateVocabularyException ||

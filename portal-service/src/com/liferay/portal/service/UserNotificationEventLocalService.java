@@ -321,6 +321,9 @@ public interface UserNotificationEventLocalService extends BaseLocalService,
 	public int getDeliveredUserNotificationEventsCount(long userId,
 		int deliveryType, boolean delivered, boolean actionRequired);
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery();
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -332,6 +335,10 @@ public interface UserNotificationEventLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.model.PersistedModel getPersistedModel(
 		java.io.Serializable primaryKeyObj) throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.portal.model.UserNotificationEvent> getTypeNotificationEvents(
+		java.lang.String type);
 
 	/**
 	* Returns the user notification event with the primary key.
@@ -426,6 +433,10 @@ public interface UserNotificationEventLocalService extends BaseLocalService,
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getUserNotificationEventsCount(long userId, int deliveryType);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getUserNotificationEventsCount(long userId,
+		java.lang.String type, int deliveryType, boolean archived);
 
 	public com.liferay.portal.model.UserNotificationEvent sendUserNotificationEvents(
 		long userId, java.lang.String portletId, int deliveryType,

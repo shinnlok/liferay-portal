@@ -513,22 +513,6 @@
 				(friendlyURL = '' OR friendlyURL IS NULL)
 		]]>
 	</sql>
-	<sql id="com.liferay.portal.service.persistence.LayoutFinder.findByScopeGroup">
-		<![CDATA[
-			SELECT
-				{Layout.*}
-			FROM
-				Layout
-			INNER JOIN
-				Group_ ON
-					(Group_.companyId = Layout.companyId) AND
-					(Group_.classNameId = [$CLASS_NAME_ID_COM.LIFERAY.PORTAL.MODEL.LAYOUT$]) AND
-					(Group_.classPK = Layout.plid)
-			WHERE
-				(Layout.groupId = ?) AND
-				(Layout.privateLayout = ?)
-		]]>
-	</sql>
 	<sql id="com.liferay.portal.service.persistence.LayoutFinder.findByC_P_P">
 		<![CDATA[
 			SELECT
@@ -1516,6 +1500,25 @@
 				(User_.status = ?)
 		]]>
 	</sql>
+	<sql id="com.liferay.portal.service.persistence.UserFinder.findByUsersOrgsGroup">
+		<![CDATA[
+			SELECT
+				User_.userId, groupId
+			FROM
+				User_
+			INNER JOIN
+				Users_Orgs ON
+					(Users_Orgs.userId = User_.userId)
+			INNER JOIN
+				Group_ ON
+					(Group_.classPK = Users_Orgs.organizationId)
+			WHERE
+				Group_.groupId IN [$GROUP_ID$] AND
+				(User_.companyId = ?) AND
+				(User_.defaultUser = ?) AND
+				(User_.status = ?)
+		]]>
+	</sql>
 	<sql id="com.liferay.portal.service.persistence.UserFinder.findByUsersUserGroups">
 		<![CDATA[
 			SELECT
@@ -1747,17 +1750,6 @@
 					(lower(UserGroup.name) LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
 					(lower(UserGroup.description) LIKE ? [$AND_OR_NULL_CHECK$])
 				)
-		]]>
-	</sql>
-	<sql id="com.liferay.portal.service.persistence.UserGroupFinder.findByC_N">
-		<![CDATA[
-			SELECT
-				{UserGroup.*}
-			FROM
-				UserGroup
-			WHERE
-				(UserGroup.companyId = ?) AND
-				(lower(UserGroup.name) = ?)
 		]]>
 	</sql>
 	<sql id="com.liferay.portal.service.persistence.UserGroupFinder.findByC_N_D">

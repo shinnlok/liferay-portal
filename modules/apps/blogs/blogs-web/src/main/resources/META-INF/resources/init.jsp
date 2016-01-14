@@ -21,15 +21,19 @@
 <%@ taglib uri="http://liferay.com/tld/aui" prefix="aui" %><%@
 taglib uri="http://liferay.com/tld/ddm" prefix="liferay-ddm" %><%@
 taglib uri="http://liferay.com/tld/frontend" prefix="liferay-frontend" %><%@
+taglib uri="http://liferay.com/tld/item-selector" prefix="liferay-item-selector" %><%@
 taglib uri="http://liferay.com/tld/portlet" prefix="liferay-portlet" %><%@
 taglib uri="http://liferay.com/tld/security" prefix="liferay-security" %><%@
 taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %><%@
+taglib uri="http://liferay.com/tld/trash" prefix="liferay-trash" %><%@
 taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %><%@
 taglib uri="http://liferay.com/tld/util" prefix="liferay-util" %>
 
 <%@ page import="com.liferay.blogs.configuration.BlogsGroupServiceOverriddenConfiguration" %><%@
+page import="com.liferay.blogs.web.BlogsItemSelectorHelper" %><%@
 page import="com.liferay.blogs.web.configuration.BlogsPortletInstanceConfiguration" %><%@
 page import="com.liferay.blogs.web.constants.BlogsPortletKeys" %><%@
+page import="com.liferay.blogs.web.constants.BlogsWebKeys" %><%@
 page import="com.liferay.blogs.web.display.context.BlogsPortletInstanceSettingsHelper" %><%@
 page import="com.liferay.portal.kernel.bean.BeanParamUtil" %><%@
 page import="com.liferay.portal.kernel.comment.CommentManagerUtil" %><%@
@@ -60,6 +64,7 @@ page import="com.liferay.portal.kernel.settings.GroupServiceSettingsLocator" %><
 page import="com.liferay.portal.kernel.settings.ParameterMapSettingsLocator" %><%@
 page import="com.liferay.portal.kernel.settings.PortletInstanceSettingsLocator" %><%@
 page import="com.liferay.portal.kernel.upload.LiferayFileItemException" %><%@
+page import="com.liferay.portal.kernel.upload.UploadRequestSizeException" %><%@
 page import="com.liferay.portal.kernel.util.Constants" %><%@
 page import="com.liferay.portal.kernel.util.FastDateFormatFactoryUtil" %><%@
 page import="com.liferay.portal.kernel.util.GetterUtil" %><%@
@@ -99,6 +104,8 @@ page import="com.liferay.portal.util.PropsValues" %><%@
 page import="com.liferay.portlet.PortalPreferences" %><%@
 page import="com.liferay.portlet.PortletPreferencesFactoryUtil" %><%@
 page import="com.liferay.portlet.PortletURLUtil" %><%@
+page import="com.liferay.portlet.RequestBackedPortletURLFactory" %><%@
+page import="com.liferay.portlet.RequestBackedPortletURLFactoryUtil" %><%@
 page import="com.liferay.portlet.asset.model.AssetEntry" %><%@
 page import="com.liferay.portlet.asset.model.AssetRenderer" %><%@
 page import="com.liferay.portlet.asset.model.AssetTag" %><%@
@@ -122,7 +129,6 @@ page import="com.liferay.portlet.blogs.service.permission.BlogsEntryPermission" 
 page import="com.liferay.portlet.blogs.service.permission.BlogsPermission" %><%@
 page import="com.liferay.portlet.blogs.util.BlogsUtil" %><%@
 page import="com.liferay.portlet.documentlibrary.FileSizeException" %><%@
-page import="com.liferay.portlet.documentlibrary.model.DLFileEntry" %><%@
 page import="com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil" %><%@
 page import="com.liferay.portlet.documentlibrary.util.DLUtil" %><%@
 page import="com.liferay.portlet.trash.util.TrashUtil" %><%@

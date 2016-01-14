@@ -33,7 +33,6 @@ import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.zip.ZipWriter;
@@ -53,6 +52,7 @@ import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppService;
+import com.liferay.portlet.documentlibrary.service.DLTrashService;
 import com.liferay.portlet.trash.util.TrashUtil;
 
 import java.io.File;
@@ -120,15 +120,16 @@ public class EditFolderMVCActionCommand extends BaseMVCActionCommand {
 			deleteFolderIds = new long[] {folderId};
 		}
 		else {
-			deleteFolderIds = StringUtil.split(
-				ParamUtil.getString(actionRequest, "folderIds"), 0L);
+			deleteFolderIds = ParamUtil.getLongValues(
+				actionRequest, "rowIdsFolder");
 		}
 
 		List<TrashedModel> trashedModels = new ArrayList<>();
 
 		for (long deleteFolderId : deleteFolderIds) {
 			if (moveToTrash) {
-				Folder folder = _dlAppService.moveFolderToTrash(deleteFolderId);
+				Folder folder = _dlTrashService.moveFolderToTrash(
+					deleteFolderId);
 
 				if (folder.getModel() instanceof DLFolder) {
 					trashedModels.add((DLFolder)folder.getModel());
@@ -242,6 +243,11 @@ public class EditFolderMVCActionCommand extends BaseMVCActionCommand {
 		_dlAppService = dlAppService;
 	}
 
+	@Reference(unbind = "-")
+	protected void setDLTrashService(DLTrashService dlTrashService) {
+		_dlTrashService = dlTrashService;
+	}
+
 	protected void subscribeFolder(ActionRequest actionRequest)
 		throws Exception {
 
@@ -335,5 +341,6 @@ public class EditFolderMVCActionCommand extends BaseMVCActionCommand {
 	}
 
 	private DLAppService _dlAppService;
+	private DLTrashService _dlTrashService;
 
 }

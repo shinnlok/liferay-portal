@@ -123,7 +123,7 @@ public class MentionsBlogsEntryServiceWrapper
 	}
 
 	private BlogsEntryLocalService _blogsEntryLocalService;
-	private volatile ConfigurationFactory _configurationFactory;
+	private ConfigurationFactory _configurationFactory;
 	private MentionsNotifier _mentionsNotifier;
 
 }

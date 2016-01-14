@@ -44,6 +44,7 @@ import com.liferay.portlet.documentlibrary.NoSuchFolderException;
 import com.liferay.portlet.documentlibrary.SourceFileNameException;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.service.DLAppService;
+import com.liferay.portlet.documentlibrary.service.DLTrashService;
 import com.liferay.portlet.trash.service.TrashEntryService;
 import com.liferay.portlet.trash.util.TrashUtil;
 
@@ -81,8 +82,8 @@ public class EditEntryMVCActionCommand extends BaseMVCActionCommand {
 	protected void cancelCheckedOutEntries(ActionRequest actionRequest)
 		throws Exception {
 
-		long[] fileEntryIds = StringUtil.split(
-			ParamUtil.getString(actionRequest, "fileEntryIds"), 0L);
+		long[] fileEntryIds = ParamUtil.getLongValues(
+			actionRequest, "rowIdsFileEntry");
 
 		for (long fileEntryId : fileEntryIds) {
 			_dlAppService.cancelCheckOut(fileEntryId);
@@ -92,8 +93,8 @@ public class EditEntryMVCActionCommand extends BaseMVCActionCommand {
 	protected void checkInEntries(ActionRequest actionRequest)
 		throws Exception {
 
-		long[] fileEntryIds = StringUtil.split(
-			ParamUtil.getString(actionRequest, "fileEntryIds"), 0L);
+		long[] fileEntryIds = ParamUtil.getLongValues(
+			actionRequest, "rowIdsFileEntry");
 
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			actionRequest);
@@ -107,8 +108,8 @@ public class EditEntryMVCActionCommand extends BaseMVCActionCommand {
 	protected void checkOutEntries(ActionRequest actionRequest)
 		throws Exception {
 
-		long[] fileEntryIds = StringUtil.split(
-			ParamUtil.getString(actionRequest, "fileEntryIds"), 0L);
+		long[] fileEntryIds = ParamUtil.getLongValues(
+			actionRequest, "rowIdsFileEntry");
 
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			actionRequest);
@@ -122,8 +123,8 @@ public class EditEntryMVCActionCommand extends BaseMVCActionCommand {
 			ActionRequest actionRequest, boolean moveToTrash)
 		throws Exception {
 
-		long[] deleteFolderIds = StringUtil.split(
-			ParamUtil.getString(actionRequest, "folderIds"), 0L);
+		long[] deleteFolderIds = ParamUtil.getLongValues(
+			actionRequest, "rowIdsFolder");
 
 		List<TrashedModel> trashedModels = new ArrayList<>();
 
@@ -131,7 +132,8 @@ public class EditEntryMVCActionCommand extends BaseMVCActionCommand {
 			long deleteFolderId = deleteFolderIds[i];
 
 			if (moveToTrash) {
-				Folder folder = _dlAppService.moveFolderToTrash(deleteFolderId);
+				Folder folder = _dlTrashService.moveFolderToTrash(
+					deleteFolderId);
 
 				if (folder.getModel() instanceof TrashedModel) {
 					trashedModels.add((TrashedModel)folder.getModel());
@@ -144,15 +146,16 @@ public class EditEntryMVCActionCommand extends BaseMVCActionCommand {
 
 		// Delete file shortcuts before file entries. See LPS-21348.
 
-		long[] deleteFileShortcutIds = StringUtil.split(
-			ParamUtil.getString(actionRequest, "fileShortcutIds"), 0L);
+		long[] deleteFileShortcutIds = ParamUtil.getLongValues(
+			actionRequest, "rowIdsDLFileShortcut");
 
 		for (int i = 0; i < deleteFileShortcutIds.length; i++) {
 			long deleteFileShortcutId = deleteFileShortcutIds[i];
 
 			if (moveToTrash) {
 				FileShortcut fileShortcut =
-					_dlAppService.moveFileShortcutToTrash(deleteFileShortcutId);
+					_dlTrashService.moveFileShortcutToTrash(
+						deleteFileShortcutId);
 
 				if (fileShortcut.getModel() instanceof TrashedModel) {
 					trashedModels.add((TrashedModel)fileShortcut.getModel());
@@ -163,12 +166,12 @@ public class EditEntryMVCActionCommand extends BaseMVCActionCommand {
 			}
 		}
 
-		long[] deleteFileEntryIds = StringUtil.split(
-			ParamUtil.getString(actionRequest, "fileEntryIds"), 0L);
+		long[] deleteFileEntryIds = ParamUtil.getLongValues(
+			actionRequest, "rowIdsFileEntry");
 
 		for (long deleteFileEntryId : deleteFileEntryIds) {
 			if (moveToTrash) {
-				FileEntry fileEntry = _dlAppService.moveFileEntryToTrash(
+				FileEntry fileEntry = _dlTrashService.moveFileEntryToTrash(
 					deleteFileEntryId);
 
 				if (fileEntry.getModel() instanceof TrashedModel) {
@@ -272,23 +275,23 @@ public class EditEntryMVCActionCommand extends BaseMVCActionCommand {
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			DLFileEntry.class.getName(), actionRequest);
 
-		long[] folderIds = StringUtil.split(
-			ParamUtil.getString(actionRequest, "folderIds"), 0L);
+		long[] folderIds = ParamUtil.getLongValues(
+			actionRequest, "rowIdsFolder");
 
 		for (long folderId : folderIds) {
 			_dlAppService.moveFolder(folderId, newFolderId, serviceContext);
 		}
 
-		long[] fileEntryIds = StringUtil.split(
-			ParamUtil.getString(actionRequest, "fileEntryIds"), 0L);
+		long[] fileEntryIds = ParamUtil.getLongValues(
+			actionRequest, "rowIdsFileEntry");
 
 		for (long fileEntryId : fileEntryIds) {
 			_dlAppService.moveFileEntry(
 				fileEntryId, newFolderId, serviceContext);
 		}
 
-		long[] fileShortcutIds = StringUtil.split(
-			ParamUtil.getString(actionRequest, "fileShortcutIds"), 0L);
+		long[] fileShortcutIds = ParamUtil.getLongValues(
+			actionRequest, "rowIdsDLFileShortcut");
 
 		for (long fileShortcutId : fileShortcutIds) {
 			if (fileShortcutId == 0) {
@@ -321,11 +324,17 @@ public class EditEntryMVCActionCommand extends BaseMVCActionCommand {
 	}
 
 	@Reference(unbind = "-")
+	protected void setDLTrashService(DLTrashService dlTrashService) {
+		_dlTrashService = dlTrashService;
+	}
+
+	@Reference(unbind = "-")
 	protected void setTrashEntryService(TrashEntryService trashEntryService) {
 		_trashEntryService = trashEntryService;
 	}
 
 	private DLAppService _dlAppService;
+	private DLTrashService _dlTrashService;
 	private TrashEntryService _trashEntryService;
 
 }

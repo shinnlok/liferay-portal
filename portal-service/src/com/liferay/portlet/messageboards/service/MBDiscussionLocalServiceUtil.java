@@ -250,6 +250,10 @@ public class MBDiscussionLocalServiceUtil {
 		return getService().getExportActionableDynamicQuery(portletDataContext);
 	}
 
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the message boards discussion with the primary key.
 	*
@@ -385,13 +389,6 @@ public class MBDiscussionLocalServiceUtil {
 		}
 
 		return _service;
-	}
-
-	/**
-	 * @deprecated As of 6.2.0
-	 */
-	@Deprecated
-	public void setService(MBDiscussionLocalService service) {
 	}
 
 	private static MBDiscussionLocalService _service;

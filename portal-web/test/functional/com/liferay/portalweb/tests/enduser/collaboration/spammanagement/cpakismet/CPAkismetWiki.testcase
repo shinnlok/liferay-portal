@@ -3,32 +3,51 @@
 	<property name="testray.main.component.name" value="Akismet" />
 
 	<set-up>
+		<var method="TestPropsUtil#get('test.portal.instance')" name="testPortalInstance" />
+
+		<if>
+			<equals arg1="${testPortalInstance}" arg2="true" />
+			<then>
+				<execute macro="SignIn#signInPortalInstanceSetUp" />
+			</then>
+		</if>
+
 		<execute macro="User#firstLoginPG" />
 
 		<execute macro="WikiNode#addMainCP" />
 	</set-up>
 
 	<tear-down>
-		<execute macro="WikiNode#tearDownCP" />
+		<var method="TestPropsUtil#get('test.portal.instance')" name="testPortalInstance" />
 
-		<execute macro="WikiPage#tearDownCP" />
+		<if>
+			<equals arg1="${testPortalInstance}" arg2="true" />
+			<then>
+				<execute macro="PortalInstances#tearDownCP" />
+			</then>
+			<else>
+				<execute macro="WikiNode#tearDownCP" />
 
-		<execute macro="User#tearDownCP" />
+				<execute macro="WikiPage#tearDownCP" />
 
-		<execute macro="AkismetPortlet#tearDownConfiguration" />
+				<execute macro="User#tearDownCP" />
+
+				<execute macro="AkismetPortlet#tearDownConfiguration" />
+			</else>
+		</if>
 	</tear-down>
 
 	<command name="MarkAsNotSpamWikiPage" priority="4">
-		<execute macro="Page#gotoCP">
-			<var name="portletName" value="Akismet" />
+		<execute macro="ProductMenu#gotoControlPanelApps">
+			<var name="portlet" value="Akismet" />
 		</execute>
 
 		<execute macro="AkismetPortlet#configure">
 			<var name="enableSpamModerationFor" value="Wiki" />
 		</execute>
 
-		<execute macro="Page#gotoCP">
-			<var name="portletName" value="Users and Organizations" />
+		<execute macro="ProductMenu#gotoControlPanelUsers">
+			<var name="portlet" value="Users and Organizations" />
 		</execute>
 
 		<execute macro="User#addCP">
@@ -38,8 +57,8 @@
 			<var name="userScreenName" value="usersn" />
 		</execute>
 
-		<execute macro="Page#gotoCP">
-			<var name="portletName" value="Users and Organizations" />
+		<execute macro="ProductMenu#gotoControlPanelUsers">
+			<var name="portlet" value="Users and Organizations" />
 		</execute>
 
 		<execute macro="User#editUserSiteCP">
@@ -47,8 +66,8 @@
 			<var name="userScreenName" value="usersn" />
 		</execute>
 
-		<execute macro="Page#gotoCP">
-			<var name="portletName" value="Users and Organizations" />
+		<execute macro="ProductMenu#gotoControlPanelUsers">
+			<var name="portlet" value="Users and Organizations" />
 		</execute>
 
 		<execute macro="User#editPasswordCP">
@@ -56,8 +75,8 @@
 			<var name="userScreenName" value="usersn" />
 		</execute>
 
-		<execute macro="Page#gotoCP">
-			<var name="portletName" value="Roles" />
+		<execute macro="ProductMenu#gotoControlPanelUsers">
+			<var name="portlet" value="Roles" />
 		</execute>
 
 		<execute macro="Role#definePermissionCmdCP">
@@ -72,15 +91,17 @@
 			<var name="userEmailAddress" value="userea@liferay.com" />
 		</execute>
 
-		<execute macro="Page#gotoContentCP">
-			<var name="portletName" value="Wiki" />
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Wiki" />
 		</execute>
 
-		<execute macro="WikiNode#gotoCP">
+		<execute macro="WikiNavigator#gotoNode">
 			<var name="wikiNodeName" value="Main" />
 		</execute>
 
-		<execute macro="WikiPage#gotoAllPagesCP" />
+		<execute macro="WikiNavigator#gotoAllPagesCP" />
 
 		<execute macro="WikiPage#addCP">
 			<var name="wikiPageContent" value="Wiki Page Content" />
@@ -94,15 +115,17 @@
 			<var name="userEmailAddress" value="test@liferay.com" />
 		</execute>
 
-		<execute macro="Page#gotoContentCP">
-			<var name="portletName" value="Wiki" />
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Wiki" />
 		</execute>
 
-		<execute macro="WikiNode#gotoCP">
+		<execute macro="WikiNavigator#gotoNode">
 			<var name="wikiNodeName" value="Main" />
 		</execute>
 
-		<execute macro="WikiPage#gotoCP">
+		<execute macro="WikiNavigator#gotoCP">
 			<var name="wikiPageRevision" value="1.0" />
 			<var name="wikiPageTitle" value="Wiki Page Title" />
 			<var name="wikiPageUsername" value="userfn userln" />
@@ -112,8 +135,10 @@
 			<var name="wikiPageRevision" value="1.0" />
 		</execute>
 
-		<execute macro="Page#gotoContentCP">
-			<var name="portletName" value="Spam Moderation" />
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Spam Moderation" />
 		</execute>
 
 		<execute macro="SpamModerationPortlet#navigateToWikis" />
@@ -125,23 +150,27 @@
 			<var name="wikiPageUsername" value="userfn userln" />
 		</execute>
 
-		<execute macro="Page#gotoContentCP">
-			<var name="portletName" value="Spam Moderation" />
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Spam Moderation" />
 		</execute>
 
 		<execute macro="SpamModerationPortlet#viewDefault">
 			<var name="assetType" value="wikiPage" />
 		</execute>
 
-		<execute macro="Page#gotoContentCP">
-			<var name="portletName" value="Wiki" />
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Wiki" />
 		</execute>
 
-		<execute macro="WikiNode#gotoCP">
+		<execute macro="WikiNavigator#gotoNode">
 			<var name="wikiNodeName" value="Main" />
 		</execute>
 
-		<execute macro="WikiPage#gotoCP">
+		<execute macro="WikiNavigator#gotoCP">
 			<var name="wikiPageRevision" value="1.0" />
 			<var name="wikiPageTitle" value="Wiki Page Title" />
 			<var name="wikiPageUsername" value="userfn userln" />
@@ -154,16 +183,16 @@
 	</command>
 
 	<command name="MarkAsSpamWikiPage" priority="4">
-		<execute macro="Page#gotoCP">
-			<var name="portletName" value="Akismet" />
+		<execute macro="ProductMenu#gotoControlPanelApps">
+			<var name="portlet" value="Akismet" />
 		</execute>
 
 		<execute macro="AkismetPortlet#configure">
 			<var name="enableSpamModerationFor" value="Wiki" />
 		</execute>
 
-		<execute macro="Page#gotoCP">
-			<var name="portletName" value="Users and Organizations" />
+		<execute macro="ProductMenu#gotoControlPanelUsers">
+			<var name="portlet" value="Users and Organizations" />
 		</execute>
 
 		<execute macro="User#addCP">
@@ -173,8 +202,8 @@
 			<var name="userScreenName" value="usersn" />
 		</execute>
 
-		<execute macro="Page#gotoCP">
-			<var name="portletName" value="Users and Organizations" />
+		<execute macro="ProductMenu#gotoControlPanelUsers">
+			<var name="portlet" value="Users and Organizations" />
 		</execute>
 
 		<execute macro="User#editUserSiteCP">
@@ -182,8 +211,8 @@
 			<var name="userScreenName" value="usersn" />
 		</execute>
 
-		<execute macro="Page#gotoCP">
-			<var name="portletName" value="Users and Organizations" />
+		<execute macro="ProductMenu#gotoControlPanelUsers">
+			<var name="portlet" value="Users and Organizations" />
 		</execute>
 
 		<execute macro="User#editPasswordCP">
@@ -191,8 +220,8 @@
 			<var name="userScreenName" value="usersn" />
 		</execute>
 
-		<execute macro="Page#gotoCP">
-			<var name="portletName" value="Roles" />
+		<execute macro="ProductMenu#gotoControlPanelUsers">
+			<var name="portlet" value="Roles" />
 		</execute>
 
 		<execute macro="Role#definePermissionCmdCP">
@@ -207,15 +236,17 @@
 			<var name="userEmailAddress" value="userea@liferay.com" />
 		</execute>
 
-		<execute macro="Page#gotoContentCP">
-			<var name="portletName" value="Wiki" />
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Wiki" />
 		</execute>
 
-		<execute macro="WikiNode#gotoCP">
+		<execute macro="WikiNavigator#gotoNode">
 			<var name="wikiNodeName" value="Main" />
 		</execute>
 
-		<execute macro="WikiPage#gotoAllPagesCP" />
+		<execute macro="WikiNavigator#gotoAllPagesCP" />
 
 		<execute macro="WikiPage#addCP">
 			<var name="wikiPageContent" value="Wiki Page Content" />
@@ -229,15 +260,17 @@
 			<var name="userEmailAddress" value="test@liferay.com" />
 		</execute>
 
-		<execute macro="Page#gotoContentCP">
-			<var name="portletName" value="Wiki" />
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Wiki" />
 		</execute>
 
-		<execute macro="WikiNode#gotoCP">
+		<execute macro="WikiNavigator#gotoNode">
 			<var name="wikiNodeName" value="Main" />
 		</execute>
 
-		<execute macro="WikiPage#gotoCP">
+		<execute macro="WikiNavigator#gotoCP">
 			<var name="wikiPageRevision" value="1.0" />
 			<var name="wikiPageTitle" value="Wiki Page Title" />
 			<var name="wikiPageUsername" value="userfn userln" />
@@ -247,8 +280,10 @@
 			<var name="wikiPageRevision" value="1.0" />
 		</execute>
 
-		<execute macro="Page#gotoContentCP">
-			<var name="portletName" value="Spam Moderation" />
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Spam Moderation" />
 		</execute>
 
 		<execute macro="SpamModerationPortlet#navigateToWikis" />

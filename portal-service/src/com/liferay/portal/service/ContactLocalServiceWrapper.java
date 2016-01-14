@@ -251,6 +251,11 @@ public class ContactLocalServiceWrapper implements ContactLocalService,
 		return _contactLocalService.getContactsCount(classNameId, classPK);
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _contactLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -293,23 +298,6 @@ public class ContactLocalServiceWrapper implements ContactLocalService,
 			firstName, middleName, lastName, prefixId, suffixId, male,
 			birthdayMonth, birthdayDay, birthdayYear, smsSn, facebookSn,
 			jabberSn, skypeSn, twitterSn, jobTitle);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public ContactLocalService getWrappedContactLocalService() {
-		return _contactLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedContactLocalService(
-		ContactLocalService contactLocalService) {
-		_contactLocalService = contactLocalService;
 	}
 
 	@Override

@@ -184,7 +184,7 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 				subject = body.substring(0, pos) + "...";
 			}
 			else {
-				throw new MessageBodyException();
+				throw new MessageBodyException("Body is null");
 			}
 		}
 
@@ -1172,6 +1172,21 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 
 	@Override
 	public MBMessageDisplay getMessageDisplay(
+			long userId, long messageId, int status, boolean includePrevAndNext)
+		throws PortalException {
+
+		MBMessage message = getMessage(messageId);
+
+		return getMessageDisplay(userId, message, status, includePrevAndNext);
+	}
+
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #getMessageDisplay(
+	 *             long, long, int, boolean)}
+	 */
+	@Deprecated
+	@Override
+	public MBMessageDisplay getMessageDisplay(
 			long userId, long messageId, int status, String threadView,
 			boolean includePrevAndNext)
 		throws PortalException {
@@ -1184,18 +1199,18 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 
 	@Override
 	public MBMessageDisplay getMessageDisplay(
-			long userId, MBMessage message, int status, String threadView,
+			long userId, MBMessage message, int status,
 			boolean includePrevAndNext)
 		throws PortalException {
 
 		return getMessageDisplay(
-			userId, message, status, threadView, includePrevAndNext,
+			userId, message, status, includePrevAndNext,
 			new MessageThreadComparator());
 	}
 
 	@Override
 	public MBMessageDisplay getMessageDisplay(
-			long userId, MBMessage message, int status, String threadView,
+			long userId, MBMessage message, int status,
 			boolean includePrevAndNext, Comparator<MBMessage> comparator)
 		throws PortalException {
 
@@ -1265,7 +1280,44 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 
 		return new MBMessageDisplayImpl(
 			message, parentMessage, category, thread, previousThread,
-			nextThread, status, threadView, this, comparator);
+			nextThread, status, this, comparator);
+	}
+
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #getMessageDisplay(
+	 *             long, MBMessage, int, boolean)}
+	 */
+	@Deprecated
+	@Override
+	public MBMessageDisplay getMessageDisplay(
+			long userId, MBMessage message, int status, String threadView,
+			boolean includePrevAndNext)
+		throws PortalException {
+
+		return getMessageDisplay(
+			userId, message, status, threadView, includePrevAndNext,
+			new MessageThreadComparator());
+	}
+
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #getMessageDisplay(
+	 *             long, MBMessage, int, boolean, Comparator)} (
+	 */
+	@Deprecated
+	@Override
+	public MBMessageDisplay getMessageDisplay(
+			long userId, MBMessage message, int status, String threadView,
+			boolean includePrevAndNext, Comparator<MBMessage> comparator)
+		throws PortalException {
+
+		MBMessageDisplay messageDisplay = getMessageDisplay(
+			userId, message, status, includePrevAndNext, comparator);
+
+		return new MBMessageDisplayImpl(
+			messageDisplay.getMessage(), messageDisplay.getParentMessage(),
+			messageDisplay.getCategory(), messageDisplay.getThread(),
+			messageDisplay.getPreviousThread(), messageDisplay.getNextThread(),
+			status, threadView, this, comparator);
 	}
 
 	@Override
@@ -1538,7 +1590,7 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 				subject = body.substring(0, pos) + "...";
 			}
 			else {
-				throw new MessageBodyException();
+				throw new MessageBodyException("Body is null");
 			}
 		}
 
@@ -2420,7 +2472,8 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 			message.getModifiedDate(), message.getWorkflowClassName(),
 			message.getMessageId(), message.getUuid(), 0, assetCategoryIds,
 			assetTagNames, visible, null, null, null, ContentTypes.TEXT_HTML,
-			message.getSubject(), null, null, null, null, 0, 0, null);
+			message.getSubject(), null, null, null, null, 0, 0,
+			message.getPriority());
 
 		assetLinkLocalService.updateLinks(
 			userId, assetEntry.getEntryId(), assetLinkEntryIds,
@@ -2525,7 +2578,7 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 		throws PortalException {
 
 		if (Validator.isNull(subject) && Validator.isNull(body)) {
-			throw new MessageSubjectException();
+			throw new MessageSubjectException("Subject and body are null");
 		}
 	}
 
@@ -2540,7 +2593,9 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 			className, classPK, WorkflowConstants.STATUS_APPROVED);
 
 		if (count >= PropsValues.DISCUSSION_MAX_COMMENTS) {
-			throw new DiscussionMaxCommentsException();
+			int max = PropsValues.DISCUSSION_MAX_COMMENTS - 1;
+
+			throw new DiscussionMaxCommentsException(count + " exceeds " + max);
 		}
 	}
 

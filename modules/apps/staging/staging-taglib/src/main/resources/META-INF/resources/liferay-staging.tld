@@ -21,7 +21,7 @@
 		</attribute>
 		<attribute>
 			<name>label</name>
-			<required>true</required>
+			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
 			<type>java.lang.String</type>
 		</attribute>
@@ -140,12 +140,6 @@
 		<name>portlet-list</name>
 		<tag-class>com.liferay.staging.taglib.servlet.taglib.PortletListTag</tag-class>
 		<body-content>JSP</body-content>
-		<attribute>
-			<name>dateRange</name>
-			<required>true</required>
-			<rtexprvalue>true</rtexprvalue>
-			<type>com.liferay.portal.kernel.util.DateRange</type>
-		</attribute>
 		<attribute>
 			<name>disableInputs</name>
 			<required>false</required>

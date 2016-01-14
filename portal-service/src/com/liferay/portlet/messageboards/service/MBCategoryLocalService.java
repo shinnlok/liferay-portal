@@ -269,6 +269,21 @@ public interface MBCategoryLocalService extends BaseLocalService,
 		long groupId, long categoryId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<java.lang.Object> getCategoriesAndThreads(
+		long groupId, long categoryId, int status);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<java.lang.Object> getCategoriesAndThreads(
+		long groupId, long categoryId, int status, int start, int end);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getCategoriesAndThreadsCount(long groupId, long categoryId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getCategoriesAndThreadsCount(long groupId, long categoryId,
+		int status);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getCategoriesCount(long groupId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
@@ -310,6 +325,9 @@ public interface MBCategoryLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
 		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery();
 
 	/**
 	* Returns a range of all the message boards categories.

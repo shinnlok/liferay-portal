@@ -15,10 +15,9 @@
 package com.liferay.users.admin.web.custom.attributes;
 
 import com.liferay.portal.model.User;
-import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portlet.expando.model.BaseCustomAttributesDisplay;
 import com.liferay.portlet.expando.model.CustomAttributesDisplay;
-import com.liferay.users.admin.web.constants.UsersAdminPortletKeys;
+import com.liferay.users.admin.constants.UsersAdminPortletKeys;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -35,11 +34,6 @@ public class UserCustomAttributesDisplay extends BaseCustomAttributesDisplay {
 	@Override
 	public String getClassName() {
 		return User.class.getName();
-	}
-
-	@Override
-	public String getIconPath(ThemeDisplay themeDisplay) {
-		return themeDisplay.getPathThemeImages() + "/common/user_icon.png";
 	}
 
 }

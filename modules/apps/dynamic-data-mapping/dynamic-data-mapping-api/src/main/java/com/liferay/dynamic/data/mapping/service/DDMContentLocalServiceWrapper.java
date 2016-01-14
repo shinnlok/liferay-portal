@@ -348,6 +348,11 @@ public class DDMContentLocalServiceWrapper implements DDMContentLocalService,
 		return _ddmContentLocalService.getExportActionableDynamicQuery(portletDataContext);
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _ddmContentLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -385,23 +390,6 @@ public class DDMContentLocalServiceWrapper implements DDMContentLocalService,
 	public com.liferay.dynamic.data.mapping.model.DDMContent updateDDMContent(
 		com.liferay.dynamic.data.mapping.model.DDMContent ddmContent) {
 		return _ddmContentLocalService.updateDDMContent(ddmContent);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public DDMContentLocalService getWrappedDDMContentLocalService() {
-		return _ddmContentLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedDDMContentLocalService(
-		DDMContentLocalService ddmContentLocalService) {
-		_ddmContentLocalService = ddmContentLocalService;
 	}
 
 	@Override

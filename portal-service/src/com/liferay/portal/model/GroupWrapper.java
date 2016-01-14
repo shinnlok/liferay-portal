@@ -552,6 +552,12 @@ public class GroupWrapper implements Group, ModelWrapper<Group> {
 		return _group.getLiveParentTypeSettingsProperty(key);
 	}
 
+	@Override
+	public java.lang.String getLogoURL(
+		com.liferay.portal.theme.ThemeDisplay themeDisplay, boolean useDefault) {
+		return _group.getLogoURL(themeDisplay, useDefault);
+	}
+
 	/**
 	* Returns the manual membership of this group.
 	*
@@ -887,15 +893,6 @@ public class GroupWrapper implements Group, ModelWrapper<Group> {
 	@Override
 	public boolean isChild(long groupId) {
 		return _group.isChild(groupId);
-	}
-
-	/**
-	* @deprecated As of 6.1.0, renamed to {@link #isRegularSite}
-	*/
-	@Deprecated
-	@Override
-	public boolean isCommunity() {
-		return _group.isCommunity();
 	}
 
 	@Override
@@ -1494,14 +1491,6 @@ public class GroupWrapper implements Group, ModelWrapper<Group> {
 		}
 
 		return false;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedModel}
-	 */
-	@Deprecated
-	public Group getWrappedGroup() {
-		return _group;
 	}
 
 	@Override

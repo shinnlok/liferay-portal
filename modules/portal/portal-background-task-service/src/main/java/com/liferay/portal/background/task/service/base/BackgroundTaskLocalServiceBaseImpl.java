@@ -21,13 +21,14 @@ import com.liferay.portal.background.task.service.BackgroundTaskLocalService;
 import com.liferay.portal.background.task.service.persistence.BackgroundTaskPersistence;
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
-import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
+import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -39,6 +40,7 @@ import com.liferay.portal.model.PersistedModel;
 import com.liferay.portal.service.BaseLocalServiceImpl;
 import com.liferay.portal.service.PersistedModelLocalServiceRegistry;
 import com.liferay.portal.service.persistence.UserPersistence;
+import com.liferay.portal.spring.extender.service.ServiceReference;
 import com.liferay.portal.util.PortalUtil;
 
 import java.io.Serializable;
@@ -228,19 +230,33 @@ public abstract class BackgroundTaskLocalServiceBaseImpl
 		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
 
 		actionableDynamicQuery.setBaseLocalService(com.liferay.portal.background.task.service.BackgroundTaskLocalServiceUtil.getService());
-		actionableDynamicQuery.setClass(BackgroundTask.class);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
+		actionableDynamicQuery.setModelClass(BackgroundTask.class);
 
 		actionableDynamicQuery.setPrimaryKeyPropertyName("backgroundTaskId");
 
 		return actionableDynamicQuery;
 	}
 
+	@Override
+	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		IndexableActionableDynamicQuery indexableActionableDynamicQuery = new IndexableActionableDynamicQuery();
+
+		indexableActionableDynamicQuery.setBaseLocalService(com.liferay.portal.background.task.service.BackgroundTaskLocalServiceUtil.getService());
+		indexableActionableDynamicQuery.setClassLoader(getClassLoader());
+		indexableActionableDynamicQuery.setModelClass(BackgroundTask.class);
+
+		indexableActionableDynamicQuery.setPrimaryKeyPropertyName(
+			"backgroundTaskId");
+
+		return indexableActionableDynamicQuery;
+	}
+
 	protected void initActionableDynamicQuery(
 		ActionableDynamicQuery actionableDynamicQuery) {
 		actionableDynamicQuery.setBaseLocalService(com.liferay.portal.background.task.service.BackgroundTaskLocalServiceUtil.getService());
-		actionableDynamicQuery.setClass(BackgroundTask.class);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
+		actionableDynamicQuery.setModelClass(BackgroundTask.class);
 
 		actionableDynamicQuery.setPrimaryKeyPropertyName("backgroundTaskId");
 	}
@@ -318,25 +334,6 @@ public abstract class BackgroundTaskLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the background task remote service.
-	 *
-	 * @return the background task remote service
-	 */
-	public com.liferay.portal.background.task.service.BackgroundTaskService getBackgroundTaskService() {
-		return backgroundTaskService;
-	}
-
-	/**
-	 * Sets the background task remote service.
-	 *
-	 * @param backgroundTaskService the background task remote service
-	 */
-	public void setBackgroundTaskService(
-		com.liferay.portal.background.task.service.BackgroundTaskService backgroundTaskService) {
-		this.backgroundTaskService = backgroundTaskService;
-	}
-
-	/**
 	 * Returns the background task persistence.
 	 *
 	 * @return the background task persistence
@@ -394,25 +391,6 @@ public abstract class BackgroundTaskLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the user remote service.
-	 *
-	 * @return the user remote service
-	 */
-	public com.liferay.portal.service.UserService getUserService() {
-		return userService;
-	}
-
-	/**
-	 * Sets the user remote service.
-	 *
-	 * @param userService the user remote service
-	 */
-	public void setUserService(
-		com.liferay.portal.service.UserService userService) {
-		this.userService = userService;
-	}
-
-	/**
 	 * Returns the user persistence.
 	 *
 	 * @return the user persistence
@@ -467,7 +445,7 @@ public abstract class BackgroundTaskLocalServiceBaseImpl
 		try {
 			DataSource dataSource = backgroundTaskPersistence.getDataSource();
 
-			DB db = DBFactoryUtil.getDB();
+			DB db = DBManagerUtil.getDB();
 
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
@@ -484,17 +462,13 @@ public abstract class BackgroundTaskLocalServiceBaseImpl
 
 	@BeanReference(type = com.liferay.portal.background.task.service.BackgroundTaskLocalService.class)
 	protected BackgroundTaskLocalService backgroundTaskLocalService;
-	@BeanReference(type = com.liferay.portal.background.task.service.BackgroundTaskService.class)
-	protected com.liferay.portal.background.task.service.BackgroundTaskService backgroundTaskService;
 	@BeanReference(type = BackgroundTaskPersistence.class)
 	protected BackgroundTaskPersistence backgroundTaskPersistence;
-	@BeanReference(type = com.liferay.counter.service.CounterLocalService.class)
+	@ServiceReference(type = com.liferay.counter.service.CounterLocalService.class)
 	protected com.liferay.counter.service.CounterLocalService counterLocalService;
-	@BeanReference(type = com.liferay.portal.service.UserLocalService.class)
+	@ServiceReference(type = com.liferay.portal.service.UserLocalService.class)
 	protected com.liferay.portal.service.UserLocalService userLocalService;
-	@BeanReference(type = com.liferay.portal.service.UserService.class)
-	protected com.liferay.portal.service.UserService userService;
-	@BeanReference(type = UserPersistence.class)
+	@ServiceReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry;

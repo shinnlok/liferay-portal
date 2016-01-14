@@ -232,20 +232,29 @@ public class JournalPortlet extends MVCPortlet {
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		String[] deleteFeedIds = StringUtil.split(
-			ParamUtil.getString(actionRequest, "deleteFeedIds"));
+		long[] deleteFeedIds = null;
 
-		for (int i = 0; i < deleteFeedIds.length; i++) {
+		long deleteFeedId = ParamUtil.getLong(actionRequest, "deleteFeedId");
+
+		if (deleteFeedId > 0) {
+			deleteFeedIds = new long[] {deleteFeedId};
+		}
+		else {
+			deleteFeedIds = ParamUtil.getLongValues(actionRequest, "rowIds");
+		}
+
+		for (long curDeleteFeedId : deleteFeedIds) {
 			_journalFeedService.deleteFeed(
-				themeDisplay.getScopeGroupId(), deleteFeedIds[i]);
+				themeDisplay.getScopeGroupId(),
+				String.valueOf(curDeleteFeedId));
 		}
 	}
 
-	public void deleteFolders(
+	public void deleteFolder(
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
-		deleteFolders(actionRequest, actionResponse, false);
+		deleteFolder(actionRequest, actionResponse, false);
 	}
 
 	public void expireArticles(
@@ -258,8 +267,8 @@ public class JournalPortlet extends MVCPortlet {
 			ActionUtil.expireArticle(actionRequest, articleId);
 		}
 		else {
-			String[] expireArticleIds = StringUtil.split(
-				ParamUtil.getString(actionRequest, "expireArticleIds"));
+			String[] expireArticleIds = ParamUtil.getParameterValues(
+				actionRequest, "rowIds");
 
 			for (String expireArticleId : expireArticleIds) {
 				ActionUtil.expireArticle(
@@ -277,8 +286,8 @@ public class JournalPortlet extends MVCPortlet {
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		long[] expireFolderIds = StringUtil.split(
-			ParamUtil.getString(actionRequest, "folderIds"), 0L);
+		long[] expireFolderIds = ParamUtil.getLongValues(
+			actionRequest, "rowIdsJournalFolder");
 
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			JournalArticle.class.getName(), actionRequest);
@@ -288,8 +297,8 @@ public class JournalPortlet extends MVCPortlet {
 				themeDisplay.getScopeGroupId(), expireFolderId, serviceContext);
 		}
 
-		String[] expireArticleIds = StringUtil.split(
-			ParamUtil.getString(actionRequest, "articleIds"));
+		String[] expireArticleIds = ParamUtil.getStringValues(
+			actionRequest, "rowIdsJournalArticle");
 
 		for (String expireArticleId : expireArticleIds) {
 			ActionUtil.expireArticle(
@@ -305,8 +314,8 @@ public class JournalPortlet extends MVCPortlet {
 
 		long newFolderId = ParamUtil.getLong(actionRequest, "newFolderId");
 
-		long[] folderIds = StringUtil.split(
-			ParamUtil.getString(actionRequest, "folderIds"), 0L);
+		long[] folderIds = ParamUtil.getLongValues(
+			actionRequest, "rowIdsJournalFolder");
 
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			JournalArticle.class.getName(), actionRequest);
@@ -321,8 +330,8 @@ public class JournalPortlet extends MVCPortlet {
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		String[] articleIds = StringUtil.split(
-			ParamUtil.getString(actionRequest, "articleIds"));
+		String[] articleIds = ParamUtil.getStringValues(
+			actionRequest, "rowIdsJournalArticle");
 
 		for (String articleId : articleIds) {
 			try {
@@ -360,11 +369,11 @@ public class JournalPortlet extends MVCPortlet {
 		deleteEntries(actionRequest, actionResponse, true);
 	}
 
-	public void moveFoldersToTrash(
+	public void moveFolderToTrash(
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
-		deleteFolders(actionRequest, actionResponse, true);
+		deleteFolder(actionRequest, actionResponse, true);
 	}
 
 	public void moveToTrash(
@@ -575,14 +584,19 @@ public class JournalPortlet extends MVCPortlet {
 				WebKeys.UPLOAD_EXCEPTION);
 
 		if (uploadException != null) {
+			Throwable cause = uploadException.getCause();
+
 			if (uploadException.isExceededLiferayFileItemSizeLimit()) {
-				throw new LiferayFileItemException();
-			}
-			else if (uploadException.isExceededSizeLimit()) {
-				throw new ArticleContentSizeException();
+				throw new LiferayFileItemException(cause);
 			}
 
-			throw new PortalException(uploadException.getCause());
+			if (uploadException.isExceededFileSizeLimit() ||
+				uploadException.isExceededUploadRequestSizeLimit()) {
+
+				throw new ArticleContentSizeException(cause);
+			}
+
+			throw new PortalException(cause);
 		}
 
 		UploadPortletRequest uploadPortletRequest =
@@ -641,16 +655,6 @@ public class JournalPortlet extends MVCPortlet {
 		String content = (String)contentAndImages[0];
 		Map<String, byte[]> images =
 			(HashMap<String, byte[]>)contentAndImages[1];
-
-		Boolean fileItemThresholdSizeExceeded =
-			(Boolean)uploadPortletRequest.getAttribute(
-				WebKeys.FILE_ITEM_THRESHOLD_SIZE_EXCEEDED);
-
-		if ((fileItemThresholdSizeExceeded != null) &&
-			fileItemThresholdSizeExceeded.booleanValue()) {
-
-			throw new ArticleContentSizeException();
-		}
 
 		String ddmTemplateKey = ParamUtil.getString(
 			uploadPortletRequest, "ddmTemplateKey");
@@ -922,10 +926,9 @@ public class JournalPortlet extends MVCPortlet {
 		throws Exception {
 
 		long[] ddmStructureIds = StringUtil.split(
-				ParamUtil.getString(
-						actionRequest,
-						"ddmStructuresSearchContainerPrimaryKeys"),
-				0L);
+			ParamUtil.getString(
+				actionRequest, "ddmStructuresSearchContainerPrimaryKeys"),
+			0L);
 		int restrinctionType = ParamUtil.getInteger(
 			actionRequest, "restrictionType");
 
@@ -962,8 +965,8 @@ public class JournalPortlet extends MVCPortlet {
 			deleteArticleIds = new String[] {articleId};
 		}
 		else {
-			deleteArticleIds = StringUtil.split(
-				ParamUtil.getString(actionRequest, "articleIds"));
+			deleteArticleIds = ParamUtil.getParameterValues(
+				actionRequest, "rowIds");
 		}
 
 		List<TrashedModel> trashedModels = new ArrayList<>();
@@ -1002,8 +1005,8 @@ public class JournalPortlet extends MVCPortlet {
 
 		List<TrashedModel> trashedModels = new ArrayList<>();
 
-		long[] deleteFolderIds = StringUtil.split(
-			ParamUtil.getString(actionRequest, "folderIds"), 0L);
+		long[] deleteFolderIds = ParamUtil.getLongValues(
+			actionRequest, "rowIdsJournalFolder");
 
 		for (long deleteFolderId : deleteFolderIds) {
 			if (moveToTrash) {
@@ -1017,8 +1020,8 @@ public class JournalPortlet extends MVCPortlet {
 			}
 		}
 
-		String[] deleteArticleIds = StringUtil.split(
-			ParamUtil.getString(actionRequest, "articleIds"));
+		String[] deleteArticleIds = ParamUtil.getStringValues(
+			actionRequest, "rowIdsJournalArticle");
 
 		for (String deleteArticleId : deleteArticleIds) {
 			if (moveToTrash) {
@@ -1044,35 +1047,23 @@ public class JournalPortlet extends MVCPortlet {
 		sendEditEntryRedirect(actionRequest, actionResponse);
 	}
 
-	protected void deleteFolders(
+	protected void deleteFolder(
 			ActionRequest actionRequest, ActionResponse actionResponse,
 			boolean moveToTrash)
 		throws Exception {
 
-		long[] deleteFolderIds = null;
-
 		long folderId = ParamUtil.getLong(actionRequest, "folderId");
-
-		if (folderId > 0) {
-			deleteFolderIds = new long[] {folderId};
-		}
-		else {
-			deleteFolderIds = StringUtil.split(
-				ParamUtil.getString(actionRequest, "folderIds"), 0L);
-		}
 
 		List<TrashedModel> trashedModels = new ArrayList<>();
 
-		for (long deleteFolderId : deleteFolderIds) {
-			if (moveToTrash) {
-				JournalFolder folder = _journalFolderService.moveFolderToTrash(
-					deleteFolderId);
+		if (moveToTrash) {
+			JournalFolder folder = _journalFolderService.moveFolderToTrash(
+				folderId);
 
-				trashedModels.add(folder);
-			}
-			else {
-				_journalFolderService.deleteFolder(deleteFolderId);
-			}
+			trashedModels.add(folder);
+		}
+		else {
+			_journalFolderService.deleteFolder(folderId);
 		}
 
 		if (moveToTrash && !trashedModels.isEmpty()) {

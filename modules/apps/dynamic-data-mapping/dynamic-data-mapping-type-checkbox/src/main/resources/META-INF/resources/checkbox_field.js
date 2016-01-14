@@ -1,6 +1,8 @@
 AUI.add(
 	'liferay-ddm-form-field-checkbox',
 	function(A) {
+		var DataTypeBoolean = A.DataType.Boolean;
+
 		var CheckboxField = A.Component.create(
 			{
 				ATTRS: {
@@ -29,17 +31,13 @@ AUI.add(
 					getTemplateContext: function() {
 						var instance = this;
 
-						var value = instance.get('value');
-
-						if (instance.get('localizable')) {
-							value = value[instance.get('locale')];
-						}
+						var value = instance.getContextValue();
 
 						return A.merge(
 							CheckboxField.superclass.getTemplateContext.apply(instance, arguments),
 							{
 								showAsSwitcher: instance.get('showAsSwitcher'),
-								status: value ? 'checked' : ''
+								status: DataTypeBoolean.parse(value) ? 'checked' : ''
 							}
 						);
 					},
@@ -75,11 +73,11 @@ AUI.add(
 
 						if (instance.get('localizable')) {
 							for (var locale in value) {
-								value[locale] = A.DataType.Boolean.parse(value[locale]);
+								value[locale] = DataTypeBoolean.parse(value[locale]);
 							}
 						}
 						else {
-							value = A.DataType.Boolean.parse(value);
+							value = DataTypeBoolean.parse(value);
 						}
 
 						return value;

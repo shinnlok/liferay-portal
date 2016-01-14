@@ -105,6 +105,22 @@ if (organization != null) {
 	</div>
 </c:if>
 
+<c:if test="<%= portletName.equals(UsersAdminPortletKeys.MY_ORGANIZATIONS) %>">
+	<aui:nav-bar>
+		<liferay-util:include page="/toolbar.jsp" servletContext="<%= application %>" />
+
+		<aui:nav-bar-search>
+			<div class="form-search">
+				<liferay-ui:input-search autoFocus="<%= windowState.equals(WindowState.MAXIMIZED) %>" />
+			</div>
+		</aui:nav-bar-search>
+	</aui:nav-bar>
+
+	<div id="breadcrumb">
+		<liferay-ui:breadcrumb showCurrentGroup="<%= false %>" showGuestGroup="<%= false %>" showLayout="<%= false %>" showPortletBreadcrumb="<%= true %>" />
+	</div>
+</c:if>
+
 <c:choose>
 	<c:when test="<%= showList %>">
 
@@ -175,27 +191,29 @@ if (organization != null) {
 						request.setAttribute("phones.classPK", organizationId);
 						request.setAttribute("websites.className", Organization.class.getName());
 						request.setAttribute("websites.classPK", organizationId);
+
+						String directoryPortletId = PortletProviderUtil.getPortletId(PortalDirectoryApplicationType.PortalDirectory.CLASS_NAME, PortletProvider.Action.VIEW);
 						%>
 
 						<div class="organization-information">
 							<div class="section">
-								<liferay-util:include page="/html/portlet/directory/common/additional_email_addresses.jsp" portletId="<%= PortletKeys.DIRECTORY %>" />
+								<liferay-util:include page="/common/additional_email_addresses.jsp" portletId="<%= directoryPortletId %>" />
 							</div>
 
 							<div class="section">
-								<liferay-util:include page="/html/portlet/directory/common/websites.jsp" portletId="<%= PortletKeys.DIRECTORY %>" />
+								<liferay-util:include page="/common/websites.jsp" portletId="<%= directoryPortletId %>" />
 							</div>
 
 							<div class="section">
-								<liferay-util:include page="/html/portlet/directory/organization/addresses.jsp" portletId="<%= PortletKeys.DIRECTORY %>" />
+								<liferay-util:include page="/organization/addresses.jsp" portletId="<%= directoryPortletId %>" />
 							</div>
 
 							<div class="section">
-								<liferay-util:include page="/html/portlet/directory/organization/phone_numbers.jsp" portletId="<%= PortletKeys.DIRECTORY %>" />
+								<liferay-util:include page="/organization/phone_numbers.jsp" portletId="<%= directoryPortletId %>" />
 							</div>
 
 							<div class="section">
-								<liferay-util:include page="/html/portlet/directory/organization/comments.jsp" portletId="<%= PortletKeys.DIRECTORY %>" />
+								<liferay-util:include page="/organization/comments.jsp" portletId="<%= directoryPortletId %>" />
 							</div>
 						</div>
 
@@ -300,7 +318,6 @@ if (organization != null) {
 
 								<c:choose>
 									<c:when test="<%= !searchTerms.hasSearchTerms() && (parentOrganizationId <= 0) && (filterManageableOrganizations) %>">
-
 										<liferay-ui:search-container-results>
 
 											<%
@@ -314,7 +331,6 @@ if (organization != null) {
 											%>
 
 										</liferay-ui:search-container-results>
-
 									</c:when>
 									<c:otherwise>
 
@@ -442,7 +458,6 @@ if (organization != null) {
 
 					<liferay-util:include page="/organization_action.jsp" servletContext="<%= application %>" />
 				</aui:col>
-
 			</c:if>
 		</aui:row>
 	</c:when>
@@ -454,7 +469,7 @@ if (organization != null) {
 </c:choose>
 
 <aui:script>
-	Liferay.Util.toggleSearchContainerButton('#<portlet:namespace />delete', '#<portlet:namespace /><%= searchContainerReference.getId("organizationSearchContainer") %>SearchContainer', document.<portlet:namespace />fm, '<portlet:namespace />allRowIds');
+	Liferay.Util.toggleSearchContainerButton('#<portlet:namespace />delete', '#<portlet:namespace /><%= searchContainerReference.getId(request, "organizationSearchContainer") %>SearchContainer', document.<portlet:namespace />fm, '<portlet:namespace />allRowIds');
 </aui:script>
 
 <%!

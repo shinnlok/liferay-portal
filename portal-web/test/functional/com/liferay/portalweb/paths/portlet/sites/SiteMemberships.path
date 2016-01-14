@@ -10,12 +10,12 @@
 <tbody>
 <tr>
 	<td>MEMBERSHIP_TYPE</td>
-	<td>//div[@class='site-membership-type']/span/span</td>
+	<td>//div[contains(@class,'site-membership-type')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>REQUEST_MESSAGE</td>
-	<td>//div[@class='site-membership-type']/span[3]/a/span</td>
+	<td>//div[contains(@class,'site-membership-type')]/span[contains(@class,'alert-link')]/a/span</td>
 	<td></td>
 </tr>
 <tr>
@@ -37,32 +37,6 @@
 <tr>
 	<td>TOOLBAR_VIEW_MEMBERSHIP_REQUESTS</td>
 	<td>//div[@class='navbar ' or contains(@class,'navbar-default')]//a[contains(.,'View Members')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td></td>
-	<td></td>
-	<td></td>
-</tr>
-<!--NAVIGATION-->
-<tr>
-	<td>NAVIGATION_SUMMARY</td>
-	<td>//ul[contains(@class,'nav') and contains(@class,'nav-tabs')]/li/a[contains(.,'Summary')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>NAVIGATION_USERS</td>
-	<td>//ul[contains(@class,'nav') and contains(@class,'nav-tabs')]/li/a[contains(.,'Users')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>NAVIGATION_ORGANIZATIONS</td>
-	<td>//ul[contains(@class,'nav') and contains(@class,'nav-tabs')]/li/a[contains(.,'Organizations')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>NAVIGATION_USER_GROUPS</td>
-	<td>//ul[contains(@class,'nav') and contains(@class,'nav-tabs')]/li/a[contains(.,'User Groups')]</td>
 	<td></td>
 </tr>
 <tr>

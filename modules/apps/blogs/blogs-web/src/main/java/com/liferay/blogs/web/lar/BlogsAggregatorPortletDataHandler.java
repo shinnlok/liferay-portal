@@ -19,6 +19,7 @@ import com.liferay.portlet.exportimport.lar.DataLevel;
 import com.liferay.portlet.exportimport.lar.DefaultConfigurationPortletDataHandler;
 import com.liferay.portlet.exportimport.lar.PortletDataHandler;
 
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 
 /**
@@ -31,7 +32,15 @@ import org.osgi.service.component.annotations.Component;
 public class BlogsAggregatorPortletDataHandler
 	extends DefaultConfigurationPortletDataHandler {
 
-	public BlogsAggregatorPortletDataHandler() {
+	public static final String SCHEMA_VERSION = "1.0.0";
+
+	@Override
+	public String getSchemaVersion() {
+		return SCHEMA_VERSION;
+	}
+
+	@Activate
+	protected void activate() {
 		setDataLevel(DataLevel.PORTLET_INSTANCE);
 		setPublishToLiveByDefault(true);
 	}

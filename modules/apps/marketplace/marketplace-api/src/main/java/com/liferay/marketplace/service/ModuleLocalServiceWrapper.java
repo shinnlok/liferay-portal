@@ -201,6 +201,11 @@ public class ModuleLocalServiceWrapper implements ModuleLocalService,
 		return _moduleLocalService.getActionableDynamicQuery();
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _moduleLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the module with the primary key.
 	*
@@ -274,23 +279,6 @@ public class ModuleLocalServiceWrapper implements ModuleLocalService,
 	public com.liferay.marketplace.model.Module updateModule(
 		com.liferay.marketplace.model.Module module) {
 		return _moduleLocalService.updateModule(module);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public ModuleLocalService getWrappedModuleLocalService() {
-		return _moduleLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedModuleLocalService(
-		ModuleLocalService moduleLocalService) {
-		_moduleLocalService = moduleLocalService;
 	}
 
 	@Override

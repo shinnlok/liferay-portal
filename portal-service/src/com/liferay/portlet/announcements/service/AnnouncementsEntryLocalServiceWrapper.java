@@ -429,6 +429,11 @@ public class AnnouncementsEntryLocalServiceWrapper
 		return _announcementsEntryLocalService.getExportActionableDynamicQuery(portletDataContext);
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _announcementsEntryLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -484,23 +489,6 @@ public class AnnouncementsEntryLocalServiceWrapper
 			displayImmediately, expirationDateMonth, expirationDateDay,
 			expirationDateYear, expirationDateHour, expirationDateMinute,
 			priority);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public AnnouncementsEntryLocalService getWrappedAnnouncementsEntryLocalService() {
-		return _announcementsEntryLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedAnnouncementsEntryLocalService(
-		AnnouncementsEntryLocalService announcementsEntryLocalService) {
-		_announcementsEntryLocalService = announcementsEntryLocalService;
 	}
 
 	@Override

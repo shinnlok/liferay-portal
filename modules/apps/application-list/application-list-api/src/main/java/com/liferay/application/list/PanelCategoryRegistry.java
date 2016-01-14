@@ -15,10 +15,10 @@
 package com.liferay.application.list;
 
 import com.liferay.application.list.util.PanelCategoryServiceReferenceMapper;
-import com.liferay.osgi.service.tracker.map.PropertyServiceReferenceComparator;
-import com.liferay.osgi.service.tracker.map.ServiceReferenceMapper;
-import com.liferay.osgi.service.tracker.map.ServiceTrackerMap;
-import com.liferay.osgi.service.tracker.map.ServiceTrackerMapFactory;
+import com.liferay.osgi.service.tracker.collections.map.PropertyServiceReferenceComparator;
+import com.liferay.osgi.service.tracker.collections.map.ServiceReferenceMapper;
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -88,8 +88,7 @@ public class PanelCategoryRegistry {
 				@Override
 				public boolean filter(PanelCategory panelCategory) {
 					try {
-						return panelCategory.hasAccessPermission(
-							permissionChecker, group);
+						return panelCategory.isShow(permissionChecker, group);
 					}
 					catch (PortalException pe) {
 						_log.error(pe, pe);
@@ -110,9 +109,7 @@ public class PanelCategoryRegistry {
 
 		for (PanelCategory panelCategory : panelCategories) {
 			try {
-				if (panelCategory.hasAccessPermission(
-						permissionChecker, group)) {
-
+				if (panelCategory.isShow(permissionChecker, group)) {
 					return panelCategory;
 				}
 			}
@@ -141,15 +138,13 @@ public class PanelCategoryRegistry {
 		throws InvalidSyntaxException {
 
 		_childPanelCategoriesServiceTrackerMap =
-			ServiceTrackerMapFactory.multiValueMap(
+			ServiceTrackerMapFactory.openMultiValueMap(
 				bundleContext, PanelCategory.class, "(panel.category.key=*)",
 				new PanelCategoryServiceReferenceMapper(),
 				new ServiceRankingPropertyServiceReferenceComparator());
 
-		_childPanelCategoriesServiceTrackerMap.open();
-
 		_panelCategoryServiceTrackerMap =
-			ServiceTrackerMapFactory.singleValueMap(
+			ServiceTrackerMapFactory.openSingleValueMap(
 				bundleContext, PanelCategory.class, null,
 				new ServiceReferenceMapper<String, PanelCategory>() {
 
@@ -170,8 +165,6 @@ public class PanelCategoryRegistry {
 					}
 
 				});
-
-		_panelCategoryServiceTrackerMap.open();
 	}
 
 	@Deactivate

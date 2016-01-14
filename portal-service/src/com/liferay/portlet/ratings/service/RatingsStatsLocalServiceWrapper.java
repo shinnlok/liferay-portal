@@ -206,6 +206,11 @@ public class RatingsStatsLocalServiceWrapper implements RatingsStatsLocalService
 		return _ratingsStatsLocalService.getActionableDynamicQuery();
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _ratingsStatsLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -292,23 +297,6 @@ public class RatingsStatsLocalServiceWrapper implements RatingsStatsLocalService
 	public com.liferay.portlet.ratings.model.RatingsStats updateRatingsStats(
 		com.liferay.portlet.ratings.model.RatingsStats ratingsStats) {
 		return _ratingsStatsLocalService.updateRatingsStats(ratingsStats);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public RatingsStatsLocalService getWrappedRatingsStatsLocalService() {
-		return _ratingsStatsLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedRatingsStatsLocalService(
-		RatingsStatsLocalService ratingsStatsLocalService) {
-		_ratingsStatsLocalService = ratingsStatsLocalService;
 	}
 
 	@Override

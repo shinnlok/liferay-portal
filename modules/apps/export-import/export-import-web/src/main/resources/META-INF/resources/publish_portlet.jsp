@@ -87,7 +87,7 @@ portletURL.setParameter("tabs3", "current-and-previous");
 			<liferay-ui:section>
 
 				<%
-				int incompleteBackgroundTaskCount = BackgroundTaskManagerUtil.getBackgroundTasksCount(themeDisplay.getScopeGroupId(), selPortlet.getPortletId(), BackgroundTaskExecutorNames.PORTLET_STAGING_BACKGROUND_TASK_EXECUTOR, false);
+				int incompleteBackgroundTaskCount = BackgroundTaskManagerUtil.getBackgroundTasksCount(StagingUtil.getStagingAndLiveGroupIds(themeDisplay.getScopeGroupId()), selPortlet.getPortletId(), BackgroundTaskExecutorNames.PORTLET_STAGING_BACKGROUND_TASK_EXECUTOR, false);
 				%>
 
 				<div class="<%= (incompleteBackgroundTaskCount == 0) ? "hide" : "in-progress" %>" id="<portlet:namespace />incompleteProcessMessage">
@@ -100,9 +100,15 @@ portletURL.setParameter("tabs3", "current-and-previous");
 					<portlet:param name="mvcRenderCommandName" value="publishPortlet" />
 				</portlet:actionURL>
 
+				<liferay-portlet:renderURL var="redirectURL">
+					<portlet:param name="mvcRenderCommandName" value="publishPortlet" />
+					<portlet:param name="tabs3" value="current-and-previous" />
+					<portlet:param name="portletResource" value="<%= portletResource %>" />
+				</liferay-portlet:renderURL>
+
 				<aui:form action="<%= publishPortletURL %>" cssClass="lfr-export-dialog" method="post" name="fm1" onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "publishToLive();" %>'>
 					<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.PUBLISH_TO_LIVE %>" />
-					<aui:input name="redirect" type="hidden" value="<%= portletURL %>" />
+					<aui:input name="redirect" type="hidden" value="<%= redirectURL %>" />
 					<aui:input name="plid" type="hidden" value="<%= exportableLayout.getPlid() %>" />
 					<aui:input name="groupId" type="hidden" value="<%= themeDisplay.getScopeGroupId() %>" />
 					<aui:input name="portletResource" type="hidden" value="<%= portletResource %>" />
@@ -442,9 +448,9 @@ portletURL.setParameter("tabs3", "current-and-previous");
 						</c:if>
 
 						<aui:button-row>
-							<aui:button type="submit" value="publish-to-live" />
+							<aui:button cssClass="btn-lg" type="submit" value="publish-to-live" />
 
-							<aui:button onClick='<%= renderResponse.getNamespace() + "copyFromLive();" %>' value="copy-from-live" />
+							<aui:button cssClass="btn-lg" onClick='<%= renderResponse.getNamespace() + "copyFromLive();" %>' value="copy-from-live" />
 						</aui:button-row>
 					</div>
 				</aui:form>

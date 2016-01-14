@@ -251,6 +251,10 @@ public class AnnouncementsDeliveryLocalServiceUtil {
 		return getService().getDelivery(deliveryId);
 	}
 
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -304,13 +308,6 @@ public class AnnouncementsDeliveryLocalServiceUtil {
 		}
 
 		return _service;
-	}
-
-	/**
-	 * @deprecated As of 6.2.0
-	 */
-	@Deprecated
-	public void setService(AnnouncementsDeliveryLocalService service) {
 	}
 
 	private static AnnouncementsDeliveryLocalService _service;

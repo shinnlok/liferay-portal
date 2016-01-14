@@ -1788,6 +1788,11 @@ public class JournalArticleLocalServiceWrapper
 	}
 
 	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _journalArticleLocalService.getIndexableActionableDynamicQuery();
+	}
+
+	@Override
 	public java.util.List<com.liferay.journal.model.JournalArticle> getIndexableArticlesByDDMStructureKey(
 		java.lang.String[] ddmStructureKeys) {
 		return _journalArticleLocalService.getIndexableArticlesByDDMStructureKey(ddmStructureKeys);
@@ -3933,23 +3938,6 @@ public class JournalArticleLocalServiceWrapper
 		java.lang.String oldDDMTemplateKey, java.lang.String newDDMTemplateKey) {
 		_journalArticleLocalService.updateTemplateId(groupId, classNameId,
 			oldDDMTemplateKey, newDDMTemplateKey);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public JournalArticleLocalService getWrappedJournalArticleLocalService() {
-		return _journalArticleLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedJournalArticleLocalService(
-		JournalArticleLocalService journalArticleLocalService) {
-		_journalArticleLocalService = journalArticleLocalService;
 	}
 
 	@Override

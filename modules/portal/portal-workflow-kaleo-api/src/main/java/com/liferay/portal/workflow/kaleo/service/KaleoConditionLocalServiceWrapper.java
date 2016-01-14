@@ -210,6 +210,11 @@ public class KaleoConditionLocalServiceWrapper
 		return _kaleoConditionLocalService.getActionableDynamicQuery();
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _kaleoConditionLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the kaleo condition with the primary key.
 	*
@@ -285,23 +290,6 @@ public class KaleoConditionLocalServiceWrapper
 	public com.liferay.portal.workflow.kaleo.model.KaleoCondition updateKaleoCondition(
 		com.liferay.portal.workflow.kaleo.model.KaleoCondition kaleoCondition) {
 		return _kaleoConditionLocalService.updateKaleoCondition(kaleoCondition);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public KaleoConditionLocalService getWrappedKaleoConditionLocalService() {
-		return _kaleoConditionLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedKaleoConditionLocalService(
-		KaleoConditionLocalService kaleoConditionLocalService) {
-		_kaleoConditionLocalService = kaleoConditionLocalService;
 	}
 
 	@Override

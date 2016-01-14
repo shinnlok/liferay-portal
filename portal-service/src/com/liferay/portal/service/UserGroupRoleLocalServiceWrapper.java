@@ -248,6 +248,11 @@ public class UserGroupRoleLocalServiceWrapper
 		return _userGroupRoleLocalService.getActionableDynamicQuery();
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _userGroupRoleLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -389,23 +394,6 @@ public class UserGroupRoleLocalServiceWrapper
 	public com.liferay.portal.model.UserGroupRole updateUserGroupRole(
 		com.liferay.portal.model.UserGroupRole userGroupRole) {
 		return _userGroupRoleLocalService.updateUserGroupRole(userGroupRole);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public UserGroupRoleLocalService getWrappedUserGroupRoleLocalService() {
-		return _userGroupRoleLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedUserGroupRoleLocalService(
-		UserGroupRoleLocalService userGroupRoleLocalService) {
-		_userGroupRoleLocalService = userGroupRoleLocalService;
 	}
 
 	@Override

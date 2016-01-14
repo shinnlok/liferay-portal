@@ -245,6 +245,10 @@ public class ContactLocalServiceUtil {
 		return getService().getContactsCount(classNameId, classPK);
 	}
 
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -296,13 +300,6 @@ public class ContactLocalServiceUtil {
 		}
 
 		return _service;
-	}
-
-	/**
-	 * @deprecated As of 6.2.0
-	 */
-	@Deprecated
-	public void setService(ContactLocalService service) {
 	}
 
 	private static ContactLocalService _service;

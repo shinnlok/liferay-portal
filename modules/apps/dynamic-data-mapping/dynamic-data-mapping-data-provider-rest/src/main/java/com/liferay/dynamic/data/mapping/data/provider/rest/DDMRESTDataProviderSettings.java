@@ -16,39 +16,75 @@ package com.liferay.dynamic.data.mapping.data.provider.rest;
 
 import com.liferay.dynamic.data.mapping.annotations.DDMForm;
 import com.liferay.dynamic.data.mapping.annotations.DDMFormField;
-import com.liferay.dynamic.data.mapping.data.provider.DDMDataProviderSettings;
-
-import org.osgi.service.component.annotations.Component;
+import com.liferay.dynamic.data.mapping.annotations.DDMFormLayout;
+import com.liferay.dynamic.data.mapping.annotations.DDMFormLayoutColumn;
+import com.liferay.dynamic.data.mapping.annotations.DDMFormLayoutPage;
+import com.liferay.dynamic.data.mapping.annotations.DDMFormLayoutRow;
 
 /**
  * @author Marcellus Tavares
  */
-@Component(immediate = true, property = "ddm.data.provider.name=rest")
-public class DDMRESTDataProviderSettings implements DDMDataProviderSettings {
-
-	@Override
-	public Class<?> getSettings() {
-		return RESTSettings.class;
+@DDMForm
+@DDMFormLayout(
+	{
+		@DDMFormLayoutPage(
+			{
+				@DDMFormLayoutRow(
+					{
+						@DDMFormLayoutColumn(
+							size = 12,
+							value = {
+								"url", "key", "value", "username", "password",
+								"cacheable"
+							}
+						)
+					}
+				)
+			}
+		)
 	}
+)
+public interface DDMRESTDataProviderSettings {
 
-	@DDMForm
-	public interface RESTSettings {
+	@DDMFormField(
+		label = "%cache-data-on-the-first-request",
+		properties = "showAsSwitcher=true"
+	)
+	public boolean cacheable();
 
-		@DDMFormField
-		public String key();
+	@DDMFormField(
+		label = "%displayed-json-attribute",
+		properties = { "placeholder=%enter-the-attribute-to-be-displayed" },
+		required = true,
+		tip = "%the-attribute-whose-value-is-displayed-to-the-end-user-for-selection"
+	)
+	public String key();
 
-		@DDMFormField
-		public String password();
+	@DDMFormField(
+		label = "%password", properties = { "placeholder=%enter-a-password" },
+		tip = "%provide-the-password-for-authenticating-to-the-rest-provider"
+	)
+	public String password();
 
-		@DDMFormField
-		public String url();
+	@DDMFormField(
+		label = "%url",
+		properties = { "placeholder=%enter-the-rest-service-url" },
+		required = true
+	)
+	public String url();
 
-		@DDMFormField
-		public String username();
+	@DDMFormField(
+		label = "%user-name", properties = { "placeholder=%enter-a-user-name" },
+		tip = "%provide-the-user-name-for-authenticating-to-the-rest-provider"
+	)
+	public String username();
 
-		@DDMFormField
-		public String value();
-
-	}
+	@DDMFormField(
+		label = "%stored-json-attribute",
+		properties = {"placeholder=%enter-the-attribute-to-be-stored"},
+		required = true,
+		tip = "%the-attribute-whose-value-is-stored-in-the-database-when-selected-by-a-user"
+	)
+	public String value();
 
 }

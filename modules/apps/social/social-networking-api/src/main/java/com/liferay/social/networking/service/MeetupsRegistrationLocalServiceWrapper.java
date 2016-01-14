@@ -191,6 +191,11 @@ public class MeetupsRegistrationLocalServiceWrapper
 		return _meetupsRegistrationLocalService.getActionableDynamicQuery();
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _meetupsRegistrationLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the meetups registration with the primary key.
 	*
@@ -289,23 +294,6 @@ public class MeetupsRegistrationLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _meetupsRegistrationLocalService.updateMeetupsRegistration(userId,
 			meetupsEntryId, status, comments);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public MeetupsRegistrationLocalService getWrappedMeetupsRegistrationLocalService() {
-		return _meetupsRegistrationLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedMeetupsRegistrationLocalService(
-		MeetupsRegistrationLocalService meetupsRegistrationLocalService) {
-		_meetupsRegistrationLocalService = meetupsRegistrationLocalService;
 	}
 
 	@Override

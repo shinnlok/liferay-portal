@@ -37,6 +37,7 @@ import com.liferay.portal.kernel.transaction.TransactionAttribute;
 import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import com.liferay.portal.kernel.upload.LiferayFileItemException;
 import com.liferay.portal.kernel.upload.UploadException;
+import com.liferay.portal.kernel.upload.UploadRequestSizeException;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.JavaConstants;
@@ -58,6 +59,7 @@ import com.liferay.portlet.asset.AssetCategoryException;
 import com.liferay.portlet.asset.AssetTagException;
 import com.liferay.portlet.blogs.BlogsEntryAttachmentFileEntryHelper;
 import com.liferay.portlet.blogs.BlogsEntryAttachmentFileEntryReference;
+import com.liferay.portlet.blogs.BlogsEntryImageSelectorHelper;
 import com.liferay.portlet.blogs.EntryContentException;
 import com.liferay.portlet.blogs.EntryCoverImageCropException;
 import com.liferay.portlet.blogs.EntryDescriptionException;
@@ -165,14 +167,21 @@ public class EditEntryMVCActionCommand extends BaseMVCActionCommand {
 					WebKeys.UPLOAD_EXCEPTION);
 
 			if (uploadException != null) {
-				if (uploadException.isExceededLiferayFileItemSizeLimit()) {
-					throw new LiferayFileItemException();
-				}
-				else if (uploadException.isExceededSizeLimit()) {
-					throw new FileSizeException(uploadException.getCause());
+				Throwable cause = uploadException.getCause();
+
+				if (uploadException.isExceededFileSizeLimit()) {
+					throw new FileSizeException(cause);
 				}
 
-				throw new PortalException(uploadException.getCause());
+				if (uploadException.isExceededLiferayFileItemSizeLimit()) {
+					throw new LiferayFileItemException(cause);
+				}
+
+				if (uploadException.isExceededUploadRequestSizeLimit()) {
+					throw new UploadRequestSizeException(cause);
+				}
+
+				throw new PortalException(cause);
 			}
 			else if (cmd.equals(Constants.ADD) ||
 					 cmd.equals(Constants.UPDATE)) {
@@ -184,10 +193,10 @@ public class EditEntryMVCActionCommand extends BaseMVCActionCommand {
 					_transactionAttribute, updateEntryCallable);
 
 				entry = (BlogsEntry)returnValue[0];
-				oldUrlTitle = ((String)returnValue[1]);
+				oldUrlTitle = (String)returnValue[1];
 				blogsEntryAttachmentFileEntryReferences =
-					((List<BlogsEntryAttachmentFileEntryReference>)
-						returnValue[2]);
+					(List<BlogsEntryAttachmentFileEntryReference>)
+						returnValue[2];
 			}
 			else if (cmd.equals(Constants.DELETE)) {
 				deleteEntries(actionRequest, false);
@@ -333,7 +342,8 @@ public class EditEntryMVCActionCommand extends BaseMVCActionCommand {
 			   EntryDescriptionException | EntryDisplayDateException |
 			   EntrySmallImageNameException | EntrySmallImageScaleException |
 			   EntryTitleException | FileSizeException |
-			   LiferayFileItemException | SanitizerException e) {
+			   LiferayFileItemException | SanitizerException |
+			   UploadRequestSizeException e) {
 
 			SessionErrors.add(actionRequest, e.getClass());
 
@@ -484,17 +494,40 @@ public class EditEntryMVCActionCommand extends BaseMVCActionCommand {
 		String coverImageCaption = ParamUtil.getString(
 			actionRequest, "coverImageCaption");
 
-		ImageSelector coverImageImageSelector = new ImageSelector(
-			coverImageFileEntryId, coverImageURL,
-			coverImageFileEntryCropRegion);
+		long oldCoverImageId = 0;
+		String oldCoverImageURL = StringPool.BLANK;
+		long oldSmallImageId = 0;
+		String oldSmallImageURL = StringPool.BLANK;
+
+		if (entryId != 0) {
+			BlogsEntry entry = _blogsEntryLocalService.getBlogsEntry(entryId);
+
+			oldCoverImageId = entry.getCoverImageFileEntryId();
+			oldCoverImageURL = entry.getCoverImageURL();
+			oldSmallImageId = entry.getSmallImageId();
+			oldSmallImageURL = entry.getSmallImageURL();
+		}
+
+		BlogsEntryImageSelectorHelper blogsEntryCoverImageSelectorHelper =
+			new BlogsEntryImageSelectorHelper(
+				coverImageFileEntryId, oldCoverImageId,
+				coverImageFileEntryCropRegion, coverImageURL, oldCoverImageURL);
+
+		ImageSelector coverImageImageSelector =
+			blogsEntryCoverImageSelectorHelper.getImageSelector();
 
 		long smallImageFileEntryId = ParamUtil.getLong(
 			actionRequest, "smallImageFileEntryId");
 		String smallImageURL = ParamUtil.getString(
 			actionRequest, "smallImageURL");
 
-		ImageSelector smallImageImageSelector = new ImageSelector(
-			smallImageFileEntryId, smallImageURL, null);
+		BlogsEntryImageSelectorHelper blogsEntrySmallImageSelectorHelper =
+			new BlogsEntryImageSelectorHelper(
+				smallImageFileEntryId, oldSmallImageId, StringPool.BLANK,
+				smallImageURL, oldSmallImageURL);
+
+		ImageSelector smallImageImageSelector =
+			blogsEntrySmallImageSelectorHelper.getImageSelector();
 
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			BlogsEntry.class.getName(), actionRequest);
@@ -609,6 +642,24 @@ public class EditEntryMVCActionCommand extends BaseMVCActionCommand {
 			if (!tempOldUrlTitle.equals(entry.getUrlTitle())) {
 				oldUrlTitle = tempOldUrlTitle;
 			}
+		}
+
+		if (blogsEntryCoverImageSelectorHelper.isFileEntryTempFile()) {
+			_blogsEntryLocalService.addOriginalImageFileEntry(
+				themeDisplay.getUserId(), entry.getGroupId(),
+				entry.getEntryId(), coverImageImageSelector);
+
+			PortletFileRepositoryUtil.deletePortletFileEntry(
+				coverImageFileEntryId);
+		}
+
+		if (blogsEntrySmallImageSelectorHelper.isFileEntryTempFile()) {
+			_blogsEntryLocalService.addOriginalImageFileEntry(
+				themeDisplay.getUserId(), entry.getGroupId(),
+				entry.getEntryId(), smallImageImageSelector);
+
+			PortletFileRepositoryUtil.deletePortletFileEntry(
+				smallImageFileEntryId);
 		}
 
 		return new Object[] {

@@ -305,6 +305,11 @@ public class AddressLocalServiceWrapper implements AddressLocalService,
 		return _addressLocalService.getExportActionableDynamicQuery(portletDataContext);
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _addressLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -343,23 +348,6 @@ public class AddressLocalServiceWrapper implements AddressLocalService,
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _addressLocalService.updateAddress(addressId, street1, street2,
 			street3, city, zip, regionId, countryId, typeId, mailing, primary);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public AddressLocalService getWrappedAddressLocalService() {
-		return _addressLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedAddressLocalService(
-		AddressLocalService addressLocalService) {
-		_addressLocalService = addressLocalService;
 	}
 
 	@Override

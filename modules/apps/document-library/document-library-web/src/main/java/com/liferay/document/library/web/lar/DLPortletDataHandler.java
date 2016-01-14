@@ -69,6 +69,7 @@ import java.util.List;
 
 import javax.portlet.PortletPreferences;
 
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -90,7 +91,20 @@ public class DLPortletDataHandler extends BasePortletDataHandler {
 
 	public static final String NAMESPACE = "document_library";
 
-	public DLPortletDataHandler() {
+	public static final String SCHEMA_VERSION = "1.0.0";
+
+	@Override
+	public String getSchemaVersion() {
+		return SCHEMA_VERSION;
+	}
+
+	@Override
+	public String getServiceName() {
+		return DLConstants.SERVICE_NAME;
+	}
+
+	@Activate
+	protected void activate() {
 		setDataLocalized(true);
 		setDataPortletPreferences("rootFolderId");
 		setDeletionSystemEventStagedModelTypes(
@@ -103,7 +117,8 @@ public class DLPortletDataHandler extends BasePortletDataHandler {
 		setExportControls(
 			new PortletDataHandlerBoolean(
 				NAMESPACE, "repositories", true, false, null,
-				Repository.class.getName()),
+				Repository.class.getName(),
+				StagedModelType.REFERRER_CLASS_NAME_ALL),
 			new PortletDataHandlerBoolean(
 				NAMESPACE, "folders", true, false, null,
 				DLFolderConstants.getClassName()),
@@ -122,11 +137,6 @@ public class DLPortletDataHandler extends BasePortletDataHandler {
 				DLFileShortcutConstants.getClassName()));
 		setPublishToLiveByDefault(PropsValues.DL_PUBLISH_TO_LIVE_BY_DEFAULT);
 		setRank(90);
-	}
-
-	@Override
-	public String getServiceName() {
-		return DLConstants.SERVICE_NAME;
 	}
 
 	@Override
@@ -391,6 +401,7 @@ public class DLPortletDataHandler extends BasePortletDataHandler {
 			});
 		exportActionableDynamicQuery.setPerformActionMethod(
 			new ActionableDynamicQuery.PerformActionMethod<DLFileShortcut>() {
+
 				@Override
 				public void performAction(DLFileShortcut dlFileShortcut)
 					throws PortalException {
@@ -402,6 +413,7 @@ public class DLPortletDataHandler extends BasePortletDataHandler {
 					StagedModelDataHandlerUtil.exportStagedModel(
 						portletDataContext, fileShortcut);
 				}
+
 			});
 		exportActionableDynamicQuery.setStagedModelType(
 			new StagedModelType(DLFileShortcutConstants.getClassName()));
@@ -494,6 +506,7 @@ public class DLPortletDataHandler extends BasePortletDataHandler {
 					StagedModelDataHandlerUtil.exportStagedModel(
 						portletDataContext, fileEntry);
 				}
+
 			});
 		exportActionableDynamicQuery.setStagedModelType(
 			new StagedModelType(DLFileEntryConstants.getClassName()));

@@ -813,7 +813,7 @@
 		<attribute default="" name="test.license.xml.url" />
 		<attribute default="" name="test.plugin.zip.url" />
 		<attribute default="" name="test.portal.bundle.zip.url" />
-		<attribute default="false" name="test.release.bundle" />
+		<attribute default="" name="test.sql.zip.url" />
 		<attribute default="false" name="tomcat.gc.log" />
 		<attribute default="false" name="tsant.gc.log" />
 
@@ -837,10 +837,12 @@
 				</test-action>
 
 				<test-set-up>
-					<antcall target="compile" />
-
 					<if>
-						<equals arg1="@{test.release.bundle}" arg2="true" />
+						<and>
+							<matches pattern="http" string="@{test.license.xml.url}" />
+							<matches pattern="http" string="@{test.portal.bundle.zip.url}" />
+							<matches pattern="http" string="@{test.sql.zip.url}" />
+						</and>
 						<then>
 							<propertycopy from="app.server.${app.server.type}.bin.dir" name="test.app.server.bin.dir" />
 
@@ -853,9 +855,17 @@
 							<antcall target="deploy-license-xml">
 								<param name="test.build.license.xml.zip.url" value="@{test.license.xml.url}" />
 							</antcall>
+
+							<antcall target="deploy-sql-zip">
+								<param name="test.sql.zip.url" value="@{test.sql.zip.url}" />
+							</antcall>
 						</then>
 						<else>
+							<antcall target="compile" />
+
 							<ant antfile="build-dist.xml" target="build-dist-${app.server.type}" />
+
+							<prepare-tomcat-setenv />
 						</else>
 					</if>
 
@@ -1029,6 +1039,23 @@
 		</sequential>
 	</macrodef>
 
+	<target name="compile-jsp">
+		<property name="testray.main.component.name" value="Compile JSP" />
+		<property name="testray.testcase.priority" value="5" />
+
+		<run-batch-test>
+			<test-action>
+				<ant dir="portal-web" target="compile-tomcat" />
+
+				<gradle-execute dir="modules" task="compileJSP" />
+			</test-action>
+
+			<test-set-up>
+				<prepare-test-build />
+			</test-set-up>
+		</run-batch-test>
+	</target>
+
 	<target name="functional-bundle-tomcat-mysql">
 		<set-tomcat-version-number liferay.portal.bundle="${test.portal.bundle.version}" />
 
@@ -1038,7 +1065,7 @@
 			test.license.xml.url="${test.license.xml.url}"
 			test.plugin.zip.url="${test.plugin.zip.url}"
 			test.portal.bundle.zip.url="${test.portal.bundle.zip.url}"
-			test.release.bundle="true"
+			test.sql.zip.url="${test.sql.zip.url}"
 		/>
 	</target>
 
@@ -1074,6 +1101,20 @@
 		<run-integration-test database.type="sybase" />
 	</target>
 
+	<target name="modules-functional">
+		<run-batch-test>
+			<test-action>
+				<antcall target="run-selenium-test">
+					<param name="test.class" value="${axis.variable}" />
+				</antcall>
+			</test-action>
+		</run-batch-test>
+	</target>
+
+	<target name="modules-functional-tomcat-mysql">
+		<run-functional-test app.server.type="tomcat" database.type="mysql" />
+	</target>
+
 	<target name="modules-integration-db2">
 		<run-modules-integration-test database.type="db2" />
 	</target>
@@ -1107,19 +1148,49 @@
 				<gradle-execute dir="modules" task="test">
 					<arg value="-Dtest.class.group.index=${axis.variable}" />
 				</gradle-execute>
-
-				<if>
-					<equals arg1="${axis.variable}" arg2="0" />
-					<then>
-						<gradle-execute dir="modules" task="compileJSP" />
-					</then>
-				</if>
 			</test-action>
 
 			<test-set-up>
 				<prepare-test-build />
 			</test-set-up>
 		</run-batch-test>
+	</target>
+
+	<target name="oracle-service-start">
+		<exec executable="service" failonerror="true">
+			<arg line="oracledb start" />
+		</exec>
+
+		<retry retrycount="60">
+			<sequential>
+				<local name="output.content" />
+				<local name="return.code" />
+
+				<exec executable="${oracle.lsnrctl.executable}" outputproperty="output.content">
+					<arg value="services" />
+				</exec>
+
+				<echo>Output:
+${output.content}</echo>
+
+				<if>
+					<or>
+						<contains string="${output.content}" substring="The listener supports no services" />
+					</or>
+					<then>
+						<sleep seconds="5" />
+
+						<fail message="Output: ${output.content}" />
+					</then>
+				</if>
+			</sequential>
+		</retry>
+	</target>
+
+	<target name="oracle-service-stop">
+		<exec executable="service">
+			<arg line="oracledb stop" />
+		</exec>
 	</target>
 
 	<target name="plugins-compile">
@@ -1147,7 +1218,7 @@
 			database.type="mysql"
 			test.license.xml.url="${test.license.xml.url}"
 			test.portal.bundle.zip.url="${test.portal.bundle.zip.url}"
-			test.release.bundle="true"
+			test.sql.zip.url="${test.sql.zip.url}"
 		/>
 	</target>
 
@@ -1308,7 +1379,7 @@ go</echo>
 				</exec>
 
 				<echo>Return code: ${return.code}
-Output content:
+Output:
 ${output.content}</echo>
 
 				<if>
@@ -1320,7 +1391,7 @@ ${output.content}</echo>
 					<then>
 						<clean-restart-sybase retry="true" />
 
-						<fail message="Output content: ${output.content}" />
+						<fail message="Output: ${output.content}" />
 					</then>
 				</if>
 

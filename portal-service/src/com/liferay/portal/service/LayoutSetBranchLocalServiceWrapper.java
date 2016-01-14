@@ -235,6 +235,11 @@ public class LayoutSetBranchLocalServiceWrapper
 	}
 
 	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _layoutSetBranchLocalService.getIndexableActionableDynamicQuery();
+	}
+
+	@Override
 	public com.liferay.portal.model.LayoutSetBranch getLayoutSetBranch(
 		long groupId, boolean privateLayout, java.lang.String name)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -366,23 +371,6 @@ public class LayoutSetBranchLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _layoutSetBranchLocalService.updateLayoutSetBranch(layoutSetBranchId,
 			name, description, serviceContext);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public LayoutSetBranchLocalService getWrappedLayoutSetBranchLocalService() {
-		return _layoutSetBranchLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedLayoutSetBranchLocalService(
-		LayoutSetBranchLocalService layoutSetBranchLocalService) {
-		_layoutSetBranchLocalService = layoutSetBranchLocalService;
 	}
 
 	@Override

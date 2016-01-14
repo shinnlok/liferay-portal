@@ -263,6 +263,11 @@ public class MBMailingListLocalServiceWrapper
 		return _mbMailingListLocalService.getExportActionableDynamicQuery(portletDataContext);
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _mbMailingListLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the message boards mailing list with the primary key.
 	*
@@ -398,23 +403,6 @@ public class MBMailingListLocalServiceWrapper
 			inUserName, inPassword, inReadInterval, outEmailAddress, outCustom,
 			outServerName, outServerPort, outUseSSL, outUserName, outPassword,
 			allowAnonymous, active, serviceContext);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public MBMailingListLocalService getWrappedMBMailingListLocalService() {
-		return _mbMailingListLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedMBMailingListLocalService(
-		MBMailingListLocalService mbMailingListLocalService) {
-		_mbMailingListLocalService = mbMailingListLocalService;
 	}
 
 	@Override

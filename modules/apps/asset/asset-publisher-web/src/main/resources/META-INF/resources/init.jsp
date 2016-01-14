@@ -20,6 +20,7 @@
 
 <%@ taglib uri="http://liferay.com/tld/aui" prefix="aui" %><%@
 taglib uri="http://liferay.com/tld/ddm" prefix="liferay-ddm" %><%@
+taglib uri="http://liferay.com/tld/frontend" prefix="liferay-frontend" %><%@
 taglib uri="http://liferay.com/tld/portlet" prefix="liferay-portlet" %><%@
 taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %><%@
 taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %><%@
@@ -31,7 +32,6 @@ page import="com.liferay.asset.publisher.web.display.context.AssetEntryResult" %
 page import="com.liferay.asset.publisher.web.display.context.AssetPublisherDisplayContext" %><%@
 page import="com.liferay.asset.publisher.web.util.AssetPublisherHelper" %><%@
 page import="com.liferay.asset.publisher.web.util.AssetPublisherUtil" %><%@
-page import="com.liferay.dynamic.data.mapping.model.DDMFormFieldType" %><%@
 page import="com.liferay.dynamic.data.mapping.model.DDMStructure" %><%@
 page import="com.liferay.dynamic.data.mapping.util.DDMIndexerUtil" %><%@
 page import="com.liferay.portal.NoSuchGroupException" %><%@
@@ -49,7 +49,6 @@ page import="com.liferay.portal.kernel.servlet.SessionErrors" %><%@
 page import="com.liferay.portal.kernel.servlet.SessionMessages" %><%@
 page import="com.liferay.portal.kernel.util.ArrayUtil" %><%@
 page import="com.liferay.portal.kernel.util.Constants" %><%@
-page import="com.liferay.portal.kernel.util.DateFormatFactoryUtil" %><%@
 page import="com.liferay.portal.kernel.util.DocumentConversionUtil" %><%@
 page import="com.liferay.portal.kernel.util.FastDateFormatFactoryUtil" %><%@
 page import="com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil" %><%@

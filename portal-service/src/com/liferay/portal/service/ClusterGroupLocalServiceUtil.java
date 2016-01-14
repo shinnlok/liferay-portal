@@ -231,6 +231,10 @@ public class ClusterGroupLocalServiceUtil {
 		return getService().getClusterGroupsCount();
 	}
 
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -266,13 +270,6 @@ public class ClusterGroupLocalServiceUtil {
 		}
 
 		return _service;
-	}
-
-	/**
-	 * @deprecated As of 6.2.0
-	 */
-	@Deprecated
-	public void setService(ClusterGroupLocalService service) {
 	}
 
 	private static ClusterGroupLocalService _service;

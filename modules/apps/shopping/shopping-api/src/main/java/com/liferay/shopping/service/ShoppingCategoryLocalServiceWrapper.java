@@ -286,6 +286,11 @@ public class ShoppingCategoryLocalServiceWrapper
 		return _shoppingCategoryLocalService.getCategory(groupId, categoryName);
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _shoppingCategoryLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -393,23 +398,6 @@ public class ShoppingCategoryLocalServiceWrapper
 	public com.liferay.shopping.model.ShoppingCategory updateShoppingCategory(
 		com.liferay.shopping.model.ShoppingCategory shoppingCategory) {
 		return _shoppingCategoryLocalService.updateShoppingCategory(shoppingCategory);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public ShoppingCategoryLocalService getWrappedShoppingCategoryLocalService() {
-		return _shoppingCategoryLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedShoppingCategoryLocalService(
-		ShoppingCategoryLocalService shoppingCategoryLocalService) {
-		_shoppingCategoryLocalService = shoppingCategoryLocalService;
 	}
 
 	@Override

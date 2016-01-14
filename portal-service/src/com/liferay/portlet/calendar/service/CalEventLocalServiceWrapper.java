@@ -476,6 +476,11 @@ public class CalEventLocalServiceWrapper implements CalEventLocalService,
 	}
 
 	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _calEventLocalService.getIndexableActionableDynamicQuery();
+	}
+
+	@Override
 	public java.util.List<com.liferay.portlet.calendar.model.CalEvent> getNoAssetEvents() {
 		return _calEventLocalService.getNoAssetEvents();
 	}
@@ -600,23 +605,6 @@ public class CalEventLocalServiceWrapper implements CalEventLocalService,
 			endDateYear, durationHour, durationMinute, allDay,
 			timeZoneSensitive, type, repeating, recurrence, remindBy,
 			firstReminder, secondReminder, serviceContext);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public CalEventLocalService getWrappedCalEventLocalService() {
-		return _calEventLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedCalEventLocalService(
-		CalEventLocalService calEventLocalService) {
-		_calEventLocalService = calEventLocalService;
 	}
 
 	@Override

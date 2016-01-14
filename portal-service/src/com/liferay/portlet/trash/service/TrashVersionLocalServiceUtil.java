@@ -210,6 +210,10 @@ public class TrashVersionLocalServiceUtil {
 		return getService().getActionableDynamicQuery();
 	}
 
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -293,13 +297,6 @@ public class TrashVersionLocalServiceUtil {
 		}
 
 		return _service;
-	}
-
-	/**
-	 * @deprecated As of 6.2.0
-	 */
-	@Deprecated
-	public void setService(TrashVersionLocalService service) {
 	}
 
 	private static TrashVersionLocalService _service;

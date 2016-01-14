@@ -64,11 +64,11 @@ import com.liferay.portal.model.CompanyConstants;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.User;
 import com.liferay.portal.security.auth.PrincipalException;
-import com.liferay.portal.service.LayoutLocalServiceUtil;
+import com.liferay.portal.service.LayoutLocalService;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
-import com.liferay.portal.service.UserLocalServiceUtil;
-import com.liferay.portal.service.UserServiceUtil;
+import com.liferay.portal.service.UserLocalService;
+import com.liferay.portal.service.UserService;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsValues;
@@ -82,6 +82,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Brian Wing Shun Chan
@@ -162,7 +163,7 @@ public class CreateAccountMVCActionCommand extends BaseMVCActionCommand {
 			openIdPending = true;
 		}
 
-		User user = UserServiceUtil.addUserWithWorkflow(
+		User user = _userService.addUserWithWorkflow(
 			company.getCompanyId(), autoPassword, password1, password2,
 			autoScreenName, screenName, emailAddress, facebookId, openId,
 			LocaleUtil.fromLanguageId(languageId), firstName, middleName,
@@ -247,44 +248,14 @@ public class CreateAccountMVCActionCommand extends BaseMVCActionCommand {
 			}
 		}
 		catch (Exception e) {
-			if (e instanceof AddressCityException ||
-				e instanceof AddressStreetException ||
-				e instanceof AddressZipException ||
-				e instanceof CaptchaConfigurationException ||
-				e instanceof CaptchaMaxChallengesException ||
-				e instanceof CaptchaTextException ||
-				e instanceof CompanyMaxUsersException ||
-				e instanceof ContactBirthdayException ||
-				e instanceof ContactNameException ||
-				e instanceof DuplicateOpenIdException ||
-				e instanceof EmailAddressException ||
-				e instanceof GroupFriendlyURLException ||
-				e instanceof NoSuchCountryException ||
-				e instanceof NoSuchListTypeException ||
-				e instanceof NoSuchOrganizationException ||
-				e instanceof NoSuchRegionException ||
-				e instanceof OrganizationParentException ||
-				e instanceof PhoneNumberException ||
-				e instanceof RequiredFieldException ||
-				e instanceof RequiredUserException ||
-				e instanceof TermsOfUseException ||
-				e instanceof UserEmailAddressException ||
-				e instanceof UserIdException ||
-				e instanceof UserPasswordException ||
-				e instanceof UserScreenNameException ||
-				e instanceof UserSmsException ||
-				e instanceof WebsiteURLException) {
-
-				SessionErrors.add(actionRequest, e.getClass(), e);
-			}
-			else if (e instanceof
-						UserEmailAddressException.MustNotBeDuplicate ||
-					 e instanceof UserScreenNameException.MustNotBeDuplicate) {
+			if (e instanceof
+					UserEmailAddressException.MustNotBeDuplicate ||
+				e instanceof UserScreenNameException.MustNotBeDuplicate) {
 
 				String emailAddress = ParamUtil.getString(
 					actionRequest, "emailAddress");
 
-				User user = UserLocalServiceUtil.fetchUserByEmailAddress(
+				User user = _userLocalService.fetchUserByEmailAddress(
 					themeDisplay.getCompanyId(), emailAddress);
 
 				if ((user == null) ||
@@ -294,8 +265,38 @@ public class CreateAccountMVCActionCommand extends BaseMVCActionCommand {
 				}
 				else {
 					actionResponse.setRenderParameter(
-						"mvcPath", "update_account.jsp");
+						"mvcPath", "/update_account.jsp");
 				}
+			}
+			else if (e instanceof AddressCityException ||
+					 e instanceof AddressStreetException ||
+					 e instanceof AddressZipException ||
+					 e instanceof CaptchaConfigurationException ||
+					 e instanceof CaptchaMaxChallengesException ||
+					 e instanceof CaptchaTextException ||
+					 e instanceof CompanyMaxUsersException ||
+					 e instanceof ContactBirthdayException ||
+					 e instanceof ContactNameException ||
+					 e instanceof DuplicateOpenIdException ||
+					 e instanceof EmailAddressException ||
+					 e instanceof GroupFriendlyURLException ||
+					 e instanceof NoSuchCountryException ||
+					 e instanceof NoSuchListTypeException ||
+					 e instanceof NoSuchOrganizationException ||
+					 e instanceof NoSuchRegionException ||
+					 e instanceof OrganizationParentException ||
+					 e instanceof PhoneNumberException ||
+					 e instanceof RequiredFieldException ||
+					 e instanceof RequiredUserException ||
+					 e instanceof TermsOfUseException ||
+					 e instanceof UserEmailAddressException ||
+					 e instanceof UserIdException ||
+					 e instanceof UserPasswordException ||
+					 e instanceof UserScreenNameException ||
+					 e instanceof UserSmsException ||
+					 e instanceof WebsiteURLException) {
+
+				SessionErrors.add(actionRequest, e.getClass(), e);
 			}
 			else {
 				throw e;
@@ -307,7 +308,7 @@ public class CreateAccountMVCActionCommand extends BaseMVCActionCommand {
 		}
 
 		try {
-			Layout layout = LayoutLocalServiceUtil.getFriendlyURLLayout(
+			Layout layout = _layoutLocalService.getFriendlyURLLayout(
 				themeDisplay.getScopeGroupId(), false,
 				PropsValues.COMPANY_SECURITY_STRANGERS_URL);
 
@@ -333,7 +334,7 @@ public class CreateAccountMVCActionCommand extends BaseMVCActionCommand {
 		String emailAddress = ParamUtil.getString(
 			actionRequest, "emailAddress");
 
-		User anonymousUser = UserLocalServiceUtil.getUserByEmailAddress(
+		User anonymousUser = _userLocalService.getUserByEmailAddress(
 			themeDisplay.getCompanyId(), emailAddress);
 
 		if (anonymousUser.getStatus() != WorkflowConstants.STATUS_INCOMPLETE) {
@@ -341,7 +342,7 @@ public class CreateAccountMVCActionCommand extends BaseMVCActionCommand {
 				anonymousUser.getUuid());
 		}
 
-		UserLocalServiceUtil.deleteUser(anonymousUser.getUserId());
+		_userLocalService.deleteUser(anonymousUser.getUserId());
 
 		addUser(actionRequest, actionResponse);
 	}
@@ -374,6 +375,23 @@ public class CreateAccountMVCActionCommand extends BaseMVCActionCommand {
 		}
 
 		actionResponse.sendRedirect(redirect);
+	}
+
+	@Reference(unbind = "-")
+	protected void setLayoutLocalService(
+		LayoutLocalService layoutLocalService) {
+
+		_layoutLocalService = layoutLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setUserLocalService(UserLocalService userLocalService) {
+		_userLocalService = userLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setUserService(UserService userService) {
+		_userService = userService;
 	}
 
 	protected void updateIncompleteUser(
@@ -422,7 +440,7 @@ public class CreateAccountMVCActionCommand extends BaseMVCActionCommand {
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			User.class.getName(), actionRequest);
 
-		User user = UserServiceUtil.updateIncompleteUser(
+		User user = _userService.updateIncompleteUser(
 			themeDisplay.getCompanyId(), autoPassword, password1, password2,
 			autoScreenName, screenName, emailAddress, facebookId, openId,
 			themeDisplay.getLocale(), firstName, middleName, lastName, prefixId,
@@ -430,12 +448,12 @@ public class CreateAccountMVCActionCommand extends BaseMVCActionCommand {
 			sendEmail, updateUserInformation, serviceContext);
 
 		if (facebookId > 0) {
-			UserLocalServiceUtil.updateLastLogin(
+			_userLocalService.updateLastLogin(
 				user.getUserId(), user.getLoginIP());
 
-			UserLocalServiceUtil.updatePasswordReset(user.getUserId(), false);
+			_userLocalService.updatePasswordReset(user.getUserId(), false);
 
-			UserLocalServiceUtil.updateEmailAddressVerified(
+			_userLocalService.updateEmailAddressVerified(
 				user.getUserId(), true);
 
 			session.removeAttribute(WebKeys.FACEBOOK_INCOMPLETE_USER_ID);
@@ -499,5 +517,9 @@ public class CreateAccountMVCActionCommand extends BaseMVCActionCommand {
 	}
 
 	private static final boolean _AUTO_SCREEN_NAME = false;
+
+	private LayoutLocalService _layoutLocalService;
+	private UserLocalService _userLocalService;
+	private UserService _userService;
 
 }

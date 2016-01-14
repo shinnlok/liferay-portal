@@ -412,6 +412,11 @@ public class MBThreadLocalServiceWrapper implements MBThreadLocalService,
 			subscribed, queryDefinition);
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _mbThreadLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the message boards thread with the primary key.
 	*
@@ -654,10 +659,10 @@ public class MBThreadLocalServiceWrapper implements MBThreadLocalService,
 
 	@Override
 	public com.liferay.portlet.messageboards.model.MBThread splitThread(
-		long messageId, java.lang.String subject,
+		long userId, long messageId, java.lang.String subject,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		return _mbThreadLocalService.splitThread(messageId, subject,
+		return _mbThreadLocalService.splitThread(userId, messageId, subject,
 			serviceContext);
 	}
 
@@ -702,23 +707,6 @@ public class MBThreadLocalServiceWrapper implements MBThreadLocalService,
 		long threadId, int viewCount)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _mbThreadLocalService.updateThread(threadId, viewCount);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public MBThreadLocalService getWrappedMBThreadLocalService() {
-		return _mbThreadLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedMBThreadLocalService(
-		MBThreadLocalService mbThreadLocalService) {
-		_mbThreadLocalService = mbThreadLocalService;
 	}
 
 	@Override
