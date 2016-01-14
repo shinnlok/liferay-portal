@@ -256,6 +256,11 @@ public class ClassNameLocalServiceWrapper implements ClassNameLocalService,
 		return _classNameLocalService.getClassNamesCount();
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _classNameLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -293,23 +298,6 @@ public class ClassNameLocalServiceWrapper implements ClassNameLocalService,
 	public com.liferay.portal.model.ClassName updateClassName(
 		com.liferay.portal.model.ClassName className) {
 		return _classNameLocalService.updateClassName(className);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public ClassNameLocalService getWrappedClassNameLocalService() {
-		return _classNameLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedClassNameLocalService(
-		ClassNameLocalService classNameLocalService) {
-		_classNameLocalService = classNameLocalService;
 	}
 
 	@Override

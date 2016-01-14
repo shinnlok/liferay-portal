@@ -396,7 +396,8 @@ public class HtmlBBCodeTranslatorImpl implements BBCodeTranslator {
 	}
 
 	protected void handleImage(
-		StringBundler sb, List<BBCodeItem> bbCodeItems, IntegerWrapper marker) {
+		StringBundler sb, Stack<String> tags, List<BBCodeItem> bbCodeItems,
+		IntegerWrapper marker) {
 
 		sb.append("<img src=\"");
 
@@ -424,6 +425,8 @@ public class HtmlBBCodeTranslatorImpl implements BBCodeTranslator {
 		}
 
 		sb.append(" />");
+
+		tags.push(StringPool.BLANK);
 	}
 
 	protected void handleImageAttributes(StringBundler sb, String attributes) {
@@ -641,7 +644,7 @@ public class HtmlBBCodeTranslatorImpl implements BBCodeTranslator {
 			handleItalic(sb, tags);
 		}
 		else if (tag.equals("img")) {
-			handleImage(sb, bbCodeItems, marker);
+			handleImage(sb, tags, bbCodeItems, marker);
 		}
 		else if (tag.equals("li") || tag.equals("*")) {
 			handleListItem(sb, tags);
@@ -716,41 +719,29 @@ public class HtmlBBCodeTranslatorImpl implements BBCodeTranslator {
 		HtmlBBCodeTranslatorImpl.class);
 
 	private final String[][] _EMOTICONS = {
-		{"happy.gif", ":)", "happy"},
-		{"smile.gif", ":D", "smile"},
-		{"cool.gif", "B)", "cool"},
-		{"sad.gif", ":(", "sad"},
-		{"tongue.gif", ":P", "tongue"},
-		{"laugh.gif", ":lol:", "laugh"},
-		{"kiss.gif", ":#", "kiss"},
-		{"blush.gif", ":*)", "blush"},
-		{"bashful.gif", ":bashful:", "bashful"},
-		{"smug.gif", ":smug:", "smug"},
-		{"blink.gif", ":blink:", "blink"},
-		{"huh.gif", ":huh:", "huh"},
+		{"happy.gif", ":)", "happy"}, {"smile.gif", ":D", "smile"},
+		{"cool.gif", "B)", "cool"}, {"sad.gif", ":(", "sad"},
+		{"tongue.gif", ":P", "tongue"}, {"laugh.gif", ":lol:", "laugh"},
+		{"kiss.gif", ":#", "kiss"}, {"blush.gif", ":*)", "blush"},
+		{"bashful.gif", ":bashful:", "bashful"}, {"smug.gif", ":smug:", "smug"},
+		{"blink.gif", ":blink:", "blink"}, {"huh.gif", ":huh:", "huh"},
 		{"mellow.gif", ":mellow:", "mellow"},
-		{"unsure.gif", ":unsure:", "unsure"},
-		{"mad.gif", ":mad:", "mad"},
+		{"unsure.gif", ":unsure:", "unsure"}, {"mad.gif", ":mad:", "mad"},
 		{"oh_my.gif", ":O", "oh-my-goodness"},
 		{"roll_eyes.gif", ":rolleyes:", "roll-eyes"},
 		{"angry.gif", ":angry:", "angry"},
 		{"suspicious.gif", "8o", "suspicious"},
 		{"big_grin.gif", ":grin:", "grin"},
-		{"in_love.gif", ":love:", "in-love"},
-		{"bored.gif", ":bored:", "bored"},
+		{"in_love.gif", ":love:", "in-love"}, {"bored.gif", ":bored:", "bored"},
 		{"closed_eyes.gif", "-_-", "closed-eyes"},
-		{"cold.gif", ":cold:", "cold"},
-		{"sleep.gif", ":sleep:", "sleep"},
+		{"cold.gif", ":cold:", "cold"}, {"sleep.gif", ":sleep:", "sleep"},
 		{"glare.gif", ":glare:", "glare"},
 		{"darth_vader.gif", ":vader:", "darth-vader"},
-		{"dry.gif", ":dry:", "dry"},
-		{"exclamation.gif", ":what:", "what"},
+		{"dry.gif", ":dry:", "dry"}, {"exclamation.gif", ":what:", "what"},
 		{"girl.gif", ":girl:", "girl"},
 		{"karate_kid.gif", ":kid:", "karate-kid"},
-		{"ninja.gif", ":ph34r:", "ninja"},
-		{"pac_man.gif", ":V", "pac-man"},
-		{"wacko.gif", ":wacko:", "wacko"},
-		{"wink.gif", ":wink:", "wink"},
+		{"ninja.gif", ":ph34r:", "ninja"}, {"pac_man.gif", ":V", "pac-man"},
+		{"wacko.gif", ":wacko:", "wacko"}, {"wink.gif", ":wink:", "wink"},
 		{"wub.gif", ":wub:", "wub"}
 	};
 

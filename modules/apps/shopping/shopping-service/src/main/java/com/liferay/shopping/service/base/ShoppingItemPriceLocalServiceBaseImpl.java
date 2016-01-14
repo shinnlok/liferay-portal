@@ -18,13 +18,14 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
-import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
+import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -35,6 +36,7 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.model.PersistedModel;
 import com.liferay.portal.service.BaseLocalServiceImpl;
 import com.liferay.portal.service.PersistedModelLocalServiceRegistry;
+import com.liferay.portal.spring.extender.service.ServiceReference;
 import com.liferay.portal.util.PortalUtil;
 
 import com.liferay.shopping.model.ShoppingItemPrice;
@@ -230,19 +232,32 @@ public abstract class ShoppingItemPriceLocalServiceBaseImpl
 		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
 
 		actionableDynamicQuery.setBaseLocalService(com.liferay.shopping.service.ShoppingItemPriceLocalServiceUtil.getService());
-		actionableDynamicQuery.setClass(ShoppingItemPrice.class);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
+		actionableDynamicQuery.setModelClass(ShoppingItemPrice.class);
 
 		actionableDynamicQuery.setPrimaryKeyPropertyName("itemPriceId");
 
 		return actionableDynamicQuery;
 	}
 
+	@Override
+	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		IndexableActionableDynamicQuery indexableActionableDynamicQuery = new IndexableActionableDynamicQuery();
+
+		indexableActionableDynamicQuery.setBaseLocalService(com.liferay.shopping.service.ShoppingItemPriceLocalServiceUtil.getService());
+		indexableActionableDynamicQuery.setClassLoader(getClassLoader());
+		indexableActionableDynamicQuery.setModelClass(ShoppingItemPrice.class);
+
+		indexableActionableDynamicQuery.setPrimaryKeyPropertyName("itemPriceId");
+
+		return indexableActionableDynamicQuery;
+	}
+
 	protected void initActionableDynamicQuery(
 		ActionableDynamicQuery actionableDynamicQuery) {
 		actionableDynamicQuery.setBaseLocalService(com.liferay.shopping.service.ShoppingItemPriceLocalServiceUtil.getService());
-		actionableDynamicQuery.setClass(ShoppingItemPrice.class);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
+		actionableDynamicQuery.setModelClass(ShoppingItemPrice.class);
 
 		actionableDynamicQuery.setPrimaryKeyPropertyName("itemPriceId");
 	}
@@ -378,25 +393,6 @@ public abstract class ShoppingItemPriceLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the shopping item remote service.
-	 *
-	 * @return the shopping item remote service
-	 */
-	public com.liferay.shopping.service.ShoppingItemService getShoppingItemService() {
-		return shoppingItemService;
-	}
-
-	/**
-	 * Sets the shopping item remote service.
-	 *
-	 * @param shoppingItemService the shopping item remote service
-	 */
-	public void setShoppingItemService(
-		com.liferay.shopping.service.ShoppingItemService shoppingItemService) {
-		this.shoppingItemService = shoppingItemService;
-	}
-
-	/**
 	 * Returns the shopping item persistence.
 	 *
 	 * @return the shopping item persistence
@@ -470,7 +466,7 @@ public abstract class ShoppingItemPriceLocalServiceBaseImpl
 		try {
 			DataSource dataSource = shoppingItemPricePersistence.getDataSource();
 
-			DB db = DBFactoryUtil.getDB();
+			DB db = DBManagerUtil.getDB();
 
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
@@ -489,12 +485,10 @@ public abstract class ShoppingItemPriceLocalServiceBaseImpl
 	protected ShoppingItemPriceLocalService shoppingItemPriceLocalService;
 	@BeanReference(type = ShoppingItemPricePersistence.class)
 	protected ShoppingItemPricePersistence shoppingItemPricePersistence;
-	@BeanReference(type = com.liferay.counter.service.CounterLocalService.class)
+	@ServiceReference(type = com.liferay.counter.service.CounterLocalService.class)
 	protected com.liferay.counter.service.CounterLocalService counterLocalService;
 	@BeanReference(type = com.liferay.shopping.service.ShoppingItemLocalService.class)
 	protected com.liferay.shopping.service.ShoppingItemLocalService shoppingItemLocalService;
-	@BeanReference(type = com.liferay.shopping.service.ShoppingItemService.class)
-	protected com.liferay.shopping.service.ShoppingItemService shoppingItemService;
 	@BeanReference(type = ShoppingItemPersistence.class)
 	protected ShoppingItemPersistence shoppingItemPersistence;
 	@BeanReference(type = ShoppingItemFinder.class)

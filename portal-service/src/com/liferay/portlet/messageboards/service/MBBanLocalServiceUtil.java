@@ -246,6 +246,10 @@ public class MBBanLocalServiceUtil {
 		return getService().getExportActionableDynamicQuery(portletDataContext);
 	}
 
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the message boards ban with the primary key.
 	*
@@ -366,13 +370,6 @@ public class MBBanLocalServiceUtil {
 		}
 
 		return _service;
-	}
-
-	/**
-	 * @deprecated As of 6.2.0
-	 */
-	@Deprecated
-	public void setService(MBBanLocalService service) {
 	}
 
 	private static MBBanLocalService _service;

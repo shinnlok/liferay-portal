@@ -237,6 +237,11 @@ public class PortletPreferencesLocalServiceWrapper
 			portletId);
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _portletPreferencesLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -434,23 +439,6 @@ public class PortletPreferencesLocalServiceWrapper
 		java.lang.String xml) {
 		return _portletPreferencesLocalService.updatePreferences(ownerId,
 			ownerType, plid, portletId, xml);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public PortletPreferencesLocalService getWrappedPortletPreferencesLocalService() {
-		return _portletPreferencesLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedPortletPreferencesLocalService(
-		PortletPreferencesLocalService portletPreferencesLocalService) {
-		_portletPreferencesLocalService = portletPreferencesLocalService;
 	}
 
 	@Override

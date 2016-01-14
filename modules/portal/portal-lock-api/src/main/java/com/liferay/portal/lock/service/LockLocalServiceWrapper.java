@@ -203,6 +203,11 @@ public class LockLocalServiceWrapper implements LockLocalService,
 	}
 
 	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _lockLocalService.getIndexableActionableDynamicQuery();
+	}
+
+	@Override
 	public com.liferay.portal.lock.model.Lock getLock(
 		java.lang.String className, java.lang.String key)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -374,22 +379,6 @@ public class LockLocalServiceWrapper implements LockLocalService,
 	public com.liferay.portal.lock.model.Lock updateLock(
 		com.liferay.portal.lock.model.Lock lock) {
 		return _lockLocalService.updateLock(lock);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public LockLocalService getWrappedLockLocalService() {
-		return _lockLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedLockLocalService(LockLocalService lockLocalService) {
-		_lockLocalService = lockLocalService;
 	}
 
 	@Override

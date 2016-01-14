@@ -241,6 +241,11 @@ public class WikiPageResourceLocalServiceWrapper
 		return _wikiPageResourceLocalService.getActionableDynamicQuery();
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _wikiPageResourceLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -389,23 +394,6 @@ public class WikiPageResourceLocalServiceWrapper
 	public com.liferay.wiki.model.WikiPageResource updateWikiPageResource(
 		com.liferay.wiki.model.WikiPageResource wikiPageResource) {
 		return _wikiPageResourceLocalService.updateWikiPageResource(wikiPageResource);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public WikiPageResourceLocalService getWrappedWikiPageResourceLocalService() {
-		return _wikiPageResourceLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedWikiPageResourceLocalService(
-		WikiPageResourceLocalService wikiPageResourceLocalService) {
-		_wikiPageResourceLocalService = wikiPageResourceLocalService;
 	}
 
 	@Override

@@ -54,6 +54,13 @@ public class DDMDataProviderInstanceServiceWrapper
 	}
 
 	@Override
+	public com.liferay.dynamic.data.mapping.model.DDMDataProviderInstance fetchDataProviderInstance(
+		long dataProviderInstanceId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _ddmDataProviderInstanceService.fetchDataProviderInstance(dataProviderInstanceId);
+	}
+
+	@Override
 	public com.liferay.dynamic.data.mapping.model.DDMDataProviderInstance getDataProviderInstance(
 		long dataProviderInstanceId)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -112,23 +119,6 @@ public class DDMDataProviderInstanceServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _ddmDataProviderInstanceService.updateDataProviderInstance(dataProviderInstanceId,
 			nameMap, descriptionMap, ddmFormValues, serviceContext);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public DDMDataProviderInstanceService getWrappedDDMDataProviderInstanceService() {
-		return _ddmDataProviderInstanceService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedDDMDataProviderInstanceService(
-		DDMDataProviderInstanceService ddmDataProviderInstanceService) {
-		_ddmDataProviderInstanceService = ddmDataProviderInstanceService;
 	}
 
 	@Override

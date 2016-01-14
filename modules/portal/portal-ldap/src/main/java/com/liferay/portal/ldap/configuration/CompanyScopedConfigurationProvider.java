@@ -15,9 +15,10 @@
 package com.liferay.portal.ldap.configuration;
 
 import aQute.bnd.annotation.metatype.Configurable;
-import aQute.bnd.annotation.metatype.Meta;
 
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringPool;
@@ -34,13 +35,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.osgi.service.cm.Configuration;
-import org.osgi.service.cm.ConfigurationAdmin;
 
 /**
  * @author Michael C. Han
  */
 public abstract class CompanyScopedConfigurationProvider
-	<T extends CompanyScopedConfiguration> implements ConfigurationProvider<T> {
+	<T extends CompanyScopedConfiguration>
+		extends BaseConfigurationProvider<T>
+		implements ConfigurationProvider<T> {
 
 	@Override
 	public boolean delete(long companyId) {
@@ -51,7 +53,17 @@ public abstract class CompanyScopedConfigurationProvider
 		}
 
 		try {
+			Dictionary<String, Object> properties =
+				configuration.getProperties();
+
 			configuration.delete();
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					"Deleted configuration " + getMetatypeId() +
+						" for company " + companyId + " with properties: " +
+							properties);
+			}
 		}
 		catch (IOException ioe) {
 			throw new SystemException(ioe);
@@ -194,10 +206,16 @@ public abstract class CompanyScopedConfigurationProvider
 
 		Dictionary<String, Object> properties = configuration.getProperties();
 
+		if (properties == null) {
+			properties = new HashMapDictionary<>();
+		}
+
 		T configurable = Configurable.createConfigurable(
 			getMetatype(), properties);
 
 		long companyId = configurable.companyId();
+
+		_companyIds.put(configuration.getPid(), companyId);
 
 		_configurations.put(companyId, configuration);
 	}
@@ -206,19 +224,22 @@ public abstract class CompanyScopedConfigurationProvider
 	public synchronized void unregisterConfiguration(
 		Configuration configuration) {
 
-		Dictionary<String, Object> properties = configuration.getProperties();
+		String pid = configuration.getPid();
 
-		T configurable = Configurable.createConfigurable(
-			getMetatype(), properties);
+		Long companyId = _companyIds.get(pid);
 
-		long companyId = configurable.companyId();
-
-		_configurations.remove(companyId);
+		if (companyId != null) {
+			_configurations.remove(companyId);
+		}
 	}
 
 	@Override
 	public void updateProperties(
 		long companyId, Dictionary<String, Object> properties) {
+
+		if (properties == null) {
+			properties = new HashMapDictionary<>();
+		}
 
 		Configuration configuration = _configurations.get(companyId);
 
@@ -235,6 +256,13 @@ public abstract class CompanyScopedConfigurationProvider
 			properties.put(LDAPConstants.COMPANY_ID, companyId);
 
 			configuration.update(properties);
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					"Updated configuration " + getMetatypeId() +
+						" for company " + companyId + " with properties: " +
+							properties);
+			}
 		}
 		catch (IOException ioe) {
 			throw new SystemException("Unable to update configuration", ioe);
@@ -248,30 +276,10 @@ public abstract class CompanyScopedConfigurationProvider
 		updateProperties(companyId, properties);
 	}
 
-	protected String getMetatypeId() {
-		Class<T> metatype = getMetatype();
+	private static final Log _log = LogFactoryUtil.getLog(
+		CompanyScopedConfigurationProvider.class);
 
-		Meta.OCD metaOCD = metatype.getAnnotation(Meta.OCD.class);
-
-		if (metaOCD == null) {
-			return null;
-		}
-
-		String id = metaOCD.id();
-
-		if (id == null) {
-			id = metatype.getName();
-		}
-
-		return id;
-	}
-
-	protected abstract void setConfigurationAdmin(
-		ConfigurationAdmin configurationAdmin);
-
-	protected ConfigurationAdmin configurationAdmin;
-	protected String factoryPid;
-
+	private final Map<String, Long> _companyIds = new HashMap<>();
 	private final Map<Long, Configuration> _configurations = new HashMap<>();
 
 }

@@ -665,6 +665,11 @@ public class SocialActivityLocalServiceWrapper
 		return _socialActivityLocalService.getGroupUsersActivitiesCount(groupId);
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _socialActivityLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the activity that has the mirror activity.
 	*
@@ -1044,23 +1049,6 @@ public class SocialActivityLocalServiceWrapper
 	public com.liferay.portlet.social.model.SocialActivity updateSocialActivity(
 		com.liferay.portlet.social.model.SocialActivity socialActivity) {
 		return _socialActivityLocalService.updateSocialActivity(socialActivity);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public SocialActivityLocalService getWrappedSocialActivityLocalService() {
-		return _socialActivityLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedSocialActivityLocalService(
-		SocialActivityLocalService socialActivityLocalService) {
-		_socialActivityLocalService = socialActivityLocalService;
 	}
 
 	@Override

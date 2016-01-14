@@ -22,6 +22,11 @@ import jodd.json.JsonContext;
 import jodd.json.JsonSerializer;
 import jodd.json.TypeJsonSerializer;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.Date;
+
 /**
  * @author Igor Spasic
  */
@@ -93,6 +98,12 @@ public class JSONSerializerImpl implements JSONSerializer {
 
 	static {
 		JoddJson.defaultSerializers.register(
+			Date.class, new LongToStringTypeJSONSerializer());
+		JoddJson.defaultSerializers.register(
+			JSONArray.class, new JSONArrayTypeJSONSerializer());
+		JoddJson.defaultSerializers.register(
+			JSONObject.class, new JSONObjectTypeJSONSerializer());
+		JoddJson.defaultSerializers.register(
 			Long.TYPE, new LongToStringTypeJSONSerializer());
 		JoddJson.defaultSerializers.register(
 			Long.class, new LongToStringTypeJSONSerializer());
@@ -100,12 +111,39 @@ public class JSONSerializerImpl implements JSONSerializer {
 
 	private final JsonSerializer _jsonSerializer;
 
-	private static class LongToStringTypeJSONSerializer
-		implements TypeJsonSerializer<Long> {
+	private static class JSONArrayTypeJSONSerializer
+		implements TypeJsonSerializer<JSONArray> {
 
 		@Override
-		public void serialize(JsonContext jsonContext, Long value) {
-			jsonContext.writeString(Long.toString(value));
+		public void serialize(JsonContext jsonContext, JSONArray jsonArray) {
+			jsonContext.write(jsonArray.toString());
+		}
+
+	}
+
+	private static class JSONObjectTypeJSONSerializer
+		implements TypeJsonSerializer<JSONObject> {
+
+		@Override
+		public void serialize(JsonContext jsonContext, JSONObject jsonObject) {
+			jsonContext.write(jsonObject.toString());
+		}
+
+	}
+
+	private static class LongToStringTypeJSONSerializer
+		implements TypeJsonSerializer<Object> {
+
+		@Override
+		public void serialize(JsonContext jsonContext, Object value) {
+			if (value instanceof Date) {
+				long time = ((Date)value).getTime();
+
+				jsonContext.writeString(Long.toString(time));
+			}
+			else if (value instanceof Long) {
+				jsonContext.writeString(Long.toString((long)value));
+			}
 		}
 
 	}

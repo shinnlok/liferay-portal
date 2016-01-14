@@ -341,16 +341,17 @@
 				}
 			},
 			{
-				"template_pt": {
+				"template_pl": {
 					"mapping": {
-						"analyzer": "brazilian",
+						"analyzer": "polish",
 						"index": "analyzed",
 						"store": "true",
 						"term_vector": "with_positions_offsets",
 						"type": "string"
 					},
-					"match": "*_pt_BR",
-					"match_mapping_type": "string"
+					"match": "\\w+_pl\\b|\\w+_pl_[A-Z]{2}\\b",
+					"match_mapping_type": "string",
+					"match_pattern": "regex"
 				}
 			},
 			{
@@ -365,6 +366,19 @@
 					"match": "\\w+_pt\\b|\\w+_pt_PT\\b",
 					"match_mapping_type": "string",
 					"match_pattern": "regex"
+				}
+			},
+			{
+				"template_pt_br": {
+					"mapping": {
+						"analyzer": "brazilian",
+						"index": "analyzed",
+						"store": "true",
+						"term_vector": "with_positions_offsets",
+						"type": "string"
+					},
+					"match": "*_pt_BR",
+					"match_mapping_type": "string"
 				}
 			},
 			{
@@ -539,6 +553,21 @@
 				"type": "string"
 			},
 			"companyId": {
+				"index": "not_analyzed",
+				"store": "yes",
+				"type": "string"
+			},
+			"configurationModelAttributeName": {
+				"index": "not_analyzed",
+				"store": "yes",
+				"type": "string"
+			},
+			"configurationModelFactoryPid": {
+				"index": "not_analyzed",
+				"store": "yes",
+				"type": "string"
+			},
+			"configurationModelId": {
 				"index": "not_analyzed",
 				"store": "yes",
 				"type": "string"

@@ -288,6 +288,11 @@ public class KaleoLogLocalServiceWrapper implements KaleoLogLocalService,
 	}
 
 	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _kaleoLogLocalService.getIndexableActionableDynamicQuery();
+	}
+
+	@Override
 	public java.util.List<com.liferay.portal.workflow.kaleo.model.KaleoLog> getKaleoInstanceKaleoLogs(
 		long kaleoInstanceId, java.util.List<java.lang.Integer> logTypes,
 		int start, int end,
@@ -388,23 +393,6 @@ public class KaleoLogLocalServiceWrapper implements KaleoLogLocalService,
 	public com.liferay.portal.workflow.kaleo.model.KaleoLog updateKaleoLog(
 		com.liferay.portal.workflow.kaleo.model.KaleoLog kaleoLog) {
 		return _kaleoLogLocalService.updateKaleoLog(kaleoLog);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public KaleoLogLocalService getWrappedKaleoLogLocalService() {
-		return _kaleoLogLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedKaleoLogLocalService(
-		KaleoLogLocalService kaleoLogLocalService) {
-		_kaleoLogLocalService = kaleoLogLocalService;
 	}
 
 	@Override

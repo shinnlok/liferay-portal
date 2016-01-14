@@ -302,6 +302,11 @@ public class SubscriptionLocalServiceWrapper implements SubscriptionLocalService
 		return _subscriptionLocalService.getActionableDynamicQuery();
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _subscriptionLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -495,23 +500,6 @@ public class SubscriptionLocalServiceWrapper implements SubscriptionLocalService
 	public com.liferay.portal.model.Subscription updateSubscription(
 		com.liferay.portal.model.Subscription subscription) {
 		return _subscriptionLocalService.updateSubscription(subscription);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public SubscriptionLocalService getWrappedSubscriptionLocalService() {
-		return _subscriptionLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedSubscriptionLocalService(
-		SubscriptionLocalService subscriptionLocalService) {
-		_subscriptionLocalService = subscriptionLocalService;
 	}
 
 	@Override

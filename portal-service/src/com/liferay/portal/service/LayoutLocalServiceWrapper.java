@@ -860,6 +860,11 @@ public class LayoutLocalServiceWrapper implements LayoutLocalService,
 			friendlyURL);
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _layoutLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the layout matching the primary key, group, and privacy; throws a
 	* {@link NoSuchLayoutException} otherwise.
@@ -1196,6 +1201,13 @@ public class LayoutLocalServiceWrapper implements LayoutLocalService,
 		return _layoutLocalService.getPersistedModel(primaryKeyObj);
 	}
 
+	@Override
+	public java.util.List<com.liferay.portal.model.Layout> getScopeGroupLayouts(
+		long parentGroupId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _layoutLocalService.getScopeGroupLayouts(parentGroupId);
+	}
+
 	/**
 	* Returns all the layouts within scope of the group
 	*
@@ -1205,8 +1217,10 @@ public class LayoutLocalServiceWrapper implements LayoutLocalService,
 	*/
 	@Override
 	public java.util.List<com.liferay.portal.model.Layout> getScopeGroupLayouts(
-		long groupId, boolean privateLayout) {
-		return _layoutLocalService.getScopeGroupLayouts(groupId, privateLayout);
+		long parentGroupId, boolean privateLayout)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _layoutLocalService.getScopeGroupLayouts(parentGroupId,
+			privateLayout);
 	}
 
 	@Override
@@ -2271,23 +2285,6 @@ public class LayoutLocalServiceWrapper implements LayoutLocalService,
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _layoutLocalService.validateImportPortletInfo(userId, plid,
 			groupId, portletId, parameterMap, inputStream);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public LayoutLocalService getWrappedLayoutLocalService() {
-		return _layoutLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedLayoutLocalService(
-		LayoutLocalService layoutLocalService) {
-		_layoutLocalService = layoutLocalService;
 	}
 
 	@Override

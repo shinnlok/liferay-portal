@@ -16,7 +16,6 @@ package com.liferay.portal.template.freemarker;
 
 import aQute.bnd.annotation.metatype.Configurable;
 
-import com.liferay.portal.kernel.template.TemplateConstants;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringPool;
@@ -83,19 +82,16 @@ public class FreeMarkerTemplateContextHelper extends TemplateContextHelper {
 				StringPool.SLASH + servletContextName +
 					theme.getFreeMarkerTemplateLoader() + theme.getCssPath());
 
-			contextObjects.put(
-				"fullTemplatesPath",
+			String fullTemplatesPath =
 				StringPool.SLASH + servletContextName +
 					theme.getFreeMarkerTemplateLoader() +
-						theme.getTemplatesPath());
+						theme.getTemplatesPath();
+
+			contextObjects.put("fullTemplatesPath", fullTemplatesPath);
 
 			// Init
 
-			contextObjects.put(
-				"init",
-				StringPool.SLASH + themeDisplay.getPathContext() +
-					TemplateConstants.SERVLET_SEPARATOR +
-						"/classic/templates/init.ftl");
+			contextObjects.put("init", fullTemplatesPath + "/init.ftl");
 		}
 
 		// Insert custom ftl variables
@@ -128,8 +124,9 @@ public class FreeMarkerTemplateContextHelper extends TemplateContextHelper {
 
 		// Enum util
 
-		helperUtilities.put(
-			"enumUtil", BeansWrapper.getDefaultInstance().getEnumModels());
+		BeansWrapper beansWrapper = FreeMarkerManager.getBeansWrapper();
+
+		helperUtilities.put("enumUtil", beansWrapper.getEnumModels());
 
 		// Object util
 
@@ -142,8 +139,7 @@ public class FreeMarkerTemplateContextHelper extends TemplateContextHelper {
 
 		// Static class util
 
-		helperUtilities.put(
-			"staticUtil", BeansWrapper.getDefaultInstance().getStaticModels());
+		helperUtilities.put("staticUtil", beansWrapper.getStaticModels());
 	}
 
 	private volatile FreeMarkerEngineConfiguration

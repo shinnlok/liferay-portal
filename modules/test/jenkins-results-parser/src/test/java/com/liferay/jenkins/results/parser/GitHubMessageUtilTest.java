@@ -43,12 +43,15 @@ public class GitHubMessageUtilTest extends BaseJenkinsResultsParserTestCase {
 			"generic-1", "1609", "test-portal-acceptance-pullrequest(master)",
 			"test-1-1");
 		downloadSample(
+			"jspc-1", "1672", "test-portal-acceptance-pullrequest(master)",
+			"test-1-5");
+		downloadSample(
 			"rebase-1", "58", "test-portal-acceptance-pullrequest(ee-6.2.x)",
 			"test-1-19");
 	}
 
 	@Test
-	public void testGetFailedJobsMessage() throws Exception {
+	public void testGetGitHubMessage() throws Exception {
 		assertSamples();
 	}
 
@@ -81,7 +84,7 @@ public class GitHubMessageUtilTest extends BaseJenkinsResultsParserTestCase {
 		urlString = replaceToken(urlString, "hostName", hostName);
 		urlString = replaceToken(urlString, "jobName", jobName);
 
-		URL url = createURL(urlString);
+		URL url = JenkinsResultsParserUtil.createURL(urlString);
 
 		downloadSample(sampleKey, url);
 	}
@@ -118,7 +121,7 @@ public class GitHubMessageUtilTest extends BaseJenkinsResultsParserTestCase {
 
 			File reportFile = new File(sampleDir, jobCount + "-report.html");
 
-			write(
+			JenkinsResultsParserUtil.write(
 				reportFile,
 				"<h5 job-result=\\\"" + jsonObject.getString("result") +
 					"\\\"><a href=\"" + urlString + "\">" +

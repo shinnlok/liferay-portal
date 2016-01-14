@@ -240,6 +240,11 @@ public class BrowserTrackerLocalServiceWrapper
 		return _browserTrackerLocalService.getBrowserTrackersCount();
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _browserTrackerLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -274,23 +279,6 @@ public class BrowserTrackerLocalServiceWrapper
 		long userId, long browserKey) {
 		return _browserTrackerLocalService.updateBrowserTracker(userId,
 			browserKey);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public BrowserTrackerLocalService getWrappedBrowserTrackerLocalService() {
-		return _browserTrackerLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedBrowserTrackerLocalService(
-		BrowserTrackerLocalService browserTrackerLocalService) {
-		_browserTrackerLocalService = browserTrackerLocalService;
 	}
 
 	@Override

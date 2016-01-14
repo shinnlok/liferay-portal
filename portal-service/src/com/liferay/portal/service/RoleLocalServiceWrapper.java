@@ -501,6 +501,11 @@ public class RoleLocalServiceWrapper implements RoleLocalService,
 		return _roleLocalService.getGroupRolesCount(groupId);
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _roleLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -1302,22 +1307,6 @@ public class RoleLocalServiceWrapper implements RoleLocalService,
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _roleLocalService.updateRole(roleId, name, titleMap,
 			descriptionMap, subtype, serviceContext);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public RoleLocalService getWrappedRoleLocalService() {
-		return _roleLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedRoleLocalService(RoleLocalService roleLocalService) {
-		_roleLocalService = roleLocalService;
 	}
 
 	@Override

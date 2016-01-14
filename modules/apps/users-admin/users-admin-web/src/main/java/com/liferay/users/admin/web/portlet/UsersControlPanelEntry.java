@@ -27,7 +27,7 @@ import com.liferay.portal.service.UserGroupRoleLocalService;
 import com.liferay.portal.service.permission.OrganizationPermissionUtil;
 import com.liferay.portlet.BaseControlPanelEntry;
 import com.liferay.portlet.ControlPanelEntry;
-import com.liferay.users.admin.web.constants.UsersAdminPortletKeys;
+import com.liferay.users.admin.constants.UsersAdminPortletKeys;
 
 import java.util.List;
 
@@ -39,7 +39,10 @@ import org.osgi.service.component.annotations.Reference;
  * @author Zsolt Berentey
  */
 @Component(
-	property = {"javax.portlet.name=" + UsersAdminPortletKeys.USERS_ADMIN},
+	property = {
+		"javax.portlet.name=" + UsersAdminPortletKeys.MY_ORGANIZATIONS,
+		"javax.portlet.name=" + UsersAdminPortletKeys.USERS_ADMIN
+	},
 	service = ControlPanelEntry.class
 )
 public class UsersControlPanelEntry extends BaseControlPanelEntry {

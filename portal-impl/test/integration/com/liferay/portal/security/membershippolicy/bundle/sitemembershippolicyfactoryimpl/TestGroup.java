@@ -266,6 +266,11 @@ public class TestGroup implements Group {
 	}
 
 	@Override
+	public String getLogoURL(ThemeDisplay themeDisplay, boolean useDefault) {
+		return null;
+	}
+
+	@Override
 	public boolean getManualMembership() {
 		return false;
 	}
@@ -508,15 +513,6 @@ public class TestGroup implements Group {
 	@Deprecated
 	@Override
 	public boolean isChild(long groupId) {
-		return false;
-	}
-
-	/**
-	 * @deprecated As of 7.0.0
-	 */
-	@Deprecated
-	@Override
-	public boolean isCommunity() {
 		return false;
 	}
 

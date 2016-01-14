@@ -188,6 +188,10 @@ public class ListTypeLocalServiceUtil {
 		return getService().getActionableDynamicQuery();
 	}
 
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the list type with the primary key.
 	*
@@ -276,13 +280,6 @@ public class ListTypeLocalServiceUtil {
 		}
 
 		return _service;
-	}
-
-	/**
-	 * @deprecated As of 6.2.0
-	 */
-	@Deprecated
-	public void setService(ListTypeLocalService service) {
 	}
 
 	private static ListTypeLocalService _service;

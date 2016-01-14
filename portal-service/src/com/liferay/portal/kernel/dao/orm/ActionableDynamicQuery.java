@@ -15,7 +15,6 @@
 package com.liferay.portal.kernel.dao.orm;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.transaction.TransactionAttribute;
 import com.liferay.portal.service.BaseLocalService;
 
@@ -24,8 +23,6 @@ import com.liferay.portal.service.BaseLocalService;
  */
 public interface ActionableDynamicQuery {
 
-	public void addDocument(Document document) throws PortalException;
-
 	public AddCriteriaMethod getAddCriteriaMethod();
 
 	public AddOrderCriteriaMethod getAddOrderCriteriaMethod();
@@ -33,6 +30,8 @@ public interface ActionableDynamicQuery {
 	public PerformActionMethod<?> getPerformActionMethod();
 
 	public PerformCountMethod getPerformCountMethod();
+
+	public boolean isParallel();
 
 	public void performActions() throws PortalException;
 
@@ -45,11 +44,13 @@ public interface ActionableDynamicQuery {
 
 	public void setBaseLocalService(BaseLocalService baseLocalService);
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #setModelClass(Class)}
+	 */
+	@Deprecated
 	public void setClass(Class<?> clazz);
 
 	public void setClassLoader(ClassLoader classLoader);
-
-	public void setCommitImmediately(boolean commitImmediately);
 
 	public void setCompanyId(long companyId);
 
@@ -59,6 +60,8 @@ public interface ActionableDynamicQuery {
 
 	public void setInterval(int interval);
 
+	public void setModelClass(Class<?> modelClass);
+
 	public void setParallel(boolean parallel);
 
 	public void setPerformActionMethod(
@@ -67,8 +70,6 @@ public interface ActionableDynamicQuery {
 	public void setPerformCountMethod(PerformCountMethod performCountMethod);
 
 	public void setPrimaryKeyPropertyName(String primaryKeyPropertyName);
-
-	public void setSearchEngineId(String searchEngineId);
 
 	public void setTransactionAttribute(
 		TransactionAttribute transactionAttribute);

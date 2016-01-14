@@ -14,6 +14,7 @@
 
 package com.liferay.staging.taglib.servlet.taglib;
 
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portlet.exportimport.model.ExportImportConfiguration;
 import com.liferay.staging.taglib.servlet.ServletContextUtil;
 import com.liferay.taglib.util.IncludeTag;
@@ -61,14 +62,11 @@ public class ConfigurationHeaderTag extends IncludeTag {
 			_exportImportConfiguration);
 		request.setAttribute(
 			"liferay-staging:configuration-header:label", _label);
-		request.setAttribute(
-			"liferay-staging:configuration-header:liferayPortletRequest",
-			pageContext.getAttribute("liferayPortletRequest"));
 	}
 
 	private static final String _PAGE = "/configuration_header/page.jsp";
 
 	private ExportImportConfiguration _exportImportConfiguration;
-	private String _label;
+	private String _label = StringPool.BLANK;
 
 }

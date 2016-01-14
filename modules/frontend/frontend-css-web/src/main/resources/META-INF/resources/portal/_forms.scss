@@ -133,6 +133,10 @@
 			margin-top: -7px;
 		}
 
+		.icon-asterisk {
+			margin-left: 4px;
+		}
+
 		.lfr-ddm-repeatable-add-button, .lfr-ddm-repeatable-delete-button {
 			display: block;
 			height: 16px;
@@ -160,6 +164,10 @@
 		&, .field-wrapper-content {
 			margin-left: 15px;
 		}
+	}
+
+	.taglib-icon-help {
+		margin-left: 5px;
 	}
 }
 

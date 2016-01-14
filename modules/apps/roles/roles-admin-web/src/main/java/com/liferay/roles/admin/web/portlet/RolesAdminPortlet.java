@@ -57,7 +57,7 @@ import com.liferay.portal.service.UserService;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PortletKeys;
-import com.liferay.roles.admin.web.constants.RolesAdminPortletKeys;
+import com.liferay.roles.admin.constants.RolesAdminPortletKeys;
 
 import java.io.IOException;
 
@@ -173,6 +173,18 @@ public class RolesAdminPortlet extends MVCPortlet {
 		long roleId = ParamUtil.getLong(actionRequest, "roleId");
 
 		_roleService.deleteRole(roleId);
+	}
+
+	public void deleteRoles(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws Exception {
+
+		long[] deleteRoleIds = StringUtil.split(
+			ParamUtil.getString(actionRequest, "deleteRoleIds"), 0L);
+
+		for (long roleId : deleteRoleIds) {
+			_roleService.deleteRole(roleId);
+		}
 	}
 
 	public Role editRole(

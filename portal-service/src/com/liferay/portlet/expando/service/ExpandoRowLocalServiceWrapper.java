@@ -306,6 +306,11 @@ public class ExpandoRowLocalServiceWrapper implements ExpandoRowLocalService,
 		return _expandoRowLocalService.getExpandoRowsCount();
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _expandoRowLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -424,23 +429,6 @@ public class ExpandoRowLocalServiceWrapper implements ExpandoRowLocalService,
 	public com.liferay.portlet.expando.model.ExpandoRow updateExpandoRow(
 		com.liferay.portlet.expando.model.ExpandoRow expandoRow) {
 		return _expandoRowLocalService.updateExpandoRow(expandoRow);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public ExpandoRowLocalService getWrappedExpandoRowLocalService() {
-		return _expandoRowLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedExpandoRowLocalService(
-		ExpandoRowLocalService expandoRowLocalService) {
-		_expandoRowLocalService = expandoRowLocalService;
 	}
 
 	@Override

@@ -204,6 +204,11 @@ public class MeetupsEntryLocalServiceWrapper implements MeetupsEntryLocalService
 		return _meetupsEntryLocalService.getActionableDynamicQuery();
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _meetupsEntryLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns a range of all the meetups entries.
 	*
@@ -300,23 +305,6 @@ public class MeetupsEntryLocalServiceWrapper implements MeetupsEntryLocalService
 			startDateYear, startDateHour, startDateMinute, endDateMonth,
 			endDateDay, endDateYear, endDateHour, endDateMinute,
 			totalAttendees, maxAttendees, price, thumbnail);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public MeetupsEntryLocalService getWrappedMeetupsEntryLocalService() {
-		return _meetupsEntryLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedMeetupsEntryLocalService(
-		MeetupsEntryLocalService meetupsEntryLocalService) {
-		_meetupsEntryLocalService = meetupsEntryLocalService;
 	}
 
 	@Override

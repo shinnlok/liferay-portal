@@ -329,6 +329,11 @@ public class CalendarNotificationTemplateLocalServiceWrapper
 		return _calendarNotificationTemplateLocalService.getExportActionableDynamicQuery(portletDataContext);
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _calendarNotificationTemplateLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -367,23 +372,6 @@ public class CalendarNotificationTemplateLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _calendarNotificationTemplateLocalService.updateCalendarNotificationTemplate(calendarNotificationTemplateId,
 			notificationTypeSettings, subject, body, serviceContext);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public CalendarNotificationTemplateLocalService getWrappedCalendarNotificationTemplateLocalService() {
-		return _calendarNotificationTemplateLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedCalendarNotificationTemplateLocalService(
-		CalendarNotificationTemplateLocalService calendarNotificationTemplateLocalService) {
-		_calendarNotificationTemplateLocalService = calendarNotificationTemplateLocalService;
 	}
 
 	@Override

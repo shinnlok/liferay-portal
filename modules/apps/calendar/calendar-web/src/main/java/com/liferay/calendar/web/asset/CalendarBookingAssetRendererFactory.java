@@ -88,7 +88,7 @@ public class CalendarBookingAssetRendererFactory
 
 	@Override
 	public String getIconCssClass() {
-		return "icon-calendar";
+		return "calendar";
 	}
 
 	@Override
@@ -96,11 +96,10 @@ public class CalendarBookingAssetRendererFactory
 		return TYPE;
 	}
 
-	@Deprecated
 	@Override
 	public PortletURL getURLAdd(
 			LiferayPortletRequest liferayPortletRequest,
-			LiferayPortletResponse liferayPortletResponse)
+			LiferayPortletResponse liferayPortletResponse, long classTypeId)
 		throws PortalException {
 
 		ThemeDisplay themeDisplay =
@@ -177,11 +176,6 @@ public class CalendarBookingAssetRendererFactory
 	)
 	public void setServletContext(ServletContext servletContext) {
 		_servletContext = servletContext;
-	}
-
-	@Override
-	protected String getIconPath(ThemeDisplay themeDisplay) {
-		return themeDisplay.getPathThemeImages() + "/common/date.png";
 	}
 
 	@Reference(unbind = "-")

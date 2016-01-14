@@ -235,6 +235,11 @@ public class RepositoryEntryLocalServiceWrapper
 		return _repositoryEntryLocalService.getExportActionableDynamicQuery(portletDataContext);
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _repositoryEntryLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -380,23 +385,6 @@ public class RepositoryEntryLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _repositoryEntryLocalService.updateRepositoryEntry(repositoryEntryId,
 			mappedId);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public RepositoryEntryLocalService getWrappedRepositoryEntryLocalService() {
-		return _repositoryEntryLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedRepositoryEntryLocalService(
-		RepositoryEntryLocalService repositoryEntryLocalService) {
-		_repositoryEntryLocalService = repositoryEntryLocalService;
 	}
 
 	@Override

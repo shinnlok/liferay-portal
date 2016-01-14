@@ -266,6 +266,10 @@ public class SocialRelationLocalServiceUtil {
 		return getService().getActionableDynamicQuery();
 	}
 
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns a range of all the inverse relations of the given type for which
 	* the user is User2 of the relation.
@@ -526,13 +530,6 @@ public class SocialRelationLocalServiceUtil {
 		}
 
 		return _service;
-	}
-
-	/**
-	 * @deprecated As of 6.2.0
-	 */
-	@Deprecated
-	public void setService(SocialRelationLocalService service) {
 	}
 
 	private static SocialRelationLocalService _service;

@@ -15,6 +15,7 @@
 package com.liferay.portlet.asset.util;
 
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -22,10 +23,9 @@ import com.liferay.portal.kernel.search.BaseIndexer;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.BooleanQuery;
 import com.liferay.portal.kernel.search.Document;
-import com.liferay.portal.kernel.search.DocumentImpl;
 import com.liferay.portal.kernel.search.Field;
+import com.liferay.portal.kernel.search.IndexWriterHelperUtil;
 import com.liferay.portal.kernel.search.SearchContext;
-import com.liferay.portal.kernel.search.SearchEngineUtil;
 import com.liferay.portal.kernel.search.Summary;
 import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
@@ -52,7 +52,6 @@ public class AssetVocabularyIndexer extends BaseIndexer<AssetVocabulary> {
 	public static final String CLASS_NAME = AssetVocabulary.class.getName();
 
 	public AssetVocabularyIndexer() {
-		setCommitImmediately(true);
 		setDefaultSelectedFieldNames(
 			Field.ASSET_VOCABULARY_ID, Field.COMPANY_ID, Field.GROUP_ID,
 			Field.UID);
@@ -98,13 +97,8 @@ public class AssetVocabularyIndexer extends BaseIndexer<AssetVocabulary> {
 
 	@Override
 	protected void doDelete(AssetVocabulary assetVocabulary) throws Exception {
-		Document document = new DocumentImpl();
-
-		document.addUID(CLASS_NAME, assetVocabulary.getVocabularyId());
-
-		SearchEngineUtil.deleteDocument(
-			getSearchEngineId(), assetVocabulary.getCompanyId(),
-			document.get(Field.UID), isCommitImmediately());
+		deleteDocument(
+			assetVocabulary.getCompanyId(), assetVocabulary.getVocabularyId());
 	}
 
 	@Override
@@ -143,11 +137,9 @@ public class AssetVocabularyIndexer extends BaseIndexer<AssetVocabulary> {
 	protected void doReindex(AssetVocabulary assetVocabulary) throws Exception {
 		Document document = getDocument(assetVocabulary);
 
-		if (document != null) {
-			SearchEngineUtil.updateDocument(
-				getSearchEngineId(), assetVocabulary.getCompanyId(), document,
-				isCommitImmediately());
-		}
+		IndexWriterHelperUtil.updateDocument(
+			getSearchEngineId(), assetVocabulary.getCompanyId(), document,
+			isCommitImmediately());
 	}
 
 	@Override
@@ -168,11 +160,12 @@ public class AssetVocabularyIndexer extends BaseIndexer<AssetVocabulary> {
 	protected void reindexVocabularies(final long companyId)
 		throws PortalException {
 
-		final ActionableDynamicQuery actionableDynamicQuery =
-			AssetVocabularyLocalServiceUtil.getActionableDynamicQuery();
+		final IndexableActionableDynamicQuery indexableActionableDynamicQuery =
+			AssetVocabularyLocalServiceUtil.
+				getIndexableActionableDynamicQuery();
 
-		actionableDynamicQuery.setCompanyId(companyId);
-		actionableDynamicQuery.setPerformActionMethod(
+		indexableActionableDynamicQuery.setCompanyId(companyId);
+		indexableActionableDynamicQuery.setPerformActionMethod(
 			new ActionableDynamicQuery.PerformActionMethod<AssetVocabulary>() {
 
 				@Override
@@ -180,9 +173,7 @@ public class AssetVocabularyIndexer extends BaseIndexer<AssetVocabulary> {
 					try {
 						Document document = getDocument(assetVocabulary);
 
-						if (document != null) {
-							actionableDynamicQuery.addDocument(document);
-						}
+						indexableActionableDynamicQuery.addDocuments(document);
 					}
 					catch (PortalException pe) {
 						if (_log.isWarnEnabled()) {
@@ -195,9 +186,9 @@ public class AssetVocabularyIndexer extends BaseIndexer<AssetVocabulary> {
 				}
 
 			});
-		actionableDynamicQuery.setSearchEngineId(getSearchEngineId());
+		indexableActionableDynamicQuery.setSearchEngineId(getSearchEngineId());
 
-		actionableDynamicQuery.performActions();
+		indexableActionableDynamicQuery.performActions();
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

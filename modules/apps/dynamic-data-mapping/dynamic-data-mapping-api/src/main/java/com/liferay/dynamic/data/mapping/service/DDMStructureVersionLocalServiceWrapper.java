@@ -234,6 +234,11 @@ public class DDMStructureVersionLocalServiceWrapper
 	}
 
 	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _ddmStructureVersionLocalService.getIndexableActionableDynamicQuery();
+	}
+
+	@Override
 	public com.liferay.dynamic.data.mapping.model.DDMStructureVersion getLatestStructureVersion(
 		long structureId)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -301,23 +306,6 @@ public class DDMStructureVersionLocalServiceWrapper
 	public com.liferay.dynamic.data.mapping.model.DDMStructureVersion updateDDMStructureVersion(
 		com.liferay.dynamic.data.mapping.model.DDMStructureVersion ddmStructureVersion) {
 		return _ddmStructureVersionLocalService.updateDDMStructureVersion(ddmStructureVersion);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public DDMStructureVersionLocalService getWrappedDDMStructureVersionLocalService() {
-		return _ddmStructureVersionLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedDDMStructureVersionLocalService(
-		DDMStructureVersionLocalService ddmStructureVersionLocalService) {
-		_ddmStructureVersionLocalService = ddmStructureVersionLocalService;
 	}
 
 	@Override

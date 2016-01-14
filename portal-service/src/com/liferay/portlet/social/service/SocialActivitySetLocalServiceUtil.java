@@ -218,6 +218,10 @@ public class SocialActivitySetLocalServiceUtil {
 		return getService().getGroupActivitySetsCount(groupId);
 	}
 
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -353,13 +357,6 @@ public class SocialActivitySetLocalServiceUtil {
 		}
 
 		return _service;
-	}
-
-	/**
-	 * @deprecated As of 6.2.0
-	 */
-	@Deprecated
-	public void setService(SocialActivitySetLocalService service) {
 	}
 
 	private static SocialActivitySetLocalService _service;

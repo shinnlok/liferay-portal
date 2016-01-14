@@ -16,8 +16,7 @@ package com.liferay.journal.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
+import com.liferay.osgi.util.ServiceTrackerFactory;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -255,6 +254,10 @@ public class JournalArticleImageLocalServiceUtil {
 		return getService().getArticleImagesCount(groupId);
 	}
 
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the journal article image with the primary key.
 	*
@@ -323,21 +326,6 @@ public class JournalArticleImageLocalServiceUtil {
 		return _serviceTracker.getService();
 	}
 
-	/**
-	 * @deprecated As of 6.2.0
-	 */
-	@Deprecated
-	public void setService(JournalArticleImageLocalService service) {
-	}
-
-	private static ServiceTracker<JournalArticleImageLocalService, JournalArticleImageLocalService> _serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(JournalArticleImageLocalServiceUtil.class);
-
-		_serviceTracker = new ServiceTracker<JournalArticleImageLocalService, JournalArticleImageLocalService>(bundle.getBundleContext(),
-				JournalArticleImageLocalService.class, null);
-
-		_serviceTracker.open();
-	}
+	private static ServiceTracker<JournalArticleImageLocalService, JournalArticleImageLocalService> _serviceTracker =
+		ServiceTrackerFactory.open(JournalArticleImageLocalService.class);
 }

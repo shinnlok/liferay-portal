@@ -314,6 +314,10 @@ public class DLFileVersionLocalServiceUtil {
 		return getService().getFileVersionsCount(fileEntryId, status);
 	}
 
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
 	public static com.liferay.portlet.documentlibrary.model.DLFileVersion getLatestFileVersion(
 		long fileEntryId, boolean excludeWorkingCopy)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -371,13 +375,6 @@ public class DLFileVersionLocalServiceUtil {
 		}
 
 		return _service;
-	}
-
-	/**
-	 * @deprecated As of 6.2.0
-	 */
-	@Deprecated
-	public void setService(DLFileVersionLocalService service) {
 	}
 
 	private static DLFileVersionLocalService _service;

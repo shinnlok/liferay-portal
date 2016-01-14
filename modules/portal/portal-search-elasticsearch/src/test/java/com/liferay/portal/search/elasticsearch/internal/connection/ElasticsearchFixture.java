@@ -24,6 +24,7 @@ import com.liferay.portal.search.elasticsearch.settings.BaseSettingsContributor;
 
 import java.io.File;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -38,13 +39,13 @@ import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.get.GetIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.get.GetIndexResponse;
+import org.elasticsearch.action.support.IndicesOptions;
 import org.elasticsearch.client.AdminClient;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.ClusterAdminClient;
 import org.elasticsearch.client.IndicesAdminClient;
-import org.elasticsearch.common.settings.ImmutableSettings.Builder;
+import org.elasticsearch.common.settings.Settings.Builder;
 import org.elasticsearch.common.unit.TimeValue;
-import org.elasticsearch.indices.IndexMissingException;
 
 import org.mockito.Mockito;
 
@@ -53,21 +54,28 @@ import org.mockito.Mockito;
  */
 public class ElasticsearchFixture {
 
+	public ElasticsearchFixture(String subdirName) {
+		this(subdirName, Collections.<String, Object>emptyMap());
+	}
+
 	public ElasticsearchFixture(
 		String subdirName,
-		HashMap<String, Object> elasticsearchConfigurationProperties) {
-
-		elasticsearchConfigurationProperties.put(
-			"configurationPid", ElasticsearchConfiguration.class.getName());
-		elasticsearchConfigurationProperties.put("logExceptionsOnly", false);
+		Map<String, Object> elasticsearchConfigurationProperties) {
 
 		_elasticsearchConfigurationProperties =
-			elasticsearchConfigurationProperties;
+			createElasticsearchConfigurationProperties(
+				elasticsearchConfigurationProperties);
 
 		_tmpDirName = "tmp/" + subdirName;
 	}
 
 	public Index createIndex(String indexName) {
+		return createIndex(indexName, Mockito.mock(IndexCreationHelper.class));
+	}
+
+	public Index createIndex(
+		String indexName, IndexCreationHelper indexCreationHelper) {
+
 		indexName = StringUtil.toLowerCase(indexName);
 
 		IndicesAdminClient indicesAdminClient = getIndicesAdminClient();
@@ -75,14 +83,15 @@ public class ElasticsearchFixture {
 		DeleteIndexRequestBuilder deleteIndexRequestBuilder =
 			indicesAdminClient.prepareDelete(indexName);
 
-		try {
-			deleteIndexRequestBuilder.get();
-		}
-		catch (IndexMissingException ime) {
-		}
+		deleteIndexRequestBuilder.setIndicesOptions(
+			IndicesOptions.lenientExpandOpen());
+
+		deleteIndexRequestBuilder.get();
 
 		CreateIndexRequestBuilder createIndexRequestBuilder =
 			indicesAdminClient.prepareCreate(indexName);
+
+		indexCreationHelper.contribute(createIndexRequestBuilder);
 
 		createIndexRequestBuilder.get();
 
@@ -102,9 +111,13 @@ public class ElasticsearchFixture {
 	}
 
 	public AdminClient getAdminClient() {
-		Client client = _embeddedElasticsearchConnection.getClient();
+		Client client = getClient();
 
 		return client.admin();
+	}
+
+	public Client getClient() {
+		return _embeddedElasticsearchConnection.getClient();
 	}
 
 	public ClusterHealthResponse getClusterHealthResponse(
@@ -194,9 +207,7 @@ public class ElasticsearchFixture {
 				@Override
 				public void populate(Builder builder) {
 					builder.put(
-						"cluster.service.cluster.service." +
-							"slow_task_logging_threshold",
-						"600s");
+						"cluster.service.slow_task_logging_threshold", "600s");
 				}
 
 			});
@@ -238,6 +249,18 @@ public class ElasticsearchFixture {
 			unicastSettingsContributor);
 	}
 
+	protected Map<String, Object> createElasticsearchConfigurationProperties(
+		Map<String, Object> elasticsearchConfigurationProperties) {
+
+		Map<String, Object> map = new HashMap<>(
+			elasticsearchConfigurationProperties);
+
+		map.put("configurationPid", ElasticsearchConfiguration.class.getName());
+		map.put("logExceptionsOnly", false);
+
+		return map;
+	}
+
 	protected EmbeddedElasticsearchConnection createElasticsearchConnection() {
 		EmbeddedElasticsearchConnection embeddedElasticsearchConnection =
 			new EmbeddedElasticsearchConnection();
@@ -254,8 +277,15 @@ public class ElasticsearchFixture {
 			_tmpDirName
 		);
 
+		ClusterSettingsContext clusterSettingsContext = _clusterSettingsContext;
+
+		if (clusterSettingsContext == null) {
+			clusterSettingsContext = Mockito.mock(ClusterSettingsContext.class);
+		}
+
 		embeddedElasticsearchConnection.setClusterSettingsContext(
-			_clusterSettingsContext);
+			clusterSettingsContext);
+
 		embeddedElasticsearchConnection.setProps(props);
 
 		embeddedElasticsearchConnection.activate(

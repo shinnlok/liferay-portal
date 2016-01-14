@@ -247,6 +247,11 @@ public class KaleoDefinitionLocalServiceWrapper
 		return _kaleoDefinitionLocalService.getActionableDynamicQuery();
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _kaleoDefinitionLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the kaleo definition with the primary key.
 	*
@@ -415,23 +420,6 @@ public class KaleoDefinitionLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _kaleoDefinitionLocalService.updateTitle(name, version, title,
 			serviceContext);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public KaleoDefinitionLocalService getWrappedKaleoDefinitionLocalService() {
-		return _kaleoDefinitionLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedKaleoDefinitionLocalService(
-		KaleoDefinitionLocalService kaleoDefinitionLocalService) {
-		_kaleoDefinitionLocalService = kaleoDefinitionLocalService;
 	}
 
 	@Override

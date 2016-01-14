@@ -333,6 +333,11 @@ public class DLFileEntryMetadataLocalServiceWrapper
 	}
 
 	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _dlFileEntryMetadataLocalService.getIndexableActionableDynamicQuery();
+	}
+
+	@Override
 	public java.util.List<com.liferay.portlet.documentlibrary.model.DLFileEntryMetadata> getMismatchedCompanyIdFileEntryMetadatas() {
 		return _dlFileEntryMetadataLocalService.getMismatchedCompanyIdFileEntryMetadatas();
 	}
@@ -391,23 +396,6 @@ public class DLFileEntryMetadataLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 		_dlFileEntryMetadataLocalService.updateFileEntryMetadata(fileEntryTypeId,
 			fileEntryId, fileVersionId, ddmFormValuesMap, serviceContext);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public DLFileEntryMetadataLocalService getWrappedDLFileEntryMetadataLocalService() {
-		return _dlFileEntryMetadataLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedDLFileEntryMetadataLocalService(
-		DLFileEntryMetadataLocalService dlFileEntryMetadataLocalService) {
-		_dlFileEntryMetadataLocalService = dlFileEntryMetadataLocalService;
 	}
 
 	@Override

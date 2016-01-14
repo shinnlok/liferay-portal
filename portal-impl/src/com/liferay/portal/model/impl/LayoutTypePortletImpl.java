@@ -311,9 +311,22 @@ public class LayoutTypePortletImpl
 	public List<Portlet> getEmbeddedPortlets() {
 		Layout layout = getLayout();
 
-		_embeddedPortlets = layout.getEmbeddedPortlets();
+		return layout.getEmbeddedPortlets();
+	}
 
-		return _embeddedPortlets;
+	@Override
+	public List<Portlet> getExplicitlyAddedPortlets() {
+		List<Portlet> portlets = new ArrayList<>();
+
+		List<String> columns = getColumns();
+
+		for (int i = 0; i < columns.size(); i++) {
+			String columnId = columns.get(i);
+
+			portlets.addAll(getAllPortlets(columnId));
+		}
+
+		return portlets;
 	}
 
 	@Override
@@ -791,21 +804,13 @@ public class LayoutTypePortletImpl
 
 	@Override
 	public boolean isPortletEmbedded(String portletId) {
-		Layout layout = getLayout();
-
-		Portlet portlet = PortletLocalServiceUtil.getPortletById(
-			layout.getCompanyId(), portletId);
-
-		long scopeGroupId = PortalUtil.getScopeGroupId(layout, portletId);
-
-		if (PortletPreferencesLocalServiceUtil.getPortletPreferencesCount(
-				scopeGroupId, PortletKeys.PREFS_OWNER_TYPE_LAYOUT,
-				PortletKeys.PREFS_PLID_SHARED, portlet, false) < 1) {
-
-			return false;
+		for (Portlet embeddedPortlet : getEmbeddedPortlets()) {
+			if (portletId.equals(embeddedPortlet.getPortletId())) {
+				return true;
+			}
 		}
 
-		return true;
+		return false;
 	}
 
 	@Override
@@ -1496,26 +1501,11 @@ public class LayoutTypePortletImpl
 			(LayoutTypePortletImpl)LayoutTypePortletFactoryUtil.create(
 				getLayout());
 
-		defaultLayoutTypePortletImpl._embeddedPortlets = _embeddedPortlets;
 		defaultLayoutTypePortletImpl._layoutSetPrototypeLayout =
 			_layoutSetPrototypeLayout;
 		defaultLayoutTypePortletImpl._updatePermission = _updatePermission;
 
 		return defaultLayoutTypePortletImpl;
-	}
-
-	protected List<Portlet> getExplicitlyAddedPortlets() {
-		List<Portlet> portlets = new ArrayList<>();
-
-		List<String> columns = getColumns();
-
-		for (int i = 0; i < columns.size(); i++) {
-			String columnId = columns.get(i);
-
-			portlets.addAll(getAllPortlets(columnId));
-		}
-
-		return portlets;
 	}
 
 	protected List<String> getNestedColumns() {
@@ -1915,7 +1905,6 @@ public class LayoutTypePortletImpl
 	private final Format _dateFormat =
 		FastDateFormatFactoryUtil.getSimpleDateFormat(
 			PropsValues.INDEX_DATE_FORMAT_PATTERN);
-	private transient List<Portlet> _embeddedPortlets;
 	private boolean _enablePortletLayoutListener = true;
 	private Layout _layoutSetPrototypeLayout;
 	private PortalPreferences _portalPreferences;

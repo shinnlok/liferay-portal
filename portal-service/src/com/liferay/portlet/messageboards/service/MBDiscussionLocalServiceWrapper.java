@@ -264,6 +264,11 @@ public class MBDiscussionLocalServiceWrapper implements MBDiscussionLocalService
 		return _mbDiscussionLocalService.getExportActionableDynamicQuery(portletDataContext);
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _mbDiscussionLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the message boards discussion with the primary key.
 	*
@@ -403,23 +408,6 @@ public class MBDiscussionLocalServiceWrapper implements MBDiscussionLocalService
 	public com.liferay.portlet.messageboards.model.MBDiscussion updateMBDiscussion(
 		com.liferay.portlet.messageboards.model.MBDiscussion mbDiscussion) {
 		return _mbDiscussionLocalService.updateMBDiscussion(mbDiscussion);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public MBDiscussionLocalService getWrappedMBDiscussionLocalService() {
-		return _mbDiscussionLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedMBDiscussionLocalService(
-		MBDiscussionLocalService mbDiscussionLocalService) {
-		_mbDiscussionLocalService = mbDiscussionLocalService;
 	}
 
 	@Override

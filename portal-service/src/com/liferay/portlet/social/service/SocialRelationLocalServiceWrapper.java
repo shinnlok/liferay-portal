@@ -280,6 +280,11 @@ public class SocialRelationLocalServiceWrapper
 		return _socialRelationLocalService.getActionableDynamicQuery();
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _socialRelationLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns a range of all the inverse relations of the given type for which
 	* the user is User2 of the relation.
@@ -549,23 +554,6 @@ public class SocialRelationLocalServiceWrapper
 	public com.liferay.portlet.social.model.SocialRelation updateSocialRelation(
 		com.liferay.portlet.social.model.SocialRelation socialRelation) {
 		return _socialRelationLocalService.updateSocialRelation(socialRelation);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public SocialRelationLocalService getWrappedSocialRelationLocalService() {
-		return _socialRelationLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedSocialRelationLocalService(
-		SocialRelationLocalService socialRelationLocalService) {
-		_socialRelationLocalService = socialRelationLocalService;
 	}
 
 	@Override

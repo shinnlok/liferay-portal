@@ -228,6 +228,11 @@ public class ShoppingOrderLocalServiceWrapper
 	}
 
 	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _shoppingOrderLocalService.getIndexableActionableDynamicQuery();
+	}
+
+	@Override
 	public com.liferay.shopping.model.ShoppingOrder getLatestOrder(
 		long userId, long groupId)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -436,23 +441,6 @@ public class ShoppingOrderLocalServiceWrapper
 	public com.liferay.shopping.model.ShoppingOrder updateShoppingOrder(
 		com.liferay.shopping.model.ShoppingOrder shoppingOrder) {
 		return _shoppingOrderLocalService.updateShoppingOrder(shoppingOrder);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public ShoppingOrderLocalService getWrappedShoppingOrderLocalService() {
-		return _shoppingOrderLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedShoppingOrderLocalService(
-		ShoppingOrderLocalService shoppingOrderLocalService) {
-		_shoppingOrderLocalService = shoppingOrderLocalService;
 	}
 
 	@Override

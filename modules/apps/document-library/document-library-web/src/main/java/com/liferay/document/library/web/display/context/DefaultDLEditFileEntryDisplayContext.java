@@ -65,12 +65,17 @@ public class DefaultDLEditFileEntryDisplayContext
 	}
 
 	@Override
+	public long getMaximumUploadRequestSize() {
+		return PrefsPropsUtil.getLong(
+			PropsKeys.UPLOAD_SERVLET_REQUEST_IMPL_MAX_SIZE);
+	}
+
+	@Override
 	public long getMaximumUploadSize() {
 		long fileMaxSize = PrefsPropsUtil.getLong(PropsKeys.DL_FILE_MAX_SIZE);
 
 		if (fileMaxSize == 0) {
-			fileMaxSize = PrefsPropsUtil.getLong(
-				PropsKeys.UPLOAD_SERVLET_REQUEST_IMPL_MAX_SIZE);
+			fileMaxSize = getMaximumUploadRequestSize();
 		}
 
 		return fileMaxSize;
@@ -78,20 +83,18 @@ public class DefaultDLEditFileEntryDisplayContext
 
 	@Override
 	public String getPublishButtonLabel() {
-		String publishButtonLabel = "publish";
-
 		if (_hasFolderWorkflowDefinitionLink()) {
-			publishButtonLabel = "submit-for-publication";
+			return "submit-for-publication";
 		}
 
 		DLPortletInstanceSettings dlPortletInstanceSettings =
 			_dlRequestHelper.getDLPortletInstanceSettings();
 
 		if (dlPortletInstanceSettings.isEnableFileEntryDrafts()) {
-			publishButtonLabel = "save";
+			return "save";
 		}
 
-		return publishButtonLabel;
+		return "publish";
 	}
 
 	@Override

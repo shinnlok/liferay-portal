@@ -253,6 +253,11 @@ public class JournalArticleResourceLocalServiceWrapper
 		return _journalArticleResourceLocalService.getArticleResources(groupId);
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _journalArticleResourceLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the journal article resource with the primary key.
 	*
@@ -370,23 +375,6 @@ public class JournalArticleResourceLocalServiceWrapper
 	public com.liferay.journal.model.JournalArticleResource updateJournalArticleResource(
 		com.liferay.journal.model.JournalArticleResource journalArticleResource) {
 		return _journalArticleResourceLocalService.updateJournalArticleResource(journalArticleResource);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public JournalArticleResourceLocalService getWrappedJournalArticleResourceLocalService() {
-		return _journalArticleResourceLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedJournalArticleResourceLocalService(
-		JournalArticleResourceLocalService journalArticleResourceLocalService) {
-		_journalArticleResourceLocalService = journalArticleResourceLocalService;
 	}
 
 	@Override

@@ -18,16 +18,16 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.User;
 import com.liferay.portal.security.permission.PermissionChecker;
-import com.liferay.portal.service.GroupLocalServiceUtil;
-import com.liferay.portal.service.UserLocalServiceUtil;
+import com.liferay.portal.service.GroupLocalService;
+import com.liferay.portal.service.UserLocalService;
 import com.liferay.portal.service.permission.UserPermissionUtil;
-import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portlet.asset.model.AssetRenderer;
 import com.liferay.portlet.asset.model.AssetRendererFactory;
 import com.liferay.portlet.asset.model.BaseAssetRendererFactory;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Michael C. Han
@@ -55,7 +55,7 @@ public class UserAssetRendererFactory extends BaseAssetRendererFactory<User> {
 	public AssetRenderer<User> getAssetRenderer(long classPK, int type)
 		throws PortalException {
 
-		User user = UserLocalServiceUtil.getUserById(classPK);
+		User user = _userLocalService.getUserById(classPK);
 
 		UserAssetRenderer userAssetRenderer = new UserAssetRenderer(user);
 
@@ -68,9 +68,9 @@ public class UserAssetRendererFactory extends BaseAssetRendererFactory<User> {
 	public AssetRenderer<User> getAssetRenderer(long groupId, String urlTitle)
 		throws PortalException {
 
-		Group group = GroupLocalServiceUtil.getGroup(groupId);
+		Group group = _groupLocalService.getGroup(groupId);
 
-		User user = UserLocalServiceUtil.getUserByScreenName(
+		User user = _userLocalService.getUserByScreenName(
 			group.getCompanyId(), urlTitle);
 
 		return new UserAssetRenderer(user);
@@ -83,7 +83,7 @@ public class UserAssetRendererFactory extends BaseAssetRendererFactory<User> {
 
 	@Override
 	public String getIconCssClass() {
-		return "icon-user";
+		return "user";
 	}
 
 	@Override
@@ -100,9 +100,17 @@ public class UserAssetRendererFactory extends BaseAssetRendererFactory<User> {
 			permissionChecker, classPK, actionId);
 	}
 
-	@Override
-	protected String getIconPath(ThemeDisplay themeDisplay) {
-		return themeDisplay.getPathThemeImages() + "/common/user_icon.png";
+	@Reference(unbind = "-")
+	protected void setGroupLocalService(GroupLocalService groupLocalService) {
+		_groupLocalService = groupLocalService;
 	}
+
+	@Reference(unbind = "-")
+	protected void setUserLocalService(UserLocalService userLocalService) {
+		_userLocalService = userLocalService;
+	}
+
+	private GroupLocalService _groupLocalService;
+	private UserLocalService _userLocalService;
 
 }

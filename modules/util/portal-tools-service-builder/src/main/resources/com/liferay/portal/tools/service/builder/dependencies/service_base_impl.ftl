@@ -6,16 +6,17 @@ import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import ${beanLocatorUtil};
 import com.liferay.portal.kernel.dao.db.DB;
-import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
+import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Criterion;
 import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Disjunction;
-import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.Property;
@@ -37,6 +38,7 @@ import com.liferay.portal.model.PersistedModel;
 import com.liferay.portal.service.Base${sessionTypeName}ServiceImpl;
 import com.liferay.portal.service.PersistedModelLocalServiceRegistry;
 import com.liferay.portal.service.PersistedModelLocalServiceRegistryUtil;
+import com.liferay.portal.spring.extender.service.ServiceReference;
 import com.liferay.portal.util.PortalUtil;
 
 import com.liferay.portlet.exportimport.lar.ExportImportHelperUtil;
@@ -372,8 +374,8 @@ import ${packagePath}.service.${entity.name}${sessionTypeName}Service;
 				ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
 
 				actionableDynamicQuery.setBaseLocalService(${packagePath}.service.${entity.name}LocalServiceUtil.getService());
-				actionableDynamicQuery.setClass(${entity.name}.class);
 				actionableDynamicQuery.setClassLoader(getClassLoader());
+				actionableDynamicQuery.setModelClass(${entity.name}.class);
 
 				<#if entity.hasPrimitivePK()>
 					actionableDynamicQuery.setPrimaryKeyPropertyName("${entity.PKVarName}");
@@ -394,10 +396,37 @@ import ${packagePath}.service.${entity.name}${sessionTypeName}Service;
 				return actionableDynamicQuery;
 			}
 
+			@Override
+			public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+				IndexableActionableDynamicQuery indexableActionableDynamicQuery = new IndexableActionableDynamicQuery();
+
+				indexableActionableDynamicQuery.setBaseLocalService(${packagePath}.service.${entity.name}LocalServiceUtil.getService());
+				indexableActionableDynamicQuery.setClassLoader(getClassLoader());
+				indexableActionableDynamicQuery.setModelClass(${entity.name}.class);
+
+				<#if entity.hasPrimitivePK()>
+					indexableActionableDynamicQuery.setPrimaryKeyPropertyName("${entity.PKVarName}");
+				<#else>
+					<#assign pkList = entity.getPKList()>
+
+					<#assign pkColumn = pkList?first>
+
+					indexableActionableDynamicQuery.setPrimaryKeyPropertyName("primaryKey.${pkColumn.name}");
+
+					<#list entity.getPKList() as pkColumn>
+						<#if pkColumn.name == "groupId">
+							indexableActionableDynamicQuery.setGroupIdPropertyName("primaryKey.groupId");
+						</#if>
+					</#list>
+				</#if>
+
+				return indexableActionableDynamicQuery;
+			}
+
 			protected void initActionableDynamicQuery(ActionableDynamicQuery actionableDynamicQuery) {
 				actionableDynamicQuery.setBaseLocalService(${packagePath}.service.${entity.name}LocalServiceUtil.getService());
-				actionableDynamicQuery.setClass(${entity.name}.class);
 				actionableDynamicQuery.setClassLoader(getClassLoader());
+				actionableDynamicQuery.setModelClass(${entity.name}.class);
 
 				<#if entity.hasPrimitivePK()>
 					actionableDynamicQuery.setPrimaryKeyPropertyName("${entity.PKVarName}");
@@ -937,7 +966,7 @@ import ${packagePath}.service.${entity.name}${sessionTypeName}Service;
 			}
 		</#if>
 
-		<#if tempEntity.hasRemoteService()>
+		<#if (sessionTypeName != "Local") && tempEntity.hasRemoteService()>
 			/**
 			 * Returns the ${tempEntity.humanName} remote service.
 			 *
@@ -1096,7 +1125,7 @@ import ${packagePath}.service.${entity.name}${sessionTypeName}Service;
 				DataSource dataSource = InfrastructureUtil.getDataSource();
 			</#if>
 
-			DB db = DBFactoryUtil.getDB();
+			DB db = DBManagerUtil.getDB();
 
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
@@ -1112,7 +1141,11 @@ import ${packagePath}.service.${entity.name}${sessionTypeName}Service;
 
 	<#list referenceList as tempEntity>
 		<#if tempEntity.hasLocalService()>
-			@BeanReference(type = ${tempEntity.packagePath}.service.${tempEntity.name}LocalService.class)
+			<#if osgiModule && (tempEntity.packagePath != packagePath)>
+				@ServiceReference(type = ${tempEntity.packagePath}.service.${tempEntity.name}LocalService.class)
+			<#else>
+				@BeanReference(type = ${tempEntity.packagePath}.service.${tempEntity.name}LocalService.class)
+			</#if>
 
 			<#if !classDeprecated && tempEntity.isDeprecated()>
 				@SuppressWarnings("deprecation")
@@ -1121,8 +1154,12 @@ import ${packagePath}.service.${entity.name}${sessionTypeName}Service;
 			protected ${tempEntity.packagePath}.service.${tempEntity.name}LocalService ${tempEntity.varName}LocalService;
 		</#if>
 
-		<#if tempEntity.hasRemoteService()>
-			@BeanReference(type = ${tempEntity.packagePath}.service.${tempEntity.name}Service.class)
+		<#if (sessionTypeName != "Local") && tempEntity.hasRemoteService()>
+			<#if osgiModule && (tempEntity.packagePath != packagePath)>
+				@ServiceReference(type = ${tempEntity.packagePath}.service.${tempEntity.name}Service.class)
+			<#else>
+				@BeanReference(type = ${tempEntity.packagePath}.service.${tempEntity.name}Service.class)
+			</#if>
 
 			<#if !classDeprecated && tempEntity.isDeprecated()>
 				@SuppressWarnings("deprecation")
@@ -1132,12 +1169,22 @@ import ${packagePath}.service.${entity.name}${sessionTypeName}Service;
 		</#if>
 
 		<#if tempEntity.hasColumns() && (entity.name == "Counter" || tempEntity.name != "Counter")>
-			@BeanReference(type = ${tempEntity.name}Persistence.class)
+			<#if osgiModule && (tempEntity.packagePath != packagePath)>
+				@ServiceReference(type = ${tempEntity.name}Persistence.class)
+			<#else>
+				@BeanReference(type = ${tempEntity.name}Persistence.class)
+			</#if>
+
 			protected ${tempEntity.name}Persistence ${tempEntity.varName}Persistence;
 		</#if>
 
 		<#if tempEntity.hasFinderClass() && (entity.name == "Counter" || tempEntity.name != "Counter")>
-			@BeanReference(type = ${tempEntity.name}Finder.class)
+			<#if osgiModule && (tempEntity.packagePath != packagePath)>
+				@ServiceReference(type = ${tempEntity.name}Finder.class)
+			<#else>
+				@BeanReference(type = ${tempEntity.name}Finder.class)
+			</#if>
+
 			protected ${tempEntity.name}Finder ${tempEntity.varName}Finder;
 		</#if>
 	</#list>

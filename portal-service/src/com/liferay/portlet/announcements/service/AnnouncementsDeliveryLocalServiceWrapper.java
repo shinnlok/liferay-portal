@@ -269,6 +269,11 @@ public class AnnouncementsDeliveryLocalServiceWrapper
 		return _announcementsDeliveryLocalService.getDelivery(deliveryId);
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _announcementsDeliveryLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -318,23 +323,6 @@ public class AnnouncementsDeliveryLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _announcementsDeliveryLocalService.updateDelivery(userId, type,
 			email, sms, website);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public AnnouncementsDeliveryLocalService getWrappedAnnouncementsDeliveryLocalService() {
-		return _announcementsDeliveryLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedAnnouncementsDeliveryLocalService(
-		AnnouncementsDeliveryLocalService announcementsDeliveryLocalService) {
-		_announcementsDeliveryLocalService = announcementsDeliveryLocalService;
 	}
 
 	@Override

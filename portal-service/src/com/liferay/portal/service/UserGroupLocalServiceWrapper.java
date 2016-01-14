@@ -505,6 +505,11 @@ public class UserGroupLocalServiceWrapper implements UserGroupLocalService,
 		return _userGroupLocalService.getGroupUserUserGroups(groupId, userId);
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _userGroupLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -1028,23 +1033,6 @@ public class UserGroupLocalServiceWrapper implements UserGroupLocalService,
 	public com.liferay.portal.model.UserGroup updateUserGroup(
 		com.liferay.portal.model.UserGroup userGroup) {
 		return _userGroupLocalService.updateUserGroup(userGroup);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public UserGroupLocalService getWrappedUserGroupLocalService() {
-		return _userGroupLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedUserGroupLocalService(
-		UserGroupLocalService userGroupLocalService) {
-		_userGroupLocalService = userGroupLocalService;
 	}
 
 	@Override

@@ -281,6 +281,9 @@ public interface CalendarResourceLocalService extends BaseLocalService,
 	public com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
 		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext);
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery();
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -319,8 +322,8 @@ public interface CalendarResourceLocalService extends BaseLocalService,
 
 	public void updateAsset(long userId,
 		com.liferay.calendar.model.CalendarResource calendarResource,
-		long[] assetCategoryIds, java.lang.String[] assetTagNames)
-		throws PortalException;
+		long[] assetCategoryIds, java.lang.String[] assetTagNames,
+		java.lang.Double priority) throws PortalException;
 
 	/**
 	* Updates the calendar resource in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.

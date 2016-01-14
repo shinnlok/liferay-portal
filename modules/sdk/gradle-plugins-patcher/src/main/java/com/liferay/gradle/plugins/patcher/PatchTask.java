@@ -61,6 +61,7 @@ import org.gradle.api.tasks.InputFiles;
 import org.gradle.api.tasks.OutputFiles;
 import org.gradle.api.tasks.SkipWhenEmpty;
 import org.gradle.api.tasks.TaskAction;
+import org.gradle.process.ExecResult;
 import org.gradle.process.ExecSpec;
 import org.gradle.util.GUtil;
 
@@ -72,6 +73,15 @@ public class PatchTask extends DefaultTask {
 	public static final String PATCHED_SRC_DIR_MAPPING_DEFAULT_EXTENSION = "*";
 
 	public PatchTask() {
+		_originalLibFile = new Callable<File>() {
+
+			@Override
+			public File call() throws Exception {
+				return getOriginalLibModuleFile();
+			}
+
+		};
+
 		_originalLibSrcFile = new Callable<File>() {
 
 			@Override
@@ -80,6 +90,18 @@ public class PatchTask extends DefaultTask {
 			}
 
 		};
+
+		args("--binary", "--strip=1", "--no-backup-if-mismatch");
+	}
+
+	public PatchTask args(Iterable<Object> args) {
+		GUtil.addToCollection(_args, args);
+
+		return this;
+	}
+
+	public PatchTask args(Object ... args) {
+		return args(Arrays.asList(args));
 	}
 
 	public PatchTask fileNames(Iterable<Object> fileNames) {
@@ -92,60 +114,34 @@ public class PatchTask extends DefaultTask {
 		return fileNames(Arrays.asList(fileNames));
 	}
 
+	public List<String> getArgs() {
+		return GradleUtil.toStringList(_args);
+	}
+
 	@Input
 	public List<String> getFileNames() {
 		return GradleUtil.toStringList(_fileNames);
 	}
 
-	@Input
 	public String getOriginalLibConfigurationName() {
 		return GradleUtil.toString(_originalLibConfigurationName);
 	}
 
+	@InputFile
 	public File getOriginalLibFile() {
-		Configuration configuration = GradleUtil.getConfiguration(
-			getProject(), getOriginalLibConfigurationName());
-
-		ResolvedConfiguration resolvedConfiguration =
-			configuration.getResolvedConfiguration();
-
-		String moduleGroup = getOriginalLibModuleGroup();
-		String moduleName = getOriginalLibModuleName();
-		String moduleVersion = getOriginalLibModuleVersion();
-
-		for (ResolvedArtifact resolvedArtifact :
-				resolvedConfiguration.getResolvedArtifacts()) {
-
-			ResolvedModuleVersion resolvedModuleVersion =
-				resolvedArtifact.getModuleVersion();
-
-			ModuleVersionIdentifier moduleVersionIdentifier =
-				resolvedModuleVersion.getId();
-
-			if (moduleGroup.equals(moduleVersionIdentifier.getGroup()) &&
-				moduleName.equals(moduleVersionIdentifier.getName()) &&
-				moduleVersion.equals(moduleVersionIdentifier.getVersion())) {
-
-				return resolvedArtifact.getFile();
-			}
-		}
-
-		throw new GradleException("Unable to find original lib " + moduleName);
+		return GradleUtil.toFile(getProject(), _originalLibFile);
 	}
 
-	@Input
 	public String getOriginalLibModuleGroup() {
 		Dependency dependency = getOriginalLibDependency();
 
 		return dependency.getGroup();
 	}
 
-	@Input
 	public String getOriginalLibModuleName() {
 		return GradleUtil.toString(_originalLibModuleName);
 	}
 
-	@Input
 	public String getOriginalLibModuleVersion() {
 		Dependency dependency = getOriginalLibDependency();
 
@@ -270,19 +266,20 @@ public class PatchTask extends DefaultTask {
 			final ByteArrayOutputStream byteArrayOutputStream =
 				new ByteArrayOutputStream();
 
-			project.exec(
+			ExecResult execResult = project.exec(
 				new Action<ExecSpec>() {
 
 					@Override
 					public void execute(ExecSpec execSpec) {
 						execSpec.setExecutable("patch");
+						execSpec.setIgnoreExitValue(true);
 						execSpec.setWorkingDir(temporaryDir);
 
-						execSpec.args("--binary");
+						execSpec.args(getArgs());
+
 						execSpec.args(
 							"--input=" +
 								FileUtil.relativize(patchFile, temporaryDir));
-						execSpec.args("--strip=1");
 
 						execSpec.setStandardOutput(byteArrayOutputStream);
 					}
@@ -290,6 +287,10 @@ public class PatchTask extends DefaultTask {
 				});
 
 			System.out.println(byteArrayOutputStream.toString());
+
+			execResult.rethrowFailure();
+
+			execResult.assertNormalExitValue();
 		}
 
 		FileTree fileTree = project.fileTree(temporaryDir);
@@ -331,6 +332,16 @@ public class PatchTask extends DefaultTask {
 		return patchFiles(Arrays.asList(patchFiles));
 	}
 
+	public void setArgs(Iterable<Object> args) {
+		_args.clear();
+
+		args(args);
+	}
+
+	public void setArgs(Object ... args) {
+		setArgs(Arrays.asList(args));
+	}
+
 	public void setCopyOriginalLibClasses(boolean copyOriginalLibClasses) {
 		_copyOriginalLibClasses = copyOriginalLibClasses;
 	}
@@ -345,6 +356,10 @@ public class PatchTask extends DefaultTask {
 		Object originalLibConfigurationName) {
 
 		_originalLibConfigurationName = originalLibConfigurationName;
+	}
+
+	public void setOriginalLibFile(Object originalLibFile) {
+		_originalLibFile = originalLibFile;
 	}
 
 	public void setOriginalLibModuleName(Object originalLibModuleName) {
@@ -397,6 +412,47 @@ public class PatchTask extends DefaultTask {
 		}
 
 		throw new GradleException("Unable to find original lib " + moduleName);
+	}
+
+	protected File getOriginalLibModuleFile() {
+		String configurationName = getOriginalLibConfigurationName();
+		String moduleGroup = getOriginalLibModuleGroup();
+		String moduleName = getOriginalLibModuleName();
+		String moduleVersion = getOriginalLibModuleVersion();
+
+		if (Validator.isNull(configurationName) ||
+			Validator.isNull(moduleGroup) || Validator.isNull(moduleName) ||
+			Validator.isNull(moduleVersion)) {
+
+			return null;
+		}
+
+		Configuration configuration = GradleUtil.getConfiguration(
+			getProject(), configurationName);
+
+		ResolvedConfiguration resolvedConfiguration =
+			configuration.getResolvedConfiguration();
+
+		for (ResolvedArtifact resolvedArtifact :
+				resolvedConfiguration.getResolvedArtifacts()) {
+
+			ResolvedModuleVersion resolvedModuleVersion =
+				resolvedArtifact.getModuleVersion();
+
+			ModuleVersionIdentifier moduleVersionIdentifier =
+				resolvedModuleVersion.getId();
+
+			if (moduleGroup.equals(
+					moduleVersionIdentifier.getGroup()) &&
+				moduleName.equals(moduleVersionIdentifier.getName()) &&
+				moduleVersion.equals(
+					moduleVersionIdentifier.getVersion())) {
+
+				return resolvedArtifact.getFile();
+			}
+		}
+
+		return null;
 	}
 
 	protected String getOriginalLibSrcUrl() {
@@ -464,10 +520,12 @@ public class PatchTask extends DefaultTask {
 	private static final String _BASE_URL =
 		"http://repo.maven.apache.org/maven2/";
 
+	private final List<Object> _args = new ArrayList<>();
 	private boolean _copyOriginalLibClasses = true;
 	private final List<Object> _fileNames = new ArrayList<>();
 	private Object _originalLibConfigurationName =
 		JavaPlugin.COMPILE_CONFIGURATION_NAME;
+	private Object _originalLibFile;
 	private Object _originalLibModuleName;
 	private Object _originalLibSrcBaseUrl;
 	private Object _originalLibSrcDirName = ".";

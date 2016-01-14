@@ -265,6 +265,11 @@ public class MDRRuleGroupInstanceLocalServiceWrapper
 		return _mdrRuleGroupInstanceLocalService.getExportActionableDynamicQuery(portletDataContext);
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _mdrRuleGroupInstanceLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the m d r rule group instance with the primary key.
 	*
@@ -445,23 +450,6 @@ public class MDRRuleGroupInstanceLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _mdrRuleGroupInstanceLocalService.updateRuleGroupInstance(ruleGroupInstanceId,
 			priority);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public MDRRuleGroupInstanceLocalService getWrappedMDRRuleGroupInstanceLocalService() {
-		return _mdrRuleGroupInstanceLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedMDRRuleGroupInstanceLocalService(
-		MDRRuleGroupInstanceLocalService mdrRuleGroupInstanceLocalService) {
-		_mdrRuleGroupInstanceLocalService = mdrRuleGroupInstanceLocalService;
 	}
 
 	@Override
