@@ -25,6 +25,8 @@ import jodd.json.TypeJsonSerializer;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.Date;
+
 /**
  * @author Igor Spasic
  */
@@ -96,6 +98,8 @@ public class JSONSerializerImpl implements JSONSerializer {
 
 	static {
 		JoddJson.defaultSerializers.register(
+			Date.class, new DateToStringTypeJSONSerializer());
+		JoddJson.defaultSerializers.register(
 			JSONArray.class, new JSONArrayTypeJSONSerializer());
 		JoddJson.defaultSerializers.register(
 			JSONObject.class, new JSONObjectTypeJSONSerializer());
@@ -106,6 +110,16 @@ public class JSONSerializerImpl implements JSONSerializer {
 	}
 
 	private final JsonSerializer _jsonSerializer;
+
+	private static class DateToStringTypeJSONSerializer
+		implements TypeJsonSerializer<Date> {
+
+		@Override
+		public void serialize(JsonContext jsonContext, Date date) {
+			jsonContext.writeString(Long.toString(date.getTime()));
+		}
+
+	}
 
 	private static class JSONArrayTypeJSONSerializer
 		implements TypeJsonSerializer<JSONArray> {
