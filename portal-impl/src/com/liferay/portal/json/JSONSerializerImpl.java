@@ -17,6 +17,8 @@ package com.liferay.portal.json;
 import com.liferay.portal.kernel.json.JSONSerializer;
 import com.liferay.portal.kernel.json.JSONTransformer;
 
+import java.util.Date;
+
 import jodd.json.JoddJson;
 import jodd.json.JsonContext;
 import jodd.json.JsonSerializer;
@@ -24,8 +26,6 @@ import jodd.json.TypeJsonSerializer;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-import java.util.Date;
 
 /**
  * @author Igor Spasic
