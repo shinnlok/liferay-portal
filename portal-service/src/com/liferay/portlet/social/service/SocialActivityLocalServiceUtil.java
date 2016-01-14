@@ -633,6 +633,10 @@ public class SocialActivityLocalServiceUtil {
 		return getService().getGroupUsersActivitiesCount(groupId);
 	}
 
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the activity that has the mirror activity.
 	*
@@ -994,13 +998,6 @@ public class SocialActivityLocalServiceUtil {
 		}
 
 		return _service;
-	}
-
-	/**
-	 * @deprecated As of 6.2.0
-	 */
-	@Deprecated
-	public void setService(SocialActivityLocalService service) {
 	}
 
 	private static SocialActivityLocalService _service;

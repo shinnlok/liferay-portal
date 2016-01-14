@@ -16,6 +16,7 @@ package com.liferay.document.library.lar.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.document.library.web.constants.DLPortletKeys;
+import com.liferay.document.library.web.lar.DLPortletDataHandler;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
@@ -51,6 +52,7 @@ import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLAppServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryTypeLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFolderLocalServiceUtil;
+import com.liferay.portlet.documentlibrary.service.DLTrashServiceUtil;
 import com.liferay.portlet.documentlibrary.util.test.DLAppTestUtil;
 import com.liferay.portlet.dynamicdatamapping.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.util.test.DDMStructureTestUtil;
@@ -150,9 +152,9 @@ public class DLPortletDataHandlerTest extends BasePortletDataHandlerTestCase {
 			group.getGroupId(), parentFolder.getFolderId(), "child",
 			RandomTestUtil.randomString(), serviceContext);
 
-		DLAppServiceUtil.moveFolderToTrash(childFolder.getFolderId());
+		DLTrashServiceUtil.moveFolderToTrash(childFolder.getFolderId());
 
-		DLAppServiceUtil.moveFolderToTrash(parentFolder.getFolderId());
+		DLTrashServiceUtil.moveFolderToTrash(parentFolder.getFolderId());
 
 		DLAppServiceUtil.deleteFolder(parentFolder.getFolderId());
 
@@ -162,6 +164,12 @@ public class DLPortletDataHandlerTest extends BasePortletDataHandlerTestCase {
 			group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
 
 		Assert.assertEquals(0, foldersCount);
+	}
+
+	@Override
+	protected void addParameters(Map<String, String[]> parameterMap) {
+		addBooleanParameter(
+			parameterMap, DLPortletDataHandler.NAMESPACE, "repositories", true);
 	}
 
 	protected void addRepositoryEntries() throws Exception {

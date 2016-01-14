@@ -14,7 +14,7 @@
 
 package com.liferay.password.policies.admin.web.portlet;
 
-import com.liferay.password.policies.admin.web.constants.PasswordPoliciesAdminPortletKeys;
+import com.liferay.password.policies.admin.constants.PasswordPoliciesAdminPortletKeys;
 import com.liferay.portal.DuplicatePasswordPolicyException;
 import com.liferay.portal.NoSuchPasswordPolicyException;
 import com.liferay.portal.PasswordPolicyNameException;
@@ -70,6 +70,18 @@ import org.osgi.service.component.annotations.Reference;
 	service = Portlet.class
 )
 public class PasswordPoliciesAdminPortlet extends MVCPortlet {
+
+	public void deletePasswordPolicies(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws Exception {
+
+		long[] passwordPolicyIds = StringUtil.split(
+			ParamUtil.getString(actionRequest, "passwordPolicyIds"), 0L);
+
+		for (long passwordPolicyId : passwordPolicyIds) {
+			_passwordPolicyService.deletePasswordPolicy(passwordPolicyId);
+		}
+	}
 
 	public void deletePasswordPolicy(
 			ActionRequest actionRequest, ActionResponse actionResponse)

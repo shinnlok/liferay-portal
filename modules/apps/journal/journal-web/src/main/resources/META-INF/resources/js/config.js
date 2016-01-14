@@ -17,7 +17,7 @@
 						'liferay-journal-navigation': {
 							path: 'navigation.js',
 							requires: [
-								'liferay-app-view-move',
+								'aui-component',
 								'liferay-portlet-base'
 							]
 						},

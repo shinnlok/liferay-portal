@@ -221,7 +221,8 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 		updateAsset(
 			userId, page, serviceContext.getAssetCategoryIds(),
 			serviceContext.getAssetTagNames(),
-			serviceContext.getAssetLinkEntryIds());
+			serviceContext.getAssetLinkEntryIds(),
+			serviceContext.getAssetPriority());
 
 		// Message boards
 
@@ -283,6 +284,9 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 
 		Folder folder = page.addAttachmentsFolder();
 
+		fileName = PortletFileRepositoryUtil.getUniqueFileName(
+			page.getGroupId(), folder.getFolderId(), fileName);
+
 		FileEntry fileEntry = PortletFileRepositoryUtil.addPortletFileEntry(
 			page.getGroupId(), userId, WikiPage.class.getName(),
 			page.getResourcePrimKey(), WikiPortletKeys.WIKI,
@@ -315,6 +319,9 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 		WikiPage page = getPage(nodeId, title);
 
 		Folder folder = page.addAttachmentsFolder();
+
+		fileName = PortletFileRepositoryUtil.getUniqueFileName(
+			page.getGroupId(), folder.getFolderId(), fileName);
 
 		FileEntry fileEntry = PortletFileRepositoryUtil.addPortletFileEntry(
 			page.getGroupId(), userId, WikiPage.class.getName(),
@@ -525,18 +532,6 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 		if (!pages.isEmpty()) {
 			wikiPageLocalService.deletePage(pages.get(0));
 		}
-	}
-
-	/**
-	 * @deprecated As of 6.2.0 replaced by {@link #discardDraft(long, String,
-	 *             double)}
-	 */
-	@Deprecated
-	@Override
-	public void deletePage(long nodeId, String title, double version)
-		throws PortalException {
-
-		discardDraft(nodeId, title, version);
 	}
 
 	@Override
@@ -1421,20 +1416,6 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 		return getPage(page.getNodeId(), page.getTitle(), previousVersion);
 	}
 
-	/**
-	 * @deprecated As of 6.2.0, replaced by {@link #getRecentChanges(long, long,
-	 *             int, int)}
-	 */
-	@Deprecated
-	@Override
-	public List<WikiPage> getRecentChanges(long nodeId, int start, int end)
-		throws PortalException {
-
-		WikiNode node = wikiNodePersistence.findByPrimaryKey(nodeId);
-
-		return getRecentChanges(node.getGroupId(), nodeId, start, end);
-	}
-
 	@Override
 	public List<WikiPage> getRecentChanges(
 		long groupId, long nodeId, int start, int end) {
@@ -1445,18 +1426,6 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 
 		return wikiPageFinder.findByCreateDate(
 			groupId, nodeId, cal.getTime(), false, start, end);
-	}
-
-	/**
-	 * @deprecated As of 6.2.0, replaced by {@link #getRecentChangesCount(long,
-	 *             long)}
-	 */
-	@Deprecated
-	@Override
-	public int getRecentChangesCount(long nodeId) throws PortalException {
-		WikiNode node = wikiNodePersistence.findByPrimaryKey(nodeId);
-
-		return getRecentChangesCount(node.getGroupId(), nodeId);
 	}
 
 	@Override
@@ -1510,20 +1479,6 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 		throws PortalException {
 
 		moveDependentToTrash(page, trashEntryId, false);
-	}
-
-	/**
-	 * @deprecated As of 6.2.0, replaced by {@link #renamePage(long, long,
-	 *             String, String, boolean, ServiceContext)}
-	 */
-	@Deprecated
-	@Override
-	public void movePage(
-			long userId, long nodeId, String title, String newTitle,
-			boolean strict, ServiceContext serviceContext)
-		throws PortalException {
-
-		renamePage(userId, nodeId, title, newTitle, strict, serviceContext);
 	}
 
 	/**
@@ -1886,7 +1841,7 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 	@Override
 	public void updateAsset(
 			long userId, WikiPage page, long[] assetCategoryIds,
-			String[] assetTagNames, long[] assetLinkEntryIds)
+			String[] assetTagNames, long[] assetLinkEntryIds, Double priority)
 		throws PortalException {
 
 		boolean addDraftAssetEntry = false;
@@ -1911,7 +1866,7 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 				page.getModifiedDate(), WikiPage.class.getName(),
 				page.getPrimaryKey(), page.getUuid(), 0, assetCategoryIds,
 				assetTagNames, false, null, null, null, ContentTypes.TEXT_HTML,
-				page.getTitle(), null, null, null, null, 0, 0, null);
+				page.getTitle(), null, null, null, null, 0, 0, priority);
 		}
 		else {
 			assetEntry = assetEntryLocalService.updateEntry(
@@ -1920,7 +1875,7 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 				page.getResourcePrimKey(), page.getUuid(), 0, assetCategoryIds,
 				assetTagNames, page.isApproved(), null, null, null,
 				ContentTypes.TEXT_HTML, page.getTitle(), null, null, null, null,
-				0, 0, null);
+				0, 0, priority);
 		}
 
 		assetLinkLocalService.updateLinks(
@@ -2308,7 +2263,8 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 		updateAsset(
 			userId, page, serviceContext.getAssetCategoryIds(),
 			serviceContext.getAssetTagNames(),
-			serviceContext.getAssetLinkEntryIds());
+			serviceContext.getAssetLinkEntryIds(),
+			serviceContext.getAssetPriority());
 
 		return page;
 	}
@@ -3202,7 +3158,8 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 		updateAsset(
 			userId, page, serviceContext.getAssetCategoryIds(),
 			serviceContext.getAssetTagNames(),
-			serviceContext.getAssetLinkEntryIds());
+			serviceContext.getAssetLinkEntryIds(),
+			serviceContext.getAssetPriority());
 
 		// Workflow
 

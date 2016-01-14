@@ -198,6 +198,15 @@ public class UserNotificationEventPersistenceTest {
 	}
 
 	@Test
+	public void testCountByType() throws Exception {
+		_persistence.countByType(StringPool.BLANK);
+
+		_persistence.countByType(StringPool.NULL);
+
+		_persistence.countByType((String)null);
+	}
+
+	@Test
 	public void testCountByU_DT() throws Exception {
 		_persistence.countByU_DT(RandomTestUtil.nextLong(),
 			RandomTestUtil.nextInt());
@@ -252,6 +261,19 @@ public class UserNotificationEventPersistenceTest {
 			RandomTestUtil.randomBoolean(), RandomTestUtil.randomBoolean());
 
 		_persistence.countByU_A_A(0L, RandomTestUtil.randomBoolean(),
+			RandomTestUtil.randomBoolean());
+	}
+
+	@Test
+	public void testCountByU_T_DT_D() throws Exception {
+		_persistence.countByU_T_DT_D(RandomTestUtil.nextLong(),
+			StringPool.BLANK, RandomTestUtil.nextInt(),
+			RandomTestUtil.randomBoolean());
+
+		_persistence.countByU_T_DT_D(0L, StringPool.NULL, 0,
+			RandomTestUtil.randomBoolean());
+
+		_persistence.countByU_T_DT_D(0L, (String)null, 0,
 			RandomTestUtil.randomBoolean());
 	}
 

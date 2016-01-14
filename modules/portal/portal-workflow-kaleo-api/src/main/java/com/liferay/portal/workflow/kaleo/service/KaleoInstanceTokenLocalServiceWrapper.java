@@ -223,6 +223,11 @@ public class KaleoInstanceTokenLocalServiceWrapper
 		return _kaleoInstanceTokenLocalService.getActionableDynamicQuery();
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _kaleoInstanceTokenLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the kaleo instance token with the primary key.
 	*
@@ -340,23 +345,6 @@ public class KaleoInstanceTokenLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _kaleoInstanceTokenLocalService.updateKaleoInstanceToken(kaleoInstanceTokenId,
 			currentKaleoNodeId);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public KaleoInstanceTokenLocalService getWrappedKaleoInstanceTokenLocalService() {
-		return _kaleoInstanceTokenLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedKaleoInstanceTokenLocalService(
-		KaleoInstanceTokenLocalService kaleoInstanceTokenLocalService) {
-		_kaleoInstanceTokenLocalService = kaleoInstanceTokenLocalService;
 	}
 
 	@Override

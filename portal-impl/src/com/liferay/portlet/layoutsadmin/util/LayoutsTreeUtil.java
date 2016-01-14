@@ -31,7 +31,6 @@ import com.liferay.portal.model.LayoutConstants;
 import com.liferay.portal.model.LayoutRevision;
 import com.liferay.portal.model.LayoutSetBranch;
 import com.liferay.portal.model.LayoutType;
-import com.liferay.portal.model.User;
 import com.liferay.portal.model.impl.VirtualLayout;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
@@ -245,7 +244,7 @@ public class LayoutsTreeUtil {
 			layoutTreeNodes.add(layoutTreeNode);
 		}
 
-		return new LayoutTreeNodes(layoutTreeNodes, layouts.size());
+		return new LayoutTreeNodes(layoutTreeNodes, layoutTreeNodes.size());
 	}
 
 	private static int _getLoadedLayoutsCount(
@@ -268,6 +267,9 @@ public class LayoutsTreeUtil {
 		String paginationJSON = SessionClicks.get(
 			session, key, JSONFactoryUtil.getNullJSON());
 
+		JSONObject paginationJSONObject = JSONFactoryUtil.createJSONObject(
+			paginationJSON);
+
 		if (_log.isDebugEnabled()) {
 			sb = new StringBundler(9);
 
@@ -277,12 +279,6 @@ public class LayoutsTreeUtil {
 			sb.append(layoutId);
 			sb.append(", paginationJSON=");
 			sb.append(paginationJSON);
-		}
-
-		JSONObject paginationJSONObject = JSONFactoryUtil.createJSONObject(
-			paginationJSON);
-
-		if (_log.isDebugEnabled()) {
 			sb.append(", paginationJSONObject");
 			sb.append(paginationJSONObject);
 			sb.append(StringPool.CLOSE_PARENTHESIS);
@@ -430,7 +426,7 @@ public class LayoutsTreeUtil {
 			jsonObject.put("regularURL", layout.getRegularURL(request));
 			jsonObject.put(
 				"sortable",
-					hasManageLayoutsPermission &&
+				hasManageLayoutsPermission &&
 					SitesUtil.isLayoutSortable(layout));
 			jsonObject.put("type", layout.getType());
 			jsonObject.put(
@@ -444,17 +440,11 @@ public class LayoutsTreeUtil {
 				layout);
 
 			if (layoutRevision != null) {
-				User user = themeDisplay.getUser();
+				long layoutSetBranchId = layoutRevision.getLayoutSetBranchId();
 
-				long recentLayoutSetBranchId =
-					StagingUtil.getRecentLayoutSetBranchId(
-						user, layout.getLayoutSet().getLayoutSetId());
-
-				if (StagingUtil.isIncomplete(layout, recentLayoutSetBranchId)) {
+				if (StagingUtil.isIncomplete(layout, layoutSetBranchId)) {
 					jsonObject.put("incomplete", true);
 				}
-
-				long layoutSetBranchId = layoutRevision.getLayoutSetBranchId();
 
 				LayoutSetBranch layoutSetBranch =
 					LayoutSetBranchLocalServiceUtil.getLayoutSetBranch(

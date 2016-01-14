@@ -199,6 +199,11 @@ public class VirtualHostLocalServiceWrapper implements VirtualHostLocalService,
 		return _virtualHostLocalService.getActionableDynamicQuery();
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _virtualHostLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -288,23 +293,6 @@ public class VirtualHostLocalServiceWrapper implements VirtualHostLocalService,
 	public com.liferay.portal.model.VirtualHost updateVirtualHost(
 		com.liferay.portal.model.VirtualHost virtualHost) {
 		return _virtualHostLocalService.updateVirtualHost(virtualHost);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public VirtualHostLocalService getWrappedVirtualHostLocalService() {
-		return _virtualHostLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedVirtualHostLocalService(
-		VirtualHostLocalService virtualHostLocalService) {
-		_virtualHostLocalService = virtualHostLocalService;
 	}
 
 	@Override

@@ -192,6 +192,11 @@ public class ShoppingItemPriceLocalServiceWrapper
 	}
 
 	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _shoppingItemPriceLocalService.getIndexableActionableDynamicQuery();
+	}
+
+	@Override
 	public java.util.List<com.liferay.shopping.model.ShoppingItemPrice> getItemPrices(
 		long itemId) throws com.liferay.portal.kernel.exception.PortalException {
 		return _shoppingItemPriceLocalService.getItemPrices(itemId);
@@ -265,23 +270,6 @@ public class ShoppingItemPriceLocalServiceWrapper
 	public com.liferay.shopping.model.ShoppingItemPrice updateShoppingItemPrice(
 		com.liferay.shopping.model.ShoppingItemPrice shoppingItemPrice) {
 		return _shoppingItemPriceLocalService.updateShoppingItemPrice(shoppingItemPrice);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public ShoppingItemPriceLocalService getWrappedShoppingItemPriceLocalService() {
-		return _shoppingItemPriceLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedShoppingItemPriceLocalService(
-		ShoppingItemPriceLocalService shoppingItemPriceLocalService) {
-		_shoppingItemPriceLocalService = shoppingItemPriceLocalService;
 	}
 
 	@Override

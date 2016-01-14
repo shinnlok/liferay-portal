@@ -444,6 +444,10 @@ public class CalEventLocalServiceUtil {
 		return getService().getExportActionableDynamicQuery(portletDataContext);
 	}
 
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
 	public static java.util.List<com.liferay.portlet.calendar.model.CalEvent> getNoAssetEvents() {
 		return getService().getNoAssetEvents();
 	}
@@ -570,13 +574,6 @@ public class CalEventLocalServiceUtil {
 		}
 
 		return _service;
-	}
-
-	/**
-	 * @deprecated As of 6.2.0
-	 */
-	@Deprecated
-	public void setService(CalEventLocalService service) {
 	}
 
 	private static CalEventLocalService _service;

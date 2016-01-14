@@ -292,6 +292,11 @@ public class AssetCategoryPropertyLocalServiceWrapper
 			key);
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _assetCategoryPropertyLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -336,23 +341,6 @@ public class AssetCategoryPropertyLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _assetCategoryPropertyLocalService.updateCategoryProperty(userId,
 			categoryPropertyId, key, value);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public AssetCategoryPropertyLocalService getWrappedAssetCategoryPropertyLocalService() {
-		return _assetCategoryPropertyLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedAssetCategoryPropertyLocalService(
-		AssetCategoryPropertyLocalService assetCategoryPropertyLocalService) {
-		_assetCategoryPropertyLocalService = assetCategoryPropertyLocalService;
 	}
 
 	@Override

@@ -27,7 +27,6 @@ taglib uri="http://liferay.com/tld/util" prefix="liferay-util" %>
 
 <%@ page import="com.liferay.portal.kernel.language.LanguageUtil" %><%@
 page import="com.liferay.portal.kernel.language.UnicodeLanguageUtil" %><%@
-page import="com.liferay.portal.kernel.portlet.LiferayPortletRequest" %><%@
 page import="com.liferay.portal.kernel.portlet.LiferayWindowState" %><%@
 page import="com.liferay.portal.kernel.servlet.SessionMessages" %><%@
 page import="com.liferay.portal.kernel.util.ArrayUtil" %><%@
@@ -43,6 +42,8 @@ page import="com.liferay.portal.kernel.util.UnicodeFormatter" %><%@
 page import="com.liferay.portal.kernel.util.UnicodeProperties" %><%@
 page import="com.liferay.portal.kernel.util.Validator" %><%@
 page import="com.liferay.portal.model.Group" %><%@
+page import="com.liferay.portal.model.LayoutRevision" %><%@
+page import="com.liferay.portal.model.LayoutRevisionConstants" %><%@
 page import="com.liferay.portal.model.LayoutSetBranch" %><%@
 page import="com.liferay.portal.model.Portlet" %><%@
 page import="com.liferay.portal.model.StagedGroupedModel" %><%@
@@ -65,7 +66,8 @@ page import="com.liferay.portlet.exportimport.lar.PortletDataHandlerControl" %><
 page import="com.liferay.portlet.exportimport.lar.PortletDataHandlerKeys" %><%@
 page import="com.liferay.portlet.exportimport.lar.StagedModelType" %><%@
 page import="com.liferay.portlet.exportimport.model.ExportImportConfiguration" %><%@
-page import="com.liferay.portlet.exportimport.staging.StagingUtil" %>
+page import="com.liferay.portlet.exportimport.staging.StagingUtil" %><%@
+page import="com.liferay.staging.processes.web.constants.StagingProcessesWebKeys" %>
 
 <%@ page import="java.util.Calendar" %><%@
 page import="java.util.Collections" %><%@
@@ -80,6 +82,8 @@ page import="java.util.Set" %>
 page import="javax.portlet.PortletRequest" %><%@
 page import="javax.portlet.PortletResponse" %><%@
 page import="javax.portlet.PortletURL" %>
+
+<portlet:defineObjects/>
 
 <liferay-theme:defineObjects/>
 

@@ -309,6 +309,11 @@ public class ResourceBlockLocalServiceWrapper
 			roleId);
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _resourceBlockLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -683,23 +688,6 @@ public class ResourceBlockLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 		_resourceBlockLocalService.verifyResourceBlockId(companyId, name,
 			primKey);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public ResourceBlockLocalService getWrappedResourceBlockLocalService() {
-		return _resourceBlockLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedResourceBlockLocalService(
-		ResourceBlockLocalService resourceBlockLocalService) {
-		_resourceBlockLocalService = resourceBlockLocalService;
 	}
 
 	@Override

@@ -414,6 +414,11 @@ public class DLFileShortcutLocalServiceWrapper
 			folderId, active, status);
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _dlFileShortcutLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -493,23 +498,6 @@ public class DLFileShortcutLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 		_dlFileShortcutLocalService.updateStatus(userId, fileShortcutId,
 			status, serviceContext);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public DLFileShortcutLocalService getWrappedDLFileShortcutLocalService() {
-		return _dlFileShortcutLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedDLFileShortcutLocalService(
-		DLFileShortcutLocalService dlFileShortcutLocalService) {
-		_dlFileShortcutLocalService = dlFileShortcutLocalService;
 	}
 
 	@Override

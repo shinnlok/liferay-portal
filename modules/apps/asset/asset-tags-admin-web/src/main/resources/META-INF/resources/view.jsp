@@ -27,6 +27,8 @@ if (Validator.isNotNull(keywords)) {
 
 SearchContainer tagsSearchContainer = new SearchContainer(renderRequest, renderResponse.createRenderURL(), null, "there-are-no-tags.-you-can-add-a-tag-by-clicking-the-plus-button-on-the-bottom-right-corner");
 
+tagsSearchContainer.setSearch(Validator.isNotNull(keywords));
+
 String orderByCol = ParamUtil.getString(request, "orderByCol", "name");
 
 tagsSearchContainer.setOrderByCol(orderByCol);
@@ -67,7 +69,7 @@ tagsSearchContainer.setResults(tags);
 
 <aui:nav-bar cssClass="collapse-basic-search" markupView="lexicon">
 	<aui:nav cssClass="navbar-nav">
-		<aui:nav-item cssClass="active" label="tags" />
+		<aui:nav-item label="tags" selected="<%= true %>" />
 	</aui:nav>
 
 	<c:if test="<%= Validator.isNotNull(keywords) || (tagsCount > 0) %>">
@@ -81,8 +83,8 @@ tagsSearchContainer.setResults(tags);
 
 <c:if test="<%= Validator.isNotNull(keywords) || (tagsCount > 0) %>">
 	<liferay-frontend:management-bar
-		checkBoxContainerId="assetTagsSearchContainer"
 		includeCheckBox="<%= true %>"
+		searchContainerId="assetTags"
 	>
 		<liferay-frontend:management-bar-filters>
 			<liferay-frontend:management-bar-navigation
@@ -107,16 +109,18 @@ tagsSearchContainer.setResults(tags);
 		</liferay-frontend:management-bar-buttons>
 
 		<liferay-frontend:management-bar-action-buttons>
-			<liferay-frontend:management-bar-button href="javascript:;" iconCssClass="icon-random" id="mergeSelectedTags" />
+			<liferay-frontend:management-bar-button href="javascript:;" icon="change" id="mergeSelectedTags" label="merge" />
 
-			<liferay-frontend:management-bar-button href="javascript:;" iconCssClass="icon-trash" id="deleteSelectedTags" />
+			<liferay-frontend:management-bar-button href="javascript:;" icon="trash" id="deleteSelectedTags" label="delete" />
 		</liferay-frontend:management-bar-action-buttons>
 	</liferay-frontend:management-bar>
 </c:if>
 
-<aui:form cssClass="container-fluid-1280" name="fm">
-	<aui:input name="deleteTagIds" type="hidden" />
+<portlet:actionURL name="deleteTag" var="deleteTagURL">
+	<portlet:param name="redirect" value="<%= currentURL %>" />
+</portlet:actionURL>
 
+<aui:form action="<%= deleteTagURL %>" cssClass="container-fluid-1280" name="fm">
 	<liferay-ui:search-container
 		id="assetTags"
 		searchContainer="<%= tagsSearchContainer %>"
@@ -124,14 +128,14 @@ tagsSearchContainer.setResults(tags);
 
 		<liferay-ui:search-container-row
 			className="com.liferay.portlet.asset.model.AssetTag"
-			cssClass="selectable"
 			keyProperty="tagId"
 			modelVar="tag"
 		>
 			<liferay-ui:search-container-column-text
 				name="name"
-				property="name"
-			/>
+			>
+				<strong><%= tag.getName() %></strong>
+			</liferay-ui:search-container-column-text>
 
 			<liferay-ui:search-container-column-text
 				name="usages"
@@ -167,13 +171,7 @@ tagsSearchContainer.setResults(tags);
 		'click',
 		function() {
 			if (confirm('<liferay-ui:message key="are-you-sure-you-want-to-delete-this" />')) {
-				<portlet:actionURL name="deleteTag" var="deleteURL">
-					<portlet:param name="redirect" value="<%= currentURL %>" />
-				</portlet:actionURL>
-
-				form.fm('deleteTagIds').val(Util.listCheckedExcept(form, '<portlet:namespace />allRowIds'));
-
-				submitForm(form, '<%= deleteURL %>');
+				submitForm(form);
 			}
 		}
 	);

@@ -189,6 +189,11 @@ public class UserTrackerPathLocalServiceWrapper
 		return _userTrackerPathLocalService.getActionableDynamicQuery();
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _userTrackerPathLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -264,23 +269,6 @@ public class UserTrackerPathLocalServiceWrapper
 	public com.liferay.portal.model.UserTrackerPath updateUserTrackerPath(
 		com.liferay.portal.model.UserTrackerPath userTrackerPath) {
 		return _userTrackerPathLocalService.updateUserTrackerPath(userTrackerPath);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public UserTrackerPathLocalService getWrappedUserTrackerPathLocalService() {
-		return _userTrackerPathLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedUserTrackerPathLocalService(
-		UserTrackerPathLocalService userTrackerPathLocalService) {
-		_userTrackerPathLocalService = userTrackerPathLocalService;
 	}
 
 	@Override

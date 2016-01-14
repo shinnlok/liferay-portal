@@ -16,26 +16,25 @@ package com.liferay.portal.upgrade.internal.release;
 
 import aQute.bnd.annotation.metatype.Configurable;
 
-import com.liferay.osgi.service.tracker.map.PropertyServiceReferenceComparator;
-import com.liferay.osgi.service.tracker.map.PropertyServiceReferenceMapper;
-import com.liferay.osgi.service.tracker.map.ServiceTrackerMap;
-import com.liferay.osgi.service.tracker.map.ServiceTrackerMapFactory;
-import com.liferay.osgi.service.tracker.map.ServiceTrackerMapListener;
+import com.liferay.osgi.service.tracker.collections.map.PropertyServiceReferenceComparator;
+import com.liferay.osgi.service.tracker.collections.map.PropertyServiceReferenceMapper;
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapListener;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBContext;
-import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
+import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.db.DBProcessContext;
 import com.liferay.portal.kernel.upgrade.UpgradeStep;
-import com.liferay.portal.kernel.util.RunnableUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Release;
 import com.liferay.portal.output.stream.container.OutputStreamContainer;
 import com.liferay.portal.output.stream.container.OutputStreamContainerFactory;
 import com.liferay.portal.output.stream.container.OutputStreamContainerFactoryTracker;
 import com.liferay.portal.service.ReleaseLocalService;
-import com.liferay.portal.upgrade.internal.UpgradeInfo;
 import com.liferay.portal.upgrade.internal.configuration.ReleaseManagerConfiguration;
 import com.liferay.portal.upgrade.internal.graph.ReleaseGraphManager;
+import com.liferay.portal.upgrade.registry.UpgradeInfo;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -72,27 +71,7 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 public class ReleaseManager {
 
 	public void execute(String bundleSymbolicName) {
-		ReleaseGraphManager releaseGraphManager = new ReleaseGraphManager(
-			_serviceTrackerMap.getService(bundleSymbolicName));
-
-		String schemaVersionString = getSchemaVersionString(bundleSymbolicName);
-
-		List<List<UpgradeInfo>> upgradeInfosList =
-			releaseGraphManager.getUpgradeInfosList(schemaVersionString);
-
-		int size = upgradeInfosList.size();
-
-		if (size > 1) {
-			throw new IllegalStateException(
-				"There are " + size + " possible end nodes for " +
-					schemaVersionString);
-		}
-
-		if (size == 0) {
-			return;
-		}
-
-		executeUpgradeInfos(bundleSymbolicName, upgradeInfosList.get(0));
+		doExecute(bundleSymbolicName, _serviceTrackerMap);
 	}
 
 	public void execute(String bundleSymbolicName, String toVersionString) {
@@ -142,7 +121,7 @@ public class ReleaseManager {
 
 		_logger = new Logger(bundleContext);
 
-		DB db = DBFactoryUtil.getDB();
+		DB db = DBManagerUtil.getDB();
 
 		ServiceTrackerMapListener<String, UpgradeInfo, List<UpgradeInfo>>
 			serviceTrackerMapListener = null;
@@ -155,10 +134,10 @@ public class ReleaseManager {
 				new UpgradeInfoServiceTrackerMapListener();
 		}
 
-		_serviceTrackerMap = ServiceTrackerMapFactory.multiValueMap(
+		_serviceTrackerMap = ServiceTrackerMapFactory.openMultiValueMap(
 			bundleContext, UpgradeStep.class,
 			"(&(upgrade.bundle.symbolic.name=*)(|(upgrade.db.type=any)" +
-				"(upgrade.db.type=" + db.getType() + ")))",
+				"(upgrade.db.type=" + db.getDBType() + ")))",
 			new PropertyServiceReferenceMapper<String, UpgradeStep>(
 				"upgrade.bundle.symbolic.name"),
 			new UpgradeServiceTrackerCustomizer(bundleContext),
@@ -166,13 +145,38 @@ public class ReleaseManager {
 				new PropertyServiceReferenceComparator<UpgradeStep>(
 					"upgrade.from.schema.version")),
 			serviceTrackerMapListener);
-
-		_serviceTrackerMap.open();
 	}
 
 	@Deactivate
 	protected void deactivate() {
 		_serviceTrackerMap.close();
+	}
+
+	protected void doExecute(
+		String bundleSymbolicName,
+		ServiceTrackerMap<String, List<UpgradeInfo>> serviceTrackerMap) {
+
+		ReleaseGraphManager releaseGraphManager = new ReleaseGraphManager(
+			serviceTrackerMap.getService(bundleSymbolicName));
+
+		String schemaVersionString = getSchemaVersionString(bundleSymbolicName);
+
+		List<List<UpgradeInfo>> upgradeInfosList =
+			releaseGraphManager.getUpgradeInfosList(schemaVersionString);
+
+		int size = upgradeInfosList.size();
+
+		if (size > 1) {
+			throw new IllegalStateException(
+				"There are " + size + " possible end nodes for " +
+					schemaVersionString);
+		}
+
+		if (size == 0) {
+			return;
+		}
+
+		executeUpgradeInfos(bundleSymbolicName, upgradeInfosList.get(0));
 	}
 
 	protected void executeUpgradeInfos(
@@ -188,10 +192,10 @@ public class ReleaseManager {
 
 		OutputStream outputStream = outputStreamContainer.getOutputStream();
 
-		RunnableUtil.runWithSwappedSystemOut(
+		_outputStreamContainerFactoryTracker.runWithSwappedLog(
 			new UpgradeInfosRunnable(
 				bundleSymbolicName, upgradeInfos, outputStream),
-			outputStream);
+			outputStreamContainer.getDescription(), outputStream);
 
 		try {
 			outputStream.close();
@@ -248,7 +252,14 @@ public class ReleaseManager {
 			final String key, UpgradeInfo upgradeInfo,
 			List<UpgradeInfo> upgradeInfos) {
 
-			execute(key);
+			doExecute(key, serviceTrackerMap);
+		}
+
+		@Override
+		public void keyRemoved(
+			ServiceTrackerMap<String, List<UpgradeInfo>> serviceTrackerMap,
+			String key, UpgradeInfo upgradeInfo,
+			List<UpgradeInfo> upgradeInfos) {
 		}
 
 	}
@@ -300,7 +311,7 @@ public class ReleaseManager {
 		private final OutputStream _outputStream;
 		private final List<UpgradeInfo> _upgradeInfos;
 
-	};
+	}
 
 	private class UpgradeServiceTrackerCustomizer
 		implements ServiceTrackerCustomizer<UpgradeStep, UpgradeInfo> {

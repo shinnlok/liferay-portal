@@ -105,6 +105,11 @@ public class AssetLinkLocalServiceWrapper implements AssetLinkLocalService,
 		return _assetLinkLocalService.deleteAssetLink(linkId);
 	}
 
+	@Override
+	public void deleteGroupLinks(long groupId) {
+		_assetLinkLocalService.deleteGroupLinks(groupId);
+	}
+
 	/**
 	* Deletes the asset link.
 	*
@@ -328,6 +333,11 @@ public class AssetLinkLocalServiceWrapper implements AssetLinkLocalService,
 		return _assetLinkLocalService.getExportActionbleDynamicQuery(portletDataContext);
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _assetLinkLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns all the asset links whose first or second entry ID is the given
 	* entry ID.
@@ -443,23 +453,6 @@ public class AssetLinkLocalServiceWrapper implements AssetLinkLocalService,
 	public void updateLinks(long userId, long entryId, long[] linkEntryIds,
 		int typeId) throws com.liferay.portal.kernel.exception.PortalException {
 		_assetLinkLocalService.updateLinks(userId, entryId, linkEntryIds, typeId);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public AssetLinkLocalService getWrappedAssetLinkLocalService() {
-		return _assetLinkLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedAssetLinkLocalService(
-		AssetLinkLocalService assetLinkLocalService) {
-		_assetLinkLocalService = assetLinkLocalService;
 	}
 
 	@Override

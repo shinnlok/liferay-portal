@@ -340,6 +340,11 @@ public class DLFileVersionLocalServiceWrapper
 	}
 
 	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _dlFileVersionLocalService.getIndexableActionableDynamicQuery();
+	}
+
+	@Override
 	public com.liferay.portlet.documentlibrary.model.DLFileVersion getLatestFileVersion(
 		long fileEntryId, boolean excludeWorkingCopy)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -394,23 +399,6 @@ public class DLFileVersionLocalServiceWrapper
 	public com.liferay.portlet.documentlibrary.model.DLFileVersion updateDLFileVersion(
 		com.liferay.portlet.documentlibrary.model.DLFileVersion dlFileVersion) {
 		return _dlFileVersionLocalService.updateDLFileVersion(dlFileVersion);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public DLFileVersionLocalService getWrappedDLFileVersionLocalService() {
-		return _dlFileVersionLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedDLFileVersionLocalService(
-		DLFileVersionLocalService dlFileVersionLocalService) {
-		_dlFileVersionLocalService = dlFileVersionLocalService;
 	}
 
 	@Override

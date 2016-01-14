@@ -33,6 +33,8 @@ public interface LDAPSettings {
 	public Properties getContactMappings(long ldapServerId, long companyId)
 		throws Exception;
 
+	public String[] getErrorPasswordHistoryKeywords(long companyId);
+
 	public Properties getGroupMappings(long ldapServerId, long companyId)
 		throws Exception;
 

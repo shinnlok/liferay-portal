@@ -14,9 +14,9 @@
 
 package com.liferay.wiki.engine.impl;
 
-import com.liferay.osgi.service.tracker.map.ServiceReferenceMapper;
-import com.liferay.osgi.service.tracker.map.ServiceTrackerMap;
-import com.liferay.osgi.service.tracker.map.ServiceTrackerMapFactory;
+import com.liferay.osgi.service.tracker.collections.map.ServiceReferenceMapper;
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.wiki.engine.WikiEngine;
@@ -57,7 +57,7 @@ public class WikiEngineTracker {
 
 		_bundleContext = bundleContext;
 
-		_serviceTrackerMap = ServiceTrackerMapFactory.multiValueMap(
+		_serviceTrackerMap = ServiceTrackerMapFactory.openMultiValueMap(
 			bundleContext, WikiEngine.class, null,
 			new ServiceReferenceMapper<String, WikiEngine>() {
 
@@ -76,9 +76,8 @@ public class WikiEngineTracker {
 						_bundleContext.ungetService(serviceReference);
 					}
 				}
-			});
 
-		_serviceTrackerMap.open();
+			});
 	}
 
 	@Deactivate

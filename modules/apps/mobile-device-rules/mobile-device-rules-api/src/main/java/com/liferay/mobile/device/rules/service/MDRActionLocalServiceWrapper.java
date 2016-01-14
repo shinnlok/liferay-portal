@@ -279,6 +279,11 @@ public class MDRActionLocalServiceWrapper implements MDRActionLocalService,
 		return _mdrActionLocalService.getExportActionableDynamicQuery(portletDataContext);
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _mdrActionLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the m d r action with the primary key.
 	*
@@ -419,23 +424,6 @@ public class MDRActionLocalServiceWrapper implements MDRActionLocalService,
 	public com.liferay.mobile.device.rules.model.MDRAction updateMDRAction(
 		com.liferay.mobile.device.rules.model.MDRAction mdrAction) {
 		return _mdrActionLocalService.updateMDRAction(mdrAction);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public MDRActionLocalService getWrappedMDRActionLocalService() {
-		return _mdrActionLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedMDRActionLocalService(
-		MDRActionLocalService mdrActionLocalService) {
-		_mdrActionLocalService = mdrActionLocalService;
 	}
 
 	@Override

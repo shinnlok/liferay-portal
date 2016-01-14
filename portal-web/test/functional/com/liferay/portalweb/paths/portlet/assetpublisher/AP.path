@@ -29,18 +29,24 @@
 	<td></td>
 </tr>
 <tr>
-	<td>ADD_BLOGS_ENTRY_BUTTON</td>
-	<td>//ul[@aria-label='Asset Publisher']/li/a[@title='Add Blogs Entry']/span</td>
-	<td></td>
-</tr>
-<tr>
-	<td>ADD_BASIC_WEB_CONTENT_BUTTON</td>
-	<td>//ul[@aria-label='Asset Publisher']/li/a[@title='Add Basic Web Content']</td>
-	<td></td>
-</tr>
-<tr>
 	<td>RSS_LINK</td>
 	<td>//div[@class='subscribe-action']/span/a[contains(@href,'asset_publisher')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+<!--MENU_ITEMS-->
+<tr>
+	<td>ADD_BLOGS_ENTRY_MENU_ITEM</td>
+	<td>//li[contains(.,'Add New in ${key_siteScope}')]//a[@title='Blogs Entry']/span</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ADD_BASIC_WEB_CONTENT_MENU_ITEM</td>
+	<td>//ul[@aria-label='Asset Publisher']/li/a[@title='Add Basic Web Content']</td>
 	<td></td>
 </tr>
 <tr>
@@ -209,6 +215,27 @@
 <tr>
 	<td>ASSET_ABSTRACT_BOOKMARK_LIFERAY_LOGO</td>
 	<td>//img[@alt='Liferay']</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+<!--ASSET_ABSTRACT_DDL_RECORD-->
+<tr>
+	<td>ASSET_ABSTRACT_DDL_RECORD_1</td>
+	<td>//div[@class='asset-content']//div[contains(@class,'field-wrapper-content')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ASSET_ABSTRACT_DDL_RECORD_2</td>
+	<td>xPath=(//div[@class='asset-content']//div[contains(@class,'field-wrapper-content')])[2]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ASSET_ABSTRACT_DDL_RECORD_3</td>
+	<td>xPath=(//div[@class='asset-content']//div[contains(@class,'field-wrapper-content')])[3]</td>
 	<td></td>
 </tr>
 <tr>

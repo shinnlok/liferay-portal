@@ -206,6 +206,10 @@ public class MBStatsUserLocalServiceUtil {
 		return getService().getActionableDynamicQuery();
 	}
 
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
 	public static java.util.Date getLastPostDateByUserId(long groupId,
 		long userId) {
 		return getService().getLastPostDateByUserId(groupId, userId);
@@ -329,13 +333,6 @@ public class MBStatsUserLocalServiceUtil {
 		}
 
 		return _service;
-	}
-
-	/**
-	 * @deprecated As of 6.2.0
-	 */
-	@Deprecated
-	public void setService(MBStatsUserLocalService service) {
 	}
 
 	private static MBStatsUserLocalService _service;

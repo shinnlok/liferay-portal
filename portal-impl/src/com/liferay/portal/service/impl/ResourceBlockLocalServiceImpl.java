@@ -16,7 +16,7 @@ package com.liferay.portal.service.impl;
 
 import com.liferay.portal.ResourceBlocksNotSupportedException;
 import com.liferay.portal.kernel.dao.db.DB;
-import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
+import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.CurrentConnectionUtil;
 import com.liferay.portal.kernel.dao.orm.ORMException;
 import com.liferay.portal.kernel.dao.orm.QueryPos;
@@ -778,6 +778,11 @@ public class ResourceBlockLocalServiceImpl
 			updateCompanyScopeResourceTypePermissions(
 				companyId, name, roleId, actionIdsLong, operator);
 
+		List<ResourceBlock> resourceBlocks = resourceBlockPersistence.findByC_N(
+			companyId, name);
+
+		updatePermissions(resourceBlocks, roleId, actionIdsLong, operator);
+
 		PermissionCacheUtil.clearResourceCache();
 	}
 
@@ -789,6 +794,11 @@ public class ResourceBlockLocalServiceImpl
 		resourceTypePermissionLocalService.
 			updateGroupScopeResourceTypePermissions(
 				companyId, groupId, name, roleId, actionIdsLong, operator);
+
+		List<ResourceBlock> resourceBlocks =
+			resourceBlockPersistence.findByC_G_N(companyId, groupId, name);
+
+		updatePermissions(resourceBlocks, roleId, actionIdsLong, operator);
 
 		PermissionCacheUtil.clearResourceCache();
 	}
@@ -890,7 +900,7 @@ public class ResourceBlockLocalServiceImpl
 
 					session.clear();
 
-					DB db = DBFactoryUtil.getDB();
+					DB db = DBManagerUtil.getDB();
 
 					if (!db.isSupportsQueryingAfterException()) {
 						DataSource dataSource =
@@ -1067,7 +1077,8 @@ public class ResourceBlockLocalServiceImpl
 	protected void updatePermissionsHash(ResourceBlock resourceBlock) {
 		ResourceBlockPermissionsContainer resourceBlockPermissionsContainer =
 			resourceBlockPermissionLocalService.
-			getResourceBlockPermissionsContainer(resourceBlock.getPrimaryKey());
+				getResourceBlockPermissionsContainer(
+					resourceBlock.getPrimaryKey());
 
 		String permissionsHash =
 			resourceBlockPermissionsContainer.getPermissionsHash();

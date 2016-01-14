@@ -250,6 +250,10 @@ public class LayoutPrototypeLocalServiceUtil {
 		return getService().getExportActionableDynamicQuery(portletDataContext);
 	}
 
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the layout prototype with the primary key.
 	*
@@ -400,13 +404,6 @@ public class LayoutPrototypeLocalServiceUtil {
 		}
 
 		return _service;
-	}
-
-	/**
-	 * @deprecated As of 6.2.0
-	 */
-	@Deprecated
-	public void setService(LayoutPrototypeLocalService service) {
 	}
 
 	private static LayoutPrototypeLocalService _service;

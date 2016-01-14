@@ -307,6 +307,11 @@ public class EmailAddressLocalServiceWrapper implements EmailAddressLocalService
 		return _emailAddressLocalService.getExportActionableDynamicQuery(portletDataContext);
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _emailAddressLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -343,23 +348,6 @@ public class EmailAddressLocalServiceWrapper implements EmailAddressLocalService
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _emailAddressLocalService.updateEmailAddress(emailAddressId,
 			address, typeId, primary);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public EmailAddressLocalService getWrappedEmailAddressLocalService() {
-		return _emailAddressLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedEmailAddressLocalService(
-		EmailAddressLocalService emailAddressLocalService) {
-		_emailAddressLocalService = emailAddressLocalService;
 	}
 
 	@Override

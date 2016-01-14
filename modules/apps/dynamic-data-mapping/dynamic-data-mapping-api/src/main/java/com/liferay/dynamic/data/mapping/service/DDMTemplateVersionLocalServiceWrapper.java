@@ -233,6 +233,11 @@ public class DDMTemplateVersionLocalServiceWrapper
 	}
 
 	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _ddmTemplateVersionLocalService.getIndexableActionableDynamicQuery();
+	}
+
+	@Override
 	public com.liferay.dynamic.data.mapping.model.DDMTemplateVersion getLatestTemplateVersion(
 		long templateId)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -294,23 +299,6 @@ public class DDMTemplateVersionLocalServiceWrapper
 	public com.liferay.dynamic.data.mapping.model.DDMTemplateVersion updateDDMTemplateVersion(
 		com.liferay.dynamic.data.mapping.model.DDMTemplateVersion ddmTemplateVersion) {
 		return _ddmTemplateVersionLocalService.updateDDMTemplateVersion(ddmTemplateVersion);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public DDMTemplateVersionLocalService getWrappedDDMTemplateVersionLocalService() {
-		return _ddmTemplateVersionLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedDDMTemplateVersionLocalService(
-		DDMTemplateVersionLocalService ddmTemplateVersionLocalService) {
-		_ddmTemplateVersionLocalService = ddmTemplateVersionLocalService;
 	}
 
 	@Override

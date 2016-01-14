@@ -16,8 +16,7 @@ package com.liferay.mobile.device.rules.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
+import com.liferay.osgi.util.ServiceTrackerFactory;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -258,6 +257,10 @@ public class MDRRuleLocalServiceUtil {
 		return getService().getExportActionableDynamicQuery(portletDataContext);
 	}
 
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the m d r rule with the primary key.
 	*
@@ -369,6 +372,12 @@ public class MDRRuleLocalServiceUtil {
 		return getService().getRules(ruleGroupId, start, end);
 	}
 
+	public static java.util.List<com.liferay.mobile.device.rules.model.MDRRule> getRules(
+		long ruleGroupId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.mobile.device.rules.model.MDRRule> obc) {
+		return getService().getRules(ruleGroupId, start, end, obc);
+	}
+
 	public static int getRulesCount(long ruleGroupId) {
 		return getService().getRulesCount(ruleGroupId);
 	}
@@ -411,21 +420,6 @@ public class MDRRuleLocalServiceUtil {
 		return _serviceTracker.getService();
 	}
 
-	/**
-	 * @deprecated As of 6.2.0
-	 */
-	@Deprecated
-	public void setService(MDRRuleLocalService service) {
-	}
-
-	private static ServiceTracker<MDRRuleLocalService, MDRRuleLocalService> _serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(MDRRuleLocalServiceUtil.class);
-
-		_serviceTracker = new ServiceTracker<MDRRuleLocalService, MDRRuleLocalService>(bundle.getBundleContext(),
-				MDRRuleLocalService.class, null);
-
-		_serviceTracker.open();
-	}
+	private static ServiceTracker<MDRRuleLocalService, MDRRuleLocalService> _serviceTracker =
+		ServiceTrackerFactory.open(MDRRuleLocalService.class);
 }

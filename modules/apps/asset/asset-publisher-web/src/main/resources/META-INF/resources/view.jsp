@@ -51,6 +51,7 @@ Group scopeGroup = themeDisplay.getScopeGroup();
 		<%
 		PortletURL redirectURL = renderResponse.createRenderURL();
 
+		redirectURL.setParameter("hideDefaultSuccessMessage", Boolean.TRUE.toString());
 		redirectURL.setParameter("mvcPath", "/add_asset_redirect.jsp");
 		redirectURL.setParameter("redirect", currentURL);
 		redirectURL.setWindowState(LiferayWindowState.POP_UP);
@@ -79,8 +80,9 @@ Group scopeGroup = themeDisplay.getScopeGroup();
 				</portlet:actionURL>
 
 				<liferay-ui:icon
-					iconCssClass="icon-remove-sign"
+					icon="start"
 					label="<%= true %>"
+					markupView="lexicon"
 					message="unsubscribe"
 					url="<%= unsubscribeURL %>"
 				/>
@@ -91,8 +93,9 @@ Group scopeGroup = themeDisplay.getScopeGroup();
 				</portlet:actionURL>
 
 				<liferay-ui:icon
-					iconCssClass="icon-ok-sign"
+					icon="start-o"
 					label="<%= true %>"
+					markupView="lexicon"
 					message="subscribe"
 					url="<%= subscribeURL %>"
 				/>

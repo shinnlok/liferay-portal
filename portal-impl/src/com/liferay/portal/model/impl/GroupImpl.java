@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
@@ -60,6 +61,7 @@ import com.liferay.portal.service.permission.LayoutPermissionUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.portal.webserver.WebServerServletTokenUtil;
 import com.liferay.portlet.exportimport.lar.PortletDataHandler;
 import com.liferay.portlet.exportimport.staging.StagingConstants;
 import com.liferay.portlet.exportimport.staging.StagingUtil;
@@ -314,19 +316,19 @@ public class GroupImpl extends GroupBaseImpl {
 
 	@Override
 	public String getIconCssClass() {
-		String iconCss = "icon-globe";
+		String iconCss = "sites";
 
 		if (isCompany()) {
-			iconCss = "icon-globe";
+			iconCss = "sites";
 		}
 		else if (isLayout()) {
-			iconCss = "icon-file";
+			iconCss = "edit-layout";
 		}
 		else if (isOrganization()) {
-			iconCss = "icon-globe";
+			iconCss = "sites";
 		}
 		else if (isUser()) {
-			iconCss = "icon-user";
+			iconCss = "user";
 		}
 
 		return iconCss;
@@ -359,11 +361,11 @@ public class GroupImpl extends GroupBaseImpl {
 	public String getLayoutRootNodeName(boolean privateLayout, Locale locale) {
 		String pagesName = null;
 
-		if (isLayoutPrototype() || isLayoutSetPrototype() || isUserGroup()) {
+		if (isLayoutPrototype() || isLayoutSetPrototype()) {
 			pagesName = "pages";
 		}
 		else if (privateLayout) {
-			if (isUser()) {
+			if (isUser() || isUserGroup()) {
 				pagesName = "my-dashboard";
 			}
 			else {
@@ -371,7 +373,7 @@ public class GroupImpl extends GroupBaseImpl {
 			}
 		}
 		else {
-			if (isUser()) {
+			if (isUser() || isUserGroup()) {
 				pagesName = "my-profile";
 			}
 			else {
@@ -424,6 +426,38 @@ public class GroupImpl extends GroupBaseImpl {
 			getParentLiveGroupTypeSettingsProperties();
 
 		return typeSettingsProperties.getProperty(key);
+	}
+
+	@Override
+	public String getLogoURL(ThemeDisplay themeDisplay, boolean useDefault) {
+		long logoId = 0;
+
+		LayoutSet publicLayoutSet = getPublicLayoutSet();
+
+		if (publicLayoutSet.getLogoId() > 0) {
+			logoId = publicLayoutSet.getLogoId();
+		}
+		else {
+			LayoutSet privateLayoutSet = getPrivateLayoutSet();
+
+			if (privateLayoutSet.getLogoId() > 0) {
+				logoId = privateLayoutSet.getLogoId();
+			}
+		}
+
+		if ((logoId == 0) && !useDefault) {
+			return null;
+		}
+
+		StringBundler sb = new StringBundler(5);
+
+		sb.append(themeDisplay.getPathImage());
+		sb.append("/layout_set_logo?img_id=");
+		sb.append(logoId);
+		sb.append("&t=");
+		sb.append(WebServerServletTokenUtil.getToken(logoId));
+
+		return sb.toString();
 	}
 
 	@Override
@@ -776,15 +810,6 @@ public class GroupImpl extends GroupBaseImpl {
 	@Override
 	public boolean isChild(long groupId) {
 		return hasAncestor(groupId);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, renamed to {@link #isRegularSite}
-	 */
-	@Deprecated
-	@Override
-	public boolean isCommunity() {
-		return isRegularSite();
 	}
 
 	@Override

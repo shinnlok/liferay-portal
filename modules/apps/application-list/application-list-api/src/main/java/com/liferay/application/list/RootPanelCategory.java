@@ -14,12 +14,11 @@
 
 package com.liferay.application.list;
 
-import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.application.list.display.context.logic.PanelCategoryHelper;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.Group;
+import com.liferay.portal.model.User;
 import com.liferay.portal.security.permission.PermissionChecker;
-
-import java.io.IOException;
 
 import java.util.Locale;
 
@@ -36,11 +35,6 @@ public class RootPanelCategory implements PanelCategory {
 	}
 
 	@Override
-	public String getIconCssClass() {
-		return StringPool.BLANK;
-	}
-
-	@Override
 	public String getKey() {
 		return _ROOT_PANEL_CATEGORY_KEY;
 	}
@@ -51,27 +45,42 @@ public class RootPanelCategory implements PanelCategory {
 	}
 
 	@Override
-	public boolean hasAccessPermission(
-			PermissionChecker permissionChecker, Group group)
-		throws PortalException {
+	public int getNotificationsCount(
+		PanelCategoryHelper panelCategoryHelper,
+		PermissionChecker permissionChecker, Group group, User user) {
 
-		return true;
+		return 0;
 	}
 
 	@Override
 	public boolean include(
-			HttpServletRequest request, HttpServletResponse response)
-		throws IOException {
+		HttpServletRequest request, HttpServletResponse response) {
 
 		return false;
 	}
 
 	@Override
 	public boolean includeHeader(
-			HttpServletRequest request, HttpServletResponse response)
-		throws IOException {
+		HttpServletRequest request, HttpServletResponse response) {
 
 		return false;
+	}
+
+	@Override
+	public boolean isActive(
+		HttpServletRequest request, PanelCategoryHelper panelCategoryHelper) {
+
+		return false;
+	}
+
+	@Override
+	public boolean isPersistState() {
+		return false;
+	}
+
+	@Override
+	public boolean isShow(PermissionChecker permissionChecker, Group group) {
+		return true;
 	}
 
 	private RootPanelCategory() {

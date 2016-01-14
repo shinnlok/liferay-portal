@@ -231,6 +231,11 @@ public class PhoneLocalServiceWrapper implements PhoneLocalService,
 		return _phoneLocalService.getExportActionableDynamicQuery(portletDataContext);
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _phoneLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -333,22 +338,6 @@ public class PhoneLocalServiceWrapper implements PhoneLocalService,
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _phoneLocalService.updatePhone(phoneId, number, extension,
 			typeId, primary);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public PhoneLocalService getWrappedPhoneLocalService() {
-		return _phoneLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedPhoneLocalService(PhoneLocalService phoneLocalService) {
-		_phoneLocalService = phoneLocalService;
 	}
 
 	@Override

@@ -263,6 +263,11 @@ public class RatingsEntryLocalServiceWrapper implements RatingsEntryLocalService
 		return _ratingsEntryLocalService.getExportActionableDynamicQuery(portletDataContext);
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _ratingsEntryLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -356,23 +361,6 @@ public class RatingsEntryLocalServiceWrapper implements RatingsEntryLocalService
 	public com.liferay.portlet.ratings.model.RatingsEntry updateRatingsEntry(
 		com.liferay.portlet.ratings.model.RatingsEntry ratingsEntry) {
 		return _ratingsEntryLocalService.updateRatingsEntry(ratingsEntry);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public RatingsEntryLocalService getWrappedRatingsEntryLocalService() {
-		return _ratingsEntryLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedRatingsEntryLocalService(
-		RatingsEntryLocalService ratingsEntryLocalService) {
-		_ratingsEntryLocalService = ratingsEntryLocalService;
 	}
 
 	@Override

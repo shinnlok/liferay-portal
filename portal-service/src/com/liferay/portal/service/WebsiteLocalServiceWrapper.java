@@ -232,6 +232,11 @@ public class WebsiteLocalServiceWrapper implements WebsiteLocalService,
 		return _websiteLocalService.getExportActionableDynamicQuery(portletDataContext);
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _websiteLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -333,23 +338,6 @@ public class WebsiteLocalServiceWrapper implements WebsiteLocalService,
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _websiteLocalService.updateWebsite(websiteId, url, typeId,
 			primary);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public WebsiteLocalService getWrappedWebsiteLocalService() {
-		return _websiteLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedWebsiteLocalService(
-		WebsiteLocalService websiteLocalService) {
-		_websiteLocalService = websiteLocalService;
 	}
 
 	@Override

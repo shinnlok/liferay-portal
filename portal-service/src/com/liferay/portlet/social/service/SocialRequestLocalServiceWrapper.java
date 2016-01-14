@@ -281,6 +281,11 @@ public class SocialRequestLocalServiceWrapper
 		return _socialRequestLocalService.getActionableDynamicQuery();
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _socialRequestLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -619,23 +624,6 @@ public class SocialRequestLocalServiceWrapper
 	public com.liferay.portlet.social.model.SocialRequest updateSocialRequest(
 		com.liferay.portlet.social.model.SocialRequest socialRequest) {
 		return _socialRequestLocalService.updateSocialRequest(socialRequest);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public SocialRequestLocalService getWrappedSocialRequestLocalService() {
-		return _socialRequestLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedSocialRequestLocalService(
-		SocialRequestLocalService socialRequestLocalService) {
-		_socialRequestLocalService = socialRequestLocalService;
 	}
 
 	@Override

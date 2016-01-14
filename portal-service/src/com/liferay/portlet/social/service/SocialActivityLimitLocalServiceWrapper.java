@@ -209,6 +209,11 @@ public class SocialActivityLimitLocalServiceWrapper
 		return _socialActivityLimitLocalService.getActionableDynamicQuery();
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _socialActivityLimitLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -278,23 +283,6 @@ public class SocialActivityLimitLocalServiceWrapper
 	public com.liferay.portlet.social.model.SocialActivityLimit updateSocialActivityLimit(
 		com.liferay.portlet.social.model.SocialActivityLimit socialActivityLimit) {
 		return _socialActivityLimitLocalService.updateSocialActivityLimit(socialActivityLimit);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public SocialActivityLimitLocalService getWrappedSocialActivityLimitLocalService() {
-		return _socialActivityLimitLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedSocialActivityLimitLocalService(
-		SocialActivityLimitLocalService socialActivityLimitLocalService) {
-		_socialActivityLimitLocalService = socialActivityLimitLocalService;
 	}
 
 	@Override

@@ -107,6 +107,10 @@ public class AssetLinkLocalServiceUtil {
 		return getService().deleteAssetLink(linkId);
 	}
 
+	public static void deleteGroupLinks(long groupId) {
+		getService().deleteGroupLinks(groupId);
+	}
+
 	/**
 	* Deletes the asset link.
 	*
@@ -313,6 +317,10 @@ public class AssetLinkLocalServiceUtil {
 		return getService().getExportActionbleDynamicQuery(portletDataContext);
 	}
 
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns all the asset links whose first or second entry ID is the given
 	* entry ID.
@@ -432,13 +440,6 @@ public class AssetLinkLocalServiceUtil {
 		}
 
 		return _service;
-	}
-
-	/**
-	 * @deprecated As of 6.2.0
-	 */
-	@Deprecated
-	public void setService(AssetLinkLocalService service) {
 	}
 
 	private static AssetLinkLocalService _service;

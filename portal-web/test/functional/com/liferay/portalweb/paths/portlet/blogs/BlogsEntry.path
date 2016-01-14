@@ -24,6 +24,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>ENTRY_VIEW_COUNT</td>
+	<td>//div[contains(@class,'profile-header')]//div[contains(@class,'nameplate')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>TITLE</td>
 	<td>//div[contains(@class,'entry-title')]//h1[contains(.,'${key_entryTitle}')] | //div[contains(@class,'entry-title')]//h2[contains(.,'${key_entryTitle}')]</td>
 	<td></td>
@@ -64,6 +69,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>COMMENTS_TRACKBACK_URL</td>
+	<td>//input[contains(@id,'trackbackURL')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>CONTENT</td>
 	<td>//div[contains(@class,'entry-body')]//p[contains(.,'${key_entryContent}')]</td>
 	<td></td>
@@ -76,6 +86,21 @@
 <tr>
 	<td>CONTENT_GENERIC</td>
 	<td>//div[contains(@class,'entry-body')]/p</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CONTENT_INLINE_IMAGE</td>
+	<td>//div[contains(@class,'entry-body')]//img[contains(@src,'${key_uploadFileName}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CONTENT_HTML_BOLD</td>
+	<td>//div[contains(@class,'entry-content')]//b</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CONTENT_HTML_ITALICS</td>
+	<td>//div[contains(@class,'entry-content')]//i</td>
 	<td></td>
 </tr>
 <tr>
@@ -99,9 +124,9 @@
 	<td></td>
 </tr>
 <tr>
-	<td>FLAG</td>
-	<td>//div[contains(@class,'entry') and contains(@class,'approved') and contains(.,'${key_entryTitle}')]//span/a[contains(.,'Flag')]</td>
-	<td>Vocabulary 1</td>
+	<td>FLAG_LINK</td>
+	<td>//div[contains(@class,'taglib-flags')]//span[contains(@class,'taglib-text') and contains(.,'Flag')]</td>
+	<td></td>
 </tr>
 <tr>
 	<td>RELATED_ASSETS_LINK_IMAGE</td>

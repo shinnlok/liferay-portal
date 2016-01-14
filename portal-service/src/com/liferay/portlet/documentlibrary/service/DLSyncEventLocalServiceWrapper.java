@@ -248,6 +248,11 @@ public class DLSyncEventLocalServiceWrapper implements DLSyncEventLocalService,
 	}
 
 	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _dlSyncEventLocalService.getIndexableActionableDynamicQuery();
+	}
+
+	@Override
 	public java.util.List<com.liferay.portlet.documentlibrary.model.DLSyncEvent> getLatestDLSyncEvents() {
 		return _dlSyncEventLocalService.getLatestDLSyncEvents();
 	}
@@ -279,23 +284,6 @@ public class DLSyncEventLocalServiceWrapper implements DLSyncEventLocalService,
 	public com.liferay.portlet.documentlibrary.model.DLSyncEvent updateDLSyncEvent(
 		com.liferay.portlet.documentlibrary.model.DLSyncEvent dlSyncEvent) {
 		return _dlSyncEventLocalService.updateDLSyncEvent(dlSyncEvent);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public DLSyncEventLocalService getWrappedDLSyncEventLocalService() {
-		return _dlSyncEventLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedDLSyncEventLocalService(
-		DLSyncEventLocalService dlSyncEventLocalService) {
-		_dlSyncEventLocalService = dlSyncEventLocalService;
 	}
 
 	@Override

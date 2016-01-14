@@ -431,6 +431,11 @@ public class ExpandoColumnLocalServiceWrapper
 		return _expandoColumnLocalService.getExpandoColumnsCount();
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _expandoColumnLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -482,23 +487,6 @@ public class ExpandoColumnLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _expandoColumnLocalService.updateTypeSettings(columnId,
 			typeSettings);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public ExpandoColumnLocalService getWrappedExpandoColumnLocalService() {
-		return _expandoColumnLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedExpandoColumnLocalService(
-		ExpandoColumnLocalService expandoColumnLocalService) {
-		_expandoColumnLocalService = expandoColumnLocalService;
 	}
 
 	@Override

@@ -200,6 +200,11 @@ public class PluginSettingLocalServiceWrapper
 		return _pluginSettingLocalService.getDefaultPluginSetting();
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _pluginSettingLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -290,23 +295,6 @@ public class PluginSettingLocalServiceWrapper
 	public com.liferay.portal.model.PluginSetting updatePluginSetting(
 		com.liferay.portal.model.PluginSetting pluginSetting) {
 		return _pluginSettingLocalService.updatePluginSetting(pluginSetting);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public PluginSettingLocalService getWrappedPluginSettingLocalService() {
-		return _pluginSettingLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedPluginSettingLocalService(
-		PluginSettingLocalService pluginSettingLocalService) {
-		_pluginSettingLocalService = pluginSettingLocalService;
 	}
 
 	@Override

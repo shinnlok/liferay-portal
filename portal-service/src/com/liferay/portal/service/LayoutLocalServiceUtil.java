@@ -839,6 +839,10 @@ public class LayoutLocalServiceUtil {
 				   .getFriendlyURLLayout(groupId, privateLayout, friendlyURL);
 	}
 
+	public static com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return getService().getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the layout matching the primary key, group, and privacy; throws a
 	* {@link NoSuchLayoutException} otherwise.
@@ -1150,6 +1154,12 @@ public class LayoutLocalServiceUtil {
 		return getService().getPersistedModel(primaryKeyObj);
 	}
 
+	public static java.util.List<com.liferay.portal.model.Layout> getScopeGroupLayouts(
+		long parentGroupId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().getScopeGroupLayouts(parentGroupId);
+	}
+
 	/**
 	* Returns all the layouts within scope of the group
 	*
@@ -1158,8 +1168,9 @@ public class LayoutLocalServiceUtil {
 	* @return the layouts within scope of the group
 	*/
 	public static java.util.List<com.liferay.portal.model.Layout> getScopeGroupLayouts(
-		long groupId, boolean privateLayout) {
-		return getService().getScopeGroupLayouts(groupId, privateLayout);
+		long parentGroupId, boolean privateLayout)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().getScopeGroupLayouts(parentGroupId, privateLayout);
 	}
 
 	public static boolean hasLayoutSetPrototypeLayout(
@@ -2200,13 +2211,6 @@ public class LayoutLocalServiceUtil {
 		}
 
 		return _service;
-	}
-
-	/**
-	 * @deprecated As of 6.2.0
-	 */
-	@Deprecated
-	public void setService(LayoutLocalService service) {
 	}
 
 	private static LayoutLocalService _service;

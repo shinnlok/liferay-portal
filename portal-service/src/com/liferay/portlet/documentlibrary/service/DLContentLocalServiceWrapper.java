@@ -307,6 +307,11 @@ public class DLContentLocalServiceWrapper implements DLContentLocalService,
 		return _dlContentLocalService.getDataBlobModel(primaryKey);
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _dlContentLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -348,23 +353,6 @@ public class DLContentLocalServiceWrapper implements DLContentLocalService,
 	public com.liferay.portlet.documentlibrary.model.DLContent updateDLContent(
 		com.liferay.portlet.documentlibrary.model.DLContent dlContent) {
 		return _dlContentLocalService.updateDLContent(dlContent);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public DLContentLocalService getWrappedDLContentLocalService() {
-		return _dlContentLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedDLContentLocalService(
-		DLContentLocalService dlContentLocalService) {
-		_dlContentLocalService = dlContentLocalService;
 	}
 
 	@Override

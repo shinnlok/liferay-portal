@@ -422,7 +422,7 @@ public class UIItemsBuilder {
 		portletURL.setParameter("redirect", redirectURL.toString());
 
 		portletURL.setParameter(
-			"fileEntryIds", String.valueOf(_fileEntry.getFileEntryId()));
+			"rowIdsFileEntry", String.valueOf(_fileEntry.getFileEntryId()));
 
 		_addURLUIItem(
 			new URLMenuItem(), menuItems, DLUIItemKeys.MOVE, "move",
@@ -501,7 +501,8 @@ public class UIItemsBuilder {
 			TemplateConstants.LANG_TYPE_FTL, urlTemplateResource, false);
 
 		template.put(
-			"errorMessage", UnicodeLanguageUtil.get(
+			"errorMessage",
+			UnicodeLanguageUtil.get(
 				_request,
 				"cannot-open-the-requested-document-due-to-the-following-" +
 					"reason"));

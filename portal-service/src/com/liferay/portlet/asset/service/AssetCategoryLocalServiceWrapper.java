@@ -565,6 +565,11 @@ public class AssetCategoryLocalServiceWrapper
 		return _assetCategoryLocalService.getExportActionableDynamicQuery(portletDataContext);
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _assetCategoryLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -729,23 +734,6 @@ public class AssetCategoryLocalServiceWrapper
 		return _assetCategoryLocalService.updateCategory(userId, categoryId,
 			parentCategoryId, titleMap, descriptionMap, vocabularyId,
 			categoryProperties, serviceContext);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public AssetCategoryLocalService getWrappedAssetCategoryLocalService() {
-		return _assetCategoryLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedAssetCategoryLocalService(
-		AssetCategoryLocalService assetCategoryLocalService) {
-		_assetCategoryLocalService = assetCategoryLocalService;
 	}
 
 	@Override

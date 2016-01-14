@@ -240,6 +240,11 @@ public class ClusterGroupLocalServiceWrapper implements ClusterGroupLocalService
 		return _clusterGroupLocalService.getClusterGroupsCount();
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _clusterGroupLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -267,23 +272,6 @@ public class ClusterGroupLocalServiceWrapper implements ClusterGroupLocalService
 	public com.liferay.portal.model.ClusterGroup updateClusterGroup(
 		com.liferay.portal.model.ClusterGroup clusterGroup) {
 		return _clusterGroupLocalService.updateClusterGroup(clusterGroup);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public ClusterGroupLocalService getWrappedClusterGroupLocalService() {
-		return _clusterGroupLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedClusterGroupLocalService(
-		ClusterGroupLocalService clusterGroupLocalService) {
-		_clusterGroupLocalService = clusterGroupLocalService;
 	}
 
 	@Override

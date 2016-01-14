@@ -454,6 +454,11 @@ public class UserNotificationEventLocalServiceWrapper
 			deliveryType, delivered, actionRequired);
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _userNotificationEventLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -469,6 +474,12 @@ public class UserNotificationEventLocalServiceWrapper
 		java.io.Serializable primaryKeyObj)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _userNotificationEventLocalService.getPersistedModel(primaryKeyObj);
+	}
+
+	@Override
+	public java.util.List<com.liferay.portal.model.UserNotificationEvent> getTypeNotificationEvents(
+		java.lang.String type) {
+		return _userNotificationEventLocalService.getTypeNotificationEvents(type);
 	}
 
 	/**
@@ -603,6 +614,13 @@ public class UserNotificationEventLocalServiceWrapper
 	}
 
 	@Override
+	public int getUserNotificationEventsCount(long userId,
+		java.lang.String type, int deliveryType, boolean archived) {
+		return _userNotificationEventLocalService.getUserNotificationEventsCount(userId,
+			type, deliveryType, archived);
+	}
+
+	@Override
 	public com.liferay.portal.model.UserNotificationEvent sendUserNotificationEvents(
 		long userId, java.lang.String portletId, int deliveryType,
 		boolean actionRequired,
@@ -646,23 +664,6 @@ public class UserNotificationEventLocalServiceWrapper
 		boolean archive) {
 		return _userNotificationEventLocalService.updateUserNotificationEvents(uuids,
 			companyId, archive);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public UserNotificationEventLocalService getWrappedUserNotificationEventLocalService() {
-		return _userNotificationEventLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedUserNotificationEventLocalService(
-		UserNotificationEventLocalService userNotificationEventLocalService) {
-		_userNotificationEventLocalService = userNotificationEventLocalService;
 	}
 
 	@Override

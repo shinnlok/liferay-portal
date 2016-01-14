@@ -14,6 +14,7 @@
 
 package com.liferay.dynamic.data.mapping.service.test;
 
+import com.liferay.dynamic.data.mapping.io.DDMFormXSDDeserializerUtil;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormLayout;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
@@ -25,11 +26,13 @@ import com.liferay.dynamic.data.mapping.storage.StorageType;
 import com.liferay.dynamic.data.mapping.test.util.DDMStructureLayoutTestHelper;
 import com.liferay.dynamic.data.mapping.test.util.DDMStructureTestHelper;
 import com.liferay.dynamic.data.mapping.util.DDMUtil;
+import com.liferay.dynamic.data.mapping.util.DDMXMLUtil;
 import com.liferay.portal.kernel.template.TemplateConstants;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -38,6 +41,11 @@ import com.liferay.portal.model.Group;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.util.PortalUtil;
 
+import java.io.Serializable;
+
+import java.text.DateFormat;
+
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -139,7 +147,7 @@ public class BaseDDMServiceTestCase {
 			String storageType, int type, int status)
 		throws Exception {
 
-		DDMForm ddmForm = ddmStructureTestHelper.toDDMForm(definition);
+		DDMForm ddmForm = toDDMForm(definition);
 
 		DDMFormLayout ddmFormLayout = DDMUtil.getDefaultDDMFormLayout(ddmForm);
 
@@ -168,7 +176,7 @@ public class BaseDDMServiceTestCase {
 			String definition, String storageType, int type)
 		throws Exception {
 
-		DDMForm ddmForm = ddmStructureTestHelper.toDDMForm(definition);
+		DDMForm ddmForm = toDDMForm(definition);
 
 		return ddmStructureTestHelper.addStructure(
 			classNameId, structureKey, name, ddmForm, storageType, type);
@@ -218,6 +226,17 @@ public class BaseDDMServiceTestCase {
 		return "com/liferay/dynamic/data/mapping/dependencies/";
 	}
 
+	protected Serializable getDateFieldValue(
+		int month, int day, int year, Locale locale) {
+
+		Date dateValue = PortalUtil.getDate(month, day, year);
+
+		DateFormat dateFormat = DateFormatFactoryUtil.getSimpleDateFormat(
+			"yyyy-MM-dd", locale);
+
+		return dateFormat.format(dateValue);
+	}
+
 	protected Map<Locale, String> getDefaultLocaleMap(String value) {
 		Map<Locale, String> map = new HashMap<>();
 
@@ -247,6 +266,12 @@ public class BaseDDMServiceTestCase {
 
 		return StringUtil.read(
 			clazz.getClassLoader(), getBasePath() + fileName);
+	}
+
+	protected DDMForm toDDMForm(String definition) throws Exception {
+		DDMXMLUtil.validateXML(definition);
+
+		return DDMFormXSDDeserializerUtil.deserialize(definition);
 	}
 
 	protected static final String DDL_RECORD_CLASS_NAME =

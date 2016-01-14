@@ -192,6 +192,11 @@ public class UserIdMapperLocalServiceWrapper implements UserIdMapperLocalService
 		return _userIdMapperLocalService.getActionableDynamicQuery();
 	}
 
+	@Override
+	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
+		return _userIdMapperLocalService.getIndexableActionableDynamicQuery();
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -289,23 +294,6 @@ public class UserIdMapperLocalServiceWrapper implements UserIdMapperLocalService
 	public com.liferay.portal.model.UserIdMapper updateUserIdMapper(
 		com.liferay.portal.model.UserIdMapper userIdMapper) {
 		return _userIdMapperLocalService.updateUserIdMapper(userIdMapper);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public UserIdMapperLocalService getWrappedUserIdMapperLocalService() {
-		return _userIdMapperLocalService;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedUserIdMapperLocalService(
-		UserIdMapperLocalService userIdMapperLocalService) {
-		_userIdMapperLocalService = userIdMapperLocalService;
 	}
 
 	@Override

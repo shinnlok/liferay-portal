@@ -262,14 +262,21 @@ public class DefaultPortalLDAP implements PortalLDAP {
 				new String[mappedGroupAttributeIds.size()]));
 
 		if (_log.isDebugEnabled()) {
-			for (String attributeId : mappedGroupAttributeIds) {
-				Attribute attribute = attributes.get(attributeId);
+			if ((attributes == null) || (attributes.size() == 0)) {
+				_log.debug(
+					"No LDAP group attributes found for " +
+						fullDistinguishedName);
+			}
+			else {
+				for (String attributeId : mappedGroupAttributeIds) {
+					Attribute attribute = attributes.get(attributeId);
 
-				if (attribute == null) {
-					continue;
+					if (attribute == null) {
+						continue;
+					}
+
+					_log.debug("LDAP group attribute " + attribute.toString());
 				}
-
-				_log.debug("LDAP group attribute " + attribute.toString());
 			}
 		}
 
@@ -528,6 +535,13 @@ public class DefaultPortalLDAP implements PortalLDAP {
 
 		try {
 			if (ldapContext == null) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(
+						"No LDAP server configuration available for " +
+							"LDAP server " + ldapServerId + " and company " +
+								companyId);
+				}
+
 				return null;
 			}
 
@@ -609,6 +623,13 @@ public class DefaultPortalLDAP implements PortalLDAP {
 				}
 			}
 
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					"Unable to retrieve user with LDAP server " + ldapServerId +
+						", company " + companyId + ", loginMapping " +
+							loginMapping + ", and login " + login);
+			}
+
 			return null;
 		}
 		finally {
@@ -651,14 +672,21 @@ public class DefaultPortalLDAP implements PortalLDAP {
 			ldapContext, fullDistinguishedName, mappedUserAttributeIds);
 
 		if (_log.isDebugEnabled()) {
-			for (String attributeId : mappedUserAttributeIds) {
-				Attribute attribute = attributes.get(attributeId);
+			if ((attributes == null) || (attributes.size() == 0)) {
+				_log.debug(
+					"No LDAP user attributes found for:: " +
+						fullDistinguishedName);
+			}
+			else {
+				for (String attributeId : mappedUserAttributeIds) {
+					Attribute attribute = attributes.get(attributeId);
 
-				if (attribute == null) {
-					continue;
+					if (attribute == null) {
+						continue;
+					}
+
+					_log.debug("LDAP user attribute " + attribute.toString());
 				}
-
-				_log.debug("LDAP user attribute " + attribute.toString());
 			}
 		}
 

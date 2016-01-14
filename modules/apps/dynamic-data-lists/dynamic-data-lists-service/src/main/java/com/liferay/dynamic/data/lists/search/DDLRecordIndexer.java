@@ -29,6 +29,7 @@ import com.liferay.dynamic.data.mapping.storage.StorageEngine;
 import com.liferay.dynamic.data.mapping.util.DDMIndexer;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
@@ -41,9 +42,9 @@ import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.BooleanQuery;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
+import com.liferay.portal.kernel.search.IndexWriterHelperUtil;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.SearchContext;
-import com.liferay.portal.kernel.search.SearchEngineUtil;
 import com.liferay.portal.kernel.search.Summary;
 import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.search.filter.QueryFilter;
@@ -207,7 +208,7 @@ public class DDLRecordIndexer extends BaseIndexer<DDLRecord> {
 					recordVersion.getVersion(),
 					DDLRecordConstants.VERSION_DEFAULT)) {
 
-				SearchEngineUtil.deleteDocument(
+				IndexWriterHelperUtil.deleteDocument(
 					getSearchEngineId(), ddlRecord.getCompanyId(),
 					document.get(Field.UID), isCommitImmediately());
 			}
@@ -215,11 +216,9 @@ public class DDLRecordIndexer extends BaseIndexer<DDLRecord> {
 			return;
 		}
 
-		if (document != null) {
-			SearchEngineUtil.updateDocument(
-				getSearchEngineId(), ddlRecord.getCompanyId(), document,
-				isCommitImmediately());
-		}
+		IndexWriterHelperUtil.updateDocument(
+			getSearchEngineId(), ddlRecord.getCompanyId(), document,
+			isCommitImmediately());
 	}
 
 	@Override
@@ -276,10 +275,10 @@ public class DDLRecordIndexer extends BaseIndexer<DDLRecord> {
 	}
 
 	protected void reindexRecords(long companyId) throws Exception {
-		final ActionableDynamicQuery actionableDynamicQuery =
-			_ddlRecordLocalService.getActionableDynamicQuery();
+		final IndexableActionableDynamicQuery indexableActionableDynamicQuery =
+			_ddlRecordLocalService.getIndexableActionableDynamicQuery();
 
-		actionableDynamicQuery.setAddCriteriaMethod(
+		indexableActionableDynamicQuery.setAddCriteriaMethod(
 			new ActionableDynamicQuery.AddCriteriaMethod() {
 
 				@Override
@@ -320,10 +319,10 @@ public class DDLRecordIndexer extends BaseIndexer<DDLRecord> {
 					dynamicQuery.add(
 						recordSetProperty.in(recordSetDynamicQuery));
 				}
-		});
-		actionableDynamicQuery.setCommitImmediately(isCommitImmediately());
-		actionableDynamicQuery.setCompanyId(companyId);
-		actionableDynamicQuery.setPerformActionMethod(
+
+			});
+		indexableActionableDynamicQuery.setCompanyId(companyId);
+		indexableActionableDynamicQuery.setPerformActionMethod(
 			new ActionableDynamicQuery.PerformActionMethod<DDLRecord>() {
 
 				@Override
@@ -334,7 +333,8 @@ public class DDLRecordIndexer extends BaseIndexer<DDLRecord> {
 						Document document = getDocument(record);
 
 						if (document != null) {
-							actionableDynamicQuery.addDocument(document);
+							indexableActionableDynamicQuery.addDocuments(
+								document);
 						}
 					}
 					catch (PortalException pe) {
@@ -347,10 +347,10 @@ public class DDLRecordIndexer extends BaseIndexer<DDLRecord> {
 					}
 				}
 
-		});
-		actionableDynamicQuery.setSearchEngineId(getSearchEngineId());
+			});
+		indexableActionableDynamicQuery.setSearchEngineId(getSearchEngineId());
 
-		actionableDynamicQuery.performActions();
+		indexableActionableDynamicQuery.performActions();
 	}
 
 	@Reference(unbind = "-")
