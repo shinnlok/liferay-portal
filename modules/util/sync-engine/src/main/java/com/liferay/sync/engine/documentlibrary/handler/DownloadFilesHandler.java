@@ -56,7 +56,9 @@ public class DownloadFilesHandler extends BaseHandler {
 			(Map<String, DownloadFileHandler>)getParameterValue("handlers");
 
 		for (DownloadFileHandler downloadFileHandler : handlers.values()) {
-			downloadFileHandler.removeEvent();
+			if (!downloadFileHandler.isEventCancelled()) {
+				downloadFileHandler.removeEvent();
+			}
 		}
 
 		super.removeEvent();
@@ -109,7 +111,7 @@ public class DownloadFilesHandler extends BaseHandler {
 					while (fields.hasNext()) {
 						Map.Entry<String, JsonNode> field = fields.next();
 
-						Handler<Void> handler = handlers.get(field.getKey());
+						Handler<Void> handler = handlers.remove(field.getKey());
 
 						JsonNode valueJsonNode = field.getValue();
 
@@ -123,7 +125,7 @@ public class DownloadFilesHandler extends BaseHandler {
 					break;
 				}
 
-				DownloadFileHandler downloadFileHandler = handlers.get(
+				DownloadFileHandler downloadFileHandler = handlers.remove(
 					zipEntryName);
 
 				SyncFile syncFile =

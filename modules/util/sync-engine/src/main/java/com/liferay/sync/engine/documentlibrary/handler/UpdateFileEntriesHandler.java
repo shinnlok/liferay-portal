@@ -60,7 +60,7 @@ public class UpdateFileEntriesHandler extends BaseJSONHandler {
 		while (fields.hasNext()) {
 			Map.Entry<String, JsonNode> field = fields.next();
 
-			Handler handler = handlers.get(field.getKey());
+			Handler handler = handlers.remove(field.getKey());
 
 			try {
 				JsonNode fieldValue = field.getValue();
