@@ -96,6 +96,18 @@ public class UpdateFileEntriesHandler extends BaseJSONHandler {
 		FileUtil.deleteFile(filePath);
 	}
 
+	@Override
+	public void removeEvent() {
+		Map<String, Handler> handlers = (Map<String, Handler>)getParameterValue(
+			"handlers");
+
+		for (Handler handler : handlers.values()) {
+			handler.removeEvent();
+		}
+
+		super.removeEvent();
+	}
+
 	private static final Logger _logger = LoggerFactory.getLogger(
 		UpdateFileEntriesHandler.class);
 

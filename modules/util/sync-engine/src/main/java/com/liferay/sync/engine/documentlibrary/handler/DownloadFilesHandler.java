@@ -51,6 +51,18 @@ public class DownloadFilesHandler extends BaseHandler {
 	}
 
 	@Override
+	public void removeEvent() {
+		Map<String, DownloadFileHandler> handlers =
+			(Map<String, DownloadFileHandler>)getParameterValue("handlers");
+
+		for (DownloadFileHandler downloadFileHandler : handlers.values()) {
+			downloadFileHandler.removeEvent();
+		}
+
+		super.removeEvent();
+	}
+
+	@Override
 	protected void doHandleResponse(HttpResponse httpResponse)
 		throws Exception {
 
