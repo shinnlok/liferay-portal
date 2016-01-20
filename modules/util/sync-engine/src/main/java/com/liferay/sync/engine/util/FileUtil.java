@@ -423,12 +423,6 @@ public class FileUtil {
 			return isIgnoredFilePath(filePath.getParent());
 		}
 
-		if (!syncFile.isSystem() &&
-			(syncFile.getState() == SyncFile.STATE_UNSYNCED)) {
-
-			return true;
-		}
-
 		return false;
 	}
 
@@ -529,6 +523,20 @@ public class FileUtil {
 
 	public static boolean isTempFile(Path filePath) {
 		if (MSOfficeFileUtil.isTempCreatedFile(filePath)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	public static boolean isUnsynced(Path filePath) {
+		SyncFile syncFile = SyncFileService.fetchSyncFile(filePath.toString());
+
+		if (syncFile == null) {
+			return isUnsynced(filePath.getParent());
+		}
+
+		if (syncFile.getState() == SyncFile.STATE_UNSYNCED) {
 			return true;
 		}
 
