@@ -400,6 +400,22 @@ public class SyncFileService {
 	}
 
 	public static List<SyncFile> findSyncFiles(
+		long repositoryId, long syncAccountId, String type) {
+
+		try {
+			return _syncFilePersistence.findByR_S_T(
+				repositoryId, syncAccountId, type);
+		}
+		catch (SQLException sqle) {
+			if (_logger.isDebugEnabled()) {
+				_logger.debug(sqle.getMessage(), sqle);
+			}
+
+			return Collections.emptyList();
+		}
+	}
+
+	public static List<SyncFile> findSyncFiles(
 		String filePathName, long localSyncTime) {
 
 		try {
