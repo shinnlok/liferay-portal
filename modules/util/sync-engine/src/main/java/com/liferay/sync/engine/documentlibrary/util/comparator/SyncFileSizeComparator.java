@@ -21,7 +21,7 @@ import java.util.Comparator;
 /**
  * @author Shinn Lok
  */
-public class SyncFileComparator implements Comparator<SyncFile> {
+public class SyncFileSizeComparator implements Comparator<SyncFile> {
 
 	@Override
 	public int compare(SyncFile syncFile1, SyncFile syncFile2) {
