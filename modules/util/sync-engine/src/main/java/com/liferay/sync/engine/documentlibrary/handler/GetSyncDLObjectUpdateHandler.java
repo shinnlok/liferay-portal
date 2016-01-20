@@ -182,6 +182,18 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 
 			SyncSiteService.update(syncSite);
 		}
+		else {
+			SyncFile syncFile = SyncFileService.fetchSyncFile(
+				(Long)getParameterValue("repositoryId"), getSyncAccountId(),
+				(Long)getParameterValue("parentFolderId"));
+
+			if (syncFile != null) {
+				syncFile.setState(SyncFile.STATE_SYNCED);
+				syncFile.setUiEvent(SyncFile.UI_EVENT_NONE);
+
+				SyncFileService.update(syncFile);
+			}
+		}
 	}
 
 	@Override
@@ -679,6 +691,19 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 			}
 
 			processDependentSyncFiles(targetSyncFile);
+
+			if (getParameterValue("parentFolderId") != null) {
+				SyncFile syncFile = SyncFileService.fetchSyncFile(
+					(Long)getParameterValue("repositoryId"), getSyncAccountId(),
+					(Long)getParameterValue("parentFolderId"));
+
+				if (syncFile != null) {
+					syncFile.setState(SyncFile.STATE_IN_PROGRESS);
+					syncFile.setUiEvent(SyncFile.UI_EVENT_RESYNCING);
+
+					SyncFileService.update(syncFile);
+				}
+			}
 		}
 		catch (FileSystemException fse) {
 			String message = fse.getMessage();
