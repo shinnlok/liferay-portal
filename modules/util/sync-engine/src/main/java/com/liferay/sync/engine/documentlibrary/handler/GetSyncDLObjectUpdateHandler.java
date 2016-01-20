@@ -622,13 +622,10 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 
 				if (sourceSyncFile != null) {
 					updateFile(sourceSyncFile, targetSyncFile, filePathName);
-
-					processDependentSyncFiles(sourceSyncFile);
-
-					return;
 				}
-
-				addFile(targetSyncFile, filePathName);
+				else {
+					addFile(targetSyncFile, filePathName);
+				}
 			}
 			else if (event.equals(SyncFile.EVENT_DELETE)) {
 				if (sourceSyncFile == null) {
@@ -640,40 +637,30 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 			else if (event.equals(SyncFile.EVENT_MOVE)) {
 				if (sourceSyncFile == null) {
 					addFile(targetSyncFile, filePathName);
-
-					processDependentSyncFiles(targetSyncFile);
-
-					return;
 				}
 				else if (sourceSyncFile.getParentFolderId() ==
 							targetSyncFile.getParentFolderId()) {
 
 					updateFile(sourceSyncFile, targetSyncFile, filePathName);
-
-					processDependentSyncFiles(targetSyncFile);
-
-					return;
 				}
-
-				moveFile(sourceSyncFile, targetSyncFile, filePathName);
+				else {
+					moveFile(sourceSyncFile, targetSyncFile, filePathName);
+				}
 			}
 			else if (event.equals(SyncFile.EVENT_RESTORE)) {
 				if (sourceSyncFile != null) {
 					updateFile(sourceSyncFile, targetSyncFile, filePathName);
-
-					processDependentSyncFiles(sourceSyncFile);
-
-					return;
 				}
 				else if (isParentUnsynced(targetSyncFile)) {
 					return;
 				}
+				else {
+					targetSyncFile.setLocalExtraSetting("restoreEvent", true);
 
-				targetSyncFile.setLocalExtraSetting("restoreEvent", true);
+					SyncFileService.update(targetSyncFile);
 
-				SyncFileService.update(targetSyncFile);
-
-				addFile(targetSyncFile, filePathName);
+					addFile(targetSyncFile, filePathName);
+				}
 			}
 			else if (event.equals(SyncFile.EVENT_TRASH)) {
 				if (sourceSyncFile == null) {
@@ -685,13 +672,10 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 			else if (event.equals(SyncFile.EVENT_UPDATE)) {
 				if (sourceSyncFile == null) {
 					addFile(targetSyncFile, filePathName);
-
-					processDependentSyncFiles(targetSyncFile);
-
-					return;
 				}
-
-				updateFile(sourceSyncFile, targetSyncFile, filePathName);
+				else {
+					updateFile(sourceSyncFile, targetSyncFile, filePathName);
+				}
 			}
 
 			processDependentSyncFiles(targetSyncFile);
