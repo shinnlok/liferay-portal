@@ -417,6 +417,22 @@ public class SyncFileService {
 	}
 
 	public static List<SyncFile> findSyncFiles(
+		long repositoryId, long syncAccountId, String type) {
+
+		try {
+			return _syncFilePersistence.findByR_S_T(
+				repositoryId, syncAccountId, type);
+		}
+		catch (SQLException sqle) {
+			if (_logger.isDebugEnabled()) {
+				_logger.debug(sqle.getMessage(), sqle);
+			}
+
+			return Collections.emptyList();
+		}
+	}
+
+	public static List<SyncFile> findSyncFiles(
 		String filePathName, long localSyncTime) {
 
 		try {
@@ -485,6 +501,28 @@ public class SyncFileService {
 		try {
 			SyncFile syncFile = _syncFilePersistence.fetchByS_U_First(
 				syncAccountId, uiEvent);
+
+			if (syncFile == null) {
+				return false;
+			}
+
+			return true;
+		}
+		catch (SQLException sqle) {
+			if (_logger.isDebugEnabled()) {
+				_logger.debug(sqle.getMessage(), sqle);
+			}
+
+			return false;
+		}
+	}
+
+	public static boolean hasSyncFiles(
+		long repositoryId, int state, long syncAccountId) {
+
+		try {
+			SyncFile syncFile = _syncFilePersistence.fetchByR_S_S_First(
+				repositoryId, state, syncAccountId);
 
 			if (syncFile == null) {
 				return false;
