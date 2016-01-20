@@ -443,6 +443,13 @@ public class FileEventUtil {
 		BatchEvent batchEvent = BatchEventManager.getBatchEvent(syncAccountId);
 
 		batchEvent.fireBatchEvent();
+
+		List<SyncFile> resyncingSyncFiles = SyncFileService.findSyncFiles(
+			syncAccountId, SyncFile.UI_EVENT_RESYNCING, "syncFileId", true);
+
+		for (SyncFile resyncingSyncFile : resyncingSyncFiles) {
+			resyncFolder(syncAccountId, resyncingSyncFile);
+		}
 	}
 
 	public static void updateFile(
