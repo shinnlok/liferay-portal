@@ -307,6 +307,19 @@ public class SyncFilePersistence extends BasePersistenceImpl<SyncFile, Long> {
 		callBatchTasks(callable);
 	}
 
+	public List<SyncFile> findByR_S_T(
+			long repositoryId, long syncAccountId, String type)
+		throws SQLException {
+
+		Map<String, Object> fieldValues = new HashMap<>();
+
+		fieldValues.put("repositoryId", repositoryId);
+		fieldValues.put("syncAccountId", syncAccountId);
+		fieldValues.put("type", type);
+
+		return queryForFieldValues(fieldValues);
+	}
+
 	public void updateByParentFilePathName(
 			String parentFilePathName, int state, int uiEvent)
 		throws SQLException {
