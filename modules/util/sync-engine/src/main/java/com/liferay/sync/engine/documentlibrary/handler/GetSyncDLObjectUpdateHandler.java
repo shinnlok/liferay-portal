@@ -17,6 +17,8 @@ package com.liferay.sync.engine.documentlibrary.handler;
 import com.liferay.sync.engine.documentlibrary.event.Event;
 import com.liferay.sync.engine.documentlibrary.event.GetSyncContextEvent;
 import com.liferay.sync.engine.documentlibrary.model.SyncDLObjectUpdate;
+import com.liferay.sync.engine.documentlibrary.util.BatchDownloadEvent;
+import com.liferay.sync.engine.documentlibrary.util.BatchEventManager;
 import com.liferay.sync.engine.documentlibrary.util.FileEventUtil;
 import com.liferay.sync.engine.documentlibrary.util.comparator.SyncFileSizeComparator;
 import com.liferay.sync.engine.filesystem.Watcher;
@@ -238,6 +240,11 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 						getParameterValue("retrieveFromCache")));
 			}
 		}
+
+		BatchDownloadEvent batchDownloadEvent =
+			BatchEventManager.getBatchDownloadEvent(getSyncAccountId());
+
+		batchDownloadEvent.fireBatchEvent();
 	}
 
 	protected void addFile(SyncFile syncFile, String filePathName)
