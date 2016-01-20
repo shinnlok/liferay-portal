@@ -305,6 +305,14 @@ public class SyncFile extends StateAwareModel {
 		return type.equals(TYPE_SYSTEM);
 	}
 
+	public boolean isUnsynced() {
+		if (state == STATE_UNSYNCED) {
+			return true;
+		}
+
+		return false;
+	}
+
 	public void setChangeLog(String changeLog) {
 		this.changeLog = changeLog;
 	}

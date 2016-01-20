@@ -536,11 +536,7 @@ public class FileUtil {
 			return isUnsynced(filePath.getParent());
 		}
 
-		if (syncFile.getState() == SyncFile.STATE_UNSYNCED) {
-			return true;
-		}
-
-		return false;
+		return syncFile.isUnsynced();
 	}
 
 	public static boolean isValidChecksum(Path filePath) throws IOException {
