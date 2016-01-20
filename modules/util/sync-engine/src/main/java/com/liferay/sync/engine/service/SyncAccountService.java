@@ -78,17 +78,6 @@ public class SyncAccountService {
 
 	public static SyncAccount addSyncAccount(
 			String filePathName, String login, int maxConnections,
-			String password, int pollInterval, SyncSite[] syncSites,
-			SyncUser syncUser, boolean trustSelfSigned, String url)
-		throws Exception {
-
-		return addSyncAccount(
-			filePathName, login, maxConnections, "", "", false, "", "",
-			password, pollInterval, syncSites, syncUser, trustSelfSigned, url);
-	}
-
-	public static SyncAccount addSyncAccount(
-			String filePathName, String login, int maxConnections,
 			String oAuthConsumerKey, String oAuthConsumerSecret,
 			boolean oAuthEnabled, String oAuthToken, String oAuthTokenSecret,
 			String password, int pollInterval, SyncSite[] syncSites,
