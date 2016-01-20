@@ -645,6 +645,15 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 
 					return;
 				}
+				else if (sourceSyncFile.getParentFolderId() ==
+							targetSyncFile.getParentFolderId()) {
+
+					updateFile(sourceSyncFile, targetSyncFile, filePathName);
+
+					processDependentSyncFiles(targetSyncFile);
+
+					return;
+				}
 
 				moveFile(sourceSyncFile, targetSyncFile, filePathName);
 			}
