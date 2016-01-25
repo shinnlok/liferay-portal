@@ -35,6 +35,16 @@ public class SyncWatchEventPersistence
 		super(SyncWatchEvent.class);
 	}
 
+	public void deleteBySyncAccountId(long syncAccountId) throws SQLException {
+		DeleteBuilder<SyncWatchEvent, Long> deleteBuilder = deleteBuilder();
+
+		Where<SyncWatchEvent, Long> where = deleteBuilder.where();
+
+		where.eq("syncAccountId", syncAccountId);
+
+		deleteBuilder.delete();
+	}
+
 	public SyncWatchEvent fetchBySyncAccountId_First(long syncAccountId)
 		throws SQLException {
 
@@ -47,16 +57,6 @@ public class SyncWatchEventPersistence
 		where.eq("syncAccountId", syncAccountId);
 
 		return where.queryForFirst();
-	}
-
-	public void deleteBySyncAccountId(long syncAccountId) throws SQLException {
-		DeleteBuilder<SyncWatchEvent, Long> deleteBuilder = deleteBuilder();
-
-		Where<SyncWatchEvent, Long> where = deleteBuilder.where();
-
-		where.eq("syncAccountId", syncAccountId);
-
-		deleteBuilder.delete();
 	}
 
 	public SyncWatchEvent fetchByE_F_T(
