@@ -42,7 +42,7 @@ public class SyncFilePersistence extends BasePersistenceImpl<SyncFile, Long> {
 		super(SyncFile.class);
 	}
 
-	public boolean containsChildState(String parentFilePathName, int state)
+	public SyncFile fetchByPF_S_First(String parentFilePathName, int state)
 		throws SQLException {
 
 		QueryBuilder<SyncFile, Long> queryBuilder = queryBuilder();
@@ -65,14 +65,7 @@ public class SyncFilePersistence extends BasePersistenceImpl<SyncFile, Long> {
 
 		where.and(6);
 
-		SyncFile syncFile = where.queryForFirst();
-
-		if (syncFile != null) {
-			return true;
-		}
-		else {
-			return false;
-		}
+		return where.queryForFirst();
 	}
 
 	public long countByS_U(long syncAccountId, int uiEvent)
