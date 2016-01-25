@@ -68,10 +68,12 @@ public class SyncFilePersistence extends BasePersistenceImpl<SyncFile, Long> {
 		return where.queryForFirst();
 	}
 
-	public long countByS_U(long syncAccountId, int uiEvent)
+	public SyncFile fetchByS_U_First(long syncAccountId, int uiEvent)
 		throws SQLException {
 
 		QueryBuilder<SyncFile, Long> queryBuilder = queryBuilder();
+
+		queryBuilder.limit(1L);
 
 		Where<SyncFile, Long> where = queryBuilder.where();
 
@@ -80,7 +82,7 @@ public class SyncFilePersistence extends BasePersistenceImpl<SyncFile, Long> {
 
 		where.and(2);
 
-		return where.countOf();
+		return where.queryForFirst();
 	}
 
 	public long countByS_T_U(long syncAccountId, String type, int uiEvent)
