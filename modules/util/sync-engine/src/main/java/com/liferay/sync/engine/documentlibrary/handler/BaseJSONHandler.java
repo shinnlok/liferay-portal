@@ -82,9 +82,7 @@ public class BaseJSONHandler extends BaseHandler {
 			exception = exceptionJsonNode.asText();
 
 			if (exception.startsWith("No JSON web service action")) {
-				return
-					"com.liferay.portal.kernel.jsonwebservice." +
-						"NoSuchJSONWebServiceException";
+				return "NoSuchJSONWebServiceException";
 			}
 		}
 
@@ -103,7 +101,7 @@ public class BaseJSONHandler extends BaseHandler {
 			exception = typeJsonNode.asText();
 		}
 
-		if (exception.equals("java.lang.RuntimeException")) {
+		if (exception.endsWith("RuntimeException")) {
 			JsonNode messageJsonNode = null;
 
 			if (errorJsonNode != null) {
@@ -116,9 +114,7 @@ public class BaseJSONHandler extends BaseHandler {
 			String message = messageJsonNode.asText();
 
 			if (message.startsWith("No JSON web service action")) {
-				return
-					"com.liferay.portal.kernel.jsonwebservice." +
-						"NoSuchJSONWebServiceException";
+				return "NoSuchJSONWebServiceException";
 			}
 		}
 
@@ -131,10 +127,13 @@ public class BaseJSONHandler extends BaseHandler {
 			return false;
 		}
 
-		int pos = exception.indexOf("$");
+		String innerException = "";
 
-		if (pos > 0) {
-			exception = exception.substring(0, pos);
+		if (exception.contains("$")) {
+			String[] exceptionParts = exception.split("$");
+
+			exception = exceptionParts[0];
+			innerException = exceptionParts[1];
 		}
 
 		boolean retryInProgress = ConnectionRetryUtil.retryInProgress(
@@ -144,9 +143,7 @@ public class BaseJSONHandler extends BaseHandler {
 			_logger.debug("Handling exception {}", exception);
 		}
 
-		if (exception.equals(
-				"com.liferay.portal.lock.exception.DuplicateLockException")) {
-
+		if (exception.endsWith("DuplicateLockException")) {
 			SyncFile syncFile = getLocalSyncFile();
 
 			syncFile.setState(SyncFile.STATE_ERROR);
@@ -154,9 +151,8 @@ public class BaseJSONHandler extends BaseHandler {
 
 			SyncFileService.update(syncFile);
 		}
-		else if (exception.equals(
-					"com.liferay.portal.kernel.upload.UploadException") ||
-				 exception.contains("SizeLimitExceededException")) {
+		else if (exception.endsWith("UploadException") ||
+				 innerException.equals("SizeLimitExceededException")) {
 
 			SyncFile syncFile = getLocalSyncFile();
 
@@ -165,18 +161,12 @@ public class BaseJSONHandler extends BaseHandler {
 
 			SyncFileService.update(syncFile);
 		}
-		else if (exception.equals(
-					"com.liferay.portal.kernel.security.auth." +
-						"PrincipalException")) {
-
+		else if (exception.endsWith("PrincipalException")) {
 			SyncFileService.setStatuses(
 				getLocalSyncFile(), SyncFile.STATE_ERROR,
 				SyncFile.UI_EVENT_INVALID_PERMISSIONS);
 		}
-		else if (exception.equals(
-					"com.liferay.portlet.documentlibrary.exception." +
-						"FileExtensionException")) {
-
+		else if (exception.endsWith("FileExtensionException")) {
 			SyncFile syncFile = getLocalSyncFile();
 
 			syncFile.setState(SyncFile.STATE_ERROR);
@@ -184,12 +174,8 @@ public class BaseJSONHandler extends BaseHandler {
 
 			SyncFileService.update(syncFile);
 		}
-		else if (exception.equals(
-					"com.liferay.portlet.documentlibrary.exception." +
-						"FileNameException") ||
-				 exception.equals(
-					 "com.liferay.portlet.documentlibrary.exception." +
-						 "FolderNameException")) {
+		else if (exception.endsWith("FileNameException") ||
+				 exception.endsWith("FolderNameException")) {
 
 			SyncFile syncFile = getLocalSyncFile();
 
@@ -198,12 +184,8 @@ public class BaseJSONHandler extends BaseHandler {
 
 			SyncFileService.update(syncFile);
 		}
-		else if (exception.equals(
-					"com.liferay.portlet.documentlibrary.exception." +
-						"NoSuchFileEntryException") ||
-				 exception.equals(
-					"com.liferay.portlet.documentlibrary.exception." +
-						"NoSuchFolderException")) {
+		else if (exception.endsWith("NoSuchFileEntryException") ||
+				 exception.endsWith("NoSuchFolderException")) {
 
 			SyncFile syncFile = getLocalSyncFile();
 
@@ -223,27 +205,18 @@ public class BaseJSONHandler extends BaseHandler {
 
 			SyncFileService.deleteSyncFile(syncFile, false);
 		}
-		else if (exception.equals(
-					"com.liferay.sync.SyncClientMinBuildException")) {
-
+		else if (exception.endsWith("SyncClientMinBuildException")) {
 			retryServerConnection(
 				SyncAccount.UI_EVENT_MIN_BUILD_REQUIREMENT_FAILED);
 		}
-		else if (exception.equals(
-					"com.liferay.sync.SyncServicesUnavailableException")) {
-
+		else if (exception.endsWith("SyncServicesUnavailableException")) {
 			retryServerConnection(
 				SyncAccount.UI_EVENT_SYNC_SERVICES_NOT_ACTIVE);
 		}
-		else if (exception.equals(
-					"com.liferay.sync.SyncSiteUnavailableException")) {
-
+		else if (exception.endsWith("SyncSiteUnavailableException")) {
 			handleSiteDeactivatedException();
 		}
-		else if (exception.equals(
-					"com.liferay.portal.kernel.jsonwebservice." +
-						"NoSuchJSONWebServiceException")) {
-
+		else if (exception.endsWith("NoSuchJSONWebServiceException")) {
 			retryServerConnection(SyncAccount.UI_EVENT_SYNC_WEB_MISSING);
 		}
 		else if (exception.equals("Authenticated access required") ||
