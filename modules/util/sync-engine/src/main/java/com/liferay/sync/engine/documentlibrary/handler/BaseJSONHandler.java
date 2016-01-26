@@ -143,28 +143,19 @@ public class BaseJSONHandler extends BaseHandler {
 			_logger.debug("Handling exception {}", exception);
 		}
 
-		if (exception.endsWith("DuplicateLockException")) {
+		if (exception.equals("Authenticated access required") ||
+			exception.equals("java.lang.SecurityException")) {
+
+			retryServerConnection(
+				SyncAccount.UI_EVENT_AUTHENTICATION_EXCEPTION);
+		}
+		else if (exception.endsWith("DuplicateLockException")) {
 			SyncFile syncFile = getLocalSyncFile();
 
 			syncFile.setState(SyncFile.STATE_ERROR);
 			syncFile.setUiEvent(SyncFile.UI_EVENT_DUPLICATE_LOCK);
 
 			SyncFileService.update(syncFile);
-		}
-		else if (exception.endsWith("UploadException") ||
-				 innerException.equals("SizeLimitExceededException")) {
-
-			SyncFile syncFile = getLocalSyncFile();
-
-			syncFile.setState(SyncFile.STATE_ERROR);
-			syncFile.setUiEvent(SyncFile.UI_EVENT_EXCEEDED_SIZE_LIMIT);
-
-			SyncFileService.update(syncFile);
-		}
-		else if (exception.endsWith("PrincipalException")) {
-			SyncFileService.setStatuses(
-				getLocalSyncFile(), SyncFile.STATE_ERROR,
-				SyncFile.UI_EVENT_INVALID_PERMISSIONS);
 		}
 		else if (exception.endsWith("FileExtensionException")) {
 			SyncFile syncFile = getLocalSyncFile();
@@ -205,6 +196,14 @@ public class BaseJSONHandler extends BaseHandler {
 
 			SyncFileService.deleteSyncFile(syncFile, false);
 		}
+		else if (exception.endsWith("NoSuchJSONWebServiceException")) {
+			retryServerConnection(SyncAccount.UI_EVENT_SYNC_WEB_MISSING);
+		}
+		else if (exception.endsWith("PrincipalException")) {
+			SyncFileService.setStatuses(
+				getLocalSyncFile(), SyncFile.STATE_ERROR,
+				SyncFile.UI_EVENT_INVALID_PERMISSIONS);
+		}
 		else if (exception.endsWith("SyncClientMinBuildException")) {
 			retryServerConnection(
 				SyncAccount.UI_EVENT_MIN_BUILD_REQUIREMENT_FAILED);
@@ -216,14 +215,15 @@ public class BaseJSONHandler extends BaseHandler {
 		else if (exception.endsWith("SyncSiteUnavailableException")) {
 			handleSiteDeactivatedException();
 		}
-		else if (exception.endsWith("NoSuchJSONWebServiceException")) {
-			retryServerConnection(SyncAccount.UI_EVENT_SYNC_WEB_MISSING);
-		}
-		else if (exception.equals("Authenticated access required") ||
-				 exception.equals("java.lang.SecurityException")) {
+		else if (exception.endsWith("UploadException") ||
+				 innerException.equals("SizeLimitExceededException")) {
 
-			retryServerConnection(
-				SyncAccount.UI_EVENT_AUTHENTICATION_EXCEPTION);
+			SyncFile syncFile = getLocalSyncFile();
+
+			syncFile.setState(SyncFile.STATE_ERROR);
+			syncFile.setUiEvent(SyncFile.UI_EVENT_EXCEEDED_SIZE_LIMIT);
+
+			SyncFileService.update(syncFile);
 		}
 		else {
 			if (retryInProgress && _logger.isDebugEnabled()) {
