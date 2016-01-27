@@ -82,7 +82,7 @@ public class SyncAccountService {
 			String oAuthConsumerKey, String oAuthConsumerSecret,
 			boolean oAuthEnabled, String oAuthToken, String oAuthTokenSecret,
 			String password, int pollInterval,
-			Map<SyncSite, List<SyncFile>> syncSites, SyncUser syncUser,
+			Map<SyncSite, List<SyncFile>> ignoredSyncFiles, SyncUser syncUser,
 			boolean trustSelfSigned, String url)
 		throws Exception {
 
@@ -123,7 +123,8 @@ public class SyncAccountService {
 
 		// Sync sites
 
-		for (Map.Entry<SyncSite, List<SyncFile>> entry : syncSites.entrySet()) {
+		for (Map.Entry<SyncSite, List<SyncFile>> entry :
+				ignoredSyncFiles.entrySet()) {
 
 			// Sync site
 
@@ -161,18 +162,8 @@ public class SyncAccountService {
 			// Sync files
 
 			for (SyncFile childSyncFile : entry.getValue()) {
-				SyncFile parentSyncFile = SyncFileService.fetchSyncFile(
-					childSyncFile.getRepositoryId(),
-					syncSite.getSyncAccountId(),
-					childSyncFile.getParentFolderId());
-
-				String childFilePathName = FileUtil.getFilePathName(
-					parentSyncFile.getFilePathName(),
-					FileUtil.getSanitizedFileName(
-						childSyncFile.getName(), null));
-
-				childSyncFile.setFilePathName(childFilePathName);
 				childSyncFile.setModifiedTime(0);
+				childSyncFile.setState(SyncFile.STATE_UNSYNCED);
 				childSyncFile.setSyncAccountId(syncSite.getSyncAccountId());
 
 				SyncFileService.update(childSyncFile);
