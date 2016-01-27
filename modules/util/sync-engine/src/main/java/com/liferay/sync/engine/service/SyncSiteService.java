@@ -53,7 +53,8 @@ import org.slf4j.LoggerFactory;
  */
 public class SyncSiteService {
 
-	public static SyncSite activateSyncSite(long syncSiteId, boolean reset)
+	public static SyncSite activateSyncSite(
+			long syncSiteId, List<SyncFile> syncFiles, boolean reset)
 		throws Exception {
 
 		// Sync site
@@ -88,6 +89,24 @@ public class SyncSiteService {
 			FileKeyUtil.writeFileKey(
 				Paths.get(filePathName),
 				String.valueOf(syncFile.getSyncFileId()), true);
+		}
+
+		// Sync files
+
+		for (SyncFile syncFile : syncFiles) {
+			SyncFile parentSyncFile = SyncFileService.fetchSyncFile(
+				syncFile.getRepositoryId(), syncFile.getSyncAccountId(),
+				syncFile.getParentFolderId());
+
+			String childFilePathName = FileUtil.getFilePathName(
+				parentSyncFile.getFilePathName(),
+				FileUtil.getSanitizedFileName(syncFile.getName(), null));
+
+			syncFile.setFilePathName(childFilePathName);
+			syncFile.setModifiedTime(0);
+			syncFile.setSyncAccountId(syncSite.getSyncAccountId());
+
+			SyncFileService.update(syncFile);
 		}
 
 		return syncSite;
