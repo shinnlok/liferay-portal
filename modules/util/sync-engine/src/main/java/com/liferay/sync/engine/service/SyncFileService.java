@@ -702,8 +702,15 @@ public class SyncFileService {
 		syncFiles.sort(_syncFileFilePathNameComparator);
 
 		for (SyncFile syncFile : syncFiles) {
-			if (syncFile.getState() != SyncFile.STATE_UNSYNCED) {
-				continue;
+			SyncFile localSyncFile = SyncFileService.fetchSyncFile(
+				syncFile.getFilePathName());
+
+			if (localSyncFile != null) {
+				if (localSyncFile.getState() != SyncFile.STATE_UNSYNCED) {
+					continue;
+				}
+
+				syncFile = localSyncFile;
 			}
 
 			syncFile.setState(SyncFile.STATE_IN_PROGRESS);
@@ -760,8 +767,15 @@ public class SyncFileService {
 		syncFiles.sort(_syncFileFilePathNameComparator);
 
 		for (SyncFile syncFile : syncFiles) {
-			if (syncFile.getState() == SyncFile.STATE_UNSYNCED) {
-				continue;
+			SyncFile localSyncFile = SyncFileService.fetchSyncFile(
+				syncFile.getFilePathName());
+
+			if (localSyncFile != null) {
+				if (localSyncFile.getState() == SyncFile.STATE_UNSYNCED) {
+					continue;
+				}
+
+				syncFile = localSyncFile;
 			}
 
 			syncFile.setModifiedTime(0);
