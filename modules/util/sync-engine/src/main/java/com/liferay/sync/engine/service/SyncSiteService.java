@@ -54,7 +54,7 @@ import org.slf4j.LoggerFactory;
 public class SyncSiteService {
 
 	public static SyncSite activateSyncSite(
-			long syncSiteId, List<SyncFile> syncFiles, boolean reset)
+			long syncSiteId, List<SyncFile> ignoredSyncFiles, boolean reset)
 		throws Exception {
 
 		// Sync site
@@ -93,7 +93,7 @@ public class SyncSiteService {
 
 		// Sync files
 
-		for (SyncFile syncFile : syncFiles) {
+		for (SyncFile syncFile : ignoredSyncFiles) {
 			SyncFile parentSyncFile = SyncFileService.fetchSyncFile(
 				syncFile.getRepositoryId(), syncFile.getSyncAccountId(),
 				syncFile.getParentFolderId());
