@@ -81,7 +81,7 @@ public class SyncAccountService {
 			String oAuthConsumerKey, String oAuthConsumerSecret,
 			boolean oAuthEnabled, String oAuthToken, String oAuthTokenSecret,
 			String password, int pollInterval,
-			Map<SyncSite, List<SyncFile>> syncSites, SyncUser syncUser,
+			Map<SyncSite, List<SyncFile>> ignoredSyncFiles, SyncUser syncUser,
 			boolean trustSelfSigned, String url)
 		throws Exception {
 
@@ -122,7 +122,8 @@ public class SyncAccountService {
 
 		// Sync sites
 
-		for (Map.Entry<SyncSite, List<SyncFile>> entry : syncSites.entrySet()) {
+		for (Map.Entry<SyncSite, List<SyncFile>> entry :
+				ignoredSyncFiles.entrySet()) {
 
 			// Sync site
 
