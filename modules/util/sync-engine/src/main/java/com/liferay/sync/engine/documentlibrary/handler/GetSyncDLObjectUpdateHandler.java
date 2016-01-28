@@ -471,6 +471,10 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 			filePathName = syncFile.getFilePathName();
 		}
 
+		if (filePathName == null) {
+			return true;
+		}
+
 		return FileUtil.isIgnoredFilePath(FileUtil.getFilePath(filePathName));
 	}
 

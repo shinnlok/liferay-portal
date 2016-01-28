@@ -746,7 +746,8 @@ public class SyncFileService {
 
 		for (SyncFile syncFile : syncFiles) {
 			SyncFile localSyncFile = SyncFileService.fetchSyncFile(
-				syncFile.getFilePathName());
+				syncFile.getRepositoryId(), syncFile.getSyncAccountId(),
+				syncFile.getTypePK());
 
 			if (localSyncFile != null) {
 				if (localSyncFile.getState() == SyncFile.STATE_UNSYNCED) {

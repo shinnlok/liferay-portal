@@ -161,18 +161,8 @@ public class SyncAccountService {
 			// Sync files
 
 			for (SyncFile childSyncFile : entry.getValue()) {
-				SyncFile parentSyncFile = SyncFileService.fetchSyncFile(
-					childSyncFile.getRepositoryId(),
-					syncSite.getSyncAccountId(),
-					childSyncFile.getParentFolderId());
-
-				String childFilePathName = FileUtil.getFilePathName(
-					parentSyncFile.getFilePathName(),
-					FileUtil.getSanitizedFileName(
-						childSyncFile.getName(), null));
-
-				childSyncFile.setFilePathName(childFilePathName);
 				childSyncFile.setModifiedTime(0);
+				childSyncFile.setState(SyncFile.STATE_UNSYNCED);
 				childSyncFile.setSyncAccountId(syncSite.getSyncAccountId());
 
 				SyncFileService.update(childSyncFile);

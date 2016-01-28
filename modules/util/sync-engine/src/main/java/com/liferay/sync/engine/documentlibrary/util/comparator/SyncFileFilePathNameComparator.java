@@ -28,7 +28,18 @@ public class SyncFileFilePathNameComparator implements Comparator<SyncFile> {
 		String filePathName1 = syncFile1.getFilePathName();
 		String filePathName2 = syncFile2.getFilePathName();
 
-		return filePathName1.compareTo(filePathName2);
+		if ((filePathName1 == null) && (filePathName2 != null)) {
+			return -1;
+		}
+		else if ((filePathName1 != null) && (filePathName2 == null)) {
+			return 1;
+		}
+		else if ((filePathName1 == null) && (filePathName2 == null)) {
+			return 0;
+		}
+		else {
+			return filePathName1.compareTo(filePathName2);
+		}
 	}
 
 }
