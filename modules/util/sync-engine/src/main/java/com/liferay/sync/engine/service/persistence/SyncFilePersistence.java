@@ -97,6 +97,29 @@ public class SyncFilePersistence extends BasePersistenceImpl<SyncFile, Long> {
 		return where.queryForFirst();
 	}
 
+	public SyncFile fetchByR_S_S_First(
+			long repositoryId, int state, long syncAccountId)
+		throws SQLException {
+
+		QueryBuilder<SyncFile, Long> queryBuilder = queryBuilder();
+
+		queryBuilder.limit(1L);
+
+		Where<SyncFile, Long> where = queryBuilder.where();
+
+		where.eq("repositoryId", repositoryId);
+		where.eq("state", state);
+		where.eq("syncAccountId", syncAccountId);
+		where.ne("uiEvent", SyncFile.UI_EVENT_DELETED_LOCAL);
+		where.ne("uiEvent", SyncFile.UI_EVENT_DELETED_REMOTE);
+		where.ne("uiEvent", SyncFile.UI_EVENT_TRASHED_LOCAL);
+		where.ne("uiEvent", SyncFile.UI_EVENT_TRASHED_REMOTE);
+
+		where.and(7);
+
+		return where.queryForFirst();
+	}
+
 	public SyncFile fetchByPF_S_First(String parentFilePathName, int state)
 		throws SQLException {
 
