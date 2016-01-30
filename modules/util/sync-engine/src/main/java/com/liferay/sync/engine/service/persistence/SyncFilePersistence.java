@@ -57,20 +57,33 @@ public class SyncFilePersistence extends BasePersistenceImpl<SyncFile, Long> {
 		return where.countOf();
 	}
 
-	public long countByS_T_U(long syncAccountId, String type, int uiEvent)
+	public boolean containsChildrenState(String parentFilePathName, int state)
 		throws SQLException {
 
 		QueryBuilder<SyncFile, Long> queryBuilder = queryBuilder();
 
+		queryBuilder.limit(1L);
+
 		Where<SyncFile, Long> where = queryBuilder.where();
 
-		where.eq("syncAccountId", syncAccountId);
-		where.eq("type", type);
-		where.eq("uiEvent", uiEvent);
+		FileSystem fileSystem = FileSystems.getDefault();
 
-		where.and(3);
+		parentFilePathName = StringUtils.replace(
+			parentFilePathName + fileSystem.getSeparator(), "\\", "\\\\");
 
-		return where.countOf();
+		where.like("filePathName", new SelectArg(parentFilePathName + "%"));
+		where.eq("state", state);
+
+		where.and(2);
+
+		SyncFile syncFile = where.queryForFirst();
+
+		if (syncFile != null) {
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 
 	public long countByUIEvent(int uiEvent) throws SQLException {
@@ -96,6 +109,22 @@ public class SyncFilePersistence extends BasePersistenceImpl<SyncFile, Long> {
 		where.and(2);
 
 		return where.queryForFirst();
+	}
+
+	public long countByS_T_U(long syncAccountId, String type, int uiEvent)
+		throws SQLException {
+
+		QueryBuilder<SyncFile, Long> queryBuilder = queryBuilder();
+
+		Where<SyncFile, Long> where = queryBuilder.where();
+
+		where.eq("syncAccountId", syncAccountId);
+		where.eq("type", type);
+		where.eq("uiEvent", uiEvent);
+
+		where.and(3);
+
+		return where.countOf();
 	}
 
 	public List<SyncFile> findByParentFilePathName(String parentFilePathName)
@@ -197,6 +226,19 @@ public class SyncFilePersistence extends BasePersistenceImpl<SyncFile, Long> {
 
 		fieldValues.put("repositoryId", repositoryId);
 		fieldValues.put("syncAccountId", syncAccountId);
+
+		return queryForFieldValues(fieldValues);
+	}
+
+	public List<SyncFile> findByR_S_T(
+			long repositoryId, long syncAccountId, String type)
+		throws SQLException {
+
+		Map<String, Object> fieldValues = new HashMap<>();
+
+		fieldValues.put("repositoryId", repositoryId);
+		fieldValues.put("syncAccountId", syncAccountId);
+		fieldValues.put("type", type);
 
 		return queryForFieldValues(fieldValues);
 	}
