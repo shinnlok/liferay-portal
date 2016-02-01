@@ -14,6 +14,7 @@
 
 package com.liferay.poshi.runner.selenium;
 
+import com.liferay.poshi.runner.PoshiRunnerContext;
 import com.liferay.poshi.runner.PoshiRunnerGetterUtil;
 import com.liferay.poshi.runner.exception.PoshiRunnerWarningException;
 import com.liferay.poshi.runner.util.AntCommands;
@@ -305,7 +306,8 @@ public class LiferaySeleniumHelper {
 	}
 
 	public static void assertLocation(
-		LiferaySelenium liferaySelenium, String pattern) {
+			LiferaySelenium liferaySelenium, String pattern)
+		throws Exception {
 
 		TestCase.assertEquals(pattern, liferaySelenium.getLocation());
 	}
@@ -484,7 +486,8 @@ public class LiferaySeleniumHelper {
 	}
 
 	public static void assertNotLocation(
-		LiferaySelenium liferaySelenium, String pattern) {
+			LiferaySelenium liferaySelenium, String pattern)
+		throws Exception {
 
 		TestCase.assertTrue(
 			Validator.equals(pattern, liferaySelenium.getLocation()));
@@ -1062,6 +1065,14 @@ public class LiferaySeleniumHelper {
 
 	public static boolean isTCatEnabled() {
 		return PropsValues.TCAT_ENABLED;
+	}
+
+	public static boolean isTestName(String testName) {
+		if (testName.equals(PoshiRunnerContext.getTestCaseCommandName())) {
+			return true;
+		}
+
+		return false;
 	}
 
 	public static boolean isTextNotPresent(

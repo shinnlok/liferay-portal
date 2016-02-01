@@ -26,12 +26,13 @@ taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %><%@
 taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %><%@
 taglib uri="http://liferay.com/tld/util" prefix="liferay-util" %>
 
-<%@ page import="com.liferay.portal.LayoutBranchNameException" %><%@
-page import="com.liferay.portal.LayoutSetBranchNameException" %><%@
+<%@ page import="com.liferay.portal.exception.LayoutBranchNameException" %><%@
+page import="com.liferay.portal.exception.LayoutSetBranchNameException" %><%@
 page import="com.liferay.portal.kernel.dao.orm.QueryUtil" %><%@
 page import="com.liferay.portal.kernel.dao.search.ResultRow" %><%@
 page import="com.liferay.portal.kernel.language.LanguageUtil" %><%@
 page import="com.liferay.portal.kernel.portlet.LiferayWindowState" %><%@
+page import="com.liferay.portal.kernel.security.permission.ActionKeys" %><%@
 page import="com.liferay.portal.kernel.util.GetterUtil" %><%@
 page import="com.liferay.portal.kernel.util.HtmlUtil" %><%@
 page import="com.liferay.portal.kernel.util.HttpUtil" %><%@
@@ -50,7 +51,6 @@ page import="com.liferay.portal.model.LayoutRevisionConstants" %><%@
 page import="com.liferay.portal.model.LayoutSetBranch" %><%@
 page import="com.liferay.portal.model.LayoutSetBranchConstants" %><%@
 page import="com.liferay.portal.model.User" %><%@
-page import="com.liferay.portal.security.permission.ActionKeys" %><%@
 page import="com.liferay.portal.service.LayoutBranchLocalServiceUtil" %><%@
 page import="com.liferay.portal.service.LayoutLocalServiceUtil" %><%@
 page import="com.liferay.portal.service.LayoutRevisionLocalServiceUtil" %><%@

@@ -22,6 +22,7 @@ import com.liferay.application.list.util.LatentGroupManagerUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.PortletProvider;
 import com.liferay.portal.kernel.portlet.PortletProviderUtil;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -30,7 +31,6 @@ import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.Organization;
 import com.liferay.portal.model.User;
-import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.service.permission.GroupPermissionUtil;
 import com.liferay.portal.service.permission.PortletPermissionUtil;
 import com.liferay.portal.theme.ThemeDisplay;
@@ -372,6 +372,16 @@ public class SiteAdministrationPanelCategoryDisplayContext {
 		return false;
 	}
 
+	public boolean isShowSiteSelector() throws PortalException {
+		List<Group> mySites = getMySites();
+
+		if (mySites.isEmpty()) {
+			return false;
+		}
+
+		return true;
+	}
+
 	public boolean isShowStagingInfo() throws PortalException {
 		if (_showStagingInfo != null) {
 			return _showStagingInfo.booleanValue();
@@ -450,8 +460,8 @@ public class SiteAdministrationPanelCategoryDisplayContext {
 	}
 
 	protected HttpSession getSession() {
-		HttpServletRequest request = PortalUtil.getHttpServletRequest(
-			_portletRequest);
+		HttpServletRequest request = PortalUtil.getOriginalServletRequest(
+			PortalUtil.getHttpServletRequest(_portletRequest));
 
 		return request.getSession();
 	}

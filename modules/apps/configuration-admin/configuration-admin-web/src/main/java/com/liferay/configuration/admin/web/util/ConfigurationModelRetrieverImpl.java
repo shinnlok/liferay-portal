@@ -14,12 +14,12 @@
 
 package com.liferay.configuration.admin.web.util;
 
-import com.liferay.configuration.admin.ExtendedMetaTypeInformation;
-import com.liferay.configuration.admin.ExtendedMetaTypeService;
 import com.liferay.configuration.admin.web.model.ConfigurationModel;
 import com.liferay.portal.kernel.util.ReflectionUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.metatype.definitions.ExtendedMetaTypeInformation;
+import com.liferay.portal.metatype.definitions.ExtendedMetaTypeService;
 
 import java.io.IOException;
 
@@ -50,6 +50,7 @@ import org.osgi.service.component.annotations.Reference;
 public class ConfigurationModelRetrieverImpl
 	implements ConfigurationModelRetriever {
 
+	@Override
 	public Map<String, Set<ConfigurationModel>> categorizeConfigurationModels(
 		Map<String, ConfigurationModel> configurationModels) {
 
@@ -78,6 +79,7 @@ public class ConfigurationModelRetrieverImpl
 		return categorizedConfigurationModels;
 	}
 
+	@Override
 	public Configuration getConfiguration(String pid) {
 		try {
 			String pidFilter = getPidFilterString(pid, false);
@@ -96,6 +98,7 @@ public class ConfigurationModelRetrieverImpl
 		return null;
 	}
 
+	@Override
 	public List<String> getConfigurationCategories(
 		Map<String, Set<ConfigurationModel>> categorizedConfigurationModels) {
 
@@ -107,10 +110,12 @@ public class ConfigurationModelRetrieverImpl
 		return new ArrayList<>(configurationCategories);
 	}
 
+	@Override
 	public Map<String, ConfigurationModel> getConfigurationModels() {
 		return getConfigurationModels((String)null);
 	}
 
+	@Override
 	public Map<String, ConfigurationModel> getConfigurationModels(
 		Bundle bundle) {
 
@@ -122,6 +127,7 @@ public class ConfigurationModelRetrieverImpl
 		return configurationModels;
 	}
 
+	@Override
 	public Map<String, ConfigurationModel> getConfigurationModels(
 		String locale) {
 
@@ -139,9 +145,9 @@ public class ConfigurationModelRetrieverImpl
 		return configurationModels;
 	}
 
+	@Override
 	public List<ConfigurationModel> getFactoryInstances(
-			Map<String, ConfigurationModel> configurationModels,
-			String factoryPid)
+			ConfigurationModel factoryConfigurationModel)
 		throws IOException {
 
 		StringBundler filter = new StringBundler(5);
@@ -149,7 +155,7 @@ public class ConfigurationModelRetrieverImpl
 		filter.append(StringPool.OPEN_PARENTHESIS);
 		filter.append(ConfigurationAdmin.SERVICE_FACTORYPID);
 		filter.append(StringPool.EQUAL);
-		filter.append(factoryPid);
+		filter.append(factoryConfigurationModel.getFactoryPid());
 		filter.append(StringPool.CLOSE_PARENTHESIS);
 
 		Configuration[] configurations = null;
@@ -166,14 +172,11 @@ public class ConfigurationModelRetrieverImpl
 			return Collections.emptyList();
 		}
 
-		ConfigurationModel configurationModel = configurationModels.get(
-			factoryPid);
-
 		List<ConfigurationModel> factoryInstances = new ArrayList<>();
 
 		for (Configuration configuration : configurations) {
 			ConfigurationModel curConfigurationModel = new ConfigurationModel(
-				configurationModel, configuration,
+				factoryConfigurationModel, configuration,
 				configuration.getBundleLocation(), false);
 
 			factoryInstances.add(curConfigurationModel);

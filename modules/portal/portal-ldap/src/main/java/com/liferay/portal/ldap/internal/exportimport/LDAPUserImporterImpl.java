@@ -14,8 +14,8 @@
 
 package com.liferay.portal.ldap.internal.exportimport;
 
-import com.liferay.portal.NoSuchRoleException;
-import com.liferay.portal.NoSuchUserGroupException;
+import com.liferay.portal.exception.NoSuchRoleException;
+import com.liferay.portal.exception.NoSuchUserGroupException;
 import com.liferay.portal.kernel.bean.BeanPropertiesUtil;
 import com.liferay.portal.kernel.cache.PortalCache;
 import com.liferay.portal.kernel.cache.SingleVMPool;
@@ -25,6 +25,15 @@ import com.liferay.portal.kernel.ldap.LDAPUtil;
 import com.liferay.portal.kernel.lock.LockManager;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.security.exportimport.UserGroupImportTransactionThreadLocal;
+import com.liferay.portal.kernel.security.exportimport.UserImporter;
+import com.liferay.portal.kernel.security.ldap.AttributesTransformer;
+import com.liferay.portal.kernel.security.ldap.LDAPGroup;
+import com.liferay.portal.kernel.security.ldap.LDAPSettings;
+import com.liferay.portal.kernel.security.ldap.LDAPToPortalConverter;
+import com.liferay.portal.kernel.security.ldap.LDAPUser;
+import com.liferay.portal.kernel.security.ldap.LDAPUserImporter;
+import com.liferay.portal.kernel.security.ldap.PortalLDAP;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -50,15 +59,6 @@ import com.liferay.portal.model.Role;
 import com.liferay.portal.model.RoleConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.model.UserGroup;
-import com.liferay.portal.security.exportimport.UserGroupImportTransactionThreadLocal;
-import com.liferay.portal.security.exportimport.UserImporter;
-import com.liferay.portal.security.ldap.AttributesTransformer;
-import com.liferay.portal.security.ldap.LDAPGroup;
-import com.liferay.portal.security.ldap.LDAPSettings;
-import com.liferay.portal.security.ldap.LDAPToPortalConverter;
-import com.liferay.portal.security.ldap.LDAPUser;
-import com.liferay.portal.security.ldap.LDAPUserImporter;
-import com.liferay.portal.security.ldap.PortalLDAP;
 import com.liferay.portal.service.CompanyLocalService;
 import com.liferay.portal.service.GroupLocalService;
 import com.liferay.portal.service.RoleLocalService;
@@ -109,9 +109,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Hugo Huijser
  */
 @Component(
-	configurationPid = "com.liferay.portal.ldap.configuration.LDAPConfiguration",
-	immediate = true,
-	service = {LDAPUserImporter.class, UserImporter.class}
+	immediate = true, service = {LDAPUserImporter.class, UserImporter.class}
 )
 public class LDAPUserImporterImpl implements LDAPUserImporter, UserImporter {
 
@@ -275,22 +273,16 @@ public class LDAPUserImporterImpl implements LDAPUserImporter, UserImporter {
 		for (LDAPServerConfiguration ldapServerConfiguration :
 				ldapServerConfigurations) {
 
-			User user = importUser(
-				ldapServerConfiguration.ldapServerId(), companyId, emailAddress,
-				screenName);
-
-			if (user != null) {
-				return user;
-			}
-		}
-
-		for (LDAPServerConfiguration ldapServerConfiguration :
-				ldapServerConfigurations) {
-
 			String providerUrl = ldapServerConfiguration.baseProviderURL();
 
 			if (Validator.isNull(providerUrl)) {
-				break;
+				if (_log.isWarnEnabled()) {
+					_log.warn(
+						"No provider URL defined in " +
+							ldapServerConfiguration);
+				}
+
+				continue;
 			}
 
 			User user = importUser(

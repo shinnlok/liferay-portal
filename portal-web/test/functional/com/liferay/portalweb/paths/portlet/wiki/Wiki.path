@@ -10,7 +10,7 @@
 <tbody>
 <tr>
 	<td>ADD_PAGE</td>
-	<td>//div[contains(@id,'wiki_web')]//button[contains(.,'Add Page')]</td>
+	<td>//a[contains(.,'Add Page')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -85,7 +85,7 @@
 </tr>
 <tr>
 	<td>PAGE_HEADER</td>
-	<td>//div[contains(@class,'taglib-header') and contains(.,'${key_wikiPageTitle}')]</td>
+	<td>//div//h2[contains(.,'${key_wikiPageTitle}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -147,7 +147,7 @@
 </tr>
 <tr>
 	<td>ALL_PAGES_TABLE_STATUS</td>
-	<td>//tr[contains(.,'${key_wikiPageTitle}')]/td[2]/following-sibling::td</td>
+	<td>//tr[contains(.,'${key_wikiPageTitle}')]/td[2]/span//strong | //tr[contains(.,'${key_wikiPageTitle}')]/td[3]/span//strong</td>
 	<td></td>
 </tr>
 <tr>
@@ -166,8 +166,8 @@
 	<td></td>
 </tr>
 <tr>
-	<td>ALL_PAGES_TABLE_ACTIONS_DROPDOWN</td>
-	<td>//tr[contains(.,'${key_wikiPageTitle}')]//td/div/a[contains(@class,'dropdown-toggle')]</td>
+	<td>ALL_PAGES_TABLE_VERTICAL_ELLIPSIS</td>
+	<td>//tr[contains(.,'${key_wikiPageTitle}')]/.//td/div/a[contains(@class,'dropdown-toggle')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -198,7 +198,7 @@
 </tr>
 <tr>
 	<td>ATTACHMENT_TABLE_REMOVE</td>
-	<td>//tr[contains(.,'${key_attachmentFileName}')]/td[contains(.,'Remove')]/span/a</td>
+	<td>//tr[contains(.,'${key_attachmentFileName}')]//span[contains(.,'Remove')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -209,12 +209,12 @@
 <!--CHILD_PAGE-->
 <tr>
 	<td>CHILD_PAGE_HEADER</td>
-	<td>//div[@class='child-pages']/h2</td>
+	<td>//div[@class='child-pages']/h5</td>
 	<td></td>
 </tr>
 <tr>
 	<td>CHILD_PAGE_TITLE</td>
-	<td>//div[@class='child-pages']/ul/li/a[contains(.,'${key_wikiChildPageTitle}')]</td>
+	<td>//tr[@data-qa-id='row']//a[contains(.,'${key_wikiChildPageTitle}')]</td>
 	<td></td>
 </tr>
 <tr>

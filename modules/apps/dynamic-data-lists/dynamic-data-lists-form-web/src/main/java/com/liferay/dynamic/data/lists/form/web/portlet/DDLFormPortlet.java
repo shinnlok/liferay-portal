@@ -35,7 +35,8 @@ import com.liferay.dynamic.data.mapping.model.DDMFormLayoutColumn;
 import com.liferay.dynamic.data.mapping.model.DDMFormLayoutPage;
 import com.liferay.dynamic.data.mapping.model.DDMFormLayoutRow;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
-import com.liferay.portal.PortletPreferencesException;
+import com.liferay.dynamic.data.mapping.validator.DDMFormValuesValidationException;
+import com.liferay.portal.exception.PortletPreferencesException;
 import com.liferay.portal.kernel.captcha.CaptchaMaxChallengesException;
 import com.liferay.portal.kernel.captcha.CaptchaTextException;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -43,12 +44,12 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
+import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PrefsParamUtil;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.service.WorkflowDefinitionLinkLocalService;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
@@ -58,6 +59,8 @@ import java.io.IOException;
 
 import java.util.List;
 
+import javax.portlet.ActionRequest;
+import javax.portlet.ActionResponse;
 import javax.portlet.Portlet;
 import javax.portlet.PortletException;
 import javax.portlet.RenderRequest;
@@ -101,6 +104,38 @@ import org.osgi.service.component.annotations.Reference;
 	service = Portlet.class
 )
 public class DDLFormPortlet extends MVCPortlet {
+
+	@Override
+	public void processAction(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws IOException, PortletException {
+
+		try {
+			super.processAction(actionRequest, actionResponse);
+		}
+		catch (Exception e) {
+			Throwable cause = getRootCause(e);
+
+			if (cause instanceof DDMFormValuesValidationException) {
+				hideDefaultErrorMessage(actionRequest);
+
+				if (cause instanceof
+						DDMFormValuesValidationException.MustSetValidValues ||
+					cause instanceof
+						DDMFormValuesValidationException.RequiredValue) {
+
+					SessionErrors.add(actionRequest, cause.getClass(), cause);
+				}
+				else {
+					SessionErrors.add(
+						actionRequest, DDMFormValuesValidationException.class);
+				}
+			}
+			else {
+				throw e;
+			}
+		}
+	}
 
 	@Override
 	public void render(
@@ -242,8 +277,7 @@ public class DDLFormPortlet extends MVCPortlet {
 		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		String submitLabel = getSubmitLabel(
-			recordSet.getRecordSetId(), themeDisplay);
+		String submitLabel = getSubmitLabel(recordSet, themeDisplay);
 
 		ddmFormRenderingContext.setSubmitLabel(submitLabel);
 
@@ -279,10 +313,18 @@ public class DDLFormPortlet extends MVCPortlet {
 		return ddmFormLayoutPages.get(ddmFormLayoutPages.size() - 1);
 	}
 
-	protected String getSubmitLabel(
-		long recordSetId, ThemeDisplay themeDisplay) {
+	protected Throwable getRootCause(Throwable throwable) {
+		while (throwable.getCause() != null) {
+			throwable = throwable.getCause();
+		}
 
-		boolean workflowEnabled = hasWorkflowEnabled(recordSetId, themeDisplay);
+		return throwable;
+	}
+
+	protected String getSubmitLabel(
+		DDLRecordSet recordSet, ThemeDisplay themeDisplay) {
+
+		boolean workflowEnabled = hasWorkflowEnabled(recordSet, themeDisplay);
 
 		if (workflowEnabled) {
 			return LanguageUtil.get(
@@ -294,11 +336,11 @@ public class DDLFormPortlet extends MVCPortlet {
 	}
 
 	protected boolean hasWorkflowEnabled(
-		long recordSetId, ThemeDisplay themeDisplay) {
+		DDLRecordSet recordSet, ThemeDisplay themeDisplay) {
 
 		return _workflowDefinitionLinkLocalService.hasWorkflowDefinitionLink(
-			themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(),
-			DDLRecordSet.class.getName(), recordSetId);
+			themeDisplay.getCompanyId(), recordSet.getGroupId(),
+			DDLRecordSet.class.getName(), recordSet.getRecordSetId());
 	}
 
 	protected boolean isCaptchaRequired(DDLRecordSet recordSet) {

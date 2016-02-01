@@ -25,10 +25,10 @@ import com.liferay.portal.kernel.dao.orm.QueryDefinition;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.PortletRequestModel;
 import com.liferay.portal.kernel.search.Hits;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.theme.ThemeDisplay;
 
@@ -2201,24 +2201,6 @@ public class JournalArticleServiceImpl extends JournalArticleServiceBaseImpl {
 		return journalArticleLocalService.updateArticle(
 			getUserId(), groupId, folderId, articleId, version, content,
 			serviceContext);
-	}
-
-	/**
-	 * @deprecated As of 6.2.0, replaced by {@link
-	 *             #updateArticleTranslation(long, String, double, Locale,
-	 *             String, String, String, Map, ServiceContext)}
-	 */
-	@Deprecated
-	@Override
-	public JournalArticle updateArticleTranslation(
-			long groupId, String articleId, double version, Locale locale,
-			String title, String description, String content,
-			Map<String, byte[]> images)
-		throws PortalException {
-
-		return updateArticleTranslation(
-			groupId, articleId, version, locale, title, description, content,
-			images, null);
 	}
 
 	/**

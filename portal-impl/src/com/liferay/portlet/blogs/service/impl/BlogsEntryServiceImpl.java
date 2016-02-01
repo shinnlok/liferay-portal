@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.servlet.taglib.ui.ImageSelector;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
@@ -32,7 +33,6 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Organization;
-import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
@@ -395,6 +395,15 @@ public class BlogsEntryServiceImpl extends BlogsEntryServiceBaseImpl {
 	}
 
 	@Override
+	public List<BlogsEntry> getGroupUserEntries(
+		long groupId, long userId, int[] statuses, int start, int end,
+		OrderByComparator<BlogsEntry> obc) {
+
+		return blogsEntryPersistence.filterFindByG_U_S(
+			groupId, userId, statuses, start, end, obc);
+	}
+
+	@Override
 	public int getGroupUserEntriesCount(long groupId, long userId, int status) {
 		if (status == WorkflowConstants.STATUS_ANY) {
 			return blogsEntryPersistence.filterCountByG_U_NotS(
@@ -404,6 +413,14 @@ public class BlogsEntryServiceImpl extends BlogsEntryServiceBaseImpl {
 			return blogsEntryPersistence.filterCountByG_U_S(
 				groupId, userId, status);
 		}
+	}
+
+	@Override
+	public int getGroupUserEntriesCount(
+		long groupId, long userId, int[] statuses) {
+
+		return blogsEntryPersistence.filterCountByG_U_S(
+			groupId, userId, statuses);
 	}
 
 	@Override

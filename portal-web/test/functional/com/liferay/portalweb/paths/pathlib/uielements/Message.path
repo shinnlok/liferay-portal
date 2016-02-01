@@ -99,6 +99,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>INFO_2</td>
+	<td>xpath=(//div[contains(@class,'alert') and contains(@class,'alert-info')])[2]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>INFO_4</td>
 	<td>xpath=(//div[contains(@class,'alert-info') and contains(@class,'alert-warning')]/a)[1]</td>
 	<td></td>
@@ -146,6 +151,11 @@
 <tr>
 	<td>RECYCLE_BIN_RESTORE_SUCCESS</td>
 	<td>//div[contains(@class,'alert-success') and em[contains(@class,'restore')]] | //div[contains(@class,'alert-success') and contains(.,'restored')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>RECYCLE_BIN_INFO</td>
+	<td>//div[contains(@class,'tooltip-help-content') and contains(@class,'tooltip-content')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -215,7 +225,7 @@
 </tr>
 <tr>
 	<td>WORKFLOW_UNAPPROVED</td>
-	<td>//div[@class='portlet-body']/div[contains(@class,'alert-block')]</td>
+	<td>//div[@class='portlet-body']/div[contains(@class,'alert-warning')]</td>
 	<td></td>
 </tr>
 </tbody>

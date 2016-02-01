@@ -60,17 +60,6 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 
 	public static final int PORTAL_MAX_DIR_LEVEL = 5;
 
-	public BaseSourceProcessor() {
-		portalSource = _isPortalSource();
-
-		try {
-			_properties = _getProperties();
-		}
-		catch (Exception e) {
-			ReflectionUtil.throwException(e);
-		}
-	}
-
 	@Override
 	public final void format() throws Exception {
 		for (String fileName : getFileNames()) {
@@ -447,6 +436,15 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 					continue;
 				}
 
+				Properties moduleLangLanguageProperties =
+					getModuleLangLanguageProperties(fileName);
+
+				if ((moduleLangLanguageProperties != null) &&
+					moduleLangLanguageProperties.containsKey(languageKey)) {
+
+					continue;
+				}
+
 				Properties bndFileLanguageProperties =
 					getBNDFileLanguageProperties(fileName);
 
@@ -498,6 +496,17 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 				fileName,
 				"Use ResourceBundleUtil.getString instead of " +
 					"resourceBundle.getString: " + fileName + " " + lineCount);
+		}
+	}
+
+	protected void checkChaining(String line, String fileName, int lineCount) {
+		if (line.startsWith("this(")) {
+			return;
+		}
+
+		if (line.contains(".getClass().")) {
+			processErrorMessage(
+				fileName, "chaining: " + fileName + " " + lineCount);
 		}
 	}
 
@@ -820,6 +829,16 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		processFormattedFile(file, fileName, content, newContent);
 	}
 
+	protected String formatEmptyArray(String line) {
+		int pos = line.indexOf("[] {}");
+
+		if ((pos != -1) && !ToolsUtil.isInsideQuotes(line, pos)) {
+			return StringUtil.replaceFirst(line, "[] {}", "[0]", pos - 1);
+		}
+
+		return line;
+	}
+
 	protected String formatIncorrectSyntax(
 		String line, String incorrectSyntax, String correctSyntax,
 		boolean lineStart) {
@@ -905,6 +924,8 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		linePart = formatIncorrectSyntax(linePart, "){", ") {", false);
 		linePart = formatIncorrectSyntax(linePart, "]{", "] {", false);
 		linePart = formatIncorrectSyntax(linePart, " [", "[", false);
+		linePart = formatIncorrectSyntax(linePart, "{ ", "{", false);
+		linePart = formatIncorrectSyntax(linePart, " }", "}", false);
 
 		for (int x = 0;;) {
 			x = linePart.indexOf(CharPool.EQUAL, x + 1);
@@ -1088,7 +1109,7 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		_annotationsExclusions = SetUtil.fromArray(
 			new String[] {
 				"ArquillianResource", "BeanReference", "Inject", "Mock",
-				"SuppressWarnings"
+				"ServiceReference", "SuppressWarnings"
 			});
 
 		return _annotationsExclusions;
@@ -1252,7 +1273,8 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 
 	protected File getFile(String fileName, int level) {
 		for (int i = 0; i < level; i++) {
-			File file = new File(fileName);
+			File file = new File(
+				sourceFormatterArgs.getBaseDirName() + fileName);
 
 			if (file.exists()) {
 				return file;
@@ -1399,6 +1421,78 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		_mainReleaseVersion = releaseVersion.substring(0, pos) + ".0";
 
 		return _mainReleaseVersion;
+	}
+
+	protected Properties getModuleLangLanguageProperties(String fileName)
+		throws Exception {
+
+		Properties properties = _moduleLangLanguageProperties.get(fileName);
+
+		if (properties != null) {
+			return properties;
+		}
+
+		String buildGradleContent = null;
+		String buildGradleFileLocation = fileName;
+
+		while (true) {
+			int pos = buildGradleFileLocation.lastIndexOf(StringPool.SLASH);
+
+			if (pos == -1) {
+				return null;
+			}
+
+			buildGradleFileLocation = buildGradleFileLocation.substring(
+				0, pos + 1);
+
+			File file = new File(buildGradleFileLocation + "build.gradle");
+
+			if (file.exists()) {
+				buildGradleContent = FileUtil.read(file);
+
+				break;
+			}
+
+			buildGradleFileLocation = StringUtil.replaceLast(
+				buildGradleFileLocation, StringPool.SLASH, StringPool.BLANK);
+		}
+
+		Matcher matcher = langMergerPluginPattern.matcher(buildGradleContent);
+
+		if (!matcher.find()) {
+			return null;
+		}
+
+		String moduleLocation = StringUtil.replaceLast(
+			buildGradleFileLocation, StringPool.SLASH, StringPool.BLANK);
+
+		int x = moduleLocation.lastIndexOf(StringPool.SLASH);
+
+		int y = moduleLocation.indexOf(StringPool.DASH, x);
+
+		String baseModuleName = moduleLocation.substring(x + 1, y);
+
+		String moduleLangName = baseModuleName.concat("-lang");
+
+		String moduleLangLanguagePath =
+			moduleLocation.substring(0, x + 1) + moduleLangName +
+				"/src/main/resources/content/Language.properties";
+
+		File file = new File(moduleLangLanguagePath);
+
+		if (!file.exists()) {
+			return null;
+		}
+
+		properties = new Properties();
+
+		InputStream inputStream = new FileInputStream(file);
+
+		properties.load(inputStream);
+
+		_moduleLangLanguageProperties.put(fileName, properties);
+
+		return properties;
 	}
 
 	protected Properties getModuleLanguageProperties(String fileName) {
@@ -1917,6 +2011,9 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		"Collections\\.EMPTY_(LIST|MAP|SET)");
 	protected static Pattern javaSourceInsideJSPTagPattern = Pattern.compile(
 		"<%=(.+?)%>");
+	protected static Pattern langMergerPluginPattern = Pattern.compile(
+		"^apply[ \t]+plugin[ \t]*:[ \t]+\"com.liferay.lang.merger\"$",
+		Pattern.MULTILINE);
 	protected static Pattern languageKeyPattern = Pattern.compile(
 		"LanguageUtil.(?:get|format)\\([^;%]+|Liferay.Language.get\\('([^']+)");
 	protected static boolean portalSource;
@@ -1962,13 +2059,16 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 
 		for (int i = 0; i <= level; i++) {
 			try {
-				InputStream inputStream = new FileInputStream(fileName);
+				InputStream inputStream = new FileInputStream(
+					sourceFormatterArgs.getBaseDirName() + fileName);
 
 				Properties props = new Properties();
 
 				props.load(inputStream);
 
 				propertiesList.add(props);
+
+				break;
 			}
 			catch (FileNotFoundException fnfe) {
 			}
@@ -2020,16 +2120,20 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 	}
 
 	private void _init() {
+		portalSource = _isPortalSource();
+
 		_errorMessagesMap = new HashMap<>();
 
-		_sourceFormatterHelper = new SourceFormatterHelper(
-			sourceFormatterArgs.isUseProperties());
-
 		try {
+			_properties = _getProperties();
+
+			_sourceFormatterHelper = new SourceFormatterHelper(
+				sourceFormatterArgs.isUseProperties());
+
 			_sourceFormatterHelper.init();
 		}
-		catch (IOException ioe) {
-			ReflectionUtil.throwException(ioe);
+		catch (Exception e) {
+			ReflectionUtil.throwException(e);
 		}
 
 		_excludes = _getExcludes();
@@ -2081,6 +2185,8 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 	private Set<String> _immutableFieldTypes;
 	private String _mainReleaseVersion;
 	private final List<String> _modifiedFileNames = new ArrayList<>();
+	private Map<String, Properties> _moduleLangLanguageProperties =
+		new HashMap<>();
 	private Map<String, Properties> _moduleLanguageProperties = new HashMap<>();
 	private String _oldCopyright;
 	private Properties _portalLanguageProperties;

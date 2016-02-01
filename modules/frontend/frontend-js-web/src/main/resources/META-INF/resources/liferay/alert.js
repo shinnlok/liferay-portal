@@ -48,7 +48,7 @@ AUI.add(
 							instance.after(['messageChange', 'titleChange'], instance._updateBodyContent, instance),
 							instance.after('typeChange', instance._afterTypeChange, instance),
 							boundingBox.on('mouseenter', instance._cancelHide, instance),
-							boundingBox.on('mouseleave', instance.hide, instance)
+							boundingBox.on('mouseleave', instance._onMouseLeave, instance)
 						];
 
 						Alert.superclass.bindUI.call(this);
@@ -153,6 +153,16 @@ AUI.add(
 						}
 					},
 
+					_onMouseLeave: function(event) {
+						var instance = this;
+
+						var delay = instance.get('delay');
+
+						if (delay.hide > 0) {
+							instance.hide();
+						}
+					},
+
 					_prepareTransition: function(visible) {
 						var instance = this;
 
@@ -224,6 +234,6 @@ AUI.add(
 	},
 	'',
 	{
-		requires: ['aui-alert', 'event-mouseenter', 'liferay-portlet-base', 'timers']
+		requires: ['aui-alert', 'aui-component', 'event-mouseenter', 'liferay-portlet-base', 'timers']
 	}
 );

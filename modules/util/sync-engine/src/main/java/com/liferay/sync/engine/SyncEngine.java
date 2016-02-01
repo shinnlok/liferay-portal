@@ -16,8 +16,6 @@ package com.liferay.sync.engine;
 
 import com.j256.ormlite.support.ConnectionSource;
 
-import com.liferay.sync.engine.documentlibrary.util.BatchDownloadEvent;
-import com.liferay.sync.engine.documentlibrary.util.BatchEventManager;
 import com.liferay.sync.engine.documentlibrary.util.FileEventUtil;
 import com.liferay.sync.engine.documentlibrary.util.ServerEventUtil;
 import com.liferay.sync.engine.filesystem.BarbaryWatcher;
@@ -92,10 +90,6 @@ public class SyncEngine {
 			(ScheduledFuture<?>)syncAccountTasks[2];
 
 		remoteEventsScheduledFuture.cancel(true);
-	}
-
-	public static ExecutorService getEventProcessorExecutorService() {
-		return _eventProcessorExecutorService;
 	}
 
 	public static ExecutorService getExecutorService() {
@@ -286,7 +280,6 @@ public class SyncEngine {
 			cancelSyncAccountTasks(syncAccountId);
 		}
 
-		_eventProcessorExecutorService.shutdownNow();
 		_executorService.shutdownNow();
 		_localEventsScheduledExecutorService.shutdownNow();
 		_remoteEventsScheduledExecutorService.shutdownNow();
@@ -359,12 +352,6 @@ public class SyncEngine {
 						syncSite.getGroupId(), syncAccount.getSyncAccountId(),
 						syncSite, true);
 				}
-
-				BatchDownloadEvent batchDownloadEvent =
-					BatchEventManager.getBatchDownloadEvent(
-						syncAccount.getSyncAccountId());
-
-				batchDownloadEvent.fireBatchEvent();
 			}
 
 		};
@@ -399,8 +386,6 @@ public class SyncEngine {
 	private static final Logger _logger = LoggerFactory.getLogger(
 		SyncEngine.class);
 
-	private static final ExecutorService _eventProcessorExecutorService =
-		Executors.newFixedThreadPool(5);
 	private static final ExecutorService _executorService =
 		Executors.newCachedThreadPool();
 	private static final ScheduledExecutorService

@@ -309,9 +309,7 @@ public class UpgradePortletId extends UpgradeProcess {
 				"update Portlet set portletId = '" + newRootPortletId +
 					"' where portletId = '" + oldRootPortletId + "'");
 
-			runSQL(
-				"update ResourceAction set name = '" + newRootPortletId +
-					"' where name = '" + oldRootPortletId + "'");
+			updateResourceAction(oldRootPortletId, newRootPortletId);
 
 			updateResourcePermission(oldRootPortletId, newRootPortletId, true);
 
@@ -348,6 +346,14 @@ public class UpgradePortletId extends UpgradeProcess {
 		finally {
 			DataAccess.cleanUp(ps);
 		}
+	}
+
+	protected void updateResourceAction(String oldName, String newName)
+		throws Exception {
+
+		runSQL(
+			"update ResourceAction set name = '" + newName +
+				"' where name = '" + oldName + "'");
 	}
 
 	protected void updateResourcePermission(

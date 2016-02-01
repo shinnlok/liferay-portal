@@ -15,26 +15,26 @@
 package com.liferay.portal.service.impl;
 
 import com.liferay.mail.service.MailService;
-import com.liferay.portal.CompanyMaxUsersException;
-import com.liferay.portal.ContactBirthdayException;
-import com.liferay.portal.ContactNameException;
-import com.liferay.portal.DuplicateOpenIdException;
-import com.liferay.portal.GroupFriendlyURLException;
-import com.liferay.portal.ModelListenerException;
-import com.liferay.portal.NoSuchImageException;
-import com.liferay.portal.NoSuchOrganizationException;
-import com.liferay.portal.NoSuchTicketException;
-import com.liferay.portal.NoSuchUserException;
-import com.liferay.portal.PasswordExpiredException;
-import com.liferay.portal.RequiredUserException;
-import com.liferay.portal.SendPasswordException;
-import com.liferay.portal.UserEmailAddressException;
-import com.liferay.portal.UserIdException;
-import com.liferay.portal.UserLockoutException;
-import com.liferay.portal.UserPasswordException;
-import com.liferay.portal.UserReminderQueryException;
-import com.liferay.portal.UserScreenNameException;
-import com.liferay.portal.UserSmsException;
+import com.liferay.portal.exception.CompanyMaxUsersException;
+import com.liferay.portal.exception.ContactBirthdayException;
+import com.liferay.portal.exception.ContactNameException;
+import com.liferay.portal.exception.DuplicateOpenIdException;
+import com.liferay.portal.exception.GroupFriendlyURLException;
+import com.liferay.portal.exception.ModelListenerException;
+import com.liferay.portal.exception.NoSuchImageException;
+import com.liferay.portal.exception.NoSuchOrganizationException;
+import com.liferay.portal.exception.NoSuchTicketException;
+import com.liferay.portal.exception.NoSuchUserException;
+import com.liferay.portal.exception.PasswordExpiredException;
+import com.liferay.portal.exception.RequiredUserException;
+import com.liferay.portal.exception.SendPasswordException;
+import com.liferay.portal.exception.UserEmailAddressException;
+import com.liferay.portal.exception.UserIdException;
+import com.liferay.portal.exception.UserLockoutException;
+import com.liferay.portal.exception.UserPasswordException;
+import com.liferay.portal.exception.UserReminderQueryException;
+import com.liferay.portal.exception.UserScreenNameException;
+import com.liferay.portal.exception.UserSmsException;
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.cache.PortalCache;
 import com.liferay.portal.kernel.cache.PortalCacheMapSynchronizeUtil;
@@ -58,6 +58,20 @@ import com.liferay.portal.kernel.search.QueryConfig;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.search.Sort;
+import com.liferay.portal.kernel.security.auth.Authenticator;
+import com.liferay.portal.kernel.security.auth.EmailAddressGenerator;
+import com.liferay.portal.kernel.security.auth.EmailAddressValidator;
+import com.liferay.portal.kernel.security.auth.FullNameDefinition;
+import com.liferay.portal.kernel.security.auth.FullNameDefinitionFactory;
+import com.liferay.portal.kernel.security.auth.FullNameGenerator;
+import com.liferay.portal.kernel.security.auth.FullNameGeneratorFactory;
+import com.liferay.portal.kernel.security.auth.FullNameValidator;
+import com.liferay.portal.kernel.security.auth.PrincipalException;
+import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
+import com.liferay.portal.kernel.security.auth.ScreenNameGenerator;
+import com.liferay.portal.kernel.security.auth.ScreenNameValidator;
+import com.liferay.portal.kernel.security.ldap.LDAPSettingsUtil;
+import com.liferay.portal.kernel.security.pwd.PasswordEncryptorUtil;
 import com.liferay.portal.kernel.spring.aop.Skip;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
@@ -107,26 +121,12 @@ import com.liferay.portal.model.impl.LayoutImpl;
 import com.liferay.portal.model.impl.UserCacheModel;
 import com.liferay.portal.model.impl.UserImpl;
 import com.liferay.portal.security.auth.AuthPipeline;
-import com.liferay.portal.security.auth.Authenticator;
-import com.liferay.portal.security.auth.EmailAddressGenerator;
 import com.liferay.portal.security.auth.EmailAddressGeneratorFactory;
-import com.liferay.portal.security.auth.EmailAddressValidator;
 import com.liferay.portal.security.auth.EmailAddressValidatorFactory;
-import com.liferay.portal.security.auth.FullNameDefinition;
-import com.liferay.portal.security.auth.FullNameDefinitionFactory;
-import com.liferay.portal.security.auth.FullNameGenerator;
-import com.liferay.portal.security.auth.FullNameGeneratorFactory;
-import com.liferay.portal.security.auth.FullNameValidator;
 import com.liferay.portal.security.auth.FullNameValidatorFactory;
-import com.liferay.portal.security.auth.PrincipalException;
-import com.liferay.portal.security.auth.PrincipalThreadLocal;
-import com.liferay.portal.security.auth.ScreenNameGenerator;
 import com.liferay.portal.security.auth.ScreenNameGeneratorFactory;
-import com.liferay.portal.security.auth.ScreenNameValidator;
 import com.liferay.portal.security.auth.ScreenNameValidatorFactory;
-import com.liferay.portal.security.ldap.LDAPSettingsUtil;
 import com.liferay.portal.security.permission.PermissionCacheUtil;
-import com.liferay.portal.security.pwd.PasswordEncryptorUtil;
 import com.liferay.portal.security.pwd.PwdAuthenticator;
 import com.liferay.portal.security.pwd.PwdToolkitUtil;
 import com.liferay.portal.security.pwd.RegExpToolkit;
@@ -142,7 +142,7 @@ import com.liferay.portal.util.SubscriptionSender;
 import com.liferay.portlet.messageboards.model.MBMessage;
 import com.liferay.portlet.social.model.SocialRelation;
 import com.liferay.portlet.social.model.SocialRelationConstants;
-import com.liferay.portlet.usersadmin.util.UsersAdminUtil;
+import com.liferay.users.admin.kernel.util.UsersAdminUtil;
 import com.liferay.util.Encryptor;
 import com.liferay.util.EncryptorException;
 
@@ -2675,27 +2675,6 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	/**
 	 * Returns the user with the UUID.
 	 *
-	 * @param      uuid the user's UUID
-	 * @return     the user with the UUID
-	 * @deprecated As of 6.2.0, replaced by {@link
-	 *             #getUserByUuidAndCompanyId(String, long)}
-	 */
-	@Deprecated
-	@Override
-	public User getUserByUuid(String uuid) throws PortalException {
-		List<User> users = userPersistence.findByUuid(uuid);
-
-		if (users.isEmpty()) {
-			throw new NoSuchUserException("{uuid=" + uuid + "}");
-		}
-		else {
-			return users.get(0);
-		}
-	}
-
-	/**
-	 * Returns the user with the UUID.
-	 *
 	 * @param  uuid the user's UUID
 	 * @param  companyId the primary key of the user's company
 	 * @return the user with the UUID
@@ -4758,19 +4737,23 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		}
 
 		try {
-			userPersistence.update(user);
+			user = userPersistence.update(user);
 		}
 		catch (ModelListenerException mle) {
 			String msg = GetterUtil.getString(mle.getCause().getMessage());
 
 			if (LDAPSettingsUtil.isPasswordPolicyEnabled(user.getCompanyId())) {
-				String errorPasswordHistory =
-					LDAPSettingsUtil.getErrorPasswordHistory(
+				String[] errorPasswordHistoryKeywords =
+					LDAPSettingsUtil.getErrorPasswordHistoryKeywords(
 						user.getCompanyId());
 
-				if (msg.contains(errorPasswordHistory)) {
-					throw new UserPasswordException.MustNotBeRecentlyUsed(
-						userId);
+				for (String errorPasswordHistoryKeyword :
+						errorPasswordHistoryKeywords) {
+
+					if (msg.contains(errorPasswordHistoryKeyword)) {
+						throw new UserPasswordException.MustNotBeRecentlyUsed(
+							userId);
+					}
 				}
 			}
 
@@ -5361,10 +5344,9 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 * @deprecated As of 7.0.0, replaced by {@link #updateUser(long, String,
 	 *             String, String, boolean, String, String, String, String,
 	 *             long, String, boolean, byte[], String, String, String,
-	 *             String, String, String, String, int, int, boolean, int, int,
-	 *             int, String, String, String, String, String, String, String,
-	 *             String, String, String, String, long[], long[], long[], List,
-	 *             long[], ServiceContext)}
+	 *             String, String, String, String, long, long, boolean, int,
+	 *             int, int, String, String, String, String, String, String,
+	 *             long[], long[], long[], List, long[], ServiceContext)}
 	 */
 	@Deprecated
 	@Override

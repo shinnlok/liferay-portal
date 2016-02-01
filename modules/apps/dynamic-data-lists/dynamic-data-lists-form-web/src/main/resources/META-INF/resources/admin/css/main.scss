@@ -278,6 +278,10 @@ $horizontal-spacing: 35px;
 		padding: 0;
 	}
 
+	.modal-title {
+		 text-transform: capitalize;
+	}
+
 	@include lg {
 		.modal-body {
 			max-height: 451px;
@@ -528,6 +532,10 @@ $horizontal-spacing: 35px;
 
 		.liferay-ddm-form-field-text textarea {
 			resize: none;
+		}
+
+		.toggle-switch-text {
+			word-break: break-word;
 		}
 	}
 

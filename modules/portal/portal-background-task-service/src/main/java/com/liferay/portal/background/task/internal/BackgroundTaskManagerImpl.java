@@ -14,10 +14,13 @@
 
 package com.liferay.portal.background.task.internal;
 
+import com.liferay.background.task.kernel.util.comparator.BackgroundTaskCompletionDateComparator;
+import com.liferay.background.task.kernel.util.comparator.BackgroundTaskCreateDateComparator;
 import com.liferay.portal.background.task.service.BackgroundTaskLocalService;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTask;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskManager;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.lock.LockManager;
 import com.liferay.portal.kernel.messaging.Destination;
 import com.liferay.portal.kernel.messaging.DestinationConfiguration;
 import com.liferay.portal.kernel.messaging.DestinationFactory;
@@ -26,8 +29,6 @@ import com.liferay.portal.kernel.util.ClassUtil;
 import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portlet.backgroundtask.util.comparator.BackgroundTaskCompletionDateComparator;
-import com.liferay.portlet.backgroundtask.util.comparator.BackgroundTaskCreateDateComparator;
 
 import java.io.File;
 import java.io.InputStream;
@@ -544,6 +545,10 @@ public class BackgroundTaskManagerImpl implements BackgroundTaskManager {
 		DestinationFactory destinationFactory) {
 
 		_destinationFactory = destinationFactory;
+	}
+
+	@Reference(unbind = "-")
+	protected void setLockManager(LockManager lockManager) {
 	}
 
 	protected List<BackgroundTask> translate(

@@ -58,6 +58,12 @@ portletURL.setParameter("version", String.valueOf(bundle.getVersion()));
 portletURL.setParameter("pluginType", pluginType);
 portletURL.setParameter("orderByType", orderByType);
 
+Dictionary<String, String> headers = bundle.getHeaders();
+
+String bundleName = GetterUtil.getString(headers.get(BundleConstants.BUNDLE_NAME));
+
+renderResponse.setTitle(bundleName);
+
 MarketplaceAppManagerUtil.addPortletBreadcrumbEntry(appDisplay, moduleGroupDisplay, bundle, request, renderResponse);
 %>
 
@@ -136,6 +142,7 @@ MarketplaceAppManagerUtil.addPortletBreadcrumbEntry(appDisplay, moduleGroupDispl
 
 	<liferay-ui:search-container
 		emptyResultsMessage="<%= emptyResultsMessage %>"
+		iteratorURL="<%= portletURL %>"
 	>
 		<liferay-ui:search-container-results>
 
@@ -222,16 +229,6 @@ MarketplaceAppManagerUtil.addPortletBreadcrumbEntry(appDisplay, moduleGroupDispl
 				<h6 class="text-default">
 					<%= description %>
 				</h6>
-
-				<div class="additional-info text-default">
-					<div class="additional-info-item">
-						<strong>
-							<liferay-ui:message key="version" />:
-						</strong>
-
-						<%= version %>
-					</div>
-				</div>
 			</liferay-ui:search-container-column-text>
 		</liferay-ui:search-container-row>
 

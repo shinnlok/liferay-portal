@@ -3,14 +3,7 @@
 	<property name="testray.main.component.name" value="Knowledge Base" />
 
 	<set-up>
-		<var method="TestPropsUtil#get('test.portal.instance')" name="testPortalInstance" />
-
-		<if>
-			<equals arg1="${testPortalInstance}" arg2="true" />
-			<then>
-				<execute macro="SignIn#signInPortalInstanceSetUp" />
-			</then>
-		</if>
+		<execute macro="TestCase#setUpPortalInstance" />
 
 		<execute macro="User#firstLoginPG" />
 	</set-up>
@@ -235,7 +228,7 @@
 		<execute macro="Portlet#dragAndDropPortletToColumnPG">
 			<var name="columnNumberFrom" value="1" />
 			<var name="columnNumberTo" value="2" />
-			<var name="portletName" value="Knowledge Base Display" />
+			<var name="portletName" value="Knowledge Base Article" />
 		</execute>
 
 		<execute macro="Page#add">
@@ -253,7 +246,7 @@
 		<execute macro="Portlet#dragAndDropPortletToColumnPG">
 			<var name="columnNumberFrom" value="1" />
 			<var name="columnNumberTo" value="2" />
-			<var name="portletName" value="Knowledge Base Display" />
+			<var name="portletName" value="Knowledge Base Search" />
 		</execute>
 
 		<execute macro="Page#add">
@@ -271,7 +264,7 @@
 		<execute macro="Portlet#dragAndDropPortletToColumnPG">
 			<var name="columnNumberFrom" value="1" />
 			<var name="columnNumberTo" value="2" />
-			<var name="portletName" value="Knowledge Base Display" />
+			<var name="portletName" value="Knowledge Base Section" />
 		</execute>
 
 		<execute macro="Page#gotoPG">
@@ -877,7 +870,7 @@
 			<var name="portlet" value="Documents and Media" />
 		</execute>
 
-		<execute function="AssertTextEquals" locator1="Message#INFO" value1="There are no documents or media files in this folder." />
+		<execute macro="DMDocument#viewDefaultCP" />
 
 		<execute macro="Navigator#openURL" />
 

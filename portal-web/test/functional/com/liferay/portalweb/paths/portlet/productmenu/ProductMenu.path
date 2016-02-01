@@ -14,6 +14,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>PRODUCT_MENU_BODY</td>
+	<td>//*[@data-qa-id='productMenuBody']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>PAGE_PLUS_ICON_COLLAPSED</td>
 	<td>//ul[contains(@class,'tree-container')]//span[contains(@class,'icon-plus') and not (contains(@class,'hidden'))]</td>
 	<td></td>
@@ -94,8 +99,18 @@
 	<td></td>
 </tr>
 <tr>
+	<td>EDIT_PUBLIC_PAGE_ICON</td>
+	<td>//*[@data-qa-id='editPublicPages']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>EDIT_PRIVATE_PAGE_ICON</td>
+	<td>//*[@data-qa-id='editPrivatePages']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>EDIT_PAGE</td>
-	<td>//div[@class='list-group-item']//a[contains(@title,'Edit ${key_page}')]</td>
+	<td>//a[contains(@class,'tree-edit') and contains(.,'${key_page}')]</td>
 	<td></td>
 </tr>
 <tr>

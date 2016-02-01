@@ -14,11 +14,12 @@
 
 package com.liferay.gradle.plugins;
 
+import com.liferay.gradle.plugins.extensions.AppServer;
 import com.liferay.gradle.plugins.extensions.LiferayExtension;
 import com.liferay.gradle.plugins.jasper.jspc.JspCExtension;
 import com.liferay.gradle.plugins.jasper.jspc.JspCPlugin;
 import com.liferay.gradle.plugins.util.FileUtil;
-import com.liferay.gradle.util.GradleUtil;
+import com.liferay.gradle.plugins.util.GradleUtil;
 
 import java.io.File;
 
@@ -31,7 +32,6 @@ import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.FileTree;
 import org.gradle.api.internal.plugins.osgi.OsgiHelper;
 import org.gradle.api.plugins.JavaPlugin;
-import org.gradle.api.plugins.PluginContainer;
 import org.gradle.api.tasks.bundling.Jar;
 import org.gradle.api.tasks.compile.JavaCompile;
 
@@ -46,15 +46,8 @@ public class JspCDefaultsPlugin
 
 	public static final String UNZIP_JAR_TASK_NAME = "unzipJar";
 
-	protected void addDependenciesJspC(Project project) {
-		PluginContainer pluginContainer = project.getPlugins();
-
-		if (!pluginContainer.hasPlugin(LiferayPlugin.class)) {
-			return;
-		}
-
-		LiferayExtension liferayExtension = GradleUtil.getExtension(
-			project, LiferayExtension.class);
+	protected void addDependenciesJspC(
+		Project project, LiferayExtension liferayExtension) {
 
 		GradleUtil.addDependency(
 			project, JspCPlugin.CONFIGURATION_NAME,
@@ -87,6 +80,10 @@ public class JspCDefaultsPlugin
 
 		GradleUtil.addDependency(
 			project, JspCPlugin.CONFIGURATION_NAME, configurableFileCollection);
+
+		AppServer appServer = liferayExtension.getAppServer();
+
+		appServer.addAdditionalDependencies(JspCPlugin.CONFIGURATION_NAME);
 	}
 
 	@Override
@@ -139,7 +136,7 @@ public class JspCDefaultsPlugin
 
 				@Override
 				public void execute(Project project) {
-					addDependenciesJspC(project);
+					addDependenciesJspC(project, liferayExtension);
 					configureTaskCompileJSP(project, liferayExtension);
 				}
 

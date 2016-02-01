@@ -38,7 +38,7 @@ if (!resultRowSplitterEntries.isEmpty()) {
 %>
 
 <table class="table table-list">
-	<c:if test="<%= headerNames != null %>">
+	<c:if test="<%= ListUtil.isNotNull(headerNames) %>">
 		<thead>
 			<tr>
 
@@ -121,13 +121,6 @@ if (!resultRowSplitterEntries.isEmpty()) {
 	</c:if>
 
 	<tbody>
-		<c:if test="<%= resultRowSplitterEntries.isEmpty() && (emptyResultsMessage != null) %>">
-			<tr>
-				<td>
-					<liferay-ui:empty-result-message message="<%= emptyResultsMessage %>" search="<%= searchContainer.isSearch() %>" />
-				</td>
-			</tr>
-		</c:if>
 
 		<%
 		for (ResultRowSplitterEntry resultRowSplitterEntry : resultRowSplitterEntries) {
@@ -216,7 +209,7 @@ if (!resultRowSplitterEntries.isEmpty()) {
 						String columnClassName = entry.getCssClass();
 					%>
 
-						<td class="<%= columnClassName %> text-<%= entry.getAlign() %> text-<%= entry.getValign() %>" colspan="<%= entry.getColspan() %>">
+						<td class="<%= columnClassName %> text-<%= entry.getAlign() %> text-<%= entry.getValign() %> text-default" colspan="<%= entry.getColspan() %>">
 
 						<c:choose>
 							<c:when test="<%= entry.isTruncate() %>">

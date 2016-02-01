@@ -129,6 +129,16 @@
 	<td></td>
 </tr>
 <tr>
+	<td>ASSIGNED_TO_ME</td>
+	<td>//a[@role='menuitem' and contains(.,'Assigned to Me')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ASSIGNED_TO_MY_ROLES</td>
+	<td>//a[@role='menuitem' and contains(.,'Assigned to My Roles')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>ASSIGN_MEMBERS</td>
 	<td>//div[contains(@class,'open')]//a[@role='menuitem' and contains(.,'Assign Members')]</td>
 	<td></td>
@@ -295,7 +305,7 @@
 </tr>
 <tr>
 	<td>EDIT</td>
-	<td>//div[contains(@class,'dropdown') and contains(@class,'open')]//a[contains(.,'Edit')]</td>
+	<td>//div[contains(@class,'dropdown') and contains(@class,'open')]//a[contains(.,'Edit')] | //div[@class='open']/ul[contains(@class,'dropdown-menu')]//a[contains(.,'Edit')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -379,6 +389,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>LOCATION</td>
+	<td>//ul[contains(@class,'dropdown-menu')]/li/a[contains(.,'Location')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>LOCK_THREAD</td>
 	<td>//div[contains(@class,'open')]//a[@role='menuitem' and contains(.,'Lock Thread')]</td>
 	<td></td>
@@ -426,6 +441,11 @@
 <tr>
 	<td>MANAGE_TEMPLATES</td>
 	<td>//div[contains(@class,'open')]//a[@role='menuitem' and contains(.,'Manage Templates')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MARK_AS_AN_ANSWER</td>
+	<td>//div[contains(@class,'open') and contains(@class,'dropdown')]//a[@role='menuitem' and contains(.,'Mark as an Answer')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -539,6 +559,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>PUBLISH_TEPMLATES</td>
+	<td>//a[@role='menuitem' and contains(.,'Publish Templates')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>PUBLISH_TO_LIVE</td>
 	<td>//a[@role='menuitem' and contains(.,'Publish to Live')]</td>
 	<td></td>
@@ -546,6 +571,11 @@
 <tr>
 	<td>PUBLISH_TO_REMOTE_LIVE</td>
 	<td>//a[@role='menuitem' and contains(.,'Publish to Remote Live')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>REGULAR_ORGANIZATION</td>
+	<td>//ul[contains(@class,'dropdown-menu')]/li/a[text()='Regular Organization']</td>
 	<td></td>
 </tr>
 <tr>
@@ -636,6 +666,11 @@
 <tr>
 	<td>SCOPE_SELECTION</td>
 	<td>//ul[contains(@class,'dropdown-menu')]/li/a[contains(.,'${key_scopeSelection}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SETTINGS</td>
+	<td>//a[@role='menuitem']//span[contains(.,'Settings')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -760,7 +795,7 @@
 </tr>
 <tr>
 	<td>USER</td>
-	<td>//li[contains(@class,'open')]//a[@title='User']</td>
+	<td>//ul[contains(@class,'dropdown-menu')]/li/a[text()='User']</td>
 	<td></td>
 </tr>
 <tr>

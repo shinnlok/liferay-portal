@@ -467,7 +467,7 @@ public class DLImpl implements DL {
 
 	@Override
 	public String getFileIconCssClass(String extension) {
-		return "icon-file-alt";
+		return "documents-and-media";
 	}
 
 	@Override
@@ -518,20 +518,6 @@ public class DLImpl implements DL {
 	public String getPreviewURL(
 		FileEntry fileEntry, FileVersion fileVersion, ThemeDisplay themeDisplay,
 		String queryString) {
-
-		return getPreviewURL(
-			fileEntry, fileVersion, themeDisplay, queryString, true, true);
-	}
-
-	/**
-	 * @deprecated As of 6.2.0, replaced by {@link #getPreviewURL(FileEntry,
-	 *             FileVersion, ThemeDisplay, String, boolean, boolean)}
-	 */
-	@Deprecated
-	@Override
-	public String getPreviewURL(
-		FileEntry fileEntry, FileVersion fileVersion, ThemeDisplay themeDisplay,
-		String queryString, boolean appendToken) {
 
 		return getPreviewURL(
 			fileEntry, fileVersion, themeDisplay, queryString, true, true);

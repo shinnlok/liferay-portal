@@ -114,7 +114,7 @@
 		<var name="key_siteName" value="${siteName}" />
 
 		<execute macro="ProductMenu#gotoSitesPublishingTools">
-			<var name="portlet" value="Staging Processes" />
+			<var name="portlet" value="Staging" />
 		</execute>
 
 		<execute function="AssertClick" locator1="Staging#SCHEDULED" value1="Scheduled" />
@@ -138,15 +138,21 @@
 		<execute function="SelectFrame" locator1="IFrame#PAGE_VARIATION_IFRAME" />
 		<execute function="AssertClick" locator1="Button#ADD_PAGE_VARIATION" value1="Add Page Variation" />
 		<execute function="Type" locator1="StagingManageVariations#MANAGE_VARIATION" value1="${pageVariationName}" />
-		<execute function="AssertClick" locator1="Button#ADD" value1="Add" />
+		<execute function="AssertClick" locator1="StagingManageVariations#ADD" value1="Add" />
 		<execute function="AssertTextEquals#assertPartialText" locator1="Message#SUCCESS" value1="Page variation was added." />
+
+		<execute function="SelectFrame" value1="relative=top" />
+
+		<execute function="Click" locator1="Icon#CLOSE" />
 	</command>
 
 	<command name="addPublishTemplate">
-		<execute function="AssertClick#assertPartialTextClickAt" locator1="StagingPublishtolivenow#SWITCH_TO_ADVANCED" value1="Switch to Advanced Publication" />
+		<execute function="Click" locator1="Icon#HEADER_VERTICAL_ELLIPSIS" />
 
-		<execute function="AssertClick" locator1="StagingPublishToLive#PUBLISH_TEMPLATES_BUTTON" value1="Publish Templates" />
-		<execute function="AssertClick" locator1="Button#NEW_TEMPLATE" value1="New" />
+		<execute function="AssertClick" locator1="MenuItem#PUBLISH_TEPMLATES" value1="Publish Templates" />
+
+		<execute function="Click" locator1="Button#PLUS" />
+
 		<execute function="Type" locator1="StagingPublishToLive#PUBLISH_TEMPLATES_NAME_FIELD" value1="${publishTemplateName}" />
 		<execute function="Type" locator1="StagingPublishToLive#PUBLISH_TEMPLATES_DESCRIPTION_FIELD" value1="${publishTemplateDescription}" />
 	</command>
@@ -174,8 +180,12 @@
 			</then>
 		</if>
 
-		<execute function="AssertClick" locator1="Button#ADD" value1="Add" />
+		<execute function="AssertClick" locator1="StagingManageVariations#ADD" value1="Add" />
 		<execute function="AssertTextEquals#assertPartialText" locator1="Message#SUCCESS" value1="Site page variation was added." />
+
+		<execute function="SelectFrame" value1="relative=top" />
+
+		<execute function="Click" locator1="Icon#CLOSE" />
 	</command>
 
 	<command name="changePageVariationPG">
@@ -554,11 +564,14 @@
 	</command>
 
 	<command name="moveToTheRecycleBinPublishTemplate">
-		<execute function="AssertClick" locator1="StagingPublishToLive#PUBLISH_TEMPLATES_BUTTON" value1="Publish Templates" />
+		<execute function="Click" locator1="Icon#HEADER_VERTICAL_ELLIPSIS" />
 
-		<var name="key_publishTemplateName" value="${publishTemplateName}" />
+		<execute function="AssertClick" locator1="MenuItem#PUBLISH_TEPMLATES" value1="Publish Templates" />
 
-		<execute function="Click" locator1="StagingPublishToLive#PUBLISH_TEMPLATES_TABLE_MOVE_TO_THE_RECYCLE_BIN_BUTTON" />
+		<var name="key_rowEntry" value="${publishTemplateName}" />
+
+		<execute function="Click" locator1="Icon#ROW_VERTICAL_ELLIPSIS" />
+		<execute function="Click" locator1="MenuItem#MOVE_TO_THE_RECYCLE_BIN" />
 		<execute function="AssertTextEquals#assertPartialText" locator1="Message#SUCCESS" value1="The Export Import Template ${publishTemplateName} was moved to the Recycle Bin." />
 	</command>
 
@@ -590,7 +603,7 @@
 	<command name="publishToLive">
 		<execute function="AssertClickNoError#assertPartialTextClickAt" locator1="Button#SUBMIT" value1="Publish" />
 
-		<execute function="AssertTextEquals" locator1="Message#INFO" value1="There is currently 1 process in progress." />
+		<execute function="AssertTextEquals#assertPartialText" locator1="Message#INFO" value1="There is currently 1 process in progress" />
 
 		<execute function="SelectFrameTop" value1="relative=top" />
 
@@ -853,6 +866,8 @@
 				<execute function="AssertClick#assertTextClickAtClickDockbar" locator1="Staging#STAGING_DROP_DOWN_BUTTON" value1="Staging" />
 			</then>
 		</if>
+
+		<execute function="Click" locator1="Icon#HISTORY_VERTICAL_ELLIPSIS" />
 
 		<execute function="Click" locator1="Staging#HISTORY_BUTTON" />
 

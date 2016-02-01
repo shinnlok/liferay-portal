@@ -2,14 +2,7 @@
 	<property name="testray.main.component.name" value="Navigation" />
 
 	<set-up>
-		<var method="TestPropsUtil#get('test.portal.instance')" name="testPortalInstance" />
-
-		<if>
-			<equals arg1="${testPortalInstance}" arg2="true" />
-			<then>
-				<execute macro="SignIn#signInPortalInstanceSetUp" />
-			</then>
-		</if>
+		<execute macro="TestCase#setUpPortalInstance" />
 
 		<execute macro="User#firstLoginPG" />
 	</set-up>
@@ -130,8 +123,12 @@
 			<var name="siteURL" value="true" />
 		</execute>
 
+		<execute macro="TestCase#getDefaultSiteName">
+			<return from="defaultSiteName" name="defaultSiteName" />
+		</execute>
+
 		<execute macro="SitesDirectory#viewDescriptivePG">
-			<var name="siteName" value="Liferay" />
+			<var name="siteName" value="${defaultSiteName}" />
 		</execute>
 
 		<execute macro="SitesDirectory#viewDescriptivePG">

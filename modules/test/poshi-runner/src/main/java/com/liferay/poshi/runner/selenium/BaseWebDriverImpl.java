@@ -251,7 +251,7 @@ public abstract class BaseWebDriverImpl
 	}
 
 	@Override
-	public void assertLocation(String pattern) {
+	public void assertLocation(String pattern) throws Exception {
 		LiferaySeleniumHelper.assertLocation(this, pattern);
 	}
 
@@ -281,7 +281,7 @@ public abstract class BaseWebDriverImpl
 	}
 
 	@Override
-	public void assertNotLocation(String pattern) {
+	public void assertNotLocation(String pattern) throws Exception {
 		LiferaySeleniumHelper.assertNotLocation(this, pattern);
 	}
 
@@ -1037,7 +1037,7 @@ public abstract class BaseWebDriverImpl
 	}
 
 	@Override
-	public String getLocation() {
+	public String getLocation() throws Exception {
 		return WebDriverHelper.getLocation(this);
 	}
 
@@ -1341,6 +1341,11 @@ public abstract class BaseWebDriverImpl
 	@Override
 	public boolean isTCatEnabled() {
 		return LiferaySeleniumHelper.isTCatEnabled();
+	}
+
+	@Override
+	public boolean isTestName(String testName) {
+		return LiferaySeleniumHelper.isTestName(testName);
 	}
 
 	@Override
@@ -1974,6 +1979,7 @@ public abstract class BaseWebDriverImpl
 	public void setDefaultTimeout() {
 	}
 
+	@Override
 	public void setDefaultTimeoutImplicit() {
 		WebDriverHelper.setDefaultTimeoutImplicit(this);
 	}
@@ -2002,6 +2008,7 @@ public abstract class BaseWebDriverImpl
 	public void setTimeout(String timeout) {
 	}
 
+	@Override
 	public void setTimeoutImplicit(String timeout) {
 		WebDriverHelper.setTimeoutImplicit(this, timeout);
 	}

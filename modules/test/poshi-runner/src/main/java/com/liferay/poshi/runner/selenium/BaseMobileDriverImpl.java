@@ -177,7 +177,7 @@ public abstract class BaseMobileDriverImpl
 	}
 
 	@Override
-	public void assertLocation(String pattern) {
+	public void assertLocation(String pattern) throws Exception {
 		LiferaySeleniumHelper.assertLocation(this, pattern);
 	}
 
@@ -708,7 +708,7 @@ public abstract class BaseMobileDriverImpl
 	}
 
 	@Override
-	public String getLocation() {
+	public String getLocation() throws Exception {
 		return WebDriverHelper.getLocation(this);
 	}
 
@@ -1019,6 +1019,11 @@ public abstract class BaseMobileDriverImpl
 	@Override
 	public boolean isTCatEnabled() {
 		return LiferaySeleniumHelper.isTCatEnabled();
+	}
+
+	@Override
+	public boolean isTestName(String testName) {
+		return LiferaySeleniumHelper.isTestName(testName);
 	}
 
 	@Override
@@ -1386,6 +1391,7 @@ public abstract class BaseMobileDriverImpl
 	public void setDefaultTimeout() {
 	}
 
+	@Override
 	public void setDefaultTimeoutImplicit() {
 		WebDriverHelper.setDefaultTimeoutImplicit(this);
 	}

@@ -5,14 +5,7 @@
 	<var name="portletName" value="Message Boards" />
 
 	<set-up>
-		<var method="TestPropsUtil#get('test.portal.instance')" name="testPortalInstance" />
-
-		<if>
-			<equals arg1="${testPortalInstance}" arg2="true" />
-			<then>
-				<execute macro="SignIn#signInPortalInstanceSetUp" />
-			</then>
-		</if>
+		<execute macro="TestCase#setUpPortalInstance" />
 
 		<execute macro="User#firstLoginPG" />
 
@@ -25,6 +18,12 @@
 		</execute>
 
 		<execute macro="Portlet#addPG">
+			<var name="portletName" value="${portletName}" />
+		</execute>
+
+		<execute macro="Portlet#dragAndDropPortletToColumnPG">
+			<var name="columnNumberFrom" value="1" />
+			<var name="columnNumberTo" value="2" />
 			<var name="portletName" value="${portletName}" />
 		</execute>
 
@@ -54,6 +53,8 @@
 	</tear-down>
 
 	<command name="AddMBCategories" priority="5">
+		<property name="portal.acceptance" value="true" />
+
 		<var name="categoryNameList" value="MB Category1 Name,MB Category2 Name,MB Category3 Name" />
 
 		<for list="${categoryNameList}" param="categoryName" >
@@ -626,6 +627,8 @@
 	</command>
 
 	<command name="DeleteMBCategory" priority="5">
+		<property name="portal.acceptance" value="true" />
+
 		<var name="categoryName" value="MB Category Name" />
 
 		<execute macro="Page#gotoPG">
@@ -648,6 +651,8 @@
 	</command>
 
 	<command name="DeleteMBThread" priority="5">
+		<property name="portal.acceptance" value="true" />
+
 		<var name="threadBody" value="MB Thread Message Body" />
 		<var name="threadSubject" value="MB Thread Message Subject" />
 
@@ -670,6 +675,8 @@
 	</command>
 
 	<command name="EditMBCategory" priority="5">
+		<property name="portal.acceptance" value="true" />
+
 		<execute macro="Page#gotoPG">
 			<var name="pageName" value="${pageName}" />
 		</execute>

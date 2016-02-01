@@ -111,7 +111,7 @@ ManifestSummary manifestSummary = ExportImportHelperUtil.getManifestSummary(user
 
 <aui:form action="<%= importPagesURL %>" cssClass="lfr-export-dialog" method="post" name="fm1">
 	<portlet:renderURL var="portletURL">
-		<portlet:param name="mvcRenderCommandName" value="viewImport" />
+		<portlet:param name="mvcRenderCommandName" value="importLayoutsView" />
 		<portlet:param name="groupId" value="<%= String.valueOf(groupId) %>" />
 		<portlet:param name="privateLayout" value="<%= String.valueOf(privateLayout) %>" />
 	</portlet:renderURL>
@@ -352,21 +352,7 @@ ManifestSummary manifestSummary = ExportImportHelperUtil.getManifestSummary(user
 				<liferay-staging:deletions cmd="<%= Constants.IMPORT %>" />
 
 				<aui:fieldset collapsible="<%= true %>" cssClass="options-group" label="permissions">
-					<ul class="lfr-tree list-unstyled">
-						<li class="tree-item">
-							<aui:input label="permissions" name="<%= PortletDataHandlerKeys.PERMISSIONS %>" type="toggle-switch" />
-
-							<ul id="<portlet:namespace />selectPermissions">
-								<li class="tree-item">
-									<aui:input label="permissions-assigned-to-roles" name="permissionsAssignedToRoles" type="toggle-switch" value="<%= true %>" />
-								</li>
-							</ul>
-
-							<aui:script>
-								Liferay.Util.toggleBoxes('<portlet:namespace /><%= PortletDataHandlerKeys.PERMISSIONS %>', '<portlet:namespace />selectPermissions');
-							</aui:script>
-						</li>
-					</ul>
+					<aui:input label="permissions" name="<%= PortletDataHandlerKeys.PERMISSIONS %>" type="toggle-switch" />
 				</aui:fieldset>
 			</aui:fieldset-group>
 

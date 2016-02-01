@@ -14,6 +14,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>BACK</td>
+	<td>//a[contains(.,'Back')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>CHANGE_EMAIL_ADDRESS</td>
 	<td>//div/a[contains(.,'Change Email Address')]</td>
 	<td></td>
@@ -26,6 +31,11 @@
 <tr>
 	<td>DETAILS</td>
 	<td>//a[contains(.,'Details')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DOWNLOAD</td>
+	<td>//a[contains(@class,'taglib-icon')]/span[contains(@class,'taglib-text') and contains(.,'Download')]</td>
 	<td></td>
 </tr>
 <tr>

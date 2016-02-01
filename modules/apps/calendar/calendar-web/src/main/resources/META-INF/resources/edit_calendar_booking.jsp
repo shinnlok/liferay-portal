@@ -184,6 +184,16 @@ for (long otherCalendarId : otherCalendarIds) {
 		manageableCalendars.add(otherCalendar);
 	}
 }
+
+Iterator<Calendar> manageableCalendarsIterator = manageableCalendars.iterator();
+
+while (manageableCalendarsIterator.hasNext()) {
+	Calendar curCalendar = manageableCalendarsIterator.next();
+
+	if (!CalendarServiceUtil.isManageableFromGroup(curCalendar.getCalendarId(), themeDisplay.getScopeGroupId())) {
+		manageableCalendarsIterator.remove();
+	}
+}
 %>
 
 <liferay-portlet:actionURL name="updateCalendarBooking" var="updateCalendarBookingURL" />
@@ -398,10 +408,6 @@ for (long otherCalendarId : otherCalendarIds) {
 <aui:script>
 	function <portlet:namespace />filterCalendarBookings(calendarBooking) {
 		return <%= calendarBookingId %> !== calendarBooking.calendarBookingId;
-	}
-
-	function <portlet:namespace />getSuggestionsContent() {
-		return document.<portlet:namespace />fm.<portlet:namespace />title.value + ' ' + window.<portlet:namespace />description.getHTML();
 	}
 
 	function <portlet:namespace />resolver(data) {

@@ -17,6 +17,7 @@ package com.liferay.dynamic.data.lists.web.portlet.action;
 import com.liferay.dynamic.data.lists.constants.DDLPortletKeys;
 import com.liferay.dynamic.data.lists.model.DDLRecord;
 import com.liferay.dynamic.data.lists.service.DDLRecordService;
+import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.service.ServiceContext;
@@ -40,7 +41,7 @@ import org.osgi.service.component.annotations.Reference;
 	},
 	service = MVCActionCommand.class
 )
-public class RevertRecordMVCActionCommand extends AddRecordMVCActionCommand {
+public class RevertRecordMVCActionCommand extends BaseMVCActionCommand {
 
 	@Override
 	protected void doProcessAction(

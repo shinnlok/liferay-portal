@@ -2,14 +2,7 @@
 	<property name="testray.main.component.name" value="XSL" />
 
 	<set-up>
-		<var method="TestPropsUtil#get('test.portal.instance')" name="testPortalInstance" />
-
-		<if>
-			<equals arg1="${testPortalInstance}" arg2="true" />
-			<then>
-				<execute macro="SignIn#signInPortalInstanceSetUp" />
-			</then>
-		</if>
+		<execute macro="TestCase#setUpPortalInstance" />
 
 		<execute macro="User#firstLoginPG" />
 
@@ -91,6 +84,8 @@
 			<var name="roleList" value="Guest" />
 		</execute>
 
+		<execute macro="IFrame#selectTopFrame" />
+
 		<execute macro="ProductMenu#gotoSite">
 			<var name="site" value="Site Name" />
 		</execute>
@@ -114,6 +109,8 @@
 			<var name="roleList" value="Guest" />
 		</execute>
 
+		<execute macro="IFrame#selectTopFrame" />
+
 		<execute macro="ProductMenu#gotoSite">
 			<var name="site" value="Site Name" />
 		</execute>
@@ -125,7 +122,7 @@
 		<var name="key_dmDocumentTitle" value="Test XML Title" />
 
 		<execute function="AssertClick" locator1="DocumentsAndMedia#ICON_DOCUMENT_TITLE" value1="Test XML Title" />
-		<execute function="ClickNoError" locator1="CPDocumentsandmediaDocument#DOCUMENT_INFO_URL_LINK" />
+		<execute function="ClickNoError" locator1="DocumentsAndMediaDocument#DOCUMENT_INFO_URL_LINK" />
 
 		<execute function="Pause" locator1="5000" />
 
@@ -148,7 +145,7 @@
 		<var name="key_dmDocumentTitle" value="Test XSL Title" />
 
 		<execute function="AssertClick" locator1="DocumentsAndMedia#ICON_DOCUMENT_TITLE" value1="Test XSL Title" />
-		<execute function="ClickNoError" locator1="CPDocumentsandmediaDocument#DOCUMENT_INFO_URL_LINK" />
+		<execute function="ClickNoError" locator1="DocumentsAndMediaDocument#DOCUMENT_INFO_URL_LINK" />
 
 		<execute function="Pause" locator1="5000" />
 
@@ -176,7 +173,8 @@
 		<execute function="Type" locator1="TextInput#SETUP_XSL_URL" value1="@portal_url@/${xslURL}" />
 
 		<execute function="Click" locator1="Button#SAVE" />
-		<execute function="AssertTextEquals#assertPartialText" locator1="Message#SUCCESS" value1="You have successfully updated the setup." />
+
+		<execute macro="Alert#viewSetupUpdatedSuccessMessage" />
 
 		<execute function="SelectFrameTop" value1="relative=top" />
 
@@ -227,6 +225,8 @@
 			<var name="roleList" value="Guest" />
 		</execute>
 
+		<execute macro="IFrame#selectTopFrame" />
+
 		<execute macro="ProductMenu#gotoSite">
 			<var name="site" value="Site Name" />
 		</execute>
@@ -250,6 +250,8 @@
 			<var name="roleList" value="Guest" />
 		</execute>
 
+		<execute macro="IFrame#selectTopFrame" />
+
 		<execute macro="ProductMenu#gotoSite">
 			<var name="site" value="Site Name" />
 		</execute>
@@ -261,7 +263,7 @@
 		<var name="key_dmDocumentTitle" value="Test Corrupt XML Title" />
 
 		<execute function="AssertClick" locator1="DocumentsAndMedia#ICON_DOCUMENT_TITLE" value1="Test Corrupt XML Title" />
-		<execute function="ClickNoError" locator1="CPDocumentsandmediaDocument#DOCUMENT_INFO_URL_LINK" />
+		<execute function="ClickNoError" locator1="DocumentsAndMediaDocument#DOCUMENT_INFO_URL_LINK" />
 
 		<execute function="Pause" locator1="5000" />
 
@@ -284,7 +286,7 @@
 		<var name="key_dmDocumentTitle" value="Test XSL Title" />
 
 		<execute function="AssertClick" locator1="DocumentsAndMedia#ICON_DOCUMENT_TITLE" value1="Test XSL Title" />
-		<execute function="ClickNoError" locator1="CPDocumentsandmediaDocument#DOCUMENT_INFO_URL_LINK" />
+		<execute function="ClickNoError" locator1="DocumentsAndMediaDocument#DOCUMENT_INFO_URL_LINK" />
 
 		<execute function="Pause" locator1="5000" />
 
@@ -312,7 +314,8 @@
 		<execute function="Type" locator1="TextInput#SETUP_XSL_URL" value1="@portal_url@/${xslURL}" />
 
 		<execute function="Click" locator1="Button#SAVE" />
-		<execute function="AssertTextEquals#assertPartialText" locator1="Message#SUCCESS" value1="You have successfully updated the setup." />
+
+		<execute macro="Alert#viewSetupUpdatedSuccessMessage" />
 
 		<execute function="SelectFrameTop" value1="relative=top" />
 
@@ -351,6 +354,8 @@
 			<var name="roleList" value="Guest" />
 		</execute>
 
+		<execute macro="IFrame#selectTopFrame" />
+
 		<execute macro="ProductMenu#gotoSite">
 			<var name="site" value="Site Name" />
 		</execute>
@@ -374,6 +379,8 @@
 			<var name="roleList" value="Guest" />
 		</execute>
 
+		<execute macro="IFrame#selectTopFrame" />
+
 		<execute macro="ProductMenu#gotoSite">
 			<var name="site" value="Site Name" />
 		</execute>
@@ -385,7 +392,7 @@
 		<var name="key_dmDocumentTitle" value="Test XML Title" />
 
 		<execute function="AssertClick" locator1="DocumentsAndMedia#ICON_DOCUMENT_TITLE" value1="Test XML Title" />
-		<execute function="ClickNoError" locator1="CPDocumentsandmediaDocument#DOCUMENT_INFO_URL_LINK" />
+		<execute function="ClickNoError" locator1="DocumentsAndMediaDocument#DOCUMENT_INFO_URL_LINK" />
 
 		<execute function="Pause" locator1="5000" />
 
@@ -408,7 +415,7 @@
 		<var name="key_dmDocumentTitle" value="Test Corrupt XSL Title" />
 
 		<execute function="AssertClick" locator1="DocumentsAndMedia#ICON_DOCUMENT_TITLE" value1="Test Corrupt XSL Title" />
-		<execute function="ClickNoError" locator1="CPDocumentsandmediaDocument#DOCUMENT_INFO_URL_LINK" />
+		<execute function="ClickNoError" locator1="DocumentsAndMediaDocument#DOCUMENT_INFO_URL_LINK" />
 
 		<execute function="Pause" locator1="5000" />
 
@@ -436,7 +443,8 @@
 		<execute function="Type" locator1="TextInput#SETUP_XSL_URL" value1="@portal_url@/${xslURL}" />
 
 		<execute function="Click" locator1="Button#SAVE" />
-		<execute function="AssertTextEquals#assertPartialText" locator1="Message#SUCCESS" value1="You have successfully updated the setup." />
+
+		<execute macro="Alert#viewSetupUpdatedSuccessMessage" />
 
 		<execute function="SelectFrameTop" value1="relative=top" />
 
@@ -473,6 +481,8 @@
 			<var name="roleList" value="Guest" />
 		</execute>
 
+		<execute macro="IFrame#selectTopFrame" />
+
 		<execute macro="ProductMenu#gotoSite">
 			<var name="site" value="Site Name" />
 		</execute>
@@ -507,7 +517,7 @@
 		<var name="key_dmDocumentTitle" value="Test XML Title" />
 
 		<execute function="AssertClick" locator1="DocumentsAndMedia#ICON_DOCUMENT_TITLE" value1="Test XML Title" />
-		<execute function="ClickNoError" locator1="CPDocumentsandmediaDocument#DOCUMENT_INFO_URL_LINK" />
+		<execute function="ClickNoError" locator1="DocumentsAndMediaDocument#DOCUMENT_INFO_URL_LINK" />
 
 		<execute function="Pause" locator1="5000" />
 
@@ -530,7 +540,7 @@
 		<var name="key_dmDocumentTitle" value="Test XSL Title" />
 
 		<execute function="AssertClick" locator1="DocumentsAndMedia#ICON_DOCUMENT_TITLE" value1="Test XSL Title" />
-		<execute function="ClickNoError" locator1="CPDocumentsandmediaDocument#DOCUMENT_INFO_URL_LINK" />
+		<execute function="ClickNoError" locator1="DocumentsAndMediaDocument#DOCUMENT_INFO_URL_LINK" />
 
 		<execute function="Pause" locator1="5000" />
 
@@ -558,7 +568,8 @@
 		<execute function="Type" locator1="TextInput#SETUP_XSL_URL" value1="@portal_url@/${xslURL}" />
 
 		<execute function="Click" locator1="Button#SAVE" />
-		<execute function="AssertTextEquals#assertPartialText" locator1="Message#SUCCESS" value1="You have successfully updated the setup." />
+
+		<execute macro="Alert#viewSetupUpdatedSuccessMessage" />
 
 		<execute function="SelectFrameTop" value1="relative=top" />
 

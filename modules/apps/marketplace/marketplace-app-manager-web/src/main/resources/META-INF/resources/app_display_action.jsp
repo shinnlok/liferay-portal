@@ -28,6 +28,18 @@ String bundleIds = _getBundleIds(appDisplay);
 %>
 
 <liferay-ui:icon-menu direction="left-side" icon="<%= StringPool.BLANK %>" markupView="lexicon" message="<%= StringPool.BLANK %>" showWhenSingleIcon="<%= true %>">
+
+	<%
+	String storeURL = appDisplay.getStoreURL(request);
+	%>
+
+	<c:if test="<%= Validator.isNotNull(storeURL) %>">
+		<liferay-ui:icon
+			message="go-to-marketplace"
+			url="<%= storeURL %>"
+		/>
+	</c:if>
+
 	<c:choose>
 		<c:when test="<%= appDisplay.getState() == BundleStateConstants.ACTIVE %>">
 			<portlet:actionURL name="deactivateBundles" var="deactivateBundlesURL">
@@ -35,9 +47,13 @@ String bundleIds = _getBundleIds(appDisplay);
 				<portlet:param name="bundleIds" value="<%= bundleIds %>" />
 			</portlet:actionURL>
 
+			<%
+			String taglibDeactivateBundlesURL = "javascript:if (confirm(\'" + UnicodeLanguageUtil.get(request, "are-you-sure-you-want-to-deactivate-this") + "\')) {submitForm(document.hrefFm, \'" + HtmlUtil.unescape(deactivateBundlesURL.toString()) + "\');};";
+			%>
+
 			<liferay-ui:icon
 				message="deactivate"
-				url="<%= deactivateBundlesURL %>"
+				url="<%= taglibDeactivateBundlesURL %>"
 			/>
 		</c:when>
 		<c:otherwise>

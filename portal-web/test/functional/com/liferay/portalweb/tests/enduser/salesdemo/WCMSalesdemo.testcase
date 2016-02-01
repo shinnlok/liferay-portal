@@ -2,14 +2,7 @@
 	<property name="testray.main.component.name" value="Web Content Display" />
 
 	<set-up>
-		<var method="TestPropsUtil#get('test.portal.instance')" name="testPortalInstance" />
-
-		<if>
-			<equals arg1="${testPortalInstance}" arg2="true" />
-			<then>
-				<execute macro="SignIn#signInPortalInstanceSetUp" />
-			</then>
-		</if>
+		<execute macro="TestCase#setUpPortalInstance" />
 
 		<execute macro="User#firstLoginPG" />
 	</set-up>
@@ -86,7 +79,7 @@
 
 		<execute macro="WebContent#publish" />
 
-		<execute macro="Page#openURL" />
+		<execute macro="Navigator#openURL" />
 
 		<execute macro="Page#editPageLayoutColumn">
 			<var name="columnName" value="2_columns_i" />
@@ -151,7 +144,7 @@
 			<var name="deviceType" value="tablet" />
 		</execute>
 
-		<execute macro="Page#openURL" />
+		<execute macro="Navigator#openURL" />
 
 		<execute macro="MobileDevice#previewPG">
 			<var name="deviceType" value="smartphone" />

@@ -18,12 +18,11 @@ import com.liferay.control.menu.BaseJSPControlMenuEntry;
 import com.liferay.control.menu.ControlMenuEntry;
 import com.liferay.control.menu.constants.ControlMenuCategoryKeys;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.LayoutTypeController;
 import com.liferay.portal.model.LayoutTypePortlet;
-import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.service.permission.LayoutPermissionUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 
@@ -48,7 +47,7 @@ public class AddContentControlMenuEntry
 	extends BaseJSPControlMenuEntry implements ControlMenuEntry {
 
 	@Override
-	public String getJspPath() {
+	public String getIconJspPath() {
 		return "/entries/add_content.jsp";
 	}
 
@@ -101,12 +100,6 @@ public class AddContentControlMenuEntry
 
 	protected boolean hasAddContentOrApplicationPermission(
 		ThemeDisplay themeDisplay) {
-
-		Group group = themeDisplay.getScopeGroup();
-
-		if (group.isLayoutPrototype()) {
-			return false;
-		}
 
 		Layout layout = themeDisplay.getLayout();
 
