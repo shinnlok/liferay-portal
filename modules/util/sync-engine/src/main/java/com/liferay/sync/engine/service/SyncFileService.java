@@ -528,6 +528,28 @@ public class SyncFileService {
 		}
 	}
 
+	public static boolean hasSyncFiles(
+		long repositoryId, int state, long syncAccountId) {
+
+		try {
+			SyncFile syncFile = _syncFilePersistence.fetchByR_S_S_First(
+				repositoryId, state, syncAccountId);
+
+			if (syncFile == null) {
+				return false;
+			}
+
+			return true;
+		}
+		catch (SQLException sqle) {
+			if (_logger.isDebugEnabled()) {
+				_logger.debug(sqle.getMessage(), sqle);
+			}
+
+			return false;
+		}
+	}
+
 	public static boolean hasSyncFiles(String parentFilePathName, int state) {
 		try {
 			SyncFile syncFile = _syncFilePersistence.fetchByPF_S_First(
