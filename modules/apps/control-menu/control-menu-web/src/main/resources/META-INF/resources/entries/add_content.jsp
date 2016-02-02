@@ -23,7 +23,6 @@ PortletURL addURL = PortletURLFactoryUtil.create(request, ControlMenuPortletKeys
 
 addURL.setParameter("mvcPath", "/add_panel.jsp");
 addURL.setParameter("stateMaximized", String.valueOf(themeDisplay.isStateMaximized()));
-addURL.setParameter("viewAssetEntries", Boolean.TRUE.toString());
 addURL.setWindowState(LiferayWindowState.EXCLUSIVE);
 
 data.put("panelURL", addURL);
@@ -31,13 +30,15 @@ data.put("panelURL", addURL);
 data.put("qa-id", "add");
 %>
 
-<liferay-ui:icon
-	data="<%= data %>"
-	icon="plus"
-	id="addPanel"
-	label="<%= false %>"
-	linkCssClass="control-menu-icon"
-	markupView="lexicon"
-	message="add"
-	url="javascript:;"
-/>
+<li class="control-menu-nav-item">
+	<liferay-ui:icon
+		data="<%= data %>"
+		icon="plus"
+		id="addPanel"
+		label="<%= false %>"
+		linkCssClass="control-menu-icon"
+		markupView="lexicon"
+		message="add"
+		url="javascript:;"
+	/>
+</li>

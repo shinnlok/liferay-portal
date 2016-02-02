@@ -12,7 +12,11 @@
 	</command>
 
 	<command name="gotoAddCurrentSiteCalendars">
-		<var name="key_siteName" value="${siteName}" />
+		<execute macro="TestCase#getDefaultSiteName">
+			<return from="defaultSiteName" name="defaultSiteName" />
+		</execute>
+
+		<var name="key_siteName" value="${defaultSiteName}" />
 
 		<execute function="Click" locator1="Calendar#CURRENT_SITE_CALENDARS_MENULIST_ARROW" />
 
@@ -63,7 +67,7 @@
 	</command>
 
 	<command name="gotoAddEventViaAssetPublisher">
-		<execute function="AssertClick" locator1="AP#ADD_NEW_DROPDOWN" value1="Add New" />
+		<execute function="Click#makeVisibleClickAt" locator1="AP#ADD_ASSET_PLUS_ICON" />
 
 		<execute function="AssertClick" locator1="MenuItem#CALENDAR_EVENT" value1="Calendar Event" />
 
@@ -107,7 +111,11 @@
 	</command>
 
 	<command name="gotoCurrentSiteCalendarsManage">
-		<var name="key_siteName" value="${siteName}" />
+		<execute macro="TestCase#getDefaultSiteName">
+			<return from="defaultSiteName" name="defaultSiteName" />
+		</execute>
+
+		<var name="key_siteName" value="${defaultSiteName}" />
 
 		<execute function="Click" locator1="Calendar#CURRENT_SITE_CALENDARS_MENULIST_ARROW" />
 
@@ -128,9 +136,7 @@
 			<var name="eventTitle" value="${eventTitle}" />
 		</execute>
 
-		<execute function="AssertClick" locator1="Calendar#SCHEDULER_EVENT_DIALOG_BOX_EDIT_BUTTON" value1="Edit" />
-
-		<execute function="SelectFrame" locator1="CalendarEditEvent#EDIT_EVENT_IFRAME" />
+		<execute macro="CalendarScheduler#gotoEditViaDialogBox" />
 	</command>
 
 	<command name="gotoEventDetails">
@@ -225,6 +231,10 @@
 		<execute macro="CalendarNavigator#gotoView">
 			<var name="viewType" value="Day" />
 		</execute>
+	</command>
+
+	<command name="gotoToday">
+		<execute function="AssertClick" locator1="Calendar#VIEW_TODAY_BUTTON" value1="Today" />
 	</command>
 
 	<command name="gotoView">

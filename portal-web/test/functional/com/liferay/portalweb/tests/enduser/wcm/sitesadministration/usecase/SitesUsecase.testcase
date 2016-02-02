@@ -4,14 +4,7 @@
 	<var name="globalSiteName" value="Global" />
 
 	<set-up>
-		<var method="TestPropsUtil#get('test.portal.instance')" name="testPortalInstance" />
-
-		<if>
-			<equals arg1="${testPortalInstance}" arg2="true" />
-			<then>
-				<execute macro="SignIn#signInPortalInstanceSetUp" />
-			</then>
-		</if>
+		<execute macro="TestCase#setUpPortalInstance" />
 
 		<execute macro="User#firstLoginPG" />
 	</set-up>
@@ -71,10 +64,8 @@
 			<var name="pageTranslationName" value="Casa" />
 		</execute>
 
-		<execute macro="Page#openURL">
-			<var name="pageName" value="Home" />
+		<execute macro="Navigator#openSiteURL">
 			<var name="siteName" value="Site Name" />
-			<var name="siteURL" value="true" />
 		</execute>
 
 		<execute macro="Page#viewTranslationsPG">
@@ -106,10 +97,8 @@
 			<var name="pageTranslationName" value="Blog Página" />
 		</execute>
 
-		<execute macro="Page#openURL">
-			<var name="pageName" value="Blog Page" />
+		<execute macro="Navigator#openSiteURL">
 			<var name="siteName" value="Site Name" />
-			<var name="siteURL" value="true" />
 		</execute>
 
 		<execute macro="Page#viewTranslationsPG">
@@ -129,10 +118,8 @@
 			<var name="siteName" value="Site Name" />
 		</execute>
 
-		<execute macro="Page#openURL">
-			<var name="pageName" value="Home" />
+		<execute macro="Navigator#openSiteURL">
 			<var name="siteName" value="Site Name" />
-			<var name="siteURL" value="true" />
 		</execute>
 
 		<execute macro="PermissionsInline#gotoConfigurationPG" >
@@ -143,10 +130,8 @@
 			<var name="roleList" value="Guest,Owner,Power User,Site Member,User" />
 		</execute>
 
-		<execute macro="Page#openURL">
-			<var name="pageName" value="Home" />
+		<execute macro="Navigator#openSiteURL">
 			<var name="siteName" value="Site Name" />
-			<var name="siteURL" value="true" />
 		</execute>
 
 		<execute macro="PermissionsInline#gotoConfigurationPG" >
@@ -157,10 +142,8 @@
 			<var name="roleList" value="Guest,Owner,Power User,Site Member,User" />
 		</execute>
 
-		<execute macro="Page#openURL">
-			<var name="pageName" value="Home" />
+		<execute macro="Navigator#openSiteURL">
 			<var name="siteName" value="Site Name" />
-			<var name="siteURL" value="true" />
 		</execute>
 
 		<execute macro="Portlet#addPG">
@@ -178,10 +161,8 @@
 		<execute function="AssertTextEquals#assertPartialText" locator1="Message#CUSTOMIZED_PAGE_INFO" value1="This page has been changed since the last update from the site template." />
 		<execute function="AssertClick" locator1="Button#RESET_CHANGES" value1="Reset Changes" />
 
-		<execute macro="Page#openURL">
-			<var name="pageName" value="Home" />
+		<execute macro="Navigator#openSiteURL">
 			<var name="siteName" value="Site Name" />
-			<var name="siteURL" value="true" />
 		</execute>
 
 		<execute macro="Portlet#viewNoSpecificPG">
@@ -196,10 +177,8 @@
 			<var name="roleList" value="Guest,Owner,Power User,Site Member,User" />
 		</execute>
 
-		<execute macro="Page#openURL">
-			<var name="pageName" value="Home" />
+		<execute macro="Navigator#openSiteURL">
 			<var name="siteName" value="Site Name" />
-			<var name="siteURL" value="true" />
 		</execute>
 
 		<execute macro="Polls#addPollPG">
@@ -222,10 +201,8 @@
 			<var name="roleList" value="Guest,Owner,Power User,Site Member,User" />
 		</execute>
 
-		<execute macro="Page#openURL">
-			<var name="pageName" value="Home" />
+		<execute macro="Navigator#openSiteURL">
 			<var name="siteName" value="Site Name" />
-			<var name="siteURL" value="true" />
 		</execute>
 
 		<execute macro="MessageboardsThread#addPG">
@@ -233,10 +210,8 @@
 			<var name="threadSubject" value="Thread" />
 		</execute>
 
-		<execute macro="Page#openURL">
-			<var name="pageName" value="Home" />
+		<execute macro="Navigator#openSiteURL">
 			<var name="siteName" value="Site Name" />
-			<var name="siteURL" value="true" />
 		</execute>
 
 		<execute macro="MessageboardsThread#gotoPG">
@@ -301,10 +276,8 @@
 			<var name="roleList" value="Guest,Owner,Power User,Site Member,User" />
 		</execute>
 
-		<execute macro="Page#openURL">
-			<var name="pageName" value="Home" />
+		<execute macro="Navigator#openSiteURL">
 			<var name="siteName" value="Site Name" />
-			<var name="siteURL" value="true" />
 		</execute>
 
 		<execute macro="PermissionsInline#gotoConfigurationPG" >

@@ -19,16 +19,32 @@
 <%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
 
 <%@ taglib uri="http://liferay.com/tld/aui" prefix="aui" %><%@
+taglib uri="http://liferay.com/tld/frontend" prefix="liferay-frontend" %><%@
 taglib uri="http://liferay.com/tld/portlet" prefix="liferay-portlet" %><%@
 taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %><%@
 taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %><%@
 taglib uri="http://liferay.com/tld/util" prefix="liferay-util" %>
 
-<%@ page import="com.liferay.announcements.web.constants.AnnouncementsPortletKeys" %><%@
+<%@ page import="com.liferay.announcements.kernel.exception.EntryContentException" %><%@
+page import="com.liferay.announcements.kernel.exception.EntryDisplayDateException" %><%@
+page import="com.liferay.announcements.kernel.exception.EntryExpirationDateException" %><%@
+page import="com.liferay.announcements.kernel.exception.EntryTitleException" %><%@
+page import="com.liferay.announcements.kernel.exception.EntryURLException" %><%@
+page import="com.liferay.announcements.kernel.exception.NoSuchEntryException" %><%@
+page import="com.liferay.announcements.kernel.exception.NoSuchFlagException" %><%@
+page import="com.liferay.announcements.kernel.model.AnnouncementsEntry" %><%@
+page import="com.liferay.announcements.kernel.model.AnnouncementsEntryConstants" %><%@
+page import="com.liferay.announcements.kernel.model.AnnouncementsFlagConstants" %><%@
+page import="com.liferay.announcements.kernel.service.AnnouncementsEntryLocalServiceUtil" %><%@
+page import="com.liferay.announcements.kernel.service.AnnouncementsFlagLocalServiceUtil" %><%@
+page import="com.liferay.announcements.kernel.util.AnnouncementsUtil" %><%@
+page import="com.liferay.announcements.web.constants.AnnouncementsPortletKeys" %><%@
 page import="com.liferay.portal.kernel.bean.BeanParamUtil" %><%@
 page import="com.liferay.portal.kernel.dao.search.SearchContainer" %><%@
 page import="com.liferay.portal.kernel.language.LanguageUtil" %><%@
 page import="com.liferay.portal.kernel.language.UnicodeLanguageUtil" %><%@
+page import="com.liferay.portal.kernel.security.auth.PrincipalException" %><%@
+page import="com.liferay.portal.kernel.security.permission.ActionKeys" %><%@
 page import="com.liferay.portal.kernel.util.Constants" %><%@
 page import="com.liferay.portal.kernel.util.FastDateFormatFactoryUtil" %><%@
 page import="com.liferay.portal.kernel.util.GetterUtil" %><%@
@@ -47,8 +63,6 @@ page import="com.liferay.portal.model.Organization" %><%@
 page import="com.liferay.portal.model.Role" %><%@
 page import="com.liferay.portal.model.User" %><%@
 page import="com.liferay.portal.model.UserGroup" %><%@
-page import="com.liferay.portal.security.auth.PrincipalException" %><%@
-page import="com.liferay.portal.security.permission.ActionKeys" %><%@
 page import="com.liferay.portal.service.GroupLocalServiceUtil" %><%@
 page import="com.liferay.portal.service.OrganizationLocalServiceUtil" %><%@
 page import="com.liferay.portal.service.RoleLocalServiceUtil" %><%@
@@ -58,20 +72,7 @@ page import="com.liferay.portal.service.permission.PortalPermissionUtil" %><%@
 page import="com.liferay.portal.util.PortalUtil" %><%@
 page import="com.liferay.portal.util.PropsValues" %><%@
 page import="com.liferay.portlet.PortletURLUtil" %><%@
-page import="com.liferay.portlet.announcements.EntryContentException" %><%@
-page import="com.liferay.portlet.announcements.EntryDisplayDateException" %><%@
-page import="com.liferay.portlet.announcements.EntryExpirationDateException" %><%@
-page import="com.liferay.portlet.announcements.EntryTitleException" %><%@
-page import="com.liferay.portlet.announcements.EntryURLException" %><%@
-page import="com.liferay.portlet.announcements.NoSuchEntryException" %><%@
-page import="com.liferay.portlet.announcements.NoSuchFlagException" %><%@
-page import="com.liferay.portlet.announcements.model.AnnouncementsEntry" %><%@
-page import="com.liferay.portlet.announcements.model.AnnouncementsEntryConstants" %><%@
-page import="com.liferay.portlet.announcements.model.AnnouncementsFlagConstants" %><%@
-page import="com.liferay.portlet.announcements.service.AnnouncementsEntryLocalServiceUtil" %><%@
-page import="com.liferay.portlet.announcements.service.AnnouncementsFlagLocalServiceUtil" %><%@
 page import="com.liferay.portlet.announcements.service.permission.AnnouncementsEntryPermission" %><%@
-page import="com.liferay.portlet.announcements.util.AnnouncementsUtil" %><%@
 page import="com.liferay.taglib.search.ResultRow" %>
 
 <%@ page import="java.text.DateFormat" %><%@
@@ -84,17 +85,13 @@ page import="java.util.List" %>
 <%@ page import="javax.portlet.PortletURL" %><%@
 page import="javax.portlet.WindowState" %>
 
-<portlet:defineObjects />
+<liferay-frontend:defineObjects />
 
 <liferay-theme:defineObjects />
 
+<portlet:defineObjects />
+
 <%
-WindowState windowState = liferayPortletRequest.getWindowState();
-
-PortletURL currentURLObj = PortletURLUtil.getCurrent(liferayPortletRequest, liferayPortletResponse);
-
-String currentURL = currentURLObj.toString();
-
 Group scopeGroup = themeDisplay.getScopeGroup();
 
 boolean customizeAnnouncementsDisplayed = PrefsParamUtil.getBoolean(portletPreferences, request, "customizeAnnouncementsDisplayed", scopeGroup.isUser() ? false : true);

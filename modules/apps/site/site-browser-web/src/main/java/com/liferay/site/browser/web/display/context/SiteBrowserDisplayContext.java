@@ -17,6 +17,7 @@ package com.liferay.site.browser.web.display.context;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -26,14 +27,13 @@ import com.liferay.portal.model.Group;
 import com.liferay.portal.model.GroupConstants;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.User;
-import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portlet.sites.util.SitesUtil;
 import com.liferay.portlet.usersadmin.search.GroupSearch;
 import com.liferay.portlet.usersadmin.search.GroupSearchTerms;
+import com.liferay.sites.kernel.util.SitesUtil;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -55,6 +55,15 @@ public class SiteBrowserDisplayContext {
 		_request = request;
 		_liferayPortletRequest = liferayPortletRequest;
 		_liferayPortletResponse = liferayPortletResponse;
+	}
+
+	public String getDisplayStyle() {
+		if (_displayStyle == null) {
+			_displayStyle = ParamUtil.getString(
+				_request, "displayStyle", "list");
+		}
+
+		return _displayStyle;
 	}
 
 	public String getFilter() {
@@ -292,6 +301,7 @@ public class SiteBrowserDisplayContext {
 			"selectedGroupIds", StringUtil.merge(selectedGroupIds));
 		portletURL.setParameter("type", getType());
 		portletURL.setParameter("types", getTypes());
+		portletURL.setParameter("displayStyle", getDisplayStyle());
 		portletURL.setParameter("filter", getFilter());
 		portletURL.setParameter(
 			"includeCompany", String.valueOf(includeCompany));
@@ -399,6 +409,7 @@ public class SiteBrowserDisplayContext {
 		return filteredGroups;
 	}
 
+	private String _displayStyle;
 	private String _filter;
 	private Long _groupId;
 	private LinkedHashMap<String, Object> _groupParams;

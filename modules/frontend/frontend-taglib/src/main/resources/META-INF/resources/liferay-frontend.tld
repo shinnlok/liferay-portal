@@ -274,23 +274,6 @@
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 		<attribute>
-			<name>icon</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
-		<attribute>
-			<description>A CSS class for styling the card image</description>
-			<name>imageCSSClass</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
-		<attribute>
-			<description>A URL for the card's image</description>
-			<name>imageUrl</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
-		<attribute>
 			<description>If you pass in a <![CDATA[<code>rowChecker</code>]]> value, a result row is mandatory. A result row is of type <![CDATA[<code>com.liferay.portal.kernel.dao.search.ResultRow</code>]]>.</description>
 			<name>resultRow</name>
 			<required>false</required>
@@ -316,6 +299,21 @@
 		<attribute>
 			<description>A URL to view the full content</description>
 			<name>url</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+	<tag>
+		<name>horizontal-card-col</name>
+		<tag-class>com.liferay.frontend.taglib.servlet.taglib.HorizontalCardColTag</tag-class>
+		<body-content>JSP</body-content>
+	</tag>
+	<tag>
+		<name>horizontal-card-icon</name>
+		<tag-class>com.liferay.frontend.taglib.servlet.taglib.HorizontalCardIconTag</tag-class>
+		<body-content>JSP</body-content>
+		<attribute>
+			<name>icon</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
@@ -462,7 +460,7 @@
 		<tag-class>com.liferay.frontend.taglib.servlet.taglib.ManagementBarTag</tag-class>
 		<body-content>JSP</body-content>
 		<attribute>
-			<name>checkBoxDisabled</name>
+			<name>disabled</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
@@ -567,8 +565,13 @@
 		<tag-class>com.liferay.frontend.taglib.servlet.taglib.ManagementBarFilterTag</tag-class>
 		<body-content>JSP</body-content>
 		<attribute>
+			<name>disabled</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
 			<name>label</name>
-			<required>true</required>
+			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 		<attribute>
@@ -583,38 +586,8 @@
 		</attribute>
 	</tag>
 	<tag>
-		<name>management-bar-filters</name>
-		<tag-class>com.liferay.frontend.taglib.servlet.taglib.ManagementBarFiltersTag</tag-class>
-		<body-content>JSP</body-content>
-	</tag>
-	<tag>
-		<name>management-bar-navigation</name>
-		<tag-class>com.liferay.frontend.taglib.servlet.taglib.ManagementBarNavigationTag</tag-class>
-		<body-content>JSP</body-content>
-		<attribute>
-			<name>label</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
-		<attribute>
-			<name>navigationKeys</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
-		<attribute>
-			<name>navigationParam</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
-		<attribute>
-			<name>portletURL</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
-	</tag>
-	<tag>
-		<name>management-bar-navigation-item</name>
-		<tag-class>com.liferay.frontend.taglib.servlet.taglib.ManagementBarNavigationItemTag</tag-class>
+		<name>management-bar-filter-item</name>
+		<tag-class>com.liferay.frontend.taglib.servlet.taglib.ManagementBarFilterItemTag</tag-class>
 		<body-content>JSP</body-content>
 		<attribute>
 			<name>active</name>
@@ -638,9 +611,49 @@
 		</attribute>
 	</tag>
 	<tag>
+		<name>management-bar-filters</name>
+		<tag-class>com.liferay.frontend.taglib.servlet.taglib.ManagementBarFiltersTag</tag-class>
+		<body-content>JSP</body-content>
+	</tag>
+	<tag>
+		<name>management-bar-navigation</name>
+		<tag-class>com.liferay.frontend.taglib.servlet.taglib.ManagementBarNavigationTag</tag-class>
+		<body-content>JSP</body-content>
+		<attribute>
+			<name>disabled</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>label</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>navigationKeys</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>navigationParam</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>portletURL</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+	<tag>
 		<name>management-bar-sort</name>
 		<tag-class>com.liferay.frontend.taglib.servlet.taglib.ManagementBarSortTag</tag-class>
 		<body-content>JSP</body-content>
+		<attribute>
+			<name>disabled</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
 		<attribute>
 			<name>orderColumns</name>
 			<required>false</required>

@@ -16,7 +16,7 @@ package com.liferay.gradle.plugins;
 
 import com.liferay.gradle.plugins.alloy.taglib.AlloyTaglibPlugin;
 import com.liferay.gradle.plugins.alloy.taglib.BuildTaglibsTask;
-import com.liferay.gradle.util.GradleUtil;
+import com.liferay.gradle.plugins.util.GradleUtil;
 
 import org.gradle.api.Action;
 import org.gradle.api.Project;
@@ -71,8 +71,8 @@ public class AlloyTaglibDefaultsPlugin
 		super.addPortalToolDependencies(project);
 
 		GradleUtil.addDependency(
-			project, getPortalToolConfigurationName(), "com.liferay",
-			"org.freemarker", "2.3.17.LIFERAY-PATCHED-1");
+			project, getPortalToolConfigurationName(), "org.freemarker",
+			"freemarker", "2.3.23");
 	}
 
 	@Override

@@ -11,6 +11,11 @@ AUI.add(
 						value: true
 					},
 
+					icon: {
+						validator: Lang.isString,
+						value: 'info-circle'
+					},
+
 					message: {
 						validator: Lang.isString,
 						value: ''
@@ -37,7 +42,7 @@ AUI.add(
 
 					TPL_ALERTS_CONTAINER: '<div class="lfr-alert-container"></div>',
 
-					TPL_CONTENT: '<strong class="lead">{title}</strong>{message}',
+					TPL_CONTENT: '<strong class="lead"><svg class="lexicon-icon"><use xlink:href="{pathThemeImages}/lexicon/icons.svg#{icon}" /></svg> {title}</strong>{message}',
 
 					bindUI: function() {
 						var instance = this;
@@ -45,10 +50,10 @@ AUI.add(
 						var boundingBox = instance.get('boundingBox');
 
 						instance._eventHandles = [
-							instance.after(['messageChange', 'titleChange'], instance._updateBodyContent, instance),
+							instance.after(['iconChange', 'messageChange', 'titleChange'], instance._updateBodyContent, instance),
 							instance.after('typeChange', instance._afterTypeChange, instance),
 							boundingBox.on('mouseenter', instance._cancelHide, instance),
-							boundingBox.on('mouseleave', instance.hide, instance)
+							boundingBox.on('mouseleave', instance._onMouseLeave, instance)
 						];
 
 						Alert.superclass.bindUI.call(this);
@@ -153,6 +158,16 @@ AUI.add(
 						}
 					},
 
+					_onMouseLeave: function(event) {
+						var instance = this;
+
+						var delay = instance.get('delay');
+
+						if (delay.hide > 0) {
+							instance.hide();
+						}
+					},
+
 					_prepareTransition: function(visible) {
 						var instance = this;
 
@@ -203,7 +218,9 @@ AUI.add(
 						var bodyContent = Lang.sub(
 							instance.TPL_CONTENT,
 							{
+								icon: instance.get('icon'),
 								message: instance.get('message'),
+								pathThemeImages: themeDisplay.getPathThemeImages(),
 								title: instance.get('title') || ''
 							}
 						);
@@ -224,6 +241,6 @@ AUI.add(
 	},
 	'',
 	{
-		requires: ['aui-alert', 'event-mouseenter', 'liferay-portlet-base', 'timers']
+		requires: ['aui-alert', 'aui-component', 'event-mouseenter', 'liferay-portlet-base', 'timers']
 	}
 );

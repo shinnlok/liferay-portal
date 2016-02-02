@@ -212,7 +212,7 @@ public class ShoppingItemFieldPersistenceImpl extends BasePersistenceImpl<Shoppi
 
 			if (orderByComparator != null) {
 				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -280,7 +280,7 @@ public class ShoppingItemFieldPersistenceImpl extends BasePersistenceImpl<Shoppi
 	 * @param itemId the item ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching shopping item field
-	 * @throws com.liferay.shopping.NoSuchItemFieldException if a matching shopping item field could not be found
+	 * @throws NoSuchItemFieldException if a matching shopping item field could not be found
 	 */
 	@Override
 	public ShoppingItemField findByItemId_First(long itemId,
@@ -331,7 +331,7 @@ public class ShoppingItemFieldPersistenceImpl extends BasePersistenceImpl<Shoppi
 	 * @param itemId the item ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching shopping item field
-	 * @throws com.liferay.shopping.NoSuchItemFieldException if a matching shopping item field could not be found
+	 * @throws NoSuchItemFieldException if a matching shopping item field could not be found
 	 */
 	@Override
 	public ShoppingItemField findByItemId_Last(long itemId,
@@ -389,7 +389,7 @@ public class ShoppingItemFieldPersistenceImpl extends BasePersistenceImpl<Shoppi
 	 * @param itemId the item ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next shopping item field
-	 * @throws com.liferay.shopping.NoSuchItemFieldException if a shopping item field with the primary key could not be found
+	 * @throws NoSuchItemFieldException if a shopping item field with the primary key could not be found
 	 */
 	@Override
 	public ShoppingItemField[] findByItemId_PrevAndNext(long itemFieldId,
@@ -428,8 +428,9 @@ public class ShoppingItemFieldPersistenceImpl extends BasePersistenceImpl<Shoppi
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
 			query = new StringBundler(3);
@@ -697,7 +698,7 @@ public class ShoppingItemFieldPersistenceImpl extends BasePersistenceImpl<Shoppi
 	 *
 	 * @param itemFieldId the primary key of the shopping item field
 	 * @return the shopping item field that was removed
-	 * @throws com.liferay.shopping.NoSuchItemFieldException if a shopping item field with the primary key could not be found
+	 * @throws NoSuchItemFieldException if a shopping item field with the primary key could not be found
 	 */
 	@Override
 	public ShoppingItemField remove(long itemFieldId)
@@ -710,7 +711,7 @@ public class ShoppingItemFieldPersistenceImpl extends BasePersistenceImpl<Shoppi
 	 *
 	 * @param primaryKey the primary key of the shopping item field
 	 * @return the shopping item field that was removed
-	 * @throws com.liferay.shopping.NoSuchItemFieldException if a shopping item field with the primary key could not be found
+	 * @throws NoSuchItemFieldException if a shopping item field with the primary key could not be found
 	 */
 	@Override
 	public ShoppingItemField remove(Serializable primaryKey)
@@ -862,11 +863,11 @@ public class ShoppingItemFieldPersistenceImpl extends BasePersistenceImpl<Shoppi
 	}
 
 	/**
-	 * Returns the shopping item field with the primary key or throws a {@link com.liferay.portal.NoSuchModelException} if it could not be found.
+	 * Returns the shopping item field with the primary key or throws a {@link com.liferay.portal.exception.NoSuchModelException} if it could not be found.
 	 *
 	 * @param primaryKey the primary key of the shopping item field
 	 * @return the shopping item field
-	 * @throws com.liferay.shopping.NoSuchItemFieldException if a shopping item field with the primary key could not be found
+	 * @throws NoSuchItemFieldException if a shopping item field with the primary key could not be found
 	 */
 	@Override
 	public ShoppingItemField findByPrimaryKey(Serializable primaryKey)
@@ -886,11 +887,11 @@ public class ShoppingItemFieldPersistenceImpl extends BasePersistenceImpl<Shoppi
 	}
 
 	/**
-	 * Returns the shopping item field with the primary key or throws a {@link com.liferay.shopping.NoSuchItemFieldException} if it could not be found.
+	 * Returns the shopping item field with the primary key or throws a {@link NoSuchItemFieldException} if it could not be found.
 	 *
 	 * @param itemFieldId the primary key of the shopping item field
 	 * @return the shopping item field
-	 * @throws com.liferay.shopping.NoSuchItemFieldException if a shopping item field with the primary key could not be found
+	 * @throws NoSuchItemFieldException if a shopping item field with the primary key could not be found
 	 */
 	@Override
 	public ShoppingItemField findByPrimaryKey(long itemFieldId)
@@ -1138,7 +1139,7 @@ public class ShoppingItemFieldPersistenceImpl extends BasePersistenceImpl<Shoppi
 
 			if (orderByComparator != null) {
 				query = new StringBundler(2 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 
 				query.append(_SQL_SELECT_SHOPPINGITEMFIELD);
 

@@ -36,7 +36,7 @@
 </tr>
 <tr>
 	<td>NAVIGATION_MY_PROFILE</td>
-	<td>//a[contains(@title,'Profile')]//span/*[name()='svg'][contains(@class,'icon-cog')]</td>
+	<td>//a[contains(.,'My Profile') and contains(@data-qa-id,'goToPublicPages')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -143,7 +143,7 @@
 </tr>
 <tr>
 	<td>PAGE_TREE_PAGE_SPECIFIC_PAGE</td>
-	<td>//a[span[contains(.,'${key_sitePageName}')]]</td>
+	<td>//a[span[contains(.,'${key_page}')]]</td>
 	<td></td>
 </tr>
 <tr>
@@ -153,12 +153,12 @@
 </tr>
 <tr>
 	<td>PAGE_TREE_PAGE_LINK</td>
-	<td>//div[@class='list-group-item']//span/a[@title='${key_sitePageName}']</td>
+	<td>//div[@class='list-group-item']//span/a[@title='${key_page}']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>PAGE_TREE_PAGE_EDIT_COG</td>
-	<td>//span[a[contains(.,'${key_sitePageName}')]]//span/*[name()='svg'][contains(@class,'lexicon-icon-cog')]</td>
+	<td>//a[contains(@class,'tree-edit') and contains(.,'${key_page}')]</td>
 	<td></td>
 </tr>
 <tr>

@@ -19,6 +19,7 @@
 <%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
 
 <%@ taglib uri="http://liferay.com/tld/aui" prefix="aui" %><%@
+taglib uri="http://liferay.com/tld/frontend" prefix="liferay-frontend" %><%@
 taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %><%@
 taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %><%@
 taglib uri="http://liferay.com/tld/util" prefix="liferay-util" %>
@@ -59,12 +60,10 @@ page import="com.liferay.portal.model.impl.*" %><%@
 page import="com.liferay.portal.service.*" %><%@
 page import="com.liferay.portal.util.Portal" %><%@
 page import="com.liferay.portal.util.PortalUtil" %><%@
-page import="com.liferay.portal.util.PortletKeys" %><%@
 page import="com.liferay.portal.util.PrefsPropsUtil" %><%@
 page import="com.liferay.portal.util.PropsUtil" %><%@
 page import="com.liferay.portal.util.PropsValues" %><%@
 page import="com.liferay.portal.util.ShutdownUtil" %><%@
-page import="com.liferay.portlet.PortletURLUtil" %><%@
 page import="com.liferay.portlet.documentlibrary.model.DLFileEntry" %><%@
 page import="com.liferay.portlet.documentlibrary.model.DLFileVersion" %><%@
 page import="com.liferay.portlet.documentlibrary.service.DLFileEntryLocalServiceUtil" %><%@
@@ -93,39 +92,19 @@ page import="javax.portlet.WindowState" %>
 page import="org.apache.log4j.LogManager" %><%@
 page import="org.apache.log4j.Logger" %>
 
+<liferay-frontend:defineObjects />
+
 <liferay-theme:defineObjects />
 
 <portlet:defineObjects />
 
 <%
 PortletMode portletMode = liferayPortletRequest.getPortletMode();
-WindowState windowState = liferayPortletRequest.getWindowState();
-
-PortletURL currentURLObj = PortletURLUtil.getCurrent(liferayPortletRequest, liferayPortletResponse);
-
-String currentURL = currentURLObj.toString();
 %>
 
 <%
-String tabs1 = ParamUtil.getString(request, "tabs1", "server");
-
-boolean showTabs1 = false;
-
-if (portletName.equals(PortletKeys.ADMIN_PLUGINS)) {
-	tabs1 = "plugins";
-}
-else if (portletName.equals(PortletKeys.SERVER_ADMIN)) {
-	tabs1 = "server";
-}
-
+String tabs1 = ParamUtil.getString(request, "tabs1", "resources");
 String tabs2 = ParamUtil.getString(request, "tabs2");
-String tabs3 = ParamUtil.getString(request, "tabs3");
-
-if (tabs1.equals("plugins")) {
-	if (!tabs2.equals("portlet-plugins") && !tabs2.equals("theme-plugins") && !tabs2.equals("layout-template-plugins") && !tabs2.equals("hook-plugins") && !tabs2.equals("web-plugins")) {
-		tabs2 = "portlet-plugins";
-	}
-}
 
 NumberFormat numberFormat = NumberFormat.getInstance();
 

@@ -77,7 +77,7 @@ public interface LiferaySelenium {
 
 	public void assertLiferayErrors() throws Exception;
 
-	public void assertLocation(String pattern);
+	public void assertLocation(String pattern) throws Exception;
 
 	public void assertNoJavaScriptExceptions() throws Exception;
 
@@ -141,7 +141,7 @@ public interface LiferaySelenium {
 
 	public void chooseOkOnNextConfirmation();
 
-	public void click(String locator);
+	public void click(String locator) throws Exception;
 
 	public void clickAndWait(String locator);
 
@@ -242,8 +242,6 @@ public interface LiferaySelenium {
 
 	public Number getElementPositionTop(String locator);
 
-	public String getElementText(String locator) throws Exception;
-
 	public String getElementValue(String locator) throws Exception;
 
 	public Number getElementWidth(String locator);
@@ -262,7 +260,7 @@ public interface LiferaySelenium {
 
 	public String getHtmlSource();
 
-	public String getLocation();
+	public String getLocation() throws Exception;
 
 	public String getLog();
 
@@ -304,7 +302,7 @@ public interface LiferaySelenium {
 
 	public String getTestDependenciesDirName();
 
-	public String getText(String locator);
+	public String getText(String locator) throws Exception;
 
 	public String getTitle();
 
@@ -374,6 +372,8 @@ public interface LiferaySelenium {
 
 	public boolean isTCatEnabled();
 
+	public boolean isTestName(String testName);
+
 	public boolean isText(String locator, String value) throws Exception;
 
 	public boolean isTextNotPresent(String pattern);
@@ -438,11 +438,11 @@ public interface LiferaySelenium {
 
 	public void mouseUpRightAt(String locator, String coordString);
 
-	public void open(String url);
+	public void open(String url) throws Exception;
 
 	public void open(String url, String ignoreResponseCode);
 
-	public void openWindow(String url, String windowID);
+	public void openWindow(String url, String windowID) throws Exception;
 
 	public void paste(String locator);
 
@@ -480,6 +480,8 @@ public interface LiferaySelenium {
 	public void select(String selectLocator, String optionLocator);
 
 	public void selectAndWait(String selectLocator, String optionLocator);
+
+	public void selectFieldText();
 
 	public void selectFrame(String locator);
 

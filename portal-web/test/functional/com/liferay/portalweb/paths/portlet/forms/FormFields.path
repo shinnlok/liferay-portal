@@ -59,6 +59,22 @@
 	<td></td>
 	<td></td>
 </tr>
+<!--DATE-->
+<tr>
+	<td>DATE_FIELD</td>
+	<td>//div[contains(@data-fieldname,'${key_fieldName}')]//input[@type='text' and contains(@aria-label,'${key_fieldLabel}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DATE_LABEL</td>
+	<td>//div[contains(@data-fieldname,'${key_fieldName}')]//label[contains(.,'${key_fieldLabel}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
 <!--OPTIONS-->
 <tr>
 	<td>OPTIONS_ADD_ROW_BUTTON</td>
@@ -140,6 +156,17 @@
 <tr>
 	<td>TEXT_MULTILINE_FIELD</td>
 	<td>//textarea[contains(@id,'${key_fieldName}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+<!--PARAGRAPH-->
+<tr>
+	<td>PARAGRAPH_BODY_TEXT_CONTENT</td>
+	<td>//div[contains(@class,'paragraph') and contains(@data-fieldname,'${key_fieldName}')]/p</td>
 	<td></td>
 </tr>
 <tr>

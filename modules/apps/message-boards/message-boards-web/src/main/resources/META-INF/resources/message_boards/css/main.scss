@@ -71,8 +71,28 @@
 		}
 	}
 
-	.thread-container > .message-container {
-		padding-left: 0;
+	.view-entries-container {
+		span.h6 {
+			margin-right: 12px;
+		}
+	}
+
+	.thread-container {
+		margin-top: 20px;
+
+		.panel-heading {
+			span.h5 {
+				margin-right: 12px;
+			}
+		}
+
+		& > .message-container {
+			padding-left: 0;
+		}
+
+		.reply-to-main-thread-container {
+			text-align: center;
+		}
 	}
 
 	.message-container {
@@ -112,12 +132,30 @@
 		}
 	}
 
+	.reply-to-message {
+		margin-bottom: 20px;
+	}
+
 	.thread-body {
 		overflow: hidden;
 		padding: 15px;
 
 		td {
 			border: 1px solid #CCC;
+		}
+	}
+
+	@include sm {
+		.social-interaction {
+			width: 100%;
+			position: absolute;
+			top: 0;
+			right: 0;
+
+			& > div {
+				float: right;
+				margin-right: 12px;
+			}
 		}
 	}
 
@@ -143,11 +181,6 @@
 		}
 	}
 
-	.question-details {
-		float: left;
-		white-space: nowrap;
-	}
-
 	.views {
 		clear: both;
 		color: #999;
@@ -162,7 +195,7 @@
 		}
 	}
 
-	.status, .votes {
+	.status {
 		display: inline-block;
 		height: 38px;
 		margin: 0 3px 0 0;
@@ -170,25 +203,8 @@
 		text-align: center;
 	}
 
-	.votes {
-		color: #555;
-		width: 40px;
-	}
-
 	.status {
 		width: 48px;
-	}
-
-	.answered, .unanswered {
-		color: #FFF;
-	}
-
-	.answered {
-		background-color: #5BA018;
-	}
-
-	.unanswered {
-		background-color: #CF4937;
 	}
 
 	.count {
@@ -283,57 +299,6 @@
 
 	.threads-panel {
 		margin-top: 1em;
-	}
-
-	.displayStyle-question {
-		.action-question {
-			.taglib-text {
-				display: none;
-			}
-		}
-
-		.last-post {
-			margin-left: 1em;
-			width: 15%;
-		}
-
-		.stats {
-			width: 20%;
-		}
-
-		.question {
-			vertical-align: top;
-			width: 65%;
-		}
-
-		.last-post .portrait {
-			text-align: center;
-		}
-
-		.username {
-			text-align: center;
-		}
-
-		.time {
-			color: #777;
-			font-size: 0.9em;
-			font-weight: bold;
-			margin-top: 0.5em;
-			text-align: center;
-		}
-
-		.question-subject {
-			font-size: 125%;
-
-			#a {
-				color: #06C;
-			}
-		}
-
-		.summary {
-			color: #444;
-			font-size: 120%;
-		}
 	}
 
 	.search-root-entry {

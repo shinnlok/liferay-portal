@@ -17,11 +17,11 @@
 <%@ include file="/init.jsp" %>
 
 <%
+String cmd = ParamUtil.getString(request, Constants.CMD, Constants.PUBLISH_TO_LIVE);
+
 long exportImportConfigurationId = GetterUtil.getLong(request.getAttribute("exportImportConfigurationId"));
 
 ExportImportConfiguration exportImportConfiguration = ExportImportConfigurationLocalServiceUtil.getExportImportConfiguration(exportImportConfigurationId);
-
-String cmd = Constants.PUBLISH_TO_LIVE;
 
 long selPlid = ParamUtil.getLong(request, "selPlid", LayoutConstants.DEFAULT_PARENT_LAYOUT_ID);
 boolean privateLayout = ParamUtil.getBoolean(request, "privateLayout");
@@ -44,6 +44,7 @@ GroupDisplayContextHelper groupDisplayContextHelper = new GroupDisplayContextHel
 		<aui:nav cssClass="navbar-nav" id="publishConfigurationButtons">
 			<portlet:renderURL var="advancedPublishURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
 				<portlet:param name="mvcRenderCommandName" value="publishLayouts" />
+				<portlet:param name="<%= Constants.CMD %>" value="<%= cmd %>" />
 				<portlet:param name="tabs1" value='<%= privateLayout ? "private-pages" : "public-pages" %>' />
 				<portlet:param name="groupId" value="<%= String.valueOf(groupDisplayContextHelper.getGroupId()) %>" />
 				<portlet:param name="selPlid" value="<%= String.valueOf(selPlid) %>" />
@@ -89,7 +90,7 @@ GroupDisplayContextHelper groupDisplayContextHelper = new GroupDisplayContextHel
 			<ul class="lfr-tree list-unstyled">
 				<aui:fieldset-group markupView="lexicon">
 					<aui:fieldset>
-						<aui:input name="name" />
+						<aui:input name="name" placeholder="process-name-placeholder" />
 					</aui:fieldset>
 
 					<aui:fieldset collapsible="<%= true %>" cssClass="options-group" label="changes-since-last-publication" markupView="lexicon">
@@ -109,21 +110,23 @@ GroupDisplayContextHelper groupDisplayContextHelper = new GroupDisplayContextHel
 								</li>
 
 								<%
-								List<Portlet> dataSiteLevelPortlets = ExportImportHelperUtil.getDataSiteLevelPortlets(company.getCompanyId(), false);
+								Set<String> portletDataHandlerClassNames = new HashSet<String>();
 
-								Set<String> portletDataHandlerClasses = new HashSet<String>();
+								List<Portlet> dataSiteLevelPortlets = ExportImportHelperUtil.getDataSiteLevelPortlets(company.getCompanyId(), false);
 
 								if (!dataSiteLevelPortlets.isEmpty()) {
 									for (Portlet portlet : dataSiteLevelPortlets) {
-										String portletDataHandlerClass = portlet.getPortletDataHandlerClass();
+										PortletDataHandler portletDataHandler = portlet.getPortletDataHandlerInstance();
 
-										if (portletDataHandlerClasses.contains(portletDataHandlerClass)) {
+										Class<?> portletDataHandlerClass = portletDataHandler.getClass();
+
+										String portletDataHandlerClassName = portletDataHandlerClass.getName();
+
+										if (portletDataHandlerClassNames.contains(portletDataHandlerClassName)) {
 											continue;
 										}
 
-										portletDataHandlerClasses.add(portletDataHandlerClass);
-
-										PortletDataHandler portletDataHandler = portlet.getPortletDataHandlerInstance();
+										portletDataHandlerClassNames.add(portletDataHandlerClassName);
 
 										Map<String, Serializable> settingsMap = exportImportConfiguration.getSettingsMap();
 

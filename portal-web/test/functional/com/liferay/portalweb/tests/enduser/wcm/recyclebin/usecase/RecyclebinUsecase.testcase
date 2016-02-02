@@ -2,14 +2,7 @@
 	<property name="testray.main.component.name" value="Recycle Bin" />
 
 	<set-up>
-		<var method="TestPropsUtil#get('test.portal.instance')" name="testPortalInstance" />
-
-		<if>
-			<equals arg1="${testPortalInstance}" arg2="true" />
-			<then>
-				<execute macro="SignIn#signInPortalInstanceSetUp" />
-			</then>
-		</if>
+		<execute macro="TestCase#setUpPortalInstance" />
 
 		<execute macro="User#firstLoginPG" />
 
@@ -179,12 +172,13 @@
 			<var name="bookmarkURL" value="http://www.liferay.com/" />
 		</execute>
 
-		<execute macro="BookmarksFolder#gotoSubfolderPG">
-			<var name="folderName" value="Folder Name" />
+		<execute macro="Navigator#gotoSitePage">
 			<var name="pageName" value="Test Page" />
 			<var name="siteName" value="Site Name" />
-			<var name="siteURL" value="true" />
-			<var name="subfolderName" value="Subfolder Name" />
+		</execute>
+
+		<execute macro="BookmarksFolder#gotoPG">
+			<var name="folderName" value="Folder Name" />
 		</execute>
 
 		<execute macro="BookmarksFolder#moveSubfolderToRecycleBinPG">
@@ -217,11 +211,6 @@
 			<var name="siteName" value="Site Name" />
 			<var name="siteURL" value="true" />
 			<var name="subfolderName" value="Subfolder Name" />
-		</execute>
-
-		<execute macro="Bookmark#gotoPG">
-			<var name="bookmarkName" value="Bookmark Name" />
-			<var name="bookmarkURL" value="http://www.liferay.com/" />
 		</execute>
 
 		<execute macro="Bookmark#viewBookmark">
@@ -267,11 +256,6 @@
 			<var name="siteName" value="Site Name" />
 			<var name="siteURL" value="true" />
 			<var name="subfolderName" value="Subfolder Name" />
-		</execute>
-
-		<execute macro="Bookmark#gotoPG">
-			<var name="bookmarkName" value="Bookmark Name" />
-			<var name="bookmarkURL" value="http://www.liferay.com/" />
 		</execute>
 
 		<execute macro="Bookmark#viewBookmark">
@@ -553,7 +537,7 @@
 			<var name="dmDocumentTitle" value="DM Document Title 1" />
 		</execute>
 
-		<execute macro="Page#openURL" />
+		<execute macro="Navigator#openURL" />
 
 		<execute macro="Page#gotoPG">
 			<var name="pageName" value="Test Page" />
@@ -571,7 +555,7 @@
 			<var name="dmDocumentTitle" value="DM Document Title 2" />
 		</execute>
 
-		<execute macro="Page#openURL" />
+		<execute macro="Navigator#openURL" />
 
 		<execute macro="Page#gotoPG">
 			<var name="pageName" value="Test Page" />
@@ -766,8 +750,8 @@
 
 		<execute macro="WebContentTemplates#save" />
 
-		<execute macro="ProductMenu#gotoSite">
-			<var name="site" value="Site Name" />
+		<execute macro="Navigator#openSiteURL">
+			<var name="siteName" value="Site Name" />
 		</execute>
 
 		<execute macro="ProductMenu#gotoSitesContent">
@@ -831,6 +815,7 @@
 		</execute>
 
 		<execute macro="WebContent#viewWithStructureCP">
+			<var name="webContentText" value="WC WebContent Text" />
 			<var name="webContentTitle" value="WC WebContent Title" />
 		</execute>
 
@@ -926,6 +911,10 @@
 			<var name="wikiNodeName" value="Wiki Node Name" />
 		</execute>
 
+		<execute macro="Portlet#changeDisplayStyle">
+			<var name="displayStyle" value="List" />
+		</execute>
+
 		<execute macro="WikiPage#deleteCP">
 			<var name="assetType" value="Wiki Page" />
 			<var name="wikiNodeName" value="Wiki Node Name" />
@@ -989,6 +978,10 @@
 		<execute macro="WikiNode#viewCP">
 			<var name="numberOfWikiPages" value="2" />
 			<var name="wikiNodeName" value="Wiki Node Name" />
+		</execute>
+
+		<execute macro="Portlet#changeDisplayStyle">
+			<var name="displayStyle" value="Descriptive" />
 		</execute>
 
 		<execute macro="WikiNavigator#gotoCP">

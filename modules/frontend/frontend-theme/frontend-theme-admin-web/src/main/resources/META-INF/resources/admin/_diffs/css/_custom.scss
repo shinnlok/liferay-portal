@@ -15,11 +15,19 @@ body {
 		.portlet-column {
 			padding: 0;
 		}
+
+		.portlet-body > .container-fluid-1280 {
+			position: relative;
+		}
 	}
 
 	.main-content-card {
 		box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2);
 		margin-top: 20px;
 		min-height: 200px;
+	}
+
+	.main-content-body {
+		margin-top: 20px;
 	}
 }

@@ -15,11 +15,18 @@
 		</if>
 
 		<if>
+			<isset var="pageStaging" />
+			<then>
+				<execute macro="Navigator#gotoStagedView" />
+			</then>
+		</if>
+
+		<if>
 			<equals arg1="${sitePagePrivacy}" arg2="Private" />
 			<then>
 				<execute macro="ProductMenu#gotoPrivatePages" />
 
-				<execute function="Click" locator1="ProductMenu#ADD_PRIVATE_PAGE_ICON" />
+				<execute function="Click#makeVisibleClickAt" locator1="ProductMenu#ADD_PRIVATE_PAGE_ICON" />
 			</then>
 			<else>
 				<execute macro="ProductMenu#gotoPublicPages" />
@@ -122,7 +129,15 @@
 			<var name="page" value="${page}" />
 		</execute>
 
+		<execute macro="ProductMenuHelper#expandPanelSites" />
+
+		<execute macro="ProductMenuHelper#expandCategory">
+			<var name="category" value="Pages" />
+		</execute>
+
 		<var name="key_page" value="${sitePageName}" />
+
+		<execute function="Click" locator1="ProductMenu#PAGES" />
 
 		<execute function="Click#makeVisibleClickAt" locator1="ProductMenu#ADD_PAGE_ICON" />
 
@@ -190,7 +205,7 @@
 	<command name="changeLogoViaPageCP">
 		<var name="key_page" value="${page}" />
 
-		<execute function="Click#makeVisibleClickAt" locator1="ProductMenu#EDIT_PAGE" />
+		<execute function="Click#makeVisibleClickAt" locator1="ProductMenu#EDIT_PUBLIC_PAGE_ICON" />
 
 		<execute macro="Panel#expandPanel">
 			<var name="panelHeading" value="Logo" />
@@ -220,25 +235,22 @@
 	</command>
 
 	<command name="deleteLivePG">
-		<execute function="Click" locator1="ControlMenu#EDIT" />
 		<execute function="ClickNoError" locator1="ControlMenu#EDIT_LIVE_DELETE" />
 
 		<execute function="Confirm#waitForConfirmation" value1="Are you sure you want to delete the selected page?" />
 	</command>
 
 	<command name="deletePG">
-		<var name="key_pageName" value="${pageName}" />
+		<execute macro="ProductMenu#gotoEditPage">
+			<var name="page" value="${pageName}" />
+		</execute>
 
-		<execute function="MouseOver#mouseOverClickNavigation" locator1="Home#PAGE" />
-		<execute function="ClickNoError" locator1="ControlMenu#EDIT" />
 		<execute function="ClickNoError" locator1="Home#PAGE_DELETE" />
 		<execute function="Confirm#waitForConfirmation" value1="Are you sure you want to delete this page?" />
 		<execute function="AssertElementNotPresent#assertElementNotPresentClickDockbar" locator1="Home#PAGE_DELETE" />
 	</command>
 
 	<command name="editPageLayoutColumn">
-		<execute function="Click" locator1="ControlMenu#EDIT" />
-
 		<var name="key_columnName" value="${columnName}" />
 
 		<execute function="Click" locator1="SitePagesEditPage#LAYOUT_RADIO" />
@@ -267,146 +279,10 @@
 		<execute function="AssertClick" locator1="Home#PAGE_CHILD_PAGE" value1="${childPageName}" />
 	</command>
 
-	<command name="gotoCmdCP">
-		<if>
-			<isset var="nodePort" />
-			<then>
-				<execute function="Open" locator1="http://localhost:${nodePort}" />
-			</then>
-			<else>
-				<execute macro="Page#openURL">
-					<var name="friendlyURL" value="${friendlyURL}" />
-					<var name="pageAccess" value="${pageAccess}" />
-					<var name="pageStaging" value="${pageStaging}" />
-					<var name="siteName" value="${siteName}" />
-					<var name="siteNameURL" value="${siteNameURL}" />
-					<var name="siteURL" value="${siteURL}" />
-					<var name="specificURL" value="${specificURL}" />
-					<var name="virtualHostsURL" value="${virtualHostsURL}" />
-				</execute>
-			</else>
-		</if>
-
-		<execute macro="ProductMenuHelper#expandPanelSites" />
-
-		<if>
-			<isset var="siteScopeName" />
-			<then>
-				<execute macro="ProductMenu#gotoSite">
-					<var name="site" value="${siteScopeName}" />
-				</execute>
-
-				<execute macro="ProductMenuHelper#expandPanelSites" />
-			</then>
-		</if>
-
-		<if>
-			<not>
-				<isset var="nonAdminUser" />
-			</not>
-			<then>
-				<execute macro="ProductMenuHelper#expandCategory">
-					<var name="category" value="${category}" />
-				</execute>
-
-				<if>
-					<not>
-						<contains string="${portletName}" substring="{portletName}" />
-					</not>
-					<then>
-						<execute macro="ProductMenuHelper#gotoPortlet">
-							<var name="portlet" value="${portletName}" />
-						</execute>
-					</then>
-				</if>
-			</then>
-		</if>
-	</command>
-
-	<command name="gotoCmdLocalizedCP">
-		<execute macro="Page#openURL">
-			<var name="friendlyURL" value="${friendlyURL}" />
-			<var name="pageAccess" value="${pageAccess}" />
-			<var name="pageStaging" value="${pageStaging}" />
-			<var name="siteName" value="${siteName}" />
-			<var name="siteNameURL" value="${siteNameURL}" />
-			<var name="siteURL" value="${siteURL}" />
-			<var name="specificURL" value="${specificURL}" />
-			<var name="virtualHostsURL" value="${virtualHostsURL}" />
-		</execute>
-
-		<execute macro="ProductMenuHelper#openProductMenu" />
-
-		<var name="key_localizedPortletCategoryName" value="${localizedPortletCategoryName}" />
-
-		<execute function="Click" locator1="ProductMenu#PRODUCT_MENU_TABS_TAB_ICON" value1="${tabName}" />
-
-		<if>
-			<isset var="siteScopeName" />
-			<then>
-				<execute macro="ProductMenu#gotoSite">
-					<var name="site" value="${siteScopeName}" />
-				</execute>
-			</then>
-		</if>
-
-		<var name="tabName" value="${localizedTabName}" />
-
-		<execute function="Click" locator1="ProductMenu#PRODUCT_MENU_TABS_TAB_ICON" value1="${tabName}" />
-
-		<if>
-			<condition function="IsElementNotPresent" locator1="ProductMenu#PRODUCT_MENU_PANEL_MENU_ITEM" value1="${localizedPortletName}" />
-			<then>
-				<var name="key_portletCategoryName" value="${localizedPortletCategoryName}" />
-
-				<execute function="AssertClick" locator1="ProductMenu#PRODUCT_MENU_PANEL_SITES_PANEL_TITLE" value1="${localizedPortletCategoryName}" />
-			</then>
-		</if>
-
-		<if>
-			<not>
-				<isset var="nonAdminUser" />
-			</not>
-			<then>
-				<if>
-					<condition function="IsElementPresent" locator1="Home#SITE_ADMINISTRATION_CATEGORY_COLLAPSED" value1="${localizedPortletCategoryName}" />
-					<then>
-						<execute function="AssertClick#assertPartialTextClickAtCPNavigation" locator1="Home#SITE_ADMINISTRATION_CATEGORY_COLLAPSED" value1="${localizedPortletCategoryName}" />
-						<execute function="AssertTextEquals#assertPartialText" locator1="Home#SITE_ADMINISTRATION_CATEGORY_EXPANDED" value1="${localizedPortletCategoryName}" />
-					</then>
-				</if>
-
-				<if>
-					<not>
-						<contains string="${localizedPortletName}" substring="{localizedPortletName}" />
-					</not>
-					<then>
-						<var name="key_portletName" value="${localizedPortletName}" />
-
-						<execute function="AssertClick" locator1="ProductMenu#PRODUCT_MENU_PANEL_MENU_ITEM" value1="${localizedPortletName}" />
-					</then>
-				</if>
-			</then>
-		</if>
-	</command>
-
-	<command name="gotoEdit">
-		<execute function="Click" locator1="ControlMenu#EDIT" />
-	</command>
-
 	<command name="gotoMyAccount">
 		<description message="Navigate to My Account > ${portletName}." />
 
-		<execute macro="Page#openURL">
-			<var name="friendlyURL" value="${friendlyURL}" />
-			<var name="pageAccess" value="${pageAccess}" />
-			<var name="pageStaging" value="${pageStaging}" />
-			<var name="siteName" value="${siteName}" />
-			<var name="siteNameURL" value="${siteNameURL}" />
-			<var name="siteURL" value="${siteURL}" />
-			<var name="specificURL" value="${specificURL}" />
-			<var name="virtualHostsURL" value="${virtualHostsURL}" />
-		</execute>
+		<execute macro="Navigator#openURL" />
 
 		<execute macro="ProductMenu#gotoUserMyAccount">
 			<var name="portlet" value="${portletName}" />
@@ -417,26 +293,6 @@
 		<var name="key_portletName" value="${portletName}" />
 
 		<execute function="AssertClick" locator1="Panel#MENU_ITEM" value1="${portletName}" />
-	</command>
-
-	<command name="gotoPagesCP">
-		<description message="Navigate to Site Administration > Pages > ${portletName}." />
-
-		<execute macro="Page#gotoCmdCP">
-			<var name="category" value="Pages" />
-			<var name="friendlyURL" value="${friendlyURL}" />
-			<var name="nodePort" value="${nodePort}" />
-			<var name="pageAccess" value="${pageAccess}" />
-			<var name="pageStaging" value="${pageStaging}" />
-			<var name="portletCategoryKey" value="ADMIN_SITE_ADMINISTRATION_PAGES" />
-			<var name="portletName" value="${portletName}" />
-			<var name="siteName" value="${siteName}" />
-			<var name="siteNameURL" value="${siteNameURL}" />
-			<var name="siteScopeName" value="${siteScopeName}" />
-			<var name="siteURL" value="${siteURL}" />
-			<var name="specificURL" value="${specificURL}" />
-			<var name="virtualHostsURL" value="${virtualHostsURL}" />
-		</execute>
 	</command>
 
 	<command name="gotoPG" summary="Navigate to the page named '${pageName}'">
@@ -607,7 +463,7 @@
 
 	<command name="tearDownPG" summary="Delete all pages except the Welcome Page">
 		<execute macro="ProductMenu#gotoSite">
-			<var name="site" value="${site}" />
+			<var name="site" value="Liferay" />
 		</execute>
 
 		<while>
@@ -619,11 +475,11 @@
 
 				<execute function="Confirm" value1="Are you sure you want to delete this page?" />
 
-				<execute function="AssertElementNotPresent#assertElementNotPresentClickDockbar" locator1="Home#DELETE_PAGE_ICON" />
-
 				<execute function="Refresh" />
 			</then>
 		</while>
+
+		<execute function="AssertElementNotPresent#assertElementNotPresentClickDockbar" locator1="Home#DELETE_PAGE_ICON" />
 	</command>
 
 	<command name="viewChildPG">
@@ -666,8 +522,6 @@
 	</command>
 
 	<command name="viewFriendlyURLLanguageOptionsPG">
-		<execute function="Click" locator1="ControlMenu#EDIT" />
-
 		<for list="${currentLanguageList}" param="languageKey">
 			<execute function="AssertElementPresent" locator1="DockbarEditpanel#${languageKey}" />
 		</for>
@@ -689,8 +543,6 @@
 	</command>
 
 	<command name="viewPageFriendURLPG">
-		<execute function="Click" locator1="ControlMenu#EDIT" />
-
 		<execute function="AssertTextNotPresent" locator1="SitePagesEditPage#FRIENDLY_URL_FIELD" value1="${pageName}" />
 		<execute function="AssertTextEquals" locator1="SitePagesEditPage#FRIENDLY_URL_FIELD" value1="/2" />
 	</command>
@@ -707,7 +559,9 @@
 			</then>
 		</if>
 
-		<execute function="Click" locator1="ControlMenu#EDIT" />
+		<execute macro="ProductMenu#gotoEditPage">
+			<var name="page" value="${page}" />
+		</execute>
 
 		<var name="key_defaultSiteLanguageKey" value="${defaultSiteLanguageKey}" />
 

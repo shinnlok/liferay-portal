@@ -79,7 +79,6 @@ AUI.add(
 			{
 				DEFAULTS: {
 					centered: true,
-					headerContent: '&nbsp;',
 					modal: true,
 					visible: true,
 					zIndex: Liferay.zIndex.WINDOW
@@ -362,7 +361,7 @@ AUI.add(
 					}
 
 					if (!Lang.isValue(config.title)) {
-						config.title = instance.DEFAULTS.headerContent;
+						config.title = '&nbsp;';
 					}
 
 					modal.titleNode.html(config.title);
@@ -378,20 +377,17 @@ AUI.add(
 					var modalConfig = A.merge(instance.DEFAULTS, config.dialog);
 
 					var height = modalConfig.height;
-
 					var width = modalConfig.width;
 
-					if (height === 'auto' || height === '' || height === undefined || height > DOM.winHeight()) {
+					if (height === '' || height === undefined || height > DOM.winHeight()) {
 						modalConfig.autoHeight = true;
 					}
 
-					if (width === 'auto' || width === '' || width === undefined || width > DOM.winWidth()) {
+					if (width === '' || width === undefined || width > DOM.winWidth()) {
 						modalConfig.autoWidth = true;
 					}
 
 					modalConfig.id = config.id;
-
-					delete modalConfig.headerContent;
 
 					return modalConfig;
 				},

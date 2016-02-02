@@ -29,6 +29,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.mobile.device.Device;
 import com.liferay.portal.kernel.mobile.device.UnknownDevice;
 import com.liferay.portal.kernel.portlet.PortletRequestModel;
+import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.template.StringTemplateResource;
 import com.liferay.portal.kernel.template.Template;
 import com.liferay.portal.kernel.template.TemplateConstants;
@@ -56,7 +57,6 @@ import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.model.Company;
-import com.liferay.portal.security.permission.PermissionThreadLocal;
 import com.liferay.portal.service.CompanyLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.xsl.XSLTemplateResource;
@@ -364,14 +364,8 @@ public class JournalTransformer {
 
 					HttpServletRequest request = themeDisplay.getRequest();
 
-					templateManager.addTaglibApplication(
-						template, "Application", request.getServletContext());
-					templateManager.addTaglibFactory(
-						template, "PortalJspTagLibs",
-						request.getServletContext());
-					templateManager.addTaglibRequest(
-						template, "Request", request,
-						themeDisplay.getResponse());
+					templateManager.addTaglibSupport(
+						template, request, themeDisplay.getResponse());
 					templateManager.addTaglibTheme(
 						template, "taglibLiferay", request,
 						new PipingServletResponse(

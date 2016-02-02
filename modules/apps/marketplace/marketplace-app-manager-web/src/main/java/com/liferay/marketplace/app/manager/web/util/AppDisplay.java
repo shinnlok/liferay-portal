@@ -27,7 +27,7 @@ import org.osgi.framework.Bundle;
  */
 public interface AppDisplay extends Comparable<AppDisplay> {
 
-	public static final String APP_TITLE_UNCATEGORIZED = "Uncategorized";
+	public static final String APP_TITLE_UNCATEGORIZED = "Independent Modules";
 
 	public void addBundle(Bundle bundle);
 
@@ -42,6 +42,8 @@ public interface AppDisplay extends Comparable<AppDisplay> {
 	public List<ModuleGroupDisplay> getModuleGroupDisplays();
 
 	public int getState();
+
+	public String getStoreURL(HttpServletRequest request);
 
 	public String getTitle();
 

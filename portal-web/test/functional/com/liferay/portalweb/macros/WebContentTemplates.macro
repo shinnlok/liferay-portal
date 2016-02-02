@@ -2,7 +2,7 @@
 	<command name="addCP">
 		<execute macro="WebContentNavigator#gotoManageTemplates" />
 
-		<execute macro="WebContentNavigator#gotoAddTemplate" />
+		<execute macro="LexiconEntry#gotoAdd" />
 
 		<execute function="Type#clickAtSendKeys" locator1="TextInput#NAME" value1="${templateName}" />
 
@@ -57,7 +57,7 @@
 	<command name="addNullCP">
 		<execute macro="WebContentNavigator#gotoManageTemplates" />
 
-		<execute macro="WebContentNavigator#gotoAddTemplate" />
+		<execute macro="LexiconEntry#gotoAdd" />
 
 		<execute function="AssertElementNotPresent" locator1="TextInput#REQUIRED_ALERT" />
 		<execute function="AssertClick" locator1="Button#SAVE" value1="Save" />
@@ -101,8 +101,6 @@
 		<execute function="Confirm" value1="Selecting a new structure changes the available input fields and available templates. Do you want to proceed?" />
 
 		<execute function="SelectFrameTop" />
-
-		<execute function="SelectFrame" locator1="IFrame#TEMPLATES" />
 
 		<execute macro="WebContentNavigator#showTemplateDetails" />
 
@@ -162,8 +160,9 @@
 		<if>
 			<equals arg1="${webContentHasReference}" arg2="true" />
 			<then>
-				<execute function="AssertTextEquals" locator1="Message#ERROR_1" value1="Your request failed to complete." />
-				<execute function="AssertTextEquals" locator1="Message#ERROR_2" value1="The template cannot be deleted because it is required by one or more template links." />
+				<execute macro="Alert#viewRequestFailedToComplete" />
+
+				<execute function="AssertTextEquals#assertPartialText" locator1="Message#ERROR_2" value1="The template cannot be deleted because it is required by one or more template links." />
 			</then>
 			<else>
 				<execute macro="Alert#viewRequestCompletedSuccessMessage" />
@@ -208,10 +207,6 @@
 
 	<command name="save">
 		<execute function="AssertClick" locator1="Button#SAVE" value1="Save" />
-
-		<execute function="SelectFrame" />
-
-		<execute function="SelectFrame" locator1="IFrame#TEMPLATES" />
 
 		<execute macro="Alert#viewRequestCompletedSuccessMessage" />
 	</command>

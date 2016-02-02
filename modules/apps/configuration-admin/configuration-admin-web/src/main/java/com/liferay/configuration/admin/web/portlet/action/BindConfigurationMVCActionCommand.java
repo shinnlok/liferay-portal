@@ -55,7 +55,7 @@ import org.osgi.service.component.annotations.Reference;
 @Component(
 	immediate = true,
 	property = {
-		"javax.portlet.name=" + ConfigurationAdminPortletKeys.CONFIGURATION_ADMIN,
+		"javax.portlet.name=" + ConfigurationAdminPortletKeys.SYSTEM_SETTINGS,
 		"mvc.command.name=bindConfiguration"
 	},
 	service = MVCActionCommand.class
@@ -174,6 +174,12 @@ public class BindConfigurationMVCActionCommand implements MVCActionCommand {
 				Object value = properties.get(key);
 
 				configuredProperties.put(key, value);
+			}
+
+			if (configurationModel.isCompanyFactory()) {
+				configuredProperties.put(
+					ConfigurationModel.PROPERTY_KEY_COMPANY_ID,
+					ConfigurationModel.PROPERTY_VALUE_COMPANY_ID_DEFAULT);
 			}
 
 			configuration.update(configuredProperties);

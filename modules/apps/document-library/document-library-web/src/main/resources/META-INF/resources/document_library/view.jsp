@@ -114,11 +114,17 @@ request.setAttribute("view.jsp-orderByType", orderByType);
 	%>
 
 	<div class="closed <%= portletTitleBasedNavigation ? "container-fluid-1280" : StringPool.BLANK %> sidenav-container sidenav-right" id="<portlet:namespace />infoPanelId">
-		<div class="sidenav-menu-slider">
-			<div class="sidebar sidebar-default sidenav-menu">
-				<liferay-util:include page="/document_library/info_panel.jsp" servletContext="<%= application %>" />
-			</div>
-		</div>
+		<portlet:resourceURL id="/document_library/info_panel" var="sidebarPanelURL">
+			<portlet:param name="folderId" value="<%= String.valueOf(folderId) %>" />
+			<portlet:param name="repositoryId" value="<%= String.valueOf(repositoryId) %>" />
+		</portlet:resourceURL>
+
+		<liferay-frontend:sidebar-panel
+			resourceURL="<%= sidebarPanelURL %>"
+			searchContainerId="entries"
+		>
+			<liferay-util:include page="/document_library/info_panel.jsp" servletContext="<%= application %>" />
+		</liferay-frontend:sidebar-panel>
 
 		<div class="sidenav-content">
 			<div class="document-library-breadcrumb" id="<portlet:namespace />breadcrumbContainer">
@@ -174,7 +180,7 @@ if (!defaultFolderView && (folder != null) && (portletName.equals(DLPortletKeys.
 %>
 
 <aui:script>
-	$('#<portlet:namespace />infoPanelId').sideNavigation(
+	AUI.$('#<portlet:namespace />infoPanelId').sideNavigation(
 		{
 			gutter: 15,
 			position: 'right',
@@ -190,7 +196,7 @@ if (!defaultFolderView && (folder != null) && (portletName.equals(DLPortletKeys.
 
 		var hide = Liferay.Util.listCheckedExcept(form, '<portlet:namespace /><%= RowChecker.ALL_ROW_IDS %>').length == 0;
 
-		$('#<portlet:namespace />actionsButtonContainer').toggleClass('hide', hide);
+		AUI.$('#<portlet:namespace />actionsButtonContainer').toggleClass('hide', hide);
 	}
 
 	<portlet:namespace />toggleActionsButton();
@@ -222,6 +228,7 @@ if (!defaultFolderView && (folder != null) && (portletName.equals(DLPortletKeys.
 			%>
 
 			decimalSeparator: '<%= decimalFormatSymbols.getDecimalSeparator() %>',
+			displayStyle: '<%= HtmlUtil.escapeJS(displayStyle) %>',
 			editEntryUrl: '<portlet:actionURL name="/document_library/edit_entry" />',
 			folders: {
 				defaultParentFolderId: '<%= folderId %>',
@@ -271,7 +278,7 @@ if (!defaultFolderView && (folder != null) && (portletName.equals(DLPortletKeys.
 	);
 
 	var clearDocumentLibraryHandles = function(event) {
-		if (event.portletId === '<%= portletDisplay.getRootPortletId() %>') {
+		if (event.portletId === '<%= portletDisplay.getId() %>') {
 			documentLibrary.destroy();
 
 			Liferay.detach('destroyPortlet', clearDocumentLibraryHandles);

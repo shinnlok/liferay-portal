@@ -117,7 +117,7 @@ renderResponse.setTitle((exportImportConfiguration == null) ? LanguageUtil.get(r
 			<aui:input name="rootNodeName" type="hidden" value="<%= rootNodeName %>" />
 			<aui:input name="<%= PortletDataHandlerKeys.PORTLET_ARCHIVED_SETUPS_ALL %>" type="hidden" value="<%= true %>" />
 			<aui:input name="<%= PortletDataHandlerKeys.PORTLET_CONFIGURATION_ALL %>" type="hidden" value="<%= true %>" />
-			<aui:input name="<%= PortletDataHandlerKeys.PORTLET_SETUP_ALL %>" type="hidden" value="<%= true %>"  />
+			<aui:input name="<%= PortletDataHandlerKeys.PORTLET_SETUP_ALL %>" type="hidden" value="<%= true %>" />
 			<aui:input name="<%= PortletDataHandlerKeys.PORTLET_USER_PREFERENCES_ALL %>" type="hidden" value="<%= true %>" />
 
 			<liferay-ui:error exception="<%= LARFileNameException.class %>" message="please-enter-a-file-with-a-valid-file-name" />
@@ -145,16 +145,14 @@ renderResponse.setTitle((exportImportConfiguration == null) ? LanguageUtil.get(r
 
 					<liferay-staging:content cmd="<%= cmd %>" parameterMap="<%= parameterMap %>" type="<%= Constants.EXPORT %>" />
 
-					<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" cssClass="options-group" label="permissions">
-						<%@ include file="/permissions.jspf" %>
-					</aui:fieldset>
+					<liferay-staging:permissions global="<%= group.isCompany() %>" parameterMap="<%= parameterMap %>" />
 				</aui:fieldset-group>
 			</div>
 
 			<aui:button-row>
-				<aui:button type="submit" value="save" />
+				<aui:button cssClass="btn-lg" type="submit" value="save" />
 
-				<aui:button href="<%= portletURL.toString() %>" type="reset" value="cancel" />
+				<aui:button cssClass="btn-lg" href="<%= portletURL.toString() %>" type="reset" value="cancel" />
 			</aui:button-row>
 		</aui:form>
 	</div>

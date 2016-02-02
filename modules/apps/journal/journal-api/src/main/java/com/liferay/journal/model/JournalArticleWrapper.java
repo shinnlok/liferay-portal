@@ -18,8 +18,12 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.ModelWrapper;
+import com.liferay.portal.service.ServiceContext;
 
+import com.liferay.portlet.expando.model.ExpandoBridge;
 import com.liferay.portlet.exportimport.lar.StagedModelType;
+
+import java.io.Serializable;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -460,15 +464,6 @@ public class JournalArticleWrapper implements JournalArticle,
 	}
 
 	/**
-	* @deprecated As of 6.2.0, replaced by {@link #getDefaultLanguageId}
-	*/
-	@Deprecated
-	@Override
-	public java.lang.String getDefaultLocale() {
-		return _journalArticle.getDefaultLocale();
-	}
-
-	/**
 	* Returns the description of this journal article.
 	*
 	* @return the description of this journal article
@@ -562,7 +557,7 @@ public class JournalArticleWrapper implements JournalArticle,
 	}
 
 	@Override
-	public com.liferay.portlet.expando.model.ExpandoBridge getExpandoBridge() {
+	public ExpandoBridge getExpandoBridge() {
 		return _journalArticle.getExpandoBridge();
 	}
 
@@ -668,7 +663,7 @@ public class JournalArticleWrapper implements JournalArticle,
 	}
 
 	@Override
-	public java.io.Serializable getPrimaryKeyObj() {
+	public Serializable getPrimaryKeyObj() {
 		return _journalArticle.getPrimaryKeyObj();
 	}
 
@@ -1342,14 +1337,12 @@ public class JournalArticleWrapper implements JournalArticle,
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portlet.expando.model.ExpandoBridge expandoBridge) {
+	public void setExpandoBridgeAttributes(ExpandoBridge expandoBridge) {
 		_journalArticle.setExpandoBridgeAttributes(expandoBridge);
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.service.ServiceContext serviceContext) {
+	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
 		_journalArticle.setExpandoBridgeAttributes(serviceContext);
 	}
 
@@ -1449,7 +1442,7 @@ public class JournalArticleWrapper implements JournalArticle,
 	}
 
 	@Override
-	public void setPrimaryKeyObj(java.io.Serializable primaryKeyObj) {
+	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
 		_journalArticle.setPrimaryKeyObj(primaryKeyObj);
 	}
 

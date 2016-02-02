@@ -22,10 +22,10 @@ String redirect = ParamUtil.getString(request, "redirect");
 WorkflowInstanceEditDisplayContext workflowInstanceEditDisplayContext = null;
 
 if (portletName.equals(WorkflowInstancePortletKeys.WORKFLOW_INSTANCE)) {
-	workflowInstanceEditDisplayContext = new WorkflowInstanceEditDisplayContext(liferayPortletRequest, liferayPortletResponse, portletPreferences);
+	workflowInstanceEditDisplayContext = new WorkflowInstanceEditDisplayContext(liferayPortletRequest, liferayPortletResponse);
 }
 else {
-	workflowInstanceEditDisplayContext = new MyWorkflowInstanceEditDisplayContext(liferayPortletRequest, liferayPortletResponse, portletPreferences);
+	workflowInstanceEditDisplayContext = new MyWorkflowInstanceEditDisplayContext(liferayPortletRequest, liferayPortletResponse);
 }
 
 portletDisplay.setShowBackIcon(true);
@@ -97,8 +97,9 @@ renderResponse.setTitle(workflowInstanceEditDisplayContext.getHeaderTitle());
 
 						<h3 class="task-content-title">
 							<liferay-ui:icon
-								iconCssClass="<%= workflowInstanceEditDisplayContext.getIconCssClass() %>"
+								icon="<%= workflowInstanceEditDisplayContext.getIconCssClass() %>"
 								label="<%= true %>"
+								markupView="lexicon"
 								message="<%= workflowInstanceEditDisplayContext.getTaskContentTitleMessage() %>"
 							/>
 						</h3>

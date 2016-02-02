@@ -1,6 +1,3 @@
-<#assign liferay_portlet=PortalJspTagLibs["/WEB-INF/tld/liferay-portlet-ext.tld"]>
-<#assign liferay_ui=PortalJspTagLibs["/WEB-INF/tld/liferay-ui.tld"]>
-
 <#assign portlet_display = portletDisplay />
 
 <#assign portlet_back_url = htmlUtil.escapeHREF(portlet_display.getURLBack()) />
@@ -16,7 +13,7 @@
 			<span class="portlet-name-text">${portlet_display_name}</span>
 		</div>
 
-		<#list portlet_toolbar.getPortletTitleMenus(portlet_display_root_portlet_id, renderRequest) as portletTitleMenu>
+		<#list portlet_toolbar.getPortletTitleMenus(portlet_display_root_portlet_id, renderRequest, renderResponse) as portletTitleMenu>
 			<menu class="portlet-title-menu portlet-topper-toolbar" id="portlet-title-menu_${portlet_id}_${portletTitleMenu_index + 1}" type="toolbar">
 				<@liferay_ui["menu"] menu=portletTitleMenu />
 			</menu>

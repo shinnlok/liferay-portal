@@ -14,16 +14,18 @@
 
 package com.liferay.wiki.web.social;
 
-import com.liferay.portal.NoSuchModelException;
+import com.liferay.portal.exception.NoSuchModelException;
+import com.liferay.portal.kernel.portletfilerepository.PortletFileRepositoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.util.ClassResourceBundleLoader;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
+import com.liferay.portal.kernel.util.ResourceBundleLoader;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.portletfilerepository.PortletFileRepositoryUtil;
-import com.liferay.portal.security.permission.ActionKeys;
-import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portlet.social.model.BaseSocialActivityInterpreter;
 import com.liferay.portlet.social.model.SocialActivity;
@@ -113,6 +115,11 @@ public class WikiActivityInterpreter extends BaseSocialActivityInterpreter {
 		SocialActivity activity, ServiceContext serviceContext) {
 
 		return "/wiki/find_page?pageResourcePrimKey=" + activity.getClassPK();
+	}
+
+	@Override
+	protected ResourceBundleLoader getResourceBundleLoader() {
+		return _resourceBundleLoader;
 	}
 
 	@Override
@@ -276,6 +283,9 @@ public class WikiActivityInterpreter extends BaseSocialActivityInterpreter {
 
 	private static final String[] _CLASS_NAMES = {WikiPage.class.getName()};
 
+	private final ResourceBundleLoader _resourceBundleLoader =
+		new ClassResourceBundleLoader(
+			"content.Language", WikiActivityInterpreter.class);
 	private WikiPageLocalService _wikiPageLocalService;
 	private WikiPageResourceLocalService _wikiPageResourceLocalService;
 

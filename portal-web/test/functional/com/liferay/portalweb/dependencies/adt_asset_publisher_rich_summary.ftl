@@ -1,5 +1,3 @@
-<#assign liferay_ui = taglibLiferayHash["/WEB-INF/tld/liferay-ui.tld"] />
-
 <#if !entries?has_content>
 	<#if !themeDisplay.isSignedIn()>
 		${renderRequest.setAttribute("PORTLET_CONFIGURATOR_VISIBILITY", true)}
@@ -36,8 +34,6 @@
 
 		<h3 class="asset-title">
 			<a href="${viewURL}">
-				<i class="${assetRenderer.getIconCssClass()}"></i>
-
 				${entryTitle}
 			</a>
 		</h3>

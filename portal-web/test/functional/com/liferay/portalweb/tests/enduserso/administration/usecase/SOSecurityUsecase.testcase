@@ -87,8 +87,6 @@
 			<var name="portlet" value="Users and Organizations" />
 		</execute>
 
-		<execute function="AssertClick" locator1="NavTab#ALL_USERS" value1="All Users" />
-
 		<var name="key_userScreenName" value="${adminScreenName}" />
 
 		<execute function="Type" locator1="NavBar#BASIC_SEARCH_FIELD" value1="${adminScreenName}" />
@@ -825,8 +823,6 @@
 			<var name="portlet" value="Users and Organizations" />
 		</execute>
 
-		<execute function="AssertClick" locator1="NavTab#ALL_USERS" value1="All Users" />
-
 		<var name="key_userScreenName" value="${adminScreenName}" />
 
 		<execute function="Type" locator1="NavBar#BASIC_SEARCH_FIELD" value1="${adminScreenName}" />
@@ -1012,8 +1008,6 @@
 		<execute macro="ProductMenu#gotoControlPanelUsers">
 			<var name="portlet" value="Users and Organizations" />
 		</execute>
-
-		<execute function="AssertClick" locator1="NavTab#ALL_USERS" value1="All Users" />
 
 		<var name="key_userScreenName" value="${adminScreenName}" />
 
@@ -1432,10 +1426,8 @@
 			<var name="userLoginFullName" value="${admin}" />
 		</execute>
 
-		<execute macro="Page#openURL">
+		<execute macro="Navigator#openSiteURL">
 			<var name="siteName" value="${siteNameFriendly}" />
-			<var name="siteURL" value="true" />
-			<var name="soPage" value="true" />
 		</execute>
 
 		<execute function="AssertAlertNotPresent" />
@@ -1447,9 +1439,8 @@
 
 		<execute function="AssertAlertNotPresent" />
 
-		<execute macro="Page#openURL">
+		<execute macro="Navigator#openSiteURL">
 			<var name="siteName" value="${siteNameFriendly}" />
-			<var name="siteURL" value="true" />
 		</execute>
 
 		<execute function="AssertAlertNotPresent" />
@@ -1462,9 +1453,8 @@
 
 		<execute function="AssertAlertNotPresent" />
 
-		<execute macro="Page#openURL">
+		<execute macro="Navigator#openSiteURL">
 			<var name="siteName" value="${siteNameFriendly}" />
-			<var name="siteURL" value="true" />
 		</execute>
 
 		<execute function="AssertAlertNotPresent" />
@@ -1477,9 +1467,8 @@
 
 		<execute function="AssertAlertNotPresent" />
 
-		<execute macro="Page#openURL">
+		<execute macro="Navigator#openSiteURL">
 			<var name="siteName" value="${siteNameFriendly}" />
-			<var name="siteURL" value="true" />
 		</execute>
 
 		<execute function="AssertAlertNotPresent" />

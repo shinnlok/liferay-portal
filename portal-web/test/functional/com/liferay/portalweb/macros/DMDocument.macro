@@ -21,16 +21,16 @@
 		<execute function="Type" locator1="Comments#COMMENT_FIELD" value1="${entryComment}" />
 
 		<if>
-			<condition function="IsElementPresent" locator1="PGDocumentsandmediaDocument#COMMENTS_SUBMIT_BUTTON" value1="Submit" />
+			<condition function="IsElementPresent" locator1="Button#SUBMIT" value1="Submit" />
 			<then>
-				<execute function="AssertClick" locator1="PGDocumentsandmediaDocument#COMMENTS_SUBMIT_BUTTON" value1="Submit" />
+				<execute function="Click" locator1="Button#SUBMIT" />
 			</then>
 			<else>
 				<execute function="AssertClick" locator1="Button#REPLY" value1="Reply" />
 			</else>
 		</if>
 
-		<execute function="AssertTextEquals#assertPartialText" locator1="PGDocumentsandmediaDocument#SUCCESS_MESSAGE" value1="Your request completed successfully." />
+		<execute function="AssertTextEquals#assertPartialText" locator1="Message#SUCCESS" value1="Your request completed successfully." />
 	</command>
 
 	<command name="addCP">
@@ -113,14 +113,13 @@
 		<execute function="Select" locator1="DocumentsAndMediaEditMarketingBanner#MARKETING_SELECT" value1="${marketingSelect}" />
 		<execute function="Select" locator1="DocumentsAndMediaEditMarketingBanner#CAMPAIGN_THEME_SELECT" value1="${campaignTheme}" />
 		<execute function="Select" locator1="DocumentsAndMediaEditMarketingBanner#BUSINESS_GOAL_SELECT" value1="${businessGoal}" />
-		<execute function="Click" locator1="CPDocumentsandmediaAddMarketingbanner#NEEDS_LEGAL_REVIEW_${legalReview}_RADIO" />
+		<execute function="Click" locator1="DocumentsAndMediaEditMarketingBanner#NEEDS_LEGAL_REVIEW_${legalReview}_RADIO" />
 		<execute function="Type" locator1="DocumentsAndMediaEditMarketingBanner#BANNER_NAME_FIELD" value1="${bannerName}" />
 		<execute function="Type" locator1="DocumentsAndMediaEditMarketingBanner#BANNER_DESCRIPTION_FIELD" value1="${bannerDescription}" />
 
 		<execute function="AssertClick" locator1="Button#PUBLISH" value1="Publish" />
 
 		<execute function="AssertTextEquals#assertPartialText" locator1="Message#SUCCESS" value1="Your request completed successfully." />
-		<execute function="AssertTextEquals" locator1="DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_TITLE" value1="${dmDocumentTitle}" />
 	</command>
 
 	<command name="addDocumentTypeCmdCP">
@@ -331,17 +330,14 @@
 			<then>
 				<var name="key_categoryName" value="${categoryName}" />
 
-				<if>
-					<condition function="IsElementNotPresent#isNotVisible" locator1="AssetCategorization#TAGS_FIELD" />
-					<then>
-						<execute function="AssertClick" locator1="AssetCategorization#CATEGORIZATION_PANEL_COLLAPSED" value1="Categorization" />
-					</then>
-				</if>
+				<execute macro="Panel#expandPanel">
+					<var name="panelHeading" value="Categorization" />
+				</execute>
 
 				<execute function="AssertClick" locator1="Button#SELECT" value1="Select" />
 
 				<execute function="AssertClick" locator1="AssetCategorization#CATEGORIES_CATEGORY" value1="${categoryName}" />
-				<execute function="AssertClick" locator1="Button#CLOSE_IFRAME" value1="×" />
+				<execute function="Click" locator1="Icon#CLOSE" />
 
 				<execute function="AssertTextEquals" locator1="AssetCategorization#CATEGORY" value1="${categoryName}" />
 			</then>
@@ -376,14 +372,16 @@
 		<if>
 			<equals arg1="${dmDocument}" arg2="Duplicate" />
 			<then>
-				<execute function="AssertTextEquals" locator1="Message#ERROR" value1="Your request failed to complete." />
+				<execute macro="Alert#viewRequestFailedToComplete" />
+
 				<execute function="AssertTextEquals" locator1="DocumentsAndMediaEditDocument#UNIQUE_DOCUMENT_ERROR_MESSAGE" value1="Please enter a unique document name." />
 			</then>
 			<elseif>
 				<equals arg1="${dmDocument}" arg2="Invalid" />
 				<then>
-					<execute function="AssertTextEquals" locator1="Message#ERROR_1" value1="Your request failed to complete." />
-					<execute function="AssertTextEquals" locator1="Message#ERROR_2" value1="Please enter a file with a valid file name." />
+					<execute macro="Alert#viewRequestFailedToComplete" />
+
+					<execute function="AssertTextEquals#assertPartialText" locator1="Message#ERROR_2" value1="Please enter a file with a valid file name." />
 				</then>
 			</elseif>
 			<else>
@@ -393,9 +391,11 @@
 	</command>
 
 	<command name="addPGViaAP">
-		<execute function="AssertClick" locator1="AP#ADD_NEW_DROPDOWN" value1="Add New" />
+		<execute function="Click#makeVisibleClickAt" locator1="AP#ADD_ASSET_PLUS_ICON" />
+
 		<execute function="AssertClick" locator1="MenuItem#BASIC_DOCUMENT" value1="Basic Document" />
-		<execute function="SelectFrame" locator1="IFrame#EDIT_ASSET" />
+
+		<execute function="SelectFrame" locator1="IFrame#DIALOG" />
 
 		<execute macro="DMDocument#editDocument">
 			<var name="dmDocumentDescription" value="${dmDocumentDescription}" />
@@ -485,18 +485,14 @@
 	</command>
 
 	<command name="addRelatedAssetPG">
-		<if>
-			<condition function="IsElementNotPresent" locator1="PGDocumentsandmediaAdddocument#RELATED_ASSETS_SELECT" />
-			<then>
-				<execute function="Click" locator1="AssetRelatedAssets#HEADER_COLLAPSED" />
-				<execute function="AssertElementPresent" locator1="AssetRelatedAssets#HEADER_EXPANDED" />
-			</then>
-		</if>
+		<execute macro="Panel#expandPanel">
+			<var name="panelHeading" value="Related Assets" />
+		</execute>
 
 		<var name="key_assetType" value="${assetType}" />
 
-		<execute function="AssertClick" locator1="PGDocumentsandmediaAdddocument#RELATED_ASSETS_SELECT" value1="Select" />
-		<execute function="AssertClick" locator1="PGDocumentsandmediaAdddocument#RELATED_ASSETS_MENULIST_SELECTION" value1="${assetType}" />
+		<execute function="AssertClick" locator1="AssetRelatedAssets#RELATED_ASSETS_SELECT" value1="Select" />
+		<execute function="AssertClick" locator1="AssetRelatedAssets#RELATED_ASSETS_SELECT_MENULIST_ASSET" value1="${assetType}" />
 
 		<var name="key_assetTitle" value="${assetTitle}" />
 
@@ -572,7 +568,7 @@
 		<execute function="AssertTextEquals" locator1="Message#CHECKOUT_SUCCESS" value1="You now have a lock on this document. No one else can edit this document until you unlock it. This lock will automatically expire in 1 day." />
 
 		<execute function="AssertClick#assertTextClick" locator1="Button#CANCEL_CHECKOUT" value1="Cancel Checkout" />
-		<execute function="AssertTextEquals#assertPartialText" locator1="PGDocumentsandmediaDocument#SUCCESS_MESSAGE" value1="Your request completed successfully." />
+		<execute function="AssertTextEquals#assertPartialText" locator1="Message#SUCCESS" value1="Your request completed successfully." />
 	</command>
 
 	<command name="cannotViewCP">
@@ -619,17 +615,17 @@
 		<execute function="AssertClick#assertTextClick" locator1="Button#CHECKIN" value1="Checkin" />
 
 		<if>
-			<condition function="IsElementPresent" locator1="PGDocumentsandmediaCheckin#MAJOR_REVISION" />
+			<condition function="IsElementPresent" locator1="Radio#MAJOR_VERSION" />
 			<then>
 				<if>
 					<equals arg1="${revision}" arg2="Major" />
 					<then>
-						<execute function="Click" locator1="PGDocumentsandmediaCheckin#MAJOR_REVISION" />
+						<execute function="Click" locator1="Radio#MAJOR_VERSION" />
 					</then>
 					<elseif>
 						<equals arg1="${revision}" arg2="Minor" />
 						<then>
-							<execute function="Click" locator1="PGDocumentsandmediaCheckin#MINOR_REVISION" />
+							<execute function="Click" locator1="Radio#MINOR_VERSION" />
 						</then>
 					</elseif>
 				</if>
@@ -637,15 +633,15 @@
 				<if>
 					<isset var="changeLog" />
 					<then>
-						<execute function="Type" locator1="PGDocumentsandmediaCheckin#CHANGE_LOG" value1="${changeLog}" />
+						<execute function="Type" locator1="TextArea#CHANGE_LOG" value1="${changeLog}" />
 					</then>
 				</if>
 
-				<execute function="AssertClick" locator1="Button#SAVE_AND_CHECKIN" value1="Save and Check In" />
+				<execute function="Click" locator1="Button#SAVE" />
 			</then>
 		</if>
 
-		<execute function="AssertTextEquals#assertPartialText" locator1="PGDocumentsandmediaDocument#SUCCESS_MESSAGE" value1="Your request completed successfully." />
+		<execute function="AssertTextEquals#assertPartialText" locator1="Message#SUCCESS" value1="Your request completed successfully." />
 	</command>
 
 	<command name="checkinViaDocumentActionsPG">
@@ -655,17 +651,17 @@
 		<execute function="AssertClick" locator1="MenuItem#CHECKIN" value1="Checkin" />
 
 		<if>
-			<condition function="IsElementPresent" locator1="PGDocumentsandmediaCheckin#MAJOR_REVISION" />
+			<condition function="IsElementPresent" locator1="Radio#MAJOR_VERSION" />
 			<then>
 				<if>
 					<equals arg1="${revision}" arg2="Major" />
 					<then>
-						<execute function="Click" locator1="PGDocumentsandmediaCheckin#MAJOR_REVISION" />
+						<execute function="Click" locator1="Radio#MAJOR_VERSION" />
 					</then>
 					<elseif>
 						<equals arg1="${revision}" arg2="Minor" />
 						<then>
-							<execute function="Click" locator1="PGDocumentsandmediaCheckin#MINOR_REVISION" />
+							<execute function="Click" locator1="Radio#MINOR_VERSION" />
 						</then>
 					</elseif>
 				</if>
@@ -673,7 +669,7 @@
 				<if>
 					<isset var="changeLog" />
 					<then>
-						<execute function="Type" locator1="PGDocumentsandmediaCheckin#CHANGE_LOG" value1="${changeLog}" />
+						<execute function="Type" locator1="TextArea#CHANGE_LOG" value1="${changeLog}" />
 					</then>
 				</if>
 
@@ -705,7 +701,7 @@
 		<execute function="AssertClick" locator1="DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_TITLE" value1="${dmDocumentTitle}" />
 
 		<execute function="AssertClick#assertTextClick" locator1="Button#CHECKOUT" value1="Checkout" />
-		<execute function="AssertTextEquals#assertPartialText" locator1="PGDocumentsandmediaDocument#SUCCESS_MESSAGE" value1="Your request completed successfully." />
+		<execute function="AssertTextEquals#assertPartialText" locator1="Message#SUCCESS" value1="Your request completed successfully." />
 		<execute function="AssertTextEquals" locator1="Message#CHECKOUT_SUCCESS" value1="You now have a lock on this document. No one else can edit this document until you unlock it. This lock will automatically expire in 1 day." />
 	</command>
 
@@ -728,10 +724,10 @@
 
 		<execute function="AssertClick" locator1="DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_TITLE" value1="${dmDocumentTitle}" />
 
-		<execute function="MakeVisible" locator1="PGDocumentsandmediaDocument#COMMENTS_DELETE" value1="Delete" />
+		<execute function="MakeVisible" locator1="Comments#DELETE_LINK_GENERIC" value1="Delete" />
 		<execute function="AssertClickNoError" locator1="Comments#DELETE_LINK" value1="Delete" />
 		<execute function="Confirm" value1="Are you sure you want to delete the selected comment?" />
-		<execute function="AssertTextEquals#assertPartialText" locator1="PGDocumentsandmediaDocument#SUCCESS_MESSAGE" value1="Your request completed successfully." />
+		<execute function="AssertTextEquals#assertPartialText" locator1="Message#SUCCESS" value1="Your request completed successfully." />
 	</command>
 
 	<command name="deleteCP">
@@ -834,23 +830,6 @@
 	<command name="editCmd">
 		<if>
 			<not>
-				<contains string="${checkedOut}" substring="{checkedOut}" />
-			</not>
-			<then>
-				<if>
-					<equals arg1="${dmRepositoryName}" arg2="true" />
-					<then>
-						<execute function="AssertTextEquals#assertPartialText" locator1="Message#SUCCESS" value1="You now have an indefinite lock on this document. No one else can edit this document until you unlock it. This lock will never expire." />
-					</then>
-					<else>
-						<execute function="AssertTextEquals#assertPartialText" locator1="Message#SUCCESS" value1="You now have a lock on this document. No one else can edit this document until you unlock it. This lock will automatically expire in 1 day." />
-					</else>
-				</if>
-			</then>
-		</if>
-
-		<if>
-			<not>
 				<contains string="${dmDocumentFileEdit}" substring="{dmDocumentFileEdit}" />
 			</not>
 			<then>
@@ -906,7 +885,7 @@
 				<contains string="${dmDocumentTitleEdit}" substring="{dmDocumentTitleEdit}" />
 			</not>
 			<then>
-				<execute function="Type" locator1="PGDocumentsandmediaEditdocument#TITLE_FIELD" value1="${dmDocumentTitleEdit}"  />
+				<execute function="Type" locator1="TextInput#TITLE" value1="${dmDocumentTitleEdit}"  />
 			</then>
 		</if>
 
@@ -915,7 +894,7 @@
 				<contains string="${dmDocumentDescriptionEdit}" substring="{dmDocumentDescriptionEdit}" />
 			</not>
 			<then>
-				<execute function="Type" locator1="PGDocumentsandmediaEditdocument#DESCRIPTION_FIELD" value1="${dmDocumentDescriptionEdit}" />
+				<execute function="Type" locator1="TextArea#DESCRIPTION" value1="${dmDocumentDescriptionEdit}" />
 			</then>
 		</if>
 
@@ -940,10 +919,10 @@
 				<if>
 					<equals arg1="${revision}" arg2="Major" />
 					<then>
-						<execute function="Click" locator1="PGDocumentsandmediaEditdocument#MAJOR_REVISION_BUTTON" />
+						<execute function="Click" locator1="DocumentsAndMediaEditDocument#MAJOR_REVISION_BUTTON" />
 					</then>
 					<else>
-						<execute function="Click" locator1="PGDocumentsandmediaEditdocument#MINOR_REVISION_BUTTON" />
+						<execute function="Click" locator1="DocumentsAndMediaEditDocument#MINOR_REVISION_BUTTON" />
 					</else>
 				</if>
 			</then>
@@ -952,7 +931,7 @@
 		<if>
 			<isset var="changeLog" />
 			<then>
-				<execute function="Type" locator1="PGDocumentsandmediaCheckin#CHANGE_LOG" value1="${changeLog}" />
+				<execute function="Type" locator1="TextArea#CHANGE_LOG" value1="${changeLog}" />
 			</then>
 		</if>
 	</command>
@@ -962,11 +941,11 @@
 
 		<execute function="AssertClick" locator1="DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_TITLE" value1="${dmDocumentTitle}" />
 
-		<execute function="MakeVisible" locator1="PGDocumentsandmediaDocument#COMMENTS_EDIT" value1="Edit" />
+		<execute function="MakeVisible" locator1="Comments#EDIT_LINK" value1="Edit" />
 		<execute function="AssertClick" locator1="Comments#EDIT_LINK" value1="Edit" />
-		<execute function="Type" locator1="PGDocumentsandmediaDocument#COMMENTS_COMMENT_EDIT_FIELD" value1="${commentBodyEdit}" />
+		<execute function="Type" locator1="AlloyEditor#CONTENT_FIELD" value1="${commentBodyEdit}" />
 		<execute function="AssertClick" locator1="Button#PUBLISH" value1="Publish" />
-		<execute function="AssertTextEquals#assertPartialText" locator1="PGDocumentsandmediaDocument#SUCCESS_MESSAGE" value1="Your request completed successfully." />
+		<execute function="AssertTextEquals#assertPartialText" locator1="Message#SUCCESS" value1="Your request completed successfully." />
 	</command>
 
 	<command name="editCP">
@@ -975,22 +954,12 @@
 		</execute>
 
 		<execute macro="DMDocument#editCmd">
-			<var name="checkedOut" value="${checkedOut}" />
 			<var name="dmDocumentDescriptionEdit" value="${dmDocumentDescriptionEdit}" />
 			<var name="dmDocumentFileEdit" value="${dmDocumentFileEdit}" />
 			<var name="dmDocumentTitleEdit" value="${dmDocumentTitleEdit}" />
-			<var name="sharepointRepository" value="${sharepointRepository}" />
 		</execute>
 
-		<if>
-			<equals arg1="${checkedOut}" arg2="true" />
-			<then>
-				<execute function="AssertClick" locator1="Button#SAVE" value1="Save" />
-			</then>
-			<else>
-				<execute function="AssertClick" locator1="Button#PUBLISH" value1="Publish" />
-			</else>
-		</if>
+		<execute function="Click" locator1="Button#PUBLISH" />
 
 		<execute function="AssertTextEquals#assertPartialText" locator1="Message#SUCCESS" value1="Your request completed successfully." />
 	</command>
@@ -1008,12 +977,16 @@
 	</command>
 
 	<command name="editPG">
+		<var name="key_dmDocumentTitle" value="${dmDocumentTitle}" />
+
+		<execute function="AssertClick" locator1="DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_TITLE" value1="${dmDocumentTitle}" />
+
+		<execute function="Click" locator1="Button#EDIT" />
+
 		<execute macro="DMDocument#editCmd">
-			<var name="checkedOut" value="${checkedOut}" />
 			<var name="dmDocumentDescriptionEdit" value="${dmDocumentDescriptionEdit}" />
 			<var name="dmDocumentFileEdit" value="${dmDocumentFileEdit}" />
 			<var name="dmDocumentTitleEdit" value="${dmDocumentTitleEdit}" />
-			<var name="sharepointRepository" value="${sharepointRepository}" />
 		</execute>
 
 		<execute function="AssertClick" locator1="Button#PUBLISH" value1="Publish" />
@@ -1026,14 +999,14 @@
 
 		<execute function="Click" locator1="AP#ASSET_ABSTRACT_EDIT" />
 
-		<execute function="SelectFrame" locator1="IFrame#EDIT_ASSET" />
+		<execute function="SelectFrame" locator1="IFrame#DIALOG" />
 
 		<if>
 			<not>
 				<contains string="${dmDocumentTitleEdit}" substring="{dmDocumentTitleEdit}" />
 			</not>
 			<then>
-				<execute function="Type" locator1="PGDocumentsandmediaEditdocument#TITLE_FIELD" value1="${dmDocumentTitleEdit}"  />
+				<execute function="Type" locator1="TextInput#TITLE" value1="${dmDocumentTitleEdit}"  />
 			</then>
 		</if>
 
@@ -1095,13 +1068,13 @@
 		<if>
 			<isset var="changeLog" />
 			<then>
-				<execute function="Type" locator1="PGDocumentsandmediaCheckin#CHANGE_LOG" value1="${changeLog}" />
+				<execute function="Type" locator1="TextArea#CHANGE_LOG" value1="${changeLog}" />
 			</then>
 		</if>
 
 		<execute function="AssertClick" locator1="Button#SAVE_AND_CHECKIN" value1="Save and Check In" />
 
-		<execute function="AssertTextEquals#assertPartialText" locator1="PGDocumentsandmediaDocument#SUCCESS_MESSAGE" value1="Your request completed successfully." />
+		<execute function="AssertTextEquals#assertPartialText" locator1="Message#SUCCESS" value1="Your request completed successfully." />
 	</command>
 
 	<command name="editSaveAsDraftPG">
@@ -1120,13 +1093,13 @@
 		<if>
 			<isset var="changeLog" />
 			<then>
-				<execute function="Type" locator1="PGDocumentsandmediaCheckin#CHANGE_LOG" value1="${changeLog}" />
+				<execute function="Type" locator1="TextArea#CHANGE_LOG" value1="${changeLog}" />
 			</then>
 		</if>
 
-		<execute function="AssertClick" locator1="PGDocumentsandmediaEditdocument#SAVE_AS_DRAFT_BUTTON" value1="Save as Draft" />
+		<execute function="Click" locator1="Button#SAVE_AS_DRAFT" />
 
-		<execute function="AssertTextEquals#assertPartialText" locator1="PGDocumentsandmediaDocument#SUCCESS_MESSAGE" value1="Your request completed successfully." />
+		<execute function="AssertTextEquals#assertPartialText" locator1="Message#SUCCESS" value1="Your request completed successfully." />
 		<execute function="AssertTextEquals" locator1="DocumentsAndMediaDocument#DOCUMENT_DETAILS_WORKFLOW" value1="Status: Draft" />
 	</command>
 
@@ -1152,36 +1125,16 @@
 
 	<command name="linkImage">
 		<execute function="Click#pauseClickAt" locator1="CKEditor#CONTENT_IMAGE_LINK" />
-		<execute function="AssertClick#pauseAssertTextClickAt" locator1="CKEditor#CONTENT_IMAGE_LINK_BROWSE_SERVER_BUTTON" value1="Browse Server" />
-		<execute function="SelectFrame" locator1="CKEditor#LINK_IMAGE_BROWSE_SERVER_IFRAME" />
 
-		<if>
-			<isset var="siteName" />
-			<then>
-				<execute function="Click" locator1="CKEditor#LINK_IMAGE_BROWSE_SERVER_SITE_BUTTON" />
+		<execute macro="ItemSelector#addFromURL">
+			<var name="imageSourceURL" value="${dmDocumentURL}" />
+		</execute>
 
-				<var name="key_siteName" value="${siteName}" />
+		<execute function="SelectFrame" locator1="CKEditor#BODY_FIELD_IFRAME" />
 
-				<execute function="Click" locator1="CKEditor#LINK_IMAGE_BROWSE_SERVER_SITE_MENULIST_BUTTON" />
-			</then>
-		</if>
+		<execute function="AssertElementPresent" locator1="CKEditor#CONTENT_IMAGE_LINK_IMAGE" />
 
-		<if>
-			<isset var="key_folderName" />
-			<then>
-				<for list="${dmFolderNames}" param="folderName">
-					<var name="key_folderName" value="${folderName}" />
-
-					<execute function="Click" locator1="CKEditor#LINK_IMAGE_BROWSE_SERVER_FOLDER_NAME" />
-				</for>
-			</then>
-		</if>
-
-		<var name="key_documentName" value="${documentName}" />
-
-		<execute function="AssertClick" locator1="CKEditor#LINK_IMAGE_BROWSE_SERVER_DOCUMENT_CHOOSE_BUTTON" value1="Choose" />
-		<execute function="SelectFrame" value1="relative=top" />
-		<execute function="AssertClick" locator1="CKEditor#CONTENT_IMAGE_LINK_OK_BUTTON" value1="OK" />
+		<execute macro="IFrame#selectTopFrame" />
 	</command>
 
 	<command name="moveToFolderCP">
@@ -1207,7 +1160,7 @@
 
 		<execute function="SelectFrame" locator1="relative=top" />
 
-		<execute function="AssertTextEquals" locator1="CPDocumentsandmediaMovefolder#NEW_FOLDER" value1="${dmFolderName}" />
+		<execute function="AssertTextEquals" locator1="DocumentsAndMediaEditDocument#FOLDER" value1="${dmFolderName}" />
 
 		<execute function="AssertClick" locator1="Button#MOVE" value1="Move" />
 
@@ -1238,8 +1191,9 @@
 		<if>
 			<isset var="dmDuplicateDocument" />
 			<then>
-				<execute function="AssertTextEquals" locator1="Message#ERROR" value1="Your request failed to complete." />
-				<execute function="AssertTextEquals" locator1="Message#ERROR_2" value1="The folder you selected already has an entry with this name. Please select a different folder." />
+				<execute macro="Alert#viewRequestFailedToComplete" />
+
+				<execute function="AssertTextEquals#assertPartialText" locator1="Message#ERROR_2" value1="The folder you selected already has an entry with this name. Please select a different folder." />
 			</then>
 			<else>
 				<execute function="AssertTextEquals#assertPartialText" locator1="Message#SUCCESS" value1="Your request completed successfully." />
@@ -1250,17 +1204,17 @@
 	<command name="moveToHomePG">
 		<var name="key_dmFolderName" value="${dmFolderName}" />
 
-		<execute function="Check" locator1="PGDocumentsandmediaFolder#ENTRY_ICON_FOLDER_CHECKBOX" />
-		<execute function="AssertClick#waitForDMHomeAssertTextEqualsClick" locator1="PGDocumentsandmediaFolder#TOOLBAR_ACTIONS" value1="Actions" />
-		<execute function="AssertClick" locator1="PGDocumentsandmediaFolder#ACTIONS_MENULIST_MOVE" value1="Move" />
+		<execute function="Check" locator1="DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_CHECKBOX" />
+		<execute function="AssertClick#waitForDMHomeAssertTextEqualsClick" locator1="DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_VERTICAL_ELLIPSIS" value1="Actions" />
+		<execute function="AssertClick" locator1="MenuItem#MOVE" value1="Move" />
 
 		<execute function="AssertClick" locator1="Button#SELECT" value1="Select" />
 		<execute function="SelectFrame" locator1="IFrame#SELECT_FOLDER" />
 
 		<if>
-			<condition function="IsElementPresent" locator1="PGDocumentsandmediaMovefiles#SELECT_POP_UP_HOME" />
+			<condition function="IsElementPresent" locator1="DocumentsAndMedia#BREADCRUMB_HOME" />
 			<then>
-				<execute function="AssertClick" locator1="PGDocumentsandmediaMovefiles#SELECT_POP_UP_HOME" value1="Home" />
+				<execute function="AssertClick" locator1="DocumentsAndMedia#BREADCRUMB_HOME" value1="Home" />
 			</then>
 		</if>
 
@@ -1314,7 +1268,7 @@
 
 		<execute function="SelectFrame" locator1="relative=top" />
 
-		<execute function="AssertTextEquals" locator1="CPDocumentsandmediaMovefolder#NEW_FOLDER" value1="${dmSubFolderName}" />
+		<execute function="AssertTextEquals" locator1="DocumentsAndMediaEditDocument#FOLDER" value1="${dmSubFolderName}" />
 
 		<execute function="AssertClick" locator1="Button#MOVE" value1="Move" />
 
@@ -1478,7 +1432,7 @@
 
 		<execute function="AssertClick" locator1="Button#PUBLISH" value1="Publish" />
 
-		<execute function="AssertTextEquals#assertPartialText" locator1="PGDocumentsandmediaDocument#SUCCESS_MESSAGE" value1="Your request completed successfully." />
+		<execute function="AssertTextEquals#assertPartialText" locator1="Message#SUCCESS" value1="Your request completed successfully." />
 	</command>
 
 	<command name="ratePG">
@@ -1489,7 +1443,7 @@
 		<if>
 			<equals arg1="${soDocument}" arg2="true" />
 			<then>
-				<execute function="SikuliClick" locator1="PGDocumentsandmediaDocument#SOCIAL_OFFICE_AVERAGE_RATING_STAR_ICON_PNG" />
+				<execute function="SikuliClick" locator1="DocumentsAndMediaDocument#SOCIAL_OFFICE_AVERAGE_RATING_STAR_ICON_PNG" />
 			</then>
 			<else>
 				<execute function="SikuliClick" locator1="Ratings#AVERAGE_RATING_STAR_ICON_PNG" />
@@ -1508,28 +1462,38 @@
 		<execute function="AssertClick" locator1="MenuItem#PERMISSIONS" value1="Permissions" />
 
 		<execute function="SelectFrame" locator1="Permissions#PERMISSIONS_IFRAME" />
-		<execute function="AssertTextEquals" locator1="Permissions#HEADER_TITLE" value1="${dmDocumentTitle}" />
+
+		<var name="key_assetTitle" value="${dmDocumentTitle}" />
+
+		<execute function="AssertTextEquals" locator1="Permissions#ASSET_TITLE" value1="${dmDocumentTitle}" />
+
 		<execute function="Uncheck" locator1="Permissions#CONFIGURATION_PERMISSIONS_VIEW_CHECKBOX" />
+
 		<execute function="AssertClick" locator1="Button#SAVE" value1="Save" />
+
 		<execute function="AssertTextEquals#assertPartialText" locator1="Permissions#SUCCESS_MESSAGE" value1="Your request completed successfully." />
+
 		<execute function="SelectFrame" value1="relative=top" />
 	</command>
 
 	<command name="revertPG">
-		<var name="key_dmDocumentTitle" value="${dmDocumentTitle}" />
-		<var name="key_dmDocumentVersionNumber" value="${dmDocumentVersionNumber}" />
+		<execute function="Click" locator1="DocumentsAndMediaDocument#DOCUMENT_DETAILS_DROPDOWN" />
 
-		<execute function="AssertClick" locator1="DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_TITLE" value1="${dmDocumentTitle}" />
+		<execute function="AssertClick" locator1="MenuItem#VERSIONS" value1="Versions" />
 
-		<execute function="AssertTextEquals" locator1="DocumentsAndMediaDocument#VERSION_HISTORY_TABLE_VERSION_GENERIC" value1="${dmDocumentVersionNumber}" />
-		<execute function="Click" locator1="DocumentsAndMediaDocument#VERSION_HISTORY_TABLE_DROPDOWN" />
+		<var name="key_rowEntry" value="Version ${dmDocumentVersionNumber}" />
+
+		<execute function="Click" locator1="Icon#ROW_VERTICAL_ELLIPSIS" />
+
 		<execute function="AssertClick" locator1="MenuItem#REVERT" value1="Revert" />
-		<execute function="AssertTextEquals#assertPartialText" locator1="PGDocumentsandmediaDocument#SUCCESS_MESSAGE" value1="Your request completed successfully." />
+
+		<execute macro="Alert#viewRequestCompletedSuccessMessage" />
 	</command>
 
 	<command name="saveAsDraftPG">
-		<execute function="AssertClick#waitForDMHomeAssertTextEqualsClick" locator1="PGDocumentsandmediaFolder#TOOLBAR_ADD" value1="Add" />
-		<execute function="AssertClick" locator1="PGDocumentsandmediaFolder#ADD_MENULIST_BASIC_DOCUMENT" value1="Basic Document" />
+		<execute function="Click" locator1="Button#PLUS" />
+
+		<execute function="AssertClick" locator1="MenuItem#BASIC_DOCUMENT" value1="Basic Document" />
 
 		<execute macro="DMDocument#editDocument">
 			<var name="dmDocumentDescription" value="${dmDocumentDescription}" />
@@ -1539,7 +1503,7 @@
 
 		<execute function="AssertClick" locator1="Button#SAVE_AS_DRAFT" value1="Save as Draft" />
 
-		<execute function="AssertTextEquals#assertPartialText" locator1="PGDocumentsandmediaFolder#SUCCESS_MESSAGE" value1="Your request completed successfully." />
+		<execute function="AssertTextEquals#assertPartialText" locator1="Message#SUCCESS" value1="Your request completed successfully." />
 	</command>
 
 	<command name="searchCP">
@@ -1766,6 +1730,8 @@
 	</command>
 
 	<command name="viewCP">
+		<var name="key_dmDocumentTitle" value="${dmDocumentTitle}" />
+
 		<execute function="AssertTextEquals" locator1="DocumentsAndMediaDocument#DOCUMENT_INFO_TITLE" value1="${dmDocumentTitle}" />
 
 		<if>
@@ -1776,7 +1742,9 @@
 				</not>
 			</and>
 			<then>
-				<execute function="AssertTextEquals" locator1="DocumentsAndMediaDocument#VERSION_HISTORY_TABLE_SIZE" value1="${dmDocumentSize}" />
+				<var name="key_dmDocumentSize" value="${dmDocumentSize}" />
+
+				<execute function="AssertTextEquals" locator1="DocumentsAndMediaDocument#DOCUMENT_DETAILS_DOWNLOAD" value1="Download (${dmDocumentSize}KB)" />
 			</then>
 		</if>
 	</command>
@@ -1815,23 +1783,23 @@
 
 		<var name="key_marketingSelect" value="${marketingSelect}" />
 
-		<execute function="AssertTextEquals#assertPartialText" locator1="PGDocumentsandmediaDocument#MARKETING_SELECT" value1="${marketingSelect}" />
+		<execute function="AssertTextEquals#assertPartialText" locator1="DocumentsAndMediaDocument#MARKETING_SELECT" value1="${marketingSelect}" />
 
 		<var name="key_campaignTheme" value="${campaignTheme}" />
 
-		<execute function="AssertTextEquals#assertPartialText" locator1="PGDocumentsandmediaDocument#MARKETING_CAMPAIGN_THEME" value1="${campaignTheme}" />
+		<execute function="AssertTextEquals#assertPartialText" locator1="DocumentsAndMediaDocument#MARKETING_CAMPAIGN_THEME" value1="${campaignTheme}" />
 
 		<var name="key_legalReview" value="${legalReview}" />
 
-		<execute function="AssertTextEquals#assertPartialText" locator1="PGDocumentsandmediaDocument#MARKETING_NEEDS_LEGAL_REVIEW" value1="${legalReview}" />
+		<execute function="AssertTextEquals#assertPartialText" locator1="DocumentsAndMediaDocument#MARKETING_NEEDS_LEGAL_REVIEW" value1="${legalReview}" />
 
 		<var name="key_bannerName" value="${bannerName}" />
 
-		<execute function="AssertTextEquals#assertPartialText" locator1="PGDocumentsandmediaDocument#MARKETING_BANNER_NAME" value1="${bannerName}" />
+		<execute function="AssertTextEquals#assertPartialText" locator1="DocumentsAndMediaDocument#MARKETING_BANNER_NAME" value1="${bannerName}" />
 
 		<var name="key_bannerDescription" value="${bannerDescription}" />
 
-		<execute function="AssertTextEquals#assertPartialText" locator1="PGDocumentsandmediaDocument#MARKETING_BANNER_DESCRIPTION" value1="${bannerDescription}" />
+		<execute function="AssertTextEquals#assertPartialText" locator1="DocumentsAndMediaDocument#MARKETING_BANNER_DESCRIPTION" value1="${bannerDescription}" />
 	</command>
 
 	<command name="viewDocumentAuthorCmdPG">
@@ -1879,10 +1847,18 @@
 	</command>
 
 	<command name="viewDocumentDetailsCmdPG">
-		<execute function="AssertElementPresent" locator1="DocumentsAndMediaDocument#DOCUMENT_INFO_DATE" />
+		<execute function="AssertElementPresent" locator1="DocumentsAndMediaDocument#DOCUMENT_INFO_CREATED_DATE" />
 		<execute function="AssertElementPresent" locator1="DocumentsAndMediaDocument#DOCUMENT_INFO_WORKFLOW_STATUS" />
+
+		<var name="key_dmDocumentSize" value="${dmDocumentSize}" />
+
 		<execute function="AssertElementPresent" locator1="DocumentsAndMediaDocument#DOCUMENT_INFO_DOWNLOAD_DOCUMENT" />
 		<execute function="AssertElementPresent" locator1="DocumentsAndMediaDocument#DOCUMENT_INFO_GET_URL_OR_WEBDAV_URL" />
+
+		<execute function="Click" locator1="DocumentsAndMediaDocument#DOCUMENT_DETAILS_DROPDOWN" />
+
+		<execute function="AssertClick" locator1="MenuItem#METADATA" value1="Metadata" />
+
 		<execute function="AssertTextEquals" locator1="DocumentsAndMediaDocument#DOCUMENT_INFO_AUTOMATICALLY_EXTRACTED_METADATA" value1="Automatically Extracted Metadata" />
 	</command>
 
@@ -1903,6 +1879,8 @@
 	</command>
 
 	<command name="viewDocumentTitleCmdPG">
+		<var name="key_dmDocumentTitle" value="${dmDocumentTitle}" />
+
 		<execute function="AssertTextEquals" locator1="DocumentsAndMediaDocument#DOCUMENT_INFO_TITLE" value1="${dmDocumentTitle}" />
 	</command>
 
@@ -1911,7 +1889,7 @@
 
 		<execute function="AssertClick" locator1="DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_TITLE" value1="${dmDocumentTitle}" />
 
-		<execute function="AssertTextEquals" locator1="Button#DOWNLOAD" value1="Download" />
+		<execute function="AssertTextEquals#assertPartialText" locator1="Link#DOWNLOAD" value1="Download" />
 		<execute function="AssertElementNotPresent" locator1="Button#EDIT" value1="Edit" />
 		<execute function="AssertElementNotPresent" locator1="Button#MOVE" value1="Move" />
 		<execute function="AssertElementNotPresent" locator1="Button#CHECKOUT" value1="Checkout" />
@@ -2009,7 +1987,10 @@
 		<execute function="AssertClick" locator1="MenuItem#PERMISSIONS" value1="Permissions" />
 
 		<execute function="SelectFrame" locator1="Permissions#PERMISSIONS_IFRAME" />
-		<execute function="AssertTextEquals" locator1="Permissions#HEADER_TITLE" value1="${dmDocumentTitle}" />
+
+		<var name="key_assetTitle" value="${dmDocumentTitle}" />
+
+		<execute function="AssertTextEquals" locator1="Permissions#ASSET_TITLE" value1="${dmDocumentTitle}" />
 
 		<if>
 			<equals arg1="${viewPermissionValue}" arg2="checked" />
@@ -2088,7 +2069,10 @@
 		<execute function="AssertClick" locator1="MenuItem#PERMISSIONS" value1="Permissions" />
 
 		<execute function="SelectFrame" locator1="Permissions#PERMISSIONS_IFRAME" />
-		<execute function="AssertTextEquals" locator1="Permissions#HEADER_TITLE" value1="${dmDocumentTitle}" />
+
+		<var name="key_assetTitle" value="${dmDocumentTitle}" />
+
+		<execute function="AssertTextEquals" locator1="Permissions#ASSET_TITLE" value1="${dmDocumentTitle}" />
 
 		<if>
 			<equals arg1="${viewPermissionValue}" arg2="checked" />
@@ -2121,15 +2105,6 @@
 		<execute function="AssertVisible" locator1="DocumentsAndMedia#ICON_DOCUMENT_ICON_NOT_LOCKED" />
 	</command>
 
-	<command name="viewLockPG">
-		<var name="key_dmDocumentTitle" value="${dmDocumentTitle}" />
-
-		<execute function="AssertClick" locator1="PGDocumentsandmediaFolder#ENTRY_ICON_FOLDER_TITLE" value1="${dmDocumentTitle}" />
-		<execute function="AssertTextEquals#assertPartialText" locator1="Message#SUCCESS" value1="You now have a lock on this document. No one else can edit this document until you unlock it. This lock will automatically expire in 1 day." />
-		<execute function="AssertClick#assertTextClick" locator1="Button#EDIT" value1="Edit" />
-		<execute function="AssertTextEquals#assertPartialText" locator1="Message#SUCCESS" value1="You now have a lock on this document. No one else can edit this document until you unlock it. This lock will automatically expire in 1 day." />
-	</command>
-
 	<command name="viewMovedToFolderCP">
 		<var name="key_dmDocumentTitle" value="${dmDocumentTitle}" />
 		<var name="key_dmFolderName" value="${dmFolderName}" />
@@ -2147,19 +2122,26 @@
 	</command>
 
 	<command name="viewOlderVersionPG">
-		<var name="dmDocumentTitle" value="${dmDocumentTitle}" />
-		<var name="key_dmDocumentDescription" value="${dmDocumentDescription}" />
-		<var name="key_dmDocumentVersionNumber" value="${dmDocumentVersionNumber}" />
+		<execute function="Click" locator1="DocumentsAndMediaDocument#DOCUMENT_DETAILS_DROPDOWN" />
 
-		<execute function="Click" locator1="DocumentsAndMediaDocument#VERSION_HISTORY_TABLE_DROPDOWN" value1="${dmDocumentVersionNumber}" />
-		<execute function="Click" locator1="MenuItem#VIEW" />
-		<execute function="AssertTextEquals" locator1="DocumentsAndMediaDocument#DOCUMENT_INFO_TITLE" value1="${dmDocumentTitle}" />
+		<execute function="AssertClick" locator1="MenuItem#VERSIONS" value1="Versions" />
+
+		<var name="key_rowEntry" value="Version ${dmDocumentVersionNumber}" />
+
+		<execute function="Click" locator1="Icon#ROW_VERTICAL_ELLIPSIS" />
+
+		<execute function="AssertClick" locator1="MenuItem#VIEW" value1="View" />
+
+		<var name="key_dmDocumentDescription" value="${dmDocumentDescription}" />
+		<var name="key_dmDocumentTitle" value="${dmDocumentTitle}" />
+
+		<execute function="AssertTextEquals" locator1="DocumentsAndMediaDocument#DOCUMENT_INFO_TITLE" value1="${dmDocumentTitle} (Version ${dmDocumentVersionNumber})" />
 		<execute function="AssertTextEquals" locator1="DocumentsAndMediaDocument#DOCUMENT_INFO_DESCRIPTION" value1="${dmDocumentDescription}" />
 		<execute function="AssertTextEquals" locator1="DocumentsAndMediaDocument#DOCUMENT_INFO_VERSION" value1="Version ${dmDocumentVersionNumber}" />
 	</command>
 
 	<command name="viewPG">
-		<execute function="AssertElementPresent" locator1="Icon#DISPLAY_STYLE_DESCRIPTIVE" />
+		<execute function="Click" locator1="Icon#DISPLAY_STYLE_DESCRIPTIVE" />
 
 		<var name="key_dmDocumentTitle" value="${dmDocumentTitle}" />
 

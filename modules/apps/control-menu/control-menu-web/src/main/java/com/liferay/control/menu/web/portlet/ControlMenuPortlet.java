@@ -17,15 +17,15 @@ package com.liferay.control.menu.web.portlet;
 import com.liferay.control.menu.web.constants.ControlMenuPortletKeys;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
+import com.liferay.portal.kernel.security.auth.PrincipalException;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.servlet.MultiSessionMessages;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.LayoutTypePortlet;
-import com.liferay.portal.security.auth.PrincipalException;
-import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.service.permission.LayoutPermissionUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portlet.sites.util.SitesUtil;
+import com.liferay.sites.kernel.util.SitesUtil;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -43,7 +43,10 @@ import org.osgi.service.component.annotations.Component;
 		"com.liferay.portlet.css-class-wrapper=portlet-control-menu",
 		"com.liferay.portlet.display-category=category.hidden",
 		"com.liferay.portlet.instanceable=false",
+		"com.liferay.portlet.system=true",
 		"com.liferay.portlet.use-default-template=false",
+		"javax.portlet.display-name=Control Menu",
+		"javax.portlet.init-param.view-template=/view.jsp",
 		"javax.portlet.name=" + ControlMenuPortletKeys.CONTROL_MENU,
 		"javax.portlet.resource-bundle=content.Language",
 		"javax.portlet.supports.mime-type=text/html"

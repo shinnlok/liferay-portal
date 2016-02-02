@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.module.configuration.ConfigurationFactoryUtil;
+import com.liferay.portal.kernel.portlet.configuration.icon.PortletConfigurationIconMenu;
 import com.liferay.portal.kernel.portlet.toolbar.PortletToolbar;
 import com.liferay.portal.kernel.settings.PortletInstanceSettingsLocator;
 import com.liferay.portal.kernel.util.HtmlUtil;
@@ -78,10 +79,13 @@ public class PortletDisplay implements Cloneable, Serializable {
 		_modePrint = master.isModePrint();
 		_modeView = master.isModeView();
 		_namespace = master.getNamespace();
+		_portletConfigurationIconMenu =
+			master.getPortletConfigurationIconMenu();
 		_portletDecorate = master.isPortletDecorate();
 		_portletDecoratorId = master.getPortletDecoratorId();
 		_portletDisplayName = master.getPortletDisplayName();
 		_portletName = master.getPortletName();
+		_portletResource = master.getPortletResource();
 		_portletSetup = master.getPortletSetup();
 		_portletToolbar = master.getPortletToolbar();
 		_resourcePK = master.getResourcePK();
@@ -113,6 +117,7 @@ public class PortletDisplay implements Cloneable, Serializable {
 		_urlBack = master.getURLBack();
 		_urlClose = master.getURLClose();
 		_urlConfiguration = master.getURLConfiguration();
+		_urlConfigurationJS = master.getURLConfigurationJS();
 		_urlEdit = master.getURLEdit();
 		_urlEditDefaults = master.getURLEditDefaults();
 		_urlEditGuest = master.getURLEditGuest();
@@ -148,6 +153,7 @@ public class PortletDisplay implements Cloneable, Serializable {
 		slave.setModePrint(_modePrint);
 		slave.setModeView(_modeView);
 		slave.setNamespace(_namespace);
+		slave.setPortletConfigurationIconMenu(_portletConfigurationIconMenu);
 		slave.setPortletDecorate(_portletDecorate);
 		slave.setPortletDecoratorId(_portletDecoratorId);
 		slave.setPortletDisplayName(_portletDisplayName);
@@ -183,6 +189,7 @@ public class PortletDisplay implements Cloneable, Serializable {
 		slave.setURLBack(_urlBack);
 		slave.setURLClose(_urlClose);
 		slave.setURLConfiguration(_urlConfiguration);
+		slave.setURLConfigurationJS(_urlConfigurationJS);
 		slave.setURLEdit(_urlEdit);
 		slave.setURLEditDefaults(_urlEditDefaults);
 		slave.setURLEditGuest(_urlEditGuest);
@@ -234,6 +241,10 @@ public class PortletDisplay implements Cloneable, Serializable {
 
 	public String getNamespace() {
 		return _namespace;
+	}
+
+	public PortletConfigurationIconMenu getPortletConfigurationIconMenu() {
+		return _portletConfigurationIconMenu;
 	}
 
 	public String getPortletDecoratorId() {
@@ -663,6 +674,12 @@ public class PortletDisplay implements Cloneable, Serializable {
 		_namespace = namespace;
 	}
 
+	public void setPortletConfigurationIconMenu(
+		PortletConfigurationIconMenu portletConfigurationIconMenu) {
+
+		_portletConfigurationIconMenu = portletConfigurationIconMenu;
+	}
+
 	public void setPortletDecorate(boolean portletDecorate) {
 		_portletDecorate = portletDecorate;
 	}
@@ -897,6 +914,7 @@ public class PortletDisplay implements Cloneable, Serializable {
 	private boolean _modePrint;
 	private boolean _modeView;
 	private String _namespace = StringPool.BLANK;
+	private PortletConfigurationIconMenu _portletConfigurationIconMenu;
 	private boolean _portletDecorate;
 	private String _portletDecoratorId = StringPool.BLANK;
 	private String _portletDisplayName = StringPool.BLANK;

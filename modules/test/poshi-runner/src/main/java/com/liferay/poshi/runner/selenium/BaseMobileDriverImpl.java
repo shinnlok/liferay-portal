@@ -177,7 +177,7 @@ public abstract class BaseMobileDriverImpl
 	}
 
 	@Override
-	public void assertLocation(String pattern) {
+	public void assertLocation(String pattern) throws Exception {
 		LiferaySeleniumHelper.assertLocation(this, pattern);
 	}
 
@@ -608,32 +608,6 @@ public abstract class BaseMobileDriverImpl
 	}
 
 	@Override
-	public String getElementText(String locator) throws Exception {
-		return getElementText(locator, null);
-	}
-
-	public String getElementText(String locator, String timeout)
-		throws Exception {
-
-		WebElement webElement = getWebElement(locator, timeout);
-
-		if (webElement == null) {
-			throw new Exception(
-				"Element is not present at \"" + locator + "\"");
-		}
-
-		if (!isInViewport(locator)) {
-			swipeWebElementIntoView(locator);
-		}
-
-		String text = webElement.getText();
-
-		text = text.trim();
-
-		return text.replace("\n", " ");
-	}
-
-	@Override
 	public String getElementValue(String locator) throws Exception {
 		return getElementValue(locator, null);
 	}
@@ -708,7 +682,7 @@ public abstract class BaseMobileDriverImpl
 	}
 
 	@Override
-	public String getLocation() {
+	public String getLocation() throws Exception {
 		return WebDriverHelper.getLocation(this);
 	}
 
@@ -817,8 +791,27 @@ public abstract class BaseMobileDriverImpl
 	}
 
 	@Override
-	public String getText(String locator) {
-		throw new UnsupportedOperationException();
+	public String getText(String locator) throws Exception {
+		return getText(locator, null);
+	}
+
+	public String getText(String locator, String timeout) throws Exception {
+		WebElement webElement = getWebElement(locator, timeout);
+
+		if (webElement == null) {
+			throw new Exception(
+				"Element is not present at \"" + locator + "\"");
+		}
+
+		if (!isInViewport(locator)) {
+			swipeWebElementIntoView(locator);
+		}
+
+		String text = webElement.getText();
+
+		text = text.trim();
+
+		return text.replace("\n", " ");
 	}
 
 	@Override
@@ -1022,8 +1015,13 @@ public abstract class BaseMobileDriverImpl
 	}
 
 	@Override
+	public boolean isTestName(String testName) {
+		return LiferaySeleniumHelper.isTestName(testName);
+	}
+
+	@Override
 	public boolean isText(String locator, String value) throws Exception {
-		return value.equals(getElementText(locator, "1"));
+		return value.equals(getText(locator, "1"));
 	}
 
 	@Override
@@ -1311,6 +1309,11 @@ public abstract class BaseMobileDriverImpl
 	}
 
 	@Override
+	public void selectFieldText() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
 	public void selectFrame(String locator) {
 		WebDriverHelper.selectFrame(this, locator);
 	}
@@ -1386,6 +1389,7 @@ public abstract class BaseMobileDriverImpl
 	public void setDefaultTimeout() {
 	}
 
+	@Override
 	public void setDefaultTimeoutImplicit() {
 		WebDriverHelper.setDefaultTimeoutImplicit(this);
 	}

@@ -19,6 +19,7 @@
 <%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
 
 <%@ taglib uri="http://liferay.com/tld/aui" prefix="aui" %><%@
+taglib uri="http://liferay.com/tld/frontend" prefix="liferay-frontend" %><%@
 taglib uri="http://liferay.com/tld/portlet" prefix="liferay-portlet" %><%@
 taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %><%@
 taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
@@ -31,8 +32,9 @@ page import="com.liferay.dynamic.data.lists.service.DDLRecordSetServiceUtil" %><
 page import="com.liferay.dynamic.data.mapping.constants.DDMWebKeys" %><%@
 page import="com.liferay.dynamic.data.mapping.exception.NoSuchStructureException" %><%@
 page import="com.liferay.dynamic.data.mapping.exception.NoSuchStructureLayoutException" %><%@
-page import="com.liferay.dynamic.data.mapping.exception.StorageFieldValueException" %><%@
+page import="com.liferay.dynamic.data.mapping.form.evaluator.DDMFormFieldEvaluationResult" %><%@
 page import="com.liferay.dynamic.data.mapping.form.renderer.DDMFormRenderingException" %><%@
+page import="com.liferay.dynamic.data.mapping.validator.DDMFormValuesValidationException" %><%@
 page import="com.liferay.portal.kernel.captcha.CaptchaMaxChallengesException" %><%@
 page import="com.liferay.portal.kernel.captcha.CaptchaTextException" %><%@
 page import="com.liferay.portal.kernel.dao.search.SearchContainer" %><%@
@@ -44,20 +46,17 @@ page import="com.liferay.portal.kernel.util.StringBundler" %><%@
 page import="com.liferay.portal.kernel.util.StringPool" %><%@
 page import="com.liferay.portal.kernel.util.StringUtil" %><%@
 page import="com.liferay.portal.kernel.util.Validator" %><%@
-page import="com.liferay.portal.kernel.workflow.WorkflowConstants" %><%@
-page import="com.liferay.portlet.PortletURLUtil" %>
+page import="com.liferay.portal.kernel.workflow.WorkflowConstants" %>
 
-<%@ page import="javax.portlet.PortletURL" %>
+<%@ page import="java.util.List" %>
 
-<portlet:defineObjects />
+<liferay-frontend:defineObjects />
 
 <liferay-theme:defineObjects />
 
+<portlet:defineObjects />
+
 <%
-PortletURL currentURLObj = PortletURLUtil.getCurrent(liferayPortletRequest, liferayPortletResponse);
-
-String currentURL = currentURLObj.toString();
-
 DDLFormDisplayContext ddlFormDisplayContext = new DDLFormDisplayContext(renderRequest);
 %>
 

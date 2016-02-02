@@ -16,6 +16,8 @@ package com.liferay.portal.kernel.portlet.configuration.icon;
 
 import com.liferay.portal.kernel.portlet.configuration.icon.locator.PortletConfigurationIconLocator;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.registry.collections.ServiceTrackerCollections;
@@ -23,6 +25,7 @@ import com.liferay.registry.collections.ServiceTrackerList;
 import com.liferay.registry.collections.ServiceTrackerMap;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -35,7 +38,7 @@ import javax.portlet.PortletRequest;
 public class PortletConfigurationIconTracker {
 
 	public static List<PortletConfigurationIconFactory>
-		getPortletConfigurationIcons(
+		getPortletConfigurationFactories(
 			String portletId, PortletRequest portletRequest) {
 
 		List<PortletConfigurationIconFactory>
@@ -62,6 +65,34 @@ public class PortletConfigurationIconTracker {
 		}
 
 		return portletConfigurationIconFactories;
+	}
+
+	public static List<PortletConfigurationIcon> getPortletConfigurationIcons(
+		String portletId, PortletRequest portletRequest,
+		Comparator<?> comparator) {
+
+		List<PortletConfigurationIcon> portletConfigurationIcons =
+			new ArrayList<>();
+
+		List<PortletConfigurationIconFactory>
+			portletConfigurationIconFactories = ListUtil.sort(
+				getPortletConfigurationFactories(portletId, portletRequest),
+				(Comparator<PortletConfigurationIconFactory>)comparator);
+
+		for (PortletConfigurationIconFactory portletConfigurationIconFactory :
+				portletConfigurationIconFactories) {
+
+			PortletConfigurationIcon portletConfigurationIcon =
+				portletConfigurationIconFactory.create(portletRequest);
+
+			if ((portletConfigurationIcon != null) &&
+				portletConfigurationIcon.isShow()) {
+
+				portletConfigurationIcons.add(portletConfigurationIcon);
+			}
+		}
+
+		return portletConfigurationIcons;
 	}
 
 	protected static String getKey(String portletId, String path) {
@@ -93,11 +124,10 @@ public class PortletConfigurationIconTracker {
 					paths.add(StringPool.DASH);
 				}
 			}
-			else if (ArrayUtil.isNotEmpty(defaultViewsArray)) {
-				paths.addAll(defaultViews);
+		}
 
-				paths.add(StringPool.DASH);
-			}
+		if (SetUtil.isEmpty(paths)) {
+			paths.add(StringPool.DASH);
 		}
 
 		return paths;

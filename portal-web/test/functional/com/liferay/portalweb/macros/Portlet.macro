@@ -126,7 +126,7 @@
 			</else>
 		</if>
 
-		<execute function="AssertElementNotPresent" locator1="ControlMenuAddPanel#LOADING_ANIMATION" />
+		<execute function="AssertElementNotPresent" locator1="Home#LOADING_ANIMATION" />
 
 		<execute macro="Panel#expandSidebarPanel">
 			<var name="panelHeading" value="Applications" />
@@ -138,19 +138,7 @@
 			<var name="portletName" value="${portletName}" />
 		</execute>
 
-		<execute function="Pause" locator1="5000" />
-
-		<if>
-			<or>
-				<equals arg1="${portletName}" arg2="Asset Publisher" />
-				<equals arg1="${portletName}" arg2="Documents and Media" />
-				<equals arg1="${portletName}" arg2="Knowledge Base Display" />
-				<equals arg1="${portletName}" arg2="Media Gallery" />
-			</or>
-			<then>
-				<execute function="Pause" locator1="30000" />
-			</then>
-		</if>
+		<execute function="AssertElementNotPresent" locator1="Home#LOADING_ANIMATION" />
 	</command>
 
 	<command name="changeDisplayStyle">
@@ -349,6 +337,12 @@
 		<var name="portletLocator" value="//span[@data-title=&quot;${portletName}&quot; and contains(@class,'add-content-item')]" />
 
 		<execute function="AssertElementNotPresent" locator1="${portletLocator}" />
+	</command>
+
+	<command name="viewDefaultDisplayStyle">
+		<var method="StringUtil#upperCase('${displayStyle}')" name="displayStyleUppercase" />
+
+		<execute function="AssertElementPresent" locator1="Icon#DISPLAY_STYLE_${displayStyleUppercase}_ACTIVE" />
 	</command>
 
 	<command name="viewDisplayStyles">

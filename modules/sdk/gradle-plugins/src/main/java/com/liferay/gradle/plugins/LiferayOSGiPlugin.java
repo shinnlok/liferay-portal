@@ -20,9 +20,9 @@ import com.liferay.gradle.plugins.extensions.LiferayExtension;
 import com.liferay.gradle.plugins.extensions.LiferayOSGiExtension;
 import com.liferay.gradle.plugins.tasks.DirectDeployTask;
 import com.liferay.gradle.plugins.util.FileUtil;
+import com.liferay.gradle.plugins.util.GradleUtil;
 import com.liferay.gradle.plugins.wsdd.builder.BuildWSDDTask;
 import com.liferay.gradle.plugins.wsdd.builder.WSDDBuilderPlugin;
-import com.liferay.gradle.util.GradleUtil;
 
 import groovy.lang.Closure;
 
@@ -79,6 +79,9 @@ public class LiferayOSGiPlugin extends LiferayJavaPlugin {
 	public void apply(Project project) {
 		super.apply(project);
 
+		addTaskAutoUpdateXml(project);
+		addTasksBuildWSDDJar(project);
+
 		configureArchivesBaseName(project);
 		configureDescription(project);
 		configureSourceSetMain(project);
@@ -126,19 +129,13 @@ public class LiferayOSGiPlugin extends LiferayJavaPlugin {
 		delete.delete(closure);
 	}
 
-	@Override
-	protected LiferayExtension addLiferayExtension(Project project) {
-		return GradleUtil.addExtension(
-			project, LiferayPlugin.PLUGIN_NAME, LiferayOSGiExtension.class);
-	}
-
 	protected DirectDeployTask addTaskAutoUpdateXml(final Project project) {
 		final DirectDeployTask directDeployTask = GradleUtil.addTask(
 			project, AUTO_UPDATE_XML_TASK_NAME, DirectDeployTask.class);
 
 		directDeployTask.setAppServerDeployDir(
 			directDeployTask.getTemporaryDir());
-		directDeployTask.setArgAppServerType("tomcat");
+		directDeployTask.setAppServerType("tomcat");
 
 		directDeployTask.setWebAppFile(
 			new Callable<File>() {
@@ -188,10 +185,8 @@ public class LiferayOSGiPlugin extends LiferayJavaPlugin {
 					Jar jar = (Jar)GradleUtil.getTask(
 						project, JavaPlugin.JAR_TASK_NAME);
 
-					String deployedPluginDirName = jar.getArchiveName();
-
-					deployedPluginDirName = deployedPluginDirName.substring(
-						0, deployedPluginDirName.lastIndexOf('.'));
+					String deployedPluginDirName = FileUtil.stripExtension(
+						jar.getArchiveName());
 
 					File deployedPluginDir = new File(
 						directDeployTask.getAppServerDeployDir(),
@@ -333,6 +328,17 @@ public class LiferayOSGiPlugin extends LiferayJavaPlugin {
 
 					jarBuilder.withBase(BundleUtils.getBase(project));
 
+					SourceSet sourceSet = GradleUtil.getSourceSet(
+						project, SourceSet.MAIN_SOURCE_SET_NAME);
+
+					SourceSetOutput sourceSetOutput = sourceSet.getOutput();
+
+					jarBuilder.withClasspath(
+						new File[] {
+							sourceSetOutput.getClassesDir(),
+							sourceSetOutput.getResourcesDir()
+						});
+
 					LiferayOSGiExtension liferayOSGiExtension =
 						GradleUtil.getExtension(
 							project, LiferayOSGiExtension.class);
@@ -374,6 +380,9 @@ public class LiferayOSGiPlugin extends LiferayJavaPlugin {
 
 					jarBuilder.withProperties(properties);
 
+					jarBuilder.withName(
+						properties.get(Constants.BUNDLE_SYMBOLICNAME));
+					jarBuilder.withResources(new File[0]);
 					jarBuilder.withSourcepath(BundleUtils.getSources(project));
 					jarBuilder.withTrace(bundleExtension.isTrace());
 					jarBuilder.withVersion(BundleUtils.getVersion(project));
@@ -420,11 +429,25 @@ public class LiferayOSGiPlugin extends LiferayJavaPlugin {
 	}
 
 	@Override
-	protected void addTasks(Project project) {
-		super.addTasks(project);
+	protected Copy addTaskDeploy(
+		final Project project, LiferayExtension liferayExtension) {
 
-		addTaskAutoUpdateXml(project);
+		Copy copy = super.addTaskDeploy(project, liferayExtension);
 
+		copy.rename(
+			new Closure<String>(null) {
+
+				@SuppressWarnings("unused")
+				public String doCall(String fileName) {
+					return getDeployedFileName(project, fileName);
+				}
+
+			});
+
+		return copy;
+	}
+
+	protected void addTasksBuildWSDDJar(Project project) {
 		TaskContainer taskContainer = project.getTasks();
 
 		taskContainer.withType(
@@ -540,46 +563,11 @@ public class LiferayOSGiPlugin extends LiferayJavaPlugin {
 		resourcesSourceDirectorySet.setSrcDirs(srcDirs);
 	}
 
-	@Override
-	protected void configureTaskDeploy(
-		Project project, LiferayExtension liferayExtension) {
-
-		super.configureTaskDeploy(project, liferayExtension);
-
-		Task task = GradleUtil.getTask(project, DEPLOY_TASK_NAME);
-
-		if (!(task instanceof Copy)) {
-			return;
-		}
-
-		configureTaskDeployRename((Copy)task);
-	}
-
-	protected void configureTaskDeployRename(Copy copy) {
-		final Project project = copy.getProject();
-
-		Closure<String> closure = new Closure<String>(null) {
-
-			@SuppressWarnings("unused")
-			public String doCall(String fileName) {
-				return getDeployedFileName(project, fileName);
-			}
-
-		};
-
-		copy.rename(closure);
-	}
-
 	protected void configureVersion(Project project) {
 		String bundleVersion = getBundleInstruction(
 			project, Constants.BUNDLE_VERSION);
 
 		project.setVersion(bundleVersion);
-	}
-
-	@Override
-	protected void configureVersion(
-		Project project, LiferayExtension liferayExtension) {
 	}
 
 	protected String getBundleInstruction(Project project, String key) {
@@ -608,6 +596,11 @@ public class LiferayOSGiPlugin extends LiferayJavaPlugin {
 			"." + Jar.DEFAULT_EXTENSION);
 	}
 
+	@Override
+	protected Class<? extends LiferayExtension> getLiferayExtensionClass() {
+		return LiferayOSGiExtension.class;
+	}
+
 	protected void replaceJarBuilderFactory(Project project) {
 		BundleExtension bundleExtension = GradleUtil.getExtension(
 			project, BundleExtension.class);
@@ -630,7 +623,11 @@ public class LiferayOSGiPlugin extends LiferayJavaPlugin {
 			while (iterator.hasNext()) {
 				File file = iterator.next();
 
-				if (_classpathFiles.contains(file) || !file.exists()) {
+				String fileName = file.getName();
+
+				if (_classpathFiles.contains(file) ||
+					fileName.endsWith(".pom") || !file.exists()) {
+
 					iterator.remove();
 
 					continue;

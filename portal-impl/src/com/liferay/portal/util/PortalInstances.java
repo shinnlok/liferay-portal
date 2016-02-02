@@ -18,7 +18,8 @@ import com.liferay.portal.events.EventsProcessorUtil;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.search.SearchEngineHelperUtil;
+import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
+import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.CookieKeys;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -33,8 +34,6 @@ import com.liferay.portal.model.LayoutSet;
 import com.liferay.portal.model.PortletCategory;
 import com.liferay.portal.model.User;
 import com.liferay.portal.model.VirtualHost;
-import com.liferay.portal.security.auth.CompanyThreadLocal;
-import com.liferay.portal.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.service.CompanyLocalServiceUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutSetLocalServiceUtil;
@@ -515,12 +514,20 @@ public class PortalInstances {
 	}
 
 	private void _removeCompanyId(long companyId) {
+		try {
+			EventsProcessorUtil.process(
+				PropsKeys.APPLICATION_SHUTDOWN_EVENTS,
+				PropsValues.APPLICATION_SHUTDOWN_EVENTS,
+				new String[] {String.valueOf(companyId)});
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+		}
+
 		_companyIds = ArrayUtil.remove(_companyIds, companyId);
 		_webIds = null;
 
 		_getWebIds();
-
-		SearchEngineHelperUtil.removeCompany(companyId);
 
 		WebAppPool.remove(companyId, WebKeys.PORTLET_CATEGORY);
 	}

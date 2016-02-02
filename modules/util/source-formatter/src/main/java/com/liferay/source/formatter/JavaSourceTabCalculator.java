@@ -34,9 +34,6 @@ import java.util.regex.Pattern;
  */
 public class JavaSourceTabCalculator {
 
-	public JavaSourceTabCalculator() {
-	}
-
 	public void calculateTabs(
 			String fileName, String content,
 			JavaSourceProcessor javaSourceProcessor)
@@ -107,8 +104,8 @@ public class JavaSourceTabCalculator {
 
 						tabLevel = calculateTabLevel(tabLevel, line);
 						calculateExtraTabs(
-							trimmedLine, lineCount, remainingContent,
-							forClause, ifClause);
+							trimmedLine, lineCount, remainingContent, forClause,
+							ifClause);
 					}
 				}
 				else if (line.endsWith("*/")) {
@@ -175,8 +172,8 @@ public class JavaSourceTabCalculator {
 	}
 
 	protected void calculateExtraTabs(
-		String line, int lineCount, String remainingContent,
-		boolean forClause, boolean ifClause) {
+		String line, int lineCount, String remainingContent, boolean forClause,
+		boolean ifClause) {
 
 		if (Validator.isNull(line)) {
 			return;
@@ -196,9 +193,7 @@ public class JavaSourceTabCalculator {
 
 		int lineTabLevel = calculateTabLevel(0, line);
 
-		if (skipCalculateExtraTabs(
-				line, lineTabLevel, remainingContent, forClause, ifClause)) {
-
+		if (skipCalculateExtraTabs(line, lineTabLevel, forClause, ifClause)) {
 			return;
 		}
 
@@ -324,9 +319,8 @@ public class JavaSourceTabCalculator {
 				return;
 			}
 
-			if (line.startsWith("-(") || line.endsWith(".concat(") ||
-				line.endsWith("&") || line.endsWith("|") ||
-				(line.endsWith("+") && (extra > 2))) {
+			if (line.startsWith("-(") || line.endsWith("&") ||
+				line.endsWith("|") || (line.endsWith("+") && (extra > 2))) {
 
 				addIgnoreTabChecks(lineCount, extra);
 
@@ -337,6 +331,14 @@ public class JavaSourceTabCalculator {
 				if (s.contains(";\n")) {
 					addIgnoreTabChecks(lineCount, extra);
 				}
+
+				return;
+			}
+
+			if ((lineTabLevel == 0) && !line.startsWith(")") &&
+				line.endsWith("(")) {
+
+				addIgnoreTabChecks(lineCount, extra);
 
 				return;
 			}
@@ -398,7 +400,9 @@ public class JavaSourceTabCalculator {
 		}
 	}
 
-	protected Tuple getFirstOccurenceTuple(String s, String[] texts, int startIndex) {
+	protected Tuple getFirstOccurenceTuple(
+		String s, String[] texts, int startIndex) {
+
 		String matchingText = null;
 		int firstIndexOf = -1;
 
@@ -445,8 +449,7 @@ public class JavaSourceTabCalculator {
 	}
 
 	protected boolean skipCalculateExtraTabs(
-		String line, int lineTabLevel, String remainingContent,
-		boolean forClause, boolean ifClause) {
+		String line, int lineTabLevel, boolean forClause, boolean ifClause) {
 
 		if (line.startsWith("@") || line.equals("}") || line.equals(")")) {
 			return true;
@@ -460,9 +463,13 @@ public class JavaSourceTabCalculator {
 			return false;
 		}
 
-		if ((line.endsWith("(") || line.endsWith("{")) &&
-			!line.endsWith(".concat(") && !forClause) {
+		if ((lineTabLevel == 0) && !line.startsWith(")") &&
+			line.endsWith("(")) {
 
+			return false;
+		}
+
+		if ((line.endsWith("(") || line.endsWith("{")) && !forClause) {
 			return true;
 		}
 

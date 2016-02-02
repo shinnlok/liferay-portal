@@ -14,10 +14,12 @@
 
 package com.liferay.site.memberships.web.portlet;
 
-import com.liferay.portal.MembershipRequestCommentsException;
-import com.liferay.portal.NoSuchGroupException;
-import com.liferay.portal.NoSuchRoleException;
+import com.liferay.portal.exception.MembershipRequestCommentsException;
+import com.liferay.portal.exception.NoSuchGroupException;
+import com.liferay.portal.exception.NoSuchRoleException;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
+import com.liferay.portal.kernel.security.auth.PrincipalException;
+import com.liferay.portal.kernel.security.membershippolicy.MembershipPolicyException;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -30,8 +32,6 @@ import com.liferay.portal.model.MembershipRequestConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.model.UserGroupGroupRole;
 import com.liferay.portal.model.UserGroupRole;
-import com.liferay.portal.security.auth.PrincipalException;
-import com.liferay.portal.security.membershippolicy.MembershipPolicyException;
 import com.liferay.portal.service.MembershipRequestService;
 import com.liferay.portal.service.OrganizationService;
 import com.liferay.portal.service.ServiceContext;
@@ -45,8 +45,8 @@ import com.liferay.portal.service.UserLocalService;
 import com.liferay.portal.service.UserService;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portlet.usersadmin.util.UsersAdmin;
 import com.liferay.site.memberships.web.constants.SiteMembershipsPortletKeys;
+import com.liferay.users.admin.kernel.util.UsersAdmin;
 
 import java.io.IOException;
 

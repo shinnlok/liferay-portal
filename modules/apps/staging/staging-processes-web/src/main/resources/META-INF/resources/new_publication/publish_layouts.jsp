@@ -19,6 +19,39 @@
 <%
 String cmd = ParamUtil.getString(request, Constants.CMD, Constants.PUBLISH_TO_LIVE);
 
+long exportImportConfigurationId = 0;
+
+ExportImportConfiguration exportImportConfiguration = null;
+
+Map<String, Serializable> exportImportConfigurationSettingsMap = Collections.emptyMap();
+
+Map<String, String[]> parameterMap = Collections.emptyMap();
+
+if (SessionMessages.contains(liferayPortletRequest, portletDisplay.getId() + "exportImportConfigurationId")) {
+	exportImportConfigurationId = (Long)SessionMessages.get(liferayPortletRequest, portletDisplay.getId() + "exportImportConfigurationId");
+
+	if (exportImportConfigurationId > 0) {
+		exportImportConfiguration = ExportImportConfigurationLocalServiceUtil.getExportImportConfiguration(exportImportConfigurationId);
+	}
+
+	exportImportConfigurationSettingsMap = (Map<String, Serializable>)SessionMessages.get(liferayPortletRequest, portletDisplay.getId() + "settingsMap");
+
+	parameterMap = (Map<String, String[]>)exportImportConfigurationSettingsMap.get("parameterMap");
+}
+else {
+	exportImportConfigurationId = ParamUtil.getLong(request, "exportImportConfigurationId");
+
+	if (exportImportConfigurationId > 0) {
+		exportImportConfiguration = ExportImportConfigurationLocalServiceUtil.getExportImportConfiguration(exportImportConfigurationId);
+
+		exportImportConfigurationSettingsMap = exportImportConfiguration.getSettingsMap();
+
+		parameterMap = (Map<String, String[]>)exportImportConfigurationSettingsMap.get("parameterMap");
+	}
+}
+
+boolean configuredPublish = (exportImportConfiguration == null) ? false : true;
+
 long layoutSetBranchId = ParamUtil.getLong(request, "layoutSetBranchId");
 String layoutSetBranchName = ParamUtil.getString(request, "layoutSetBranchName");
 
@@ -97,6 +130,8 @@ renderURL.setParameter("layoutSetBranchName", layoutSetBranchName);
 renderURL.setParameter("privateLayout", String.valueOf(privateLayout));
 
 response.setHeader("Ajax-ID", request.getHeader("Ajax-ID"));
+
+renderResponse.setTitle(!configuredPublish ? LanguageUtil.get(request, "new-publication") : LanguageUtil.format(request, "new-publication-based-on-x", exportImportConfiguration.getName(), false));
 %>
 
 <c:if test='<%= SessionMessages.contains(renderRequest, "requestProcessed") %>'>
@@ -130,6 +165,7 @@ response.setHeader("Ajax-ID", request.getHeader("Ajax-ID"));
 	<aui:input name="layoutSetBranchName" type="hidden" value="<%= layoutSetBranchName %>" />
 	<aui:input name="lastImportUserName" type="hidden" value="<%= user.getFullName() %>" />
 	<aui:input name="lastImportUserUuid" type="hidden" value="<%= String.valueOf(user.getUserUuid()) %>" />
+	<aui:input name="treeId" type="hidden" value="<%= treeId %>" />
 	<aui:input name="<%= PortletDataHandlerKeys.PORTLET_ARCHIVED_SETUPS_ALL %>" type="hidden" value="<%= true %>" />
 	<aui:input name="<%= PortletDataHandlerKeys.PORTLET_CONFIGURATION_ALL %>" type="hidden" value="<%= true %>" />
 	<aui:input name="<%= PortletDataHandlerKeys.PORTLET_SETUP_ALL %>" type="hidden" value="<%= true %>" />
@@ -217,7 +253,7 @@ response.setHeader("Ajax-ID", request.getHeader("Ajax-ID"));
 
 			<aui:fieldset-group markupView="lexicon">
 				<aui:fieldset>
-					<aui:input name="name" />
+					<aui:input name="name" placeholder="process-name-placeholder" />
 				</aui:fieldset>
 
 				<aui:fieldset collapsible="<%= true %>" cssClass="options-group" label="date">
@@ -228,22 +264,21 @@ response.setHeader("Ajax-ID", request.getHeader("Ajax-ID"));
 					<aui:fieldset collapsible="<%= true %>" cssClass="options-group" label="pages">
 						<liferay-util:include page="/new_publication/select_pages.jsp" servletContext="<%= application %>">
 							<liferay-util:param name="<%= Constants.CMD %>" value="<%= Constants.PUBLISH %>" />
-							<liferay-util:param name="groupId" value="<%= String.valueOf(stagingGroupId) %>" />
+							<liferay-util:param name="groupId" value="<%= String.valueOf(groupId) %>" />
 							<liferay-util:param name="layoutSetBranchId" value="<%= String.valueOf(layoutSetBranchId) %>" />
 							<liferay-util:param name="privateLayout" value="<%= String.valueOf(privateLayout) %>" />
 							<liferay-util:param name="treeId" value="<%= treeId %>" />
 							<liferay-util:param name="selectedLayoutIds" value="<%= StringUtil.merge(selectedLayoutIds) %>" />
+							<liferay-util:param name="disableInputs" value="<%= String.valueOf(configuredPublish) %>" />
 						</liferay-util:include>
 					</aui:fieldset>
 				</c:if>
 
-				<liferay-staging:content cmd="<%= cmd %>" parameterMap="<%= null %>" type="<%= localPublishing ? Constants.PUBLISH_TO_LIVE : Constants.PUBLISH_TO_REMOTE %>" />
+				<liferay-staging:content cmd="<%= cmd %>" disableInputs="<%= configuredPublish %>" parameterMap="<%= parameterMap %>" type="<%= localPublishing ? Constants.PUBLISH_TO_LIVE : Constants.PUBLISH_TO_REMOTE %>" />
 
-				<liferay-staging:deletions cmd="<%= Constants.PUBLISH %>" />
+				<liferay-staging:deletions cmd="<%= Constants.PUBLISH %>" disableInputs="<%= configuredPublish %>" />
 
-				<aui:fieldset collapsible="<%= true %>" cssClass="options-group" label="permissions">
-					<%@ include file="/new_publication/permissions.jspf" %>
-				</aui:fieldset>
+				<liferay-staging:permissions disableInputs="<%= configuredPublish %>" global="<%= group.isCompany() %>" parameterMap="<%= parameterMap %>" />
 
 				<c:if test="<%= !localPublishing %>">
 					<aui:fieldset collapsible="<%= true %>" cssClass="options-group" label="remote-live-connection-settings">
@@ -256,7 +291,7 @@ response.setHeader("Ajax-ID", request.getHeader("Ajax-ID"));
 		<aui:button-row>
 			<aui:button cssClass="btn-lg" id="addButton" onClick='<%= renderResponse.getNamespace() + "schedulePublishEvent();" %>' value="add-event" />
 
-			<aui:button cssClass="btn-lg" id="publishButton" type="submit" value="<%= publishMessageKey %>" />
+			<aui:button cssClass="btn-lg" id="publishButton" type="submit" value="<%= LanguageUtil.get(request, publishMessageKey) %>" />
 
 			<aui:button cssClass="btn-lg" href="<%= basePortletURL %>" type="reset" value="cancel" />
 		</aui:button-row>
@@ -299,13 +334,10 @@ response.setHeader("Ajax-ID", request.getHeader("Ajax-ID"));
 	new Liferay.ExportImport(
 		{
 			commentsNode: '#<%= PortletDataHandlerKeys.COMMENTS %>',
-			deleteMissingLayoutsNode: '#<%= PortletDataHandlerKeys.DELETE_MISSING_LAYOUTS %>',
 			deletionsNode: '#<%= PortletDataHandlerKeys.DELETIONS %>',
 			form: document.<portlet:namespace />exportPagesFm,
 			incompleteProcessMessageNode: '#<portlet:namespace />incompleteProcessMessage',
-			layoutSetSettingsNode: '#<%= PortletDataHandlerKeys.LAYOUT_SET_SETTINGS %>',
 			locale: '<%= locale.toLanguageTag() %>',
-			logoNode: '#<%= PortletDataHandlerKeys.LOGO %>',
 			namespace: '<portlet:namespace />',
 			pageTreeId: '<%= treeId %>',
 			processesNode: '#publishProcesses',
@@ -321,7 +353,6 @@ response.setHeader("Ajax-ID", request.getHeader("Ajax-ID"));
 			remotePortNode: '#<portlet:namespace />remotePort',
 			secureConnectionNode: '#secureConnection',
 			setupNode: '#<%= PortletDataHandlerKeys.PORTLET_SETUP_ALL %>',
-			themeReferenceNode: '#<%= PortletDataHandlerKeys.THEME_REFERENCE %>',
 			timeZone: '<%= timeZone.getID() %>',
 			userPreferencesNode: '#<%= PortletDataHandlerKeys.PORTLET_USER_PREFERENCES_ALL %>'
 		}

@@ -16,13 +16,43 @@
 
 <%@ include file="/init.jsp" %>
 
+<%
+ArticleSearch articleSearchContainer = journalDisplayContext.getSearchContainer();
+%>
+
 <portlet:actionURL name="restoreTrashEntries" var="restoreTrashEntriesURL" />
 
 <liferay-trash:undo
 	portletURL="<%= restoreTrashEntriesURL %>"
 />
 
-<liferay-util:include page="/navigation.jsp" servletContext="<%= application %>" />
+<%
+Map<String, Object> data = new HashMap<>();
+
+data.put("qa-id", "navigation");
+%>
+
+<aui:nav-bar cssClass="collapse-basic-search" data="<%= data %>" markupView="lexicon">
+	<aui:nav cssClass="navbar-nav">
+		<aui:nav-item label="web-content" selected="<%= true %>" />
+	</aui:nav>
+
+	<c:if test="<%= journalDisplayContext.isShowSearch() %>">
+		<aui:nav-bar-search>
+
+			<%
+			PortletURL portletURL = liferayPortletResponse.createRenderURL();
+
+			portletURL.setParameter("folderId", String.valueOf(journalDisplayContext.getFolderId()));
+			portletURL.setParameter("showEditActions", String.valueOf(journalDisplayContext.isShowEditActions()));
+			%>
+
+			<aui:form action="<%= portletURL.toString() %>" method="post" name="fm1">
+				<liferay-ui:input-search markupView="lexicon" />
+			</aui:form>
+		</aui:nav-bar-search>
+	</c:if>
+</aui:nav-bar>
 
 <liferay-util:include page="/toolbar.jsp" servletContext="<%= application %>">
 	<liferay-util:param name="searchContainerId" value="articles" />
@@ -62,13 +92,50 @@
 
 				<div class="journal-container" id="<portlet:namespace />entriesContainer">
 					<c:choose>
-						<c:when test="<%= journalDisplayContext.isSearch() %>">
-							<liferay-util:include page="/search_resources.jsp" servletContext="<%= application %>" />
-						</c:when>
-						<c:otherwise>
+						<c:when test="<%= !journalDisplayContext.isSearch() || (!journalDisplayContext.hasResults() && !journalDisplayContext.hasCommentsResults()) %>">
 							<liferay-util:include page="/view_entries.jsp" servletContext="<%= application %>">
 								<liferay-util:param name="searchContainerId" value="articles" />
 							</liferay-util:include>
+						</c:when>
+						<c:otherwise>
+
+							<%
+							String[] tabsNames = new String[0];
+
+							if (journalDisplayContext.hasResults()) {
+								String tabName = StringUtil.appendParentheticalSuffix(LanguageUtil.get(request, "web-content"), journalDisplayContext.getTotal());
+
+								tabsNames = ArrayUtil.append(tabsNames, tabName);
+							}
+
+							if (journalDisplayContext.hasCommentsResults()) {
+								String tabName = StringUtil.appendParentheticalSuffix(LanguageUtil.get(request, "comments"), journalDisplayContext.getCommentsTotal());
+
+								tabsNames = ArrayUtil.append(tabsNames, tabName);
+							}
+							%>
+
+							<liferay-ui:tabs
+								names="<%= StringUtil.merge(tabsNames) %>"
+								portletURL="<%= portletURL %>"
+								type="tabs nav-tabs-default"
+							>
+								<c:if test="<%= journalDisplayContext.hasResults() %>">
+									<liferay-ui:section>
+										<liferay-util:include page="/view_entries.jsp" servletContext="<%= application %>">
+											<liferay-util:param name="searchContainerId" value="articles" />
+										</liferay-util:include>
+									</liferay-ui:section>
+								</c:if>
+
+								<c:if test="<%= journalDisplayContext.hasCommentsResults() %>">
+									<liferay-ui:section>
+										<liferay-util:include page="/view_comments.jsp" servletContext="<%= application %>">
+											<liferay-util:param name="searchContainerId" value="comments" />
+										</liferay-util:include>
+									</liferay-ui:section>
+								</c:if>
+							</liferay-ui:tabs>
 						</c:otherwise>
 					</c:choose>
 				</div>

@@ -15,7 +15,7 @@
 </tr>
 <tr>
 	<td>CHECKOUT_SUCCESS</td>
-	<td>//div[contains(@class,'lfr-asset-column-details')]/div[contains(@class,'alert-success')]</td>
+	<td>//div[contains(@class,'sidenav-content')]/div[contains(@class,'alert-success')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -99,6 +99,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>INFO_2</td>
+	<td>xpath=(//div[contains(@class,'alert') and contains(@class,'alert-info')])[2]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>INFO_4</td>
 	<td>xpath=(//div[contains(@class,'alert-info') and contains(@class,'alert-warning')]/a)[1]</td>
 	<td></td>
@@ -146,6 +151,11 @@
 <tr>
 	<td>RECYCLE_BIN_RESTORE_SUCCESS</td>
 	<td>//div[contains(@class,'alert-success') and em[contains(@class,'restore')]] | //div[contains(@class,'alert-success') and contains(.,'restored')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>RECYCLE_BIN_INFO</td>
+	<td>//div[contains(@class,'tooltip-help-content') and contains(@class,'tooltip-content')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -209,13 +219,18 @@
 	<td></td>
 </tr>
 <tr>
+	<td>WEB_CONTENT_STATUS</td>
+	<td>//span[contains(@class,'workflow-status')]/span[3]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>WORKFLOW_STATUS</td>
 	<td>//span[contains(@class,'workflow-status')]/strong | //span[contains(@class,'workflow-status')]/span</td>
 	<td></td>
 </tr>
 <tr>
 	<td>WORKFLOW_UNAPPROVED</td>
-	<td>//div[@class='portlet-body']/div[contains(@class,'alert-block')]</td>
+	<td>//div[@class='portlet-body']/div[contains(@class,'alert-warning')]</td>
 	<td></td>
 </tr>
 </tbody>

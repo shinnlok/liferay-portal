@@ -17,6 +17,7 @@ package com.liferay.sync.engine.util;
 import com.liferay.sync.engine.documentlibrary.util.FileEventUtil;
 import com.liferay.sync.engine.model.SyncAccount;
 import com.liferay.sync.engine.model.SyncFile;
+import com.liferay.sync.engine.model.SyncSite;
 import com.liferay.sync.engine.service.SyncAccountService;
 import com.liferay.sync.engine.service.SyncFileService;
 
@@ -42,6 +43,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -58,13 +60,19 @@ import org.slf4j.LoggerFactory;
  */
 public class FileUtil {
 
-	public static void checkFilePath(Path filePath) {
+	public static boolean checkFilePath(Path filePath) {
 
 		// Check to see if the file or folder is still being written to. If
 		// it is, wait until the process is finished before making any future
 		// modifications. This is used to prevent file system interruptions.
 
 		try {
+			if (_checkInProgressFilePathNames.contains(filePath.toString())) {
+				return false;
+			}
+
+			_checkInProgressFilePathNames.add(filePath.toString());
+
 			while (true) {
 				long size1 = FileUtils.sizeOf(filePath.toFile());
 
@@ -73,12 +81,16 @@ public class FileUtil {
 				long size2 = FileUtils.sizeOf(filePath.toFile());
 
 				if (size1 == size2) {
-					break;
+					_checkInProgressFilePathNames.remove(filePath.toString());
+
+					return true;
 				}
 			}
 		}
 		catch (Exception e) {
 			_logger.error(e.getMessage(), e);
+
+			return true;
 		}
 	}
 
@@ -360,6 +372,18 @@ public class FileUtil {
 		return fileName;
 	}
 
+	public static String getSiteFilePathName(
+		String syncAccountFilePathName, SyncSite syncSite) {
+
+		String syncSiteName = syncSite.getName();
+
+		if (!FileUtil.isValidFileName(syncSiteName)) {
+			syncSiteName = String.valueOf(syncSite.getGroupId());
+		}
+
+		return FileUtil.getFilePathName(syncAccountFilePathName, syncSiteName);
+	}
+
 	public static Path getTempFilePath(SyncFile syncFile) {
 		SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
 			syncFile.getSyncAccountId());
@@ -406,12 +430,6 @@ public class FileUtil {
 
 		if (syncFile == null) {
 			return isIgnoredFilePath(filePath.getParent());
-		}
-
-		if (!syncFile.isSystem() &&
-			(syncFile.getState() == SyncFile.STATE_UNSYNCED)) {
-
-			return true;
 		}
 
 		return false;
@@ -496,6 +514,16 @@ public class FileUtil {
 
 			return true;
 		}
+	}
+
+	public static boolean isUnsynced(Path filePath) {
+		SyncFile syncFile = SyncFileService.fetchSyncFile(filePath.toString());
+
+		if (syncFile == null) {
+			return isUnsynced(filePath.getParent());
+		}
+
+		return syncFile.isUnsynced();
 	}
 
 	public static boolean isValidChecksum(Path filePath) throws IOException {
@@ -620,6 +648,8 @@ public class FileUtil {
 	private static final Logger _logger = LoggerFactory.getLogger(
 		FileUtil.class);
 
+	private static final List<String> _checkInProgressFilePathNames =
+		new CopyOnWriteArrayList<>();
 	private static final Set<String> _syncFileIgnoreNames = new HashSet<>(
 		Arrays.asList(PropsValues.SYNC_FILE_IGNORE_NAMES));
 

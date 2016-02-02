@@ -216,7 +216,7 @@ public class DDMTemplateVersionPersistenceImpl extends BasePersistenceImpl<DDMTe
 
 			if (orderByComparator != null) {
 				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -284,7 +284,7 @@ public class DDMTemplateVersionPersistenceImpl extends BasePersistenceImpl<DDMTe
 	 * @param templateId the template ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching d d m template version
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateVersionException if a matching d d m template version could not be found
+	 * @throws NoSuchTemplateVersionException if a matching d d m template version could not be found
 	 */
 	@Override
 	public DDMTemplateVersion findByTemplateId_First(long templateId,
@@ -335,7 +335,7 @@ public class DDMTemplateVersionPersistenceImpl extends BasePersistenceImpl<DDMTe
 	 * @param templateId the template ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching d d m template version
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateVersionException if a matching d d m template version could not be found
+	 * @throws NoSuchTemplateVersionException if a matching d d m template version could not be found
 	 */
 	@Override
 	public DDMTemplateVersion findByTemplateId_Last(long templateId,
@@ -393,7 +393,7 @@ public class DDMTemplateVersionPersistenceImpl extends BasePersistenceImpl<DDMTe
 	 * @param templateId the template ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next d d m template version
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateVersionException if a d d m template version with the primary key could not be found
+	 * @throws NoSuchTemplateVersionException if a d d m template version with the primary key could not be found
 	 */
 	@Override
 	public DDMTemplateVersion[] findByTemplateId_PrevAndNext(
@@ -434,8 +434,9 @@ public class DDMTemplateVersionPersistenceImpl extends BasePersistenceImpl<DDMTe
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
 			query = new StringBundler(3);
@@ -611,12 +612,12 @@ public class DDMTemplateVersionPersistenceImpl extends BasePersistenceImpl<DDMTe
 			new String[] { Long.class.getName(), String.class.getName() });
 
 	/**
-	 * Returns the d d m template version where templateId = &#63; and version = &#63; or throws a {@link com.liferay.dynamic.data.mapping.NoSuchTemplateVersionException} if it could not be found.
+	 * Returns the d d m template version where templateId = &#63; and version = &#63; or throws a {@link NoSuchTemplateVersionException} if it could not be found.
 	 *
 	 * @param templateId the template ID
 	 * @param version the version
 	 * @return the matching d d m template version
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateVersionException if a matching d d m template version could not be found
+	 * @throws NoSuchTemplateVersionException if a matching d d m template version could not be found
 	 */
 	@Override
 	public DDMTemplateVersion findByT_V(long templateId, String version)
@@ -990,7 +991,7 @@ public class DDMTemplateVersionPersistenceImpl extends BasePersistenceImpl<DDMTe
 
 			if (orderByComparator != null) {
 				query = new StringBundler(4 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -1063,7 +1064,7 @@ public class DDMTemplateVersionPersistenceImpl extends BasePersistenceImpl<DDMTe
 	 * @param status the status
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching d d m template version
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateVersionException if a matching d d m template version could not be found
+	 * @throws NoSuchTemplateVersionException if a matching d d m template version could not be found
 	 */
 	@Override
 	public DDMTemplateVersion findByT_S_First(long templateId, int status,
@@ -1119,7 +1120,7 @@ public class DDMTemplateVersionPersistenceImpl extends BasePersistenceImpl<DDMTe
 	 * @param status the status
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching d d m template version
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateVersionException if a matching d d m template version could not be found
+	 * @throws NoSuchTemplateVersionException if a matching d d m template version could not be found
 	 */
 	@Override
 	public DDMTemplateVersion findByT_S_Last(long templateId, int status,
@@ -1182,7 +1183,7 @@ public class DDMTemplateVersionPersistenceImpl extends BasePersistenceImpl<DDMTe
 	 * @param status the status
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next d d m template version
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateVersionException if a d d m template version with the primary key could not be found
+	 * @throws NoSuchTemplateVersionException if a d d m template version with the primary key could not be found
 	 */
 	@Override
 	public DDMTemplateVersion[] findByT_S_PrevAndNext(long templateVersionId,
@@ -1223,11 +1224,12 @@ public class DDMTemplateVersionPersistenceImpl extends BasePersistenceImpl<DDMTe
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(4);
 		}
 
 		query.append(_SQL_SELECT_DDMTEMPLATEVERSION_WHERE);
@@ -1564,7 +1566,7 @@ public class DDMTemplateVersionPersistenceImpl extends BasePersistenceImpl<DDMTe
 	 *
 	 * @param templateVersionId the primary key of the d d m template version
 	 * @return the d d m template version that was removed
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateVersionException if a d d m template version with the primary key could not be found
+	 * @throws NoSuchTemplateVersionException if a d d m template version with the primary key could not be found
 	 */
 	@Override
 	public DDMTemplateVersion remove(long templateVersionId)
@@ -1577,7 +1579,7 @@ public class DDMTemplateVersionPersistenceImpl extends BasePersistenceImpl<DDMTe
 	 *
 	 * @param primaryKey the primary key of the d d m template version
 	 * @return the d d m template version that was removed
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateVersionException if a d d m template version with the primary key could not be found
+	 * @throws NoSuchTemplateVersionException if a d d m template version with the primary key could not be found
 	 */
 	@Override
 	public DDMTemplateVersion remove(Serializable primaryKey)
@@ -1766,11 +1768,11 @@ public class DDMTemplateVersionPersistenceImpl extends BasePersistenceImpl<DDMTe
 	}
 
 	/**
-	 * Returns the d d m template version with the primary key or throws a {@link com.liferay.portal.NoSuchModelException} if it could not be found.
+	 * Returns the d d m template version with the primary key or throws a {@link com.liferay.portal.exception.NoSuchModelException} if it could not be found.
 	 *
 	 * @param primaryKey the primary key of the d d m template version
 	 * @return the d d m template version
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateVersionException if a d d m template version with the primary key could not be found
+	 * @throws NoSuchTemplateVersionException if a d d m template version with the primary key could not be found
 	 */
 	@Override
 	public DDMTemplateVersion findByPrimaryKey(Serializable primaryKey)
@@ -1790,11 +1792,11 @@ public class DDMTemplateVersionPersistenceImpl extends BasePersistenceImpl<DDMTe
 	}
 
 	/**
-	 * Returns the d d m template version with the primary key or throws a {@link com.liferay.dynamic.data.mapping.NoSuchTemplateVersionException} if it could not be found.
+	 * Returns the d d m template version with the primary key or throws a {@link NoSuchTemplateVersionException} if it could not be found.
 	 *
 	 * @param templateVersionId the primary key of the d d m template version
 	 * @return the d d m template version
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateVersionException if a d d m template version with the primary key could not be found
+	 * @throws NoSuchTemplateVersionException if a d d m template version with the primary key could not be found
 	 */
 	@Override
 	public DDMTemplateVersion findByPrimaryKey(long templateVersionId)
@@ -2043,7 +2045,7 @@ public class DDMTemplateVersionPersistenceImpl extends BasePersistenceImpl<DDMTe
 
 			if (orderByComparator != null) {
 				query = new StringBundler(2 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 
 				query.append(_SQL_SELECT_DDMTEMPLATEVERSION);
 

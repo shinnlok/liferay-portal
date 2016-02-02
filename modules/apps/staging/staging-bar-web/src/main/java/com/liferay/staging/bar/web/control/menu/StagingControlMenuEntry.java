@@ -29,7 +29,6 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
- *
  * @author Julio Camarero
  */
 @Component(
@@ -44,7 +43,7 @@ public class StagingControlMenuEntry
 	extends BaseJSPControlMenuEntry implements ControlMenuEntry {
 
 	@Override
-	public String getJspPath() {
+	public String getIconJspPath() {
 		return "/control_menu/entry.jsp";
 	}
 

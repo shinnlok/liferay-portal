@@ -17,6 +17,12 @@ package com.liferay.portal.ldap.internal.exportimport;
 import com.liferay.portal.kernel.ldap.LDAPUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.security.exportimport.UserExporter;
+import com.liferay.portal.kernel.security.exportimport.UserOperation;
+import com.liferay.portal.kernel.security.ldap.LDAPSettings;
+import com.liferay.portal.kernel.security.ldap.Modifications;
+import com.liferay.portal.kernel.security.ldap.PortalLDAP;
+import com.liferay.portal.kernel.security.ldap.PortalToLDAPConverter;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.ldap.GroupConverterKeys;
@@ -26,12 +32,6 @@ import com.liferay.portal.ldap.internal.PortalLDAPContext;
 import com.liferay.portal.model.Contact;
 import com.liferay.portal.model.User;
 import com.liferay.portal.model.UserGroup;
-import com.liferay.portal.security.exportimport.UserExporter;
-import com.liferay.portal.security.exportimport.UserOperation;
-import com.liferay.portal.security.ldap.LDAPSettings;
-import com.liferay.portal.security.ldap.Modifications;
-import com.liferay.portal.security.ldap.PortalLDAP;
-import com.liferay.portal.security.ldap.PortalToLDAPConverter;
 import com.liferay.portal.service.UserGroupLocalService;
 import com.liferay.portal.service.UserLocalService;
 
@@ -64,10 +64,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Wesley Gong
  * @author Vilmos Papp
  */
-@Component(
-	configurationPid = "com.liferay.portal.authenticator.ldap.configuration.LDAPAuthConfiguration",
-	immediate = true, service = UserExporter.class
-)
+@Component(immediate = true, service = UserExporter.class)
 public class LDAPUserExporterImpl implements UserExporter {
 
 	@Override
@@ -85,12 +82,7 @@ public class LDAPUserExporterImpl implements UserExporter {
 			_log.debug("Exporting contact " + contact);
 		}
 
-		LDAPAuthConfiguration ldapAuthConfiguration =
-			_ldapAuthConfigurationProvider.getConfiguration(companyId);
-
-		if (!ldapAuthConfiguration.enabled() ||
-			!_ldapSettings.isExportEnabled(companyId)) {
-
+		if (!_ldapSettings.isExportEnabled(companyId)) {
 			return;
 		}
 
@@ -182,11 +174,7 @@ public class LDAPUserExporterImpl implements UserExporter {
 				"Exporting user " + user + " in user group " + userGroupId);
 		}
 
-		LDAPAuthConfiguration ldapAuthConfiguration =
-			_ldapAuthConfigurationProvider.getConfiguration(companyId);
-
-		if (!ldapAuthConfiguration.enabled() ||
-			!_ldapSettings.isExportEnabled(companyId) ||
+		if (!_ldapSettings.isExportEnabled(companyId) ||
 			!_ldapSettings.isExportGroupEnabled(companyId)) {
 
 			return;
@@ -278,12 +266,7 @@ public class LDAPUserExporterImpl implements UserExporter {
 
 		long companyId = user.getCompanyId();
 
-		LDAPAuthConfiguration ldapAuthConfiguration =
-			_ldapAuthConfigurationProvider.getConfiguration(companyId);
-
-		if (!ldapAuthConfiguration.enabled() ||
-			!_ldapSettings.isExportEnabled(companyId)) {
-
+		if (!_ldapSettings.isExportEnabled(companyId)) {
 			return;
 		}
 
@@ -379,6 +362,9 @@ public class LDAPUserExporterImpl implements UserExporter {
 			}
 		}
 		catch (NameNotFoundException nnfe) {
+			LDAPAuthConfiguration ldapAuthConfiguration =
+				_ldapAuthConfigurationProvider.getConfiguration(companyId);
+
 			if (ldapAuthConfiguration.required()) {
 				throw nnfe;
 			}

@@ -35,12 +35,10 @@ page import="com.liferay.portal.kernel.util.StringPool" %>
 
 <%@ page import="javax.portlet.WindowState" %>
 
-<portlet:defineObjects />
+<liferay-frontend:defineObjects />
 
 <liferay-theme:defineObjects />
 
-<%
-WindowState windowState = liferayPortletRequest.getWindowState();
-%>
+<portlet:defineObjects />
 
 <%@ include file="/init-ext.jsp" %>

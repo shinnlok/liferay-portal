@@ -3,14 +3,7 @@
 	<property name="testray.main.component.name" value="Knowledge Base" />
 
 	<set-up>
-		<var method="TestPropsUtil#get('test.portal.instance')" name="testPortalInstance" />
-
-		<if>
-			<equals arg1="${testPortalInstance}" arg2="true" />
-			<then>
-				<execute macro="SignIn#signInPortalInstanceSetUp" />
-			</then>
-		</if>
+		<execute macro="TestCase#setUpPortalInstance" />
 
 		<execute macro="User#firstLoginPG" />
 	</set-up>
@@ -235,7 +228,7 @@
 		<execute macro="Portlet#dragAndDropPortletToColumnPG">
 			<var name="columnNumberFrom" value="1" />
 			<var name="columnNumberTo" value="2" />
-			<var name="portletName" value="Knowledge Base Display" />
+			<var name="portletName" value="Knowledge Base Article" />
 		</execute>
 
 		<execute macro="Page#add">
@@ -253,7 +246,7 @@
 		<execute macro="Portlet#dragAndDropPortletToColumnPG">
 			<var name="columnNumberFrom" value="1" />
 			<var name="columnNumberTo" value="2" />
-			<var name="portletName" value="Knowledge Base Display" />
+			<var name="portletName" value="Knowledge Base Search" />
 		</execute>
 
 		<execute macro="Page#add">
@@ -271,7 +264,7 @@
 		<execute macro="Portlet#dragAndDropPortletToColumnPG">
 			<var name="columnNumberFrom" value="1" />
 			<var name="columnNumberTo" value="2" />
-			<var name="portletName" value="Knowledge Base Display" />
+			<var name="portletName" value="Knowledge Base Section" />
 		</execute>
 
 		<execute macro="Page#gotoPG">
@@ -877,7 +870,7 @@
 			<var name="portlet" value="Documents and Media" />
 		</execute>
 
-		<execute function="AssertTextEquals" locator1="Message#INFO" value1="There are no documents or media files in this folder." />
+		<execute macro="DMDocument#viewDefaultCP" />
 
 		<execute macro="Navigator#openURL" />
 
@@ -1149,6 +1142,10 @@
 	<command name="ViewKBArticlesHierarchyWithinFolders" priority="4">
 		<execute macro="Page#add">
 			<var name="pageName" value="Knowledge Base Display Page" />
+		</execute>
+
+		<execute macro="ProductMenu#gotoEditPage">
+			<var name="page" value="Knowledge Base Display Page" />
 		</execute>
 
 		<execute macro="Page#editPageLayoutColumn">
@@ -1779,6 +1776,21 @@
 			<var name="userScreenName" value="${userScreenName}" />
 		</execute>
 
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Knowledge Base" />
+		</execute>
+
+		<execute macro="KBArticle#configureEmailCP">
+			<var name="emailFrom" value="true" />
+			<var name="suggestionInProgress" value="true" />
+			<var name="suggestionReceived" value="true" />
+			<var name="suggestionResolved" value="true" />
+			<var name="userEmailAddress" value="${userEmailAddress}" />
+			<var name="userName" value="${userName}" />
+		</execute>
+
 		<execute macro="User#logoutPG" />
 
 		<execute macro="User#loginUserPG">
@@ -1793,15 +1805,6 @@
 		</execute>
 
 		<execute macro="KBArticle#subscribeCP" />
-
-		<execute macro="KBArticle#configureEmailCP">
-			<var name="emailFrom" value="true" />
-			<var name="suggestionInProgress" value="true" />
-			<var name="suggestionReceived" value="true" />
-			<var name="suggestionResolved" value="true" />
-			<var name="userEmailAddress" value="${userEmailAddress}" />
-			<var name="userName" value="${userName}" />
-		</execute>
 
 		<execute macro="User#logoutPG" />
 
@@ -1884,6 +1887,7 @@
 		</execute>
 
 		<execute macro="KBArticle#viewKBSuggestionNotificationsInGmail">
+			<var name="folderName" value="Home" />
 			<var name="gmailKBArticleDate" value="true" />
 			<var name="gmailMessageKBArticleURL" value="true" />
 			<var name="kbArticleContent" value="${kbArticleContent}" />

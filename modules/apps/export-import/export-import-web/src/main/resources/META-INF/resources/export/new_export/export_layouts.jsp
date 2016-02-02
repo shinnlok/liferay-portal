@@ -50,6 +50,39 @@ else {
 	selectedLayoutIds = GetterUtil.getLongValues(StringUtil.split(openNodes, ','));
 }
 
+long exportImportConfigurationId = 0;
+
+ExportImportConfiguration exportImportConfiguration = null;
+
+Map<String, Serializable> exportImportConfigurationSettingsMap = Collections.emptyMap();
+
+Map<String, String[]> parameterMap = Collections.emptyMap();
+
+if (SessionMessages.contains(liferayPortletRequest, portletDisplay.getId() + "exportImportConfigurationId")) {
+	exportImportConfigurationId = (Long)SessionMessages.get(liferayPortletRequest, portletDisplay.getId() + "exportImportConfigurationId");
+
+	if (exportImportConfigurationId > 0) {
+		exportImportConfiguration = ExportImportConfigurationLocalServiceUtil.getExportImportConfiguration(exportImportConfigurationId);
+	}
+
+	exportImportConfigurationSettingsMap = (Map<String, Serializable>)SessionMessages.get(liferayPortletRequest, portletDisplay.getId() + "settingsMap");
+
+	parameterMap = (Map<String, String[]>)exportImportConfigurationSettingsMap.get("parameterMap");
+}
+else {
+	exportImportConfigurationId = ParamUtil.getLong(request, "exportImportConfigurationId");
+
+	if (exportImportConfigurationId > 0) {
+		exportImportConfiguration = ExportImportConfigurationLocalServiceUtil.getExportImportConfiguration(exportImportConfigurationId);
+
+		exportImportConfigurationSettingsMap = exportImportConfiguration.getSettingsMap();
+
+		parameterMap = (Map<String, String[]>)exportImportConfigurationSettingsMap.get("parameterMap");
+	}
+}
+
+boolean configuredExport = (exportImportConfiguration == null) ? false : true;
+
 PortletURL portletURL = renderResponse.createRenderURL();
 
 portletURL.setParameter("mvcRenderCommandName", "exportLayoutsView");
@@ -57,7 +90,7 @@ portletURL.setParameter("groupId", String.valueOf(groupId));
 portletURL.setParameter("liveGroupId", String.valueOf(liveGroupId));
 portletURL.setParameter("privateLayout", String.valueOf(privateLayout));
 
-Map<String, String[]> parameterMap = Collections.emptyMap();
+renderResponse.setTitle(!configuredExport ? LanguageUtil.get(request, "new-export") : LanguageUtil.format(request, "new-export-based-on-x", exportImportConfiguration.getName(), false));
 %>
 
 <liferay-util:include page="/export/new_export/navigation.jsp" servletContext="<%= application %>">
@@ -97,9 +130,10 @@ Map<String, String[]> parameterMap = Collections.emptyMap();
 			<aui:input name="liveGroupId" type="hidden" value="<%= String.valueOf(liveGroupId) %>" />
 			<aui:input name="privateLayout" type="hidden" value="<%= String.valueOf(privateLayout) %>" />
 			<aui:input name="rootNodeName" type="hidden" value="<%= rootNodeName %>" />
+			<aui:input name="treeId" type="hidden" value="<%= treeId %>" />
 			<aui:input name="<%= PortletDataHandlerKeys.PORTLET_ARCHIVED_SETUPS_ALL %>" type="hidden" value="<%= true %>" />
 			<aui:input name="<%= PortletDataHandlerKeys.PORTLET_CONFIGURATION_ALL %>" type="hidden" value="<%= true %>" />
-			<aui:input name="<%= PortletDataHandlerKeys.PORTLET_SETUP_ALL %>" type="hidden" value="<%= true %>"  />
+			<aui:input name="<%= PortletDataHandlerKeys.PORTLET_SETUP_ALL %>" type="hidden" value="<%= true %>" />
 			<aui:input name="<%= PortletDataHandlerKeys.PORTLET_USER_PREFERENCES_ALL %>" type="hidden" value="<%= true %>" />
 
 			<liferay-ui:error exception="<%= LARFileNameException.class %>" message="please-enter-a-file-with-a-valid-file-name" />
@@ -107,7 +141,7 @@ Map<String, String[]> parameterMap = Collections.emptyMap();
 			<div class="export-dialog-tree">
 				<aui:fieldset-group markupView="lexicon">
 					<aui:fieldset>
-						<aui:input name="name" />
+						<aui:input name="name" placeholder="process-name-placeholder" />
 					</aui:fieldset>
 
 					<c:if test="<%= !group.isLayoutPrototype() && !group.isCompany() %>">
@@ -117,28 +151,27 @@ Map<String, String[]> parameterMap = Collections.emptyMap();
 							request.setAttribute("select_pages.jsp-parameterMap", parameterMap);
 							%>
 
-							<liferay-util:include page="/select_pages.jsp" servletContext="<%= application %>">
+							<liferay-util:include page="/export/new_export/select_pages.jsp" servletContext="<%= application %>">
 								<liferay-util:param name="<%= Constants.CMD %>" value="<%= Constants.EXPORT %>" />
 								<liferay-util:param name="groupId" value="<%= String.valueOf(liveGroupId) %>" />
 								<liferay-util:param name="privateLayout" value="<%= String.valueOf(privateLayout) %>" />
 								<liferay-util:param name="treeId" value="<%= treeId %>" />
 								<liferay-util:param name="selectedLayoutIds" value="<%= StringUtil.merge(selectedLayoutIds) %>" />
+								<liferay-util:param name="disableInputs" value="<%= String.valueOf(configuredExport) %>" />
 							</liferay-util:include>
 						</aui:fieldset>
 					</c:if>
 
-					<liferay-staging:content cmd="<%= Constants.EXPORT %>" parameterMap="<%= parameterMap %>" type="<%= Constants.EXPORT %>" />
+					<liferay-staging:content cmd="<%= Constants.EXPORT %>" disableInputs="<%= configuredExport %>" parameterMap="<%= parameterMap %>" type="<%= Constants.EXPORT %>" />
 
-					<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" cssClass="options-group" label="permissions">
-						<%@ include file="/permissions.jspf" %>
-					</aui:fieldset>
+					<liferay-staging:permissions disableInputs="<%= configuredExport %>" global="<%= group.isCompany() %>" parameterMap="<%= parameterMap %>" />
 				</aui:fieldset-group>
 			</div>
 
 			<aui:button-row>
-				<aui:button type="submit" value="export" />
+				<aui:button cssClass="btn-lg" type="submit" value="export" />
 
-				<aui:button href="<%= portletURL.toString() %>" type="cancel" />
+				<aui:button cssClass="btn-lg" href="<%= portletURL.toString() %>" type="cancel" />
 			</aui:button-row>
 		</aui:form>
 	</div>
@@ -153,9 +186,7 @@ Map<String, String[]> parameterMap = Collections.emptyMap();
 			exportLAR: true,
 			form: document.<portlet:namespace />fm1,
 			incompleteProcessMessageNode: '#<portlet:namespace />incompleteProcessMessage',
-			layoutSetSettingsNode: '#<%= PortletDataHandlerKeys.LAYOUT_SET_SETTINGS %>',
 			locale: '<%= locale.toLanguageTag() %>',
-			logoNode: '#<%= PortletDataHandlerKeys.LOGO %>',
 			namespace: '<portlet:namespace />',
 			pageTreeId: '<%= treeId %>',
 			rangeAllNode: '#rangeAll',
@@ -163,7 +194,6 @@ Map<String, String[]> parameterMap = Collections.emptyMap();
 			rangeLastNode: '#rangeLast',
 			ratingsNode: '#<%= PortletDataHandlerKeys.RATINGS %>',
 			setupNode: '#<%= PortletDataHandlerKeys.PORTLET_SETUP_ALL %>',
-			themeReferenceNode: '#<%= PortletDataHandlerKeys.THEME_REFERENCE %>',
 			timeZone: '<%= timeZone.getID() %>',
 			userPreferencesNode: '#<%= PortletDataHandlerKeys.PORTLET_USER_PREFERENCES_ALL %>'
 		}

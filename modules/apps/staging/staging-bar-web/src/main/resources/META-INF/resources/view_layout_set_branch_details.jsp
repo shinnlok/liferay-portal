@@ -25,7 +25,7 @@ String stagingFriendlyURL = (String)request.getAttribute("view.jsp-stagingFriend
 
 <c:if test="<%= (layoutSetBranches != null) && (layoutSetBranches.size() >= 1) %>">
 	<li class="control-menu-nav-item">
-		<a class="staging-variation-label" href="javascript:;" id="manageLayoutSetRevisions" onclick='<%= renderResponse.getNamespace() + "openSitePagesVariationsDialog();" %>'>
+		<a class="control-menu-label staging-variation-label" href="javascript:;" id="manageLayoutSetRevisions" onclick='<%= renderResponse.getNamespace() + "openSitePagesVariationsDialog();" %>'>
 			<liferay-ui:message key="site-pages-variation" />
 		</a>
 
@@ -72,7 +72,12 @@ String stagingFriendlyURL = (String)request.getAttribute("view.jsp-stagingFriend
 						destroyOnHide: true
 					},
 					id: 'sitePagesVariationDialog',
-					title: '<liferay-ui:message key="site-pages-variation" />',
+
+					<liferay-util:buffer var="helpIcon">
+						<liferay-ui:icon-help message="pages-variations-help" />
+					</liferay-util:buffer>
+
+					title: '<liferay-ui:message arguments="<%= helpIcon %>" key="site-pages-variation-x" />',
 
 					<liferay-portlet:renderURL var="layoutSetBranchesURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
 						<portlet:param name="mvcRenderCommandName" value="viewLayoutSetBranches" />

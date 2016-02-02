@@ -267,7 +267,7 @@ public class OrganizationLocalServiceTest {
 				TestPropsValues.getUserId(),
 				OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID,
 				RandomTestUtil.randomString(),
-				OrganizationConstants.TYPE_REGULAR_ORGANIZATION, 0, 0,
+				OrganizationConstants.TYPE_ORGANIZATION, 0, 0,
 				ListTypeConstants.ORGANIZATION_STATUS_DEFAULT, StringPool.BLANK,
 				false, new ServiceContext());
 
@@ -275,7 +275,7 @@ public class OrganizationLocalServiceTest {
 			OrganizationLocalServiceUtil.addOrganization(
 				TestPropsValues.getUserId(),
 				OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID, "Test2",
-				OrganizationConstants.TYPE_REGULAR_ORGANIZATION, 0, 0,
+				OrganizationConstants.TYPE_ORGANIZATION, 0, 0,
 				ListTypeConstants.ORGANIZATION_STATUS_DEFAULT, StringPool.BLANK,
 				false, new ServiceContext());
 
@@ -294,6 +294,57 @@ public class OrganizationLocalServiceTest {
 
 		Assert.assertEquals(1, organizations.size());
 		Assert.assertEquals(organizationB, organizations.get(0));
+	}
+
+	@Test
+	public void testHasUserOrganization1() throws Exception {
+		Organization organizationA = OrganizationTestUtil.addOrganization(
+			OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID,
+			"Organization A", false);
+
+		Organization organizationB = OrganizationTestUtil.addOrganization(
+			OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID,
+			"Organization B", false);
+
+		_organizations.add(organizationA);
+		_organizations.add(organizationB);
+
+		UserLocalServiceUtil.addOrganizationUser(
+			organizationA.getOrganizationId(), TestPropsValues.getUserId());
+
+		Assert.assertTrue(
+			OrganizationLocalServiceUtil.hasUserOrganization(
+				TestPropsValues.getUserId(), organizationA.getOrganizationId(),
+				false, false));
+		Assert.assertFalse(
+			OrganizationLocalServiceUtil.hasUserOrganization(
+				TestPropsValues.getUserId(), organizationB.getOrganizationId(),
+				false, false));
+	}
+
+	@Test
+	public void testHasUserOrganization2() throws Exception {
+		Organization organizationA = OrganizationTestUtil.addOrganization(
+			OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID,
+			"Organization A", false);
+
+		Organization organizationAA = OrganizationTestUtil.addOrganization(
+			organizationA.getOrganizationId(), "Organization AA", false);
+
+		_organizations.add(organizationAA);
+		_organizations.add(organizationA);
+
+		UserLocalServiceUtil.addOrganizationUser(
+			organizationAA.getOrganizationId(), TestPropsValues.getUserId());
+
+		Assert.assertTrue(
+			OrganizationLocalServiceUtil.hasUserOrganization(
+				TestPropsValues.getUserId(), organizationA.getOrganizationId(),
+				true, false));
+		Assert.assertTrue(
+			OrganizationLocalServiceUtil.hasUserOrganization(
+				TestPropsValues.getUserId(), organizationA.getOrganizationId(),
+				true, true));
 	}
 
 	@Test

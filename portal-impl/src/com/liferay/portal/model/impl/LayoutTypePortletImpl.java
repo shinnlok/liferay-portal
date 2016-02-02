@@ -21,6 +21,9 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletLayoutListener;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
@@ -46,9 +49,6 @@ import com.liferay.portal.model.PortletConstants;
 import com.liferay.portal.model.PortletPreferencesIds;
 import com.liferay.portal.model.ResourcePermission;
 import com.liferay.portal.model.Theme;
-import com.liferay.portal.security.permission.ActionKeys;
-import com.liferay.portal.security.permission.PermissionChecker;
-import com.liferay.portal.security.permission.PermissionThreadLocal;
 import com.liferay.portal.service.LayoutTemplateLocalServiceUtil;
 import com.liferay.portal.service.PluginSettingLocalServiceUtil;
 import com.liferay.portal.service.PortletLocalServiceUtil;
@@ -63,7 +63,7 @@ import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.PortalPreferences;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
-import com.liferay.portlet.sites.util.SitesUtil;
+import com.liferay.sites.kernel.util.SitesUtil;
 import com.liferay.util.JS;
 
 import java.text.DateFormat;
@@ -804,13 +804,9 @@ public class LayoutTypePortletImpl
 
 	@Override
 	public boolean isPortletEmbedded(String portletId) {
-		for (Portlet embeddedPortlet : getEmbeddedPortlets()) {
-			if (portletId.equals(embeddedPortlet.getPortletId())) {
-				return true;
-			}
-		}
+		Layout layout = getLayout();
 
-		return false;
+		return layout.isPortletEmbedded(portletId);
 	}
 
 	@Override

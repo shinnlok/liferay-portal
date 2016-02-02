@@ -14,9 +14,9 @@
 
 package com.liferay.portal.kernel.search;
 
-import com.liferay.portal.NoSuchCountryException;
-import com.liferay.portal.NoSuchModelException;
-import com.liferay.portal.NoSuchRegionException;
+import com.liferay.portal.exception.NoSuchCountryException;
+import com.liferay.portal.exception.NoSuchModelException;
+import com.liferay.portal.exception.NoSuchRegionException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
@@ -32,6 +32,8 @@ import com.liferay.portal.kernel.search.filter.TermsFilter;
 import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
 import com.liferay.portal.kernel.search.generic.MatchAllQuery;
 import com.liferay.portal.kernel.search.hits.HitsProcessorRegistryUtil;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.trash.TrashHandler;
 import com.liferay.portal.kernel.trash.TrashRenderer;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -60,8 +62,6 @@ import com.liferay.portal.model.ResourcedModel;
 import com.liferay.portal.model.TrashedModel;
 import com.liferay.portal.model.User;
 import com.liferay.portal.model.WorkflowedModel;
-import com.liferay.portal.security.permission.PermissionChecker;
-import com.liferay.portal.security.permission.PermissionThreadLocal;
 import com.liferay.portal.service.CountryServiceUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.RegionServiceUtil;

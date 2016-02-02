@@ -14,13 +14,15 @@
 
 package com.liferay.portal.model.impl;
 
-import com.liferay.portal.LayoutFriendlyURLException;
-import com.liferay.portal.NoSuchGroupException;
+import com.liferay.portal.exception.LayoutFriendlyURLException;
+import com.liferay.portal.exception.NoSuchGroupException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.CookieKeys;
@@ -49,8 +51,6 @@ import com.liferay.portal.model.LayoutTypePortletConstants;
 import com.liferay.portal.model.Portlet;
 import com.liferay.portal.model.PortletPreferences;
 import com.liferay.portal.model.Theme;
-import com.liferay.portal.security.permission.ActionKeys;
-import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutFriendlyURLLocalServiceUtil;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
@@ -403,29 +403,8 @@ public class LayoutImpl extends LayoutBaseImpl {
 
 	@Override
 	public List<Portlet> getEmbeddedPortlets(long groupId) {
-		List<PortletPreferences> portletPreferences =
-			PortletPreferencesLocalServiceUtil.getPortletPreferences(
-				groupId, PortletKeys.PREFS_OWNER_TYPE_LAYOUT,
-				PortletKeys.PREFS_PLID_SHARED);
-
-		if (isTypePortlet()) {
-			LayoutTypePortlet layoutTypePortlet =
-				(LayoutTypePortlet)getLayoutType();
-
-			PortalPreferences portalPreferences =
-				layoutTypePortlet.getPortalPreferences();
-
-			if (layoutTypePortlet.isCustomizable() &&
-				(portalPreferences != null)) {
-
-				portletPreferences = ListUtil.copy(portletPreferences);
-
-				portletPreferences.addAll(
-					PortletPreferencesLocalServiceUtil.getPortletPreferences(
-						portalPreferences.getUserId(),
-						PortletKeys.PREFS_OWNER_TYPE_USER, getPlid()));
-			}
-		}
+		List<PortletPreferences> portletPreferences = _getPortletPreferences(
+			groupId);
 
 		if (portletPreferences.isEmpty()) {
 			return Collections.emptyList();
@@ -1040,6 +1019,35 @@ public class LayoutImpl extends LayoutBaseImpl {
 		return false;
 	}
 
+	@Override
+	public boolean isPortletEmbedded(String portletId) {
+		List<PortletPreferences> portletPreferences = _getPortletPreferences(
+			getGroupId());
+
+		if (portletPreferences.isEmpty()) {
+			return false;
+		}
+
+		for (PortletPreferences portletPreference : portletPreferences) {
+			String currentPortletId = portletPreference.getPortletId();
+
+			if (!portletId.equals(currentPortletId)) {
+				continue;
+			}
+
+			Portlet portlet = PortletLocalServiceUtil.getPortletById(
+				getCompanyId(), currentPortletId);
+
+			if ((portlet != null) && portlet.isReady() &&
+				!portlet.isUndeployedPortlet() && portlet.isActive()) {
+
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	/**
 	 * Returns <code>true</code> if the current layout is part of the public
 	 * {@link LayoutSet}.
@@ -1332,6 +1340,34 @@ public class LayoutImpl extends LayoutBaseImpl {
 		}
 
 		return layoutTypePortlet;
+	}
+
+	private List<PortletPreferences> _getPortletPreferences(long groupId) {
+		List<PortletPreferences> portletPreferences =
+			PortletPreferencesLocalServiceUtil.getPortletPreferences(
+				groupId, PortletKeys.PREFS_OWNER_TYPE_LAYOUT,
+				PortletKeys.PREFS_PLID_SHARED);
+
+		if (isTypePortlet()) {
+			LayoutTypePortlet layoutTypePortlet =
+				(LayoutTypePortlet)getLayoutType();
+
+			PortalPreferences portalPreferences =
+				layoutTypePortlet.getPortalPreferences();
+
+			if ((portalPreferences != null) &&
+				layoutTypePortlet.isCustomizable()) {
+
+				portletPreferences = ListUtil.copy(portletPreferences);
+
+				portletPreferences.addAll(
+					PortletPreferencesLocalServiceUtil.getPortletPreferences(
+						portalPreferences.getUserId(),
+						PortletKeys.PREFS_OWNER_TYPE_USER, getPlid()));
+			}
+		}
+
+		return portletPreferences;
 	}
 
 	private String _getURL(

@@ -20,9 +20,9 @@ import com.liferay.control.menu.BaseJSPControlMenuEntry;
 import com.liferay.control.menu.ControlMenuEntry;
 import com.liferay.control.menu.constants.ControlMenuCategoryKeys;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.Layout;
-import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.service.permission.LayoutPermissionUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.product.navigation.simulation.application.list.SimulationPanelCategory;
@@ -42,7 +42,7 @@ import org.osgi.service.component.annotations.Reference;
 	immediate = true,
 	property = {
 		"control.menu.category.key=" + ControlMenuCategoryKeys.USER,
-		"service.ranking:Integer=100"
+		"service.ranking:Integer=200"
 	},
 	service = ControlMenuEntry.class
 )
@@ -50,7 +50,7 @@ public class SimulationControlMenuEntry
 	extends BaseJSPControlMenuEntry implements ControlMenuEntry {
 
 	@Override
-	public String getJspPath() {
+	public String getIconJspPath() {
 		return "/portlet/control_menu/simulation_control_menu_entry.jsp";
 	}
 

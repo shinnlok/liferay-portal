@@ -26,7 +26,7 @@ String principal = ParamUtil.getString(request, "principal");
 String credentials = request.getParameter("credentials");
 
 if (credentials.equals(Portal.TEMP_OBFUSCATION_VALUE)) {
-	LDAPServerConfiguration ldapServerConfiguration = ldapServerConfigurationProvider.getConfiguration(themeDisplay.getCompanyId(), ldapServerId, true);
+	LDAPServerConfiguration ldapServerConfiguration = ldapServerConfigurationProvider.getConfiguration(themeDisplay.getCompanyId(), ldapServerId);
 
 	credentials = ldapServerConfiguration.securityCredential();
 
@@ -122,11 +122,10 @@ portletURL.setWindowState(LiferayWindowState.POP_UP);
 <liferay-ui:search-container
 	emptyResultsMessage="no-users-were-found"
 	iteratorURL="<%= portletURL %>"
+	total="<%= searchResults.size() %>"
 >
-
 	<liferay-ui:search-container-results
 		results="<%= ListUtil.subList(searchResults, searchContainer.getStart(), searchContainer.getEnd()) %>"
-		total="<%= searchResults.size() %>"
 	/>
 
 	<liferay-ui:search-container-row

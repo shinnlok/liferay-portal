@@ -54,14 +54,14 @@ if (recurrence != null) {
 
 	List<java.util.Calendar> exceptionJCalendars = recurrence.getExceptionJCalendars();
 
-	Iterator<java.util.Calendar> iterator = exceptionJCalendars.iterator();
+	Iterator<java.util.Calendar> exceptionJCalendarsIterator = exceptionJCalendars.iterator();
 
-	while (iterator.hasNext()) {
-		java.util.Calendar exceptionJCalendar = iterator.next();
+	while (exceptionJCalendarsIterator.hasNext()) {
+		java.util.Calendar exceptionJCalendar = exceptionJCalendarsIterator.next();
 
 		sb.append(exceptionJCalendar.getTimeInMillis());
 
-		if (iterator.hasNext()) {
+		if (exceptionJCalendarsIterator.hasNext()) {
 			sb.append(StringPool.COMMA);
 		}
 	}
@@ -166,7 +166,7 @@ if (recurrence != null) {
 						Weekday weekday = positionalWeekday.getWeekday();
 						%>
 
-						<aui:input label="repeat-on-month-last-day-of-the-week" name="lastPosition" type="checkbox" />
+						<aui:input checked="<%= positionalWeekday.getPosition() == -1 %>" label="repeat-on-month-last-day-of-the-week" name="lastPosition" type="checkbox" />
 
 						<aui:input name="position" type="hidden" value="<%= positionalWeekday.getPosition() %>" />
 
@@ -192,7 +192,7 @@ if (recurrence != null) {
 
 						<label><liferay-ui:message key="after" /></label>
 
-						<aui:input disabled="<%= !afterChecked %>" label="<%= StringPool.BLANK %>"  name="count" size="5" type="text" value="<%= afterChecked ? count : StringPool.BLANK %>" />
+						<aui:input disabled="<%= !afterChecked %>" label="<%= StringPool.BLANK %>" name="count" size="5" type="text" value="<%= afterChecked ? count : StringPool.BLANK %>" />
 
 						<label><liferay-ui:message key="occurrences" /></label>
 					</aui:field-wrapper>

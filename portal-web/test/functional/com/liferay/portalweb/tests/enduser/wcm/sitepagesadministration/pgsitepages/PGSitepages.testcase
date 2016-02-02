@@ -2,14 +2,7 @@
 	<property name="testray.main.component.name" value="Site Pages Administration" />
 
 	<set-up>
-		<var method="TestPropsUtil#get('test.portal.instance')" name="testPortalInstance" />
-
-		<if>
-			<equals arg1="${testPortalInstance}" arg2="true" />
-			<then>
-				<execute macro="SignIn#signInPortalInstanceSetUp" />
-			</then>
-		</if>
+		<execute macro="TestCase#setUpPortalInstance" />
 
 		<execute macro="User#firstLoginPG" />
 	</set-up>
@@ -31,7 +24,7 @@
 	</tear-down>
 
 	<command name="AddPageFromExistingPage" priority="3">
-		<execute macro="Page#openURL" />
+		<execute macro="Navigator#openURL" />
 
 		<execute macro="Page#add">
 			<var name="pageName" value="Site Page" />
@@ -58,7 +51,7 @@
 	</command>
 
 	<command name="EditSitePage" priority="4">
-		<execute macro="Page#openURL" />
+		<execute macro="Navigator#openURL" />
 
 		<execute macro="Page#add">
 			<var name="pageName" value="Site Page" />
@@ -66,6 +59,10 @@
 
 		<execute macro="Page#gotoPG">
 			<var name="pageName" value="Site Page" />
+		</execute>
+
+		<execute macro="ProductMenu#gotoEditPage">
+			<var name="page" value="Site Page" />
 		</execute>
 
 		<execute macro="SitePage#editPG">

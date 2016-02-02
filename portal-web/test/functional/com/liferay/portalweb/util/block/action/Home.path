@@ -169,6 +169,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>LOADING_ANIMATION</td>
+	<td>//div[contains(@class,'loading-animation')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td></td>
 	<td></td>
 	<td></td>
@@ -587,7 +592,7 @@
 </tr>
 <tr>
 	<td>SITE_ADMINISTRATION_PORTLET_TITLE</td>
-	<td>//span[contains(@class,'header-toolbar-title')]</td>
+	<td>//*[@data-qa-id='headerTitle']</td>
 	<td></td>
 </tr>
 <tr>

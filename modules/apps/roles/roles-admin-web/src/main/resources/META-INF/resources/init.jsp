@@ -33,12 +33,12 @@ page import="com.liferay.application.list.PanelCategoryRegistry" %><%@
 page import="com.liferay.application.list.constants.ApplicationListWebKeys" %><%@
 page import="com.liferay.application.list.constants.PanelCategoryKeys" %><%@
 page import="com.liferay.application.list.display.context.logic.PanelCategoryHelper" %><%@
-page import="com.liferay.portal.DuplicateRoleException" %><%@
-page import="com.liferay.portal.NoSuchRoleException" %><%@
-page import="com.liferay.portal.RequiredRoleException" %><%@
-page import="com.liferay.portal.RoleAssignmentException" %><%@
-page import="com.liferay.portal.RoleNameException" %><%@
-page import="com.liferay.portal.RolePermissionsException" %><%@
+page import="com.liferay.portal.exception.DuplicateRoleException" %><%@
+page import="com.liferay.portal.exception.NoSuchRoleException" %><%@
+page import="com.liferay.portal.exception.RequiredRoleException" %><%@
+page import="com.liferay.portal.exception.RoleAssignmentException" %><%@
+page import="com.liferay.portal.exception.RoleNameException" %><%@
+page import="com.liferay.portal.exception.RolePermissionsException" %><%@
 page import="com.liferay.portal.kernel.bean.BeanParamUtil" %><%@
 page import="com.liferay.portal.kernel.dao.orm.QueryUtil" %><%@
 page import="com.liferay.portal.kernel.dao.search.SearchContainer" %><%@
@@ -48,6 +48,15 @@ page import="com.liferay.portal.kernel.language.UnicodeLanguageUtil" %><%@
 page import="com.liferay.portal.kernel.portlet.LiferayWindowState" %><%@
 page import="com.liferay.portal.kernel.portlet.PortletProvider" %><%@
 page import="com.liferay.portal.kernel.portlet.PortletProviderUtil" %><%@
+page import="com.liferay.portal.kernel.security.membershippolicy.OrganizationMembershipPolicyUtil" %><%@
+page import="com.liferay.portal.kernel.security.membershippolicy.RoleMembershipPolicyUtil" %><%@
+page import="com.liferay.portal.kernel.security.membershippolicy.SiteMembershipPolicyUtil" %><%@
+page import="com.liferay.portal.kernel.security.permission.ActionKeys" %><%@
+page import="com.liferay.portal.kernel.security.permission.PermissionConverterUtil" %><%@
+page import="com.liferay.portal.kernel.security.permission.ResourceActionsUtil" %><%@
+page import="com.liferay.portal.kernel.security.permission.RolePermissions" %><%@
+page import="com.liferay.portal.kernel.security.permission.comparator.ActionComparator" %><%@
+page import="com.liferay.portal.kernel.security.permission.comparator.ModelResourceWeightComparator" %><%@
 page import="com.liferay.portal.kernel.template.TemplateHandler" %><%@
 page import="com.liferay.portal.kernel.template.comparator.TemplateHandlerComparator" %><%@
 page import="com.liferay.portal.kernel.util.ArrayUtil" %><%@
@@ -77,15 +86,6 @@ page import="com.liferay.portal.model.User" %><%@
 page import="com.liferay.portal.model.UserGroupRole" %><%@
 page import="com.liferay.portal.model.UserPersonalSite" %><%@
 page import="com.liferay.portal.model.impl.ResourceImpl" %><%@
-page import="com.liferay.portal.security.membershippolicy.OrganizationMembershipPolicyUtil" %><%@
-page import="com.liferay.portal.security.membershippolicy.RoleMembershipPolicyUtil" %><%@
-page import="com.liferay.portal.security.membershippolicy.SiteMembershipPolicyUtil" %><%@
-page import="com.liferay.portal.security.permission.ActionKeys" %><%@
-page import="com.liferay.portal.security.permission.PermissionConverterUtil" %><%@
-page import="com.liferay.portal.security.permission.ResourceActionsUtil" %><%@
-page import="com.liferay.portal.security.permission.RolePermissions" %><%@
-page import="com.liferay.portal.security.permission.comparator.ActionComparator" %><%@
-page import="com.liferay.portal.security.permission.comparator.ModelResourceWeightComparator" %><%@
 page import="com.liferay.portal.service.GroupLocalServiceUtil" %><%@
 page import="com.liferay.portal.service.GroupServiceUtil" %><%@
 page import="com.liferay.portal.service.OrganizationLocalServiceUtil" %><%@
@@ -114,7 +114,6 @@ page import="com.liferay.portlet.rolesadmin.search.RoleSearch" %><%@
 page import="com.liferay.portlet.rolesadmin.search.RoleSearchTerms" %><%@
 page import="com.liferay.portlet.rolesadmin.search.UserGroupRoleChecker" %><%@
 page import="com.liferay.portlet.rolesadmin.search.UserRoleChecker" %><%@
-page import="com.liferay.portlet.rolesadmin.util.RolesAdminUtil" %><%@
 page import="com.liferay.portlet.usergroupsadmin.search.UserGroupDisplayTerms" %><%@
 page import="com.liferay.portlet.usergroupsadmin.search.UserGroupSearch" %><%@
 page import="com.liferay.portlet.usersadmin.search.GroupSearch" %><%@
@@ -123,10 +122,11 @@ page import="com.liferay.portlet.usersadmin.search.OrganizationSearch" %><%@
 page import="com.liferay.portlet.usersadmin.search.OrganizationSearchTerms" %><%@
 page import="com.liferay.portlet.usersadmin.search.UserSearch" %><%@
 page import="com.liferay.portlet.usersadmin.search.UserSearchTerms" %><%@
-page import="com.liferay.portlet.usersadmin.util.UsersAdmin" %><%@
-page import="com.liferay.portlet.usersadmin.util.UsersAdminUtil" %><%@
+page import="com.liferay.roles.admin.kernel.util.RolesAdminUtil" %><%@
 page import="com.liferay.roles.admin.web.search.RoleChecker" %><%@
-page import="com.liferay.taglib.search.ResultRow" %>
+page import="com.liferay.taglib.search.ResultRow" %><%@
+page import="com.liferay.users.admin.kernel.util.UsersAdmin" %><%@
+page import="com.liferay.users.admin.kernel.util.UsersAdminUtil" %>
 
 <%@ page import="java.util.ArrayList" %><%@
 page import="java.util.Collections" %><%@
@@ -141,16 +141,13 @@ page import="java.util.Set" %>
 page import="javax.portlet.ResourceURL" %><%@
 page import="javax.portlet.WindowState" %>
 
-<portlet:defineObjects />
+<liferay-frontend:defineObjects />
 
 <liferay-theme:defineObjects />
 
+<portlet:defineObjects />
+
 <%
-WindowState windowState = liferayPortletRequest.getWindowState();
-
-PortletURL currentURLObj = PortletURLUtil.getCurrent(liferayPortletRequest, liferayPortletResponse);
-String currentURL = currentURLObj.toString();
-
 boolean filterManageableGroups = true;
 boolean filterManageableOrganizations = true;
 boolean filterManageableRoles = true;

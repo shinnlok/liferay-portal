@@ -28,17 +28,22 @@ import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.model.Group;
 import com.liferay.portal.model.TrashedModel;
+import com.liferay.portal.service.GroupLocalService;
 import com.liferay.portal.theme.ThemeDisplay;
+import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.exportimport.configuration.ExportImportConfigurationConstants;
 import com.liferay.portlet.exportimport.configuration.ExportImportConfigurationHelper;
+import com.liferay.portlet.exportimport.lar.ExportImportHelperUtil;
 import com.liferay.portlet.exportimport.model.ExportImportConfiguration;
 import com.liferay.portlet.exportimport.service.ExportImportConfigurationLocalService;
 import com.liferay.portlet.exportimport.service.ExportImportConfigurationService;
 import com.liferay.portlet.exportimport.staging.StagingUtil;
 import com.liferay.portlet.trash.service.TrashEntryService;
 import com.liferay.portlet.trash.util.TrashUtil;
-import com.liferay.staging.processes.web.constants.StagingProcessesPortletKeys;
+import com.liferay.staging.constants.StagingProcessesPortletKeys;
+import com.liferay.taglib.ui.util.SessionTreeJSClicks;
 
 import java.io.Serializable;
 
@@ -48,6 +53,8 @@ import java.util.Map;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -126,18 +133,10 @@ public class EditPublishConfigurationMVCActionCommand
 			WebKeys.THEME_DISPLAY);
 
 		try {
-			long exportImportConfigurationId = ParamUtil.getLong(
-				actionRequest, "exportImportConfigurationId");
-
 			if (cmd.equals(Constants.ADD) || cmd.equals(Constants.UPDATE)) {
+				setLayoutIds(actionRequest);
+
 				updatePublishConfiguration(actionRequest);
-			}
-			else if (cmd.equals(Constants.PUBLISH_TO_LIVE)) {
-				StagingUtil.publishLayouts(
-					themeDisplay.getUserId(), exportImportConfigurationId);
-			}
-			else if (cmd.equals(Constants.PUBLISH_TO_REMOTE)) {
-				StagingUtil.copyRemoteLayouts(exportImportConfigurationId);
 			}
 			else if (cmd.equals(Constants.MOVE_TO_TRASH)) {
 				deleteExportImportConfiguration(actionRequest, true);
@@ -219,6 +218,31 @@ public class EditPublishConfigurationMVCActionCommand
 	}
 
 	@Reference(unbind = "-")
+	protected void setGroupLocalService(GroupLocalService groupLocalService) {
+		_groupLocalService = groupLocalService;
+	}
+
+	protected void setLayoutIds(ActionRequest actionRequest) {
+		HttpServletRequest portletRequest = PortalUtil.getHttpServletRequest(
+			actionRequest);
+
+		long groupId = ParamUtil.getLong(actionRequest, "groupId");
+		boolean privateLayout = ParamUtil.getBoolean(
+			actionRequest, "privateLayout");
+
+		String treeId = ParamUtil.getString(actionRequest, "treeId");
+
+		String openNodes = SessionTreeJSClicks.getOpenNodes(
+			portletRequest, treeId + "SelectedNode");
+
+		String selectedLayoutsJSON =
+			ExportImportHelperUtil.getSelectedLayoutsJSON(
+				groupId, privateLayout, openNodes);
+
+		actionRequest.setAttribute("layoutIds", selectedLayoutsJSON);
+	}
+
+	@Reference(unbind = "-")
 	protected void setTrashEntryService(TrashEntryService trashEntryService) {
 		_trashEntryService = trashEntryService;
 	}
@@ -237,30 +261,31 @@ public class EditPublishConfigurationMVCActionCommand
 		long exportImportConfigurationId = ParamUtil.getLong(
 			actionRequest, "exportImportConfigurationId");
 
-		boolean localPublishing = ParamUtil.getBoolean(
-			actionRequest, "localPublishing");
+		long groupId = ParamUtil.getLong(actionRequest, "groupId");
 
-		if (exportImportConfigurationId > 0) {
-			if (localPublishing) {
+		Group group = _groupLocalService.fetchGroup(groupId);
+
+		if (group.isStagedRemotely()) {
+			if (exportImportConfigurationId > 0) {
+				return ExportImportConfigurationHelper.
+					updatePublishLayoutRemoteExportImportConfiguration(
+						actionRequest);
+			}
+			else {
+				return ExportImportConfigurationHelper.
+					addPublishLayoutRemoteExportImportConfiguration(
+						actionRequest);
+			}
+		}
+		else {
+			if (exportImportConfigurationId > 0) {
 				return ExportImportConfigurationHelper.
 					updatePublishLayoutLocalExportImportConfiguration(
 						actionRequest);
 			}
 			else {
 				return ExportImportConfigurationHelper.
-					updatePublishLayoutRemoteExportImportConfiguration(
-						actionRequest);
-			}
-		}
-		else {
-			if (localPublishing) {
-				return ExportImportConfigurationHelper.
 					addPublishLayoutLocalExportImportConfiguration(
-						actionRequest);
-			}
-			else {
-				return ExportImportConfigurationHelper.
-					addPublishLayoutRemoteExportImportConfiguration(
 						actionRequest);
 			}
 		}
@@ -272,6 +297,7 @@ public class EditPublishConfigurationMVCActionCommand
 	private ExportImportConfigurationLocalService
 		_exportImportConfigurationLocalService;
 	private ExportImportConfigurationService _exportImportConfigurationService;
+	private GroupLocalService _groupLocalService;
 	private TrashEntryService _trashEntryService;
 
 }

@@ -5,14 +5,7 @@
 	<var name="portletName" value="Bookmarks" />
 
 	<set-up>
-		<var method="TestPropsUtil#get('test.portal.instance')" name="testPortalInstance" />
-
-		<if>
-			<equals arg1="${testPortalInstance}" arg2="true" />
-			<then>
-				<execute macro="SignIn#signInPortalInstanceSetUp" />
-			</then>
-		</if>
+		<execute macro="TestCase#setUpPortalInstance" />
 
 		<execute macro="User#firstLoginPG" />
 
@@ -207,7 +200,7 @@
 	<command name="DeleteFolderBookmark" priority="5">
 		<var name="bookmarkDescription" value="Test Bookmark Description" />
 		<var name="bookmarkName" value="Test Bookmark Name" />
-		<var name="bookmarkURL" value="http://liferay.com" />
+		<var name="bookmarkURL" value="http://www.liferay.com" />
 		<var name="folderDescription" value="Test Folder Description" />
 		<var name="folderName" value="Test Folder Name" />
 
@@ -330,7 +323,7 @@
 	<command name="MoveFolderBookmarkToFolder" priority="4">
 		<var name="bookmarkDescription" value="Test Bookmark Description" />
 		<var name="bookmarkName" value="Test Bookmark Name" />
-		<var name="bookmarkURL" value="http://liferay.com" />
+		<var name="bookmarkURL" value="http://www.liferay.com" />
 		<var name="bookmarkURLEdit" value="http://www.alloyui.com" />
 		<var name="folderDescription1" value="Test Folder Description 1" />
 		<var name="folderDescription2" value="Test Folder Description 2" />

@@ -210,7 +210,7 @@ public class AppPersistenceImpl extends BasePersistenceImpl<App>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -291,7 +291,7 @@ public class AppPersistenceImpl extends BasePersistenceImpl<App>
 	 * @param uuid the uuid
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching app
-	 * @throws com.liferay.marketplace.NoSuchAppException if a matching app could not be found
+	 * @throws NoSuchAppException if a matching app could not be found
 	 */
 	@Override
 	public App findByUuid_First(String uuid,
@@ -339,7 +339,7 @@ public class AppPersistenceImpl extends BasePersistenceImpl<App>
 	 * @param uuid the uuid
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching app
-	 * @throws com.liferay.marketplace.NoSuchAppException if a matching app could not be found
+	 * @throws NoSuchAppException if a matching app could not be found
 	 */
 	@Override
 	public App findByUuid_Last(String uuid,
@@ -394,7 +394,7 @@ public class AppPersistenceImpl extends BasePersistenceImpl<App>
 	 * @param uuid the uuid
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next app
-	 * @throws com.liferay.marketplace.NoSuchAppException if a app with the primary key could not be found
+	 * @throws NoSuchAppException if a app with the primary key could not be found
 	 */
 	@Override
 	public App[] findByUuid_PrevAndNext(long appId, String uuid,
@@ -431,8 +431,9 @@ public class AppPersistenceImpl extends BasePersistenceImpl<App>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
 			query = new StringBundler(3);
@@ -758,7 +759,7 @@ public class AppPersistenceImpl extends BasePersistenceImpl<App>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(4 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -844,7 +845,7 @@ public class AppPersistenceImpl extends BasePersistenceImpl<App>
 	 * @param companyId the company ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching app
-	 * @throws com.liferay.marketplace.NoSuchAppException if a matching app could not be found
+	 * @throws NoSuchAppException if a matching app could not be found
 	 */
 	@Override
 	public App findByUuid_C_First(String uuid, long companyId,
@@ -897,7 +898,7 @@ public class AppPersistenceImpl extends BasePersistenceImpl<App>
 	 * @param companyId the company ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching app
-	 * @throws com.liferay.marketplace.NoSuchAppException if a matching app could not be found
+	 * @throws NoSuchAppException if a matching app could not be found
 	 */
 	@Override
 	public App findByUuid_C_Last(String uuid, long companyId,
@@ -958,7 +959,7 @@ public class AppPersistenceImpl extends BasePersistenceImpl<App>
 	 * @param companyId the company ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next app
-	 * @throws com.liferay.marketplace.NoSuchAppException if a app with the primary key could not be found
+	 * @throws NoSuchAppException if a app with the primary key could not be found
 	 */
 	@Override
 	public App[] findByUuid_C_PrevAndNext(long appId, String uuid,
@@ -997,11 +998,12 @@ public class AppPersistenceImpl extends BasePersistenceImpl<App>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(4);
 		}
 
 		query.append(_SQL_SELECT_APP_WHERE);
@@ -1324,7 +1326,7 @@ public class AppPersistenceImpl extends BasePersistenceImpl<App>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -1391,7 +1393,7 @@ public class AppPersistenceImpl extends BasePersistenceImpl<App>
 	 * @param companyId the company ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching app
-	 * @throws com.liferay.marketplace.NoSuchAppException if a matching app could not be found
+	 * @throws NoSuchAppException if a matching app could not be found
 	 */
 	@Override
 	public App findByCompanyId_First(long companyId,
@@ -1439,7 +1441,7 @@ public class AppPersistenceImpl extends BasePersistenceImpl<App>
 	 * @param companyId the company ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching app
-	 * @throws com.liferay.marketplace.NoSuchAppException if a matching app could not be found
+	 * @throws NoSuchAppException if a matching app could not be found
 	 */
 	@Override
 	public App findByCompanyId_Last(long companyId,
@@ -1495,7 +1497,7 @@ public class AppPersistenceImpl extends BasePersistenceImpl<App>
 	 * @param companyId the company ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next app
-	 * @throws com.liferay.marketplace.NoSuchAppException if a app with the primary key could not be found
+	 * @throws NoSuchAppException if a app with the primary key could not be found
 	 */
 	@Override
 	public App[] findByCompanyId_PrevAndNext(long appId, long companyId,
@@ -1533,8 +1535,9 @@ public class AppPersistenceImpl extends BasePersistenceImpl<App>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
 			query = new StringBundler(3);
@@ -1708,11 +1711,11 @@ public class AppPersistenceImpl extends BasePersistenceImpl<App>
 			new String[] { Long.class.getName() });
 
 	/**
-	 * Returns the app where remoteAppId = &#63; or throws a {@link com.liferay.marketplace.NoSuchAppException} if it could not be found.
+	 * Returns the app where remoteAppId = &#63; or throws a {@link NoSuchAppException} if it could not be found.
 	 *
 	 * @param remoteAppId the remote app ID
 	 * @return the matching app
-	 * @throws com.liferay.marketplace.NoSuchAppException if a matching app could not be found
+	 * @throws NoSuchAppException if a matching app could not be found
 	 */
 	@Override
 	public App findByRemoteAppId(long remoteAppId) throws NoSuchAppException {
@@ -2026,7 +2029,7 @@ public class AppPersistenceImpl extends BasePersistenceImpl<App>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -2107,7 +2110,7 @@ public class AppPersistenceImpl extends BasePersistenceImpl<App>
 	 * @param category the category
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching app
-	 * @throws com.liferay.marketplace.NoSuchAppException if a matching app could not be found
+	 * @throws NoSuchAppException if a matching app could not be found
 	 */
 	@Override
 	public App findByCategory_First(String category,
@@ -2155,7 +2158,7 @@ public class AppPersistenceImpl extends BasePersistenceImpl<App>
 	 * @param category the category
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching app
-	 * @throws com.liferay.marketplace.NoSuchAppException if a matching app could not be found
+	 * @throws NoSuchAppException if a matching app could not be found
 	 */
 	@Override
 	public App findByCategory_Last(String category,
@@ -2211,7 +2214,7 @@ public class AppPersistenceImpl extends BasePersistenceImpl<App>
 	 * @param category the category
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next app
-	 * @throws com.liferay.marketplace.NoSuchAppException if a app with the primary key could not be found
+	 * @throws NoSuchAppException if a app with the primary key could not be found
 	 */
 	@Override
 	public App[] findByCategory_PrevAndNext(long appId, String category,
@@ -2249,8 +2252,9 @@ public class AppPersistenceImpl extends BasePersistenceImpl<App>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
 			query = new StringBundler(3);
@@ -2594,7 +2598,7 @@ public class AppPersistenceImpl extends BasePersistenceImpl<App>
 	 *
 	 * @param appId the primary key of the app
 	 * @return the app that was removed
-	 * @throws com.liferay.marketplace.NoSuchAppException if a app with the primary key could not be found
+	 * @throws NoSuchAppException if a app with the primary key could not be found
 	 */
 	@Override
 	public App remove(long appId) throws NoSuchAppException {
@@ -2606,7 +2610,7 @@ public class AppPersistenceImpl extends BasePersistenceImpl<App>
 	 *
 	 * @param primaryKey the primary key of the app
 	 * @return the app that was removed
-	 * @throws com.liferay.marketplace.NoSuchAppException if a app with the primary key could not be found
+	 * @throws NoSuchAppException if a app with the primary key could not be found
 	 */
 	@Override
 	public App remove(Serializable primaryKey) throws NoSuchAppException {
@@ -2839,11 +2843,11 @@ public class AppPersistenceImpl extends BasePersistenceImpl<App>
 	}
 
 	/**
-	 * Returns the app with the primary key or throws a {@link com.liferay.portal.NoSuchModelException} if it could not be found.
+	 * Returns the app with the primary key or throws a {@link com.liferay.portal.exception.NoSuchModelException} if it could not be found.
 	 *
 	 * @param primaryKey the primary key of the app
 	 * @return the app
-	 * @throws com.liferay.marketplace.NoSuchAppException if a app with the primary key could not be found
+	 * @throws NoSuchAppException if a app with the primary key could not be found
 	 */
 	@Override
 	public App findByPrimaryKey(Serializable primaryKey)
@@ -2863,11 +2867,11 @@ public class AppPersistenceImpl extends BasePersistenceImpl<App>
 	}
 
 	/**
-	 * Returns the app with the primary key or throws a {@link com.liferay.marketplace.NoSuchAppException} if it could not be found.
+	 * Returns the app with the primary key or throws a {@link NoSuchAppException} if it could not be found.
 	 *
 	 * @param appId the primary key of the app
 	 * @return the app
-	 * @throws com.liferay.marketplace.NoSuchAppException if a app with the primary key could not be found
+	 * @throws NoSuchAppException if a app with the primary key could not be found
 	 */
 	@Override
 	public App findByPrimaryKey(long appId) throws NoSuchAppException {
@@ -3109,7 +3113,7 @@ public class AppPersistenceImpl extends BasePersistenceImpl<App>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(2 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 
 				query.append(_SQL_SELECT_APP);
 

@@ -59,6 +59,7 @@ if (liveGroup == null) {
 			emptyResultsMessage="there-are-no-saved-export-templates"
 			iteratorURL="<%= portletURL %>"
 			orderByCol="name"
+			orderByComparator="<%= new ExportImportConfigurationNameComparator(true) %>"
 			orderByType="asc"
 			searchTerms="<%= new ExportImportConfigurationSearchTerms(renderRequest) %>"
 		>
@@ -124,7 +125,9 @@ if (liveGroup == null) {
 				/>
 
 				<%
+				request.setAttribute("view.jsp-groupId", groupId);
 				request.setAttribute("view.jsp-liveGroupId", liveGroupId);
+				request.setAttribute("view.jsp-privateLayout", privateLayout);
 				%>
 
 				<liferay-ui:search-container-column-jsp
@@ -142,7 +145,7 @@ if (liveGroup == null) {
 		<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.ADD %>" />
 		<portlet:param name="groupId" value="<%= String.valueOf(groupId) %>" />
 		<portlet:param name="liveGroupId" value="<%= String.valueOf(liveGroupId) %>" />
-		<portlet:param name="privateLayout" value="<%= String.valueOf(privateLayout) %>" />
+		<portlet:param name="privateLayout" value="<%= Boolean.FALSE.toString() %>" />
 	</portlet:renderURL>
 
 	<liferay-frontend:add-menu>

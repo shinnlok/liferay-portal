@@ -78,7 +78,8 @@
 		<if>
 			<equals arg1="${currentDisplayStyleViews}" arg2="" />
 			<then>
-				<execute function="AssertClick" locator1="Message#ERROR_1" value1="Your request failed to complete." />
+				<execute macro="Alert#viewRequestFailedToComplete" />
+
 				<execute function="AssertClick" locator1="Message#ERROR_2" value1="Display style views cannot be empty." />
 			</then>
 			<else>
@@ -162,7 +163,7 @@
 
 	<command name="viewNoPermissionCP">
 		<execute function="AssertTextEquals" locator1="DocumentsAndMedia#PORTLET_TITLE" value1="Documents and Media" />
-		<execute function="AssertTextEquals" locator1="Message#INFO" value1="There are no documents or media files in this folder." />
+		<execute function="AssertTextEquals" locator1="Message#EMPTY_INFO" value1="There are no documents or media files in this folder." />
 	</command>
 
 	<command name="viewRootFolderPG">

@@ -16,14 +16,14 @@ package com.liferay.portal.ldap.configuration;
 
 import aQute.bnd.annotation.metatype.Meta;
 
-import com.liferay.configuration.admin.ConfigurationAdmin;
+import com.liferay.portal.metatype.annotations.ExtendedObjectClassDefinition;
 
 /**
  * @author Michael C. Han
  */
-@ConfigurationAdmin(
+@ExtendedObjectClassDefinition(
 	category = "platform", factoryInstanceLabelAttribute = "companyId",
-	scope = ConfigurationAdmin.Scope.COMPANY
+	scope = ExtendedObjectClassDefinition.Scope.COMPANY
 )
 @Meta.OCD(
 	factory = true,
@@ -31,6 +31,8 @@ import com.liferay.configuration.admin.ConfigurationAdmin;
 	localization = "content/Language", name = "%ldap.server.configuration.name"
 )
 public interface LDAPServerConfiguration {
+
+	public static final long LDAP_SERVER_ID_DEFAULT = 0;
 
 	@Meta.AD(deflt = "(mail=@email_address@)", required = false)
 	public String authSearchFilter();

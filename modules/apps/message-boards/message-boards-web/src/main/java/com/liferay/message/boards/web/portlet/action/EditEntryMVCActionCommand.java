@@ -17,14 +17,14 @@ package com.liferay.message.boards.web.portlet.action;
 import com.liferay.message.boards.web.constants.MBPortletKeys;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
+import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.TrashedModel;
-import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.theme.ThemeDisplay;
-import com.liferay.portlet.messageboards.LockedThreadException;
+import com.liferay.portlet.messageboards.exception.LockedThreadException;
 import com.liferay.portlet.messageboards.model.MBCategory;
 import com.liferay.portlet.messageboards.model.MBThread;
 import com.liferay.portlet.messageboards.service.MBCategoryService;
@@ -128,7 +128,8 @@ public class EditEntryMVCActionCommand extends BaseMVCActionCommand {
 	}
 
 	protected void lockThreads(ActionRequest actionRequest) throws Exception {
-		long[] threadIds = ParamUtil.getLongValues(actionRequest, "rowIds");
+		long[] threadIds = ParamUtil.getLongValues(
+			actionRequest, "rowIdsMBThread");
 
 		for (long threadId : threadIds) {
 			_mbThreadService.lockThread(threadId);
@@ -146,7 +147,8 @@ public class EditEntryMVCActionCommand extends BaseMVCActionCommand {
 	}
 
 	protected void unlockThreads(ActionRequest actionRequest) throws Exception {
-		long[] threadIds = ParamUtil.getLongValues(actionRequest, "rowIds");
+		long[] threadIds = ParamUtil.getLongValues(
+			actionRequest, "rowIdsMBThread");
 
 		for (long threadId : threadIds) {
 			_mbThreadService.unlockThread(threadId);

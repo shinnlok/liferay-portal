@@ -26,6 +26,7 @@ import com.liferay.portal.service.ServiceContext;
 
 import org.osgi.util.tracker.ServiceTracker;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -186,7 +187,7 @@ public class MicroblogsEntryUtil {
 	* @param companyId the company ID
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching microblogs entry
-	* @throws com.liferay.microblogs.NoSuchEntryException if a matching microblogs entry could not be found
+	* @throws NoSuchEntryException if a matching microblogs entry could not be found
 	*/
 	public static MicroblogsEntry findByCompanyId_First(long companyId,
 		OrderByComparator<MicroblogsEntry> orderByComparator)
@@ -214,7 +215,7 @@ public class MicroblogsEntryUtil {
 	* @param companyId the company ID
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching microblogs entry
-	* @throws com.liferay.microblogs.NoSuchEntryException if a matching microblogs entry could not be found
+	* @throws NoSuchEntryException if a matching microblogs entry could not be found
 	*/
 	public static MicroblogsEntry findByCompanyId_Last(long companyId,
 		OrderByComparator<MicroblogsEntry> orderByComparator)
@@ -243,7 +244,7 @@ public class MicroblogsEntryUtil {
 	* @param companyId the company ID
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the previous, current, and next microblogs entry
-	* @throws com.liferay.microblogs.NoSuchEntryException if a microblogs entry with the primary key could not be found
+	* @throws NoSuchEntryException if a microblogs entry with the primary key could not be found
 	*/
 	public static MicroblogsEntry[] findByCompanyId_PrevAndNext(
 		long microblogsEntryId, long companyId,
@@ -347,7 +348,7 @@ public class MicroblogsEntryUtil {
 	* @param userId the user ID
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching microblogs entry
-	* @throws com.liferay.microblogs.NoSuchEntryException if a matching microblogs entry could not be found
+	* @throws NoSuchEntryException if a matching microblogs entry could not be found
 	*/
 	public static MicroblogsEntry findByUserId_First(long userId,
 		OrderByComparator<MicroblogsEntry> orderByComparator)
@@ -373,7 +374,7 @@ public class MicroblogsEntryUtil {
 	* @param userId the user ID
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching microblogs entry
-	* @throws com.liferay.microblogs.NoSuchEntryException if a matching microblogs entry could not be found
+	* @throws NoSuchEntryException if a matching microblogs entry could not be found
 	*/
 	public static MicroblogsEntry findByUserId_Last(long userId,
 		OrderByComparator<MicroblogsEntry> orderByComparator)
@@ -400,7 +401,7 @@ public class MicroblogsEntryUtil {
 	* @param userId the user ID
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the previous, current, and next microblogs entry
-	* @throws com.liferay.microblogs.NoSuchEntryException if a microblogs entry with the primary key could not be found
+	* @throws NoSuchEntryException if a microblogs entry with the primary key could not be found
 	*/
 	public static MicroblogsEntry[] findByUserId_PrevAndNext(
 		long microblogsEntryId, long userId,
@@ -510,7 +511,7 @@ public class MicroblogsEntryUtil {
 	* @param type the type
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching microblogs entry
-	* @throws com.liferay.microblogs.NoSuchEntryException if a matching microblogs entry could not be found
+	* @throws NoSuchEntryException if a matching microblogs entry could not be found
 	*/
 	public static MicroblogsEntry findByU_T_First(long userId, int type,
 		OrderByComparator<MicroblogsEntry> orderByComparator)
@@ -538,7 +539,7 @@ public class MicroblogsEntryUtil {
 	* @param type the type
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching microblogs entry
-	* @throws com.liferay.microblogs.NoSuchEntryException if a matching microblogs entry could not be found
+	* @throws NoSuchEntryException if a matching microblogs entry could not be found
 	*/
 	public static MicroblogsEntry findByU_T_Last(long userId, int type,
 		OrderByComparator<MicroblogsEntry> orderByComparator)
@@ -567,7 +568,7 @@ public class MicroblogsEntryUtil {
 	* @param type the type
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the previous, current, and next microblogs entry
-	* @throws com.liferay.microblogs.NoSuchEntryException if a microblogs entry with the primary key could not be found
+	* @throws NoSuchEntryException if a microblogs entry with the primary key could not be found
 	*/
 	public static MicroblogsEntry[] findByU_T_PrevAndNext(
 		long microblogsEntryId, long userId, int type,
@@ -685,7 +686,7 @@ public class MicroblogsEntryUtil {
 	* @param creatorClassPK the creator class p k
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching microblogs entry
-	* @throws com.liferay.microblogs.NoSuchEntryException if a matching microblogs entry could not be found
+	* @throws NoSuchEntryException if a matching microblogs entry could not be found
 	*/
 	public static MicroblogsEntry findByCCNI_CCPK_First(
 		long creatorClassNameId, long creatorClassPK,
@@ -719,7 +720,7 @@ public class MicroblogsEntryUtil {
 	* @param creatorClassPK the creator class p k
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching microblogs entry
-	* @throws com.liferay.microblogs.NoSuchEntryException if a matching microblogs entry could not be found
+	* @throws NoSuchEntryException if a matching microblogs entry could not be found
 	*/
 	public static MicroblogsEntry findByCCNI_CCPK_Last(
 		long creatorClassNameId, long creatorClassPK,
@@ -754,7 +755,7 @@ public class MicroblogsEntryUtil {
 	* @param creatorClassPK the creator class p k
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the previous, current, and next microblogs entry
-	* @throws com.liferay.microblogs.NoSuchEntryException if a microblogs entry with the primary key could not be found
+	* @throws NoSuchEntryException if a microblogs entry with the primary key could not be found
 	*/
 	public static MicroblogsEntry[] findByCCNI_CCPK_PrevAndNext(
 		long microblogsEntryId, long creatorClassNameId, long creatorClassPK,
@@ -969,7 +970,7 @@ public class MicroblogsEntryUtil {
 	* @param type the type
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching microblogs entry
-	* @throws com.liferay.microblogs.NoSuchEntryException if a matching microblogs entry could not be found
+	* @throws NoSuchEntryException if a matching microblogs entry could not be found
 	*/
 	public static MicroblogsEntry findByCCNI_T_First(long creatorClassNameId,
 		int type, OrderByComparator<MicroblogsEntry> orderByComparator)
@@ -1001,7 +1002,7 @@ public class MicroblogsEntryUtil {
 	* @param type the type
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching microblogs entry
-	* @throws com.liferay.microblogs.NoSuchEntryException if a matching microblogs entry could not be found
+	* @throws NoSuchEntryException if a matching microblogs entry could not be found
 	*/
 	public static MicroblogsEntry findByCCNI_T_Last(long creatorClassNameId,
 		int type, OrderByComparator<MicroblogsEntry> orderByComparator)
@@ -1034,7 +1035,7 @@ public class MicroblogsEntryUtil {
 	* @param type the type
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the previous, current, and next microblogs entry
-	* @throws com.liferay.microblogs.NoSuchEntryException if a microblogs entry with the primary key could not be found
+	* @throws NoSuchEntryException if a microblogs entry with the primary key could not be found
 	*/
 	public static MicroblogsEntry[] findByCCNI_T_PrevAndNext(
 		long microblogsEntryId, long creatorClassNameId, int type,
@@ -1150,7 +1151,7 @@ public class MicroblogsEntryUtil {
 	* @param parentMicroblogsEntryId the parent microblogs entry ID
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching microblogs entry
-	* @throws com.liferay.microblogs.NoSuchEntryException if a matching microblogs entry could not be found
+	* @throws NoSuchEntryException if a matching microblogs entry could not be found
 	*/
 	public static MicroblogsEntry findByT_P_First(int type,
 		long parentMicroblogsEntryId,
@@ -1184,7 +1185,7 @@ public class MicroblogsEntryUtil {
 	* @param parentMicroblogsEntryId the parent microblogs entry ID
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching microblogs entry
-	* @throws com.liferay.microblogs.NoSuchEntryException if a matching microblogs entry could not be found
+	* @throws NoSuchEntryException if a matching microblogs entry could not be found
 	*/
 	public static MicroblogsEntry findByT_P_Last(int type,
 		long parentMicroblogsEntryId,
@@ -1219,7 +1220,7 @@ public class MicroblogsEntryUtil {
 	* @param parentMicroblogsEntryId the parent microblogs entry ID
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the previous, current, and next microblogs entry
-	* @throws com.liferay.microblogs.NoSuchEntryException if a microblogs entry with the primary key could not be found
+	* @throws NoSuchEntryException if a microblogs entry with the primary key could not be found
 	*/
 	public static MicroblogsEntry[] findByT_P_PrevAndNext(
 		long microblogsEntryId, int type, long parentMicroblogsEntryId,
@@ -1343,7 +1344,7 @@ public class MicroblogsEntryUtil {
 	* @param type the type
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching microblogs entry
-	* @throws com.liferay.microblogs.NoSuchEntryException if a matching microblogs entry could not be found
+	* @throws NoSuchEntryException if a matching microblogs entry could not be found
 	*/
 	public static MicroblogsEntry findByCCNI_CCPK_T_First(
 		long creatorClassNameId, long creatorClassPK, int type,
@@ -1379,7 +1380,7 @@ public class MicroblogsEntryUtil {
 	* @param type the type
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching microblogs entry
-	* @throws com.liferay.microblogs.NoSuchEntryException if a matching microblogs entry could not be found
+	* @throws NoSuchEntryException if a matching microblogs entry could not be found
 	*/
 	public static MicroblogsEntry findByCCNI_CCPK_T_Last(
 		long creatorClassNameId, long creatorClassPK, int type,
@@ -1416,7 +1417,7 @@ public class MicroblogsEntryUtil {
 	* @param type the type
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the previous, current, and next microblogs entry
-	* @throws com.liferay.microblogs.NoSuchEntryException if a microblogs entry with the primary key could not be found
+	* @throws NoSuchEntryException if a microblogs entry with the primary key could not be found
 	*/
 	public static MicroblogsEntry[] findByCCNI_CCPK_T_PrevAndNext(
 		long microblogsEntryId, long creatorClassNameId, long creatorClassPK,
@@ -1566,7 +1567,7 @@ public class MicroblogsEntryUtil {
 	* @return the matching microblogs entries
 	*/
 	public static List<MicroblogsEntry> findByU_C_T_S(long userId,
-		java.util.Date createDate, int type, int socialRelationType) {
+		Date createDate, int type, int socialRelationType) {
 		return getPersistence()
 				   .findByU_C_T_S(userId, createDate, type, socialRelationType);
 	}
@@ -1587,8 +1588,7 @@ public class MicroblogsEntryUtil {
 	* @return the range of matching microblogs entries
 	*/
 	public static List<MicroblogsEntry> findByU_C_T_S(long userId,
-		java.util.Date createDate, int type, int socialRelationType, int start,
-		int end) {
+		Date createDate, int type, int socialRelationType, int start, int end) {
 		return getPersistence()
 				   .findByU_C_T_S(userId, createDate, type, socialRelationType,
 			start, end);
@@ -1611,8 +1611,8 @@ public class MicroblogsEntryUtil {
 	* @return the ordered range of matching microblogs entries
 	*/
 	public static List<MicroblogsEntry> findByU_C_T_S(long userId,
-		java.util.Date createDate, int type, int socialRelationType, int start,
-		int end, OrderByComparator<MicroblogsEntry> orderByComparator) {
+		Date createDate, int type, int socialRelationType, int start, int end,
+		OrderByComparator<MicroblogsEntry> orderByComparator) {
 		return getPersistence()
 				   .findByU_C_T_S(userId, createDate, type, socialRelationType,
 			start, end, orderByComparator);
@@ -1636,8 +1636,8 @@ public class MicroblogsEntryUtil {
 	* @return the ordered range of matching microblogs entries
 	*/
 	public static List<MicroblogsEntry> findByU_C_T_S(long userId,
-		java.util.Date createDate, int type, int socialRelationType, int start,
-		int end, OrderByComparator<MicroblogsEntry> orderByComparator,
+		Date createDate, int type, int socialRelationType, int start, int end,
+		OrderByComparator<MicroblogsEntry> orderByComparator,
 		boolean retrieveFromCache) {
 		return getPersistence()
 				   .findByU_C_T_S(userId, createDate, type, socialRelationType,
@@ -1653,10 +1653,10 @@ public class MicroblogsEntryUtil {
 	* @param socialRelationType the social relation type
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching microblogs entry
-	* @throws com.liferay.microblogs.NoSuchEntryException if a matching microblogs entry could not be found
+	* @throws NoSuchEntryException if a matching microblogs entry could not be found
 	*/
 	public static MicroblogsEntry findByU_C_T_S_First(long userId,
-		java.util.Date createDate, int type, int socialRelationType,
+		Date createDate, int type, int socialRelationType,
 		OrderByComparator<MicroblogsEntry> orderByComparator)
 		throws com.liferay.microblogs.exception.NoSuchEntryException {
 		return getPersistence()
@@ -1675,7 +1675,7 @@ public class MicroblogsEntryUtil {
 	* @return the first matching microblogs entry, or <code>null</code> if a matching microblogs entry could not be found
 	*/
 	public static MicroblogsEntry fetchByU_C_T_S_First(long userId,
-		java.util.Date createDate, int type, int socialRelationType,
+		Date createDate, int type, int socialRelationType,
 		OrderByComparator<MicroblogsEntry> orderByComparator) {
 		return getPersistence()
 				   .fetchByU_C_T_S_First(userId, createDate, type,
@@ -1691,10 +1691,10 @@ public class MicroblogsEntryUtil {
 	* @param socialRelationType the social relation type
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching microblogs entry
-	* @throws com.liferay.microblogs.NoSuchEntryException if a matching microblogs entry could not be found
+	* @throws NoSuchEntryException if a matching microblogs entry could not be found
 	*/
 	public static MicroblogsEntry findByU_C_T_S_Last(long userId,
-		java.util.Date createDate, int type, int socialRelationType,
+		Date createDate, int type, int socialRelationType,
 		OrderByComparator<MicroblogsEntry> orderByComparator)
 		throws com.liferay.microblogs.exception.NoSuchEntryException {
 		return getPersistence()
@@ -1713,7 +1713,7 @@ public class MicroblogsEntryUtil {
 	* @return the last matching microblogs entry, or <code>null</code> if a matching microblogs entry could not be found
 	*/
 	public static MicroblogsEntry fetchByU_C_T_S_Last(long userId,
-		java.util.Date createDate, int type, int socialRelationType,
+		Date createDate, int type, int socialRelationType,
 		OrderByComparator<MicroblogsEntry> orderByComparator) {
 		return getPersistence()
 				   .fetchByU_C_T_S_Last(userId, createDate, type,
@@ -1730,11 +1730,11 @@ public class MicroblogsEntryUtil {
 	* @param socialRelationType the social relation type
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the previous, current, and next microblogs entry
-	* @throws com.liferay.microblogs.NoSuchEntryException if a microblogs entry with the primary key could not be found
+	* @throws NoSuchEntryException if a microblogs entry with the primary key could not be found
 	*/
 	public static MicroblogsEntry[] findByU_C_T_S_PrevAndNext(
-		long microblogsEntryId, long userId, java.util.Date createDate,
-		int type, int socialRelationType,
+		long microblogsEntryId, long userId, Date createDate, int type,
+		int socialRelationType,
 		OrderByComparator<MicroblogsEntry> orderByComparator)
 		throws com.liferay.microblogs.exception.NoSuchEntryException {
 		return getPersistence()
@@ -1750,8 +1750,8 @@ public class MicroblogsEntryUtil {
 	* @param type the type
 	* @param socialRelationType the social relation type
 	*/
-	public static void removeByU_C_T_S(long userId, java.util.Date createDate,
-		int type, int socialRelationType) {
+	public static void removeByU_C_T_S(long userId, Date createDate, int type,
+		int socialRelationType) {
 		getPersistence()
 			.removeByU_C_T_S(userId, createDate, type, socialRelationType);
 	}
@@ -1765,8 +1765,8 @@ public class MicroblogsEntryUtil {
 	* @param socialRelationType the social relation type
 	* @return the number of matching microblogs entries
 	*/
-	public static int countByU_C_T_S(long userId, java.util.Date createDate,
-		int type, int socialRelationType) {
+	public static int countByU_C_T_S(long userId, Date createDate, int type,
+		int socialRelationType) {
 		return getPersistence()
 				   .countByU_C_T_S(userId, createDate, type, socialRelationType);
 	}
@@ -1804,7 +1804,7 @@ public class MicroblogsEntryUtil {
 	*
 	* @param microblogsEntryId the primary key of the microblogs entry
 	* @return the microblogs entry that was removed
-	* @throws com.liferay.microblogs.NoSuchEntryException if a microblogs entry with the primary key could not be found
+	* @throws NoSuchEntryException if a microblogs entry with the primary key could not be found
 	*/
 	public static MicroblogsEntry remove(long microblogsEntryId)
 		throws com.liferay.microblogs.exception.NoSuchEntryException {
@@ -1816,11 +1816,11 @@ public class MicroblogsEntryUtil {
 	}
 
 	/**
-	* Returns the microblogs entry with the primary key or throws a {@link com.liferay.microblogs.NoSuchEntryException} if it could not be found.
+	* Returns the microblogs entry with the primary key or throws a {@link NoSuchEntryException} if it could not be found.
 	*
 	* @param microblogsEntryId the primary key of the microblogs entry
 	* @return the microblogs entry
-	* @throws com.liferay.microblogs.NoSuchEntryException if a microblogs entry with the primary key could not be found
+	* @throws NoSuchEntryException if a microblogs entry with the primary key could not be found
 	*/
 	public static MicroblogsEntry findByPrimaryKey(long microblogsEntryId)
 		throws com.liferay.microblogs.exception.NoSuchEntryException {

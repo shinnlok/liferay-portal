@@ -50,18 +50,18 @@ recordSetSearch.setOrderByType(orderByType);
 		>
 
 			<%
+			searchContainer.setTotal(ddlFormAdminDisplayContext.getSearchContainerTotal(searchContainer));
+
 			request.setAttribute(WebKeys.SEARCH_CONTAINER, searchContainer);
 			%>
 
 			<liferay-ui:search-container-results
 				results="<%= ddlFormAdminDisplayContext.getSearchContainerResults(searchContainer) %>"
-				total="<%= ddlFormAdminDisplayContext.getSearchContainerTotal(searchContainer) %>"
 			/>
 
 			<liferay-ui:search-container-row
 				className="com.liferay.dynamic.data.lists.model.DDLRecordSet"
 				cssClass="entry-display-style"
-				escapedModel="<%= true %>"
 				keyProperty="recordSetId"
 				modelVar="recordSet"
 			>
@@ -89,46 +89,17 @@ recordSetSearch.setOrderByType(orderByType);
 							path="/admin/record_set_action.jsp"
 						/>
 					</c:when>
-					<c:when test='<%= displayStyle.equals("icon") %>'>
-
-						<%
-						row.setCssClass("col-md-3 col-sm-4 col-xs-12");
-						%>
-
-						<liferay-ui:search-container-column-text colspan="<%= 2 %>">
-							<liferay-frontend:vertical-card
-								actionJsp="/admin/record_set_action.jsp"
-								actionJspServletContext="<%= application %>"
-								cssClass="entry-display-style"
-								imageUrl='<%= themeDisplay.getPathThemeImages() + "/file_system/large/article.png" %>'
-								resultRow="<%= row %>"
-								showCheckbox= "<%= false %>"
-								title="<%= recordSet.getName(locale) %>"
-								url="<%= rowURL %>"
-							>
-								<liferay-frontend:vertical-card-sticker-bottom>
-									<liferay-ui:user-portrait
-										userId="<%= recordSet.getUserId() %>"
-									/>
-								</liferay-frontend:vertical-card-sticker-bottom>
-
-								<liferay-frontend:vertical-card-header>
-									<liferay-ui:message arguments="<%= new String[] {LanguageUtil.getTimeDescription(locale, System.currentTimeMillis() - recordSet.getModifiedDate().getTime(), true), HtmlUtil.escape(recordSet.getUserName())} %>" key="x-ago-by-x" translateArguments="<%= false %>" />
-								</liferay-frontend:vertical-card-header>
-							</liferay-frontend:vertical-card>
-						</liferay-ui:search-container-column-text>
-					</c:when>
 					<c:otherwise>
 
 						<liferay-ui:search-container-column-text
 							href="<%= rowURL %>"
 							name="name"
-							value="<%= recordSet.getName(locale) %>"
+							value="<%= HtmlUtil.escape(recordSet.getName(locale)) %>"
 						/>
 
 						<liferay-ui:search-container-column-text
 							name="description"
-							value="<%= StringUtil.shorten(recordSet.getDescription(locale), 100) %>"
+							value="<%= HtmlUtil.escape(StringUtil.shorten(recordSet.getDescription(locale), 100)) %>"
 						/>
 
 						<liferay-ui:search-container-column-date

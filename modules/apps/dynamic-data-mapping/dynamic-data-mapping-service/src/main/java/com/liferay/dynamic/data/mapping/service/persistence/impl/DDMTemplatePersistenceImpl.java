@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.dao.orm.SQLQuery;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.security.permission.InlineSQLHelperUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.SetUtil;
@@ -41,7 +42,6 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.model.CacheModel;
-import com.liferay.portal.security.permission.InlineSQLHelperUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextThreadLocal;
 import com.liferay.portal.service.persistence.CompanyProvider;
@@ -216,7 +216,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -298,7 +298,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 	 * @param uuid the uuid
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching d d m template
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a matching d d m template could not be found
+	 * @throws NoSuchTemplateException if a matching d d m template could not be found
 	 */
 	@Override
 	public DDMTemplate findByUuid_First(String uuid,
@@ -347,7 +347,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 	 * @param uuid the uuid
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching d d m template
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a matching d d m template could not be found
+	 * @throws NoSuchTemplateException if a matching d d m template could not be found
 	 */
 	@Override
 	public DDMTemplate findByUuid_Last(String uuid,
@@ -404,7 +404,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 	 * @param uuid the uuid
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next d d m template
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a d d m template with the primary key could not be found
+	 * @throws NoSuchTemplateException if a d d m template with the primary key could not be found
 	 */
 	@Override
 	public DDMTemplate[] findByUuid_PrevAndNext(long templateId, String uuid,
@@ -443,8 +443,9 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
 			query = new StringBundler(3);
@@ -649,12 +650,12 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 			new String[] { String.class.getName(), Long.class.getName() });
 
 	/**
-	 * Returns the d d m template where uuid = &#63; and groupId = &#63; or throws a {@link com.liferay.dynamic.data.mapping.NoSuchTemplateException} if it could not be found.
+	 * Returns the d d m template where uuid = &#63; and groupId = &#63; or throws a {@link NoSuchTemplateException} if it could not be found.
 	 *
 	 * @param uuid the uuid
 	 * @param groupId the group ID
 	 * @return the matching d d m template
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a matching d d m template could not be found
+	 * @throws NoSuchTemplateException if a matching d d m template could not be found
 	 */
 	@Override
 	public DDMTemplate findByUUID_G(String uuid, long groupId)
@@ -1025,7 +1026,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(4 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -1112,7 +1113,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 	 * @param companyId the company ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching d d m template
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a matching d d m template could not be found
+	 * @throws NoSuchTemplateException if a matching d d m template could not be found
 	 */
 	@Override
 	public DDMTemplate findByUuid_C_First(String uuid, long companyId,
@@ -1168,7 +1169,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 	 * @param companyId the company ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching d d m template
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a matching d d m template could not be found
+	 * @throws NoSuchTemplateException if a matching d d m template could not be found
 	 */
 	@Override
 	public DDMTemplate findByUuid_C_Last(String uuid, long companyId,
@@ -1231,7 +1232,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 	 * @param companyId the company ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next d d m template
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a d d m template with the primary key could not be found
+	 * @throws NoSuchTemplateException if a d d m template with the primary key could not be found
 	 */
 	@Override
 	public DDMTemplate[] findByUuid_C_PrevAndNext(long templateId, String uuid,
@@ -1270,11 +1271,12 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(4);
 		}
 
 		query.append(_SQL_SELECT_DDMTEMPLATE_WHERE);
@@ -1597,7 +1599,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -1665,7 +1667,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 	 * @param groupId the group ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching d d m template
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a matching d d m template could not be found
+	 * @throws NoSuchTemplateException if a matching d d m template could not be found
 	 */
 	@Override
 	public DDMTemplate findByGroupId_First(long groupId,
@@ -1715,7 +1717,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 	 * @param groupId the group ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching d d m template
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a matching d d m template could not be found
+	 * @throws NoSuchTemplateException if a matching d d m template could not be found
 	 */
 	@Override
 	public DDMTemplate findByGroupId_Last(long groupId,
@@ -1772,7 +1774,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 	 * @param groupId the group ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next d d m template
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a d d m template with the primary key could not be found
+	 * @throws NoSuchTemplateException if a d d m template with the primary key could not be found
 	 */
 	@Override
 	public DDMTemplate[] findByGroupId_PrevAndNext(long templateId,
@@ -1811,8 +1813,9 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
 			query = new StringBundler(3);
@@ -1964,10 +1967,10 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 
 		if (orderByComparator != null) {
 			query = new StringBundler(3 +
-					(orderByComparator.getOrderByFields().length * 3));
+					(orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(4);
 		}
 
 		if (getDB().isSupportsInlineDistinct()) {
@@ -2041,7 +2044,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 	 * @param groupId the group ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next d d m template
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a d d m template with the primary key could not be found
+	 * @throws NoSuchTemplateException if a d d m template with the primary key could not be found
 	 */
 	@Override
 	public DDMTemplate[] filterFindByGroupId_PrevAndNext(long templateId,
@@ -2085,11 +2088,12 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(4);
 		}
 
 		if (getDB().isSupportsInlineDistinct()) {
@@ -2454,7 +2458,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -2522,7 +2526,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 	 * @param classPK the class p k
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching d d m template
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a matching d d m template could not be found
+	 * @throws NoSuchTemplateException if a matching d d m template could not be found
 	 */
 	@Override
 	public DDMTemplate findByClassPK_First(long classPK,
@@ -2572,7 +2576,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 	 * @param classPK the class p k
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching d d m template
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a matching d d m template could not be found
+	 * @throws NoSuchTemplateException if a matching d d m template could not be found
 	 */
 	@Override
 	public DDMTemplate findByClassPK_Last(long classPK,
@@ -2629,7 +2633,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 	 * @param classPK the class p k
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next d d m template
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a d d m template with the primary key could not be found
+	 * @throws NoSuchTemplateException if a d d m template with the primary key could not be found
 	 */
 	@Override
 	public DDMTemplate[] findByClassPK_PrevAndNext(long templateId,
@@ -2668,8 +2672,9 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
 			query = new StringBundler(3);
@@ -2959,7 +2964,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -3041,7 +3046,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 	 * @param templateKey the template key
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching d d m template
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a matching d d m template could not be found
+	 * @throws NoSuchTemplateException if a matching d d m template could not be found
 	 */
 	@Override
 	public DDMTemplate findByTemplateKey_First(String templateKey,
@@ -3092,7 +3097,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 	 * @param templateKey the template key
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching d d m template
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a matching d d m template could not be found
+	 * @throws NoSuchTemplateException if a matching d d m template could not be found
 	 */
 	@Override
 	public DDMTemplate findByTemplateKey_Last(String templateKey,
@@ -3150,7 +3155,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 	 * @param templateKey the template key
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next d d m template
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a d d m template with the primary key could not be found
+	 * @throws NoSuchTemplateException if a d d m template with the primary key could not be found
 	 */
 	@Override
 	public DDMTemplate[] findByTemplateKey_PrevAndNext(long templateId,
@@ -3189,8 +3194,9 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
 			query = new StringBundler(3);
@@ -3504,7 +3510,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -3586,7 +3592,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 	 * @param type the type
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching d d m template
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a matching d d m template could not be found
+	 * @throws NoSuchTemplateException if a matching d d m template could not be found
 	 */
 	@Override
 	public DDMTemplate findByType_First(String type,
@@ -3635,7 +3641,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 	 * @param type the type
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching d d m template
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a matching d d m template could not be found
+	 * @throws NoSuchTemplateException if a matching d d m template could not be found
 	 */
 	@Override
 	public DDMTemplate findByType_Last(String type,
@@ -3692,7 +3698,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 	 * @param type the type
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next d d m template
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a d d m template with the primary key could not be found
+	 * @throws NoSuchTemplateException if a d d m template with the primary key could not be found
 	 */
 	@Override
 	public DDMTemplate[] findByType_PrevAndNext(long templateId, String type,
@@ -3731,8 +3737,9 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
 			query = new StringBundler(3);
@@ -4048,7 +4055,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -4130,7 +4137,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 	 * @param language the language
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching d d m template
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a matching d d m template could not be found
+	 * @throws NoSuchTemplateException if a matching d d m template could not be found
 	 */
 	@Override
 	public DDMTemplate findByLanguage_First(String language,
@@ -4181,7 +4188,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 	 * @param language the language
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching d d m template
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a matching d d m template could not be found
+	 * @throws NoSuchTemplateException if a matching d d m template could not be found
 	 */
 	@Override
 	public DDMTemplate findByLanguage_Last(String language,
@@ -4239,7 +4246,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 	 * @param language the language
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next d d m template
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a d d m template with the primary key could not be found
+	 * @throws NoSuchTemplateException if a d d m template with the primary key could not be found
 	 */
 	@Override
 	public DDMTemplate[] findByLanguage_PrevAndNext(long templateId,
@@ -4278,8 +4285,9 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
 			query = new StringBundler(3);
@@ -4483,11 +4491,11 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 			new String[] { Long.class.getName() });
 
 	/**
-	 * Returns the d d m template where smallImageId = &#63; or throws a {@link com.liferay.dynamic.data.mapping.NoSuchTemplateException} if it could not be found.
+	 * Returns the d d m template where smallImageId = &#63; or throws a {@link NoSuchTemplateException} if it could not be found.
 	 *
 	 * @param smallImageId the small image ID
 	 * @return the matching d d m template
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a matching d d m template could not be found
+	 * @throws NoSuchTemplateException if a matching d d m template could not be found
 	 */
 	@Override
 	public DDMTemplate findBySmallImageId(long smallImageId)
@@ -4817,7 +4825,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(4 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -4890,7 +4898,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 	 * @param classNameId the class name ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching d d m template
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a matching d d m template could not be found
+	 * @throws NoSuchTemplateException if a matching d d m template could not be found
 	 */
 	@Override
 	public DDMTemplate findByG_C_First(long groupId, long classNameId,
@@ -4946,7 +4954,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 	 * @param classNameId the class name ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching d d m template
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a matching d d m template could not be found
+	 * @throws NoSuchTemplateException if a matching d d m template could not be found
 	 */
 	@Override
 	public DDMTemplate findByG_C_Last(long groupId, long classNameId,
@@ -5009,7 +5017,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 	 * @param classNameId the class name ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next d d m template
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a d d m template with the primary key could not be found
+	 * @throws NoSuchTemplateException if a d d m template with the primary key could not be found
 	 */
 	@Override
 	public DDMTemplate[] findByG_C_PrevAndNext(long templateId, long groupId,
@@ -5048,11 +5056,12 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(4);
 		}
 
 		query.append(_SQL_SELECT_DDMTEMPLATE_WHERE);
@@ -5208,10 +5217,10 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 
 		if (orderByComparator != null) {
 			query = new StringBundler(4 +
-					(orderByComparator.getOrderByFields().length * 3));
+					(orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
-			query = new StringBundler(4);
+			query = new StringBundler(5);
 		}
 
 		if (getDB().isSupportsInlineDistinct()) {
@@ -5290,7 +5299,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 	 * @param classNameId the class name ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next d d m template
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a d d m template with the primary key could not be found
+	 * @throws NoSuchTemplateException if a d d m template with the primary key could not be found
 	 */
 	@Override
 	public DDMTemplate[] filterFindByG_C_PrevAndNext(long templateId,
@@ -5336,10 +5345,11 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 
 		if (orderByComparator != null) {
 			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(5);
 		}
 
 		if (getDB().isSupportsInlineDistinct()) {
@@ -5735,7 +5745,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(4 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -5808,7 +5818,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 	 * @param classPK the class p k
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching d d m template
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a matching d d m template could not be found
+	 * @throws NoSuchTemplateException if a matching d d m template could not be found
 	 */
 	@Override
 	public DDMTemplate findByG_CPK_First(long groupId, long classPK,
@@ -5864,7 +5874,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 	 * @param classPK the class p k
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching d d m template
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a matching d d m template could not be found
+	 * @throws NoSuchTemplateException if a matching d d m template could not be found
 	 */
 	@Override
 	public DDMTemplate findByG_CPK_Last(long groupId, long classPK,
@@ -5927,7 +5937,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 	 * @param classPK the class p k
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next d d m template
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a d d m template with the primary key could not be found
+	 * @throws NoSuchTemplateException if a d d m template with the primary key could not be found
 	 */
 	@Override
 	public DDMTemplate[] findByG_CPK_PrevAndNext(long templateId, long groupId,
@@ -5966,11 +5976,12 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(4);
 		}
 
 		query.append(_SQL_SELECT_DDMTEMPLATE_WHERE);
@@ -6126,10 +6137,10 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 
 		if (orderByComparator != null) {
 			query = new StringBundler(4 +
-					(orderByComparator.getOrderByFields().length * 3));
+					(orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
-			query = new StringBundler(4);
+			query = new StringBundler(5);
 		}
 
 		if (getDB().isSupportsInlineDistinct()) {
@@ -6208,7 +6219,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 	 * @param classPK the class p k
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next d d m template
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a d d m template with the primary key could not be found
+	 * @throws NoSuchTemplateException if a d d m template with the primary key could not be found
 	 */
 	@Override
 	public DDMTemplate[] filterFindByG_CPK_PrevAndNext(long templateId,
@@ -6254,10 +6265,11 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 
 		if (orderByComparator != null) {
 			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(5);
 		}
 
 		if (getDB().isSupportsInlineDistinct()) {
@@ -7171,7 +7183,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(5 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(5);
@@ -7249,7 +7261,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 	 * @param classPK the class p k
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching d d m template
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a matching d d m template could not be found
+	 * @throws NoSuchTemplateException if a matching d d m template could not be found
 	 */
 	@Override
 	public DDMTemplate findByG_C_C_First(long groupId, long classNameId,
@@ -7310,7 +7322,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 	 * @param classPK the class p k
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching d d m template
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a matching d d m template could not be found
+	 * @throws NoSuchTemplateException if a matching d d m template could not be found
 	 */
 	@Override
 	public DDMTemplate findByG_C_C_Last(long groupId, long classNameId,
@@ -7378,7 +7390,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 	 * @param classPK the class p k
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next d d m template
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a d d m template with the primary key could not be found
+	 * @throws NoSuchTemplateException if a d d m template with the primary key could not be found
 	 */
 	@Override
 	public DDMTemplate[] findByG_C_C_PrevAndNext(long templateId, long groupId,
@@ -7419,10 +7431,11 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 
 		if (orderByComparator != null) {
 			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(5);
 		}
 
 		query.append(_SQL_SELECT_DDMTEMPLATE_WHERE);
@@ -7588,10 +7601,10 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 
 		if (orderByComparator != null) {
 			query = new StringBundler(5 +
-					(orderByComparator.getOrderByFields().length * 3));
+					(orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
-			query = new StringBundler(5);
+			query = new StringBundler(6);
 		}
 
 		if (getDB().isSupportsInlineDistinct()) {
@@ -7675,7 +7688,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 	 * @param classPK the class p k
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next d d m template
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a d d m template with the primary key could not be found
+	 * @throws NoSuchTemplateException if a d d m template with the primary key could not be found
 	 */
 	@Override
 	public DDMTemplate[] filterFindByG_C_C_PrevAndNext(long templateId,
@@ -7720,11 +7733,12 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(7 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(6);
 		}
 
 		if (getDB().isSupportsInlineDistinct()) {
@@ -8558,13 +8572,13 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 			});
 
 	/**
-	 * Returns the d d m template where groupId = &#63; and classNameId = &#63; and templateKey = &#63; or throws a {@link com.liferay.dynamic.data.mapping.NoSuchTemplateException} if it could not be found.
+	 * Returns the d d m template where groupId = &#63; and classNameId = &#63; and templateKey = &#63; or throws a {@link NoSuchTemplateException} if it could not be found.
 	 *
 	 * @param groupId the group ID
 	 * @param classNameId the class name ID
 	 * @param templateKey the template key
 	 * @return the matching d d m template
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a matching d d m template could not be found
+	 * @throws NoSuchTemplateException if a matching d d m template could not be found
 	 */
 	@Override
 	public DDMTemplate findByG_C_T(long groupId, long classNameId,
@@ -8970,7 +8984,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(5 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(5);
@@ -9062,7 +9076,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 	 * @param type the type
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching d d m template
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a matching d d m template could not be found
+	 * @throws NoSuchTemplateException if a matching d d m template could not be found
 	 */
 	@Override
 	public DDMTemplate findByC_C_T_First(long classNameId, long classPK,
@@ -9123,7 +9137,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 	 * @param type the type
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching d d m template
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a matching d d m template could not be found
+	 * @throws NoSuchTemplateException if a matching d d m template could not be found
 	 */
 	@Override
 	public DDMTemplate findByC_C_T_Last(long classNameId, long classPK,
@@ -9191,7 +9205,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 	 * @param type the type
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next d d m template
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a d d m template with the primary key could not be found
+	 * @throws NoSuchTemplateException if a d d m template with the primary key could not be found
 	 */
 	@Override
 	public DDMTemplate[] findByC_C_T_PrevAndNext(long templateId,
@@ -9232,10 +9246,11 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 
 		if (orderByComparator != null) {
 			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(5);
 		}
 
 		query.append(_SQL_SELECT_DDMTEMPLATE_WHERE);
@@ -9605,7 +9620,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(6 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(6);
@@ -9702,7 +9717,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 	 * @param type the type
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching d d m template
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a matching d d m template could not be found
+	 * @throws NoSuchTemplateException if a matching d d m template could not be found
 	 */
 	@Override
 	public DDMTemplate findByG_C_C_T_First(long groupId, long classNameId,
@@ -9770,7 +9785,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 	 * @param type the type
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching d d m template
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a matching d d m template could not be found
+	 * @throws NoSuchTemplateException if a matching d d m template could not be found
 	 */
 	@Override
 	public DDMTemplate findByG_C_C_T_Last(long groupId, long classNameId,
@@ -9845,7 +9860,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 	 * @param type the type
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next d d m template
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a d d m template with the primary key could not be found
+	 * @throws NoSuchTemplateException if a d d m template with the primary key could not be found
 	 */
 	@Override
 	public DDMTemplate[] findByG_C_C_T_PrevAndNext(long templateId,
@@ -9886,11 +9901,12 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(7 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(6);
 		}
 
 		query.append(_SQL_SELECT_DDMTEMPLATE_WHERE);
@@ -10078,10 +10094,10 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 
 		if (orderByComparator != null) {
 			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 3));
+					(orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
-			query = new StringBundler(6);
+			query = new StringBundler(7);
 		}
 
 		if (getDB().isSupportsInlineDistinct()) {
@@ -10184,7 +10200,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 	 * @param type the type
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next d d m template
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a d d m template with the primary key could not be found
+	 * @throws NoSuchTemplateException if a d d m template with the primary key could not be found
 	 */
 	@Override
 	public DDMTemplate[] filterFindByG_C_C_T_PrevAndNext(long templateId,
@@ -10231,11 +10247,12 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(8 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(7);
 		}
 
 		if (getDB().isSupportsInlineDistinct()) {
@@ -10741,7 +10758,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(7 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(7);
@@ -10857,7 +10874,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 	 * @param mode the mode
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching d d m template
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a matching d d m template could not be found
+	 * @throws NoSuchTemplateException if a matching d d m template could not be found
 	 */
 	@Override
 	public DDMTemplate findByG_C_C_T_M_First(long groupId, long classNameId,
@@ -10930,7 +10947,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 	 * @param mode the mode
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching d d m template
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a matching d d m template could not be found
+	 * @throws NoSuchTemplateException if a matching d d m template could not be found
 	 */
 	@Override
 	public DDMTemplate findByG_C_C_T_M_Last(long groupId, long classNameId,
@@ -11010,7 +11027,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 	 * @param mode the mode
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next d d m template
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a d d m template with the primary key could not be found
+	 * @throws NoSuchTemplateException if a d d m template with the primary key could not be found
 	 */
 	@Override
 	public DDMTemplate[] findByG_C_C_T_M_PrevAndNext(long templateId,
@@ -11053,11 +11070,12 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(8 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(7);
 		}
 
 		query.append(_SQL_SELECT_DDMTEMPLATE_WHERE);
@@ -11267,10 +11285,10 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 
 		if (orderByComparator != null) {
 			query = new StringBundler(7 +
-					(orderByComparator.getOrderByFields().length * 3));
+					(orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
-			query = new StringBundler(7);
+			query = new StringBundler(8);
 		}
 
 		if (getDB().isSupportsInlineDistinct()) {
@@ -11392,7 +11410,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 	 * @param mode the mode
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next d d m template
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a d d m template with the primary key could not be found
+	 * @throws NoSuchTemplateException if a d d m template with the primary key could not be found
 	 */
 	@Override
 	public DDMTemplate[] filterFindByG_C_C_T_M_PrevAndNext(long templateId,
@@ -11440,11 +11458,12 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(9 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(8);
 		}
 
 		if (getDB().isSupportsInlineDistinct()) {
@@ -12103,7 +12122,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 	 *
 	 * @param templateId the primary key of the d d m template
 	 * @return the d d m template that was removed
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a d d m template with the primary key could not be found
+	 * @throws NoSuchTemplateException if a d d m template with the primary key could not be found
 	 */
 	@Override
 	public DDMTemplate remove(long templateId) throws NoSuchTemplateException {
@@ -12115,7 +12134,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 	 *
 	 * @param primaryKey the primary key of the d d m template
 	 * @return the d d m template that was removed
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a d d m template with the primary key could not be found
+	 * @throws NoSuchTemplateException if a d d m template with the primary key could not be found
 	 */
 	@Override
 	public DDMTemplate remove(Serializable primaryKey)
@@ -12563,11 +12582,11 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 	}
 
 	/**
-	 * Returns the d d m template with the primary key or throws a {@link com.liferay.portal.NoSuchModelException} if it could not be found.
+	 * Returns the d d m template with the primary key or throws a {@link com.liferay.portal.exception.NoSuchModelException} if it could not be found.
 	 *
 	 * @param primaryKey the primary key of the d d m template
 	 * @return the d d m template
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a d d m template with the primary key could not be found
+	 * @throws NoSuchTemplateException if a d d m template with the primary key could not be found
 	 */
 	@Override
 	public DDMTemplate findByPrimaryKey(Serializable primaryKey)
@@ -12587,11 +12606,11 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 	}
 
 	/**
-	 * Returns the d d m template with the primary key or throws a {@link com.liferay.dynamic.data.mapping.NoSuchTemplateException} if it could not be found.
+	 * Returns the d d m template with the primary key or throws a {@link NoSuchTemplateException} if it could not be found.
 	 *
 	 * @param templateId the primary key of the d d m template
 	 * @return the d d m template
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchTemplateException if a d d m template with the primary key could not be found
+	 * @throws NoSuchTemplateException if a d d m template with the primary key could not be found
 	 */
 	@Override
 	public DDMTemplate findByPrimaryKey(long templateId)
@@ -12837,7 +12856,7 @@ public class DDMTemplatePersistenceImpl extends BasePersistenceImpl<DDMTemplate>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(2 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 
 				query.append(_SQL_SELECT_DDMTEMPLATE);
 

@@ -2,14 +2,7 @@
 	<property name="testray.main.component.name" value="Navigation" />
 
 	<set-up>
-		<var method="TestPropsUtil#get('test.portal.instance')" name="testPortalInstance" />
-
-		<if>
-			<equals arg1="${testPortalInstance}" arg2="true" />
-			<then>
-				<execute macro="SignIn#signInPortalInstanceSetUp" />
-			</then>
-		</if>
+		<execute macro="TestCase#setUpPortalInstance" />
 
 		<execute macro="User#firstLoginPG" />
 	</set-up>
@@ -112,7 +105,8 @@
 
 		<var name="key_pageName" value="Test User Group Private Page" />
 
-		<execute function="AssertTextEquals" locator1="Home#PAGE" value1="Test User Group Private Page" />
+		<execute function="AssertTextEquals" locator1="ProductMenu#PRIVATE_PAGE_LINK" value1="Test User Group Private Page" />
+
 		<execute function="Pause" locator1="1073" />
 		<execute function="Pause" locator1="1073" />
 

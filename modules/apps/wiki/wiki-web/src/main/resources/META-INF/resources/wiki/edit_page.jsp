@@ -205,9 +205,11 @@ if (portletTitleBasedNavigation) {
 							</div>
 						</c:if>
 
-						<div class="alert alert-info">
-							<liferay-ui:message key="this-page-does-not-exist-yet-use-the-form-below-to-create-it" />
-						</div>
+						<c:if test="<%= newPage && Validator.isNotNull(title) %>">
+							<div class="alert alert-info">
+								<liferay-ui:message key="this-page-does-not-exist-yet-use-the-form-below-to-create-it" />
+							</div>
+						</c:if>
 
 						<c:choose>
 							<c:when test="<%= editTitle %>">
@@ -318,8 +320,8 @@ if (portletTitleBasedNavigation) {
 					</aui:fieldset>
 
 					<c:if test="<%= wikiPage != null %>">
-						<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="custom-fields">
-							<liferay-ui:custom-attributes-available className="<%= WikiPage.class.getName() %>">
+						<liferay-ui:custom-attributes-available className="<%= WikiPage.class.getName() %>">
+							<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="custom-fields">
 
 								<%
 								classPK = 0;
@@ -338,8 +340,8 @@ if (portletTitleBasedNavigation) {
 									editable="<%= true %>"
 									label="<%= true %>"
 								/>
-							</liferay-ui:custom-attributes-available>
-						</aui:fieldset>
+							</aui:fieldset>
+						</liferay-ui:custom-attributes-available>
 					</c:if>
 
 					<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="permissions">

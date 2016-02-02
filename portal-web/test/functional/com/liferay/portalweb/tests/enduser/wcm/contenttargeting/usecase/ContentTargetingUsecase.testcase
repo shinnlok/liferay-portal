@@ -4,14 +4,7 @@
 	<property name="testray.main.component.name" value="Content Targeting" />
 
 	<set-up>
-		<var method="TestPropsUtil#get('test.portal.instance')" name="testPortalInstance" />
-
-		<if>
-			<equals arg1="${testPortalInstance}" arg2="true" />
-			<then>
-				<execute macro="SignIn#signInPortalInstanceSetUp" />
-			</then>
-		</if>
+		<execute macro="TestCase#setUpPortalInstance" />
 
 		<execute macro="User#firstLoginPG" />
 
@@ -641,9 +634,8 @@
 
 		<execute macro="ContentTargetingCampaign#saveCP" />
 
-		<execute macro="Page#openURL">
+		<execute macro="Navigator#openSiteURL">
 			<var name="siteName" value="Site Name" />
-			<var name="siteURL" value="true" />
 		</execute>
 
 		<execute macro="ContentTargetingSimulator#gotoPG" />
@@ -1268,7 +1260,7 @@
 
 		<execute macro="ContentTargetingCampaign#saveCP" />
 
-		<execute macro="LAR#gotoExportSiteCmd">
+		<execute macro="LAR#_gotoExportSite">
 			<var name="siteScopeName" value="Site Name" />
 		</execute>
 
@@ -1323,7 +1315,7 @@
 
 		<execute macro="ContentTargetingCampaign#deleteAllCP" />
 
-		<execute macro="LAR#gotoExportSiteCmd">
+		<execute macro="LAR#_gotoExportSite">
 			<var name="siteScopeName" value="Site Name" />
 		</execute>
 
@@ -1350,9 +1342,13 @@
 		<execute function="DownloadTempFile" />
 		<execute function="SelectFrame" value1="relative=top" />
 
-		<execute macro="Page#gotoPagesCP">
-			<var name="portletName" value="Site Pages" />
-			<var name="siteScopeName" value="Import Site" />
+		<execute macro="ProductMenu#gotoSitesPages">
+			<var name="page" value="Public Pages" />
+			<var name="siteName" value="Import Site" />
+		</execute>
+
+		<execute macro="ProductMenu#gotoSitesPublishingTools">
+			<var name="portlet" value="Import" />
 		</execute>
 
 		<execute macro="LAR#importSiteCP">
@@ -1390,7 +1386,7 @@
 	<command name="ExportImportSmoke" priority="4">
 		<execute macro="LAR#setupContentTargeting" />
 
-		<execute macro="LAR#gotoExportSiteCmd">
+		<execute macro="LAR#_gotoExportSite">
 			<var name="siteScopeName" value="Site Name" />
 		</execute>
 
@@ -1523,7 +1519,7 @@
 
 		<execute macro="ContentTargetingCampaign#saveCP" />
 
-		<execute macro="LAR#gotoExportSiteCmd">
+		<execute macro="LAR#_gotoExportSite">
 			<var name="siteScopeName" value="Site Name" />
 		</execute>
 
@@ -1615,7 +1611,7 @@
 	<command name="ExportImportUncheckAppCTRefAllAndContentAll" priority="4">
 		<execute macro="LAR#setupContentTargeting" />
 
-		<execute macro="LAR#gotoExportSiteCmd">
+		<execute macro="LAR#_gotoExportSite">
 			<var name="siteScopeName" value="Site Name" />
 		</execute>
 
@@ -1673,7 +1669,7 @@
 	<command name="ExportImportUncheckAppCTRefAllAndContentAT" priority="4">
 		<execute macro="LAR#setupContentTargeting" />
 
-		<execute macro="LAR#gotoExportSiteCmd">
+		<execute macro="LAR#_gotoExportSite">
 			<var name="siteScopeName" value="Site Name" />
 		</execute>
 
@@ -1727,7 +1723,7 @@
 	<command name="ExportImportUncheckAppCTRefAllAndContentWC" priority="4">
 		<execute macro="LAR#setupContentTargeting" />
 
-		<execute macro="LAR#gotoExportSiteCmd">
+		<execute macro="LAR#_gotoExportSite">
 			<var name="siteScopeName" value="Site Name" />
 		</execute>
 
@@ -1867,7 +1863,7 @@
 
 		<execute macro="ContentTargetingCampaign#saveCP" />
 
-		<execute macro="LAR#gotoExportSiteCmd">
+		<execute macro="LAR#_gotoExportSite">
 			<var name="siteScopeName" value="Site Name" />
 		</execute>
 
@@ -1999,7 +1995,7 @@
 			<var name="webContentTitle" value="WC Title Unreferenced" />
 		</execute>
 
-		<execute macro="LAR#gotoExportSiteCmd">
+		<execute macro="LAR#_gotoExportSite">
 			<var name="siteScopeName" value="Site Name" />
 		</execute>
 
@@ -3282,9 +3278,8 @@
 			<var name="userScreenName" value="person" />
 		</execute>
 
-		<execute macro="Page#openURL">
+		<execute macro="Navigator#openSiteURL">
 			<var name="siteName" value="Site Name" />
-			<var name="siteURL" value="true" />
 		</execute>
 
 		<execute macro="Portlet#addPG">
@@ -3336,9 +3331,8 @@
 			<var name="userLoginFullName" value="male male" />
 		</execute>
 
-		<execute macro="Page#openURL">
+		<execute macro="Navigator#openSiteURL">
 			<var name="siteName" value="Site Name" />
-			<var name="siteURL" value="true" />
 		</execute>
 
 		<execute macro="UserSegmentContentDisplayPortlet#viewEntryPG">
@@ -4204,9 +4198,8 @@
 
 		<execute macro="ContentTargetingUserSegment#saveCP" />
 
-		<execute macro="Page#openURL">
+		<execute macro="Navigator#openSiteURL">
 			<var name="siteName" value="Site Name" />
-			<var name="siteURL" value="true" />
 		</execute>
 
 		<execute macro="Portlet#addPG">
@@ -4235,9 +4228,8 @@
 
 		<execute macro="UserSegmentContentDisplayPortlet#savePG" />
 
-		<execute macro="Page#openURL">
+		<execute macro="Navigator#openSiteURL">
 			<var name="siteName" value="Site Name" />
-			<var name="siteURL" value="true" />
 		</execute>
 
 		<execute macro="UserSegmentContentDisplayPortlet#viewEntryPG">
@@ -4264,9 +4256,8 @@
 			<var name="simulationbutton" value="Simulate" />
 		</execute>
 
-		<execute macro="Page#openURL">
+		<execute macro="Navigator#openSiteURL">
 			<var name="siteName" value="Site Name" />
-			<var name="siteURL" value="true" />
 		</execute>
 
 		<execute macro="UserSegmentContentDisplayPortlet#viewEntryPG">
@@ -4280,9 +4271,8 @@
 			<var name="simulationbutton" value="Stop Simulation" />
 		</execute>
 
-		<execute macro="Page#openURL">
+		<execute macro="Navigator#openSiteURL">
 			<var name="siteName" value="Site Name" />
-			<var name="siteURL" value="true" />
 		</execute>
 
 		<execute macro="UserSegmentContentDisplayPortlet#viewEntryPG">
@@ -4453,9 +4443,8 @@
 
 		<execute macro="ContentTargetingUserSegment#saveCP" />
 
-		<execute macro="Page#openURL">
+		<execute macro="Navigator#openSiteURL">
 			<var name="siteName" value="Site Name" />
-			<var name="siteURL" value="true" />
 		</execute>
 
 		<execute macro="ContentTargetingSimulator#gotoPG" />

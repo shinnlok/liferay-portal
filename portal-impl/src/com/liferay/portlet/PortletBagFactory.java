@@ -36,6 +36,7 @@ import com.liferay.portal.kernel.scheduler.messaging.SchedulerEventMessageListen
 import com.liferay.portal.kernel.scheduler.messaging.SchedulerEventMessageListenerWrapper;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.OpenSearch;
+import com.liferay.portal.kernel.security.permission.PermissionPropagator;
 import com.liferay.portal.kernel.servlet.URLEncoder;
 import com.liferay.portal.kernel.template.TemplateHandler;
 import com.liferay.portal.kernel.trash.TrashHandler;
@@ -56,7 +57,6 @@ import com.liferay.portal.kernel.xml.UnsecureSAXReaderUtil;
 import com.liferay.portal.kernel.xmlrpc.Method;
 import com.liferay.portal.model.Portlet;
 import com.liferay.portal.notifications.UserNotificationHandlerImpl;
-import com.liferay.portal.security.permission.PermissionPropagator;
 import com.liferay.portal.service.PortletLocalServiceUtil;
 import com.liferay.portal.util.JavaFieldsParser;
 import com.liferay.portal.util.PortalUtil;
@@ -93,6 +93,12 @@ import javax.servlet.ServletContext;
 public class PortletBagFactory {
 
 	public PortletBag create(Portlet portlet) throws Exception {
+		return create(portlet, false);
+	}
+
+	public PortletBag create(Portlet portlet, boolean destroyPrevious)
+		throws Exception {
+
 		validate();
 
 		javax.portlet.Portlet portletInstance = getPortletInstance(portlet);
@@ -186,7 +192,7 @@ public class PortletBagFactory {
 			newPreferencesValidatorInstances(portlet, filter, properties);
 
 		ResourceBundleTracker resourceBundleTracker = new ResourceBundleTracker(
-			_classLoader, portlet);
+			portlet.getPortletId());
 
 		PortletBag portletBag = new PortletBagImpl(
 			portlet.getPortletId(), _servletContext, portletInstance,
@@ -209,7 +215,8 @@ public class PortletBagFactory {
 		PortletBagPool.put(portlet.getRootPortletId(), portletBag);
 
 		try {
-			PortletInstanceFactoryUtil.create(portlet, _servletContext);
+			PortletInstanceFactoryUtil.create(
+				portlet, _servletContext, destroyPrevious);
 		}
 		catch (Exception e) {
 			_log.error(e, e);

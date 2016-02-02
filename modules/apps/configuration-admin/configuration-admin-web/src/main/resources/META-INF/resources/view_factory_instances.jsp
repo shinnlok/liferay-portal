@@ -31,7 +31,7 @@ renderResponse.setTitle(factoryConfigurationModel.getName());
 <aui:nav-bar markupView="lexicon">
 	<aui:nav cssClass="navbar-nav">
 		<aui:nav-item
-			label="entries"
+			label="configuration-entries"
 			selected="<%= true %>"
 		/>
 	</aui:nav>
@@ -45,14 +45,14 @@ renderResponse.setTitle(factoryConfigurationModel.getName());
 	</portlet:renderURL>
 
 	<liferay-frontend:add-menu-item
-		title='<%= LanguageUtil.format(request, "add-x", factoryConfigurationModel.getName()) %>'
+		title="add-entry"
 		url="<%= createFactoryConfigURL %>"
 	/>
 </liferay-frontend:add-menu>
 
 <div class="container-fluid-1280">
 	<liferay-ui:search-container
-		emptyResultsMessage="no-configurations-were-found"
+		emptyResultsMessage='<%= LanguageUtil.format(request, "no-entries-for-x-have-been-added-yet", factoryConfigurationModel.getName()) %>'
 		total="<%= configurationModelIterator.getTotal() %>"
 	>
 		<liferay-ui:search-container-results
@@ -71,7 +71,21 @@ renderResponse.setTitle(factoryConfigurationModel.getName());
 				<portlet:param name="pid" value="<%= configurationModel.getID() %>" />
 			</portlet:renderURL>
 
-			<liferay-ui:search-container-column-text name="entry">
+			<%
+			String columnLabel = "entry";
+
+			String labelAttribute = configurationModel.getLabelAttribute();
+
+			if (labelAttribute != null) {
+				AttributeDefinition attributeDefinition = configurationModel.getExtendedAttributeDefinition(labelAttribute);
+
+				if (attributeDefinition != null) {
+					columnLabel = attributeDefinition.getName();
+				}
+			}
+			%>
+
+			<liferay-ui:search-container-column-text name="<%= columnLabel %>">
 				<aui:a href="<%= editURL %>"><strong><%= configurationModel.getLabel() %></strong></aui:a>
 			</liferay-ui:search-container-column-text>
 
@@ -91,7 +105,7 @@ renderResponse.setTitle(factoryConfigurationModel.getName());
 						url="<%= editURL %>"
 					/>
 
-					<c:if test="<%= configurationModel.getConfiguration() != null %>">
+					<c:if test="<%= configurationModel.hasConfiguration() %>">
 						<portlet:actionURL name="deleteConfiguration" var="deleteConfigActionURL">
 							<portlet:param name="redirect" value="<%= currentURL %>" />
 							<portlet:param name="factoryPid" value="<%= configurationModel.getFactoryPid() %>" />
@@ -111,7 +125,7 @@ renderResponse.setTitle(factoryConfigurationModel.getName());
 
 						<liferay-ui:icon
 							message="export"
-							method="post"
+							method="get"
 							url="<%= exportURL %>"
 						/>
 					</c:if>

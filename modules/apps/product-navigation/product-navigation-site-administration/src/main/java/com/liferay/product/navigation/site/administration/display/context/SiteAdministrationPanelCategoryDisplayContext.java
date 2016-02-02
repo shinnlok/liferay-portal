@@ -18,10 +18,12 @@ import com.liferay.application.list.PanelCategory;
 import com.liferay.application.list.constants.ApplicationListWebKeys;
 import com.liferay.application.list.constants.PanelCategoryKeys;
 import com.liferay.application.list.display.context.logic.PanelCategoryHelper;
-import com.liferay.application.list.util.LatentGroupManagerUtil;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.PortletProvider;
 import com.liferay.portal.kernel.portlet.PortletProviderUtil;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -30,7 +32,7 @@ import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.Organization;
 import com.liferay.portal.model.User;
-import com.liferay.portal.security.permission.ActionKeys;
+import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.service.permission.GroupPermissionUtil;
 import com.liferay.portal.service.permission.PortletPermissionUtil;
 import com.liferay.portal.theme.ThemeDisplay;
@@ -39,8 +41,10 @@ import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.exportimport.staging.StagingUtil;
 import com.liferay.product.navigation.product.menu.web.display.context.ProductMenuDisplayContext;
 import com.liferay.product.navigation.site.administration.application.list.SiteAdministrationPanelCategory;
+import com.liferay.site.util.LatentGroupManagerUtil;
 
 import java.util.List;
+import java.util.ResourceBundle;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
@@ -106,7 +110,23 @@ public class SiteAdministrationPanelCategoryDisplayContext {
 			_groupName = StringPool.BLANK;
 		}
 		else {
-			_groupName = group.getDescriptiveName(_themeDisplay.getLocale());
+			if (group.isUser()) {
+				if (group.getClassPK() == _themeDisplay.getUserId()) {
+					_groupName = LanguageUtil.get(
+						_themeDisplay.getRequest(), "my-site");
+				}
+				else {
+					User user = UserLocalServiceUtil.getUser(
+						group.getClassPK());
+
+					_groupName = LanguageUtil.format(
+						getResourceBundle(), "x-site", user.getFullName());
+				}
+			}
+			else {
+				_groupName = group.getDescriptiveName(
+					_themeDisplay.getLocale());
+			}
 		}
 
 		return _groupName;
@@ -372,6 +392,16 @@ public class SiteAdministrationPanelCategoryDisplayContext {
 		return false;
 	}
 
+	public boolean isShowSiteSelector() throws PortalException {
+		List<Group> mySites = getMySites();
+
+		if (mySites.isEmpty()) {
+			return false;
+		}
+
+		return true;
+	}
+
 	public boolean isShowStagingInfo() throws PortalException {
 		if (_showStagingInfo != null) {
 			return _showStagingInfo.booleanValue();
@@ -449,9 +479,14 @@ public class SiteAdministrationPanelCategoryDisplayContext {
 		return getGroupAdministrationURL(group);
 	}
 
+	protected ResourceBundle getResourceBundle() {
+		return ResourceBundleUtil.getBundle(
+			"content.Language", _themeDisplay.getLocale(), getClass());
+	}
+
 	protected HttpSession getSession() {
-		HttpServletRequest request = PortalUtil.getHttpServletRequest(
-			_portletRequest);
+		HttpServletRequest request = PortalUtil.getOriginalServletRequest(
+			PortalUtil.getHttpServletRequest(_portletRequest));
 
 		return request.getSession();
 	}

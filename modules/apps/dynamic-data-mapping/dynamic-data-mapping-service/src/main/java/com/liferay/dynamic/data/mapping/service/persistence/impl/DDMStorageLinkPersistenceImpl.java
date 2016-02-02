@@ -212,7 +212,7 @@ public class DDMStorageLinkPersistenceImpl extends BasePersistenceImpl<DDMStorag
 
 			if (orderByComparator != null) {
 				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -294,7 +294,7 @@ public class DDMStorageLinkPersistenceImpl extends BasePersistenceImpl<DDMStorag
 	 * @param uuid the uuid
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching d d m storage link
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchStorageLinkException if a matching d d m storage link could not be found
+	 * @throws NoSuchStorageLinkException if a matching d d m storage link could not be found
 	 */
 	@Override
 	public DDMStorageLink findByUuid_First(String uuid,
@@ -344,7 +344,7 @@ public class DDMStorageLinkPersistenceImpl extends BasePersistenceImpl<DDMStorag
 	 * @param uuid the uuid
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching d d m storage link
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchStorageLinkException if a matching d d m storage link could not be found
+	 * @throws NoSuchStorageLinkException if a matching d d m storage link could not be found
 	 */
 	@Override
 	public DDMStorageLink findByUuid_Last(String uuid,
@@ -401,7 +401,7 @@ public class DDMStorageLinkPersistenceImpl extends BasePersistenceImpl<DDMStorag
 	 * @param uuid the uuid
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next d d m storage link
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchStorageLinkException if a d d m storage link with the primary key could not be found
+	 * @throws NoSuchStorageLinkException if a d d m storage link with the primary key could not be found
 	 */
 	@Override
 	public DDMStorageLink[] findByUuid_PrevAndNext(long storageLinkId,
@@ -440,8 +440,9 @@ public class DDMStorageLinkPersistenceImpl extends BasePersistenceImpl<DDMStorag
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
 			query = new StringBundler(3);
@@ -771,7 +772,7 @@ public class DDMStorageLinkPersistenceImpl extends BasePersistenceImpl<DDMStorag
 
 			if (orderByComparator != null) {
 				query = new StringBundler(4 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -858,7 +859,7 @@ public class DDMStorageLinkPersistenceImpl extends BasePersistenceImpl<DDMStorag
 	 * @param companyId the company ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching d d m storage link
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchStorageLinkException if a matching d d m storage link could not be found
+	 * @throws NoSuchStorageLinkException if a matching d d m storage link could not be found
 	 */
 	@Override
 	public DDMStorageLink findByUuid_C_First(String uuid, long companyId,
@@ -914,7 +915,7 @@ public class DDMStorageLinkPersistenceImpl extends BasePersistenceImpl<DDMStorag
 	 * @param companyId the company ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching d d m storage link
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchStorageLinkException if a matching d d m storage link could not be found
+	 * @throws NoSuchStorageLinkException if a matching d d m storage link could not be found
 	 */
 	@Override
 	public DDMStorageLink findByUuid_C_Last(String uuid, long companyId,
@@ -977,7 +978,7 @@ public class DDMStorageLinkPersistenceImpl extends BasePersistenceImpl<DDMStorag
 	 * @param companyId the company ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next d d m storage link
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchStorageLinkException if a d d m storage link with the primary key could not be found
+	 * @throws NoSuchStorageLinkException if a d d m storage link with the primary key could not be found
 	 */
 	@Override
 	public DDMStorageLink[] findByUuid_C_PrevAndNext(long storageLinkId,
@@ -1017,11 +1018,12 @@ public class DDMStorageLinkPersistenceImpl extends BasePersistenceImpl<DDMStorag
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(4);
 		}
 
 		query.append(_SQL_SELECT_DDMSTORAGELINK_WHERE);
@@ -1233,11 +1235,11 @@ public class DDMStorageLinkPersistenceImpl extends BasePersistenceImpl<DDMStorag
 			new String[] { Long.class.getName() });
 
 	/**
-	 * Returns the d d m storage link where classPK = &#63; or throws a {@link com.liferay.dynamic.data.mapping.NoSuchStorageLinkException} if it could not be found.
+	 * Returns the d d m storage link where classPK = &#63; or throws a {@link NoSuchStorageLinkException} if it could not be found.
 	 *
 	 * @param classPK the class p k
 	 * @return the matching d d m storage link
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchStorageLinkException if a matching d d m storage link could not be found
+	 * @throws NoSuchStorageLinkException if a matching d d m storage link could not be found
 	 */
 	@Override
 	public DDMStorageLink findByClassPK(long classPK)
@@ -1553,7 +1555,7 @@ public class DDMStorageLinkPersistenceImpl extends BasePersistenceImpl<DDMStorag
 
 			if (orderByComparator != null) {
 				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -1621,7 +1623,7 @@ public class DDMStorageLinkPersistenceImpl extends BasePersistenceImpl<DDMStorag
 	 * @param structureId the structure ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching d d m storage link
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchStorageLinkException if a matching d d m storage link could not be found
+	 * @throws NoSuchStorageLinkException if a matching d d m storage link could not be found
 	 */
 	@Override
 	public DDMStorageLink findByStructureId_First(long structureId,
@@ -1672,7 +1674,7 @@ public class DDMStorageLinkPersistenceImpl extends BasePersistenceImpl<DDMStorag
 	 * @param structureId the structure ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching d d m storage link
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchStorageLinkException if a matching d d m storage link could not be found
+	 * @throws NoSuchStorageLinkException if a matching d d m storage link could not be found
 	 */
 	@Override
 	public DDMStorageLink findByStructureId_Last(long structureId,
@@ -1730,7 +1732,7 @@ public class DDMStorageLinkPersistenceImpl extends BasePersistenceImpl<DDMStorag
 	 * @param structureId the structure ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next d d m storage link
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchStorageLinkException if a d d m storage link with the primary key could not be found
+	 * @throws NoSuchStorageLinkException if a d d m storage link with the primary key could not be found
 	 */
 	@Override
 	public DDMStorageLink[] findByStructureId_PrevAndNext(long storageLinkId,
@@ -1769,8 +1771,9 @@ public class DDMStorageLinkPersistenceImpl extends BasePersistenceImpl<DDMStorag
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
 			query = new StringBundler(3);
@@ -2089,7 +2092,7 @@ public class DDMStorageLinkPersistenceImpl extends BasePersistenceImpl<DDMStorag
 	 *
 	 * @param storageLinkId the primary key of the d d m storage link
 	 * @return the d d m storage link that was removed
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchStorageLinkException if a d d m storage link with the primary key could not be found
+	 * @throws NoSuchStorageLinkException if a d d m storage link with the primary key could not be found
 	 */
 	@Override
 	public DDMStorageLink remove(long storageLinkId)
@@ -2102,7 +2105,7 @@ public class DDMStorageLinkPersistenceImpl extends BasePersistenceImpl<DDMStorag
 	 *
 	 * @param primaryKey the primary key of the d d m storage link
 	 * @return the d d m storage link that was removed
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchStorageLinkException if a d d m storage link with the primary key could not be found
+	 * @throws NoSuchStorageLinkException if a d d m storage link with the primary key could not be found
 	 */
 	@Override
 	public DDMStorageLink remove(Serializable primaryKey)
@@ -2300,11 +2303,11 @@ public class DDMStorageLinkPersistenceImpl extends BasePersistenceImpl<DDMStorag
 	}
 
 	/**
-	 * Returns the d d m storage link with the primary key or throws a {@link com.liferay.portal.NoSuchModelException} if it could not be found.
+	 * Returns the d d m storage link with the primary key or throws a {@link com.liferay.portal.exception.NoSuchModelException} if it could not be found.
 	 *
 	 * @param primaryKey the primary key of the d d m storage link
 	 * @return the d d m storage link
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchStorageLinkException if a d d m storage link with the primary key could not be found
+	 * @throws NoSuchStorageLinkException if a d d m storage link with the primary key could not be found
 	 */
 	@Override
 	public DDMStorageLink findByPrimaryKey(Serializable primaryKey)
@@ -2324,11 +2327,11 @@ public class DDMStorageLinkPersistenceImpl extends BasePersistenceImpl<DDMStorag
 	}
 
 	/**
-	 * Returns the d d m storage link with the primary key or throws a {@link com.liferay.dynamic.data.mapping.NoSuchStorageLinkException} if it could not be found.
+	 * Returns the d d m storage link with the primary key or throws a {@link NoSuchStorageLinkException} if it could not be found.
 	 *
 	 * @param storageLinkId the primary key of the d d m storage link
 	 * @return the d d m storage link
-	 * @throws com.liferay.dynamic.data.mapping.NoSuchStorageLinkException if a d d m storage link with the primary key could not be found
+	 * @throws NoSuchStorageLinkException if a d d m storage link with the primary key could not be found
 	 */
 	@Override
 	public DDMStorageLink findByPrimaryKey(long storageLinkId)
@@ -2575,7 +2578,7 @@ public class DDMStorageLinkPersistenceImpl extends BasePersistenceImpl<DDMStorag
 
 			if (orderByComparator != null) {
 				query = new StringBundler(2 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 
 				query.append(_SQL_SELECT_DDMSTORAGELINK);
 

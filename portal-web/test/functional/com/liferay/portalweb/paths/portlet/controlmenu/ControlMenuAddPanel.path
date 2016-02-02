@@ -14,11 +14,6 @@
 	<td></td>
 </tr>
 <tr>
-	<td>LOADING_ANIMATION</td>
-	<td>//div[@class='loading-animation']</td>
-	<td></td>
-</tr>
-<tr>
 	<td></td>
 	<td></td>
 	<td></td>
@@ -31,7 +26,7 @@
 </tr>
 <tr>
 	<td>CONTENT_TITLE</td>
-	<td>//div[contains(@class,'add-content-details')]/div[contains(.,'${key_assetTitle}')]</td>
+	<td>//div[contains(@class,'list-group-item-content')]/h4[contains(.,'${key_assetTitle}')]</td>
 	<td></td>
 </tr>
 <tr>

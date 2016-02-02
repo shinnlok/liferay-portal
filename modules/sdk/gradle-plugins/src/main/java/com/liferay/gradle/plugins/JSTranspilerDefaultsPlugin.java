@@ -16,7 +16,7 @@ package com.liferay.gradle.plugins;
 
 import com.liferay.gradle.plugins.js.transpiler.JSTranspilerExtension;
 import com.liferay.gradle.plugins.js.transpiler.JSTranspilerPlugin;
-import com.liferay.gradle.util.GradleUtil;
+import com.liferay.gradle.plugins.util.GradleUtil;
 
 import org.gradle.api.Project;
 
@@ -37,15 +37,15 @@ public class JSTranspilerDefaultsPlugin
 		JSTranspilerExtension jsTranspilerExtension = GradleUtil.getExtension(
 			project, JSTranspilerExtension.class);
 
-		String babelVersion = GradleUtil.getProperty(
-			project, "nodejs.babel.version", _BABEL_VERSION);
-
-		jsTranspilerExtension.setBabelVersion(babelVersion);
-
 		String lfrAmdLoaderVersion = GradleUtil.getProperty(
 			project, "nodejs.lfr.amd.loader.version", _LFR_AMD_LOADER_VERSION);
 
 		jsTranspilerExtension.setLfrAmdLoaderVersion(lfrAmdLoaderVersion);
+
+		String metalCliVersion = GradleUtil.getProperty(
+			project, "nodejs.metal.cli.version", _METAL_CLI_VERSION);
+
+		jsTranspilerExtension.setMetalCliVersion(metalCliVersion);
 	}
 
 	@Override
@@ -53,8 +53,8 @@ public class JSTranspilerDefaultsPlugin
 		return JSTranspilerPlugin.class;
 	}
 
-	private static final String _BABEL_VERSION = "5.8.23";
-
 	private static final String _LFR_AMD_LOADER_VERSION = "1.3.5";
+
+	private static final String _METAL_CLI_VERSION = "0.3.0";
 
 }

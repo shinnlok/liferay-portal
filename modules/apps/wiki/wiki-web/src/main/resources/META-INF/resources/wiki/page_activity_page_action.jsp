@@ -19,7 +19,14 @@
 <%
 ResultRow row = (ResultRow)request.getAttribute(WebKeys.SEARCH_CONTAINER_RESULT_ROW);
 
-SocialActivity socialActivity = (SocialActivity)row.getObject();
+SocialActivity socialActivity = null;
+
+if (row == null) {
+	socialActivity = (SocialActivity)request.getAttribute("info_panel.jsp-socialActivity");
+}
+else {
+	socialActivity = (SocialActivity)row.getObject();
+}
 
 JSONObject extraDataJSONObject = JSONFactoryUtil.createJSONObject(HtmlUtil.unescape(socialActivity.getExtraData()));
 
@@ -70,3 +77,5 @@ WikiPage socialActivityWikiPage = WikiPageLocalServiceUtil.fetchPage(wikiPage.ge
 		/>
 	</liferay-ui:icon-menu>
 </c:if>
+
+<%@ include file="/wiki/compare_versions_pop_up.jspf" %>

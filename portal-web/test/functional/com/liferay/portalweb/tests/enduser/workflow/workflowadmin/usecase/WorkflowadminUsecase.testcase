@@ -2,14 +2,7 @@
 	<property name="testray.main.component.name" value="Workflow" />
 
 	<set-up>
-		<var method="TestPropsUtil#get('test.portal.instance')" name="testPortalInstance" />
-
-		<if>
-			<equals arg1="${testPortalInstance}" arg2="true" />
-			<then>
-				<execute macro="SignIn#signInPortalInstanceSetUp" />
-			</then>
-		</if>
+		<execute macro="TestCase#setUpPortalInstance" />
 
 		<execute macro="User#firstLoginPG" />
 	</set-up>
@@ -228,13 +221,13 @@
 			<var name="portletName" value="My Workflow Tasks" />
 		</execute>
 
-		<execute macro="Workflow#viewCompletedTasks">
+		<execute macro="Workflow#viewCompletedTask">
 			<var name="workflowAssetTitle" value="Blogs Entry Title - Liferay" />
 			<var name="workflowAssetType" value="Blogs Entry" />
 			<var name="workflowTask" value="Review" />
 		</execute>
 
-		<execute macro="Workflow#viewCompletedTasks">
+		<execute macro="Workflow#viewCompletedTask">
 			<var name="workflowAssetTitle" value="Blogs Entry Title - Site Name" />
 			<var name="workflowAssetType" value="Blogs Entry" />
 			<var name="workflowTask" value="Review" />
@@ -331,7 +324,7 @@
 			<var name="portletName" value="My Workflow Tasks" />
 		</execute>
 
-		<execute macro="Workflow#viewCompletedTasks">
+		<execute macro="Workflow#viewCompletedTask">
 			<var name="workflowAssetTitle" value="Blogs Entry Title - Liferay" />
 			<var name="workflowAssetType" value="Blogs Entry" />
 			<var name="workflowTask" value="Review" />
@@ -540,12 +533,14 @@
 
 		<execute macro="Organization#addCP">
 			<var name="orgName" value="Organization Name" />
-			<var name="orgType" value="Regular Organization" />
+			<var name="orgType" value="Organization" />
 		</execute>
 
 		<execute macro="ProductMenu#gotoControlPanelUsers">
 			<var name="portlet" value="Users and Organizations" />
 		</execute>
+
+		<execute macro="UsersAndOrganizationsNavigator#gotoOrganizations" />
 
 		<execute macro="Organization#addSiteCP">
 			<var name="orgName" value="Organization Name" />
@@ -1324,11 +1319,6 @@
 	</command>
 
 	<command name="ViewTaskCount" priority="3">
-		<var name="entryContent" value="Blogs Entry Content" />
-		<var name="entryTitle" value="Blogs Entry Title" />
-		<var name="webContentContent" value="WC WebContent Content" />
-		<var name="webContentTitle" value="WC WebContent Title" />
-
 		<execute macro="Navigator#openURL" />
 
 		<execute macro="ProductMenu#gotoSitesConfiguration">
@@ -1350,30 +1340,32 @@
 			<var name="workflowDefinition" value="Single Approver (Version 1)" />
 		</execute>
 
-		<execute macro="Navigator#openURL" />
+		<for list="1,2,3" param="number">
+			<execute macro="Navigator#openURL" />
 
-		<execute macro="ProductMenu#gotoSitesContent">
-			<var name="portlet" value="Web Content" />
-		</execute>
+			<execute macro="ProductMenu#gotoSitesContent">
+				<var name="portlet" value="Web Content" />
+			</execute>
 
-		<execute macro="WebContentNavigator#gotoAddCP" />
+			<execute macro="WebContentNavigator#gotoAddCP" />
 
-		<execute macro="WebContent#addWithWorkflowCP">
-			<var name="webContentContent" value="${webContentContent}" />
-			<var name="webContentTitle" value="${webContentTitle}" />
-		</execute>
+			<execute macro="WebContent#addWithWorkflowCP">
+				<var name="webContentContent" value="WC WebContent Content ${number}" />
+				<var name="webContentTitle" value="WC WebContent Title ${number}" />
+			</execute>
 
-		<execute macro="Navigator#openURL" />
+			<execute macro="Navigator#openURL" />
 
-		<execute macro="ProductMenu#gotoSitesContent">
-			<var name="portlet" value="Blogs" />
-		</execute>
+			<execute macro="ProductMenu#gotoSitesContent">
+				<var name="portlet" value="Blogs" />
+			</execute>
 
-		<execute macro="Blogs#addWithWorkflow">
-			<var name="entryContent" value="${entryContent}" />
-			<var name="entrySubtitle" value="Subtitle" />
-			<var name="entryTitle" value="${entryTitle}" />
-		</execute>
+			<execute macro="Blogs#addWithWorkflow">
+				<var name="entryContent" value="Blogs Entry Content ${number}" />
+				<var name="entrySubtitle" value="Subtitle ${number}" />
+				<var name="entryTitle" value="Blogs Entry Title ${number}" />
+			</execute>
+		</for>
 
 		<execute macro="ProductMenu#gotoControlPanelConfiguration">
 			<var name="portlet" value="Workflow Definition" />
@@ -1383,19 +1375,35 @@
 			<var name="portletName" value="My Workflow Tasks" />
 		</execute>
 
-		<execute macro="Workflow#viewTaskAssignedToMyRoles">
-			<var name="workflowAssetTitle" value="${webContentTitle}" />
-			<var name="workflowAssetType" value="Web Content Article" />
-			<var name="workflowTask" value="Review" />
+		<for list="1,2,3" param="number">
+			<execute macro="Workflow#viewTaskAssignedToMyRoles">
+				<var name="workflowAssetTitle" value="WC WebContent Title ${number}" />
+				<var name="workflowAssetType" value="Web Content Article" />
+				<var name="workflowTask" value="Review" />
+			</execute>
+
+			<execute macro="Workflow#viewTaskAssignedToMyRoles">
+				<var name="workflowAssetTitle" value="Blogs Entry Title ${number}" />
+				<var name="workflowAssetType" value="Blogs Entry" />
+				<var name="workflowTask" value="Review" />
+			</execute>
+		</for>
+
+		<execute macro="Pagination#viewResults">
+			<var name="results" value="Showing 1 to 6 of 6 entries." />
 		</execute>
 
-		<execute macro="Workflow#viewTaskAssignedToMyRoles">
-			<var name="workflowAssetTitle" value="${entryTitle}" />
-			<var name="workflowAssetType" value="Blogs Entry" />
-			<var name="workflowTask" value="Review" />
+		<execute function="AssertElementPresent" locator1="xpath=(//div[contains(@id,'workflowTasksSearchContainer')]//tr[contains(@class,'panel entry-display-style')])[6]" />
+
+		<execute macro="Pagination#changePagination">
+			<var name="itemsPerPage" value="5" />
 		</execute>
 
-		<execute function="AssertElementNotPresent#assertNotVisible" locator1="//div[@id='workflowMyRolesTasksPanelContent']//tr[3]/td" />
+		<execute macro="Pagination#viewResults">
+			<var name="results" value="Showing 1 to 5 of 6 entries." />
+		</execute>
+
+		<execute function="AssertElementNotPresent" locator1="xpath=(//div[contains(@id,'workflowTasksSearchContainer')]//tr[contains(@class,'panel entry-display-style')])[6]" />
 	</command>
 
 	<command name="ViewWebContentConfigurationCP" priority="3">
@@ -1629,10 +1637,11 @@
 			<var name="workflowAssetTitle" value="User 2 Blog Title Pending" />
 		</execute>
 
-		<execute macro="Workflow#viewCompletedTasks">
+		<execute macro="Workflow#viewCompletedSubmission">
 			<var name="workflowAssetTitle" value="User 1 Blog Title Approved" />
 			<var name="workflowAssetType" value="Blogs Entry" />
-			<var name="workflowTask" value="Single Approver" />
+			<var name="workflowDefinition" value="Single Approver" />
+			<var name="workflowStatus" value="Approved" />
 		</execute>
 
 		<execute macro="Workflow#viewSubmissionNotPresent">
@@ -1659,10 +1668,11 @@
 			<var name="workflowAssetTitle" value="User 1 Blog Title Pending" />
 		</execute>
 
-		<execute macro="Workflow#viewCompletedTasks">
+		<execute macro="Workflow#viewCompletedSubmission">
 			<var name="workflowAssetTitle" value="User 2 Blog Title Approved" />
 			<var name="workflowAssetType" value="Blogs Entry" />
-			<var name="workflowTask" value="Single Approver" />
+			<var name="workflowDefinition" value="Single Approver" />
+			<var name="workflowStatus" value="Approved" />
 		</execute>
 
 		<execute macro="Workflow#viewSubmissionNotPresent">

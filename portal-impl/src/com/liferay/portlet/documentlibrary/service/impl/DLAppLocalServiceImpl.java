@@ -14,7 +14,7 @@
 
 package com.liferay.portlet.documentlibrary.service.impl;
 
-import com.liferay.portal.NoSuchGroupException;
+import com.liferay.portal.exception.NoSuchGroupException;
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -43,7 +43,7 @@ import com.liferay.portal.model.Repository;
 import com.liferay.portal.model.UserConstants;
 import com.liferay.portal.repository.liferayrepository.model.LiferayFolder;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portlet.documentlibrary.NoSuchFileEntryException;
+import com.liferay.portlet.documentlibrary.exception.NoSuchFileEntryException;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryType;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryTypeConstants;
 import com.liferay.portlet.documentlibrary.model.DLFileRank;
@@ -95,8 +95,9 @@ public class DLAppLocalServiceImpl extends DLAppLocalServiceBaseImpl {
 		throws PortalException {
 
 		return addFileEntry(
-			userId, repositoryId, folderId, sourceFileName, mimeType, null,
-			StringPool.BLANK, StringPool.BLANK, bytes, serviceContext);
+			userId, repositoryId, folderId, sourceFileName, mimeType,
+			sourceFileName, StringPool.BLANK, StringPool.BLANK, bytes,
+			serviceContext);
 	}
 
 	/**

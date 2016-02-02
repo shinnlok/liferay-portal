@@ -14,13 +14,13 @@
 
 package com.liferay.exportimport.staging;
 
-import com.liferay.portal.LayoutPrototypeException;
 import com.liferay.portal.LocaleException;
-import com.liferay.portal.NoSuchGroupException;
-import com.liferay.portal.NoSuchLayoutBranchException;
-import com.liferay.portal.NoSuchLayoutRevisionException;
-import com.liferay.portal.PortletIdException;
 import com.liferay.portal.RemoteOptionsException;
+import com.liferay.portal.exception.LayoutPrototypeException;
+import com.liferay.portal.exception.NoSuchGroupException;
+import com.liferay.portal.exception.NoSuchLayoutBranchException;
+import com.liferay.portal.exception.NoSuchLayoutRevisionException;
+import com.liferay.portal.exception.PortletIdException;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskManagerUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -35,13 +35,21 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.DestinationNames;
 import com.liferay.portal.kernel.scheduler.SchedulerEngineHelperUtil;
+import com.liferay.portal.kernel.security.auth.HttpPrincipal;
+import com.liferay.portal.kernel.security.auth.PrincipalException;
+import com.liferay.portal.kernel.security.auth.RemoteAuthException;
 import com.liferay.portal.kernel.security.pacl.DoPrivileged;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
+import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
 import com.liferay.portal.kernel.servlet.ServletResponseConstants;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
@@ -71,13 +79,6 @@ import com.liferay.portal.model.StagedModel;
 import com.liferay.portal.model.User;
 import com.liferay.portal.model.WorkflowInstanceLink;
 import com.liferay.portal.model.adapter.StagedTheme;
-import com.liferay.portal.security.auth.HttpPrincipal;
-import com.liferay.portal.security.auth.PrincipalException;
-import com.liferay.portal.security.auth.RemoteAuthException;
-import com.liferay.portal.security.permission.ActionKeys;
-import com.liferay.portal.security.permission.PermissionChecker;
-import com.liferay.portal.security.permission.PermissionThreadLocal;
-import com.liferay.portal.security.permission.ResourceActionsUtil;
 import com.liferay.portal.service.GroupLocalService;
 import com.liferay.portal.service.LayoutBranchLocalService;
 import com.liferay.portal.service.LayoutLocalService;
@@ -98,19 +99,19 @@ import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.portlet.documentlibrary.DuplicateFileEntryException;
-import com.liferay.portlet.documentlibrary.FileExtensionException;
-import com.liferay.portlet.documentlibrary.FileNameException;
-import com.liferay.portlet.documentlibrary.FileSizeException;
-import com.liferay.portlet.exportimport.LARFileException;
-import com.liferay.portlet.exportimport.LARFileSizeException;
-import com.liferay.portlet.exportimport.LARTypeException;
-import com.liferay.portlet.exportimport.MissingReferenceException;
-import com.liferay.portlet.exportimport.RemoteExportException;
+import com.liferay.portlet.documentlibrary.exception.DuplicateFileEntryException;
+import com.liferay.portlet.documentlibrary.exception.FileExtensionException;
+import com.liferay.portlet.documentlibrary.exception.FileNameException;
+import com.liferay.portlet.documentlibrary.exception.FileSizeException;
 import com.liferay.portlet.exportimport.background.task.BackgroundTaskExecutorNames;
 import com.liferay.portlet.exportimport.configuration.ExportImportConfigurationConstants;
 import com.liferay.portlet.exportimport.configuration.ExportImportConfigurationParameterMapFactory;
 import com.liferay.portlet.exportimport.configuration.ExportImportConfigurationSettingsMapFactory;
+import com.liferay.portlet.exportimport.exception.LARFileException;
+import com.liferay.portlet.exportimport.exception.LARFileSizeException;
+import com.liferay.portlet.exportimport.exception.LARTypeException;
+import com.liferay.portlet.exportimport.exception.MissingReferenceException;
+import com.liferay.portlet.exportimport.exception.RemoteExportException;
 import com.liferay.portlet.exportimport.lar.ExportImportDateUtil;
 import com.liferay.portlet.exportimport.lar.ExportImportHelperUtil;
 import com.liferay.portlet.exportimport.lar.MissingReference;
@@ -1190,6 +1191,36 @@ public class StagingImpl implements Staging {
 	}
 
 	@Override
+	public boolean isGroupAccessible(Group group, Group fromGroup) {
+		if (group.equals(fromGroup)) {
+			return true;
+		}
+
+		if (group.isStaged() && !group.isStagedRemotely() &&
+			group.isStagingGroup()) {
+
+			return false;
+		}
+
+		if (group.hasStagingGroup() &&
+			fromGroup.equals(group.getStagingGroup())) {
+
+			return false;
+		}
+
+		return true;
+	}
+
+	@Override
+	public boolean isGroupAccessible(long groupId, long fromGroupId)
+		throws PortalException {
+
+		return isGroupAccessible(
+			_groupLocalService.getGroup(groupId),
+			_groupLocalService.getGroup(fromGroupId));
+	}
+
+	@Override
 	public boolean isIncomplete(Layout layout, long layoutSetBranchId) {
 		LayoutRevision layoutRevision = LayoutStagingUtil.getLayoutRevision(
 			layout);
@@ -2052,16 +2083,17 @@ public class StagingImpl implements Staging {
 		long layoutBranchId = getRecentLayoutBranchId(
 			userId, layoutSetBranchId, plid);
 
-		if (layoutBranchId > 0) {
+		LayoutBranch layoutBranch = _layoutBranchLocalService.fetchLayoutBranch(
+			layoutBranchId);
+
+		if (layoutBranch == null) {
 			try {
-				_layoutBranchLocalService.getLayoutBranch(layoutBranchId);
-			}
-			catch (NoSuchLayoutBranchException nslbe) {
-				LayoutBranch layoutBranch =
-					_layoutBranchLocalService.getMasterLayoutBranch(
-						layoutSetBranchId, plid);
+				layoutBranch = _layoutBranchLocalService.getMasterLayoutBranch(
+					layoutSetBranchId, plid);
 
 				layoutBranchId = layoutBranch.getLayoutBranchId();
+			}
+			catch (NoSuchLayoutBranchException nslbe) {
 			}
 		}
 
@@ -2142,6 +2174,7 @@ public class StagingImpl implements Staging {
 
 		long[] layoutIds = ExportImportHelperUtil.getLayoutIds(
 			portletRequest, targetGroupId);
+		String name = ParamUtil.getString(portletRequest, "name");
 
 		if (schedule) {
 			String groupName = getSchedulerGroupName(
@@ -2168,17 +2201,12 @@ public class StagingImpl implements Staging {
 				schedulerEndDate = endCalendar.getTime();
 			}
 
-			String description = ParamUtil.getString(
-				portletRequest, "description");
-
 			_layoutService.schedulePublishToLive(
 				sourceGroupId, targetGroupId, privateLayout, layoutIds,
 				parameterMap, groupName, cronText, startCalendar.getTime(),
-				schedulerEndDate, description);
+				schedulerEndDate, name);
 		}
 		else {
-			String name = ParamUtil.getString(portletRequest, "name");
-
 			publishLayouts(
 				themeDisplay.getUserId(), sourceGroupId, targetGroupId,
 				privateLayout, layoutIds, name, parameterMap);
@@ -2239,6 +2267,8 @@ public class StagingImpl implements Staging {
 			groupId, remoteAddress, remotePort, remotePathContext,
 			secureConnection, remoteGroupId);
 
+		String name = ParamUtil.getString(portletRequest, "name");
+
 		if (schedule) {
 			String groupName = getSchedulerGroupName(
 				DestinationNames.LAYOUTS_REMOTE_PUBLISHER, groupId);
@@ -2264,19 +2294,13 @@ public class StagingImpl implements Staging {
 				schedulerEndDate = endCalendar.getTime();
 			}
 
-			String description = ParamUtil.getString(
-				portletRequest, "description");
-
 			_layoutService.schedulePublishToRemote(
 				groupId, privateLayout, layoutIdMap, parameterMap,
 				remoteAddress, remotePort, remotePathContext, secureConnection,
 				remoteGroupId, remotePrivateLayout, null, null, groupName,
-				cronText, startCalendar.getTime(), schedulerEndDate,
-				description);
+				cronText, startCalendar.getTime(), schedulerEndDate, name);
 		}
 		else {
-			String name = ParamUtil.getString(portletRequest, "name");
-
 			copyRemoteLayouts(
 				groupId, privateLayout, layoutIdMap, name, parameterMap,
 				remoteAddress, remotePort, remotePathContext, secureConnection,
@@ -2518,20 +2542,25 @@ public class StagingImpl implements Staging {
 			throw roe;
 		}
 
+		Thread currentThread = Thread.currentThread();
+
+		ClassLoader contextClassLoader = currentThread.getContextClassLoader();
+
 		PermissionChecker permissionChecker =
 			PermissionThreadLocal.getPermissionChecker();
 
 		User user = permissionChecker.getUser();
 
 		String remoteURL = buildRemoteURL(
-			remoteAddress, remotePort, remotePathContext, secureConnection,
-			GroupConstants.DEFAULT_LIVE_GROUP_ID, false);
+			remoteAddress, remotePort, remotePathContext, secureConnection);
 
 		HttpPrincipal httpPrincipal = new HttpPrincipal(
 			remoteURL, user.getLogin(), user.getPassword(),
 			user.getPasswordEncrypted());
 
 		try {
+			currentThread.setContextClassLoader(
+				PortalClassLoaderUtil.getClassLoader());
 
 			// Ping the remote host and verify that the remote group exists in
 			// the same company as the remote user
@@ -2587,6 +2616,9 @@ public class StagingImpl implements Staging {
 			ree.setURL(remoteURL);
 
 			throw ree;
+		}
+		finally {
+			currentThread.setContextClassLoader(contextClassLoader);
 		}
 	}
 

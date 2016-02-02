@@ -21,12 +21,12 @@ import com.liferay.portal.kernel.dao.orm.SQLQuery;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.dao.orm.Type;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.security.permission.InlineSQLHelperUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.security.permission.InlineSQLHelperUtil;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFileShortcutConstants;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
@@ -253,6 +253,14 @@ public class DLFolderFinderImpl
 			qPos.add(folderId);
 			qPos.add(groupId);
 			qPos.add(queryDefinition.getStatus());
+
+			if ((queryDefinition.getOwnerUserId() > 0) &&
+				queryDefinition.isIncludeOwner()) {
+
+				qPos.add(queryDefinition.getOwnerUserId());
+				qPos.add(WorkflowConstants.STATUS_IN_TRASH);
+			}
+
 			qPos.add(folderId);
 
 			if (mimeTypes != null) {
@@ -475,6 +483,14 @@ public class DLFolderFinderImpl
 			qPos.add(folderId);
 			qPos.add(groupId);
 			qPos.add(queryDefinition.getStatus());
+
+			if ((queryDefinition.getOwnerUserId() > 0) &&
+				queryDefinition.isIncludeOwner()) {
+
+				qPos.add(queryDefinition.getOwnerUserId());
+				qPos.add(WorkflowConstants.STATUS_IN_TRASH);
+			}
+
 			qPos.add(folderId);
 
 			if (mimeTypes != null) {

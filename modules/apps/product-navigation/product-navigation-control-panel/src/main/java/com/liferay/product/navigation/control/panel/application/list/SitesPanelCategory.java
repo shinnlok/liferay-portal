@@ -19,9 +19,9 @@ import com.liferay.application.list.PanelCategory;
 import com.liferay.application.list.constants.PanelCategoryKeys;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.model.Group;
-import com.liferay.portal.security.permission.ActionKeys;
-import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.permission.PortalPermissionUtil;
 
 import java.util.Locale;
@@ -40,11 +40,6 @@ import org.osgi.service.component.annotations.Component;
 	service = PanelCategory.class
 )
 public class SitesPanelCategory extends BasePanelCategory {
-
-	@Override
-	public String getIconCssClass() {
-		return "icon-sitemap";
-	}
 
 	@Override
 	public String getKey() {

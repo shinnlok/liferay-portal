@@ -14,9 +14,9 @@
 
 package com.liferay.application.list;
 
-import com.liferay.application.list.util.LatentGroupManagerUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
@@ -25,12 +25,12 @@ import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Portlet;
 import com.liferay.portal.model.User;
 import com.liferay.portal.model.UserNotificationDeliveryConstants;
-import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.UserNotificationEventLocalService;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PortletCategoryKeys;
 import com.liferay.portlet.ControlPanelEntry;
+import com.liferay.site.util.LatentGroupManagerUtil;
 
 import java.io.IOException;
 
@@ -74,6 +74,7 @@ public abstract class BasePanelApp implements PanelApp {
 				UserNotificationDeliveryConstants.TYPE_WEBSITE, false);
 	}
 
+	@Override
 	public Portlet getPortlet() {
 		return _portlet;
 	}

@@ -50,6 +50,7 @@
 						path: 'alert.js',
 						requires: [
 							'aui-alert',
+							'aui-component',
 							'event-mouseenter',
 							'liferay-portlet-base',
 							'timers'
@@ -291,15 +292,6 @@
 						path: 'icon.js',
 						requires: [
 							'aui-base'
-						]
-					},
-					'liferay-image-selector': {
-						path: 'image_selector.js',
-						requires: [
-							'aui-base',
-							'liferay-item-selector-dialog',
-							'liferay-portlet-base',
-							'uploader'
 						]
 					},
 					'liferay-inline-editor-base': {
@@ -766,6 +758,13 @@
 							'liferay-portlet-base',
 							'liferay-storage-formatter',
 							'uploader'
+						]
+					},
+					'liferay-url-preview': {
+						path: 'url_preview.js',
+						requires: [
+							'aui-component',
+							'liferay-util-window'
 						]
 					},
 					'liferay-util-window': {

@@ -4,14 +4,7 @@
 	<var name="globalSiteName" value="Global" />
 
 	<set-up>
-		<var method="TestPropsUtil#get('test.portal.instance')" name="testPortalInstance" />
-
-		<if>
-			<equals arg1="${testPortalInstance}" arg2="true" />
-			<then>
-				<execute macro="SignIn#signInPortalInstanceSetUp" />
-			</then>
-		</if>
+		<execute macro="TestCase#setUpPortalInstance" />
 
 		<execute macro="User#firstLoginPG" />
 	</set-up>
@@ -52,7 +45,7 @@
 		</execute>
 
 		<execute macro="ProductMenu#gotoSitesPages">
-			<var name="portlet" value="Site Pages" />
+			<var name="page" value="Public Pages" />
 		</execute>
 
 		<execute macro="Page#add">
@@ -278,6 +271,8 @@
 	</command>
 
 	<command name="AddAudioViaWebContent" priority="4">
+		<property name="custom.properties" value="editor.wysiwyg.portal-impl.portlet.ddm.text_html.ftl=ckeditor" />
+
 		<execute macro="ProductMenu#gotoControlPanelConfiguration">
 			<var name="portlet" value="Server Administration" />
 		</execute>
@@ -291,7 +286,7 @@
 
 		<execute macro="Portlet#startServer" />
 
-		<execute macro="Page#openURL" />
+		<execute macro="Navigator#openURL" />
 
 		<execute macro="User#firstLoginPG" />
 
@@ -331,7 +326,7 @@
 
 		<execute macro="WebContentNavigator#gotoAddCP" />
 
-		<execute macro="WebContent#addCP">
+		<execute macro="WebContent#addViaCKEditor">
 			<var name="webContentContent" value="WC WebContent Content" />
 			<var name="webContentTitle" value="WC WebContent Title" />
 		</execute>
@@ -383,7 +378,7 @@
 		</execute>
 
 		<execute macro="ProductMenu#gotoSitesPages">
-			<var name="portlet" value="Site Pages" />
+			<var name="page" value="Public Pages" />
 		</execute>
 
 		<execute macro="Page#add">
@@ -392,7 +387,9 @@
 			<var name="siteScopeSelected" value="true" />
 		</execute>
 
-		<execute macro="Navigator#openURL" />
+		<execute macro="ProductMenu#gotoSite">
+			<var name="site" value="Test Site Name" />
+		</execute>
 
 		<execute macro="ProductMenu#gotoSitesContent">
 			<var name="portlet" value="Web Content" />
@@ -423,9 +420,7 @@
 
 		<var name="templateScript">
 				<![CDATA[
-<#assign liferay_portlet = PortalJspTagLibs["/WEB-INF/tld/liferay-portlet-ext.tld"] />
-
-<@liferay_portlet["runtime"] portletName="com_liferay_currency_converter_web_portlet_CurrencyConverterPortlet" />
+<@liferay_portlet_ext["runtime"] portletName="com_liferay_currency_converter_web_portlet_CurrencyConverterPortlet" />
 				]]>
 			</var>
 
@@ -445,7 +440,7 @@
 
 		<execute function="Refresh" />
 
-		<execute macro="WebContent#addPGViaWCD">
+		<execute macro="WebContent#addStructuredPGViaWCD">
 			<var name="structureName" value="WC Structure Name" />
 			<var name="webContentTitle" value="WC Title" />
 		</execute>
@@ -467,7 +462,7 @@
 		</execute>
 
 		<execute macro="ProductMenu#gotoSitesPages">
-			<var name="portlet" value="Site Pages" />
+			<var name="page" value="Public Pages" />
 		</execute>
 
 		<execute macro="Page#add">
@@ -476,7 +471,9 @@
 			<var name="siteScopeSelected" value="true" />
 		</execute>
 
-		<execute macro="Navigator#openURL" />
+		<execute macro="ProductMenu#gotoSite">
+			<var name="site" value="Test Site Name" />
+		</execute>
 
 		<execute macro="ProductMenu#gotoSitesContent">
 			<var name="portlet" value="Web Content" />
@@ -522,7 +519,7 @@
 
 		<execute function="Refresh" />
 
-		<execute macro="WebContent#addPGViaWCD">
+		<execute macro="WebContent#addStructuredPGViaWCD">
 			<var name="structureName" value="WC Structure Name" />
 			<var name="webContentTitle" value="WC Title" />
 		</execute>
@@ -549,22 +546,16 @@
 			<var name="siteName" value="Blank Site Name" />
 		</execute>
 
-		<execute macro="Page#openURL">
-			<var name="pageAccess" value="Public" />
+		<execute macro="Navigator#openSiteURL">
 			<var name="siteName" value="Blank Site Name" />
-			<var name="sitePageName" value="Site Page Name" />
-			<var name="siteURL" value="true" />
 		</execute>
 
 		<execute macro="Portlet#addPG">
 			<var name="portletName" value="Asset Publisher" />
 		</execute>
 
-		<execute macro="Page#openURL">
-			<var name="pageAccess" value="Public" />
+		<execute macro="Navigator#openSiteURL">
 			<var name="siteName" value="Blank Site Name" />
-			<var name="sitePageName" value="Site Page Name" />
-			<var name="siteURL" value="true" />
 		</execute>
 
 		<execute macro="AssetPublisherPortlet#configureFlaggableDisplaySettingsPG">
@@ -609,11 +600,8 @@
 			<var name="webContentTitle" value="Web Content Title" />
 		</execute>
 
-		<execute macro="Page#openURL">
-			<var name="pageAccess" value="Public" />
+		<execute macro="Navigator#openSiteURL">
 			<var name="siteName" value="Blank Site Name" />
-			<var name="sitePageName" value="Site Page Name" />
-			<var name="siteURL" value="true" />
 		</execute>
 
 		<execute macro="WebContent#viewPGViaAP">
@@ -748,6 +736,8 @@
 		</execute>
 
 		<execute macro="WebContentTemplates#save" />
+
+		<execute macro="Navigator#openURL" />
 
 		<execute macro="Page#add">
 			<var name="pageName" value="Web Content Display Page" />
@@ -1063,6 +1053,8 @@
 
 		<execute macro="WebContentTemplates#save" />
 
+		<execute macro="Navigator#openURL" />
+
 		<execute macro="Page#add">
 			<var name="pageName" value="Web Content Display Page" />
 		</execute>
@@ -1234,6 +1226,8 @@
 		</execute>
 
 		<execute macro="WebContentTemplates#save" />
+
+		<execute macro="Navigator#openURL" />
 
 		<execute macro="Page#add">
 			<var name="pageName" value="Web Content Display Page" />
@@ -1789,7 +1783,7 @@
 		<execute macro="WebContentStructures#addCP">
 			<var name="localization1Name" value="nom de la structure de wc" />
 			<var name="localization1NameKey" value="fr_FR" />
-			<var name="localization2Name" value="wc 结构名称" />
+			<var name="localization2Name" value="wc 结构�??称" />
 			<var name="localization2NameKey" value="zh_CN" />
 			<var name="structureDescription" value="WC Structure Description" />
 			<var name="structureName" value="WC Structure Name" />
@@ -1822,7 +1816,7 @@
 		<execute macro="WebContentTemplates#localizeTemplateName">
 			<var name="localization1Name" value="nom de la template de wc" />
 			<var name="localization1NameKey" value="fr_FR" />
-			<var name="localization2Name" value="wc 模板名称" />
+			<var name="localization2Name" value="wc 模�?��??称" />
 			<var name="localization2NameKey" value="zh_CN" />
 			<var name="templateName" value="WC Template Name" />
 		</execute>
@@ -1902,6 +1896,7 @@
 			<var name="localizedText" value="WC contenu WebContent" />
 			<var name="localizedTitle" value="WC WebContent Titre" />
 			<var name="lowercaseLanguageCode" value="fr" />
+			<var name="panelHeading" value="Structure et modèle" />
 			<var name="structureLocalizationName" value="nom de la structure de wc" />
 			<var name="templateLocalizationName" value="nom de la template de wc" />
 			<var name="webContentTranslationLanguage" value="français (France)" />
@@ -1922,8 +1917,9 @@
 		<execute macro="WebContentNavigator#gotoEditPGViaWCD" />
 
 		<execute macro="WebContent#viewTranslationPGViaWCD">
-			<var name="structureLocalizationName" value="wc 结构名称" />
-			<var name="templateLocalizationName" value="wc 模板名称" />
+			<var name="panelHeading" value="结构和模�?�" />
+			<var name="structureLocalizationName" value="wc 结构�??称" />
+			<var name="templateLocalizationName" value="wc 模�?��??称" />
 		</execute>
 
 		<execute macro="Page#gotoPG">

@@ -19,8 +19,6 @@
 <%
 String redirect = ParamUtil.getString(request, "redirect");
 String closeRedirect = ParamUtil.getString(request, "closeRedirect");
-boolean showBackURL = ParamUtil.getBoolean(request, "showBackURL", true);
-boolean showHeader = ParamUtil.getBoolean(request, "showHeader", true);
 
 String portletResource = ParamUtil.getString(request, "portletResource");
 
@@ -76,7 +74,9 @@ if (Validator.isNotNull(structureAvailableFields)) {
 	scopeAvailableFields = structureAvailableFields;
 }
 
+boolean showBackURL = ParamUtil.getBoolean(request, "showBackURL", true);
 boolean showCacheableInput = ParamUtil.getBoolean(request, "showCacheableInput");
+boolean showHeader = ParamUtil.getBoolean(request, "showHeader", true);
 %>
 
 <portlet:actionURL name="addTemplate" var="addTemplateURL">
@@ -438,7 +438,7 @@ boolean showCacheableInput = ParamUtil.getBoolean(request, "showCacheableInput")
 
 		<aui:button cssClass="btn-lg" onClick="<%= taglibOnClick %>" primary="<%= true %>" value='<%= LanguageUtil.get(request, "save") %>' />
 
-		<aui:button cssClass="btn-lg" onClick='<%= renderResponse.getNamespace() + "saveAndContinueTemplate();" %>' value='<%= LanguageUtil.get(request, "save-and-continue") %>' />
+		<aui:button cssClass="btn-lg" onClick='<%= renderResponse.getNamespace() + "saveAndContinueTemplate();" %>' value='<%= LanguageUtil.get(resourceBundle, "save-and-continue") %>' />
 
 	<c:if test="<%= ddmDisplay.isVersioningEnabled() %>">
 		<aui:button cssClass="btn-lg" onClick='<%= renderResponse.getNamespace() + "saveDraftTemplate();" %>' value='<%= LanguageUtil.get(request, "save-draft") %>' />

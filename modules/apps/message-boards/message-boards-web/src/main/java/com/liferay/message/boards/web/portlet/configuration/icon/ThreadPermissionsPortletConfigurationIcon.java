@@ -14,14 +14,13 @@
 
 package com.liferay.message.boards.web.portlet.configuration.icon;
 
-import com.liferay.message.boards.web.portlet.action.ActionUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.configuration.icon.BasePortletConfigurationIcon;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.User;
-import com.liferay.portal.security.permission.ActionKeys;
-import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portlet.messageboards.model.MBMessage;
 import com.liferay.portlet.messageboards.model.MBMessageDisplay;
 import com.liferay.portlet.messageboards.model.MBThread;
@@ -40,9 +39,11 @@ public class ThreadPermissionsPortletConfigurationIcon
 	extends BasePortletConfigurationIcon {
 
 	public ThreadPermissionsPortletConfigurationIcon(
-		PortletRequest portletRequest) {
+		PortletRequest portletRequest, MBMessageDisplay messageDisplay) {
 
 		super(portletRequest);
+
+		_messageDisplay = messageDisplay;
 	}
 
 	@Override
@@ -57,10 +58,7 @@ public class ThreadPermissionsPortletConfigurationIcon
 		try {
 			MBMessage rootMessage = null;
 
-			MBMessageDisplay messageDisplay = ActionUtil.getMessageDisplay(
-				portletRequest);
-
-			MBMessage message = messageDisplay.getMessage();
+			MBMessage message = _messageDisplay.getMessage();
 
 			if (message.isRoot()) {
 				rootMessage = message;
@@ -73,7 +71,7 @@ public class ThreadPermissionsPortletConfigurationIcon
 			String modelResource = MBMessage.class.getName();
 			String modelResourceDescription = rootMessage.getSubject();
 
-			MBThread thread = messageDisplay.getThread();
+			MBThread thread = _messageDisplay.getThread();
 
 			String resourcePrimKey = String.valueOf(thread.getRootMessageId());
 
@@ -100,17 +98,14 @@ public class ThreadPermissionsPortletConfigurationIcon
 			themeDisplay.getPermissionChecker();
 
 		try {
-			MBMessageDisplay messageDisplay = ActionUtil.getMessageDisplay(
-				portletRequest);
-
-			MBThread thread = messageDisplay.getThread();
+			MBThread thread = _messageDisplay.getThread();
 
 			if (thread.isLocked()) {
 				return false;
 			}
 
 			if (!MBMessagePermission.contains(
-					permissionChecker, messageDisplay.getMessage(),
+					permissionChecker, _messageDisplay.getMessage(),
 					ActionKeys.PERMISSIONS)) {
 
 				return false;
@@ -141,5 +136,6 @@ public class ThreadPermissionsPortletConfigurationIcon
 	}
 
 	private volatile MBMessageLocalService _mbMessageLocalService;
+	private final MBMessageDisplay _messageDisplay;
 
 }

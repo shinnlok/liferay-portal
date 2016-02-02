@@ -187,11 +187,19 @@
 	</command>
 
 	<command name="definePermissionPG">
-		<var method="StringUtil#replace('${roleName}', ' ', '-')" name="key_roleName" />
-		<var method="StringUtil#lowerCase('${key_roleName}')" name="key_roleName" />
+		<var name="key_roleName" value="${roleName}" />
+
+		<if>
+			<condition function="IsElementPresent#isElementPresentAfterWait" locator1="IFrame#DIALOG" />
+			<then>
+				<execute function="SelectFrame" locator1="IFrame#DIALOG" />
+			</then>
+		</if>
 
 		<execute function="Check" locator1="Permissions#${permissionDefinitionKey}" />
+
 		<execute function="AssertClick" locator1="Button#SAVE" value1="Save" />
+
 		<execute function="AssertTextEquals#assertPartialText" locator1="Permissions#SUCCESS_MESSAGE" value1="Your request completed successfully." />
 		<execute function="AssertChecked" locator1="Permissions#${permissionDefinitionKey}" />
 	</command>
@@ -297,7 +305,7 @@
 
 		<if>
 			<and>
-				<condition function="IsElementPresent" locator1="Message#INFO" />
+				<condition function="IsElementPresent#isElementPresentAfterWait" locator1="Message#INFO" />
 				<condition function="IsVisible" locator1="Message#INFO" />
 			</and>
 			<then>
@@ -533,8 +541,7 @@
 					<var name="key_siteNameScope" value="${siteNameScope}" />
 
 					<execute function="SelectFrame" locator1="RolesPermissionsSelectSite#SELECT_SITE_IFRAME" />
-					<execute function="AssertTextEquals" locator1="RolesPermissionsSelectSite#SCOPE_SITES_TABLE_NAME" value1="${siteNameScope}" />
-					<execute function="Click" locator1="RolesPermissionsSelectSite#SCOPE_SITES_TABLE_CHOOSE_BUTTON" value1="Choose" />
+					<execute function="AssertClick" locator1="RolesPermissionsSelectSite#SCOPE_SITES_TABLE_NAME" value1="${siteNameScope}" />
 
 					<var name="key_siteNameScope" value="${siteNameScope}" />
 					<var method="StringUtil#replace('${permissionDefinitionKey}', 'CHECKBOX', 'SITE_SCOPE')" name="permissionDefinitionKeySiteScope" />
@@ -728,6 +735,13 @@
 	<command name="removePermissionPG">
 		<var method="StringUtil#replace('${roleName}', ' ', '-')" name="key_roleName" />
 		<var method="StringUtil#lowerCase('${key_roleName}')" name="key_roleName" />
+
+		<if>
+			<condition function="IsElementPresent#isElementPresentAfterWait" locator1="IFrame#DIALOG" />
+			<then>
+				<execute function="SelectFrame" locator1="IFrame#DIALOG" />
+			</then>
+		</if>
 
 		<execute function="Uncheck" locator1="Permissions#${permissionDefinitionKey}" />
 		<execute function="AssertClick" locator1="Button#SAVE" value1="Save" />

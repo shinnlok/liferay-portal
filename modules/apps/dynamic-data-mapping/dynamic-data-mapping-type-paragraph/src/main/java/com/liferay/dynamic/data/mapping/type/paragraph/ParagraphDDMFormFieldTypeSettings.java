@@ -68,40 +68,44 @@ public interface ParagraphDDMFormFieldTypeSettings
 
 	@DDMFormField(
 		label = "%title",
-		properties = {
-			"placeholder=%enter-title", "setting.category=basic",
-			"setting.weight=4"
-		},
-		required = true, tip = "%enter-title", type = "key-value"
+		properties = {"placeholder=%enter-title", "tooltip=%enter-title"},
+		required = true, type = "key-value"
 	)
+	@Override
 	public LocalizedValue label();
 
 	@DDMFormField(visibilityExpression = "false")
+	@Override
 	public LocalizedValue predefinedValue();
 
 	@DDMFormField(visibilityExpression = "false")
+	@Override
 	public boolean repeatable();
 
 	@DDMFormField(visibilityExpression = "false")
+	@Override
 	public boolean required();
 
 	@DDMFormField(visibilityExpression = "false")
+	@Override
 	public boolean showLabel();
 
 	@DDMFormField(
 		dataType = "string", label = "%body-text",
-		properties = {"setting.category=basic", "displayStyle=multiline"},
-		required = true, tip = "%enter-body-text", type = "text"
+		properties = {"displayStyle=multiline", "tooltip=%enter-body-text"},
+		required = true, type = "text"
 	)
 	public String text();
 
 	@DDMFormField(visibilityExpression = "false")
+	@Override
 	public LocalizedValue tip();
 
 	@DDMFormField(
 		dataType = "ddm-validation", type = "validation",
 		visibilityExpression = "false"
 	)
+	@Override
 	public DDMFormFieldValidation validation();
 
 }

@@ -32,7 +32,7 @@ String selectStyle = (String)request.getAttribute("configuration.jsp-selectStyle
 	type="tabs nav-tabs-default"
 >
 	<liferay-ui:section>
-		<liferay-ui:error-marker key="errorSection" value="asset-selection" />
+		<liferay-ui:error-marker key="<%= WebKeys.ERROR_SECTION %>" value="asset-selection" />
 
 		<aui:fieldset-group markupView="lexicon">
 			<%= selectStyle %>
@@ -196,7 +196,7 @@ String selectStyle = (String)request.getAttribute("configuration.jsp-selectStyle
 										<span class="asset-subtypefields hide" id="<portlet:namespace /><%= classType.getClassTypeId() %>_<%= className %>Options">
 											<liferay-portlet:renderURL portletName="<%= assetPublisherDisplayContext.getPortletResource() %>" var="selectStructureFieldURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
 												<portlet:param name="mvcPath" value="/select_structure_field.jsp" />
-												<portlet:param name="portletResource" value="<%= assetPublisherDisplayContext.getPortletResource() %>" />
+												<portlet:param name="portletResource" value="<%= HtmlUtil.escapeJS(assetPublisherDisplayContext.getPortletResource()) %>" />
 												<portlet:param name="className" value="<%= assetRendererFactory.getClassName() %>" />
 												<portlet:param name="classTypeId" value="<%= String.valueOf(classType.getClassTypeId()) %>" />
 												<portlet:param name="eventName" value='<%= renderResponse.getNamespace() + "selectDDMStructureField" %>' />
@@ -509,14 +509,14 @@ String selectStyle = (String)request.getAttribute("configuration.jsp-selectStyle
 	</liferay-ui:section>
 
 	<liferay-ui:section>
-		<liferay-ui:error-marker key="errorSection" value="display-settings" />
+		<liferay-ui:error-marker key="<%= WebKeys.ERROR_SECTION %>" value="display-settings" />
 
 		<%@ include file="/display_settings.jspf" %>
 	</liferay-ui:section>
 
 	<liferay-ui:section>
 		<aui:fieldset-group markupView="lexicon">
-			<liferay-ui:error-marker key="errorSection" value="subscriptions" />
+			<liferay-ui:error-marker key="<%= WebKeys.ERROR_SECTION %>" value="subscriptions" />
 
 			<c:if test="<%= PortalUtil.isRSSFeedsEnabled() %>">
 				<aui:fieldset>
@@ -553,7 +553,7 @@ String selectStyle = (String)request.getAttribute("configuration.jsp-selectStyle
 	var ddmStructureFieldName = $('#<portlet:namespace />ddmStructureFieldName');
 	var orderByColumn1 = $('#<portlet:namespace />orderByColumn1');
 	var orderByColumn2 = $('#<portlet:namespace />orderByColumn2');
-	var sourcePanel = $('#assetPublisherSourcePanel');
+	var sourcePanel = $('#<portlet:namespace />assetPublisherSourcePanel');
 
 	<%
 	for (AssetRendererFactory<?> curRendererFactory : classTypesAssetRendererFactories) {
@@ -750,9 +750,9 @@ String selectStyle = (String)request.getAttribute("configuration.jsp-selectStyle
 
 			var uri = btn.data('href');
 
-			uri = Util.addParams('_<%= assetPublisherDisplayContext.getPortletResource() %>_ddmStructureDisplayFieldValue=' + encodeURIComponent($('#<portlet:namespace />ddmStructureDisplayFieldValue').val()), uri);
-			uri = Util.addParams('_<%= assetPublisherDisplayContext.getPortletResource() %>_ddmStructureFieldName=' + encodeURIComponent($('#<portlet:namespace />ddmStructureFieldName').val()), uri);
-			uri = Util.addParams('_<%= assetPublisherDisplayContext.getPortletResource() %>_ddmStructureFieldValue=' + encodeURIComponent($('#<portlet:namespace />ddmStructureFieldValue').val()), uri);
+			uri = Util.addParams('_<%= HtmlUtil.escapeJS(assetPublisherDisplayContext.getPortletResource()) %>_ddmStructureDisplayFieldValue=' + encodeURIComponent($('#<portlet:namespace />ddmStructureDisplayFieldValue').val()), uri);
+			uri = Util.addParams('_<%= HtmlUtil.escapeJS(assetPublisherDisplayContext.getPortletResource()) %>_ddmStructureFieldName=' + encodeURIComponent($('#<portlet:namespace />ddmStructureFieldName').val()), uri);
+			uri = Util.addParams('_<%= HtmlUtil.escapeJS(assetPublisherDisplayContext.getPortletResource()) %>_ddmStructureFieldValue=' + encodeURIComponent($('#<portlet:namespace />ddmStructureFieldValue').val()), uri);
 
 			Util.selectEntity(
 				{

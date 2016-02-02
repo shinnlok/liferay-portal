@@ -39,9 +39,7 @@ public class UpdateFileEntriesHandler extends BaseJSONHandler {
 
 	@Override
 	public boolean handlePortalException(String exception) throws Exception {
-		if (exception.equals(
-				"com.liferay.portal.kernel.upload.UploadException")) {
-
+		if (exception.endsWith("UploadException")) {
 			return true;
 		}
 
@@ -60,7 +58,7 @@ public class UpdateFileEntriesHandler extends BaseJSONHandler {
 		while (fields.hasNext()) {
 			Map.Entry<String, JsonNode> field = fields.next();
 
-			Handler handler = handlers.get(field.getKey());
+			Handler handler = handlers.remove(field.getKey());
 
 			try {
 				JsonNode fieldValue = field.getValue();
@@ -94,6 +92,18 @@ public class UpdateFileEntriesHandler extends BaseJSONHandler {
 		Path filePath = (Path)getParameterValue("zipFilePath");
 
 		FileUtil.deleteFile(filePath);
+	}
+
+	@Override
+	public void removeEvent() {
+		Map<String, Handler> handlers = (Map<String, Handler>)getParameterValue(
+			"handlers");
+
+		for (Handler handler : handlers.values()) {
+			handler.removeEvent();
+		}
+
+		super.removeEvent();
 	}
 
 	private static final Logger _logger = LoggerFactory.getLogger(
