@@ -17,6 +17,7 @@ package com.liferay.sync.engine.util;
 import com.liferay.sync.engine.documentlibrary.util.FileEventUtil;
 import com.liferay.sync.engine.model.SyncAccount;
 import com.liferay.sync.engine.model.SyncFile;
+import com.liferay.sync.engine.model.SyncSite;
 import com.liferay.sync.engine.service.SyncAccountService;
 import com.liferay.sync.engine.service.SyncFileService;
 
@@ -375,6 +376,18 @@ public class FileUtil {
 		}
 
 		return fileName;
+	}
+
+	public static String getSiteFilePathName(
+		String syncAccountFilePathName, SyncSite syncSite) {
+
+		String syncSiteName = syncSite.getName();
+
+		if (!FileUtil.isValidFileName(syncSiteName)) {
+			syncSiteName = String.valueOf(syncSite.getGroupId());
+		}
+
+		return FileUtil.getFilePathName(syncAccountFilePathName, syncSiteName);
 	}
 
 	public static Path getTempFilePath(SyncFile syncFile) {
