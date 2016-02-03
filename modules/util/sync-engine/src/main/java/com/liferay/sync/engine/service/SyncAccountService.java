@@ -130,8 +130,8 @@ public class SyncAccountService {
 
 			SyncSite syncSite = entry.getKey();
 
-			String siteFilePathName = FileUtil.getSiteFilePathName(
-				syncAccount.getFilePathName(), syncSite);
+			String siteFilePathName = FileUtil.getFilePathName(
+				syncAccount.getFilePathName(), syncSite.getSanitizedName());
 
 			syncSite.setFilePathName(siteFilePathName);
 			syncSite.setRemoteSyncTime(-1);
