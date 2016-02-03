@@ -202,7 +202,8 @@ public class SyncFileServiceTest extends BaseTestCase {
 
 		int previousSyncedSyncFilesSize = syncedSyncFiles.size();
 
-		SyncFileService.unsyncFolders(syncFiles);
+		SyncFileService.unsyncFolders(
+			syncAccount.getSyncAccountId(), syncFiles);
 
 		syncedSyncFiles = syncFilePersistence.queryForEq(
 			"state", SyncFile.STATE_SYNCED);
@@ -254,7 +255,8 @@ public class SyncFileServiceTest extends BaseTestCase {
 
 		PowerMockito.mockStatic(FileEventUtil.class);
 
-		SyncFileService.resyncFolders(syncFiles);
+		SyncFileService.resyncFolders(
+			syncAccount.getSyncAccountId(), syncFiles);
 
 		PowerMockito.verifyStatic(Mockito.times(expectedExecutionCount));
 

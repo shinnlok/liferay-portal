@@ -262,10 +262,22 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 
 		Path filePath = Paths.get(filePathName);
 
-		if (isParentUnsynced(syncFile) ||
-			(Files.exists(filePath) &&
-			 (syncFile.isFolder() ||
-			  !FileUtil.isModified(syncFile, filePath)))) {
+		if (isParentUnsynced(syncFile)) {
+			if (syncFile.isFolder()) {
+				syncFile.setFilePathName(filePath.toString());
+				syncFile.setModifiedTime(0);
+				syncFile.setState(SyncFile.STATE_UNSYNCED);
+				syncFile.setSyncAccountId(getSyncAccountId());
+				syncFile.setUiEvent(SyncFile.UI_EVENT_NONE);
+
+				SyncFileService.update(syncFile);
+			}
+
+			return;
+		}
+
+		if (Files.exists(filePath) &&
+			(syncFile.isFolder() || !FileUtil.isModified(syncFile, filePath))) {
 
 			return;
 		}
@@ -369,7 +381,9 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 			sourceSyncFile.setUiEvent(SyncFile.UI_EVENT_DELETED_REMOTE);
 		}
 
-		SyncFileService.deleteSyncFile(sourceSyncFile);
+		if (!sourceSyncFile.isUnsynced()) {
+			SyncFileService.deleteSyncFile(sourceSyncFile);
+		}
 
 		Path sourceFilePath = Paths.get(sourceSyncFile.getFilePathName());
 
@@ -482,16 +496,6 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 		Path filePath = Paths.get(syncFile.getFilePathName());
 
 		if (FileUtil.isUnsynced(filePath.getParent())) {
-			if (syncFile.isFolder()) {
-				syncFile.setFilePathName(filePath.toString());
-				syncFile.setModifiedTime(0);
-				syncFile.setState(SyncFile.STATE_UNSYNCED);
-				syncFile.setUiEvent(SyncFile.UI_EVENT_NONE);
-				syncFile.setSyncAccountId(getSyncAccountId());
-
-				SyncFileService.update(syncFile);
-			}
-
 			return true;
 		}
 
@@ -531,28 +535,60 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 			String targetFilePathName)
 		throws Exception {
 
+		Path targetFilePath = Paths.get(targetFilePathName);
+
 		if (isParentUnsynced(targetSyncFile)) {
-			deleteFile(sourceSyncFile, targetSyncFile);
+			if (sourceSyncFile.isFolder()) {
+				List<SyncFile> syncFiles = new ArrayList<>();
+
+				syncFiles.add(sourceSyncFile);
+
+				List<SyncFile> childSyncFiles = SyncFileService.findSyncFiles(
+					sourceSyncFile.getFilePathName());
+
+				syncFiles.addAll(childSyncFiles);
+
+				SyncFileService.unsyncFolders(getSyncAccountId(), syncFiles);
+
+				sourceSyncFile = SyncFileService.fetchSyncFile(
+					sourceSyncFile.getSyncFileId());
+
+				SyncFileService.updateSyncFile(
+					targetFilePath, targetSyncFile.getParentFolderId(),
+					sourceSyncFile);
+			}
+			else {
+				deleteFile(sourceSyncFile, targetSyncFile);
+			}
+
+			return;
+		}
+
+		if (sourceSyncFile.isUnsynced()) {
+			if (!isParentUnsynced(sourceSyncFile)) {
+				return;
+			}
+
+			List<SyncFile> syncFiles = new ArrayList<>();
+
+			syncFiles.add(sourceSyncFile);
+
+			List<SyncFile> childSyncFiles = SyncFileService.findSyncFiles(
+				sourceSyncFile.getFilePathName());
+
+			syncFiles.addAll(childSyncFiles);
+
+			SyncFileService.resyncFolders(getSyncAccountId(), syncFiles);
 
 			return;
 		}
 
 		Path sourceFilePath = Paths.get(sourceSyncFile.getFilePathName());
-		Path targetFilePath = Paths.get(targetFilePathName);
 
 		sourceSyncFile = SyncFileService.updateSyncFile(
 			targetFilePath, targetSyncFile.getParentFolderId(), sourceSyncFile);
 
-		if (sourceSyncFile.isUnsynced()) {
-			List<SyncFile> syncFiles = new ArrayList<>();
-
-			syncFiles.add(sourceSyncFile);
-
-			SyncFileService.resyncFolders(syncFiles);
-
-			return;
-		}
-		else if (Files.exists(sourceFilePath)) {
+		if (Files.exists(sourceFilePath)) {
 			FileUtil.moveFile(sourceFilePath, targetFilePath);
 
 			sourceSyncFile.setState(SyncFile.STATE_SYNCED);
@@ -620,7 +656,7 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 				return;
 			}
 
-			if (sourceSyncFile != null) {
+			if ((sourceSyncFile != null) && !sourceSyncFile.isUnsynced()) {
 				sourceSyncFile.setState(SyncFile.STATE_IN_PROGRESS);
 			}
 
@@ -664,6 +700,15 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 					updateFile(sourceSyncFile, targetSyncFile, filePathName);
 				}
 				else if (isParentUnsynced(targetSyncFile)) {
+					if (targetSyncFile.isFolder()) {
+						targetSyncFile.setModifiedTime(0);
+						targetSyncFile.setState(SyncFile.STATE_UNSYNCED);
+						targetSyncFile.setSyncAccountId(getSyncAccountId());
+						targetSyncFile.setUiEvent(SyncFile.UI_EVENT_NONE);
+
+						SyncFileService.update(targetSyncFile);
+					}
+
 					return;
 				}
 				else {
@@ -763,7 +808,7 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 
 		SyncFileService.update(sourceSyncFile);
 
-		if (isParentUnsynced(sourceSyncFile)) {
+		if (isParentUnsynced(sourceSyncFile) || sourceSyncFile.isUnsynced()) {
 			return;
 		}
 

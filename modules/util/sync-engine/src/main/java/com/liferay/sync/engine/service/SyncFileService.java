@@ -267,9 +267,8 @@ public class SyncFileService {
 
 				@Override
 				public Object call() throws Exception {
-					List<SyncFile> childSyncFiles =
-						_syncFilePersistence.findByParentFilePathName(
-							syncFile.getFilePathName());
+					List<SyncFile> childSyncFiles = findSyncFiles(
+						syncFile.getFilePathName());
 
 					for (SyncFile childSyncFile : childSyncFiles) {
 						if (childSyncFile.isSystem()) {
@@ -445,6 +444,20 @@ public class SyncFileService {
 		}
 	}
 
+	public static List<SyncFile> findSyncFiles(String parentFilePathName) {
+		try {
+			return _syncFilePersistence.findByParentFilePathName(
+				parentFilePathName);
+		}
+		catch (SQLException sqle) {
+			if (_logger.isDebugEnabled()) {
+				_logger.debug(sqle.getMessage(), sqle);
+			}
+
+			return Collections.emptyList();
+		}
+	}
+
 	public static List<SyncFile> findSyncFiles(
 		String filePathName, long localSyncTime) {
 
@@ -592,7 +605,7 @@ public class SyncFileService {
 		// Remote sync file
 
 		if ((syncFile.getState() != SyncFile.STATE_ERROR) &&
-			(syncFile.getState() != SyncFile.STATE_UNSYNCED)) {
+			!syncFile.isUnsynced()) {
 
 			FileEventUtil.moveFile(folderId, syncAccountId, syncFile);
 		}
@@ -672,7 +685,7 @@ public class SyncFileService {
 		// Remote sync file
 
 		if ((syncFile.getState() != SyncFile.STATE_ERROR) &&
-			(syncFile.getState() != SyncFile.STATE_UNSYNCED)) {
+			!syncFile.isUnsynced()) {
 
 			FileEventUtil.updateFolder(filePath, syncAccountId, syncFile);
 		}
@@ -694,14 +707,15 @@ public class SyncFileService {
 		}
 	}
 
-	public static void resyncFolders(List<SyncFile> syncFiles)
+	public static void resyncFolders(
+			long syncAccountId, List<SyncFile> syncFiles)
 		throws Exception {
 
 		Map<Long, SyncFile> resyncedSyncFileMap = new HashMap<>();
 
 		Set<Long> resyncedSyncFileIds = resyncedSyncFileMap.keySet();
 
-		syncFiles.sort(_syncFileFilePathNameComparator);
+		Collections.sort(syncFiles, _syncFileFilePathNameComparator);
 
 		for (SyncFile syncFile : syncFiles) {
 			SyncFile localSyncFile = SyncFileService.fetchSyncFile(
@@ -714,7 +728,11 @@ public class SyncFileService {
 
 				syncFile = localSyncFile;
 			}
+			else {
+				syncFile.setSyncAccountId(syncAccountId);
+			}
 
+			syncFile.setModifiedTime(0);
 			syncFile.setState(SyncFile.STATE_IN_PROGRESS);
 			syncFile.setUiEvent(SyncFile.UI_EVENT_RESYNCING);
 
@@ -761,12 +779,13 @@ public class SyncFileService {
 		_syncFilePersistence.unregisterModelListener(modelListener);
 	}
 
-	public static void unsyncFolders(List<SyncFile> syncFiles)
+	public static void unsyncFolders(
+			long syncAccountId, List<SyncFile> syncFiles)
 		throws Exception {
 
 		Set<Long> unsyncedSyncFileIds = new HashSet<>();
 
-		syncFiles.sort(_syncFileFilePathNameComparator);
+		Collections.sort(syncFiles, _syncFileFilePathNameComparator);
 
 		for (SyncFile syncFile : syncFiles) {
 			SyncFile localSyncFile = SyncFileService.fetchSyncFile(
@@ -779,8 +798,10 @@ public class SyncFileService {
 
 				syncFile = localSyncFile;
 			}
+			else {
+				syncFile.setSyncAccountId(syncAccountId);
+			}
 
-			syncFile.setModifiedTime(0);
 			syncFile.setState(SyncFile.STATE_UNSYNCED);
 			syncFile.setUiEvent(SyncFile.UI_EVENT_NONE);
 
@@ -927,7 +948,7 @@ public class SyncFileService {
 		// Remote sync file
 
 		if ((syncFile.getState() != SyncFile.STATE_ERROR) &&
-			(syncFile.getState() != SyncFile.STATE_UNSYNCED)) {
+			!syncFile.isUnsynced()) {
 
 			FileEventUtil.updateFolder(filePath, syncAccountId, syncFile);
 		}
