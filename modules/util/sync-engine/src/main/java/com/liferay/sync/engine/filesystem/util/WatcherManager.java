@@ -22,7 +22,7 @@ import java.util.Map;
 /**
  * @author Shinn Lok
  */
-public class WatcherRegistry {
+public class WatcherManager {
 
 	public static Watcher getWatcher(long syncAccountId) {
 		return _watchers.get(syncAccountId);
