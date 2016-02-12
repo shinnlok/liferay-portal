@@ -68,6 +68,10 @@ public class DownloadFileHandler extends BaseHandler {
 
 	@Override
 	public void handleException(Exception e) {
+		if (isEventCancelled()) {
+			return;
+		}
+
 		if (e instanceof ConnectionClosedException) {
 			String message = e.getMessage();
 
