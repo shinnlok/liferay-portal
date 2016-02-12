@@ -14,7 +14,16 @@
 
 package com.liferay.sync.engine.filesystem.util;
 
+import com.liferay.sync.engine.filesystem.BarbaryWatcher;
+import com.liferay.sync.engine.filesystem.JPathWatcher;
 import com.liferay.sync.engine.filesystem.Watcher;
+import com.liferay.sync.engine.filesystem.listener.SyncSiteWatchEventListener;
+import com.liferay.sync.engine.filesystem.listener.WatchEventListener;
+import com.liferay.sync.engine.model.SyncAccount;
+import com.liferay.sync.engine.service.SyncAccountService;
+import com.liferay.sync.engine.util.OSDetector;
+
+import java.nio.file.Paths;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,15 +33,34 @@ import java.util.Map;
  */
 public class WatcherManager {
 
-	public static Watcher getWatcher(long syncAccountId) {
-		return _watchers.get(syncAccountId);
-	}
+	public static synchronized Watcher getWatcher(long syncAccountId) {
+		Watcher watcher = _watchers.get(syncAccountId);
 
-	public static void register(long syncAccountId, Watcher watcher) {
+		if (watcher != null) {
+			return watcher;
+		}
+
+		SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
+			syncAccountId);
+
+		WatchEventListener watchEventListener = new SyncSiteWatchEventListener(
+			syncAccountId);
+
+		if (OSDetector.isApple()) {
+			watcher = new BarbaryWatcher(
+				Paths.get(syncAccount.getFilePathName()), watchEventListener);
+		}
+		else {
+			watcher = new JPathWatcher(
+				Paths.get(syncAccount.getFilePathName()), watchEventListener);
+		}
+
 		_watchers.put(syncAccountId, watcher);
+
+		return watcher;
 	}
 
-	public static void unregister(long syncAccountId) {
+	public static synchronized void removeWatcher(long syncAccountId) {
 		_watchers.remove(syncAccountId);
 	}
 

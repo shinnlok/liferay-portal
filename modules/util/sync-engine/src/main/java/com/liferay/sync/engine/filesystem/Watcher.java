@@ -50,19 +50,15 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class Watcher implements Runnable {
 
-	public Watcher(Path filePath, WatchEventListener watchEventListener)
-		throws IOException {
-
+	public Watcher(Path filePath, WatchEventListener watchEventListener) {
 		_baseFilePath = filePath;
 		_watchEventListener = watchEventListener;
 
 		init();
-
-		WatcherManager.register(_watchEventListener.getSyncAccountId(), this);
 	}
 
 	public void close() {
-		WatcherManager.unregister(_watchEventListener.getSyncAccountId());
+		WatcherManager.removeWatcher(_watchEventListener.getSyncAccountId());
 	}
 
 	public List<String> getDeletedFilePathNames() {
