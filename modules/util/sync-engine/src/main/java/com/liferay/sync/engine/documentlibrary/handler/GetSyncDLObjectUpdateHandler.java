@@ -186,6 +186,8 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 			if (response.startsWith("\"")) {
 				response = StringEscapeUtils.unescapeJava(response);
 
+				response = response.replaceAll("\n", "\\n");
+
 				response = response.substring(1, response.length() - 1);
 			}
 
@@ -455,6 +457,8 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 		try {
 			if (response.startsWith("\"")) {
 				response = StringEscapeUtils.unescapeJava(response);
+
+				response = response.replaceAll("\n", "\\n");
 
 				response = response.substring(1, response.length() - 1);
 			}

@@ -65,6 +65,8 @@ public class BaseJSONHandler extends BaseHandler {
 		try {
 			response = StringEscapeUtils.unescapeJava(response);
 
+			response = response.replaceAll("\n", "\\n");
+
 			responseJsonNode = JSONUtil.readTree(response);
 		}
 		catch (Exception e) {
