@@ -245,7 +245,7 @@ public class BaseJSONHandler extends BaseHandler {
 
 			SyncFile syncFile = getLocalSyncFile();
 
-			if (syncFile == null) {
+			if ((syncFile == null) || syncFile.isSystem()) {
 				return true;
 			}
 
@@ -261,7 +261,7 @@ public class BaseJSONHandler extends BaseHandler {
 
 			SyncFile syncFile = getLocalSyncFile();
 
-			if (syncFile == null) {
+			if ((syncFile == null) || syncFile.isSystem()) {
 				return true;
 			}
 
