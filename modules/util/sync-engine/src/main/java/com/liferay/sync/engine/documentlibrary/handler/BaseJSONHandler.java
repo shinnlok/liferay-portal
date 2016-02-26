@@ -245,6 +245,10 @@ public class BaseJSONHandler extends BaseHandler {
 
 			SyncFile syncFile = getLocalSyncFile();
 
+			if (syncFile == null) {
+				return true;
+			}
+
 			syncFile.setState(SyncFile.STATE_ERROR);
 			syncFile.setUiEvent(SyncFile.UI_EVENT_EXCEEDED_SIZE_LIMIT);
 
@@ -256,6 +260,10 @@ public class BaseJSONHandler extends BaseHandler {
 			}
 
 			SyncFile syncFile = getLocalSyncFile();
+
+			if (syncFile == null) {
+				return true;
+			}
 
 			syncFile.setState(SyncFile.STATE_ERROR);
 			syncFile.setUiEvent(SyncFile.UI_EVENT_NONE);

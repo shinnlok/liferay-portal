@@ -115,6 +115,10 @@ public class DownloadFileHandler extends BaseHandler {
 
 			SyncFile syncFile = getLocalSyncFile();
 
+			if (syncFile == null) {
+				return;
+			}
+
 			if ((boolean)getParameterValue("patch")) {
 				removeEvent();
 
