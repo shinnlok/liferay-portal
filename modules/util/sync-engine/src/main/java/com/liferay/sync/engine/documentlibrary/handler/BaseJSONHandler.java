@@ -102,7 +102,7 @@ public class BaseJSONHandler extends BaseHandler {
 			exception = typeJsonNode.asText();
 		}
 
-		if (exception.endsWith("RuntimeException")) {
+		if (exception.equals("java.lang.RuntimeException")) {
 			JsonNode messageJsonNode = null;
 
 			if (errorJsonNode != null) {
@@ -187,6 +187,9 @@ public class BaseJSONHandler extends BaseHandler {
 			syncFile.setUiEvent(SyncFile.UI_EVENT_INVALID_FILE_NAME);
 
 			SyncFileService.update(syncFile);
+		}
+		else if (exception.equals("java.lang.OutOfMemoryError")) {
+			retryServerConnection(SyncAccount.UI_EVENT_CONNECTION_EXCEPTION);
 		}
 		else if (exception.endsWith("NoSuchFileEntryException") ||
 				 exception.endsWith("NoSuchFolderException")) {
