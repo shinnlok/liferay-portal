@@ -42,7 +42,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 import org.apache.commons.io.IOUtils;
@@ -182,9 +181,6 @@ public class DownloadFileHandler extends BaseHandler {
 
 		Watcher watcher = WatcherManager.getWatcher(getSyncAccountId());
 
-		List<String> downloadedFilePathNames =
-			watcher.getDownloadedFilePathNames();
-
 		try {
 			Path tempFilePath = FileUtil.getTempFilePath(syncFile);
 
@@ -211,7 +207,7 @@ public class DownloadFileHandler extends BaseHandler {
 				}
 			}
 
-			downloadedFilePathNames.add(filePath.toString());
+			watcher.addDownloadedFilePathName(filePath.toString());
 
 			if (GetterUtil.getBoolean(
 					syncFile.getLocalExtraSettingValue("restoreEvent"))) {
@@ -261,7 +257,7 @@ public class DownloadFileHandler extends BaseHandler {
 		}
 
 		catch (FileSystemException fse) {
-			downloadedFilePathNames.remove(filePath.toString());
+			watcher.removeDownloadedFilePathName(filePath.toString());
 
 			String message = fse.getMessage();
 

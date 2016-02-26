@@ -33,8 +33,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import java.util.List;
-
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -204,10 +202,7 @@ public class BaseJSONHandler extends BaseHandler {
 			if (Files.exists(filePath)) {
 				Watcher watcher = WatcherManager.getWatcher(getSyncAccountId());
 
-				List<String> deletedFilePathNames =
-					watcher.getDeletedFilePathNames();
-
-				deletedFilePathNames.add(syncFile.getFilePathName());
+				watcher.addDeletedFilePathName(syncFile.getFilePathName());
 
 				FileUtil.deleteFile(filePath);
 			}

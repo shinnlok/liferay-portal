@@ -292,10 +292,7 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 
 		Watcher watcher = WatcherManager.getWatcher(getSyncAccountId());
 
-		List<String> downloadedFilePathNames =
-			watcher.getDownloadedFilePathNames();
-
-		downloadedFilePathNames.add(targetSyncFile.getFilePathName());
+		watcher.addDownloadedFilePathName(targetSyncFile.getFilePathName());
 
 		boolean exists = Files.exists(
 			Paths.get(targetSyncFile.getFilePathName()));
@@ -350,11 +347,8 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 
 		final Watcher watcher = WatcherManager.getWatcher(getSyncAccountId());
 
-		final List<String> deletedFilePathNames =
-			watcher.getDeletedFilePathNames();
-
 		if (sourceSyncFile.isFile()) {
-			deletedFilePathNames.add(sourceSyncFile.getFilePathName());
+			watcher.addDeletedFilePathName(sourceSyncFile.getFilePathName());
 
 			FileUtil.deleteFile(sourceFilePath);
 
@@ -374,7 +368,7 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 						return super.postVisitDirectory(filePath, ioe);
 					}
 
-					deletedFilePathNames.add(filePath.toString());
+					watcher.addDeletedFilePathName(filePath.toString());
 
 					FileUtil.deleteFile(filePath);
 
@@ -397,7 +391,7 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 						Path filePath, BasicFileAttributes basicFileAttributes)
 					throws IOException {
 
-					deletedFilePathNames.add(filePath.toString());
+					watcher.addDeletedFilePathName(filePath.toString());
 
 					FileUtil.deleteFile(filePath);
 
