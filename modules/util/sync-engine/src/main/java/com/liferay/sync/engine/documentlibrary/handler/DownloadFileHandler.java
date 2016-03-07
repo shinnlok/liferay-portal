@@ -284,12 +284,13 @@ public class DownloadFileHandler extends BaseHandler {
 
 			_logger.error(message, fse);
 
-			if (message.contains("File name too long")) {
-				syncFile.setState(SyncFile.STATE_ERROR);
-				syncFile.setUiEvent(SyncFile.UI_EVENT_FILE_NAME_TOO_LONG);
+			syncFile.setState(SyncFile.STATE_ERROR);
 
-				SyncFileService.update(syncFile);
+			if (message.contains("File name too long")) {
+				syncFile.setUiEvent(SyncFile.UI_EVENT_FILE_NAME_TOO_LONG);
 			}
+
+			SyncFileService.update(syncFile);
 		}
 		finally {
 			StreamUtil.cleanUp(outputStream);
