@@ -27,9 +27,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import java.text.SimpleDateFormat;
-
-import java.util.Calendar;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -53,14 +50,8 @@ public class UpgradeProcess_3_1_0 extends BaseUpgradeProcess {
 
 		Files.createDirectories(archiveFilePath);
 
-		Calendar calendar = Calendar.getInstance();
-
-		calendar.add(Calendar.DAY_OF_MONTH, -7);
-
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-
 		Path archiveZipFilePath = archiveFilePath.resolve(
-			"sync-" + dateFormat.format(calendar.getTime()) + ".log.zip");
+			"sync-" + System.currentTimeMillis() + ".log.zip");
 
 		FileOutputStream fileOutputStream = new FileOutputStream(
 			archiveZipFilePath.toFile());
