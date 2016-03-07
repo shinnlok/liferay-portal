@@ -148,8 +148,8 @@ public class SyncSiteWatchEventListener extends BaseWatchEventListener {
 				SyncWatchEventService.update(lastSyncWatchEvent);
 			}
 			else if (parentFilePath.equals(previousFilePath.getParent())) {
-				if (MSOfficeFileUtil.isTempRenamedFile(filePath) &&
-					MSOfficeFileUtil.isExcelFile(previousFilePath)) {
+				if (MSOfficeFileUtil.isTempRenamedFile(
+						previousFilePath, filePath)) {
 
 					SyncWatchEventService.deleteSyncWatchEvent(
 						lastSyncWatchEvent.getSyncWatchEventId());
