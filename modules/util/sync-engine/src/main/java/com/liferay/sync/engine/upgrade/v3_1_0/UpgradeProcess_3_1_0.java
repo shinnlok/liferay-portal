@@ -14,6 +14,7 @@
 
 package com.liferay.sync.engine.upgrade.v3_1_0;
 
+import com.liferay.sync.engine.model.SyncFile;
 import com.liferay.sync.engine.upgrade.BaseUpgradeProcess;
 import com.liferay.sync.engine.upgrade.util.UpgradeUtil;
 import com.liferay.sync.engine.util.PropsValues;
@@ -43,6 +44,31 @@ public class UpgradeProcess_3_1_0 extends BaseUpgradeProcess {
 
 	@Override
 	public void upgrade() throws Exception {
+		upgradeLogger();
+		upgradeSyncFiles();
+	}
+
+	@Override
+	public void upgradeSchema() throws Exception {
+		runSQL(
+			"ALTER TABLE `SyncAccount` ADD COLUMN " +
+				"authenticationRetryInterval INTEGER BEFORE batchFileMaxSize;");
+		runSQL(
+			"ALTER TABLE `SyncAccount` ALTER COLUMN batchFileMaxSize INTEGER;");
+		runSQL("ALTER TABLE `SyncAccount` ALTER COLUMN oAuthEnabled BOOLEAN;");
+		runSQL(
+			"ALTER TABLE `SyncAccount` ALTER COLUMN pluginVersion " +
+				"VARCHAR(255);");
+		runSQL("ALTER TABLE `SyncAccount` ADD COLUMN uuid VARCHAR(255);");
+
+		runSQL("ALTER TABLE `SyncFile` ALTER COLUMN userName VARCHAR(255);");
+
+		runSQL("CREATE INDEX syncaccount_state_idx ON SyncAccount(state);");
+		runSQL("CREATE INDEX syncfile_state_idx ON SyncFile(state);");
+		runSQL("CREATE INDEX syncsite_state_idx ON SyncSite(state);");
+	}
+
+	protected void upgradeLogger() throws Exception {
 		Path logsFolderPath = Paths.get(
 			PropsValues.SYNC_CONFIGURATION_DIRECTORY, "logs");
 
@@ -103,24 +129,11 @@ public class UpgradeProcess_3_1_0 extends BaseUpgradeProcess {
 		UpgradeUtil.copyLoggerConfiguration();
 	}
 
-	@Override
-	public void upgradeSchema() throws Exception {
+	protected void upgradeSyncFiles() throws Exception {
 		runSQL(
-			"ALTER TABLE `SyncAccount` ADD COLUMN " +
-				"authenticationRetryInterval INTEGER BEFORE batchFileMaxSize;");
-		runSQL(
-			"ALTER TABLE `SyncAccount` ALTER COLUMN batchFileMaxSize INTEGER;");
-		runSQL("ALTER TABLE `SyncAccount` ALTER COLUMN oAuthEnabled BOOLEAN;");
-		runSQL(
-			"ALTER TABLE `SyncAccount` ALTER COLUMN pluginVersion " +
-				"VARCHAR(255);");
-		runSQL("ALTER TABLE `SyncAccount` ADD COLUMN uuid VARCHAR(255);");
-
-		runSQL("ALTER TABLE `SyncFile` ALTER COLUMN userName VARCHAR(255);");
-
-		runSQL("CREATE INDEX syncaccount_state_idx ON SyncAccount(state);");
-		runSQL("CREATE INDEX syncfile_state_idx ON SyncFile(state);");
-		runSQL("CREATE INDEX syncsite_state_idx ON SyncSite(state);");
+			"UPDATE SyncFile SET uiEvent = " + SyncFile.UI_EVENT_DOWNLOADING +
+				" WHERE type = '" + SyncFile.TYPE_FILE + "' AND uiEvent = " +
+					SyncFile.UI_EVENT_ADDED_REMOTE + ";");
 	}
 
 }
