@@ -51,17 +51,16 @@ public class UpgradeProcess_3_1_0 extends BaseUpgradeProcess {
 	@Override
 	public void upgradeSchema() throws Exception {
 		runSQL(
-			"ALTER TABLE `SyncAccount` ADD COLUMN " +
-				"authenticationRetryInterval INTEGER BEFORE batchFileMaxSize;");
+			"ALTER TABLE SyncAccount ADD COLUMN authenticationRetryInterval " +
+				"INTEGER BEFORE batchFileMaxSize;");
 		runSQL(
-			"ALTER TABLE `SyncAccount` ALTER COLUMN batchFileMaxSize INTEGER;");
-		runSQL("ALTER TABLE `SyncAccount` ALTER COLUMN oAuthEnabled BOOLEAN;");
+			"ALTER TABLE SyncAccount ALTER COLUMN batchFileMaxSize INTEGER;");
+		runSQL("ALTER TABLE SyncAccount ALTER COLUMN oAuthEnabled BOOLEAN;");
 		runSQL(
-			"ALTER TABLE `SyncAccount` ALTER COLUMN pluginVersion " +
-				"VARCHAR(255);");
-		runSQL("ALTER TABLE `SyncAccount` ADD COLUMN uuid VARCHAR(255);");
+			"ALTER TABLE SyncAccount ALTER COLUMN pluginVersion VARCHAR(255);");
+		runSQL("ALTER TABLE SyncAccount ADD COLUMN uuid VARCHAR(255);");
 
-		runSQL("ALTER TABLE `SyncFile` ALTER COLUMN userName VARCHAR(255);");
+		runSQL("ALTER TABLE SyncFile ALTER COLUMN userName VARCHAR(255);");
 
 		runSQL("CREATE INDEX syncaccount_state_idx ON SyncAccount(state);");
 		runSQL("CREATE INDEX syncfile_state_idx ON SyncFile(state);");
