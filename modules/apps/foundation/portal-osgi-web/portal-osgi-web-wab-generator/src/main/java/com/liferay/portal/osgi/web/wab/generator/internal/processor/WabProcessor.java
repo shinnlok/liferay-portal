@@ -832,12 +832,8 @@ public class WabProcessor {
 			}
 
 			if (path.startsWith("WEB-INF/lib/")) {
-				if (path.endsWith("-service.jar")) {
-					if (path.endsWith(_context.concat("-service.jar"))) {
-						expandServiceJarIntoClassesDir(uri, file);
-					}
-
-					// Ignore any other "-service.jar" so they use real imports
+				if (path.endsWith(_context.concat("-service.jar"))) {
+					expandServiceJarIntoClassesDir(uri, file);
 
 					_ignoredResources.add(path);
 
@@ -1325,13 +1321,6 @@ public class WabProcessor {
 			if (ArrayUtil.contains(
 					PropsValues.MODULE_FRAMEWORK_WEB_GENERATOR_EXCLUDED_PATHS,
 					path)) {
-
-				continue;
-			}
-
-			if (path.startsWith("WEB-INF/lib/") &&
-				path.endsWith("-service.jar") &&
-				!path.endsWith(_context.concat("-service.jar"))) {
 
 				continue;
 			}
