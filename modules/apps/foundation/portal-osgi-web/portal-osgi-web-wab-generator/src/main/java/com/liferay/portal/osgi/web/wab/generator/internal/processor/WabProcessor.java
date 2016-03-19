@@ -541,8 +541,7 @@ public class WabProcessor {
 
 		classPath.put(
 			"ext/WEB-INF/classes", new File(_pluginDir, "ext/WEB-INF/classes"));
-		classPath.put(
-			"WEB-INF/classes", new File(_pluginDir, "WEB-INF/classes"));
+		classPath.put("WEB-INF/classes", null);
 
 		String[] portalDependencyJars = new String[0];
 
@@ -554,6 +553,9 @@ public class WabProcessor {
 
 		processFiles(
 			_pluginDir, _pluginDir.toURI(), classPath, portalDependencyJars);
+
+		classPath.put(
+			"WEB-INF/classes", new File(_pluginDir, "WEB-INF/classes"));
 
 		Jar wab = analyzer.getJar();
 
