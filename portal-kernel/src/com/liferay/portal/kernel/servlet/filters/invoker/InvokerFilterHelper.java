@@ -273,7 +273,7 @@ public class InvokerFilterHelper {
 
 	protected Filter initFilter(
 		ServletContext servletContext, String filterClassName,
-		FilterConfig filterConfig) {
+		String filterName, FilterConfig filterConfig) {
 
 		Thread currentThread = Thread.currentThread();
 
@@ -341,7 +341,7 @@ public class InvokerFilterHelper {
 				servletContext, filterName, initParameterMap);
 
 			Filter filter = initFilter(
-				servletContext, filterClassName, filterConfig);
+				servletContext, filterClassName, filterName, filterConfig);
 
 			if (filter != null) {
 				filterObjectValuePairs.put(
