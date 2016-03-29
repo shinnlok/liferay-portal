@@ -67,19 +67,14 @@ public class UpgradeLayout extends UpgradeProcess {
 			long companyId, String primKey, long ownerId)
 		throws Exception {
 
-		StringBundler sb = new StringBundler(8);
-
-		sb.append("update Layout set userId = ");
-		sb.append(ownerId);
-		sb.append(", userName = '");
-		sb.append(getUserName(ownerId));
-		sb.append("' where companyId = ");
-		sb.append(companyId);
-		sb.append(" and plid = ");
-		sb.append(Long.valueOf(primKey));
-
 		try (PreparedStatement ps = connection.prepareStatement(
-				sb.toString())) {
+				"update Layout set userId = ?, userName = ? where companyId =" +
+					" ? and plid = ?")) {
+
+			ps.setLong(1, ownerId);
+			ps.setString(2, getUserName(ownerId));
+			ps.setLong(3, companyId);
+			ps.setLong(4, Long.valueOf(primKey));
 
 			ps.executeUpdate();
 		}
