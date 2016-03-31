@@ -284,11 +284,10 @@ public abstract class Watcher implements Runnable {
 						"Missing sync site file path {}", missingFilePath);
 				}
 
+				syncSite.setActive(false);
 				syncSite.setUiEvent(SyncSite.UI_EVENT_SYNC_SITE_FOLDER_MISSING);
 
 				SyncSiteService.update(syncSite);
-
-				SyncSiteService.deactivateSyncSite(syncSite.getSyncSiteId());
 			}
 		}
 	}
