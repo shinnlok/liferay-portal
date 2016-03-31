@@ -81,27 +81,28 @@ public class UpgradeLayout extends UpgradeProcess {
 	}
 
 	protected void updateLayoutOwners() throws Exception {
-		StringBundler sb = new StringBundler(9);
+		StringBundler sb = new StringBundler(5);
 
 		sb.append("select ResourcePermission.companyId, ");
 		sb.append("ResourcePermission.primKey, ResourcePermission.ownerId ");
 		sb.append("from ResourcePermission inner join Role_ on ");
 		sb.append("ResourcePermission.roleId = Role_.roleId where ");
-		sb.append("ResourcePermission.name = '");
-		sb.append(Layout.class.getName());
-		sb.append("' and Role_.name = '");
-		sb.append(RoleConstants.OWNER);
-		sb.append("'");
+		sb.append("ResourcePermission.name = ? and Role_.name = ?");
 
-		try (PreparedStatement ps = connection.prepareStatement(sb.toString());
-			ResultSet rs = ps.executeQuery()) {
+		try (PreparedStatement ps = connection.prepareStatement(
+				sb.toString())) {
 
-			while (rs.next()) {
-				long companyId = rs.getLong("companyId");
-				String primKey = rs.getString("primKey");
-				long ownerId = rs.getLong("ownerId");
+			ps.setString(1, Layout.class.getName());
+			ps.setString(2, RoleConstants.OWNER);
 
-				updateLayoutOwner(companyId, primKey, ownerId);
+			try (ResultSet rs = ps.executeQuery()) {
+				while (rs.next()) {
+					long companyId = rs.getLong("companyId");
+					String primKey = rs.getString("primKey");
+					long ownerId = rs.getLong("ownerId");
+
+					updateLayoutOwner(companyId, primKey, ownerId);
+				}
 			}
 		}
 	}
