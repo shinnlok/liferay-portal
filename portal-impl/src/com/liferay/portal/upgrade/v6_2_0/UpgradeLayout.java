@@ -68,8 +68,8 @@ public class UpgradeLayout extends UpgradeProcess {
 		throws Exception {
 
 		try (PreparedStatement ps = connection.prepareStatement(
-				"update Layout set userId = ?, userName = ? where companyId =" +
-					" ? and plid = ?")) {
+				"update Layout set userId = ?, userName = ? where companyId " +
+					"= ? and plid = ?")) {
 
 			ps.setLong(1, ownerId);
 			ps.setString(2, getUserName(ownerId));
@@ -81,14 +81,13 @@ public class UpgradeLayout extends UpgradeProcess {
 	}
 
 	protected void updateLayoutOwners() throws Exception {
-		StringBundler sb = new StringBundler(10);
+		StringBundler sb = new StringBundler(9);
 
 		sb.append("select ResourcePermission.companyId, ");
-		sb.append("ResourcePermission.primKey, ");
-		sb.append("ResourcePermission.ownerId ");
+		sb.append("ResourcePermission.primKey, ResourcePermission.ownerId ");
 		sb.append("from ResourcePermission inner join Role_ on ");
-		sb.append("ResourcePermission.roleId = Role_.roleId ");
-		sb.append("where ResourcePermission.name = '");
+		sb.append("ResourcePermission.roleId = Role_.roleId where ");
+		sb.append("ResourcePermission.name = '");
 		sb.append(Layout.class.getName());
 		sb.append("' and Role_.name = '");
 		sb.append(RoleConstants.OWNER);
