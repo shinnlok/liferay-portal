@@ -371,8 +371,11 @@ public abstract class Watcher implements Runnable {
 				SyncWatchEvent.EVENT_TYPE_RENAME_FROM, filePath);
 		}
 		else if (eventType.equals(SyncWatchEvent.EVENT_TYPE_RENAME_TO)) {
-			if (_downloadedFilePathNames.remove(filePath.toString()) ||
-				FileUtil.isIgnoredFileName(
+			if (_downloadedFilePathNames.remove(filePath.toString())) {
+				return;
+			}
+
+			if (FileUtil.isIgnoredFileName(
 					String.valueOf(filePath.getFileName())) ||
 				FileUtil.isHidden(filePath) || FileUtil.isShortcut(filePath)) {
 
