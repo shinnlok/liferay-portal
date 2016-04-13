@@ -1,0 +1,6 @@
+Bundle-Name: Liferay Sync Connector Web
+Bundle-SymbolicName: com.liferay.sync.connector.web
+Bundle-Version: 1.0.0
+Liferay-Releng-Module-Group-Description:
+Liferay-Releng-Module-Group-Title: Sync Connector
+Web-ContextPath: /sync-web
