@@ -84,6 +84,18 @@ public abstract class BaseEvent implements Event {
 			_handler);
 	}
 
+	public void executeThrottledAsynchronousPost(
+			String urlPath, Map<String, Object> parameters)
+		throws Exception {
+
+		SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
+			_syncAccountId);
+
+		executeThrottledAsynchronousPost(
+			syncAccount.getUrl() + "/api/jsonws" + urlPath, parameters,
+			_handler);
+	}
+
 	public void executeAsynchronousPost(
 			String urlPath, Map<String, Object> parameters,
 			Handler<Void> handler)
@@ -94,6 +106,18 @@ public abstract class BaseEvent implements Event {
 		_httpPost = new HttpPost(urlPath);
 
 		session.asynchronousExecute(_httpPost, parameters, handler);
+	}
+
+	public void executeThrottledAsynchronousPost(
+			String urlPath, Map<String, Object> parameters,
+			Handler<Void> handler)
+		throws Exception {
+
+		Session session = getSession();
+
+		_httpPost = new HttpPost(urlPath);
+
+		session.throttledAsynchronousExecute(_httpPost, parameters, handler);
 	}
 
 	public void executeGet(String urlPath) throws Exception {
@@ -194,6 +218,16 @@ public abstract class BaseEvent implements Event {
 
 		if (!batchEvent.addEvent(this)) {
 			executeAsynchronousPost(getURLPath(), _parameters);
+		}
+	}
+
+	protected void processThrottledAsynchronousRequest() throws Exception {
+		SyncFile syncFile = (SyncFile)getParameterValue("syncFile");
+
+		BatchEvent batchEvent = BatchEventManager.getBatchEvent(syncFile);
+
+		if (!batchEvent.addEvent(this)) {
+			executeThrottledAsynchronousPost(_urlPath, _parameters);
 		}
 	}
 
