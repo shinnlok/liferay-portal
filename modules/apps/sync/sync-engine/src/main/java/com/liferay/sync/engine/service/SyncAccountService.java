@@ -246,6 +246,19 @@ public class SyncAccountService {
 		}
 	}
 
+	public static SyncAccount fetchSyncAccountByUuid(long syncAccountUuid) {
+		try {
+			return _syncAccountPersistence.queryForId(syncAccountUuid);
+		}
+		catch (SQLException sqle) {
+			if (_logger.isDebugEnabled()) {
+				_logger.debug(sqle.getMessage(), sqle);
+			}
+
+			return null;
+		}
+	}
+
 	public static List<SyncAccount> findAll() {
 		try {
 			return _syncAccountPersistence.queryForAll();
