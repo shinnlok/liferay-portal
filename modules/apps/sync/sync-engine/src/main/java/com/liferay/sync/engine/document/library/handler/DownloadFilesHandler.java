@@ -96,7 +96,11 @@ public class DownloadFilesHandler extends BaseHandler {
 
 			};
 
-			ZipInputStream zipInputStream = new ZipInputStream(inputStream);
+			ThrottledInputStream throttledInputStream =
+				new ThrottledInputStream(inputStream);
+
+			ZipInputStream zipInputStream = new ZipInputStream(
+				throttledInputStream);
 
 			ZipEntry zipEntry = null;
 

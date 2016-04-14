@@ -317,6 +317,8 @@ public class DownloadFileHandler extends BaseHandler {
 
 		InputStream inputStream = null;
 
+		ThrottledInputStream throttledInputStream = null;
+
 		SyncFile syncFile = getLocalSyncFile();
 
 		if ((syncFile == null) || isUnsynced(syncFile)) {
@@ -324,6 +326,8 @@ public class DownloadFileHandler extends BaseHandler {
 		}
 
 		Path filePath = Paths.get(syncFile.getFilePathName());
+
+		Long start = System.currentTimeMillis();
 
 		try {
 			HttpEntity httpEntity = httpResponse.getEntity();
@@ -339,16 +343,23 @@ public class DownloadFileHandler extends BaseHandler {
 
 			};
 
+			throttledInputStream = new ThrottledInputStream(inputStream);
+
 			if (httpResponse.getFirstHeader("Accept-Ranges") != null) {
-				copyFile(syncFile, filePath, inputStream, true);
+				copyFile(syncFile, filePath, throttledInputStream, true);
 			}
 			else {
-				copyFile(syncFile, filePath, inputStream, false);
+				copyFile(syncFile, filePath, throttledInputStream, false);
 			}
 		}
 		finally {
+			StreamUtil.cleanUp(throttledInputStream);
 			StreamUtil.cleanUp(inputStream);
 		}
+
+		Long end = System.currentTimeMillis();
+
+		System.out.println("end - start = " + (end - start));
 	}
 
 	protected boolean isUnsynced(SyncFile syncFile) {
