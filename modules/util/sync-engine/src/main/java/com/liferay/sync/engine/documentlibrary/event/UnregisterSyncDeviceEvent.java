@@ -16,8 +16,6 @@ package com.liferay.sync.engine.documentlibrary.event;
 
 import com.liferay.sync.engine.documentlibrary.handler.BaseJSONHandler;
 import com.liferay.sync.engine.documentlibrary.handler.Handler;
-import com.liferay.sync.engine.session.Session;
-import com.liferay.sync.engine.session.SessionManager;
 
 import java.util.Map;
 
@@ -32,7 +30,6 @@ public class UnregisterSyncDeviceEvent extends BaseEvent {
 		super(syncAccountId, _URL_PATH, parameters);
 
 		_handler = new BaseJSONHandler(this);
-		_session = SessionManager.getSession(syncAccountId);
 	}
 
 	@Override
@@ -41,14 +38,13 @@ public class UnregisterSyncDeviceEvent extends BaseEvent {
 	}
 
 	@Override
-	public Session getSession() {
-		return _session;
+	protected void processRequest() throws Exception {
+		executeAsynchronousPost(_URL_PATH, getParameters());
 	}
 
 	private static final String _URL_PATH =
 		"/sync-web.syncdevice/unregister-sync-device";
 
 	private final Handler<Void> _handler;
-	private final Session _session;
 
 }
