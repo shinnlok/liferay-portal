@@ -126,7 +126,7 @@ public class ServerEventUtil {
 		UnregisterSyncDeviceEvent unregisterSyncDeviceEvent =
 			new UnregisterSyncDeviceEvent(syncAccountId, parameters);
 
-		unregisterSyncDeviceEvent.run();
+		_scheduledExecutorService.execute(unregisterSyncDeviceEvent);
 	}
 
 	private static final Map<Long, ScheduledFuture>
