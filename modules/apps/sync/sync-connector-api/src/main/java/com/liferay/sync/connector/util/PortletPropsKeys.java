@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.connector.shared.util;
+package com.liferay.sync.connector.util;
 
 /**
  * @author Shinn Lok
@@ -21,6 +21,12 @@ public class PortletPropsKeys {
 
 	public static final String SYNC_ALLOW_USER_PERSONAL_SITES =
 		"sync.allow.user.personal.sites";
+
+	public static final String SYNC_CLIENT_AUTHENTICATION_RETRY_INTERVAL =
+		"sync.client.authentication.retry.interval";
+
+	public static final String SYNC_CLIENT_BATCH_FILE_MAX_SIZE =
+		"sync.client.batch.file.max.size";
 
 	public static final String SYNC_CLIENT_MAX_CONNECTIONS =
 		"sync.client.max.connections";
@@ -36,6 +42,24 @@ public class PortletPropsKeys {
 
 	public static final String SYNC_CLIENT_POLL_INTERVAL =
 		"sync.client.poll.interval";
+
+	public static final String SYNC_FILE_CHECKSUM_THRESHOLD_SIZE =
+		"sync.file.checksum.threshold.size";
+
+	public static final String SYNC_FILE_DIFF_CACHE_DELETE_INTERVAL =
+		"sync.file.diff.cache.delete.interval";
+
+	public static final String SYNC_FILE_DIFF_CACHE_ENABLED =
+		"sync.file.diff.cache.enabled";
+
+	public static final String SYNC_FILE_DIFF_CACHE_EXPIRATION_TIME =
+		"sync.file.diff.cache.expiration.time";
+
+	public static final String SYNC_MAC_PACKAGE_FOLDER_EXTENSIONS =
+		"sync.mac.package.folder.extensions";
+
+	public static final String SYNC_MAC_PACKAGE_METADATA_FILE_NAMES =
+		"sync.mac.package.metadata.file.names";
 
 	public static final String SYNC_OAUTH_APPLICATION_ID =
 		"sync.oauth.application.id";
