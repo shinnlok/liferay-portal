@@ -185,23 +185,11 @@ public class Session {
 		URL url, String login, String password, boolean trustSelfSigned,
 		int maxConnections) {
 
-		HttpClientBuilder httpClientBuilder = createHttpClientBuilder(
-			trustSelfSigned, maxConnections);
-
 		if (maxConnections == Integer.MAX_VALUE) {
 			_executorService = Executors.newCachedThreadPool();
 		}
 		else {
 			_executorService = Executors.newFixedThreadPool(maxConnections);
-
-			HttpConnectionFactory<HttpRoute, ManagedHttpClientConnection>
-				connectionFactory =
-					new ThrottledManagedHttpClientConnectionFactory();
-
-			PoolingHttpClientConnectionManager connManager =
-				new PoolingHttpClientConnectionManager(connectionFactory);
-
-			httpClientBuilder.setConnectionManager(connManager);
 		}
 
 		CredentialsProvider credentialsProvider =
@@ -214,9 +202,23 @@ public class Session {
 			new AuthScope(_httpHost),
 			new UsernamePasswordCredentials(login, password));
 
+		HttpClientBuilder httpClientBuilder = createHttpClientBuilder(
+			trustSelfSigned, maxConnections);
+
 		httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
 
 		_httpClient = httpClientBuilder.build();
+
+		HttpConnectionFactory<HttpRoute, ManagedHttpClientConnection>
+			connectionFactory =
+				new ThrottledManagedHttpClientConnectionFactory();
+
+		PoolingHttpClientConnectionManager connManager =
+			new PoolingHttpClientConnectionManager(connectionFactory);
+
+		httpClientBuilder.setConnectionManager(connManager);
+
+		_throttledHttpClient = httpClientBuilder.build();
 
 		_oAuthEnabled = false;
 	}
@@ -237,6 +239,15 @@ public class Session {
 			trustSelfSigned, maxConnections);
 
 		_httpClient = httpClientBuilder.build();
+
+		HttpConnectionFactory<HttpRoute, ManagedHttpClientConnection>
+			connectionFactory = new ThrottledManagedHttpClientConnectionFactory();
+
+		PoolingHttpClientConnectionManager connManager = new PoolingHttpClientConnectionManager(connectionFactory);
+
+		httpClientBuilder.setConnectionManager(connManager);
+
+		_throttledHttpClient = httpClientBuilder.build();
 
 		_httpHost = new HttpHost(
 			url.getHost(), url.getPort(), url.getProtocol());
@@ -296,6 +307,28 @@ public class Session {
 		_executorService.execute(runnable);
 	}
 
+	public void throttledAsynchronousExecute(
+			final HttpPost httpPost, final Map<String, Object> parameters,
+			final Handler<Void> handler)
+		throws Exception {
+
+		Runnable runnable = new Runnable() {
+
+			@Override
+			public void run() {
+				try {
+					executeThrottled(httpPost, parameters, handler);
+				}
+				catch (Exception e) {
+					handler.handleException(e);
+				}
+			}
+
+		};
+
+		_executorService.execute(runnable);
+	}
+
 	public HttpResponse execute(
 			HttpPost httpPost, Map<String, Object> parameters)
 		throws Exception {
@@ -317,6 +350,19 @@ public class Session {
 		_prepareHttpRequest(httpPost);
 
 		return _httpClient.execute(
+			_httpHost, httpPost, handler, _getBasicHttpContext());
+	}
+
+	public <T> T executeThrottled(
+			HttpPost httpPost, Map<String, Object> parameters,
+			Handler<? extends T> handler)
+		throws Exception {
+
+		_buildHttpPostBody(httpPost, parameters);
+
+		_prepareHttpRequest(httpPost);
+
+		return _throttledHttpClient.execute(
 			_httpHost, httpPost, handler, _getBasicHttpContext());
 	}
 
@@ -605,6 +651,7 @@ public class Session {
 	private final ExecutorService _executorService;
 	private final Map<String, String> _headers = new HashMap<>();
 	private final HttpClient _httpClient;
+	private final HttpClient _throttledHttpClient;
 	private final HttpHost _httpHost;
 	private final Set<String> _ignoredParameterKeys = new HashSet<>(
 		Arrays.asList(
