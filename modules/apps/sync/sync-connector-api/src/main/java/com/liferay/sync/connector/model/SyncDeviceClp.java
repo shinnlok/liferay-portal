@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.model;
+package com.liferay.sync.connector.model;
 
 import aQute.bnd.annotation.ProviderType;
 
@@ -30,8 +30,8 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 
-import com.liferay.sync.service.ClpSerializer;
-import com.liferay.sync.service.SyncDeviceLocalServiceUtil;
+import com.liferay.sync.connector.service.ClpSerializer;
+import com.liferay.sync.connector.service.SyncDeviceLocalServiceUtil;
 
 import java.io.Serializable;
 
@@ -698,7 +698,7 @@ public class SyncDeviceClp extends BaseModelImpl<SyncDevice>
 		StringBundler sb = new StringBundler(37);
 
 		sb.append("<model><model-name>");
-		sb.append("com.liferay.sync.model.SyncDevice");
+		sb.append("com.liferay.sync.connector.model.SyncDevice");
 		sb.append("</model-name>");
 
 		sb.append(
@@ -763,7 +763,7 @@ public class SyncDeviceClp extends BaseModelImpl<SyncDevice>
 	private int _featureSet;
 	private int _status;
 	private BaseModel<?> _syncDeviceRemoteModel;
-	private Class<?> _clpSerializerClass = com.liferay.sync.service.ClpSerializer.class;
+	private Class<?> _clpSerializerClass = com.liferay.sync.connector.service.ClpSerializer.class;
 	private boolean _entityCacheEnabled;
 	private boolean _finderCacheEnabled;
 }

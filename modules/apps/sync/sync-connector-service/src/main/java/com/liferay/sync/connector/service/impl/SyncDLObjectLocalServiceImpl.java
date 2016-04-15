@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.service.impl;
+package com.liferay.sync.connector.service.impl;
 
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
@@ -32,10 +32,10 @@ import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.sync.model.SyncDLObject;
-import com.liferay.sync.model.SyncDLObjectConstants;
-import com.liferay.sync.service.base.SyncDLObjectLocalServiceBaseImpl;
-import com.liferay.sync.util.PortletPropsValues;
+import com.liferay.sync.connector.model.SyncDLObject;
+import com.liferay.sync.connector.model.SyncDLObjectConstants;
+import com.liferay.sync.connector.service.base.SyncDLObjectLocalServiceBaseImpl;
+import com.liferay.sync.connector.util.PortletPropsValues;
 
 import java.util.Date;
 import java.util.List;

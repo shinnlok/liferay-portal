@@ -12,12 +12,12 @@
  * details.
  */
 
-package com.liferay.sync.hook.upgrade.v1_0_1;
+package com.liferay.sync.connector.hook.upgrade.v1_0_1;
 
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.sync.model.SyncDLObjectConstants;
+import com.liferay.sync.connector.model.SyncDLObjectConstants;
 
 /**
  * @author Shinn Lok

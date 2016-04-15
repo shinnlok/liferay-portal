@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.service.impl;
+package com.liferay.sync.connector.service.impl;
 
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -24,9 +24,9 @@ import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.sync.model.SyncDLFileVersionDiff;
-import com.liferay.sync.service.base.SyncDLFileVersionDiffLocalServiceBaseImpl;
-import com.liferay.sync.util.PortletPropsValues;
+import com.liferay.sync.connector.model.SyncDLFileVersionDiff;
+import com.liferay.sync.connector.service.base.SyncDLFileVersionDiffLocalServiceBaseImpl;
+import com.liferay.sync.connector.util.PortletPropsValues;
 
 import java.io.File;
 

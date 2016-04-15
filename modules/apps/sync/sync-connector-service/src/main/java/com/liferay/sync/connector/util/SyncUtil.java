@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.util;
+package com.liferay.sync.connector.util;
 
 import com.liferay.document.library.kernel.exception.NoSuchFileVersionException;
 import com.liferay.document.library.kernel.model.DLFileEntry;
@@ -46,13 +46,13 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.sync.SyncSiteUnavailableException;
-import com.liferay.sync.model.SyncDLObject;
-import com.liferay.sync.model.SyncDLObjectConstants;
-import com.liferay.sync.model.SyncDevice;
-import com.liferay.sync.model.impl.SyncDLObjectImpl;
-import com.liferay.sync.service.SyncDLObjectLocalServiceUtil;
-import com.liferay.sync.shared.util.SyncPermissionsConstants;
+import com.liferay.sync.connector.SyncSiteUnavailableException;
+import com.liferay.sync.connector.model.SyncDLObject;
+import com.liferay.sync.connector.model.SyncDLObjectConstants;
+import com.liferay.sync.connector.model.SyncDevice;
+import com.liferay.sync.connector.model.impl.SyncDLObjectImpl;
+import com.liferay.sync.connector.constants.SyncPermissionsConstants;
+import com.liferay.sync.connector.service.SyncDLObjectLocalServiceUtil;
 
 import java.io.File;
 import java.io.FileInputStream;

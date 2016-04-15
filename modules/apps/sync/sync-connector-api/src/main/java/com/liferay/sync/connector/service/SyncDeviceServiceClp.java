@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.service;
+package com.liferay.sync.connector.service;
 
 import aQute.bnd.annotation.ProviderType;
 
@@ -73,7 +73,7 @@ public class SyncDeviceServiceClp implements SyncDeviceService {
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDevice registerSyncDevice(
+	public com.liferay.sync.connector.model.SyncDevice registerSyncDevice(
 		java.lang.String type, int buildNumber, int featureSet,
 		java.lang.String uuid)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -108,7 +108,7 @@ public class SyncDeviceServiceClp implements SyncDeviceService {
 			}
 		}
 
-		return (com.liferay.sync.model.SyncDevice)ClpSerializer.translateOutput(returnObj);
+		return (com.liferay.sync.connector.model.SyncDevice)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override

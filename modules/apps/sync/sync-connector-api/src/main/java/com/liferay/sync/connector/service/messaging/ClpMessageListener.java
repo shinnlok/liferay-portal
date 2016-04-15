@@ -12,20 +12,20 @@
  * details.
  */
 
-package com.liferay.sync.service.messaging;
+package com.liferay.sync.connector.service.messaging;
 
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.messaging.BaseMessageListener;
 import com.liferay.portal.kernel.messaging.Message;
 
-import com.liferay.sync.service.ClpSerializer;
-import com.liferay.sync.service.SyncDLFileVersionDiffLocalServiceUtil;
-import com.liferay.sync.service.SyncDLObjectLocalServiceUtil;
-import com.liferay.sync.service.SyncDLObjectServiceUtil;
-import com.liferay.sync.service.SyncDeviceLocalServiceUtil;
-import com.liferay.sync.service.SyncDeviceServiceUtil;
-import com.liferay.sync.service.SyncPreferencesLocalServiceUtil;
+import com.liferay.sync.connector.service.ClpSerializer;
+import com.liferay.sync.connector.service.SyncDLFileVersionDiffLocalServiceUtil;
+import com.liferay.sync.connector.service.SyncDLObjectLocalServiceUtil;
+import com.liferay.sync.connector.service.SyncDLObjectServiceUtil;
+import com.liferay.sync.connector.service.SyncDeviceLocalServiceUtil;
+import com.liferay.sync.connector.service.SyncDeviceServiceUtil;
+import com.liferay.sync.connector.service.SyncPreferencesLocalServiceUtil;
 
 /**
  * @author Brian Wing Shun Chan

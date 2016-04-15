@@ -12,13 +12,13 @@
  * details.
  */
 
-package com.liferay.sync.hook.upgrade.v1_0_0;
+package com.liferay.sync.connector.hook.upgrade.v1_0_0;
 
 import com.liferay.document.library.kernel.model.DLFileEntryConstants;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.sync.model.SyncDLObjectConstants;
-import com.liferay.sync.service.SyncDLObjectLocalServiceUtil;
-import com.liferay.sync.util.VerifyUtil;
+import com.liferay.sync.connector.model.SyncDLObjectConstants;
+import com.liferay.sync.connector.service.SyncDLObjectLocalServiceUtil;
+import com.liferay.sync.connector.util.VerifyUtil;
 
 /**
  * @author Dennis Ju

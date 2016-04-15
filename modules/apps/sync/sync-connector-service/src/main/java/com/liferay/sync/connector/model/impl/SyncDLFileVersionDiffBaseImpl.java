@@ -12,12 +12,12 @@
  * details.
  */
 
-package com.liferay.sync.model.impl;
+package com.liferay.sync.connector.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.sync.model.SyncDLFileVersionDiff;
-import com.liferay.sync.service.SyncDLFileVersionDiffLocalServiceUtil;
+import com.liferay.sync.connector.model.SyncDLFileVersionDiff;
+import com.liferay.sync.connector.service.SyncDLFileVersionDiffLocalServiceUtil;
 
 /**
  * The extended model base implementation for the SyncDLFileVersionDiff service. Represents a row in the &quot;SyncDLFileVersionDiff&quot; database table, with each column mapped to a property of this class.

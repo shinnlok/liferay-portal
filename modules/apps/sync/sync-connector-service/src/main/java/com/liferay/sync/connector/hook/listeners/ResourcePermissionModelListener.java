@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.hook.listeners;
+package com.liferay.sync.connector.hook.listeners;
 
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.model.DLFolder;
@@ -22,9 +22,9 @@ import com.liferay.portal.kernel.model.ResourcePermission;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalServiceUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.sync.model.SyncDLObject;
-import com.liferay.sync.model.SyncDLObjectConstants;
-import com.liferay.sync.service.SyncDLObjectLocalServiceUtil;
+import com.liferay.sync.connector.model.SyncDLObject;
+import com.liferay.sync.connector.model.SyncDLObjectConstants;
+import com.liferay.sync.connector.service.SyncDLObjectLocalServiceUtil;
 
 import java.util.Date;
 import java.util.List;

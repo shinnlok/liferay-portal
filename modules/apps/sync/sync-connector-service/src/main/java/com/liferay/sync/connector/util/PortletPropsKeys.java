@@ -12,13 +12,13 @@
  * details.
  */
 
-package com.liferay.sync.util;
+package com.liferay.sync.connector.util;
 
 /**
  * @author Dennis Ju
  */
 public class PortletPropsKeys
-	extends com.liferay.sync.shared.util.PortletPropsKeys {
+	extends com.liferay.sync.connector.shared.util.PortletPropsKeys {
 
 	public static final String SYNC_CLIENT_AUTHENTICATION_RETRY_INTERVAL =
 		"sync.client.authentication.retry.interval";

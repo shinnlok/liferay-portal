@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.model;
+package com.liferay.sync.connector.model;
 
 import aQute.bnd.annotation.ProviderType;
 
@@ -23,10 +23,10 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * This class is used by SOAP remote services, specifically {@link com.liferay.sync.service.http.SyncDLObjectServiceSoap}.
+ * This class is used by SOAP remote services, specifically {@link com.liferay.sync.connector.service.http.SyncDLObjectServiceSoap}.
  *
  * @author Brian Wing Shun Chan
- * @see com.liferay.sync.service.http.SyncDLObjectServiceSoap
+ * @see com.liferay.sync.connector.service.http.SyncDLObjectServiceSoap
  * @generated
  */
 @ProviderType

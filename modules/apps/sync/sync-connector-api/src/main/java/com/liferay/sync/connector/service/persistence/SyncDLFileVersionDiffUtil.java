@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.service.persistence;
+package com.liferay.sync.connector.service.persistence;
 
 import aQute.bnd.annotation.ProviderType;
 
@@ -22,13 +22,13 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
-import com.liferay.sync.model.SyncDLFileVersionDiff;
+import com.liferay.sync.connector.model.SyncDLFileVersionDiff;
 
 import java.util.Date;
 import java.util.List;
 
 /**
- * The persistence utility for the sync d l file version diff service. This utility wraps {@link com.liferay.sync.service.persistence.impl.SyncDLFileVersionDiffPersistenceImpl} and provides direct access to the database for CRUD operations. This utility should only be used by the service layer, as it must operate within a transaction. Never access this utility in a JSP, controller, model, or other front-end class.
+ * The persistence utility for the sync d l file version diff service. This utility wraps {@link com.liferay.sync.connector.service.persistence.impl.SyncDLFileVersionDiffPersistenceImpl} and provides direct access to the database for CRUD operations. This utility should only be used by the service layer, as it must operate within a transaction. Never access this utility in a JSP, controller, model, or other front-end class.
  *
  * <p>
  * Caching information and settings can be found in <code>portal.properties</code>
@@ -36,7 +36,7 @@ import java.util.List;
  *
  * @author Brian Wing Shun Chan
  * @see SyncDLFileVersionDiffPersistence
- * @see com.liferay.sync.service.persistence.impl.SyncDLFileVersionDiffPersistenceImpl
+ * @see com.liferay.sync.connector.service.persistence.impl.SyncDLFileVersionDiffPersistenceImpl
  * @generated
  */
 @ProviderType
@@ -194,7 +194,7 @@ public class SyncDLFileVersionDiffUtil {
 	public static SyncDLFileVersionDiff findByFileEntryId_First(
 		long fileEntryId,
 		OrderByComparator<SyncDLFileVersionDiff> orderByComparator)
-		throws com.liferay.sync.exception.NoSuchDLFileVersionDiffException {
+		throws com.liferay.sync.connector.exception.NoSuchDLFileVersionDiffException {
 		return getPersistence()
 				   .findByFileEntryId_First(fileEntryId, orderByComparator);
 	}
@@ -224,7 +224,7 @@ public class SyncDLFileVersionDiffUtil {
 	public static SyncDLFileVersionDiff findByFileEntryId_Last(
 		long fileEntryId,
 		OrderByComparator<SyncDLFileVersionDiff> orderByComparator)
-		throws com.liferay.sync.exception.NoSuchDLFileVersionDiffException {
+		throws com.liferay.sync.connector.exception.NoSuchDLFileVersionDiffException {
 		return getPersistence()
 				   .findByFileEntryId_Last(fileEntryId, orderByComparator);
 	}
@@ -255,7 +255,7 @@ public class SyncDLFileVersionDiffUtil {
 	public static SyncDLFileVersionDiff[] findByFileEntryId_PrevAndNext(
 		long syncDLFileVersionDiffId, long fileEntryId,
 		OrderByComparator<SyncDLFileVersionDiff> orderByComparator)
-		throws com.liferay.sync.exception.NoSuchDLFileVersionDiffException {
+		throws com.liferay.sync.connector.exception.NoSuchDLFileVersionDiffException {
 		return getPersistence()
 				   .findByFileEntryId_PrevAndNext(syncDLFileVersionDiffId,
 			fileEntryId, orderByComparator);
@@ -363,7 +363,7 @@ public class SyncDLFileVersionDiffUtil {
 	public static SyncDLFileVersionDiff findByExpirationDate_First(
 		Date expirationDate,
 		OrderByComparator<SyncDLFileVersionDiff> orderByComparator)
-		throws com.liferay.sync.exception.NoSuchDLFileVersionDiffException {
+		throws com.liferay.sync.connector.exception.NoSuchDLFileVersionDiffException {
 		return getPersistence()
 				   .findByExpirationDate_First(expirationDate, orderByComparator);
 	}
@@ -394,7 +394,7 @@ public class SyncDLFileVersionDiffUtil {
 	public static SyncDLFileVersionDiff findByExpirationDate_Last(
 		Date expirationDate,
 		OrderByComparator<SyncDLFileVersionDiff> orderByComparator)
-		throws com.liferay.sync.exception.NoSuchDLFileVersionDiffException {
+		throws com.liferay.sync.connector.exception.NoSuchDLFileVersionDiffException {
 		return getPersistence()
 				   .findByExpirationDate_Last(expirationDate, orderByComparator);
 	}
@@ -425,7 +425,7 @@ public class SyncDLFileVersionDiffUtil {
 	public static SyncDLFileVersionDiff[] findByExpirationDate_PrevAndNext(
 		long syncDLFileVersionDiffId, Date expirationDate,
 		OrderByComparator<SyncDLFileVersionDiff> orderByComparator)
-		throws com.liferay.sync.exception.NoSuchDLFileVersionDiffException {
+		throws com.liferay.sync.connector.exception.NoSuchDLFileVersionDiffException {
 		return getPersistence()
 				   .findByExpirationDate_PrevAndNext(syncDLFileVersionDiffId,
 			expirationDate, orderByComparator);
@@ -461,7 +461,7 @@ public class SyncDLFileVersionDiffUtil {
 	*/
 	public static SyncDLFileVersionDiff findByF_S_T(long fileEntryId,
 		long sourceFileVersionId, long targetFileVersionId)
-		throws com.liferay.sync.exception.NoSuchDLFileVersionDiffException {
+		throws com.liferay.sync.connector.exception.NoSuchDLFileVersionDiffException {
 		return getPersistence()
 				   .findByF_S_T(fileEntryId, sourceFileVersionId,
 			targetFileVersionId);
@@ -509,7 +509,7 @@ public class SyncDLFileVersionDiffUtil {
 	*/
 	public static SyncDLFileVersionDiff removeByF_S_T(long fileEntryId,
 		long sourceFileVersionId, long targetFileVersionId)
-		throws com.liferay.sync.exception.NoSuchDLFileVersionDiffException {
+		throws com.liferay.sync.connector.exception.NoSuchDLFileVersionDiffException {
 		return getPersistence()
 				   .removeByF_S_T(fileEntryId, sourceFileVersionId,
 			targetFileVersionId);
@@ -567,7 +567,7 @@ public class SyncDLFileVersionDiffUtil {
 	* @throws NoSuchDLFileVersionDiffException if a sync d l file version diff with the primary key could not be found
 	*/
 	public static SyncDLFileVersionDiff remove(long syncDLFileVersionDiffId)
-		throws com.liferay.sync.exception.NoSuchDLFileVersionDiffException {
+		throws com.liferay.sync.connector.exception.NoSuchDLFileVersionDiffException {
 		return getPersistence().remove(syncDLFileVersionDiffId);
 	}
 
@@ -585,7 +585,7 @@ public class SyncDLFileVersionDiffUtil {
 	*/
 	public static SyncDLFileVersionDiff findByPrimaryKey(
 		long syncDLFileVersionDiffId)
-		throws com.liferay.sync.exception.NoSuchDLFileVersionDiffException {
+		throws com.liferay.sync.connector.exception.NoSuchDLFileVersionDiffException {
 		return getPersistence().findByPrimaryKey(syncDLFileVersionDiffId);
 	}
 
@@ -688,7 +688,7 @@ public class SyncDLFileVersionDiffUtil {
 
 	public static SyncDLFileVersionDiffPersistence getPersistence() {
 		if (_persistence == null) {
-			_persistence = (SyncDLFileVersionDiffPersistence)PortletBeanLocatorUtil.locate(com.liferay.sync.service.ClpSerializer.getServletContextName(),
+			_persistence = (SyncDLFileVersionDiffPersistence)PortletBeanLocatorUtil.locate(com.liferay.sync.connector.service.ClpSerializer.getServletContextName(),
 					SyncDLFileVersionDiffPersistence.class.getName());
 
 			ReferenceRegistry.registerReference(SyncDLFileVersionDiffUtil.class,

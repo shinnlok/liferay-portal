@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.service;
+package com.liferay.sync.connector.service;
 
 import aQute.bnd.annotation.ProviderType;
 
@@ -34,7 +34,7 @@ public class SyncDLObjectLocalServiceWrapper implements SyncDLObjectLocalService
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject addSyncDLObject(long companyId,
+	public com.liferay.sync.connector.model.SyncDLObject addSyncDLObject(long companyId,
 		long userId, java.lang.String userName, long modifiedTime,
 		long repositoryId, long parentFolderId, java.lang.String treePath,
 		java.lang.String name, java.lang.String extension,
@@ -60,8 +60,8 @@ public class SyncDLObjectLocalServiceWrapper implements SyncDLObjectLocalService
 	* @return the sync d l object that was added
 	*/
 	@Override
-	public com.liferay.sync.model.SyncDLObject addSyncDLObject(
-		com.liferay.sync.model.SyncDLObject syncDLObject) {
+	public com.liferay.sync.connector.model.SyncDLObject addSyncDLObject(
+		com.liferay.sync.connector.model.SyncDLObject syncDLObject) {
 		return _syncDLObjectLocalService.addSyncDLObject(syncDLObject);
 	}
 
@@ -72,7 +72,7 @@ public class SyncDLObjectLocalServiceWrapper implements SyncDLObjectLocalService
 	* @return the new sync d l object
 	*/
 	@Override
-	public com.liferay.sync.model.SyncDLObject createSyncDLObject(
+	public com.liferay.sync.connector.model.SyncDLObject createSyncDLObject(
 		long syncDLObjectId) {
 		return _syncDLObjectLocalService.createSyncDLObject(syncDLObjectId);
 	}
@@ -94,8 +94,8 @@ public class SyncDLObjectLocalServiceWrapper implements SyncDLObjectLocalService
 	* @return the sync d l object that was removed
 	*/
 	@Override
-	public com.liferay.sync.model.SyncDLObject deleteSyncDLObject(
-		com.liferay.sync.model.SyncDLObject syncDLObject) {
+	public com.liferay.sync.connector.model.SyncDLObject deleteSyncDLObject(
+		com.liferay.sync.connector.model.SyncDLObject syncDLObject) {
 		return _syncDLObjectLocalService.deleteSyncDLObject(syncDLObject);
 	}
 
@@ -107,7 +107,7 @@ public class SyncDLObjectLocalServiceWrapper implements SyncDLObjectLocalService
 	* @throws PortalException if a sync d l object with the primary key could not be found
 	*/
 	@Override
-	public com.liferay.sync.model.SyncDLObject deleteSyncDLObject(
+	public com.liferay.sync.connector.model.SyncDLObject deleteSyncDLObject(
 		long syncDLObjectId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _syncDLObjectLocalService.deleteSyncDLObject(syncDLObjectId);
@@ -140,7 +140,7 @@ public class SyncDLObjectLocalServiceWrapper implements SyncDLObjectLocalService
 	* Performs a dynamic query on the database and returns a range of the matching rows.
 	*
 	* <p>
-	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.sync.model.impl.SyncDLObjectModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.sync.connector.model.impl.SyncDLObjectModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	* </p>
 	*
 	* @param dynamicQuery the dynamic query
@@ -159,7 +159,7 @@ public class SyncDLObjectLocalServiceWrapper implements SyncDLObjectLocalService
 	* Performs a dynamic query on the database and returns an ordered range of the matching rows.
 	*
 	* <p>
-	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.sync.model.impl.SyncDLObjectModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.sync.connector.model.impl.SyncDLObjectModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	* </p>
 	*
 	* @param dynamicQuery the dynamic query
@@ -205,13 +205,13 @@ public class SyncDLObjectLocalServiceWrapper implements SyncDLObjectLocalService
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject fetchSyncDLObject(
+	public com.liferay.sync.connector.model.SyncDLObject fetchSyncDLObject(
 		long syncDLObjectId) {
 		return _syncDLObjectLocalService.fetchSyncDLObject(syncDLObjectId);
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject fetchSyncDLObject(
+	public com.liferay.sync.connector.model.SyncDLObject fetchSyncDLObject(
 		java.lang.String type, long typePK) {
 		return _syncDLObjectLocalService.fetchSyncDLObject(type, typePK);
 	}
@@ -256,14 +256,14 @@ public class SyncDLObjectLocalServiceWrapper implements SyncDLObjectLocalService
 	* @throws PortalException if a sync d l object with the primary key could not be found
 	*/
 	@Override
-	public com.liferay.sync.model.SyncDLObject getSyncDLObject(
+	public com.liferay.sync.connector.model.SyncDLObject getSyncDLObject(
 		long syncDLObjectId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _syncDLObjectLocalService.getSyncDLObject(syncDLObjectId);
 	}
 
 	@Override
-	public java.util.List<com.liferay.sync.model.SyncDLObject> getSyncDLObjects(
+	public java.util.List<com.liferay.sync.connector.model.SyncDLObject> getSyncDLObjects(
 		long repositoryId, long parentFolderId) {
 		return _syncDLObjectLocalService.getSyncDLObjects(repositoryId,
 			parentFolderId);
@@ -273,7 +273,7 @@ public class SyncDLObjectLocalServiceWrapper implements SyncDLObjectLocalService
 	* Returns a range of all the sync d l objects.
 	*
 	* <p>
-	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.sync.model.impl.SyncDLObjectModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.sync.connector.model.impl.SyncDLObjectModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	* </p>
 	*
 	* @param start the lower bound of the range of sync d l objects
@@ -281,7 +281,7 @@ public class SyncDLObjectLocalServiceWrapper implements SyncDLObjectLocalService
 	* @return the range of sync d l objects
 	*/
 	@Override
-	public java.util.List<com.liferay.sync.model.SyncDLObject> getSyncDLObjects(
+	public java.util.List<com.liferay.sync.connector.model.SyncDLObject> getSyncDLObjects(
 		int start, int end) {
 		return _syncDLObjectLocalService.getSyncDLObjects(start, end);
 	}
@@ -306,21 +306,21 @@ public class SyncDLObjectLocalServiceWrapper implements SyncDLObjectLocalService
 
 	@Override
 	public void moveSyncDLObjects(
-		com.liferay.sync.model.SyncDLObject parentSyncDLObject)
+		com.liferay.sync.connector.model.SyncDLObject parentSyncDLObject)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		_syncDLObjectLocalService.moveSyncDLObjects(parentSyncDLObject);
 	}
 
 	@Override
 	public void restoreSyncDLObjects(
-		com.liferay.sync.model.SyncDLObject parentSyncDLObject)
+		com.liferay.sync.connector.model.SyncDLObject parentSyncDLObject)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		_syncDLObjectLocalService.restoreSyncDLObjects(parentSyncDLObject);
 	}
 
 	@Override
 	public void trashSyncDLObjects(
-		com.liferay.sync.model.SyncDLObject parentSyncDLObject)
+		com.liferay.sync.connector.model.SyncDLObject parentSyncDLObject)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		_syncDLObjectLocalService.trashSyncDLObjects(parentSyncDLObject);
 	}
@@ -332,8 +332,8 @@ public class SyncDLObjectLocalServiceWrapper implements SyncDLObjectLocalService
 	* @return the sync d l object that was updated
 	*/
 	@Override
-	public com.liferay.sync.model.SyncDLObject updateSyncDLObject(
-		com.liferay.sync.model.SyncDLObject syncDLObject) {
+	public com.liferay.sync.connector.model.SyncDLObject updateSyncDLObject(
+		com.liferay.sync.connector.model.SyncDLObject syncDLObject) {
 		return _syncDLObjectLocalService.updateSyncDLObject(syncDLObject);
 	}
 

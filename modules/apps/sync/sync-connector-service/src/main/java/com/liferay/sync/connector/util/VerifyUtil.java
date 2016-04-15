@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.util;
+package com.liferay.sync.connector.util;
 
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.model.DLFolder;
@@ -30,9 +30,9 @@ import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.sync.model.SyncDLObject;
-import com.liferay.sync.model.SyncDLObjectConstants;
-import com.liferay.sync.service.SyncDLObjectLocalServiceUtil;
+import com.liferay.sync.connector.model.SyncDLObject;
+import com.liferay.sync.connector.model.SyncDLObjectConstants;
+import com.liferay.sync.connector.service.SyncDLObjectLocalServiceUtil;
 
 import java.util.Date;
 import java.util.List;

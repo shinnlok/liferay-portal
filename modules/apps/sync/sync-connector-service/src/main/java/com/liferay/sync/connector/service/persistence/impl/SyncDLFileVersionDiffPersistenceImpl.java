@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.service.persistence.impl;
+package com.liferay.sync.connector.service.persistence.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
@@ -34,11 +34,11 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 
-import com.liferay.sync.exception.NoSuchDLFileVersionDiffException;
-import com.liferay.sync.model.SyncDLFileVersionDiff;
-import com.liferay.sync.model.impl.SyncDLFileVersionDiffImpl;
-import com.liferay.sync.model.impl.SyncDLFileVersionDiffModelImpl;
-import com.liferay.sync.service.persistence.SyncDLFileVersionDiffPersistence;
+import com.liferay.sync.connector.exception.NoSuchDLFileVersionDiffException;
+import com.liferay.sync.connector.model.SyncDLFileVersionDiff;
+import com.liferay.sync.connector.model.impl.SyncDLFileVersionDiffImpl;
+import com.liferay.sync.connector.model.impl.SyncDLFileVersionDiffModelImpl;
+import com.liferay.sync.connector.service.persistence.SyncDLFileVersionDiffPersistence;
 
 import java.io.Serializable;
 
@@ -62,7 +62,7 @@ import java.util.Set;
  *
  * @author Brian Wing Shun Chan
  * @see SyncDLFileVersionDiffPersistence
- * @see com.liferay.sync.service.persistence.SyncDLFileVersionDiffUtil
+ * @see com.liferay.sync.connector.service.persistence.SyncDLFileVersionDiffUtil
  * @generated
  */
 @ProviderType

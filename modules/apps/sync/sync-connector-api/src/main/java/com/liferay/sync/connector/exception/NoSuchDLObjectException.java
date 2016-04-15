@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.exception;
+package com.liferay.sync.connector.exception;
 
 import com.liferay.portal.kernel.exception.NoSuchModelException;
 

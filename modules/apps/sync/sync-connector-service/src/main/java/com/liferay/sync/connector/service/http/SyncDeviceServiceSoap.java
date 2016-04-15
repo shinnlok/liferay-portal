@@ -12,14 +12,14 @@
  * details.
  */
 
-package com.liferay.sync.service.http;
+package com.liferay.sync.connector.service.http;
 
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 
-import com.liferay.sync.service.SyncDeviceServiceUtil;
+import com.liferay.sync.connector.service.SyncDeviceServiceUtil;
 
 import java.rmi.RemoteException;
 
@@ -33,10 +33,10 @@ import java.rmi.RemoteException;
  * <p>
  * ServiceBuilder follows certain rules in translating the methods. For example,
  * if the method in the service utility returns a {@link java.util.List}, that
- * is translated to an array of {@link com.liferay.sync.model.SyncDeviceSoap}.
+ * is translated to an array of {@link com.liferay.sync.connector.model.SyncDeviceSoap}.
  * If the method in the service utility returns a
- * {@link com.liferay.sync.model.SyncDevice}, that is translated to a
- * {@link com.liferay.sync.model.SyncDeviceSoap}. Methods that SOAP cannot
+ * {@link com.liferay.sync.connector.model.SyncDevice}, that is translated to a
+ * {@link com.liferay.sync.connector.model.SyncDeviceSoap}. Methods that SOAP cannot
  * safely wire are skipped.
  * </p>
  *
@@ -59,20 +59,20 @@ import java.rmi.RemoteException;
  *
  * @author Brian Wing Shun Chan
  * @see SyncDeviceServiceHttp
- * @see com.liferay.sync.model.SyncDeviceSoap
+ * @see com.liferay.sync.connector.model.SyncDeviceSoap
  * @see SyncDeviceServiceUtil
  * @generated
  */
 @ProviderType
 public class SyncDeviceServiceSoap {
-	public static com.liferay.sync.model.SyncDeviceSoap registerSyncDevice(
+	public static com.liferay.sync.connector.model.SyncDeviceSoap registerSyncDevice(
 		java.lang.String type, int buildNumber, int featureSet,
 		java.lang.String uuid) throws RemoteException {
 		try {
-			com.liferay.sync.model.SyncDevice returnValue = SyncDeviceServiceUtil.registerSyncDevice(type,
+			com.liferay.sync.connector.model.SyncDevice returnValue = SyncDeviceServiceUtil.registerSyncDevice(type,
 					buildNumber, featureSet, uuid);
 
-			return com.liferay.sync.model.SyncDeviceSoap.toSoapModel(returnValue);
+			return com.liferay.sync.connector.model.SyncDeviceSoap.toSoapModel(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);

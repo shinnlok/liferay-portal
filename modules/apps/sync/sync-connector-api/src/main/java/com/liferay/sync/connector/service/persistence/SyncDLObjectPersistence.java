@@ -12,14 +12,14 @@
  * details.
  */
 
-package com.liferay.sync.service.persistence;
+package com.liferay.sync.connector.service.persistence;
 
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
-import com.liferay.sync.exception.NoSuchDLObjectException;
-import com.liferay.sync.model.SyncDLObject;
+import com.liferay.sync.connector.exception.NoSuchDLObjectException;
+import com.liferay.sync.connector.model.SyncDLObject;
 
 /**
  * The persistence interface for the sync d l object service.
@@ -29,7 +29,7 @@ import com.liferay.sync.model.SyncDLObject;
  * </p>
  *
  * @author Brian Wing Shun Chan
- * @see com.liferay.sync.service.persistence.impl.SyncDLObjectPersistenceImpl
+ * @see com.liferay.sync.connector.service.persistence.impl.SyncDLObjectPersistenceImpl
  * @see SyncDLObjectUtil
  * @generated
  */

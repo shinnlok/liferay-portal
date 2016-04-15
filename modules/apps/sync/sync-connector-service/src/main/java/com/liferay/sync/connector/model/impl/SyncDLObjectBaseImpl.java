@@ -12,12 +12,12 @@
  * details.
  */
 
-package com.liferay.sync.model.impl;
+package com.liferay.sync.connector.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.sync.model.SyncDLObject;
-import com.liferay.sync.service.SyncDLObjectLocalServiceUtil;
+import com.liferay.sync.connector.model.SyncDLObject;
+import com.liferay.sync.connector.service.SyncDLObjectLocalServiceUtil;
 
 /**
  * The extended model base implementation for the SyncDLObject service. Represents a row in the &quot;SyncDLObject&quot; database table, with each column mapped to a property of this class.

@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.model;
+package com.liferay.sync.connector.model;
 
 import com.liferay.document.library.kernel.model.DLSyncConstants;
 

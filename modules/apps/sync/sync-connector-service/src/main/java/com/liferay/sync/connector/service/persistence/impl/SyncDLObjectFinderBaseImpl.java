@@ -12,13 +12,13 @@
  * details.
  */
 
-package com.liferay.sync.service.persistence.impl;
+package com.liferay.sync.connector.service.persistence.impl;
 
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 
-import com.liferay.sync.model.SyncDLObject;
-import com.liferay.sync.service.persistence.SyncDLObjectPersistence;
+import com.liferay.sync.connector.model.SyncDLObject;
+import com.liferay.sync.connector.service.persistence.SyncDLObjectPersistence;
 
 import java.util.Set;
 

@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.hook.upgrade.v1_0_2;
+package com.liferay.sync.connector.hook.upgrade.v1_0_2;
 
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
@@ -21,9 +21,9 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.sync.model.SyncDLObject;
-import com.liferay.sync.model.SyncDLObjectConstants;
-import com.liferay.sync.service.SyncDLObjectLocalServiceUtil;
+import com.liferay.sync.connector.model.SyncDLObject;
+import com.liferay.sync.connector.model.SyncDLObjectConstants;
+import com.liferay.sync.connector.service.SyncDLObjectLocalServiceUtil;
 
 /**
  * @author Dennis Ju

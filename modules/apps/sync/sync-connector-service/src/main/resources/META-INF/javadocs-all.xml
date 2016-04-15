@@ -3,7 +3,7 @@
 <javadocs>
 	<javadoc>
 		<name>SyncJSONFilter</name>
-		<type>com.liferay.sync.filter.SyncJSONFilter</type>
+		<type>com.liferay.sync.connector.filter.SyncJSONFilter</type>
 		<author><![CDATA[Shinn Lok]]></author>
 		<method>
 			<name>destroy</name>
@@ -47,7 +47,7 @@
 	</javadoc>
 	<javadoc>
 		<name>SyncAuthVerifier</name>
-		<type>com.liferay.sync.hook.security.auth.verifier.SyncAuthVerifier</type>
+		<type>com.liferay.sync.connector.hook.security.auth.verifier.SyncAuthVerifier</type>
 		<author><![CDATA[Michael Young]]></author>
 		<author><![CDATA[Dennis Ju]]></author>
 		<method>
@@ -158,7 +158,7 @@
 	</javadoc>
 	<javadoc>
 		<name>UpgradeProcess_1_0_0</name>
-		<type>com.liferay.sync.hook.upgrade.UpgradeProcess_1_0_0</type>
+		<type>com.liferay.sync.connector.hook.upgrade.UpgradeProcess_1_0_0</type>
 		<author><![CDATA[Dennis Ju]]></author>
 		<method>
 			<name>getThreshold</name>
@@ -177,7 +177,7 @@
 	</javadoc>
 	<javadoc>
 		<name>UpgradeSyncDLObject</name>
-		<type>com.liferay.sync.hook.upgrade.v1_0_0.UpgradeSyncDLObject</type>
+		<type>com.liferay.sync.connector.hook.upgrade.v1_0_0.UpgradeSyncDLObject</type>
 		<author><![CDATA[Dennis Ju]]></author>
 		<method>
 			<name>doUpgrade</name>
@@ -224,7 +224,7 @@
 	</javadoc>
 	<javadoc>
 		<name>SyncDLFileVersionDiffMessageListener</name>
-		<type>com.liferay.sync.messaging.SyncDLFileVersionDiffMessageListener</type>
+		<type>com.liferay.sync.connector.messaging.SyncDLFileVersionDiffMessageListener</type>
 		<author><![CDATA[Dennis Ju]]></author>
 		<method>
 			<name>doReceive</name>
@@ -245,7 +245,7 @@
 	</javadoc>
 	<javadoc>
 		<name>SyncDLObjectMessageListener</name>
-		<type>com.liferay.sync.messaging.SyncDLObjectMessageListener</type>
+		<type>com.liferay.sync.connector.messaging.SyncDLObjectMessageListener</type>
 		<author><![CDATA[Dennis Ju]]></author>
 		<method>
 			<name>addSyncDLObject</name>
@@ -291,7 +291,7 @@
 	</javadoc>
 	<javadoc>
 		<name>SyncConstants</name>
-		<type>com.liferay.sync.model.SyncDLObjectConstants</type>
+		<type>com.liferay.sync.connector.model.SyncDLObjectConstants</type>
 		<author><![CDATA[Dennis Ju]]></author>
 		<field>
 			<name>TYPE_PRIVATE_WORKING_COPY</name>
@@ -299,7 +299,7 @@
 	</javadoc>
 	<javadoc>
 		<name>SyncDLFileVersionDiffImpl</name>
-		<type>com.liferay.sync.model.impl.SyncDLFileVersionDiffImpl</type>
+		<type>com.liferay.sync.connector.model.impl.SyncDLFileVersionDiffImpl</type>
 		<author><![CDATA[Brian Wing Shun Chan]]></author>
 		<method>
 			<name>SyncDLFileVersionDiffImpl</name>
@@ -307,7 +307,7 @@
 	</javadoc>
 	<javadoc>
 		<name>SyncDLObjectImpl</name>
-		<type>com.liferay.sync.model.impl.SyncDLObjectImpl</type>
+		<type>com.liferay.sync.connector.model.impl.SyncDLObjectImpl</type>
 		<author><![CDATA[Brian Wing Shun Chan]]></author>
 		<method>
 			<name>SyncDLObjectImpl</name>
@@ -331,7 +331,7 @@
 	</javadoc>
 	<javadoc>
 		<name>SyncDLObjectUpgradeTableListener</name>
-		<type>com.liferay.sync.model.upgrade.SyncDLObjectUpgradeTableListener</type>
+		<type>com.liferay.sync.connector.model.upgrade.SyncDLObjectUpgradeTableListener</type>
 		<author><![CDATA[Dennis Ju]]></author>
 		<method>
 			<name>onAfterUpdateTable</name>
@@ -397,7 +397,7 @@
 	</javadoc>
 	<javadoc>
 		<name>SyncDLFileVersionDiffLocalServiceImpl</name>
-		<type>com.liferay.sync.service.impl.SyncDLFileVersionDiffLocalServiceImpl</type>
+		<type>com.liferay.sync.connector.service.impl.SyncDLFileVersionDiffLocalServiceImpl</type>
 		<author><![CDATA[Dennis Ju]]></author>
 		<method>
 			<name>addSyncDLFileVersionDiff</name>
@@ -496,7 +496,7 @@
 	</javadoc>
 	<javadoc>
 		<name>SyncDLObjectLocalServiceImpl</name>
-		<type>com.liferay.sync.service.impl.SyncDLObjectLocalServiceImpl</type>
+		<type>com.liferay.sync.connector.service.impl.SyncDLObjectLocalServiceImpl</type>
 		<author><![CDATA[Michael Young]]></author>
 		<author><![CDATA[Dennis Ju]]></author>
 		<method>
@@ -648,7 +648,7 @@
 	</javadoc>
 	<javadoc>
 		<name>SyncDLObjectServiceImpl</name>
-		<type>com.liferay.sync.service.impl.SyncDLObjectServiceImpl</type>
+		<type>com.liferay.sync.connector.service.impl.SyncDLObjectServiceImpl</type>
 		<author><![CDATA[Michael Young]]></author>
 		<author><![CDATA[Dennis Ju]]></author>
 		<method>
@@ -1462,7 +1462,7 @@
 	</javadoc>
 	<javadoc>
 		<name>SyncDLObjectFinderImpl</name>
-		<type>com.liferay.sync.service.persistence.impl.SyncDLObjectFinderImpl</type>
+		<type>com.liferay.sync.connector.service.persistence.impl.SyncDLObjectFinderImpl</type>
 		<author><![CDATA[Michael Young]]></author>
 		<author><![CDATA[Shinn Lok]]></author>
 		<method>
@@ -1525,7 +1525,7 @@
 	</javadoc>
 	<javadoc>
 		<name>DownloadServlet</name>
-		<type>com.liferay.sync.servlet.DownloadServlet</type>
+		<type>com.liferay.sync.connector.servlet.DownloadServlet</type>
 		<author><![CDATA[Dennis Ju]]></author>
 		<method>
 			<name>service</name>
@@ -1663,7 +1663,7 @@
 	</javadoc>
 	<javadoc>
 		<name>SyncServletContextListener</name>
-		<type>com.liferay.sync.servlet.SyncServletContextListener</type>
+		<type>com.liferay.sync.connector.servlet.SyncServletContextListener</type>
 		<author><![CDATA[Brian Wing Shun Chan]]></author>
 		<author><![CDATA[Dennis Ju]]></author>
 		<method>
@@ -1724,7 +1724,7 @@
 	</javadoc>
 	<javadoc>
 		<name>PortletPropsKeys</name>
-		<type>com.liferay.sync.util.PortletPropsKeys</type>
+		<type>com.liferay.sync.connector.util.PortletPropsKeys</type>
 		<author><![CDATA[Dennis Ju]]></author>
 		<field>
 			<name>SYNC_AUTH_VERIFIER_PIPELINE</name>
@@ -1744,7 +1744,7 @@
 	</javadoc>
 	<javadoc>
 		<name>PortletPropsValues</name>
-		<type>com.liferay.sync.util.PortletPropsValues</type>
+		<type>com.liferay.sync.connector.util.PortletPropsValues</type>
 		<author><![CDATA[Dennis Ju]]></author>
 		<field>
 			<name>SYNC_AUTH_VERIFIER_PIPELINE</name>
@@ -1773,7 +1773,7 @@
 	</javadoc>
 	<javadoc>
 		<name>SyncUtil</name>
-		<type>com.liferay.sync.util.SyncUtil</type>
+		<type>com.liferay.sync.connector.util.SyncUtil</type>
 		<author><![CDATA[Dennis Ju]]></author>
 		<method>
 			<name>buildExceptionMessage</name>

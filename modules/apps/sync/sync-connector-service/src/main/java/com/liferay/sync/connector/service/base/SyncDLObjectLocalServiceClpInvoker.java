@@ -12,11 +12,11 @@
  * details.
  */
 
-package com.liferay.sync.service.base;
+package com.liferay.sync.connector.service.base;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.sync.service.SyncDLObjectLocalServiceUtil;
+import com.liferay.sync.connector.service.SyncDLObjectLocalServiceUtil;
 
 import java.util.Arrays;
 
@@ -30,7 +30,7 @@ public class SyncDLObjectLocalServiceClpInvoker {
 		_methodName0 = "addSyncDLObject";
 
 		_methodParameterTypes0 = new String[] {
-				"com.liferay.sync.model.SyncDLObject"
+				"com.liferay.sync.connector.model.SyncDLObject"
 			};
 
 		_methodName1 = "createSyncDLObject";
@@ -44,7 +44,7 @@ public class SyncDLObjectLocalServiceClpInvoker {
 		_methodName3 = "deleteSyncDLObject";
 
 		_methodParameterTypes3 = new String[] {
-				"com.liferay.sync.model.SyncDLObject"
+				"com.liferay.sync.connector.model.SyncDLObject"
 			};
 
 		_methodName4 = "dynamicQuery";
@@ -120,7 +120,7 @@ public class SyncDLObjectLocalServiceClpInvoker {
 		_methodName19 = "updateSyncDLObject";
 
 		_methodParameterTypes19 = new String[] {
-				"com.liferay.sync.model.SyncDLObject"
+				"com.liferay.sync.connector.model.SyncDLObject"
 			};
 
 		_methodName74 = "getOSGiServiceIdentifier";
@@ -160,19 +160,19 @@ public class SyncDLObjectLocalServiceClpInvoker {
 		_methodName84 = "moveSyncDLObjects";
 
 		_methodParameterTypes84 = new String[] {
-				"com.liferay.sync.model.SyncDLObject"
+				"com.liferay.sync.connector.model.SyncDLObject"
 			};
 
 		_methodName85 = "restoreSyncDLObjects";
 
 		_methodParameterTypes85 = new String[] {
-				"com.liferay.sync.model.SyncDLObject"
+				"com.liferay.sync.connector.model.SyncDLObject"
 			};
 
 		_methodName86 = "trashSyncDLObjects";
 
 		_methodParameterTypes86 = new String[] {
-				"com.liferay.sync.model.SyncDLObject"
+				"com.liferay.sync.connector.model.SyncDLObject"
 			};
 	}
 
@@ -180,7 +180,7 @@ public class SyncDLObjectLocalServiceClpInvoker {
 		Object[] arguments) throws Throwable {
 		if (_methodName0.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes0, parameterTypes)) {
-			return SyncDLObjectLocalServiceUtil.addSyncDLObject((com.liferay.sync.model.SyncDLObject)arguments[0]);
+			return SyncDLObjectLocalServiceUtil.addSyncDLObject((com.liferay.sync.connector.model.SyncDLObject)arguments[0]);
 		}
 
 		if (_methodName1.equals(name) &&
@@ -195,7 +195,7 @@ public class SyncDLObjectLocalServiceClpInvoker {
 
 		if (_methodName3.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes3, parameterTypes)) {
-			return SyncDLObjectLocalServiceUtil.deleteSyncDLObject((com.liferay.sync.model.SyncDLObject)arguments[0]);
+			return SyncDLObjectLocalServiceUtil.deleteSyncDLObject((com.liferay.sync.connector.model.SyncDLObject)arguments[0]);
 		}
 
 		if (_methodName4.equals(name) &&
@@ -277,7 +277,7 @@ public class SyncDLObjectLocalServiceClpInvoker {
 
 		if (_methodName19.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes19, parameterTypes)) {
-			return SyncDLObjectLocalServiceUtil.updateSyncDLObject((com.liferay.sync.model.SyncDLObject)arguments[0]);
+			return SyncDLObjectLocalServiceUtil.updateSyncDLObject((com.liferay.sync.connector.model.SyncDLObject)arguments[0]);
 		}
 
 		if (_methodName74.equals(name) &&
@@ -337,21 +337,21 @@ public class SyncDLObjectLocalServiceClpInvoker {
 
 		if (_methodName84.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes84, parameterTypes)) {
-			SyncDLObjectLocalServiceUtil.moveSyncDLObjects((com.liferay.sync.model.SyncDLObject)arguments[0]);
+			SyncDLObjectLocalServiceUtil.moveSyncDLObjects((com.liferay.sync.connector.model.SyncDLObject)arguments[0]);
 
 			return null;
 		}
 
 		if (_methodName85.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes85, parameterTypes)) {
-			SyncDLObjectLocalServiceUtil.restoreSyncDLObjects((com.liferay.sync.model.SyncDLObject)arguments[0]);
+			SyncDLObjectLocalServiceUtil.restoreSyncDLObjects((com.liferay.sync.connector.model.SyncDLObject)arguments[0]);
 
 			return null;
 		}
 
 		if (_methodName86.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes86, parameterTypes)) {
-			SyncDLObjectLocalServiceUtil.trashSyncDLObjects((com.liferay.sync.model.SyncDLObject)arguments[0]);
+			SyncDLObjectLocalServiceUtil.trashSyncDLObjects((com.liferay.sync.connector.model.SyncDLObject)arguments[0]);
 
 			return null;
 		}

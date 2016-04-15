@@ -12,10 +12,10 @@
  * details.
  */
 
-package com.liferay.sync.hook.upgrade;
+package com.liferay.sync.connector.hook.upgrade;
 
 import com.liferay.portal.kernel.upgrade.UpgradeException;
-import com.liferay.sync.service.SyncDLObjectLocalServiceUtil;
+import com.liferay.sync.connector.service.SyncDLObjectLocalServiceUtil;
 
 /**
  * @author Shinn Lok

@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.service;
+package com.liferay.sync.connector.service;
 
 import aQute.bnd.annotation.ProviderType;
 
@@ -38,7 +38,7 @@ public class SyncDLFileVersionDiffLocalServiceClp
 		_methodName1 = "addSyncDLFileVersionDiff";
 
 		_methodParameterTypes1 = new String[] {
-				"com.liferay.sync.model.SyncDLFileVersionDiff"
+				"com.liferay.sync.connector.model.SyncDLFileVersionDiff"
 			};
 
 		_methodName2 = "createSyncDLFileVersionDiff";
@@ -58,7 +58,7 @@ public class SyncDLFileVersionDiffLocalServiceClp
 		_methodName5 = "deleteSyncDLFileVersionDiff";
 
 		_methodParameterTypes5 = new String[] {
-				"com.liferay.sync.model.SyncDLFileVersionDiff"
+				"com.liferay.sync.connector.model.SyncDLFileVersionDiff"
 			};
 
 		_methodName6 = "deleteSyncDLFileVersionDiff";
@@ -148,12 +148,12 @@ public class SyncDLFileVersionDiffLocalServiceClp
 		_methodName25 = "updateSyncDLFileVersionDiff";
 
 		_methodParameterTypes25 = new String[] {
-				"com.liferay.sync.model.SyncDLFileVersionDiff"
+				"com.liferay.sync.connector.model.SyncDLFileVersionDiff"
 			};
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLFileVersionDiff addSyncDLFileVersionDiff(
+	public com.liferay.sync.connector.model.SyncDLFileVersionDiff addSyncDLFileVersionDiff(
 		long fileEntryId, long sourceFileVersionId, long targetFileVersionId,
 		java.io.File file)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -188,12 +188,12 @@ public class SyncDLFileVersionDiffLocalServiceClp
 			}
 		}
 
-		return (com.liferay.sync.model.SyncDLFileVersionDiff)ClpSerializer.translateOutput(returnObj);
+		return (com.liferay.sync.connector.model.SyncDLFileVersionDiff)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLFileVersionDiff addSyncDLFileVersionDiff(
-		com.liferay.sync.model.SyncDLFileVersionDiff syncDLFileVersionDiff) {
+	public com.liferay.sync.connector.model.SyncDLFileVersionDiff addSyncDLFileVersionDiff(
+		com.liferay.sync.connector.model.SyncDLFileVersionDiff syncDLFileVersionDiff) {
 		Object returnObj = null;
 
 		try {
@@ -215,11 +215,11 @@ public class SyncDLFileVersionDiffLocalServiceClp
 			}
 		}
 
-		return (com.liferay.sync.model.SyncDLFileVersionDiff)ClpSerializer.translateOutput(returnObj);
+		return (com.liferay.sync.connector.model.SyncDLFileVersionDiff)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLFileVersionDiff createSyncDLFileVersionDiff(
+	public com.liferay.sync.connector.model.SyncDLFileVersionDiff createSyncDLFileVersionDiff(
 		long syncDLFileVersionDiffId) {
 		Object returnObj = null;
 
@@ -240,7 +240,7 @@ public class SyncDLFileVersionDiffLocalServiceClp
 			}
 		}
 
-		return (com.liferay.sync.model.SyncDLFileVersionDiff)ClpSerializer.translateOutput(returnObj);
+		return (com.liferay.sync.connector.model.SyncDLFileVersionDiff)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
@@ -298,8 +298,8 @@ public class SyncDLFileVersionDiffLocalServiceClp
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLFileVersionDiff deleteSyncDLFileVersionDiff(
-		com.liferay.sync.model.SyncDLFileVersionDiff syncDLFileVersionDiff)
+	public com.liferay.sync.connector.model.SyncDLFileVersionDiff deleteSyncDLFileVersionDiff(
+		com.liferay.sync.connector.model.SyncDLFileVersionDiff syncDLFileVersionDiff)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		Object returnObj = null;
 
@@ -326,11 +326,11 @@ public class SyncDLFileVersionDiffLocalServiceClp
 			}
 		}
 
-		return (com.liferay.sync.model.SyncDLFileVersionDiff)ClpSerializer.translateOutput(returnObj);
+		return (com.liferay.sync.connector.model.SyncDLFileVersionDiff)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLFileVersionDiff deleteSyncDLFileVersionDiff(
+	public com.liferay.sync.connector.model.SyncDLFileVersionDiff deleteSyncDLFileVersionDiff(
 		long syncDLFileVersionDiffId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		Object returnObj = null;
@@ -356,7 +356,7 @@ public class SyncDLFileVersionDiffLocalServiceClp
 			}
 		}
 
-		return (com.liferay.sync.model.SyncDLFileVersionDiff)ClpSerializer.translateOutput(returnObj);
+		return (com.liferay.sync.connector.model.SyncDLFileVersionDiff)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
@@ -554,7 +554,7 @@ public class SyncDLFileVersionDiffLocalServiceClp
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLFileVersionDiff fetchSyncDLFileVersionDiff(
+	public com.liferay.sync.connector.model.SyncDLFileVersionDiff fetchSyncDLFileVersionDiff(
 		long fileEntryId, long sourceFileVersionId, long targetFileVersionId) {
 		Object returnObj = null;
 
@@ -581,11 +581,11 @@ public class SyncDLFileVersionDiffLocalServiceClp
 			}
 		}
 
-		return (com.liferay.sync.model.SyncDLFileVersionDiff)ClpSerializer.translateOutput(returnObj);
+		return (com.liferay.sync.connector.model.SyncDLFileVersionDiff)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLFileVersionDiff fetchSyncDLFileVersionDiff(
+	public com.liferay.sync.connector.model.SyncDLFileVersionDiff fetchSyncDLFileVersionDiff(
 		long syncDLFileVersionDiffId) {
 		Object returnObj = null;
 
@@ -606,7 +606,7 @@ public class SyncDLFileVersionDiffLocalServiceClp
 			}
 		}
 
-		return (com.liferay.sync.model.SyncDLFileVersionDiff)ClpSerializer.translateOutput(returnObj);
+		return (com.liferay.sync.connector.model.SyncDLFileVersionDiff)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
@@ -709,7 +709,7 @@ public class SyncDLFileVersionDiffLocalServiceClp
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLFileVersionDiff getSyncDLFileVersionDiff(
+	public com.liferay.sync.connector.model.SyncDLFileVersionDiff getSyncDLFileVersionDiff(
 		long syncDLFileVersionDiffId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		Object returnObj = null;
@@ -735,11 +735,11 @@ public class SyncDLFileVersionDiffLocalServiceClp
 			}
 		}
 
-		return (com.liferay.sync.model.SyncDLFileVersionDiff)ClpSerializer.translateOutput(returnObj);
+		return (com.liferay.sync.connector.model.SyncDLFileVersionDiff)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
-	public java.util.List<com.liferay.sync.model.SyncDLFileVersionDiff> getSyncDLFileVersionDiffs(
+	public java.util.List<com.liferay.sync.connector.model.SyncDLFileVersionDiff> getSyncDLFileVersionDiffs(
 		int start, int end) {
 		Object returnObj = null;
 
@@ -759,7 +759,7 @@ public class SyncDLFileVersionDiffLocalServiceClp
 			}
 		}
 
-		return (java.util.List<com.liferay.sync.model.SyncDLFileVersionDiff>)ClpSerializer.translateOutput(returnObj);
+		return (java.util.List<com.liferay.sync.connector.model.SyncDLFileVersionDiff>)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
@@ -818,8 +818,8 @@ public class SyncDLFileVersionDiffLocalServiceClp
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLFileVersionDiff updateSyncDLFileVersionDiff(
-		com.liferay.sync.model.SyncDLFileVersionDiff syncDLFileVersionDiff) {
+	public com.liferay.sync.connector.model.SyncDLFileVersionDiff updateSyncDLFileVersionDiff(
+		com.liferay.sync.connector.model.SyncDLFileVersionDiff syncDLFileVersionDiff) {
 		Object returnObj = null;
 
 		try {
@@ -841,7 +841,7 @@ public class SyncDLFileVersionDiffLocalServiceClp
 			}
 		}
 
-		return (com.liferay.sync.model.SyncDLFileVersionDiff)ClpSerializer.translateOutput(returnObj);
+		return (com.liferay.sync.connector.model.SyncDLFileVersionDiff)ClpSerializer.translateOutput(returnObj);
 	}
 
 	private InvokableLocalService _invokableLocalService;

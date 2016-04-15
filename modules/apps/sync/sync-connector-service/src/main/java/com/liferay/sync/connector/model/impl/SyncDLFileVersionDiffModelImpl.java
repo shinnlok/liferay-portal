@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.model.impl;
+package com.liferay.sync.connector.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
@@ -27,8 +27,8 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 
-import com.liferay.sync.model.SyncDLFileVersionDiff;
-import com.liferay.sync.model.SyncDLFileVersionDiffModel;
+import com.liferay.sync.connector.model.SyncDLFileVersionDiff;
+import com.liferay.sync.connector.model.SyncDLFileVersionDiffModel;
 
 import java.io.Serializable;
 
@@ -89,13 +89,13 @@ public class SyncDLFileVersionDiffModelImpl extends BaseModelImpl<SyncDLFileVers
 	public static final String SESSION_FACTORY = "liferaySessionFactory";
 	public static final String TX_MANAGER = "liferayTransactionManager";
 	public static final boolean ENTITY_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.util.service.ServiceProps.get(
-				"value.object.entity.cache.enabled.com.liferay.sync.model.SyncDLFileVersionDiff"),
+				"value.object.entity.cache.enabled.com.liferay.sync.connector.model.SyncDLFileVersionDiff"),
 			true);
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.util.service.ServiceProps.get(
-				"value.object.finder.cache.enabled.com.liferay.sync.model.SyncDLFileVersionDiff"),
+				"value.object.finder.cache.enabled.com.liferay.sync.connector.model.SyncDLFileVersionDiff"),
 			true);
 	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.util.service.ServiceProps.get(
-				"value.object.column.bitmask.enabled.com.liferay.sync.model.SyncDLFileVersionDiff"),
+				"value.object.column.bitmask.enabled.com.liferay.sync.connector.model.SyncDLFileVersionDiff"),
 			true);
 	public static final long EXPIRATIONDATE_COLUMN_BITMASK = 1L;
 	public static final long FILEENTRYID_COLUMN_BITMASK = 2L;
@@ -103,7 +103,7 @@ public class SyncDLFileVersionDiffModelImpl extends BaseModelImpl<SyncDLFileVers
 	public static final long TARGETFILEVERSIONID_COLUMN_BITMASK = 8L;
 	public static final long SYNCDLFILEVERSIONDIFFID_COLUMN_BITMASK = 16L;
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.util.service.ServiceProps.get(
-				"lock.expiration.time.com.liferay.sync.model.SyncDLFileVersionDiff"));
+				"lock.expiration.time.com.liferay.sync.connector.model.SyncDLFileVersionDiff"));
 
 	public SyncDLFileVersionDiffModelImpl() {
 	}
@@ -491,7 +491,7 @@ public class SyncDLFileVersionDiffModelImpl extends BaseModelImpl<SyncDLFileVers
 		StringBundler sb = new StringBundler(25);
 
 		sb.append("<model><model-name>");
-		sb.append("com.liferay.sync.model.SyncDLFileVersionDiff");
+		sb.append("com.liferay.sync.connector.model.SyncDLFileVersionDiff");
 		sb.append("</model-name>");
 
 		sb.append(

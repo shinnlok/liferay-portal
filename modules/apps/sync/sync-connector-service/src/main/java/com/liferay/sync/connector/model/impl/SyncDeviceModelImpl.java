@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.model.impl;
+package com.liferay.sync.connector.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
@@ -35,9 +35,9 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 
-import com.liferay.sync.model.SyncDevice;
-import com.liferay.sync.model.SyncDeviceModel;
-import com.liferay.sync.model.SyncDeviceSoap;
+import com.liferay.sync.connector.model.SyncDevice;
+import com.liferay.sync.connector.model.SyncDeviceModel;
+import com.liferay.sync.connector.model.SyncDeviceSoap;
 
 import java.io.Serializable;
 
@@ -109,13 +109,13 @@ public class SyncDeviceModelImpl extends BaseModelImpl<SyncDevice>
 	public static final String SESSION_FACTORY = "liferaySessionFactory";
 	public static final String TX_MANAGER = "liferayTransactionManager";
 	public static final boolean ENTITY_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.util.service.ServiceProps.get(
-				"value.object.entity.cache.enabled.com.liferay.sync.model.SyncDevice"),
+				"value.object.entity.cache.enabled.com.liferay.sync.connector.model.SyncDevice"),
 			true);
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.util.service.ServiceProps.get(
-				"value.object.finder.cache.enabled.com.liferay.sync.model.SyncDevice"),
+				"value.object.finder.cache.enabled.com.liferay.sync.connector.model.SyncDevice"),
 			true);
 	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.util.service.ServiceProps.get(
-				"value.object.column.bitmask.enabled.com.liferay.sync.model.SyncDevice"),
+				"value.object.column.bitmask.enabled.com.liferay.sync.connector.model.SyncDevice"),
 			true);
 	public static final long COMPANYID_COLUMN_BITMASK = 1L;
 	public static final long USERNAME_COLUMN_BITMASK = 2L;
@@ -171,7 +171,7 @@ public class SyncDeviceModelImpl extends BaseModelImpl<SyncDevice>
 	}
 
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.util.service.ServiceProps.get(
-				"lock.expiration.time.com.liferay.sync.model.SyncDevice"));
+				"lock.expiration.time.com.liferay.sync.connector.model.SyncDevice"));
 
 	public SyncDeviceModelImpl() {
 	}
@@ -705,7 +705,7 @@ public class SyncDeviceModelImpl extends BaseModelImpl<SyncDevice>
 		StringBundler sb = new StringBundler(37);
 
 		sb.append("<model><model-name>");
-		sb.append("com.liferay.sync.model.SyncDevice");
+		sb.append("com.liferay.sync.connector.model.SyncDevice");
 		sb.append("</model-name>");
 
 		sb.append(

@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.filter;
+package com.liferay.sync.connector.filter;
 
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
@@ -25,15 +25,15 @@ import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.sync.SyncClientMinBuildException;
-import com.liferay.sync.SyncDeviceHeaderException;
-import com.liferay.sync.SyncServicesUnavailableException;
-import com.liferay.sync.model.SyncDevice;
-import com.liferay.sync.service.SyncDeviceLocalServiceUtil;
-import com.liferay.sync.util.PortletPropsKeys;
-import com.liferay.sync.util.PortletPropsValues;
-import com.liferay.sync.util.SyncDeviceThreadLocal;
-import com.liferay.sync.util.SyncUtil;
+import com.liferay.sync.connector.SyncClientMinBuildException;
+import com.liferay.sync.connector.SyncDeviceHeaderException;
+import com.liferay.sync.connector.SyncServicesUnavailableException;
+import com.liferay.sync.connector.model.SyncDevice;
+import com.liferay.sync.connector.service.SyncDeviceLocalServiceUtil;
+import com.liferay.sync.connector.util.PortletPropsKeys;
+import com.liferay.sync.connector.util.PortletPropsValues;
+import com.liferay.sync.connector.util.SyncDeviceThreadLocal;
+import com.liferay.sync.connector.util.SyncUtil;
 
 import java.io.IOException;
 import java.io.OutputStream;

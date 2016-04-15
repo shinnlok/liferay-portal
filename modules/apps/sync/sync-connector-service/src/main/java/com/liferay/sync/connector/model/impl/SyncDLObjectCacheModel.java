@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.model.impl;
+package com.liferay.sync.connector.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
@@ -21,7 +21,7 @@ import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 
-import com.liferay.sync.model.SyncDLObject;
+import com.liferay.sync.connector.model.SyncDLObject;
 
 import java.io.Externalizable;
 import java.io.IOException;

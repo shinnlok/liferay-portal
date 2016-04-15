@@ -12,14 +12,14 @@
  * details.
  */
 
-package com.liferay.sync.service.persistence;
+package com.liferay.sync.connector.service.persistence;
 
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
-import com.liferay.sync.exception.NoSuchDLFileVersionDiffException;
-import com.liferay.sync.model.SyncDLFileVersionDiff;
+import com.liferay.sync.connector.exception.NoSuchDLFileVersionDiffException;
+import com.liferay.sync.connector.model.SyncDLFileVersionDiff;
 
 import java.util.Date;
 
@@ -31,7 +31,7 @@ import java.util.Date;
  * </p>
  *
  * @author Brian Wing Shun Chan
- * @see com.liferay.sync.service.persistence.impl.SyncDLFileVersionDiffPersistenceImpl
+ * @see com.liferay.sync.connector.service.persistence.impl.SyncDLFileVersionDiffPersistenceImpl
  * @see SyncDLFileVersionDiffUtil
  * @generated
  */

@@ -12,11 +12,11 @@
  * details.
  */
 
-package com.liferay.sync.service.base;
+package com.liferay.sync.connector.service.base;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.sync.service.SyncDeviceServiceUtil;
+import com.liferay.sync.connector.service.SyncDeviceServiceUtil;
 
 import java.util.Arrays;
 

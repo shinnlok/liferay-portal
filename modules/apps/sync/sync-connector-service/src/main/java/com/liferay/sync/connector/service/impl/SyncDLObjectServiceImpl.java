@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.service.impl;
+package com.liferay.sync.connector.service.impl;
 
 import com.liferay.document.library.kernel.exception.DuplicateFileException;
 import com.liferay.document.library.kernel.exception.DuplicateFolderNameException;
@@ -67,19 +67,19 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.comparator.GroupNameComparator;
 import com.liferay.portal.kernel.zip.ZipReader;
 import com.liferay.portal.kernel.zip.ZipReaderFactoryUtil;
-import com.liferay.sync.model.SyncDLObject;
-import com.liferay.sync.model.SyncDLObjectConstants;
-import com.liferay.sync.model.SyncDevice;
-import com.liferay.sync.service.base.SyncDLObjectServiceBaseImpl;
-import com.liferay.sync.shared.util.SyncDeviceConstants;
-import com.liferay.sync.util.JSONWebServiceActionParametersMap;
-import com.liferay.sync.util.PortletPropsKeys;
-import com.liferay.sync.util.PortletPropsValues;
-import com.liferay.sync.util.SyncContext;
-import com.liferay.sync.util.SyncDLObjectUpdate;
-import com.liferay.sync.util.SyncDeviceThreadLocal;
-import com.liferay.sync.util.SyncUtil;
-import com.liferay.sync.util.comparator.SyncDLObjectModifiedTimeComparator;
+import com.liferay.sync.connector.model.SyncDLObject;
+import com.liferay.sync.connector.model.SyncDLObjectConstants;
+import com.liferay.sync.connector.model.SyncDevice;
+import com.liferay.sync.connector.service.base.SyncDLObjectServiceBaseImpl;
+import com.liferay.sync.connector.shared.util.SyncDeviceConstants;
+import com.liferay.sync.connector.util.JSONWebServiceActionParametersMap;
+import com.liferay.sync.connector.util.PortletPropsKeys;
+import com.liferay.sync.connector.util.PortletPropsValues;
+import com.liferay.sync.connector.util.SyncContext;
+import com.liferay.sync.connector.util.SyncDLObjectUpdate;
+import com.liferay.sync.connector.util.SyncDeviceThreadLocal;
+import com.liferay.sync.connector.util.SyncUtil;
+import com.liferay.sync.connector.util.comparator.SyncDLObjectModifiedTimeComparator;
 
 import java.io.File;
 import java.io.InputStream;

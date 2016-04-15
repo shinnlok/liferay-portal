@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.model.impl;
+package com.liferay.sync.connector.model.impl;
 
 /**
  * @author Brian Wing Shun Chan

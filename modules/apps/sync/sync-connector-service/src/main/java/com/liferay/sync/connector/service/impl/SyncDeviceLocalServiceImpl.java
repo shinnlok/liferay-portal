@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.service.impl;
+package com.liferay.sync.connector.service.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
@@ -21,9 +21,9 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.sync.model.SyncDevice;
-import com.liferay.sync.service.base.SyncDeviceLocalServiceBaseImpl;
-import com.liferay.sync.shared.util.SyncDeviceConstants;
+import com.liferay.sync.connector.model.SyncDevice;
+import com.liferay.sync.connector.service.base.SyncDeviceLocalServiceBaseImpl;
+import com.liferay.sync.connector.shared.util.SyncDeviceConstants;
 
 import java.util.Date;
 import java.util.List;

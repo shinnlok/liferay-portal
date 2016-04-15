@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.service.http;
+package com.liferay.sync.connector.service.http;
 
 import aQute.bnd.annotation.ProviderType;
 
@@ -23,7 +23,7 @@ import com.liferay.portal.kernel.service.http.TunnelUtil;
 import com.liferay.portal.kernel.util.MethodHandler;
 import com.liferay.portal.kernel.util.MethodKey;
 
-import com.liferay.sync.service.SyncDeviceServiceUtil;
+import com.liferay.sync.connector.service.SyncDeviceServiceUtil;
 
 /**
  * Provides the HTTP utility for the
@@ -55,7 +55,7 @@ import com.liferay.sync.service.SyncDeviceServiceUtil;
  */
 @ProviderType
 public class SyncDeviceServiceHttp {
-	public static com.liferay.sync.model.SyncDevice registerSyncDevice(
+	public static com.liferay.sync.connector.model.SyncDevice registerSyncDevice(
 		HttpPrincipal httpPrincipal, java.lang.String type, int buildNumber,
 		int featureSet, java.lang.String uuid)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -79,7 +79,7 @@ public class SyncDeviceServiceHttp {
 				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
-			return (com.liferay.sync.model.SyncDevice)returnObj;
+			return (com.liferay.sync.connector.model.SyncDevice)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);

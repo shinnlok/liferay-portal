@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.service.persistence.impl;
+package com.liferay.sync.connector.service.persistence.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
@@ -43,11 +43,11 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
-import com.liferay.sync.exception.NoSuchDeviceException;
-import com.liferay.sync.model.SyncDevice;
-import com.liferay.sync.model.impl.SyncDeviceImpl;
-import com.liferay.sync.model.impl.SyncDeviceModelImpl;
-import com.liferay.sync.service.persistence.SyncDevicePersistence;
+import com.liferay.sync.connector.exception.NoSuchDeviceException;
+import com.liferay.sync.connector.model.SyncDevice;
+import com.liferay.sync.connector.model.impl.SyncDeviceImpl;
+import com.liferay.sync.connector.model.impl.SyncDeviceModelImpl;
+import com.liferay.sync.connector.service.persistence.SyncDevicePersistence;
 
 import java.io.Serializable;
 
@@ -69,7 +69,7 @@ import java.util.Set;
  *
  * @author Brian Wing Shun Chan
  * @see SyncDevicePersistence
- * @see com.liferay.sync.service.persistence.SyncDeviceUtil
+ * @see com.liferay.sync.connector.service.persistence.SyncDeviceUtil
  * @generated
  */
 @ProviderType

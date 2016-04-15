@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.service;
+package com.liferay.sync.connector.service;
 
 import aQute.bnd.annotation.ProviderType;
 
@@ -40,13 +40,13 @@ public class SyncDeviceLocalServiceWrapper implements SyncDeviceLocalService,
 	* @return the sync device that was added
 	*/
 	@Override
-	public com.liferay.sync.model.SyncDevice addSyncDevice(
-		com.liferay.sync.model.SyncDevice syncDevice) {
+	public com.liferay.sync.connector.model.SyncDevice addSyncDevice(
+		com.liferay.sync.connector.model.SyncDevice syncDevice) {
 		return _syncDeviceLocalService.addSyncDevice(syncDevice);
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDevice addSyncDevice(long userId,
+	public com.liferay.sync.connector.model.SyncDevice addSyncDevice(long userId,
 		java.lang.String type, int buildNumber, int featureSet)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _syncDeviceLocalService.addSyncDevice(userId, type, buildNumber,
@@ -60,7 +60,7 @@ public class SyncDeviceLocalServiceWrapper implements SyncDeviceLocalService,
 	* @return the new sync device
 	*/
 	@Override
-	public com.liferay.sync.model.SyncDevice createSyncDevice(long syncDeviceId) {
+	public com.liferay.sync.connector.model.SyncDevice createSyncDevice(long syncDeviceId) {
 		return _syncDeviceLocalService.createSyncDevice(syncDeviceId);
 	}
 
@@ -81,8 +81,8 @@ public class SyncDeviceLocalServiceWrapper implements SyncDeviceLocalService,
 	* @return the sync device that was removed
 	*/
 	@Override
-	public com.liferay.sync.model.SyncDevice deleteSyncDevice(
-		com.liferay.sync.model.SyncDevice syncDevice) {
+	public com.liferay.sync.connector.model.SyncDevice deleteSyncDevice(
+		com.liferay.sync.connector.model.SyncDevice syncDevice) {
 		return _syncDeviceLocalService.deleteSyncDevice(syncDevice);
 	}
 
@@ -94,7 +94,7 @@ public class SyncDeviceLocalServiceWrapper implements SyncDeviceLocalService,
 	* @throws PortalException if a sync device with the primary key could not be found
 	*/
 	@Override
-	public com.liferay.sync.model.SyncDevice deleteSyncDevice(long syncDeviceId)
+	public com.liferay.sync.connector.model.SyncDevice deleteSyncDevice(long syncDeviceId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _syncDeviceLocalService.deleteSyncDevice(syncDeviceId);
 	}
@@ -120,7 +120,7 @@ public class SyncDeviceLocalServiceWrapper implements SyncDeviceLocalService,
 	* Performs a dynamic query on the database and returns a range of the matching rows.
 	*
 	* <p>
-	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.sync.model.impl.SyncDeviceModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.sync.connector.model.impl.SyncDeviceModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	* </p>
 	*
 	* @param dynamicQuery the dynamic query
@@ -139,7 +139,7 @@ public class SyncDeviceLocalServiceWrapper implements SyncDeviceLocalService,
 	* Performs a dynamic query on the database and returns an ordered range of the matching rows.
 	*
 	* <p>
-	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.sync.model.impl.SyncDeviceModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.sync.connector.model.impl.SyncDeviceModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	* </p>
 	*
 	* @param dynamicQuery the dynamic query
@@ -185,7 +185,7 @@ public class SyncDeviceLocalServiceWrapper implements SyncDeviceLocalService,
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDevice fetchSyncDevice(long syncDeviceId) {
+	public com.liferay.sync.connector.model.SyncDevice fetchSyncDevice(long syncDeviceId) {
 		return _syncDeviceLocalService.fetchSyncDevice(syncDeviceId);
 	}
 
@@ -197,7 +197,7 @@ public class SyncDeviceLocalServiceWrapper implements SyncDeviceLocalService,
 	* @return the matching sync device, or <code>null</code> if a matching sync device could not be found
 	*/
 	@Override
-	public com.liferay.sync.model.SyncDevice fetchSyncDeviceByUuidAndCompanyId(
+	public com.liferay.sync.connector.model.SyncDevice fetchSyncDeviceByUuidAndCompanyId(
 		java.lang.String uuid, long companyId) {
 		return _syncDeviceLocalService.fetchSyncDeviceByUuidAndCompanyId(uuid,
 			companyId);
@@ -244,7 +244,7 @@ public class SyncDeviceLocalServiceWrapper implements SyncDeviceLocalService,
 	* @throws PortalException if a sync device with the primary key could not be found
 	*/
 	@Override
-	public com.liferay.sync.model.SyncDevice getSyncDevice(long syncDeviceId)
+	public com.liferay.sync.connector.model.SyncDevice getSyncDevice(long syncDeviceId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _syncDeviceLocalService.getSyncDevice(syncDeviceId);
 	}
@@ -258,7 +258,7 @@ public class SyncDeviceLocalServiceWrapper implements SyncDeviceLocalService,
 	* @throws PortalException if a matching sync device could not be found
 	*/
 	@Override
-	public com.liferay.sync.model.SyncDevice getSyncDeviceByUuidAndCompanyId(
+	public com.liferay.sync.connector.model.SyncDevice getSyncDeviceByUuidAndCompanyId(
 		java.lang.String uuid, long companyId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _syncDeviceLocalService.getSyncDeviceByUuidAndCompanyId(uuid,
@@ -269,7 +269,7 @@ public class SyncDeviceLocalServiceWrapper implements SyncDeviceLocalService,
 	* Returns a range of all the sync devices.
 	*
 	* <p>
-	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.sync.model.impl.SyncDeviceModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.sync.connector.model.impl.SyncDeviceModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	* </p>
 	*
 	* @param start the lower bound of the range of sync devices
@@ -277,7 +277,7 @@ public class SyncDeviceLocalServiceWrapper implements SyncDeviceLocalService,
 	* @return the range of sync devices
 	*/
 	@Override
-	public java.util.List<com.liferay.sync.model.SyncDevice> getSyncDevices(
+	public java.util.List<com.liferay.sync.connector.model.SyncDevice> getSyncDevices(
 		int start, int end) {
 		return _syncDeviceLocalService.getSyncDevices(start, end);
 	}
@@ -301,9 +301,9 @@ public class SyncDeviceLocalServiceWrapper implements SyncDeviceLocalService,
 	}
 
 	@Override
-	public java.util.List<com.liferay.sync.model.SyncDevice> search(
+	public java.util.List<com.liferay.sync.connector.model.SyncDevice> search(
 		long companyId, java.lang.String keywords, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.sync.model.SyncDevice> orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.sync.connector.model.SyncDevice> orderByComparator) {
 		return _syncDeviceLocalService.search(companyId, keywords, start, end,
 			orderByComparator);
 	}
@@ -321,13 +321,13 @@ public class SyncDeviceLocalServiceWrapper implements SyncDeviceLocalService,
 	* @return the sync device that was updated
 	*/
 	@Override
-	public com.liferay.sync.model.SyncDevice updateSyncDevice(
-		com.liferay.sync.model.SyncDevice syncDevice) {
+	public com.liferay.sync.connector.model.SyncDevice updateSyncDevice(
+		com.liferay.sync.connector.model.SyncDevice syncDevice) {
 		return _syncDeviceLocalService.updateSyncDevice(syncDevice);
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDevice updateSyncDevice(
+	public com.liferay.sync.connector.model.SyncDevice updateSyncDevice(
 		long syncDeviceId, java.lang.String type, int buildNumber,
 		int featureSet, int status)
 		throws com.liferay.portal.kernel.exception.PortalException {

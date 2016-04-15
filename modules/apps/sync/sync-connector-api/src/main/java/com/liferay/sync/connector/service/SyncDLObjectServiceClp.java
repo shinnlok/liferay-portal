@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.service;
+package com.liferay.sync.connector.service;
 
 import aQute.bnd.annotation.ProviderType;
 
@@ -193,7 +193,7 @@ public class SyncDLObjectServiceClp implements SyncDLObjectService {
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject addFileEntry(long repositoryId,
+	public com.liferay.sync.connector.model.SyncDLObject addFileEntry(long repositoryId,
 		long folderId, java.lang.String sourceFileName,
 		java.lang.String mimeType, java.lang.String title,
 		java.lang.String description, java.lang.String changeLog,
@@ -243,11 +243,11 @@ public class SyncDLObjectServiceClp implements SyncDLObjectService {
 			}
 		}
 
-		return (com.liferay.sync.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
+		return (com.liferay.sync.connector.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject addFolder(long repositoryId,
+	public com.liferay.sync.connector.model.SyncDLObject addFolder(long repositoryId,
 		long parentFolderId, java.lang.String name,
 		java.lang.String description,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
@@ -285,11 +285,11 @@ public class SyncDLObjectServiceClp implements SyncDLObjectService {
 			}
 		}
 
-		return (com.liferay.sync.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
+		return (com.liferay.sync.connector.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject cancelCheckOut(long fileEntryId)
+	public com.liferay.sync.connector.model.SyncDLObject cancelCheckOut(long fileEntryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		Object returnObj = null;
 
@@ -313,11 +313,11 @@ public class SyncDLObjectServiceClp implements SyncDLObjectService {
 			}
 		}
 
-		return (com.liferay.sync.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
+		return (com.liferay.sync.connector.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject checkInFileEntry(
+	public com.liferay.sync.connector.model.SyncDLObject checkInFileEntry(
 		long fileEntryId, boolean majorVersion, java.lang.String changeLog,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -352,11 +352,11 @@ public class SyncDLObjectServiceClp implements SyncDLObjectService {
 			}
 		}
 
-		return (com.liferay.sync.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
+		return (com.liferay.sync.connector.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject checkOutFileEntry(
+	public com.liferay.sync.connector.model.SyncDLObject checkOutFileEntry(
 		long fileEntryId, java.lang.String owner, long expirationTime,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -391,11 +391,11 @@ public class SyncDLObjectServiceClp implements SyncDLObjectService {
 			}
 		}
 
-		return (com.liferay.sync.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
+		return (com.liferay.sync.connector.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject checkOutFileEntry(
+	public com.liferay.sync.connector.model.SyncDLObject checkOutFileEntry(
 		long fileEntryId,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -426,11 +426,11 @@ public class SyncDLObjectServiceClp implements SyncDLObjectService {
 			}
 		}
 
-		return (com.liferay.sync.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
+		return (com.liferay.sync.connector.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject copyFileEntry(
+	public com.liferay.sync.connector.model.SyncDLObject copyFileEntry(
 		long sourceFileEntryId, long repositoryId, long folderId,
 		java.lang.String sourceFileName, java.lang.String title,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
@@ -470,11 +470,11 @@ public class SyncDLObjectServiceClp implements SyncDLObjectService {
 			}
 		}
 
-		return (com.liferay.sync.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
+		return (com.liferay.sync.connector.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
-	public java.util.List<com.liferay.sync.model.SyncDLObject> getAllFolderSyncDLObjects(
+	public java.util.List<com.liferay.sync.connector.model.SyncDLObject> getAllFolderSyncDLObjects(
 		long repositoryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		Object returnObj = null;
@@ -499,11 +499,11 @@ public class SyncDLObjectServiceClp implements SyncDLObjectService {
 			}
 		}
 
-		return (java.util.List<com.liferay.sync.model.SyncDLObject>)ClpSerializer.translateOutput(returnObj);
+		return (java.util.List<com.liferay.sync.connector.model.SyncDLObject>)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject getFileEntrySyncDLObject(
+	public com.liferay.sync.connector.model.SyncDLObject getFileEntrySyncDLObject(
 		long repositoryId, long folderId, java.lang.String title)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		Object returnObj = null;
@@ -535,11 +535,11 @@ public class SyncDLObjectServiceClp implements SyncDLObjectService {
 			}
 		}
 
-		return (com.liferay.sync.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
+		return (com.liferay.sync.connector.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
-	public java.util.List<com.liferay.sync.model.SyncDLObject> getFileEntrySyncDLObjects(
+	public java.util.List<com.liferay.sync.connector.model.SyncDLObject> getFileEntrySyncDLObjects(
 		long repositoryId, long folderId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		Object returnObj = null;
@@ -565,11 +565,11 @@ public class SyncDLObjectServiceClp implements SyncDLObjectService {
 			}
 		}
 
-		return (java.util.List<com.liferay.sync.model.SyncDLObject>)ClpSerializer.translateOutput(returnObj);
+		return (java.util.List<com.liferay.sync.connector.model.SyncDLObject>)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject getFolderSyncDLObject(
+	public com.liferay.sync.connector.model.SyncDLObject getFolderSyncDLObject(
 		long folderId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		Object returnObj = null;
@@ -594,11 +594,11 @@ public class SyncDLObjectServiceClp implements SyncDLObjectService {
 			}
 		}
 
-		return (com.liferay.sync.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
+		return (com.liferay.sync.connector.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject getFolderSyncDLObject(
+	public com.liferay.sync.connector.model.SyncDLObject getFolderSyncDLObject(
 		long repositoryId, long parentFolderId, java.lang.String name)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		Object returnObj = null;
@@ -630,11 +630,11 @@ public class SyncDLObjectServiceClp implements SyncDLObjectService {
 			}
 		}
 
-		return (com.liferay.sync.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
+		return (com.liferay.sync.connector.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
-	public java.util.List<com.liferay.sync.model.SyncDLObject> getFolderSyncDLObjects(
+	public java.util.List<com.liferay.sync.connector.model.SyncDLObject> getFolderSyncDLObjects(
 		long repositoryId, long parentFolderId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		Object returnObj = null;
@@ -660,7 +660,7 @@ public class SyncDLObjectServiceClp implements SyncDLObjectService {
 			}
 		}
 
-		return (java.util.List<com.liferay.sync.model.SyncDLObject>)ClpSerializer.translateOutput(returnObj);
+		return (java.util.List<com.liferay.sync.connector.model.SyncDLObject>)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
@@ -904,7 +904,7 @@ public class SyncDLObjectServiceClp implements SyncDLObjectService {
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject moveFileEntry(long fileEntryId,
+	public com.liferay.sync.connector.model.SyncDLObject moveFileEntry(long fileEntryId,
 		long newFolderId,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -937,11 +937,11 @@ public class SyncDLObjectServiceClp implements SyncDLObjectService {
 			}
 		}
 
-		return (com.liferay.sync.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
+		return (com.liferay.sync.connector.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject moveFileEntryToTrash(
+	public com.liferay.sync.connector.model.SyncDLObject moveFileEntryToTrash(
 		long fileEntryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		Object returnObj = null;
@@ -966,11 +966,11 @@ public class SyncDLObjectServiceClp implements SyncDLObjectService {
 			}
 		}
 
-		return (com.liferay.sync.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
+		return (com.liferay.sync.connector.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject moveFolder(long folderId,
+	public com.liferay.sync.connector.model.SyncDLObject moveFolder(long folderId,
 		long parentFolderId,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -1003,11 +1003,11 @@ public class SyncDLObjectServiceClp implements SyncDLObjectService {
 			}
 		}
 
-		return (com.liferay.sync.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
+		return (com.liferay.sync.connector.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject moveFolderToTrash(long folderId)
+	public com.liferay.sync.connector.model.SyncDLObject moveFolderToTrash(long folderId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		Object returnObj = null;
 
@@ -1031,11 +1031,11 @@ public class SyncDLObjectServiceClp implements SyncDLObjectService {
 			}
 		}
 
-		return (com.liferay.sync.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
+		return (com.liferay.sync.connector.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject patchFileEntry(
+	public com.liferay.sync.connector.model.SyncDLObject patchFileEntry(
 		long fileEntryId, long sourceVersionId,
 		java.lang.String sourceFileName, java.lang.String mimeType,
 		java.lang.String title, java.lang.String description,
@@ -1088,11 +1088,11 @@ public class SyncDLObjectServiceClp implements SyncDLObjectService {
 			}
 		}
 
-		return (com.liferay.sync.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
+		return (com.liferay.sync.connector.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject restoreFileEntryFromTrash(
+	public com.liferay.sync.connector.model.SyncDLObject restoreFileEntryFromTrash(
 		long fileEntryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		Object returnObj = null;
@@ -1117,11 +1117,11 @@ public class SyncDLObjectServiceClp implements SyncDLObjectService {
 			}
 		}
 
-		return (com.liferay.sync.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
+		return (com.liferay.sync.connector.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject restoreFolderFromTrash(
+	public com.liferay.sync.connector.model.SyncDLObject restoreFolderFromTrash(
 		long folderId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		Object returnObj = null;
@@ -1146,7 +1146,7 @@ public class SyncDLObjectServiceClp implements SyncDLObjectService {
 			}
 		}
 
-		return (com.liferay.sync.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
+		return (com.liferay.sync.connector.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
@@ -1180,7 +1180,7 @@ public class SyncDLObjectServiceClp implements SyncDLObjectService {
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject updateFileEntry(
+	public com.liferay.sync.connector.model.SyncDLObject updateFileEntry(
 		long fileEntryId, java.lang.String sourceFileName,
 		java.lang.String mimeType, java.lang.String title,
 		java.lang.String description, java.lang.String changeLog,
@@ -1230,11 +1230,11 @@ public class SyncDLObjectServiceClp implements SyncDLObjectService {
 			}
 		}
 
-		return (com.liferay.sync.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
+		return (com.liferay.sync.connector.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject updateFolder(long folderId,
+	public com.liferay.sync.connector.model.SyncDLObject updateFolder(long folderId,
 		java.lang.String name, java.lang.String description,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -1269,7 +1269,7 @@ public class SyncDLObjectServiceClp implements SyncDLObjectService {
 			}
 		}
 
-		return (com.liferay.sync.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
+		return (com.liferay.sync.connector.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
 	}
 
 	private InvokableService _invokableService;

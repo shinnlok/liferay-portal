@@ -12,10 +12,10 @@
  * details.
  */
 
-package com.liferay.sync.util;
+package com.liferay.sync.connector.util;
 
 import com.liferay.portal.kernel.util.AutoResetThreadLocal;
-import com.liferay.sync.model.SyncDevice;
+import com.liferay.sync.connector.model.SyncDevice;
 
 /**
  * @author Shinn Lok

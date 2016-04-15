@@ -12,11 +12,11 @@
  * details.
  */
 
-package com.liferay.sync.messaging;
+package com.liferay.sync.connector.messaging;
 
 import com.liferay.portal.kernel.messaging.BaseMessageListener;
 import com.liferay.portal.kernel.messaging.Message;
-import com.liferay.sync.service.SyncDLFileVersionDiffLocalServiceUtil;
+import com.liferay.sync.connector.service.SyncDLFileVersionDiffLocalServiceUtil;
 
 /**
  * @author Dennis Ju

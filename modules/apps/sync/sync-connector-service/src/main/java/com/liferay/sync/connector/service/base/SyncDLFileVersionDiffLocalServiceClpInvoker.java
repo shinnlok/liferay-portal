@@ -12,11 +12,11 @@
  * details.
  */
 
-package com.liferay.sync.service.base;
+package com.liferay.sync.connector.service.base;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.sync.service.SyncDLFileVersionDiffLocalServiceUtil;
+import com.liferay.sync.connector.service.SyncDLFileVersionDiffLocalServiceUtil;
 
 import java.util.Arrays;
 
@@ -30,7 +30,7 @@ public class SyncDLFileVersionDiffLocalServiceClpInvoker {
 		_methodName0 = "addSyncDLFileVersionDiff";
 
 		_methodParameterTypes0 = new String[] {
-				"com.liferay.sync.model.SyncDLFileVersionDiff"
+				"com.liferay.sync.connector.model.SyncDLFileVersionDiff"
 			};
 
 		_methodName1 = "createSyncDLFileVersionDiff";
@@ -44,7 +44,7 @@ public class SyncDLFileVersionDiffLocalServiceClpInvoker {
 		_methodName3 = "deleteSyncDLFileVersionDiff";
 
 		_methodParameterTypes3 = new String[] {
-				"com.liferay.sync.model.SyncDLFileVersionDiff"
+				"com.liferay.sync.connector.model.SyncDLFileVersionDiff"
 			};
 
 		_methodName4 = "dynamicQuery";
@@ -120,7 +120,7 @@ public class SyncDLFileVersionDiffLocalServiceClpInvoker {
 		_methodName19 = "updateSyncDLFileVersionDiff";
 
 		_methodParameterTypes19 = new String[] {
-				"com.liferay.sync.model.SyncDLFileVersionDiff"
+				"com.liferay.sync.connector.model.SyncDLFileVersionDiff"
 			};
 
 		_methodName56 = "getOSGiServiceIdentifier";
@@ -140,7 +140,7 @@ public class SyncDLFileVersionDiffLocalServiceClpInvoker {
 		_methodName63 = "deleteSyncDLFileVersionDiff";
 
 		_methodParameterTypes63 = new String[] {
-				"com.liferay.sync.model.SyncDLFileVersionDiff"
+				"com.liferay.sync.connector.model.SyncDLFileVersionDiff"
 			};
 
 		_methodName64 = "deleteSyncDLFileVersionDiffs";
@@ -160,7 +160,7 @@ public class SyncDLFileVersionDiffLocalServiceClpInvoker {
 		Object[] arguments) throws Throwable {
 		if (_methodName0.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes0, parameterTypes)) {
-			return SyncDLFileVersionDiffLocalServiceUtil.addSyncDLFileVersionDiff((com.liferay.sync.model.SyncDLFileVersionDiff)arguments[0]);
+			return SyncDLFileVersionDiffLocalServiceUtil.addSyncDLFileVersionDiff((com.liferay.sync.connector.model.SyncDLFileVersionDiff)arguments[0]);
 		}
 
 		if (_methodName1.equals(name) &&
@@ -175,7 +175,7 @@ public class SyncDLFileVersionDiffLocalServiceClpInvoker {
 
 		if (_methodName3.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes3, parameterTypes)) {
-			return SyncDLFileVersionDiffLocalServiceUtil.deleteSyncDLFileVersionDiff((com.liferay.sync.model.SyncDLFileVersionDiff)arguments[0]);
+			return SyncDLFileVersionDiffLocalServiceUtil.deleteSyncDLFileVersionDiff((com.liferay.sync.connector.model.SyncDLFileVersionDiff)arguments[0]);
 		}
 
 		if (_methodName4.equals(name) &&
@@ -257,7 +257,7 @@ public class SyncDLFileVersionDiffLocalServiceClpInvoker {
 
 		if (_methodName19.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes19, parameterTypes)) {
-			return SyncDLFileVersionDiffLocalServiceUtil.updateSyncDLFileVersionDiff((com.liferay.sync.model.SyncDLFileVersionDiff)arguments[0]);
+			return SyncDLFileVersionDiffLocalServiceUtil.updateSyncDLFileVersionDiff((com.liferay.sync.connector.model.SyncDLFileVersionDiff)arguments[0]);
 		}
 
 		if (_methodName56.equals(name) &&
@@ -281,7 +281,7 @@ public class SyncDLFileVersionDiffLocalServiceClpInvoker {
 
 		if (_methodName63.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes63, parameterTypes)) {
-			return SyncDLFileVersionDiffLocalServiceUtil.deleteSyncDLFileVersionDiff((com.liferay.sync.model.SyncDLFileVersionDiff)arguments[0]);
+			return SyncDLFileVersionDiffLocalServiceUtil.deleteSyncDLFileVersionDiff((com.liferay.sync.connector.model.SyncDLFileVersionDiff)arguments[0]);
 		}
 
 		if (_methodName64.equals(name) &&

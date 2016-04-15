@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.service;
+package com.liferay.sync.connector.service;
 
 import aQute.bnd.annotation.ProviderType;
 
@@ -35,7 +35,7 @@ public class SyncDLFileVersionDiffLocalServiceWrapper
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLFileVersionDiff addSyncDLFileVersionDiff(
+	public com.liferay.sync.connector.model.SyncDLFileVersionDiff addSyncDLFileVersionDiff(
 		long fileEntryId, long sourceFileVersionId, long targetFileVersionId,
 		java.io.File file)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -50,8 +50,8 @@ public class SyncDLFileVersionDiffLocalServiceWrapper
 	* @return the sync d l file version diff that was added
 	*/
 	@Override
-	public com.liferay.sync.model.SyncDLFileVersionDiff addSyncDLFileVersionDiff(
-		com.liferay.sync.model.SyncDLFileVersionDiff syncDLFileVersionDiff) {
+	public com.liferay.sync.connector.model.SyncDLFileVersionDiff addSyncDLFileVersionDiff(
+		com.liferay.sync.connector.model.SyncDLFileVersionDiff syncDLFileVersionDiff) {
 		return _syncDLFileVersionDiffLocalService.addSyncDLFileVersionDiff(syncDLFileVersionDiff);
 	}
 
@@ -62,7 +62,7 @@ public class SyncDLFileVersionDiffLocalServiceWrapper
 	* @return the new sync d l file version diff
 	*/
 	@Override
-	public com.liferay.sync.model.SyncDLFileVersionDiff createSyncDLFileVersionDiff(
+	public com.liferay.sync.connector.model.SyncDLFileVersionDiff createSyncDLFileVersionDiff(
 		long syncDLFileVersionDiffId) {
 		return _syncDLFileVersionDiffLocalService.createSyncDLFileVersionDiff(syncDLFileVersionDiffId);
 	}
@@ -91,8 +91,8 @@ public class SyncDLFileVersionDiffLocalServiceWrapper
 	* @throws PortalException
 	*/
 	@Override
-	public com.liferay.sync.model.SyncDLFileVersionDiff deleteSyncDLFileVersionDiff(
-		com.liferay.sync.model.SyncDLFileVersionDiff syncDLFileVersionDiff)
+	public com.liferay.sync.connector.model.SyncDLFileVersionDiff deleteSyncDLFileVersionDiff(
+		com.liferay.sync.connector.model.SyncDLFileVersionDiff syncDLFileVersionDiff)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _syncDLFileVersionDiffLocalService.deleteSyncDLFileVersionDiff(syncDLFileVersionDiff);
 	}
@@ -105,7 +105,7 @@ public class SyncDLFileVersionDiffLocalServiceWrapper
 	* @throws PortalException if a sync d l file version diff with the primary key could not be found
 	*/
 	@Override
-	public com.liferay.sync.model.SyncDLFileVersionDiff deleteSyncDLFileVersionDiff(
+	public com.liferay.sync.connector.model.SyncDLFileVersionDiff deleteSyncDLFileVersionDiff(
 		long syncDLFileVersionDiffId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _syncDLFileVersionDiffLocalService.deleteSyncDLFileVersionDiff(syncDLFileVersionDiffId);
@@ -138,7 +138,7 @@ public class SyncDLFileVersionDiffLocalServiceWrapper
 	* Performs a dynamic query on the database and returns a range of the matching rows.
 	*
 	* <p>
-	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.sync.model.impl.SyncDLFileVersionDiffModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.sync.connector.model.impl.SyncDLFileVersionDiffModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	* </p>
 	*
 	* @param dynamicQuery the dynamic query
@@ -158,7 +158,7 @@ public class SyncDLFileVersionDiffLocalServiceWrapper
 	* Performs a dynamic query on the database and returns an ordered range of the matching rows.
 	*
 	* <p>
-	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.sync.model.impl.SyncDLFileVersionDiffModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.sync.connector.model.impl.SyncDLFileVersionDiffModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	* </p>
 	*
 	* @param dynamicQuery the dynamic query
@@ -204,14 +204,14 @@ public class SyncDLFileVersionDiffLocalServiceWrapper
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLFileVersionDiff fetchSyncDLFileVersionDiff(
+	public com.liferay.sync.connector.model.SyncDLFileVersionDiff fetchSyncDLFileVersionDiff(
 		long fileEntryId, long sourceFileVersionId, long targetFileVersionId) {
 		return _syncDLFileVersionDiffLocalService.fetchSyncDLFileVersionDiff(fileEntryId,
 			sourceFileVersionId, targetFileVersionId);
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLFileVersionDiff fetchSyncDLFileVersionDiff(
+	public com.liferay.sync.connector.model.SyncDLFileVersionDiff fetchSyncDLFileVersionDiff(
 		long syncDLFileVersionDiffId) {
 		return _syncDLFileVersionDiffLocalService.fetchSyncDLFileVersionDiff(syncDLFileVersionDiffId);
 	}
@@ -251,7 +251,7 @@ public class SyncDLFileVersionDiffLocalServiceWrapper
 	* @throws PortalException if a sync d l file version diff with the primary key could not be found
 	*/
 	@Override
-	public com.liferay.sync.model.SyncDLFileVersionDiff getSyncDLFileVersionDiff(
+	public com.liferay.sync.connector.model.SyncDLFileVersionDiff getSyncDLFileVersionDiff(
 		long syncDLFileVersionDiffId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _syncDLFileVersionDiffLocalService.getSyncDLFileVersionDiff(syncDLFileVersionDiffId);
@@ -261,7 +261,7 @@ public class SyncDLFileVersionDiffLocalServiceWrapper
 	* Returns a range of all the sync d l file version diffs.
 	*
 	* <p>
-	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.sync.model.impl.SyncDLFileVersionDiffModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.sync.connector.model.impl.SyncDLFileVersionDiffModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	* </p>
 	*
 	* @param start the lower bound of the range of sync d l file version diffs
@@ -269,7 +269,7 @@ public class SyncDLFileVersionDiffLocalServiceWrapper
 	* @return the range of sync d l file version diffs
 	*/
 	@Override
-	public java.util.List<com.liferay.sync.model.SyncDLFileVersionDiff> getSyncDLFileVersionDiffs(
+	public java.util.List<com.liferay.sync.connector.model.SyncDLFileVersionDiff> getSyncDLFileVersionDiffs(
 		int start, int end) {
 		return _syncDLFileVersionDiffLocalService.getSyncDLFileVersionDiffs(start,
 			end);
@@ -306,8 +306,8 @@ public class SyncDLFileVersionDiffLocalServiceWrapper
 	* @return the sync d l file version diff that was updated
 	*/
 	@Override
-	public com.liferay.sync.model.SyncDLFileVersionDiff updateSyncDLFileVersionDiff(
-		com.liferay.sync.model.SyncDLFileVersionDiff syncDLFileVersionDiff) {
+	public com.liferay.sync.connector.model.SyncDLFileVersionDiff updateSyncDLFileVersionDiff(
+		com.liferay.sync.connector.model.SyncDLFileVersionDiff syncDLFileVersionDiff) {
 		return _syncDLFileVersionDiffLocalService.updateSyncDLFileVersionDiff(syncDLFileVersionDiff);
 	}
 

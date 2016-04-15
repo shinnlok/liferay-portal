@@ -12,10 +12,10 @@
  * details.
  */
 
-package com.liferay.sync.util.comparator;
+package com.liferay.sync.connector.util.comparator;
 
 import com.liferay.portal.kernel.util.OrderByComparator;
-import com.liferay.sync.model.SyncDLObject;
+import com.liferay.sync.connector.model.SyncDLObject;
 
 /**
  * @author Shinn Lok

@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.service;
+package com.liferay.sync.connector.service;
 
 import aQute.bnd.annotation.ProviderType;
 
@@ -22,7 +22,7 @@ import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
  * Provides the remote service utility for SyncDevice. This utility wraps
- * {@link com.liferay.sync.service.impl.SyncDeviceServiceImpl} and is the
+ * {@link com.liferay.sync.connector.service.impl.SyncDeviceServiceImpl} and is the
  * primary access point for service operations in application layer code running
  * on a remote server. Methods of this service are expected to have security
  * checks based on the propagated JAAS credentials because this service can be
@@ -30,8 +30,8 @@ import com.liferay.portal.kernel.util.ReferenceRegistry;
  *
  * @author Brian Wing Shun Chan
  * @see SyncDeviceService
- * @see com.liferay.sync.service.base.SyncDeviceServiceBaseImpl
- * @see com.liferay.sync.service.impl.SyncDeviceServiceImpl
+ * @see com.liferay.sync.connector.service.base.SyncDeviceServiceBaseImpl
+ * @see com.liferay.sync.connector.service.impl.SyncDeviceServiceImpl
  * @generated
  */
 @ProviderType
@@ -39,7 +39,7 @@ public class SyncDeviceServiceUtil {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this class directly. Add custom service methods to {@link com.liferay.sync.service.impl.SyncDeviceServiceImpl} and rerun ServiceBuilder to regenerate this class.
+	 * Never modify this class directly. Add custom service methods to {@link com.liferay.sync.connector.service.impl.SyncDeviceServiceImpl} and rerun ServiceBuilder to regenerate this class.
 	 */
 
 	/**
@@ -57,7 +57,7 @@ public class SyncDeviceServiceUtil {
 		return getService().invokeMethod(name, parameterTypes, arguments);
 	}
 
-	public static com.liferay.sync.model.SyncDevice registerSyncDevice(
+	public static com.liferay.sync.connector.model.SyncDevice registerSyncDevice(
 		java.lang.String type, int buildNumber, int featureSet,
 		java.lang.String uuid)
 		throws com.liferay.portal.kernel.exception.PortalException {

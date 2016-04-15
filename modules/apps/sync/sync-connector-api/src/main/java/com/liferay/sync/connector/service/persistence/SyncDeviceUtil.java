@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.service.persistence;
+package com.liferay.sync.connector.service.persistence;
 
 import aQute.bnd.annotation.ProviderType;
 
@@ -22,12 +22,12 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
-import com.liferay.sync.model.SyncDevice;
+import com.liferay.sync.connector.model.SyncDevice;
 
 import java.util.List;
 
 /**
- * The persistence utility for the sync device service. This utility wraps {@link com.liferay.sync.service.persistence.impl.SyncDevicePersistenceImpl} and provides direct access to the database for CRUD operations. This utility should only be used by the service layer, as it must operate within a transaction. Never access this utility in a JSP, controller, model, or other front-end class.
+ * The persistence utility for the sync device service. This utility wraps {@link com.liferay.sync.connector.service.persistence.impl.SyncDevicePersistenceImpl} and provides direct access to the database for CRUD operations. This utility should only be used by the service layer, as it must operate within a transaction. Never access this utility in a JSP, controller, model, or other front-end class.
  *
  * <p>
  * Caching information and settings can be found in <code>portal.properties</code>
@@ -35,7 +35,7 @@ import java.util.List;
  *
  * @author Brian Wing Shun Chan
  * @see SyncDevicePersistence
- * @see com.liferay.sync.service.persistence.impl.SyncDevicePersistenceImpl
+ * @see com.liferay.sync.connector.service.persistence.impl.SyncDevicePersistenceImpl
  * @generated
  */
 @ProviderType
@@ -186,7 +186,7 @@ public class SyncDeviceUtil {
 	*/
 	public static SyncDevice findByUuid_First(java.lang.String uuid,
 		OrderByComparator<SyncDevice> orderByComparator)
-		throws com.liferay.sync.exception.NoSuchDeviceException {
+		throws com.liferay.sync.connector.exception.NoSuchDeviceException {
 		return getPersistence().findByUuid_First(uuid, orderByComparator);
 	}
 
@@ -212,7 +212,7 @@ public class SyncDeviceUtil {
 	*/
 	public static SyncDevice findByUuid_Last(java.lang.String uuid,
 		OrderByComparator<SyncDevice> orderByComparator)
-		throws com.liferay.sync.exception.NoSuchDeviceException {
+		throws com.liferay.sync.connector.exception.NoSuchDeviceException {
 		return getPersistence().findByUuid_Last(uuid, orderByComparator);
 	}
 
@@ -239,7 +239,7 @@ public class SyncDeviceUtil {
 	*/
 	public static SyncDevice[] findByUuid_PrevAndNext(long syncDeviceId,
 		java.lang.String uuid, OrderByComparator<SyncDevice> orderByComparator)
-		throws com.liferay.sync.exception.NoSuchDeviceException {
+		throws com.liferay.sync.connector.exception.NoSuchDeviceException {
 		return getPersistence()
 				   .findByUuid_PrevAndNext(syncDeviceId, uuid, orderByComparator);
 	}
@@ -349,7 +349,7 @@ public class SyncDeviceUtil {
 	*/
 	public static SyncDevice findByUuid_C_First(java.lang.String uuid,
 		long companyId, OrderByComparator<SyncDevice> orderByComparator)
-		throws com.liferay.sync.exception.NoSuchDeviceException {
+		throws com.liferay.sync.connector.exception.NoSuchDeviceException {
 		return getPersistence()
 				   .findByUuid_C_First(uuid, companyId, orderByComparator);
 	}
@@ -379,7 +379,7 @@ public class SyncDeviceUtil {
 	*/
 	public static SyncDevice findByUuid_C_Last(java.lang.String uuid,
 		long companyId, OrderByComparator<SyncDevice> orderByComparator)
-		throws com.liferay.sync.exception.NoSuchDeviceException {
+		throws com.liferay.sync.connector.exception.NoSuchDeviceException {
 		return getPersistence()
 				   .findByUuid_C_Last(uuid, companyId, orderByComparator);
 	}
@@ -411,7 +411,7 @@ public class SyncDeviceUtil {
 	public static SyncDevice[] findByUuid_C_PrevAndNext(long syncDeviceId,
 		java.lang.String uuid, long companyId,
 		OrderByComparator<SyncDevice> orderByComparator)
-		throws com.liferay.sync.exception.NoSuchDeviceException {
+		throws com.liferay.sync.connector.exception.NoSuchDeviceException {
 		return getPersistence()
 				   .findByUuid_C_PrevAndNext(syncDeviceId, uuid, companyId,
 			orderByComparator);
@@ -525,7 +525,7 @@ public class SyncDeviceUtil {
 	public static SyncDevice findByC_U_First(long companyId,
 		java.lang.String userName,
 		OrderByComparator<SyncDevice> orderByComparator)
-		throws com.liferay.sync.exception.NoSuchDeviceException {
+		throws com.liferay.sync.connector.exception.NoSuchDeviceException {
 		return getPersistence()
 				   .findByC_U_First(companyId, userName, orderByComparator);
 	}
@@ -557,7 +557,7 @@ public class SyncDeviceUtil {
 	public static SyncDevice findByC_U_Last(long companyId,
 		java.lang.String userName,
 		OrderByComparator<SyncDevice> orderByComparator)
-		throws com.liferay.sync.exception.NoSuchDeviceException {
+		throws com.liferay.sync.connector.exception.NoSuchDeviceException {
 		return getPersistence()
 				   .findByC_U_Last(companyId, userName, orderByComparator);
 	}
@@ -590,7 +590,7 @@ public class SyncDeviceUtil {
 	public static SyncDevice[] findByC_U_PrevAndNext(long syncDeviceId,
 		long companyId, java.lang.String userName,
 		OrderByComparator<SyncDevice> orderByComparator)
-		throws com.liferay.sync.exception.NoSuchDeviceException {
+		throws com.liferay.sync.connector.exception.NoSuchDeviceException {
 		return getPersistence()
 				   .findByC_U_PrevAndNext(syncDeviceId, companyId, userName,
 			orderByComparator);
@@ -653,7 +653,7 @@ public class SyncDeviceUtil {
 	* @throws NoSuchDeviceException if a sync device with the primary key could not be found
 	*/
 	public static SyncDevice remove(long syncDeviceId)
-		throws com.liferay.sync.exception.NoSuchDeviceException {
+		throws com.liferay.sync.connector.exception.NoSuchDeviceException {
 		return getPersistence().remove(syncDeviceId);
 	}
 
@@ -669,7 +669,7 @@ public class SyncDeviceUtil {
 	* @throws NoSuchDeviceException if a sync device with the primary key could not be found
 	*/
 	public static SyncDevice findByPrimaryKey(long syncDeviceId)
-		throws com.liferay.sync.exception.NoSuchDeviceException {
+		throws com.liferay.sync.connector.exception.NoSuchDeviceException {
 		return getPersistence().findByPrimaryKey(syncDeviceId);
 	}
 
@@ -771,7 +771,7 @@ public class SyncDeviceUtil {
 
 	public static SyncDevicePersistence getPersistence() {
 		if (_persistence == null) {
-			_persistence = (SyncDevicePersistence)PortletBeanLocatorUtil.locate(com.liferay.sync.service.ClpSerializer.getServletContextName(),
+			_persistence = (SyncDevicePersistence)PortletBeanLocatorUtil.locate(com.liferay.sync.connector.service.ClpSerializer.getServletContextName(),
 					SyncDevicePersistence.class.getName());
 
 			ReferenceRegistry.registerReference(SyncDeviceUtil.class,

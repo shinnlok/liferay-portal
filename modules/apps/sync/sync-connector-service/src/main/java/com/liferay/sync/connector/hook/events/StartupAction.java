@@ -12,12 +12,12 @@
  * details.
  */
 
-package com.liferay.sync.hook.events;
+package com.liferay.sync.connector.hook.events;
 
 import com.liferay.portal.kernel.events.ActionException;
 import com.liferay.portal.kernel.events.SimpleAction;
-import com.liferay.sync.service.SyncDLObjectLocalServiceUtil;
-import com.liferay.sync.util.VerifyUtil;
+import com.liferay.sync.connector.service.SyncDLObjectLocalServiceUtil;
+import com.liferay.sync.connector.util.VerifyUtil;
 
 /**
  * @author Shinn Lok

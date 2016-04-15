@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <model-hints>
-	<model name="com.liferay.sync.model.SyncDevice">
+	<model name="com.liferay.sync.connector.model.SyncDevice">
 		<field name="uuid" type="String" />
 		<field name="syncDeviceId" type="long" />
 		<field name="companyId" type="long" />
@@ -14,7 +14,7 @@
 		<field name="featureSet" type="int" />
 		<field name="status" type="int" />
 	</model>
-	<model name="com.liferay.sync.model.SyncDLFileVersionDiff">
+	<model name="com.liferay.sync.connector.model.SyncDLFileVersionDiff">
 		<field name="syncDLFileVersionDiffId" type="long" />
 		<field name="fileEntryId" type="long" />
 		<field name="sourceFileVersionId" type="long" />
@@ -23,7 +23,7 @@
 		<field name="size" type="long" />
 		<field name="expirationDate" type="Date" />
 	</model>
-	<model name="com.liferay.sync.model.SyncDLObject">
+	<model name="com.liferay.sync.connector.model.SyncDLObject">
 		<field name="syncDLObjectId" type="long" />
 		<field name="companyId" type="long" />
 		<field name="userId" type="long" />

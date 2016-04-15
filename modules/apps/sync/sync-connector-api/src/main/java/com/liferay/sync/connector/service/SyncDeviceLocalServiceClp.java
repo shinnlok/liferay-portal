@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.service;
+package com.liferay.sync.connector.service;
 
 import aQute.bnd.annotation.ProviderType;
 
@@ -31,7 +31,7 @@ public class SyncDeviceLocalServiceClp implements SyncDeviceLocalService {
 		_methodName0 = "addSyncDevice";
 
 		_methodParameterTypes0 = new String[] {
-				"com.liferay.sync.model.SyncDevice"
+				"com.liferay.sync.connector.model.SyncDevice"
 			};
 
 		_methodName1 = "addSyncDevice";
@@ -53,7 +53,7 @@ public class SyncDeviceLocalServiceClp implements SyncDeviceLocalService {
 		_methodName4 = "deleteSyncDevice";
 
 		_methodParameterTypes4 = new String[] {
-				"com.liferay.sync.model.SyncDevice"
+				"com.liferay.sync.connector.model.SyncDevice"
 			};
 
 		_methodName5 = "deleteSyncDevice";
@@ -156,7 +156,7 @@ public class SyncDeviceLocalServiceClp implements SyncDeviceLocalService {
 		_methodName26 = "updateSyncDevice";
 
 		_methodParameterTypes26 = new String[] {
-				"com.liferay.sync.model.SyncDevice"
+				"com.liferay.sync.connector.model.SyncDevice"
 			};
 
 		_methodName27 = "updateSyncDevice";
@@ -167,8 +167,8 @@ public class SyncDeviceLocalServiceClp implements SyncDeviceLocalService {
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDevice addSyncDevice(
-		com.liferay.sync.model.SyncDevice syncDevice) {
+	public com.liferay.sync.connector.model.SyncDevice addSyncDevice(
+		com.liferay.sync.connector.model.SyncDevice syncDevice) {
 		Object returnObj = null;
 
 		try {
@@ -188,11 +188,11 @@ public class SyncDeviceLocalServiceClp implements SyncDeviceLocalService {
 			}
 		}
 
-		return (com.liferay.sync.model.SyncDevice)ClpSerializer.translateOutput(returnObj);
+		return (com.liferay.sync.connector.model.SyncDevice)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDevice addSyncDevice(long userId,
+	public com.liferay.sync.connector.model.SyncDevice addSyncDevice(long userId,
 		java.lang.String type, int buildNumber, int featureSet)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		Object returnObj = null;
@@ -226,11 +226,11 @@ public class SyncDeviceLocalServiceClp implements SyncDeviceLocalService {
 			}
 		}
 
-		return (com.liferay.sync.model.SyncDevice)ClpSerializer.translateOutput(returnObj);
+		return (com.liferay.sync.connector.model.SyncDevice)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDevice createSyncDevice(long syncDeviceId) {
+	public com.liferay.sync.connector.model.SyncDevice createSyncDevice(long syncDeviceId) {
 		Object returnObj = null;
 
 		try {
@@ -249,7 +249,7 @@ public class SyncDeviceLocalServiceClp implements SyncDeviceLocalService {
 			}
 		}
 
-		return (com.liferay.sync.model.SyncDevice)ClpSerializer.translateOutput(returnObj);
+		return (com.liferay.sync.connector.model.SyncDevice)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
@@ -283,8 +283,8 @@ public class SyncDeviceLocalServiceClp implements SyncDeviceLocalService {
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDevice deleteSyncDevice(
-		com.liferay.sync.model.SyncDevice syncDevice) {
+	public com.liferay.sync.connector.model.SyncDevice deleteSyncDevice(
+		com.liferay.sync.connector.model.SyncDevice syncDevice) {
 		Object returnObj = null;
 
 		try {
@@ -304,11 +304,11 @@ public class SyncDeviceLocalServiceClp implements SyncDeviceLocalService {
 			}
 		}
 
-		return (com.liferay.sync.model.SyncDevice)ClpSerializer.translateOutput(returnObj);
+		return (com.liferay.sync.connector.model.SyncDevice)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDevice deleteSyncDevice(long syncDeviceId)
+	public com.liferay.sync.connector.model.SyncDevice deleteSyncDevice(long syncDeviceId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		Object returnObj = null;
 
@@ -332,7 +332,7 @@ public class SyncDeviceLocalServiceClp implements SyncDeviceLocalService {
 			}
 		}
 
-		return (com.liferay.sync.model.SyncDevice)ClpSerializer.translateOutput(returnObj);
+		return (com.liferay.sync.connector.model.SyncDevice)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
@@ -506,7 +506,7 @@ public class SyncDeviceLocalServiceClp implements SyncDeviceLocalService {
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDevice fetchSyncDevice(long syncDeviceId) {
+	public com.liferay.sync.connector.model.SyncDevice fetchSyncDevice(long syncDeviceId) {
 		Object returnObj = null;
 
 		try {
@@ -525,11 +525,11 @@ public class SyncDeviceLocalServiceClp implements SyncDeviceLocalService {
 			}
 		}
 
-		return (com.liferay.sync.model.SyncDevice)ClpSerializer.translateOutput(returnObj);
+		return (com.liferay.sync.connector.model.SyncDevice)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDevice fetchSyncDeviceByUuidAndCompanyId(
+	public com.liferay.sync.connector.model.SyncDevice fetchSyncDeviceByUuidAndCompanyId(
 		java.lang.String uuid, long companyId) {
 		Object returnObj = null;
 
@@ -550,7 +550,7 @@ public class SyncDeviceLocalServiceClp implements SyncDeviceLocalService {
 			}
 		}
 
-		return (com.liferay.sync.model.SyncDevice)ClpSerializer.translateOutput(returnObj);
+		return (com.liferay.sync.connector.model.SyncDevice)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
@@ -680,7 +680,7 @@ public class SyncDeviceLocalServiceClp implements SyncDeviceLocalService {
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDevice getSyncDevice(long syncDeviceId)
+	public com.liferay.sync.connector.model.SyncDevice getSyncDevice(long syncDeviceId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		Object returnObj = null;
 
@@ -704,11 +704,11 @@ public class SyncDeviceLocalServiceClp implements SyncDeviceLocalService {
 			}
 		}
 
-		return (com.liferay.sync.model.SyncDevice)ClpSerializer.translateOutput(returnObj);
+		return (com.liferay.sync.connector.model.SyncDevice)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDevice getSyncDeviceByUuidAndCompanyId(
+	public com.liferay.sync.connector.model.SyncDevice getSyncDeviceByUuidAndCompanyId(
 		java.lang.String uuid, long companyId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		Object returnObj = null;
@@ -734,11 +734,11 @@ public class SyncDeviceLocalServiceClp implements SyncDeviceLocalService {
 			}
 		}
 
-		return (com.liferay.sync.model.SyncDevice)ClpSerializer.translateOutput(returnObj);
+		return (com.liferay.sync.connector.model.SyncDevice)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
-	public java.util.List<com.liferay.sync.model.SyncDevice> getSyncDevices(
+	public java.util.List<com.liferay.sync.connector.model.SyncDevice> getSyncDevices(
 		int start, int end) {
 		Object returnObj = null;
 
@@ -758,7 +758,7 @@ public class SyncDeviceLocalServiceClp implements SyncDeviceLocalService {
 			}
 		}
 
-		return (java.util.List<com.liferay.sync.model.SyncDevice>)ClpSerializer.translateOutput(returnObj);
+		return (java.util.List<com.liferay.sync.connector.model.SyncDevice>)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
@@ -792,9 +792,9 @@ public class SyncDeviceLocalServiceClp implements SyncDeviceLocalService {
 	}
 
 	@Override
-	public java.util.List<com.liferay.sync.model.SyncDevice> search(
+	public java.util.List<com.liferay.sync.connector.model.SyncDevice> search(
 		long companyId, java.lang.String keywords, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.sync.model.SyncDevice> orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.sync.connector.model.SyncDevice> orderByComparator) {
 		Object returnObj = null;
 
 		try {
@@ -824,7 +824,7 @@ public class SyncDeviceLocalServiceClp implements SyncDeviceLocalService {
 			}
 		}
 
-		return (java.util.List<com.liferay.sync.model.SyncDevice>)ClpSerializer.translateOutput(returnObj);
+		return (java.util.List<com.liferay.sync.connector.model.SyncDevice>)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
@@ -852,8 +852,8 @@ public class SyncDeviceLocalServiceClp implements SyncDeviceLocalService {
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDevice updateSyncDevice(
-		com.liferay.sync.model.SyncDevice syncDevice) {
+	public com.liferay.sync.connector.model.SyncDevice updateSyncDevice(
+		com.liferay.sync.connector.model.SyncDevice syncDevice) {
 		Object returnObj = null;
 
 		try {
@@ -873,11 +873,11 @@ public class SyncDeviceLocalServiceClp implements SyncDeviceLocalService {
 			}
 		}
 
-		return (com.liferay.sync.model.SyncDevice)ClpSerializer.translateOutput(returnObj);
+		return (com.liferay.sync.connector.model.SyncDevice)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDevice updateSyncDevice(
+	public com.liferay.sync.connector.model.SyncDevice updateSyncDevice(
 		long syncDeviceId, java.lang.String type, int buildNumber,
 		int featureSet, int status)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -914,7 +914,7 @@ public class SyncDeviceLocalServiceClp implements SyncDeviceLocalService {
 			}
 		}
 
-		return (com.liferay.sync.model.SyncDevice)ClpSerializer.translateOutput(returnObj);
+		return (com.liferay.sync.connector.model.SyncDevice)ClpSerializer.translateOutput(returnObj);
 	}
 
 	private InvokableLocalService _invokableLocalService;

@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.service;
+package com.liferay.sync.connector.service;
 
 import aQute.bnd.annotation.ProviderType;
 
@@ -25,7 +25,7 @@ import com.liferay.portal.kernel.service.InvokableService;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Transactional;
 
-import com.liferay.sync.model.SyncDevice;
+import com.liferay.sync.connector.model.SyncDevice;
 
 /**
  * Provides the remote service interface for SyncDevice. Methods of this
@@ -34,8 +34,8 @@ import com.liferay.sync.model.SyncDevice;
  *
  * @author Brian Wing Shun Chan
  * @see SyncDeviceServiceUtil
- * @see com.liferay.sync.service.base.SyncDeviceServiceBaseImpl
- * @see com.liferay.sync.service.impl.SyncDeviceServiceImpl
+ * @see com.liferay.sync.connector.service.base.SyncDeviceServiceBaseImpl
+ * @see com.liferay.sync.connector.service.impl.SyncDeviceServiceImpl
  * @generated
  */
 @AccessControlled
@@ -47,7 +47,7 @@ public interface SyncDeviceService extends BaseService, InvokableService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this interface directly. Always use {@link SyncDeviceServiceUtil} to access the sync device remote service. Add custom service methods to {@link com.liferay.sync.service.impl.SyncDeviceServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify or reference this interface directly. Always use {@link SyncDeviceServiceUtil} to access the sync device remote service. Add custom service methods to {@link com.liferay.sync.connector.service.impl.SyncDeviceServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
 
 	/**

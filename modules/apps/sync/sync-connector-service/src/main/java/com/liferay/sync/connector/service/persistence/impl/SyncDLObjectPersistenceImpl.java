@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.service.persistence.impl;
+package com.liferay.sync.connector.service.persistence.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
@@ -41,11 +41,11 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
-import com.liferay.sync.exception.NoSuchDLObjectException;
-import com.liferay.sync.model.SyncDLObject;
-import com.liferay.sync.model.impl.SyncDLObjectImpl;
-import com.liferay.sync.model.impl.SyncDLObjectModelImpl;
-import com.liferay.sync.service.persistence.SyncDLObjectPersistence;
+import com.liferay.sync.connector.exception.NoSuchDLObjectException;
+import com.liferay.sync.connector.model.SyncDLObject;
+import com.liferay.sync.connector.model.impl.SyncDLObjectImpl;
+import com.liferay.sync.connector.model.impl.SyncDLObjectModelImpl;
+import com.liferay.sync.connector.service.persistence.SyncDLObjectPersistence;
 
 import java.io.Serializable;
 
@@ -67,7 +67,7 @@ import java.util.Set;
  *
  * @author Brian Wing Shun Chan
  * @see SyncDLObjectPersistence
- * @see com.liferay.sync.service.persistence.SyncDLObjectUtil
+ * @see com.liferay.sync.connector.service.persistence.SyncDLObjectUtil
  * @generated
  */
 @ProviderType

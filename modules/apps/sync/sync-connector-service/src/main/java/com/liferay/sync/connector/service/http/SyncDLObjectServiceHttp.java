@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.service.http;
+package com.liferay.sync.connector.service.http;
 
 import aQute.bnd.annotation.ProviderType;
 
@@ -23,7 +23,7 @@ import com.liferay.portal.kernel.service.http.TunnelUtil;
 import com.liferay.portal.kernel.util.MethodHandler;
 import com.liferay.portal.kernel.util.MethodKey;
 
-import com.liferay.sync.service.SyncDLObjectServiceUtil;
+import com.liferay.sync.connector.service.SyncDLObjectServiceUtil;
 
 /**
  * Provides the HTTP utility for the
@@ -55,7 +55,7 @@ import com.liferay.sync.service.SyncDLObjectServiceUtil;
  */
 @ProviderType
 public class SyncDLObjectServiceHttp {
-	public static com.liferay.sync.model.SyncDLObject addFileEntry(
+	public static com.liferay.sync.connector.model.SyncDLObject addFileEntry(
 		HttpPrincipal httpPrincipal, long repositoryId, long folderId,
 		java.lang.String sourceFileName, java.lang.String mimeType,
 		java.lang.String title, java.lang.String description,
@@ -84,7 +84,7 @@ public class SyncDLObjectServiceHttp {
 				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
-			return (com.liferay.sync.model.SyncDLObject)returnObj;
+			return (com.liferay.sync.connector.model.SyncDLObject)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -93,7 +93,7 @@ public class SyncDLObjectServiceHttp {
 		}
 	}
 
-	public static com.liferay.sync.model.SyncDLObject addFolder(
+	public static com.liferay.sync.connector.model.SyncDLObject addFolder(
 		HttpPrincipal httpPrincipal, long repositoryId, long parentFolderId,
 		java.lang.String name, java.lang.String description,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
@@ -119,7 +119,7 @@ public class SyncDLObjectServiceHttp {
 				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
-			return (com.liferay.sync.model.SyncDLObject)returnObj;
+			return (com.liferay.sync.connector.model.SyncDLObject)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -128,7 +128,7 @@ public class SyncDLObjectServiceHttp {
 		}
 	}
 
-	public static com.liferay.sync.model.SyncDLObject cancelCheckOut(
+	public static com.liferay.sync.connector.model.SyncDLObject cancelCheckOut(
 		HttpPrincipal httpPrincipal, long fileEntryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		try {
@@ -151,7 +151,7 @@ public class SyncDLObjectServiceHttp {
 				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
-			return (com.liferay.sync.model.SyncDLObject)returnObj;
+			return (com.liferay.sync.connector.model.SyncDLObject)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -160,7 +160,7 @@ public class SyncDLObjectServiceHttp {
 		}
 	}
 
-	public static com.liferay.sync.model.SyncDLObject checkInFileEntry(
+	public static com.liferay.sync.connector.model.SyncDLObject checkInFileEntry(
 		HttpPrincipal httpPrincipal, long fileEntryId, boolean majorVersion,
 		java.lang.String changeLog,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
@@ -185,7 +185,7 @@ public class SyncDLObjectServiceHttp {
 				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
-			return (com.liferay.sync.model.SyncDLObject)returnObj;
+			return (com.liferay.sync.connector.model.SyncDLObject)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -194,7 +194,7 @@ public class SyncDLObjectServiceHttp {
 		}
 	}
 
-	public static com.liferay.sync.model.SyncDLObject checkOutFileEntry(
+	public static com.liferay.sync.connector.model.SyncDLObject checkOutFileEntry(
 		HttpPrincipal httpPrincipal, long fileEntryId,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -218,7 +218,7 @@ public class SyncDLObjectServiceHttp {
 				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
-			return (com.liferay.sync.model.SyncDLObject)returnObj;
+			return (com.liferay.sync.connector.model.SyncDLObject)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -227,7 +227,7 @@ public class SyncDLObjectServiceHttp {
 		}
 	}
 
-	public static com.liferay.sync.model.SyncDLObject checkOutFileEntry(
+	public static com.liferay.sync.connector.model.SyncDLObject checkOutFileEntry(
 		HttpPrincipal httpPrincipal, long fileEntryId, java.lang.String owner,
 		long expirationTime,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
@@ -252,7 +252,7 @@ public class SyncDLObjectServiceHttp {
 				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
-			return (com.liferay.sync.model.SyncDLObject)returnObj;
+			return (com.liferay.sync.connector.model.SyncDLObject)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -261,7 +261,7 @@ public class SyncDLObjectServiceHttp {
 		}
 	}
 
-	public static com.liferay.sync.model.SyncDLObject copyFileEntry(
+	public static com.liferay.sync.connector.model.SyncDLObject copyFileEntry(
 		HttpPrincipal httpPrincipal, long sourceFileEntryId, long repositoryId,
 		long folderId, java.lang.String sourceFileName, java.lang.String title,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
@@ -287,7 +287,7 @@ public class SyncDLObjectServiceHttp {
 				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
-			return (com.liferay.sync.model.SyncDLObject)returnObj;
+			return (com.liferay.sync.connector.model.SyncDLObject)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -296,7 +296,7 @@ public class SyncDLObjectServiceHttp {
 		}
 	}
 
-	public static java.util.List<com.liferay.sync.model.SyncDLObject> getAllFolderSyncDLObjects(
+	public static java.util.List<com.liferay.sync.connector.model.SyncDLObject> getAllFolderSyncDLObjects(
 		HttpPrincipal httpPrincipal, long repositoryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		try {
@@ -320,7 +320,7 @@ public class SyncDLObjectServiceHttp {
 				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
-			return (java.util.List<com.liferay.sync.model.SyncDLObject>)returnObj;
+			return (java.util.List<com.liferay.sync.connector.model.SyncDLObject>)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -329,7 +329,7 @@ public class SyncDLObjectServiceHttp {
 		}
 	}
 
-	public static com.liferay.sync.model.SyncDLObject getFileEntrySyncDLObject(
+	public static com.liferay.sync.connector.model.SyncDLObject getFileEntrySyncDLObject(
 		HttpPrincipal httpPrincipal, long repositoryId, long folderId,
 		java.lang.String title)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -354,7 +354,7 @@ public class SyncDLObjectServiceHttp {
 				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
-			return (com.liferay.sync.model.SyncDLObject)returnObj;
+			return (com.liferay.sync.connector.model.SyncDLObject)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -363,7 +363,7 @@ public class SyncDLObjectServiceHttp {
 		}
 	}
 
-	public static java.util.List<com.liferay.sync.model.SyncDLObject> getFileEntrySyncDLObjects(
+	public static java.util.List<com.liferay.sync.connector.model.SyncDLObject> getFileEntrySyncDLObjects(
 		HttpPrincipal httpPrincipal, long repositoryId, long folderId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		try {
@@ -387,7 +387,7 @@ public class SyncDLObjectServiceHttp {
 				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
-			return (java.util.List<com.liferay.sync.model.SyncDLObject>)returnObj;
+			return (java.util.List<com.liferay.sync.connector.model.SyncDLObject>)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -396,7 +396,7 @@ public class SyncDLObjectServiceHttp {
 		}
 	}
 
-	public static com.liferay.sync.model.SyncDLObject getFolderSyncDLObject(
+	public static com.liferay.sync.connector.model.SyncDLObject getFolderSyncDLObject(
 		HttpPrincipal httpPrincipal, long folderId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		try {
@@ -419,7 +419,7 @@ public class SyncDLObjectServiceHttp {
 				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
-			return (com.liferay.sync.model.SyncDLObject)returnObj;
+			return (com.liferay.sync.connector.model.SyncDLObject)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -428,7 +428,7 @@ public class SyncDLObjectServiceHttp {
 		}
 	}
 
-	public static com.liferay.sync.model.SyncDLObject getFolderSyncDLObject(
+	public static com.liferay.sync.connector.model.SyncDLObject getFolderSyncDLObject(
 		HttpPrincipal httpPrincipal, long repositoryId, long parentFolderId,
 		java.lang.String name)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -453,7 +453,7 @@ public class SyncDLObjectServiceHttp {
 				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
-			return (com.liferay.sync.model.SyncDLObject)returnObj;
+			return (com.liferay.sync.connector.model.SyncDLObject)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -462,7 +462,7 @@ public class SyncDLObjectServiceHttp {
 		}
 	}
 
-	public static java.util.List<com.liferay.sync.model.SyncDLObject> getFolderSyncDLObjects(
+	public static java.util.List<com.liferay.sync.connector.model.SyncDLObject> getFolderSyncDLObjects(
 		HttpPrincipal httpPrincipal, long repositoryId, long parentFolderId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		try {
@@ -486,7 +486,7 @@ public class SyncDLObjectServiceHttp {
 				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
-			return (java.util.List<com.liferay.sync.model.SyncDLObject>)returnObj;
+			return (java.util.List<com.liferay.sync.connector.model.SyncDLObject>)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -719,7 +719,7 @@ public class SyncDLObjectServiceHttp {
 		}
 	}
 
-	public static com.liferay.sync.model.SyncDLObject moveFileEntry(
+	public static com.liferay.sync.connector.model.SyncDLObject moveFileEntry(
 		HttpPrincipal httpPrincipal, long fileEntryId, long newFolderId,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -743,7 +743,7 @@ public class SyncDLObjectServiceHttp {
 				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
-			return (com.liferay.sync.model.SyncDLObject)returnObj;
+			return (com.liferay.sync.connector.model.SyncDLObject)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -752,7 +752,7 @@ public class SyncDLObjectServiceHttp {
 		}
 	}
 
-	public static com.liferay.sync.model.SyncDLObject moveFileEntryToTrash(
+	public static com.liferay.sync.connector.model.SyncDLObject moveFileEntryToTrash(
 		HttpPrincipal httpPrincipal, long fileEntryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		try {
@@ -776,7 +776,7 @@ public class SyncDLObjectServiceHttp {
 				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
-			return (com.liferay.sync.model.SyncDLObject)returnObj;
+			return (com.liferay.sync.connector.model.SyncDLObject)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -785,7 +785,7 @@ public class SyncDLObjectServiceHttp {
 		}
 	}
 
-	public static com.liferay.sync.model.SyncDLObject moveFolder(
+	public static com.liferay.sync.connector.model.SyncDLObject moveFolder(
 		HttpPrincipal httpPrincipal, long folderId, long parentFolderId,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -809,7 +809,7 @@ public class SyncDLObjectServiceHttp {
 				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
-			return (com.liferay.sync.model.SyncDLObject)returnObj;
+			return (com.liferay.sync.connector.model.SyncDLObject)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -818,7 +818,7 @@ public class SyncDLObjectServiceHttp {
 		}
 	}
 
-	public static com.liferay.sync.model.SyncDLObject moveFolderToTrash(
+	public static com.liferay.sync.connector.model.SyncDLObject moveFolderToTrash(
 		HttpPrincipal httpPrincipal, long folderId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		try {
@@ -840,7 +840,7 @@ public class SyncDLObjectServiceHttp {
 				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
-			return (com.liferay.sync.model.SyncDLObject)returnObj;
+			return (com.liferay.sync.connector.model.SyncDLObject)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -849,7 +849,7 @@ public class SyncDLObjectServiceHttp {
 		}
 	}
 
-	public static com.liferay.sync.model.SyncDLObject patchFileEntry(
+	public static com.liferay.sync.connector.model.SyncDLObject patchFileEntry(
 		HttpPrincipal httpPrincipal, long fileEntryId, long sourceVersionId,
 		java.lang.String sourceFileName, java.lang.String mimeType,
 		java.lang.String title, java.lang.String description,
@@ -879,7 +879,7 @@ public class SyncDLObjectServiceHttp {
 				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
-			return (com.liferay.sync.model.SyncDLObject)returnObj;
+			return (com.liferay.sync.connector.model.SyncDLObject)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -888,7 +888,7 @@ public class SyncDLObjectServiceHttp {
 		}
 	}
 
-	public static com.liferay.sync.model.SyncDLObject restoreFileEntryFromTrash(
+	public static com.liferay.sync.connector.model.SyncDLObject restoreFileEntryFromTrash(
 		HttpPrincipal httpPrincipal, long fileEntryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		try {
@@ -912,7 +912,7 @@ public class SyncDLObjectServiceHttp {
 				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
-			return (com.liferay.sync.model.SyncDLObject)returnObj;
+			return (com.liferay.sync.connector.model.SyncDLObject)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -921,7 +921,7 @@ public class SyncDLObjectServiceHttp {
 		}
 	}
 
-	public static com.liferay.sync.model.SyncDLObject restoreFolderFromTrash(
+	public static com.liferay.sync.connector.model.SyncDLObject restoreFolderFromTrash(
 		HttpPrincipal httpPrincipal, long folderId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		try {
@@ -944,7 +944,7 @@ public class SyncDLObjectServiceHttp {
 				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
-			return (com.liferay.sync.model.SyncDLObject)returnObj;
+			return (com.liferay.sync.connector.model.SyncDLObject)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -984,7 +984,7 @@ public class SyncDLObjectServiceHttp {
 		}
 	}
 
-	public static com.liferay.sync.model.SyncDLObject updateFileEntry(
+	public static com.liferay.sync.connector.model.SyncDLObject updateFileEntry(
 		HttpPrincipal httpPrincipal, long fileEntryId,
 		java.lang.String sourceFileName, java.lang.String mimeType,
 		java.lang.String title, java.lang.String description,
@@ -1013,7 +1013,7 @@ public class SyncDLObjectServiceHttp {
 				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
-			return (com.liferay.sync.model.SyncDLObject)returnObj;
+			return (com.liferay.sync.connector.model.SyncDLObject)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -1022,7 +1022,7 @@ public class SyncDLObjectServiceHttp {
 		}
 	}
 
-	public static com.liferay.sync.model.SyncDLObject updateFolder(
+	public static com.liferay.sync.connector.model.SyncDLObject updateFolder(
 		HttpPrincipal httpPrincipal, long folderId, java.lang.String name,
 		java.lang.String description,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
@@ -1047,7 +1047,7 @@ public class SyncDLObjectServiceHttp {
 				throw new com.liferay.portal.kernel.exception.SystemException(e);
 			}
 
-			return (com.liferay.sync.model.SyncDLObject)returnObj;
+			return (com.liferay.sync.connector.model.SyncDLObject)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);

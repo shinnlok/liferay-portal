@@ -12,11 +12,11 @@
  * details.
  */
 
-package com.liferay.sync.service.base;
+package com.liferay.sync.connector.service.base;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.sync.service.SyncDeviceLocalServiceUtil;
+import com.liferay.sync.connector.service.SyncDeviceLocalServiceUtil;
 
 import java.util.Arrays;
 
@@ -30,7 +30,7 @@ public class SyncDeviceLocalServiceClpInvoker {
 		_methodName0 = "addSyncDevice";
 
 		_methodParameterTypes0 = new String[] {
-				"com.liferay.sync.model.SyncDevice"
+				"com.liferay.sync.connector.model.SyncDevice"
 			};
 
 		_methodName1 = "createSyncDevice";
@@ -44,7 +44,7 @@ public class SyncDeviceLocalServiceClpInvoker {
 		_methodName3 = "deleteSyncDevice";
 
 		_methodParameterTypes3 = new String[] {
-				"com.liferay.sync.model.SyncDevice"
+				"com.liferay.sync.connector.model.SyncDevice"
 			};
 
 		_methodName4 = "dynamicQuery";
@@ -134,7 +134,7 @@ public class SyncDeviceLocalServiceClpInvoker {
 		_methodName22 = "updateSyncDevice";
 
 		_methodParameterTypes22 = new String[] {
-				"com.liferay.sync.model.SyncDevice"
+				"com.liferay.sync.connector.model.SyncDevice"
 			};
 
 		_methodName53 = "getOSGiServiceIdentifier";
@@ -169,7 +169,7 @@ public class SyncDeviceLocalServiceClpInvoker {
 		Object[] arguments) throws Throwable {
 		if (_methodName0.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes0, parameterTypes)) {
-			return SyncDeviceLocalServiceUtil.addSyncDevice((com.liferay.sync.model.SyncDevice)arguments[0]);
+			return SyncDeviceLocalServiceUtil.addSyncDevice((com.liferay.sync.connector.model.SyncDevice)arguments[0]);
 		}
 
 		if (_methodName1.equals(name) &&
@@ -184,7 +184,7 @@ public class SyncDeviceLocalServiceClpInvoker {
 
 		if (_methodName3.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes3, parameterTypes)) {
-			return SyncDeviceLocalServiceUtil.deleteSyncDevice((com.liferay.sync.model.SyncDevice)arguments[0]);
+			return SyncDeviceLocalServiceUtil.deleteSyncDevice((com.liferay.sync.connector.model.SyncDevice)arguments[0]);
 		}
 
 		if (_methodName4.equals(name) &&
@@ -283,7 +283,7 @@ public class SyncDeviceLocalServiceClpInvoker {
 
 		if (_methodName22.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes22, parameterTypes)) {
-			return SyncDeviceLocalServiceUtil.updateSyncDevice((com.liferay.sync.model.SyncDevice)arguments[0]);
+			return SyncDeviceLocalServiceUtil.updateSyncDevice((com.liferay.sync.connector.model.SyncDevice)arguments[0]);
 		}
 
 		if (_methodName53.equals(name) &&
@@ -305,7 +305,7 @@ public class SyncDeviceLocalServiceClpInvoker {
 				(java.lang.String)arguments[1],
 				((Integer)arguments[2]).intValue(),
 				((Integer)arguments[3]).intValue(),
-				(com.liferay.portal.kernel.util.OrderByComparator<com.liferay.sync.model.SyncDevice>)arguments[4]);
+				(com.liferay.portal.kernel.util.OrderByComparator<com.liferay.sync.connector.model.SyncDevice>)arguments[4]);
 		}
 
 		if (_methodName60.equals(name) &&

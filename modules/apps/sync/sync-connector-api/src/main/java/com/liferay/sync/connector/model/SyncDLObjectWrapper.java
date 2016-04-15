@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.model;
+package com.liferay.sync.connector.model;
 
 import aQute.bnd.annotation.ProviderType;
 
@@ -266,7 +266,7 @@ public class SyncDLObjectWrapper implements SyncDLObject,
 	}
 
 	@Override
-	public int compareTo(com.liferay.sync.model.SyncDLObject syncDLObject) {
+	public int compareTo(com.liferay.sync.connector.model.SyncDLObject syncDLObject) {
 		return _syncDLObject.compareTo(syncDLObject);
 	}
 
@@ -947,12 +947,12 @@ public class SyncDLObjectWrapper implements SyncDLObject,
 	}
 
 	@Override
-	public com.liferay.portal.kernel.model.CacheModel<com.liferay.sync.model.SyncDLObject> toCacheModel() {
+	public com.liferay.portal.kernel.model.CacheModel<com.liferay.sync.connector.model.SyncDLObject> toCacheModel() {
 		return _syncDLObject.toCacheModel();
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject toEscapedModel() {
+	public com.liferay.sync.connector.model.SyncDLObject toEscapedModel() {
 		return new SyncDLObjectWrapper(_syncDLObject.toEscapedModel());
 	}
 
@@ -962,7 +962,7 @@ public class SyncDLObjectWrapper implements SyncDLObject,
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject toUnescapedModel() {
+	public com.liferay.sync.connector.model.SyncDLObject toUnescapedModel() {
 		return new SyncDLObjectWrapper(_syncDLObject.toUnescapedModel());
 	}
 

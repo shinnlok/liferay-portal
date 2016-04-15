@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.model.impl;
+package com.liferay.sync.connector.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
@@ -32,9 +32,9 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 
-import com.liferay.sync.model.SyncDLObject;
-import com.liferay.sync.model.SyncDLObjectModel;
-import com.liferay.sync.model.SyncDLObjectSoap;
+import com.liferay.sync.connector.model.SyncDLObject;
+import com.liferay.sync.connector.model.SyncDLObjectModel;
+import com.liferay.sync.connector.model.SyncDLObjectSoap;
 
 import java.io.Serializable;
 
@@ -138,13 +138,13 @@ public class SyncDLObjectModelImpl extends BaseModelImpl<SyncDLObject>
 	public static final String SESSION_FACTORY = "liferaySessionFactory";
 	public static final String TX_MANAGER = "liferayTransactionManager";
 	public static final boolean ENTITY_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.util.service.ServiceProps.get(
-				"value.object.entity.cache.enabled.com.liferay.sync.model.SyncDLObject"),
+				"value.object.entity.cache.enabled.com.liferay.sync.connector.model.SyncDLObject"),
 			true);
 	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.util.service.ServiceProps.get(
-				"value.object.finder.cache.enabled.com.liferay.sync.model.SyncDLObject"),
+				"value.object.finder.cache.enabled.com.liferay.sync.connector.model.SyncDLObject"),
 			true);
 	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.util.service.ServiceProps.get(
-				"value.object.column.bitmask.enabled.com.liferay.sync.model.SyncDLObject"),
+				"value.object.column.bitmask.enabled.com.liferay.sync.connector.model.SyncDLObject"),
 			true);
 	public static final long EVENT_COLUMN_BITMASK = 1L;
 	public static final long MODIFIEDTIME_COLUMN_BITMASK = 2L;
@@ -220,7 +220,7 @@ public class SyncDLObjectModelImpl extends BaseModelImpl<SyncDLObject>
 	}
 
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.util.service.ServiceProps.get(
-				"lock.expiration.time.com.liferay.sync.model.SyncDLObject"));
+				"lock.expiration.time.com.liferay.sync.connector.model.SyncDLObject"));
 
 	public SyncDLObjectModelImpl() {
 	}
@@ -1340,7 +1340,7 @@ public class SyncDLObjectModelImpl extends BaseModelImpl<SyncDLObject>
 		StringBundler sb = new StringBundler(85);
 
 		sb.append("<model><model-name>");
-		sb.append("com.liferay.sync.model.SyncDLObject");
+		sb.append("com.liferay.sync.connector.model.SyncDLObject");
 		sb.append("</model-name>");
 
 		sb.append(

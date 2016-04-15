@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.model.upgrade;
+package com.liferay.sync.connector.model.upgrade;
 
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.exception.SystemException;

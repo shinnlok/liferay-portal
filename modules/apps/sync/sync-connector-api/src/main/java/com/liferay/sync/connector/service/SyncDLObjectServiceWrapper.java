@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.service;
+package com.liferay.sync.connector.service;
 
 import aQute.bnd.annotation.ProviderType;
 
@@ -33,7 +33,7 @@ public class SyncDLObjectServiceWrapper implements SyncDLObjectService,
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject addFileEntry(long repositoryId,
+	public com.liferay.sync.connector.model.SyncDLObject addFileEntry(long repositoryId,
 		long folderId, java.lang.String sourceFileName,
 		java.lang.String mimeType, java.lang.String title,
 		java.lang.String description, java.lang.String changeLog,
@@ -46,7 +46,7 @@ public class SyncDLObjectServiceWrapper implements SyncDLObjectService,
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject addFolder(long repositoryId,
+	public com.liferay.sync.connector.model.SyncDLObject addFolder(long repositoryId,
 		long parentFolderId, java.lang.String name,
 		java.lang.String description,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
@@ -56,13 +56,13 @@ public class SyncDLObjectServiceWrapper implements SyncDLObjectService,
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject cancelCheckOut(long fileEntryId)
+	public com.liferay.sync.connector.model.SyncDLObject cancelCheckOut(long fileEntryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _syncDLObjectService.cancelCheckOut(fileEntryId);
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject checkInFileEntry(
+	public com.liferay.sync.connector.model.SyncDLObject checkInFileEntry(
 		long fileEntryId, boolean majorVersion, java.lang.String changeLog,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -71,7 +71,7 @@ public class SyncDLObjectServiceWrapper implements SyncDLObjectService,
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject checkOutFileEntry(
+	public com.liferay.sync.connector.model.SyncDLObject checkOutFileEntry(
 		long fileEntryId, java.lang.String owner, long expirationTime,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -80,7 +80,7 @@ public class SyncDLObjectServiceWrapper implements SyncDLObjectService,
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject checkOutFileEntry(
+	public com.liferay.sync.connector.model.SyncDLObject checkOutFileEntry(
 		long fileEntryId,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -89,7 +89,7 @@ public class SyncDLObjectServiceWrapper implements SyncDLObjectService,
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject copyFileEntry(
+	public com.liferay.sync.connector.model.SyncDLObject copyFileEntry(
 		long sourceFileEntryId, long repositoryId, long folderId,
 		java.lang.String sourceFileName, java.lang.String title,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
@@ -99,14 +99,14 @@ public class SyncDLObjectServiceWrapper implements SyncDLObjectService,
 	}
 
 	@Override
-	public java.util.List<com.liferay.sync.model.SyncDLObject> getAllFolderSyncDLObjects(
+	public java.util.List<com.liferay.sync.connector.model.SyncDLObject> getAllFolderSyncDLObjects(
 		long repositoryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _syncDLObjectService.getAllFolderSyncDLObjects(repositoryId);
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject getFileEntrySyncDLObject(
+	public com.liferay.sync.connector.model.SyncDLObject getFileEntrySyncDLObject(
 		long repositoryId, long folderId, java.lang.String title)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _syncDLObjectService.getFileEntrySyncDLObject(repositoryId,
@@ -114,7 +114,7 @@ public class SyncDLObjectServiceWrapper implements SyncDLObjectService,
 	}
 
 	@Override
-	public java.util.List<com.liferay.sync.model.SyncDLObject> getFileEntrySyncDLObjects(
+	public java.util.List<com.liferay.sync.connector.model.SyncDLObject> getFileEntrySyncDLObjects(
 		long repositoryId, long folderId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _syncDLObjectService.getFileEntrySyncDLObjects(repositoryId,
@@ -122,14 +122,14 @@ public class SyncDLObjectServiceWrapper implements SyncDLObjectService,
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject getFolderSyncDLObject(
+	public com.liferay.sync.connector.model.SyncDLObject getFolderSyncDLObject(
 		long folderId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _syncDLObjectService.getFolderSyncDLObject(folderId);
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject getFolderSyncDLObject(
+	public com.liferay.sync.connector.model.SyncDLObject getFolderSyncDLObject(
 		long repositoryId, long parentFolderId, java.lang.String name)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _syncDLObjectService.getFolderSyncDLObject(repositoryId,
@@ -137,7 +137,7 @@ public class SyncDLObjectServiceWrapper implements SyncDLObjectService,
 	}
 
 	@Override
-	public java.util.List<com.liferay.sync.model.SyncDLObject> getFolderSyncDLObjects(
+	public java.util.List<com.liferay.sync.connector.model.SyncDLObject> getFolderSyncDLObjects(
 		long repositoryId, long parentFolderId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _syncDLObjectService.getFolderSyncDLObjects(repositoryId,
@@ -210,7 +210,7 @@ public class SyncDLObjectServiceWrapper implements SyncDLObjectService,
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject moveFileEntry(long fileEntryId,
+	public com.liferay.sync.connector.model.SyncDLObject moveFileEntry(long fileEntryId,
 		long newFolderId,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -219,14 +219,14 @@ public class SyncDLObjectServiceWrapper implements SyncDLObjectService,
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject moveFileEntryToTrash(
+	public com.liferay.sync.connector.model.SyncDLObject moveFileEntryToTrash(
 		long fileEntryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _syncDLObjectService.moveFileEntryToTrash(fileEntryId);
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject moveFolder(long folderId,
+	public com.liferay.sync.connector.model.SyncDLObject moveFolder(long folderId,
 		long parentFolderId,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -235,13 +235,13 @@ public class SyncDLObjectServiceWrapper implements SyncDLObjectService,
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject moveFolderToTrash(long folderId)
+	public com.liferay.sync.connector.model.SyncDLObject moveFolderToTrash(long folderId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _syncDLObjectService.moveFolderToTrash(folderId);
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject patchFileEntry(
+	public com.liferay.sync.connector.model.SyncDLObject patchFileEntry(
 		long fileEntryId, long sourceVersionId,
 		java.lang.String sourceFileName, java.lang.String mimeType,
 		java.lang.String title, java.lang.String description,
@@ -255,14 +255,14 @@ public class SyncDLObjectServiceWrapper implements SyncDLObjectService,
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject restoreFileEntryFromTrash(
+	public com.liferay.sync.connector.model.SyncDLObject restoreFileEntryFromTrash(
 		long fileEntryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _syncDLObjectService.restoreFileEntryFromTrash(fileEntryId);
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject restoreFolderFromTrash(
+	public com.liferay.sync.connector.model.SyncDLObject restoreFolderFromTrash(
 		long folderId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _syncDLObjectService.restoreFolderFromTrash(folderId);
@@ -276,7 +276,7 @@ public class SyncDLObjectServiceWrapper implements SyncDLObjectService,
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject updateFileEntry(
+	public com.liferay.sync.connector.model.SyncDLObject updateFileEntry(
 		long fileEntryId, java.lang.String sourceFileName,
 		java.lang.String mimeType, java.lang.String title,
 		java.lang.String description, java.lang.String changeLog,
@@ -289,7 +289,7 @@ public class SyncDLObjectServiceWrapper implements SyncDLObjectService,
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject updateFolder(long folderId,
+	public com.liferay.sync.connector.model.SyncDLObject updateFolder(long folderId,
 		java.lang.String name, java.lang.String description,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {

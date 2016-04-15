@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.servlet;
+package com.liferay.sync.connector.servlet;
 
 import com.liferay.document.library.kernel.exception.DuplicateFileException;
 import com.liferay.document.library.kernel.exception.NoSuchFileEntryException;
@@ -54,13 +54,13 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.zip.ZipWriter;
 import com.liferay.portal.kernel.zip.ZipWriterFactoryUtil;
-import com.liferay.sync.SyncSiteUnavailableException;
-import com.liferay.sync.model.SyncDLFileVersionDiff;
-import com.liferay.sync.model.SyncDevice;
-import com.liferay.sync.service.SyncDLFileVersionDiffLocalServiceUtil;
-import com.liferay.sync.service.SyncDeviceLocalServiceUtil;
-import com.liferay.sync.util.PortletPropsValues;
-import com.liferay.sync.util.SyncUtil;
+import com.liferay.sync.connector.SyncSiteUnavailableException;
+import com.liferay.sync.connector.model.SyncDLFileVersionDiff;
+import com.liferay.sync.connector.model.SyncDevice;
+import com.liferay.sync.connector.service.SyncDLFileVersionDiffLocalServiceUtil;
+import com.liferay.sync.connector.service.SyncDeviceLocalServiceUtil;
+import com.liferay.sync.connector.util.PortletPropsValues;
+import com.liferay.sync.connector.util.SyncUtil;
 
 import java.io.File;
 import java.io.FileInputStream;

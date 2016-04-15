@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.messaging;
+package com.liferay.sync.connector.messaging;
 
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.model.DLFolder;
@@ -28,10 +28,10 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.sync.model.SyncDLObject;
-import com.liferay.sync.model.SyncDLObjectConstants;
-import com.liferay.sync.model.impl.SyncDLObjectImpl;
-import com.liferay.sync.util.SyncUtil;
+import com.liferay.sync.connector.model.SyncDLObject;
+import com.liferay.sync.connector.model.SyncDLObjectConstants;
+import com.liferay.sync.connector.model.impl.SyncDLObjectImpl;
+import com.liferay.sync.connector.util.SyncUtil;
 
 import java.util.List;
 

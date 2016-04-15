@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.model;
+package com.liferay.sync.connector.model;
 
 import aQute.bnd.annotation.ProviderType;
 
@@ -23,8 +23,8 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 
-import com.liferay.sync.service.ClpSerializer;
-import com.liferay.sync.service.SyncDLFileVersionDiffLocalServiceUtil;
+import com.liferay.sync.connector.service.ClpSerializer;
+import com.liferay.sync.connector.service.SyncDLFileVersionDiffLocalServiceUtil;
 
 import java.io.Serializable;
 
@@ -473,7 +473,7 @@ public class SyncDLFileVersionDiffClp extends BaseModelImpl<SyncDLFileVersionDif
 		StringBundler sb = new StringBundler(25);
 
 		sb.append("<model><model-name>");
-		sb.append("com.liferay.sync.model.SyncDLFileVersionDiff");
+		sb.append("com.liferay.sync.connector.model.SyncDLFileVersionDiff");
 		sb.append("</model-name>");
 
 		sb.append(
@@ -518,7 +518,7 @@ public class SyncDLFileVersionDiffClp extends BaseModelImpl<SyncDLFileVersionDif
 	private long _size;
 	private Date _expirationDate;
 	private BaseModel<?> _syncDLFileVersionDiffRemoteModel;
-	private Class<?> _clpSerializerClass = com.liferay.sync.service.ClpSerializer.class;
+	private Class<?> _clpSerializerClass = com.liferay.sync.connector.service.ClpSerializer.class;
 	private boolean _entityCacheEnabled;
 	private boolean _finderCacheEnabled;
 }

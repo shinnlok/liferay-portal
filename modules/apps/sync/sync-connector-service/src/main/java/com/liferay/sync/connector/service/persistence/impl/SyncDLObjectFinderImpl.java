@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.service.persistence.impl;
+package com.liferay.sync.connector.service.persistence.impl;
 
 import com.liferay.portal.kernel.dao.orm.QueryPos;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
@@ -28,9 +28,9 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.sync.model.SyncDLObject;
-import com.liferay.sync.model.impl.SyncDLObjectImpl;
-import com.liferay.sync.service.persistence.SyncDLObjectFinder;
+import com.liferay.sync.connector.model.SyncDLObject;
+import com.liferay.sync.connector.model.impl.SyncDLObjectImpl;
+import com.liferay.sync.connector.service.persistence.SyncDLObjectFinder;
 import com.liferay.util.dao.orm.CustomSQLUtil;
 
 import java.util.Collections;

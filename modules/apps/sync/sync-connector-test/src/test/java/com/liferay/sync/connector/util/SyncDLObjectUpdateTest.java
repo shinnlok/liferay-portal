@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.util;
+package com.liferay.sync.connector.util;
 
 import com.liferay.portal.configuration.ConfigurationFactoryImpl;
 import com.liferay.portal.json.JSONFactoryImpl;
@@ -20,8 +20,8 @@ import com.liferay.portal.kernel.configuration.ConfigurationFactoryUtil;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletClassLoaderUtil;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.sync.model.SyncDLObject;
-import com.liferay.sync.model.impl.SyncDLObjectImpl;
+import com.liferay.sync.connector.model.SyncDLObject;
+import com.liferay.sync.connector.model.impl.SyncDLObjectImpl;
 
 import java.util.ArrayList;
 import java.util.Date;

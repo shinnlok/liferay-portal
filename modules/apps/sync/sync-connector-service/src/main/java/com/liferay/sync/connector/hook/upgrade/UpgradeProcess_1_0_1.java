@@ -12,9 +12,9 @@
  * details.
  */
 
-package com.liferay.sync.hook.upgrade;
+package com.liferay.sync.connector.hook.upgrade;
 
-import com.liferay.sync.hook.upgrade.v1_0_1.UpgradeSyncDLObject;
+import com.liferay.sync.connector.hook.upgrade.v1_0_1.UpgradeSyncDLObject;
 
 /**
  * @author Shinn Lok

@@ -12,11 +12,11 @@
  * details.
  */
 
-package com.liferay.sync.hook.upgrade;
+package com.liferay.sync.connector.hook.upgrade;
 
 import com.liferay.portal.kernel.upgrade.UpgradeException;
-import com.liferay.sync.hook.upgrade.v1_0_0.UpgradeIndex;
-import com.liferay.sync.hook.upgrade.v1_0_0.UpgradeSyncDLObject;
+import com.liferay.sync.connector.hook.upgrade.v1_0_0.UpgradeIndex;
+import com.liferay.sync.connector.hook.upgrade.v1_0_0.UpgradeSyncDLObject;
 
 /**
  * @author Dennis Ju

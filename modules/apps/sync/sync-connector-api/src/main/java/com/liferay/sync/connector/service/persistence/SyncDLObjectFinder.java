@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.service.persistence;
+package com.liferay.sync.connector.service.persistence;
 
 import aQute.bnd.annotation.ProviderType;
 
@@ -25,7 +25,7 @@ public interface SyncDLObjectFinder {
 	public java.util.List<java.lang.Long> filterFindByR_U_T(long groupId,
 		long userId, long[] typePKs);
 
-	public java.util.List<com.liferay.sync.model.SyncDLObject> findByModifiedTime(
+	public java.util.List<com.liferay.sync.connector.model.SyncDLObject> findByModifiedTime(
 		long modifiedTime, long repositoryId, long parentFolderId,
 		java.lang.String type, int start, int end);
 }

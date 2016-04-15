@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.servlet;
+package com.liferay.sync.connector.servlet;
 
 import com.liferay.document.library.kernel.model.DLSyncEvent;
 import com.liferay.document.library.kernel.service.DLSyncEventLocalServiceUtil;
@@ -34,13 +34,13 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.util.BasePortalLifecycle;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
-import com.liferay.sync.messaging.DLSyncEventMessageListener;
-import com.liferay.sync.messaging.SyncDLFileVersionDiffMessageListener;
-import com.liferay.sync.service.SyncDLObjectLocalServiceUtil;
-import com.liferay.sync.service.SyncPreferencesLocalServiceUtil;
-import com.liferay.sync.util.PortletPropsKeys;
-import com.liferay.sync.util.PortletPropsValues;
-import com.liferay.sync.util.VerifyUtil;
+import com.liferay.sync.connector.messaging.DLSyncEventMessageListener;
+import com.liferay.sync.connector.messaging.SyncDLFileVersionDiffMessageListener;
+import com.liferay.sync.connector.service.SyncDLObjectLocalServiceUtil;
+import com.liferay.sync.connector.service.SyncPreferencesLocalServiceUtil;
+import com.liferay.sync.connector.util.PortletPropsKeys;
+import com.liferay.sync.connector.util.PortletPropsValues;
+import com.liferay.sync.connector.util.VerifyUtil;
 
 import java.util.HashMap;
 import java.util.List;

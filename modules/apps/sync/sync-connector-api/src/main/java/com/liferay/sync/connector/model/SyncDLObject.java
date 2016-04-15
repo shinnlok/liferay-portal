@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.model;
+package com.liferay.sync.connector.model;
 
 import aQute.bnd.annotation.ProviderType;
 
@@ -26,18 +26,18 @@ import com.liferay.portal.kernel.util.Accessor;
  *
  * @author Brian Wing Shun Chan
  * @see SyncDLObjectModel
- * @see com.liferay.sync.model.impl.SyncDLObjectImpl
- * @see com.liferay.sync.model.impl.SyncDLObjectModelImpl
+ * @see com.liferay.sync.connector.model.impl.SyncDLObjectImpl
+ * @see com.liferay.sync.connector.model.impl.SyncDLObjectModelImpl
  * @generated
  */
-@ImplementationClassName("com.liferay.sync.model.impl.SyncDLObjectImpl")
+@ImplementationClassName("com.liferay.sync.connector.model.impl.SyncDLObjectImpl")
 @ProviderType
 public interface SyncDLObject extends SyncDLObjectModel, PersistedModel,
 	TreeModel {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this interface directly. Add methods to {@link com.liferay.sync.model.impl.SyncDLObjectImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add methods to {@link com.liferay.sync.connector.model.impl.SyncDLObjectImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
 	public static final Accessor<SyncDLObject, Long> SYNC_D_L_OBJECT_ID_ACCESSOR =
 		new Accessor<SyncDLObject, Long>() {

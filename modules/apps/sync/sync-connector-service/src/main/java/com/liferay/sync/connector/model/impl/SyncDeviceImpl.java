@@ -12,19 +12,19 @@
  * details.
  */
 
-package com.liferay.sync.model.impl;
+package com.liferay.sync.connector.model.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
-import com.liferay.sync.SyncClientMinBuildException;
-import com.liferay.sync.SyncServicesUnavailableException;
-import com.liferay.sync.exception.SyncDeviceActiveException;
-import com.liferay.sync.exception.SyncDeviceWipeException;
-import com.liferay.sync.shared.util.SyncDeviceConstants;
-import com.liferay.sync.util.PortletPropsKeys;
-import com.liferay.sync.util.PortletPropsValues;
+import com.liferay.sync.connector.SyncClientMinBuildException;
+import com.liferay.sync.connector.SyncServicesUnavailableException;
+import com.liferay.sync.connector.exception.SyncDeviceActiveException;
+import com.liferay.sync.connector.exception.SyncDeviceWipeException;
+import com.liferay.sync.connector.shared.util.SyncDeviceConstants;
+import com.liferay.sync.connector.util.PortletPropsKeys;
+import com.liferay.sync.connector.util.PortletPropsValues;
 
 /**
  * @author Shinn Lok

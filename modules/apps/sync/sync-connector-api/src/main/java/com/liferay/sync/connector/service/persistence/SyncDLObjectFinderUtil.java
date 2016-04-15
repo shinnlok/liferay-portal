@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.service.persistence;
+package com.liferay.sync.connector.service.persistence;
 
 import aQute.bnd.annotation.ProviderType;
 
@@ -30,7 +30,7 @@ public class SyncDLObjectFinderUtil {
 		return getFinder().filterFindByR_U_T(groupId, userId, typePKs);
 	}
 
-	public static java.util.List<com.liferay.sync.model.SyncDLObject> findByModifiedTime(
+	public static java.util.List<com.liferay.sync.connector.model.SyncDLObject> findByModifiedTime(
 		long modifiedTime, long repositoryId, long parentFolderId,
 		java.lang.String type, int start, int end) {
 		return getFinder()
@@ -40,7 +40,7 @@ public class SyncDLObjectFinderUtil {
 
 	public static SyncDLObjectFinder getFinder() {
 		if (_finder == null) {
-			_finder = (SyncDLObjectFinder)PortletBeanLocatorUtil.locate(com.liferay.sync.service.ClpSerializer.getServletContextName(),
+			_finder = (SyncDLObjectFinder)PortletBeanLocatorUtil.locate(com.liferay.sync.connector.service.ClpSerializer.getServletContextName(),
 					SyncDLObjectFinder.class.getName());
 
 			ReferenceRegistry.registerReference(SyncDLObjectFinderUtil.class,

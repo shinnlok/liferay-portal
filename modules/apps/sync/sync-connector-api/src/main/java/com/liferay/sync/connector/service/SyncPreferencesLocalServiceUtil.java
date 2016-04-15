@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.service;
+package com.liferay.sync.connector.service;
 
 import aQute.bnd.annotation.ProviderType;
 
@@ -22,7 +22,7 @@ import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
  * Provides the local service utility for SyncPreferences. This utility wraps
- * {@link com.liferay.sync.service.impl.SyncPreferencesLocalServiceImpl} and is the
+ * {@link com.liferay.sync.connector.service.impl.SyncPreferencesLocalServiceImpl} and is the
  * primary access point for service operations in application layer code running
  * on the local server. Methods of this service will not have security checks
  * based on the propagated JAAS credentials because this service can only be
@@ -30,8 +30,8 @@ import com.liferay.portal.kernel.util.ReferenceRegistry;
  *
  * @author Brian Wing Shun Chan
  * @see SyncPreferencesLocalService
- * @see com.liferay.sync.service.base.SyncPreferencesLocalServiceBaseImpl
- * @see com.liferay.sync.service.impl.SyncPreferencesLocalServiceImpl
+ * @see com.liferay.sync.connector.service.base.SyncPreferencesLocalServiceBaseImpl
+ * @see com.liferay.sync.connector.service.impl.SyncPreferencesLocalServiceImpl
  * @generated
  */
 @ProviderType
@@ -39,7 +39,7 @@ public class SyncPreferencesLocalServiceUtil {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this class directly. Add custom service methods to {@link com.liferay.sync.service.impl.SyncPreferencesLocalServiceImpl} and rerun ServiceBuilder to regenerate this class.
+	 * Never modify this class directly. Add custom service methods to {@link com.liferay.sync.connector.service.impl.SyncPreferencesLocalServiceImpl} and rerun ServiceBuilder to regenerate this class.
 	 */
 	public static void enableOAuth(long companyId,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)

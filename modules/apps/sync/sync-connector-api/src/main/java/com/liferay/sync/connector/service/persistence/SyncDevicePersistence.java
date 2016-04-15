@@ -12,14 +12,14 @@
  * details.
  */
 
-package com.liferay.sync.service.persistence;
+package com.liferay.sync.connector.service.persistence;
 
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
-import com.liferay.sync.exception.NoSuchDeviceException;
-import com.liferay.sync.model.SyncDevice;
+import com.liferay.sync.connector.exception.NoSuchDeviceException;
+import com.liferay.sync.connector.model.SyncDevice;
 
 /**
  * The persistence interface for the sync device service.
@@ -29,7 +29,7 @@ import com.liferay.sync.model.SyncDevice;
  * </p>
  *
  * @author Brian Wing Shun Chan
- * @see com.liferay.sync.service.persistence.impl.SyncDevicePersistenceImpl
+ * @see com.liferay.sync.connector.service.persistence.impl.SyncDevicePersistenceImpl
  * @see SyncDeviceUtil
  * @generated
  */

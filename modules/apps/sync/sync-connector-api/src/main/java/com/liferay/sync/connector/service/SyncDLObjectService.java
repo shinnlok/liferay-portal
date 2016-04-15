@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.service;
+package com.liferay.sync.connector.service;
 
 import aQute.bnd.annotation.ProviderType;
 
@@ -28,7 +28,7 @@ import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
 
-import com.liferay.sync.model.SyncDLObject;
+import com.liferay.sync.connector.model.SyncDLObject;
 
 import java.io.File;
 
@@ -42,8 +42,8 @@ import java.util.Map;
  *
  * @author Brian Wing Shun Chan
  * @see SyncDLObjectServiceUtil
- * @see com.liferay.sync.service.base.SyncDLObjectServiceBaseImpl
- * @see com.liferay.sync.service.impl.SyncDLObjectServiceImpl
+ * @see com.liferay.sync.connector.service.base.SyncDLObjectServiceBaseImpl
+ * @see com.liferay.sync.connector.service.impl.SyncDLObjectServiceImpl
  * @generated
  */
 @AccessControlled
@@ -55,7 +55,7 @@ public interface SyncDLObjectService extends BaseService, InvokableService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this interface directly. Always use {@link SyncDLObjectServiceUtil} to access the sync d l object remote service. Add custom service methods to {@link com.liferay.sync.service.impl.SyncDLObjectServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify or reference this interface directly. Always use {@link SyncDLObjectServiceUtil} to access the sync d l object remote service. Add custom service methods to {@link com.liferay.sync.connector.service.impl.SyncDLObjectServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
 	public SyncDLObject addFileEntry(long repositoryId, long folderId,
 		java.lang.String sourceFileName, java.lang.String mimeType,

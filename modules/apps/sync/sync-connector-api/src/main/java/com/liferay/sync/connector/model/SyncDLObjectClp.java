@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.model;
+package com.liferay.sync.connector.model;
 
 import aQute.bnd.annotation.ProviderType;
 
@@ -27,8 +27,8 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 
-import com.liferay.sync.service.ClpSerializer;
-import com.liferay.sync.service.SyncDLObjectLocalServiceUtil;
+import com.liferay.sync.connector.service.ClpSerializer;
+import com.liferay.sync.connector.service.SyncDLObjectLocalServiceUtil;
 
 import java.io.Serializable;
 
@@ -1247,7 +1247,7 @@ public class SyncDLObjectClp extends BaseModelImpl<SyncDLObject>
 		StringBundler sb = new StringBundler(85);
 
 		sb.append("<model><model-name>");
-		sb.append("com.liferay.sync.model.SyncDLObject");
+		sb.append("com.liferay.sync.connector.model.SyncDLObject");
 		sb.append("</model-name>");
 
 		sb.append(
@@ -1392,7 +1392,7 @@ public class SyncDLObjectClp extends BaseModelImpl<SyncDLObject>
 	private long _typePK;
 	private String _typeUuid;
 	private BaseModel<?> _syncDLObjectRemoteModel;
-	private Class<?> _clpSerializerClass = com.liferay.sync.service.ClpSerializer.class;
+	private Class<?> _clpSerializerClass = com.liferay.sync.connector.service.ClpSerializer.class;
 	private boolean _entityCacheEnabled;
 	private boolean _finderCacheEnabled;
 }

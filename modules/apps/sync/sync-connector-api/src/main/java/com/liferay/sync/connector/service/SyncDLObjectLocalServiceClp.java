@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.service;
+package com.liferay.sync.connector.service;
 
 import aQute.bnd.annotation.ProviderType;
 
@@ -43,7 +43,7 @@ public class SyncDLObjectLocalServiceClp implements SyncDLObjectLocalService {
 		_methodName1 = "addSyncDLObject";
 
 		_methodParameterTypes1 = new String[] {
-				"com.liferay.sync.model.SyncDLObject"
+				"com.liferay.sync.connector.model.SyncDLObject"
 			};
 
 		_methodName2 = "createSyncDLObject";
@@ -59,7 +59,7 @@ public class SyncDLObjectLocalServiceClp implements SyncDLObjectLocalService {
 		_methodName4 = "deleteSyncDLObject";
 
 		_methodParameterTypes4 = new String[] {
-				"com.liferay.sync.model.SyncDLObject"
+				"com.liferay.sync.connector.model.SyncDLObject"
 			};
 
 		_methodName5 = "deleteSyncDLObject";
@@ -155,30 +155,30 @@ public class SyncDLObjectLocalServiceClp implements SyncDLObjectLocalService {
 		_methodName25 = "moveSyncDLObjects";
 
 		_methodParameterTypes25 = new String[] {
-				"com.liferay.sync.model.SyncDLObject"
+				"com.liferay.sync.connector.model.SyncDLObject"
 			};
 
 		_methodName26 = "restoreSyncDLObjects";
 
 		_methodParameterTypes26 = new String[] {
-				"com.liferay.sync.model.SyncDLObject"
+				"com.liferay.sync.connector.model.SyncDLObject"
 			};
 
 		_methodName27 = "trashSyncDLObjects";
 
 		_methodParameterTypes27 = new String[] {
-				"com.liferay.sync.model.SyncDLObject"
+				"com.liferay.sync.connector.model.SyncDLObject"
 			};
 
 		_methodName28 = "updateSyncDLObject";
 
 		_methodParameterTypes28 = new String[] {
-				"com.liferay.sync.model.SyncDLObject"
+				"com.liferay.sync.connector.model.SyncDLObject"
 			};
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject addSyncDLObject(long companyId,
+	public com.liferay.sync.connector.model.SyncDLObject addSyncDLObject(long companyId,
 		long userId, java.lang.String userName, long modifiedTime,
 		long repositoryId, long parentFolderId, java.lang.String treePath,
 		java.lang.String name, java.lang.String extension,
@@ -261,12 +261,12 @@ public class SyncDLObjectLocalServiceClp implements SyncDLObjectLocalService {
 			}
 		}
 
-		return (com.liferay.sync.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
+		return (com.liferay.sync.connector.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject addSyncDLObject(
-		com.liferay.sync.model.SyncDLObject syncDLObject) {
+	public com.liferay.sync.connector.model.SyncDLObject addSyncDLObject(
+		com.liferay.sync.connector.model.SyncDLObject syncDLObject) {
 		Object returnObj = null;
 
 		try {
@@ -286,11 +286,11 @@ public class SyncDLObjectLocalServiceClp implements SyncDLObjectLocalService {
 			}
 		}
 
-		return (com.liferay.sync.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
+		return (com.liferay.sync.connector.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject createSyncDLObject(
+	public com.liferay.sync.connector.model.SyncDLObject createSyncDLObject(
 		long syncDLObjectId) {
 		Object returnObj = null;
 
@@ -310,7 +310,7 @@ public class SyncDLObjectLocalServiceClp implements SyncDLObjectLocalService {
 			}
 		}
 
-		return (com.liferay.sync.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
+		return (com.liferay.sync.connector.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
@@ -344,8 +344,8 @@ public class SyncDLObjectLocalServiceClp implements SyncDLObjectLocalService {
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject deleteSyncDLObject(
-		com.liferay.sync.model.SyncDLObject syncDLObject) {
+	public com.liferay.sync.connector.model.SyncDLObject deleteSyncDLObject(
+		com.liferay.sync.connector.model.SyncDLObject syncDLObject) {
 		Object returnObj = null;
 
 		try {
@@ -365,11 +365,11 @@ public class SyncDLObjectLocalServiceClp implements SyncDLObjectLocalService {
 			}
 		}
 
-		return (com.liferay.sync.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
+		return (com.liferay.sync.connector.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject deleteSyncDLObject(
+	public com.liferay.sync.connector.model.SyncDLObject deleteSyncDLObject(
 		long syncDLObjectId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		Object returnObj = null;
@@ -394,7 +394,7 @@ public class SyncDLObjectLocalServiceClp implements SyncDLObjectLocalService {
 			}
 		}
 
-		return (com.liferay.sync.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
+		return (com.liferay.sync.connector.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
@@ -593,7 +593,7 @@ public class SyncDLObjectLocalServiceClp implements SyncDLObjectLocalService {
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject fetchSyncDLObject(
+	public com.liferay.sync.connector.model.SyncDLObject fetchSyncDLObject(
 		long syncDLObjectId) {
 		Object returnObj = null;
 
@@ -613,11 +613,11 @@ public class SyncDLObjectLocalServiceClp implements SyncDLObjectLocalService {
 			}
 		}
 
-		return (com.liferay.sync.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
+		return (com.liferay.sync.connector.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject fetchSyncDLObject(
+	public com.liferay.sync.connector.model.SyncDLObject fetchSyncDLObject(
 		java.lang.String type, long typePK) {
 		Object returnObj = null;
 
@@ -638,7 +638,7 @@ public class SyncDLObjectLocalServiceClp implements SyncDLObjectLocalService {
 			}
 		}
 
-		return (com.liferay.sync.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
+		return (com.liferay.sync.connector.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
@@ -764,7 +764,7 @@ public class SyncDLObjectLocalServiceClp implements SyncDLObjectLocalService {
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject getSyncDLObject(
+	public com.liferay.sync.connector.model.SyncDLObject getSyncDLObject(
 		long syncDLObjectId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		Object returnObj = null;
@@ -789,11 +789,11 @@ public class SyncDLObjectLocalServiceClp implements SyncDLObjectLocalService {
 			}
 		}
 
-		return (com.liferay.sync.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
+		return (com.liferay.sync.connector.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
-	public java.util.List<com.liferay.sync.model.SyncDLObject> getSyncDLObjects(
+	public java.util.List<com.liferay.sync.connector.model.SyncDLObject> getSyncDLObjects(
 		long repositoryId, long parentFolderId) {
 		Object returnObj = null;
 
@@ -814,11 +814,11 @@ public class SyncDLObjectLocalServiceClp implements SyncDLObjectLocalService {
 			}
 		}
 
-		return (java.util.List<com.liferay.sync.model.SyncDLObject>)ClpSerializer.translateOutput(returnObj);
+		return (java.util.List<com.liferay.sync.connector.model.SyncDLObject>)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
-	public java.util.List<com.liferay.sync.model.SyncDLObject> getSyncDLObjects(
+	public java.util.List<com.liferay.sync.connector.model.SyncDLObject> getSyncDLObjects(
 		int start, int end) {
 		Object returnObj = null;
 
@@ -838,7 +838,7 @@ public class SyncDLObjectLocalServiceClp implements SyncDLObjectLocalService {
 			}
 		}
 
-		return (java.util.List<com.liferay.sync.model.SyncDLObject>)ClpSerializer.translateOutput(returnObj);
+		return (java.util.List<com.liferay.sync.connector.model.SyncDLObject>)ClpSerializer.translateOutput(returnObj);
 	}
 
 	@Override
@@ -873,7 +873,7 @@ public class SyncDLObjectLocalServiceClp implements SyncDLObjectLocalService {
 
 	@Override
 	public void moveSyncDLObjects(
-		com.liferay.sync.model.SyncDLObject parentSyncDLObject)
+		com.liferay.sync.connector.model.SyncDLObject parentSyncDLObject)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		try {
 			_invokableLocalService.invokeMethod(_methodName25,
@@ -899,7 +899,7 @@ public class SyncDLObjectLocalServiceClp implements SyncDLObjectLocalService {
 
 	@Override
 	public void restoreSyncDLObjects(
-		com.liferay.sync.model.SyncDLObject parentSyncDLObject)
+		com.liferay.sync.connector.model.SyncDLObject parentSyncDLObject)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		try {
 			_invokableLocalService.invokeMethod(_methodName26,
@@ -925,7 +925,7 @@ public class SyncDLObjectLocalServiceClp implements SyncDLObjectLocalService {
 
 	@Override
 	public void trashSyncDLObjects(
-		com.liferay.sync.model.SyncDLObject parentSyncDLObject)
+		com.liferay.sync.connector.model.SyncDLObject parentSyncDLObject)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		try {
 			_invokableLocalService.invokeMethod(_methodName27,
@@ -950,8 +950,8 @@ public class SyncDLObjectLocalServiceClp implements SyncDLObjectLocalService {
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLObject updateSyncDLObject(
-		com.liferay.sync.model.SyncDLObject syncDLObject) {
+	public com.liferay.sync.connector.model.SyncDLObject updateSyncDLObject(
+		com.liferay.sync.connector.model.SyncDLObject syncDLObject) {
 		Object returnObj = null;
 
 		try {
@@ -971,7 +971,7 @@ public class SyncDLObjectLocalServiceClp implements SyncDLObjectLocalService {
 			}
 		}
 
-		return (com.liferay.sync.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
+		return (com.liferay.sync.connector.model.SyncDLObject)ClpSerializer.translateOutput(returnObj);
 	}
 
 	private InvokableLocalService _invokableLocalService;

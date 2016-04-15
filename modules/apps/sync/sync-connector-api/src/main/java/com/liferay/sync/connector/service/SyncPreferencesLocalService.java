@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.service;
+package com.liferay.sync.connector.service;
 
 import aQute.bnd.annotation.ProviderType;
 
@@ -35,8 +35,8 @@ import javax.portlet.PortletPreferences;
  *
  * @author Brian Wing Shun Chan
  * @see SyncPreferencesLocalServiceUtil
- * @see com.liferay.sync.service.base.SyncPreferencesLocalServiceBaseImpl
- * @see com.liferay.sync.service.impl.SyncPreferencesLocalServiceImpl
+ * @see com.liferay.sync.connector.service.base.SyncPreferencesLocalServiceBaseImpl
+ * @see com.liferay.sync.connector.service.impl.SyncPreferencesLocalServiceImpl
  * @generated
  */
 @ProviderType
@@ -47,7 +47,7 @@ public interface SyncPreferencesLocalService extends BaseLocalService,
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this interface directly. Always use {@link SyncPreferencesLocalServiceUtil} to access the sync preferences local service. Add custom service methods to {@link com.liferay.sync.service.impl.SyncPreferencesLocalServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify or reference this interface directly. Always use {@link SyncPreferencesLocalServiceUtil} to access the sync preferences local service. Add custom service methods to {@link com.liferay.sync.connector.service.impl.SyncPreferencesLocalServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
 	public void enableOAuth(long companyId, ServiceContext serviceContext)
 		throws PortalException;

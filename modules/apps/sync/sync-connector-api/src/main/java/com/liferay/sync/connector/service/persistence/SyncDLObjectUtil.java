@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.service.persistence;
+package com.liferay.sync.connector.service.persistence;
 
 import aQute.bnd.annotation.ProviderType;
 
@@ -22,12 +22,12 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 
-import com.liferay.sync.model.SyncDLObject;
+import com.liferay.sync.connector.model.SyncDLObject;
 
 import java.util.List;
 
 /**
- * The persistence utility for the sync d l object service. This utility wraps {@link com.liferay.sync.service.persistence.impl.SyncDLObjectPersistenceImpl} and provides direct access to the database for CRUD operations. This utility should only be used by the service layer, as it must operate within a transaction. Never access this utility in a JSP, controller, model, or other front-end class.
+ * The persistence utility for the sync d l object service. This utility wraps {@link com.liferay.sync.connector.service.persistence.impl.SyncDLObjectPersistenceImpl} and provides direct access to the database for CRUD operations. This utility should only be used by the service layer, as it must operate within a transaction. Never access this utility in a JSP, controller, model, or other front-end class.
  *
  * <p>
  * Caching information and settings can be found in <code>portal.properties</code>
@@ -35,7 +35,7 @@ import java.util.List;
  *
  * @author Brian Wing Shun Chan
  * @see SyncDLObjectPersistence
- * @see com.liferay.sync.service.persistence.impl.SyncDLObjectPersistenceImpl
+ * @see com.liferay.sync.connector.service.persistence.impl.SyncDLObjectPersistenceImpl
  * @generated
  */
 @ProviderType
@@ -187,7 +187,7 @@ public class SyncDLObjectUtil {
 	*/
 	public static SyncDLObject findByTreePath_First(java.lang.String treePath,
 		OrderByComparator<SyncDLObject> orderByComparator)
-		throws com.liferay.sync.exception.NoSuchDLObjectException {
+		throws com.liferay.sync.connector.exception.NoSuchDLObjectException {
 		return getPersistence().findByTreePath_First(treePath, orderByComparator);
 	}
 
@@ -215,7 +215,7 @@ public class SyncDLObjectUtil {
 	*/
 	public static SyncDLObject findByTreePath_Last(java.lang.String treePath,
 		OrderByComparator<SyncDLObject> orderByComparator)
-		throws com.liferay.sync.exception.NoSuchDLObjectException {
+		throws com.liferay.sync.connector.exception.NoSuchDLObjectException {
 		return getPersistence().findByTreePath_Last(treePath, orderByComparator);
 	}
 
@@ -243,7 +243,7 @@ public class SyncDLObjectUtil {
 	public static SyncDLObject[] findByTreePath_PrevAndNext(
 		long syncDLObjectId, java.lang.String treePath,
 		OrderByComparator<SyncDLObject> orderByComparator)
-		throws com.liferay.sync.exception.NoSuchDLObjectException {
+		throws com.liferay.sync.connector.exception.NoSuchDLObjectException {
 		return getPersistence()
 				   .findByTreePath_PrevAndNext(syncDLObjectId, treePath,
 			orderByComparator);
@@ -355,7 +355,7 @@ public class SyncDLObjectUtil {
 	*/
 	public static SyncDLObject findByM_R_First(long modifiedTime,
 		long repositoryId, OrderByComparator<SyncDLObject> orderByComparator)
-		throws com.liferay.sync.exception.NoSuchDLObjectException {
+		throws com.liferay.sync.connector.exception.NoSuchDLObjectException {
 		return getPersistence()
 				   .findByM_R_First(modifiedTime, repositoryId,
 			orderByComparator);
@@ -387,7 +387,7 @@ public class SyncDLObjectUtil {
 	*/
 	public static SyncDLObject findByM_R_Last(long modifiedTime,
 		long repositoryId, OrderByComparator<SyncDLObject> orderByComparator)
-		throws com.liferay.sync.exception.NoSuchDLObjectException {
+		throws com.liferay.sync.connector.exception.NoSuchDLObjectException {
 		return getPersistence()
 				   .findByM_R_Last(modifiedTime, repositoryId, orderByComparator);
 	}
@@ -420,7 +420,7 @@ public class SyncDLObjectUtil {
 	public static SyncDLObject[] findByM_R_PrevAndNext(long syncDLObjectId,
 		long modifiedTime, long repositoryId,
 		OrderByComparator<SyncDLObject> orderByComparator)
-		throws com.liferay.sync.exception.NoSuchDLObjectException {
+		throws com.liferay.sync.connector.exception.NoSuchDLObjectException {
 		return getPersistence()
 				   .findByM_R_PrevAndNext(syncDLObjectId, modifiedTime,
 			repositoryId, orderByComparator);
@@ -535,7 +535,7 @@ public class SyncDLObjectUtil {
 	*/
 	public static SyncDLObject findByR_P_First(long repositoryId,
 		long parentFolderId, OrderByComparator<SyncDLObject> orderByComparator)
-		throws com.liferay.sync.exception.NoSuchDLObjectException {
+		throws com.liferay.sync.connector.exception.NoSuchDLObjectException {
 		return getPersistence()
 				   .findByR_P_First(repositoryId, parentFolderId,
 			orderByComparator);
@@ -567,7 +567,7 @@ public class SyncDLObjectUtil {
 	*/
 	public static SyncDLObject findByR_P_Last(long repositoryId,
 		long parentFolderId, OrderByComparator<SyncDLObject> orderByComparator)
-		throws com.liferay.sync.exception.NoSuchDLObjectException {
+		throws com.liferay.sync.connector.exception.NoSuchDLObjectException {
 		return getPersistence()
 				   .findByR_P_Last(repositoryId, parentFolderId,
 			orderByComparator);
@@ -601,7 +601,7 @@ public class SyncDLObjectUtil {
 	public static SyncDLObject[] findByR_P_PrevAndNext(long syncDLObjectId,
 		long repositoryId, long parentFolderId,
 		OrderByComparator<SyncDLObject> orderByComparator)
-		throws com.liferay.sync.exception.NoSuchDLObjectException {
+		throws com.liferay.sync.connector.exception.NoSuchDLObjectException {
 		return getPersistence()
 				   .findByR_P_PrevAndNext(syncDLObjectId, repositoryId,
 			parentFolderId, orderByComparator);
@@ -716,7 +716,7 @@ public class SyncDLObjectUtil {
 	public static SyncDLObject findByR_NotE_First(long repositoryId,
 		java.lang.String event,
 		OrderByComparator<SyncDLObject> orderByComparator)
-		throws com.liferay.sync.exception.NoSuchDLObjectException {
+		throws com.liferay.sync.connector.exception.NoSuchDLObjectException {
 		return getPersistence()
 				   .findByR_NotE_First(repositoryId, event, orderByComparator);
 	}
@@ -748,7 +748,7 @@ public class SyncDLObjectUtil {
 	public static SyncDLObject findByR_NotE_Last(long repositoryId,
 		java.lang.String event,
 		OrderByComparator<SyncDLObject> orderByComparator)
-		throws com.liferay.sync.exception.NoSuchDLObjectException {
+		throws com.liferay.sync.connector.exception.NoSuchDLObjectException {
 		return getPersistence()
 				   .findByR_NotE_Last(repositoryId, event, orderByComparator);
 	}
@@ -781,7 +781,7 @@ public class SyncDLObjectUtil {
 	public static SyncDLObject[] findByR_NotE_PrevAndNext(long syncDLObjectId,
 		long repositoryId, java.lang.String event,
 		OrderByComparator<SyncDLObject> orderByComparator)
-		throws com.liferay.sync.exception.NoSuchDLObjectException {
+		throws com.liferay.sync.connector.exception.NoSuchDLObjectException {
 		return getPersistence()
 				   .findByR_NotE_PrevAndNext(syncDLObjectId, repositoryId,
 			event, orderByComparator);
@@ -894,7 +894,7 @@ public class SyncDLObjectUtil {
 	*/
 	public static SyncDLObject findByR_T_First(long repositoryId,
 		java.lang.String type, OrderByComparator<SyncDLObject> orderByComparator)
-		throws com.liferay.sync.exception.NoSuchDLObjectException {
+		throws com.liferay.sync.connector.exception.NoSuchDLObjectException {
 		return getPersistence()
 				   .findByR_T_First(repositoryId, type, orderByComparator);
 	}
@@ -924,7 +924,7 @@ public class SyncDLObjectUtil {
 	*/
 	public static SyncDLObject findByR_T_Last(long repositoryId,
 		java.lang.String type, OrderByComparator<SyncDLObject> orderByComparator)
-		throws com.liferay.sync.exception.NoSuchDLObjectException {
+		throws com.liferay.sync.connector.exception.NoSuchDLObjectException {
 		return getPersistence()
 				   .findByR_T_Last(repositoryId, type, orderByComparator);
 	}
@@ -956,7 +956,7 @@ public class SyncDLObjectUtil {
 	public static SyncDLObject[] findByR_T_PrevAndNext(long syncDLObjectId,
 		long repositoryId, java.lang.String type,
 		OrderByComparator<SyncDLObject> orderByComparator)
-		throws com.liferay.sync.exception.NoSuchDLObjectException {
+		throws com.liferay.sync.connector.exception.NoSuchDLObjectException {
 		return getPersistence()
 				   .findByR_T_PrevAndNext(syncDLObjectId, repositoryId, type,
 			orderByComparator);
@@ -1070,7 +1070,7 @@ public class SyncDLObjectUtil {
 	public static SyncDLObject findByT_NotE_First(java.lang.String treePath,
 		java.lang.String event,
 		OrderByComparator<SyncDLObject> orderByComparator)
-		throws com.liferay.sync.exception.NoSuchDLObjectException {
+		throws com.liferay.sync.connector.exception.NoSuchDLObjectException {
 		return getPersistence()
 				   .findByT_NotE_First(treePath, event, orderByComparator);
 	}
@@ -1102,7 +1102,7 @@ public class SyncDLObjectUtil {
 	public static SyncDLObject findByT_NotE_Last(java.lang.String treePath,
 		java.lang.String event,
 		OrderByComparator<SyncDLObject> orderByComparator)
-		throws com.liferay.sync.exception.NoSuchDLObjectException {
+		throws com.liferay.sync.connector.exception.NoSuchDLObjectException {
 		return getPersistence()
 				   .findByT_NotE_Last(treePath, event, orderByComparator);
 	}
@@ -1135,7 +1135,7 @@ public class SyncDLObjectUtil {
 	public static SyncDLObject[] findByT_NotE_PrevAndNext(long syncDLObjectId,
 		java.lang.String treePath, java.lang.String event,
 		OrderByComparator<SyncDLObject> orderByComparator)
-		throws com.liferay.sync.exception.NoSuchDLObjectException {
+		throws com.liferay.sync.connector.exception.NoSuchDLObjectException {
 		return getPersistence()
 				   .findByT_NotE_PrevAndNext(syncDLObjectId, treePath, event,
 			orderByComparator);
@@ -1250,7 +1250,7 @@ public class SyncDLObjectUtil {
 	*/
 	public static SyncDLObject findByV_T_First(java.lang.String version,
 		java.lang.String type, OrderByComparator<SyncDLObject> orderByComparator)
-		throws com.liferay.sync.exception.NoSuchDLObjectException {
+		throws com.liferay.sync.connector.exception.NoSuchDLObjectException {
 		return getPersistence().findByV_T_First(version, type, orderByComparator);
 	}
 
@@ -1279,7 +1279,7 @@ public class SyncDLObjectUtil {
 	*/
 	public static SyncDLObject findByV_T_Last(java.lang.String version,
 		java.lang.String type, OrderByComparator<SyncDLObject> orderByComparator)
-		throws com.liferay.sync.exception.NoSuchDLObjectException {
+		throws com.liferay.sync.connector.exception.NoSuchDLObjectException {
 		return getPersistence().findByV_T_Last(version, type, orderByComparator);
 	}
 
@@ -1309,7 +1309,7 @@ public class SyncDLObjectUtil {
 	public static SyncDLObject[] findByV_T_PrevAndNext(long syncDLObjectId,
 		java.lang.String version, java.lang.String type,
 		OrderByComparator<SyncDLObject> orderByComparator)
-		throws com.liferay.sync.exception.NoSuchDLObjectException {
+		throws com.liferay.sync.connector.exception.NoSuchDLObjectException {
 		return getPersistence()
 				   .findByV_T_PrevAndNext(syncDLObjectId, version, type,
 			orderByComparator);
@@ -1346,7 +1346,7 @@ public class SyncDLObjectUtil {
 	* @throws NoSuchDLObjectException if a matching sync d l object could not be found
 	*/
 	public static SyncDLObject findByT_T(java.lang.String type, long typePK)
-		throws com.liferay.sync.exception.NoSuchDLObjectException {
+		throws com.liferay.sync.connector.exception.NoSuchDLObjectException {
 		return getPersistence().findByT_T(type, typePK);
 	}
 
@@ -1382,7 +1382,7 @@ public class SyncDLObjectUtil {
 	* @return the sync d l object that was removed
 	*/
 	public static SyncDLObject removeByT_T(java.lang.String type, long typePK)
-		throws com.liferay.sync.exception.NoSuchDLObjectException {
+		throws com.liferay.sync.connector.exception.NoSuchDLObjectException {
 		return getPersistence().removeByT_T(type, typePK);
 	}
 
@@ -1491,7 +1491,7 @@ public class SyncDLObjectUtil {
 	public static SyncDLObject findByM_R_NotE_First(long modifiedTime,
 		long repositoryId, java.lang.String event,
 		OrderByComparator<SyncDLObject> orderByComparator)
-		throws com.liferay.sync.exception.NoSuchDLObjectException {
+		throws com.liferay.sync.connector.exception.NoSuchDLObjectException {
 		return getPersistence()
 				   .findByM_R_NotE_First(modifiedTime, repositoryId, event,
 			orderByComparator);
@@ -1527,7 +1527,7 @@ public class SyncDLObjectUtil {
 	public static SyncDLObject findByM_R_NotE_Last(long modifiedTime,
 		long repositoryId, java.lang.String event,
 		OrderByComparator<SyncDLObject> orderByComparator)
-		throws com.liferay.sync.exception.NoSuchDLObjectException {
+		throws com.liferay.sync.connector.exception.NoSuchDLObjectException {
 		return getPersistence()
 				   .findByM_R_NotE_Last(modifiedTime, repositoryId, event,
 			orderByComparator);
@@ -1565,7 +1565,7 @@ public class SyncDLObjectUtil {
 		long syncDLObjectId, long modifiedTime, long repositoryId,
 		java.lang.String event,
 		OrderByComparator<SyncDLObject> orderByComparator)
-		throws com.liferay.sync.exception.NoSuchDLObjectException {
+		throws com.liferay.sync.connector.exception.NoSuchDLObjectException {
 		return getPersistence()
 				   .findByM_R_NotE_PrevAndNext(syncDLObjectId, modifiedTime,
 			repositoryId, event, orderByComparator);
@@ -1792,7 +1792,7 @@ public class SyncDLObjectUtil {
 	public static SyncDLObject findByR_P_T_First(long repositoryId,
 		long parentFolderId, java.lang.String type,
 		OrderByComparator<SyncDLObject> orderByComparator)
-		throws com.liferay.sync.exception.NoSuchDLObjectException {
+		throws com.liferay.sync.connector.exception.NoSuchDLObjectException {
 		return getPersistence()
 				   .findByR_P_T_First(repositoryId, parentFolderId, type,
 			orderByComparator);
@@ -1828,7 +1828,7 @@ public class SyncDLObjectUtil {
 	public static SyncDLObject findByR_P_T_Last(long repositoryId,
 		long parentFolderId, java.lang.String type,
 		OrderByComparator<SyncDLObject> orderByComparator)
-		throws com.liferay.sync.exception.NoSuchDLObjectException {
+		throws com.liferay.sync.connector.exception.NoSuchDLObjectException {
 		return getPersistence()
 				   .findByR_P_T_Last(repositoryId, parentFolderId, type,
 			orderByComparator);
@@ -1865,7 +1865,7 @@ public class SyncDLObjectUtil {
 	public static SyncDLObject[] findByR_P_T_PrevAndNext(long syncDLObjectId,
 		long repositoryId, long parentFolderId, java.lang.String type,
 		OrderByComparator<SyncDLObject> orderByComparator)
-		throws com.liferay.sync.exception.NoSuchDLObjectException {
+		throws com.liferay.sync.connector.exception.NoSuchDLObjectException {
 		return getPersistence()
 				   .findByR_P_T_PrevAndNext(syncDLObjectId, repositoryId,
 			parentFolderId, type, orderByComparator);
@@ -2030,7 +2030,7 @@ public class SyncDLObjectUtil {
 	* @throws NoSuchDLObjectException if a sync d l object with the primary key could not be found
 	*/
 	public static SyncDLObject remove(long syncDLObjectId)
-		throws com.liferay.sync.exception.NoSuchDLObjectException {
+		throws com.liferay.sync.connector.exception.NoSuchDLObjectException {
 		return getPersistence().remove(syncDLObjectId);
 	}
 
@@ -2046,7 +2046,7 @@ public class SyncDLObjectUtil {
 	* @throws NoSuchDLObjectException if a sync d l object with the primary key could not be found
 	*/
 	public static SyncDLObject findByPrimaryKey(long syncDLObjectId)
-		throws com.liferay.sync.exception.NoSuchDLObjectException {
+		throws com.liferay.sync.connector.exception.NoSuchDLObjectException {
 		return getPersistence().findByPrimaryKey(syncDLObjectId);
 	}
 
@@ -2148,7 +2148,7 @@ public class SyncDLObjectUtil {
 
 	public static SyncDLObjectPersistence getPersistence() {
 		if (_persistence == null) {
-			_persistence = (SyncDLObjectPersistence)PortletBeanLocatorUtil.locate(com.liferay.sync.service.ClpSerializer.getServletContextName(),
+			_persistence = (SyncDLObjectPersistence)PortletBeanLocatorUtil.locate(com.liferay.sync.connector.service.ClpSerializer.getServletContextName(),
 					SyncDLObjectPersistence.class.getName());
 
 			ReferenceRegistry.registerReference(SyncDLObjectUtil.class,

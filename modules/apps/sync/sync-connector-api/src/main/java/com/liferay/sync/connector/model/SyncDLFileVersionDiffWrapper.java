@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.model;
+package com.liferay.sync.connector.model;
 
 import aQute.bnd.annotation.ProviderType;
 
@@ -123,7 +123,7 @@ public class SyncDLFileVersionDiffWrapper implements SyncDLFileVersionDiff,
 
 	@Override
 	public int compareTo(
-		com.liferay.sync.model.SyncDLFileVersionDiff syncDLFileVersionDiff) {
+		com.liferay.sync.connector.model.SyncDLFileVersionDiff syncDLFileVersionDiff) {
 		return _syncDLFileVersionDiff.compareTo(syncDLFileVersionDiff);
 	}
 
@@ -354,12 +354,12 @@ public class SyncDLFileVersionDiffWrapper implements SyncDLFileVersionDiff,
 	}
 
 	@Override
-	public com.liferay.portal.kernel.model.CacheModel<com.liferay.sync.model.SyncDLFileVersionDiff> toCacheModel() {
+	public com.liferay.portal.kernel.model.CacheModel<com.liferay.sync.connector.model.SyncDLFileVersionDiff> toCacheModel() {
 		return _syncDLFileVersionDiff.toCacheModel();
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLFileVersionDiff toEscapedModel() {
+	public com.liferay.sync.connector.model.SyncDLFileVersionDiff toEscapedModel() {
 		return new SyncDLFileVersionDiffWrapper(_syncDLFileVersionDiff.toEscapedModel());
 	}
 
@@ -369,7 +369,7 @@ public class SyncDLFileVersionDiffWrapper implements SyncDLFileVersionDiff,
 	}
 
 	@Override
-	public com.liferay.sync.model.SyncDLFileVersionDiff toUnescapedModel() {
+	public com.liferay.sync.connector.model.SyncDLFileVersionDiff toUnescapedModel() {
 		return new SyncDLFileVersionDiffWrapper(_syncDLFileVersionDiff.toUnescapedModel());
 	}
 

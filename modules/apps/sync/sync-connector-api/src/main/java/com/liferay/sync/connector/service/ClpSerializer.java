@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.service;
+package com.liferay.sync.connector.service;
 
 import aQute.bnd.annotation.ProviderType;
 
@@ -25,9 +25,9 @@ import com.liferay.portal.kernel.util.ClassLoaderObjectInputStream;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.Validator;
 
-import com.liferay.sync.model.SyncDLFileVersionDiffClp;
-import com.liferay.sync.model.SyncDLObjectClp;
-import com.liferay.sync.model.SyncDeviceClp;
+import com.liferay.sync.connector.model.SyncDLFileVersionDiffClp;
+import com.liferay.sync.connector.model.SyncDLObjectClp;
+import com.liferay.sync.connector.model.SyncDeviceClp;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -181,7 +181,7 @@ public class ClpSerializer {
 		String oldModelClassName = oldModelClass.getName();
 
 		if (oldModelClassName.equals(
-					"com.liferay.sync.model.impl.SyncDeviceImpl")) {
+					"com.liferay.sync.connector.model.impl.SyncDeviceImpl")) {
 			return translateOutputSyncDevice(oldModel);
 		}
 		else if (oldModelClassName.endsWith("Clp")) {
@@ -218,7 +218,7 @@ public class ClpSerializer {
 		}
 
 		if (oldModelClassName.equals(
-					"com.liferay.sync.model.impl.SyncDLFileVersionDiffImpl")) {
+					"com.liferay.sync.connector.model.impl.SyncDLFileVersionDiffImpl")) {
 			return translateOutputSyncDLFileVersionDiff(oldModel);
 		}
 		else if (oldModelClassName.endsWith("Clp")) {
@@ -255,7 +255,7 @@ public class ClpSerializer {
 		}
 
 		if (oldModelClassName.equals(
-					"com.liferay.sync.model.impl.SyncDLObjectImpl")) {
+					"com.liferay.sync.connector.model.impl.SyncDLObjectImpl")) {
 			return translateOutputSyncDLObject(oldModel);
 		}
 		else if (oldModelClassName.endsWith("Clp")) {
@@ -371,37 +371,37 @@ public class ClpSerializer {
 		String className = clazz.getName();
 
 		if (className.equals(
-					"com.liferay.sync.exception.SyncDLObjectChecksumException")) {
-			return new com.liferay.sync.exception.SyncDLObjectChecksumException(throwable.getMessage(),
+					"com.liferay.sync.connector.exception.SyncDLObjectChecksumException")) {
+			return new com.liferay.sync.connector.exception.SyncDLObjectChecksumException(throwable.getMessage(),
 				throwable.getCause());
 		}
 
 		if (className.equals(
-					"com.liferay.sync.exception.SyncDeviceActiveException")) {
-			return new com.liferay.sync.exception.SyncDeviceActiveException(throwable.getMessage(),
+					"com.liferay.sync.connector.exception.SyncDeviceActiveException")) {
+			return new com.liferay.sync.connector.exception.SyncDeviceActiveException(throwable.getMessage(),
 				throwable.getCause());
 		}
 
 		if (className.equals(
-					"com.liferay.sync.exception.SyncDeviceWipeException")) {
-			return new com.liferay.sync.exception.SyncDeviceWipeException(throwable.getMessage(),
+					"com.liferay.sync.connector.exception.SyncDeviceWipeException")) {
+			return new com.liferay.sync.connector.exception.SyncDeviceWipeException(throwable.getMessage(),
 				throwable.getCause());
 		}
 
-		if (className.equals("com.liferay.sync.exception.NoSuchDeviceException")) {
-			return new com.liferay.sync.exception.NoSuchDeviceException(throwable.getMessage(),
-				throwable.getCause());
-		}
-
-		if (className.equals(
-					"com.liferay.sync.exception.NoSuchDLFileVersionDiffException")) {
-			return new com.liferay.sync.exception.NoSuchDLFileVersionDiffException(throwable.getMessage(),
+		if (className.equals("com.liferay.sync.connector.exception.NoSuchDeviceException")) {
+			return new com.liferay.sync.connector.exception.NoSuchDeviceException(throwable.getMessage(),
 				throwable.getCause());
 		}
 
 		if (className.equals(
-					"com.liferay.sync.exception.NoSuchDLObjectException")) {
-			return new com.liferay.sync.exception.NoSuchDLObjectException(throwable.getMessage(),
+					"com.liferay.sync.connector.exception.NoSuchDLFileVersionDiffException")) {
+			return new com.liferay.sync.connector.exception.NoSuchDLFileVersionDiffException(throwable.getMessage(),
+				throwable.getCause());
+		}
+
+		if (className.equals(
+					"com.liferay.sync.connector.exception.NoSuchDLObjectException")) {
+			return new com.liferay.sync.connector.exception.NoSuchDLObjectException(throwable.getMessage(),
 				throwable.getCause());
 		}
 
