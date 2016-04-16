@@ -64,7 +64,7 @@ import org.osgi.service.component.annotations.Reference;
 @Component(
 	immediate = true,
 	property = {
-		"auth.verifier.SyncAuthVerifier.urls.includes=/api/jsonws/sync-web.syncdlobject/*"
+		"auth.verifier.SyncAuthVerifier.urls.includes=/api/jsonws/sync-web.syncdlobject/*,/download/*"
 	}
 )
 public class SyncAuthVerifier implements AuthVerifier {

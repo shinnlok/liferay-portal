@@ -12,10 +12,11 @@
  * details.
  */
 
-package com.liferay.sync.connector.admin.portlet;
+package com.liferay.sync.connector.web.portlet;
 
 import com.liferay.portal.kernel.deploy.DeployManagerUtil;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.plugin.PluginPackage;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
@@ -27,9 +28,11 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.sync.connector.admin.exception.OAuthPortletUndeployedException;
 import com.liferay.sync.connector.service.SyncPreferencesLocalServiceUtil;
-import com.liferay.sync.connector.shared.util.PortletPropsKeys;
+import com.liferay.sync.connector.constants.PortletPropsKeys;
+import com.liferay.sync.connector.web.constants.SyncAdminPortletKeys;
+import com.liferay.sync.connector.web.exception.OAuthPortletUndeployedException;
+import com.liferay.sync.connector.service.SyncPreferencesLocalServiceUtil;
 
 import java.io.IOException;
 
@@ -42,7 +45,30 @@ import javax.portlet.PortletPreferences;
  * @author Shinn Lok
  * @author Jonathan McCann
  */
-public class AdminPortlet extends MVCPortlet {
+@Component(
+	immediate = true,
+	property = {
+		"com.liferay.portlet.add-default-resource=true",
+		"com.liferay.portlet.css-class-wrapper=portlet-sync-admin",
+		"com.liferay.portlet.display-category=category.hidden",
+		"com.liferay.portlet.icon=/icons/sync_connector.png",
+		"com.liferay.portlet.preferences-owned-by-group=true",
+		"com.liferay.portlet.private-request-attributes=false",
+		"com.liferay.portlet.private-session-attributes=false",
+		"com.liferay.portlet.render-weight=50",
+		"com.liferay.portlet.use-default-template=true",
+		"javax.portlet.display-name=Sync Connector Admin",
+		"javax.portlet.expiration-cache=0",
+		"javax.portlet.init-param.template-path=/",
+		"javax.portlet.init-param.view-template=/view.jsp",
+		"javax.portlet.name=" + SyncAdminPortletKeys.SYNC_ADMIN_PORTLET,
+		"javax.portlet.resource-bundle=content.Language",
+		"javax.portlet.security-role-ref=administrator",
+		"javax.portlet.supports.mime-type=text/html"
+	},
+	service = Portlet.class
+)
+public class SyncAdminPortlet extends MVCPortlet {
 
 	public void updatePreferences(
 			ActionRequest actionRequest, ActionResponse actionResponse)

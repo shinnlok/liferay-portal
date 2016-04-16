@@ -22,7 +22,7 @@ import com.liferay.sync.connector.SyncClientMinBuildException;
 import com.liferay.sync.connector.SyncServicesUnavailableException;
 import com.liferay.sync.connector.exception.SyncDeviceActiveException;
 import com.liferay.sync.connector.exception.SyncDeviceWipeException;
-import com.liferay.sync.connector.shared.util.SyncDeviceConstants;
+import com.liferay.sync.connector.constants.SyncDeviceConstants;
 import com.liferay.sync.connector.util.PortletPropsKeys;
 import com.liferay.sync.connector.util.PortletPropsValues;
 

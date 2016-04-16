@@ -71,7 +71,7 @@ import com.liferay.sync.connector.model.SyncDLObject;
 import com.liferay.sync.connector.model.SyncDLObjectConstants;
 import com.liferay.sync.connector.model.SyncDevice;
 import com.liferay.sync.connector.service.base.SyncDLObjectServiceBaseImpl;
-import com.liferay.sync.connector.shared.util.SyncDeviceConstants;
+import com.liferay.sync.connector.constants.SyncDeviceConstants;
 import com.liferay.sync.connector.util.JSONWebServiceActionParametersMap;
 import com.liferay.sync.connector.util.PortletPropsKeys;
 import com.liferay.sync.connector.util.PortletPropsValues;

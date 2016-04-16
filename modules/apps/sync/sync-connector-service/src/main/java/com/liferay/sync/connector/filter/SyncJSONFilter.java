@@ -52,9 +52,20 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
+import org.osgi.service.component.annotations.Component;
+
 /**
  * @author Shinn Lok
  */
+@Component(
+	immediate = true,
+	property = {
+		"osgi.http.whiteboard.filter.name=Sync JSON Filter",
+		"osgi.http.whiteboard.filter.pattern=/api/jsonws/*",
+		"after-filter=Upload Servlet Request Filter"
+	},
+	service = Filter.class
+)
 public class SyncJSONFilter implements Filter {
 
 	@Override
