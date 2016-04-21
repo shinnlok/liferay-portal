@@ -522,7 +522,8 @@ public interface SyncDLObjectModel extends BaseModel<SyncDLObject>, ShardedModel
 	public Object clone();
 
 	@Override
-	public int compareTo(com.liferay.sync.connector.model.SyncDLObject syncDLObject);
+	public int compareTo(
+		com.liferay.sync.connector.model.SyncDLObject syncDLObject);
 
 	@Override
 	public int hashCode();

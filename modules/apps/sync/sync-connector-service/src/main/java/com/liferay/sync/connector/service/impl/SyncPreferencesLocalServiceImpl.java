@@ -16,17 +16,17 @@ package com.liferay.sync.connector.service.impl;
 
 import com.liferay.oauth.model.OAuthApplication;
 import com.liferay.oauth.model.OAuthApplicationConstants;
-import com.liferay.oauth.service.OAuthApplicationLocalServiceUtil;
+import com.liferay.oauth.service.OAuthApplicationLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.sync.connector.constants.PortletPropsKeys;
 import com.liferay.sync.connector.service.base.SyncPreferencesLocalServiceBaseImpl;
-import com.liferay.sync.connector.util.PortletPropsKeys;
-import com.liferay.util.portlet.PortletProps;
 
 import java.io.InputStream;
 
@@ -34,6 +34,8 @@ import java.util.Map;
 import java.util.Properties;
 
 import javax.portlet.PortletPreferences;
+
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Dennis Ju
@@ -49,14 +51,14 @@ public class SyncPreferencesLocalServiceImpl
 			companyId, PortletPropsKeys.SYNC_OAUTH_APPLICATION_ID, 0);
 
 		OAuthApplication oAuthApplication =
-			OAuthApplicationLocalServiceUtil.fetchOAuthApplication(
+			_oAuthApplicationLocalService.fetchOAuthApplication(
 				oAuthApplicationId);
 
 		if (oAuthApplication != null) {
 			return;
 		}
 
-		oAuthApplication = OAuthApplicationLocalServiceUtil.addOAuthApplication(
+		oAuthApplication = _oAuthApplicationLocalService.addOAuthApplication(
 			serviceContext.getUserId(), "Liferay Sync", StringPool.BLANK,
 			OAuthApplicationConstants.ACCESS_WRITE, true, "http://liferay-sync",
 			"http://liferay-sync", serviceContext);
@@ -66,7 +68,7 @@ public class SyncPreferencesLocalServiceImpl
 		InputStream inputStream = classLoader.getResourceAsStream(
 			"/resources/images/logo.png");
 
-		OAuthApplicationLocalServiceUtil.updateLogo(
+		_oAuthApplicationLocalService.updateLogo(
 			oAuthApplication.getOAuthApplicationId(), inputStream);
 
 		PortletPreferences portletPreferences = PrefsPropsUtil.getPreferences(
@@ -97,7 +99,7 @@ public class SyncPreferencesLocalServiceImpl
 		PortletPreferences portletPreferences = PrefsPropsUtil.getPreferences(
 			companyId);
 
-		Properties properties = PortletProps.getProperties();
+		Properties properties = PropsUtil.getProperties();
 
 		for (Map.Entry<Object, Object> entry : properties.entrySet()) {
 			String key = String.valueOf(entry.getKey());
@@ -121,7 +123,7 @@ public class SyncPreferencesLocalServiceImpl
 	@Override
 	public boolean isOAuthApplicationAvailable(long oAuthApplicationId) {
 		OAuthApplication oAuthApplication =
-			OAuthApplicationLocalServiceUtil.fetchOAuthApplication(
+			_oAuthApplicationLocalService.fetchOAuthApplication(
 				oAuthApplicationId);
 
 		if (oAuthApplication == null) {
@@ -131,7 +133,16 @@ public class SyncPreferencesLocalServiceImpl
 		return true;
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
+	@Reference(unbind = "-")
+	protected void setOAuthApplicationLocalService(
+		OAuthApplicationLocalService oAuthApplicationLocalService) {
+
+		_oAuthApplicationLocalService = oAuthApplicationLocalService;
+	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
 		SyncPreferencesLocalServiceImpl.class);
+
+	private OAuthApplicationLocalService _oAuthApplicationLocalService;
 
 }

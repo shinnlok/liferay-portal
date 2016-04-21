@@ -16,13 +16,15 @@ package com.liferay.sync.connector.service.persistence;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
+import com.liferay.osgi.util.ServiceTrackerFactory;
+
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
-import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 import com.liferay.sync.connector.model.SyncDLObject;
+
+import org.osgi.util.tracker.ServiceTracker;
 
 import java.util.List;
 
@@ -2147,16 +2149,9 @@ public class SyncDLObjectUtil {
 	}
 
 	public static SyncDLObjectPersistence getPersistence() {
-		if (_persistence == null) {
-			_persistence = (SyncDLObjectPersistence)PortletBeanLocatorUtil.locate(com.liferay.sync.connector.service.ClpSerializer.getServletContextName(),
-					SyncDLObjectPersistence.class.getName());
-
-			ReferenceRegistry.registerReference(SyncDLObjectUtil.class,
-				"_persistence");
-		}
-
-		return _persistence;
+		return _serviceTracker.getService();
 	}
 
-	private static SyncDLObjectPersistence _persistence;
+	private static ServiceTracker<SyncDLObjectPersistence, SyncDLObjectPersistence> _serviceTracker =
+		ServiceTrackerFactory.open(SyncDLObjectPersistence.class);
 }

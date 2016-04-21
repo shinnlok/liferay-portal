@@ -16,11 +16,8 @@ package com.liferay.sync.connector.service.persistence.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
-import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
-import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
 import com.liferay.portal.kernel.dao.orm.Query;
 import com.liferay.portal.kernel.dao.orm.QueryPos;
@@ -42,6 +39,7 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
+import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import com.liferay.sync.connector.exception.NoSuchDeviceException;
 import com.liferay.sync.connector.model.SyncDevice;
@@ -58,6 +56,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -201,7 +200,7 @@ public class SyncDevicePersistenceImpl extends BasePersistenceImpl<SyncDevice>
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SyncDevice syncDevice : list) {
-					if (!Validator.equals(uuid, syncDevice.getUuid())) {
+					if (!Objects.equals(uuid, syncDevice.getUuid())) {
 						list = null;
 
 						break;
@@ -756,7 +755,7 @@ public class SyncDevicePersistenceImpl extends BasePersistenceImpl<SyncDevice>
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SyncDevice syncDevice : list) {
-					if (!Validator.equals(uuid, syncDevice.getUuid()) ||
+					if (!Objects.equals(uuid, syncDevice.getUuid()) ||
 							(companyId != syncDevice.getCompanyId())) {
 						list = null;
 
@@ -2520,10 +2519,12 @@ public class SyncDevicePersistenceImpl extends BasePersistenceImpl<SyncDevice>
 		finderCache.removeCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 	}
 
-	@BeanReference(type = CompanyProviderWrapper.class)
+	@ServiceReference(type = CompanyProviderWrapper.class)
 	protected CompanyProvider companyProvider;
-	protected EntityCache entityCache = EntityCacheUtil.getEntityCache();
-	protected FinderCache finderCache = FinderCacheUtil.getFinderCache();
+	@ServiceReference(type = EntityCache.class)
+	protected EntityCache entityCache;
+	@ServiceReference(type = FinderCache.class)
+	protected FinderCache finderCache;
 	private static final String _SQL_SELECT_SYNCDEVICE = "SELECT syncDevice FROM SyncDevice syncDevice";
 	private static final String _SQL_SELECT_SYNCDEVICE_WHERE_PKS_IN = "SELECT syncDevice FROM SyncDevice syncDevice WHERE syncDeviceId IN (";
 	private static final String _SQL_SELECT_SYNCDEVICE_WHERE = "SELECT syncDevice FROM SyncDevice syncDevice WHERE ";

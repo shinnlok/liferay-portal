@@ -27,6 +27,7 @@ import com.liferay.sync.engine.session.SessionManager;
 
 import java.util.Map;
 
+import com.liferay.sync.engine.util.ServerInfo;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 
@@ -137,6 +138,10 @@ public abstract class BaseEvent implements Event {
 
 	@Override
 	public String getURLPath() {
+		if (ServerInfo.supportsModuleFramework(_syncAccountId)) {
+			return _urlPath.replace("/sync-web.", "/sync.");
+		}
+
 		return _urlPath;
 	}
 
@@ -192,12 +197,12 @@ public abstract class BaseEvent implements Event {
 		BatchEvent batchEvent = BatchEventManager.getBatchEvent(syncFile);
 
 		if (!batchEvent.addEvent(this)) {
-			executeAsynchronousPost(_urlPath, _parameters);
+			executeAsynchronousPost(getURLPath(), _parameters);
 		}
 	}
 
 	protected void processRequest() throws Exception {
-		executePost(_urlPath, _parameters);
+		executePost(getURLPath(), _parameters);
 	}
 
 	private static final Logger _logger = LoggerFactory.getLogger(

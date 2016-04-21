@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.connector.util;
+package com.liferay.sync.connector.constants;
 
 /**
  * @author Shinn Lok

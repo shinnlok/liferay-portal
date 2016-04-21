@@ -23,8 +23,11 @@ import com.liferay.document.library.kernel.model.DLFileVersion;
 import com.liferay.document.library.kernel.model.DLFolder;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.model.DLSyncEvent;
-import com.liferay.document.library.kernel.service.DLSyncEventLocalServiceUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.util.CharPool;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.deploy.DeployManagerUtil;
@@ -38,6 +41,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.Organization;
+import com.liferay.portal.kernel.model.Release;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.plugin.PluginPackage;
@@ -48,7 +52,7 @@ import com.liferay.portal.kernel.security.access.control.AccessControlled;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
-import com.liferay.portal.kernel.service.ResourcePermissionLocalServiceUtil;
+import com.liferay.portal.kernel.service.ReleaseLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -67,13 +71,13 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.comparator.GroupNameComparator;
 import com.liferay.portal.kernel.zip.ZipReader;
 import com.liferay.portal.kernel.zip.ZipReaderFactoryUtil;
+import com.liferay.sync.connector.constants.PortletPropsKeys;
+import com.liferay.sync.connector.constants.SyncDeviceConstants;
 import com.liferay.sync.connector.model.SyncDLObject;
 import com.liferay.sync.connector.model.SyncDLObjectConstants;
 import com.liferay.sync.connector.model.SyncDevice;
 import com.liferay.sync.connector.service.base.SyncDLObjectServiceBaseImpl;
-import com.liferay.sync.connector.constants.SyncDeviceConstants;
 import com.liferay.sync.connector.util.JSONWebServiceActionParametersMap;
-import com.liferay.sync.connector.util.PortletPropsKeys;
 import com.liferay.sync.connector.util.PortletPropsValues;
 import com.liferay.sync.connector.util.SyncContext;
 import com.liferay.sync.connector.util.SyncDLObjectUpdate;
@@ -97,6 +101,10 @@ import java.util.Set;
 import jodd.bean.BeanUtil;
 
 import jodd.util.NameValue;
+
+import org.osgi.service.component.annotations.Component;
+
+import com.liferay.sync.connector.service.SyncDLObjectService;
 
 /**
  * @author Michael Young
@@ -533,10 +541,13 @@ public class SyncDLObjectServiceImpl extends SyncDLObjectServiceBaseImpl {
 
 			syncContext.setOAuthEnabled(oAuthEnabled);
 
-			PluginPackage syncWebPluginPackage =
-				DeployManagerUtil.getInstalledPluginPackage("sync-web");
+			Bundle bundle = FrameworkUtil.getBundle(this.getClass());
 
-			syncContext.setPluginVersion(syncWebPluginPackage.getVersion());
+			String pluginVersion = StringUtil.strip(
+				String.valueOf(bundle.getVersion()), CharPool.PERIOD);
+
+			syncContext.setPluginVersion(
+				ReleaseInfo.getVersion() + StringPool.PERIOD + pluginVersion);
 
 			if (!user.isDefaultUser()) {
 				syncContext.setPortalBuildNumber(ReleaseInfo.getBuildNumber());
@@ -1117,12 +1128,12 @@ public class SyncDLObjectServiceImpl extends SyncDLObjectServiceBaseImpl {
 	protected SyncDLObject checkModifiedTime(
 		SyncDLObject syncDLObject, long typePk) {
 
-		DynamicQuery dynamicQuery = DLSyncEventLocalServiceUtil.dynamicQuery();
+		DynamicQuery dynamicQuery = dlSyncEventLocalService.dynamicQuery();
 
 		dynamicQuery.add(RestrictionsFactoryUtil.eq("typePK", typePk));
 
-		List<DLSyncEvent> dlSyncEvents =
-			DLSyncEventLocalServiceUtil.dynamicQuery(dynamicQuery);
+		List<DLSyncEvent> dlSyncEvents = dlSyncEventLocalService.dynamicQuery(
+			dynamicQuery);
 
 		if (dlSyncEvents.isEmpty()) {
 			return syncDLObject;
@@ -1286,17 +1297,17 @@ public class SyncDLObjectServiceImpl extends SyncDLObjectServiceBaseImpl {
 			return false;
 		}
 
-		if (ResourcePermissionLocalServiceUtil.hasResourcePermission(
+		if (resourcePermissionLocalService.hasResourcePermission(
 				permissionChecker.getCompanyId(), name,
 				ResourceConstants.SCOPE_COMPANY,
 				String.valueOf(permissionChecker.getCompanyId()), roleIds,
 				ActionKeys.VIEW) ||
-			ResourcePermissionLocalServiceUtil.hasResourcePermission(
+			resourcePermissionLocalService.hasResourcePermission(
 				permissionChecker.getCompanyId(), name,
 				ResourceConstants.SCOPE_GROUP_TEMPLATE,
 				String.valueOf(GroupConstants.DEFAULT_PARENT_GROUP_ID), roleIds,
 				ActionKeys.VIEW) ||
-			ResourcePermissionLocalServiceUtil.hasResourcePermission(
+			resourcePermissionLocalService.hasResourcePermission(
 				permissionChecker.getCompanyId(), name,
 				ResourceConstants.SCOPE_GROUP, String.valueOf(groupId), roleIds,
 				ActionKeys.VIEW)) {
@@ -1580,7 +1591,7 @@ public class SyncDLObjectServiceImpl extends SyncDLObjectServiceBaseImpl {
 	private static final int _SQL_DATA_MAX_PARAMETERS = GetterUtil.getInteger(
 		PropsUtil.get(PropsKeys.SQL_DATA_MAX_PARAMETERS));
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		SyncDLObjectServiceImpl.class);
 
 }

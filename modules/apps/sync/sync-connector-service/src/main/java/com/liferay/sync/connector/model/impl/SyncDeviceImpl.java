@@ -20,10 +20,10 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.sync.connector.SyncClientMinBuildException;
 import com.liferay.sync.connector.SyncServicesUnavailableException;
+import com.liferay.sync.connector.constants.PortletPropsKeys;
+import com.liferay.sync.connector.constants.SyncDeviceConstants;
 import com.liferay.sync.connector.exception.SyncDeviceActiveException;
 import com.liferay.sync.connector.exception.SyncDeviceWipeException;
-import com.liferay.sync.connector.constants.SyncDeviceConstants;
-import com.liferay.sync.connector.util.PortletPropsKeys;
 import com.liferay.sync.connector.util.PortletPropsValues;
 
 /**

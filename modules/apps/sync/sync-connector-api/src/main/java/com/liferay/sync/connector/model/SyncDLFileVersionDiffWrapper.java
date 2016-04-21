@@ -20,13 +20,13 @@ import com.liferay.expando.kernel.model.ExpandoBridge;
 
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * <p>
@@ -117,8 +117,38 @@ public class SyncDLFileVersionDiffWrapper implements SyncDLFileVersionDiff,
 	}
 
 	@Override
-	public java.lang.Object clone() {
-		return new SyncDLFileVersionDiffWrapper((SyncDLFileVersionDiff)_syncDLFileVersionDiff.clone());
+	public boolean isCachedModel() {
+		return _syncDLFileVersionDiff.isCachedModel();
+	}
+
+	@Override
+	public boolean isEscapedModel() {
+		return _syncDLFileVersionDiff.isEscapedModel();
+	}
+
+	@Override
+	public boolean isNew() {
+		return _syncDLFileVersionDiff.isNew();
+	}
+
+	@Override
+	public ExpandoBridge getExpandoBridge() {
+		return _syncDLFileVersionDiff.getExpandoBridge();
+	}
+
+	@Override
+	public com.liferay.portal.kernel.model.CacheModel<com.liferay.sync.connector.model.SyncDLFileVersionDiff> toCacheModel() {
+		return _syncDLFileVersionDiff.toCacheModel();
+	}
+
+	@Override
+	public com.liferay.sync.connector.model.SyncDLFileVersionDiff toEscapedModel() {
+		return new SyncDLFileVersionDiffWrapper(_syncDLFileVersionDiff.toEscapedModel());
+	}
+
+	@Override
+	public com.liferay.sync.connector.model.SyncDLFileVersionDiff toUnescapedModel() {
+		return new SyncDLFileVersionDiffWrapper(_syncDLFileVersionDiff.toUnescapedModel());
 	}
 
 	@Override
@@ -127,19 +157,29 @@ public class SyncDLFileVersionDiffWrapper implements SyncDLFileVersionDiff,
 		return _syncDLFileVersionDiff.compareTo(syncDLFileVersionDiff);
 	}
 
-	/**
-	* Returns the data file entry ID of this sync d l file version diff.
-	*
-	* @return the data file entry ID of this sync d l file version diff
-	*/
 	@Override
-	public long getDataFileEntryId() {
-		return _syncDLFileVersionDiff.getDataFileEntryId();
+	public int hashCode() {
+		return _syncDLFileVersionDiff.hashCode();
 	}
 
 	@Override
-	public ExpandoBridge getExpandoBridge() {
-		return _syncDLFileVersionDiff.getExpandoBridge();
+	public Serializable getPrimaryKeyObj() {
+		return _syncDLFileVersionDiff.getPrimaryKeyObj();
+	}
+
+	@Override
+	public java.lang.Object clone() {
+		return new SyncDLFileVersionDiffWrapper((SyncDLFileVersionDiff)_syncDLFileVersionDiff.clone());
+	}
+
+	@Override
+	public java.lang.String toString() {
+		return _syncDLFileVersionDiff.toString();
+	}
+
+	@Override
+	public java.lang.String toXmlString() {
+		return _syncDLFileVersionDiff.toXmlString();
 	}
 
 	/**
@@ -150,6 +190,16 @@ public class SyncDLFileVersionDiffWrapper implements SyncDLFileVersionDiff,
 	@Override
 	public Date getExpirationDate() {
 		return _syncDLFileVersionDiff.getExpirationDate();
+	}
+
+	/**
+	* Returns the data file entry ID of this sync d l file version diff.
+	*
+	* @return the data file entry ID of this sync d l file version diff
+	*/
+	@Override
+	public long getDataFileEntryId() {
+		return _syncDLFileVersionDiff.getDataFileEntryId();
 	}
 
 	/**
@@ -170,11 +220,6 @@ public class SyncDLFileVersionDiffWrapper implements SyncDLFileVersionDiff,
 	@Override
 	public long getPrimaryKey() {
 		return _syncDLFileVersionDiff.getPrimaryKey();
-	}
-
-	@Override
-	public Serializable getPrimaryKeyObj() {
-		return _syncDLFileVersionDiff.getPrimaryKeyObj();
 	}
 
 	/**
@@ -218,26 +263,6 @@ public class SyncDLFileVersionDiffWrapper implements SyncDLFileVersionDiff,
 	}
 
 	@Override
-	public int hashCode() {
-		return _syncDLFileVersionDiff.hashCode();
-	}
-
-	@Override
-	public boolean isCachedModel() {
-		return _syncDLFileVersionDiff.isCachedModel();
-	}
-
-	@Override
-	public boolean isEscapedModel() {
-		return _syncDLFileVersionDiff.isEscapedModel();
-	}
-
-	@Override
-	public boolean isNew() {
-		return _syncDLFileVersionDiff.isNew();
-	}
-
-	@Override
 	public void persist() {
 		_syncDLFileVersionDiff.persist();
 	}
@@ -258,14 +283,14 @@ public class SyncDLFileVersionDiffWrapper implements SyncDLFileVersionDiff,
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
-		_syncDLFileVersionDiff.setExpandoBridgeAttributes(baseModel);
+	public void setExpandoBridgeAttributes(ExpandoBridge expandoBridge) {
+		_syncDLFileVersionDiff.setExpandoBridgeAttributes(expandoBridge);
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(ExpandoBridge expandoBridge) {
-		_syncDLFileVersionDiff.setExpandoBridgeAttributes(expandoBridge);
+	public void setExpandoBridgeAttributes(
+		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
+		_syncDLFileVersionDiff.setExpandoBridgeAttributes(baseModel);
 	}
 
 	@Override
@@ -354,31 +379,6 @@ public class SyncDLFileVersionDiffWrapper implements SyncDLFileVersionDiff,
 	}
 
 	@Override
-	public com.liferay.portal.kernel.model.CacheModel<com.liferay.sync.connector.model.SyncDLFileVersionDiff> toCacheModel() {
-		return _syncDLFileVersionDiff.toCacheModel();
-	}
-
-	@Override
-	public com.liferay.sync.connector.model.SyncDLFileVersionDiff toEscapedModel() {
-		return new SyncDLFileVersionDiffWrapper(_syncDLFileVersionDiff.toEscapedModel());
-	}
-
-	@Override
-	public java.lang.String toString() {
-		return _syncDLFileVersionDiff.toString();
-	}
-
-	@Override
-	public com.liferay.sync.connector.model.SyncDLFileVersionDiff toUnescapedModel() {
-		return new SyncDLFileVersionDiffWrapper(_syncDLFileVersionDiff.toUnescapedModel());
-	}
-
-	@Override
-	public java.lang.String toXmlString() {
-		return _syncDLFileVersionDiff.toXmlString();
-	}
-
-	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
 			return true;
@@ -390,7 +390,7 @@ public class SyncDLFileVersionDiffWrapper implements SyncDLFileVersionDiff,
 
 		SyncDLFileVersionDiffWrapper syncDLFileVersionDiffWrapper = (SyncDLFileVersionDiffWrapper)obj;
 
-		if (Validator.equals(_syncDLFileVersionDiff,
+		if (Objects.equals(_syncDLFileVersionDiff,
 					syncDLFileVersionDiffWrapper._syncDLFileVersionDiff)) {
 			return true;
 		}

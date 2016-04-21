@@ -1,7 +1,12 @@
 Bundle-Name: Liferay Sync Connector Service
 Bundle-SymbolicName: com.liferay.sync.connector.service
 Bundle-Version: 1.0.0
+Export-Package:\
+	com.liferay.io.delta,\
+	com.liferay.oauth.*,\
+	com.liferay.sync.connector.*
 Liferay-Releng-Module-Group-Description:
 Liferay-Releng-Module-Group-Title: Sync Connector
 Liferay-Require-SchemaVersion: 1.0.0
 Liferay-Service: true
+Web-ContextPath: /sync-web

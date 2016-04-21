@@ -21,7 +21,7 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
 import com.liferay.portal.kernel.security.access.control.AccessControlled;
 import com.liferay.portal.kernel.service.BaseService;
-import com.liferay.portal.kernel.service.InvokableService;
+import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Transactional;
 
@@ -40,15 +40,20 @@ import com.liferay.sync.connector.model.SyncDevice;
  */
 @AccessControlled
 @JSONWebService
+@OSGiBeanProperties(property =  {
+	"json.web.service.context.name=sync", "json.web.service.context.path=SyncDevice"}, service = SyncDeviceService.class)
 @ProviderType
 @Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
 	PortalException.class, SystemException.class})
-public interface SyncDeviceService extends BaseService, InvokableService {
+public interface SyncDeviceService extends BaseService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link SyncDeviceServiceUtil} to access the sync device remote service. Add custom service methods to {@link com.liferay.sync.connector.service.impl.SyncDeviceServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
+	public SyncDevice registerSyncDevice(java.lang.String type,
+		int buildNumber, int featureSet, java.lang.String uuid)
+		throws PortalException;
 
 	/**
 	* Returns the OSGi service identifier.
@@ -56,15 +61,6 @@ public interface SyncDeviceService extends BaseService, InvokableService {
 	* @return the OSGi service identifier
 	*/
 	public java.lang.String getOSGiServiceIdentifier();
-
-	@Override
-	public java.lang.Object invokeMethod(java.lang.String name,
-		java.lang.String[] parameterTypes, java.lang.Object[] arguments)
-		throws java.lang.Throwable;
-
-	public SyncDevice registerSyncDevice(java.lang.String type,
-		int buildNumber, int featureSet, java.lang.String uuid)
-		throws PortalException;
 
 	public void unregisterSyncDevice(java.lang.String uuid)
 		throws PortalException;

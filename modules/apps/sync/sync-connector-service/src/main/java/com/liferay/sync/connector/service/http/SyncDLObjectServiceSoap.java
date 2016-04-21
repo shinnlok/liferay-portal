@@ -170,7 +170,8 @@ public class SyncDLObjectServiceSoap {
 	public static com.liferay.sync.connector.model.SyncDLObjectSoap[] getAllFolderSyncDLObjects(
 		long repositoryId) throws RemoteException {
 		try {
-			java.util.List<com.liferay.sync.connector.model.SyncDLObject> returnValue = SyncDLObjectServiceUtil.getAllFolderSyncDLObjects(repositoryId);
+			java.util.List<com.liferay.sync.connector.model.SyncDLObject> returnValue =
+				SyncDLObjectServiceUtil.getAllFolderSyncDLObjects(repositoryId);
 
 			return com.liferay.sync.connector.model.SyncDLObjectSoap.toSoapModels(returnValue);
 		}
@@ -200,7 +201,8 @@ public class SyncDLObjectServiceSoap {
 	public static com.liferay.sync.connector.model.SyncDLObjectSoap[] getFileEntrySyncDLObjects(
 		long repositoryId, long folderId) throws RemoteException {
 		try {
-			java.util.List<com.liferay.sync.connector.model.SyncDLObject> returnValue = SyncDLObjectServiceUtil.getFileEntrySyncDLObjects(repositoryId,
+			java.util.List<com.liferay.sync.connector.model.SyncDLObject> returnValue =
+				SyncDLObjectServiceUtil.getFileEntrySyncDLObjects(repositoryId,
 					folderId);
 
 			return com.liferay.sync.connector.model.SyncDLObjectSoap.toSoapModels(returnValue);
@@ -245,7 +247,8 @@ public class SyncDLObjectServiceSoap {
 	public static com.liferay.sync.connector.model.SyncDLObjectSoap[] getFolderSyncDLObjects(
 		long repositoryId, long parentFolderId) throws RemoteException {
 		try {
-			java.util.List<com.liferay.sync.connector.model.SyncDLObject> returnValue = SyncDLObjectServiceUtil.getFolderSyncDLObjects(repositoryId,
+			java.util.List<com.liferay.sync.connector.model.SyncDLObject> returnValue =
+				SyncDLObjectServiceUtil.getFolderSyncDLObjects(repositoryId,
 					parentFolderId);
 
 			return com.liferay.sync.connector.model.SyncDLObjectSoap.toSoapModels(returnValue);

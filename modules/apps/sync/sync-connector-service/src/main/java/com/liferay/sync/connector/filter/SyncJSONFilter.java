@@ -28,9 +28,9 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.sync.connector.SyncClientMinBuildException;
 import com.liferay.sync.connector.SyncDeviceHeaderException;
 import com.liferay.sync.connector.SyncServicesUnavailableException;
+import com.liferay.sync.connector.constants.PortletPropsKeys;
 import com.liferay.sync.connector.model.SyncDevice;
 import com.liferay.sync.connector.service.SyncDeviceLocalServiceUtil;
-import com.liferay.sync.connector.util.PortletPropsKeys;
 import com.liferay.sync.connector.util.PortletPropsValues;
 import com.liferay.sync.connector.util.SyncDeviceThreadLocal;
 import com.liferay.sync.connector.util.SyncUtil;
@@ -60,9 +60,9 @@ import org.osgi.service.component.annotations.Component;
 @Component(
 	immediate = true,
 	property = {
+		"after-filter=Upload Servlet Request Filter",
 		"osgi.http.whiteboard.filter.name=Sync JSON Filter",
-		"osgi.http.whiteboard.filter.pattern=/api/jsonws/*",
-		"after-filter=Upload Servlet Request Filter"
+		"osgi.http.whiteboard.filter.pattern=/api/jsonws/*"
 	},
 	service = Filter.class
 )

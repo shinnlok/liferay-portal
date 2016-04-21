@@ -19,7 +19,6 @@ import aQute.bnd.annotation.ProviderType;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.service.BaseLocalService;
-import com.liferay.portal.kernel.service.InvokableLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
@@ -42,15 +41,14 @@ import javax.portlet.PortletPreferences;
 @ProviderType
 @Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
 	PortalException.class, SystemException.class})
-public interface SyncPreferencesLocalService extends BaseLocalService,
-	InvokableLocalService {
+public interface SyncPreferencesLocalService extends BaseLocalService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link SyncPreferencesLocalServiceUtil} to access the sync preferences local service. Add custom service methods to {@link com.liferay.sync.connector.service.impl.SyncPreferencesLocalServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public void enableOAuth(long companyId, ServiceContext serviceContext)
-		throws PortalException;
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public boolean isOAuthApplicationAvailable(long oAuthApplicationId);
 
 	/**
 	* Returns the OSGi service identifier.
@@ -63,11 +61,6 @@ public interface SyncPreferencesLocalService extends BaseLocalService,
 	public PortletPreferences getPortletPreferences(long companyId)
 		throws PortalException;
 
-	@Override
-	public java.lang.Object invokeMethod(java.lang.String name,
-		java.lang.String[] parameterTypes, java.lang.Object[] arguments)
-		throws java.lang.Throwable;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public boolean isOAuthApplicationAvailable(long oAuthApplicationId);
+	public void enableOAuth(long companyId, ServiceContext serviceContext)
+		throws PortalException;
 }

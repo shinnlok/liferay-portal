@@ -85,7 +85,7 @@ import org.osgi.service.component.annotations.Component;
 	immediate = true,
 	property = {
 		"osgi.http.whiteboard.servlet.name=Sync Download Servlet",
-		"osgi.http.whiteboard.servlet.pattern=/sync-web/download/*",
+		"osgi.http.whiteboard.servlet.pattern=/o/sync-web/download/*"
 	},
 	service = Servlet.class
 )

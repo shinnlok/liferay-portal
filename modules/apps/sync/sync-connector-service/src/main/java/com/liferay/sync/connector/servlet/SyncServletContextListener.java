@@ -34,11 +34,11 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.util.BasePortalLifecycle;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
+import com.liferay.sync.connector.constants.PortletPropsKeys;
 import com.liferay.sync.connector.messaging.DLSyncEventMessageListener;
 import com.liferay.sync.connector.messaging.SyncDLFileVersionDiffMessageListener;
 import com.liferay.sync.connector.service.SyncDLObjectLocalServiceUtil;
 import com.liferay.sync.connector.service.SyncPreferencesLocalServiceUtil;
-import com.liferay.sync.connector.util.PortletPropsKeys;
 import com.liferay.sync.connector.util.PortletPropsValues;
 import com.liferay.sync.connector.util.VerifyUtil;
 
@@ -208,7 +208,7 @@ public class SyncServletContextListener
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		SyncServletContextListener.class);
 
 	private MessageListener _dlSyncEventMessageListener;

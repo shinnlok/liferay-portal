@@ -41,9 +41,10 @@ public class SyncPolicies {
 	public static final Object[][] POLICIES = new Object[][] {
 		{
 			"SYNC_DEFAULT",
-			"com.liferay.sync.service.SyncDLObjectService#getSyncContext", true
+			"com.liferay.sync.connector.service." +
+				"SyncDLObjectService#getSyncContext", true
 		},
-		{"SYNC_TOKEN", "com.liferay.sync.service.*", false}
+		{"SYNC_TOKEN", "com.liferay.sync.connector.service.*", false}
 	};
 
 	@Activate

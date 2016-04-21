@@ -22,8 +22,8 @@ import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.security.access.control.AccessControlled;
 import com.liferay.portal.kernel.service.BaseService;
-import com.liferay.portal.kernel.service.InvokableService;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
@@ -48,15 +48,20 @@ import java.util.Map;
  */
 @AccessControlled
 @JSONWebService
+@OSGiBeanProperties(property =  {
+	"json.web.service.context.name=sync", "json.web.service.context.path=SyncDLObject"}, service = SyncDLObjectService.class)
 @ProviderType
 @Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
 	PortalException.class, SystemException.class})
-public interface SyncDLObjectService extends BaseService, InvokableService {
+public interface SyncDLObjectService extends BaseService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link SyncDLObjectServiceUtil} to access the sync d l object remote service. Add custom service methods to {@link com.liferay.sync.connector.service.impl.SyncDLObjectServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public Group getGroup(long groupId) throws PortalException;
+
 	public SyncDLObject addFileEntry(long repositoryId, long folderId,
 		java.lang.String sourceFileName, java.lang.String mimeType,
 		java.lang.String title, java.lang.String description,
@@ -75,10 +80,10 @@ public interface SyncDLObjectService extends BaseService, InvokableService {
 		ServiceContext serviceContext) throws PortalException;
 
 	public SyncDLObject checkOutFileEntry(long fileEntryId,
-		java.lang.String owner, long expirationTime,
 		ServiceContext serviceContext) throws PortalException;
 
 	public SyncDLObject checkOutFileEntry(long fileEntryId,
+		java.lang.String owner, long expirationTime,
 		ServiceContext serviceContext) throws PortalException;
 
 	public SyncDLObject copyFileEntry(long sourceFileEntryId,
@@ -87,16 +92,8 @@ public interface SyncDLObjectService extends BaseService, InvokableService {
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<SyncDLObject> getAllFolderSyncDLObjects(long repositoryId)
-		throws PortalException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public SyncDLObject getFileEntrySyncDLObject(long repositoryId,
 		long folderId, java.lang.String title) throws PortalException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<SyncDLObject> getFileEntrySyncDLObjects(long repositoryId,
-		long folderId) throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public SyncDLObject getFolderSyncDLObject(long folderId)
@@ -105,48 +102,6 @@ public interface SyncDLObjectService extends BaseService, InvokableService {
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public SyncDLObject getFolderSyncDLObject(long repositoryId,
 		long parentFolderId, java.lang.String name) throws PortalException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<SyncDLObject> getFolderSyncDLObjects(long repositoryId,
-		long parentFolderId) throws PortalException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public Group getGroup(long groupId) throws PortalException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public long getLatestModifiedTime() throws PortalException;
-
-	/**
-	* Returns the OSGi service identifier.
-	*
-	* @return the OSGi service identifier
-	*/
-	public java.lang.String getOSGiServiceIdentifier();
-
-	@AccessControlled(guestAccessEnabled = true)
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.lang.Object getSyncContext() throws PortalException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.lang.String getSyncDLObjectUpdate(long repositoryId,
-		long lastAccessTime, int max) throws PortalException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.lang.String getSyncDLObjectUpdate(long repositoryId,
-		long lastAccessTime, int max, boolean retrieveFromCache)
-		throws PortalException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.lang.String getSyncDLObjectUpdate(long repositoryId,
-		long parentFolderId, long lastAccessTime) throws PortalException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<Group> getUserSitesGroups() throws PortalException;
-
-	@Override
-	public java.lang.Object invokeMethod(java.lang.String name,
-		java.lang.String[] parameterTypes, java.lang.Object[] arguments)
-		throws java.lang.Throwable;
 
 	public SyncDLObject moveFileEntry(long fileEntryId, long newFolderId,
 		ServiceContext serviceContext) throws PortalException;
@@ -173,10 +128,6 @@ public interface SyncDLObjectService extends BaseService, InvokableService {
 	public SyncDLObject restoreFolderFromTrash(long folderId)
 		throws PortalException;
 
-	@Transactional(enabled = false)
-	public Map<java.lang.String, java.lang.Object> updateFileEntries(
-		File zipFile) throws PortalException;
-
 	public SyncDLObject updateFileEntry(long fileEntryId,
 		java.lang.String sourceFileName, java.lang.String mimeType,
 		java.lang.String title, java.lang.String description,
@@ -187,4 +138,50 @@ public interface SyncDLObjectService extends BaseService, InvokableService {
 	public SyncDLObject updateFolder(long folderId, java.lang.String name,
 		java.lang.String description, ServiceContext serviceContext)
 		throws PortalException;
+
+	@AccessControlled(guestAccessEnabled = true)
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.lang.Object getSyncContext() throws PortalException;
+
+	/**
+	* Returns the OSGi service identifier.
+	*
+	* @return the OSGi service identifier
+	*/
+	public java.lang.String getOSGiServiceIdentifier();
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.lang.String getSyncDLObjectUpdate(long repositoryId,
+		long lastAccessTime, int max) throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.lang.String getSyncDLObjectUpdate(long repositoryId,
+		long lastAccessTime, int max, boolean retrieveFromCache)
+		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.lang.String getSyncDLObjectUpdate(long repositoryId,
+		long parentFolderId, long lastAccessTime) throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<SyncDLObject> getAllFolderSyncDLObjects(long repositoryId)
+		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<SyncDLObject> getFileEntrySyncDLObjects(long repositoryId,
+		long folderId) throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<SyncDLObject> getFolderSyncDLObjects(long repositoryId,
+		long parentFolderId) throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<Group> getUserSitesGroups() throws PortalException;
+
+	@Transactional(enabled = false)
+	public Map<java.lang.String, java.lang.Object> updateFileEntries(
+		File zipFile) throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public long getLatestModifiedTime() throws PortalException;
 }

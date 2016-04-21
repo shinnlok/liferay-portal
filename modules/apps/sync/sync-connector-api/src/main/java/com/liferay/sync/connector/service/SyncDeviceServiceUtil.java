@@ -16,9 +16,9 @@ package com.liferay.sync.connector.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
-import com.liferay.portal.kernel.service.InvokableService;
-import com.liferay.portal.kernel.util.ReferenceRegistry;
+import com.liferay.osgi.util.ServiceTrackerFactory;
+
+import org.osgi.util.tracker.ServiceTracker;
 
 /**
  * Provides the remote service utility for SyncDevice. This utility wraps
@@ -41,6 +41,13 @@ public class SyncDeviceServiceUtil {
 	 *
 	 * Never modify this class directly. Add custom service methods to {@link com.liferay.sync.connector.service.impl.SyncDeviceServiceImpl} and rerun ServiceBuilder to regenerate this class.
 	 */
+	public static com.liferay.sync.connector.model.SyncDevice registerSyncDevice(
+		java.lang.String type, int buildNumber, int featureSet,
+		java.lang.String uuid)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService()
+				   .registerSyncDevice(type, buildNumber, featureSet, uuid);
+	}
 
 	/**
 	* Returns the OSGi service identifier.
@@ -51,47 +58,15 @@ public class SyncDeviceServiceUtil {
 		return getService().getOSGiServiceIdentifier();
 	}
 
-	public static java.lang.Object invokeMethod(java.lang.String name,
-		java.lang.String[] parameterTypes, java.lang.Object[] arguments)
-		throws java.lang.Throwable {
-		return getService().invokeMethod(name, parameterTypes, arguments);
-	}
-
-	public static com.liferay.sync.connector.model.SyncDevice registerSyncDevice(
-		java.lang.String type, int buildNumber, int featureSet,
-		java.lang.String uuid)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService()
-				   .registerSyncDevice(type, buildNumber, featureSet, uuid);
-	}
-
 	public static void unregisterSyncDevice(java.lang.String uuid)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		getService().unregisterSyncDevice(uuid);
 	}
 
-	public static void clearService() {
-		_service = null;
-	}
-
 	public static SyncDeviceService getService() {
-		if (_service == null) {
-			InvokableService invokableService = (InvokableService)PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(),
-					SyncDeviceService.class.getName());
-
-			if (invokableService instanceof SyncDeviceService) {
-				_service = (SyncDeviceService)invokableService;
-			}
-			else {
-				_service = new SyncDeviceServiceClp(invokableService);
-			}
-
-			ReferenceRegistry.registerReference(SyncDeviceServiceUtil.class,
-				"_service");
-		}
-
-		return _service;
+		return _serviceTracker.getService();
 	}
 
-	private static SyncDeviceService _service;
+	private static ServiceTracker<SyncDeviceService, SyncDeviceService> _serviceTracker =
+		ServiceTrackerFactory.open(SyncDeviceService.class);
 }

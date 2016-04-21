@@ -84,7 +84,7 @@ public class SyncDLObjectModelImpl extends BaseModelImpl<SyncDLObject>
 			{ "mimeType", Types.VARCHAR },
 			{ "description", Types.VARCHAR },
 			{ "changeLog", Types.VARCHAR },
-			{ "extraSettings", Types.CLOB },
+			{ "extraSettings", Types.VARCHAR },
 			{ "version", Types.VARCHAR },
 			{ "versionId", Types.BIGINT },
 			{ "size_", Types.BIGINT },
@@ -115,7 +115,7 @@ public class SyncDLObjectModelImpl extends BaseModelImpl<SyncDLObject>
 		TABLE_COLUMNS_MAP.put("mimeType", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("description", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("changeLog", Types.VARCHAR);
-		TABLE_COLUMNS_MAP.put("extraSettings", Types.CLOB);
+		TABLE_COLUMNS_MAP.put("extraSettings", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("version", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("versionId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("size_", Types.BIGINT);
@@ -130,20 +130,20 @@ public class SyncDLObjectModelImpl extends BaseModelImpl<SyncDLObject>
 		TABLE_COLUMNS_MAP.put("typeUuid", Types.VARCHAR);
 	}
 
-	public static final String TABLE_SQL_CREATE = "create table SyncDLObject (syncDLObjectId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createTime LONG,modifiedTime LONG,repositoryId LONG,parentFolderId LONG,treePath STRING null,name VARCHAR(255) null,extension VARCHAR(75) null,mimeType VARCHAR(75) null,description STRING null,changeLog VARCHAR(75) null,extraSettings TEXT null,version VARCHAR(75) null,versionId LONG,size_ LONG,checksum VARCHAR(75) null,event VARCHAR(75) null,lastPermissionChangeDate DATE null,lockExpirationDate DATE null,lockUserId LONG,lockUserName VARCHAR(75) null,type_ VARCHAR(75) null,typePK LONG,typeUuid VARCHAR(75) null)";
+	public static final String TABLE_SQL_CREATE = "create table SyncDLObject (syncDLObjectId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createTime LONG,modifiedTime LONG,repositoryId LONG,parentFolderId LONG,treePath VARCHAR(75) null,name VARCHAR(75) null,extension VARCHAR(75) null,mimeType VARCHAR(75) null,description VARCHAR(75) null,changeLog VARCHAR(75) null,extraSettings VARCHAR(75) null,version VARCHAR(75) null,versionId LONG,size_ LONG,checksum VARCHAR(75) null,event VARCHAR(75) null,lastPermissionChangeDate DATE null,lockExpirationDate DATE null,lockUserId LONG,lockUserName VARCHAR(75) null,type_ VARCHAR(75) null,typePK LONG,typeUuid VARCHAR(75) null)";
 	public static final String TABLE_SQL_DROP = "drop table SyncDLObject";
 	public static final String ORDER_BY_JPQL = " ORDER BY syncDLObject.modifiedTime ASC, syncDLObject.repositoryId ASC";
 	public static final String ORDER_BY_SQL = " ORDER BY SyncDLObject.modifiedTime ASC, SyncDLObject.repositoryId ASC";
 	public static final String DATA_SOURCE = "liferayDataSource";
 	public static final String SESSION_FACTORY = "liferaySessionFactory";
 	public static final String TX_MANAGER = "liferayTransactionManager";
-	public static final boolean ENTITY_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.util.service.ServiceProps.get(
+	public static final boolean ENTITY_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.sync.connector.service.util.ServiceProps.get(
 				"value.object.entity.cache.enabled.com.liferay.sync.connector.model.SyncDLObject"),
 			true);
-	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.util.service.ServiceProps.get(
+	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.sync.connector.service.util.ServiceProps.get(
 				"value.object.finder.cache.enabled.com.liferay.sync.connector.model.SyncDLObject"),
 			true);
-	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.util.service.ServiceProps.get(
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.sync.connector.service.util.ServiceProps.get(
 				"value.object.column.bitmask.enabled.com.liferay.sync.connector.model.SyncDLObject"),
 			true);
 	public static final long EVENT_COLUMN_BITMASK = 1L;
@@ -219,7 +219,7 @@ public class SyncDLObjectModelImpl extends BaseModelImpl<SyncDLObject>
 		return models;
 	}
 
-	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.util.service.ServiceProps.get(
+	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.sync.connector.service.util.ServiceProps.get(
 				"lock.expiration.time.com.liferay.sync.connector.model.SyncDLObject"));
 
 	public SyncDLObjectModelImpl() {

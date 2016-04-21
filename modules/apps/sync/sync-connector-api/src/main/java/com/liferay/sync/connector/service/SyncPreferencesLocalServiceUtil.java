@@ -16,9 +16,9 @@ package com.liferay.sync.connector.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
-import com.liferay.portal.kernel.service.InvokableLocalService;
-import com.liferay.portal.kernel.util.ReferenceRegistry;
+import com.liferay.osgi.util.ServiceTrackerFactory;
+
+import org.osgi.util.tracker.ServiceTracker;
 
 /**
  * Provides the local service utility for SyncPreferences. This utility wraps
@@ -41,10 +41,8 @@ public class SyncPreferencesLocalServiceUtil {
 	 *
 	 * Never modify this class directly. Add custom service methods to {@link com.liferay.sync.connector.service.impl.SyncPreferencesLocalServiceImpl} and rerun ServiceBuilder to regenerate this class.
 	 */
-	public static void enableOAuth(long companyId,
-		com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		getService().enableOAuth(companyId, serviceContext);
+	public static boolean isOAuthApplicationAvailable(long oAuthApplicationId) {
+		return getService().isOAuthApplicationAvailable(oAuthApplicationId);
 	}
 
 	/**
@@ -62,38 +60,16 @@ public class SyncPreferencesLocalServiceUtil {
 		return getService().getPortletPreferences(companyId);
 	}
 
-	public static java.lang.Object invokeMethod(java.lang.String name,
-		java.lang.String[] parameterTypes, java.lang.Object[] arguments)
-		throws java.lang.Throwable {
-		return getService().invokeMethod(name, parameterTypes, arguments);
-	}
-
-	public static boolean isOAuthApplicationAvailable(long oAuthApplicationId) {
-		return getService().isOAuthApplicationAvailable(oAuthApplicationId);
-	}
-
-	public static void clearService() {
-		_service = null;
+	public static void enableOAuth(long companyId,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		getService().enableOAuth(companyId, serviceContext);
 	}
 
 	public static SyncPreferencesLocalService getService() {
-		if (_service == null) {
-			InvokableLocalService invokableLocalService = (InvokableLocalService)PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(),
-					SyncPreferencesLocalService.class.getName());
-
-			if (invokableLocalService instanceof SyncPreferencesLocalService) {
-				_service = (SyncPreferencesLocalService)invokableLocalService;
-			}
-			else {
-				_service = new SyncPreferencesLocalServiceClp(invokableLocalService);
-			}
-
-			ReferenceRegistry.registerReference(SyncPreferencesLocalServiceUtil.class,
-				"_service");
-		}
-
-		return _service;
+		return _serviceTracker.getService();
 	}
 
-	private static SyncPreferencesLocalService _service;
+	private static ServiceTracker<SyncPreferencesLocalService, SyncPreferencesLocalService> _serviceTracker =
+		ServiceTrackerFactory.open(SyncPreferencesLocalService.class);
 }

@@ -19,9 +19,9 @@ import aQute.bnd.annotation.ProviderType;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
+import com.liferay.sync.connector.constants.SyncDeviceConstants;
 import com.liferay.sync.connector.model.SyncDevice;
 import com.liferay.sync.connector.service.base.SyncDeviceServiceBaseImpl;
-import com.liferay.sync.connector.constants.SyncDeviceConstants;
 
 /**
  * @author Shinn Lok

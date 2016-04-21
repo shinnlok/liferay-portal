@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" default-destroy-method="destroy" default-init-method="afterPropertiesSet" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" default-destroy-method="destroy" default-init-method="afterPropertiesSet" xsi:schemaLocation=" http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 	<bean id="com.liferay.sync.connector.service.SyncDeviceLocalService" class="com.liferay.sync.connector.service.impl.SyncDeviceLocalServiceImpl" />
 	<bean id="com.liferay.sync.connector.service.SyncDeviceService" class="com.liferay.sync.connector.service.impl.SyncDeviceServiceImpl" />
 	<bean id="com.liferay.sync.connector.service.persistence.SyncDevicePersistence" class="com.liferay.sync.connector.service.persistence.impl.SyncDevicePersistenceImpl" parent="basePersistence" />
