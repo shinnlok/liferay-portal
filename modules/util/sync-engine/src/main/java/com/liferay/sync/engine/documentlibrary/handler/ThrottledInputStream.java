@@ -28,6 +28,16 @@ public class ThrottledInputStream extends InputStream {
 
 	public ThrottledInputStream(InputStream inputStream) {
 		_inputStream = inputStream;
+
+		_rateLimiter = RateLimiter.create(100 * FileUtils.ONE_KB);
+	}
+
+	public ThrottledInputStream(
+		InputStream inputStream, RateLimiter rateLimiter) {
+
+		_inputStream = inputStream;
+
+		_rateLimiter = rateLimiter;
 	}
 
 	@Override
@@ -51,8 +61,11 @@ public class ThrottledInputStream extends InputStream {
 		return _inputStream.read(bytes, off, len);
 	}
 
-	private static final RateLimiter _rateLimiter = RateLimiter.create(
-		100 * FileUtils.ONE_KB);
+	public void setRateLimiter(RateLimiter rateLimiter) {
+		_rateLimiter = rateLimiter;
+	}
+
+	private static RateLimiter _rateLimiter;
 
 	private final InputStream _inputStream;
 
