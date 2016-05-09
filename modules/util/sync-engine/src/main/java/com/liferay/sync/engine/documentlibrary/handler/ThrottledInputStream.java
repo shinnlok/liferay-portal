@@ -26,18 +26,23 @@ import org.apache.commons.io.FileUtils;
  */
 public class ThrottledInputStream extends InputStream {
 
-	public ThrottledInputStream(InputStream inputStream) {
+	public ThrottledInputStream(InputStream inputStream, long syncAccountId) {
 		_inputStream = inputStream;
 
-		_rateLimiter = RateLimiter.create(100 * FileUtils.ONE_KB);
+		_rateLimiter = RateLimiter.create(2 * FileUtils.ONE_MB);
+
+		_syncAccountId = syncAccountId;
+
+		RateLimiterUtil.registerDownloadConnection(
+			_syncAccountId, _rateLimiter);
 	}
 
-	public ThrottledInputStream(
-		InputStream inputStream, RateLimiter rateLimiter) {
+	@Override
+	public void close() throws IOException {
+		RateLimiterUtil.unregisterDownloadConnection(
+			_syncAccountId, _rateLimiter);
 
-		_inputStream = inputStream;
-
-		_rateLimiter = rateLimiter;
+		super.close();
 	}
 
 	@Override
@@ -61,9 +66,7 @@ public class ThrottledInputStream extends InputStream {
 		return _inputStream.read(bytes, off, len);
 	}
 
-	public void setRateLimiter(RateLimiter rateLimiter) {
-		_rateLimiter = rateLimiter;
-	}
+	private static long _syncAccountId;
 
 	private static RateLimiter _rateLimiter;
 

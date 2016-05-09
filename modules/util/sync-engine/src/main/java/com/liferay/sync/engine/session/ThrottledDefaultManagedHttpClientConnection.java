@@ -71,8 +71,10 @@ public class ThrottledDefaultManagedHttpClientConnection
 
 		final OutputStream outputStream = prepareOutput(request);
 
+		String syncAccountUuid = request.getHeaders("Sync-UUID")[0].getValue();
+
 		ThrottledOutputStream throttledOutputStream = new ThrottledOutputStream(
-			outputStream);
+			outputStream, syncAccountUuid);
 
 		entity.writeTo(throttledOutputStream);
 

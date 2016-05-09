@@ -26,8 +26,23 @@ import org.apache.commons.io.FileUtils;
  */
 public class ThrottledOutputStream extends OutputStream {
 
-	public ThrottledOutputStream(OutputStream outputStream) {
+	public ThrottledOutputStream(
+		OutputStream outputStream, String syncAccountUuid) {
+
+		_rateLimiter = RateLimiter.create(2 * FileUtils.ONE_MB);
+
 		_outputStream = outputStream;
+		_syncAccountUuid = syncAccountUuid;
+
+		RateLimiterUtil.registerUploadConnection(_syncAccountUuid, _rateLimiter);
+	}
+
+	@Override
+	public void close() throws IOException {
+		RateLimiterUtil.unregisterUploadConnection(
+			_syncAccountUuid, _rateLimiter);
+
+		super.close();
 	}
 
 	@Override
@@ -51,9 +66,10 @@ public class ThrottledOutputStream extends OutputStream {
 		_outputStream.write(b);
 	}
 
-	private static final RateLimiter _rateLimiter = RateLimiter.create(
-		100 * FileUtils.ONE_KB);
+	private static RateLimiter _rateLimiter;
 
 	private final OutputStream _outputStream;
+
+	private static String _syncAccountUuid;
 
 }

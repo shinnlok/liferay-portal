@@ -69,7 +69,9 @@ public class DownloadFilesHandler extends BaseHandler {
 	protected void doHandleResponse(HttpResponse httpResponse)
 		throws Exception {
 
-		final Session session = SessionManager.getSession(getSyncAccountId());
+		long syncAccountId = getSyncAccountId();
+
+		final Session session = SessionManager.getSession(syncAccountId);
 
 		Header header = httpResponse.getFirstHeader("Sync-JWT");
 
@@ -81,6 +83,8 @@ public class DownloadFilesHandler extends BaseHandler {
 			(Map<String, DownloadFileHandler>)getParameterValue("handlers");
 
 		InputStream inputStream = null;
+
+		ThrottledInputStream throttledInputStream = null;
 
 		try {
 			HttpEntity httpEntity = httpResponse.getEntity();
@@ -96,8 +100,8 @@ public class DownloadFilesHandler extends BaseHandler {
 
 			};
 
-			ThrottledInputStream throttledInputStream =
-				new ThrottledInputStream(inputStream);
+			throttledInputStream = new ThrottledInputStream(
+				inputStream, syncAccountId);
 
 			ZipInputStream zipInputStream = new ZipInputStream(
 				throttledInputStream);
@@ -175,6 +179,7 @@ public class DownloadFilesHandler extends BaseHandler {
 			}
 		}
 		finally {
+			StreamUtil.cleanUp(throttledInputStream);
 			StreamUtil.cleanUp(inputStream);
 		}
 	}

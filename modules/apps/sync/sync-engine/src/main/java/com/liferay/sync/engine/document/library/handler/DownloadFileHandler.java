@@ -307,7 +307,9 @@ public class DownloadFileHandler extends BaseHandler {
 			handleSiteDeactivatedException();
 		}
 
-		final Session session = SessionManager.getSession(getSyncAccountId());
+		long syncAccountId = getSyncAccountId();
+
+		final Session session = SessionManager.getSession(syncAccountId);
 
 		Header tokenHeader = httpResponse.getFirstHeader("Sync-JWT");
 
@@ -343,7 +345,8 @@ public class DownloadFileHandler extends BaseHandler {
 
 			};
 
-			throttledInputStream = new ThrottledInputStream(inputStream);
+			throttledInputStream = new ThrottledInputStream(
+				inputStream, syncAccountId);
 
 			if (httpResponse.getFirstHeader("Accept-Ranges") != null) {
 				copyFile(syncFile, filePath, throttledInputStream, true);
