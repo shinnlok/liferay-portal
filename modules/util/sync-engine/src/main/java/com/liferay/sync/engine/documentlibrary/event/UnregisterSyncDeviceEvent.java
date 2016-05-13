@@ -39,7 +39,7 @@ public class UnregisterSyncDeviceEvent extends BaseEvent {
 
 	@Override
 	protected void processRequest() throws Exception {
-		executeAsynchronousPost(_URL_PATH, getParameters());
+		executeAsynchronousPost(getURLPath(), getParameters());
 	}
 
 	private static final String _URL_PATH =

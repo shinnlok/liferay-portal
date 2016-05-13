@@ -81,7 +81,7 @@ public class SyncAccountService {
 			String filePathName, String login, int maxConnections,
 			String oAuthConsumerKey, String oAuthConsumerSecret,
 			boolean oAuthEnabled, String oAuthToken, String oAuthTokenSecret,
-			String password, int pollInterval,
+			String password, String pluginVersion, int pollInterval,
 			Map<SyncSite, List<SyncFile>> ignoredSyncFiles, SyncUser syncUser,
 			boolean trustSelfSigned, String url)
 		throws Exception {
@@ -93,6 +93,7 @@ public class SyncAccountService {
 		syncAccount.setFilePathName(filePathName);
 		syncAccount.setLogin(login);
 		syncAccount.setMaxConnections(maxConnections);
+		syncAccount.setPluginVersion(pluginVersion);
 		syncAccount.setOAuthConsumerKey(oAuthConsumerKey);
 		syncAccount.setOAuthConsumerSecret(oAuthConsumerSecret);
 		syncAccount.setOAuthEnabled(oAuthEnabled);
