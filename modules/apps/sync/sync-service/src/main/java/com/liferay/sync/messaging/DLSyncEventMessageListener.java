@@ -130,9 +130,13 @@ public class DLSyncEventMessageListener extends BaseMessageListener {
 		String type = message.getString("type");
 		long typePK = message.getLong("typePK");
 
-		processDLSyncEvent(modifiedTime, event, type, typePK);
+		try {
+			processDLSyncEvent(modifiedTime, event, type, typePK);
 
-		deleteDLSyncEvent(modifiedTime, syncEventId, typePK);
+			deleteDLSyncEvent(modifiedTime, syncEventId, typePK);
+		}
+		catch (Exception e) {
+		}
 	}
 
 	protected void processDLSyncEvent(
