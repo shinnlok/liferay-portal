@@ -58,6 +58,10 @@ public class DLSyncEventMessageListener extends BaseMessageListener {
 
 	@Activate
 	protected void activate() {
+		if (true) {
+			return;
+		}
+
 		ActionableDynamicQuery actionableDynamicQuery =
 			_dlSyncEventLocalService.getActionableDynamicQuery();
 
