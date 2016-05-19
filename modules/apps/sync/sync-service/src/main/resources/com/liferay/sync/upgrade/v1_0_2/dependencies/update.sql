@@ -1,0 +1,3 @@
+create index IX_EE41CBEB on SyncDLObject (treePath[$COLUMN_LENGTH:4000$], event[$COLUMN_LENGTH:75$]);
+
+COMMIT_TRANSACTION;
