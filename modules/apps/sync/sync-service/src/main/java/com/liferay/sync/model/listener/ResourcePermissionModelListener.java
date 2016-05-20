@@ -88,14 +88,14 @@ public class ResourcePermissionModelListener
 	}
 
 	@Reference(unbind = "-")
-	public void setResourcePermissionLocalService(
+	protected void setResourcePermissionLocalService(
 		ResourcePermissionLocalService resourcePermissionLocalService) {
 
 		_resourcePermissionLocalService = resourcePermissionLocalService;
 	}
 
 	@Reference(unbind = "-")
-	public void setSyncDLObjectLocalService(
+	protected void setSyncDLObjectLocalService(
 		SyncDLObjectLocalService syncDLObjectLocalService) {
 
 		_syncDLObjectLocalService = syncDLObjectLocalService;

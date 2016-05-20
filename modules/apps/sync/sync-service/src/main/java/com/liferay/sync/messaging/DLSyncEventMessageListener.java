@@ -38,6 +38,7 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.sync.constants.SyncDLObjectConstants;
 import com.liferay.sync.model.SyncDLObject;
 import com.liferay.sync.model.impl.SyncDLObjectImpl;
+import com.liferay.sync.service.SyncDLObjectLocalService;
 import com.liferay.sync.util.SyncUtil;
 
 import java.util.List;
@@ -213,6 +214,11 @@ public class DLSyncEventMessageListener extends BaseMessageListener {
 	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind = "-")
 	protected void setModuleServiceLifecycle(
 		ModuleServiceLifecycle moduleServiceLifecycle) {
+	}
+
+	@Reference(unbind = "-")
+	protected void setSyncDLObjectLocalService(
+		SyncDLObjectLocalService syncDLObjectLocalService) {
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
