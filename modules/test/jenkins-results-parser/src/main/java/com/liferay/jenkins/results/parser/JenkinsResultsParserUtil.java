@@ -506,33 +506,69 @@ public class JenkinsResultsParserUtil {
 	}
 
 	public static JSONObject toJSONObject(String url) throws Exception {
-		return toJSONObject(url, true, 0);
+		return toJSONObject(
+			url, true, _MAX_RETRIES_DEFAULT, _RETRY_PERIOD_DEFAULT,
+			_TIMEOUT_DEFAULT);
 	}
 
 	public static JSONObject toJSONObject(String url, boolean checkCache)
 		throws Exception {
 
-		return createJSONObject(toString(url, checkCache, 0));
+		return createJSONObject(
+			toString(
+				url, checkCache, _MAX_RETRIES_DEFAULT, _RETRY_PERIOD_DEFAULT,
+				_TIMEOUT_DEFAULT));
 	}
 
 	public static JSONObject toJSONObject(
 			String url, boolean checkCache, int timeout)
 		throws Exception {
 
-		return createJSONObject(toString(url, checkCache, timeout));
+		return toJSONObject(
+			url, checkCache, _MAX_RETRIES_DEFAULT, _RETRY_PERIOD_DEFAULT,
+			timeout);
+	}
+
+	public static JSONObject toJSONObject(
+			String url, boolean checkCache, int maxRetries, int retryPeriod,
+			int timeout)
+		throws Exception {
+
+		String response = toString(
+			url, checkCache, maxRetries, retryPeriod, timeout);
+
+		if (response.endsWith("was truncated due to its size.")) {
+			return null;
+		}
+
+		return createJSONObject(response);
 	}
 
 	public static String toString(String url) throws Exception {
-		return toString(url, true, 0);
+		return toString(
+			url, true, _MAX_RETRIES_DEFAULT, _RETRY_PERIOD_DEFAULT,
+			_TIMEOUT_DEFAULT);
 	}
 
 	public static String toString(String url, boolean checkCache)
 		throws Exception {
 
-		return toString(url, checkCache, 0);
+		return toString(
+			url, checkCache, _MAX_RETRIES_DEFAULT, _RETRY_PERIOD_DEFAULT,
+			_TIMEOUT_DEFAULT);
 	}
 
 	public static String toString(String url, boolean checkCache, int timeout)
+		throws Exception {
+
+		return toString(
+			url, checkCache, _MAX_RETRIES_DEFAULT, _RETRY_PERIOD_DEFAULT,
+			timeout);
+	}
+
+	public static String toString(
+			String url, boolean checkCache, int maxRetries, int retryPeriod,
+			int timeout)
 		throws Exception {
 
 		url = fixURL(url);
@@ -564,43 +600,47 @@ public class JenkinsResultsParserUtil {
 					urlConnection.setReadTimeout(timeout);
 				}
 
-				InputStreamReader inputStreamReader = new InputStreamReader(
-					urlConnection.getInputStream());
-
-				BufferedReader bufferedReader = new BufferedReader(
-					inputStreamReader);
-
+				int bytes = 0;
 				String line = null;
 
-				while ((line = bufferedReader.readLine()) != null) {
-					sb.append(line);
-					sb.append("\n");
+				try (BufferedReader bufferedReader = new BufferedReader(
+						new InputStreamReader(
+							urlConnection.getInputStream()))) {
+
+					while ((line = bufferedReader.readLine()) != null) {
+						byte[] lineBytes = line.getBytes();
+
+						bytes += lineBytes.length;
+
+						if (bytes > (30 * 1024 * 1024)) {
+							sb.append("Response for ");
+							sb.append(url);
+							sb.append(" was truncated due to its size.");
+
+							break;
+						}
+
+						sb.append(line);
+						sb.append("\n");
+					}
 				}
 
-				bufferedReader.close();
-
-				String string = sb.toString();
-
-				byte[] bytes = string.getBytes();
-
-				if (!url.startsWith("file:") &&
-					(bytes.length < (3 * 1024 * 1024))) {
-
-					_toStringCache.put(key, string);
+				if (!url.startsWith("file:") && (bytes < (3 * 1024 * 1024))) {
+					_toStringCache.put(key, sb.toString());
 				}
 
-				return string;
+				return sb.toString();
 			}
 			catch (FileNotFoundException fnfe) {
 				retryCount++;
 
-				if (retryCount > 3) {
+				if ((maxRetries >= 0) && (retryCount >= maxRetries)) {
 					throw fnfe;
 				}
 
-				System.out.println("Retry in 5 seconds");
+				System.out.println("Retry in " + retryPeriod + " seconds");
 
-				Thread.sleep(5000);
+				sleep(1000 * retryPeriod);
 			}
 		}
 	}
@@ -611,7 +651,7 @@ public class JenkinsResultsParserUtil {
 
 		File parentDir = file.getParentFile();
 
-		if (!parentDir.exists()) {
+		if ((parentDir != null) && !parentDir.exists()) {
 			System.out.println("Make parent directories for " + file);
 
 			parentDir.mkdirs();
@@ -640,6 +680,12 @@ public class JenkinsResultsParserUtil {
 			throw new RuntimeException(murle);
 		}
 	}
+
+	private static final int _MAX_RETRIES_DEFAULT = 3;
+
+	private static final int _RETRY_PERIOD_DEFAULT = 5;
+
+	private static final int _TIMEOUT_DEFAULT = 0;
 
 	private static final Pattern _localURLPattern1 = Pattern.compile(
 		"https://test.liferay.com/([0-9]+)/");
