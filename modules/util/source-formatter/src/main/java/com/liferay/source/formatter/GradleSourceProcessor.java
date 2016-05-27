@@ -74,6 +74,8 @@ public class GradleSourceProcessor extends BaseSourceProcessor {
 			uniqueDependencies.add(dependency);
 		}
 
+		boolean portalModule = _isPortalModule(absolutePath);
+
 		StringBundler sb = new StringBundler();
 
 		String previousConfiguration = null;
@@ -83,7 +85,7 @@ public class GradleSourceProcessor extends BaseSourceProcessor {
 
 			String configuration = dependency.substring(0, pos);
 
-			if (configuration.equals("compile") &&
+			if (portalModule && configuration.equals("compile") &&
 				(absolutePath.contains("/modules/apps/") ||
 				 absolutePath.contains("/modules/private/apps/"))) {
 
@@ -105,6 +107,20 @@ public class GradleSourceProcessor extends BaseSourceProcessor {
 		}
 
 		return StringUtil.replace(content, dependencies, sb.toString());
+	}
+
+	private boolean _isPortalModule(String absolutePath) {
+		int pos = absolutePath.lastIndexOf(StringPool.SLASH);
+
+		absolutePath = absolutePath.substring(0, pos + 1);
+
+		File file = new File(absolutePath + ".lfrbuild-portal");
+
+		if (file.exists()) {
+			return true;
+		}
+
+		return false;
 	}
 
 	private static final String[] _INCLUDES = new String[] {"**/build.gradle"};
