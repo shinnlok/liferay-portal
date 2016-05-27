@@ -1667,7 +1667,6 @@
 
 		<execute macro="Page#add">
 			<var name="pageName" value="Empty Page Name" />
-			<var name="siteName" value="Community Site Name" />
 			<var name="siteScopeSelected" value="true" />
 		</execute>
 
@@ -3415,20 +3414,11 @@
 
 	<command name="StagingRemoteDMViaGlobalScope" priority="3">
 		<property name="app.server.bundles.size" value="1" />
+		<property name="cluster.enabled" value="true" />
 		<property name="custom.properties" value="tunneling.servlet.shared.secret=1234567890123456${line.separator}auth.verifier.TunnelAuthVerifier.hosts.allowed=${line.separator}dl.store.impl=com.liferay.portal.store.db.DBStore" />
 		<property name="test.name.skip.portal.instance" value="StagingUsecase#StagingRemoteDMViaGlobalScope" />
 
-		<var name="siteID" value="${siteID}" />
-
-		<execute macro="User#loginPG">
-			<var name="nodePort" value="9080" />
-			<var name="password" value="test" />
-			<var name="userEmailAddress" value="test@liferay.com" />
-		</execute>
-
-		<execute macro="Navigator#openSpecificURL">
-			<var name="url" value="http://localhost:9080" />
-		</execute>
+		<execute macro="Navigator#openURL" />
 
 		<execute macro="ProductMenu#gotoSite">
 			<var name="site" value="Global" />
@@ -3442,10 +3432,19 @@
 
 		<execute function="Copy" locator1="SitesEditSite#SITE_ID" value1="siteID" />
 
-		<execute macro="User#loginPG">
-			<var name="nodePort" value="8080" />
+		<execute macro="User#logoutPG">
 			<var name="password" value="test" />
 			<var name="userEmailAddress" value="test@liferay.com" />
+		</execute>
+
+		<execute macro="User#loginPG">
+			<var name="nodePort" value="9080" />
+			<var name="password" value="test" />
+			<var name="userEmailAddress" value="test@liferay.com" />
+		</execute>
+
+		<execute macro="Page#assertNodePortPG">
+			<var name="nodePort" value="9080" />
 		</execute>
 
 		<execute macro="Navigator#openSpecificURL">
@@ -3461,15 +3460,15 @@
 		</execute>
 
 		<execute macro="Staging#activateStagingCP">
-			<var name="nodePort" value="8080" />
-			<var name="remotePort" value="9080" />
+			<var name="nodePort" value="9080" />
+			<var name="remotePort" value="8080" />
 			<var name="remoteStaging" value="true" />
 			<var name="siteID" value="${siteID}" />
 			<var name="siteName" value="Global" />
 		</execute>
 
 		<execute macro="Navigator#openSpecificURL">
-			<var name="url" value="http://localhost:8080/" />
+			<var name="url" value="http://localhost:9080/" />
 		</execute>
 
 		<execute macro="ProductMenu#gotoSite">
@@ -3484,12 +3483,12 @@
 			<var name="dmDocumentDescription" value="DM Document Description" />
 			<var name="dmDocumentFile" value="Document_1.jpg" />
 			<var name="dmDocumentTitle" value="DM Document Title" />
-			<var name="nodePort" value="8080" />
+			<var name="nodePort" value="9080" />
 			<var name="siteScopeName" value="Global" />
 		</execute>
 
 		<execute macro="Navigator#openSpecificURL">
-			<var name="url" value="http://localhost:8080/" />
+			<var name="url" value="http://localhost:9080/" />
 		</execute>
 
 		<execute macro="ProductMenu#gotoControlPanelSites">
@@ -3497,18 +3496,22 @@
 		</execute>
 
 		<execute macro="Staging#publishGlobalToLiveCP">
-			<var name="nodePort" value="8080" />
+			<var name="nodePort" value="9080" />
 			<var name="remoteStaging" value="true" />
 		</execute>
 
-		<execute macro="User#loginPG">
-			<var name="nodePort" value="9080" />
+		<execute macro="User#logoutPG">
 			<var name="password" value="test" />
 			<var name="userEmailAddress" value="test@liferay.com" />
 		</execute>
 
-		<execute macro="Navigator#openSpecificURL">
-			<var name="url" value="http://localhost:9080" />
+		<execute macro="User#loginUserPG">
+			<var name="password" value="test" />
+			<var name="userEmailAddress" value="userea@liferay.com" />
+		</execute>
+
+		<execute macro="Page#assertNodePortPG">
+			<var name="nodePort" value="8080" />
 		</execute>
 
 		<execute macro="ProductMenu#gotoSite">
@@ -3521,18 +3524,10 @@
 
 		<execute macro="DMNavigator#gotoDocumentCP">
 			<var name="dmDocumentTitle" value="DM Document Title" />
-			<var name="nodePort" value="9080" />
 		</execute>
 
 		<execute macro="DMDocument#viewCP">
 			<var name="dmDocumentTitle" value="DM Document Title" />
-			<var name="nodePort" value="9080" />
-		</execute>
-
-		<execute macro="User#loginPG">
-			<var name="nodePort" value="8080" />
-			<var name="password" value="test" />
-			<var name="userEmailAddress" value="test@liferay.com" />
 		</execute>
 	</command>
 
@@ -3756,27 +3751,6 @@
 		<execute macro="WebContentStructures#viewCP">
 			<var name="structureDescription" value="Structure Description" />
 			<var name="structureName" value="Structure Name" />
-		</execute>
-
-		<for list="Text,Text Box" param="structureFieldName">
-			<execute macro="DynamicDataMapping#viewField">
-				<var name="fieldFieldLabel" value="${structureFieldName}" />
-				<var method="StringUtil#replace('${structureFieldName}', ' ', '')" name="fieldName" />
-			</execute>
-		</for>
-
-		<execute macro="ProductMenu#gotoSite">
-			<var name="site" value="Remote Site" />
-		</execute>
-
-		<execute macro="ProductMenu#gotoSitesContent">
-			<var name="portlet" value="Web Content" />
-		</execute>
-
-		<execute macro="WebContentTemplates#viewCP">
-			<var name="templateDescription" value="Template Description" />
-			<var name="templateLanguage" value="ftl" />
-			<var name="templateName" value="Template Name" />
 		</execute>
 	</command>
 

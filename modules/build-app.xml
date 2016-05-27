@@ -2,6 +2,7 @@
 <!DOCTYPE project>
 
 <project name="build-app">
+	<property name="build.modules.excludes" value="apps/foundation/required-dependencies/required-dependencies" />
 	<property name="osgi.dir" value="${basedir}/../../bundles/osgi" />
 
 	<macrodef name="set-artifact-versions-previous-release">
@@ -39,6 +40,8 @@
 				</antcall>
 			</sequential>
 		</for>
+
+		<antcall target="index-modules-and-app-lpkgs" />
 	</target>
 
 	<target name="check-app-version">
@@ -197,6 +200,32 @@
 		</pathconvert>
 	</target>
 
+	<target name="index-modules-and-app-lpkgs">
+		<path id="target.platform.indexer.classpath">
+			<fileset dir="${osgi.dir}/core" includes="com.liferay.portal.bootstrap.jar,org.eclipse.osgi.jar" />
+			<fileset dir="${osgi.dir}/static" includes="com.liferay.portal.target.platform.indexer.jar" />
+		</path>
+
+		<java
+			classname="com.liferay.portal.target.platform.indexer.main.TargetPlatformIndexerMain"
+			classpathref="target.platform.indexer.classpath"
+			fork="true"
+			newenvironment="true"
+		>
+			<jvmarg value="-Dmodule.framework.base.dir=${osgi.dir}" />
+		</java>
+
+		<java
+			classname="com.liferay.portal.target.platform.indexer.main.LPKGIndexerMain"
+			classpathref="target.platform.indexer.classpath"
+			fork="true"
+			newenvironment="true"
+		>
+			<jvmarg value="-Dmodule.framework.base.dir=${osgi.dir}" />
+			<arg value="${osgi.dir}/marketplace" />
+		</java>
+	</target>
+
 	<target name="init-build-app">
 		<fail message="Please specify a value for &quot;app.name&quot; when running this command.">
 			<condition>
@@ -217,12 +246,33 @@
 
 		<property name="dist.dir" value="${releng.app.dir}/dist" />
 
-		<pathconvert pathsep="," property="app.module.dirs">
-			<globmapper from="${modules.dir}${file.separator}*" to="*" />
+		<pathconvert pathsep="," property="app.module.dirs.excludes">
+			<chainedmapper>
+				<globmapper from="${modules.dir}${file.separator}*" to="*" />
+
+				<filtermapper>
+					<linecontains>
+						<contains value="-dxp" />
+					</linecontains>
+
+					<replacestring from="-dxp" to="" />
+				</filtermapper>
+			</chainedmapper>
 			<path>
 				<dirset dir="${basedir}" excludes="**/*-test*" includes="apps/${app.name}/**">
 					<present targetdir="${basedir}">
-						<mapper from="*" to="*/portal.build" type="glob" />
+						<mapper from="*" to="*/.lfrbuild-portal" type="glob" />
+					</present>
+				</dirset>
+			</path>
+		</pathconvert>
+
+		<pathconvert pathsep="," property="app.module.dirs">
+			<globmapper from="${modules.dir}${file.separator}*" to="*" />
+			<path>
+				<dirset dir="${basedir}" excludes="**/*-test*,${app.module.dirs.excludes}" includes="apps/${app.name}/**">
+					<present targetdir="${basedir}">
+						<mapper from="*" to="*/.lfrbuild-portal" type="glob" />
 					</present>
 				</dirset>
 			</path>
