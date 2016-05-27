@@ -54,6 +54,11 @@ public interface PropsKeys {
 	public static final String SYNC_HTTP_SOCKET_TIMEOUT =
 		"sync.http.socket.timeout";
 
+	public static final String SYNC_LAN_BROADCAST_INTERVAL =
+		"sync.lan.broadcast.interval";
+
+	public static final String SYNC_LAN_UDP_PORT = "sync.lan.udp.port";
+
 	public static final String SYNC_LOGGER_CONFIGURATION_FILE =
 		"sync.logger.configuration.file";
 
@@ -74,5 +79,8 @@ public interface PropsKeys {
 
 	public static final String SYNC_SELECTIVE_SYNC_ENABLED =
 		"sync.selective.sync.enabled";
+
+
+	public static final String SYNC_LAN_ENABLED = "sync.lan.enabled";
 
 }

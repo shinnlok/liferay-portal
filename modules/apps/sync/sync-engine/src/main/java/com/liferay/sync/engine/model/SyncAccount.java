@@ -83,6 +83,18 @@ public class SyncAccount extends StateAwareModel {
 		return filePathName;
 	}
 
+	public String getLanCertificate() {
+		return lanCertificate;
+	}
+
+	public String getLanKey() {
+		return lanKey;
+	}
+
+	public String getLanServerId() {
+		return lanServerId;
+	}
+
 	public String getLogin() {
 		return login;
 	}
@@ -182,6 +194,18 @@ public class SyncAccount extends StateAwareModel {
 		this.filePathName = filePathName;
 	}
 
+	public void setLanCertificate(String lanCertificate) {
+		this.lanCertificate = lanCertificate;
+	}
+
+	public void setLanKey(String lanKey) {
+		this.lanKey = lanKey;
+	}
+
+	public void setLanServerId(String lanServerId) {
+		this.lanServerId = lanServerId;
+	}
+
 	public void setLogin(String login) {
 		this.login = login;
 	}
@@ -253,6 +277,15 @@ public class SyncAccount extends StateAwareModel {
 
 	@DatabaseField(useGetSet = true, width = 16777216)
 	protected String filePathName;
+
+	@DatabaseField(useGetSet = true, width = 16777216)
+	protected String lanCertificate;
+
+	@DatabaseField(useGetSet = true, width = 16777216)
+	protected String lanKey;
+
+	@DatabaseField(index = true, useGetSet = true, width = 16777216)
+	protected String lanServerId;
 
 	@DatabaseField(useGetSet = true, width = 16777216)
 	protected String login;

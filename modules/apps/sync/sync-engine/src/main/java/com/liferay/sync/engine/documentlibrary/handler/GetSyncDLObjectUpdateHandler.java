@@ -480,7 +480,7 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 				syncFile.getVersionId());
 		}
 		else {
-			FileEventUtil.downloadFile(getSyncAccountId(), syncFile);
+			FileEventUtil.downloadFile(getSyncAccountId(), syncFile, false);
 		}
 	}
 
@@ -797,6 +797,7 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 		sourceSyncFile.setDescription(targetSyncFile.getDescription());
 		sourceSyncFile.setExtension(targetSyncFile.getExtension());
 		sourceSyncFile.setExtraSettings(targetSyncFile.getExtraSettings());
+		sourceSyncFile.setKey(targetSyncFile.getKey());
 		sourceSyncFile.setLockExpirationDate(
 			targetSyncFile.getLockExpirationDate());
 		sourceSyncFile.setLockUserId(targetSyncFile.getLockUserId());

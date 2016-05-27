@@ -24,6 +24,7 @@ import com.liferay.sync.engine.documentlibrary.event.DownloadFileEvent;
 import com.liferay.sync.engine.documentlibrary.event.Event;
 import com.liferay.sync.engine.documentlibrary.event.GetAllFolderSyncDLObjectsEvent;
 import com.liferay.sync.engine.documentlibrary.event.GetSyncDLObjectUpdateEvent;
+import com.liferay.sync.engine.documentlibrary.event.LanDownloadFileEvent;
 import com.liferay.sync.engine.documentlibrary.event.MoveFileEntryEvent;
 import com.liferay.sync.engine.documentlibrary.event.MoveFileEntryToTrashEvent;
 import com.liferay.sync.engine.documentlibrary.event.MoveFolderEvent;
@@ -221,10 +222,16 @@ public class FileEventUtil {
 		parameters.put("patch", false);
 		parameters.put("syncFile", syncFile);
 
-		DownloadFileEvent downloadFileEvent = new DownloadFileEvent(
-			syncAccountId, parameters);
+		Event event = null;
 
-		downloadFileEvent.run();
+		if (batch || !PropsValues.SYNC_LAN_ENABLED) {
+			event = new DownloadFileEvent(syncAccountId, parameters);
+		}
+		else {
+			event = new LanDownloadFileEvent(syncAccountId, parameters);
+		}
+
+		event.run();
 	}
 
 	public static void downloadPatch(

@@ -21,6 +21,7 @@ import com.liferay.sync.engine.documentlibrary.util.ServerEventUtil;
 import com.liferay.sync.engine.filesystem.SyncWatchEventProcessor;
 import com.liferay.sync.engine.filesystem.Watcher;
 import com.liferay.sync.engine.filesystem.util.WatcherManager;
+import com.liferay.sync.engine.lan.LanEngine;
 import com.liferay.sync.engine.model.SyncAccount;
 import com.liferay.sync.engine.model.SyncFile;
 import com.liferay.sync.engine.model.SyncSite;
@@ -265,6 +266,8 @@ public class SyncEngine {
 			scheduleSyncAccountTasks(syncAccount.getSyncAccountId());
 		}
 
+		LanEngine.start();
+
 		SyncEngineUtil.fireSyncEngineStateChanged(
 			SyncEngineUtil.SYNC_ENGINE_STATE_STARTED);
 	}
@@ -287,6 +290,8 @@ public class SyncEngine {
 		_remoteEventsScheduledExecutorService.shutdownNow();
 
 		FileLockRetryUtil.shutdown();
+
+		LanEngine.stop();
 
 		LoggerUtil.shutdown();
 

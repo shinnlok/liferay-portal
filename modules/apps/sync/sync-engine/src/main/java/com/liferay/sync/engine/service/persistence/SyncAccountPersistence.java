@@ -17,6 +17,7 @@ package com.liferay.sync.engine.service.persistence;
 import com.j256.ormlite.dao.GenericRawResults;
 import com.j256.ormlite.dao.RawRowMapper;
 import com.j256.ormlite.stmt.QueryBuilder;
+import com.j256.ormlite.stmt.SelectArg;
 import com.j256.ormlite.stmt.Where;
 
 import com.liferay.sync.engine.model.SyncAccount;
@@ -33,6 +34,20 @@ public class SyncAccountPersistence
 
 	public SyncAccountPersistence() throws SQLException {
 		super(SyncAccount.class);
+	}
+
+	public SyncAccount fetchByLanServerId(String lanServerId)
+		throws SQLException {
+
+		QueryBuilder<SyncAccount, Long> queryBuilder = queryBuilder();
+
+		queryBuilder.limit(1L);
+
+		Where<SyncAccount, Long> where = queryBuilder.where();
+
+		where.eq("lanServerId", new SelectArg(lanServerId));
+
+		return where.queryForFirst();
 	}
 
 	public List<Long> findByActive(boolean active) throws SQLException {

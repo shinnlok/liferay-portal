@@ -75,4 +75,15 @@ public class PropsValues {
 	public static final boolean SYNC_SELECTIVE_SYNC_ENABLED = Boolean.valueOf(
 		PropsUtil.get(PropsKeys.SYNC_SELECTIVE_SYNC_ENABLED));
 
+	public static final int SYNC_LAN_UDP_PORT =
+		Integer.parseInt(PropsUtil.get(PropsKeys.SYNC_LAN_UDP_PORT));
+
+	public static final int SYNC_LAN_BROADCAST_INTERVAL =
+		Integer.parseInt(PropsUtil.get(PropsKeys.SYNC_LAN_BROADCAST_INTERVAL));
+
+
+
+	public static final boolean SYNC_LAN_ENABLED = Boolean.valueOf(
+		PropsUtil.get(PropsKeys.SYNC_LAN_ENABLED));
+
 }

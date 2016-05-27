@@ -49,6 +49,18 @@ public class SyncContext {
 		return authType;
 	}
 
+	public String getLanCertificate() {
+		return lanCertificate;
+	}
+
+	public String getLanKey() {
+		return lanKey;
+	}
+
+	public String getLanServerId() {
+		return lanServerId;
+	}
+
 	public String getOAuthConsumerKey() {
 		return oAuthConsumerKey;
 	}
@@ -89,6 +101,18 @@ public class SyncContext {
 		this.authType = authType;
 	}
 
+	public void setLanCertificate(String lanCertificate) {
+		this.lanCertificate = lanCertificate;
+	}
+
+	public void setLanKey(String lanKey) {
+		this.lanKey = lanKey;
+	}
+
+	public void setLanServerId(String lanServerId) {
+		this.lanServerId = lanServerId;
+	}
+
 	public void setOAuthConsumerKey(String oAuthConsumerKey) {
 		this.oAuthConsumerKey = oAuthConsumerKey;
 	}
@@ -124,6 +148,9 @@ public class SyncContext {
 	}
 
 	protected String authType;
+	protected String lanCertificate;
+	protected String lanKey;
+	protected String lanServerId;
 
 	@JsonProperty("OAuthConsumerKey")
 	protected String oAuthConsumerKey;

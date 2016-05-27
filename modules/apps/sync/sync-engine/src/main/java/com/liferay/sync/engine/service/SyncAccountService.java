@@ -78,7 +78,8 @@ public class SyncAccountService {
 	}
 
 	public static SyncAccount addSyncAccount(
-			String filePathName, String login, int maxConnections,
+			String filePathName, String lanCertificate, String lanKey,
+			String lanServerId, String login, int maxConnections,
 			String oAuthConsumerKey, String oAuthConsumerSecret,
 			boolean oAuthEnabled, String oAuthToken, String oAuthTokenSecret,
 			String password, String pluginVersion, int pollInterval,
@@ -91,6 +92,9 @@ public class SyncAccountService {
 		SyncAccount syncAccount = new SyncAccount();
 
 		syncAccount.setFilePathName(filePathName);
+		syncAccount.setLanCertificate(lanCertificate);
+		syncAccount.setLanKey(lanKey);
+		syncAccount.setLanServerId(lanServerId);
 		syncAccount.setLogin(login);
 		syncAccount.setMaxConnections(maxConnections);
 		syncAccount.setPluginVersion(pluginVersion);
@@ -236,6 +240,19 @@ public class SyncAccountService {
 	public static SyncAccount fetchSyncAccount(long syncAccountId) {
 		try {
 			return _syncAccountPersistence.queryForId(syncAccountId);
+		}
+		catch (SQLException sqle) {
+			if (_logger.isDebugEnabled()) {
+				_logger.debug(sqle.getMessage(), sqle);
+			}
+
+			return null;
+		}
+	}
+
+	public static SyncAccount fetchSyncAccount(String lanServerId) {
+		try {
+			return _syncAccountPersistence.fetchByLanServerId(lanServerId);
 		}
 		catch (SQLException sqle) {
 			if (_logger.isDebugEnabled()) {

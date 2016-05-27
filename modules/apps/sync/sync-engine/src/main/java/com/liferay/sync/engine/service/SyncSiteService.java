@@ -215,6 +215,30 @@ public class SyncSiteService {
 		}
 	}
 
+	public static Set<Long> getActiveGroupIds(long syncAccountId) {
+		try {
+			Set<Long> activeGroupIds = _activeGroupIds.get(syncAccountId);
+
+			if (activeGroupIds != null) {
+				return activeGroupIds;
+			}
+
+			activeGroupIds = new HashSet<>(
+				_syncSitePersistence.findByA_S(true, "groupId", syncAccountId));
+
+			_activeGroupIds.put(syncAccountId, activeGroupIds);
+
+			return activeGroupIds;
+		}
+		catch (SQLException sqle) {
+			if (_logger.isDebugEnabled()) {
+				_logger.debug(sqle.getMessage(), sqle);
+			}
+
+			return Collections.emptySet();
+		}
+	}
+
 	public static Set<Long> getActiveSyncSiteIds(long syncAccountId) {
 		try {
 			Set<Long> activeSyncSiteIds = _activeSyncSiteIds.get(syncAccountId);
@@ -224,7 +248,8 @@ public class SyncSiteService {
 			}
 
 			activeSyncSiteIds = new HashSet<>(
-				_syncSitePersistence.findByA_S(true, syncAccountId));
+				_syncSitePersistence.findByA_S(
+					true, "syncSiteId", syncAccountId));
 
 			_activeSyncSiteIds.put(syncAccountId, activeSyncSiteIds);
 
@@ -413,6 +438,7 @@ public class SyncSiteService {
 	private static final Logger _logger = LoggerFactory.getLogger(
 		SyncSiteService.class);
 
+	private static final Map<Long, Set<Long>> _activeGroupIds = new HashMap<>();
 	private static final Map<Long, Set<Long>> _activeSyncSiteIds =
 		new HashMap<>();
 	private static SyncSitePersistence _syncSitePersistence =
