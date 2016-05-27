@@ -83,8 +83,6 @@ import org.gradle.api.artifacts.DependencySet;
 import org.gradle.api.artifacts.ModuleDependency;
 import org.gradle.api.artifacts.ProjectDependency;
 import org.gradle.api.artifacts.ResolutionStrategy;
-import org.gradle.api.artifacts.ResolvedConfiguration;
-import org.gradle.api.artifacts.ResolvedDependency;
 import org.gradle.api.artifacts.dsl.ArtifactHandler;
 import org.gradle.api.artifacts.dsl.RepositoryHandler;
 import org.gradle.api.artifacts.maven.Conf2ScopeMapping;
@@ -132,7 +130,7 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent;
 import org.gradle.api.tasks.testing.logging.TestLoggingContainer;
 import org.gradle.execution.ProjectConfigurer;
 import org.gradle.external.javadoc.CoreJavadocOptions;
-import org.gradle.external.javadoc.MinimalJavadocOptions;
+import org.gradle.external.javadoc.StandardJavadocDocletOptions;
 import org.gradle.internal.service.ServiceRegistry;
 import org.gradle.plugins.ide.eclipse.EclipsePlugin;
 import org.gradle.plugins.ide.eclipse.model.EclipseClasspath;
@@ -253,6 +251,7 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 		configureTaskJavadoc(project);
 		configureTaskTest(project);
 		configureTaskTestIntegration(project);
+		configureTaskTlddoc(project, portalRootDir);
 		configureTasksBaseline(project);
 		configureTasksFindBugs(project);
 		configureTasksJavaCompile(project);
@@ -1123,9 +1122,7 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 			bundleDefaultInstructions);
 	}
 
-	protected void configureBundleExportPackage(
-		Project project, Map<String, String> bundleInstructions) {
-
+	protected void configureBundleInstructions(Project project) {
 		String projectPath = project.getPath();
 
 		if (!projectPath.startsWith(":apps:") &&
@@ -1134,6 +1131,8 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 
 			return;
 		}
+
+		Map<String, String> bundleInstructions = getBundleInstructions(project);
 
 		String exportPackage = bundleInstructions.get(Constants.EXPORT_PACKAGE);
 
@@ -1144,73 +1143,6 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 		exportPackage = "!com.liferay.*.kernel.*," + exportPackage;
 
 		bundleInstructions.put(Constants.EXPORT_PACKAGE, exportPackage);
-	}
-
-	protected void configureBundleInstructions(Project project) {
-		Map<String, String> bundleInstructions = getBundleInstructions(project);
-
-		configureBundleExportPackage(project, bundleInstructions);
-		configureBundleLiferayIncludeResource(project, bundleInstructions);
-	}
-
-	protected void configureBundleLiferayIncludeResource(
-		Project project, Map<String, String> bundleInstructions) {
-
-		String includeResource = bundleInstructions.get(
-			_LIFERAY_INCLUDERESOURCE);
-
-		if (Validator.isNull(includeResource) ||
-			!includeResource.contains("-*.")) {
-
-			return;
-		}
-
-		Configuration configuration = GradleUtil.getConfiguration(
-			project, JavaPlugin.COMPILE_CONFIGURATION_NAME);
-
-		DependencySet dependencySet = configuration.getAllDependencies();
-
-		GradleInternal gradle = (GradleInternal)project.getGradle();
-
-		ServiceRegistry serviceRegistry = gradle.getServices();
-
-		ProjectConfigurer projectConfigurer = serviceRegistry.get(
-			ProjectConfigurer.class);
-
-		for (ProjectDependency projectDependency :
-				dependencySet.withType(ProjectDependency.class)) {
-
-			ProjectInternal dependencyProject =
-				(ProjectInternal)projectDependency.getDependencyProject();
-
-			projectConfigurer.configure(dependencyProject);
-
-			if (!GradleUtil.hasPlugin(dependencyProject, BasePlugin.class)) {
-				continue;
-			}
-
-			String name = GradleUtil.getArchivesBaseName(dependencyProject);
-			String version = String.valueOf(dependencyProject.getVersion());
-
-			includeResource = includeResource.replace(
-				name + "-*.", name + "-" + version + ".");
-		}
-
-		ResolvedConfiguration resolvedConfiguration =
-			configuration.getResolvedConfiguration();
-
-		for (ResolvedDependency resolvedDependency :
-				resolvedConfiguration.getFirstLevelModuleDependencies()) {
-
-			String name = resolvedDependency.getModuleName();
-			String version = resolvedDependency.getModuleVersion();
-
-			includeResource = includeResource.replace(
-				name + "-*.", name + "-" + version + ".");
-		}
-
-		bundleInstructions.put(
-			Constants.INCLUDERESOURCE + ".liferay", includeResource);
 	}
 
 	protected void configureConfiguration(Configuration configuration) {
@@ -1310,7 +1242,7 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 
 				@Override
 				public File call() throws Exception {
-					if (FileUtil.exists(project, "static.build")) {
+					if (FileUtil.exists(project, ".lfrbuild-static")) {
 						return new File(
 							liferayExtension.getLiferayHome(), "osgi/static");
 					}
@@ -1715,7 +1647,8 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 	}
 
 	protected void configureTaskJavadocOptions(Javadoc javadoc) {
-		MinimalJavadocOptions minimalJavadocOptions = javadoc.getOptions();
+		StandardJavadocDocletOptions standardJavadocDocletOptions =
+			(StandardJavadocDocletOptions)javadoc.getOptions();
 		Project project = javadoc.getProject();
 
 		File overviewFile = null;
@@ -1736,9 +1669,11 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 		}
 
 		if (overviewFile != null) {
-			minimalJavadocOptions.setOverview(
+			standardJavadocDocletOptions.setOverview(
 				project.relativePath(overviewFile));
 		}
+
+		standardJavadocDocletOptions.tags("generated");
 	}
 
 	protected void configureTaskPublishNodeModule(
@@ -1855,6 +1790,19 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 		testLoggingContainer.setEvents(EnumSet.allOf(TestLogEvent.class));
 		testLoggingContainer.setExceptionFormat(TestExceptionFormat.FULL);
 		testLoggingContainer.setStackTraceFilters(Collections.emptyList());
+	}
+
+	protected void configureTaskTlddoc(Project project, File portalRootDir) {
+		if (portalRootDir == null) {
+			return;
+		}
+
+		TLDDocTask tlddocTask = (TLDDocTask)GradleUtil.getTask(
+			project, TLDDocBuilderPlugin.TLDDOC_TASK_NAME);
+
+		File xsltDir = new File(portalRootDir, "tools/styles/taglibs");
+
+		tlddocTask.setXsltDir(xsltDir);
 	}
 
 	protected void configureTaskUpdateFileVersions(
@@ -2149,9 +2097,6 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 	private static final String _GROUP = "com.liferay";
 
 	private static final JavaVersion _JAVA_VERSION = JavaVersion.VERSION_1_7;
-
-	private static final String _LIFERAY_INCLUDERESOURCE =
-		"-liferay-includeresource";
 
 	private static final Version _LOWEST_BASELINE_VERSION = new Version(
 		1, 0, 0);
