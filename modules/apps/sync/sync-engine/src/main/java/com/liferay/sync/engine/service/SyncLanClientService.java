@@ -19,6 +19,7 @@ import com.liferay.sync.engine.model.SyncLanClient;
 import com.liferay.sync.engine.service.persistence.SyncLanClientPersistence;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +28,25 @@ import org.slf4j.LoggerFactory;
  * @author Dennis Ju
  */
 public class SyncLanClientService {
+
+	public static void deleteSyncLanClients(long modifiedTime) {
+		try {
+			List<SyncLanClient> syncLanClients =
+				_syncLanClientPersistence.findByModifiedTime(modifiedTime);
+
+			for (SyncLanClient syncLanClient : syncLanClients) {
+				SyncLanEndpointService.deleteSyncLanEndpoint(
+					syncLanClient.getSyncLanClientUuid());
+
+				_syncLanClientPersistence.delete(syncLanClient);
+			}
+		}
+		catch (SQLException sqle) {
+			if (_logger.isDebugEnabled()) {
+				_logger.debug(sqle.getMessage(), sqle);
+			}
+		}
+	}
 
 	public static SyncLanClient fetchSyncLanClient(String syncLanClientUuid) {
 		try {

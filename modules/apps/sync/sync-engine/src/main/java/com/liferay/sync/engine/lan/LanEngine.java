@@ -16,6 +16,7 @@ package com.liferay.sync.engine.lan;
 
 import com.liferay.sync.engine.lan.discovery.DiscoveryBroadcaster;
 import com.liferay.sync.engine.lan.discovery.DiscoveryListener;
+import com.liferay.sync.engine.lan.fileserver.LanFileServer;
 import com.liferay.sync.engine.lan.util.LanClientUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.engine.lan;
+package com.liferay.sync.engine.lan.fileserver;
 
 import com.liferay.sync.engine.model.ModelListener;
 import com.liferay.sync.engine.model.SyncAccount;

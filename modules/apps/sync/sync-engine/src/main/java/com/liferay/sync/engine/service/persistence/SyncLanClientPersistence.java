@@ -14,9 +14,13 @@
 
 package com.liferay.sync.engine.service.persistence;
 
+import com.j256.ormlite.stmt.DeleteBuilder;
+import com.j256.ormlite.stmt.QueryBuilder;
+import com.j256.ormlite.stmt.Where;
 import com.liferay.sync.engine.model.SyncLanClient;
 
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  * @author Dennis Ju
@@ -28,19 +32,16 @@ public class SyncLanClientPersistence
 		super(SyncLanClient.class);
 	}
 
-//
-//	public SyncLanClient fetchBySyncAccountId(long syncAccountId)
-//		throws SQLException {
-//
-//		QueryBuilder<SyncLanClient, Long> queryBuilder = queryBuilder();
-//
-//		queryBuilder.limit(1L);
-//
-//		Where<SyncLanClient, Long> where = queryBuilder.where();
-//
-//		where.eq("syncAccountId", syncAccountId);
-//
-//		return where.queryForFirst();
-//	}
+	public List<SyncLanClient> findByModifiedTime(long modifiedTime)
+		throws SQLException {
+
+		QueryBuilder<SyncLanClient, String> queryBuilder = queryBuilder();
+
+		Where<SyncLanClient, String> where = queryBuilder.where();
+
+		where.lt("modifiedTime", modifiedTime);
+
+		return queryBuilder.query();
+	}
 
 }

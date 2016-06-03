@@ -58,17 +58,19 @@ public class DiscoveryListenerHandler
 			return;
 		}
 
-		Map<String, Set<Long>> endpoints = syncLanClient.getEndpoints();
-
 		SyncLanEndpointService.deleteSyncLanEndpoint(syncLanClientUuid);
+
+		long modifiedTime = System.currentTimeMillis();
+
+		Map<String, Set<Long>> endpoints = syncLanClient.getEndpoints();
 
 		for (Map.Entry<String, Set<Long>> entry : endpoints.entrySet()) {
 			for (Long groupId : entry.getValue()) {
 				SyncLanEndpoint syncLanEndpoint = new SyncLanEndpoint();
 
-				syncLanEndpoint.setSyncLanClientUuid(syncLanClientUuid);
 				syncLanEndpoint.setLanServerId(entry.getKey());
 				syncLanEndpoint.setRepositoryId(groupId);
+				syncLanEndpoint.setSyncLanClientUuid(syncLanClientUuid);
 
 				SyncLanEndpointService.update(syncLanEndpoint);
 			}
@@ -77,6 +79,7 @@ public class DiscoveryListenerHandler
 		InetSocketAddress inetSocketAddress = datagramPacket.sender();
 
 		syncLanClient.setHostname(inetSocketAddress.getHostName());
+		syncLanClient.setModifiedTime(modifiedTime);
 
 		SyncLanClientService.update(syncLanClient);
 	}

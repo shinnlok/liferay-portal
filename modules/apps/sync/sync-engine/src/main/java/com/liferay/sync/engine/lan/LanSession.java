@@ -50,7 +50,6 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 
-import com.liferay.sync.engine.util.PropsValues;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpRequest;
@@ -289,19 +288,41 @@ public class LanSession {
 			callables.add(callable);
 		}
 
-		try {
-//			List<Future<String[]>> futures =
-			//	_getExecutorService().invokeAll(callables, 5000, TimeUnit.MILLISECONDS);
+		int fromIndex = 0;
+		int toIndex = queryBlockSize;
 
-			return _getExecutorService().invokeAny(
-				callables, 5000, TimeUnit.MILLISECONDS);
-		}
-		catch (Exception e) {
-			_logger.error(e.getMessage(), e);
+
+		//TODO How to do total timeout check?
+
+		while (true) {
+			List<Callable<Object[]>> callablesSubList = callables.subList(
+				fromIndex, toIndex);
+
+			try {
+				return _getExecutorService().invokeAny(
+					callablesSubList, 5000, TimeUnit.MILLISECONDS);
+			}
+			catch (Exception e) {
+			}
+
+			if (toIndex == callables.size() - 1) {
+				return null;
+			}
+
+			fromIndex = toIndex;
+
+			if (toIndex + queryBlockSize > callables.size() - 1) {
+				toIndex = callables.size() - 1;
+			}
+			else {
+				toIndex = toIndex + queryBlockSize;
+			}
 		}
 
-		return null;
 	}
+
+	private static int queryBlockSize = 10;
+	private static int queryTimeout = 1000;
 
 	private static HttpClientBuilder _createHttpClientBuilder() {
 		HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();

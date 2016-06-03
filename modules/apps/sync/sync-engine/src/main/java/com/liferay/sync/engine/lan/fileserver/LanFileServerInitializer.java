@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.engine.lan;
+package com.liferay.sync.engine.lan.fileserver;
 
 import com.liferay.sync.engine.lan.util.LanClientUtil;
 import com.liferay.sync.engine.lan.util.LanPEMUtil;
