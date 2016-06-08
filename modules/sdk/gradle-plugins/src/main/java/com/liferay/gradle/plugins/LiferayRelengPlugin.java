@@ -14,6 +14,10 @@
 
 package com.liferay.gradle.plugins;
 
+import com.liferay.gradle.plugins.cache.CacheExtension;
+import com.liferay.gradle.plugins.cache.CachePlugin;
+import com.liferay.gradle.plugins.cache.task.TaskCache;
+import com.liferay.gradle.plugins.cache.task.TaskCacheApplicator;
 import com.liferay.gradle.plugins.change.log.builder.BuildChangeLogTask;
 import com.liferay.gradle.plugins.change.log.builder.ChangeLogBuilderPlugin;
 import com.liferay.gradle.plugins.tasks.PrintArtifactPublishCommandsTask;
@@ -156,9 +160,11 @@ public class LiferayRelengPlugin implements Plugin<Project> {
 		configureTaskEnabledIfStale(
 			printArtifactPublishCommandsTask, recordArtifactTask);
 
-		File gitRepoDir = GradleUtil.getRootDir(project, ".gitrepo");
+		String projectPath = project.getPath();
 
-		if (gitRepoDir != null) {
+		if (projectPath.startsWith(":apps:") ||
+			projectPath.startsWith(":private:apps:")) {
+
 			configureTaskEnabledIfLeaf(printArtifactPublishCommandsTask);
 		}
 
@@ -186,17 +192,28 @@ public class LiferayRelengPlugin implements Plugin<Project> {
 					Task task = taskContainer.findByName(
 						UPDATE_VERSION_TASK_NAME);
 
-					if (!(task instanceof ReplaceRegexTask)) {
-						return;
+					if (task instanceof ReplaceRegexTask) {
+						ReplaceRegexTask replaceRegexTask =
+							(ReplaceRegexTask)task;
+
+						Map<String, FileCollection> matches =
+							replaceRegexTask.getMatches();
+
+						printArtifactPublishCommandsTask.prepNextFiles(
+							matches.values());
 					}
 
-					ReplaceRegexTask replaceRegexTask = (ReplaceRegexTask)task;
+					if (GradleUtil.hasPlugin(project, CachePlugin.class)) {
+						CacheExtension cacheExtension = GradleUtil.getExtension(
+							project, CacheExtension.class);
 
-					Map<String, FileCollection> matches =
-						replaceRegexTask.getMatches();
-
-					printArtifactPublishCommandsTask.prepNextFiles(
-						matches.values());
+						for (TaskCache taskCache : cacheExtension.getTasks()) {
+							printArtifactPublishCommandsTask.prepNextFiles(
+								new File(
+									taskCache.getCacheDir(),
+									TaskCacheApplicator.DIGEST_FILE_NAME));
+						}
+					}
 				}
 
 			});
@@ -223,24 +240,12 @@ public class LiferayRelengPlugin implements Plugin<Project> {
 
 			});
 
-		task.onlyIf(
-			new Spec<Task>() {
-
-				@Override
-				public boolean isSatisfiedBy(Task task) {
-					Properties artifactProperties = getArtifactProperties(
-						recordArtifactTask);
-
-					return isStale(
-						recordArtifactTask.getProject(), artifactProperties);
-				}
-
-			});
-
 		task.setDescription(
 			"Prints the project directory if this project has been changed " +
 				"since the last publish.");
 		task.setGroup(JavaBasePlugin.VERIFICATION_GROUP);
+
+		configureTaskEnabledIfStale(task, recordArtifactTask);
 
 		GradleUtil.withPlugin(
 			project, LiferayOSGiDefaultsPlugin.class,
@@ -471,6 +476,22 @@ public class LiferayRelengPlugin implements Plugin<Project> {
 
 	protected void configureTaskEnabledIfStale(
 		Task task, final WritePropertiesTask recordArtifactTask) {
+
+		task.onlyIf(
+			new Spec<Task>() {
+
+				@Override
+				public boolean isSatisfiedBy(Task task) {
+					if (FileUtil.exists(
+							task.getProject(), ".lfrbuild-releng-ignore")) {
+
+						return false;
+					}
+
+					return true;
+				}
+
+			});
 
 		task.onlyIf(
 			new Spec<Task>() {

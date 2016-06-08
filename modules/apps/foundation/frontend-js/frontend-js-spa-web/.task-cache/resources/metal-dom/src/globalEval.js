@@ -1,4 +1,4 @@
-define("frontend-js-spa-web@1.0.6/metal-dom/src/globalEval", ['exports', 'metal/src/metal', './dom'], function (exports, _metal, _dom) {
+define("frontend-js-spa-web@1.0.7/metal-dom/src/globalEval", ['exports', 'metal/src/metal', './dom'], function (exports, _metal, _dom) {
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
@@ -44,8 +44,8 @@ define("frontend-js-spa-web@1.0.6/metal-dom/src/globalEval", ['exports', 'metal/
 				_dom2.default.exitDocument(script);
 				opt_callback && opt_callback();
 			};
-			_dom2.default.on(script, 'load', callback);
-			_dom2.default.on(script, 'error', callback);
+			_dom2.default.once(script, 'load', callback);
+			_dom2.default.once(script, 'error', callback);
 
 			if (opt_appendFn) {
 				opt_appendFn(script);

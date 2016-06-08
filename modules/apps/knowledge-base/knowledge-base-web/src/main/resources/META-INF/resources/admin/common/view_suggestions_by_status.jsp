@@ -19,58 +19,81 @@
 <%
 KBSuggestionListDisplayContext kbSuggestionListDisplayContext = (KBSuggestionListDisplayContext)request.getAttribute(KBWebKeys.KNOWLEDGE_BASE_KB_SUGGESTION_LIST_DISPLAY_CONTEXT);
 
-String navItem = kbSuggestionListDisplayContext.getSelectedNavItem();
+SearchContainer kbCommentsSearchContainer = (SearchContainer)request.getAttribute("view_suggestions.jsp-searchContainer");
+
+KBCommentResultRowSplitter resultRowSplitter = (KBCommentResultRowSplitter)request.getAttribute("view_suggestions.jsp-resultRowSplitter");
 %>
 
-<aui:nav-bar>
-	<aui:nav cssClass="navbar-nav">
+<liferay-portlet:actionURL name="deleteKBComments" varImpl="deleteKBCommentsURL">
+	<portlet:param name="redirect" value="<%= currentURL %>" />
+</liferay-portlet:actionURL>
 
-		<%
-		int newKBCommentsCount = kbSuggestionListDisplayContext.getNewKBCommentsCount();
+<aui:form action="<%= deleteKBCommentsURL %>" name="fm">
+	<liferay-ui:search-container
+		id="kbComments"
+		searchContainer="<%= kbCommentsSearchContainer %>"
+	>
+		<liferay-ui:search-container-row
+			className="com.liferay.knowledge.base.model.KBComment"
+			keyProperty="kbCommentId"
+			modelVar="kbComment"
+		>
+			<liferay-ui:search-container-column-user
+				cssClass="user-icon-lg"
+				showDetails="<%= false %>"
+				userId="<%= kbComment.getUserId() %>"
+			/>
 
-		String newKBCommentsLabel = String.format("%s (%s)", LanguageUtil.get(request, "new"), newKBCommentsCount);
-		%>
+			<liferay-ui:search-container-column-text colspan="<%= 2 %>">
 
-		<aui:nav-item
-			href='<%= kbSuggestionListDisplayContext.getViewSuggestionURL(renderResponse, "viewNewSuggestions") %>'
-			label="<%= newKBCommentsLabel %>"
-			selected='<%= navItem.equals("viewNewSuggestions") %>'
-		/>
+				<%
+				Date modifiedDate = kbComment.getModifiedDate();
 
-		<%
-		int inProgressKBCommentsCount = kbSuggestionListDisplayContext.getInProgressKBCommentsCount();
+				String modifiedDateDescription = LanguageUtil.getTimeDescription(request, System.currentTimeMillis() - modifiedDate.getTime(), true);
+				%>
 
-		String inProgressKBCommentsLabel = String.format("%s (%s)", LanguageUtil.get(request, "in-progress"), inProgressKBCommentsCount);
-		%>
+				<h5 class="text-default">
+					<liferay-ui:message arguments="<%= new String[] {kbComment.getUserName(), modifiedDateDescription} %>" key="x-suggested-x-ago" />
+				</h5>
 
-		<aui:nav-item
-			href='<%= kbSuggestionListDisplayContext.getViewSuggestionURL(renderResponse, "viewInProgressSuggestions") %>'
-			label="<%= inProgressKBCommentsLabel %>"
-			selected='<%= navItem.equals("viewInProgressSuggestions") %>'
-		/>
+				<h4>
+					<liferay-portlet:renderURL varImpl="rowURL">
+						<portlet:param name="mvcPath" value='<%= templatePath + "view_suggestion.jsp" %>' />
+						<portlet:param name="kbCommentId" value="<%= String.valueOf(kbComment.getKbCommentId()) %>" />
+						<portlet:param name="redirect" value="<%= currentURL %>" />
+					</liferay-portlet:renderURL>
 
-		<%
-		int completedKBCommentsCount = kbSuggestionListDisplayContext.getCompletedKBCommentsCount();
+					<aui:a href="<%= rowURL.toString() %>">
+						<%= StringUtil.shorten(HtmlUtil.escape(kbComment.getContent()), 100) %>
+					</aui:a>
+				</h4>
 
-		String completedLabel = String.format("%s (%s)", LanguageUtil.get(request, "resolved"), completedKBCommentsCount);
-		%>
+				<h5>
+					<span class="kb-comment-status text-default">
+						<liferay-ui:message key="<%= KnowledgeBaseUtil.getStatusLabel(kbComment.getStatus()) %>" />
+					</span>
 
-		<aui:nav-item
-			href='<%= kbSuggestionListDisplayContext.getViewSuggestionURL(renderResponse, "viewCompletedSuggestions") %>'
-			label="<%= completedLabel %>"
-			selected='<%= navItem.equals("viewCompletedSuggestions") %>'
-		/>
-	</aui:nav>
-</aui:nav-bar>
+					<%
+					KBArticle kbArticle = KBArticleServiceUtil.getLatestKBArticle(kbComment.getClassPK(), WorkflowConstants.STATUS_ANY);
 
-<c:choose>
-	<c:when test='<%= navItem.equals("viewInProgressSuggestions") %>'>
-		<liferay-util:include page="/admin/common/view_in_progress_suggestions.jsp" servletContext="<%= application %>" />
-	</c:when>
-	<c:when test='<%= navItem.equals("viewNewSuggestions") %>'>
-		<liferay-util:include page="/admin/common/view_new_suggestions.jsp" servletContext="<%= application %>" />
-	</c:when>
-	<c:otherwise>
-		<liferay-util:include page="/admin/common/view_completed_suggestions.jsp" servletContext="<%= application %>" />
-	</c:otherwise>
-</c:choose>
+					request.setAttribute(KBWebKeys.KNOWLEDGE_BASE_KB_ARTICLE, kbArticle);
+
+					KBArticleURLHelper kbArticleURLHelper = new KBArticleURLHelper(renderRequest, renderResponse, templatePath);
+
+					PortletURL viewKBArticleURL = kbArticleURLHelper.createViewWithRedirectURL(kbArticle, currentURL);
+					%>
+
+					<c:if test="<%= kbSuggestionListDisplayContext.isShowKBArticleTitle() %>">
+						<a class="kb-article-link text-default" href="<%= viewKBArticleURL.toString() %>"><%= HtmlUtil.escape(kbArticle.getTitle()) %></a>
+					</c:if>
+				</h5>
+			</liferay-ui:search-container-column-text>
+
+			<liferay-ui:search-container-column-jsp
+				path="/admin/common/suggestion_action.jsp"
+			/>
+		</liferay-ui:search-container-row>
+
+		<liferay-ui:search-iterator displayStyle="descriptive" markupView="lexicon" resultRowSplitter="<%= resultRowSplitter %>" />
+	</liferay-ui:search-container>
+</aui:form>

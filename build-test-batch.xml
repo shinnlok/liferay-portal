@@ -133,7 +133,7 @@
 
 lportal_BS
 		master tcp ether ${hostname} 5001
-		query tcp ether ${hotsname} 5001
+		query tcp ether ${hostname} 5001
 					</echo>
 				</then>
 				<else>
@@ -348,10 +348,36 @@ echo "Sent notification."]]>
 
 	<macrodef name="prepare-test-build">
 		<sequential>
-			<antcall target="prepare-test-build">
-				<param name="test.class.groups.size" value="${test.batch.size}" />
-				<param name="test.plugin.groups.size" value="${test.batch.size}" />
-			</antcall>
+			<trycatch property="exception.message">
+				<try>
+					<antcall target="prepare-test-build">
+						<param name="test.class.groups.size" value="${test.batch.size}" />
+						<param name="test.plugin.groups.size" value="${test.batch.size}" />
+					</antcall>
+				</try>
+				<catch>
+					<echo message="${exception.message}" />
+
+					<fail message="Unable to prepare test build." />
+				</catch>
+			</trycatch>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="prepare-test-build-custom">
+		<sequential>
+			<trycatch property="exception.message">
+				<try>
+					<antcall target="prepare-test-build-custom">
+						<param name="app.server.type" value="${app.server.type}" />
+					</antcall>
+				</try>
+				<catch>
+					<echo message="${exception.message}" />
+
+					<fail message="Unable to prepare test build." />
+				</catch>
+			</trycatch>
 		</sequential>
 	</macrodef>
 
@@ -397,7 +423,6 @@ app.server.type=@{app.server.type}]]></echo>
 /sql/sql.*.properties
 /test.*.properties
 /tools/cobertura-agent/classes
-/tools/liferay-doclet
 /tools/maven/*.asc
 /tools/node*
 /tools/selenium/*.exe
@@ -434,9 +459,18 @@ app.server.type=@{app.server.type}]]></echo>
 
 	<macrodef name="prepare-test-build-unit">
 		<sequential>
-			<antcall target="prepare-test-build-unit">
-				<param name="test.class.groups.size" value="${test.batch.size}" />
-			</antcall>
+			<trycatch property="exception.message">
+				<try>
+					<antcall target="prepare-test-build-unit">
+						<param name="test.class.groups.size" value="${test.batch.size}" />
+					</antcall>
+				</try>
+				<catch>
+					<echo message="${exception.message}" />
+
+					<fail message="Unable to prepare test build." />
+				</catch>
+			</trycatch>
 		</sequential>
 	</macrodef>
 
@@ -548,15 +582,19 @@ app.server.type=@{app.server.type}]]></echo>
 							<ant antfile="build-test-${app.server.type}.xml" inheritAll="false" target="run-selenium-${app.server.type}">
 								<property name="database.type" value="@{database.type}" />
 								<property name="liferay.portal.bundle" value="@{test.portal.bundle.version}" />
-								<property name="print.java.process.on.fail" value="Bootstrap" />
 								<property name="test.class" value="${test.class}" />
 							</ant>
 
 							<if>
 								<equals arg1="@{test.legacy.database.dump}" arg2="true" />
 								<then>
+									<get-testcase-property property.name="data.archive.type" />
+
 									<ant dir="${portal.legacy.dir}/@{test.portal.bundle.version}" target="export-database">
+										<property name="data.archive.type" value="${data.archive.type}" />
 										<property name="database.type" value="@{database.type}" />
+										<property name="database.version" value="${database.version}" />
+										<property name="test.class" value="${test.class}" />
 									</ant>
 								</then>
 							</if>
@@ -609,9 +647,7 @@ app.server.type=@{app.server.type}]]></echo>
 											<equals arg1="${app.server.type}" arg2="websphere" />
 										</or>
 										<then>
-											<antcall target="prepare-test-build-custom">
-												<param name="app.server.type" value="${app.server.type}" />
-											</antcall>
+											<prepare-test-build-custom />
 										</then>
 										<else>
 											<ant antfile="build-dist.xml" target="build-dist-${app.server.type}" />
@@ -746,9 +782,13 @@ app.server.type=@{app.server.type}]]></echo>
 								<try>
 									<antcall inheritall="false" target="start-app-server" />
 
-									<gradle-execute dir="modules/core/portal-lpkg-deployer-test" task="testIntegration">
+									<gradle-execute dir="modules/apps/static/portal-lpkg-deployer/portal-lpkg-deployer-test" task="testIntegration">
 										<arg value="-Dmodules.only.build=true" />
 									</gradle-execute>
+
+									<antcall inheritall="false" target="run-selenium-test">
+										<param name="test.class" value="PortalSmoke#Smoke" />
+									</antcall>
 								</try>
 
 								<finally>
@@ -884,6 +924,36 @@ app.server.type=@{app.server.type}]]></echo>
 		/>
 	</target>
 
+	<target name="functional-bundle-tomcat-mysql56-jdk8">
+		<set-tomcat-version-number liferay.portal.bundle="${test.portal.bundle.version}" />
+
+		<run-functional-test
+			app.server.type="tomcat"
+			database.type="mysql"
+			test.build.fix.pack.zip.url="${test.build.fix.pack.zip.url}"
+			test.fix.pack.base.url="${test.fix.pack.base.url}"
+			test.license.xml.url="${test.license.xml.url}"
+			test.plugin.zip.url="${test.plugin.zip.url}"
+			test.portal.bundle.version="${test.portal.bundle.version}"
+			test.portal.bundle.zip.url="${test.portal.bundle.zip.url}"
+			test.sql.zip.url="${test.sql.zip.url}"
+		/>
+	</target>
+
+	<target name="functional-bundle-wildfly-mysql56-jdk8">
+		<run-functional-test
+			app.server.type="wildfly"
+			database.type="mysql"
+			database.version="5.6"
+			test.build.fix.pack.zip.url="${test.build.fix.pack.zip.url}"
+			test.fix.pack.base.url="${test.fix.pack.base.url}"
+			test.license.xml.url="${test.license.xml.url}"
+			test.plugin.zip.url="${test.plugin.zip.url}"
+			test.portal.bundle.zip.url="${test.portal.bundle.zip.url}"
+			test.sql.zip.url="${test.sql.zip.url}"
+		/>
+	</target>
+
 	<target name="functional-jboss64-mysql56-jdk8">
 		<run-functional-test app.server.type="jboss" database.type="mysql" />
 	</target>
@@ -898,6 +968,10 @@ app.server.type=@{app.server.type}]]></echo>
 
 	<target name="functional-tomcat8-hypersonic20-jdk7">
 		<run-functional-test app.server.type="tomcat" database.type="hypersonic" />
+	</target>
+
+	<target name="functional-tomcat8-mariadb100-jdk8">
+		<run-functional-test app.server.type="tomcat" database.type="mariadb" />
 	</target>
 
 	<target name="functional-tomcat8-mysql55-jdk8">
@@ -1199,12 +1273,12 @@ ${output.content}</echo>
 		</run-batch-test>
 	</target>
 
-	<target name="release-functional-bundle-tomcat-mysql56-jdk7">
-		<antcall target="functional-bundle-tomcat-mysql56-jdk7" />
+	<target name="release-functional-bundle-tomcat-mysql56-jdk8">
+		<antcall target="functional-bundle-tomcat-mysql56-jdk8" />
 	</target>
 
-	<target name="release-functional-smoke-bundle-tomcat-mysql56-jdk7">
-		<antcall target="functional-bundle-tomcat-mysql56-jdk7" />
+	<target name="release-functional-smoke-bundle-tomcat-mysql56-jdk8">
+		<antcall target="functional-bundle-tomcat-mysql56-jdk8" />
 	</target>
 
 	<target name="ruby-sass-compiler-jdk7">

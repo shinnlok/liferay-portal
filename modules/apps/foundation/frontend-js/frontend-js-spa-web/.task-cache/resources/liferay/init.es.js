@@ -1,4 +1,4 @@
-define("frontend-js-spa-web@1.0.6/liferay/init.es", ['exports', './screen/ActionURLScreen.es', './app/App.es', 'metal/src/async/async', 'senna/src/globals/globals', './screen/RenderURLScreen.es', 'metal-uri/src/Uri', 'senna/src/utils/utils'], function (exports, _ActionURLScreen, _App, _async, _globals, _RenderURLScreen, _Uri, _utils) {
+define("frontend-js-spa-web@1.0.7/liferay/init.es", ['exports', './screen/ActionURLScreen.es', './app/App.es', 'metal/src/async/async', 'senna/src/globals/globals', './screen/RenderURLScreen.es', 'metal-uri/src/Uri', 'senna/src/utils/utils'], function (exports, _ActionURLScreen, _App, _async, _globals, _RenderURLScreen, _Uri, _utils) {
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
@@ -71,7 +71,7 @@ define("frontend-js-spa-web@1.0.6/liferay/init.es", ['exports', './screen/Action
 				var formElement = form.getDOM();
 				var url = formElement.action;
 
-				if (app.canNavigate(url) && formElement.method !== 'get') {
+				if (app.canNavigate(url) && formElement.method !== 'get' && !app.isInPortletBlacklist(formElement)) {
 					Liferay.Util._submitLocked = false;
 
 					_globals2.default.capturedFormElement = formElement;

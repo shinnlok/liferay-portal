@@ -8,6 +8,11 @@
 <tr><td rowspan="1" colspan="3">ContentTargeting</td></tr>
 </thead>
 <tbody>
+<tr>
+	<td>PLUS_LINK</td>
+	<td>xpath=(//div[contains(@class,'lfr-form-row')]//button[contains(@class,'add-row')])[${key_indexNumber}]</td>
+	<td></td>
+</tr>
 <!--FORM-->
 <tr>
 	<td>FORM_SEARCH_FIELD</td>
@@ -105,6 +110,16 @@
 <tr>
 	<td>PREVIEW_BUTTON</td>
 	<td>//div[contains(@class,'portlet-content') and contains(.,'${key_portletName}')]//div[contains(@class,'preview-button')]/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PREVIEW_BUTTON_STAGING_LIVE_MODE</td>
+	<td>//div/h2[contains(@class,'portlet-title') and contains(.,'${key_portletName}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>VIEW_ENTRY_CONTENT</td>
+	<td>//div[contains(@id,'content_targeting') and contains(.,'${key_portletName}')]//div[@class='full-content']</td>
 	<td></td>
 </tr>
 <tr>

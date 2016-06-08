@@ -108,7 +108,7 @@
 		<execute macro="UserSegmentContentDisplayPortlet#configureDisplayContent">
 			<var name="belongs" value="true" />
 			<var name="contentTitle" value="Targeted Web Content Title" />
-			<var name="contentType" value="Web Content Article" />
+			<var name="contentType" value="Basic Web Content" />
 			<var name="rowNumber" value="1" />
 			<var name="siteScope" value="Global" />
 			<var name="toAll" value="true" />
@@ -237,7 +237,7 @@
 		<execute macro="UserSegmentContentDisplayPortlet#configureDisplayContent">
 			<var name="belongs" value="true" />
 			<var name="contentTitle" value="Targeted Web Content Title" />
-			<var name="contentType" value="Web Content Article" />
+			<var name="contentType" value="Basic Web Content" />
 			<var name="rowNumber" value="1" />
 			<var name="siteScope" value="Site Name" />
 			<var name="toAll" value="true" />
@@ -293,7 +293,7 @@
 		</execute>
 
 		<execute macro="ContentTargetingUserSegment#addBehaviorContentVisitedRuleCP">
-			<var name="contentVisitedContent" value="Web Content Article" />
+			<var name="contentVisitedContent" value="Basic Web Content" />
 			<var name="webContentTitle" value="Web Content Title" />
 		</execute>
 
@@ -1121,7 +1121,7 @@
 		<execute macro="ContentTargetingUserSegment#viewRulesCP">
 			<var name="userGroupName" value="User Group Name" />
 			<var name="userSegmentName" value="User Segment Name" />
-			<var name="viewUserSegmentRuleList" value="UserGroup Member" />
+			<var name="viewUserSegmentRuleList" value="User Group Member" />
 		</execute>
 	</command>
 
@@ -1292,7 +1292,7 @@
 		<execute macro="UserSegmentContentDisplayPortlet#configureDisplayContent">
 			<var name="belong" value="true" />
 			<var name="contentTitle" value="WC Male View Title" />
-			<var name="contentType" value="Web Content Article" />
+			<var name="contentType" value="Basic Web Content" />
 			<var name="rowNumber" value="1" />
 			<var name="toAny" value="true" />
 			<var name="userSegmentName" value="Male Users" />
@@ -1424,7 +1424,7 @@
 
 		<execute macro="UserSegmentContentDisplayPortlet#configureDisplayContent">
 			<var name="contentTitle" value="Targeted Web Content Title" />
-			<var name="contentType" value="Web Content Article" />
+			<var name="contentType" value="Basic Web Content" />
 			<var name="doesNotBelong" value="true" />
 			<var name="rowNumber" value="1" />
 			<var name="toAny" value="true" />
@@ -1434,7 +1434,7 @@
 
 		<execute macro="UserSegmentContentDisplayPortlet#configureOtherwiseContentDisplayRule">
 			<var name="otherwiseContentTitle" value="Targeted Web Content Title 2" />
-			<var name="otherwiseContentType" value="Web Content Article" />
+			<var name="otherwiseContentType" value="Basic Web Content" />
 		</execute>
 
 		<execute macro="UserSegmentContentDisplayPortlet#savePG" />

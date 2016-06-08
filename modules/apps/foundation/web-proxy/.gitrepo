@@ -4,7 +4,7 @@
 ;
 [subrepo]
 	cmdver = liferay
-	commit = 63272f17b7d80727b4275bae307dc4704467ffb2
+	commit = 140620938b2c63bfcee338da9d798462148783a7
 	mode = push
-	parent = 4aa46b49dc3cf65da1839fa3d7e2d3687ae15ff9
+	parent = 7acc58a1f5e7081860e1ecec12c74daa0420386d
 	remote = git@github.com:liferay/com-liferay-web-proxy.git

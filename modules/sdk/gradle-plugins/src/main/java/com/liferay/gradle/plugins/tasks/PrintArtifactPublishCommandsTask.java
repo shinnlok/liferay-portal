@@ -105,6 +105,11 @@ public class PrintArtifactPublishCommandsTask extends DefaultTask {
 	}
 
 	@Input
+	public boolean isForcedCache() {
+		return _forcedCache;
+	}
+
+	@Input
 	public boolean isGradleDaemon() {
 		return _gradleDaemon;
 	}
@@ -200,6 +205,10 @@ public class PrintArtifactPublishCommandsTask extends DefaultTask {
 		Object firstPublishExcludedTaskName) {
 
 		_firstPublishExcludedTaskName = firstPublishExcludedTaskName;
+	}
+
+	public void setForcedCache(boolean forcedCache) {
+		_forcedCache = forcedCache;
 	}
 
 	public void setGradleDaemon(boolean gradleDaemon) {
@@ -339,6 +348,13 @@ public class PrintArtifactPublishCommandsTask extends DefaultTask {
 			sb.append(" --daemon");
 		}
 
+		if (isForcedCache() &&
+			!LiferayOSGiDefaultsPlugin.BASELINE_TASK_NAME.equals(
+				task.getName())) {
+
+			sb.append(" -Dforced.cache.enabled=true");
+		}
+
 		for (String argument : arguments) {
 			sb.append(' ');
 			sb.append(argument);
@@ -396,6 +412,7 @@ public class PrintArtifactPublishCommandsTask extends DefaultTask {
 	private Object _artifactPropertiesFile;
 	private boolean _firstOnly;
 	private Object _firstPublishExcludedTaskName;
+	private boolean _forcedCache = true;
 	private boolean _gradleDaemon;
 	private Object _gradleDir;
 	private Object _lowestPublishedVersion = "1.0.0";

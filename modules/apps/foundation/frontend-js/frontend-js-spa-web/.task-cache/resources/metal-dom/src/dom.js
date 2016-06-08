@@ -1,4 +1,4 @@
-define("frontend-js-spa-web@1.0.6/metal-dom/src/dom", ['exports', 'metal/src/metal', './DomEventHandle'], function (exports, _metal, _DomEventHandle) {
+define("frontend-js-spa-web@1.0.7/metal-dom/src/dom", ['exports', 'metal/src/metal', './DomEventHandle'], function (exports, _metal, _DomEventHandle) {
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
@@ -116,11 +116,11 @@ define("frontend-js-spa-web@1.0.6/metal-dom/src/dom", ['exports', 'metal/src/met
 		};
 
 		dom.enterDocument = function enterDocument(node) {
-			dom.append(document.body, node);
+			node && dom.append(document.body, node);
 		};
 
 		dom.exitDocument = function exitDocument(node) {
-			if (node.parentNode) {
+			if (node && node.parentNode) {
 				node.parentNode.removeChild(node);
 			}
 		};

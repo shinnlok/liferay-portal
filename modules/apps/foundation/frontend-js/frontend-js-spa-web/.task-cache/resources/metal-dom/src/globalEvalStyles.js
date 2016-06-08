@@ -1,4 +1,4 @@
-define("frontend-js-spa-web@1.0.6/metal-dom/src/globalEvalStyles", ['exports', 'metal/src/metal', './dom'], function (exports, _metal, _dom) {
+define("frontend-js-spa-web@1.0.7/metal-dom/src/globalEvalStyles", ['exports', 'metal/src/metal', './dom'], function (exports, _metal, _dom) {
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
@@ -55,8 +55,8 @@ define("frontend-js-spa-web@1.0.6/metal-dom/src/globalEvalStyles", ['exports', '
 			if (style.tagName === 'STYLE') {
 				_metal.async.nextTick(callback);
 			} else {
-				_dom2.default.on(style, 'load', callback);
-				_dom2.default.on(style, 'error', callback);
+				_dom2.default.once(style, 'load', callback);
+				_dom2.default.once(style, 'error', callback);
 			}
 
 			if (opt_appendFn) {

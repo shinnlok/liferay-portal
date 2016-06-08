@@ -1,6 +1,6 @@
 Bundle-Name: Liferay Portal Security LDAP
 Bundle-SymbolicName: com.liferay.portal.security.ldap
-Bundle-Version: 2.0.2
+Bundle-Version: 2.0.4
 Export-Package:\
 	com.liferay.portal.security.ldap,\
 	com.liferay.portal.security.ldap.authenticator.configuration,\
@@ -9,8 +9,6 @@ Export-Package:\
 	com.liferay.portal.security.ldap.dummy,\
 	com.liferay.portal.security.ldap.exportimport,\
 	com.liferay.portal.security.ldap.exportimport.configuration,\
-	com.liferay.portal.security.ldap.exportimport.util,\
-	com.liferay.portal.security.ldap.exportimport.validator,\
 	com.liferay.portal.security.ldap.util,\
 	com.liferay.portal.security.ldap.validator
 Import-Package:\

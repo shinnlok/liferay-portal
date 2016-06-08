@@ -168,10 +168,10 @@ public class AppViewSearchEntryTag extends IncludeTag {
 	@Override
 	protected void setAttributes(HttpServletRequest request) {
 		request.setAttribute(
-			"liferay-ui:app-view-search-entry:actionJsp", _actionJsp);
-		request.setAttribute(
 			"liferay-ui:app-view-entry:actionJspServletContext",
 			getActionJspServletContext());
+		request.setAttribute(
+			"liferay-ui:app-view-search-entry:actionJsp", _actionJsp);
 		request.setAttribute(
 			"liferay-ui:app-view-search-entry:commentRelatedSearchResults",
 			_commentRelatedSearchResults);
@@ -226,7 +226,7 @@ public class AppViewSearchEntryTag extends IncludeTag {
 	private String _containerType;
 	private String _cssClass;
 	private String _description;
-	private boolean _escape;
+	private boolean _escape = true;
 	private List<RelatedSearchResult<FileEntry>> _fileEntryRelatedSearchResults;
 	private boolean _highlightEnabled = _HIGHLIGHT_ENABLED;
 	private boolean _locked;

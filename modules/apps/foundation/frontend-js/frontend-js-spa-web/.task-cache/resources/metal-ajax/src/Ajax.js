@@ -1,4 +1,4 @@
-define("frontend-js-spa-web@1.0.6/metal-ajax/src/Ajax", ['exports', 'metal/src/metal', 'metal-uri/src/Uri', 'metal-promise/src/promise/Promise'], function (exports, _metal, _Uri, _Promise) {
+define("frontend-js-spa-web@1.0.7/metal-ajax/src/Ajax", ['exports', 'metal/src/metal', 'metal-uri/src/Uri', 'metal-promise/src/promise/Promise'], function (exports, _metal, _Uri, _Promise) {
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
@@ -44,7 +44,7 @@ define("frontend-js-spa-web@1.0.6/metal-ajax/src/Ajax", ['exports', 'metal/src/m
 			return headers;
 		};
 
-		Ajax.request = function request(url, method, body, opt_headers, opt_params, opt_timeout, opt_sync) {
+		Ajax.request = function request(url, method, body, opt_headers, opt_params, opt_timeout, opt_sync, opt_withCredentials) {
 			var request = new XMLHttpRequest();
 
 			var promise = new _Promise.CancellablePromise(function (resolve, reject) {
@@ -72,6 +72,10 @@ define("frontend-js-spa-web@1.0.6/metal-ajax/src/Ajax", ['exports', 'metal/src/m
 			}
 
 			request.open(method, url, !opt_sync);
+
+			if (opt_withCredentials) {
+				request.withCredentials = true;
+			}
 
 			if (opt_headers) {
 				opt_headers.names().forEach(function (name) {

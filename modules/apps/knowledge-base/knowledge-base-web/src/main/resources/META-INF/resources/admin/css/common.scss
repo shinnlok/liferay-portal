@@ -20,11 +20,6 @@
 		margin-left: 15px;
 	}
 
-	.kb-submit-buttons {
-		margin: 0;
-		padding: 10px 0 0;
-	}
-
 	.social-boomarks-options {
 		margin-left: 15px;
 	}
@@ -78,36 +73,24 @@
 
 	/* ---------- Portlet ---------- */
 
-	.kb-add-article-button {
-		font-weight: normal;
+	.kb-article {
+		.panel .panel-body, .panel .list-group-item {
+			padding: 15px 30px;
+		}
+
+		h1 {
+			font-size: 48px;
+			margin-bottom: 30px;
+		}
+
+		.kb-article-assets, .kb-attachments, .taglib-asset-links,
+		.kb-article-ratings, .kb-article-suggestion-actions {
+			margin-top: 20px;
+		}
 	}
 
-	.kb-article-child {
-		margin: 15px 0 0;
-
-		@include respond-to(desktop) {
-			.kb-elements .kb-element {
-				display: inline-table;
-				margin: 1% 2%;
-				padding: 0 2%;
-				width: 41%;
-			}
-		}
-
-		.kb-element-header {
-			font-size: 21px;
-			line-height: 25px;
-			margin-bottom: 15px;
-
-			a {
-				display: block;
-			}
-		}
-
-		.kb-element-body a {
-			display: block;
-			margin-top: 5px;
-		}
+	.kb-add-article-button {
+		font-weight: normal;
 	}
 
 	.kb-article-comment {
@@ -143,6 +126,11 @@
 		}
 	}
 
+	.kb-article-ratings {
+		display: inline-block;
+		width: 100%;
+	}
+
 	.kb-article-suggestion {
 		clear: both;
 
@@ -159,7 +147,8 @@
 
 	@include respond-to(desktop) {
 		.kb-article-suggestion {
-			margin-left: 25px;
+			margin-left: 15px;
+			margin-top: 15px;
 
 			textarea {
 				max-width: 500px;
@@ -170,7 +159,6 @@
 	.kb-article-suggestion-actions {
 		clear: both;
 		display: inline-block;
-		padding-left: 20px;
 	}
 
 	.kb-article-siblings {
@@ -232,7 +220,12 @@
 	}
 
 	.kb-attachments {
-		margin: 5px 0 0;
+		display: inline-block;
+		margin: 20px 0 0;
+
+		& > div {
+			padding-left: 0;
+		}
 	}
 
 	.kb-block-labels .field-label {
@@ -252,12 +245,20 @@
 		width: 85px;
 	}
 
+	.kb-comment-status {
+		margin-right: 15px;
+	}
+
 	.kb-edit-link {
 		margin: 5px 0 0;
 	}
 
 	.kb-entity-body {
 		padding: 0 7px;
+
+		img {
+			max-width: 100%;
+		}
 
 		.kb-article-asset-entries {
 			margin: 15px 0 0;
@@ -374,16 +375,15 @@
 	.kb-select-article-breadcrumbs {
 		margin: 0 0 5px;
 	}
-
-	.kb-submit-buttons {
-		margin-top: 0;
-		padding-top: 10px;
-	}
 }
 
 /* Skin */
 
 .knowledge-base-portlet {
+	a.text-default, a.text-default:hover {
+		color: #869CAD;
+	}
+
 	.lfr-panel-container {
 		border-width: 0;
 	}

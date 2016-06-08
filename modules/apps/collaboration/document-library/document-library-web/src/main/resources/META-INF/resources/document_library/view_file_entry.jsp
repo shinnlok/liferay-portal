@@ -537,7 +537,7 @@ if (portletTitleBasedNavigation) {
 
 			</c:if>
 
-			<c:if test="<%= PropsValues.DL_FILE_ENTRY_COMMENTS_ENABLED && showComments %>">
+			<c:if test="<%= showComments && fileEntry.isRepositoryCapabilityProvided(CommentCapability.class) %>">
 				<liferay-ui:panel collapsible="<%= true %>" cssClass="lfr-document-library-comments" extended="<%= true %>" markupView="lexicon" persistState="<%= true %>" title="<%= dlViewFileVersionDisplayContext.getDiscussionLabel(locale) %>">
 					<liferay-ui:discussion
 						className="<%= dlViewFileVersionDisplayContext.getDiscussionClassName() %>"
@@ -554,7 +554,12 @@ if (portletTitleBasedNavigation) {
 </div>
 
 <c:if test="<%= dlPortletInstanceSettingsHelper.isShowActions() %>">
-	<%@ include file="/document_library/version_details.jspf" %>
+
+	<%
+	request.setAttribute("edit_file_entry.jsp-checkedOut", fileEntry.isCheckedOut());
+	%>
+
+	<liferay-util:include page="/document_library/version_details.jsp" servletContext="<%= application %>" />
 </c:if>
 
 <aui:script>

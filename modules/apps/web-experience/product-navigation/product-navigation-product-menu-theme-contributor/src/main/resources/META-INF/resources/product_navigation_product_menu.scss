@@ -127,6 +127,10 @@
 			padding: 10px 40px 10px 24px;
 		}
 
+		.aspect-ratio-bg-cover {
+			background-size: contain;
+		}
+
 		.site-administration-toggler {
 			padding-right: 85px;
 		}
@@ -458,6 +462,7 @@
 
 	&.sidenav-fixed.sidenav-menu-slider {
 		overflow: auto;
+		visibility: visible;
 		width: 100%;
 	}
 }
