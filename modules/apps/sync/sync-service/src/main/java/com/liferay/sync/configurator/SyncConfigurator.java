@@ -25,7 +25,6 @@ import com.liferay.portal.kernel.messaging.sender.SingleDestinationMessageSender
 import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.sync.messaging.SyncDLFileVersionDiffMessageListener;
 import com.liferay.sync.service.configuration.SyncServiceConfigurationValues;
-import com.liferay.sync.util.VerifyUtil;
 
 import java.util.Dictionary;
 
@@ -45,15 +44,6 @@ public class SyncConfigurator {
 	@Activate
 	protected void activate(BundleContext bundleContext) {
 		_bundleContext = bundleContext;
-
-		try {
-			if (SyncServiceConfigurationValues.SYNC_VERIFY) {
-				VerifyUtil.verify();
-			}
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-		}
 
 		_serviceRegistration = registerMessageListener(
 			DestinationNames.DOCUMENT_LIBRARY_SYNC_EVENT_PROCESSOR);
