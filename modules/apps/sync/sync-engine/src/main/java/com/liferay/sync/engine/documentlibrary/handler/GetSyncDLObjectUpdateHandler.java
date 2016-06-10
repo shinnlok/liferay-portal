@@ -454,20 +454,20 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 			boolean patch)
 		throws Exception {
 
-		String checksum = syncFile.getChecksum();
-
-		if (!checksum.isEmpty() && (syncFile.getSize() > 0)) {
-			SyncFile sourceSyncFile = SyncFileService.fetchSyncFile(
-				checksum, SyncFile.STATE_SYNCED);
-
-			if ((sourceSyncFile != null) &&
-				Files.exists(Paths.get(sourceSyncFile.getFilePathName()))) {
-
-				copyFile(sourceSyncFile, syncFile);
-
-				return;
-			}
-		}
+//		String checksum = syncFile.getChecksum();
+//
+//		if (!checksum.isEmpty() && (syncFile.getSize() > 0)) {
+//			SyncFile sourceSyncFile = SyncFileService.fetchSyncFile(
+//				checksum, SyncFile.STATE_SYNCED);
+//
+//			if ((sourceSyncFile != null) &&
+//				Files.exists(Paths.get(sourceSyncFile.getFilePathName()))) {
+//
+//				copyFile(sourceSyncFile, syncFile);
+//
+//				return;
+//			}
+//		}
 
 		String targetVersion = syncFile.getVersion();
 
@@ -480,7 +480,7 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 				syncFile.getVersionId());
 		}
 		else {
-			FileEventUtil.downloadFile(getSyncAccountId(), syncFile, false);
+			FileEventUtil.downloadFile(getSyncAccountId(), syncFile);
 		}
 	}
 
@@ -608,6 +608,7 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 			downloadFile(sourceSyncFile, null, 0, false);
 		}
 
+		sourceSyncFile.setKey(targetSyncFile.getKey());
 		sourceSyncFile.setModifiedTime(targetSyncFile.getModifiedTime());
 		sourceSyncFile.setUiEvent(SyncFile.UI_EVENT_MOVED_REMOTE);
 

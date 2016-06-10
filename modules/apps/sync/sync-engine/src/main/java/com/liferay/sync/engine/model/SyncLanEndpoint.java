@@ -19,11 +19,40 @@ import com.j256.ormlite.table.DatabaseTable;
 
 import com.liferay.sync.engine.service.persistence.BasePersistenceImpl;
 
+import java.util.Arrays;
+
 /**
  * @author Dennis Ju
  */
-@DatabaseTable(daoClass = BasePersistenceImpl.class, tableName = "SyncLanEndpoint")
+@DatabaseTable(
+	daoClass = BasePersistenceImpl.class, tableName = "SyncLanEndpoint"
+)
 public class SyncLanEndpoint extends BaseModel {
+
+	@Override
+	public boolean equals(Object object) {
+		if (object == this) {
+			return true;
+		}
+
+		if (!(object instanceof SyncLanEndpoint)) {
+			return false;
+		}
+
+		SyncLanEndpoint syncLanEndpoint = (SyncLanEndpoint)object;
+
+		if (!lanServerId.equals(syncLanEndpoint.lanServerId)) {
+			return false;
+		}
+		else if (repositoryId != syncLanEndpoint.repositoryId) {
+			return false;
+		}
+		else if (!syncLanClientUuid.equals(syncLanEndpoint.syncLanClientUuid)) {
+			return false;
+		}
+
+		return true;
+	}
 
 	public String getLanServerId() {
 		return lanServerId;
@@ -39,6 +68,12 @@ public class SyncLanEndpoint extends BaseModel {
 
 	public long getSyncLanEndpointId() {
 		return syncLanEndpointId;
+	}
+
+	@Override
+	public int hashCode() {
+		return Arrays.hashCode(
+			new Object[] {lanServerId, repositoryId, syncLanClientUuid});
 	}
 
 	public void setLanServerId(String lanServerId) {

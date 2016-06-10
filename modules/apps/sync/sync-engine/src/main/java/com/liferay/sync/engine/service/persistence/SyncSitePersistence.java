@@ -75,38 +75,6 @@ public class SyncSitePersistence extends BasePersistenceImpl<SyncSite, Long> {
 		return queryForEq("syncAccountId", syncAccountId);
 	}
 
-//
-//	public List<Long> findByA_S(boolean active, long syncAccountId)
-//		throws SQLException {
-//
-//		QueryBuilder<SyncSite, Long> queryBuilder = queryBuilder();
-//
-//		queryBuilder.selectColumns("syncSiteId");
-//
-//		Where<SyncSite, Long> where = queryBuilder.where();
-//
-//		where.eq("active", active);
-//		where.eq("syncAccountId", syncAccountId);
-//
-//		where.and(2);
-//
-//		GenericRawResults<Long> genericRawResults = queryRaw(
-//			queryBuilder.prepareStatementString(),
-//			new RawRowMapper<Long>() {
-//
-//				@Override
-//				public Long mapRow(
-//					String[] columnNames, String[] resultColumns) {
-//
-//					return Long.valueOf(resultColumns[0]);
-//				}
-//
-//			});
-//
-//		return genericRawResults.getResults();
-//	}
-//
-
 	public List<Long> findByA_S(
 			boolean active, String column, long syncAccountId)
 		throws SQLException {

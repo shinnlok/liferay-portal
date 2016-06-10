@@ -45,15 +45,19 @@ import org.slf4j.LoggerFactory;
 public class LanFileServerInitializer
 	extends ChannelInitializer<SocketChannel> {
 
+	public LanFileServerInitializer() {
+		updateDomainNameMapping();
+	}
+
 	@Override
 	public void initChannel(SocketChannel socketChannel) {
 		ChannelPipeline channelPipeline = socketChannel.pipeline();
 
-		try {
-			DomainNameMapping domainNameMapping = _getDomainNameMapping();
+		long start = System.currentTimeMillis();
 
-			if (domainNameMapping != null) {
-				channelPipeline.addLast(new SniHandler(domainNameMapping));
+		try {
+			if (_domainNameMapping != null) {
+				channelPipeline.addLast(new SniHandler(_domainNameMapping));
 			}
 		}
 		catch (Exception e) {
@@ -67,19 +71,13 @@ public class LanFileServerInitializer
 		LanFileServerHandler lanSyncServerHandler = new LanFileServerHandler();
 
 		channelPipeline.addLast(lanSyncServerHandler);
+
+		long end = System.currentTimeMillis();
+
+		System.out.println("" + (end - start));
 	}
 
-	public void reload() {
-		_domainNameMapping = null;
-	}
-
-	private DomainNameMapping<SslContext> _getDomainNameMapping()
-		throws Exception {
-
-		if (_domainNameMapping != null) {
-			return _domainNameMapping;
-		}
-
+	public void updateDomainNameMapping() {
 		DomainNameMappingBuilder<SslContext> domainNameMappingBuilder = null;
 
 		for (SyncAccount syncAccount : SyncAccountService.findAll()) {
@@ -87,40 +85,46 @@ public class LanFileServerInitializer
 				continue;
 			}
 
-			PrivateKey privateKey = LanPEMUtil.getPrivateKey(
-				syncAccount.getLanKey());
+			SslContext sslContext = null;
 
-			X509Certificate x509Certificate = LanPEMUtil.getX509Certificate(
-				syncAccount.getLanCertificate());
+			try {
+				PrivateKey privateKey = LanPEMUtil.getPrivateKey(
+					syncAccount.getLanKey());
 
-			SslContextBuilder sslContextBuilder = SslContextBuilder.forServer(
-				privateKey, x509Certificate);
+				X509Certificate x509Certificate = LanPEMUtil.getX509Certificate(
+					syncAccount.getLanCertificate());
 
-			sslContextBuilder.clientAuth(ClientAuth.REQUIRE);
-			sslContextBuilder.sslProvider(SslProvider.JDK);
-			sslContextBuilder.trustManager(x509Certificate);
+				SslContextBuilder sslContextBuilder =
+					SslContextBuilder.forServer(privateKey, x509Certificate);
 
-			SslContext sslContext = sslContextBuilder.build();
+				sslContextBuilder.clientAuth(ClientAuth.REQUIRE);
+				sslContextBuilder.sslProvider(SslProvider.JDK);
+				sslContextBuilder.trustManager(x509Certificate);
+
+				sslContext = sslContextBuilder.build();
+			}
+			catch (Exception e) {
+				_logger.error(e.getMessage(), e);
+
+				continue;
+			}
 
 			if (domainNameMappingBuilder == null) {
 				domainNameMappingBuilder = new DomainNameMappingBuilder<>(
 					sslContext);
 			}
 
-			String sniCompliantLanServerId =
-				LanClientUtil.getSNICompliantLanServerId(
-					syncAccount.getLanServerId());
+			String sniHostname = LanClientUtil.getSNIHostname(
+				syncAccount.getLanServerId());
 
-			domainNameMappingBuilder.add(sniCompliantLanServerId, sslContext);
+			domainNameMappingBuilder.add(sniHostname, sslContext);
 		}
 
 		if (domainNameMappingBuilder == null) {
-			return null;
+			return;
 		}
 
 		_domainNameMapping = domainNameMappingBuilder.build();
-
-		return _domainNameMapping;
 	}
 
 	private static final Logger _logger = LoggerFactory.getLogger(

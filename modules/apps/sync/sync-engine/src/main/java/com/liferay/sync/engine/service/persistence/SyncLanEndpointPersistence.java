@@ -36,21 +36,6 @@ public class SyncLanEndpointPersistence
 		super(SyncLanEndpoint.class);
 	}
 
-//
-//	public SyncLanEndpoint fetchBySyncAccountId(long syncAccountId)
-//		throws SQLException {
-//
-//		QueryBuilder<SyncLanEndpoint, Long> queryBuilder = queryBuilder();
-//
-//		queryBuilder.limit(1L);
-//
-//		Where<SyncLanEndpoint, Long> where = queryBuilder.where();
-//
-//		where.eq("syncAccountId", syncAccountId);
-//
-//		return where.queryForFirst();
-//	}
-
 	public List<SyncLanEndpoint> findBySyncLanClientUuid(
 			String syncLanClientUuid)
 		throws SQLException {
@@ -99,13 +84,5 @@ public class SyncLanEndpointPersistence
 
 		deleteBuilder.delete();
 	}
-
-//
-//	public List<SyncLanEndpoint> findBySyncLanClientUuid(String syncLanClientUuid)
-//		throws SQLException {
-//
-//		return queryForEq("syncLanClientUuid", syncLanClientUuid);
-//
-//	}
 
 }

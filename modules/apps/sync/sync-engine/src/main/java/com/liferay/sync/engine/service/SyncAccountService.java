@@ -78,8 +78,8 @@ public class SyncAccountService {
 	}
 
 	public static SyncAccount addSyncAccount(
-			String filePathName, String lanCertificate, String lanKey,
-			String lanServerId, String login, int maxConnections,
+			String filePathName, String lanCertificate, boolean lanEnabled,
+			String lanKey, String lanServerId, String login, int maxConnections,
 			String oAuthConsumerKey, String oAuthConsumerSecret,
 			boolean oAuthEnabled, String oAuthToken, String oAuthTokenSecret,
 			String password, String pluginVersion, int pollInterval,
@@ -93,6 +93,7 @@ public class SyncAccountService {
 
 		syncAccount.setFilePathName(filePathName);
 		syncAccount.setLanCertificate(lanCertificate);
+		syncAccount.setLanEnabled(lanEnabled);
 		syncAccount.setLanKey(lanKey);
 		syncAccount.setLanServerId(lanServerId);
 		syncAccount.setLogin(login);

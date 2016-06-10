@@ -18,46 +18,35 @@ import com.liferay.sync.engine.lan.discovery.DiscoveryBroadcaster;
 import com.liferay.sync.engine.lan.discovery.DiscoveryListener;
 import com.liferay.sync.engine.lan.fileserver.LanFileServer;
 import com.liferay.sync.engine.lan.util.LanClientUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.liferay.sync.engine.model.SyncLanClient;
+import com.liferay.sync.engine.service.SyncAccountService;
+import com.liferay.sync.engine.service.SyncLanClientService;
+import com.liferay.sync.engine.util.PropsValues;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Dennis Ju
  */
 public class LanEngine {
 
-	private static DiscoveryListener _discoveryListener;
-	private static DiscoveryBroadcaster _discoveryBroadcaster;
-	private static LanFileServer _lanFileServer;
-
-	public static synchronized void stop() {
-		if (_discoveryListener != null) {
-			_discoveryListener.shutdown();
-		}
-
-		if (_discoveryBroadcasterScheduledFuture != null) {
-			_discoveryBroadcasterScheduledFuture.cancel(true);
-		}
-
-		if (_lanFileServer != null) {
-			_lanFileServer.stop();
-		}
-	}
-
-	private static ScheduledFuture _discoveryBroadcasterScheduledFuture;
-
 	public static synchronized void start() {
+		_logger.info("Starting LAN engine");
+
 		if (_lanFileServer == null) {
 			_lanFileServer = new LanFileServer();
 		}
 
 		try {
 			_lanFileServer.start();
+
+			SyncAccountService.registerModelListener(
+				_lanFileServer.getSyncAccountListener());
 		}
 		catch (Exception e) {
 			_logger.error(e.getMessage(), e);
@@ -76,8 +65,10 @@ public class LanEngine {
 				try {
 					int port = _lanFileServer.getPort();
 
-					_discoveryBroadcaster.broadcast(
-						LanClientUtil.createSyncLanClient(port));
+					SyncLanClient syncLanClient =
+						LanClientUtil.createSyncLanClient(port);
+
+					_discoveryBroadcaster.broadcast(syncLanClient);
 				}
 				catch (Exception e) {
 					_logger.error(e.getMessage(), e);
@@ -86,16 +77,16 @@ public class LanEngine {
 
 		};
 
-		_discoveryBroadcasterScheduledFuture = _scheduledExecutorService.scheduleWithFixedDelay(
-			broadcastRunnable, 0, 5000,
-//		broadcastRunnable, 0, PropsValues.SYNC_LAN_BROADCAST_INTERVAL,
+		_scheduledExecutorService.scheduleWithFixedDelay(
+			broadcastRunnable, 0, PropsValues.SYNC_LAN_BROADCAST_INTERVAL,
 			TimeUnit.MILLISECONDS);
 
 		if (_discoveryListener == null) {
 			_discoveryListener = new DiscoveryListener();
 		}
 
-		Runnable _discoveryListenerRunnable = new Runnable() {
+		Runnable discoveryListenerRunnable = new Runnable() {
+
 			@Override
 			public void run() {
 				try {
@@ -105,16 +96,49 @@ public class LanEngine {
 					_logger.error(e.getMessage(), e);
 				}
 			}
+
 		};
 
-		_scheduledExecutorService.submit(_discoveryListenerRunnable);
+		_scheduledExecutorService.submit(discoveryListenerRunnable);
+
+		Runnable expireSyncLanClientsRunnable = new Runnable() {
+
+			@Override
+			public void run() {
+				SyncLanClientService.deleteSyncLanClients(
+					System.currentTimeMillis() -
+						PropsValues.SYNC_LAN_BROADCAST_INTERVAL * 3);
+			}
+
+		};
+
+		_scheduledExecutorService.scheduleWithFixedDelay(
+			expireSyncLanClientsRunnable,
+			PropsValues.SYNC_LAN_BROADCAST_INTERVAL * 3,
+			PropsValues.SYNC_LAN_BROADCAST_INTERVAL, TimeUnit.MILLISECONDS);
 	}
 
+	public static synchronized void stop() {
+		if (_discoveryListener != null) {
+			_discoveryListener.shutdown();
+		}
+
+		_scheduledExecutorService.shutdownNow();
+
+		if (_lanFileServer != null) {
+			SyncAccountService.unregisterModelListener(
+				_lanFileServer.getSyncAccountListener());
+
+			_lanFileServer.stop();
+		}
+	}
 
 	private static final Logger _logger = LoggerFactory.getLogger(
 		LanEngine.class);
 
-
+	private static DiscoveryBroadcaster _discoveryBroadcaster;
+	private static DiscoveryListener _discoveryListener;
+	private static LanFileServer _lanFileServer;
 	private static final ScheduledExecutorService _scheduledExecutorService =
 		Executors.newScheduledThreadPool(2);
 

@@ -14,12 +14,13 @@
 
 package com.liferay.sync.engine.service.persistence;
 
-import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.stmt.Where;
+
 import com.liferay.sync.engine.model.SyncLanClient;
 
 import java.sql.SQLException;
+
 import java.util.List;
 
 /**

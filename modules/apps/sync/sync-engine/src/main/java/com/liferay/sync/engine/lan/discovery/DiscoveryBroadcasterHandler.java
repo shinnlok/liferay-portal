@@ -17,13 +17,15 @@ package com.liferay.sync.engine.lan.discovery;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.socket.DatagramPacket;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * @author Dennis Ju
  */
-public class DiscoveryBroadcasterHandler extends SimpleChannelInboundHandler<DatagramPacket> {
+public class DiscoveryBroadcasterHandler
+	extends SimpleChannelInboundHandler<DatagramPacket> {
 
 	@Override
 	public void channelRead0(

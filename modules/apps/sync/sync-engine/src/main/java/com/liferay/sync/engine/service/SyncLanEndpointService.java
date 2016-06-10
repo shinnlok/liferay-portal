@@ -31,7 +31,18 @@ import org.slf4j.LoggerFactory;
  */
 public class SyncLanEndpointService {
 
-	public static void deleteSyncLanEndpoint(String syncLanClientUuid) {
+	public static void deleteSyncLanEndpoint(SyncLanEndpoint syncLanEndpoint) {
+		try {
+			_syncLanEndpointPersistence.delete(syncLanEndpoint);
+		}
+		catch (SQLException sqle) {
+			if (_logger.isDebugEnabled()) {
+				_logger.debug(sqle.getMessage(), sqle);
+			}
+		}
+	}
+
+	public static void deleteSyncLanEndpoints(String syncLanClientUuid) {
 		try {
 			_syncLanEndpointPersistence.deleteBySyncLanClientUuid(
 				syncLanClientUuid);
@@ -43,27 +54,28 @@ public class SyncLanEndpointService {
 		}
 	}
 
-//
-//	public static SyncLanEndpoint findSyncLanEndpoints(String syncLanClientId) {
-//		try {
-//			return _syncLanEndpointPersistence.fetchBySyncAccountId(
-//	syncAccountId);
-//		}
-//		catch (SQLException sqle) {
-//			if (_logger.isDebugEnabled()) {
-//				_logger.debug(sqle.getMessage(), sqle);
-//			}
-//
-//			return null;
-//		}
-	//	}
-
 	public static List<String> findSyncLanClientUuids(
 		String lanServerId, long repositoryId) {
 
 		try {
 			return _syncLanEndpointPersistence.findByL_R(
 				lanServerId, repositoryId);
+		}
+		catch (SQLException sqle) {
+			if (_logger.isDebugEnabled()) {
+				_logger.debug(sqle.getMessage(), sqle);
+			}
+
+			return Collections.emptyList();
+		}
+	}
+
+	public static List<SyncLanEndpoint> findSyncLanEndPoints(
+		String syncLanClientUuid) {
+
+		try {
+			return _syncLanEndpointPersistence.findBySyncLanClientUuid(
+				syncLanClientUuid);
 		}
 		catch (SQLException sqle) {
 			if (_logger.isDebugEnabled()) {

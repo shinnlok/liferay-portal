@@ -87,6 +87,10 @@ public class SyncAccount extends StateAwareModel {
 		return lanCertificate;
 	}
 
+	public boolean getLanEnabled() {
+		return lanEnabled;
+	}
+
 	public String getLanKey() {
 		return lanKey;
 	}
@@ -164,6 +168,10 @@ public class SyncAccount extends StateAwareModel {
 		return getActive();
 	}
 
+	public boolean isLanEnabled() {
+		return getLanEnabled();
+	}
+
 	public boolean isOAuthEnabled() {
 		return getOAuthEnabled();
 	}
@@ -196,6 +204,10 @@ public class SyncAccount extends StateAwareModel {
 
 	public void setLanCertificate(String lanCertificate) {
 		this.lanCertificate = lanCertificate;
+	}
+
+	public void setLanEnabled(boolean lanEnabled) {
+		this.lanEnabled = lanEnabled;
 	}
 
 	public void setLanKey(String lanKey) {
@@ -280,6 +292,9 @@ public class SyncAccount extends StateAwareModel {
 
 	@DatabaseField(useGetSet = true, width = 16777216)
 	protected String lanCertificate;
+
+	@DatabaseField(useGetSet = true)
+	protected boolean lanEnabled;
 
 	@DatabaseField(useGetSet = true, width = 16777216)
 	protected String lanKey;

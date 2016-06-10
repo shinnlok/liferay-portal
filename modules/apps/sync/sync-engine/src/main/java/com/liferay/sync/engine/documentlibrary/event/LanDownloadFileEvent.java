@@ -26,6 +26,8 @@ import java.nio.file.Paths;
 
 import java.util.Map;
 
+import org.apache.http.client.methods.HttpGet;
+
 /**
  * @author Dennis Ju
  */
@@ -37,6 +39,15 @@ public class LanDownloadFileEvent extends BaseEvent {
 		super(syncAccountId, "", parameters);
 
 		_handler = new LanDownloadFileHandler(this);
+	}
+
+	@Override
+	public void cancel() {
+		if (_httpGet != null) {
+			_httpGet.abort();
+		}
+
+		super.cancel();
 	}
 
 	@Override
@@ -59,9 +70,10 @@ public class LanDownloadFileEvent extends BaseEvent {
 
 		LanSession lanSession = LanSession.getLanSession();
 
-		lanSession.downloadFile(syncFile, _handler);
+		_httpGet = lanSession.downloadFile(syncFile, _handler);
 	}
 
 	private final Handler<Void> _handler;
+	private HttpGet _httpGet;
 
 }

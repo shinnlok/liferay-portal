@@ -27,8 +27,12 @@ import java.util.Set;
 /**
  * @author Dennis Ju
  */
-@DatabaseTable(daoClass = BasePersistenceImpl.class, tableName = "SyncLanClient")
-@JsonIgnoreProperties(ignoreUnknown = true, value = {"hostname", "modifiedTime", "uiEvent"})
+@DatabaseTable(
+	daoClass = BasePersistenceImpl.class, tableName = "SyncLanClient"
+)
+@JsonIgnoreProperties(
+	ignoreUnknown = true, value = {"hostname", "modifiedTime", "uiEvent"}
+)
 public class SyncLanClient extends BaseModel {
 
 	public Map<String, Set<Long>> getEndpoints() {
@@ -37,6 +41,10 @@ public class SyncLanClient extends BaseModel {
 
 	public String getHostname() {
 		return hostname;
+	}
+
+	public long getModifiedTime() {
+		return modifiedTime;
 	}
 
 	public int getPort() {
@@ -55,6 +63,10 @@ public class SyncLanClient extends BaseModel {
 		this.hostname = hostname;
 	}
 
+	public void setModifiedTime(long modifiedTime) {
+		this.modifiedTime = modifiedTime;
+	}
+
 	public void setPort(int port) {
 		this.port = port;
 	}
@@ -69,20 +81,12 @@ public class SyncLanClient extends BaseModel {
 	protected String hostname;
 
 	@DatabaseField(useGetSet = true)
+	protected long modifiedTime;
+
+	@DatabaseField(useGetSet = true)
 	protected int port;
 
 	@DatabaseField(id = true, useGetSet = true)
 	protected String syncLanClientUuid;
-
-	public long getModifiedTime() {
-		return modifiedTime;
-	}
-
-	public void setModifiedTime(long modifiedTime) {
-		this.modifiedTime = modifiedTime;
-	}
-
-	@DatabaseField(useGetSet = true)
-	protected long modifiedTime;
 
 }

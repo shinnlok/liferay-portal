@@ -217,18 +217,8 @@ public class SyncSiteService {
 
 	public static Set<Long> getActiveGroupIds(long syncAccountId) {
 		try {
-			Set<Long> activeGroupIds = _activeGroupIds.get(syncAccountId);
-
-			if (activeGroupIds != null) {
-				return activeGroupIds;
-			}
-
-			activeGroupIds = new HashSet<>(
+			return new HashSet<>(
 				_syncSitePersistence.findByA_S(true, "groupId", syncAccountId));
-
-			_activeGroupIds.put(syncAccountId, activeGroupIds);
-
-			return activeGroupIds;
 		}
 		catch (SQLException sqle) {
 			if (_logger.isDebugEnabled()) {
@@ -438,7 +428,6 @@ public class SyncSiteService {
 	private static final Logger _logger = LoggerFactory.getLogger(
 		SyncSiteService.class);
 
-	private static final Map<Long, Set<Long>> _activeGroupIds = new HashMap<>();
 	private static final Map<Long, Set<Long>> _activeSyncSiteIds =
 		new HashMap<>();
 	private static SyncSitePersistence _syncSitePersistence =

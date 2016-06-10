@@ -45,12 +45,19 @@ public class SyncContext {
 	public static final String PREFERENCE_KEY_POLL_INTERVAL =
 		"sync.client.poll.interval";
 
+	public static final String PREFERENCE_LAN_BROADCAST_INTERVAL =
+		"sync.client.lan.broadcast.interval";
+
 	public String getAuthType() {
 		return authType;
 	}
 
 	public String getLanCertificate() {
 		return lanCertificate;
+	}
+
+	public boolean getLanEnabled() {
+		return lanEnabled;
 	}
 
 	public String getLanKey() {
@@ -89,6 +96,10 @@ public class SyncContext {
 		return syncUser;
 	}
 
+	public boolean isLanEnabled() {
+		return getLanEnabled();
+	}
+
 	public boolean isOAuthEnabled() {
 		return getOAuthEnabled();
 	}
@@ -103,6 +114,10 @@ public class SyncContext {
 
 	public void setLanCertificate(String lanCertificate) {
 		this.lanCertificate = lanCertificate;
+	}
+
+	public void setLanEnabled(boolean lanEnabled) {
+		this.lanEnabled = lanEnabled;
 	}
 
 	public void setLanKey(String lanKey) {
@@ -149,6 +164,7 @@ public class SyncContext {
 
 	protected String authType;
 	protected String lanCertificate;
+	protected boolean lanEnabled;
 	protected String lanKey;
 	protected String lanServerId;
 

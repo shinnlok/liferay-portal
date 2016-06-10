@@ -29,6 +29,7 @@ import io.netty.util.CharsetUtil;
 
 import java.net.InetSocketAddress;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -58,9 +59,8 @@ public class DiscoveryListenerHandler
 			return;
 		}
 
-		SyncLanEndpointService.deleteSyncLanEndpoint(syncLanClientUuid);
-
-		long modifiedTime = System.currentTimeMillis();
+		List<SyncLanEndpoint> syncLanEndpoints =
+			SyncLanEndpointService.findSyncLanEndPoints(syncLanClientUuid);
 
 		Map<String, Set<Long>> endpoints = syncLanClient.getEndpoints();
 
@@ -72,14 +72,20 @@ public class DiscoveryListenerHandler
 				syncLanEndpoint.setRepositoryId(groupId);
 				syncLanEndpoint.setSyncLanClientUuid(syncLanClientUuid);
 
-				SyncLanEndpointService.update(syncLanEndpoint);
+				if (!syncLanEndpoints.remove(syncLanEndpoint)) {
+					SyncLanEndpointService.update(syncLanEndpoint);
+				}
 			}
+		}
+
+		for (SyncLanEndpoint syncLanEndpoint : syncLanEndpoints) {
+			SyncLanEndpointService.deleteSyncLanEndpoint(syncLanEndpoint);
 		}
 
 		InetSocketAddress inetSocketAddress = datagramPacket.sender();
 
 		syncLanClient.setHostname(inetSocketAddress.getHostName());
-		syncLanClient.setModifiedTime(modifiedTime);
+		syncLanClient.setModifiedTime(System.currentTimeMillis());
 
 		SyncLanClientService.update(syncLanClient);
 	}

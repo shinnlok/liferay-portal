@@ -35,7 +35,12 @@ public class LanPEMUtil {
 
 		sb.append("-----BEGIN PRIVATE KEY-----\n");
 		sb.append(privateKey);
-		sb.append("-----END PRIVATE KEY-----\n");
+
+		if (!privateKey.endsWith("\n")) {
+			sb.append("\n");
+		}
+
+		sb.append("-----END PRIVATE KEY-----");
 
 		PEMParser pemParser = new PEMParser(new StringReader(sb.toString()));
 
@@ -59,7 +64,12 @@ public class LanPEMUtil {
 
 		sb.append("-----BEGIN CERTIFICATE-----\n");
 		sb.append(certificate);
-		sb.append("-----END CERTIFICATE-----\n");
+
+		if (!certificate.endsWith("\n")) {
+			sb.append("\n");
+		}
+
+		sb.append("-----END CERTIFICATE-----");
 
 		PEMParser pemParser = new PEMParser(new StringReader(sb.toString()));
 

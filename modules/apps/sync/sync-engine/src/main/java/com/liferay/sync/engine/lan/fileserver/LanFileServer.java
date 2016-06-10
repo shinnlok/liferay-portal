@@ -18,6 +18,7 @@ import com.liferay.sync.engine.model.ModelListener;
 import com.liferay.sync.engine.model.SyncAccount;
 
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
@@ -28,13 +29,48 @@ import java.net.InetSocketAddress;
 
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * @author Dennis Ju
  */
 public class LanFileServer {
+
+	public int getPort() {
+		return _port;
+	}
+
+	public ModelListener<SyncAccount> getSyncAccountListener() {
+		if (syncAccountListener != null) {
+			return syncAccountListener;
+		}
+
+		syncAccountListener = new ModelListener<SyncAccount>() {
+
+			@Override
+			public void onCreate(SyncAccount syncAccount) {
+				_lanFileServerInitializer.updateDomainNameMapping();
+			}
+
+			@Override
+			public void onRemove(SyncAccount syncAccount) {
+				_lanFileServerInitializer.updateDomainNameMapping();
+			}
+
+			@Override
+			public void onUpdate(
+				SyncAccount syncAccount, Map<String, Object> originalValues) {
+
+				if (originalValues.containsKey("active") ||
+					originalValues.containsKey("lanCertificate") ||
+					originalValues.containsKey("lanKey")) {
+
+					_lanFileServerInitializer.updateDomainNameMapping();
+				}
+			}
+
+		};
+
+		return syncAccountListener;
+	}
 
 	public void start() throws Exception {
 		_childEventLoopGroup = new NioEventLoopGroup();
@@ -54,10 +90,10 @@ public class LanFileServer {
 
 		channelFuture.sync();
 
-		InetSocketAddress inetSocketAddress =
-			(InetSocketAddress)channelFuture.channel().localAddress();
+		Channel channel = channelFuture.channel();
 
-		System.out.println(inetSocketAddress.getPort());
+		InetSocketAddress inetSocketAddress =
+			(InetSocketAddress)channel.localAddress();
 
 		_port = inetSocketAddress.getPort();
 
@@ -74,52 +110,7 @@ public class LanFileServer {
 		}
 	}
 
-	public ModelListener<SyncAccount> getSyncAccountListener() {
-		if (syncAccountListener != null) {
-			return syncAccountListener;
-		}
-
-		syncAccountListener = new ModelListener<SyncAccount>() {
-
-			@Override
-			public void onCreate(SyncAccount syncAccount) {
-				_lanFileServerInitializer.reload();
-			}
-
-			@Override
-			public void onRemove(SyncAccount syncAccount) {
-				_lanFileServerInitializer.reload();
-			}
-
-			@Override
-			public void onUpdate(
-				SyncAccount syncAccount, Map<String, Object> originalValues) {
-
-				if (originalValues.containsKey("lanKey") ||
-					originalValues.containsKey("lanCertificate") ||
-					originalValues.containsKey("lanServerId)")) {
-
-					_lanFileServerInitializer.reload();
-				}
-			}
-
-		};
-
-		return syncAccountListener;
-	}
-
-	public int getPort() {
-		return _port;
-	}
-
-	public void reload() {
-		_lanFileServerInitializer.reload();
-	}
-
 	protected ModelListener<SyncAccount> syncAccountListener;
-
-	private static final Logger _logger = LoggerFactory.getLogger(
-		LanFileServer.class.getName());
 
 	private EventLoopGroup _childEventLoopGroup;
 	private LanFileServerInitializer _lanFileServerInitializer;

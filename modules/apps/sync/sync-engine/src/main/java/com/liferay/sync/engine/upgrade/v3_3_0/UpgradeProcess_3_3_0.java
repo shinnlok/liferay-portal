@@ -14,24 +14,11 @@
 
 package com.liferay.sync.engine.upgrade.v3_3_0;
 
-import com.liferay.sync.engine.model.SyncFile;
 import com.liferay.sync.engine.service.SyncLanClientService;
 import com.liferay.sync.engine.service.SyncLanEndpointService;
 import com.liferay.sync.engine.service.persistence.SyncLanClientPersistence;
 import com.liferay.sync.engine.service.persistence.SyncLanEndpointPersistence;
 import com.liferay.sync.engine.upgrade.BaseUpgradeProcess;
-import com.liferay.sync.engine.upgrade.util.UpgradeUtil;
-import com.liferay.sync.engine.util.PropsValues;
-import com.liferay.sync.engine.util.StreamUtil;
-
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 /**
  * @author Dennis Ju

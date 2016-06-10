@@ -53,7 +53,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.RandomAccessFile;
 
-import java.util.Set;
+import java.net.SocketAddress;
 
 import javax.activation.MimetypesFileTypeMap;
 
@@ -73,13 +73,6 @@ public class LanFileServerHandler
 			ChannelHandlerContext channelHandlerContext,
 			FullHttpRequest fullHttpRequest)
 		throws Exception {
-
-		if (_DEBUG_MODE) {
-			long delay = (long)(Math.random() * 300);
-
-			System.out.println("Sleeping " + delay);
-			Thread.sleep(delay);
-		}
 
 		ChannelPipeline channelPipeline = channelHandlerContext.pipeline();
 
@@ -131,14 +124,25 @@ public class LanFileServerHandler
 		String token = httpHeaders.get("token");
 
 		if ((token == null) || token.isEmpty()) {
+			Channel channel = channelHandlerContext.channel();
+
+			SocketAddress remoteAddress = channel.remoteAddress();
+
+			_logger.error("Lan client {} did not send token", remoteAddress);
+
 			_sendError(channelHandlerContext, NOT_FOUND);
 
 			return;
 		}
 
-		Set<String> tokens = LanTokenUtil.getTokens();
+		if (!LanTokenUtil.consumeToken(token)) {
+			Channel channel = channelHandlerContext.channel();
 
-		if (!tokens.contains(token)) {
+			SocketAddress remoteAddress = channel.remoteAddress();
+
+			_logger.error(
+				"Lan client {} token not found or expired", remoteAddress);
+
 			_sendError(channelHandlerContext, NOT_FOUND);
 
 			return;
@@ -158,15 +162,6 @@ public class LanFileServerHandler
 	protected void processHeadRequest(
 		ChannelHandlerContext channelHandlerContext,
 		FullHttpRequest fullHttpRequest) {
-
-		if (_DEBUG_MODE) {
-			if (Math.floor(Math.random() * 4) == 1) {
-				System.out.println("randomly sending error");
-				_sendError(channelHandlerContext, NOT_FOUND);
-
-				return;
-			}
-		}
 
 		SyncFile syncFile = _getSyncFile(fullHttpRequest);
 
@@ -199,7 +194,7 @@ public class LanFileServerHandler
 
 		HttpHeaders httpHeaders = httpResponse.headers();
 
-		httpHeaders.set("token", encryptedToken);
+		httpHeaders.set("encryptedToken", encryptedToken);
 
 		channelHandlerContext.writeAndFlush(httpResponse);
 	}
@@ -296,11 +291,15 @@ public class LanFileServerHandler
 			return null;
 		}
 
-		return SyncFileService.fetchSyncFile(
+		SyncFile syncFile = SyncFileService.fetchSyncFile(
 			repositoryId, syncAccount.getSyncAccountId(), typePK, versionId);
-	}
 
-	private static final boolean _DEBUG_MODE = false;
+		if (syncFile.getState() != SyncFile.STATE_SYNCED) {
+			return null;
+		}
+
+		return syncFile;
+	}
 
 	private static final Logger _logger = LoggerFactory.getLogger(
 		LanFileServerHandler.class);

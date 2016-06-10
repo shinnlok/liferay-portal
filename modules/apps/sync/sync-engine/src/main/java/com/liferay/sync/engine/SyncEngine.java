@@ -36,6 +36,7 @@ import com.liferay.sync.engine.util.FileKeyUtil;
 import com.liferay.sync.engine.util.FileLockRetryUtil;
 import com.liferay.sync.engine.util.FileUtil;
 import com.liferay.sync.engine.util.LoggerUtil;
+import com.liferay.sync.engine.util.PropsValues;
 import com.liferay.sync.engine.util.SyncEngineUtil;
 
 import java.io.IOException;
@@ -266,7 +267,9 @@ public class SyncEngine {
 			scheduleSyncAccountTasks(syncAccount.getSyncAccountId());
 		}
 
-		LanEngine.start();
+		if (PropsValues.SYNC_LAN_ENABLED) {
+			LanEngine.start();
+		}
 
 		SyncEngineUtil.fireSyncEngineStateChanged(
 			SyncEngineUtil.SYNC_ENGINE_STATE_STARTED);

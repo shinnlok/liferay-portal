@@ -33,8 +33,10 @@ import com.liferay.sync.engine.documentlibrary.event.PatchFileEntryEvent;
 import com.liferay.sync.engine.documentlibrary.event.UpdateFileEntryEvent;
 import com.liferay.sync.engine.documentlibrary.event.UpdateFolderEvent;
 import com.liferay.sync.engine.documentlibrary.handler.GetAllFolderSyncDLObjectsHandler;
+import com.liferay.sync.engine.model.SyncAccount;
 import com.liferay.sync.engine.model.SyncFile;
 import com.liferay.sync.engine.model.SyncSite;
+import com.liferay.sync.engine.service.SyncAccountService;
 import com.liferay.sync.engine.service.SyncFileService;
 import com.liferay.sync.engine.service.SyncSiteService;
 import com.liferay.sync.engine.util.FileUtil;
@@ -52,6 +54,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.commons.lang.StringUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -212,6 +216,12 @@ public class FileEventUtil {
 	public static void downloadFile(
 		long syncAccountId, SyncFile syncFile, boolean batch) {
 
+		downloadFile(syncAccountId, syncFile, batch, true);
+	}
+
+	public static void downloadFile(
+		long syncAccountId, SyncFile syncFile, boolean batch, boolean lan) {
+
 		if (isDownloadInProgress(syncFile)) {
 			return;
 		}
@@ -224,11 +234,17 @@ public class FileEventUtil {
 
 		Event event = null;
 
-		if (batch || !PropsValues.SYNC_LAN_ENABLED) {
-			event = new DownloadFileEvent(syncAccountId, parameters);
+		SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
+			syncAccountId);
+
+		if (lan && syncAccount.isLanEnabled() && PropsValues.SYNC_LAN_ENABLED &&
+			StringUtils.isNotEmpty(syncFile.getKey()) &&
+			(syncFile.getSize() >= syncAccount.getBatchFileMaxSize()/10)) {
+
+			event = new LanDownloadFileEvent(syncAccountId, parameters);
 		}
 		else {
-			event = new LanDownloadFileEvent(syncAccountId, parameters);
+			event = new DownloadFileEvent(syncAccountId, parameters);
 		}
 
 		event.run();

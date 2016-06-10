@@ -30,7 +30,32 @@ import java.util.UUID;
  */
 public class LanClientUtil {
 
-	public static String getSNICompliantLanServerId(String lanServerId) {
+	public static SyncLanClient createSyncLanClient(int port) throws Exception {
+		SyncLanClient syncLanClient = new SyncLanClient();
+
+		Map<String, Set<Long>> endpoints = new HashMap<>();
+
+		for (SyncAccount syncAccount : SyncAccountService.findAll()) {
+			if (!syncAccount.isActive() || !syncAccount.isLanEnabled()) {
+				continue;
+			}
+
+			endpoints.put(
+				syncAccount.getLanServerId(),
+				SyncSiteService.getActiveGroupIds(
+					syncAccount.getSyncAccountId()));
+		}
+
+		syncLanClient.setEndpoints(endpoints);
+
+		syncLanClient.setPort(port);
+		syncLanClient.setSyncLanClientUuid(
+			LanClientUtil.getSyncLanClientUuid());
+
+		return syncLanClient;
+	}
+
+	public static String getSNIHostname(String lanServerId) {
 		return lanServerId + ".com";
 	}
 
@@ -48,32 +73,6 @@ public class LanClientUtil {
 		}
 
 		return syncLanClientUuid;
-	}
-
-
-	public static SyncLanClient createSyncLanClient(int port) throws Exception {
-		SyncLanClient syncLanClient = new SyncLanClient();
-
-		Map<String, Set<Long>> endpoints = new HashMap<>();
-
-		for (SyncAccount syncAccount : SyncAccountService.findAll()) {
-			if (!syncAccount.isActive()) {
-				continue;
-			}
-
-			endpoints.put(
-				syncAccount.getLanServerId(),
-				SyncSiteService.getActiveGroupIds(
-					syncAccount.getSyncAccountId()));
-		}
-
-		syncLanClient.setEndpoints(endpoints);
-
-		syncLanClient.setPort(port);
-		syncLanClient.setSyncLanClientUuid(
-			LanClientUtil.getSyncLanClientUuid());
-
-		return syncLanClient;
 	}
 
 }

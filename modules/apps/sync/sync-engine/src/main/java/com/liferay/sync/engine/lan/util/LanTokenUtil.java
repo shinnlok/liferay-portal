@@ -16,34 +16,60 @@ package com.liferay.sync.engine.lan.util;
 
 import java.nio.charset.Charset;
 
+import java.security.SecureRandom;
+
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.Collections;
 import java.util.Set;
-import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
-import net.jodah.expiringmap.ExpiringMap;
-
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.collections4.map.PassiveExpiringMap;
+import org.apache.commons.lang.RandomStringUtils;
 
 /**
  * @author Dennis Ju
  */
 public class LanTokenUtil {
 
+	public static boolean consumeToken(String token) {
+
+		// Must explicitly check for token. PassiveExpiringMap.remove() returns
+		// true even for expired values.
+
+		if (_tokens.contains(token)) {
+			_tokens.remove(token);
+
+			return true;
+		}
+
+		return false;
+	}
+
 	public static String createEncryptedToken(String key) throws Exception {
-		UUID uuid = UUID.randomUUID();
+		String token = RandomStringUtils.random(
+			32, 0, 0, true, true, null, _secureRandom);
 
-		String tokenUuid = uuid.toString();
+		byte[] bytes = DigestUtils.sha1(key);
 
-		String encryptedToken = encryptToken(key, tokenUuid);
+		bytes = Arrays.copyOf(bytes, 16);
 
-		getTokens().add(tokenUuid);
+		Cipher cipher = Cipher.getInstance("AES");
+
+		cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(bytes, "AES"));
+
+		byte[] encryptedBytes = cipher.doFinal(
+			token.getBytes(Charset.forName("UTF-8")));
+
+		String encryptedToken = Base64.encodeBase64String(encryptedBytes);
+
+		_tokens.add(token);
 
 		return encryptedToken;
 	}
@@ -61,44 +87,16 @@ public class LanTokenUtil {
 
 		cipher.init(Cipher.DECRYPT_MODE, secretKey);
 
-		byte[] decodedBytes = Base64.getDecoder().decode(encryptedToken);
+		byte[] decodedBytes = Base64.decodeBase64(encryptedToken);
 
 		byte[] decryptedBytes = cipher.doFinal(decodedBytes);
 
 		return new String(decryptedBytes, Charset.forName("UTF-8"));
 	}
 
-	public static String encryptToken(String key, String token)
-		throws Exception {
-
-		byte[] bytes = DigestUtils.sha1(key);
-
-		bytes = Arrays.copyOf(bytes, 16);
-
-		SecretKey secretKey = new SecretKeySpec(bytes, "AES");
-
-		Cipher cipher = Cipher.getInstance("AES");
-
-		cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-
-		byte[] encryptedBytes = cipher.doFinal(
-			token.getBytes(Charset.forName("UTF-8")));
-
-		return Base64.getEncoder().encodeToString(encryptedBytes);
-	}
-
-	public static Set<String> getTokens() {
-		if (_tokens == null) {
-			ExpiringMap.Builder builder = ExpiringMap.builder();
-
-			builder.expiration(30, TimeUnit.SECONDS);
-
-			_tokens = Collections.newSetFromMap(builder.build());
-		}
-
-		return _tokens;
-	}
-
-	private static Set<String> _tokens;
+	private static final SecureRandom _secureRandom = new SecureRandom();
+	private static final Set<String> _tokens = Collections.newSetFromMap(
+		new PassiveExpiringMap(
+			3600, TimeUnit.SECONDS, new ConcurrentHashMap()));
 
 }

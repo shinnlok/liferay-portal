@@ -35,16 +35,14 @@ import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -68,7 +66,6 @@ import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.protocol.HttpContext;
 
@@ -80,8 +77,6 @@ import org.slf4j.LoggerFactory;
  */
 public class LanSession {
 
-	private static LanSession _lanSession;
-
 	public static LanSession getLanSession() {
 		if (_lanSession == null) {
 			_lanSession = new LanSession();
@@ -91,7 +86,6 @@ public class LanSession {
 	}
 
 	public LanSession() {
-		startTrackTransferRate();
 		RegistryBuilder<ConnectionSocketFactory> registryBuilder =
 			RegistryBuilder.create();
 
@@ -107,83 +101,84 @@ public class LanSession {
 
 		Registry<ConnectionSocketFactory> registry = registryBuilder.build();
 
-		PoolingHttpClientConnectionManager connectionManager =
+		PoolingHttpClientConnectionManager queryConnectionManager =
 			new PoolingHttpClientConnectionManager(registry);
 
-		connectionManager.setMaxTotal(50);
-		connectionManager.setDefaultMaxPerRoute(10);
+		queryConnectionManager.setDefaultMaxPerRoute(_QUERY_POOL_MAX_SIZE);
+		queryConnectionManager.setMaxTotal(_QUERY_POOL_MAX_SIZE);
 
-//		httpClientBuilder.setConnectionManagerShared(true);
+		HttpClientBuilder queryHttpClientBuilder = HttpClientBuilder.create();
 
-		HttpClientBuilder httpClientBuilder = _createHttpClientBuilder();
+		queryHttpClientBuilder.disableAutomaticRetries();
 
-		httpClientBuilder.setConnectionManager(connectionManager);
+		RequestConfig.Builder queryBuilder = RequestConfig.custom();
 
-		_httpClient = httpClientBuilder.build();
+		queryBuilder.setConnectTimeout(_QUERY_CONNECT_TIMEOUT);
+		queryBuilder.setSocketTimeout(5000);
+
+		queryHttpClientBuilder.setDefaultRequestConfig(queryBuilder.build());
+
+		queryHttpClientBuilder.setConnectionManager(queryConnectionManager);
+
+		_queryHttpClient = queryHttpClientBuilder.build();
+
+		PoolingHttpClientConnectionManager downloadConnectionManager =
+			new PoolingHttpClientConnectionManager(registry);
+
+		downloadConnectionManager.setDefaultMaxPerRoute(2);
+		downloadConnectionManager.setMaxTotal(16);
+
+		HttpClientBuilder downloadHttpClientBuilder =
+			HttpClientBuilder.create();
+
+		downloadHttpClientBuilder.disableAutomaticRetries();
+
+		RequestConfig.Builder downloadBuilder = RequestConfig.custom();
+
+		downloadBuilder.setConnectTimeout(5000);
+		downloadBuilder.setSocketTimeout(10000);
+
+		downloadHttpClientBuilder.setDefaultRequestConfig(queryBuilder.build());
+
+		downloadHttpClientBuilder.setConnectionManager(
+			downloadConnectionManager);
+
+		_downloadHttpClient = downloadHttpClientBuilder.build();
 	}
 
-	private static String _getUrl(
-		String hostname, int port, SyncFile syncFile) {
-		SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
-			syncFile.getSyncAccountId());
-
-		StringBuilder sb = new StringBuilder("https://");
-
-		sb.append(hostname);
-		sb.append(":");
-		sb.append(port);
-		sb.append("/");
-		sb.append(syncAccount.getLanServerId());
-		sb.append("/");
-		sb.append(syncFile.getRepositoryId());
-		sb.append("/");
-		sb.append(syncFile.getTypePK());
-		sb.append("/");
-		sb.append(syncFile.getVersionId());
-
-		return sb.toString();
-	}
-
-	public void downloadFile(SyncFile syncFile, final Handler handler)
+	public HttpGet downloadFile(SyncFile syncFile, final Handler handler)
 		throws Exception {
-
-		String key = syncFile.getKey();
-
-		if (key == null || key.isEmpty()) {
-			System.out.println("I don't have the key");
-			return;
-		}
 
 		Object[] objects = findSyncLanClient(syncFile);
 
 		if (objects == null) {
 			handler.handleException(new Exception("none found"));
 
-			return;
+			return null;
 		}
 
 		SyncLanClient syncLanClient = (SyncLanClient)objects[0];
 
-		String url = _getUrl(
-			syncLanClient.getHostname(), syncLanClient.getPort(), syncFile);
+		String url = _getUrl(syncLanClient, syncFile);
 
 		final HttpGet httpGet = new HttpGet(url);
 
 		String encryptedToken = (String)objects[1];
 
-		String token = LanTokenUtil.decryptToken(key, encryptedToken);
+		String token = LanTokenUtil.decryptToken(
+			syncFile.getKey(), encryptedToken);
 
 		httpGet.addHeader("token", token);
-
-//		HttpResponse httpResponse = _httpClient.execute(
-//			httpGet, HttpClientContext.create());
 
 		Runnable runnable = new Runnable() {
 
 			@Override
 			public void run() {
 				try {
-					_httpClient.execute(
+					System.out.println(
+						"Submitting download " + syncFile.getName() + " from " + url);
+
+					_downloadHttpClient.execute(
 						httpGet, handler, HttpClientContext.create());
 				}
 				catch (Exception e) {
@@ -193,44 +188,9 @@ public class LanSession {
 
 		};
 
-		_executorService.execute(runnable);
+		_downloadExecutorService.execute(runnable);
 
-//		System.out.println(httpResponse.getStatusLine());
-//
-//		if (httpResponse.getStatusLine().getStatusCode() != 200) {
-//			return;
-//		}
-//			String output = EntityUtils.toString(httpResponse.getEntity());
-
-//			System.out.println(output);
-
-//		HttpEntity httpEntity = httpResponse.getEntity();
-//
-//		InputStream inputStream =
-//new CountingInputStream(httpEntity.getContent()) {
-//
-//
-//			@Override
-//			protected synchronized void afterRead(int n) {
-//				incrementDownloadedBytes(n);
-//
-//				super.afterRead(n);
-//			}
-//
-//		};
-//
-//		OutputStream os = new FileOutputStream(
-//	new File("/Users/deju/Desktop/testing123.pptx"));
-//
-//		long start = System.currentTimeMillis();
-//		System.out.println("start");
-//
-//		IOUtils.copy(inputStream, os);
-//
-//		long end = System.currentTimeMillis();
-//		System.out.println("end: " + ((end - start)/1000));
-//
-//		EntityUtils.consumeQuietly(httpResponse.getEntity());
+		return httpGet;
 	}
 
 	public Object[] findSyncLanClient(SyncFile syncFile) throws Exception {
@@ -241,109 +201,123 @@ public class LanSession {
 			SyncLanEndpointService.findSyncLanClientUuids(
 				syncAccount.getLanServerId(), syncFile.getRepositoryId());
 
-		List<SyncLanClient> syncLanClients = new ArrayList<>(
-			syncLanClientUuids.size());
-
-		for (String syncLanClientUuid : syncLanClientUuids) {
-			syncLanClients.add(
-				SyncLanClientService.fetchSyncLanClient(syncLanClientUuid));
+		if (syncLanClientUuids.isEmpty()) {
+			return null;
 		}
 
-		List<Callable<Object[]>> callables = new ArrayList<>();
+		List<Callable<Object[]>> findSyncLanClientCallables =
+			Collections.synchronizedList(
+				new ArrayList<>(syncLanClientUuids.size()));
 
-		for (final SyncLanClient syncLanClient : syncLanClients) {
-			String url = _getUrl(
-				syncLanClient.getHostname(), syncLanClient.getPort(), syncFile);
+		for (String syncLanClientUuid : syncLanClientUuids) {
+			SyncLanClient syncLanClient =
+				SyncLanClientService.fetchSyncLanClient(syncLanClientUuid);
 
-			final HttpHead httpHead = new HttpHead(url);
+			findSyncLanClientCallables.add(
+				createFindSyncLanClientCallable(syncLanClient, syncFile));
+		}
 
-			Callable<Object[]> callable = new Callable<Object[]>() {
+		int queryPoolSize = Math.min(
+			syncLanClientUuids.size(), _QUERY_POOL_MAX_SIZE);
+
+		List<Callable<Object[]>> createFindSyncLanClientPool = new ArrayList<>(
+			queryPoolSize);
+
+		for (int i = 0; i < queryPoolSize; i++) {
+			Callable callable = new Callable<Object[]>() {
 
 				@Override
 				public Object[] call() throws Exception {
-					HttpResponse httpResponse = _httpClient.execute(
-						httpHead, HttpClientContext.create());
+					Callable<Object[]> findSyncLanClientCallable =
+						findSyncLanClientCallables.remove(0);
 
-					StatusLine statusLine = httpResponse.getStatusLine();
-
-					if (statusLine.getStatusCode() != HttpStatus.SC_OK) {
-						throw new Exception();
+					try {
+						return findSyncLanClientCallable.call();
 					}
-
-					Header[] headers = httpResponse.getHeaders("token");
-
-					if (headers.length == 0) {
-						throw new Exception("");
+					catch (Exception e) {
+						return this.call();
 					}
-
-					Header header = headers[0];
-
-					String token = header.getValue();
-
-					return new Object[] {syncLanClient, token};
 				}
 
 			};
 
-			callables.add(callable);
+			createFindSyncLanClientPool.add(callable);
 		}
 
-		int fromIndex = 0;
-		int toIndex = queryBlockSize;
+		ExecutorService executorService = _getExecutorService();
 
+		try {
+			return executorService.invokeAny(
+				createFindSyncLanClientPool, _QUERY_TOTAL_TIMEOUT,
+				TimeUnit.MILLISECONDS);
+		}
+		catch (Exception e) {
+			return null;
+		}
+	}
 
-		//TODO How to do total timeout check?
+	protected Callable<Object[]> createFindSyncLanClientCallable(
+		SyncLanClient syncLanClient, SyncFile syncFile) {
 
-		while (true) {
-			List<Callable<Object[]>> callablesSubList = callables.subList(
-				fromIndex, toIndex);
+		String url = _getUrl(syncLanClient, syncFile);
 
-			try {
-				return _getExecutorService().invokeAny(
-					callablesSubList, 5000, TimeUnit.MILLISECONDS);
+		final HttpHead httpHead = new HttpHead(url);
+
+		return new Callable<Object[]>() {
+
+			@Override
+			public Object[] call() throws Exception {
+				HttpResponse httpResponse = null;
+
+				long start = System.currentTimeMillis();
+
+				try {
+					httpResponse = _queryHttpClient.execute(
+						httpHead, HttpClientContext.create());
+				}
+				finally {
+					long end = System.currentTimeMillis();
+
+					System.out.println(
+						"" + (end - start) + " " + syncFile.getName() + " " + httpHead.getURI());
+				}
+
+				StatusLine statusLine = httpResponse.getStatusLine();
+
+				if (statusLine.getStatusCode() != HttpStatus.SC_OK) {
+					throw new Exception();
+				}
+
+				Header[] headers = httpResponse.getHeaders("encryptedToken");
+
+				if (headers.length == 0) {
+					_logger.error("Sync lan client did not return ");
+
+					throw new Exception();
+				}
+
+				Header header = headers[0];
+
+				String encryptedToken = header.getValue();
+
+				return new Object[] {syncLanClient, encryptedToken};
 			}
-			catch (Exception e) {
-			}
 
-			if (toIndex == callables.size() - 1) {
-				return null;
-			}
+		};
+	}
 
-			fromIndex = toIndex;
-
-			if (toIndex + queryBlockSize > callables.size() - 1) {
-				toIndex = callables.size() - 1;
-			}
-			else {
-				toIndex = toIndex + queryBlockSize;
-			}
+	private static ExecutorService _getExecutorService() {
+		if (_queryExecutorService != null) {
+			return _queryExecutorService;
 		}
 
+		_queryExecutorService = new ThreadPoolExecutor(
+			16, 16, 60, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
+
+		_queryExecutorService.allowCoreThreadTimeOut(true);
+
+		return _queryExecutorService;
 	}
-
-	private static int queryBlockSize = 10;
-	private static int queryTimeout = 1000;
-
-	private static HttpClientBuilder _createHttpClientBuilder() {
-		HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
-
-		httpClientBuilder.disableAutomaticRetries();
-
-		RequestConfig.Builder builder = RequestConfig.custom();
-
-		builder.setConnectTimeout(500);
-		builder.setSocketTimeout(10000);
-
-		httpClientBuilder.setDefaultRequestConfig(builder.build());
-		httpClientBuilder.setRedirectStrategy(new LaxRedirectStrategy());
-
-		return httpClientBuilder;
-	}
-
-	private static ThreadPoolExecutor _threadPoolExecutor;
-
-	private static final Logger _logger = LoggerFactory.getLogger(
-		LanSession.class);
 
 	private static SSLConnectionSocketFactory _getSSLSocketFactory()
 		throws Exception {
@@ -407,106 +381,70 @@ public class LanSession {
 		return new SSLConnectionSocketFactory(
 			sslContext, new NoopHostnameVerifier()) {
 
-				@Override
-				public Socket createLayeredSocket(
-						final Socket socket, final String target,
-						final int port, final HttpContext httpContext)
-					throws IOException {
-
-					HttpClientContext httpClientContext =
-						(HttpClientContext)httpContext;
-
-					HttpRequest httpRequest = httpClientContext.getRequest();
-
-					RequestLine requestLine = httpRequest.getRequestLine();
-
-					String[] parts = StringUtils.split(
-						requestLine.getUri(), "/");
-
-					String sniCompliantLanServerId =
-						LanClientUtil.getSNICompliantLanServerId(parts[0]);
-
-//					return super.createLayeredSocket(
-//						socket, target, port, httpContext);
-//
-					return super.createLayeredSocket(
-						socket, sniCompliantLanServerId, port, httpContext);
-				}
-
-			};
-	}
-
-	public int getUploadRate() {
-		return _uploadRate;
-	}
-
-	public void incrementDownloadedBytes(int bytes) {
-		_downloadedBytes.getAndAdd(bytes);
-	}
-
-	public void incrementUploadedBytes(int bytes) {
-		_uploadedBytes.getAndAdd(bytes);
-	}
-
-	public void startTrackTransferRate() {
-		if ((_trackTransferRateScheduledFuture != null) &&
-			!_trackTransferRateScheduledFuture.isDone()) {
-
-			return;
-		}
-
-		Runnable runnable = new Runnable() {
-
 			@Override
-			public void run() {
-				_downloadRate = _downloadedBytes.get();
+			public Socket createLayeredSocket(
+					Socket socket, String target, int port,
+					HttpContext httpContext)
+				throws IOException {
 
-				_downloadedBytes.set(0);
+				HttpClientContext httpClientContext =
+					(HttpClientContext)httpContext;
 
-				_uploadRate = _uploadedBytes.get();
+				HttpRequest httpRequest = httpClientContext.getRequest();
 
-				_uploadedBytes.set(0);
+				RequestLine requestLine = httpRequest.getRequestLine();
+
+				String[] parts = StringUtils.split(requestLine.getUri(), "/");
+
+				String sniCompliantLanServerId = LanClientUtil.getSNIHostname(
+					parts[0]);
+
+				return super.createLayeredSocket(
+					socket, sniCompliantLanServerId, port, httpContext);
 			}
 
 		};
-
-		_trackTransferRateScheduledFuture =
-			_scheduledExecutorService.scheduleWithFixedDelay(
-				runnable, 0, 1, TimeUnit.SECONDS);
 	}
 
-	public void stopTrackTransferRate() {
-		if (_trackTransferRateScheduledFuture == null) {
-			return;
-		}
+	private static String _getUrl(
+		SyncLanClient syncLanClient, SyncFile syncFile) {
 
-		_trackTransferRateScheduledFuture.cancel(false);
+		SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
+			syncFile.getSyncAccountId());
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("https://");
+		sb.append(syncLanClient.getHostname());
+		sb.append(":");
+		sb.append(syncLanClient.getPort());
+		sb.append("/");
+		sb.append(syncAccount.getLanServerId());
+		sb.append("/");
+		sb.append(syncFile.getRepositoryId());
+		sb.append("/");
+		sb.append(syncFile.getTypePK());
+		sb.append("/");
+		sb.append(syncFile.getVersionId());
+
+		return sb.toString();
 	}
 
-	private static ExecutorService _getExecutorService() {
-		if (_threadPoolExecutor != null) {
-			return _threadPoolExecutor;
-		}
+	private static final int _QUERY_CONNECT_TIMEOUT = 500;
 
-		_threadPoolExecutor = new ThreadPoolExecutor(
-			32, 32, 60, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+	private static final int _QUERY_POOL_MAX_SIZE = 32;
 
-		_threadPoolExecutor.allowCoreThreadTimeOut(true);
+	private static final int _QUERY_TOTAL_TIMEOUT = 3000;
 
-		return _threadPoolExecutor;
-	}
+	private static final Logger _logger = LoggerFactory.getLogger(
+		LanSession.class);
 
-	private final HttpClient _httpClient;
+	private static LanSession _lanSession;
+	private static ThreadPoolExecutor _queryExecutorService;
 
-	private final AtomicInteger _downloadedBytes = new AtomicInteger(0);
-	private volatile int _downloadRate;
-
-	private ScheduledFuture<?> _trackTransferRateScheduledFuture;
-	private final AtomicInteger _uploadedBytes = new AtomicInteger(0);
-	private volatile int _uploadRate;
-	private static final ScheduledExecutorService _scheduledExecutorService =
-		Executors.newSingleThreadScheduledExecutor();
-	private final ExecutorService _executorService =
+	private final ExecutorService _downloadExecutorService =
 		Executors.newCachedThreadPool();
+	private final HttpClient _downloadHttpClient;
+	private final HttpClient _queryHttpClient;
 
 }
