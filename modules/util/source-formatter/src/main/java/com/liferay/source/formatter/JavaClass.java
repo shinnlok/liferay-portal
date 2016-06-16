@@ -116,6 +116,7 @@ public class JavaClass {
 
 			checkUnusedParameters(javaTerm);
 
+			_formatBooleanStatements(javaTerm);
 			_formatReturnStatements(javaTerm);
 
 			if (javaTerm.isMethod() || javaTerm.isConstructor()) {
@@ -282,6 +283,59 @@ public class JavaClass {
 
 			_javaSourceProcessor.processErrorMessage(
 				_fileName, "chaining: " + _fileName + " " + lineCount);
+		}
+	}
+
+	protected void checkCleanUpMethodValue(
+		String cleanUpMethodContent, JavaTerm javaTerm, String defaultValue) {
+
+		String javaTermName = javaTerm.getName();
+
+		if (!cleanUpMethodContent.contains(javaTermName + " =")) {
+			return;
+		}
+
+		Pattern pattern = Pattern.compile(javaTermName + " =\\s+[a-z]\\w*\\.");
+
+		Matcher matcher = pattern.matcher(cleanUpMethodContent);
+
+		if (matcher.find()) {
+			return;
+		}
+
+		String javaTermContent = javaTerm.getContent();
+
+		int x = javaTermContent.indexOf(javaTermName);
+
+		String setVariableCommand = javaTermContent.substring(x);
+
+		if (!setVariableCommand.contains(" =")) {
+			setVariableCommand = StringUtil.replaceLast(
+				setVariableCommand, ";", " = " + defaultValue + ";");
+		}
+
+		setVariableCommand = StringUtil.replace(
+			setVariableCommand,
+			new String[] {StringPool.TAB, StringPool.NEW_LINE},
+			new String[] {StringPool.BLANK, StringPool.SPACE});
+
+		String setVariableCommandRegex = StringUtil.replace(
+			setVariableCommand,
+			new String[] {
+				StringPool.CLOSE_PARENTHESIS, StringPool.OPEN_PARENTHESIS,
+				StringPool.SPACE, "0\\.0"
+			},
+			new String[] {"\\)", "\\(", "\\s*", "0(\\.0)?"});
+
+		pattern = Pattern.compile(setVariableCommandRegex);
+
+		matcher = pattern.matcher(cleanUpMethodContent);
+
+		if (!matcher.find()) {
+			_javaSourceProcessor.processErrorMessage(
+				_fileName,
+				"LPS-66242: Initial value differs from value in cleanUp " +
+					"method: " + _fileName + " " + javaTerm.getLineCount());
 		}
 	}
 
@@ -533,6 +587,13 @@ public class JavaClass {
 						_classContent, javaTermContent,
 						matcher.replaceFirst(";$1"));
 				}
+			}
+
+			// LPS-66242
+
+			if (_fileName.endsWith("Tag.java")) {
+				checkCleanUpMethodValue(
+					getCleanUpMethodContent(javaTerms), javaTerm, defaultValue);
 			}
 		}
 
@@ -1043,6 +1104,32 @@ public class JavaClass {
 		return line.substring(pos + 1);
 	}
 
+	protected String getCleanUpMethodContent(Set<JavaTerm> javaTerms) {
+		if (_cleanUpMethodContent != null) {
+			return _cleanUpMethodContent;
+		}
+
+		String cleanUpMethodContent = StringPool.BLANK;
+
+		for (JavaTerm javaTerm : javaTerms) {
+			if (!javaTerm.isMethod()) {
+				continue;
+			}
+
+			String javaTermName = javaTerm.getName();
+
+			if (javaTermName.equals("cleanUp")) {
+				cleanUpMethodContent = javaTerm.getContent();
+
+				break;
+			}
+		}
+
+		_cleanUpMethodContent = cleanUpMethodContent;
+
+		return _cleanUpMethodContent;
+	}
+
 	protected String getConstructorOrMethodName(String line, int pos) {
 		line = line.substring(0, pos);
 
@@ -1437,19 +1524,18 @@ public class JavaClass {
 		}
 
 		for (JavaTerm curJavaTerm : getJavaTerms()) {
-			if (!curJavaTerm.isMethod() &&
-				(!curJavaTerm.isConstructor() ||
-				 javaTermClassName.equals(_name))) {
-
-				continue;
-			}
-
 			String content = curJavaTerm.getContent();
 
-			Matcher matcher = pattern.matcher(content);
+			if (curJavaTerm.isMethod() ||
+				(curJavaTerm.isConstructor() &&
+				 !javaTermClassName.equals(_name)) ||
+				(curJavaTerm.isVariable() && content.contains("{\n\n"))) {
 
-			if (content.contains(javaTerm.getName()) && matcher.find()) {
-				return false;
+				Matcher matcher = pattern.matcher(content);
+
+				if (content.contains(javaTerm.getName()) && matcher.find()) {
+					return false;
+				}
 			}
 		}
 
@@ -1549,6 +1635,97 @@ public class JavaClass {
 		}
 	}
 
+	private void _formatBooleanStatement(
+		String javaTermContent, String booleanStatement, String tabs,
+		String variableName, String ifCondition, String trueValue,
+		String falseValue) {
+
+		StringBundler sb = new StringBundler(19);
+
+		sb.append("\n\n");
+		sb.append(tabs);
+		sb.append("boolean ");
+		sb.append(variableName);
+		sb.append(" = ");
+		sb.append(falseValue);
+		sb.append(";\n\n");
+		sb.append(tabs);
+		sb.append("if (");
+		sb.append(ifCondition);
+		sb.append(") {\n\n");
+		sb.append(tabs);
+		sb.append("\t");
+		sb.append(variableName);
+		sb.append(" = ");
+		sb.append(trueValue);
+		sb.append(";\n");
+		sb.append(tabs);
+		sb.append("}\n");
+
+		String newJavaTermContent = StringUtil.replace(
+			javaTermContent, booleanStatement, sb.toString());
+
+		_classContent = StringUtil.replace(
+			_classContent, javaTermContent, newJavaTermContent);
+	}
+
+	private void _formatBooleanStatements(JavaTerm javaTerm) {
+		String javaTermContent = javaTerm.getContent();
+
+		Matcher matcher1 = _booleanPattern.matcher(javaTermContent);
+
+		while (matcher1.find()) {
+			String booleanStatement = matcher1.group();
+
+			if (booleanStatement.contains("\t//") ||
+				booleanStatement.contains(" {\n")) {
+
+				continue;
+			}
+
+			String criteria = matcher1.group(3);
+
+			String[] ternaryOperatorParts = _getTernaryOperatorParts(criteria);
+
+			if (ternaryOperatorParts != null) {
+				String falseValue = ternaryOperatorParts[2];
+				String ifCondition = ternaryOperatorParts[0];
+				String trueValue = ternaryOperatorParts[1];
+
+				_formatBooleanStatement(
+					javaTermContent, booleanStatement, matcher1.group(1),
+					matcher1.group(2), ifCondition, trueValue, falseValue);
+
+				return;
+			}
+
+			String strippedCriteria = _stripQuotesAndMethodParameters(criteria);
+
+			if ((_javaSourceProcessor.getLevel(strippedCriteria) == 0) &&
+				(strippedCriteria.contains("|") ||
+				 strippedCriteria.contains("&") ||
+				 strippedCriteria.contains("^"))) {
+
+				_formatBooleanStatement(
+					javaTermContent, booleanStatement, matcher1.group(1),
+					matcher1.group(2), criteria, "true", "false");
+
+				return;
+			}
+
+			Matcher matcher2 = _relationalOperatorPattern.matcher(
+				strippedCriteria);
+
+			if (matcher2.find()) {
+				_formatBooleanStatement(
+					javaTermContent, booleanStatement, matcher1.group(1),
+					matcher1.group(2), criteria, "true", "false");
+
+				return;
+			}
+		}
+	}
+
 	private void _formatReturnStatement(
 		String javaTermContent, String returnStatement, String tabs,
 		String ifCondition, String trueValue, String falseValue) {
@@ -1582,9 +1759,8 @@ public class JavaClass {
 		String javaTermContent = javaTerm.getContent();
 		String returnType = javaTerm.getReturnType();
 
-		Matcher matcher1 = _returnPattern1.matcher(javaTermContent);
+		Matcher matcher1 = _returnPattern.matcher(javaTermContent);
 
-		outerLoop:
 		while (matcher1.find()) {
 			String returnStatement = matcher1.group();
 
@@ -1594,77 +1770,139 @@ public class JavaClass {
 				continue;
 			}
 
-			if (returnType.equals("boolean")) {
-				if (returnStatement.contains("|\n") ||
-					returnStatement.contains("&\n")) {
+			String[] ternaryOperatorParts = _getTernaryOperatorParts(
+				matcher1.group(2));
 
-					_formatReturnStatement(
-						javaTermContent, returnStatement, matcher1.group(1),
-						matcher1.group(2), "true", "false");
-
-					return;
-				}
-
-				Matcher matcher2 = _returnPattern2.matcher(returnStatement);
-
-				if (matcher2.find() &&
-					!ToolsUtil.isInsideQuotes(
-						returnStatement, matcher2.start(1))) {
-
-					_formatReturnStatement(
-						javaTermContent, returnStatement, matcher1.group(1),
-						matcher1.group(2), "true", "false");
-
-					return;
-				}
-			}
-
-			String match = matcher1.group(2);
-
-			int x = -1;
-
-			while (true) {
-				x = match.indexOf(StringPool.QUESTION, x + 1);
-
-				if (x == -1) {
-					continue outerLoop;
-				}
-
-				if (!ToolsUtil.isInsideQuotes(match, x) &&
-					_javaSourceProcessor.getLevel(
-						match.substring(0, x), "<", ">") == 0) {
-
-					break;
-				}
-			}
-
-			int y = x;
-
-			while (true) {
-				y = match.indexOf(StringPool.COLON, y + 1);
-
-				if (y == -1) {
-					continue outerLoop;
-				}
-
-				if (!ToolsUtil.isInsideQuotes(match, y)) {
-					break;
-				}
-			}
-
-			String falseValue = StringUtil.trim(match.substring(y + 1));
-			String ifCondition = StringUtil.trim(match.substring(0, x));
-			String trueValue = StringUtil.trim(match.substring(x + 1, y));
-
-			if ((_javaSourceProcessor.getLevel(falseValue) == 0) &&
-				(_javaSourceProcessor.getLevel(ifCondition) == 0) &&
-				(_javaSourceProcessor.getLevel(trueValue) == 0)) {
+			if (ternaryOperatorParts != null) {
+				String falseValue = ternaryOperatorParts[2];
+				String ifCondition = ternaryOperatorParts[0];
+				String trueValue = ternaryOperatorParts[1];
 
 				_formatReturnStatement(
 					javaTermContent, returnStatement, matcher1.group(1),
 					ifCondition, trueValue, falseValue);
+
+				return;
+			}
+
+			if (!returnType.equals("boolean")) {
+				continue;
+			}
+
+			String strippedReturnStatement = _javaSourceProcessor.stripQuotes(
+				returnStatement);
+
+			if (strippedReturnStatement.contains("|") ||
+				strippedReturnStatement.contains("&") ||
+				strippedReturnStatement.contains("^")) {
+
+				_formatReturnStatement(
+					javaTermContent, returnStatement, matcher1.group(1),
+					matcher1.group(2), "true", "false");
+
+				return;
+			}
+
+			Matcher matcher2 = _relationalOperatorPattern.matcher(
+				returnStatement);
+
+			if (matcher2.find() &&
+				!ToolsUtil.isInsideQuotes(returnStatement, matcher2.start(1))) {
+
+				_formatReturnStatement(
+					javaTermContent, returnStatement, matcher1.group(1),
+					matcher1.group(2), "true", "false");
+
+				return;
 			}
 		}
+	}
+
+	private String[] _getTernaryOperatorParts(String operator) {
+		int x = -1;
+
+		while (true) {
+			x = operator.indexOf(StringPool.QUESTION, x + 1);
+
+			if (x == -1) {
+				return null;
+			}
+
+			if (!ToolsUtil.isInsideQuotes(operator, x) &&
+				_javaSourceProcessor.getLevel(
+					operator.substring(0, x), "<", ">") == 0) {
+
+				break;
+			}
+		}
+
+		int y = x;
+
+		while (true) {
+			y = operator.indexOf(StringPool.COLON, y + 1);
+
+			if (y == -1) {
+				return null;
+			}
+
+			if (!ToolsUtil.isInsideQuotes(operator, y)) {
+				break;
+			}
+		}
+
+		String falseValue = StringUtil.trim(operator.substring(y + 1));
+		String ifCondition = StringUtil.trim(operator.substring(0, x));
+		String trueValue = StringUtil.trim(operator.substring(x + 1, y));
+
+		if ((_javaSourceProcessor.getLevel(falseValue) == 0) &&
+			(_javaSourceProcessor.getLevel(ifCondition) == 0) &&
+			(_javaSourceProcessor.getLevel(trueValue) == 0)) {
+
+			return new String[] {ifCondition, trueValue, falseValue};
+		}
+
+		return null;
+	}
+
+	private String _stripQuotesAndMethodParameters(String s) {
+		s = _javaSourceProcessor.stripQuotes(s);
+
+		outerLoop:
+		while (true) {
+			int start = -1;
+
+			for (int i = 1; i < s.length(); i++) {
+				char c1 = s.charAt(i);
+
+				if (start == -1) {
+					if (c1 == CharPool.OPEN_PARENTHESIS) {
+						char c2 = s.charAt(i - 1);
+
+						if (Character.isLetterOrDigit(c2)) {
+							start = i;
+						}
+					}
+
+					continue;
+				}
+
+				if (c1 != CharPool.CLOSE_PARENTHESIS) {
+					continue;
+				}
+
+				String part = s.substring(start, i + 1);
+
+				if (_javaSourceProcessor.getLevel(part) == 0) {
+					s = StringUtil.replace(s, part, StringPool.BLANK, start);
+
+					continue outerLoop;
+				}
+			}
+
+			break;
+		}
+
+		return s;
 	}
 
 	private static final String _ACCESS_MODIFIER_PRIVATE = "private";
@@ -1684,13 +1922,14 @@ public class JavaClass {
 		MapUtil.fromArray(
 			new String[] {
 				"boolean", "false", "char", "'\\\\0'", "byte", "0", "double",
-				"0\\.0d", "float", "0\\.0f", "int", "0", "long", "0L", "short",
-				"0"
+				"0\\.0", "float", "0\\.0", "int", "0", "long", "0", "short", "0"
 			});
 	private static final List<String> _underscoreNotAllowedMethodNames =
 		ListUtil.fromArray(new String[] {"readObject", "writeObject"});
 
 	private final String _absolutePath;
+	private final Pattern _booleanPattern = Pattern.compile(
+		"\n(\t+)boolean (\\w+) =(.*?);\n", Pattern.DOTALL);
 	private final Pattern _camelCasePattern = Pattern.compile(
 		"([a-z])([A-Z0-9])");
 	private final Pattern _chainingPattern = Pattern.compile(
@@ -1699,6 +1938,7 @@ public class JavaClass {
 	private final Pattern _classPattern = Pattern.compile(
 		"(private|protected|public) ((abstract|static) )*" +
 			"(class|enum|interface) ([\\s\\S]*?) \\{\n");
+	private String _cleanUpMethodContent;
 	private int _constructorCount;
 	private final String _content;
 	private final Pattern _enumTypePattern = Pattern.compile(
@@ -1716,10 +1956,10 @@ public class JavaClass {
 	private final String _name;
 	private final JavaClass _outerClass;
 	private String _packagePath;
-	private final Pattern _returnPattern1 = Pattern.compile(
-		"\n(\t+)return (.*?);\n", Pattern.DOTALL);
-	private final Pattern _returnPattern2 = Pattern.compile(
+	private final Pattern _relationalOperatorPattern = Pattern.compile(
 		".* (==|!=|<|>|>=|<=)[ \n].*");
+	private final Pattern _returnPattern = Pattern.compile(
+		"\n(\t+)return (.*?);\n", Pattern.DOTALL);
 	private final Pattern _variableNameStartingWithUpperCasePattern =
 		Pattern.compile("\t[\\w\\s<>,]+ ([A-Z]\\w+) =");
 

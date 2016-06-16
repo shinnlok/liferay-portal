@@ -1,4 +1,4 @@
-define("frontend-js-spa-web@1.0.6/metal/src/string/string", ['exports'], function (exports) {
+define("frontend-js-spa-web@1.0.8/metal/src/string/string", ['exports'], function (exports) {
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
@@ -18,6 +18,10 @@ define("frontend-js-spa-web@1.0.6/metal/src/string/string", ['exports'], functio
 
 		string.collapseBreakingSpaces = function collapseBreakingSpaces(str) {
 			return str.replace(/[\t\r\n ]+/g, ' ').replace(/^[\t\r\n ]+|[\t\r\n ]+$/g, '');
+		};
+
+		string.escapeRegex = function escapeRegex(str) {
+			return String(str).replace(/([-()\[\]{}+?*.$\^|,:#<!\\])/g, '\\$1').replace(/\x08/g, '\\x08');
 		};
 
 		string.getRandomString = function getRandomString() {

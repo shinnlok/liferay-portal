@@ -19,6 +19,7 @@
 <%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
 
 <%@ taglib uri="http://liferay.com/tld/aui" prefix="aui" %><%@
+taglib uri="http://liferay.com/tld/frontend" prefix="liferay-frontend" %><%@
 taglib uri="http://liferay.com/tld/portlet" prefix="liferay-portlet" %><%@
 taglib uri="http://liferay.com/tld/security" prefix="liferay-security" %><%@
 taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %><%@
@@ -37,6 +38,7 @@ page import="com.liferay.asset.kernel.service.AssetEntryServiceUtil" %><%@
 page import="com.liferay.asset.kernel.service.AssetVocabularyLocalServiceUtil" %><%@
 page import="com.liferay.asset.kernel.service.persistence.AssetEntryQuery" %><%@
 page import="com.liferay.blogs.kernel.model.BlogsEntry" %><%@
+page import="com.liferay.document.library.display.context.DLMimeTypeDisplayContext" %><%@
 page import="com.liferay.document.library.kernel.exception.DuplicateFileException" %><%@
 page import="com.liferay.document.library.kernel.exception.FileNameException" %><%@
 page import="com.liferay.document.library.kernel.exception.FileSizeException" %><%@
@@ -47,7 +49,6 @@ page import="com.liferay.knowledge.base.configuration.KBGroupServiceConfiguratio
 page import="com.liferay.knowledge.base.constants.KBActionKeys" %><%@
 page import="com.liferay.knowledge.base.constants.KBArticleConstants" %><%@
 page import="com.liferay.knowledge.base.constants.KBCommentConstants" %><%@
-page import="com.liferay.knowledge.base.constants.KBConstants" %><%@
 page import="com.liferay.knowledge.base.constants.KBFolderConstants" %><%@
 page import="com.liferay.knowledge.base.constants.KBPortletKeys" %><%@
 page import="com.liferay.knowledge.base.exception.DuplicateKBFolderNameException" %><%@
@@ -73,6 +74,7 @@ page import="com.liferay.knowledge.base.model.KBTemplateSearchDisplay" %><%@
 page import="com.liferay.knowledge.base.service.KBArticleLocalServiceUtil" %><%@
 page import="com.liferay.knowledge.base.service.KBArticleServiceUtil" %><%@
 page import="com.liferay.knowledge.base.service.KBCommentLocalServiceUtil" %><%@
+page import="com.liferay.knowledge.base.service.KBCommentServiceUtil" %><%@
 page import="com.liferay.knowledge.base.service.KBFolderLocalServiceUtil" %><%@
 page import="com.liferay.knowledge.base.service.KBFolderServiceUtil" %><%@
 page import="com.liferay.knowledge.base.service.KBTemplateServiceUtil" %><%@
@@ -86,6 +88,9 @@ page import="com.liferay.knowledge.base.service.permission.SuggestionPermission"
 page import="com.liferay.knowledge.base.service.util.AdminUtil" %><%@
 page import="com.liferay.knowledge.base.util.KnowledgeBaseUtil" %><%@
 page import="com.liferay.knowledge.base.util.comparator.KBArticlePriorityComparator" %><%@
+page import="com.liferay.knowledge.base.util.comparator.KBObjectsTitleComparator" %><%@
+page import="com.liferay.knowledge.base.web.application.dao.search.KBCommentResultRowSplitter" %><%@
+page import="com.liferay.knowledge.base.web.application.dao.search.KBResultRowSplitter" %><%@
 page import="com.liferay.knowledge.base.web.configuration.KBArticlePortletInstanceConfiguration" %><%@
 page import="com.liferay.knowledge.base.web.configuration.KBDisplayPortletInstanceConfiguration" %><%@
 page import="com.liferay.knowledge.base.web.configuration.KBSearchPortletInstanceConfiguration" %><%@
@@ -94,19 +99,20 @@ page import="com.liferay.knowledge.base.web.constants.KBWebKeys" %><%@
 page import="com.liferay.knowledge.base.web.display.context.KBNavigationDisplayContext" %><%@
 page import="com.liferay.knowledge.base.web.display.context.KBSuggestionListDisplayContext" %><%@
 page import="com.liferay.knowledge.base.web.display.context.util.KBArticleURLHelper" %><%@
-page import="com.liferay.knowledge.base.web.search.KBArticleDisplayTerms" %><%@
+page import="com.liferay.knowledge.base.web.search.EntriesChecker" %><%@
 page import="com.liferay.knowledge.base.web.search.KBArticleSearch" %><%@
-page import="com.liferay.knowledge.base.web.search.KBArticleSearchTerms" %><%@
-page import="com.liferay.knowledge.base.web.search.KBTemplateDisplayTerms" %><%@
+page import="com.liferay.knowledge.base.web.search.KBCommentsChecker" %><%@
 page import="com.liferay.knowledge.base.web.search.KBTemplateSearch" %><%@
-page import="com.liferay.knowledge.base.web.search.KBTemplateSearchTerms" %><%@
 page import="com.liferay.knowledge.base.web.util.KBArticleAssetEntriesUtil" %><%@
 page import="com.liferay.message.boards.kernel.model.MBMessage" %><%@
+page import="com.liferay.portal.configuration.metatype.util.ParameterMapUtil" %><%@
 page import="com.liferay.portal.kernel.bean.BeanParamUtil" %><%@
 page import="com.liferay.portal.kernel.bean.BeanPropertiesUtil" %><%@
 page import="com.liferay.portal.kernel.dao.orm.QueryUtil" %><%@
 page import="com.liferay.portal.kernel.dao.search.RowChecker" %><%@
+page import="com.liferay.portal.kernel.dao.search.SearchContainer" %><%@
 page import="com.liferay.portal.kernel.exception.NoSuchSubscriptionException" %><%@
+page import="com.liferay.portal.kernel.exception.PortalException" %><%@
 page import="com.liferay.portal.kernel.language.LanguageUtil" %><%@
 page import="com.liferay.portal.kernel.language.UnicodeLanguageUtil" %><%@
 page import="com.liferay.portal.kernel.model.ModelHintsUtil" %><%@
@@ -120,6 +126,7 @@ page import="com.liferay.portal.kernel.portlet.PortalPreferences" %><%@
 page import="com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil" %><%@
 page import="com.liferay.portal.kernel.portlet.PortletProvider" %><%@
 page import="com.liferay.portal.kernel.portlet.PortletProviderUtil" %><%@
+page import="com.liferay.portal.kernel.portlet.PortletURLUtil" %><%@
 page import="com.liferay.portal.kernel.repository.model.FileEntry" %><%@
 page import="com.liferay.portal.kernel.search.Document" %><%@
 page import="com.liferay.portal.kernel.search.Field" %><%@
@@ -128,6 +135,7 @@ page import="com.liferay.portal.kernel.search.Indexer" %><%@
 page import="com.liferay.portal.kernel.search.IndexerRegistryUtil" %><%@
 page import="com.liferay.portal.kernel.search.SearchContext" %><%@
 page import="com.liferay.portal.kernel.search.SearchContextFactory" %><%@
+page import="com.liferay.portal.kernel.security.permission.ActionKeys" %><%@
 page import="com.liferay.portal.kernel.service.ClassNameLocalServiceUtil" %><%@
 page import="com.liferay.portal.kernel.service.PortletLocalServiceUtil" %><%@
 page import="com.liferay.portal.kernel.service.ServiceContext" %><%@
@@ -136,8 +144,8 @@ page import="com.liferay.portal.kernel.service.TicketLocalServiceUtil" %><%@
 page import="com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalServiceUtil" %><%@
 page import="com.liferay.portal.kernel.service.permission.GroupPermissionUtil" %><%@
 page import="com.liferay.portal.kernel.service.permission.PortletPermissionUtil" %><%@
+page import="com.liferay.portal.kernel.servlet.HttpHeaders" %><%@
 page import="com.liferay.portal.kernel.servlet.SessionMessages" %><%@
-page import="com.liferay.portal.kernel.settings.GroupServiceSettingsLocator" %><%@
 page import="com.liferay.portal.kernel.upload.UploadRequestSizeException" %><%@
 page import="com.liferay.portal.kernel.util.ArrayUtil" %><%@
 page import="com.liferay.portal.kernel.util.Constants" %><%@
@@ -145,6 +153,7 @@ page import="com.liferay.portal.kernel.util.FastDateFormatConstants" %><%@
 page import="com.liferay.portal.kernel.util.FastDateFormatFactoryUtil" %><%@
 page import="com.liferay.portal.kernel.util.GetterUtil" %><%@
 page import="com.liferay.portal.kernel.util.HtmlUtil" %><%@
+page import="com.liferay.portal.kernel.util.ListUtil" %><%@
 page import="com.liferay.portal.kernel.util.OrderByComparator" %><%@
 page import="com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil" %><%@
 page import="com.liferay.portal.kernel.util.ParamUtil" %><%@
@@ -158,11 +167,11 @@ page import="com.liferay.portal.kernel.util.StringUtil" %><%@
 page import="com.liferay.portal.kernel.util.TextFormatter" %><%@
 page import="com.liferay.portal.kernel.util.Time" %><%@
 page import="com.liferay.portal.kernel.util.Tuple" %><%@
-page import="com.liferay.portal.kernel.util.UnicodeFormatter" %><%@
 page import="com.liferay.portal.kernel.util.Validator" %><%@
+page import="com.liferay.portal.kernel.util.WebKeys" %><%@
 page import="com.liferay.portal.kernel.workflow.WorkflowConstants" %><%@
-page import="com.liferay.portlet.configuration.kernel.util.PortletConfigurationApplicationType" %><%@
-page import="com.liferay.taglib.search.DateSearchEntry" %><%@
+page import="com.liferay.ratings.kernel.RatingsType" %><%@
+page import="com.liferay.ratings.kernel.definition.PortletRatingsDefinitionUtil" %><%@
 page import="com.liferay.taglib.search.ResultRow" %><%@
 page import="com.liferay.wiki.model.WikiPage" %>
 
@@ -171,10 +180,10 @@ page import="com.liferay.wiki.model.WikiPage" %>
 <%@ page import="java.text.Format" %>
 
 <%@ page import="java.util.ArrayList" %><%@
-page import="java.util.Arrays" %><%@
 page import="java.util.Collections" %><%@
 page import="java.util.Date" %><%@
 page import="java.util.HashMap" %><%@
+page import="java.util.LinkedHashMap" %><%@
 page import="java.util.List" %><%@
 page import="java.util.Map" %><%@
 page import="java.util.Objects" %><%@
@@ -185,22 +194,20 @@ page import="javax.portlet.PortletRequest" %><%@
 page import="javax.portlet.PortletURL" %><%@
 page import="javax.portlet.WindowState" %>
 
+<liferay-frontend:defineObjects />
+
 <liferay-theme:defineObjects />
 
 <portlet:defineObjects />
 
 <%
-WindowState windowState = renderRequest.getWindowState();
-
-String currentURL = PortalUtil.getCurrentURL(request);
-
 String redirect = ParamUtil.getString(request, "redirect", currentURL);
 
 String rootPortletId = portletDisplay.getRootPortletId();
 
 String templatePath = portletConfig.getInitParameter("template-path");
 
-KBGroupServiceConfiguration kbGroupServiceConfiguration = ConfigurationProviderUtil.getConfiguration(KBGroupServiceConfiguration.class, new GroupServiceSettingsLocator(themeDisplay.getScopeGroupId(), KBConstants.SERVICE_NAME));
+KBGroupServiceConfiguration kbGroupServiceConfiguration = ConfigurationProviderUtil.getGroupConfiguration(KBGroupServiceConfiguration.class, themeDisplay.getScopeGroupId());
 
 KBSectionPortletInstanceConfiguration kbSectionPortletInstanceConfiguration = portletDisplay.getPortletInstanceConfiguration(KBSectionPortletInstanceConfiguration.class);
 

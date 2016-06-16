@@ -42,7 +42,9 @@ import com.liferay.exportimport.resources.importer.portlet.preferences.PortletPr
 import com.liferay.journal.configuration.JournalServiceConfigurationValues;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.model.JournalArticleConstants;
+import com.liferay.journal.model.JournalFolderConstants;
 import com.liferay.journal.service.JournalArticleLocalService;
+import com.liferay.journal.service.JournalFolderLocalService;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
@@ -94,6 +96,7 @@ import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReader;
 import com.liferay.portal.search.index.IndexStatusManager;
+import com.liferay.portlet.display.template.PortletDisplayTemplate;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -132,6 +135,7 @@ public class FileSystemImporter extends BaseImporter {
 		DLFolderLocalService dlFolderLocalService,
 		IndexStatusManager indexStatusManager, IndexerRegistry indexerRegistry,
 		JournalArticleLocalService journalArticleLocalService,
+		JournalFolderLocalService journalFolderLocalService,
 		LayoutLocalService layoutLocalService,
 		LayoutPrototypeLocalService layoutPrototypeLocalService,
 		LayoutSetLocalService layoutSetLocalService,
@@ -139,6 +143,7 @@ public class FileSystemImporter extends BaseImporter {
 		MimeTypes mimeTypes, Portal portal,
 		PortletPreferencesFactory portletPreferencesFactory,
 		PortletPreferencesLocalService portletPreferencesLocalService,
+		PortletPreferencesTranslator portletPreferencesTranslator,
 		Map<String, PortletPreferencesTranslator> portletPreferencesTranslators,
 		RepositoryLocalService repositoryLocalService, SAXReader saxReader,
 		ThemeLocalService themeLocalService) {
@@ -155,6 +160,7 @@ public class FileSystemImporter extends BaseImporter {
 		this.indexStatusManager = indexStatusManager;
 		this.indexerRegistry = indexerRegistry;
 		this.journalArticleLocalService = journalArticleLocalService;
+		this.journalFolderLocalService = journalFolderLocalService;
 		this.layoutLocalService = layoutLocalService;
 		this.layoutPrototypeLocalService = layoutPrototypeLocalService;
 		this.layoutSetLocalService = layoutSetLocalService;
@@ -163,7 +169,9 @@ public class FileSystemImporter extends BaseImporter {
 		this.portal = portal;
 		this.portletPreferencesFactory = portletPreferencesFactory;
 		this.portletPreferencesLocalService = portletPreferencesLocalService;
-		this.portletPreferencesTranslators = portletPreferencesTranslators;
+		this.portletPreferencesTranslators =
+			new DefaultedPortletPreferencesTranslatorMap(
+				portletPreferencesTranslators, portletPreferencesTranslator);
 		this.repositoryLocalService = repositoryLocalService;
 		this.saxReader = saxReader;
 		this.themeLocalService = themeLocalService;
@@ -212,7 +220,7 @@ public class FileSystemImporter extends BaseImporter {
 			if (!updateModeEnabled || (ddmTemplate == null)) {
 				ddmTemplateLocalService.addTemplate(
 					userId, groupId, classNameId, 0,
-					portal.getClassNameId(JournalArticle.class),
+					portal.getClassNameId(PortletDisplayTemplate.class),
 					getKey(fileName), getMap(name), null,
 					DDMTemplateConstants.TEMPLATE_TYPE_DISPLAY,
 					StringPool.BLANK, getDDMTemplateLanguage(file.getName()),
@@ -712,7 +720,8 @@ public class FileSystemImporter extends BaseImporter {
 
 		addJournalArticles(
 			ddmStructureKey, ddmTemplate.getTemplateKey(),
-			_JOURNAL_ARTICLES_DIR_NAME + fileName);
+			_JOURNAL_ARTICLES_DIR_NAME + fileName,
+			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID);
 	}
 
 	protected void addDLFileEntries(String dirName) throws Exception {
@@ -846,7 +855,8 @@ public class FileSystemImporter extends BaseImporter {
 	}
 
 	protected void addJournalArticles(
-			String ddmStructureKey, String ddmTemplateKey, String dirName)
+			String ddmStructureKey, String ddmTemplateKey, String dirName,
+			long folderId)
 		throws Exception {
 
 		File dir = new File(_resourcesDir, dirName);
@@ -865,7 +875,7 @@ public class FileSystemImporter extends BaseImporter {
 					new FileInputStream(file));
 
 				addJournalArticles(
-					ddmStructureKey, ddmTemplateKey, file.getName(),
+					ddmStructureKey, ddmTemplateKey, file.getName(), folderId,
 					inputStream);
 			}
 			finally {
@@ -878,7 +888,7 @@ public class FileSystemImporter extends BaseImporter {
 
 	protected void addJournalArticles(
 			String ddmStructureKey, String ddmTemplateKey, String fileName,
-			InputStream inputStream)
+			long folderId, InputStream inputStream)
 		throws Exception {
 
 		String title = FileUtil.stripExtension(fileName);
@@ -936,7 +946,7 @@ public class FileSystemImporter extends BaseImporter {
 		try {
 			if (journalArticle == null) {
 				journalArticle = journalArticleLocalService.addArticle(
-					userId, groupId, 0, 0, 0, journalArticleId, false,
+					userId, groupId, folderId, 0, 0, journalArticleId, false,
 					JournalArticleConstants.VERSION_DEFAULT,
 					getMap(articleDefaultLocale, title), descriptionMap,
 					content, ddmStructureKey, ddmTemplateKey, StringPool.BLANK,
@@ -947,7 +957,7 @@ public class FileSystemImporter extends BaseImporter {
 			}
 			else {
 				journalArticle = journalArticleLocalService.updateArticle(
-					userId, groupId, 0, journalArticleId,
+					userId, groupId, folderId, journalArticleId,
 					journalArticle.getVersion(),
 					getMap(articleDefaultLocale, title), descriptionMap,
 					content, ddmStructureKey, ddmTemplateKey, StringPool.BLANK,
@@ -1706,18 +1716,22 @@ public class FileSystemImporter extends BaseImporter {
 	protected void resetLayoutColumns(Layout layout) {
 		UnicodeProperties typeSettings = layout.getTypeSettingsProperties();
 
-		int count = 1;
+		Set<Map.Entry<String, String>> set = typeSettings.entrySet();
 
-		do {
-			String portletIds = typeSettings.remove("column-" + count++);
+		Iterator<Map.Entry<String, String>> iterator = set.iterator();
 
-			if (Validator.isNull(portletIds)) {
-				break;
+		while (iterator.hasNext()) {
+			Map.Entry<String, String> entry = iterator.next();
+
+			String key = entry.getKey();
+
+			if (!key.startsWith("column-")) {
+				continue;
 			}
 
-			String[] portletIdsArray = StringUtil.split(portletIds);
+			String[] portletIds = StringUtil.split(entry.getValue());
 
-			for (String portletId : portletIdsArray) {
+			for (String portletId : portletIds) {
 				try {
 					portletPreferencesLocalService.deletePortletPreferences(
 						PortletKeys.PREFS_OWNER_ID_DEFAULT,
@@ -1733,8 +1747,9 @@ public class FileSystemImporter extends BaseImporter {
 					}
 				}
 			}
+
+			iterator.remove();
 		}
-		while (true);
 
 		layout.setTypeSettingsProperties(typeSettings);
 
@@ -1927,6 +1942,7 @@ public class FileSystemImporter extends BaseImporter {
 	protected final IndexerRegistry indexerRegistry;
 	protected final IndexStatusManager indexStatusManager;
 	protected final JournalArticleLocalService journalArticleLocalService;
+	protected final JournalFolderLocalService journalFolderLocalService;
 	protected final LayoutLocalService layoutLocalService;
 	protected final LayoutPrototypeLocalService layoutPrototypeLocalService;
 	protected final LayoutSetLocalService layoutSetLocalService;
@@ -2008,5 +2024,34 @@ public class FileSystemImporter extends BaseImporter {
 		"\\[\\$FILE=([^\\$]+)\\$\\]");
 	private final Map<String, Set<Long>> _primaryKeys = new HashMap<>();
 	private File _resourcesDir;
+
+	private class DefaultedPortletPreferencesTranslatorMap
+		extends HashMap<String, PortletPreferencesTranslator> {
+
+		public DefaultedPortletPreferencesTranslatorMap(
+			Map<String, PortletPreferencesTranslator>
+				portletPreferencesTranslators,
+			PortletPreferencesTranslator portletPreferencesTranslator) {
+
+			super(portletPreferencesTranslators);
+
+			_portletPreferencesTranslator = portletPreferencesTranslator;
+		}
+
+		@Override
+		public PortletPreferencesTranslator get(Object key) {
+			PortletPreferencesTranslator value = super.get(key);
+
+			if (value == null) {
+				value = _portletPreferencesTranslator;
+			}
+
+			return value;
+		}
+
+		private final PortletPreferencesTranslator
+			_portletPreferencesTranslator;
+
+	}
 
 }

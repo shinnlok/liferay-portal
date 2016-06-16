@@ -22,6 +22,7 @@ import com.liferay.knowledge.base.exception.KBTemplateContentException;
 import com.liferay.knowledge.base.exception.KBTemplateTitleException;
 import com.liferay.knowledge.base.exception.NoSuchArticleException;
 import com.liferay.knowledge.base.exception.NoSuchCommentException;
+import com.liferay.knowledge.base.exception.NoSuchFolderException;
 import com.liferay.knowledge.base.exception.NoSuchTemplateException;
 import com.liferay.knowledge.base.model.KBArticle;
 import com.liferay.knowledge.base.model.KBFolder;
@@ -52,19 +53,28 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import java.io.IOException;
 import java.io.InputStream;
 
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.Portlet;
+import javax.portlet.PortletContext;
 import javax.portlet.PortletException;
 import javax.portlet.PortletRequest;
+import javax.portlet.PortletRequestDispatcher;
+import javax.portlet.PortletSession;
 import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
+import javax.portlet.ResourceRequest;
+import javax.portlet.ResourceResponse;
 import javax.portlet.WindowStateException;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -80,7 +90,8 @@ import org.osgi.service.component.annotations.Reference;
 		"com.liferay.portlet.add-default-resource=true",
 		"com.liferay.portlet.css-class-wrapper=knowledge-base-portlet knowledge-base-portlet-admin",
 		"com.liferay.portlet.display-category=category.hidden",
-		"com.liferay.portlet.header-portlet-css=/admin/css/common.css,/admin/css/main.css",
+		"com.liferay.portlet.header-portlet-css=/admin/css/common.css",
+		"com.liferay.portlet.header-portlet-css=/admin/css/main.css",
 		"com.liferay.portlet.icon=/icons/admin.png",
 		"com.liferay.portlet.preferences-unique-per-layout=false",
 		"com.liferay.portlet.scopeable=true",
@@ -89,6 +100,7 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.expiration-cache=0",
 		"javax.portlet.init-param.always-send-redirect=true",
 		"javax.portlet.init-param.copy-request-parameters=true",
+		"javax.portlet.init-param.portlet-title-based-navigation=true",
 		"javax.portlet.init-param.template-path=/admin/",
 		"javax.portlet.init-param.view-template=/admin/view.jsp",
 		"javax.portlet.name=" + KBPortletKeys.KNOWLEDGE_BASE_ADMIN,
@@ -114,6 +126,27 @@ public class AdminPortlet extends BaseKBPortlet {
 
 		kbArticleService.deleteKBArticles(
 			themeDisplay.getScopeGroupId(), resourcePrimKeys);
+	}
+
+	public void deleteKBArticlesAndFolders(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws PortalException {
+
+		long[] deleteKBArticleResourcePrimKeys = ParamUtil.getLongValues(
+			actionRequest, "rowIdsKBArticle");
+
+		for (long deleteKBArticleResourcePrimKey :
+				deleteKBArticleResourcePrimKeys) {
+
+			kbArticleService.deleteKBArticle(deleteKBArticleResourcePrimKey);
+		}
+
+		long[] deleteKBFolderIds = ParamUtil.getLongValues(
+			actionRequest, "rowIdsKBFolder");
+
+		for (long deleteKBFolderId : deleteKBFolderIds) {
+			kbFolderService.deleteKBFolder(deleteKBFolderId);
+		}
 	}
 
 	public void deleteKBFolder(
@@ -206,9 +239,9 @@ public class AdminPortlet extends BaseKBPortlet {
 		throws IOException, PortletException {
 
 		try {
-			int status = WorkflowConstants.STATUS_ANY;
-
-			renderRequest.setAttribute(KBWebKeys.KNOWLEDGE_BASE_STATUS, status);
+			renderRequest.setAttribute(
+				KBWebKeys.DL_MIME_TYPE_DISPLAY_CONTEXT,
+				dlMimeTypeDisplayContext);
 
 			KBArticle kbArticle = null;
 
@@ -219,6 +252,7 @@ public class AdminPortlet extends BaseKBPortlet {
 				renderRequest, "resourceClassNameId", kbArticleClassNameId);
 			long resourcePrimKey = ParamUtil.getLong(
 				renderRequest, "resourcePrimKey");
+			int status = WorkflowConstants.STATUS_ANY;
 
 			if ((resourcePrimKey > 0) &&
 				(resourceClassNameId == kbArticleClassNameId)) {
@@ -229,6 +263,34 @@ public class AdminPortlet extends BaseKBPortlet {
 
 			renderRequest.setAttribute(
 				KBWebKeys.KNOWLEDGE_BASE_KB_ARTICLE, kbArticle);
+
+			KBArticle parentKBArticle = null;
+			KBFolder parentKBFolder = null;
+
+			long kbFolderClassNameId = PortalUtil.getClassNameId(
+				KBFolderConstants.getClassName());
+
+			long parentResourceClassNameId = ParamUtil.getLong(
+				renderRequest, "parentResourceClassNameId",
+				kbFolderClassNameId);
+			long parentResourcePrimKey = ParamUtil.getLong(
+				renderRequest, "parentResourcePrimKey");
+
+			if (parentResourcePrimKey > 0) {
+				if (parentResourceClassNameId == kbFolderClassNameId) {
+					parentKBFolder = kbFolderService.getKBFolder(
+						parentResourcePrimKey);
+				}
+				else {
+					parentKBArticle = kbArticleService.getLatestKBArticle(
+						parentResourcePrimKey, status);
+				}
+			}
+
+			renderRequest.setAttribute(
+				KBWebKeys.KNOWLEDGE_BASE_PARENT_KB_ARTICLE, parentKBArticle);
+			renderRequest.setAttribute(
+				KBWebKeys.KNOWLEDGE_BASE_PARENT_KB_FOLDER, parentKBFolder);
 
 			KBTemplate kbTemplate = null;
 
@@ -241,9 +303,12 @@ public class AdminPortlet extends BaseKBPortlet {
 
 			renderRequest.setAttribute(
 				KBWebKeys.KNOWLEDGE_BASE_KB_TEMPLATE, kbTemplate);
+
+			renderRequest.setAttribute(KBWebKeys.KNOWLEDGE_BASE_STATUS, status);
 		}
 		catch (Exception e) {
 			if (e instanceof NoSuchArticleException ||
+				e instanceof NoSuchFolderException ||
 				e instanceof NoSuchTemplateException ||
 				e instanceof PrincipalException) {
 
@@ -255,6 +320,38 @@ public class AdminPortlet extends BaseKBPortlet {
 		}
 
 		super.render(renderRequest, renderResponse);
+	}
+
+	public void serveResource(
+			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
+		throws IOException, PortletException {
+
+		try {
+			HttpServletRequest request = PortalUtil.getHttpServletRequest(
+				resourceRequest);
+
+			List<KBArticle> kbArticles = getKBArticles(request);
+
+			resourceRequest.setAttribute(
+				KBWebKeys.KNOWLEDGE_BASE_KB_ARTICLES, kbArticles);
+
+			List<KBFolder> kbFolders = getKBFolders(request);
+
+			resourceRequest.setAttribute(
+				KBWebKeys.KNOWLEDGE_BASE_KB_FOLDERS, kbFolders);
+
+			PortletSession portletSession = resourceRequest.getPortletSession();
+
+			PortletContext portletContext = portletSession.getPortletContext();
+
+			PortletRequestDispatcher portletRequestDispatcher =
+				portletContext.getRequestDispatcher("/admin/info_panel.jsp");
+
+			portletRequestDispatcher.include(resourceRequest, resourceResponse);
+		}
+		catch (Exception e) {
+			throw new PortletException(e);
+		}
 	}
 
 	public void subscribeGroupKBArticles(
@@ -422,6 +519,40 @@ public class AdminPortlet extends BaseKBPortlet {
 		else {
 			super.doDispatch(renderRequest, renderResponse);
 		}
+	}
+
+	protected List<KBArticle> getKBArticles(HttpServletRequest request)
+		throws Exception {
+
+		long[] kbArticleResourcePrimKeys = ParamUtil.getLongValues(
+			request, "rowIdsKBArticle");
+
+		List<KBArticle> kbArticles = new ArrayList<>();
+
+		for (long kbArticleResourcePrimKey : kbArticleResourcePrimKeys) {
+			KBArticle kbArticle = kbArticleService.getLatestKBArticle(
+				kbArticleResourcePrimKey, WorkflowConstants.STATUS_ANY);
+
+			kbArticles.add(kbArticle);
+		}
+
+		return kbArticles;
+	}
+
+	protected List<KBFolder> getKBFolders(HttpServletRequest request)
+		throws Exception {
+
+		long[] kbFolderIds = ParamUtil.getLongValues(request, "rowIdsKBFolder");
+
+		List<KBFolder> kbFolders = new ArrayList<>();
+
+		for (long kbFolderId : kbFolderIds) {
+			KBFolder kbFolder = kbFolderService.getKBFolder(kbFolderId);
+
+			kbFolders.add(kbFolder);
+		}
+
+		return kbFolders;
 	}
 
 	@Override

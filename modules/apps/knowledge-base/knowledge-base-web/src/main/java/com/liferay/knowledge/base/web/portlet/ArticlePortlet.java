@@ -55,7 +55,8 @@ import org.osgi.service.component.annotations.Reference;
 		"com.liferay.portlet.add-default-resource=true",
 		"com.liferay.portlet.css-class-wrapper=knowledge-base-portlet knowledge-base-portlet-article",
 		"com.liferay.portlet.display-category=category.cms",
-		"com.liferay.portlet.header-portlet-css=/admin/css/common.css,/article/css/main.css",
+		"com.liferay.portlet.header-portlet-css=/admin/css/common.css",
+		"com.liferay.portlet.header-portlet-css=/article/css/main.css",
 		"com.liferay.portlet.icon=/icons/article.png",
 		"com.liferay.portlet.instanceable=true",
 		"com.liferay.portlet.scopeable=true",
@@ -82,13 +83,14 @@ public class ArticlePortlet extends BaseKBPortlet {
 		throws IOException, PortletException {
 
 		try {
-			int status = getStatus(renderRequest);
-
-			renderRequest.setAttribute(KBWebKeys.KNOWLEDGE_BASE_STATUS, status);
+			renderRequest.setAttribute(
+				KBWebKeys.DL_MIME_TYPE_DISPLAY_CONTEXT,
+				dlMimeTypeDisplayContext);
 
 			KBArticle kbArticle = null;
 
 			long resourcePrimKey = getResourcePrimKey(renderRequest);
+			int status = getStatus(renderRequest);
 
 			if (resourcePrimKey > 0) {
 				kbArticle = kbArticleService.getLatestKBArticle(
@@ -97,6 +99,8 @@ public class ArticlePortlet extends BaseKBPortlet {
 
 			renderRequest.setAttribute(
 				KBWebKeys.KNOWLEDGE_BASE_KB_ARTICLE, kbArticle);
+
+			renderRequest.setAttribute(KBWebKeys.KNOWLEDGE_BASE_STATUS, status);
 		}
 		catch (Exception e) {
 			if (e instanceof NoSuchArticleException ||
@@ -165,9 +169,7 @@ public class ArticlePortlet extends BaseKBPortlet {
 
 		String mvcPath = ParamUtil.getString(renderRequest, "mvcPath");
 
-		if (((defaultValue == 0) && mvcPath.equals(viewTemplate)) ||
-			mvcPath.equals("/article/select_configuration_object.jsp")) {
-
+		if ((defaultValue == 0) && mvcPath.equals(viewTemplate)) {
 			return 0;
 		}
 

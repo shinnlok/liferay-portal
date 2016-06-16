@@ -1,4 +1,4 @@
-define("frontend-image-editor-capability-resize@1.0.0/ResizeComponent.es", ['exports', 'metal-component/src/Component', 'metal-soy/src/Soy', 'metal/src/core', 'metal-promise/src/promise/Promise', './ResizeComponent.soy', './ResizeControls.soy'], function (exports, _Component2, _Soy, _core, _Promise, _ResizeComponent, _ResizeControls) {
+define("frontend-image-editor-capability-resize@1.0.3/ResizeComponent.es", ['exports', 'metal-component/src/Component', 'metal-soy/src/Soy', 'metal/src/core', 'metal-promise/src/promise/Promise', './ResizeComponent.soy', './ResizeControls.soy'], function (exports, _Component2, _Soy, _core, _Promise, _ResizeComponent, _ResizeControls) {
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
@@ -98,18 +98,20 @@ define("frontend-image-editor-capability-resize@1.0.0/ResizeComponent.es", ['exp
 		};
 
 		ResizeComponent.prototype.syncDimensions = function syncDimensions(event) {
-			if (this.lockProportions) {
-				var newValue = parseInt(event.delegateTarget.value, 10);
+			var newValue = parseInt(event.delegateTarget.value, 10);
 
-				if (event.delegateTarget === this.imageWidthInput_) {
-					this.imageHeight = (newValue / this.imageRatio_).toFixed(1);
-					this.imageWidth = newValue;
+			if (event.delegateTarget === this.imageWidthInput_) {
+				this.imageWidth = newValue;
 
+				if (this.lockProportions) {
+					this.imageHeight = parseInt(newValue / this.imageRatio_, 10);
 					this.imageHeightInput_.value = this.imageHeight;
-				} else {
-					this.imageHeight = newValue;
-					this.imageWidth = (newValue * this.imageRatio_).toFixed(1);
+				}
+			} else {
+				this.imageHeight = newValue;
 
+				if (this.lockProportions) {
+					this.imageWidth = parseInt(newValue * this.imageRatio_, 10);
 					this.imageWidthInput_.value = this.imageWidth;
 				}
 			}

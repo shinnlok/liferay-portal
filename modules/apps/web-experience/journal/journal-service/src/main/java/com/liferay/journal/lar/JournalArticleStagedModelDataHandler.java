@@ -694,7 +694,7 @@ public class JournalArticleStagedModelDataHandler
 				if (existingArticle != null) {
 					existingArticleVersion = fetchExistingArticleVersion(
 						article.getUuid(), portletDataContext.getScopeGroupId(),
-						articleId, article.getVersion());
+						existingArticle.getArticleId(), article.getVersion());
 				}
 
 				if ((existingArticle != null) &&
@@ -739,14 +739,11 @@ public class JournalArticleStagedModelDataHandler
 						article.getSmallImageURL(), smallFile, images,
 						articleURL, serviceContext);
 
-					String existingArticleVersionUuid =
-						existingArticleVersion.getUuid();
+					String articleUuid = article.getUuid();
 					String importedArticleUuid = importedArticle.getUuid();
 
-					if (!existingArticleVersionUuid.equals(
-							importedArticleUuid)) {
-
-						importedArticle.setUuid(existingArticleVersionUuid);
+					if (!articleUuid.equals(importedArticleUuid)) {
+						importedArticle.setUuid(articleUuid);
 
 						_journalArticleLocalService.updateJournalArticle(
 							importedArticle);
@@ -777,6 +774,13 @@ public class JournalArticleStagedModelDataHandler
 				articleIds.put(
 					article.getArticleId(), importedArticle.getArticleId());
 			}
+
+			Map<Long, Long> articlePrimaryKeys =
+				(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
+					JournalArticle.class + ".primaryKey");
+
+			articlePrimaryKeys.put(
+				article.getPrimaryKey(), importedArticle.getPrimaryKey());
 		}
 		finally {
 			if (smallFile != null) {

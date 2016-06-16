@@ -1,6 +1,6 @@
 Bundle-Name: Liferay Portal Cache Ehcache Provider
 Bundle-SymbolicName: com.liferay.portal.cache.ehcache.provider
-Bundle-Version: 2.0.1
+Bundle-Version: 2.0.2
 DynamicImport-Package:\
 	com.liferay.portal.cache.ehcache.cluster,\
 	com.liferay.portal.cache.io
@@ -48,8 +48,8 @@ Import-Package:\
 	*
 Liferay-Releng-Module-Group-Description:
 Liferay-Releng-Module-Group-Title: Cache Engines
--liferay-includeresource:\
-	@ehcache-*.jar!/META-INF/*,\
-	@ehcache-*.jar!/com/*,\
-	@ehcache-*.jar!/net/*,\
-	@ehcache-*.jar!/org/*
+-includeresource:\
+	@ehcache-[0-9]*.jar!/META-INF/*,\
+	@ehcache-[0-9]*.jar!/com/*,\
+	@ehcache-[0-9]*.jar!/net/*,\
+	@ehcache-[0-9]*.jar!/org/*

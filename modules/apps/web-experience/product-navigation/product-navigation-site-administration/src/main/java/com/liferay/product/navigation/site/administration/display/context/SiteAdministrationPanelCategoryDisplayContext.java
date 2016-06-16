@@ -188,7 +188,7 @@ public class SiteAdministrationPanelCategoryDisplayContext {
 			Group liveGroup = StagingUtil.getLiveGroup(group.getGroupId());
 
 			if (liveGroup != null) {
-				_liveGroupURL = _groupURLProvider.getGroupURL(
+				_liveGroupURL = _groupURLProvider.getLiveGroupURL(
 					liveGroup, _portletRequest);
 			}
 		}
@@ -203,13 +203,20 @@ public class SiteAdministrationPanelCategoryDisplayContext {
 
 		_logoURL = StringPool.BLANK;
 
-		Group group = getGroup();
+		Company company = _themeDisplay.getCompany();
 
-		if (group == null) {
-			return _logoURL;
+		if (company.isSiteLogo()) {
+			Group group = getGroup();
+
+			if (group == null) {
+				return _logoURL;
+			}
+
+			_logoURL = group.getLogoURL(_themeDisplay, false);
 		}
-
-		_logoURL = group.getLogoURL(_themeDisplay, false);
+		else {
+			_logoURL = _themeDisplay.getCompanyLogo();
+		}
 
 		return _logoURL;
 	}

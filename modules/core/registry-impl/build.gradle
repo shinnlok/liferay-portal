@@ -5,7 +5,7 @@ import com.liferay.gradle.util.copy.RenameDependencyClosure
 dependencies {
 	provided group: "com.liferay", name: "com.liferay.osgi.service.tracker.collections", version: "2.0.0"
 	provided group: "com.liferay", name: "com.liferay.registry.api", version: "1.0.0"
-	provided group: "org.eclipse.osgi", name: "org.eclipse.osgi", version: "3.10.200-20150904.172142-1"
+	provided group: "com.liferay", name: "org.eclipse.osgi", version: "3.10.200-20150904.172142-1-LIFERAY-CACHED"
 }
 
 deploy {
@@ -13,6 +13,8 @@ deploy {
 }
 
 deployDependencies {
+	boolean keepDependencyVersions = Boolean.getBoolean("deploy.dependencies.keep.versions")
+
 	ext {
 		autoClean = false
 	}
@@ -25,7 +27,9 @@ deployDependencies {
 		liferay.deployDir
 	}
 
-	rename new RenameDependencyClosure(project, configurations.provided.name)
+	if (!keepDependencyVersions) {
+		rename new RenameDependencyClosure(project, configurations.provided.name)
+	}
 }
 
 liferay {

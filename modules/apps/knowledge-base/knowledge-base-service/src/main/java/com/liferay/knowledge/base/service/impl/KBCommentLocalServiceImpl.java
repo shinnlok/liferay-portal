@@ -19,7 +19,6 @@ import aQute.bnd.annotation.ProviderType;
 import com.liferay.knowledge.base.configuration.KBGroupServiceConfiguration;
 import com.liferay.knowledge.base.constants.AdminActivityKeys;
 import com.liferay.knowledge.base.constants.KBCommentConstants;
-import com.liferay.knowledge.base.constants.KBConstants;
 import com.liferay.knowledge.base.exception.KBCommentContentException;
 import com.liferay.knowledge.base.model.KBArticle;
 import com.liferay.knowledge.base.model.KBComment;
@@ -38,7 +37,6 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.settings.GroupServiceSettingsLocator;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -181,6 +179,21 @@ public class KBCommentLocalServiceImpl extends KBCommentLocalServiceBaseImpl {
 
 	@Override
 	public List<KBComment> getKBComments(
+		long groupId, int status, int start, int end,
+		OrderByComparator<KBComment> obc) {
+
+		return kbCommentPersistence.findByG_S(groupId, status, start, end, obc);
+	}
+
+	@Override
+	public List<KBComment> getKBComments(
+		long groupId, int start, int end, OrderByComparator<KBComment> obc) {
+
+		return kbCommentPersistence.findByGroupId(groupId, start, end, obc);
+	}
+
+	@Override
+	public List<KBComment> getKBComments(
 		long userId, String className, long classPK, int start, int end,
 		OrderByComparator<KBComment> orderByComparator) {
 
@@ -194,11 +207,20 @@ public class KBCommentLocalServiceImpl extends KBCommentLocalServiceBaseImpl {
 	public List<KBComment> getKBComments(
 		String className, long classPK, int status, int start, int end) {
 
+		return getKBComments(
+			className, classPK, status, start, end,
+			new KBCommentCreateDateComparator());
+	}
+
+	@Override
+	public List<KBComment> getKBComments(
+		String className, long classPK, int status, int start, int end,
+		OrderByComparator<KBComment> obc) {
+
 		long classNameId = classNameLocalService.getClassNameId(className);
 
 		return kbCommentPersistence.findByC_C_S(
-			classNameId, classPK, status, start, end,
-			new KBCommentCreateDateComparator());
+			classNameId, classPK, status, start, end, obc);
 	}
 
 	@Override
@@ -309,6 +331,7 @@ public class KBCommentLocalServiceImpl extends KBCommentLocalServiceBaseImpl {
 			kbComment.getUserRating(), status, serviceContext);
 	}
 
+	@Override
 	public KBComment updateStatus(
 			long userId, long kbCommentId, int status,
 			ServiceContext serviceContext)
@@ -378,9 +401,8 @@ public class KBCommentLocalServiceImpl extends KBCommentLocalServiceBaseImpl {
 			long groupId)
 		throws ConfigurationException {
 
-		return configurationProvider.getConfiguration(
-			KBGroupServiceConfiguration.class,
-			new GroupServiceSettingsLocator(groupId, KBConstants.SERVICE_NAME));
+		return configurationProvider.getGroupConfiguration(
+			KBGroupServiceConfiguration.class, groupId);
 	}
 
 	protected int getUserRating(long userId, long classNameId, long classPK)

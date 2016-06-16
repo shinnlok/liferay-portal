@@ -14,6 +14,7 @@
 
 package com.liferay.knowledge.base.util;
 
+import com.liferay.knowledge.base.constants.KBArticleConstants;
 import com.liferay.knowledge.base.constants.KBCommentConstants;
 import com.liferay.knowledge.base.constants.KBFolderConstants;
 import com.liferay.knowledge.base.constants.KBPortletKeys;
@@ -33,6 +34,8 @@ import com.liferay.knowledge.base.util.comparator.KBArticleVersionComparator;
 import com.liferay.knowledge.base.util.comparator.KBArticleViewCountComparator;
 import com.liferay.knowledge.base.util.comparator.KBCommentCreateDateComparator;
 import com.liferay.knowledge.base.util.comparator.KBCommentModifiedDateComparator;
+import com.liferay.knowledge.base.util.comparator.KBCommentStatusComparator;
+import com.liferay.knowledge.base.util.comparator.KBCommentUserNameComparator;
 import com.liferay.knowledge.base.util.comparator.KBTemplateCreateDateComparator;
 import com.liferay.knowledge.base.util.comparator.KBTemplateModifiedDateComparator;
 import com.liferay.knowledge.base.util.comparator.KBTemplateTitleComparator;
@@ -125,7 +128,34 @@ public class KnowledgeBaseUtil {
 
 		parameters.put("parentResourceClassNameId", parentResourceClassNameId);
 		parameters.put("parentResourcePrimKey", parentResourcePrimKey);
-		parameters.put("mvcPath", mvcPath);
+
+		String mvcPathParameterValue = (String)parameters.get("mvcPath");
+
+		if (Validator.isNull(mvcPathParameterValue) ||
+			mvcPathParameterValue.equals("/admin/view.jsp") ||
+			mvcPathParameterValue.equals("/admin/view_articles.jsp") ||
+			mvcPathParameterValue.equals("/admin/view_folders.jsp")) {
+
+			if (parentResourceClassNameId ==
+					PortalUtil.getClassNameId(
+						KBFolderConstants.getClassName())) {
+
+				parameters.put("mvcPath", "/admin/view_folders.jsp");
+			}
+			else if (parentResourceClassNameId ==
+						PortalUtil.getClassNameId(
+							KBArticleConstants.getClassName())) {
+
+				parameters.put("mvcPath", "/admin/view_articles.jsp");
+				parameters.put("resourcePrimKey", parentResourcePrimKey);
+			}
+			else {
+				parameters.put("mvcPath", "/admin/view.jsp");
+			}
+		}
+		else {
+			parameters.put("mvcPath", mvcPath);
+		}
 
 		addPortletBreadcrumbEntries(parameters, request, renderResponse);
 	}
@@ -300,7 +330,7 @@ public class KnowledgeBaseUtil {
 		String orderByCol, String orderByType) {
 
 		if (Validator.isNull(orderByCol) || Validator.isNull(orderByType)) {
-			return null;
+			return new KBCommentStatusComparator();
 		}
 
 		boolean ascending = false;
@@ -314,6 +344,12 @@ public class KnowledgeBaseUtil {
 		}
 		else if (orderByCol.equals("modified-date")) {
 			return new KBCommentModifiedDateComparator(ascending);
+		}
+		else if (orderByCol.equals("status")) {
+			return new KBCommentStatusComparator(ascending);
+		}
+		else if (orderByCol.equals("user-name")) {
+			return new KBCommentUserNameComparator(ascending);
 		}
 
 		return null;
@@ -614,6 +650,8 @@ public class KnowledgeBaseUtil {
 
 		if (parentResourcePrimKey ==
 				KBFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
+
+			portletURL.setParameter("mvcPath", "/admin/view.jsp");
 
 			ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
 				WebKeys.THEME_DISPLAY);

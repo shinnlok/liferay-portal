@@ -174,7 +174,7 @@ public class IconTag extends IncludeTag {
 		_onClick = null;
 		_src = null;
 		_srcHover = null;
-		_target = null;
+		_target = "_self";
 		_toolTip = null;
 		_url = null;
 		_useDialog = false;
@@ -573,13 +573,13 @@ public class IconTag extends IncludeTag {
 		request.setAttribute("liferay-ui:icon:cssClass", _cssClass);
 		request.setAttribute("liferay-ui:icon:data", getData());
 		request.setAttribute("liferay-ui:icon:details", getDetails());
+		request.setAttribute(
+			"liferay-ui:icon:forcePost", String.valueOf(isForcePost()));
 		request.setAttribute("liferay-ui:icon:icon", _icon);
 		request.setAttribute("liferay-ui:icon:iconCssClass", _iconCssClass);
 		request.setAttribute("liferay-ui:icon:id", getId());
 		request.setAttribute("liferay-ui:icon:image", _image);
 		request.setAttribute("liferay-ui:icon:imageHover", _imageHover);
-		request.setAttribute(
-			"liferay-ui:icon:forcePost", String.valueOf(isForcePost()));
 		request.setAttribute(
 			"liferay-ui:icon:label", String.valueOf(isLabel()));
 		request.setAttribute("liferay-ui:icon:lang", _lang);
