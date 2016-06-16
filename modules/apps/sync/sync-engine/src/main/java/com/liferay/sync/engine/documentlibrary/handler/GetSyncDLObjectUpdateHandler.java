@@ -632,8 +632,29 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 			targetSyncFile.getRepositoryId(), getSyncAccountId(),
 			targetSyncFile.getParentFolderId());
 
+		String event = targetSyncFile.getEvent();
+
 		if (parentSyncFile == null) {
-			queueSyncFile(targetSyncFile.getParentFolderId(), targetSyncFile);
+			if (event.equals(SyncFile.EVENT_DELETE)) {
+				SyncFile sourceSyncFile = SyncFileService.fetchSyncFile(
+					targetSyncFile.getRepositoryId(), getSyncAccountId(),
+					targetSyncFile.getTypePK());
+
+				if (sourceSyncFile == null) {
+					return;
+				}
+
+				try {
+					deleteFile(sourceSyncFile, targetSyncFile);
+				}
+				catch (Exception e) {
+					_logger.error(e.getMessage(), e);
+				}
+			}
+			else {
+				queueSyncFile(
+					targetSyncFile.getParentFolderId(), targetSyncFile);
+			}
 
 			return;
 		}
@@ -664,8 +685,6 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 
 			targetSyncFile.setFilePathName(filePathName);
 			targetSyncFile.setState(SyncFile.STATE_IN_PROGRESS);
-
-			String event = targetSyncFile.getEvent();
 
 			if (event.equals(SyncFile.EVENT_ADD) ||
 				event.equals(SyncFile.EVENT_GET)) {
