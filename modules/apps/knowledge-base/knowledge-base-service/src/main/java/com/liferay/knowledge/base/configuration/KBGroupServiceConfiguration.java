@@ -32,6 +32,9 @@ import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClass
 )
 public interface KBGroupServiceConfiguration {
 
+	@Meta.AD(deflt = "alloyeditor", required = false)
+	public String getEditorName();
+
 	@Meta.AD(deflt = "true", required = false)
 	public boolean articleIncrementPriorityEnabled();
 
@@ -52,12 +55,6 @@ public interface KBGroupServiceConfiguration {
 
 	@Meta.AD(deflt = "edit-on-github", required = false)
 	public String sourceURLEditMessageKey();
-
-	@Meta.AD(
-		deflt = "${server-property://com.liferay.portal/ratings.default.number.of.stars}",
-		required = false
-	)
-	public String ratingsNumberOfStars();
 
 	@Meta.AD(
 		deflt = "${server-property://com.liferay.portal/admin.email.from.name}",

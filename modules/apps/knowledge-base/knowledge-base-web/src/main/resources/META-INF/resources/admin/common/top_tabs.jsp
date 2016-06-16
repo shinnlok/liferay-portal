@@ -20,50 +20,42 @@
 String mvcPath = ParamUtil.getString(request, "mvcPath");
 %>
 
-<c:if test="<%= AdminPermission.contains(permissionChecker, scopeGroupId, KBActionKeys.VIEW_KB_TEMPLATES) %>">
+<aui:nav-bar cssClass="collapse-basic-search" markupView="lexicon">
+	<aui:nav cssClass="navbar-nav">
+		<c:if test="<%= PortletPermissionUtil.contains(permissionChecker, plid, portletDisplay.getId(), KBActionKeys.VIEW) %>">
+			<portlet:renderURL var="viewKBObjectsURL">
+				<portlet:param name="mvcPath" value="/admin/view.jsp" />
+			</portlet:renderURL>
 
-	<%
-	List<String> names = new ArrayList<String>();
-	List<String> urls = new ArrayList<String>();
-	String value = null;
+			<aui:nav-item
+				href="<%= viewKBObjectsURL %>"
+				label="articles"
+				selected='<%= !mvcPath.equals("/admin/view_suggestions.jsp") %>'
+			/>
+		</c:if>
 
-	if (PortletPermissionUtil.contains(permissionChecker, plid, portletDisplay.getId(), KBActionKeys.VIEW)) {
-		PortletURL kbArticlesURL = renderResponse.createRenderURL();
+		<c:if test="<%= AdminPermission.contains(permissionChecker, scopeGroupId, KBActionKeys.VIEW_SUGGESTIONS) %>">
+			<portlet:renderURL var="viewKBSuggestionsURL">
+				<portlet:param name="mvcPath" value="/admin/view_suggestions.jsp" />
+			</portlet:renderURL>
 
-		kbArticlesURL.setParameter("mvcPath", "/admin/view.jsp");
+			<aui:nav-item
+				href="<%= viewKBSuggestionsURL %>"
+				label="suggestions"
+				selected='<%= mvcPath.equals("/admin/view_suggestions.jsp") %>'
+			/>
+		</c:if>
+	</aui:nav>
 
-		names.add("articles");
-		urls.add(kbArticlesURL.toString());
-		value = names.get(names.size() - 1);
-	}
+	<aui:nav-bar-search>
+		<liferay-portlet:renderURL varImpl="searchURL">
+			<portlet:param name="mvcPath" value="/admin/search.jsp" />
+		</liferay-portlet:renderURL>
 
-	if (AdminPermission.contains(permissionChecker, scopeGroupId, KBActionKeys.VIEW_KB_TEMPLATES)) {
-		PortletURL kbTemplatesURL = renderResponse.createRenderURL();
+		<aui:form action="<%= searchURL %>" method="get" name="searchFm">
+			<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
 
-		kbTemplatesURL.setParameter("mvcPath", "/admin/view_templates.jsp");
-
-		names.add("templates");
-		urls.add(kbTemplatesURL.toString());
-		value = mvcPath.contains("template") ? names.get(names.size() - 1) : value;
-	}
-
-	if (AdminPermission.contains(permissionChecker, scopeGroupId, KBActionKeys.VIEW_SUGGESTIONS)) {
-		PortletURL kbSuggestionsURL = renderResponse.createRenderURL();
-
-		kbSuggestionsURL.setParameter("mvcPath", "/admin/view_suggestions.jsp");
-
-		names.add("suggestions");
-		urls.add(kbSuggestionsURL.toString());
-		value = mvcPath.contains("suggestions") ? names.get(names.size() - 1) : value;
-	}
-	%>
-
-	<liferay-ui:tabs
-		names="<%= StringUtil.merge(names) %>"
-		param="topTabs"
-		url0="<%= (urls.size() > 0) ? urls.get(0) : null %>"
-		url1="<%= (urls.size() > 1) ? urls.get(1) : null %>"
-		url2="<%= (urls.size() > 2) ? urls.get(2) : null %>"
-		value="<%= value %>"
-	/>
-</c:if>
+			<liferay-ui:input-search id="keywords" markupView="lexicon" />
+		</aui:form>
+	</aui:nav-bar-search>
+</aui:nav-bar>

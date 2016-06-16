@@ -112,13 +112,19 @@ else if (group != null) {
 
 	<%
 	boolean disabled = false;
+	boolean value = false;
+
+	if (group != null) {
+		value = group.isInheritContent();
+	}
 
 	if ((parentGroup != null) && parentGroup.isInheritContent()) {
 		disabled = true;
+		value = false;
 	}
 	%>
 
-	<aui:input disabled="<%= disabled %>" helpMessage='<%= disabled ? "this-site-cannot-inherit-the-content-from-its-parent-site-since-the-parent-site-is-already-inheriting-the-content-from-its-parent" : StringPool.BLANK %>' name="inheritContent" value="<%= false %>" />
+	<aui:input disabled="<%= disabled %>" helpMessage='<%= disabled ? "this-site-cannot-inherit-the-content-from-its-parent-site-since-the-parent-site-is-already-inheriting-the-content-from-its-parent" : StringPool.BLANK %>' name="inheritContent" type="toggle-switch" value="<%= value %>" />
 </c:if>
 
 <h4 class="text-default"><liferay-ui:message key="membership-options" /></h4>
@@ -179,21 +185,17 @@ else if (group != null) {
 			modelVar="curGroup"
 		>
 			<liferay-ui:search-container-column-text
-				cssClass="content-column name-column title-column"
 				name="name"
 				truncate="<%= true %>"
 				value="<%= HtmlUtil.escape(curGroup.getDescriptiveName(locale)) %>"
 			/>
 
 			<liferay-ui:search-container-column-text
-				cssClass="text-column type-column"
 				name="type"
 				value="<%= LanguageUtil.get(request, curGroup.getTypeLabel()) %>"
 			/>
 
-			<liferay-ui:search-container-column-text
-				cssClass="entry-action-column"
-			>
+			<liferay-ui:search-container-column-text>
 				<a class="modify-link" data-rowId="<%= curGroup.getGroupId() %>" href="javascript:;"><%= removeGroupIcon %></a>
 			</liferay-ui:search-container-column-text>
 		</liferay-ui:search-container-row>

@@ -106,6 +106,7 @@ create unique index IX_ED5CA615 on DLFileEntry (groupId, folderId, title[$COLUMN
 create index IX_D20C434D on DLFileEntry (groupId, userId, folderId);
 create index IX_D9492CF6 on DLFileEntry (mimeType[$COLUMN_LENGTH:75$]);
 create index IX_1B352F4A on DLFileEntry (repositoryId, folderId);
+create index IX_25F5CAB9 on DLFileEntry (smallImageId, largeImageId, custom1ImageId, custom2ImageId);
 create index IX_31079DE8 on DLFileEntry (uuid_[$COLUMN_LENGTH:75$], companyId);
 create unique index IX_BC2E7E6A on DLFileEntry (uuid_[$COLUMN_LENGTH:75$], groupId);
 
@@ -503,14 +504,14 @@ create unique index IX_D1C44A6E on UserIdMapper (userId, type_[$COLUMN_LENGTH:75
 
 create unique index IX_8B6E3ACE on UserNotificationDelivery (userId, portletId[$COLUMN_LENGTH:200$], classNameId, notificationType, deliveryType);
 
-create index IX_BF29100B on UserNotificationEvent (type_[$COLUMN_LENGTH:75$]);
+create index IX_BF29100B on UserNotificationEvent (type_[$COLUMN_LENGTH:200$]);
 create index IX_5CE95F03 on UserNotificationEvent (userId, actionRequired, archived);
 create index IX_3DBB361A on UserNotificationEvent (userId, archived);
 create index IX_E32CC19 on UserNotificationEvent (userId, delivered, actionRequired);
 create index IX_C4EFBD45 on UserNotificationEvent (userId, deliveryType, actionRequired, archived);
 create index IX_A87A585C on UserNotificationEvent (userId, deliveryType, archived);
 create index IX_A6F83617 on UserNotificationEvent (userId, deliveryType, delivered, actionRequired);
-create index IX_8FB65EC1 on UserNotificationEvent (userId, type_[$COLUMN_LENGTH:75$], deliveryType, delivered);
+create index IX_8FB65EC1 on UserNotificationEvent (userId, type_[$COLUMN_LENGTH:200$], deliveryType, delivered);
 create index IX_A6BAFDFE on UserNotificationEvent (uuid_[$COLUMN_LENGTH:75$], companyId);
 
 create index IX_29BA1CF5 on UserTracker (companyId);

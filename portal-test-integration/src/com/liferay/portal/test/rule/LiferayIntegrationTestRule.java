@@ -14,6 +14,7 @@
 
 package com.liferay.portal.test.rule;
 
+import com.liferay.portal.kernel.process.ClassPathUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.BaseTestRule;
 import com.liferay.portal.kernel.test.rule.BaseTestRule.StatementWrapper;
@@ -41,6 +42,8 @@ import java.util.List;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
+
+import org.springframework.mock.web.MockServletContext;
 
 /**
  * @author Shuyang Zhou
@@ -110,6 +113,9 @@ public class LiferayIntegrationTestRule extends AggregateTestRule {
 
 								configureLog4j = true;
 							}
+
+							ClassPathUtil.initializeClassPaths(
+								new MockServletContext());
 
 							InitUtil.initWithSpring(
 								configLocations, true, true);

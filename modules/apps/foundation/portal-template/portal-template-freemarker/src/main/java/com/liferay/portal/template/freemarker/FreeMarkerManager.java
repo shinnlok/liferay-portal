@@ -15,6 +15,7 @@
 package com.liferay.portal.template.freemarker;
 
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
+import com.liferay.portal.kernel.cache.SingleVMPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.JSPSupportServlet;
@@ -24,7 +25,6 @@ import com.liferay.portal.kernel.template.TemplateException;
 import com.liferay.portal.kernel.template.TemplateManager;
 import com.liferay.portal.kernel.template.TemplateResource;
 import com.liferay.portal.kernel.template.TemplateResourceLoader;
-import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.PropertiesUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.ReflectionUtil;
@@ -249,7 +249,7 @@ public class FreeMarkerManager extends BaseSingleTemplateManager {
 
 			TemplateCache templateCache = new LiferayTemplateCache(
 				_configuration, _freemarkerEngineConfiguration,
-				templateResourceLoader);
+				templateResourceLoader, _singleVMPool);
 
 			field.set(_configuration, templateCache);
 		}
@@ -377,6 +377,11 @@ public class FreeMarkerManager extends BaseSingleTemplateManager {
 		return false;
 	}
 
+	@Reference(unbind = "-")
+	protected void setSingleVMPool(SingleVMPool singleVMPool) {
+		_singleVMPool = singleVMPool;
+	}
+
 	private static final Class<?>[] _INTERFACES = {ServletContext.class};
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -388,6 +393,7 @@ public class FreeMarkerManager extends BaseSingleTemplateManager {
 	private volatile FreeMarkerBundleClassloader _freeMarkerBundleClassloader;
 	private volatile FreeMarkerEngineConfiguration
 		_freemarkerEngineConfiguration;
+	private SingleVMPool _singleVMPool;
 	private final Map<String, String> _taglibMappings =
 		new ConcurrentHashMap<>();
 	private TemplateClassResolver _templateClassResolver;
@@ -561,11 +567,7 @@ public class FreeMarkerManager extends BaseSingleTemplateManager {
 				Object value = attributes.get("osgi.extender");
 
 				if (value.equals("jsp.taglib")) {
-					Bundle[] bundles = ArrayUtil.append(
-						_freeMarkerBundleClassloader.getBundles(), bundle);
-
-					_freeMarkerBundleClassloader =
-						new FreeMarkerBundleClassloader(bundles);
+					_freeMarkerBundleClassloader.addBundle(bundle);
 
 					track = true;
 
@@ -589,14 +591,7 @@ public class FreeMarkerManager extends BaseSingleTemplateManager {
 		public void removedBundle(
 			Bundle bundle, BundleEvent bundleEvent, Set<String> trackedKeys) {
 
-			Bundle[] bundles = _freeMarkerBundleClassloader.getBundles();
-
-			if (ArrayUtil.contains(bundles, bundle)) {
-				bundles = ArrayUtil.remove(bundles, bundle);
-
-				_freeMarkerBundleClassloader = new FreeMarkerBundleClassloader(
-					bundles);
-			}
+			_freeMarkerBundleClassloader.removeBundle(bundle);
 
 			for (String key : trackedKeys) {
 				_taglibMappings.remove(key);

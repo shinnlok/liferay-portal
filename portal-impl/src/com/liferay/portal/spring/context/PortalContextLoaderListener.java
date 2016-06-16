@@ -213,6 +213,8 @@ public class PortalContextLoaderListener extends ContextLoaderListener {
 				PropsKeys.LIFERAY_LIB_PORTAL_DIR, portalLibDir);
 		}
 
+		ClassPathUtil.initializeClassPaths(servletContext);
+
 		InitUtil.init();
 
 		_portalServletContextName = servletContext.getServletContextName();
@@ -228,8 +230,6 @@ public class PortalContextLoaderListener extends ContextLoaderListener {
 		}
 
 		_portalServletContextPath = servletContext.getContextPath();
-
-		ClassPathUtil.initializeClassPaths(servletContext);
 
 		File tempDir = (File)servletContext.getAttribute(
 			JavaConstants.JAVAX_SERVLET_CONTEXT_TEMPDIR);
@@ -301,6 +301,8 @@ public class PortalContextLoaderListener extends ContextLoaderListener {
 		catch (Exception e) {
 			_log.error(e, e);
 		}
+
+		InitUtil.registerSpringInitialized();
 
 		if (PropsValues.CACHE_CLEAR_ON_CONTEXT_INITIALIZATION) {
 			CacheRegistryUtil.clear();

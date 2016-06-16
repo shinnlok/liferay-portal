@@ -1,7 +1,30 @@
 import com.liferay.gradle.util.FileUtil
+import com.liferay.gradle.util.GradleUtil
+
+import java.util.concurrent.ConcurrentSkipListSet
 
 buildscript {
 	apply from: rootProject.file("build-buildscript.gradle"), to: buildscript
+}
+
+Set<File> bndPrintJarFiles = null
+
+if (System.getenv("JENKINS_HOME")) {
+	configurations {
+		bnd
+	}
+
+	dependencies {
+		bnd group: "biz.aQute.bnd", name: "biz.aQute.bnd", version: "3.2.0"
+	}
+
+	repositories {
+		maven {
+			url System.properties["repository.url"] ?: "https://cdn.lfrs.sl/repository.liferay.com/nexus/content/groups/public"
+		}
+	}
+
+	bndPrintJarFiles = new ConcurrentSkipListSet<File>()
 }
 
 buildDir = new File(rootDir.parentFile, "build")
@@ -31,6 +54,16 @@ gradle.beforeProject {
 
 		pluginManager.withPlugin("com.liferay.osgi.plugin") {
 			apply plugin: "pmd"
+
+			afterEvaluate {
+				bundle.jarBuilderFactory.contextClassLoader = buildscript.classLoader
+
+				File forcedDeployDir = GradleUtil.getProperty(project, "forced.deploy.dir", (File)null)
+
+				if (forcedDeployDir) {
+					liferay.deployDir = forcedDeployDir
+				}
+			}
 
 			configurations {
 				xmltask
@@ -76,6 +109,14 @@ gradle.beforeProject {
 				classpath = null
 			}
 
+			if (bndPrintJarFiles != null) {
+				jar {
+					doLast {
+						bndPrintJarFiles << archivePath
+					}
+				}
+			}
+
 			if (gradle.hasProperty("testClassGroupIndex")) {
 				configure([test, testIntegration]) {
 					include gradle.testClasses
@@ -103,6 +144,20 @@ gradle.beforeProject {
 						throw new GradleException("Unable to use Node.js on CI, please configure com.liferay.cache or update the cache")
 					}
 				}
+			}
+		}
+	}
+}
+
+if (bndPrintJarFiles != null) {
+	gradle.buildFinished {
+		bndPrintJarFiles.each {
+			File jarFile ->
+
+			javaexec {
+				args "print", jarFile
+				classpath = configurations.bnd
+				main = "aQute.bnd.main.bnd"
 			}
 		}
 	}

@@ -14,6 +14,7 @@
 
 package com.liferay.portal.servlet.filters.secure;
 
+import com.liferay.portal.kernel.exception.NoSuchUserException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
@@ -268,16 +269,21 @@ public class SecureFilter extends BasePortalFilter {
 			response.sendRedirect(redirectURL.toString());
 		}
 		else {
-			if (_log.isDebugEnabled()) {
-				String completeURL = HttpUtil.getCompleteURL(request);
+			String completeURL = HttpUtil.getCompleteURL(request);
 
+			if (_log.isDebugEnabled()) {
 				_log.debug("Not securing " + completeURL);
 			}
 
-			User user = PortalUtil.getUser(request);
+			User user = null;
 
-			if (user == null) {
+			try {
 				user = PortalUtil.initUser(request);
+			}
+			catch (NoSuchUserException nsue) {
+				response.sendRedirect(completeURL);
+
+				return;
 			}
 
 			initThreadLocals(user);
@@ -314,8 +320,8 @@ public class SecureFilter extends BasePortalFilter {
 
 		request = new ProtectedServletRequest(request, userIdString, authType);
 
-		session.setAttribute(WebKeys.USER, user);
 		session.setAttribute(_AUTHENTICATED_USER, userIdString);
+		session.setAttribute(WebKeys.USER, user);
 
 		initThreadLocals(request);
 

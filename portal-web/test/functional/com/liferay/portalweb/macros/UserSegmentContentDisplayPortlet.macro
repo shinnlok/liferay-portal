@@ -11,7 +11,7 @@
 			<then>
 				<var name="key_indexNumber" value="${rowIndexNumber}" />
 
-				<execute function="Click" locator1="UserSegmentContentDisplay#CONTENT_PLUS_LINK" />
+				<execute function="Click" locator1="ContentTargeting#PLUS_LINK" />
 			</then>
 		</if>
 
@@ -252,6 +252,6 @@
 	</command>
 
 	<command name="viewNoContentPG">
-		<execute function="AssertTextEquals" locator1="UserSegmentContentDisplay#ENTRY_CONTENT" value1="There are no matching rules" />
+		<execute function="AssertTextEquals" locator1="UserSegmentContentDisplay#ENTRY_CONTENT" value1="The selected content no longer exists" />
 	</command>
 </definition>

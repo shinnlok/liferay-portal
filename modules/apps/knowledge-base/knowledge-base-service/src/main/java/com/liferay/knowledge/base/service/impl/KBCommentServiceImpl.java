@@ -24,6 +24,7 @@ import com.liferay.knowledge.base.service.permission.KBCommentPermission;
 import com.liferay.knowledge.base.service.permission.SuggestionPermission;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.util.OrderByComparator;
 
 import java.util.Collections;
 import java.util.List;
@@ -60,6 +61,7 @@ public class KBCommentServiceImpl extends KBCommentServiceBaseImpl {
 		return kbCommentLocalService.getKBComment(kbCommentId);
 	}
 
+	@Override
 	public List<KBComment> getKBComments(
 			long groupId, int status, int start, int end)
 		throws PortalException {
@@ -68,7 +70,41 @@ public class KBCommentServiceImpl extends KBCommentServiceBaseImpl {
 				getPermissionChecker(), groupId,
 				KBActionKeys.VIEW_SUGGESTIONS)) {
 
-			return kbCommentPersistence.findByG_S(groupId, status, start, end);
+			return kbCommentLocalService.getKBComments(
+				groupId, status, start, end);
+		}
+
+		return Collections.emptyList();
+	}
+
+	@Override
+	public List<KBComment> getKBComments(
+			long groupId, int status, int start, int end,
+			OrderByComparator<KBComment> obc)
+		throws PortalException {
+
+		if (AdminPermission.contains(
+				getPermissionChecker(), groupId,
+				KBActionKeys.VIEW_SUGGESTIONS)) {
+
+			return kbCommentLocalService.getKBComments(
+				groupId, status, start, end, obc);
+		}
+
+		return Collections.emptyList();
+	}
+
+	@Override
+	public List<KBComment> getKBComments(
+			long groupId, int start, int end, OrderByComparator<KBComment> obc)
+		throws PortalException {
+
+		if (AdminPermission.contains(
+				getPermissionChecker(), groupId,
+				KBActionKeys.VIEW_SUGGESTIONS)) {
+
+			return kbCommentLocalService.getKBComments(
+				groupId, start, end, obc);
 		}
 
 		return Collections.emptyList();
@@ -91,6 +127,53 @@ public class KBCommentServiceImpl extends KBCommentServiceBaseImpl {
 		return Collections.emptyList();
 	}
 
+	@Override
+	public List<KBComment> getKBComments(
+			long groupId, String className, long classPK, int status, int start,
+			int end, OrderByComparator<KBComment> obc)
+		throws PortalException {
+
+		if (SuggestionPermission.contains(
+				getPermissionChecker(), groupId, className, classPK,
+				KBActionKeys.VIEW_SUGGESTIONS)) {
+
+			return kbCommentLocalService.getKBComments(
+				className, classPK, status, start, end, obc);
+		}
+
+		return Collections.emptyList();
+	}
+
+	@Override
+	public List<KBComment> getKBComments(
+			long groupId, String className, long classPK, int start, int end,
+			OrderByComparator<KBComment> obc)
+		throws PortalException {
+
+		if (SuggestionPermission.contains(
+				getPermissionChecker(), groupId, className, classPK,
+				KBActionKeys.VIEW_SUGGESTIONS)) {
+
+			return kbCommentLocalService.getKBComments(
+				className, classPK, start, end, obc);
+		}
+
+		return Collections.emptyList();
+	}
+
+	@Override
+	public int getKBCommentsCount(long groupId) throws PortalException {
+		if (AdminPermission.contains(
+				getPermissionChecker(), groupId,
+				KBActionKeys.VIEW_SUGGESTIONS)) {
+
+			return kbCommentPersistence.countByGroupId(groupId);
+		}
+
+		return 0;
+	}
+
+	@Override
 	public int getKBCommentsCount(long groupId, int status)
 		throws PortalException {
 
@@ -98,7 +181,21 @@ public class KBCommentServiceImpl extends KBCommentServiceBaseImpl {
 				getPermissionChecker(), groupId,
 				KBActionKeys.VIEW_SUGGESTIONS)) {
 
-			return kbCommentPersistence.countByG_S(groupId, status);
+			return kbCommentLocalService.getKBCommentsCount(groupId, status);
+		}
+
+		return 0;
+	}
+
+	@Override
+	public int getKBCommentsCount(long groupId, String className, long classPK)
+		throws PortalException {
+
+		if (SuggestionPermission.contains(
+				getPermissionChecker(), groupId, className, classPK,
+				KBActionKeys.VIEW_SUGGESTIONS)) {
+
+			return kbCommentLocalService.getKBCommentsCount(className, classPK);
 		}
 
 		return 0;
@@ -120,6 +217,7 @@ public class KBCommentServiceImpl extends KBCommentServiceBaseImpl {
 		return 0;
 	}
 
+	@Override
 	public KBComment updateKBComment(
 			long kbCommentId, long classNameId, long classPK, String content,
 			int status, ServiceContext serviceContext)
@@ -132,6 +230,7 @@ public class KBCommentServiceImpl extends KBCommentServiceBaseImpl {
 			kbCommentId, classNameId, classPK, content, status, serviceContext);
 	}
 
+	@Override
 	public KBComment updateKBComment(
 			long kbCommentId, long classNameId, long classPK, String content,
 			ServiceContext serviceContext)
@@ -145,6 +244,7 @@ public class KBCommentServiceImpl extends KBCommentServiceBaseImpl {
 			serviceContext);
 	}
 
+	@Override
 	public KBComment updateStatus(
 			long kbCommentId, int status, ServiceContext serviceContext)
 		throws PortalException {
