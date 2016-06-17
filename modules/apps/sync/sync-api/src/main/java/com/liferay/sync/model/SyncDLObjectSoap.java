@@ -54,6 +54,7 @@ public class SyncDLObjectSoap implements Serializable {
 		soapModel.setSize(model.getSize());
 		soapModel.setChecksum(model.getChecksum());
 		soapModel.setEvent(model.getEvent());
+		soapModel.setKey(model.getKey());
 		soapModel.setLastPermissionChangeDate(model.getLastPermissionChangeDate());
 		soapModel.setLockExpirationDate(model.getLockExpirationDate());
 		soapModel.setLockUserId(model.getLockUserId());
@@ -273,6 +274,14 @@ public class SyncDLObjectSoap implements Serializable {
 		_event = event;
 	}
 
+	public String getKey() {
+		return _key;
+	}
+
+	public void setKey(String key) {
+		_key = key;
+	}
+
 	public Date getLastPermissionChangeDate() {
 		return _lastPermissionChangeDate;
 	}
@@ -349,6 +358,7 @@ public class SyncDLObjectSoap implements Serializable {
 	private long _size;
 	private String _checksum;
 	private String _event;
+	private String _key;
 	private Date _lastPermissionChangeDate;
 	private Date _lockExpirationDate;
 	private long _lockUserId;

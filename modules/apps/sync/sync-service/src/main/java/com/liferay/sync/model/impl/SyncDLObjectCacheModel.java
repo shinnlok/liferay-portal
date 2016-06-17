@@ -66,7 +66,7 @@ public class SyncDLObjectCacheModel implements CacheModel<SyncDLObject>,
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(55);
+		StringBundler sb = new StringBundler(57);
 
 		sb.append("{syncDLObjectId=");
 		sb.append(syncDLObjectId);
@@ -108,6 +108,8 @@ public class SyncDLObjectCacheModel implements CacheModel<SyncDLObject>,
 		sb.append(checksum);
 		sb.append(", event=");
 		sb.append(event);
+		sb.append(", key=");
+		sb.append(key);
 		sb.append(", lastPermissionChangeDate=");
 		sb.append(lastPermissionChangeDate);
 		sb.append(", lockExpirationDate=");
@@ -220,6 +222,13 @@ public class SyncDLObjectCacheModel implements CacheModel<SyncDLObject>,
 			syncDLObjectImpl.setEvent(event);
 		}
 
+		if (key == null) {
+			syncDLObjectImpl.setKey(StringPool.BLANK);
+		}
+		else {
+			syncDLObjectImpl.setKey(key);
+		}
+
 		if (lastPermissionChangeDate == Long.MIN_VALUE) {
 			syncDLObjectImpl.setLastPermissionChangeDate(null);
 		}
@@ -295,6 +304,7 @@ public class SyncDLObjectCacheModel implements CacheModel<SyncDLObject>,
 		size = objectInput.readLong();
 		checksum = objectInput.readUTF();
 		event = objectInput.readUTF();
+		key = objectInput.readUTF();
 		lastPermissionChangeDate = objectInput.readLong();
 		lockExpirationDate = objectInput.readLong();
 
@@ -404,6 +414,13 @@ public class SyncDLObjectCacheModel implements CacheModel<SyncDLObject>,
 			objectOutput.writeUTF(event);
 		}
 
+		if (key == null) {
+			objectOutput.writeUTF(StringPool.BLANK);
+		}
+		else {
+			objectOutput.writeUTF(key);
+		}
+
 		objectOutput.writeLong(lastPermissionChangeDate);
 		objectOutput.writeLong(lockExpirationDate);
 
@@ -453,6 +470,7 @@ public class SyncDLObjectCacheModel implements CacheModel<SyncDLObject>,
 	public long size;
 	public String checksum;
 	public String event;
+	public String key;
 	public long lastPermissionChangeDate;
 	public long lockExpirationDate;
 	public long lockUserId;

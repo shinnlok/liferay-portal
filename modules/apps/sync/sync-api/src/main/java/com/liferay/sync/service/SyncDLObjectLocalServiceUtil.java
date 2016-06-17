@@ -87,15 +87,16 @@ public class SyncDLObjectLocalServiceUtil {
 		java.lang.String description, java.lang.String changeLog,
 		java.lang.String extraSettings, java.lang.String version,
 		long versionId, long size, java.lang.String checksum,
-		java.lang.String event, java.util.Date lockExpirationDate,
-		long lockUserId, java.lang.String lockUserName, java.lang.String type,
-		long typePK, java.lang.String typeUuid)
+		java.lang.String event, java.lang.String key,
+		java.util.Date lockExpirationDate, long lockUserId,
+		java.lang.String lockUserName, java.lang.String type, long typePK,
+		java.lang.String typeUuid)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
 				   .addSyncDLObject(companyId, userId, userName, modifiedTime,
 			repositoryId, parentFolderId, treePath, name, extension, mimeType,
 			description, changeLog, extraSettings, version, versionId, size,
-			checksum, event, lockExpirationDate, lockUserId, lockUserName,
+			checksum, event, key, lockExpirationDate, lockUserId, lockUserName,
 			type, typePK, typeUuid);
 	}
 

@@ -302,12 +302,13 @@ public class SyncDLObjectLocalServiceClpInvoker {
 				((Long)arguments[14]).longValue(),
 				((Long)arguments[15]).longValue(),
 				(java.lang.String)arguments[16],
-				(java.lang.String)arguments[17], (java.util.Date)arguments[18],
-				((Long)arguments[19]).longValue(),
-				(java.lang.String)arguments[20],
+				(java.lang.String)arguments[17],
+				(java.lang.String)arguments[18], (java.util.Date)arguments[19],
+				((Long)arguments[20]).longValue(),
 				(java.lang.String)arguments[21],
-				((Long)arguments[22]).longValue(),
-				(java.lang.String)arguments[23]);
+				(java.lang.String)arguments[22],
+				((Long)arguments[23]).longValue(),
+				(java.lang.String)arguments[24]);
 		}
 
 		if (_methodName88.equals(name) &&

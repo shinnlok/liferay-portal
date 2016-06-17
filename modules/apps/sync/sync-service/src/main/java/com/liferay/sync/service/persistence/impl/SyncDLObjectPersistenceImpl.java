@@ -6694,6 +6694,7 @@ public class SyncDLObjectPersistenceImpl extends BasePersistenceImpl<SyncDLObjec
 		syncDLObjectImpl.setSize(syncDLObject.getSize());
 		syncDLObjectImpl.setChecksum(syncDLObject.getChecksum());
 		syncDLObjectImpl.setEvent(syncDLObject.getEvent());
+		syncDLObjectImpl.setKey(syncDLObject.getKey());
 		syncDLObjectImpl.setLastPermissionChangeDate(syncDLObject.getLastPermissionChangeDate());
 		syncDLObjectImpl.setLockExpirationDate(syncDLObject.getLockExpirationDate());
 		syncDLObjectImpl.setLockUserId(syncDLObject.getLockUserId());
@@ -7125,6 +7126,6 @@ public class SyncDLObjectPersistenceImpl extends BasePersistenceImpl<SyncDLObjec
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No SyncDLObject exists with the key {";
 	private static final Log _log = LogFactoryUtil.getLog(SyncDLObjectPersistenceImpl.class);
 	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
-				"size", "type"
+				"size", "key", "type"
 			});
 }
