@@ -288,6 +288,7 @@ public class SyncDLObjectLocalServiceImpl
 						parentSyncDLObject.getTreePath());
 
 					syncDLObject.setTreePath(treePath);
+
 					syncDLObject.setLastPermissionChangeDate(
 						parentSyncDLObject.getLastPermissionChangeDate());
 
