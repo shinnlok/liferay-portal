@@ -31,6 +31,18 @@ public class SyncContext {
 		return _authType;
 	}
 
+	public String getLanCertificate() {
+		return _lanCertificate;
+	}
+
+	public String getLanKey() {
+		return _lanKey;
+	}
+
+	public String getLanServerId() {
+		return _lanServerId;
+	}
+
 	public String getOAuthConsumerKey() {
 		return _oAuthConsumerKey;
 	}
@@ -62,6 +74,10 @@ public class SyncContext {
 		return _userSitesGroups;
 	}
 
+	public boolean isLanEnabled() {
+		return _lanEnabled;
+	}
+
 	public boolean isOAuthEnabled() {
 		return _oAuthEnabled;
 	}
@@ -72,6 +88,22 @@ public class SyncContext {
 
 	public void setAuthType(String authType) {
 		_authType = authType;
+	}
+
+	public void setLanCertificate(String lanCertificate) {
+		_lanCertificate = lanCertificate;
+	}
+
+	public void setLanEnabled(boolean lanEnabled) {
+		_lanEnabled = lanEnabled;
+	}
+
+	public void setLanKey(String lanKey) {
+		_lanKey = lanKey;
+	}
+
+	public void setLanServerId(String lanServerId) {
+		_lanServerId = lanServerId;
 	}
 
 	public void setOAuthConsumerKey(String oAuthConsumerKey) {
@@ -113,6 +145,10 @@ public class SyncContext {
 	}
 
 	private String _authType;
+	private String _lanCertificate;
+	private boolean _lanEnabled;
+	private String _lanKey;
+	private String _lanServerId;
 	private String _oAuthConsumerKey;
 	private String _oAuthConsumerSecret;
 	private boolean _oAuthEnabled;

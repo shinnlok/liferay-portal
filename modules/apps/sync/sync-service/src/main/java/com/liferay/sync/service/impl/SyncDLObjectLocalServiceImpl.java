@@ -36,6 +36,7 @@ import com.liferay.sync.constants.SyncDLObjectConstants;
 import com.liferay.sync.model.SyncDLObject;
 import com.liferay.sync.service.base.SyncDLObjectLocalServiceBaseImpl;
 import com.liferay.sync.service.configuration.SyncServiceConfigurationValues;
+import com.liferay.sync.util.SyncUtil;
 
 import java.util.Date;
 import java.util.List;
@@ -54,8 +55,8 @@ public class SyncDLObjectLocalServiceImpl
 			String name, String extension, String mimeType, String description,
 			String changeLog, String extraSettings, String version,
 			long versionId, long size, String checksum, String event,
-			Date lockExpirationDate, long lockUserId, String lockUserName,
-			String type, long typePK, String typeUuid)
+			String key, Date lockExpirationDate, long lockUserId,
+			String lockUserName, String type, long typePK, String typeUuid)
 		throws PortalException {
 
 		if (!isDefaultRepository(parentFolderId)) {
@@ -135,6 +136,7 @@ public class SyncDLObjectLocalServiceImpl
 		syncDLObject.setSize(size);
 		syncDLObject.setChecksum(checksum);
 		syncDLObject.setEvent(event);
+		syncDLObject.setKey(key);
 		syncDLObject.setLockExpirationDate(lockExpirationDate);
 		syncDLObject.setLockUserId(lockUserId);
 		syncDLObject.setLockUserName(lockUserName);
@@ -326,6 +328,10 @@ public class SyncDLObjectLocalServiceImpl
 					syncDLObject.setModifiedTime(
 						parentSyncDLObject.getModifiedTime());
 					syncDLObject.setEvent(SyncDLObjectConstants.EVENT_RESTORE);
+					syncDLObject.setKey(
+						SyncUtil.popKey(
+							parentSyncDLObject.getModifiedTime(),
+							syncDLObject.getTypePK()));
 
 					syncDLObjectPersistence.update(syncDLObject);
 				}

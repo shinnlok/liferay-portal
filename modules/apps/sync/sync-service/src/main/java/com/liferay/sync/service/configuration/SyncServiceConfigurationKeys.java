@@ -55,6 +55,14 @@ public class SyncServiceConfigurationKeys {
 	public static final String SYNC_FILE_DIFF_CACHE_EXPIRATION_TIME =
 		"sync.file.diff.cache.expiration.time";
 
+	public static final String SYNC_LAN_CERTIFICATE = "sync.lan.certificate";
+
+	public static final String SYNC_LAN_ENABLED = "sync.lan.enabled";
+
+	public static final String SYNC_LAN_KEY = "sync.lan.key";
+
+	public static final String SYNC_LAN_SERVER_ID = "sync.lan.server.id";
+
 	public static final String SYNC_MAC_PACKAGE_FOLDER_EXTENSIONS =
 		"sync.mac.package.folder.extensions";
 
