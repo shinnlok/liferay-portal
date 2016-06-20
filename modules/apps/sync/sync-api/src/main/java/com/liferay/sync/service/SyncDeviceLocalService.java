@@ -97,7 +97,7 @@ public interface SyncDeviceLocalService extends BaseLocalService,
 	public SyncDevice addSyncDevice(SyncDevice syncDevice);
 
 	public SyncDevice addSyncDevice(long userId, java.lang.String type,
-		int buildNumber, int featureSet) throws PortalException;
+		long buildNumber, int featureSet) throws PortalException;
 
 	/**
 	* Creates a new sync device with the primary key. Does not add the sync device to the database.
@@ -174,7 +174,7 @@ public interface SyncDeviceLocalService extends BaseLocalService,
 	public SyncDevice updateSyncDevice(SyncDevice syncDevice);
 
 	public SyncDevice updateSyncDevice(long syncDeviceId,
-		java.lang.String type, int buildNumber, int featureSet, int status)
+		java.lang.String type, long buildNumber, int featureSet, int status)
 		throws PortalException;
 
 	/**
