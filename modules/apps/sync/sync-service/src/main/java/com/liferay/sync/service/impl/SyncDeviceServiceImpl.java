@@ -31,7 +31,7 @@ public class SyncDeviceServiceImpl extends SyncDeviceServiceBaseImpl {
 
 	@Override
 	public SyncDevice registerSyncDevice(
-			String type, int buildNumber, int featureSet, String uuid)
+			String type, long buildNumber, int featureSet, String uuid)
 		throws PortalException {
 
 		User user = getUser();
