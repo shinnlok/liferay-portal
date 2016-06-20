@@ -36,7 +36,7 @@ public class SyncDeviceLocalServiceImpl extends SyncDeviceLocalServiceBaseImpl {
 
 	@Override
 	public SyncDevice addSyncDevice(
-			long userId, String type, int buildNumber, int featureSet)
+			long userId, String type, long buildNumber, int featureSet)
 		throws PortalException {
 
 		User user = userPersistence.findByPrimaryKey(userId);
@@ -85,7 +85,7 @@ public class SyncDeviceLocalServiceImpl extends SyncDeviceLocalServiceBaseImpl {
 
 	@Override
 	public SyncDevice updateSyncDevice(
-			long syncDeviceId, String type, int buildNumber, int featureSet,
+			long syncDeviceId, String type, long buildNumber, int featureSet,
 			int status)
 		throws PortalException {
 
