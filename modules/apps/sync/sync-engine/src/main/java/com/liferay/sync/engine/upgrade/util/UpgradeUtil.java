@@ -17,12 +17,16 @@ package com.liferay.sync.engine.upgrade.util;
 import com.liferay.sync.engine.model.SyncProp;
 import com.liferay.sync.engine.service.SyncAccountService;
 import com.liferay.sync.engine.service.SyncFileService;
+import com.liferay.sync.engine.service.SyncLanClientService;
+import com.liferay.sync.engine.service.SyncLanEndpointService;
 import com.liferay.sync.engine.service.SyncPropService;
 import com.liferay.sync.engine.service.SyncSiteService;
 import com.liferay.sync.engine.service.SyncUserService;
 import com.liferay.sync.engine.service.SyncWatchEventService;
 import com.liferay.sync.engine.service.persistence.SyncAccountPersistence;
 import com.liferay.sync.engine.service.persistence.SyncFilePersistence;
+import com.liferay.sync.engine.service.persistence.SyncLanClientPersistence;
+import com.liferay.sync.engine.service.persistence.SyncLanEndpointPersistence;
 import com.liferay.sync.engine.service.persistence.SyncPropPersistence;
 import com.liferay.sync.engine.service.persistence.SyncSitePersistence;
 import com.liferay.sync.engine.service.persistence.SyncUserPersistence;
@@ -148,6 +152,20 @@ public class UpgradeUtil {
 
 		if (!syncFilePersistence.isTableExists()) {
 			syncFilePersistence.createTable();
+		}
+
+		SyncLanClientPersistence syncLanClientPersistence =
+			SyncLanClientService.getSyncLanClientPersistence();
+
+		if (!syncLanClientPersistence.isTableExists()) {
+			syncLanClientPersistence.createTable();
+		}
+
+		SyncLanEndpointPersistence syncLanEndpointPersistence =
+			SyncLanEndpointService.getSyncLanEndpointPersistence();
+
+		if (!syncLanEndpointPersistence.isTableExists()) {
+			syncLanEndpointPersistence.createTable();
 		}
 
 		SyncPropPersistence syncPropPersistence =
