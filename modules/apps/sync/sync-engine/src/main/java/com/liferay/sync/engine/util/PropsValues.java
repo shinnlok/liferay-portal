@@ -57,6 +57,12 @@ public class PropsValues {
 	public static final int SYNC_HTTP_SOCKET_TIMEOUT = Integer.parseInt(
 		PropsUtil.get(PropsKeys.SYNC_HTTP_SOCKET_TIMEOUT));
 
+	public static final int SYNC_LAN_BROADCAST_INTERVAL = Integer.parseInt(
+		PropsUtil.get(PropsKeys.SYNC_LAN_BROADCAST_INTERVAL));
+
+	public static final int SYNC_LAN_UDP_PORT = Integer.parseInt(
+		PropsUtil.get(PropsKeys.SYNC_LAN_UDP_PORT));
+
 	public static final String SYNC_LOGGER_CONFIGURATION_FILE = PropsUtil.get(
 		PropsKeys.SYNC_LOGGER_CONFIGURATION_FILE);
 
