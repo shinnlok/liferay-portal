@@ -62,6 +62,16 @@ public class SyncDeviceLocalServiceImpl extends SyncDeviceLocalServiceBaseImpl {
 	}
 
 	@Override
+	public List<SyncDevice> getSyncDevices(
+			long userId, int start, int end,
+			OrderByComparator orderByComparator)
+		throws PortalException {
+
+		return syncDevicePersistence.findByUserId(
+			userId, start, end, orderByComparator);
+	}
+
+	@Override
 	public List<SyncDevice> search(
 		long companyId, String keywords, int start, int end,
 		OrderByComparator<SyncDevice> orderByComparator) {
