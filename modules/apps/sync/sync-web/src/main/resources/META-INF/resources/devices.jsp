@@ -68,10 +68,21 @@ portletURL.setParameter("delta", String.valueOf(delta));
 			<%
 			searchContainer.setOrderByType(orderByType);
 			searchContainer.setOrderByCol(orderByCol);
+
+			List<SyncDevice> syncDevices = new ArrayList<>();
+
+			String portletId = (String)request.getAttribute(WebKeys.PORTLET_ID);
+
+			if (portletId.equals(SyncAdminPortletKeys.SYNC_ADMIN_PORTLET)) {
+				syncDevices = SyncDeviceLocalServiceUtil.search(themeDisplay.getCompanyId(), keywords, searchContainer.getStart(), searchContainer.getEnd(), obc);
+			}
+			else {
+				syncDevices = SyncDeviceLocalServiceUtil.getSyncDevices(themeDisplay.getUserId(), searchContainer.getStart(), searchContainer.getEnd(), obc);
+			}
 			%>
 
 			<liferay-ui:search-container-results
-				results="<%= SyncDeviceLocalServiceUtil.search(themeDisplay.getCompanyId(), keywords, searchContainer.getStart(), searchContainer.getEnd(), obc) %>"
+				results="<%= syncDevices %>"
 			/>
 
 			<liferay-ui:search-container-row
