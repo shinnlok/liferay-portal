@@ -118,9 +118,10 @@ public class SyncDeviceModelImpl extends BaseModelImpl<SyncDevice>
 				"value.object.column.bitmask.enabled.com.liferay.sync.model.SyncDevice"),
 			true);
 	public static final long COMPANYID_COLUMN_BITMASK = 1L;
-	public static final long USERNAME_COLUMN_BITMASK = 2L;
-	public static final long UUID_COLUMN_BITMASK = 4L;
-	public static final long SYNCDEVICEID_COLUMN_BITMASK = 8L;
+	public static final long USERID_COLUMN_BITMASK = 2L;
+	public static final long USERNAME_COLUMN_BITMASK = 4L;
+	public static final long UUID_COLUMN_BITMASK = 8L;
+	public static final long SYNCDEVICEID_COLUMN_BITMASK = 16L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -363,6 +364,14 @@ public class SyncDeviceModelImpl extends BaseModelImpl<SyncDevice>
 
 	@Override
 	public void setUserId(long userId) {
+		_columnBitmask |= USERID_COLUMN_BITMASK;
+
+		if (!_setOriginalUserId) {
+			_setOriginalUserId = true;
+
+			_originalUserId = _userId;
+		}
+
 		_userId = userId;
 	}
 
@@ -380,6 +389,10 @@ public class SyncDeviceModelImpl extends BaseModelImpl<SyncDevice>
 
 	@Override
 	public void setUserUuid(String userUuid) {
+	}
+
+	public long getOriginalUserId() {
+		return _originalUserId;
 	}
 
 	@JSON
@@ -601,6 +614,10 @@ public class SyncDeviceModelImpl extends BaseModelImpl<SyncDevice>
 
 		syncDeviceModelImpl._setOriginalCompanyId = false;
 
+		syncDeviceModelImpl._originalUserId = syncDeviceModelImpl._userId;
+
+		syncDeviceModelImpl._setOriginalUserId = false;
+
 		syncDeviceModelImpl._originalUserName = syncDeviceModelImpl._userName;
 
 		syncDeviceModelImpl._setModifiedDate = false;
@@ -769,6 +786,8 @@ public class SyncDeviceModelImpl extends BaseModelImpl<SyncDevice>
 	private long _originalCompanyId;
 	private boolean _setOriginalCompanyId;
 	private long _userId;
+	private long _originalUserId;
+	private boolean _setOriginalUserId;
 	private String _userName;
 	private String _originalUserName;
 	private Date _createDate;

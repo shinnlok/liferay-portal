@@ -273,6 +273,13 @@ public class SyncDeviceLocalServiceUtil {
 		return getService().getSyncDevices(start, end);
 	}
 
+	public static java.util.List<com.liferay.sync.model.SyncDevice> getSyncDevices(
+		long userId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().getSyncDevices(userId, start, end, orderByComparator);
+	}
+
 	public static java.util.List<com.liferay.sync.model.SyncDevice> search(
 		long companyId, java.lang.String keywords, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.sync.model.SyncDevice> orderByComparator) {
