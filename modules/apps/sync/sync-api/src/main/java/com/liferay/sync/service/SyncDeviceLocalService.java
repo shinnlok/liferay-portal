@@ -246,6 +246,10 @@ public interface SyncDeviceLocalService extends BaseLocalService,
 	public List<SyncDevice> getSyncDevices(int start, int end);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<SyncDevice> getSyncDevices(long userId, int start, int end,
+		OrderByComparator orderByComparator) throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<SyncDevice> search(long companyId, java.lang.String keywords,
 		int start, int end, OrderByComparator<SyncDevice> orderByComparator);
 
