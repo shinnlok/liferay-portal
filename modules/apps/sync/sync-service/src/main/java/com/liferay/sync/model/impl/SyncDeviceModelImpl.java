@@ -80,6 +80,7 @@ public class SyncDeviceModelImpl extends BaseModelImpl<SyncDevice>
 			{ "userName", Types.VARCHAR },
 			{ "createDate", Types.TIMESTAMP },
 			{ "modifiedDate", Types.TIMESTAMP },
+			{ "hostName", Types.VARCHAR },
 			{ "type_", Types.VARCHAR },
 			{ "buildNumber", Types.BIGINT },
 			{ "featureSet", Types.INTEGER },
@@ -95,13 +96,14 @@ public class SyncDeviceModelImpl extends BaseModelImpl<SyncDevice>
 		TABLE_COLUMNS_MAP.put("userName", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("createDate", Types.TIMESTAMP);
 		TABLE_COLUMNS_MAP.put("modifiedDate", Types.TIMESTAMP);
+		TABLE_COLUMNS_MAP.put("hostName", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("type_", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("buildNumber", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("featureSet", Types.INTEGER);
 		TABLE_COLUMNS_MAP.put("status", Types.INTEGER);
 	}
 
-	public static final String TABLE_SQL_CREATE = "create table SyncDevice (uuid_ VARCHAR(75) null,syncDeviceId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,type_ VARCHAR(75) null,buildNumber LONG,featureSet INTEGER,status INTEGER)";
+	public static final String TABLE_SQL_CREATE = "create table SyncDevice (uuid_ VARCHAR(75) null,syncDeviceId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,hostName VARCHAR(75) null,type_ VARCHAR(75) null,buildNumber LONG,featureSet INTEGER,status INTEGER)";
 	public static final String TABLE_SQL_DROP = "drop table SyncDevice";
 	public static final String ORDER_BY_JPQL = " ORDER BY syncDevice.syncDeviceId ASC";
 	public static final String ORDER_BY_SQL = " ORDER BY SyncDevice.syncDeviceId ASC";
@@ -143,6 +145,7 @@ public class SyncDeviceModelImpl extends BaseModelImpl<SyncDevice>
 		model.setUserName(soapModel.getUserName());
 		model.setCreateDate(soapModel.getCreateDate());
 		model.setModifiedDate(soapModel.getModifiedDate());
+		model.setHostName(soapModel.getHostName());
 		model.setType(soapModel.getType());
 		model.setBuildNumber(soapModel.getBuildNumber());
 		model.setFeatureSet(soapModel.getFeatureSet());
@@ -218,6 +221,7 @@ public class SyncDeviceModelImpl extends BaseModelImpl<SyncDevice>
 		attributes.put("userName", getUserName());
 		attributes.put("createDate", getCreateDate());
 		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("hostName", getHostName());
 		attributes.put("type", getType());
 		attributes.put("buildNumber", getBuildNumber());
 		attributes.put("featureSet", getFeatureSet());
@@ -271,6 +275,12 @@ public class SyncDeviceModelImpl extends BaseModelImpl<SyncDevice>
 
 		if (modifiedDate != null) {
 			setModifiedDate(modifiedDate);
+		}
+
+		String hostName = (String)attributes.get("hostName");
+
+		if (hostName != null) {
+			setHostName(hostName);
 		}
 
 		String type = (String)attributes.get("type");
@@ -451,6 +461,22 @@ public class SyncDeviceModelImpl extends BaseModelImpl<SyncDevice>
 
 	@JSON
 	@Override
+	public String getHostName() {
+		if (_hostName == null) {
+			return StringPool.BLANK;
+		}
+		else {
+			return _hostName;
+		}
+	}
+
+	@Override
+	public void setHostName(String hostName) {
+		_hostName = hostName;
+	}
+
+	@JSON
+	@Override
 	public String getType() {
 		if (_type == null) {
 			return StringPool.BLANK;
@@ -542,6 +568,7 @@ public class SyncDeviceModelImpl extends BaseModelImpl<SyncDevice>
 		syncDeviceImpl.setUserName(getUserName());
 		syncDeviceImpl.setCreateDate(getCreateDate());
 		syncDeviceImpl.setModifiedDate(getModifiedDate());
+		syncDeviceImpl.setHostName(getHostName());
 		syncDeviceImpl.setType(getType());
 		syncDeviceImpl.setBuildNumber(getBuildNumber());
 		syncDeviceImpl.setFeatureSet(getFeatureSet());
@@ -669,6 +696,14 @@ public class SyncDeviceModelImpl extends BaseModelImpl<SyncDevice>
 			syncDeviceCacheModel.modifiedDate = Long.MIN_VALUE;
 		}
 
+		syncDeviceCacheModel.hostName = getHostName();
+
+		String hostName = syncDeviceCacheModel.hostName;
+
+		if ((hostName != null) && (hostName.length() == 0)) {
+			syncDeviceCacheModel.hostName = null;
+		}
+
 		syncDeviceCacheModel.type = getType();
 
 		String type = syncDeviceCacheModel.type;
@@ -688,7 +723,7 @@ public class SyncDeviceModelImpl extends BaseModelImpl<SyncDevice>
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(23);
+		StringBundler sb = new StringBundler(25);
 
 		sb.append("{uuid=");
 		sb.append(getUuid());
@@ -704,6 +739,8 @@ public class SyncDeviceModelImpl extends BaseModelImpl<SyncDevice>
 		sb.append(getCreateDate());
 		sb.append(", modifiedDate=");
 		sb.append(getModifiedDate());
+		sb.append(", hostName=");
+		sb.append(getHostName());
 		sb.append(", type=");
 		sb.append(getType());
 		sb.append(", buildNumber=");
@@ -719,7 +756,7 @@ public class SyncDeviceModelImpl extends BaseModelImpl<SyncDevice>
 
 	@Override
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(37);
+		StringBundler sb = new StringBundler(40);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.sync.model.SyncDevice");
@@ -752,6 +789,10 @@ public class SyncDeviceModelImpl extends BaseModelImpl<SyncDevice>
 		sb.append(
 			"<column><column-name>modifiedDate</column-name><column-value><![CDATA[");
 		sb.append(getModifiedDate());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>hostName</column-name><column-value><![CDATA[");
+		sb.append(getHostName());
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>type</column-name><column-value><![CDATA[");
@@ -793,6 +834,7 @@ public class SyncDeviceModelImpl extends BaseModelImpl<SyncDevice>
 	private Date _createDate;
 	private Date _modifiedDate;
 	private boolean _setModifiedDate;
+	private String _hostName;
 	private String _type;
 	private long _buildNumber;
 	private int _featureSet;

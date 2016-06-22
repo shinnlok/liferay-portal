@@ -51,9 +51,9 @@ public interface SyncDeviceService extends BaseService {
 	 *
 	 * Never modify or reference this interface directly. Always use {@link SyncDeviceServiceUtil} to access the sync device remote service. Add custom service methods to {@link com.liferay.sync.service.impl.SyncDeviceServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public SyncDevice registerSyncDevice(java.lang.String type,
-		long buildNumber, int featureSet, java.lang.String uuid)
-		throws PortalException;
+	public SyncDevice registerSyncDevice(java.lang.String hostName,
+		java.lang.String type, long buildNumber, int featureSet,
+		java.lang.String uuid) throws PortalException;
 
 	/**
 	* Returns the OSGi service identifier.

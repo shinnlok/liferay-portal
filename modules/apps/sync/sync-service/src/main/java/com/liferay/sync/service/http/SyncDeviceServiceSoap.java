@@ -66,11 +66,11 @@ import java.rmi.RemoteException;
 @ProviderType
 public class SyncDeviceServiceSoap {
 	public static com.liferay.sync.model.SyncDeviceSoap registerSyncDevice(
-		java.lang.String type, long buildNumber, int featureSet,
-		java.lang.String uuid) throws RemoteException {
+		java.lang.String hostName, java.lang.String type, long buildNumber,
+		int featureSet, java.lang.String uuid) throws RemoteException {
 		try {
-			com.liferay.sync.model.SyncDevice returnValue = SyncDeviceServiceUtil.registerSyncDevice(type,
-					buildNumber, featureSet, uuid);
+			com.liferay.sync.model.SyncDevice returnValue = SyncDeviceServiceUtil.registerSyncDevice(hostName,
+					type, buildNumber, featureSet, uuid);
 
 			return com.liferay.sync.model.SyncDeviceSoap.toSoapModel(returnValue);
 		}

@@ -194,6 +194,21 @@ public interface SyncDeviceModel extends BaseModel<SyncDevice>, ShardedModel,
 	public void setModifiedDate(Date modifiedDate);
 
 	/**
+	 * Returns the host name of this sync device.
+	 *
+	 * @return the host name of this sync device
+	 */
+	@AutoEscape
+	public String getHostName();
+
+	/**
+	 * Sets the host name of this sync device.
+	 *
+	 * @param hostName the host name of this sync device
+	 */
+	public void setHostName(String hostName);
+
+	/**
 	 * Returns the type of this sync device.
 	 *
 	 * @return the type of this sync device

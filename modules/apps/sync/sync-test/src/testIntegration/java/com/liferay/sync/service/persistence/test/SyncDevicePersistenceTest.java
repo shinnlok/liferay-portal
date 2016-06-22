@@ -134,6 +134,8 @@ public class SyncDevicePersistenceTest {
 
 		newSyncDevice.setModifiedDate(RandomTestUtil.nextDate());
 
+		newSyncDevice.setHostName(RandomTestUtil.randomString());
+
 		newSyncDevice.setType(RandomTestUtil.randomString());
 
 		newSyncDevice.setBuildNumber(RandomTestUtil.nextLong());
@@ -162,6 +164,8 @@ public class SyncDevicePersistenceTest {
 		Assert.assertEquals(Time.getShortTimestamp(
 				existingSyncDevice.getModifiedDate()),
 			Time.getShortTimestamp(newSyncDevice.getModifiedDate()));
+		Assert.assertEquals(existingSyncDevice.getHostName(),
+			newSyncDevice.getHostName());
 		Assert.assertEquals(existingSyncDevice.getType(),
 			newSyncDevice.getType());
 		Assert.assertEquals(existingSyncDevice.getBuildNumber(),
@@ -231,8 +235,9 @@ public class SyncDevicePersistenceTest {
 	protected OrderByComparator<SyncDevice> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create("SyncDevice", "uuid", true,
 			"syncDeviceId", true, "companyId", true, "userId", true,
-			"userName", true, "createDate", true, "modifiedDate", true, "type",
-			true, "buildNumber", true, "featureSet", true, "status", true);
+			"userName", true, "createDate", true, "modifiedDate", true,
+			"hostName", true, "type", true, "buildNumber", true, "featureSet",
+			true, "status", true);
 	}
 
 	@Test
@@ -445,6 +450,8 @@ public class SyncDevicePersistenceTest {
 		syncDevice.setCreateDate(RandomTestUtil.nextDate());
 
 		syncDevice.setModifiedDate(RandomTestUtil.nextDate());
+
+		syncDevice.setHostName(RandomTestUtil.randomString());
 
 		syncDevice.setType(RandomTestUtil.randomString());
 
