@@ -117,7 +117,4 @@ public interface PropsKeys {
 	public static final String SYNC_OAUTH_WEBSITE_URL =
 		"sync.oauth.website.url";
 
-	public static final String SYNC_SELECTIVE_SYNC_ENABLED =
-		"sync.selective.sync.enabled";
-
 }

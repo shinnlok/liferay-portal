@@ -31,16 +31,16 @@ public class LanDiscoveryListener {
 	public void listen() throws Exception {
 		_eventLoopGroup = new NioEventLoopGroup();
 
+		Bootstrap bootstrap = new Bootstrap();
+
+		bootstrap.channel(NioDatagramChannel.class);
+		bootstrap.group(_eventLoopGroup);
+		bootstrap.handler(new LanDiscoveryListenerHandler());
+
+		ChannelFuture channelFuture = bootstrap.bind(
+			PropsValues.SYNC_LAN_UDP_PORT);
+
 		try {
-			Bootstrap bootstrap = new Bootstrap();
-
-			bootstrap.channel(NioDatagramChannel.class);
-			bootstrap.group(_eventLoopGroup);
-			bootstrap.handler(new LanDiscoveryListenerHandler());
-
-			ChannelFuture channelFuture = bootstrap.bind(
-				PropsValues.SYNC_LAN_UDP_PORT);
-
 			channelFuture.sync();
 
 			Channel channel = channelFuture.channel();
@@ -49,8 +49,10 @@ public class LanDiscoveryListener {
 
 			closeChannelFuture.await();
 		}
+		catch (InterruptedException ie) {
+		}
 		finally {
-			shutdown();
+			_eventLoopGroup.shutdownGracefully();
 		}
 	}
 

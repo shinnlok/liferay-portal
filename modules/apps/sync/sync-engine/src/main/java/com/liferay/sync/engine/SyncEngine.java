@@ -29,6 +29,7 @@ import com.liferay.sync.engine.model.SyncSite;
 import com.liferay.sync.engine.model.SyncUser;
 import com.liferay.sync.engine.service.SyncAccountService;
 import com.liferay.sync.engine.service.SyncFileService;
+import com.liferay.sync.engine.service.SyncPropService;
 import com.liferay.sync.engine.service.SyncSiteService;
 import com.liferay.sync.engine.service.SyncUserService;
 import com.liferay.sync.engine.service.SyncWatchEventService;
@@ -41,7 +42,6 @@ import com.liferay.sync.engine.util.FileUtil;
 import com.liferay.sync.engine.util.LoggerUtil;
 import com.liferay.sync.engine.util.PropsKeys;
 import com.liferay.sync.engine.util.PropsUtil;
-import com.liferay.sync.engine.util.PropsValues;
 import com.liferay.sync.engine.util.SyncEngineUtil;
 import com.liferay.sync.engine.util.Validator;
 
@@ -351,7 +351,7 @@ public class SyncEngine {
 			scheduleSyncAccountTasks(syncAccount.getSyncAccountId());
 		}
 
-		if (PropsValues.SYNC_LAN_ENABLED) {
+		if (SyncPropService.getBoolean("lanEnabled", true)) {
 			LanEngine.start();
 		}
 

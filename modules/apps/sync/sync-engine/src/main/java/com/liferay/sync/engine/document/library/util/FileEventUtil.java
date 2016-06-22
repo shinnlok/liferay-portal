@@ -38,6 +38,7 @@ import com.liferay.sync.engine.model.SyncFile;
 import com.liferay.sync.engine.model.SyncSite;
 import com.liferay.sync.engine.service.SyncAccountService;
 import com.liferay.sync.engine.service.SyncFileService;
+import com.liferay.sync.engine.service.SyncPropService;
 import com.liferay.sync.engine.service.SyncSiteService;
 import com.liferay.sync.engine.util.FileUtil;
 import com.liferay.sync.engine.util.IODeltaUtil;
@@ -237,7 +238,8 @@ public class FileEventUtil {
 		SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
 			syncAccountId);
 
-		if (lan && syncAccount.isLanEnabled() && PropsValues.SYNC_LAN_ENABLED &&
+		if (lan && syncAccount.isLanEnabled() &&
+			SyncPropService.getBoolean("lanEnabled", true) &&
 			StringUtils.isNotEmpty(syncFile.getLanTokenKey()) &&
 			(syncFile.getSize() >= syncAccount.getBatchFileMaxSize()/10)) {
 
