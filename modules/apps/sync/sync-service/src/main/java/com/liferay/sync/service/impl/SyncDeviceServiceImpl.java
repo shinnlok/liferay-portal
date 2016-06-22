@@ -31,7 +31,8 @@ public class SyncDeviceServiceImpl extends SyncDeviceServiceBaseImpl {
 
 	@Override
 	public SyncDevice registerSyncDevice(
-			String type, long buildNumber, int featureSet, String uuid)
+			String hostName, String type, long buildNumber, int featureSet,
+			String uuid)
 		throws PortalException {
 
 		User user = getUser();
@@ -42,7 +43,7 @@ public class SyncDeviceServiceImpl extends SyncDeviceServiceBaseImpl {
 
 		if (syncDevice == null) {
 			return syncDeviceLocalService.addSyncDevice(
-				user.getUserId(), type, buildNumber, featureSet);
+				user.getUserId(), hostName, type, buildNumber, featureSet);
 		}
 
 		if (syncDevice.getUserId() != user.getUserId()) {
@@ -50,8 +51,8 @@ public class SyncDeviceServiceImpl extends SyncDeviceServiceBaseImpl {
 		}
 
 		return syncDeviceLocalService.updateSyncDevice(
-			syncDevice.getSyncDeviceId(), type, buildNumber, featureSet,
-			syncDevice.getStatus());
+			syncDevice.getSyncDeviceId(), hostName, type, buildNumber,
+			featureSet, syncDevice.getStatus());
 	}
 
 	@Override
