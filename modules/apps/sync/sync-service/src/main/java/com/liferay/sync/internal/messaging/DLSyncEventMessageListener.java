@@ -173,6 +173,8 @@ public class DLSyncEventMessageListener extends BaseMessageListener {
 			if (event.equals(SyncDLObjectConstants.EVENT_TRASH)) {
 				setUser(syncDLObject);
 			}
+
+			syncDLObject.setKey(SyncUtil.popKey(modifiedTime, typePK));
 		}
 		else {
 			DLFolder dlFolder = _dlFolderLocalService.fetchDLFolder(typePK);

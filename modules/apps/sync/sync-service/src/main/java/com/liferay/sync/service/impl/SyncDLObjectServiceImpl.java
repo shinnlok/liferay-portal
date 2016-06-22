@@ -1353,7 +1353,14 @@ public class SyncDLObjectServiceImpl extends SyncDLObjectServiceBaseImpl {
 
 		SyncDLObject syncDLObject = SyncUtil.toSyncDLObject(fileEntry, event);
 
-		return checkModifiedTime(syncDLObject, fileEntry.getFileEntryId());
+		checkModifiedTime(syncDLObject, fileEntry.getFileEntryId());
+
+		String key = SyncUtil.stashKey(
+			syncDLObject.getModifiedTime(), fileEntry.getFileEntryId());
+
+		syncDLObject.setKey(key);
+
+		return syncDLObject;
 	}
 
 	protected SyncDLObject toSyncDLObject(Folder folder, String event)
