@@ -19,6 +19,8 @@
 <%
 String redirect = ParamUtil.getString(request, "redirect");
 
+MBRequestHelper mbRequestHelper = new MBRequestHelper(request);
+
 MBCategory category = mbRequestHelper.getCategory();
 
 long categoryId = MBUtil.getCategoryId(request, category);
@@ -63,6 +65,8 @@ else {
 }
 
 boolean portletTitleBasedNavigation = GetterUtil.getBoolean(portletConfig.getInitParameter("portlet-title-based-navigation"));
+
+MBHomeDisplayContext mbHomeDisplayContext = mbDisplayContextProvider.getMBHomeDisplayContext(request, response);
 
 if (portletTitleBasedNavigation) {
 	portletDisplay.setShowBackIcon(true);
@@ -148,9 +152,9 @@ if (portletTitleBasedNavigation) {
 			<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="mailing-list">
 				<aui:model-context bean="<%= mailingList %>" model="<%= MBMailingList.class %>" />
 
-				<aui:input fieldParam="mailingListActive" name="active" />
+				<aui:input label="active" name="mailingListActive" type="toggle-switch" value='<%= ParamUtil.getBoolean(request, "mailingListActive", BeanPropertiesUtil.getBoolean(mailingList, "active")) %>' />
 
-				<aui:input label="allow-anonymous-emails" name="allowAnonymous" />
+				<aui:input label="allow-anonymous-emails" name="allowAnonymous" type="toggle-switch" value='<%= BeanParamUtil.getBoolean(mailingList, request, "allowAnonymous") %>' />
 
 				<div id="<portlet:namespace />mailingListSettings">
 					<aui:input name="emailAddress" />

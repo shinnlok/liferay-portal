@@ -33,7 +33,13 @@ public class ContactsWebUpgrade implements UpgradeStepRegistrator {
 			new DummyUpgradeStep());
 
 		registry.register(
-			"com.liferay.contacts.web", "0.0.1", "1.0.0",
+			"com.liferay.contacts.web", "0.0.1", "1.0.1",
+			new UpgradePortletId());
+
+		// See LPS-65946
+
+		registry.register(
+			"com.liferay.contacts.web", "1.0.0", "1.0.1",
 			new UpgradePortletId());
 	}
 

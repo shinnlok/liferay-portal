@@ -76,7 +76,8 @@ import org.osgi.service.component.annotations.Reference;
 	property = {
 		"com.liferay.portlet.css-class-wrapper=knowledge-base-portlet knowledge-base-portlet-display",
 		"com.liferay.portlet.display-category=category.cms",
-		"com.liferay.portlet.header-portlet-css=/admin/css/common.css,/display/css/main.css",
+		"com.liferay.portlet.header-portlet-css=/admin/css/common.css",
+		"com.liferay.portlet.header-portlet-css=/display/css/main.css",
 		"com.liferay.portlet.icon=/icons/display.png",
 		"com.liferay.portlet.scopeable=true",
 		"javax.portlet.display-name=Knowledge Base Display",
@@ -102,13 +103,19 @@ public class DisplayPortlet extends BaseKBPortlet {
 		throws IOException, PortletException {
 
 		try {
+			renderRequest.setAttribute(
+				KBWebKeys.DL_MIME_TYPE_DISPLAY_CONTEXT,
+				dlMimeTypeDisplayContext);
+
 			KBArticleSelection kbArticleSelection = getKBArticle(renderRequest);
+
+			renderRequest.setAttribute(
+				KBWebKeys.KNOWLEDGE_BASE_EXACT_MATCH,
+				kbArticleSelection.isExactMatch());
 
 			KBArticle kbArticle = kbArticleSelection.getKBArticle();
 
 			int status = getStatus(renderRequest, kbArticle);
-
-			renderRequest.setAttribute(KBWebKeys.KNOWLEDGE_BASE_STATUS, status);
 
 			if ((kbArticle != null) && (kbArticle.getStatus() != status)) {
 				kbArticle = _kbArticleLocalService.fetchLatestKBArticle(
@@ -117,12 +124,12 @@ public class DisplayPortlet extends BaseKBPortlet {
 
 			renderRequest.setAttribute(
 				KBWebKeys.KNOWLEDGE_BASE_KB_ARTICLE, kbArticle);
-			renderRequest.setAttribute(
-				KBWebKeys.KNOWLEDGE_BASE_EXACT_MATCH,
-				kbArticleSelection.isExactMatch());
+
 			renderRequest.setAttribute(
 				KBWebKeys.KNOWLEDGE_BASE_SEARCH_KEYWORDS,
 				kbArticleSelection.getKeywords());
+
+			renderRequest.setAttribute(KBWebKeys.KNOWLEDGE_BASE_STATUS, status);
 
 			if (!kbArticleSelection.isExactMatch()) {
 				HttpServletResponse response =

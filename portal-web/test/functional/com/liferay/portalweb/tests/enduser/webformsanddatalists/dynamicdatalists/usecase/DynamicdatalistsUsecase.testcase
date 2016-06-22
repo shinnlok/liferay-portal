@@ -1236,6 +1236,11 @@
 	</command>
 
 	<command name="AssertUserCannotDeleteEntryAfterPermissionRemoved" priority="4">
+		<execute macro="TestCase#getSiteName">
+			<return from="siteName" name="siteName" />
+			<var name="siteName" value="${siteName}" />
+		</execute>
+
 		<execute macro="ProductMenu#gotoControlPanelUsers">
 			<var name="portlet" value="Users and Organizations" />
 		</execute>
@@ -1335,6 +1340,7 @@
 		</execute>
 
 		<execute macro="User#impersonateCP">
+			<var name="siteName" value="${siteName}" />
 			<var name="userScreenName" value="usersn1" />
 		</execute>
 
@@ -1347,8 +1353,8 @@
 		</execute>
 
 		<execute macro="Navigator#closeSpecificWindow">
-			<var name="closeWindowTitle" value="Data Definition Page Name - Liferay" />
-			<var name="selectWindowTitle" value="Users and Organizations - Control Panel - Liferay" />
+			<var name="closeWindowTitle" value="Data Definition Page Name - ${siteName}" />
+			<var name="selectWindowTitle" value="Users and Organizations - Control Panel - ${siteName}" />
 		</execute>
 
 		<execute macro="Navigator#openURL" />
@@ -1375,6 +1381,7 @@
 		</execute>
 
 		<execute macro="User#impersonateCP">
+			<var name="siteName" value="${siteName}" />
 			<var name="userScreenName" value="usersn1" />
 		</execute>
 
@@ -2100,6 +2107,81 @@
 		</execute>
 
 		<execute macro="DDLTemplate#saveFormTemplateCP" />
+	</command>
+
+	<command name="RemoveRepeatableDateField" priority="4">
+		<description message="This is a use case for LPS-65479." />
+
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Dynamic Data Lists" />
+		</execute>
+
+		<execute macro="DDLDataDefinition#addCP" />
+
+		<execute macro="DynamicDataMapping#addField">
+			<var name="field" value="Date" />
+			<var name="fieldFieldLabel" value="Date" />
+			<var name="fieldName" value="Date" />
+		</execute>
+
+		<execute macro="DynamicDataMapping#editFieldRepeatable">
+			<var name="fieldFieldLabel" value="Date" />
+		</execute>
+
+		<execute macro="DDLDataDefinition#save" />
+
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Dynamic Data Lists" />
+		</execute>
+
+		<execute macro="DDLList#addCP" />
+
+		<execute macro="DDLDataDefinition#selectCP" />
+
+		<execute macro="DDLList#save" />
+
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Dynamic Data Lists" />
+		</execute>
+
+		<execute macro="DDLRecord#addCP" />
+
+		<execute macro="DDLRecord#populateFieldDate">
+			<var name="ddlRecordFieldData" value="04/01/2018" />
+			<var name="fieldFieldLabel" value="Date" />
+			<var name="fieldName" value="Date" />
+		</execute>
+
+		<execute macro="DDLRecord#addRepeatableField">
+			<var name="fieldName" value="Date" />
+		</execute>
+
+		<execute macro="DDLRecord#addRepeatableField">
+			<var name="fieldName" value="Date" />
+		</execute>
+
+		<execute macro="DDLRecord#deleteRepeatableField">
+			<var name="fieldName" value="Date" />
+			<var name="fieldNumber" value="2" />
+		</execute>
+
+		<execute macro="DDLRecord#deleteRepeatableField">
+			<var name="fieldName" value="Date" />
+			<var name="fieldNumber" value="2" />
+		</execute>
+
+		<execute macro="DDLRecord#viewFieldRepeatedNotPresent">
+			<var name="ddlRecordFieldData" value="04/01/2018" />
+			<var name="fieldName" value="Date" />
+		</execute>
+
+		<execute macro="PortletEntry#publish" />
 	</command>
 
 	<command name="RemoveRepeatableFieldAndAssertOrderInTranslation" priority="3">

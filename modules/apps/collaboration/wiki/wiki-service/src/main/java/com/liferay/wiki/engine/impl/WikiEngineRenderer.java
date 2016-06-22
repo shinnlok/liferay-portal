@@ -36,7 +36,7 @@ import com.liferay.wiki.exception.WikiFormatException;
 import com.liferay.wiki.model.WikiNode;
 import com.liferay.wiki.model.WikiPage;
 import com.liferay.wiki.model.WikiPageDisplay;
-import com.liferay.wiki.util.WikiCacheUtil;
+import com.liferay.wiki.util.WikiCacheHelper;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -80,6 +80,8 @@ public class WikiEngineRenderer {
 		WikiEngine wikiEngine = fetchWikiEngine(page.getFormat());
 
 		if (wikiEngine == null) {
+			_wikiCacheHelper.clearCache(page.getNodeId(), page.getTitle());
+
 			throw new WikiFormatException();
 		}
 
@@ -155,7 +157,7 @@ public class WikiEngineRenderer {
 		List<Map<String, Boolean>> pageTitles = new ArrayList<>();
 
 		for (WikiPage page : pages) {
-			pageTitles.add(WikiCacheUtil.getOutgoingLinks(page, this));
+			pageTitles.add(_wikiCacheHelper.getOutgoingLinks(page, this));
 		}
 
 		Set<WikiPage> notOrphans = new HashSet<>();
@@ -232,7 +234,7 @@ public class WikiEngineRenderer {
 		String attachmentURLPrefix = sb.toString();
 
 		if (!preview && (version == 0)) {
-			WikiPageDisplay pageDisplay = WikiCacheUtil.getDisplay(
+			WikiPageDisplay pageDisplay = _wikiCacheHelper.getDisplay(
 				page.getNodeId(), title, curViewPageURL, curEditPageURL,
 				attachmentURLPrefix);
 
@@ -248,9 +250,15 @@ public class WikiEngineRenderer {
 	public void renderEditPageHTML(
 			String format, PageContext pageContext, WikiNode node,
 			WikiPage page)
-		throws IOException, ServletException {
+		throws IOException, ServletException, WikiFormatException {
 
 		WikiEngine wikiEngine = _wikiEngineTracker.getWikiEngine(format);
+
+		if (wikiEngine == null) {
+			_wikiCacheHelper.clearCache(page.getNodeId(), page.getTitle());
+
+			throw new WikiFormatException();
+		}
 
 		HttpServletResponse response =
 			(HttpServletResponse)pageContext.getResponse();
@@ -268,6 +276,11 @@ public class WikiEngineRenderer {
 		StringBundler sb = unsyncStringWriter.getStringBundler();
 
 		writer.write(sb.toString());
+	}
+
+	@Reference(unbind = "-")
+	protected void setWikiCacheHelper(WikiCacheHelper wikiCacheHelper) {
+		_wikiCacheHelper = wikiCacheHelper;
 	}
 
 	@Reference(unbind = "-")
@@ -314,6 +327,7 @@ public class WikiEngineRenderer {
 	private static final Pattern _viewPageURLPattern = Pattern.compile(
 		"\\[\\$BEGIN_PAGE_TITLE\\$\\](.*?)\\[\\$END_PAGE_TITLE\\$\\]");
 
+	private WikiCacheHelper _wikiCacheHelper;
 	private WikiEngineTracker _wikiEngineTracker;
 
 }

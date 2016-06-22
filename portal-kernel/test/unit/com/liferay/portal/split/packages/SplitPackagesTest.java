@@ -81,7 +81,7 @@ public class SplitPackagesTest {
 						}
 					}
 
-					if (Files.exists(dirPath.resolve("portal.build"))) {
+					if (Files.exists(dirPath.resolve(".lfrbuild-portal"))) {
 						Path sourcePath = dirPath.resolve("src/main/java");
 
 						if (Files.exists(dirPath.resolve("docroot"))) {
@@ -122,13 +122,7 @@ public class SplitPackagesTest {
 			if (!modulePackageNames.isEmpty() &&
 				modulePath.equals(Paths.get("portal-impl"))) {
 
-				String buildGradleContent = new String(
-					Files.readAllBytes(dirPath.resolve("build.gradle")));
-
-				if (buildGradleContent.contains(
-						"deployDir = new File(appServerPortalDir, " +
-							"\"WEB-INF/lib\")")) {
-
+				if (Files.exists(dirPath.resolve(".lfrbuild-app-server-lib"))) {
 					Set<String> portalImplPackages = entry.getValue();
 
 					portalImplPackages.addAll(packageNames);

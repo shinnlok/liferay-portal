@@ -45,6 +45,7 @@ import com.liferay.gradle.util.Validator;
 import groovy.lang.Closure;
 
 import java.io.File;
+import java.io.OutputStream;
 
 import java.nio.charset.StandardCharsets;
 
@@ -91,6 +92,7 @@ import org.gradle.api.tasks.bundling.Jar;
 import org.gradle.api.tasks.bundling.War;
 import org.gradle.api.tasks.compile.CompileOptions;
 import org.gradle.api.tasks.compile.JavaCompile;
+import org.gradle.api.tasks.javadoc.Javadoc;
 import org.gradle.api.tasks.testing.Test;
 import org.gradle.internal.Factory;
 import org.gradle.plugins.ide.eclipse.EclipsePlugin;
@@ -127,6 +129,8 @@ public class LiferayOSGiPlugin implements Plugin<Project> {
 		configureDescription(project);
 		configureSourceSetMain(project);
 		configureTaskClean(project);
+		configureTaskJar(project);
+		configureTaskJavadoc(project);
 		configureTaskTest(project);
 		configureTasksTest(project);
 
@@ -148,14 +152,36 @@ public class LiferayOSGiPlugin implements Plugin<Project> {
 			});
 	}
 
+	public static class LiferayJarBuilderFactory
+		implements Factory<JarBuilder> {
+
+		@Override
+		public JarBuilder create() {
+			LiferayJarBuilder liferayJarBuilder = new LiferayJarBuilder();
+
+			return liferayJarBuilder.withContextClassLoader(
+				_contextClassLoader);
+		}
+
+		public ClassLoader getContextClassLoader() {
+			return _contextClassLoader;
+		}
+
+		public void setContextClassLoader(ClassLoader contextClassLoader) {
+			_contextClassLoader = contextClassLoader;
+		}
+
+		private ClassLoader _contextClassLoader;
+
+	}
+
 	protected void addDeployedFile(
 		final AbstractArchiveTask abstractArchiveTask, boolean lazy) {
 
-		Project project = abstractArchiveTask.getProject();
+		final Project project = abstractArchiveTask.getProject();
 
 		Task task = GradleUtil.getTask(
-			abstractArchiveTask.getProject(),
-			LiferayBasePlugin.DEPLOY_TASK_NAME);
+			project, LiferayBasePlugin.DEPLOY_TASK_NAME);
 
 		if (!(task instanceof Copy)) {
 			return;
@@ -178,12 +204,12 @@ public class LiferayOSGiPlugin implements Plugin<Project> {
 
 		copy.from(
 			sourcePath,
-			new Closure<Void>(null) {
+			new Closure<Void>(project) {
 
 				@SuppressWarnings("unused")
 				public void doCall(CopySpec copySpec) {
 					copySpec.rename(
-						new Closure<String>(null) {
+						new Closure<String>(project) {
 
 							public String doCall(String fileName) {
 								return getDeployedFileName(abstractArchiveTask);
@@ -413,6 +439,7 @@ public class LiferayOSGiPlugin implements Plugin<Project> {
 
 					jarBuilder.withBase(BundleUtils.getBase(project));
 					jarBuilder.withClasspath(_getClasspath(project));
+					jarBuilder.withFailOnError(true);
 					jarBuilder.withName(
 						properties.get(Constants.BUNDLE_SYMBOLICNAME));
 					jarBuilder.withProperties(properties);
@@ -586,7 +613,13 @@ public class LiferayOSGiPlugin implements Plugin<Project> {
 	protected void configureBundleExtension(Project project) {
 		replaceJarBuilderFactory(project);
 
-		Map<String, String> bundleInstructions = getBundleInstructions(project);
+		BundleExtension bundleExtension = GradleUtil.getExtension(
+			project, BundleExtension.class);
+
+		bundleExtension.setFailOnError(true);
+
+		Map<String, String> bundleInstructions = getBundleInstructions(
+			bundleExtension);
 
 		Properties bundleProperties = null;
 
@@ -680,7 +713,9 @@ public class LiferayOSGiPlugin implements Plugin<Project> {
 	}
 
 	protected void configureTaskCleanDependsOn(Delete delete) {
-		Closure<Set<String>> closure = new Closure<Set<String>>(null) {
+		Project project = delete.getProject();
+
+		Closure<Set<String>> closure = new Closure<Set<String>>(project) {
 
 			@SuppressWarnings("unused")
 			public Set<String> doCall(Delete delete) {
@@ -744,12 +779,44 @@ public class LiferayOSGiPlugin implements Plugin<Project> {
 		delete.dependsOn(closure);
 	}
 
+	protected void configureTaskJar(Project project) {
+		File bndFile = project.file("bnd.bnd");
+
+		if (!bndFile.exists()) {
+			return;
+		}
+
+		Task jarTask = GradleUtil.getTask(project, JavaPlugin.JAR_TASK_NAME);
+
+		TaskInputs taskInputs = jarTask.getInputs();
+
+		taskInputs.file(bndFile);
+	}
+
 	protected void configureTaskJavaCompileFork(
 		JavaCompile javaCompile, boolean fork) {
 
 		CompileOptions compileOptions = javaCompile.getOptions();
 
 		compileOptions.setFork(fork);
+	}
+
+	protected void configureTaskJavadoc(Project project) {
+		String bundleName = getBundleInstruction(
+			project, Constants.BUNDLE_NAME);
+		String bundleVersion = getBundleInstruction(
+			project, Constants.BUNDLE_VERSION);
+
+		if (Validator.isNull(bundleName) || Validator.isNull(bundleVersion)) {
+			return;
+		}
+
+		Javadoc javadoc = (Javadoc)GradleUtil.getTask(
+			project, JavaPlugin.JAVADOC_TASK_NAME);
+
+		String title = String.format("%s %s API", bundleName, bundleVersion);
+
+		javadoc.setTitle(title);
 	}
 
 	protected void configureTasksJavaCompileFork(
@@ -832,11 +899,17 @@ public class LiferayOSGiPlugin implements Plugin<Project> {
 		return bundleInstructions.get(key);
 	}
 
+	protected Map<String, String> getBundleInstructions(
+		BundleExtension bundleExtension) {
+
+		return (Map<String, String>)bundleExtension.getInstructions();
+	}
+
 	protected Map<String, String> getBundleInstructions(Project project) {
 		BundleExtension bundleExtension = GradleUtil.getExtension(
 			project, BundleExtension.class);
 
-		return (Map<String, String>)bundleExtension.getInstructions();
+		return getBundleInstructions(bundleExtension);
 	}
 
 	protected String getDeployedFileName(
@@ -898,6 +971,14 @@ public class LiferayOSGiPlugin implements Plugin<Project> {
 				filesList.toArray(new File[filesList.size()]));
 		}
 
+		public JarBuilder withContextClassLoader(
+			ClassLoader contextClassLoader) {
+
+			_contextClassLoader = contextClassLoader;
+
+			return this;
+		}
+
 		@Override
 		public JarBuilder withResources(Object files) {
 			List<File> filesList = new ArrayList<>(
@@ -925,18 +1006,68 @@ public class LiferayOSGiPlugin implements Plugin<Project> {
 				filesList.toArray(new File[filesList.size()]));
 		}
 
-		private final Set<File> _classpathFiles = new HashSet<>();
-		private final Set<File> _resourceFiles = new HashSet<>();
+		@Override
+		public void writeJarTo(File file) {
+			ClassLoader contextClassLoader = _replaceContextClassLoader(
+				_contextClassLoader);
 
-	}
-
-	private static class LiferayJarBuilderFactory
-		implements Factory<JarBuilder> {
+			try {
+				super.writeJarTo(file);
+			}
+			finally {
+				_replaceContextClassLoader(contextClassLoader);
+			}
+		}
 
 		@Override
-		public JarBuilder create() {
-			return new LiferayJarBuilder();
+		public void writeManifestTo(OutputStream outputStream) {
+			ClassLoader contextClassLoader = _replaceContextClassLoader(
+				_contextClassLoader);
+
+			try {
+				super.writeManifestTo(outputStream);
+			}
+			finally {
+				_replaceContextClassLoader(contextClassLoader);
+			}
 		}
+
+		@Override
+		public void writeManifestTo(
+			OutputStream outputStream,
+			@SuppressWarnings("rawtypes") Closure closure) {
+
+			ClassLoader contextClassLoader = _replaceContextClassLoader(
+				_contextClassLoader);
+
+			try {
+				super.writeManifestTo(outputStream, closure);
+			}
+			finally {
+				_replaceContextClassLoader(contextClassLoader);
+			}
+		}
+
+		private ClassLoader _replaceContextClassLoader(
+			ClassLoader newContextClassLoader) {
+
+			if (newContextClassLoader == null) {
+				return null;
+			}
+
+			Thread currentThread = Thread.currentThread();
+
+			ClassLoader contextClassLoader =
+				currentThread.getContextClassLoader();
+
+			currentThread.setContextClassLoader(newContextClassLoader);
+
+			return contextClassLoader;
+		}
+
+		private final Set<File> _classpathFiles = new HashSet<>();
+		private ClassLoader _contextClassLoader;
+		private final Set<File> _resourceFiles = new HashSet<>();
 
 	}
 

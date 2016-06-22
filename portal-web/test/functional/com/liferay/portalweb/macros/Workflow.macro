@@ -36,7 +36,7 @@
 			</then>
 		</if>
 
-		<for list="Blogs Entry,Calendar Event,Comments,Message Boards Message,Page Revision,Wiki Page" param="workflowResourceValue">
+		<for list="Blogs Entry,Calendar Event,Comment,Message Boards Message,Page Revision,Wiki Page" param="workflowResourceValue">
 			<var name="key_rowEntry" value="${workflowResourceValue}" />
 
 			<execute function="Click#waitForMenuToggleJSClick" locator1="Icon#ROW_VERTICAL_ELLIPSIS" />
@@ -141,8 +141,6 @@
 		<execute function="AssertClick" locator1="MenuItem#APPROVE" value1="Approve" />
 
 		<execute macro="Workflow#confirmAndViewSucessMessageViaDetails" />
-
-		<execute function="Click" locator1="Icon#ANGLE_LEFT_BACK" />
 
 		<execute macro="Workflow#viewCompletedTask">
 			<var name="ddlDataDefinitionName" value="${ddlDataDefinitionName}" />
@@ -456,8 +454,6 @@
 
 		<execute macro="Workflow#confirmAndViewSucessMessageViaDetails" />
 
-		<execute function="Click" locator1="Icon#ANGLE_LEFT_BACK" />
-
 		<execute function="SelectFrame" value1="relative=top" />
 
 		<execute macro="Workflow#viewCompletedTask">
@@ -513,8 +509,6 @@
 		<execute function="AssertClick" locator1="MenuItem#RESUBMIT" value1="Resubmit" />
 
 		<execute macro="Workflow#confirmAndViewSucessMessageViaDetails" />
-
-		<execute function="Click" locator1="Icon#ANGLE_LEFT_BACK" />
 
 		<execute macro="Workflow#viewCompletedTask">
 			<var name="ddlDataDefinitionName" value="${ddlDataDefinitionName}" />

@@ -1,4 +1,4 @@
-define("frontend-js-spa-web@1.0.6/senna/src/utils/utils", ['exports', '../globals/globals', 'metal-uri/src/Uri'], function (exports, _globals, _Uri) {
+define("frontend-js-spa-web@1.0.8/senna/src/utils/utils", ['exports', '../globals/globals', 'metal-uri/src/Uri'], function (exports, _globals, _Uri) {
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
@@ -25,6 +25,12 @@ define("frontend-js-spa-web@1.0.6/senna/src/utils/utils", ['exports', '../global
 		function utils() {
 			_classCallCheck(this, utils);
 		}
+
+		utils.copyNodeAttributes = function copyNodeAttributes(source, target) {
+			Array.prototype.slice.call(source.attributes).forEach(function (attribute) {
+				return target.setAttribute(attribute.name, attribute.value);
+			});
+		};
 
 		utils.getCurrentBrowserPath = function getCurrentBrowserPath() {
 			return this.getCurrentBrowserPathWithoutHash() + _globals2.default.window.location.hash;
@@ -53,6 +59,12 @@ define("frontend-js-spa-web@1.0.6/senna/src/utils/utils", ['exports', '../global
 
 		utils.isHtml5HistorySupported = function isHtml5HistorySupported() {
 			return !!(_globals2.default.window.history && _globals2.default.window.history.pushState);
+		};
+
+		utils.clearNodeAttributes = function clearNodeAttributes(node) {
+			Array.prototype.slice.call(node.attributes).forEach(function (attribute) {
+				return node.removeAttribute(attribute.name);
+			});
 		};
 
 		return utils;

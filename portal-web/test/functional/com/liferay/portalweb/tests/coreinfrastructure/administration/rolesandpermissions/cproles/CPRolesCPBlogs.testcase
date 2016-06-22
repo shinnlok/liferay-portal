@@ -37,7 +37,8 @@
 	</tear-down>
 
 	<command name="ViewBlogsEntryRegRoleInline" priority="5">
-		<property name="portal.acceptance" value="false" />
+		<property name="portal.acceptance" value="true" />
+		<property name="test.name.skip.portal.instance" value="CPRolesCPBlogs#ViewBlogsEntryRegRoleInline" />
 
 		<execute macro="Permissions#setUpRegRoleLoginUserCP">
 			<var name="portletName" value="Blogs" />
@@ -163,8 +164,6 @@
 
 		<execute macro="Navigator#openURL" />
 
-		<execute function="AssertElementNotPresent" locator1="ControlMenu#ADMIN" />
-
 		<execute macro="Permissions#definePermissionLoginUserCP">
 			<var name="permissionDefinitionKey" value="SITE_ADMIN_CONTENT_BLOGS_GENERAL_PERMISSIONS_ACCESS_IN_SITE_ADMINISTRATION_CHECKBOX" />
 			<var name="permissionDefinitionValue" value="Access in Site Administration" />
@@ -196,10 +195,6 @@
 			<var name="userLoginEmailAddress" value="userea@liferay.com" />
 			<var name="userLoginFullName" value="userfn userln" />
 		</execute>
-
-		<execute macro="Navigator#openURL" />
-
-		<execute function="AssertElementNotPresent" locator1="ControlMenu#ADMIN" />
 	</command>
 
 	<command name="ViewBlogsPortletSiteRole" priority="4">
@@ -223,8 +218,6 @@
 			<var name="siteName" value="Site Name" />
 		</execute>
 
-		<execute function="AssertElementNotPresent" locator1="ControlMenu#ADMIN" />
-
 		<execute macro="Permissions#definePermissionLoginUserCP">
 			<var name="permissionDefinitionKey" value="SITE_ADMIN_CONTENT_BLOGS_GENERAL_PERMISSIONS_ACCESS_IN_SITE_ADMINISTRATION_CHECKBOX" />
 			<var name="permissionDefinitionValue" value="Access in Site Administration" />
@@ -236,6 +229,10 @@
 
 		<execute macro="Navigator#openSiteURL">
 			<var name="siteName" value="Site Name" />
+		</execute>
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Blogs" />
 		</execute>
 
 		<execute macro="BlogsConfiguration#viewNoPermissionCP" />
@@ -257,12 +254,5 @@
 			<var name="userLoginEmailAddress" value="userea@liferay.com" />
 			<var name="userLoginFullName" value="userfn userln" />
 		</execute>
-
-		<execute macro="Navigator#gotoSitePage">
-			<var name="pageName" value="Blogs Page" />
-			<var name="siteName" value="Site Name" />
-		</execute>
-
-		<execute function="AssertElementNotPresent" locator1="ControlMenu#ADMIN" />
 	</command>
 </definition>

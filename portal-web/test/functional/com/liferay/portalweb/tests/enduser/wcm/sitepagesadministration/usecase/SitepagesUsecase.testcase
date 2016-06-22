@@ -67,6 +67,10 @@
 			<var name="webContentTitle" value="WC WebContent Title" />
 		</execute>
 
+		<execute macro="WebContent#viewPGViaWCD">
+			<var name="webContentContent" value="WC WebContent Content" />
+		</execute>
+
 		<execute macro="Navigator#gotoPage">
 			<var name="pageName" value="${sitePage3Name}" />
 		</execute>
@@ -182,8 +186,7 @@
 			<var name="page" value="Page Name" />
 		</execute>
 
-		<execute macro="Page#viewPageFriendURLPG">
-			<var name="localizedFriendlyURL" value="/german" />
+		<execute macro="Page#viewPageFriendlyURLPG">
 			<var name="pageName" value="page-name" />
 		</execute>
 	</command>
@@ -243,6 +246,15 @@
 
 		<execute macro="User#editPasswordCP">
 			<var name="userEmailAddress" value="userea@liferay.com" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+
+		<execute macro="ProductMenu#gotoControlPanelUsers">
+			<var name="portlet" value="Roles" />
+		</execute>
+
+		<execute macro="Role#assignRegRoleCP">
+			<var name="roleName" value="Power User" />
 			<var name="userScreenName" value="usersn" />
 		</execute>
 
@@ -415,6 +427,11 @@
 	</command>
 
 	<command name="ViewSecureContentAndPageAsGuest" priority="3">
+		<execute macro="TestCase#getSiteName">
+			<return from="siteName" name="siteName" />
+			<var name="siteName" value="${siteName}" />
+		</execute>
+
 		<execute macro="ProductMenu#gotoControlPanelConfiguration">
 			<var name="portlet" value="Server Administration" />
 		</execute>
@@ -552,6 +569,7 @@
 			<var name="contentTitle" value="Blogs Entry Title" />
 			<var name="gmailAssetType" value="Blogs" />
 			<var name="pageName" value="Blog and Message Board Page" />
+			<var name="siteName" value="${siteName}" />
 		</execute>
 
 		<var method="selenium#getLocation()" name="blogEntryURL" />
@@ -580,6 +598,7 @@
 			<var name="contentTitle" value="MB Thread Message Subject" />
 			<var name="gmailAssetType" value="Message Boards" />
 			<var name="pageName" value="Blog and Message Board Page" />
+			<var name="siteName" value="${siteName}" />
 		</execute>
 
 		<var method="selenium#getLocation()" name="messageBoardsThreadURL" />
@@ -619,6 +638,11 @@
 	</command>
 
 	<command name="ViewSecureContentAndPageAsSiteMember" priority="3">
+		<execute macro="TestCase#getSiteName">
+			<return from="siteName" name="siteName" />
+			<var name="siteName" value="${siteName}" />
+		</execute>
+
 		<execute macro="ProductMenu#gotoControlPanelConfiguration">
 			<var name="portlet" value="Server Administration" />
 		</execute>
@@ -781,6 +805,7 @@
 			<var name="contentTitle" value="Blogs Entry Title" />
 			<var name="gmailAssetType" value="Blogs" />
 			<var name="pageName" value="Blog and Message Board Page" />
+			<var name="siteName" value="${siteName}" />
 		</execute>
 
 		<var method="selenium#getLocation()" name="blogEntryURL" />
@@ -809,6 +834,7 @@
 			<var name="contentTitle" value="MB Thread Message Subject" />
 			<var name="gmailAssetType" value="Message Boards" />
 			<var name="pageName" value="Blog and Message Board Page" />
+			<var name="siteName" value="${siteName}" />
 		</execute>
 
 		<var method="selenium#getLocation()" name="messageBoardsThreadURL" />
@@ -869,6 +895,11 @@
 	</command>
 
 	<command name="ViewSecureContentAndPageAsUser" priority="3">
+		<execute macro="TestCase#getSiteName">
+			<return from="siteName" name="siteName" />
+			<var name="siteName" value="${siteName}" />
+		</execute>
+
 		<execute macro="ProductMenu#gotoControlPanelConfiguration">
 			<var name="portlet" value="Server Administration" />
 		</execute>
@@ -1022,6 +1053,7 @@
 			<var name="contentTitle" value="Blogs Entry Title" />
 			<var name="gmailAssetType" value="Blogs" />
 			<var name="pageName" value="Blog and Message Board Page" />
+			<var name="siteName" value="${siteName}" />
 		</execute>
 
 		<var method="selenium#getLocation()" name="blogEntryURL" />
@@ -1050,6 +1082,7 @@
 			<var name="contentTitle" value="MB Thread Message Subject" />
 			<var name="gmailAssetType" value="Message Boards" />
 			<var name="pageName" value="Blog and Message Board Page" />
+			<var name="siteName" value="${siteName}" />
 		</execute>
 
 		<var method="selenium#getLocation()" name="messageBoardsThreadURL" />

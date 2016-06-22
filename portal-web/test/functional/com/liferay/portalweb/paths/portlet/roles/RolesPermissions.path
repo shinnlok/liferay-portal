@@ -276,6 +276,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>SITE_ADMIN_PAGES_SITE_PAGES_RESOURCE_PERMISSIONS_PAGE_UPDATE_CHECKBOX</td>
+	<td>//input[contains(@value,'LayoutUPDATE')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td></td>
 	<td></td>
 	<td></td>
@@ -743,7 +748,7 @@
 <!--SITE_ADMIN_CONTENT_CATEGORIES_RESOURCE_PERMISSIONS_ASSET_ENTRIES-->
 <tr>
 	<td>SITE_ADMIN_CONTENT_CATEGORIES_RESOURCE_PERMISSIONS_ASSET_ENTRIES_ADD_CATEGORY_CHECKBOX</td>
-	<td>//input[contains(@value,'assetADD_CATEGORY')]</td>
+	<td>//label/input[contains(@value,'assetADD_CATEGORY')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -775,7 +780,7 @@
 <!--SITE_ADMIN_CONTENT_CATEGORIES_RESOURCE_PERMISSIONS_CATEGORY-->
 <tr>
 	<td>SITE_ADMIN_CONTENT_CATEGORIES_RESOURCE_PERMISSIONS_CATEGORY_ADD_CATEGORY_CHECKBOX</td>
-	<td>//input[contains(@value,'AssetCategoryADD_CATEGORY')]</td>
+	<td>//label/input[contains(@value,'AssetCategoryADD_CATEGORY')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -929,12 +934,12 @@
 </tr>
 <tr>
 	<td>SITE_ADMIN_APPLICATIONS_DOCUMENTS_AND_MEDIA_RESOURCE_PERMISSIONS_DOCUMENTS_ADD_DOCUMENT_CHECKBOX</td>
-	<td>//input[contains(@value,'documentlibraryADD_DOCUMENT')]</td>
+	<td>//input[contains(@value,'document.libraryADD_DOCUMENT')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>SITE_ADMIN_APPLICATIONS_DOCUMENTS_AND_MEDIA_RESOURCE_PERMISSIONS_DOCUMENTS_ADD_REPOSITORY_CHECKBOX</td>
-	<td>//tbody//input[contains(@value,'documentlibraryADD_REPOSITORY')]</td>
+	<td>//tbody//input[contains(@value,'document.libraryADD_REPOSITORY')]</td>
 	<td></td>
 </tr>
 <tr>

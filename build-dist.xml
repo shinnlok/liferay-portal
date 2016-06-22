@@ -1838,15 +1838,6 @@ wrapper.java.additional.11="-Dfile.encoding=UTF-8"]]></replacevalue>
 	<target name="unzip-weblogic">
 		<if>
 			<not>
-				<equals arg1="${app.server.weblogic.major.version}" arg2="12" />
-			</not>
-			<then>
-				<fail>Weblogic ${app.server.weblogic.major.version} is unsupported.</fail>
-			</then>
-		</if>
-
-		<if>
-			<not>
 				<available file="${app.server.parent.dir}/${app.server.weblogic.zip.name}" />
 			</not>
 			<then>
@@ -1951,6 +1942,14 @@ closeTemplate()
 		<if>
 			<os family="windows" />
 			<then>
+				<pathconvert property="app.server.weblogic.dir.windows" targetos="windows">
+					<path location="${app.server.weblogic.dir}" />
+				</pathconvert>
+
+				<pathconvert property="app.server.weblogic.wlserver.dir.windows" targetos="windows">
+					<path location="${app.server.weblogic.wlserver.dir}" />
+				</pathconvert>
+
 				<if>
 					<equals arg1="${app.server.weblogic.version.build}" arg2="1221" />
 					<then>
@@ -2219,7 +2218,7 @@ closeTemplate()
 
 						<mirrors-get
 							dest="${app.server.parent.dir}/${app.server.weblogic.custom.zip.name}"
-							src="http://mirrors/files.liferay.com/private/apps/oracle/weblogicas/12/${app.server.weblogic.custom.zip.name}"
+							src="http://files.liferay.com/private/apps/oracle/weblogicas/12/${app.server.weblogic.custom.zip.name}"
 							verbose="true"
 						/>
 					</try>
@@ -2934,29 +2933,6 @@ plugins.includes=</echo>
 		</xmltask>
 	</target>
 
-	<target name="zip-db-upgrade">
-		<tstamp>
-			<format pattern="yyyyMMddkkmmssSSS" property="tstamp.value" />
-		</tstamp>
-
-		<mkdir dir="${tstamp.value}" />
-
-		<copy todir="${tstamp.value}">
-			<fileset
-				dir="${liferay.home}/tools/portal-tools-db-upgrade-client"
-			/>
-		</copy>
-
-		<zip destfile="dist/liferay-portal-tools-db-upgrade-client-${lp.version}.zip">
-			<zipfileset
-				dir="${tstamp.value}"
-				prefix="liferay-portal-tools-db-upgrade-client-${lp.version}"
-			/>
-		</zip>
-
-		<delete dir="${tstamp.value}" />
-	</target>
-
 	<target name="zip-executable">
 		<delete failonerror="false" file="dist/${zip.executable.file}-${lp.version}.zip" />
 
@@ -2994,6 +2970,11 @@ plugins.includes=</echo>
 						filemode="744"
 						includes="**/*.sh"
 						prefix="liferay-portal-${lp.version}/${zip.executable.dir.name}"
+					/>
+					<zipfileset
+						dir="${zip.executable.dir}/.."
+						includes=".liferay-home"
+						prefix="liferay-portal-${lp.version}"
 					/>
 					<zipfileset
 						dir="${zip.executable.dir}/../data"
@@ -3054,7 +3035,7 @@ plugins.includes=</echo>
 							</then>
 							<else>
 								<antcall target="exec-patching-tool">
-									<param name="patching.tool.arg.line" value="auto-discovery ${zip.executable.dir}" />
+									<param name="patching.tool.arg.line" value="auto-discovery" />
 									<param name="patching.tool.dir" value="${zip.executable.dir}/../patching-tool" />
 								</antcall>
 							</else>
@@ -3263,6 +3244,29 @@ plugins.includes=</echo>
 		</zip>
 	</target>
 
+	<target name="zip-portal-tools">
+		<tstamp>
+			<format pattern="yyyyMMddkkmmssSSS" property="tstamp.value" />
+		</tstamp>
+
+		<mkdir dir="${tstamp.value}" />
+
+		<copy todir="${tstamp.value}">
+			<fileset
+				dir="${liferay.home}/tools"
+			/>
+		</copy>
+
+		<zip destfile="dist/liferay-portal-tools-${lp.version}.zip">
+			<zipfileset
+				dir="${tstamp.value}"
+				prefix="liferay-portal-tools-${lp.version}"
+			/>
+		</zip>
+
+		<delete dir="${tstamp.value}" />
+	</target>
+
 	<target name="zip-portal-war">
 		<antcall target="zip-portal-war-2.4" />
 		<!--<antcall target="zip-portal-war-2.3" />
@@ -3464,6 +3468,10 @@ plugins.includes=</echo>
 			<elseif>
 				<os family="windows" />
 				<then>
+					<pathconvert property="app.server.parent.dir.windows" targetos="windows">
+						<path location="${app.server.parent.dir}" />
+					</pathconvert>
+
 					<propertyregex
 						input="${app.server.parent.dir.windows}"
 						property="app.server.parent.dir.windows.double.slash"
@@ -3477,6 +3485,10 @@ plugins.includes=</echo>
 						regexp=":"
 						replace="\\\\:"
 					/>
+
+					<pathconvert property="app.server.weblogic.dir.windows" targetos="windows">
+						<path location="${app.server.weblogic.dir}" />
+					</pathconvert>
 
 					<propertyregex
 						input="${app.server.weblogic.dir.windows}"
@@ -3535,6 +3547,10 @@ plugins.includes=</echo>
 		<if>
 			<os family="windows" />
 			<then>
+				<pathconvert property="app.server.websphere.dir.windows" targetos="windows">
+					<path location="${app.server.websphere.dir}" />
+				</pathconvert>
+
 				<propertyregex
 					input="${app.server.websphere.dir.windows}"
 					property="app.server.websphere.dir.windows.double.slash"

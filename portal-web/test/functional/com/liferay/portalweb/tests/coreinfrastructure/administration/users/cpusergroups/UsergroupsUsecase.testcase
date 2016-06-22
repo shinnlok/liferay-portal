@@ -136,11 +136,11 @@
 
 		<execute function="Type" locator1="NavBar#BASIC_SEARCH_FIELD" value1="userfn" />
 
-		<execute function="AssertClick" locator1="NavBar#BASIC_SEARCH_BUTTON" value1="Search" />
+		<execute function="Click" locator1="Button#SUBMIT" />
 
-		<var name="key_userScreenName" value="usersn" />
+		<var name="key_rowEntry" value="usersn" />
 
-		<execute function="Click" locator1="UsersAndOrganizations#USER_TABLE_ACTIONS" />
+		<execute function="Click" locator1="ContentRow#ENTRY_CONTENT_ENTRY_ELLIPSIS" />
 
 		<execute function="AssertClick" locator1="MenuItem#MANAGE_PAGES" value1="Manage Pages" />
 
@@ -166,7 +166,7 @@
 
 		<execute macro="UserBar#gotoDashboard" />
 
-		<execute function="AssertTextEquals" locator1="Home#PAGE_1" value1="Test User Group Page 1" />
+		<execute function="AssertTextEquals" locator1="Home#PAGE_2" value1="Test User Group Page 1" />
 
 		<execute macro="User#logoutUserPG" />
 

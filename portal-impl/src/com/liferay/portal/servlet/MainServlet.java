@@ -601,8 +601,8 @@ public class MainServlet extends ActionServlet {
 	protected void checkTilesDefinitionsFactory() {
 		ServletContext servletContext = getServletContext();
 
-		if (servletContext.getAttribute(
-				TilesUtilImpl.DEFINITIONS_FACTORY) != null) {
+		if (servletContext.getAttribute(TilesUtilImpl.DEFINITIONS_FACTORY) !=
+				null) {
 
 			return;
 		}
@@ -756,8 +756,8 @@ public class MainServlet extends ActionServlet {
 	}
 
 	protected boolean hasAbsoluteRedirect(HttpServletRequest request) {
-		if (request.getAttribute(
-				AbsoluteRedirectsResponse.class.getName()) == null) {
+		if (request.getAttribute(AbsoluteRedirectsResponse.class.getName()) ==
+				null) {
 
 			return false;
 		}
@@ -1038,9 +1038,9 @@ public class MainServlet extends ActionServlet {
 
 		HttpSession session = request.getSession();
 
+		session.setAttribute(Globals.LOCALE_KEY, user.getLocale());
 		session.setAttribute(WebKeys.USER, user);
 		session.setAttribute(WebKeys.USER_ID, Long.valueOf(userId));
-		session.setAttribute(Globals.LOCALE_KEY, user.getLocale());
 
 		session.removeAttribute("j_remoteuser");
 

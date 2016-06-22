@@ -179,6 +179,18 @@
 		<execute function="Click" locator1="Icon#CLOSE" />
 	</command>
 
+	<command name="changePageVariationInHistory">
+		<execute function="Click" locator1="Icon#STAGING_BAR_VERTICAL_ELLIPSIS" />
+
+		<execute function="Click" locator1="Staging#HISTORY_BUTTON" />
+
+		<execute function="SelectFrame" locator1="IFrame#DIALOG" />
+
+		<execute function="Select" locator1="Staging#VARIATIONS_SELECTOR" value1="${pageVariationNameMenulistName}">
+			<var name="key_pageVariationName" value="${pageVariationNameMenulistName}" />
+		</execute>
+	</command>
+
 	<command name="changePageVariationPG">
 		<var name="key_pageVariationName" value="${pageVariationName}" />
 
@@ -522,9 +534,9 @@
 
 		<execute function="SelectFrame" locator1="IFrame#SITE_VARIATION_IFRAME" />
 
-		<var name="key_sitePagesVariationName" value="${sitePagesVariationName}" />
+		<var name="key_rowEntry" value="${sitePagesVariationName}" />
 
-		<execute function="AssertClick" locator1="StagingManageVariations#SITE_PAGES_VARIATIONS_TABLE_ACTIONS" value1="Actions" />
+		<execute function="Click" locator1="Icon#ROW_VERTICAL_ELLIPSIS" />
 		<execute function="AssertClick" locator1="MenuItem#MERGE" value1="Merge" />
 
 		<var name="key_sitePagesVariationMergeName" value="${sitePagesVariationMergeName}" />
@@ -549,28 +561,14 @@
 		<execute function="AssertElementPresent" locator1="Message#SUCCESS" />
 	</command>
 
-	<command name="publishGlobalToLiveCP">
-		<var name="key_siteName" value="Global" />
+	<command name="publishCustomPublication">
+		<execute function="Click" locator1="Button#PLUS" />
 
-		<execute function="Click#waitForMenuToggleJSClick" locator1="Sites#SITE_TABLE_ACTIONS" />
+		<execute function="AssertClickNoError" locator1="Button#PUBLISH_TO_LIVE" value1="Publish to Live" />
 
-		<if>
-			<equals arg1="${remoteStaging}" arg2="true" />
-			<then>
-				<execute function="AssertClick" locator1="MenuItem#PUBLISH_TO_REMOTE_LIVE" value1="Publish to Remote Live" />
-			</then>
-			<else>
-				<execute function="AssertClick" locator1="MenuItem#PUBLISH_TO_LIVE" value1="Publish to Live" />
-			</else>
-		</if>
+		<execute function="Pause" locator1="30000" />
 
-		<execute function="SelectFrame" locator1="IFrame#DIALOG" />
-		<execute function="AssertClickNoError" locator1="Button#SUBMIT" value1="Publish" />
-		<execute function="Confirm" value1="Are you sure you want to publish these pages?" />
-		<execute function="AssertTextEquals" locator1="StagingPublishToLive#CURRENT_AND_PREVIOUS_TABLE_STATUS" value1="Successful" />
-		<execute function="SelectFrameTop" value1="relative=top" />
-
-		<execute function="Pause" locator1="5000" />
+		<execute function="AssertTextEquals" locator1="Staging#INITIAL_PROCESS_SUCCESSFUL" value1="Successful" />
 	</command>
 
 	<command name="publishToLive">
@@ -838,19 +836,30 @@
 	</command>
 
 	<command name="viewHistoryVersionPG">
-		<execute function="Click" locator1="Icon#HISTORY_VERTICAL_ELLIPSIS" />
+		<if>
+			<condition function="IsElementPresent#isVisible" locator1="Icon#HISTORY_VERTICAL_ELLIPSIS" />
+			<then>
+				<execute function="Click" locator1="Icon#HISTORY_VERTICAL_ELLIPSIS" />
 
-		<execute function="Click" locator1="Staging#HISTORY_BUTTON" />
+				<execute function="Click" locator1="Staging#HISTORY_BUTTON" />
 
-		<execute function="SelectFrame" locator1="IFrame#METADATA_SETS_IFRAME" />
+				<execute function="SelectFrame" locator1="IFrame#METADATA_SETS_IFRAME" />
+			</then>
+		</if>
 
 		<if>
 			<equals arg1="${modifiedVersion}" arg2="true" />
 			<then>
 				<execute function="AssertTextNotEquals" locator1="Staging#HISTORY_VERSION" value1="${historyVersion}" />
 			</then>
+			<elseif>
+				<condition function="IsElementPresent#isVisible" locator1="Staging#HISTORY_VERSION" />
+				<then>
+					<execute function="AssertTextEquals#assertPartialText" locator1="Staging#HISTORY_VERSION" value1="${historyVersion}" />
+				</then>
+			</elseif>
 			<else>
-				<execute function="AssertTextEquals#assertPartialText" locator1="Staging#HISTORY_VERSION" value1="${historyVersion}" />
+				<execute function="AssertTextEquals#assertPartialText" locator1="Staging#HISTORY_VERSION_ANCHOR" value1="${historyVersion}" />
 			</else>
 		</if>
 
@@ -940,7 +949,12 @@
 	</command>
 
 	<command name="viewStagingWorkflowStatusPG">
-		<execute function="AssertTextEquals" locator1="Staging#STAGING_MENU_READY_FOR_PUBLICATION" value1="${stagingWorkflowStatus}" />
+		<if>
+			<equals arg1="${stagingWorkflowStatus}" arg2="Ready for Publication" />
+			<then>
+				<execute function="AssertElementPresent" locator1="Staging#STAGING_MENU_READY_FOR_PUBLICATION" />
+			</then>
+		</if>
 	</command>
 
 	<command name="viewValidationError">

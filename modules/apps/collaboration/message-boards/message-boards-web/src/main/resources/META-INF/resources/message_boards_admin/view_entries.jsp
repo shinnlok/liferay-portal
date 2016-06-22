@@ -25,12 +25,6 @@ SearchContainer entriesSearchContainer = (SearchContainer)request.getAttribute("
 
 long groupThreadsUserId = ParamUtil.getLong(request, "groupThreadsUserId");
 
-Calendar calendar = Calendar.getInstance();
-
-int offset = GetterUtil.getInteger(recentPostsDateOffset);
-
-calendar.add(Calendar.DATE, -offset);
-
 boolean showBreadcrumb = ParamUtil.getBoolean(request, "showBreadcrumb", true);
 
 PortletURL portletURL = (PortletURL)request.getAttribute("view.jsp-portletURL");
@@ -137,11 +131,11 @@ if (groupThreadsUserId > 0) {
 							int threadsCount = MBThreadServiceUtil.getThreadsCount(scopeGroupId, curCategory.getCategoryId(), WorkflowConstants.STATUS_APPROVED);
 							%>
 
-							<span class="h6">
+							<span class="h6 text-default">
 								<liferay-ui:message arguments="<%= subcategoriesCount %>" key='<%= subcategoriesCount == 1 ? "x-subcategory" : "x-subcategories" %>' />
 							</span>
 
-							<span class="h6">
+							<span class="h6 text-default">
 								<liferay-ui:message arguments="<%= threadsCount %>" key='<%= threadsCount == 1 ? "x-thread" : "x-threads" %>' />
 							</span>
 						</liferay-ui:search-container-column-text>
@@ -255,11 +249,11 @@ if (groupThreadsUserId > 0) {
 							int viewCount = thread.getViewCount();
 							%>
 
-							<span class="h6">
+							<span class="h6 text-default">
 								<liferay-ui:message arguments="<%= messageCount %>" key='<%= messageCount == 1 ? "x-post" : "x-posts" %>' />
 							</span>
 
-							<span class="h6">
+							<span class="h6 text-default">
 								<liferay-ui:message arguments="<%= viewCount %>" key='<%= viewCount == 1 ? "x-view" : "x-views" %>' />
 							</span>
 

@@ -231,14 +231,14 @@
 		<execute macro="CampaignDisplayPortlet#configureCampaignRule">
 			<var name="campaignName" value="Low Priority Campaign Name" />
 			<var name="contentTitle" value="Low Priority Web Content Title" />
-			<var name="contentType" value="Web Content Article" />
+			<var name="contentType" value="Basic Web Content" />
 			<var name="rowNumber" value="1" />
 		</execute>
 
 		<execute macro="CampaignDisplayPortlet#configureCampaignRule">
 			<var name="campaignName" value="Higher Priority Campaign Name" />
 			<var name="contentTitle" value="Higher Priority Web Content Title" />
-			<var name="contentType" value="Web Content Article" />
+			<var name="contentType" value="Basic Web Content" />
 			<var name="rowNumber" value="2" />
 		</execute>
 
@@ -251,8 +251,11 @@
 
 		<execute macro="CampaignDisplayPortlet#viewPG">
 			<var name="entryContentText" value="Web Content Content Higher Priority" />
-			<var name="previewCampaignList" value="Higher Priority Campaign Name,Low Priority Campaign Name,default" />
 			<var name="viewCampaignSelected" value="Higher Priority Campaign Name" />
+		</execute>
+
+		<execute macro="CampaignDisplayPortlet#viewPG">
+			<var name="previewCampaignList" value="Higher Priority Campaign Name,Low Priority Campaign Name,default" />
 		</execute>
 	</command>
 
@@ -358,7 +361,7 @@
 		<execute macro="CampaignDisplayPortlet#configureCampaignRule">
 			<var name="campaignName" value="Campaign Name" />
 			<var name="contentTitle" value="Web Content Title" />
-			<var name="contentType" value="Web Content Article" />
+			<var name="contentType" value="Basic Web Content" />
 			<var name="rowNumber" value="1" />
 		</execute>
 
@@ -524,7 +527,7 @@
 			<var name="contentMetricName" value="Content Metric Name" />
 			<var name="contentTitle" value="DM Document Title" />
 			<var name="linkId" value="Content id" />
-			<var name="menulistContent" value="Document" />
+			<var name="menulistContent" value="Basic Document" />
 		</execute>
 
 		<execute macro="PortletEntry#save" />
@@ -582,7 +585,7 @@
 		<execute macro="CampaignDisplayPortlet#configureCampaignRule">
 			<var name="campaignName" value="Campaign Name" />
 			<var name="contentTitle" value="DM Document Title" />
-			<var name="contentType" value="Document" />
+			<var name="contentType" value="Basic Document" />
 			<var name="rowNumber" value="1" />
 		</execute>
 
@@ -833,13 +836,13 @@
 		<execute macro="CampaignDisplayPortlet#configureCampaignRule">
 			<var name="campaignName" value="Campaign Name" />
 			<var name="contentTitle" value="Web Content Title" />
-			<var name="contentType" value="Web Content Article" />
+			<var name="contentType" value="Basic Web Content" />
 			<var name="rowNumber" value="1" />
 		</execute>
 
 		<execute macro="CampaignDisplayPortlet#configureOtherwiseRule">
 			<var name="contentTitle" value="Web Content Title Otherwise" />
-			<var name="contentType" value="Web Content Article" />
+			<var name="contentType" value="Basic Web Content" />
 		</execute>
 
 		<execute macro="CampaignDisplayPortlet#savePG" />
@@ -958,7 +961,7 @@
 		<execute macro="CampaignDisplayPortlet#configureCampaignRule">
 			<var name="campaignName" value="Campaign Name" />
 			<var name="contentTitle" value="Web Content Title" />
-			<var name="contentType" value="Web Content Article" />
+			<var name="contentType" value="Basic Web Content" />
 			<var name="rowNumber" value="1" />
 		</execute>
 
@@ -1172,7 +1175,7 @@
 			<var name="contentMetricName" value="Content Metric Name" />
 			<var name="contentTitle" value="DM Document Title" />
 			<var name="linkId" value="Content id" />
-			<var name="menulistContent" value="Document" />
+			<var name="menulistContent" value="Basic Document" />
 		</execute>
 
 		<execute macro="PortletEntry#save" />
@@ -1228,7 +1231,7 @@
 		<execute macro="CampaignDisplayPortlet#configureCampaignRule">
 			<var name="campaignName" value="Campaign Name" />
 			<var name="contentTitle" value="DM Document Title" />
-			<var name="contentType" value="Document" />
+			<var name="contentType" value="Basic Document" />
 			<var name="rowNumber" value="1" />
 		</execute>
 
@@ -1347,7 +1350,7 @@
 		<execute macro="UserSegmentContentDisplayPortlet#configureDisplayContent">
 			<var name="belongs" value="true" />
 			<var name="contentTitle" value="Targeted Web Content Title" />
-			<var name="contentType" value="Web Content Article" />
+			<var name="contentType" value="Basic Web Content" />
 			<var name="rowNumber" value="1" />
 			<var name="toAll" value="true" />
 			<var name="userSegmentName" value="Male Users" />
@@ -1418,7 +1421,7 @@
 			<var name="displayStyle" value="list" />
 		</execute>
 
-		<var method="selenium#getText('//div/span/span/a')" name="valueName" />
+		<var method="selenium#getText('//span/span/a')" name="valueName" />
 
 		<echo message="value name ${valueName}" />
 
@@ -1488,7 +1491,7 @@
 			<var name="displayStyle" value="list" />
 		</execute>
 
-		<var method="selenium#getText('//div/span/span/a')" name="valueName" />
+		<var method="selenium#getText('//span/span/a')" name="valueName" />
 
 		<echo message="value name ${valueName}" />
 
@@ -1564,7 +1567,7 @@
 			<var name="displayStyle" value="list" />
 		</execute>
 
-		<var method="selenium#getText('//div/span/span/a')" name="valueName" />
+		<var method="selenium#getText('//span/span/a')" name="valueName" />
 
 		<echo message="value name ${valueName}" />
 
@@ -1651,7 +1654,7 @@
 		</execute>
 
 		<execute macro="ContentTargetingUserSegment#addBehaviorContentVisitedRuleCP">
-			<var name="contentVisitedContent" value="Web Content Article" />
+			<var name="contentVisitedContent" value="Basic Web Content" />
 			<var name="webContentTitle" value="Web Content Title" />
 		</execute>
 
@@ -1697,7 +1700,7 @@
 		<execute macro="ContentTargetingCampaign#addTrackingActionContentCP">
 			<var name="contentMetricName" value="Content Alias" />
 			<var name="contentTitle" value="Web Content Title" />
-			<var name="menulistContent" value="Web Content Article" />
+			<var name="menulistContent" value="Basic Web Content" />
 		</execute>
 
 		<execute macro="PortletEntry#save" />
@@ -1734,7 +1737,7 @@
 			<var name="displayStyle" value="list" />
 		</execute>
 
-		<var method="selenium#getText('//div/span/span/a')" name="valueName" />
+		<var method="selenium#getText('//span/span/a')" name="valueName" />
 
 		<echo message="value name ${valueName}" />
 
@@ -1858,7 +1861,7 @@
 		</execute>
 
 		<execute macro="ContentTargetingUserSegment#addBehaviorContentVisitedRuleCP">
-			<var name="contentVisitedContent" value="Web Content Article" />
+			<var name="contentVisitedContent" value="Basic Web Content" />
 			<var name="webContentTitle" value="Web Content Title" />
 		</execute>
 
@@ -1904,7 +1907,7 @@
 		<execute macro="ContentTargetingCampaign#addTrackingActionContentCP">
 			<var name="contentAlias" value="Content Alias" />
 			<var name="contentTitle" value="Web Content Title" />
-			<var name="menulistContent" value="Web Content Article" />
+			<var name="menulistContent" value="Basic Web Content" />
 		</execute>
 
 		<execute macro="PortletEntry#save" />
@@ -1933,7 +1936,7 @@
 			<var name="displayStyle" value="list" />
 		</execute>
 
-		<var method="selenium#getText('//div/span/span/a')" name="valueName" />
+		<var method="selenium#getText('//span/span/a')" name="valueName" />
 
 		<echo message="value name ${valueName}" />
 
@@ -2068,11 +2071,19 @@
 
 		<execute macro="PortletEntry#save" />
 
-		<execute macro="ProductMenu#gotoSite">
-			<var name="site" value="Site Name" />
+		<execute macro="Navigator#gotoStagedSitePage">
+			<var name="pageName" value="Test Page Name" />
+			<var name="siteName" value="Site Name" />
 		</execute>
 
-		<execute macro="Navigator#gotoStagedView" />
+		<execute macro="Staging#gotoPublishToLive" />
+
+		<execute macro="Staging#publishToLive" />
+
+		<execute macro="Navigator#gotoSitePage">
+			<var name="pageName" value="Test Page Name" />
+			<var name="siteName" value="Site Name" />
+		</execute>
 
 		<execute macro="ProductMenu#gotoSitesConfiguration">
 			<var name="portlet" value="Audience Targeting" />
@@ -2134,7 +2145,7 @@
 		<execute macro="CampaignDisplayPortlet#configureCampaignRule">
 			<var name="campaignName" value="Campaign Name" />
 			<var name="contentTitle" value="Web Content Title" />
-			<var name="contentType" value="Web Content Article" />
+			<var name="contentType" value="Basic Web Content" />
 			<var name="rowNumber" value="1" />
 		</execute>
 
@@ -2153,7 +2164,7 @@
 		<execute macro="UserSegmentContentDisplayPortlet#configureDisplayContent">
 			<var name="belongs" value="true" />
 			<var name="contentTitle" value="Web Content Title" />
-			<var name="contentType" value="Web Content Article" />
+			<var name="contentType" value="Basic Web Content" />
 			<var name="rowNumber" value="1" />
 			<var name="toAll" value="true" />
 			<var name="userSegmentName" value="Male Users" />
@@ -2209,16 +2220,23 @@
 			<var name="viewEntryContentList" value="Web Content Content" />
 		</execute>
 
-		<execute macro="UserSegmentContentDisplayPortlet#viewEntryPG">
+		<execute macro="ContentTargeting#viewEntryOnStagingLiveMode">
 			<var name="entryContentText" value="Web Content Content" />
-			<var name="previewUserSegmentList" value="Male Users,default" />
-			<var name="viewUserSegmentSelected" value="Male Users" />
+			<var name="portletName" value="User Segment Content Display" />
+			<var name="previewContentList" value="Male Users,default" />
+			<var name="viewSelectedContent" value="Male Users" />
 		</execute>
 
-		<execute macro="CampaignDisplayPortlet#viewPG">
+		<execute macro="Navigator#gotoSitePage">
+			<var name="pageName" value="Test Page Name" />
+			<var name="siteName" value="Site Name" />
+		</execute>
+
+		<execute macro="ContentTargeting#viewEntryOnStagingLiveMode">
 			<var name="entryContentText" value="Web Content Content" />
-			<var name="previewCampaignList" value="Campaign Name,default" />
-			<var name="viewCampaignSelected" value="Campaign Name" />
+			<var name="portletName" value="Campaign Content Display" />
+			<var name="previewContentList" value="Campaign Name,default" />
+			<var name="viewSelectedContent" value="Campaign Name" />
 		</execute>
 	</command>
 
@@ -2286,7 +2304,7 @@
 			<var name="siteName" value="Site Name" />
 		</execute>
 
-		<execute macro="CampaignDisplayPortlet#viewNoContentPG" />
+		<execute macro="CampaignDisplayPortlet#viewContentNoLongerExistsAfterDeletion" />
 
 		<execute macro="Navigator#gotoSitePage">
 			<var name="pageName" value="Test Page Name" />
@@ -2333,11 +2351,11 @@
 			<var name="site" value="Site Name" />
 		</execute>
 
+		<execute macro="Navigator#gotoStagedView" />
+
 		<execute macro="ProductMenu#gotoSitesContent">
 			<var name="portlet" value="Web Content" />
 		</execute>
-
-		<execute macro="Navigator#gotoStagedView" />
 
 		<execute macro="WebContentNavigator#gotoAddCP" />
 
@@ -2618,7 +2636,7 @@
 		</execute>
 
 		<execute macro="ContentTargetingUserSegment#addBehaviorContentVisitedRuleCP">
-			<var name="contentVisitedContent" value="Web Content Article" />
+			<var name="contentVisitedContent" value="Basic Web Content" />
 			<var name="webContentTitle" value="Web Content Title" />
 		</execute>
 
@@ -2650,6 +2668,15 @@
 			<var name="siteName" value="Site Name" />
 		</execute>
 
+		<execute macro="Staging#gotoPublishToLive" />
+
+		<execute macro="Staging#publishToLive" />
+
+		<execute macro="Navigator#gotoSitePage">
+			<var name="pageName" value="Test Page Name" />
+			<var name="siteName" value="Site Name" />
+		</execute>
+
 		<execute macro="ProductMenu#gotoSitesConfiguration">
 			<var name="portlet" value="Audience Targeting" />
 		</execute>
@@ -2667,7 +2694,7 @@
 			<var name="contentMetricName" value="Content Metric Name" />
 			<var name="contentTitle" value="Web Content Title" />
 			<var name="contentTrackingActionSelect" value="View" />
-			<var name="menulistContent" value="Web Content Article" />
+			<var name="menulistContent" value="Basic Web Content" />
 		</execute>
 
 		<execute macro="PortletEntry#save" />
@@ -3039,8 +3066,8 @@
 		</execute>
 
 		<execute macro="User#editUserGenderCP">
-			<var name="userFirstName" value="woman" />
 			<var name="userGender" value="Female" />
+			<var name="userName" value="woman woman" />
 		</execute>
 
 		<execute macro="Navigator#openSiteURL">
@@ -3058,7 +3085,7 @@
 		<execute macro="UserSegmentContentDisplayPortlet#configureDisplayContent">
 			<var name="belongs" value="true" />
 			<var name="contentTitle" value="WC Title Admin" />
-			<var name="contentType" value="Web Content Article" />
+			<var name="contentType" value="Basic Web Content" />
 			<var name="rowNumber" value="1" />
 			<var name="toAny" value="true" />
 			<var name="userSegmentName" value="Site Role Admin User Segment" />
@@ -3067,7 +3094,7 @@
 		<execute macro="UserSegmentContentDisplayPortlet#configureDisplayContent">
 			<var name="belongs" value="true" />
 			<var name="contentTitle" value="WC Title Page Visited" />
-			<var name="contentType" value="Web Content Article" />
+			<var name="contentType" value="Basic Web Content" />
 			<var name="rowNumber" value="2" />
 			<var name="toAny" value="true" />
 			<var name="userSegmentName" value="Page Visited User Segment" />
@@ -3076,7 +3103,7 @@
 		<execute macro="UserSegmentContentDisplayPortlet#configureDisplayContent">
 			<var name="belongs" value="true" />
 			<var name="contentTitle" value="WC Title Male" />
-			<var name="contentType" value="Web Content Article" />
+			<var name="contentType" value="Basic Web Content" />
 			<var name="rowNumber" value="3" />
 			<var name="toAny" value="true" />
 			<var name="userSegmentName" value="Male User Segment" />
@@ -3084,7 +3111,7 @@
 
 		<execute macro="UserSegmentContentDisplayPortlet#configureOtherwiseContentDisplayRule">
 			<var name="otherwiseContentTitle" value="WC Title Woman" />
-			<var name="otherwiseContentType" value="Web Content Article" />
+			<var name="otherwiseContentType" value="Basic Web Content" />
 		</execute>
 
 		<execute macro="UserSegmentContentDisplayPortlet#savePG" />
@@ -3098,7 +3125,7 @@
 			<var name="siteName" value="Site Name" />
 		</execute>
 
-		<execute macro="UserSegmentContentDisplayPortlet#viewEntryPG">
+		<execute macro="UserSegmentContentDisplayPortlet#viewContentOnly">
 			<var name="entryContentText" value="WC Content Male" />
 		</execute>
 
@@ -3117,7 +3144,7 @@
 			<var name="siteName" value="Site Name" />
 		</execute>
 
-		<execute macro="UserSegmentContentDisplayPortlet#viewEntryPG">
+		<execute macro="UserSegmentContentDisplayPortlet#viewContentOnly">
 			<var name="entryContentText" value="WC Content Page Visited" />
 		</execute>
 
@@ -3131,7 +3158,7 @@
 			<var name="siteName" value="Site Name" />
 		</execute>
 
-		<execute macro="UserSegmentContentDisplayPortlet#viewEntryPG">
+		<execute macro="UserSegmentContentDisplayPortlet#viewContentOnly">
 			<var name="entryContentText" value="WC Content Woman" />
 		</execute>
 	</command>
@@ -3282,7 +3309,7 @@
 		<execute macro="UserSegmentContentDisplayPortlet#configureDisplayContent">
 			<var name="belongs" value="true" />
 			<var name="contentTitle" value="Web Content Title All" />
-			<var name="contentType" value="Web Content Article" />
+			<var name="contentType" value="Basic Web Content" />
 			<var name="rowNumber" value="1" />
 			<var name="toAll" value="true" />
 			<var name="userSegmentName" value="User Segment Name Age,User Segment Name Reg Role" />
@@ -3290,7 +3317,7 @@
 
 		<execute macro="UserSegmentContentDisplayPortlet#configureOtherwiseContentDisplayRule">
 			<var name="otherwiseContentTitle" value="Web Content Title Otherwise" />
-			<var name="otherwiseContentType" value="Web Content Article" />
+			<var name="otherwiseContentType" value="Basic Web Content" />
 		</execute>
 
 		<execute macro="UserSegmentContentDisplayPortlet#savePG" />
@@ -3405,7 +3432,7 @@
 		<execute macro="UserSegmentContentDisplayPortlet#configureDisplayContent">
 			<var name="belongs" value="true" />
 			<var name="contentTitle" value="Web Content Title Any" />
-			<var name="contentType" value="Web Content Article" />
+			<var name="contentType" value="Basic Web Content" />
 			<var name="rowNumber" value="1" />
 			<var name="toAny" value="true" />
 			<var name="userSegmentName" value="User Segment Name Age,User Segment Name Reg Role" />
@@ -3413,7 +3440,7 @@
 
 		<execute macro="UserSegmentContentDisplayPortlet#configureOtherwiseContentDisplayRule">
 			<var name="otherwiseContentTitle" value="Web Content Title Otherwise" />
-			<var name="otherwiseContentType" value="Web Content Article" />
+			<var name="otherwiseContentType" value="Basic Web Content" />
 		</execute>
 
 		<execute macro="UserSegmentContentDisplayPortlet#savePG" />
@@ -3493,7 +3520,7 @@
 		<execute macro="UserSegmentContentDisplayPortlet#configureDisplayContent">
 			<var name="belongs" value="true" />
 			<var name="contentTitle" value="DM Document Title 1" />
-			<var name="contentType" value="Document" />
+			<var name="contentType" value="Basic Document" />
 			<var name="rowNumber" value="1" />
 			<var name="toAll" value="true" />
 			<var name="userSegmentName" value="User Segment Name" />
@@ -3501,7 +3528,7 @@
 
 		<execute macro="UserSegmentContentDisplayPortlet#configureOtherwiseContentDisplayRule">
 			<var name="otherwiseContentTitle" value="DM Document Title 2" />
-			<var name="otherwiseContentType" value="Document" />
+			<var name="otherwiseContentType" value="Basic Document" />
 		</execute>
 
 		<execute macro="UserSegmentContentDisplayPortlet#savePG" />
@@ -3641,7 +3668,7 @@
 
 		<execute macro="UserSegmentContentDisplayPortlet#configureDisplayContent">
 			<var name="contentTitle" value="Web Content Title Female" />
-			<var name="contentType" value="Web Content Article" />
+			<var name="contentType" value="Basic Web Content" />
 			<var name="doesNotBelong" value="true" />
 			<var name="rowNumber" value="1" />
 			<var name="toAll" value="true" />
@@ -3650,7 +3677,7 @@
 
 		<execute macro="UserSegmentContentDisplayPortlet#configureOtherwiseContentDisplayRule">
 			<var name="otherwiseContentTitle" value="Web Content Title Male" />
-			<var name="otherwiseContentType" value="Web Content Article" />
+			<var name="otherwiseContentType" value="Basic Web Content" />
 		</execute>
 
 		<execute macro="UserSegmentContentDisplayPortlet#savePG" />
@@ -3773,7 +3800,7 @@
 		<execute macro="UserSegmentContentDisplayPortlet#configureDisplayContent">
 			<var name="belongs" value="true" />
 			<var name="contentTitle" value="Web Content Title" />
-			<var name="contentType" value="Web Content Article" />
+			<var name="contentType" value="Basic Web Content" />
 			<var name="rowNumber" value="1" />
 			<var name="toAll" value="true" />
 			<var name="userSegmentName" value="User Segment Name" />
@@ -3946,7 +3973,7 @@
 		<execute macro="UserSegmentContentDisplayPortlet#configureDisplayContent">
 			<var name="belongs" value="true" />
 			<var name="contentTitle" value="Web Content Title Male" />
-			<var name="contentType" value="Web Content Article" />
+			<var name="contentType" value="Basic Web Content" />
 			<var name="rowNumber" value="1" />
 			<var name="toAll" value="true" />
 			<var name="userSegmentName" value="Male User Segment Name" />
@@ -3954,7 +3981,7 @@
 
 		<execute macro="UserSegmentContentDisplayPortlet#configureOtherwiseContentDisplayRule">
 			<var name="otherwiseContentTitle" value="Web Content Title Female" />
-			<var name="otherwiseContentType" value="Web Content Article" />
+			<var name="otherwiseContentType" value="Basic Web Content" />
 		</execute>
 
 		<execute macro="UserSegmentContentDisplayPortlet#savePG" />

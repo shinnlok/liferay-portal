@@ -99,6 +99,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>ERROR_SPECIFIC_FORM_FIELD_REQUIRED</td>
+	<td>//div[contains(@data-fieldname,'${key_fieldName}')]/../../div[contains(@class,'has-error')]//div[@class='help-block']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>INFO</td>
 	<td>//div[contains(@class,'alert alert-info') and not(contains(@class,'hide'))]</td>
 	<td></td>
@@ -130,7 +135,7 @@
 </tr>
 <tr>
 	<td>INFO_NO_RESULTS_FOUND</td>
-	<td>//div[contains(@id,'EmptyResultsMessage')]//p</td>
+	<td>//div[contains(@class,'empty-result-message')]//div[contains(@class,'text-center')]</td>
 	<td></td>
 </tr>
 <tr>

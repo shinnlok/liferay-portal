@@ -17,140 +17,89 @@
 <%@ include file="/section/init.jsp" %>
 
 <%
-String tabs2 = ParamUtil.getString(request, "tabs2", "general");
-
-String tabs2Names = "general,display-settings";
+kbSectionPortletInstanceConfiguration = ParameterMapUtil.setParameterMap(KBSectionPortletInstanceConfiguration.class, kbSectionPortletInstanceConfiguration, request.getParameterMap(), "preferences--", "--");
 %>
 
 <liferay-portlet:actionURL portletConfiguration="<%= true %>" var="configurationActionURL" />
 
-<liferay-portlet:renderURL portletConfiguration="<%= true %>" var="configurationRenderURL">
-	<portlet:param name="tabs2" value="<%= tabs2 %>" />
-</liferay-portlet:renderURL>
-
-<liferay-ui:tabs
-	names="<%= tabs2Names %>"
-	param="tabs2"
-	url="<%= configurationRenderURL %>"
-/>
-
 <aui:form action="<%= configurationActionURL %>" method="post" name="fm">
 	<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.UPDATE %>" />
-	<aui:input name="tabs2" type="hidden" value="<%= tabs2 %>" />
 
 	<liferay-ui:error key="kbArticlesSections" message="please-select-at-least-one-section" />
 
-	<aui:fieldset>
-		<c:choose>
-			<c:when test='<%= tabs2.equals("general") %>'>
-				<aui:input label="show-sections-title" name="preferences--showKBArticlesSectionsTitle--" type="checkbox" value="<%= showKBArticlesSectionsTitle %>" />
+	<liferay-ui:tabs
+		names="general,display-settings"
+		refresh="<%= false %>"
+		type="tabs nav-tabs-default"
+	>
+		<liferay-ui:section>
+			<aui:fieldset-group markupView="lexicon">
+				<aui:fieldset>
+					<aui:input label="show-sections-title" name="preferences--showKBArticlesSectionsTitle--" type="checkbox" value="<%= kbSectionPortletInstanceConfiguration.showKBArticlesSectionsTitle() %>" />
 
-				<aui:select cssClass="kb-field-wrapper" ignoreRequestValue="<%= true %>" label="sections" multiple="<%= true %>" name="kbArticlesSections">
+					<aui:select ignoreRequestValue="<%= true %>" label="sections" multiple="<%= true %>" name="kbArticlesSections" required="<%= true %>">
 
-					<%
-					Map<String, String> sectionsMap = new TreeMap<String, String>();
+						<%
+						Map<String, String> sectionsMap = new TreeMap<String, String>();
 
-					for (String section : kbSectionPortletInstanceConfiguration.adminKBArticleSections()) {
-						sectionsMap.put(LanguageUtil.get(request, section), section);
-					}
+						for (String section : kbSectionPortletInstanceConfiguration.adminKBArticleSections()) {
+							sectionsMap.put(LanguageUtil.get(request, section), section);
+						}
 
-					for (Map.Entry<String, String> entry : sectionsMap.entrySet()) {
-					%>
+						for (Map.Entry<String, String> entry : sectionsMap.entrySet()) {
+						%>
 
-						<aui:option label="<%= entry.getKey() %>" selected="<%= ArrayUtil.contains(kbArticlesSections, entry.getValue()) %>" value="<%= entry.getValue() %>" />
+							<aui:option label="<%= entry.getKey() %>" selected="<%= ArrayUtil.contains(kbSectionPortletInstanceConfiguration.kbArticlesSections(), entry.getValue()) %>" value="<%= entry.getValue() %>" />
 
-					<%
-					}
-					%>
+						<%
+						}
+						%>
 
-				</aui:select>
+					</aui:select>
 
-				<aui:select label="article-display-style" name="preferences--kbArticleDisplayStyle--" value="<%= kbArticleDisplayStyle %>">
-					<aui:option label="title" />
-					<aui:option label="abstract" />
-				</aui:select>
-
-				<aui:select label="article-window-state" name="preferences--kbArticleWindowState--" value="<%= kbArticleWindowState %>">
-					<aui:option label="maximized" value="<%= WindowState.MAXIMIZED.toString() %>" />
-					<aui:option label="normal" value="<%= WindowState.NORMAL.toString() %>" />
-				</aui:select>
-
-				<div class="kb-block-labels kb-field-wrapper">
-					<aui:select inlineField="<%= true %>" label="order-by" name="preferences--kbArticlesOrderByCol--" value="<%= kbArticlesOrderByCol %>">
-						<aui:option label="create-date" />
-						<aui:option label="modified-date" />
-						<aui:option label="priority" />
+					<aui:select label="article-display-style" name="preferences--kbArticleDisplayStyle--" value="<%= kbSectionPortletInstanceConfiguration.kbArticleDisplayStyle() %>">
 						<aui:option label="title" />
-						<aui:option label="view-count" />
+						<aui:option label="abstract" />
 					</aui:select>
 
-					<aui:select inlineField="<%= true %>" label="<%= StringPool.NBSP %>" name="preferences--kbArticlesOrderByType--" value="<%= kbArticlesOrderByType %>">
-						<aui:option label="ascending" value="asc" />
-						<aui:option label="descending" value="desc" />
-					</aui:select>
-				</div>
+					<aui:input label="show-pagination" name="preferences--showKBArticlesPagination--" type="checkbox" value="<%= kbSectionPortletInstanceConfiguration.showKBArticlesPagination() %>" />
+				</aui:fieldset>
+			</aui:fieldset-group>
+		</liferay-ui:section>
 
-				<aui:select cssClass="kb-field-wrapper" label="items-per-page" name="preferences--kbArticlesDelta--">
+		<liferay-ui:section>
+			<aui:fieldset-group markupView="lexicon">
+				<aui:fieldset>
+					<aui:input label="enable-description" name="preferences--enableKBArticleDescription--" type="checkbox" value="<%= kbSectionPortletInstanceConfiguration.enableKBArticleDescription() %>" />
 
-					<%
-					int[] pageDeltaValues = GetterUtil.getIntegerValues(PropsUtil.getArray(PropsKeys.SEARCH_CONTAINER_PAGE_DELTA_VALUES));
+					<aui:input label="enable-ratings" name="preferences--enableKBArticleRatings--" type="checkbox" value="<%= kbSectionPortletInstanceConfiguration.enableKBArticleRatings() %>" />
 
-					Arrays.sort(pageDeltaValues);
+					<aui:input label="show-asset-entries" name="preferences--showKBArticleAssetEntries--" type="checkbox" value="<%= kbSectionPortletInstanceConfiguration.showKBArticleAssetEntries() %>" />
 
-					for (int pageDeltaValue : pageDeltaValues) {
-					%>
+					<aui:input label="show-attachments" name="preferences--showKBArticleAttachments--" type="checkbox" value="<%= kbSectionPortletInstanceConfiguration.showKBArticleAttachments() %>" />
 
-						<aui:option label="<%= pageDeltaValue %>" selected="<%= kbArticlesDelta == pageDeltaValue %>" />
+					<aui:input label="enable-related-assets" name="preferences--enableKBArticleAssetLinks--" type="checkbox" value="<%= kbSectionPortletInstanceConfiguration.enableKBArticleAssetLinks() %>" />
 
-					<%
-					}
-					%>
+					<aui:input label="enable-view-count-increment" name="preferences--enableKBArticleViewCountIncrement--" type="checkbox" value="<%= kbSectionPortletInstanceConfiguration.enableKBArticleViewCountIncrement() %>" />
 
-				</aui:select>
+					<aui:input label="enable-subscriptions" name="preferences--enableKBArticleSubscriptions--" type="checkbox" value="<%= kbSectionPortletInstanceConfiguration.enableKBArticleSubscriptions() %>" />
 
-				<aui:input label="show-pagination" name="preferences--showKBArticlesPagination--" type="checkbox" value="<%= showKBArticlesPagination %>" />
-			</c:when>
-			<c:when test='<%= tabs2.equals("display-settings") %>'>
-				<aui:input label="enable-description" name="preferences--enableKBArticleDescription--" type="checkbox" value="<%= enableKBArticleDescription %>" />
+					<aui:input label="enable-history" name="preferences--enableKBArticleHistory--" type="checkbox" value="<%= kbSectionPortletInstanceConfiguration.enableKBArticleHistory() %>" />
 
-				<aui:input label="enable-ratings" name="preferences--enableKBArticleRatings--" type="checkbox" value="<%= enableKBArticleRatings %>" />
+					<aui:input label="enable-print" name="preferences--enableKBArticlePrint--" type="checkbox" value="<%= kbSectionPortletInstanceConfiguration.enableKBArticlePrint() %>" />
 
-				<div class="kb-ratings-type" id="<portlet:namespace />ratingsType">
-					<aui:input checked='<%= kbArticleRatingsType.equals("stars") %>' label="use-star-ratings" name="preferences--kbArticleRatingsType--" type="radio" value="stars" />
-					<aui:input checked='<%= kbArticleRatingsType.equals("thumbs") %>' label="use-thumbs-up-thumbs-down" name="preferences--kbArticleRatingsType--" type="radio" value="thumbs" />
-				</div>
+					<liferay-ui:social-bookmarks-settings
+						displayPosition="<%= kbSectionPortletInstanceConfiguration.socialBookmarksDisplayPosition() %>"
+						displayStyle="<%= kbSectionPortletInstanceConfiguration.socialBookmarksDisplayStyle() %>"
+						enabled="<%= kbSectionPortletInstanceConfiguration.enableSocialBookmarks() %>"
+						types="<%= kbSectionPortletInstanceConfiguration.socialBookmarksTypes() %>"
+					/>
+				</aui:fieldset>
+			</aui:fieldset-group>
+		</liferay-ui:section>
+	</liferay-ui:tabs>
 
-				<aui:input label="show-asset-entries" name="preferences--showKBArticleAssetEntries--" type="checkbox" value="<%= showKBArticleAssetEntries %>" />
-
-				<aui:input label="show-attachments" name="preferences--showKBArticleAttachments--" type="checkbox" value="<%= showKBArticleAttachments %>" />
-
-				<aui:input label="enable-related-assets" name="preferences--enableKBArticleAssetLinks--" type="checkbox" value="<%= enableKBArticleAssetLinks %>" />
-
-				<aui:input label="enable-view-count-increment" name="preferences--enableKBArticleViewCountIncrement--" type="checkbox" value="<%= enableKBArticleViewCountIncrement %>" />
-
-				<aui:input label="enable-subscriptions" name="preferences--enableKBArticleSubscriptions--" type="checkbox" value="<%= enableKBArticleSubscriptions %>" />
-
-				<aui:input label="enable-history" name="preferences--enableKBArticleHistory--" type="checkbox" value="<%= enableKBArticleHistory %>" />
-
-				<aui:input label="enable-print" name="preferences--enableKBArticlePrint--" type="checkbox" value="<%= enableKBArticlePrint %>" />
-
-				<liferay-ui:social-bookmarks-settings
-					displayPosition="<%= socialBookmarksDisplayPosition %>"
-					displayStyle="<%= socialBookmarksDisplayStyle %>"
-					enabled="<%= enableSocialBookmarks %>"
-					types="<%= socialBookmarksTypes %>"
-				/>
-			</c:when>
-		</c:choose>
-
-		<aui:button-row cssClass="kb-submit-buttons">
-			<aui:button type="submit" />
-		</aui:button-row>
-	</aui:fieldset>
+	<aui:button-row>
+		<aui:button cssClass="btn btn-lg btn-primary" type="submit" />
+	</aui:button-row>
 </aui:form>
-
-<c:if test='<%= tabs2.equals("display-settings") %>'>
-	<aui:script>
-		Liferay.Util.toggleBoxes('<portlet:namespace />enableKBArticleRatingsCheckbox', '<portlet:namespace />ratingsType');
-	</aui:script>
-</c:if>

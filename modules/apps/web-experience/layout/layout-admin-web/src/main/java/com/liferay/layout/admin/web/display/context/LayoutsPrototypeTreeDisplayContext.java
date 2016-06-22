@@ -55,10 +55,10 @@ public class LayoutsPrototypeTreeDisplayContext
 
 		Layout layout = getLayout();
 
+		editLayoutURL.setParameter(
+			"backURL", PortalUtil.getCurrentURL(liferayPortletRequest));
 		editLayoutURL.setParameter("selPlid", String.valueOf(layout.getPlid()));
-
 		editLayoutURL.setParameter("privateLayout", Boolean.TRUE.toString());
-		editLayoutURL.setParameter("viewLayout", Boolean.TRUE.toString());
 
 		return editLayoutURL.toString();
 	}
