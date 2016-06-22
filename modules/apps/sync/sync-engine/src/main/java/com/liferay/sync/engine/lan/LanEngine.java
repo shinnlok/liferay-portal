@@ -41,10 +41,13 @@ public class LanEngine {
 		}
 
 		try {
+			SyncAccountService.registerModelListener(
+				_lanFileServer.getSyncAccountListener());
+
 			_lanFileServer.start();
 
 			SyncAccountService.registerModelListener(
-				_lanFileServer.getSyncAccountListener());
+				LanSession.getSyncAccountListener());
 		}
 		catch (Exception e) {
 			_logger.error(e.getMessage(), e);
@@ -70,6 +73,8 @@ public class LanEngine {
 			}
 
 		};
+
+		_scheduledExecutorService = Executors.newScheduledThreadPool(2);
 
 		_scheduledExecutorService.scheduleWithFixedDelay(
 			broadcastRunnable, 0, PropsValues.SYNC_LAN_BROADCAST_INTERVAL,
@@ -113,15 +118,26 @@ public class LanEngine {
 	}
 
 	public static synchronized void stop() {
+		_logger.info("Stopping LAN engine");
+
+		if (_scheduledExecutorService != null) {
+			_scheduledExecutorService.shutdownNow();
+		}
+
 		if (_lanDiscoveryListener != null) {
 			_lanDiscoveryListener.shutdown();
 		}
 
-		_scheduledExecutorService.shutdownNow();
+		if (_lanDiscoveryBroadcaster != null) {
+			_lanDiscoveryBroadcaster.shutdown();
+		}
 
 		if (_lanFileServer != null) {
 			SyncAccountService.unregisterModelListener(
 				_lanFileServer.getSyncAccountListener());
+
+			SyncAccountService.unregisterModelListener(
+				LanSession.getSyncAccountListener());
 
 			_lanFileServer.stop();
 		}
@@ -133,7 +149,6 @@ public class LanEngine {
 	private static LanDiscoveryBroadcaster _lanDiscoveryBroadcaster;
 	private static LanDiscoveryListener _lanDiscoveryListener;
 	private static LanFileServer _lanFileServer;
-	private static final ScheduledExecutorService _scheduledExecutorService =
-		Executors.newScheduledThreadPool(2);
+	private static ScheduledExecutorService _scheduledExecutorService;
 
 }

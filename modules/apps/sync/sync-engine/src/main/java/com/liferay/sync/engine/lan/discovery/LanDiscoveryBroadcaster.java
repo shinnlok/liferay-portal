@@ -37,7 +37,7 @@ import java.net.InetSocketAddress;
 public class LanDiscoveryBroadcaster {
 
 	public void broadcast(int port) throws Exception {
-		if (_channel == null) {
+		if ((_channel == null) || !_channel.isActive()) {
 			_initialize();
 		}
 
@@ -56,32 +56,37 @@ public class LanDiscoveryBroadcaster {
 		channelFuture.sync();
 	}
 
+	public void shutdown() {
+		if (_eventLoopGroup != null) {
+			_eventLoopGroup.shutdownGracefully();
+		}
+	}
+
 	private void _initialize() throws Exception {
-		EventLoopGroup eventLoopGroup = null;
+		_eventLoopGroup = new NioEventLoopGroup();
+
+		Bootstrap bootstrap = new Bootstrap();
+
+		bootstrap.channel(NioDatagramChannel.class);
+		bootstrap.group(_eventLoopGroup);
+		bootstrap.handler(new LanDiscoveryBroadcasterHandler());
+		bootstrap.option(ChannelOption.SO_BROADCAST, true);
+
+		ChannelFuture channelFuture = bootstrap.bind(0);
 
 		try {
-			eventLoopGroup = new NioEventLoopGroup();
-
-			Bootstrap bootstrap = new Bootstrap();
-
-			bootstrap.channel(NioDatagramChannel.class);
-			bootstrap.group(eventLoopGroup);
-			bootstrap.handler(new LanDiscoveryBroadcasterHandler());
-			bootstrap.option(ChannelOption.SO_BROADCAST, true);
-
-			ChannelFuture channelFuture = bootstrap.bind(0);
-
 			channelFuture = channelFuture.sync();
 
 			_channel = channelFuture.channel();
 		}
-		catch (Exception e) {
-			eventLoopGroup.shutdownGracefully();
+		catch (InterruptedException ie) {
+			_eventLoopGroup.shutdownGracefully();
 
-			throw e;
+			throw ie;
 		}
 	}
 
-	private static Channel _channel;
+	private Channel _channel;
+	private EventLoopGroup _eventLoopGroup;
 
 }

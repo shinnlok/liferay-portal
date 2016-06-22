@@ -18,6 +18,7 @@ import com.liferay.sync.engine.document.library.handler.Handler;
 import com.liferay.sync.engine.lan.util.LanClientUtil;
 import com.liferay.sync.engine.lan.util.LanPEMParserUtil;
 import com.liferay.sync.engine.lan.util.LanTokenUtil;
+import com.liferay.sync.engine.model.ModelListener;
 import com.liferay.sync.engine.model.SyncAccount;
 import com.liferay.sync.engine.model.SyncFile;
 import com.liferay.sync.engine.model.SyncLanClient;
@@ -38,6 +39,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -84,6 +86,40 @@ public class LanSession {
 		}
 
 		return _lanSession;
+	}
+
+	public static ModelListener<SyncAccount> getSyncAccountListener() {
+		if (_syncAccountListener != null) {
+			return _syncAccountListener;
+		}
+
+		_syncAccountListener = new ModelListener<SyncAccount>() {
+
+			@Override
+			public void onCreate(SyncAccount syncAccount) {
+				_lanSession = new LanSession();
+			}
+
+			@Override
+			public void onRemove(SyncAccount syncAccount) {
+				_lanSession = new LanSession();
+			}
+
+			@Override
+			public void onUpdate(
+				SyncAccount syncAccount, Map<String, Object> originalValues) {
+
+				if (originalValues.containsKey("active") ||
+					originalValues.containsKey("lanCertificate") ||
+					originalValues.containsKey("lanKey")) {
+
+					_lanSession = new LanSession();
+				}
+			}
+
+		};
+
+		return _syncAccountListener;
 	}
 
 	public LanSession() {
@@ -315,7 +351,7 @@ public class LanSession {
 		keyStore.load(null, null);
 
 		for (SyncAccount syncAccount : SyncAccountService.findAll()) {
-			if (!syncAccount.isActive()) {
+			if (!syncAccount.isActive() || !syncAccount.isLanEnabled()) {
 				continue;
 			}
 
@@ -429,6 +465,7 @@ public class LanSession {
 
 	private static LanSession _lanSession;
 	private static ThreadPoolExecutor _queryExecutorService;
+	private static ModelListener<SyncAccount> _syncAccountListener;
 
 	private final ExecutorService _downloadExecutorService =
 		Executors.newCachedThreadPool();
