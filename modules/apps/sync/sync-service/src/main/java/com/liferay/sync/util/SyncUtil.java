@@ -41,6 +41,7 @@ import com.liferay.portal.kernel.util.DigesterUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
+import com.liferay.portal.kernel.util.PwdGenerator;
 import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
@@ -70,6 +71,8 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 
 import java.util.Date;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Dennis Ju
@@ -90,8 +93,9 @@ public class SyncUtil {
 				syncDLObject.getTreePath(), StringPool.BLANK, StringPool.BLANK,
 				StringPool.BLANK, StringPool.BLANK, StringPool.BLANK,
 				StringPool.BLANK, StringPool.BLANK, 0, 0, StringPool.BLANK,
-				event, null, 0, StringPool.BLANK, syncDLObject.getType(),
-				syncDLObject.getTypePK(), StringPool.BLANK);
+				event, StringPool.BLANK, null, 0, StringPool.BLANK,
+				syncDLObject.getType(), syncDLObject.getTypePK(),
+				StringPool.BLANK);
 		}
 		else {
 			SyncDLObjectLocalServiceUtil.addSyncDLObject(
@@ -104,7 +108,8 @@ public class SyncUtil {
 				syncDLObject.getChangeLog(), syncDLObject.getExtraSettings(),
 				syncDLObject.getVersion(), syncDLObject.getVersionId(),
 				syncDLObject.getSize(), syncDLObject.getChecksum(),
-				syncDLObject.getEvent(), syncDLObject.getLockExpirationDate(),
+				syncDLObject.getEvent(), syncDLObject.getLanTokenKey(),
+				syncDLObject.getLockExpirationDate(),
 				syncDLObject.getLockUserId(), syncDLObject.getLockUserName(),
 				syncDLObject.getType(), syncDLObject.getTypePK(),
 				syncDLObject.getTypeUuid());
@@ -398,6 +403,16 @@ public class SyncUtil {
 		}
 	}
 
+	public static String popLanTokenKey(long modifiedTime, long typePK) {
+		String id = String.valueOf(modifiedTime) + "." + String.valueOf(typePK);
+
+		if (_lanTokenKeys.containsKey(id)) {
+			return _lanTokenKeys.remove(id);
+		}
+
+		return PwdGenerator.getPassword();
+	}
+
 	public static void setFilePermissions(
 		Group group, boolean folder, ServiceContext serviceContext) {
 
@@ -424,6 +439,16 @@ public class SyncUtil {
 		}
 
 		serviceContext.setGroupPermissions(resourceActions);
+	}
+
+	public static String stashLanTokenKey(long modifiedTime, long typePK) {
+		String id = String.valueOf(modifiedTime) + "." + String.valueOf(typePK);
+
+		String lanTokenKey = PwdGenerator.getPassword();
+
+		_lanTokenKeys.put(id, lanTokenKey);
+
+		return lanTokenKey;
 	}
 
 	public static SyncDLObject toSyncDLObject(
@@ -584,5 +609,8 @@ public class SyncUtil {
 
 		throw new PortalException("Folder must be an instance of DLFolder");
 	}
+
+	private static final Map<String, String> _lanTokenKeys =
+		new ConcurrentHashMap<>();
 
 }
