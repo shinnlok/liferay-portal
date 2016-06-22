@@ -2627,6 +2627,7 @@ public class SyncDevicePersistenceImpl extends BasePersistenceImpl<SyncDevice>
 		syncDeviceImpl.setUserName(syncDevice.getUserName());
 		syncDeviceImpl.setCreateDate(syncDevice.getCreateDate());
 		syncDeviceImpl.setModifiedDate(syncDevice.getModifiedDate());
+		syncDeviceImpl.setHostName(syncDevice.getHostName());
 		syncDeviceImpl.setType(syncDevice.getType());
 		syncDeviceImpl.setBuildNumber(syncDevice.getBuildNumber());
 		syncDeviceImpl.setFeatureSet(syncDevice.getFeatureSet());

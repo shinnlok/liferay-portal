@@ -66,7 +66,7 @@ public class SyncDeviceCacheModel implements CacheModel<SyncDevice>,
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(23);
+		StringBundler sb = new StringBundler(25);
 
 		sb.append("{uuid=");
 		sb.append(uuid);
@@ -82,6 +82,8 @@ public class SyncDeviceCacheModel implements CacheModel<SyncDevice>,
 		sb.append(createDate);
 		sb.append(", modifiedDate=");
 		sb.append(modifiedDate);
+		sb.append(", hostName=");
+		sb.append(hostName);
 		sb.append(", type=");
 		sb.append(type);
 		sb.append(", buildNumber=");
@@ -131,6 +133,13 @@ public class SyncDeviceCacheModel implements CacheModel<SyncDevice>,
 			syncDeviceImpl.setModifiedDate(new Date(modifiedDate));
 		}
 
+		if (hostName == null) {
+			syncDeviceImpl.setHostName(StringPool.BLANK);
+		}
+		else {
+			syncDeviceImpl.setHostName(hostName);
+		}
+
 		if (type == null) {
 			syncDeviceImpl.setType(StringPool.BLANK);
 		}
@@ -159,6 +168,7 @@ public class SyncDeviceCacheModel implements CacheModel<SyncDevice>,
 		userName = objectInput.readUTF();
 		createDate = objectInput.readLong();
 		modifiedDate = objectInput.readLong();
+		hostName = objectInput.readUTF();
 		type = objectInput.readUTF();
 
 		buildNumber = objectInput.readLong();
@@ -194,6 +204,13 @@ public class SyncDeviceCacheModel implements CacheModel<SyncDevice>,
 		objectOutput.writeLong(createDate);
 		objectOutput.writeLong(modifiedDate);
 
+		if (hostName == null) {
+			objectOutput.writeUTF(StringPool.BLANK);
+		}
+		else {
+			objectOutput.writeUTF(hostName);
+		}
+
 		if (type == null) {
 			objectOutput.writeUTF(StringPool.BLANK);
 		}
@@ -215,6 +232,7 @@ public class SyncDeviceCacheModel implements CacheModel<SyncDevice>,
 	public String userName;
 	public long createDate;
 	public long modifiedDate;
+	public String hostName;
 	public String type;
 	public long buildNumber;
 	public int featureSet;

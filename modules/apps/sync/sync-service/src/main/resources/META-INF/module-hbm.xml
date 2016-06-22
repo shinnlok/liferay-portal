@@ -15,6 +15,7 @@
 		<property name="userName" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="createDate" type="org.hibernate.type.TimestampType" />
 		<property name="modifiedDate" type="org.hibernate.type.TimestampType" />
+		<property name="hostName" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property column="type_" name="type" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="buildNumber" type="com.liferay.portal.dao.orm.hibernate.LongType" />
 		<property name="featureSet" type="com.liferay.portal.dao.orm.hibernate.IntegerType" />
