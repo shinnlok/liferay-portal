@@ -31,10 +31,13 @@ import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.security.SecureRandom;
+import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.util.Base64;
 import com.liferay.portal.kernel.util.ClassUtil;
 import com.liferay.portal.kernel.util.Digester;
 import com.liferay.portal.kernel.util.DigesterUtil;
@@ -47,6 +50,7 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.sync.SyncSiteUnavailableException;
 import com.liferay.sync.constants.SyncDLObjectConstants;
 import com.liferay.sync.constants.SyncPermissionsConstants;
@@ -65,14 +69,33 @@ import java.io.OutputStream;
 
 import java.lang.reflect.InvocationTargetException;
 
+import java.math.BigInteger;
+
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.PrivateKey;
+import java.security.Provider;
+import java.security.cert.X509Certificate;
+
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import javax.portlet.PortletPreferences;
+
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.X509v3CertificateBuilder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
 /**
  * @author Dennis Ju
@@ -197,6 +220,70 @@ public class SyncUtil {
 		if ((group == null) || !isSyncEnabled(group)) {
 			throw new SyncSiteUnavailableException();
 		}
+	}
+
+	public static void configureLanSync(long companyId) throws Exception {
+		String lanServerUuid = PrefsPropsUtil.getString(
+			CompanyThreadLocal.getCompanyId(),
+			SyncServiceConfigurationKeys.SYNC_LAN_SERVER_UUID);
+
+		if (Validator.isNotNull(lanServerUuid)) {
+			return;
+		}
+
+		lanServerUuid = PortalUUIDUtil.generate();
+
+		X500Name x500Name = new X500Name("CN=" + lanServerUuid);
+
+		Date notBeforeDate = new Date(
+			System.currentTimeMillis() - 86400000L * 365);
+		Date notAfterDate = new Date(
+			System.currentTimeMillis() + 86400000L * 365 * 1000);
+
+		KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+
+		keyPairGenerator.initialize(1024);
+
+		KeyPair keyPair = keyPairGenerator.generateKeyPair();
+
+		X509v3CertificateBuilder x509v3CertificateBuilder =
+			new JcaX509v3CertificateBuilder(
+				x500Name, new BigInteger(64, new SecureRandom()), notBeforeDate,
+				notAfterDate, x500Name, keyPair.getPublic());
+
+		JcaContentSignerBuilder jcaContentSignerBuilder =
+			new JcaContentSignerBuilder("SHA256WithRSAEncryption");
+
+		PrivateKey privateKey = keyPair.getPrivate();
+
+		ContentSigner contentSigner = jcaContentSignerBuilder.build(privateKey);
+
+		X509CertificateHolder x509CertificateHolder =
+			x509v3CertificateBuilder.build(contentSigner);
+
+		JcaX509CertificateConverter jcaX509CertificateConverter =
+			new JcaX509CertificateConverter();
+
+		jcaX509CertificateConverter.setProvider(_provider);
+
+		X509Certificate x509Certificate =
+			jcaX509CertificateConverter.getCertificate(x509CertificateHolder);
+
+		x509Certificate.verify(keyPair.getPublic());
+
+		PortletPreferences portletPreferences = PrefsPropsUtil.getPreferences(
+			companyId);
+
+		portletPreferences.setValue(
+			SyncServiceConfigurationKeys.SYNC_LAN_CERTIFICATE,
+			Base64.encode(x509Certificate.getEncoded()));
+		portletPreferences.setValue(
+			SyncServiceConfigurationKeys.SYNC_LAN_KEY,
+			Base64.encode(privateKey.getEncoded()));
+		portletPreferences.setValue(
+			SyncServiceConfigurationKeys.SYNC_LAN_SERVER_UUID, lanServerUuid);
+
+		portletPreferences.store();
 	}
 
 	public static String getChecksum(DLFileVersion dlFileVersion)
@@ -609,6 +696,8 @@ public class SyncUtil {
 
 		throw new PortalException("Folder must be an instance of DLFolder");
 	}
+
+	private static final Provider _provider = new BouncyCastleProvider();
 
 	private static final Map<String, String> _lanTokenKeys =
 		new ConcurrentHashMap<>();
