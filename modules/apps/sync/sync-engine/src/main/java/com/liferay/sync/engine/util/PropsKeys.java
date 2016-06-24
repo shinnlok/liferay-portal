@@ -73,6 +73,8 @@ public interface PropsKeys {
 
 	public static final String SYNC_LAN_ENABLED = "sync.lan.enabled";
 
+	public static final String SYNC_LAN_PORT = "sync.lan.port";
+
 	public static final String SYNC_LAN_SESSION_DOWNLOAD_CONNECT_TIMEOUT =
 		"sync.lan.session.download.connect.timeout";
 
@@ -96,8 +98,6 @@ public interface PropsKeys {
 
 	public static final String SYNC_LAN_SESSION_QUERY_TOTAL_TIMEOUT =
 		"sync.lan.session.query.total.timeout";
-
-	public static final String SYNC_LAN_UDP_PORT = "sync.lan.udp.port";
 
 	public static final String SYNC_LOGGER_CONFIGURATION_FILE =
 		"sync.logger.configuration.file";

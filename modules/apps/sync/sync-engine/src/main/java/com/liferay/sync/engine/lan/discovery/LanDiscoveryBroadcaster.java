@@ -46,7 +46,7 @@ public class LanDiscoveryBroadcaster {
 		byte[] jsonBytes = JSONUtil.writeValueAsBytes(syncLanClient);
 
 		InetSocketAddress inetSocketAddress = new InetSocketAddress(
-			"255.255.255.255", PropsValues.SYNC_LAN_UDP_PORT);
+			"255.255.255.255", PropsValues.SYNC_LAN_PORT);
 
 		DatagramPacket datagramPacket = new DatagramPacket(
 			Unpooled.copiedBuffer(jsonBytes), inetSocketAddress);

@@ -16,6 +16,7 @@ package com.liferay.sync.engine.lan.fileserver;
 
 import com.liferay.sync.engine.model.ModelListener;
 import com.liferay.sync.engine.model.SyncAccount;
+import com.liferay.sync.engine.util.PropsValues;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
@@ -25,6 +26,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 
+import java.net.BindException;
 import java.net.InetSocketAddress;
 
 import java.util.Map;
@@ -92,9 +94,26 @@ public class LanFileServer {
 		serverBootstrap.childHandler(_lanFileServerInitializer);
 		serverBootstrap.childOption(ChannelOption.SO_KEEPALIVE, true);
 
-		ChannelFuture channelFuture = serverBootstrap.bind(0);
+		ChannelFuture channelFuture = serverBootstrap.bind(
+			PropsValues.SYNC_LAN_PORT);
 
-		channelFuture.sync();
+		try {
+			channelFuture.sync();
+		}
+		catch (Exception e) {
+
+			// Compiling fails when directly catching BindException. Netty seems
+			// to throw an undeclared exception.
+
+			if (e instanceof BindException) {
+				channelFuture = serverBootstrap.bind(0);
+
+				channelFuture.sync();
+			}
+			else {
+				throw e;
+			}
+		}
 
 		Channel channel = channelFuture.channel();
 
