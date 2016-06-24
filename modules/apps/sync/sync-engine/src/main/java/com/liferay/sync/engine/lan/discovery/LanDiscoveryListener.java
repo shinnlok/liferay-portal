@@ -37,8 +37,7 @@ public class LanDiscoveryListener {
 		bootstrap.group(_eventLoopGroup);
 		bootstrap.handler(new LanDiscoveryListenerHandler());
 
-		ChannelFuture channelFuture = bootstrap.bind(
-			PropsValues.SYNC_LAN_UDP_PORT);
+		ChannelFuture channelFuture = bootstrap.bind(PropsValues.SYNC_LAN_PORT);
 
 		try {
 			channelFuture.sync();
