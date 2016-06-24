@@ -136,7 +136,7 @@ public class LanSession {
 			PropsValues.SYNC_LAN_SESSION_QUERY_SOCKET_TIMEOUT);
 	}
 
-	public HttpGet downloadFile(SyncFile syncFile, final Handler handler)
+	public HttpGet downloadFile(final SyncFile syncFile, final Handler handler)
 		throws Exception {
 
 		Object[] objects = findSyncLanClient(syncFile);
@@ -198,9 +198,9 @@ public class LanSession {
 			return null;
 		}
 
-		List<Callable<Object[]>> querySyncLanClientCallables =
+		final List<Callable<Object[]>> querySyncLanClientCallables =
 			Collections.synchronizedList(
-				new ArrayList<>(syncLanClientUuids.size()));
+				new ArrayList<Callable<Object[]>>(syncLanClientUuids.size()));
 
 		for (String syncLanClientUuid : syncLanClientUuids) {
 			SyncLanClient syncLanClient =
@@ -252,7 +252,7 @@ public class LanSession {
 	}
 
 	protected Callable<Object[]> createQuerySyncLanClientCallable(
-		SyncLanClient syncLanClient, SyncFile syncFile) {
+		final SyncLanClient syncLanClient, SyncFile syncFile) {
 
 		String url = _getUrl(syncLanClient, syncFile);
 
@@ -336,7 +336,7 @@ public class LanSession {
 		_queryExecutorService = new ThreadPoolExecutor(
 			PropsValues.SYNC_LAN_SESSION_QUERY_POOL_MAX_SIZE,
 			PropsValues.SYNC_LAN_SESSION_QUERY_POOL_MAX_SIZE, 60,
-			TimeUnit.SECONDS, new LinkedBlockingQueue<>());
+			TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
 
 		_queryExecutorService.allowCoreThreadTimeOut(true);
 
