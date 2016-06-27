@@ -40,8 +40,8 @@ public class SyncDeviceImpl extends SyncDeviceBaseImpl {
 		}
 		else if (getStatus() == SyncDeviceConstants.STATUS_PENDING_WIPE) {
 			SyncDeviceLocalServiceUtil.updateSyncDevice(
-				getSyncDeviceId(), getHostName(), getType(), getBuildNumber(),
-				getFeatureSet(), SyncDeviceConstants.STATUS_WIPED);
+				getSyncDeviceId(), getType(), getBuildNumber(), getFeatureSet(),
+				getLoginIP(), SyncDeviceConstants.STATUS_WIPED);
 
 			throw new SyncDeviceWipeException();
 		}
