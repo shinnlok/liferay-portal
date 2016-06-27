@@ -134,13 +134,13 @@ public class SyncDevicePersistenceTest {
 
 		newSyncDevice.setModifiedDate(RandomTestUtil.nextDate());
 
-		newSyncDevice.setHostName(RandomTestUtil.randomString());
-
 		newSyncDevice.setType(RandomTestUtil.randomString());
 
 		newSyncDevice.setBuildNumber(RandomTestUtil.nextLong());
 
 		newSyncDevice.setFeatureSet(RandomTestUtil.nextInt());
+
+		newSyncDevice.setLoginIP(RandomTestUtil.randomString());
 
 		newSyncDevice.setStatus(RandomTestUtil.nextInt());
 
@@ -164,14 +164,14 @@ public class SyncDevicePersistenceTest {
 		Assert.assertEquals(Time.getShortTimestamp(
 				existingSyncDevice.getModifiedDate()),
 			Time.getShortTimestamp(newSyncDevice.getModifiedDate()));
-		Assert.assertEquals(existingSyncDevice.getHostName(),
-			newSyncDevice.getHostName());
 		Assert.assertEquals(existingSyncDevice.getType(),
 			newSyncDevice.getType());
 		Assert.assertEquals(existingSyncDevice.getBuildNumber(),
 			newSyncDevice.getBuildNumber());
 		Assert.assertEquals(existingSyncDevice.getFeatureSet(),
 			newSyncDevice.getFeatureSet());
+		Assert.assertEquals(existingSyncDevice.getLoginIP(),
+			newSyncDevice.getLoginIP());
 		Assert.assertEquals(existingSyncDevice.getStatus(),
 			newSyncDevice.getStatus());
 	}
@@ -235,9 +235,9 @@ public class SyncDevicePersistenceTest {
 	protected OrderByComparator<SyncDevice> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create("SyncDevice", "uuid", true,
 			"syncDeviceId", true, "companyId", true, "userId", true,
-			"userName", true, "createDate", true, "modifiedDate", true,
-			"hostName", true, "type", true, "buildNumber", true, "featureSet",
-			true, "status", true);
+			"userName", true, "createDate", true, "modifiedDate", true, "type",
+			true, "buildNumber", true, "featureSet", true, "loginIP", true,
+			"status", true);
 	}
 
 	@Test
@@ -451,13 +451,13 @@ public class SyncDevicePersistenceTest {
 
 		syncDevice.setModifiedDate(RandomTestUtil.nextDate());
 
-		syncDevice.setHostName(RandomTestUtil.randomString());
-
 		syncDevice.setType(RandomTestUtil.randomString());
 
 		syncDevice.setBuildNumber(RandomTestUtil.nextLong());
 
 		syncDevice.setFeatureSet(RandomTestUtil.nextInt());
+
+		syncDevice.setLoginIP(RandomTestUtil.randomString());
 
 		syncDevice.setStatus(RandomTestUtil.nextInt());
 
