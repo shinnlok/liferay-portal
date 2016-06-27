@@ -25,8 +25,6 @@ import com.liferay.sync.engine.util.OSDetector;
 import com.liferay.sync.engine.util.ReleaseInfo;
 import com.liferay.sync.engine.util.ServerInfo;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -49,19 +47,6 @@ public class ServerEventUtil {
 
 		parameters.put("buildNumber", ReleaseInfo.getBuildNumber());
 		parameters.put("featureSet", ReleaseInfo.getFeatureSet());
-
-		String hostName = null;
-
-		try {
-			InetAddress inetAddress = InetAddress.getLocalHost();
-
-			hostName = inetAddress.getHostName();
-		}
-		catch (UnknownHostException uhe) {
-			hostName = "UNKNOWN";
-		}
-
-		parameters.put("hostName", hostName);
 
 		String type = null;
 
