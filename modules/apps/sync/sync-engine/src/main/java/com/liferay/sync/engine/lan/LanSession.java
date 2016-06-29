@@ -97,12 +97,12 @@ public class LanSession {
 
 			@Override
 			public void onCreate(SyncAccount syncAccount) {
-				_lanSession = new LanSession();
+				createLanSession(syncAccount);
 			}
 
 			@Override
 			public void onRemove(SyncAccount syncAccount) {
-				_lanSession = new LanSession();
+				createLanSession(syncAccount);
 			}
 
 			@Override
@@ -113,6 +113,12 @@ public class LanSession {
 					originalValues.containsKey("lanCertificate") ||
 					originalValues.containsKey("lanKey")) {
 
+					createLanSession(syncAccount);
+				}
+			}
+
+			protected void createLanSession(SyncAccount syncAccount) {
+				if (syncAccount.isLanEnabled()) {
 					_lanSession = new LanSession();
 				}
 			}
