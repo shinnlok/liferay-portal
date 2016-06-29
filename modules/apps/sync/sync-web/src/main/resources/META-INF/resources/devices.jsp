@@ -110,11 +110,25 @@ portletURL.setParameter("delta", String.valueOf(delta));
 					property="userName"
 				/>
 
+				<%
+				String location = syncDevice.getLoginIP();
+
+				IPGeocoder ipGeocoder = (IPGeocoder)request.getAttribute(SyncWebKeys.IP_GEOCODER);
+
+				IPInfo ipInfo = ipGeocoder.getIPInfo(syncDevice.getLoginIP());
+
+				if (ipInfo != null) {
+					String city = ipInfo.getCity();
+
+					if (city != null) {
+						location = city + " " + syncDevice.getLoginIP();
+					}
+				}
+				%>
+
 				<liferay-ui:search-container-column-text
-                    name="ip-address"
-                    orderable="<%= true %>"
-                    orderableProperty="loginIP"
-                    property="loginIP"
+					name="location"
+					value="<%= location %>"
 				/>
 
 				<liferay-ui:search-container-column-text
