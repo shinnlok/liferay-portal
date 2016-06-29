@@ -14,21 +14,18 @@
 
 package com.liferay.sync.web.portlet;
 
-import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.sync.constants.SyncAdminPortletKeys;
 import com.liferay.sync.model.SyncDevice;
-import com.liferay.sync.service.SyncDeviceLocalService;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.Portlet;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Jonathan McCann
@@ -55,7 +52,7 @@ import org.osgi.service.component.annotations.Reference;
 	},
 	service = Portlet.class
 )
-public class SyncDevicesPortlet extends MVCPortlet {
+public class SyncDevicesPortlet extends BaseSyncPortlet {
 
 	public void deleteDevice(
 			ActionRequest actionRequest, ActionResponse actionResponse)
@@ -66,9 +63,9 @@ public class SyncDevicesPortlet extends MVCPortlet {
 
 		long syncDeviceId = ParamUtil.getLong(actionRequest, "syncDeviceId");
 
-		_checkSyncDeviceUserId(syncDeviceId, themeDisplay.getUserId());
+		checkSyncDevice(syncDeviceId, themeDisplay.getUserId());
 
-		_syncDeviceLocalService.deleteSyncDevice(syncDeviceId);
+		super.deleteDevice(actionRequest, actionResponse);
 	}
 
 	public void updateDevice(
@@ -80,31 +77,20 @@ public class SyncDevicesPortlet extends MVCPortlet {
 
 		long syncDeviceId = ParamUtil.getLong(actionRequest, "syncDeviceId");
 
-		_checkSyncDeviceUserId(syncDeviceId, themeDisplay.getUserId());
+		checkSyncDevice(syncDeviceId, themeDisplay.getUserId());
 
-		int status = ParamUtil.getInteger(actionRequest, "status");
-
-		_syncDeviceLocalService.updateStatus(syncDeviceId, status);
+		super.updateDevice(actionRequest, actionResponse);
 	}
 
-	@Reference(unbind = "-")
-	protected void setSyncLocalService(
-		SyncDeviceLocalService syncDeviceLocalService) {
-
-		_syncDeviceLocalService = syncDeviceLocalService;
-	}
-
-	private void _checkSyncDeviceUserId(long syncDeviceId, long userId)
+	protected void checkSyncDevice(long syncDeviceId, long userId)
 		throws Exception {
 
-		SyncDevice syncDevice = _syncDeviceLocalService.getSyncDevice(
+		SyncDevice syncDevice = syncDeviceLocalService.getSyncDevice(
 			syncDeviceId);
 
 		if (userId != syncDevice.getUserId()) {
 			throw new PrincipalException();
 		}
 	}
-
-	private SyncDeviceLocalService _syncDeviceLocalService;
 
 }
