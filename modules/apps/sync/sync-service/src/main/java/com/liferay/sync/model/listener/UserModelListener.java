@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.model;
+package com.liferay.sync.model.listener;
 
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.ModelListenerException;
@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.model.ModelListener;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.sync.constants.SyncDeviceConstants;
+import com.liferay.sync.model.SyncDevice;
 import com.liferay.sync.service.SyncDeviceLocalService;
 
 import java.util.List;
