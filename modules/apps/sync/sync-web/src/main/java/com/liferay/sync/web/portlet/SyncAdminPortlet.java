@@ -15,7 +15,6 @@
 package com.liferay.sync.web.portlet;
 
 import com.liferay.portal.kernel.model.Group;
-import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -29,7 +28,6 @@ import com.liferay.sync.constants.SyncAdminPortletKeys;
 import com.liferay.sync.constants.SyncConstants;
 import com.liferay.sync.exception.OAuthPortletUndeployedException;
 import com.liferay.sync.oauth.helper.SyncOAuthHelperUtil;
-import com.liferay.sync.service.SyncDeviceLocalService;
 import com.liferay.sync.service.configuration.SyncServiceConfigurationKeys;
 
 import java.io.IOException;
@@ -69,27 +67,7 @@ import org.osgi.service.component.annotations.Reference;
 	},
 	service = Portlet.class
 )
-public class SyncAdminPortlet extends MVCPortlet {
-
-	public void deleteDevice(
-			ActionRequest actionRequest, ActionResponse actionResponse)
-		throws Exception {
-
-		long syncDeviceId = ParamUtil.getLong(actionRequest, "syncDeviceId");
-
-		_syncDeviceLocalService.deleteSyncDevice(syncDeviceId);
-	}
-
-	public void updateDevice(
-			ActionRequest actionRequest, ActionResponse actionResponse)
-		throws Exception {
-
-		long syncDeviceId = ParamUtil.getLong(actionRequest, "syncDeviceId");
-
-		int status = ParamUtil.getInteger(actionRequest, "status");
-
-		_syncDeviceLocalService.updateStatus(syncDeviceId, status);
-	}
+public class SyncAdminPortlet extends BaseSyncPortlet {
 
 	public void updatePreferences(
 			ActionRequest actionRequest, ActionResponse actionResponse)
@@ -195,13 +173,6 @@ public class SyncAdminPortlet extends MVCPortlet {
 	}
 
 	@Reference(unbind = "-")
-	protected void setSyncLocalService(
-		SyncDeviceLocalService syncDeviceLocalService) {
-
-		_syncDeviceLocalService = syncDeviceLocalService;
-	}
-
-	@Reference(unbind = "-")
 	protected void setSyncOAuthHelperUtil(
 		SyncOAuthHelperUtil syncOAuthHelperUtil) {
 
@@ -209,7 +180,6 @@ public class SyncAdminPortlet extends MVCPortlet {
 	}
 
 	private GroupLocalService _groupLocalService;
-	private SyncDeviceLocalService _syncDeviceLocalService;
 	private SyncOAuthHelperUtil _syncOAuthHelperUtil;
 
 }
