@@ -42,12 +42,11 @@ public class SyncDeviceServiceUtil {
 	 * Never modify this class directly. Add custom service methods to {@link com.liferay.sync.service.impl.SyncDeviceServiceImpl} and rerun ServiceBuilder to regenerate this class.
 	 */
 	public static com.liferay.sync.model.SyncDevice registerSyncDevice(
-		java.lang.String hostName, java.lang.String type, long buildNumber,
-		int featureSet, java.lang.String uuid)
+		java.lang.String type, long buildNumber, int featureSet,
+		java.lang.String uuid)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
-				   .registerSyncDevice(hostName, type, buildNumber, featureSet,
-			uuid);
+				   .registerSyncDevice(type, buildNumber, featureSet, uuid);
 	}
 
 	/**
