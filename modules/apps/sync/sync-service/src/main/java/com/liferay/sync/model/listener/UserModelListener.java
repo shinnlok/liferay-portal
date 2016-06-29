@@ -44,9 +44,7 @@ public class UserModelListener extends BaseModelListener<User> {
 					null);
 
 			for (SyncDevice syncDevice : syncDevices) {
-				_syncDeviceLocalService.updateStatus(
-					syncDevice.getSyncDeviceId(),
-					SyncDeviceConstants.STATUS_PENDING_WIPE);
+				_syncDeviceLocalService.deleteSyncDevice(syncDevice);
 			}
 		}
 		catch (Exception e) {
