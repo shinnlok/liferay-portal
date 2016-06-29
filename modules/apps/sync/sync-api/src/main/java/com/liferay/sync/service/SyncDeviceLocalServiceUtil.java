@@ -85,12 +85,11 @@ public class SyncDeviceLocalServiceUtil {
 	}
 
 	public static com.liferay.sync.model.SyncDevice addSyncDevice(long userId,
-		java.lang.String hostName, java.lang.String type, long buildNumber,
+		java.lang.String type, long buildNumber, java.lang.String loginIP,
 		int featureSet)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
-				   .addSyncDevice(userId, hostName, type, buildNumber,
-			featureSet);
+				   .addSyncDevice(userId, type, buildNumber, loginIP, featureSet);
 	}
 
 	/**
@@ -184,12 +183,12 @@ public class SyncDeviceLocalServiceUtil {
 	}
 
 	public static com.liferay.sync.model.SyncDevice updateSyncDevice(
-		long syncDeviceId, java.lang.String hostName, java.lang.String type,
-		long buildNumber, int featureSet, int status)
+		long syncDeviceId, java.lang.String type, long buildNumber,
+		int featureSet, java.lang.String loginIP, int status)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
-				   .updateSyncDevice(syncDeviceId, hostName, type, buildNumber,
-			featureSet, status);
+				   .updateSyncDevice(syncDeviceId, type, buildNumber,
+			featureSet, loginIP, status);
 	}
 
 	/**

@@ -9,10 +9,10 @@
 		<field name="userName" type="String" />
 		<field name="createDate" type="Date" />
 		<field name="modifiedDate" type="Date" />
-		<field name="hostName" type="String" />
 		<field name="type" type="String" />
 		<field name="buildNumber" type="long" />
 		<field name="featureSet" type="int" />
+		<field name="loginIP" type="String" />
 		<field name="status" type="int" />
 	</model>
 	<model name="com.liferay.sync.model.SyncDLFileVersionDiff">
