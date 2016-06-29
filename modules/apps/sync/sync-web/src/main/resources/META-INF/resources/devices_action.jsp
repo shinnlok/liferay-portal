@@ -24,7 +24,7 @@ SyncDevice syncDevice = (SyncDevice)row.getObject();
 String syncDeviceId = String.valueOf(syncDevice.getSyncDeviceId());
 %>
 
-<liferay-ui:icon-menu icon="<%= StringPool.BLANK %>" message="<%= StringPool.BLANK %>" showWhenSingleIcon="<%= true %>">
+<liferay-ui:icon-menu direction="left-side" icon="<%= StringPool.BLANK %>" markupView="lexicon" message="<%= StringPool.BLANK %>" showWhenSingleIcon="<%= true %>">
 	<c:choose>
 		<c:when test="<%= syncDevice.getStatus() == SyncDeviceConstants.STATUS_ACTIVE %>">
 			<portlet:actionURL name="updateDevice" var="disableDeviceURL">
@@ -33,8 +33,7 @@ String syncDeviceId = String.valueOf(syncDevice.getSyncDeviceId());
 				<portlet:param name="syncDeviceId" value="<%= syncDeviceId %>" />
 			</portlet:actionURL>
 
-			<liferay-ui:icon-delete
-				image="unlink"
+			<liferay-ui:icon
 				label="<%= true %>"
 				message="disable-sync-device"
 				url="<%= disableDeviceURL %>"
@@ -49,7 +48,6 @@ String syncDeviceId = String.valueOf(syncDevice.getSyncDeviceId());
 				</portlet:actionURL>
 
 				<liferay-ui:icon
-					image="check"
 					label="<%= true %>"
 					message="enable-sync-device"
 					url="<%= enableDeviceURL %>"
@@ -64,7 +62,7 @@ String syncDeviceId = String.valueOf(syncDevice.getSyncDeviceId());
 				</portlet:actionURL>
 
 				<liferay-ui:icon-delete
-					image="trash"
+					confirmation="wiping-a-sync-device-will-delete-all-associated-files-from-the-client"
 					label="<%= true %>"
 					message="wipe-sync-device"
 					url="<%= wipeDeviceURL %>"
