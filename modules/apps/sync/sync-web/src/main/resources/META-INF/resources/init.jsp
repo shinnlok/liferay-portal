@@ -26,6 +26,8 @@ taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %><%@
 taglib uri="http://liferay.com/tld/util" prefix="liferay-util" %>
 
 <%@ page import="com.liferay.document.library.kernel.model.DLFileEntry" %><%@
+page import="com.liferay.ip.geocoder.IPGeocoder" %><%@
+page import="com.liferay.ip.geocoder.IPInfo" %><%@
 page import="com.liferay.portal.kernel.dao.orm.QueryUtil" %><%@
 page import="com.liferay.portal.kernel.dao.search.ResultRow" %><%@
 page import="com.liferay.portal.kernel.dao.search.RowChecker" %><%@
@@ -56,7 +58,8 @@ page import="com.liferay.sync.model.SyncDevice" %><%@
 page import="com.liferay.sync.oauth.helper.SyncOAuthHelperUtil" %><%@
 page import="com.liferay.sync.service.SyncDeviceLocalServiceUtil" %><%@
 page import="com.liferay.sync.service.configuration.SyncServiceConfigurationKeys" %><%@
-page import="com.liferay.sync.service.configuration.SyncServiceConfigurationValues" %>
+page import="com.liferay.sync.service.configuration.SyncServiceConfigurationValues" %><%@
+page import="com.liferay.sync.web.constants.SyncWebKeys" %>
 
 <%@ page import="java.util.ArrayList" %><%@
 page import="java.util.LinkedHashMap" %><%@
