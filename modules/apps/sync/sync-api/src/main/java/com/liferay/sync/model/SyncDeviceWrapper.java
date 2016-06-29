@@ -66,10 +66,10 @@ public class SyncDeviceWrapper implements SyncDevice, ModelWrapper<SyncDevice> {
 		attributes.put("userName", getUserName());
 		attributes.put("createDate", getCreateDate());
 		attributes.put("modifiedDate", getModifiedDate());
-		attributes.put("hostName", getHostName());
 		attributes.put("type", getType());
 		attributes.put("buildNumber", getBuildNumber());
 		attributes.put("featureSet", getFeatureSet());
+		attributes.put("loginIP", getLoginIP());
 		attributes.put("status", getStatus());
 
 		return attributes;
@@ -119,12 +119,6 @@ public class SyncDeviceWrapper implements SyncDevice, ModelWrapper<SyncDevice> {
 			setModifiedDate(modifiedDate);
 		}
 
-		String hostName = (String)attributes.get("hostName");
-
-		if (hostName != null) {
-			setHostName(hostName);
-		}
-
 		String type = (String)attributes.get("type");
 
 		if (type != null) {
@@ -141,6 +135,12 @@ public class SyncDeviceWrapper implements SyncDevice, ModelWrapper<SyncDevice> {
 
 		if (featureSet != null) {
 			setFeatureSet(featureSet);
+		}
+
+		String loginIP = (String)attributes.get("loginIP");
+
+		if (loginIP != null) {
+			setLoginIP(loginIP);
 		}
 
 		Integer status = (Integer)attributes.get("status");
@@ -241,13 +241,13 @@ public class SyncDeviceWrapper implements SyncDevice, ModelWrapper<SyncDevice> {
 	}
 
 	/**
-	* Returns the host name of this sync device.
+	* Returns the login i p of this sync device.
 	*
-	* @return the host name of this sync device
+	* @return the login i p of this sync device
 	*/
 	@Override
-	public java.lang.String getHostName() {
-		return _syncDevice.getHostName();
+	public java.lang.String getLoginIP() {
+		return _syncDevice.getLoginIP();
 	}
 
 	/**
@@ -443,13 +443,13 @@ public class SyncDeviceWrapper implements SyncDevice, ModelWrapper<SyncDevice> {
 	}
 
 	/**
-	* Sets the host name of this sync device.
+	* Sets the login i p of this sync device.
 	*
-	* @param hostName the host name of this sync device
+	* @param loginIP the login i p of this sync device
 	*/
 	@Override
-	public void setHostName(java.lang.String hostName) {
-		_syncDevice.setHostName(hostName);
+	public void setLoginIP(java.lang.String loginIP) {
+		_syncDevice.setLoginIP(loginIP);
 	}
 
 	/**

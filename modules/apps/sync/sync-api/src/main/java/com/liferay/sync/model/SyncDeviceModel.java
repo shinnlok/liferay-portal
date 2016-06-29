@@ -194,21 +194,6 @@ public interface SyncDeviceModel extends BaseModel<SyncDevice>, ShardedModel,
 	public void setModifiedDate(Date modifiedDate);
 
 	/**
-	 * Returns the host name of this sync device.
-	 *
-	 * @return the host name of this sync device
-	 */
-	@AutoEscape
-	public String getHostName();
-
-	/**
-	 * Sets the host name of this sync device.
-	 *
-	 * @param hostName the host name of this sync device
-	 */
-	public void setHostName(String hostName);
-
-	/**
 	 * Returns the type of this sync device.
 	 *
 	 * @return the type of this sync device
@@ -250,6 +235,21 @@ public interface SyncDeviceModel extends BaseModel<SyncDevice>, ShardedModel,
 	 * @param featureSet the feature set of this sync device
 	 */
 	public void setFeatureSet(int featureSet);
+
+	/**
+	 * Returns the login i p of this sync device.
+	 *
+	 * @return the login i p of this sync device
+	 */
+	@AutoEscape
+	public String getLoginIP();
+
+	/**
+	 * Sets the login i p of this sync device.
+	 *
+	 * @param loginIP the login i p of this sync device
+	 */
+	public void setLoginIP(String loginIP);
 
 	/**
 	 * Returns the status of this sync device.
