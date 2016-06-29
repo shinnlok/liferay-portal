@@ -21,13 +21,9 @@ String tabs1 = ParamUtil.getString(request, "tabs1", "devices");
 
 String keywords = ParamUtil.getString(request, "keywords");
 
-String orderByCol = ParamUtil.getString(request, "orderByCol", "userName");
-
-String orderByType = ParamUtil.getString(request, "orderByType", "asc");
-
-OrderByComparator obc = OrderByComparatorFactoryUtil.create("SyncDevice", orderByCol, orderByType.equals("asc"));
-
 int delta = ParamUtil.getInteger(request, "delta", SearchContainer.DEFAULT_DELTA);
+String orderByCol = ParamUtil.getString(request, "orderByCol", "name");
+String orderByType = ParamUtil.getString(request, "orderByType", "asc");
 
 PortletURL portletURL = renderResponse.createRenderURL();
 
@@ -35,9 +31,7 @@ portletURL.setParameter("tabs1", tabs1);
 portletURL.setParameter("delta", String.valueOf(delta));
 %>
 
-<liferay-frontend:management-bar
-	searchContainerId="devices"
->
+<liferay-frontend:management-bar>
 	<c:if test="<%= Validator.isNull(keywords) %>">
 		<liferay-frontend:management-bar-buttons>
 			<liferay-frontend:management-bar-display-buttons
@@ -50,6 +44,13 @@ portletURL.setParameter("delta", String.valueOf(delta));
 		<liferay-frontend:management-bar-filters>
 			<liferay-frontend:management-bar-navigation
 				navigationKeys='<%= new String[] {"all"} %>'
+				portletURL="<%= PortletURLUtil.clone(portletURL, liferayPortletResponse) %>"
+			/>
+
+			<liferay-frontend:management-bar-sort
+				orderByCol="<%= orderByCol %>"
+				orderByType="<%= orderByType %>"
+				orderColumns='<%= new String[] {"build", "last-seen", "name", "type"} %>'
 				portletURL="<%= PortletURLUtil.clone(portletURL, liferayPortletResponse) %>"
 			/>
 		</liferay-frontend:management-bar-filters>
@@ -66,18 +67,30 @@ portletURL.setParameter("delta", String.valueOf(delta));
 		>
 
 			<%
-			searchContainer.setOrderByType(orderByType);
-			searchContainer.setOrderByCol(orderByCol);
-
 			List<SyncDevice> syncDevices = new ArrayList<>();
+
+			OrderByComparator orderByComparator = null;
+
+			if (orderByCol.equals("name")) {
+				orderByComparator = OrderByComparatorFactoryUtil.create("SyncDevice", "userName", orderByType.equals("asc"));
+			}
+			else if (orderByCol.equals("build")) {
+				orderByComparator = OrderByComparatorFactoryUtil.create("SyncDevice", "buildNumber", orderByType.equals("asc"));
+			}
+			else if (orderByCol.equals("last-seen")) {
+				orderByComparator = OrderByComparatorFactoryUtil.create("SyncDevice", "modifiedDate", orderByType.equals("asc"));
+			}
+			else {
+				OrderByComparatorFactoryUtil.create("SyncDevice", orderByCol, orderByType.equals("asc"));
+			}
 
 			String portletId = (String)request.getAttribute(WebKeys.PORTLET_ID);
 
 			if (portletId.equals(SyncAdminPortletKeys.SYNC_ADMIN_PORTLET)) {
-				syncDevices = SyncDeviceLocalServiceUtil.search(themeDisplay.getCompanyId(), keywords, searchContainer.getStart(), searchContainer.getEnd(), obc);
+				syncDevices = SyncDeviceLocalServiceUtil.search(themeDisplay.getCompanyId(), keywords, searchContainer.getStart(), searchContainer.getEnd(), orderByComparator);
 			}
 			else {
-				syncDevices = SyncDeviceLocalServiceUtil.getSyncDevices(themeDisplay.getUserId(), searchContainer.getStart(), searchContainer.getEnd(), obc);
+				syncDevices = SyncDeviceLocalServiceUtil.getSyncDevices(themeDisplay.getUserId(), searchContainer.getStart(), searchContainer.getEnd(), orderByComparator);
 			}
 			%>
 
@@ -92,17 +105,16 @@ portletURL.setParameter("delta", String.valueOf(delta));
 				modelVar="syncDevice"
 			>
 				<liferay-ui:search-container-column-text
+					cssClass="content-column name-column title-column"
 					name="name"
-					orderable="<%= true %>"
-					orderableProperty="userName"
 					property="userName"
 				/>
 
 				<liferay-ui:search-container-column-text
-					name="ip-address"
-					orderable="<%= true %>"
-					orderableProperty="loginIP"
-					property="loginIP"
+                    name="ip-address"
+                    orderable="<%= true %>"
+                    orderableProperty="loginIP"
+                    property="loginIP"
 				/>
 
 				<liferay-ui:search-container-column-text
@@ -112,15 +124,11 @@ portletURL.setParameter("delta", String.valueOf(delta));
 
 				<liferay-ui:search-container-column-text
 					name="build"
-					orderable="<%= true %>"
-					orderableProperty="buildNumber"
 					property="buildNumber"
 				/>
 
 				<liferay-ui:search-container-column-date
 					name="last-seen"
-					orderable="<%= true %>"
-					orderableProperty="modifiedDate"
 					property="modifiedDate"
 				/>
 
@@ -132,12 +140,12 @@ portletURL.setParameter("delta", String.valueOf(delta));
 
 				<liferay-ui:search-container-column-jsp
 					align="right"
-					cssClass="entry-action"
+					cssClass="entry-action-column"
 					path="/devices_action.jsp"
 				/>
 			</liferay-ui:search-container-row>
 
-			<liferay-ui:search-iterator />
+			<liferay-ui:search-iterator markupView="lexicon" />
 		</liferay-ui:search-container>
 	</aui:form>
 </div>
