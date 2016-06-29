@@ -49,16 +49,12 @@ public class LanFileServer {
 
 			@Override
 			public void onCreate(SyncAccount syncAccount) {
-				if (_lanFileServerInitializer != null) {
-					_lanFileServerInitializer.updateDomainNameMapping();
-				}
+				updateDomainNameMapping(syncAccount);
 			}
 
 			@Override
 			public void onRemove(SyncAccount syncAccount) {
-				if (_lanFileServerInitializer != null) {
-					_lanFileServerInitializer.updateDomainNameMapping();
-				}
+				updateDomainNameMapping(syncAccount);
 			}
 
 			@Override
@@ -69,9 +65,15 @@ public class LanFileServer {
 					originalValues.containsKey("lanCertificate") ||
 					originalValues.containsKey("lanKey")) {
 
-					if (_lanFileServerInitializer != null) {
-						_lanFileServerInitializer.updateDomainNameMapping();
-					}
+					updateDomainNameMapping(syncAccount);
+				}
+			}
+
+			protected void updateDomainNameMapping(SyncAccount syncAccount) {
+				if ((_lanFileServerInitializer != null) &&
+					syncAccount.isLanEnabled()) {
+
+					_lanFileServerInitializer.updateDomainNameMapping();
 				}
 			}
 

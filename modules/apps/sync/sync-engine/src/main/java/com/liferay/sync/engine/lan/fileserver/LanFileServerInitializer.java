@@ -53,8 +53,6 @@ public class LanFileServerInitializer
 	public void initChannel(SocketChannel socketChannel) {
 		ChannelPipeline channelPipeline = socketChannel.pipeline();
 
-		long start = System.currentTimeMillis();
-
 		try {
 			if (_domainNameMapping != null) {
 				channelPipeline.addLast(new SniHandler(_domainNameMapping));
@@ -71,10 +69,6 @@ public class LanFileServerInitializer
 		LanFileServerHandler lanSyncServerHandler = new LanFileServerHandler();
 
 		channelPipeline.addLast(lanSyncServerHandler);
-
-		long end = System.currentTimeMillis();
-
-		System.out.println("" + (end - start));
 	}
 
 	public void updateDomainNameMapping() {
