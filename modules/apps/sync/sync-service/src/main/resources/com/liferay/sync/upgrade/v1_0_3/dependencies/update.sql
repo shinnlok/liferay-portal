@@ -1,3 +1,3 @@
-alter table SyncDevice add loginIP VARCHAR(75) null;
+alter table SyncDevice add host VARCHAR(75) null;
 
 COMMIT_TRANSACTION;
