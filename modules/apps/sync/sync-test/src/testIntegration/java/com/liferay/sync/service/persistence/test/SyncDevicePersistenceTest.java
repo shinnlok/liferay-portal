@@ -140,7 +140,7 @@ public class SyncDevicePersistenceTest {
 
 		newSyncDevice.setFeatureSet(RandomTestUtil.nextInt());
 
-		newSyncDevice.setLoginIP(RandomTestUtil.randomString());
+		newSyncDevice.setHost(RandomTestUtil.randomString());
 
 		newSyncDevice.setStatus(RandomTestUtil.nextInt());
 
@@ -170,8 +170,8 @@ public class SyncDevicePersistenceTest {
 			newSyncDevice.getBuildNumber());
 		Assert.assertEquals(existingSyncDevice.getFeatureSet(),
 			newSyncDevice.getFeatureSet());
-		Assert.assertEquals(existingSyncDevice.getLoginIP(),
-			newSyncDevice.getLoginIP());
+		Assert.assertEquals(existingSyncDevice.getHost(),
+			newSyncDevice.getHost());
 		Assert.assertEquals(existingSyncDevice.getStatus(),
 			newSyncDevice.getStatus());
 	}
@@ -236,7 +236,7 @@ public class SyncDevicePersistenceTest {
 		return OrderByComparatorFactoryUtil.create("SyncDevice", "uuid", true,
 			"syncDeviceId", true, "companyId", true, "userId", true,
 			"userName", true, "createDate", true, "modifiedDate", true, "type",
-			true, "buildNumber", true, "featureSet", true, "loginIP", true,
+			true, "buildNumber", true, "featureSet", true, "host", true,
 			"status", true);
 	}
 
@@ -457,7 +457,7 @@ public class SyncDevicePersistenceTest {
 
 		syncDevice.setFeatureSet(RandomTestUtil.nextInt());
 
-		syncDevice.setLoginIP(RandomTestUtil.randomString());
+		syncDevice.setHost(RandomTestUtil.randomString());
 
 		syncDevice.setStatus(RandomTestUtil.nextInt());
 

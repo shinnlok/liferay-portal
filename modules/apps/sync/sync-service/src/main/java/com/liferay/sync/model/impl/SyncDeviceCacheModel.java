@@ -88,8 +88,8 @@ public class SyncDeviceCacheModel implements CacheModel<SyncDevice>,
 		sb.append(buildNumber);
 		sb.append(", featureSet=");
 		sb.append(featureSet);
-		sb.append(", loginIP=");
-		sb.append(loginIP);
+		sb.append(", host=");
+		sb.append(host);
 		sb.append(", status=");
 		sb.append(status);
 		sb.append("}");
@@ -143,11 +143,11 @@ public class SyncDeviceCacheModel implements CacheModel<SyncDevice>,
 		syncDeviceImpl.setBuildNumber(buildNumber);
 		syncDeviceImpl.setFeatureSet(featureSet);
 
-		if (loginIP == null) {
-			syncDeviceImpl.setLoginIP(StringPool.BLANK);
+		if (host == null) {
+			syncDeviceImpl.setHost(StringPool.BLANK);
 		}
 		else {
-			syncDeviceImpl.setLoginIP(loginIP);
+			syncDeviceImpl.setHost(host);
 		}
 
 		syncDeviceImpl.setStatus(status);
@@ -174,7 +174,7 @@ public class SyncDeviceCacheModel implements CacheModel<SyncDevice>,
 		buildNumber = objectInput.readLong();
 
 		featureSet = objectInput.readInt();
-		loginIP = objectInput.readUTF();
+		host = objectInput.readUTF();
 
 		status = objectInput.readInt();
 	}
@@ -216,11 +216,11 @@ public class SyncDeviceCacheModel implements CacheModel<SyncDevice>,
 
 		objectOutput.writeInt(featureSet);
 
-		if (loginIP == null) {
+		if (host == null) {
 			objectOutput.writeUTF(StringPool.BLANK);
 		}
 		else {
-			objectOutput.writeUTF(loginIP);
+			objectOutput.writeUTF(host);
 		}
 
 		objectOutput.writeInt(status);
@@ -236,6 +236,6 @@ public class SyncDeviceCacheModel implements CacheModel<SyncDevice>,
 	public String type;
 	public long buildNumber;
 	public int featureSet;
-	public String loginIP;
+	public String host;
 	public int status;
 }

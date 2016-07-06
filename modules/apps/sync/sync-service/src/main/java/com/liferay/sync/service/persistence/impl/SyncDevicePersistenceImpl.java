@@ -2630,7 +2630,7 @@ public class SyncDevicePersistenceImpl extends BasePersistenceImpl<SyncDevice>
 		syncDeviceImpl.setType(syncDevice.getType());
 		syncDeviceImpl.setBuildNumber(syncDevice.getBuildNumber());
 		syncDeviceImpl.setFeatureSet(syncDevice.getFeatureSet());
-		syncDeviceImpl.setLoginIP(syncDevice.getLoginIP());
+		syncDeviceImpl.setHost(syncDevice.getHost());
 		syncDeviceImpl.setStatus(syncDevice.getStatus());
 
 		return syncDeviceImpl;

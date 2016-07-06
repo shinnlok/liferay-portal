@@ -85,11 +85,11 @@ public class SyncDeviceLocalServiceWrapper implements SyncDeviceLocalService,
 
 	@Override
 	public com.liferay.sync.model.SyncDevice addSyncDevice(long userId,
-		java.lang.String type, long buildNumber, java.lang.String loginIP,
+		java.lang.String type, long buildNumber, java.lang.String host,
 		int featureSet)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _syncDeviceLocalService.addSyncDevice(userId, type, buildNumber,
-			loginIP, featureSet);
+			host, featureSet);
 	}
 
 	/**
@@ -191,10 +191,10 @@ public class SyncDeviceLocalServiceWrapper implements SyncDeviceLocalService,
 	@Override
 	public com.liferay.sync.model.SyncDevice updateSyncDevice(
 		long syncDeviceId, java.lang.String type, long buildNumber,
-		int featureSet, java.lang.String loginIP, int status)
+		int featureSet, java.lang.String host, int status)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _syncDeviceLocalService.updateSyncDevice(syncDeviceId, type,
-			buildNumber, featureSet, loginIP, status);
+			buildNumber, featureSet, host, status);
 	}
 
 	/**

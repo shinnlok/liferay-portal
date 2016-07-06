@@ -69,7 +69,7 @@ public class SyncDeviceWrapper implements SyncDevice, ModelWrapper<SyncDevice> {
 		attributes.put("type", getType());
 		attributes.put("buildNumber", getBuildNumber());
 		attributes.put("featureSet", getFeatureSet());
-		attributes.put("loginIP", getLoginIP());
+		attributes.put("host", getHost());
 		attributes.put("status", getStatus());
 
 		return attributes;
@@ -137,10 +137,10 @@ public class SyncDeviceWrapper implements SyncDevice, ModelWrapper<SyncDevice> {
 			setFeatureSet(featureSet);
 		}
 
-		String loginIP = (String)attributes.get("loginIP");
+		String host = (String)attributes.get("host");
 
-		if (loginIP != null) {
-			setLoginIP(loginIP);
+		if (host != null) {
+			setHost(host);
 		}
 
 		Integer status = (Integer)attributes.get("status");
@@ -241,13 +241,13 @@ public class SyncDeviceWrapper implements SyncDevice, ModelWrapper<SyncDevice> {
 	}
 
 	/**
-	* Returns the login i p of this sync device.
+	* Returns the host of this sync device.
 	*
-	* @return the login i p of this sync device
+	* @return the host of this sync device
 	*/
 	@Override
-	public java.lang.String getLoginIP() {
-		return _syncDevice.getLoginIP();
+	public java.lang.String getHost() {
+		return _syncDevice.getHost();
 	}
 
 	/**
@@ -443,13 +443,13 @@ public class SyncDeviceWrapper implements SyncDevice, ModelWrapper<SyncDevice> {
 	}
 
 	/**
-	* Sets the login i p of this sync device.
+	* Sets the host of this sync device.
 	*
-	* @param loginIP the login i p of this sync device
+	* @param host the host of this sync device
 	*/
 	@Override
-	public void setLoginIP(java.lang.String loginIP) {
-		_syncDevice.setLoginIP(loginIP);
+	public void setHost(java.lang.String host) {
+		_syncDevice.setHost(host);
 	}
 
 	/**

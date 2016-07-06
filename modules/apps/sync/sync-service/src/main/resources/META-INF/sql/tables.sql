@@ -49,6 +49,6 @@ create table SyncDevice (
 	type_ VARCHAR(75) null,
 	buildNumber LONG,
 	featureSet INTEGER,
-	loginIP VARCHAR(75) null,
+	host VARCHAR(75) null,
 	status INTEGER
 );
