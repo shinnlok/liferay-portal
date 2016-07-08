@@ -16,12 +16,13 @@ package com.liferay.sync.engine.session.rate.limiter;
 
 import com.google.common.util.concurrent.RateLimiter;
 
+import com.liferay.sync.engine.model.SyncAccount;
+import com.liferay.sync.engine.service.SyncAccountService;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.io.FileUtils;
 
 /**
  * @author Jonathan McCann
@@ -74,7 +75,7 @@ public class RateLimiterManager {
 	protected static RateLimiter getRateLimiter(
 		long syncAccountId, Map<Long, List<RateLimiter>> rateLimiterMap) {
 
-		RateLimiter rateLimiter = RateLimiter.create(0);
+		RateLimiter rateLimiter = RateLimiter.create(1);
 
 		List<RateLimiter> rateLimiters = rateLimiterMap.get(syncAccountId);
 
@@ -96,7 +97,27 @@ public class RateLimiterManager {
 		List<RateLimiter> rateLimiters = _downloadRateLimiters.get(
 			syncAccountId);
 
-		double rate = (2 * FileUtils.ONE_MB) / rateLimiters.size();
+		SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
+			syncAccountId);
+
+		updateRateLimits(rateLimiters, syncAccount.getMaxDownloadRate());
+	}
+
+	protected static void updateRateLimits(
+		List<RateLimiter> rateLimiters, int maxRate) {
+
+		if (rateLimiters.isEmpty()) {
+			return;
+		}
+
+		int rate = 0;
+
+		if (maxRate <= 0) {
+			rate = Integer.MAX_VALUE;
+		}
+		else {
+			rate = maxRate / rateLimiters.size();
+		}
 
 		for (RateLimiter rateLimiter : rateLimiters) {
 			rateLimiter.setRate(rate);
@@ -106,11 +127,10 @@ public class RateLimiterManager {
 	protected static void updateUploadRateLimits(long syncAccountId) {
 		List<RateLimiter> rateLimiters = _uploadRateLimiters.get(syncAccountId);
 
-		double rate = (2 * FileUtils.ONE_MB) / rateLimiters.size();
+		SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
+			syncAccountId);
 
-		for (RateLimiter rateLimiter : rateLimiters) {
-			rateLimiter.setRate(rate);
-		}
+		updateRateLimits(rateLimiters, syncAccount.getMaxUploadRate());
 	}
 
 	private static final Map<Long, List<RateLimiter>> _downloadRateLimiters =
