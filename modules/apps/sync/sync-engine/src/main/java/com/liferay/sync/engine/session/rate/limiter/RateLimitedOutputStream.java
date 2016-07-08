@@ -19,8 +19,6 @@ import com.google.common.util.concurrent.RateLimiter;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.apache.commons.io.FileUtils;
-
 /**
  * @author Jonathan McCann
  */
@@ -29,17 +27,14 @@ public class RateLimitedOutputStream extends OutputStream {
 	public RateLimitedOutputStream(
 		OutputStream outputStream, long syncAccountId) {
 
-		_rateLimiter = RateLimiter.create(2 * FileUtils.ONE_MB);
-
 		_outputStream = outputStream;
+		_rateLimiter = RateLimiterManager.getUploadRateLimiter(syncAccountId);
 		_syncAccountId = syncAccountId;
-
-		RateLimiterUtil.registerUploadConnection(_syncAccountId, _rateLimiter);
 	}
 
 	@Override
 	public void close() throws IOException {
-		RateLimiterUtil.unregisterUploadConnection(
+		RateLimiterManager.removeUploadRateLimiter(
 			_syncAccountId, _rateLimiter);
 
 		_outputStream.close();
