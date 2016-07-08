@@ -21,6 +21,7 @@ import com.liferay.sync.engine.document.library.util.FileEventUtil;
 import com.liferay.sync.engine.model.SyncFile;
 import com.liferay.sync.engine.session.Session;
 import com.liferay.sync.engine.session.SessionManager;
+import com.liferay.sync.engine.session.rate.limiter.RateLimitedInputStream;
 import com.liferay.sync.engine.util.JSONUtil;
 import com.liferay.sync.engine.util.StreamUtil;
 
@@ -84,7 +85,7 @@ public class DownloadFilesHandler extends BaseHandler {
 
 		InputStream inputStream = null;
 
-		ThrottledInputStream throttledInputStream = null;
+		RateLimitedInputStream rateLimitedInputStream = null;
 
 		try {
 			HttpEntity httpEntity = httpResponse.getEntity();
@@ -100,11 +101,11 @@ public class DownloadFilesHandler extends BaseHandler {
 
 			};
 
-			throttledInputStream = new ThrottledInputStream(
+			rateLimitedInputStream = new RateLimitedInputStream(
 				inputStream, syncAccountId);
 
 			ZipInputStream zipInputStream = new ZipInputStream(
-				throttledInputStream);
+					rateLimitedInputStream);
 
 			ZipEntry zipEntry = null;
 
@@ -179,7 +180,7 @@ public class DownloadFilesHandler extends BaseHandler {
 			}
 		}
 		finally {
-			StreamUtil.cleanUp(throttledInputStream);
+			StreamUtil.cleanUp(rateLimitedInputStream);
 			StreamUtil.cleanUp(inputStream);
 		}
 	}

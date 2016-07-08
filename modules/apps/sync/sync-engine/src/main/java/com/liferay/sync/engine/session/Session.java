@@ -17,6 +17,7 @@ package com.liferay.sync.engine.session;
 import com.btr.proxy.search.ProxySearch;
 
 import com.liferay.sync.engine.document.library.handler.Handler;
+import com.liferay.sync.engine.session.rate.limiter.RateLimitedManagedHttpClientConnectionFactory;
 import com.liferay.sync.engine.util.OSDetector;
 import com.liferay.sync.engine.util.PropsValues;
 import com.liferay.sync.engine.util.ReleaseInfo;
@@ -211,14 +212,14 @@ public class Session {
 
 		HttpConnectionFactory<HttpRoute, ManagedHttpClientConnection>
 			connectionFactory =
-				new ThrottledManagedHttpClientConnectionFactory();
+				new RateLimitedManagedHttpClientConnectionFactory();
 
 		PoolingHttpClientConnectionManager connManager =
 			new PoolingHttpClientConnectionManager(connectionFactory);
 
 		httpClientBuilder.setConnectionManager(connManager);
 
-		_throttledHttpClient = httpClientBuilder.build();
+		_rateLimitedHttpClient = httpClientBuilder.build();
 
 		_oAuthEnabled = false;
 	}
@@ -241,13 +242,15 @@ public class Session {
 		_httpClient = httpClientBuilder.build();
 
 		HttpConnectionFactory<HttpRoute, ManagedHttpClientConnection>
-			connectionFactory = new ThrottledManagedHttpClientConnectionFactory();
+			connectionFactory =
+				new RateLimitedManagedHttpClientConnectionFactory();
 
-		PoolingHttpClientConnectionManager connManager = new PoolingHttpClientConnectionManager(connectionFactory);
+		PoolingHttpClientConnectionManager connManager =
+			new PoolingHttpClientConnectionManager(connectionFactory);
 
 		httpClientBuilder.setConnectionManager(connManager);
 
-		_throttledHttpClient = httpClientBuilder.build();
+		_rateLimitedHttpClient = httpClientBuilder.build();
 
 		_httpHost = new HttpHost(
 			url.getHost(), url.getPort(), url.getProtocol());
@@ -307,28 +310,6 @@ public class Session {
 		_executorService.execute(runnable);
 	}
 
-	public void throttledAsynchronousExecute(
-			final HttpPost httpPost, final Map<String, Object> parameters,
-			final Handler<Void> handler)
-		throws Exception {
-
-		Runnable runnable = new Runnable() {
-
-			@Override
-			public void run() {
-				try {
-					executeThrottled(httpPost, parameters, handler);
-				}
-				catch (Exception e) {
-					handler.handleException(e);
-				}
-			}
-
-		};
-
-		_executorService.execute(runnable);
-	}
-
 	public HttpResponse execute(
 			HttpPost httpPost, Map<String, Object> parameters)
 		throws Exception {
@@ -350,19 +331,6 @@ public class Session {
 		_prepareHttpRequest(httpPost);
 
 		return _httpClient.execute(
-			_httpHost, httpPost, handler, _getBasicHttpContext());
-	}
-
-	public <T> T executeThrottled(
-			HttpPost httpPost, Map<String, Object> parameters,
-			Handler<? extends T> handler)
-		throws Exception {
-
-		_buildHttpPostBody(httpPost, parameters);
-
-		_prepareHttpRequest(httpPost);
-
-		return _throttledHttpClient.execute(
 			_httpHost, httpPost, handler, _getBasicHttpContext());
 	}
 
@@ -418,6 +386,41 @@ public class Session {
 
 	public void incrementUploadedBytes(int bytes) {
 		_uploadedBytes.getAndAdd(bytes);
+	}
+
+	public void rateLimitedAsynchronousExecute(
+			final HttpPost httpPost, final Map<String, Object> parameters,
+			final Handler<Void> handler)
+		throws Exception {
+
+		Runnable runnable = new Runnable() {
+
+			@Override
+			public void run() {
+				try {
+					rateLimitedExecute(httpPost, parameters, handler);
+				}
+				catch (Exception e) {
+					handler.handleException(e);
+				}
+			}
+
+		};
+
+		_executorService.execute(runnable);
+	}
+
+	public <T> T rateLimitedExecute(
+			HttpPost httpPost, Map<String, Object> parameters,
+			Handler<? extends T> handler)
+		throws Exception {
+
+		_buildHttpPostBody(httpPost, parameters);
+
+		_prepareHttpRequest(httpPost);
+
+		return _rateLimitedHttpClient.execute(
+			_httpHost, httpPost, handler, _getBasicHttpContext());
 	}
 
 	public void startTrackTransferRate() {
@@ -651,13 +654,13 @@ public class Session {
 	private final ExecutorService _executorService;
 	private final Map<String, String> _headers = new HashMap<>();
 	private final HttpClient _httpClient;
-	private final HttpClient _throttledHttpClient;
 	private final HttpHost _httpHost;
 	private final Set<String> _ignoredParameterKeys = new HashSet<>(
 		Arrays.asList(
 			"filePath", "handlers", "syncFile", "syncSite", "uiEvent"));
 	private OAuthConsumer _oAuthConsumer;
 	private final boolean _oAuthEnabled;
+	private final HttpClient _rateLimitedHttpClient;
 	private ScheduledFuture<?> _trackTransferRateScheduledFuture;
 	private final AtomicInteger _uploadedBytes = new AtomicInteger(0);
 	private volatile int _uploadRate;

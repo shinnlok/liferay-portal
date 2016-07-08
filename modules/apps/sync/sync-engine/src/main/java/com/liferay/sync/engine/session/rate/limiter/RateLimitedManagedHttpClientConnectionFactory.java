@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.engine.session;
+package com.liferay.sync.engine.session.rate.limiter;
 
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
@@ -29,7 +29,7 @@ import org.apache.http.impl.conn.ManagedHttpClientConnectionFactory;
 /**
  * @author Jonathan McCann
  */
-public class ThrottledManagedHttpClientConnectionFactory
+public class RateLimitedManagedHttpClientConnectionFactory
 	extends ManagedHttpClientConnectionFactory {
 
 	@Override
@@ -71,7 +71,7 @@ public class ThrottledManagedHttpClientConnectionFactory
 		final String id =
 			"http-outgoing-" + Long.toString(_COUNTER.getAndIncrement());
 
-		return new ThrottledDefaultManagedHttpClientConnection(
+		return new RateLimitedManagedHttpClientConnection(
 			id, connectionConfig.getBufferSize(),
 			connectionConfig.getFragmentSizeHint(), charsetDecoder,
 			charsetEncoder, connectionConfig.getMessageConstraints(), null,

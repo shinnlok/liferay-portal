@@ -12,64 +12,64 @@
  * details.
  */
 
-package com.liferay.sync.engine.document.library.handler;
+package com.liferay.sync.engine.session.rate.limiter;
 
 import com.google.common.util.concurrent.RateLimiter;
 
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.InputStream;
 
 import org.apache.commons.io.FileUtils;
 
 /**
  * @author Jonathan McCann
  */
-public class ThrottledOutputStream extends OutputStream {
+public class RateLimitedInputStream extends InputStream {
 
-	public ThrottledOutputStream(
-		OutputStream outputStream, String syncAccountUuid) {
+	public RateLimitedInputStream(InputStream inputStream, long syncAccountId) {
+		_inputStream = inputStream;
 
 		_rateLimiter = RateLimiter.create(2 * FileUtils.ONE_MB);
 
-		_outputStream = outputStream;
-		_syncAccountUuid = syncAccountUuid;
+		_syncAccountId = syncAccountId;
 
-		RateLimiterUtil.registerUploadConnection(_syncAccountUuid, _rateLimiter);
+		RateLimiterUtil.registerDownloadConnection(
+			_syncAccountId, _rateLimiter);
 	}
 
 	@Override
 	public void close() throws IOException {
-		RateLimiterUtil.unregisterUploadConnection(
-			_syncAccountUuid, _rateLimiter);
+		RateLimiterUtil.unregisterDownloadConnection(
+			_syncAccountId, _rateLimiter);
 
 		super.close();
 	}
 
 	@Override
-	public void write(byte[] bytes) throws IOException {
-		_rateLimiter.acquire(bytes.length);
-
-		_outputStream.write(bytes);
-	}
-
-	@Override
-	public void write(byte[] bytes, int off, int len) throws IOException {
-		_rateLimiter.acquire(len);
-
-		_outputStream.write(bytes, off, len);
-	}
-
-	@Override
-	public void write(int b) throws IOException {
+	public int read() throws IOException {
 		_rateLimiter.acquire(1);
 
-		_outputStream.write(b);
+		return _inputStream.read();
 	}
+
+	@Override
+	public int read(byte[] bytes) throws IOException {
+		_rateLimiter.acquire(bytes.length);
+
+		return _inputStream.read(bytes);
+	}
+
+	@Override
+	public int read(byte[] bytes, int off, int len) throws IOException {
+		_rateLimiter.acquire(len);
+
+		return _inputStream.read(bytes, off, len);
+	}
+
+	private static long _syncAccountId;
 
 	private static RateLimiter _rateLimiter;
 
-	private final OutputStream _outputStream;
-
-	private static String _syncAccountUuid;
+	private final InputStream _inputStream;
 
 }

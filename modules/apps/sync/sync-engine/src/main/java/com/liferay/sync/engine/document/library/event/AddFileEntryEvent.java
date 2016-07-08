@@ -48,7 +48,7 @@ public class AddFileEntryEvent extends BaseEvent {
 
 		SyncFileService.update(syncFile);
 
-		processThrottledAsynchronousRequest();
+		processRateLimitedAsynchronousRequest();
 	}
 
 	private static final String _URL_PATH =

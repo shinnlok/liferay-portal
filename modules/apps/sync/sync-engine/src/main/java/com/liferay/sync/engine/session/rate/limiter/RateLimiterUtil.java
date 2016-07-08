@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.engine.document.library.handler;
+package com.liferay.sync.engine.session.rate.limiter;
 
 import com.google.common.util.concurrent.RateLimiter;
 
