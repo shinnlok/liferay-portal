@@ -31,7 +31,8 @@ public class RateLimiterUtil {
 	public static void registerDownloadConnection(
 		long syncAccountId, RateLimiter rateLimiter) {
 
-		List<RateLimiter> rateLimiters = _downloadConnections.get(syncAccountId);
+		List<RateLimiter> rateLimiters = _downloadConnections.get(
+			syncAccountId);
 
 		if (rateLimiters == null) {
 			rateLimiters = new ArrayList<>();
@@ -48,28 +49,29 @@ public class RateLimiterUtil {
 	}
 
 	public static void registerUploadConnection(
-		String syncAccountUuid, RateLimiter rateLimiter) {
+		long syncAccountId, RateLimiter rateLimiter) {
 
-		List<RateLimiter> rateLimiters = _uploadConnections.get(syncAccountUuid);
+		List<RateLimiter> rateLimiters = _uploadConnections.get(syncAccountId);
 
 		if (rateLimiters == null) {
 			rateLimiters = new ArrayList<>();
 
 			rateLimiters.add(rateLimiter);
 
-			_uploadConnections.put(syncAccountUuid, rateLimiters);
+			_uploadConnections.put(syncAccountId, rateLimiters);
 		}
 		else {
 			rateLimiters.add(rateLimiter);
 		}
 
-		updateUploadRates(syncAccountUuid);
+		updateUploadRates(syncAccountId);
 	}
 
 	public static void unregisterDownloadConnection(
 		long syncAccountId, RateLimiter rateLimiter) {
 
-		List<RateLimiter> rateLimiters = _downloadConnections.get(syncAccountId);
+		List<RateLimiter> rateLimiters = _downloadConnections.get(
+			syncAccountId);
 
 		rateLimiters.remove(rateLimiter);
 
@@ -77,17 +79,18 @@ public class RateLimiterUtil {
 	}
 
 	public static void unregisterUploadConnection(
-		String syncAccountUuid, RateLimiter rateLimiter) {
+		long syncAccountId, RateLimiter rateLimiter) {
 
-		List<RateLimiter> rateLimiters = _uploadConnections.get(syncAccountUuid);
+		List<RateLimiter> rateLimiters = _uploadConnections.get(syncAccountId);
 
 		rateLimiters.remove(rateLimiter);
 
-		updateUploadRates(syncAccountUuid);
+		updateUploadRates(syncAccountId);
 	}
 
 	protected static void updateDownloadRates(long syncAccountId) {
-		List<RateLimiter> rateLimiters = _downloadConnections.get(syncAccountId);
+		List<RateLimiter> rateLimiters = _downloadConnections.get(
+			syncAccountId);
 
 		double rate = (2 * FileUtils.ONE_MB) / rateLimiters.size();
 
@@ -96,8 +99,8 @@ public class RateLimiterUtil {
 		}
 	}
 
-	protected static void updateUploadRates(String syncAccountUuid) {
-		List<RateLimiter> rateLimiters = _uploadConnections.get(syncAccountUuid);
+	protected static void updateUploadRates(long syncAccountId) {
+		List<RateLimiter> rateLimiters = _uploadConnections.get(syncAccountId);
 
 		double rate = (2 * FileUtils.ONE_MB) / rateLimiters.size();
 
@@ -106,9 +109,9 @@ public class RateLimiterUtil {
 		}
 	}
 
-	private static Map<Long, List<RateLimiter>> _downloadConnections =
+	private static final Map<Long, List<RateLimiter>> _downloadConnections =
 		new HashMap<>();
-	private static Map<String, List<RateLimiter>> _uploadConnections =
+	private static final Map<Long, List<RateLimiter>> _uploadConnections =
 		new HashMap<>();
 
 }

@@ -14,12 +14,16 @@
 
 package com.liferay.sync.engine.session.rate.limiter;
 
+import com.liferay.sync.engine.model.SyncAccount;
+import com.liferay.sync.engine.service.SyncAccountService;
+
 import java.io.IOException;
 import java.io.OutputStream;
 
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpException;
@@ -61,18 +65,21 @@ public class RateLimitedManagedHttpClientConnection
 
 		ensureOpen();
 
-		final HttpEntity entity = request.getEntity();
+		HttpEntity entity = request.getEntity();
 
 		if (entity == null) {
 			return;
 		}
 
-		final OutputStream outputStream = prepareOutput(request);
+		OutputStream outputStream = prepareOutput(request);
 
-		String syncAccountUuid = request.getHeaders("Sync-UUID")[0].getValue();
+		Header header = request.getFirstHeader("Sync-UUID");
 
-		RateLimitedOutputStream rateLimitedOutputStream = new RateLimitedOutputStream(
-			outputStream, syncAccountUuid);
+		SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
+			header.getValue());
+
+		OutputStream rateLimitedOutputStream = new RateLimitedOutputStream(
+			outputStream, syncAccount.getSyncAccountId());
 
 		entity.writeTo(rateLimitedOutputStream);
 
