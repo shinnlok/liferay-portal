@@ -16,6 +16,7 @@ package com.liferay.sync.engine.lan.util;
 
 import com.liferay.sync.engine.model.SyncAccount;
 import com.liferay.sync.engine.model.SyncLanClient;
+import com.liferay.sync.engine.model.SyncProp;
 import com.liferay.sync.engine.service.SyncAccountService;
 import com.liferay.sync.engine.service.SyncPropService;
 import com.liferay.sync.engine.service.SyncSiteService;
@@ -61,7 +62,7 @@ public class LanClientUtil {
 
 	public static String getSyncLanClientUuid() throws Exception {
 		String syncLanClientUuid = SyncPropService.getValue(
-			"syncLanClientUuid");
+			SyncProp.KEY_SYNC_LAN_CLIENT_UUID);
 
 		if (syncLanClientUuid == null) {
 			UUID uuid = UUID.randomUUID();
@@ -69,7 +70,7 @@ public class LanClientUtil {
 			syncLanClientUuid = uuid.toString();
 
 			SyncPropService.updateSyncProp(
-				"syncLanClientUuid", syncLanClientUuid);
+				SyncProp.KEY_SYNC_LAN_CLIENT_UUID, syncLanClientUuid);
 		}
 
 		return syncLanClientUuid;

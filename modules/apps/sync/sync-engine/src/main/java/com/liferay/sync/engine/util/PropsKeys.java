@@ -71,8 +71,6 @@ public interface PropsKeys {
 	public static final String SYNC_LAN_BROADCAST_INTERVAL =
 		"sync.lan.broadcast.interval";
 
-	public static final String SYNC_LAN_ENABLED = "sync.lan.enabled";
-
 	public static final String SYNC_LAN_PORT = "sync.lan.port";
 
 	public static final String SYNC_LAN_SESSION_DOWNLOAD_CONNECT_TIMEOUT =

@@ -99,7 +99,7 @@ public class UpgradeUtil {
 			}
 
 			SyncPropService.updateSyncProp(
-				"buildNumber", ReleaseInfo.getBuildNumber());
+				SyncProp.KEY_BUILD_NUMBER, ReleaseInfo.getBuildNumber());
 
 			return;
 		}
