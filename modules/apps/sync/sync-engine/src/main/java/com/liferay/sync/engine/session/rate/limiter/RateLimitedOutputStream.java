@@ -42,7 +42,7 @@ public class RateLimitedOutputStream extends OutputStream {
 		RateLimiterUtil.unregisterUploadConnection(
 			_syncAccountId, _rateLimiter);
 
-		super.close();
+		_outputStream.close();
 	}
 
 	@Override

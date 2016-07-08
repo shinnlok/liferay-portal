@@ -16,6 +16,7 @@ package com.liferay.sync.engine.session.rate.limiter;
 
 import com.liferay.sync.engine.model.SyncAccount;
 import com.liferay.sync.engine.service.SyncAccountService;
+import com.liferay.sync.engine.util.StreamUtil;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -73,17 +74,20 @@ public class RateLimitedManagedHttpClientConnection
 
 		OutputStream outputStream = prepareOutput(request);
 
-		Header header = request.getFirstHeader("Sync-UUID");
+		try {
+			Header header = request.getFirstHeader("Sync-UUID");
 
-		SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
-			header.getValue());
+			SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
+				header.getValue());
 
-		OutputStream rateLimitedOutputStream = new RateLimitedOutputStream(
-			outputStream, syncAccount.getSyncAccountId());
+			outputStream = new RateLimitedOutputStream(
+				outputStream, syncAccount.getSyncAccountId());
 
-		entity.writeTo(rateLimitedOutputStream);
-
-		outputStream.close();
+			entity.writeTo(outputStream);
+		}
+		finally {
+			StreamUtil.cleanUp(outputStream);
+		}
 	}
 
 }
