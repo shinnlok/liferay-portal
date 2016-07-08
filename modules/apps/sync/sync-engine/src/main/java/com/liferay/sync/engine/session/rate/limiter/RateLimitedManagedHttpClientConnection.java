@@ -12,9 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.engine.session;
-
-import com.liferay.sync.engine.document.library.handler.ThrottledOutputStream;
+package com.liferay.sync.engine.session.rate.limiter;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -37,10 +35,10 @@ import org.apache.http.util.Args;
 /**
  * @author Jonathan McCann
  */
-public class ThrottledDefaultManagedHttpClientConnection
+public class RateLimitedManagedHttpClientConnection
 	extends DefaultManagedHttpClientConnection {
 
-	public ThrottledDefaultManagedHttpClientConnection(
+	public RateLimitedManagedHttpClientConnection(
 		String id, int buffersize, int fragmentSizeHint,
 		CharsetDecoder chardecoder, CharsetEncoder charencoder,
 		MessageConstraints constraints,
@@ -73,10 +71,10 @@ public class ThrottledDefaultManagedHttpClientConnection
 
 		String syncAccountUuid = request.getHeaders("Sync-UUID")[0].getValue();
 
-		ThrottledOutputStream throttledOutputStream = new ThrottledOutputStream(
+		RateLimitedOutputStream rateLimitedOutputStream = new RateLimitedOutputStream(
 			outputStream, syncAccountUuid);
 
-		entity.writeTo(throttledOutputStream);
+		entity.writeTo(rateLimitedOutputStream);
 
 		outputStream.close();
 	}

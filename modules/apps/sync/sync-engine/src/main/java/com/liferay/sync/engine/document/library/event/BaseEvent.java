@@ -84,18 +84,6 @@ public abstract class BaseEvent implements Event {
 			_handler);
 	}
 
-	public void executeThrottledAsynchronousPost(
-			String urlPath, Map<String, Object> parameters)
-		throws Exception {
-
-		SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
-			_syncAccountId);
-
-		executeThrottledAsynchronousPost(
-			syncAccount.getUrl() + "/api/jsonws" + urlPath, parameters,
-			_handler);
-	}
-
 	public void executeAsynchronousPost(
 			String urlPath, Map<String, Object> parameters,
 			Handler<Void> handler)
@@ -106,18 +94,6 @@ public abstract class BaseEvent implements Event {
 		_httpPost = new HttpPost(urlPath);
 
 		session.asynchronousExecute(_httpPost, parameters, handler);
-	}
-
-	public void executeThrottledAsynchronousPost(
-			String urlPath, Map<String, Object> parameters,
-			Handler<Void> handler)
-		throws Exception {
-
-		Session session = getSession();
-
-		_httpPost = new HttpPost(urlPath);
-
-		session.throttledAsynchronousExecute(_httpPost, parameters, handler);
 	}
 
 	public void executeGet(String urlPath) throws Exception {
@@ -143,6 +119,30 @@ public abstract class BaseEvent implements Event {
 			syncAccount.getUrl() + "/api/jsonws" + urlPath);
 
 		session.execute(_httpPost, parameters, _handler);
+	}
+
+	public void executeRateLimitedAsynchronousPost(
+			String urlPath, Map<String, Object> parameters)
+		throws Exception {
+
+		SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
+			_syncAccountId);
+
+		executeRateLimitedAsynchronousPost(
+			syncAccount.getUrl() + "/api/jsonws" + urlPath, parameters,
+			_handler);
+	}
+
+	public void executeRateLimitedAsynchronousPost(
+			String urlPath, Map<String, Object> parameters,
+			Handler<Void> handler)
+		throws Exception {
+
+		Session session = getSession();
+
+		_httpPost = new HttpPost(urlPath);
+
+		session.rateLimitedAsynchronousExecute(_httpPost, parameters, handler);
 	}
 
 	@Override
@@ -221,13 +221,13 @@ public abstract class BaseEvent implements Event {
 		}
 	}
 
-	protected void processThrottledAsynchronousRequest() throws Exception {
+	protected void processRateLimitedAsynchronousRequest() throws Exception {
 		SyncFile syncFile = (SyncFile)getParameterValue("syncFile");
 
 		BatchEvent batchEvent = BatchEventManager.getBatchEvent(syncFile);
 
 		if (!batchEvent.addEvent(this)) {
-			executeThrottledAsynchronousPost(_urlPath, _parameters);
+			executeRateLimitedAsynchronousPost(_urlPath, _parameters);
 		}
 	}
 

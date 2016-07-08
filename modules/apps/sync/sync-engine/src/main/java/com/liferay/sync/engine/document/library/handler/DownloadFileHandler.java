@@ -25,6 +25,7 @@ import com.liferay.sync.engine.service.SyncAccountService;
 import com.liferay.sync.engine.service.SyncFileService;
 import com.liferay.sync.engine.session.Session;
 import com.liferay.sync.engine.session.SessionManager;
+import com.liferay.sync.engine.session.rate.limiter.RateLimitedInputStream;
 import com.liferay.sync.engine.util.FileKeyUtil;
 import com.liferay.sync.engine.util.FileUtil;
 import com.liferay.sync.engine.util.GetterUtil;
@@ -319,7 +320,7 @@ public class DownloadFileHandler extends BaseHandler {
 
 		InputStream inputStream = null;
 
-		ThrottledInputStream throttledInputStream = null;
+		RateLimitedInputStream rateLimitedInputStream = null;
 
 		SyncFile syncFile = getLocalSyncFile();
 
@@ -345,18 +346,18 @@ public class DownloadFileHandler extends BaseHandler {
 
 			};
 
-			throttledInputStream = new ThrottledInputStream(
+			rateLimitedInputStream = new RateLimitedInputStream(
 				inputStream, syncAccountId);
 
 			if (httpResponse.getFirstHeader("Accept-Ranges") != null) {
-				copyFile(syncFile, filePath, throttledInputStream, true);
+				copyFile(syncFile, filePath, rateLimitedInputStream, true);
 			}
 			else {
-				copyFile(syncFile, filePath, throttledInputStream, false);
+				copyFile(syncFile, filePath, rateLimitedInputStream, false);
 			}
 		}
 		finally {
-			StreamUtil.cleanUp(throttledInputStream);
+			StreamUtil.cleanUp(rateLimitedInputStream);
 			StreamUtil.cleanUp(inputStream);
 		}
 
