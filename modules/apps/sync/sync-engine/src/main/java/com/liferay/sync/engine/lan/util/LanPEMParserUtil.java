@@ -46,15 +46,10 @@ public class LanPEMParserUtil {
 
 		PEMParser pemParser = new PEMParser(new StringReader(sb.toString()));
 
-		Object object = pemParser.readObject();
-
-		if (!(object instanceof PrivateKeyInfo)) {
-			return null;
-		}
-
 		JcaPEMKeyConverter jcaPEMKeyConverter = new JcaPEMKeyConverter();
 
-		return jcaPEMKeyConverter.getPrivateKey((PrivateKeyInfo)object);
+		return jcaPEMKeyConverter.getPrivateKey(
+			(PrivateKeyInfo)pemParser.readObject());
 	}
 
 	public static X509Certificate parseX509Certificate(String certificate)
@@ -73,17 +68,11 @@ public class LanPEMParserUtil {
 
 		PEMParser pemParser = new PEMParser(new StringReader(sb.toString()));
 
-		Object object = pemParser.readObject();
-
-		if (!(object instanceof X509CertificateHolder)) {
-			return null;
-		}
-
 		JcaX509CertificateConverter jcaX509CertificateConverter =
 			new JcaX509CertificateConverter();
 
 		return jcaX509CertificateConverter.getCertificate(
-			(X509CertificateHolder)object);
+			(X509CertificateHolder)pemParser.readObject());
 	}
 
 }
