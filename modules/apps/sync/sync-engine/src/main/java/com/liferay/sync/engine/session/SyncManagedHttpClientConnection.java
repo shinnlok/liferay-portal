@@ -12,10 +12,13 @@
  * details.
  */
 
-package com.liferay.sync.engine.session.rate.limiter;
+package com.liferay.sync.engine.session;
 
+import com.liferay.sync.engine.document.library.event.constants.EventURLPaths;
+import com.liferay.sync.engine.document.library.util.ServerUtil;
 import com.liferay.sync.engine.model.SyncAccount;
 import com.liferay.sync.engine.service.SyncAccountService;
+import com.liferay.sync.engine.session.rate.limiter.RateLimitedOutputStream;
 import com.liferay.sync.engine.util.StreamUtil;
 
 import java.io.IOException;
@@ -30,6 +33,7 @@ import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
+import org.apache.http.RequestLine;
 import org.apache.http.config.MessageConstraints;
 import org.apache.http.entity.ContentLengthStrategy;
 import org.apache.http.impl.conn.DefaultManagedHttpClientConnection;
@@ -40,10 +44,10 @@ import org.apache.http.util.Args;
 /**
  * @author Jonathan McCann
  */
-public class RateLimitedManagedHttpClientConnection
+public class SyncManagedHttpClientConnection
 	extends DefaultManagedHttpClientConnection {
 
-	public RateLimitedManagedHttpClientConnection(
+	public SyncManagedHttpClientConnection(
 		String id, int buffersize, int fragmentSizeHint,
 		CharsetDecoder chardecoder, CharsetEncoder charencoder,
 		MessageConstraints constraints,
@@ -59,7 +63,7 @@ public class RateLimitedManagedHttpClientConnection
 	}
 
 	@Override
-	public void sendRequestEntity(final HttpEntityEnclosingRequest request)
+	public void sendRequestEntity(HttpEntityEnclosingRequest request)
 		throws HttpException, IOException {
 
 		Args.notNull(request, "HTTP request");
@@ -72,22 +76,54 @@ public class RateLimitedManagedHttpClientConnection
 			return;
 		}
 
-		OutputStream outputStream = prepareOutput(request);
+		OutputStream outputStream = null;
 
 		try {
-			Header header = request.getFirstHeader("Sync-UUID");
-
-			SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
-				header.getValue());
-
-			outputStream = new RateLimitedOutputStream(
-				outputStream, syncAccount.getSyncAccountId());
+			outputStream = getOutputStream(request);
 
 			entity.writeTo(outputStream);
 		}
 		finally {
 			StreamUtil.cleanUp(outputStream);
 		}
+	}
+
+	protected OutputStream getOutputStream(HttpEntityEnclosingRequest request)
+		throws HttpException {
+
+		OutputStream outputStream = prepareOutput(request);
+
+		Header header = request.getFirstHeader("Sync-UUID");
+
+		SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
+			header.getValue());
+
+		if (syncAccount == null) {
+			return outputStream;
+		}
+
+		RequestLine requestLine = request.getRequestLine();
+
+		String uri = requestLine.getUri();
+
+		if (uri.endsWith(
+				ServerUtil.getURLPath(
+					syncAccount.getSyncAccountId(),
+					EventURLPaths.ADD_FILE_ENTRY)) ||
+			uri.endsWith(
+				ServerUtil.getURLPath(
+					syncAccount.getSyncAccountId(),
+					EventURLPaths.UPDATE_FILE_ENTRIES)) ||
+			uri.endsWith(
+				ServerUtil.getURLPath(
+					syncAccount.getSyncAccountId(),
+					EventURLPaths.UPDATE_FILE_ENTRY))) {
+
+			return new RateLimitedOutputStream(
+				outputStream, syncAccount.getSyncAccountId());
+		}
+
+		return outputStream;
 	}
 
 }

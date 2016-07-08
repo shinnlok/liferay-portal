@@ -49,7 +49,7 @@ public class AddFileEntryEvent extends BaseEvent {
 
 		SyncFileService.update(syncFile);
 
-		processRateLimitedAsynchronousRequest();
+		processAsynchronousRequest();
 	}
 
 	private final Handler<Void> _handler;
