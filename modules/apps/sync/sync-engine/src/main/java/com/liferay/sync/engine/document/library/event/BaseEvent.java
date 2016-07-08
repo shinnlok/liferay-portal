@@ -121,30 +121,6 @@ public abstract class BaseEvent implements Event {
 		session.execute(_httpPost, parameters, _handler);
 	}
 
-	public void executeRateLimitedAsynchronousPost(
-			String urlPath, Map<String, Object> parameters)
-		throws Exception {
-
-		SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
-			_syncAccountId);
-
-		executeRateLimitedAsynchronousPost(
-			syncAccount.getUrl() + "/api/jsonws" + urlPath, parameters,
-			_handler);
-	}
-
-	public void executeRateLimitedAsynchronousPost(
-			String urlPath, Map<String, Object> parameters,
-			Handler<Void> handler)
-		throws Exception {
-
-		Session session = getSession();
-
-		_httpPost = new HttpPost(urlPath);
-
-		session.rateLimitedAsynchronousExecute(_httpPost, parameters, handler);
-	}
-
 	@Override
 	public Map<String, Object> getParameters() {
 		return _parameters;
@@ -218,16 +194,6 @@ public abstract class BaseEvent implements Event {
 
 		if (!batchEvent.addEvent(this)) {
 			executeAsynchronousPost(getURLPath(), _parameters);
-		}
-	}
-
-	protected void processRateLimitedAsynchronousRequest() throws Exception {
-		SyncFile syncFile = (SyncFile)getParameterValue("syncFile");
-
-		BatchEvent batchEvent = BatchEventManager.getBatchEvent(syncFile);
-
-		if (!batchEvent.addEvent(this)) {
-			executeRateLimitedAsynchronousPost(_urlPath, _parameters);
 		}
 	}
 

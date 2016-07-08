@@ -17,7 +17,6 @@ package com.liferay.sync.engine.session;
 import com.btr.proxy.search.ProxySearch;
 
 import com.liferay.sync.engine.document.library.handler.Handler;
-import com.liferay.sync.engine.session.rate.limiter.RateLimitedManagedHttpClientConnectionFactory;
 import com.liferay.sync.engine.util.OSDetector;
 import com.liferay.sync.engine.util.PropsValues;
 import com.liferay.sync.engine.util.ReleaseInfo;
@@ -193,6 +192,17 @@ public class Session {
 			_executorService = Executors.newFixedThreadPool(maxConnections);
 		}
 
+		HttpClientBuilder httpClientBuilder = createHttpClientBuilder(
+			trustSelfSigned, maxConnections);
+
+		HttpConnectionFactory<HttpRoute, ManagedHttpClientConnection>
+			connectionFactory = new SyncManagedHttpClientConnectionFactory();
+
+		PoolingHttpClientConnectionManager connectionManager =
+			new PoolingHttpClientConnectionManager(connectionFactory);
+
+		httpClientBuilder.setConnectionManager(connectionManager);
+
 		CredentialsProvider credentialsProvider =
 			new BasicCredentialsProvider();
 
@@ -203,23 +213,9 @@ public class Session {
 			new AuthScope(_httpHost),
 			new UsernamePasswordCredentials(login, password));
 
-		HttpClientBuilder httpClientBuilder = createHttpClientBuilder(
-			trustSelfSigned, maxConnections);
-
 		httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
 
 		_httpClient = httpClientBuilder.build();
-
-		HttpConnectionFactory<HttpRoute, ManagedHttpClientConnection>
-			connectionFactory =
-				new RateLimitedManagedHttpClientConnectionFactory();
-
-		PoolingHttpClientConnectionManager connManager =
-			new PoolingHttpClientConnectionManager(connectionFactory);
-
-		httpClientBuilder.setConnectionManager(connManager);
-
-		_rateLimitedHttpClient = httpClientBuilder.build();
 
 		_oAuthEnabled = false;
 	}
@@ -239,18 +235,15 @@ public class Session {
 		HttpClientBuilder httpClientBuilder = createHttpClientBuilder(
 			trustSelfSigned, maxConnections);
 
-		_httpClient = httpClientBuilder.build();
-
 		HttpConnectionFactory<HttpRoute, ManagedHttpClientConnection>
-			connectionFactory =
-				new RateLimitedManagedHttpClientConnectionFactory();
+			connectionFactory = new SyncManagedHttpClientConnectionFactory();
 
-		PoolingHttpClientConnectionManager connManager =
+		PoolingHttpClientConnectionManager connectionManager =
 			new PoolingHttpClientConnectionManager(connectionFactory);
 
-		httpClientBuilder.setConnectionManager(connManager);
+		httpClientBuilder.setConnectionManager(connectionManager);
 
-		_rateLimitedHttpClient = httpClientBuilder.build();
+		_httpClient = httpClientBuilder.build();
 
 		_httpHost = new HttpHost(
 			url.getHost(), url.getPort(), url.getProtocol());
@@ -386,41 +379,6 @@ public class Session {
 
 	public void incrementUploadedBytes(int bytes) {
 		_uploadedBytes.getAndAdd(bytes);
-	}
-
-	public void rateLimitedAsynchronousExecute(
-			final HttpPost httpPost, final Map<String, Object> parameters,
-			final Handler<Void> handler)
-		throws Exception {
-
-		Runnable runnable = new Runnable() {
-
-			@Override
-			public void run() {
-				try {
-					rateLimitedExecute(httpPost, parameters, handler);
-				}
-				catch (Exception e) {
-					handler.handleException(e);
-				}
-			}
-
-		};
-
-		_executorService.execute(runnable);
-	}
-
-	public <T> T rateLimitedExecute(
-			HttpPost httpPost, Map<String, Object> parameters,
-			Handler<? extends T> handler)
-		throws Exception {
-
-		_buildHttpPostBody(httpPost, parameters);
-
-		_prepareHttpRequest(httpPost);
-
-		return _rateLimitedHttpClient.execute(
-			_httpHost, httpPost, handler, _getBasicHttpContext());
 	}
 
 	public void startTrackTransferRate() {
@@ -660,7 +618,6 @@ public class Session {
 			"filePath", "handlers", "syncFile", "syncSite", "uiEvent"));
 	private OAuthConsumer _oAuthConsumer;
 	private final boolean _oAuthEnabled;
-	private final HttpClient _rateLimitedHttpClient;
 	private ScheduledFuture<?> _trackTransferRateScheduledFuture;
 	private final AtomicInteger _uploadedBytes = new AtomicInteger(0);
 	private volatile int _uploadRate;
