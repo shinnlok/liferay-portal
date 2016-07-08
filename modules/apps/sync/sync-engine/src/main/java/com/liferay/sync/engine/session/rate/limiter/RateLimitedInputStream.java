@@ -66,10 +66,8 @@ public class RateLimitedInputStream extends InputStream {
 		return _inputStream.read(bytes, off, len);
 	}
 
-	private static long _syncAccountId;
-
-	private static RateLimiter _rateLimiter;
-
 	private final InputStream _inputStream;
+	private final RateLimiter _rateLimiter;
+	private final long _syncAccountId;
 
 }

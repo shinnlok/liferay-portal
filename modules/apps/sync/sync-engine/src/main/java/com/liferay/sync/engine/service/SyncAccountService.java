@@ -246,9 +246,9 @@ public class SyncAccountService {
 		}
 	}
 
-	public static SyncAccount fetchSyncAccountByUuid(long syncAccountUuid) {
+	public static SyncAccount fetchSyncAccount(String uuid) {
 		try {
-			return _syncAccountPersistence.queryForId(syncAccountUuid);
+			return _syncAccountPersistence.fetchByUuid(uuid);
 		}
 		catch (SQLException sqle) {
 			if (_logger.isDebugEnabled()) {

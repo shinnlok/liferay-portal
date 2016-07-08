@@ -27,20 +27,20 @@ import org.apache.commons.io.FileUtils;
 public class RateLimitedOutputStream extends OutputStream {
 
 	public RateLimitedOutputStream(
-		OutputStream outputStream, String syncAccountUuid) {
+		OutputStream outputStream, long syncAccountId) {
 
 		_rateLimiter = RateLimiter.create(2 * FileUtils.ONE_MB);
 
 		_outputStream = outputStream;
-		_syncAccountUuid = syncAccountUuid;
+		_syncAccountId = syncAccountId;
 
-		RateLimiterUtil.registerUploadConnection(_syncAccountUuid, _rateLimiter);
+		RateLimiterUtil.registerUploadConnection(_syncAccountId, _rateLimiter);
 	}
 
 	@Override
 	public void close() throws IOException {
 		RateLimiterUtil.unregisterUploadConnection(
-			_syncAccountUuid, _rateLimiter);
+			_syncAccountId, _rateLimiter);
 
 		super.close();
 	}
@@ -66,10 +66,8 @@ public class RateLimitedOutputStream extends OutputStream {
 		_outputStream.write(b);
 	}
 
-	private static RateLimiter _rateLimiter;
-
 	private final OutputStream _outputStream;
-
-	private static String _syncAccountUuid;
+	private final RateLimiter _rateLimiter;
+	private final long _syncAccountId;
 
 }
