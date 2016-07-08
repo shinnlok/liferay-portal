@@ -42,7 +42,7 @@ public class RateLimitedInputStream extends InputStream {
 		RateLimiterUtil.unregisterDownloadConnection(
 			_syncAccountId, _rateLimiter);
 
-		super.close();
+		_inputStream.close();
 	}
 
 	@Override
