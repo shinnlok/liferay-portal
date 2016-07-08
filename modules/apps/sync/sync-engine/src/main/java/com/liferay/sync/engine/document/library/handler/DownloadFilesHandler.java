@@ -85,8 +85,6 @@ public class DownloadFilesHandler extends BaseHandler {
 
 		InputStream inputStream = null;
 
-		RateLimitedInputStream rateLimitedInputStream = null;
-
 		try {
 			HttpEntity httpEntity = httpResponse.getEntity();
 
@@ -101,11 +99,10 @@ public class DownloadFilesHandler extends BaseHandler {
 
 			};
 
-			rateLimitedInputStream = new RateLimitedInputStream(
+			inputStream = new RateLimitedInputStream(
 				inputStream, syncAccountId);
 
-			ZipInputStream zipInputStream = new ZipInputStream(
-					rateLimitedInputStream);
+			ZipInputStream zipInputStream = new ZipInputStream(inputStream);
 
 			ZipEntry zipEntry = null;
 
@@ -180,7 +177,6 @@ public class DownloadFilesHandler extends BaseHandler {
 			}
 		}
 		finally {
-			StreamUtil.cleanUp(rateLimitedInputStream);
 			StreamUtil.cleanUp(inputStream);
 		}
 	}
