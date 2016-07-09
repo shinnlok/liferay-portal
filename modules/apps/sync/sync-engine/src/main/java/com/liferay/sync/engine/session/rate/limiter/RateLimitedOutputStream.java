@@ -48,17 +48,17 @@ public class RateLimitedOutputStream extends OutputStream {
 	}
 
 	@Override
-	public void write(byte[] bytes, int off, int len) throws IOException {
-		_rateLimiter.acquire(len);
+	public void write(byte[] bytes, int offset, int length) throws IOException {
+		_rateLimiter.acquire(length);
 
-		_outputStream.write(bytes, off, len);
+		_outputStream.write(bytes, offset, length);
 	}
 
 	@Override
-	public void write(int b) throws IOException {
+	public void write(int byteValue) throws IOException {
 		_rateLimiter.acquire(1);
 
-		_outputStream.write(b);
+		_outputStream.write(byteValue);
 	}
 
 	private final OutputStream _outputStream;

@@ -53,10 +53,10 @@ public class RateLimitedInputStream extends InputStream {
 	}
 
 	@Override
-	public int read(byte[] bytes, int off, int len) throws IOException {
-		_rateLimiter.acquire(len);
+	public int read(byte[] bytes, int offset, int length) throws IOException {
+		_rateLimiter.acquire(length);
 
-		return _inputStream.read(bytes, off, len);
+		return _inputStream.read(bytes, offset, length);
 	}
 
 	private final InputStream _inputStream;

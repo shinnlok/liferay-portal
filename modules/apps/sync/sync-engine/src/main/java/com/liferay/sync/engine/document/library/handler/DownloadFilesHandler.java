@@ -110,7 +110,8 @@ public class DownloadFilesHandler extends BaseHandler {
 				String zipEntryName = zipEntry.getName();
 
 				if (zipEntryName.equals("errors.json")) {
-					JsonNode rootJsonNode = JSONUtil.readTree(zipInputStream);
+					JsonNode rootJsonNode = JSONUtil.readTree(
+						new CloseShieldInputStream(zipInputStream));
 
 					Iterator<Map.Entry<String, JsonNode>> fields =
 						rootJsonNode.fields();

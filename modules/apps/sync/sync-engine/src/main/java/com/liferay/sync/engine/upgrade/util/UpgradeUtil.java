@@ -14,6 +14,7 @@
 
 package com.liferay.sync.engine.upgrade.util;
 
+import com.liferay.sync.engine.model.SyncProp;
 import com.liferay.sync.engine.service.SyncAccountService;
 import com.liferay.sync.engine.service.SyncFileService;
 import com.liferay.sync.engine.service.SyncPropService;
@@ -74,7 +75,7 @@ public class UpgradeUtil {
 	}
 
 	public static void upgrade() throws Exception {
-		int buildNumber = SyncPropService.getInteger("buildNumber");
+		int buildNumber = SyncPropService.getInteger(SyncProp.KEY_BUILD_NUMBER);
 
 		if (buildNumber == 0) {
 			createTables();
@@ -131,7 +132,7 @@ public class UpgradeUtil {
 		}
 
 		SyncPropService.updateSyncProp(
-			"buildNumber", ReleaseInfo.getBuildNumber());
+			SyncProp.KEY_BUILD_NUMBER, ReleaseInfo.getBuildNumber());
 	}
 
 	protected static void createTables() throws Exception {

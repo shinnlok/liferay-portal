@@ -17,7 +17,9 @@ package com.liferay.sync.engine.session.rate.limiter;
 import com.google.common.util.concurrent.RateLimiter;
 
 import com.liferay.sync.engine.model.SyncAccount;
+import com.liferay.sync.engine.model.SyncProp;
 import com.liferay.sync.engine.service.SyncAccountService;
+import com.liferay.sync.engine.service.SyncPropService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,7 +37,9 @@ public class RateLimiterManager {
 		RateLimiter rateLimiter = getRateLimiter(
 			syncAccountId, _downloadRateLimiters);
 
-		updateDownloadRateLimits(syncAccountId);
+		_downloadRateLimiterCount++;
+
+		updateDownloadRateLimits();
 
 		return rateLimiter;
 	}
@@ -46,7 +50,9 @@ public class RateLimiterManager {
 		RateLimiter rateLimiter = getRateLimiter(
 			syncAccountId, _uploadRateLimiters);
 
-		updateUploadRateLimits(syncAccountId);
+		_uploadRateLimiterCount++;
+
+		updateUploadRateLimits();
 
 		return rateLimiter;
 	}
@@ -57,9 +63,13 @@ public class RateLimiterManager {
 		List<RateLimiter> rateLimiters = _downloadRateLimiters.get(
 			syncAccountId);
 
-		rateLimiters.remove(rateLimiter);
+		if (!rateLimiters.remove(rateLimiter)) {
+			return;
+		}
 
-		updateDownloadRateLimits(syncAccountId);
+		_downloadRateLimiterCount--;
+
+		updateDownloadRateLimits();
 	}
 
 	public static synchronized void removeUploadRateLimiter(
@@ -67,9 +77,69 @@ public class RateLimiterManager {
 
 		List<RateLimiter> rateLimiters = _uploadRateLimiters.get(syncAccountId);
 
-		rateLimiters.remove(rateLimiter);
+		if (!rateLimiters.remove(rateLimiter)) {
+			return;
+		}
 
-		updateUploadRateLimits(syncAccountId);
+		_uploadRateLimiterCount--;
+
+		updateUploadRateLimits();
+	}
+
+	public static synchronized void updateDownloadRateLimits() {
+		if (_downloadRateLimiterCount == 0) {
+			return;
+		}
+
+		int globalMaxDownloadRate =
+			SyncPropService.getInteger(SyncProp.KEY_GLOBAL_MAX_DOWNLOAD_RATE) /
+				_downloadRateLimiterCount;
+
+		for (Map.Entry<Long, List<RateLimiter>> entry :
+				_downloadRateLimiters.entrySet()) {
+
+			long syncAccountId = entry.getKey();
+			List<RateLimiter> rateLimiters = entry.getValue();
+
+			if (rateLimiters.isEmpty()) {
+				continue;
+			}
+
+			SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
+				syncAccountId);
+
+			updateRateLimits(
+				rateLimiters, globalMaxDownloadRate,
+				syncAccount.getMaxDownloadRate() / rateLimiters.size());
+		}
+	}
+
+	public static synchronized void updateUploadRateLimits() {
+		if (_uploadRateLimiterCount == 0) {
+			return;
+		}
+
+		int globalMaxUploadRate =
+			SyncPropService.getInteger(SyncProp.KEY_GLOBAL_MAX_UPLOAD_RATE) /
+				_uploadRateLimiterCount;
+
+		for (Map.Entry<Long, List<RateLimiter>> entry :
+				_uploadRateLimiters.entrySet()) {
+
+			long syncAccountId = entry.getKey();
+			List<RateLimiter> rateLimiters = entry.getValue();
+
+			if (rateLimiters.isEmpty()) {
+				continue;
+			}
+
+			SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
+				syncAccountId);
+
+			updateRateLimits(
+				rateLimiters, globalMaxUploadRate,
+				syncAccount.getMaxUploadRate() / rateLimiters.size());
+		}
 	}
 
 	protected static RateLimiter getRateLimiter(
@@ -93,30 +163,23 @@ public class RateLimiterManager {
 		return rateLimiter;
 	}
 
-	protected static void updateDownloadRateLimits(long syncAccountId) {
-		List<RateLimiter> rateLimiters = _downloadRateLimiters.get(
-			syncAccountId);
-
-		SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
-			syncAccountId);
-
-		updateRateLimits(rateLimiters, syncAccount.getMaxDownloadRate());
-	}
-
 	protected static void updateRateLimits(
-		List<RateLimiter> rateLimiters, int maxRate) {
-
-		if (rateLimiters.isEmpty()) {
-			return;
-		}
+		List<RateLimiter> rateLimiters, int globalMaxRateLimit,
+		int maxRateLimit) {
 
 		int rate = 0;
 
-		if (maxRate <= 0) {
+		if ((globalMaxRateLimit == 0) && (maxRateLimit == 0)) {
 			rate = Integer.MAX_VALUE;
 		}
+		else if (globalMaxRateLimit == 0) {
+			rate = maxRateLimit;
+		}
+		else if (maxRateLimit == 0) {
+			rate = globalMaxRateLimit;
+		}
 		else {
-			rate = maxRate / rateLimiters.size();
+			rate = Math.min(globalMaxRateLimit, maxRateLimit);
 		}
 
 		for (RateLimiter rateLimiter : rateLimiters) {
@@ -124,17 +187,10 @@ public class RateLimiterManager {
 		}
 	}
 
-	protected static void updateUploadRateLimits(long syncAccountId) {
-		List<RateLimiter> rateLimiters = _uploadRateLimiters.get(syncAccountId);
-
-		SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
-			syncAccountId);
-
-		updateRateLimits(rateLimiters, syncAccount.getMaxUploadRate());
-	}
-
+	private static int _downloadRateLimiterCount;
 	private static final Map<Long, List<RateLimiter>> _downloadRateLimiters =
 		new HashMap<>();
+	private static int _uploadRateLimiterCount;
 	private static final Map<Long, List<RateLimiter>> _uploadRateLimiters =
 		new HashMap<>();
 
