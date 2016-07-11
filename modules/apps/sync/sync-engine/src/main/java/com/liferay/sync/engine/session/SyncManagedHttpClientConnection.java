@@ -24,21 +24,12 @@ import com.liferay.sync.engine.util.StreamUtil;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.CharsetEncoder;
-
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpException;
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpResponse;
 import org.apache.http.RequestLine;
-import org.apache.http.config.MessageConstraints;
-import org.apache.http.entity.ContentLengthStrategy;
 import org.apache.http.impl.conn.DefaultManagedHttpClientConnection;
-import org.apache.http.io.HttpMessageParserFactory;
-import org.apache.http.io.HttpMessageWriterFactory;
 import org.apache.http.util.Args;
 
 /**
@@ -47,19 +38,8 @@ import org.apache.http.util.Args;
 public class SyncManagedHttpClientConnection
 	extends DefaultManagedHttpClientConnection {
 
-	public SyncManagedHttpClientConnection(
-		String id, int buffersize, int fragmentSizeHint,
-		CharsetDecoder chardecoder, CharsetEncoder charencoder,
-		MessageConstraints constraints,
-		ContentLengthStrategy incomingContentStrategy,
-		ContentLengthStrategy outgoingContentStrategy,
-		HttpMessageWriterFactory<HttpRequest> requestWriterFactory,
-		HttpMessageParserFactory<HttpResponse> responseParserFactory) {
-
-		super(
-			id, buffersize, fragmentSizeHint, chardecoder, charencoder,
-			constraints, incomingContentStrategy, outgoingContentStrategy,
-			requestWriterFactory, responseParserFactory);
+	public SyncManagedHttpClientConnection(String id, int bufferSize) {
+		super(id, bufferSize);
 	}
 
 	@Override

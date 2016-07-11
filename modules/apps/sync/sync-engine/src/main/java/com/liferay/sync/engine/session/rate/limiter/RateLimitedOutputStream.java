@@ -56,7 +56,7 @@ public class RateLimitedOutputStream extends OutputStream {
 
 	@Override
 	public void write(int byteValue) throws IOException {
-		_rateLimiter.acquire(1);
+		_rateLimiter.acquire();
 
 		_outputStream.write(byteValue);
 	}

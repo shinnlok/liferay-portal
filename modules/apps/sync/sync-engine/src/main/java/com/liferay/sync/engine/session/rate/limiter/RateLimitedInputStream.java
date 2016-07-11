@@ -40,7 +40,7 @@ public class RateLimitedInputStream extends InputStream {
 
 	@Override
 	public int read() throws IOException {
-		_rateLimiter.acquire(1);
+		_rateLimiter.acquire();
 
 		return _inputStream.read();
 	}
