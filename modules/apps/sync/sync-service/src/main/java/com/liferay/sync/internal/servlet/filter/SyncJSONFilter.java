@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.servlet.filter;
+package com.liferay.sync.internal.servlet.filter;
 
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
