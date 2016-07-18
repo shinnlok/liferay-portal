@@ -34,24 +34,10 @@ public class SyncManagedHttpClientConnectionFactory
 
 	@Override
 	public ManagedHttpClientConnection create(
-		HttpRoute route, ConnectionConfig connectionConfig) {
+		HttpRoute httpRoute, ConnectionConfig connectionConfig) {
 
 		if (connectionConfig == null) {
 			connectionConfig = ConnectionConfig.DEFAULT;
-		}
-
-		CodingErrorAction malformedInputAction =
-			connectionConfig.getMalformedInputAction();
-
-		if (malformedInputAction == null) {
-			malformedInputAction = CodingErrorAction.REPORT;
-		}
-
-		CodingErrorAction unmappableInputAction =
-			connectionConfig.getUnmappableInputAction();
-
-		if (unmappableInputAction == null) {
-			unmappableInputAction = CodingErrorAction.REPORT;
 		}
 
 		CharsetDecoder charsetDecoder = null;
@@ -61,18 +47,32 @@ public class SyncManagedHttpClientConnectionFactory
 
 		if (charset != null) {
 			charsetDecoder = charset.newDecoder();
-			charsetDecoder.onMalformedInput(malformedInputAction);
-			charsetDecoder.onUnmappableCharacter(unmappableInputAction);
 			charsetEncoder = charset.newEncoder();
+
+			CodingErrorAction malformedInputAction =
+				connectionConfig.getMalformedInputAction();
+
+			if (malformedInputAction == null) {
+				malformedInputAction = CodingErrorAction.REPORT;
+			}
+
+			charsetDecoder.onMalformedInput(malformedInputAction);
 			charsetEncoder.onMalformedInput(malformedInputAction);
+
+			CodingErrorAction unmappableInputAction =
+				connectionConfig.getUnmappableInputAction();
+
+			if (unmappableInputAction == null) {
+				unmappableInputAction = CodingErrorAction.REPORT;
+			}
+
+			charsetDecoder.onUnmappableCharacter(unmappableInputAction);
 			charsetEncoder.onUnmappableCharacter(unmappableInputAction);
 		}
 
-		final String id =
-			"http-outgoing-" + Long.toString(_counter.getAndIncrement());
-
 		return new SyncManagedHttpClientConnection(
-			id, connectionConfig.getBufferSize(),
+			"http-outgoing-" + _counter.getAndIncrement(),
+			connectionConfig.getBufferSize(),
 			connectionConfig.getFragmentSizeHint(), charsetDecoder,
 			charsetEncoder, connectionConfig.getMessageConstraints(), null,
 			null, null, null);

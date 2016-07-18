@@ -48,18 +48,19 @@ public class SyncManagedHttpClientConnection
 	extends DefaultManagedHttpClientConnection {
 
 	public SyncManagedHttpClientConnection(
-		String id, int buffersize, int fragmentSizeHint,
-		CharsetDecoder chardecoder, CharsetEncoder charencoder,
-		MessageConstraints constraints,
-		ContentLengthStrategy incomingContentStrategy,
-		ContentLengthStrategy outgoingContentStrategy,
-		HttpMessageWriterFactory<HttpRequest> requestWriterFactory,
-		HttpMessageParserFactory<HttpResponse> responseParserFactory) {
+		String id, int bufferSize, int fragmentSizeHint,
+		CharsetDecoder charsetDecoder, CharsetEncoder charsetEncoder,
+		MessageConstraints messageConstraints,
+		ContentLengthStrategy incomingContentLengthStrategy,
+		ContentLengthStrategy outgoingContentLengthStrategy,
+		HttpMessageWriterFactory<HttpRequest> httpMessageWriterFactory,
+		HttpMessageParserFactory<HttpResponse> httpMessageParserFactory) {
 
 		super(
-			id, buffersize, fragmentSizeHint, chardecoder, charencoder,
-			constraints, incomingContentStrategy, outgoingContentStrategy,
-			requestWriterFactory, responseParserFactory);
+			id, bufferSize, fragmentSizeHint, charsetDecoder, charsetEncoder,
+			messageConstraints, incomingContentLengthStrategy,
+			outgoingContentLengthStrategy, httpMessageWriterFactory,
+			httpMessageParserFactory);
 	}
 
 	@Override
