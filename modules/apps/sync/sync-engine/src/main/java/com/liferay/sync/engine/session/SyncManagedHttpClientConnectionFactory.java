@@ -24,6 +24,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.apache.http.config.ConnectionConfig;
 import org.apache.http.conn.ManagedHttpClientConnection;
 import org.apache.http.conn.routing.HttpRoute;
+import org.apache.http.impl.conn.DefaultHttpResponseParserFactory;
 import org.apache.http.impl.conn.ManagedHttpClientConnectionFactory;
 
 /**
@@ -75,7 +76,7 @@ public class SyncManagedHttpClientConnectionFactory
 			connectionConfig.getBufferSize(),
 			connectionConfig.getFragmentSizeHint(), charsetDecoder,
 			charsetEncoder, connectionConfig.getMessageConstraints(), null,
-			null, null, null);
+			null, null, DefaultHttpResponseParserFactory.INSTANCE);
 	}
 
 	private final AtomicLong _counter = new AtomicLong();

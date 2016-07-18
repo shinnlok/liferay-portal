@@ -94,10 +94,14 @@ public class SyncManagedHttpClientConnection
 
 		OutputStream outputStream = prepareOutput(request);
 
-		Header syncUUIDheader = request.getFirstHeader("Sync-UUID");
+		Header syncUUIDHeader = request.getFirstHeader("Sync-UUID");
+
+		if ((syncUUIDHeader == null) || (syncUUIDHeader.getValue() == null)) {
+			return outputStream;
+		}
 
 		SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
-			syncUUIDheader.getValue());
+			syncUUIDHeader.getValue());
 
 		if (syncAccount == null) {
 			return outputStream;
