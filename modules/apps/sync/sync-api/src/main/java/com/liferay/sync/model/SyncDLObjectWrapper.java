@@ -78,6 +78,7 @@ public class SyncDLObjectWrapper implements SyncDLObject,
 		attributes.put("size", getSize());
 		attributes.put("checksum", getChecksum());
 		attributes.put("event", getEvent());
+		attributes.put("key", getKey());
 		attributes.put("lastPermissionChangeDate", getLastPermissionChangeDate());
 		attributes.put("lockExpirationDate", getLockExpirationDate());
 		attributes.put("lockUserId", getLockUserId());
@@ -209,6 +210,12 @@ public class SyncDLObjectWrapper implements SyncDLObject,
 
 		if (event != null) {
 			setEvent(event);
+		}
+
+		String key = (String)attributes.get("key");
+
+		if (key != null) {
+			setKey(key);
 		}
 
 		Date lastPermissionChangeDate = (Date)attributes.get(
@@ -373,6 +380,16 @@ public class SyncDLObjectWrapper implements SyncDLObject,
 	@Override
 	public java.lang.String getExtraSettings() {
 		return _syncDLObject.getExtraSettings();
+	}
+
+	/**
+	* Returns the key of this sync d l object.
+	*
+	* @return the key of this sync d l object
+	*/
+	@Override
+	public java.lang.String getKey() {
+		return _syncDLObject.getKey();
 	}
 
 	/**
@@ -734,6 +751,16 @@ public class SyncDLObjectWrapper implements SyncDLObject,
 	@Override
 	public void setExtraSettings(java.lang.String extraSettings) {
 		_syncDLObject.setExtraSettings(extraSettings);
+	}
+
+	/**
+	* Sets the key of this sync d l object.
+	*
+	* @param key the key of this sync d l object
+	*/
+	@Override
+	public void setKey(java.lang.String key) {
+		_syncDLObject.setKey(key);
 	}
 
 	/**

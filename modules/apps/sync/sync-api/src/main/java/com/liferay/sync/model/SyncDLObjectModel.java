@@ -371,6 +371,21 @@ public interface SyncDLObjectModel extends BaseModel<SyncDLObject>, ShardedModel
 	public void setEvent(String event);
 
 	/**
+	 * Returns the key of this sync d l object.
+	 *
+	 * @return the key of this sync d l object
+	 */
+	@AutoEscape
+	public String getKey();
+
+	/**
+	 * Sets the key of this sync d l object.
+	 *
+	 * @param key the key of this sync d l object
+	 */
+	public void setKey(String key);
+
+	/**
 	 * Returns the last permission change date of this sync d l object.
 	 *
 	 * @return the last permission change date of this sync d l object
