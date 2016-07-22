@@ -55,6 +55,12 @@ public class SyncDLObjectUpdate {
 		this.resultsTotal = resultsTotal;
 	}
 
+	public void setSettingsModifiedTimes(
+		Map<String, Long> settingsModifiedTimes) {
+
+		this.settingsModifiedTimes = settingsModifiedTimes;
+	}
+
 	public void setSyncFiles(List<SyncFile> syncFiles) {
 		this.syncFiles = syncFiles;
 	}
