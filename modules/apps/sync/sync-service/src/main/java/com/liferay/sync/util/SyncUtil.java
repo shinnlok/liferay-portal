@@ -697,9 +697,8 @@ public class SyncUtil {
 		throw new PortalException("Folder must be an instance of DLFolder");
 	}
 
-	private static final Provider _provider = new BouncyCastleProvider();
-
 	private static final Map<String, String> _lanTokenKeys =
 		new ConcurrentHashMap<>();
+	private static final Provider _provider = new BouncyCastleProvider();
 
 }
