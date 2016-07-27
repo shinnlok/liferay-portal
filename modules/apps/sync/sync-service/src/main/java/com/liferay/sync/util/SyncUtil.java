@@ -32,7 +32,6 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.security.SecureRandom;
-import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
@@ -49,9 +48,11 @@ import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.sync.SyncSiteUnavailableException;
+import com.liferay.sync.constants.SyncConstants;
 import com.liferay.sync.constants.SyncDLObjectConstants;
 import com.liferay.sync.constants.SyncPermissionsConstants;
 import com.liferay.sync.model.SyncDLObject;
@@ -89,12 +90,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.portlet.PortletPreferences;
 
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
 /**
@@ -222,10 +221,9 @@ public class SyncUtil {
 		}
 	}
 
-	public static void configureLanSync(long companyId) throws Exception {
+	public static void enableLanSync(long companyId) throws Exception {
 		String lanServerUuid = PrefsPropsUtil.getString(
-			CompanyThreadLocal.getCompanyId(),
-			SyncServiceConfigurationKeys.SYNC_LAN_SERVER_UUID);
+			companyId, SyncConstants.SYNC_LAN_SERVER_UUID);
 
 		if (Validator.isNotNull(lanServerUuid)) {
 			return;
@@ -235,11 +233,6 @@ public class SyncUtil {
 
 		X500Name x500Name = new X500Name("CN=" + lanServerUuid);
 
-		Date notBeforeDate = new Date(
-			System.currentTimeMillis() - 86400000L * 365);
-		Date notAfterDate = new Date(
-			System.currentTimeMillis() + 86400000L * 365 * 1000);
-
 		KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
 
 		keyPairGenerator.initialize(1024);
@@ -248,18 +241,15 @@ public class SyncUtil {
 
 		X509v3CertificateBuilder x509v3CertificateBuilder =
 			new JcaX509v3CertificateBuilder(
-				x500Name, new BigInteger(64, new SecureRandom()), notBeforeDate,
-				notAfterDate, x500Name, keyPair.getPublic());
-
-		JcaContentSignerBuilder jcaContentSignerBuilder =
-			new JcaContentSignerBuilder("SHA256WithRSAEncryption");
+				x500Name, new BigInteger(64, new SecureRandom()),
+				new Date(System.currentTimeMillis() - Time.YEAR),
+				new Date(System.currentTimeMillis() + Time.YEAR * 1000),
+				x500Name, keyPair.getPublic());
 
 		PrivateKey privateKey = keyPair.getPrivate();
 
-		ContentSigner contentSigner = jcaContentSignerBuilder.build(privateKey);
-
-		X509CertificateHolder x509CertificateHolder =
-			x509v3CertificateBuilder.build(contentSigner);
+		JcaContentSignerBuilder jcaContentSignerBuilder =
+			new JcaContentSignerBuilder("SHA256WithRSAEncryption");
 
 		JcaX509CertificateConverter jcaX509CertificateConverter =
 			new JcaX509CertificateConverter();
@@ -267,7 +257,9 @@ public class SyncUtil {
 		jcaX509CertificateConverter.setProvider(_provider);
 
 		X509Certificate x509Certificate =
-			jcaX509CertificateConverter.getCertificate(x509CertificateHolder);
+			jcaX509CertificateConverter.getCertificate(
+				x509v3CertificateBuilder.build(
+					jcaContentSignerBuilder.build(privateKey)));
 
 		x509Certificate.verify(keyPair.getPublic());
 
@@ -275,13 +267,12 @@ public class SyncUtil {
 			companyId);
 
 		portletPreferences.setValue(
-			SyncServiceConfigurationKeys.SYNC_LAN_CERTIFICATE,
+			SyncConstants.SYNC_LAN_CERTIFICATE,
 			Base64.encode(x509Certificate.getEncoded()));
 		portletPreferences.setValue(
-			SyncServiceConfigurationKeys.SYNC_LAN_KEY,
-			Base64.encode(privateKey.getEncoded()));
+			SyncConstants.SYNC_LAN_KEY, Base64.encode(privateKey.getEncoded()));
 		portletPreferences.setValue(
-			SyncServiceConfigurationKeys.SYNC_LAN_SERVER_UUID, lanServerUuid);
+			SyncConstants.SYNC_LAN_SERVER_UUID, lanServerUuid);
 
 		portletPreferences.store();
 	}
@@ -414,6 +405,26 @@ public class SyncUtil {
 		return deltaFile;
 	}
 
+	public static String getLanTokenKey(
+		long modifiedTime, long typePK, boolean addToMap) {
+
+		String id = modifiedTime + StringPool.PERIOD + typePK;
+
+		String lanTokenKey = _lanTokenKeys.remove(id);
+
+		if (lanTokenKey != null) {
+			return lanTokenKey;
+		}
+
+		lanTokenKey = PwdGenerator.getPassword();
+
+		if (addToMap) {
+			_lanTokenKeys.put(id, lanTokenKey);
+		}
+
+		return lanTokenKey;
+	}
+
 	public static boolean isSupportedFolder(DLFolder dlFolder) {
 		if (dlFolder.isHidden() || dlFolder.isMountPoint()) {
 			return false;
@@ -490,16 +501,6 @@ public class SyncUtil {
 		}
 	}
 
-	public static String popLanTokenKey(long modifiedTime, long typePK) {
-		String id = String.valueOf(modifiedTime) + "." + String.valueOf(typePK);
-
-		if (_lanTokenKeys.containsKey(id)) {
-			return _lanTokenKeys.remove(id);
-		}
-
-		return PwdGenerator.getPassword();
-	}
-
 	public static void setFilePermissions(
 		Group group, boolean folder, ServiceContext serviceContext) {
 
@@ -526,16 +527,6 @@ public class SyncUtil {
 		}
 
 		serviceContext.setGroupPermissions(resourceActions);
-	}
-
-	public static String stashLanTokenKey(long modifiedTime, long typePK) {
-		String id = String.valueOf(modifiedTime) + "." + String.valueOf(typePK);
-
-		String lanTokenKey = PwdGenerator.getPassword();
-
-		_lanTokenKeys.put(id, lanTokenKey);
-
-		return lanTokenKey;
 	}
 
 	public static SyncDLObject toSyncDLObject(

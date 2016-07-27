@@ -71,7 +71,7 @@ public class SyncConfigurator {
 
 			if (lanEnabled) {
 				try {
-					SyncUtil.configureLanSync(company.getCompanyId());
+					SyncUtil.enableLanSync(company.getCompanyId());
 				}
 				catch (Exception e) {
 					_log.error(e, e);

@@ -527,9 +527,9 @@ public class SyncDLObjectServiceImpl extends SyncDLObjectServiceBaseImpl {
 					SyncConstants.SYNC_OAUTH_CONSUMER_SECRET);
 
 				syncContext.setOAuthConsumerSecret(oAuthConsumerSecret);
-			}
 
-			syncContext.setOAuthEnabled(oAuthEnabled);
+				syncContext.setOAuthEnabled(true);
+			}
 
 			syncContext.setPortletPreferencesMap(getPortletPreferencesMap());
 
@@ -546,21 +546,20 @@ public class SyncDLObjectServiceImpl extends SyncDLObjectServiceBaseImpl {
 				if (lanEnabled) {
 					String lanCertificate = PrefsPropsUtil.getString(
 						user.getCompanyId(),
-						SyncServiceConfigurationKeys.SYNC_LAN_CERTIFICATE);
+						SyncConstants.SYNC_LAN_CERTIFICATE);
 
 					syncContext.setLanCertificate(lanCertificate);
 
-					syncContext.setLanEnabled(lanEnabled);
+					syncContext.setLanEnabled(true);
 
 					String lanKey = PrefsPropsUtil.getString(
-						user.getCompanyId(),
-						SyncServiceConfigurationKeys.SYNC_LAN_KEY);
+						user.getCompanyId(), SyncConstants.SYNC_LAN_KEY);
 
 					syncContext.setLanKey(lanKey);
 
 					String lanServerUuid = PrefsPropsUtil.getString(
 						user.getCompanyId(),
-						SyncServiceConfigurationKeys.SYNC_LAN_SERVER_UUID);
+						SyncConstants.SYNC_LAN_SERVER_UUID);
 
 					syncContext.setLanServerUuid(lanServerUuid);
 				}
@@ -1406,8 +1405,8 @@ public class SyncDLObjectServiceImpl extends SyncDLObjectServiceBaseImpl {
 
 		checkModifiedTime(syncDLObject, fileEntry.getFileEntryId());
 
-		String lanTokenKey = SyncUtil.stashLanTokenKey(
-			syncDLObject.getModifiedTime(), fileEntry.getFileEntryId());
+		String lanTokenKey = SyncUtil.getLanTokenKey(
+			syncDLObject.getModifiedTime(), fileEntry.getFileEntryId(), true);
 
 		syncDLObject.setLanTokenKey(lanTokenKey);
 

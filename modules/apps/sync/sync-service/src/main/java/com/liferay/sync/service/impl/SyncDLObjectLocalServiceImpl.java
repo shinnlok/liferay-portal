@@ -365,9 +365,9 @@ public class SyncDLObjectLocalServiceImpl
 						parentSyncDLObject.getModifiedTime());
 					syncDLObject.setEvent(SyncDLObjectConstants.EVENT_RESTORE);
 					syncDLObject.setLanTokenKey(
-						SyncUtil.popLanTokenKey(
+						SyncUtil.getLanTokenKey(
 							parentSyncDLObject.getModifiedTime(),
-							syncDLObject.getTypePK()));
+							syncDLObject.getTypePK(), false));
 
 					syncDLObjectPersistence.update(syncDLObject);
 				}
