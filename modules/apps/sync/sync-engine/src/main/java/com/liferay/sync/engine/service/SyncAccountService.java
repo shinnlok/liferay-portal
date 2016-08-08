@@ -189,9 +189,9 @@ public class SyncAccountService {
 		throws Exception {
 
 		return SyncAccountService.addSyncAccount(
-			filePathName, login, 1, "", "", false, "", "", password,
-			pluginVersion, 5, Collections.<SyncSite, List<SyncFile>>emptyMap(),
-			null, false, url);
+			filePathName, "", false, "", "", login, 1, "", "", false, "", "",
+			password, pluginVersion, 5,
+			Collections.<SyncSite, List<SyncFile>>emptyMap(), null, false, url);
 	}
 
 	public static void deleteSyncAccount(long syncAccountId) {
