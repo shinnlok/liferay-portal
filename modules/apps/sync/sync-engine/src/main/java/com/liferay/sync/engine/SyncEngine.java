@@ -25,6 +25,7 @@ import com.liferay.sync.engine.file.system.util.WatcherManager;
 import com.liferay.sync.engine.lan.LanEngine;
 import com.liferay.sync.engine.model.SyncAccount;
 import com.liferay.sync.engine.model.SyncFile;
+import com.liferay.sync.engine.model.SyncProp;
 import com.liferay.sync.engine.model.SyncSite;
 import com.liferay.sync.engine.model.SyncUser;
 import com.liferay.sync.engine.service.SyncAccountService;
@@ -351,7 +352,7 @@ public class SyncEngine {
 			scheduleSyncAccountTasks(syncAccount.getSyncAccountId());
 		}
 
-		if (SyncPropService.getBoolean("lanEnabled", true)) {
+		if (SyncPropService.getBoolean(SyncProp.KEY_LAN_ENABLED, true)) {
 			LanEngine.start();
 		}
 
