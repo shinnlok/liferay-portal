@@ -28,7 +28,10 @@ import com.liferay.sync.engine.model.SyncFile;
 import com.liferay.sync.engine.service.SyncAccountService;
 import com.liferay.sync.engine.service.SyncFileService;
 import com.liferay.sync.engine.util.GetterUtil;
+import com.liferay.sync.engine.util.OSDetector;
 
+import io.netty.buffer.ByteBufInputStream;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -39,21 +42,26 @@ import io.netty.handler.codec.DecoderResult;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.DefaultHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.HttpChunkedInput;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpUtil;
+import io.netty.handler.codec.http.LastHttpContent;
 import io.netty.handler.ssl.SslHandler;
-import io.netty.handler.stream.ChunkedFile;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.RandomAccessFile;
+import io.netty.handler.stream.ChunkedStream;
 
 import java.net.SocketAddress;
+
+import java.nio.ByteBuffer;
+import java.nio.channels.SeekableByteChannel;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.FileTime;
 
 import java.util.List;
 
@@ -206,26 +214,17 @@ public class LanFileServerHandler
 			FullHttpRequest fullHttpRequest, SyncFile syncFile)
 		throws Exception {
 
-		HttpResponse httpResponse = new DefaultHttpResponse(HTTP_1_1, OK);
+		Path path = Paths.get(syncFile.getFilePathName());
 
-		File file = new File(syncFile.getFilePathName());
-
-		RandomAccessFile randomAccessFile = null;
-
-		try {
-			randomAccessFile = new RandomAccessFile(file, "r");
-		}
-		catch (FileNotFoundException fnfe) {
-			_logger.error(fnfe.getMessage(), fnfe);
-
+		if (Files.notExists(path)) {
 			_sendError(channelHandlerContext, NOT_FOUND);
 
 			return;
 		}
 
-		long length = randomAccessFile.length();
+		HttpResponse httpResponse = new DefaultHttpResponse(HTTP_1_1, OK);
 
-		HttpUtil.setContentLength(httpResponse, length);
+		HttpUtil.setContentLength(httpResponse, Files.size(path));
 
 		HttpHeaders httpHeaders = httpResponse.headers();
 
@@ -242,13 +241,50 @@ public class LanFileServerHandler
 
 		channelHandlerContext.write(httpResponse);
 
-		ChunkedFile chunkedFile = new ChunkedFile(
-			randomAccessFile, 0, length, 8192);
+		SeekableByteChannel seekableByteChannel = Files.newByteChannel(
+			path, StandardOpenOption.READ);
 
-		HttpChunkedInput httpChunkedInput = new HttpChunkedInput(chunkedFile);
+		ByteBuffer byteBuffer = ByteBuffer.allocate(65536);
+
+		long modifiedTime = syncFile.getModifiedTime();
+		long previousModifiedTime = syncFile.getPreviousModifiedTime();
+
+		if (OSDetector.isApple()) {
+			modifiedTime = modifiedTime / 1000 * 1000;
+			previousModifiedTime = previousModifiedTime / 1000 * 1000;
+		}
+
+		while (seekableByteChannel.read(byteBuffer) > 0) {
+			byteBuffer.flip();
+
+			ByteBufInputStream byteBufInputStream = new ByteBufInputStream(
+				Unpooled.wrappedBuffer(byteBuffer));
+
+			channelHandlerContext.write(new ChunkedStream(byteBufInputStream));
+
+			byteBuffer.clear();
+
+			FileTime currentFileTime = Files.getLastModifiedTime(
+				path, LinkOption.NOFOLLOW_LINKS);
+
+			long currentTime = currentFileTime.toMillis();
+
+			if ((currentTime != modifiedTime) &&
+				(currentTime != previousModifiedTime)) {
+
+				seekableByteChannel.close();
+
+				channelHandlerContext.close();
+
+				return;
+			}
+		}
+
+		seekableByteChannel.close();
 
 		ChannelFuture channelFuture = channelHandlerContext.writeAndFlush(
-			httpChunkedInput, channelHandlerContext.newProgressivePromise());
+			LastHttpContent.EMPTY_LAST_CONTENT,
+			channelHandlerContext.newProgressivePromise());
 
 		if (!HttpUtil.isKeepAlive(fullHttpRequest)) {
 			channelFuture.addListener(ChannelFutureListener.CLOSE);

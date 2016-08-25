@@ -60,6 +60,9 @@ public class PropsValues {
 	public static final int SYNC_LAN_BROADCAST_INTERVAL = Integer.parseInt(
 		PropsUtil.get(PropsKeys.SYNC_LAN_BROADCAST_INTERVAL));
 
+	public static final int SYNC_LAN_PORT = Integer.parseInt(
+		PropsUtil.get(PropsKeys.SYNC_LAN_PORT));
+
 	public static final int SYNC_LAN_SESSION_DOWNLOAD_CONNECT_TIMEOUT =
 		Integer.parseInt(
 			PropsUtil.get(PropsKeys.SYNC_LAN_SESSION_DOWNLOAD_CONNECT_TIMEOUT));
@@ -91,9 +94,6 @@ public class PropsValues {
 	public static final int SYNC_LAN_SESSION_QUERY_TOTAL_TIMEOUT =
 		Integer.parseInt(
 			PropsUtil.get(PropsKeys.SYNC_LAN_SESSION_QUERY_TOTAL_TIMEOUT));
-
-	public static final int SYNC_LAN_PORT = Integer.parseInt(
-		PropsUtil.get(PropsKeys.SYNC_LAN_PORT));
 
 	public static final String SYNC_LOGGER_CONFIGURATION_FILE = PropsUtil.get(
 		PropsKeys.SYNC_LOGGER_CONFIGURATION_FILE);
