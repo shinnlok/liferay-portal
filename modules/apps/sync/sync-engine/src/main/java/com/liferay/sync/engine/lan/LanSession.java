@@ -153,18 +153,14 @@ public class LanSession {
 			return null;
 		}
 
-		SyncLanClient syncLanClient = (SyncLanClient)objects[0];
-
-		final String url = _getUrl(syncLanClient, syncFile);
+		final String url = _getUrl((SyncLanClient)objects[0], syncFile);
 
 		final HttpGet httpGet = new HttpGet(url);
 
-		String encryptedToken = (String)objects[1];
+		String lanToken = LanTokenUtil.decryptLanToken(
+			syncFile.getLanTokenKey(), (String)objects[1]);
 
-		String token = LanTokenUtil.decryptToken(
-			syncFile.getLanTokenKey(), encryptedToken);
-
-		httpGet.addHeader("token", token);
+		httpGet.addHeader("lanToken", lanToken);
 
 		Runnable runnable = new Runnable() {
 

@@ -38,25 +38,17 @@ import org.apache.commons.lang.RandomStringUtils;
  */
 public class LanTokenUtil {
 
-	public static boolean consumeToken(String token) {
-
-		// Must explicitly check for token. PassiveExpiringMap.remove() returns
-		// true even for expired values.
-
-		if (_tokens.contains(token)) {
-			_tokens.remove(token);
-
-			return true;
-		}
-
-		return false;
+	public static boolean containsLanToken(String lanToken) {
+		return _lanTokens.contains(lanToken);
 	}
 
-	public static String createEncryptedToken(String key) throws Exception {
-		String token = RandomStringUtils.random(
+	public static String createEncryptedToken(String lanTokenKey)
+		throws Exception {
+
+		String lanToken = RandomStringUtils.random(
 			32, 0, 0, true, true, null, _secureRandom);
 
-		byte[] bytes = DigestUtils.sha1(key);
+		byte[] bytes = DigestUtils.sha1(lanTokenKey);
 
 		bytes = Arrays.copyOf(bytes, 16);
 
@@ -65,16 +57,17 @@ public class LanTokenUtil {
 		cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(bytes, "AES"));
 
 		byte[] encryptedBytes = cipher.doFinal(
-			token.getBytes(Charset.forName("UTF-8")));
+			lanToken.getBytes(Charset.forName("UTF-8")));
 
 		String encryptedToken = Base64.encodeBase64String(encryptedBytes);
 
-		_tokens.add(token);
+		_lanTokens.add(lanToken);
 
 		return encryptedToken;
 	}
 
-	public static String decryptToken(String lanTokenKey, String encryptedToken)
+	public static String decryptLanToken(
+			String lanTokenKey, String encryptedToken)
 		throws Exception {
 
 		byte[] bytes = DigestUtils.sha1(lanTokenKey);
@@ -94,9 +87,13 @@ public class LanTokenUtil {
 		return new String(decryptedBytes, Charset.forName("UTF-8"));
 	}
 
-	private static final SecureRandom _secureRandom = new SecureRandom();
-	private static final Set<String> _tokens = Collections.newSetFromMap(
+	public static boolean removeLanToken(String lanToken) {
+		return _lanTokens.remove(lanToken);
+	}
+
+	private static final Set<String> _lanTokens = Collections.newSetFromMap(
 		new PassiveExpiringMap(
 			3600, TimeUnit.SECONDS, new ConcurrentHashMap()));
+	private static final SecureRandom _secureRandom = new SecureRandom();
 
 }

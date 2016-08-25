@@ -52,8 +52,6 @@ import io.netty.handler.codec.http.LastHttpContent;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.handler.stream.ChunkedStream;
 
-import java.net.SocketAddress;
-
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.Files;
@@ -131,27 +129,25 @@ public class LanFileServerHandler
 
 		HttpHeaders httpHeaders = fullHttpRequest.headers();
 
-		String token = httpHeaders.get("token");
+		String lanToken = httpHeaders.get("lanToken");
 
-		if ((token == null) || token.isEmpty()) {
+		if ((lanToken == null) || lanToken.isEmpty()) {
 			Channel channel = channelHandlerContext.channel();
 
-			SocketAddress remoteAddress = channel.remoteAddress();
-
-			_logger.error("Lan client {} did not send token", remoteAddress);
+			_logger.error(
+				"Lan client {} did not send token", channel.remoteAddress());
 
 			_sendError(channelHandlerContext, NOT_FOUND);
 
 			return;
 		}
 
-		if (!LanTokenUtil.consumeToken(token)) {
+		if (!LanTokenUtil.containsLanToken(lanToken)) {
 			Channel channel = channelHandlerContext.channel();
 
-			SocketAddress remoteAddress = channel.remoteAddress();
-
 			_logger.error(
-				"Lan client {} token not found or expired", remoteAddress);
+				"Lan client {} token not found or expired",
+				channel.remoteAddress());
 
 			_sendError(channelHandlerContext, NOT_FOUND);
 
@@ -167,6 +163,8 @@ public class LanFileServerHandler
 		}
 
 		sendFile(channelHandlerContext, fullHttpRequest, syncFile);
+
+		LanTokenUtil.removeLanToken(lanToken);
 	}
 
 	protected void processHeadRequest(
