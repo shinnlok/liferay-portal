@@ -241,7 +241,7 @@ public class FileEventUtil {
 		if (lan && syncAccount.isLanEnabled() &&
 			SyncPropService.getBoolean("lanEnabled", true) &&
 			StringUtils.isNotEmpty(syncFile.getLanTokenKey()) &&
-			(syncFile.getSize() >= syncAccount.getBatchFileMaxSize()/10)) {
+			(syncFile.getSize() >= (syncAccount.getBatchFileMaxSize() / 10))) {
 
 			event = new LanDownloadFileEvent(syncAccountId, parameters);
 		}

@@ -329,11 +329,8 @@ public class LanFileServerHandler
 		ChannelHandlerContext channelHandlerContext,
 		HttpResponseStatus httpResponseStatus) {
 
-		HttpResponse httpResponse = new DefaultFullHttpResponse(
-			HTTP_1_1, httpResponseStatus);
-
 		ChannelFuture channelFuture = channelHandlerContext.writeAndFlush(
-			httpResponse);
+			new DefaultFullHttpResponse(HTTP_1_1, httpResponseStatus));
 
 		channelFuture.addListener(ChannelFutureListener.CLOSE);
 	}

@@ -63,7 +63,6 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
@@ -157,10 +156,10 @@ public class LanSession {
 
 		final HttpGet httpGet = new HttpGet(url);
 
-		String lanToken = LanTokenUtil.decryptLanToken(
-			syncFile.getLanTokenKey(), (String)objects[1]);
-
-		httpGet.addHeader("lanToken", lanToken);
+		httpGet.addHeader(
+			"lanToken",
+			LanTokenUtil.decryptLanToken(
+				syncFile.getLanTokenKey(), (String)objects[1]));
 
 		Runnable runnable = new Runnable() {
 
@@ -188,7 +187,44 @@ public class LanSession {
 		return httpGet;
 	}
 
-	public Object[] findSyncLanClient(SyncFile syncFile) throws Exception {
+	protected Callable<Object[]> createQuerySyncLanClientCallable(
+		final SyncLanClient syncLanClient, SyncFile syncFile) {
+
+		String url = _getUrl(syncLanClient, syncFile);
+
+		final HttpHead httpHead = new HttpHead(url);
+
+		return new Callable<Object[]>() {
+
+			@Override
+			public Object[] call() throws Exception {
+				HttpResponse httpResponse = _queryHttpClient.execute(
+					httpHead, HttpClientContext.create());
+
+				StatusLine statusLine = httpResponse.getStatusLine();
+
+				if (statusLine.getStatusCode() != HttpStatus.SC_OK) {
+					throw new Exception();
+				}
+
+				Header[] headers = httpResponse.getHeaders("encryptedToken");
+
+				if (headers.length == 0) {
+					_logger.error(
+						"Sync lan client did not return encrypted token");
+
+					throw new Exception();
+				}
+
+				Header header = headers[0];
+
+				return new Object[] {syncLanClient, header.getValue()};
+			}
+
+		};
+	}
+
+	protected Object[] findSyncLanClient(SyncFile syncFile) throws Exception {
 		SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
 			syncFile.getSyncAccountId());
 
@@ -253,45 +289,6 @@ public class LanSession {
 		}
 	}
 
-	protected Callable<Object[]> createQuerySyncLanClientCallable(
-		final SyncLanClient syncLanClient, SyncFile syncFile) {
-
-		String url = _getUrl(syncLanClient, syncFile);
-
-		final HttpHead httpHead = new HttpHead(url);
-
-		return new Callable<Object[]>() {
-
-			@Override
-			public Object[] call() throws Exception {
-				HttpResponse httpResponse = _queryHttpClient.execute(
-					httpHead, HttpClientContext.create());
-
-				StatusLine statusLine = httpResponse.getStatusLine();
-
-				if (statusLine.getStatusCode() != HttpStatus.SC_OK) {
-					throw new Exception();
-				}
-
-				Header[] headers = httpResponse.getHeaders("encryptedToken");
-
-				if (headers.length == 0) {
-					_logger.error(
-						"Sync lan client did not return encrypted token");
-
-					throw new Exception();
-				}
-
-				Header header = headers[0];
-
-				String encryptedToken = header.getValue();
-
-				return new Object[] {syncLanClient, encryptedToken};
-			}
-
-		};
-	}
-
 	private static HttpClient _createHttpClient(
 		int connectTimeout, int maxPerRoute, int maxTotal, int socketTimeout) {
 
@@ -299,19 +296,14 @@ public class LanSession {
 			RegistryBuilder.create();
 
 		try {
-			SSLConnectionSocketFactory sslConnectionSocketFactory =
-				_getSSLSocketFactory();
-
-			registryBuilder.register("https", sslConnectionSocketFactory);
+			registryBuilder.register("https", _getSSLSocketFactory());
 		}
 		catch (Exception e) {
 			_logger.error(e.getMessage(), e);
 		}
 
-		Registry<ConnectionSocketFactory> registry = registryBuilder.build();
-
 		PoolingHttpClientConnectionManager connectionManager =
-			new PoolingHttpClientConnectionManager(registry);
+			new PoolingHttpClientConnectionManager(registryBuilder.build());
 
 		connectionManager.setDefaultMaxPerRoute(maxPerRoute);
 		connectionManager.setMaxTotal(maxTotal);

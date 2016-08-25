@@ -33,7 +33,6 @@ import io.netty.handler.stream.ChunkedWriteHandler;
 import io.netty.util.DomainNameMapping;
 import io.netty.util.DomainNameMappingBuilder;
 
-import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 
 import org.slf4j.Logger;
@@ -65,10 +64,7 @@ public class LanFileServerInitializer
 		channelPipeline.addLast(new HttpServerCodec());
 		channelPipeline.addLast(new HttpObjectAggregator(65536));
 		channelPipeline.addLast(new ChunkedWriteHandler());
-
-		LanFileServerHandler lanSyncServerHandler = new LanFileServerHandler();
-
-		channelPipeline.addLast(lanSyncServerHandler);
+		channelPipeline.addLast(new LanFileServerHandler());
 	}
 
 	public void updateDomainNameMapping() {
@@ -82,15 +78,15 @@ public class LanFileServerInitializer
 			SslContext sslContext = null;
 
 			try {
-				PrivateKey privateKey = LanPEMParserUtil.parsePrivateKey(
-					syncAccount.getLanKey());
-
 				X509Certificate x509Certificate =
 					LanPEMParserUtil.parseX509Certificate(
 						syncAccount.getLanCertificate());
 
 				SslContextBuilder sslContextBuilder =
-					SslContextBuilder.forServer(privateKey, x509Certificate);
+					SslContextBuilder.forServer(
+						LanPEMParserUtil.parsePrivateKey(
+							syncAccount.getLanKey()),
+						x509Certificate);
 
 				sslContextBuilder.clientAuth(ClientAuth.REQUIRE);
 				sslContextBuilder.sslProvider(SslProvider.JDK);
@@ -109,10 +105,9 @@ public class LanFileServerInitializer
 					sslContext);
 			}
 
-			String sniHostname = LanClientUtil.getSNIHostname(
-				syncAccount.getLanServerUuid());
-
-			domainNameMappingBuilder.add(sniHostname, sslContext);
+			domainNameMappingBuilder.add(
+				LanClientUtil.getSNIHostname(syncAccount.getLanServerUuid()),
+				sslContext);
 		}
 
 		if (domainNameMappingBuilder == null) {

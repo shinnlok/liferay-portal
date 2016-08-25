@@ -25,7 +25,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.codec.binary.Base64;
@@ -56,10 +55,8 @@ public class LanTokenUtil {
 
 		cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(bytes, "AES"));
 
-		byte[] encryptedBytes = cipher.doFinal(
-			lanToken.getBytes(Charset.forName("UTF-8")));
-
-		String encryptedToken = Base64.encodeBase64String(encryptedBytes);
+		String encryptedToken = Base64.encodeBase64String(
+			cipher.doFinal(lanToken.getBytes(Charset.forName("UTF-8"))));
 
 		_lanTokens.add(lanToken);
 
@@ -74,17 +71,13 @@ public class LanTokenUtil {
 
 		bytes = Arrays.copyOf(bytes, 16);
 
-		SecretKey secretKey = new SecretKeySpec(bytes, "AES");
-
 		Cipher cipher = Cipher.getInstance("AES");
 
-		cipher.init(Cipher.DECRYPT_MODE, secretKey);
+		cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(bytes, "AES"));
 
-		byte[] decodedBytes = Base64.decodeBase64(encryptedToken);
-
-		byte[] decryptedBytes = cipher.doFinal(decodedBytes);
-
-		return new String(decryptedBytes, Charset.forName("UTF-8"));
+		return new String(
+			cipher.doFinal(Base64.decodeBase64(encryptedToken)),
+			Charset.forName("UTF-8"));
 	}
 
 	public static boolean removeLanToken(String lanToken) {

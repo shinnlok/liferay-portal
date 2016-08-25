@@ -15,7 +15,6 @@
 package com.liferay.sync.engine.lan.discovery;
 
 import com.liferay.sync.engine.lan.util.LanClientUtil;
-import com.liferay.sync.engine.model.SyncLanClient;
 import com.liferay.sync.engine.util.JSONUtil;
 import com.liferay.sync.engine.util.PropsValues;
 
@@ -41,15 +40,13 @@ public class LanDiscoveryBroadcaster {
 			_initialize();
 		}
 
-		SyncLanClient syncLanClient = LanClientUtil.createSyncLanClient(port);
-
-		byte[] jsonBytes = JSONUtil.writeValueAsBytes(syncLanClient);
-
-		InetSocketAddress inetSocketAddress = new InetSocketAddress(
-			"255.255.255.255", PropsValues.SYNC_LAN_PORT);
+		byte[] jsonBytes = JSONUtil.writeValueAsBytes(
+			LanClientUtil.createSyncLanClient(port));
 
 		DatagramPacket datagramPacket = new DatagramPacket(
-			Unpooled.copiedBuffer(jsonBytes), inetSocketAddress);
+			Unpooled.copiedBuffer(jsonBytes),
+			new InetSocketAddress(
+				"255.255.255.255", PropsValues.SYNC_LAN_PORT));
 
 		ChannelFuture channelFuture = _channel.writeAndFlush(datagramPacket);
 
