@@ -150,7 +150,7 @@ public class SyncAccountService {
 				SyncFile.TYPE_SYSTEM);
 
 			if (syncSite.isActive() &&
-				!Files.exists(Paths.get(syncSite.getFilePathName()))) {
+				!FileUtil.exists(Paths.get(syncSite.getFilePathName()))) {
 
 				Files.createDirectories(Paths.get(syncSite.getFilePathName()));
 			}
@@ -492,7 +492,7 @@ public class SyncAccountService {
 
 		Path filePath = Paths.get(syncAccount.getFilePathName());
 
-		if (!Files.exists(filePath)) {
+		if (!FileUtil.exists(filePath)) {
 			return;
 		}
 
