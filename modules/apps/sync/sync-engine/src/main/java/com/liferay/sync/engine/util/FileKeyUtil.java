@@ -75,8 +75,7 @@ public class FileKeyUtil {
 					return -1;
 				}
 
-				ByteBuffer byteBuffer = ByteBuffer.allocate(
-					userDefinedFileAttributeView.size("fileKey"));
+				ByteBuffer byteBuffer = ByteBuffer.allocate(20);
 
 				userDefinedFileAttributeView.read("fileKey", byteBuffer);
 
