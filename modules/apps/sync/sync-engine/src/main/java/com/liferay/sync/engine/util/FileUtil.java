@@ -486,6 +486,19 @@ public class FileUtil {
 		return !checksumsEqual(getChecksum(filePath), syncFile.getChecksum());
 	}
 
+	public static boolean isRealFilePath(Path filePath) {
+		try {
+			Path realFilePath = filePath.toRealPath(LinkOption.NOFOLLOW_LINKS);
+
+			String realFilePathString = realFilePath.toString();
+
+			return realFilePathString.equals(filePath.toString());
+		}
+		catch (Exception e) {
+			return false;
+		}
+	}
+
 	public static boolean isShortcut(Path filePath) {
 		if (Files.isSymbolicLink(filePath)) {
 			return true;
@@ -687,23 +700,6 @@ public class FileUtil {
 
 	public static boolean notExists(Path filePath) {
 		return Files.notExists(filePath, LinkOption.NOFOLLOW_LINKS);
-	}
-
-	public static boolean realPathExists(Path filePath) {
-		try {
-			Path realFilePath = filePath.toRealPath(LinkOption.NOFOLLOW_LINKS);
-
-			String realFilePathString = realFilePath.toString();
-
-			if (!realFilePathString.equals(filePath.toString())) {
-				return false;
-			}
-
-			return exists(filePath);
-		}
-		catch (Exception e) {
-			return false;
-		}
 	}
 
 	public static void releaseFileLock(FileLock fileLock) {

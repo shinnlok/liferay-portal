@@ -262,7 +262,9 @@ public abstract class Watcher implements Runnable {
 
 		Path syncAccountFilePath = Paths.get(syncAccount.getFilePathName());
 
-		if (!FileUtil.realPathExists(syncAccountFilePath)) {
+		if (!FileUtil.isRealFilePath(syncAccountFilePath) ||
+			!FileUtil.exists(syncAccountFilePath)) {
+
 			if (_logger.isTraceEnabled()) {
 				_logger.trace(
 					"Missing sync account file path {}", syncAccountFilePath);
@@ -279,7 +281,8 @@ public abstract class Watcher implements Runnable {
 				missingFilePath.toString(), syncAccount.getSyncAccountId());
 
 			if ((syncSite != null) && syncSite.isActive() &&
-				!FileUtil.realPathExists(missingFilePath)) {
+				(!FileUtil.isRealFilePath(syncAccountFilePath) ||
+				 !FileUtil.exists(missingFilePath))) {
 
 				if (_logger.isTraceEnabled()) {
 					_logger.trace(

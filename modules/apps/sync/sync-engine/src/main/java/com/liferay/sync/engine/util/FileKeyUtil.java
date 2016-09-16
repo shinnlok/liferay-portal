@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
 public class FileKeyUtil {
 
 	public static long getFileKey(Path filePath) {
-		if (!FileUtil.realPathExists(filePath)) {
+		if (!FileUtil.isRealFilePath(filePath) || !FileUtil.exists(filePath)) {
 			return -1;
 		}
 
