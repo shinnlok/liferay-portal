@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.engine.lan.discovery;
+package com.liferay.sync.engine.lan.server.discovery;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;

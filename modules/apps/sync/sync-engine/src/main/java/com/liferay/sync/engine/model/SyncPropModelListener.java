@@ -14,7 +14,7 @@
 
 package com.liferay.sync.engine.model;
 
-import com.liferay.sync.engine.lan.LanEngine;
+import com.liferay.sync.engine.lan.server.LanEngine;
 import com.liferay.sync.engine.session.rate.limiter.RateLimiterManager;
 
 import java.util.Map;

@@ -22,7 +22,7 @@ import com.liferay.sync.engine.document.library.util.ServerEventUtil;
 import com.liferay.sync.engine.file.system.SyncWatchEventProcessor;
 import com.liferay.sync.engine.file.system.Watcher;
 import com.liferay.sync.engine.file.system.util.WatcherManager;
-import com.liferay.sync.engine.lan.LanEngine;
+import com.liferay.sync.engine.lan.server.LanEngine;
 import com.liferay.sync.engine.model.SyncAccount;
 import com.liferay.sync.engine.model.SyncFile;
 import com.liferay.sync.engine.model.SyncProp;

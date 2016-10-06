@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.engine.lan.fileserver;
+package com.liferay.sync.engine.lan.server.file;
 
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.HEAD;

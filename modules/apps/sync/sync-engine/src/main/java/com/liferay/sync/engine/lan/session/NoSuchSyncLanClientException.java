@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.engine.lan;
+package com.liferay.sync.engine.lan.session;
 
 /**
  * @author Dennis Ju

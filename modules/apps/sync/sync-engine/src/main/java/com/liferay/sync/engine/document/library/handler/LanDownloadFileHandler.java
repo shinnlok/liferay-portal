@@ -16,7 +16,7 @@ package com.liferay.sync.engine.document.library.handler;
 
 import com.liferay.sync.engine.document.library.event.Event;
 import com.liferay.sync.engine.document.library.util.FileEventUtil;
-import com.liferay.sync.engine.lan.NoSuchSyncLanClientException;
+import com.liferay.sync.engine.lan.session.NoSuchSyncLanClientException;
 import com.liferay.sync.engine.model.SyncFile;
 
 import org.apache.http.ConnectionClosedException;

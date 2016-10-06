@@ -12,45 +12,49 @@
  * details.
  */
 
-package com.liferay.sync.engine.lan.discovery;
+package com.liferay.sync.engine.lan.server.discovery;
 
-import com.liferay.sync.engine.lan.util.LanClientUtil;
-import com.liferay.sync.engine.util.JSONUtil;
 import com.liferay.sync.engine.util.PropsValues;
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.DatagramPacket;
 import io.netty.channel.socket.nio.NioDatagramChannel;
-
-import java.net.InetSocketAddress;
 
 /**
  * @author Dennis Ju
  */
-public class LanDiscoveryBroadcaster {
+public class LanDiscoveryListener {
 
-	public void broadcast(int port) throws Exception {
-		if ((_channel == null) || !_channel.isActive()) {
-			_initialize();
+	public void listen() throws Exception {
+		_eventLoopGroup = new NioEventLoopGroup();
+
+		Bootstrap bootstrap = new Bootstrap();
+
+		bootstrap.channel(NioDatagramChannel.class);
+		bootstrap.group(_eventLoopGroup);
+		bootstrap.handler(new LanDiscoveryListenerHandler());
+		bootstrap.option(ChannelOption.SO_REUSEADDR, true);
+
+		ChannelFuture channelFuture = bootstrap.bind(PropsValues.SYNC_LAN_PORT);
+
+		try {
+			channelFuture.sync();
+
+			Channel channel = channelFuture.channel();
+
+			ChannelFuture closeChannelFuture = channel.closeFuture();
+
+			closeChannelFuture.await();
 		}
-
-		byte[] jsonBytes = JSONUtil.writeValueAsBytes(
-			LanClientUtil.createSyncLanClient(port));
-
-		DatagramPacket datagramPacket = new DatagramPacket(
-			Unpooled.copiedBuffer(jsonBytes),
-			new InetSocketAddress(
-				"255.255.255.255", PropsValues.SYNC_LAN_PORT));
-
-		ChannelFuture channelFuture = _channel.writeAndFlush(datagramPacket);
-
-		channelFuture.sync();
+		catch (InterruptedException ie) {
+		}
+		finally {
+			_eventLoopGroup.shutdownGracefully();
+		}
 	}
 
 	public void shutdown() {
@@ -59,31 +63,6 @@ public class LanDiscoveryBroadcaster {
 		}
 	}
 
-	private void _initialize() throws Exception {
-		_eventLoopGroup = new NioEventLoopGroup();
-
-		Bootstrap bootstrap = new Bootstrap();
-
-		bootstrap.channel(NioDatagramChannel.class);
-		bootstrap.group(_eventLoopGroup);
-		bootstrap.handler(new LanDiscoveryBroadcasterHandler());
-		bootstrap.option(ChannelOption.SO_BROADCAST, true);
-
-		ChannelFuture channelFuture = bootstrap.bind(0);
-
-		try {
-			channelFuture = channelFuture.sync();
-
-			_channel = channelFuture.channel();
-		}
-		catch (InterruptedException ie) {
-			_eventLoopGroup.shutdownGracefully();
-
-			throw ie;
-		}
-	}
-
-	private Channel _channel;
 	private EventLoopGroup _eventLoopGroup;
 
 }

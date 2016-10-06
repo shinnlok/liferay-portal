@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.engine.lan.discovery;
+package com.liferay.sync.engine.lan.server.discovery;
 
 import com.liferay.sync.engine.lan.util.LanClientUtil;
 import com.liferay.sync.engine.model.SyncLanClient;

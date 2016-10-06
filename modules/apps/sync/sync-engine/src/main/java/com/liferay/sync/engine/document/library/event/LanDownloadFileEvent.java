@@ -16,7 +16,7 @@ package com.liferay.sync.engine.document.library.event;
 
 import com.liferay.sync.engine.document.library.handler.Handler;
 import com.liferay.sync.engine.document.library.handler.LanDownloadFileHandler;
-import com.liferay.sync.engine.lan.LanSession;
+import com.liferay.sync.engine.lan.session.LanSession;
 import com.liferay.sync.engine.model.SyncFile;
 import com.liferay.sync.engine.service.SyncFileService;
 import com.liferay.sync.engine.util.FileUtil;

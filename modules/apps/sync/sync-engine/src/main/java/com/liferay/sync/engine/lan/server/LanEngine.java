@@ -12,11 +12,12 @@
  * details.
  */
 
-package com.liferay.sync.engine.lan;
+package com.liferay.sync.engine.lan.server;
 
-import com.liferay.sync.engine.lan.discovery.LanDiscoveryBroadcaster;
-import com.liferay.sync.engine.lan.discovery.LanDiscoveryListener;
-import com.liferay.sync.engine.lan.fileserver.LanFileServer;
+import com.liferay.sync.engine.lan.session.LanSession;
+import com.liferay.sync.engine.lan.server.discovery.LanDiscoveryBroadcaster;
+import com.liferay.sync.engine.lan.server.discovery.LanDiscoveryListener;
+import com.liferay.sync.engine.lan.server.file.LanFileServer;
 import com.liferay.sync.engine.service.SyncAccountService;
 import com.liferay.sync.engine.service.SyncLanClientService;
 import com.liferay.sync.engine.util.PropsValues;
