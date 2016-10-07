@@ -14,7 +14,8 @@
 
 package com.liferay.sync.engine.lan.session;
 
-import com.liferay.sync.engine.document.library.handler.Handler;
+import com.liferay.sync.engine.document.library.event.LanDownloadFileEvent;
+import com.liferay.sync.engine.document.library.handler.LanDownloadFileHandler;
 import com.liferay.sync.engine.lan.util.LanClientUtil;
 import com.liferay.sync.engine.lan.util.LanPEMParserUtil;
 import com.liferay.sync.engine.lan.util.LanTokenUtil;
@@ -25,6 +26,7 @@ import com.liferay.sync.engine.model.SyncLanClient;
 import com.liferay.sync.engine.service.SyncAccountService;
 import com.liferay.sync.engine.service.SyncLanClientService;
 import com.liferay.sync.engine.service.SyncLanEndpointService;
+import com.liferay.sync.engine.util.GetterUtil;
 import com.liferay.sync.engine.util.PropsValues;
 
 import java.io.IOException;
@@ -41,8 +43,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -55,9 +59,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
 import org.apache.http.RequestLine;
-import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
@@ -78,6 +80,21 @@ import org.slf4j.LoggerFactory;
  * @author Dennis Ju
  */
 public class LanSession {
+
+	public static ExecutorService getExecutorService() {
+		if (_queryExecutorService != null) {
+			return _queryExecutorService;
+		}
+
+		_queryExecutorService = new ThreadPoolExecutor(
+			PropsValues.SYNC_LAN_SESSION_QUERY_POOL_MAX_SIZE,
+			PropsValues.SYNC_LAN_SESSION_QUERY_POOL_MAX_SIZE, 60,
+			TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+
+		_queryExecutorService.allowCoreThreadTimeOut(true);
+
+		return _queryExecutorService;
+	}
 
 	public static LanSession getLanSession() {
 		if (_lanSession == null) {
@@ -141,25 +158,43 @@ public class LanSession {
 			PropsValues.SYNC_LAN_SESSION_QUERY_SOCKET_TIMEOUT);
 	}
 
-	public HttpGet downloadFile(final SyncFile syncFile, final Handler handler)
+	public HttpGet downloadFile(LanDownloadFileEvent lanDownloadFileEvent)
 		throws Exception {
 
-		Object[] objects = findSyncLanClient(syncFile);
+		final SyncFile syncFile =
+			(SyncFile)lanDownloadFileEvent.getParameterValue("syncFile");
 
-		if (objects == null) {
-			handler.handleException(new NoSuchSyncLanClientException());
+		SyncLanClientQueryResult syncLanClientQueryResult = findSyncLanClient(
+			syncFile);
+
+		final LanDownloadFileHandler lanDownloadFileHandler =
+			(LanDownloadFileHandler)lanDownloadFileEvent.getHandler();
+
+		if (syncLanClientQueryResult == null) {
+			lanDownloadFileHandler.handleException(
+				new NoSuchSyncLanClientException());
 
 			return null;
 		}
 
-		final String url = _getUrl((SyncLanClient)objects[0], syncFile);
+		if (syncLanClientQueryResult.getConnectionsCount() >=
+				syncLanClientQueryResult.getMaxConnections()) {
+
+			lanDownloadFileHandler.queueDownload();
+
+			return null;
+		}
+
+		final String url = _getUrl(
+			syncLanClientQueryResult.getSyncLanClient(), syncFile);
 
 		final HttpGet httpGet = new HttpGet(url);
 
 		httpGet.addHeader(
 			"lanToken",
 			LanTokenUtil.decryptLanToken(
-				syncFile.getLanTokenKey(), (String)objects[1]));
+				syncFile.getLanTokenKey(),
+				syncLanClientQueryResult.getEncryptedToken()));
 
 		Runnable runnable = new Runnable() {
 
@@ -173,10 +208,11 @@ public class LanSession {
 					}
 
 					_downloadHttpClient.execute(
-						httpGet, handler, HttpClientContext.create());
+						httpGet, lanDownloadFileHandler,
+						HttpClientContext.create());
 				}
 				catch (Exception e) {
-					handler.handleException(e);
+					lanDownloadFileHandler.handleException(e);
 				}
 			}
 
@@ -187,44 +223,75 @@ public class LanSession {
 		return httpGet;
 	}
 
-	protected Callable<Object[]> createQuerySyncLanClientCallable(
-		final SyncLanClient syncLanClient, SyncFile syncFile) {
+	protected Callable<SyncLanClientQueryResult>
+		createSyncLanClientQueryResultCallable(
+			final SyncLanClient syncLanClient, SyncFile syncFile) {
 
 		String url = _getUrl(syncLanClient, syncFile);
 
 		final HttpHead httpHead = new HttpHead(url);
 
-		return new Callable<Object[]>() {
+		return new Callable<SyncLanClientQueryResult>() {
 
 			@Override
-			public Object[] call() throws Exception {
+			public SyncLanClientQueryResult call() throws Exception {
+				SyncLanClientQueryResult syncLanClientQueryResult =
+					new SyncLanClientQueryResult();
+
+				syncLanClientQueryResult.setSyncLanClient(syncLanClient);
+
 				HttpResponse httpResponse = _queryHttpClient.execute(
 					httpHead, HttpClientContext.create());
 
-				StatusLine statusLine = httpResponse.getStatusLine();
+				Header connectionsCountHeader = httpResponse.getFirstHeader(
+					"connectionsCount");
 
-				if (statusLine.getStatusCode() != HttpStatus.SC_OK) {
-					throw new Exception();
+				if (connectionsCountHeader == null) {
+					return null;
 				}
 
-				Header[] headers = httpResponse.getHeaders("encryptedToken");
+				syncLanClientQueryResult.setConnectionsCount(
+					GetterUtil.getInteger(connectionsCountHeader.getValue()));
 
-				if (headers.length == 0) {
-					_logger.error(
-						"Sync lan client did not return encrypted token");
+				Header downloadRateHeader = httpResponse.getFirstHeader(
+					"downloadRate");
 
-					throw new Exception();
+				if (downloadRateHeader == null) {
+					return null;
 				}
 
-				Header header = headers[0];
+				syncLanClientQueryResult.setDownloadRate(
+					GetterUtil.getInteger(downloadRateHeader.getValue()));
 
-				return new Object[] {syncLanClient, header.getValue()};
+				Header encryptedTokenHeader = httpResponse.getFirstHeader(
+					"encryptedToken");
+
+				if (encryptedTokenHeader == null) {
+					return null;
+				}
+
+				syncLanClientQueryResult.setEncryptedToken(
+					encryptedTokenHeader.getValue());
+
+				Header maxConnectionsHeader = httpResponse.getFirstHeader(
+					"maxConnections");
+
+				if (maxConnectionsHeader == null) {
+					return null;
+				}
+
+				syncLanClientQueryResult.setMaxConnections(
+					GetterUtil.getInteger(maxConnectionsHeader.getValue()));
+
+				return syncLanClientQueryResult;
 			}
 
 		};
 	}
 
-	protected Object[] findSyncLanClient(SyncFile syncFile) throws Exception {
+	protected SyncLanClientQueryResult findSyncLanClient(SyncFile syncFile)
+		throws Exception {
+
 		SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
 			syncFile.getSyncAccountId());
 
@@ -236,35 +303,48 @@ public class LanSession {
 			return null;
 		}
 
-		final List<Callable<Object[]>> querySyncLanClientCallables =
-			Collections.synchronizedList(
-				new ArrayList<Callable<Object[]>>(syncLanClientUuids.size()));
+		final List<Callable<SyncLanClientQueryResult>>
+			syncLanClientQueryResultCallables = Collections.synchronizedList(
+				new ArrayList<Callable<SyncLanClientQueryResult>>(
+					syncLanClientUuids.size()));
 
 		for (String syncLanClientUuid : syncLanClientUuids) {
 			SyncLanClient syncLanClient =
 				SyncLanClientService.fetchSyncLanClient(syncLanClientUuid);
 
-			querySyncLanClientCallables.add(
-				createQuerySyncLanClientCallable(syncLanClient, syncFile));
+			syncLanClientQueryResultCallables.add(
+				createSyncLanClientQueryResultCallable(
+					syncLanClient, syncFile));
 		}
 
 		int queryPoolSize = Math.min(
 			syncLanClientUuids.size(),
 			PropsValues.SYNC_LAN_SESSION_QUERY_POOL_MAX_SIZE);
 
-		List<Callable<Object[]>> querySyncLanClientPool = new ArrayList<>(
+		List<Future<SyncLanClientQueryResult>> pendingFutures = new ArrayList<>(
 			queryPoolSize);
 
+		ExecutorCompletionService<SyncLanClientQueryResult>
+			executorCompletionService = new ExecutorCompletionService<>(
+				getExecutorService());
+
 		for (int i = 0; i < queryPoolSize; i++) {
-			Callable callable = new Callable<Object[]>() {
+			Callable callable = new Callable<SyncLanClientQueryResult>() {
 
 				@Override
-				public Object[] call() throws Exception {
-					Callable<Object[]> querySyncLanClientCallable =
-						querySyncLanClientCallables.remove(0);
+				public synchronized SyncLanClientQueryResult call()
+					throws Exception {
+
+					if (syncLanClientQueryResultCallables.isEmpty()) {
+						return null;
+					}
+
+					Callable<SyncLanClientQueryResult>
+						syncLanClientQueryResultCallable =
+							syncLanClientQueryResultCallables.remove(0);
 
 					try {
-						return querySyncLanClientCallable.call();
+						return syncLanClientQueryResultCallable.call();
 					}
 					catch (Exception e) {
 						return this.call();
@@ -273,20 +353,84 @@ public class LanSession {
 
 			};
 
-			querySyncLanClientPool.add(callable);
+			pendingFutures.add(executorCompletionService.submit(callable));
 		}
 
-		ExecutorService executorService = _getExecutorService();
+		List<Future<SyncLanClientQueryResult>> completedFutures =
+			new ArrayList<>(queryPoolSize);
 
-		try {
-			return executorService.invokeAny(
-				querySyncLanClientPool,
-				PropsValues.SYNC_LAN_SESSION_QUERY_TOTAL_TIMEOUT,
-				TimeUnit.MILLISECONDS);
+		long timeout = PropsValues.SYNC_LAN_SESSION_QUERY_TOTAL_TIMEOUT;
+
+		long endTime = System.currentTimeMillis() + timeout;
+
+		for (int i = 0; i < queryPoolSize; i++) {
+			Future<SyncLanClientQueryResult> future =
+				executorCompletionService.poll(timeout, TimeUnit.MILLISECONDS);
+
+			if (future == null) {
+				for (Future<SyncLanClientQueryResult> pendingFuture :
+						pendingFutures) {
+
+					if (!pendingFuture.isDone()) {
+						pendingFuture.cancel(true);
+					}
+				}
+
+				break;
+			}
+
+			completedFutures.add(future);
+
+			timeout = endTime - System.currentTimeMillis();
 		}
-		catch (Exception e) {
-			return null;
+
+		SyncLanClientQueryResult candidateSyncLanClientQueryResult = null;
+		int candidateDownloadRatePerConnection = 0;
+
+		for (Future<SyncLanClientQueryResult> completedFuture :
+				completedFutures) {
+
+			SyncLanClientQueryResult syncLanClientQueryResult = null;
+
+			try {
+				syncLanClientQueryResult = completedFuture.get();
+			}
+			catch (Exception e) {
+				continue;
+			}
+
+			if (syncLanClientQueryResult == null) {
+				continue;
+			}
+
+			if (syncLanClientQueryResult.getConnectionsCount() >=
+					syncLanClientQueryResult.getMaxConnections()) {
+
+				if (candidateSyncLanClientQueryResult == null) {
+					candidateSyncLanClientQueryResult =
+						syncLanClientQueryResult;
+				}
+
+				continue;
+			}
+
+			if (syncLanClientQueryResult.getConnectionsCount() == 0) {
+				return syncLanClientQueryResult;
+			}
+
+			int downloadRatePerConnection =
+				syncLanClientQueryResult.getDownloadRate() /
+					(syncLanClientQueryResult.getConnectionsCount() + 1);
+
+			if (downloadRatePerConnection >=
+					candidateDownloadRatePerConnection) {
+
+				candidateDownloadRatePerConnection = downloadRatePerConnection;
+				candidateSyncLanClientQueryResult = syncLanClientQueryResult;
+			}
 		}
+
+		return candidateSyncLanClientQueryResult;
 	}
 
 	private static HttpClient _createHttpClient(
@@ -320,21 +464,6 @@ public class LanSession {
 		httpClientBuilder.setConnectionManager(connectionManager);
 
 		return httpClientBuilder.build();
-	}
-
-	private static ExecutorService _getExecutorService() {
-		if (_queryExecutorService != null) {
-			return _queryExecutorService;
-		}
-
-		_queryExecutorService = new ThreadPoolExecutor(
-			PropsValues.SYNC_LAN_SESSION_QUERY_POOL_MAX_SIZE,
-			PropsValues.SYNC_LAN_SESSION_QUERY_POOL_MAX_SIZE, 60,
-			TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
-
-		_queryExecutorService.allowCoreThreadTimeOut(true);
-
-		return _queryExecutorService;
 	}
 
 	private static SSLConnectionSocketFactory _getSSLSocketFactory()

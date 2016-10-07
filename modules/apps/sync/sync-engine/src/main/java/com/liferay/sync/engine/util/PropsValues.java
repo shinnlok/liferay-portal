@@ -102,6 +102,18 @@ public class PropsValues {
 		Integer.parseInt(
 			PropsUtil.get(PropsKeys.SYNC_LAN_SESSION_QUERY_TOTAL_TIMEOUT));
 
+	public static final int SYNC_LAN_SESSION_QUEUE_CHECK_INTERVAL =
+		Integer.parseInt(
+			PropsUtil.get(PropsKeys.SYNC_LAN_SESSION_QUEUE_CHECK_INTERVAL));
+
+	public static final int SYNC_LAN_SESSION_QUEUE_DURATION_RATE =
+		Integer.parseInt(
+			PropsUtil.get(PropsKeys.SYNC_LAN_SESSION_QUEUE_DURATION_RATE));
+
+	public static final int SYNC_LAN_SESSION_QUEUE_MAX_DURATION =
+		Integer.parseInt(
+			PropsUtil.get(PropsKeys.SYNC_LAN_SESSION_QUEUE_MAX_DURATION));
+
 	public static final String SYNC_LOGGER_CONFIGURATION_FILE = PropsUtil.get(
 		PropsKeys.SYNC_LOGGER_CONFIGURATION_FILE);
 

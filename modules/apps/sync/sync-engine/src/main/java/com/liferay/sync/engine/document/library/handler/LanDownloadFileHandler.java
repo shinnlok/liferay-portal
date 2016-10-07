@@ -18,8 +18,12 @@ import com.liferay.sync.engine.document.library.event.Event;
 import com.liferay.sync.engine.document.library.util.FileEventUtil;
 import com.liferay.sync.engine.lan.session.NoSuchSyncLanClientException;
 import com.liferay.sync.engine.model.SyncFile;
+import com.liferay.sync.engine.util.PropsValues;
 
-import org.apache.http.ConnectionClosedException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.http.conn.ConnectTimeoutException;
 
 import org.slf4j.Logger;
@@ -42,14 +46,11 @@ public class LanDownloadFileHandler extends DownloadFileHandler {
 
 		SyncFile syncFile = getLocalSyncFile();
 
-		if ((e instanceof ConnectTimeoutException) ||
-			(e instanceof ConnectionClosedException)) {
-
+		if (e instanceof ConnectTimeoutException) {
 			_logger.error(
 				"Download exception {} for {}", e, syncFile.getFilePathName());
 
-			FileEventUtil.downloadFile(
-				getSyncAccountId(), syncFile, true, true);
+			retryEvent();
 		}
 		else {
 			if (!(e instanceof NoSuchSyncLanClientException)) {
@@ -63,7 +64,57 @@ public class LanDownloadFileHandler extends DownloadFileHandler {
 		}
 	}
 
+	public void queueDownload() {
+		SyncFile syncFile = getLocalSyncFile();
+
+		long now = System.currentTimeMillis();
+
+		if (_queueEndTime == 0) {
+			long queueEndTime =
+				now + ((syncFile.getSize() * 1000) /
+					PropsValues.SYNC_LAN_SESSION_QUEUE_DURATION_RATE);
+
+			long maxQueueEndTime =
+				now + PropsValues.SYNC_LAN_SESSION_QUEUE_MAX_DURATION;
+
+			_queueEndTime = Math.min(queueEndTime, maxQueueEndTime);
+		}
+		else if (now > _queueEndTime) {
+			FileEventUtil.downloadFile(
+				getSyncAccountId(), getLocalSyncFile(), true, false);
+
+			return;
+		}
+
+		if (_logger.isTraceEnabled()) {
+			_queueCounter++;
+
+			_logger.trace(
+				"Queueing {}. Attempt #{}", syncFile.getFilePathName(),
+				_queueCounter);
+		}
+
+		Runnable runnable = new Runnable() {
+
+			@Override
+			public void run() {
+				retryEvent();
+			}
+
+		};
+
+		_scheduledExecutorService.schedule(
+			runnable, PropsValues.SYNC_LAN_SESSION_QUEUE_CHECK_INTERVAL,
+			TimeUnit.MILLISECONDS);
+	}
+
 	private static final Logger _logger = LoggerFactory.getLogger(
 		LanDownloadFileHandler.class);
+
+	private static final ScheduledExecutorService _scheduledExecutorService =
+		Executors.newSingleThreadScheduledExecutor();
+
+	private long _queueCounter;
+	private long _queueEndTime;
 
 }

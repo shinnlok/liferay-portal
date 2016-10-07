@@ -63,6 +63,7 @@ public class LanDownloadFileEvent extends BaseEvent {
 
 		syncFile.setPreviousModifiedTime(
 			FileUtil.getLastModifiedTime(filePath));
+
 		syncFile.setState(SyncFile.STATE_IN_PROGRESS);
 		syncFile.setUiEvent(SyncFile.UI_EVENT_DOWNLOADING);
 
@@ -70,7 +71,7 @@ public class LanDownloadFileEvent extends BaseEvent {
 
 		LanSession lanSession = LanSession.getLanSession();
 
-		_httpGet = lanSession.downloadFile(syncFile, _handler);
+		_httpGet = lanSession.downloadFile(this);
 	}
 
 	private final Handler<Void> _handler;

@@ -103,6 +103,15 @@ public interface PropsKeys {
 	public static final String SYNC_LAN_SESSION_QUERY_TOTAL_TIMEOUT =
 		"sync.lan.session.query.total.timeout";
 
+	public static final String SYNC_LAN_SESSION_QUEUE_CHECK_INTERVAL =
+		"sync.lan.session.queue.check.interval";
+
+	public static final String SYNC_LAN_SESSION_QUEUE_DURATION_RATE =
+		"sync.lan.session.queue.duration.rate";
+
+	public static final String SYNC_LAN_SESSION_QUEUE_MAX_DURATION =
+		"sync.lan.session.queue.max.duration";
+
 	public static final String SYNC_LOGGER_CONFIGURATION_FILE =
 		"sync.logger.configuration.file";
 
