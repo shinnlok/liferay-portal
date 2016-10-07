@@ -14,10 +14,10 @@
 
 package com.liferay.sync.engine.lan.server;
 
-import com.liferay.sync.engine.lan.session.LanSession;
 import com.liferay.sync.engine.lan.server.discovery.LanDiscoveryBroadcaster;
 import com.liferay.sync.engine.lan.server.discovery.LanDiscoveryListener;
 import com.liferay.sync.engine.lan.server.file.LanFileServer;
+import com.liferay.sync.engine.lan.session.LanSession;
 import com.liferay.sync.engine.service.SyncAccountService;
 import com.liferay.sync.engine.service.SyncLanClientService;
 import com.liferay.sync.engine.util.PropsValues;
@@ -34,8 +34,15 @@ import org.slf4j.LoggerFactory;
  */
 public class LanEngine {
 
+	public static ScheduledExecutorService getScheduledExecutorService() {
+		return _scheduledExecutorService;
+	}
+
 	public static synchronized void start() {
 		_logger.info("Starting LAN engine");
+
+		_scheduledExecutorService =
+			Executors.newSingleThreadScheduledExecutor();
 
 		if (_lanFileServer == null) {
 			_lanFileServer = new LanFileServer();
@@ -75,10 +82,9 @@ public class LanEngine {
 
 		};
 
-		_scheduledExecutorService = Executors.newScheduledThreadPool(2);
-
 		_scheduledExecutorService.scheduleWithFixedDelay(
-			broadcastRunnable, 0, PropsValues.SYNC_LAN_BROADCAST_INTERVAL,
+			broadcastRunnable, 0,
+			PropsValues.SYNC_LAN_SERVER_BROADCAST_INTERVAL,
 			TimeUnit.MILLISECONDS);
 
 		if (_lanDiscoveryListener == null) {
@@ -107,15 +113,16 @@ public class LanEngine {
 			public void run() {
 				SyncLanClientService.deleteSyncLanClients(
 					System.currentTimeMillis() -
-						PropsValues.SYNC_LAN_BROADCAST_INTERVAL * 3);
+						PropsValues.SYNC_LAN_SERVER_BROADCAST_INTERVAL * 3);
 			}
 
 		};
 
 		_scheduledExecutorService.scheduleWithFixedDelay(
 			expireSyncLanClientsRunnable,
-			PropsValues.SYNC_LAN_BROADCAST_INTERVAL * 3,
-			PropsValues.SYNC_LAN_BROADCAST_INTERVAL, TimeUnit.MILLISECONDS);
+			PropsValues.SYNC_LAN_SERVER_BROADCAST_INTERVAL * 3,
+			PropsValues.SYNC_LAN_SERVER_BROADCAST_INTERVAL,
+			TimeUnit.MILLISECONDS);
 	}
 
 	public static synchronized void stop() {

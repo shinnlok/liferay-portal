@@ -19,6 +19,7 @@ import com.liferay.sync.engine.service.SyncLanEndpointService;
 import com.liferay.sync.engine.service.persistence.SyncLanClientPersistence;
 import com.liferay.sync.engine.service.persistence.SyncLanEndpointPersistence;
 import com.liferay.sync.engine.upgrade.BaseUpgradeProcess;
+import com.liferay.sync.engine.upgrade.util.UpgradeUtil;
 
 /**
  * @author Dennis Ju
@@ -33,6 +34,7 @@ public class UpgradeProcess_3_4_0 extends BaseUpgradeProcess {
 
 	@Override
 	public void upgrade() throws Exception {
+		UpgradeUtil.copyLoggerConfiguration();
 	}
 
 	@Override

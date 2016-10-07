@@ -85,6 +85,7 @@ public class LanDiscoveryListenerHandler
 		InetSocketAddress inetSocketAddress = datagramPacket.sender();
 
 		syncLanClient.setHostname(inetSocketAddress.getHostName());
+
 		syncLanClient.setModifiedTime(System.currentTimeMillis());
 
 		SyncLanClientService.update(syncLanClient);

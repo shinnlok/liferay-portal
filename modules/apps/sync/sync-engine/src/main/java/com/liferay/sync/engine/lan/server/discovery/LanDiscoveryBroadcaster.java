@@ -46,7 +46,7 @@ public class LanDiscoveryBroadcaster {
 		DatagramPacket datagramPacket = new DatagramPacket(
 			Unpooled.copiedBuffer(jsonBytes),
 			new InetSocketAddress(
-				"255.255.255.255", PropsValues.SYNC_LAN_PORT));
+				"255.255.255.255", PropsValues.SYNC_LAN_SERVER_PORT));
 
 		ChannelFuture channelFuture = _channel.writeAndFlush(datagramPacket);
 

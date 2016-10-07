@@ -68,10 +68,10 @@ public interface PropsKeys {
 	public static final String SYNC_HTTP_SOCKET_TIMEOUT =
 		"sync.http.socket.timeout";
 
-	public static final String SYNC_LAN_BROADCAST_INTERVAL =
-		"sync.lan.broadcast.interval";
+	public static final String SYNC_LAN_SERVER_BROADCAST_INTERVAL =
+		"sync.lan.server.broadcast.interval";
 
-	public static final String SYNC_LAN_PORT = "sync.lan.port";
+	public static final String SYNC_LAN_SERVER_PORT = "sync.lan.server.port";
 
 	public static final String SYNC_LAN_SESSION_DOWNLOAD_CONNECT_TIMEOUT =
 		"sync.lan.session.download.connect.timeout";
