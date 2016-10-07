@@ -14,8 +14,11 @@
 
 package com.liferay.sync.engine.lan.server.file;
 
+import com.liferay.sync.engine.lan.server.LanEngine;
 import com.liferay.sync.engine.model.ModelListener;
 import com.liferay.sync.engine.model.SyncAccount;
+import com.liferay.sync.engine.model.SyncFile;
+import com.liferay.sync.engine.service.SyncFileService;
 import com.liferay.sync.engine.util.PropsValues;
 
 import io.netty.bootstrap.ServerBootstrap;
@@ -30,6 +33,8 @@ import java.net.BindException;
 import java.net.InetSocketAddress;
 
 import java.util.Map;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Dennis Ju
@@ -91,13 +96,18 @@ public class LanFileServer {
 		serverBootstrap.group(_parentEventLoopGroup, _childEventLoopGroup);
 		serverBootstrap.channel(NioServerSocketChannel.class);
 
-		_lanFileServerInitializer = new LanFileServerInitializer();
+		_syncTrafficShapingHandler = new SyncTrafficShapingHandler(
+			_childEventLoopGroup);
+
+		_lanFileServerInitializer = new LanFileServerInitializer(
+			_syncTrafficShapingHandler);
 
 		serverBootstrap.childHandler(_lanFileServerInitializer);
+
 		serverBootstrap.childOption(ChannelOption.SO_KEEPALIVE, true);
 
 		ChannelFuture channelFuture = serverBootstrap.bind(
-			PropsValues.SYNC_LAN_PORT);
+			PropsValues.SYNC_LAN_SERVER_PORT);
 
 		try {
 			channelFuture.sync();
@@ -125,9 +135,38 @@ public class LanFileServer {
 		_port = inetSocketAddress.getPort();
 
 		channelFuture.sync();
+
+		Runnable runnable = new Runnable() {
+
+			@Override
+			public void run() {
+				long count = SyncFileService.getSyncFilesCount(
+					SyncFile.UI_EVENT_DOWNLOADING, SyncFile.UI_EVENT_UPLOADING);
+
+				long writeDelay = 0;
+
+				if (count > 0) {
+					_syncTrafficShapingHandler.setWriteDelay(
+						PropsValues.SYNC_LAN_SERVER_WRITE_DELAY);
+				}
+
+				_syncTrafficShapingHandler.setWriteDelay(writeDelay);
+			}
+
+		};
+
+		ScheduledExecutorService scheduledExecutorService =
+			LanEngine.getScheduledExecutorService();
+
+		scheduledExecutorService.scheduleWithFixedDelay(
+			runnable, 0, 500, TimeUnit.MILLISECONDS);
 	}
 
 	public void stop() {
+		if (_syncTrafficShapingHandler != null) {
+			_syncTrafficShapingHandler.release();
+		}
+
 		if (_childEventLoopGroup != null) {
 			_childEventLoopGroup.shutdownGracefully();
 		}
@@ -143,5 +182,6 @@ public class LanFileServer {
 	private LanFileServerInitializer _lanFileServerInitializer;
 	private EventLoopGroup _parentEventLoopGroup;
 	private int _port;
+	private SyncTrafficShapingHandler _syncTrafficShapingHandler;
 
 }

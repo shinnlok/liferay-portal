@@ -71,7 +71,13 @@ public interface PropsKeys {
 	public static final String SYNC_LAN_SERVER_BROADCAST_INTERVAL =
 		"sync.lan.server.broadcast.interval";
 
+	public static final String SYNC_LAN_SERVER_MAX_CONNECTIONS =
+		"sync.lan.server.max.connections";
+
 	public static final String SYNC_LAN_SERVER_PORT = "sync.lan.server.port";
+
+	public static final String SYNC_LAN_SERVER_WRITE_DELAY =
+		"sync.lan.server.write.delay";
 
 	public static final String SYNC_LAN_SESSION_DOWNLOAD_CONNECT_TIMEOUT =
 		"sync.lan.session.download.connect.timeout";

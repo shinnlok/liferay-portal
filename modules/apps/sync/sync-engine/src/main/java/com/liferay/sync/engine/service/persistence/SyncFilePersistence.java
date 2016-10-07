@@ -42,12 +42,12 @@ public class SyncFilePersistence extends BasePersistenceImpl<SyncFile, Long> {
 		super(SyncFile.class);
 	}
 
-	public long countByUIEvent(int uiEvent) throws SQLException {
+	public long countByUIEvents(Integer... uiEvents) throws SQLException {
 		QueryBuilder<SyncFile, Long> queryBuilder = queryBuilder();
 
 		Where<SyncFile, Long> where = queryBuilder.where();
 
-		where.eq("uiEvent", uiEvent);
+		where.in("uiEvent", uiEvents);
 
 		return where.countOf();
 	}

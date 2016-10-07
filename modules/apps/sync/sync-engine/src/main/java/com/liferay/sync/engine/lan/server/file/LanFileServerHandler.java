@@ -17,7 +17,6 @@ package com.liferay.sync.engine.lan.server.file;
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.HEAD;
 import static io.netty.handler.codec.http.HttpResponseStatus.BAD_REQUEST;
-import static io.netty.handler.codec.http.HttpResponseStatus.INTERNAL_SERVER_ERROR;
 import static io.netty.handler.codec.http.HttpResponseStatus.NOT_FOUND;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
@@ -29,36 +28,31 @@ import com.liferay.sync.engine.service.SyncAccountService;
 import com.liferay.sync.engine.service.SyncFileService;
 import com.liferay.sync.engine.util.GetterUtil;
 import com.liferay.sync.engine.util.OSDetector;
+import com.liferay.sync.engine.util.PropsValues;
+import com.liferay.sync.engine.util.Validator;
 
-import io.netty.buffer.ByteBufInputStream;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPipeline;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.DecoderResult;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.DefaultHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.HttpChunkedInput;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpUtil;
-import io.netty.handler.codec.http.LastHttpContent;
-import io.netty.handler.ssl.SslHandler;
-import io.netty.handler.stream.ChunkedStream;
+import io.netty.handler.traffic.TrafficCounter;
 
-import java.nio.ByteBuffer;
-import java.nio.channels.SeekableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.FileTime;
 
 import java.util.List;
@@ -76,19 +70,19 @@ import org.slf4j.LoggerFactory;
 public class LanFileServerHandler
 	extends SimpleChannelInboundHandler<FullHttpRequest> {
 
+	public LanFileServerHandler(
+		SyncTrafficShapingHandler syncTrafficShapingHandler) {
+
+		_syncTrafficShapingHandler = syncTrafficShapingHandler;
+
+		_trafficCounter = _syncTrafficShapingHandler.trafficCounter();
+	}
+
 	@Override
 	public void channelRead0(
 			ChannelHandlerContext channelHandlerContext,
 			FullHttpRequest fullHttpRequest)
 		throws Exception {
-
-		ChannelPipeline channelPipeline = channelHandlerContext.pipeline();
-
-		if (channelPipeline.get(SslHandler.class) == null) {
-			_sendError(channelHandlerContext, BAD_REQUEST);
-
-			return;
-		}
 
 		DecoderResult decoderResult = fullHttpRequest.decoderResult();
 
@@ -111,15 +105,24 @@ public class LanFileServerHandler
 
 	@Override
 	public void exceptionCaught(
-		ChannelHandlerContext channelHandlerContext, Throwable cause) {
+		ChannelHandlerContext channelHandlerContext, Throwable exception) {
 
-		_logger.error(cause.getMessage(), cause);
+		String message = exception.getMessage();
+
+		if (!message.startsWith(
+				"An existing connectionn was forcibly closed") &&
+			!message.startsWith("Connection reset by peer")) {
+
+			Channel channel = channelHandlerContext.channel();
+
+			_logger.error(
+				"Client {}: {}", channel.remoteAddress(),
+				exception.getMessage(), exception);
+		}
 
 		Channel channel = channelHandlerContext.channel();
 
-		if (channel.isActive()) {
-			_sendError(channelHandlerContext, INTERNAL_SERVER_ERROR);
-		}
+		channel.close();
 	}
 
 	protected void processGetRequest(
@@ -127,15 +130,23 @@ public class LanFileServerHandler
 			FullHttpRequest fullHttpRequest)
 		throws Exception {
 
-		HttpHeaders httpHeaders = fullHttpRequest.headers();
+		if (_logger.isTraceEnabled()) {
+			Channel channel = channelHandlerContext.channel();
 
-		String lanToken = httpHeaders.get("lanToken");
+			_logger.trace(
+				"Client {}: processing get request {}", channel.remoteAddress(),
+				fullHttpRequest.uri());
+		}
 
-		if ((lanToken == null) || lanToken.isEmpty()) {
+		HttpHeaders requestHttpHeaders = fullHttpRequest.headers();
+
+		String lanToken = requestHttpHeaders.get("lanToken");
+
+		if (Validator.isBlank(lanToken)) {
 			Channel channel = channelHandlerContext.channel();
 
 			_logger.error(
-				"Lan client {} did not send token", channel.remoteAddress());
+				"Client {}: did not send token", channel.remoteAddress());
 
 			_sendError(channelHandlerContext, NOT_FOUND);
 
@@ -146,7 +157,7 @@ public class LanFileServerHandler
 			Channel channel = channelHandlerContext.channel();
 
 			_logger.error(
-				"Lan client {} token not found or expired",
+				"Client {}: token not found or expired",
 				channel.remoteAddress());
 
 			_sendError(channelHandlerContext, NOT_FOUND);
@@ -157,12 +168,37 @@ public class LanFileServerHandler
 		SyncFile syncFile = _getSyncFile(fullHttpRequest);
 
 		if (syncFile == null) {
+			if (_logger.isTraceEnabled()) {
+				Channel channel = channelHandlerContext.channel();
+
+				_logger.trace(
+					"Client {}: SyncFile not found. uri: {}",
+					channel.remoteAddress(), fullHttpRequest.uri());
+			}
+
 			_sendError(channelHandlerContext, NOT_FOUND);
 
 			return;
 		}
 
-		sendFile(channelHandlerContext, fullHttpRequest, syncFile);
+		if (_syncTrafficShapingHandler.getConnectionsCount() >=
+				PropsValues.SYNC_LAN_SERVER_MAX_CONNECTIONS) {
+
+			_sendError(channelHandlerContext, NOT_FOUND);
+
+			return;
+		}
+
+		_syncTrafficShapingHandler.incrementConnectionsCount();
+
+		try {
+			sendFile(channelHandlerContext, fullHttpRequest, syncFile);
+		}
+		catch (Exception e) {
+			_syncTrafficShapingHandler.decrementConnectionsCount();
+
+			throw e;
+		}
 
 		LanTokenUtil.removeLanToken(lanToken);
 	}
@@ -170,6 +206,14 @@ public class LanFileServerHandler
 	protected void processHeadRequest(
 		ChannelHandlerContext channelHandlerContext,
 		FullHttpRequest fullHttpRequest) {
+
+		if (_logger.isTraceEnabled()) {
+			Channel channel = channelHandlerContext.channel();
+
+			_logger.trace(
+				"Client {}: processing head request {}",
+				channel.remoteAddress(), fullHttpRequest.uri());
+		}
 
 		SyncFile syncFile = _getSyncFile(fullHttpRequest);
 
@@ -202,19 +246,74 @@ public class LanFileServerHandler
 
 		HttpHeaders httpHeaders = httpResponse.headers();
 
+		httpHeaders.set(
+			"connectionsCount",
+			_syncTrafficShapingHandler.getConnectionsCount());
+
+		httpHeaders.set("downloadRate", _trafficCounter.lastWrittenBytes());
 		httpHeaders.set("encryptedToken", encryptedToken);
+		httpHeaders.set(
+			"maxConnections", PropsValues.SYNC_LAN_SERVER_MAX_CONNECTIONS);
 
 		channelHandlerContext.writeAndFlush(httpResponse);
 	}
 
 	protected void sendFile(
-			ChannelHandlerContext channelHandlerContext,
+			final ChannelHandlerContext channelHandlerContext,
 			FullHttpRequest fullHttpRequest, SyncFile syncFile)
 		throws Exception {
 
 		Path path = Paths.get(syncFile.getFilePathName());
 
 		if (Files.notExists(path)) {
+			_syncTrafficShapingHandler.decrementConnectionsCount();
+
+			if (_logger.isTraceEnabled()) {
+				Channel channel = channelHandlerContext.channel();
+
+				_logger.trace(
+					"Client {}: file not found {}", channel.remoteAddress(),
+					path);
+			}
+
+			_sendError(channelHandlerContext, NOT_FOUND);
+
+			return;
+		}
+
+		if (_logger.isDebugEnabled()) {
+			Channel channel = channelHandlerContext.channel();
+
+			_logger.debug(
+				"Client {}: sending file {}", channel.remoteAddress(), path);
+		}
+
+		long modifiedTime = syncFile.getModifiedTime();
+		long previousModifiedTime = syncFile.getPreviousModifiedTime();
+
+		if (OSDetector.isApple()) {
+			modifiedTime = modifiedTime / 1000 * 1000;
+			previousModifiedTime = previousModifiedTime / 1000 * 1000;
+		}
+
+		FileTime currentFileTime = Files.getLastModifiedTime(
+			path, LinkOption.NOFOLLOW_LINKS);
+
+		long currentTime = currentFileTime.toMillis();
+
+		if ((currentTime != modifiedTime) &&
+			(currentTime != previousModifiedTime)) {
+
+			_syncTrafficShapingHandler.decrementConnectionsCount();
+
+			Channel channel = channelHandlerContext.channel();
+
+			_logger.error(
+				"Client {}: file modified {}, currentTime {}, modifiedTime " +
+					"{}, previousModifiedTime {}",
+				channel.remoteAddress(), path, currentTime, modifiedTime,
+				previousModifiedTime);
+
 			_sendError(channelHandlerContext, NOT_FOUND);
 
 			return;
@@ -222,7 +321,9 @@ public class LanFileServerHandler
 
 		HttpResponse httpResponse = new DefaultHttpResponse(HTTP_1_1, OK);
 
-		HttpUtil.setContentLength(httpResponse, Files.size(path));
+		long size = Files.size(path);
+
+		HttpUtil.setContentLength(httpResponse, size);
 
 		HttpHeaders httpHeaders = httpResponse.headers();
 
@@ -239,50 +340,38 @@ public class LanFileServerHandler
 
 		channelHandlerContext.write(httpResponse);
 
-		SeekableByteChannel seekableByteChannel = Files.newByteChannel(
-			path, StandardOpenOption.READ);
-
-		ByteBuffer byteBuffer = ByteBuffer.allocate(65536);
-
-		long modifiedTime = syncFile.getModifiedTime();
-		long previousModifiedTime = syncFile.getPreviousModifiedTime();
-
-		if (OSDetector.isApple()) {
-			modifiedTime = modifiedTime / 1000 * 1000;
-			previousModifiedTime = previousModifiedTime / 1000 * 1000;
-		}
-
-		while (seekableByteChannel.read(byteBuffer) > 0) {
-			byteBuffer.flip();
-
-			ByteBufInputStream byteBufInputStream = new ByteBufInputStream(
-				Unpooled.wrappedBuffer(byteBuffer));
-
-			channelHandlerContext.write(new ChunkedStream(byteBufInputStream));
-
-			byteBuffer.clear();
-
-			FileTime currentFileTime = Files.getLastModifiedTime(
-				path, LinkOption.NOFOLLOW_LINKS);
-
-			long currentTime = currentFileTime.toMillis();
-
-			if ((currentTime != modifiedTime) &&
-				(currentTime != previousModifiedTime)) {
-
-				seekableByteChannel.close();
-
-				channelHandlerContext.close();
-
-				return;
-			}
-		}
-
-		seekableByteChannel.close();
+		SyncChunkedFile syncChunkedFile = new SyncChunkedFile(
+			path, size, 4 * 1024 * 1024, currentTime);
 
 		ChannelFuture channelFuture = channelHandlerContext.writeAndFlush(
-			LastHttpContent.EMPTY_LAST_CONTENT,
+			new HttpChunkedInput(syncChunkedFile),
 			channelHandlerContext.newProgressivePromise());
+
+		channelFuture.addListener(
+			new ChannelFutureListener() {
+
+				@Override
+				public void operationComplete(ChannelFuture channelFuture)
+					throws Exception {
+
+					_syncTrafficShapingHandler.decrementConnectionsCount();
+
+					if (channelFuture.isSuccess()) {
+						return;
+					}
+
+					Throwable exception = channelFuture.cause();
+
+					Channel channel = channelHandlerContext.channel();
+
+					_logger.error(
+						"Client {}: {}", channel.remoteAddress(),
+						exception.getMessage(), exception);
+
+					channelHandlerContext.close();
+				}
+
+			});
 
 		if (!HttpUtil.isKeepAlive(fullHttpRequest)) {
 			channelFuture.addListener(ChannelFutureListener.CLOSE);
@@ -337,5 +426,8 @@ public class LanFileServerHandler
 
 	private static final Logger _logger = LoggerFactory.getLogger(
 		LanFileServerHandler.class);
+
+	private final SyncTrafficShapingHandler _syncTrafficShapingHandler;
+	private final TrafficCounter _trafficCounter;
 
 }

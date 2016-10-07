@@ -327,6 +327,9 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 			tempFilePath, String.valueOf(targetSyncFile.getSyncFileId()),
 			false);
 
+		FileUtil.setModifiedTime(
+			tempFilePath, targetSyncFile.getModifiedTime());
+
 		Watcher watcher = WatcherManager.getWatcher(getSyncAccountId());
 
 		watcher.addDownloadedFilePathName(targetSyncFile.getFilePathName());

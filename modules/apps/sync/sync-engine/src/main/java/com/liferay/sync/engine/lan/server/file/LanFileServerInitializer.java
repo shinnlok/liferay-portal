@@ -44,7 +44,11 @@ import org.slf4j.LoggerFactory;
 public class LanFileServerInitializer
 	extends ChannelInitializer<SocketChannel> {
 
-	public LanFileServerInitializer() {
+	public LanFileServerInitializer(
+		SyncTrafficShapingHandler syncTrafficShapingHandler) {
+
+		_syncTrafficShapingHandler = syncTrafficShapingHandler;
+
 		updateDomainNameMapping();
 	}
 
@@ -52,19 +56,16 @@ public class LanFileServerInitializer
 	public void initChannel(SocketChannel socketChannel) {
 		ChannelPipeline channelPipeline = socketChannel.pipeline();
 
-		try {
-			if (_domainNameMapping != null) {
-				channelPipeline.addLast(new SniHandler(_domainNameMapping));
-			}
-		}
-		catch (Exception e) {
-			_logger.error(e.getMessage(), e);
+		if (_domainNameMapping != null) {
+			channelPipeline.addLast(new SniHandler(_domainNameMapping));
 		}
 
 		channelPipeline.addLast(new HttpServerCodec());
 		channelPipeline.addLast(new HttpObjectAggregator(65536));
+		channelPipeline.addLast(_syncTrafficShapingHandler);
 		channelPipeline.addLast(new ChunkedWriteHandler());
-		channelPipeline.addLast(new LanFileServerHandler());
+		channelPipeline.addLast(
+			new LanFileServerHandler(_syncTrafficShapingHandler));
 	}
 
 	public void updateDomainNameMapping() {
@@ -121,5 +122,6 @@ public class LanFileServerInitializer
 		LanFileServerInitializer.class);
 
 	private DomainNameMapping<SslContext> _domainNameMapping;
+	private final SyncTrafficShapingHandler _syncTrafficShapingHandler;
 
 }

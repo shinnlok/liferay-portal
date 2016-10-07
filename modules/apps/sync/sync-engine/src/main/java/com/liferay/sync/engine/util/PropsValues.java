@@ -61,8 +61,14 @@ public class PropsValues {
 		Integer.parseInt(
 			PropsUtil.get(PropsKeys.SYNC_LAN_SERVER_BROADCAST_INTERVAL));
 
+	public static final int SYNC_LAN_SERVER_MAX_CONNECTIONS = Integer.parseInt(
+		PropsUtil.get(PropsKeys.SYNC_LAN_SERVER_MAX_CONNECTIONS));
+
 	public static final int SYNC_LAN_SERVER_PORT = Integer.parseInt(
 		PropsUtil.get(PropsKeys.SYNC_LAN_SERVER_PORT));
+
+	public static final long SYNC_LAN_SERVER_WRITE_DELAY = Long.parseLong(
+		PropsUtil.get(PropsKeys.SYNC_LAN_SERVER_WRITE_DELAY));
 
 	public static final int SYNC_LAN_SESSION_DOWNLOAD_CONNECT_TIMEOUT =
 		Integer.parseInt(

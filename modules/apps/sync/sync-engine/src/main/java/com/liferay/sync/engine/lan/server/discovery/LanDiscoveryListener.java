@@ -17,7 +17,6 @@ package com.liferay.sync.engine.lan.server.discovery;
 import com.liferay.sync.engine.util.PropsValues;
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
@@ -39,22 +38,10 @@ public class LanDiscoveryListener {
 		bootstrap.handler(new LanDiscoveryListenerHandler());
 		bootstrap.option(ChannelOption.SO_REUSEADDR, true);
 
-		ChannelFuture channelFuture = bootstrap.bind(PropsValues.SYNC_LAN_PORT);
+		ChannelFuture channelFuture = bootstrap.bind(
+			PropsValues.SYNC_LAN_SERVER_PORT);
 
-		try {
-			channelFuture.sync();
-
-			Channel channel = channelFuture.channel();
-
-			ChannelFuture closeChannelFuture = channel.closeFuture();
-
-			closeChannelFuture.await();
-		}
-		catch (InterruptedException ie) {
-		}
-		finally {
-			_eventLoopGroup.shutdownGracefully();
-		}
+		channelFuture.sync();
 	}
 
 	public void shutdown() {
