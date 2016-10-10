@@ -1,0 +1,30 @@
+{namespace TouchPointsHome}
+
+/**
+ * Prints the DXP Cloud Portlet Touchpoints Main View
+ *
+ * @param id
+ * @param mvcRenderCommandName
+ * @param sidebar
+ */
+{template .render}
+	<div id="{$id}">
+		{call DXPTopbar.render data="all"}{/call}
+
+		{if $sidebar}
+			{call DXPSidebar.render}
+				{param mvcRenderCommandName: $mvcRenderCommandName /}
+				{param items: $sidebar.items /}
+			{/call}
+		{/if}
+
+		<div class="sidebar-offset">
+			<div class="container-hybrid-half">
+				<div class="content-header"></div>
+				<div class="row">
+					<h1>TouchPoints</h1>
+				</div>
+			</div>
+		</div>
+	</div>
+{/template}

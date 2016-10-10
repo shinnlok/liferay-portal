@@ -1,0 +1,30 @@
+{namespace Home}
+
+/**
+ * Prints the DXP Cloud Portlet Main View
+ *
+ * @param id
+ * @param mvcRenderCommandName
+ * @param? sidebar
+ */
+{template .render}
+	<div id="{$id}">
+		{call DXPTopbar.render data="all"}{/call}
+
+		{if $sidebar}
+			{call DXPSidebar.render}
+				{param mvcRenderCommandName: $mvcRenderCommandName /}
+				{param items: $sidebar.items /}
+			{/call}
+		{/if}
+
+		<div class="sidebar-offset">
+			<div class="container-hybrid-half">
+				<div class="content-header"></div>
+				<div class="row">
+					<h1>Home</h1>
+				</div>
+			</div>
+		</div>
+	</div>
+{/template}

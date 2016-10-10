@@ -14,12 +14,12 @@
 
 package com.liferay.hello.soy.web.internal.portlet;
 
-import com.liferay.portal.kernel.service.LayoutService;
 import com.liferay.portal.kernel.util.ReleaseInfo;
 import com.liferay.portal.portlet.bridge.soy.SoyPortlet;
 
 import java.io.IOException;
 
+import javax.portlet.ActionRequest;
 import javax.portlet.Portlet;
 import javax.portlet.PortletException;
 import javax.portlet.PortletURL;
@@ -27,7 +27,6 @@ import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Bruno Basto
@@ -45,12 +44,13 @@ import org.osgi.service.component.annotations.Reference;
 		"com.liferay.portlet.private-session-attributes=false",
 		"com.liferay.portlet.render-weight=50",
 		"com.liferay.portlet.scopeable=true",
+		"com.liferay.portlet.single-page-application=false",
 		"com.liferay.portlet.use-default-template=true",
 		"javax.portlet.display-name=Hello Soy Portlet",
 		"javax.portlet.expiration-cache=0",
 		"javax.portlet.init-param.copy-request-parameters=true",
 		"javax.portlet.init-param.template-path=/",
-		"javax.portlet.init-param.view-template=View",
+		"javax.portlet.init-param.view-template=Home",
 		"javax.portlet.name=hello_soy_portlet",
 		"javax.portlet.resource-bundle=content.Language",
 		"javax.portlet.security-role-ref=guest,power-user,user",
@@ -65,18 +65,49 @@ public class HelloSoyPortlet extends SoyPortlet {
 			RenderRequest renderRequest, RenderResponse renderResponse)
 		throws IOException, PortletException {
 
-		PortletURL navigationURL = renderResponse.createRenderURL();
+		PortletURL contributorURL = renderResponse.createRenderURL();
 
-		navigationURL.setParameter("mvcRenderCommandName", "Navigation");
+		contributorURL.setParameter(
+			"mvcRenderCommandName", "/contributor/Contributor");
 
-		template.put("navigationURL", navigationURL.toString());
+		template.put("contributorURL", contributorURL.toString());
 
+		PortletURL detailsURL = renderResponse.createRenderURL();
+
+		detailsURL.setParameter(
+			"mvcRenderCommandName", "/gallery/GalleryDetails");
+
+		template.put("detailsURL", detailsURL.toString());
+
+		PortletURL galleryURL = renderResponse.createRenderURL();
+
+		galleryURL.setParameter("mvcRenderCommandName", "/gallery/GalleryHome");
+
+		template.put("galleryURL", galleryURL.toString());
+
+		PortletURL homeURL = renderResponse.createRenderURL();
+
+		homeURL.setParameter("mvcRenderCommandName", "Home");
+
+		template.put("homeURL", homeURL.toString());
+
+		PortletURL submitFormRenderURL = renderResponse.createRenderURL();
+
+		submitFormRenderURL.setParameter(
+			"mvcRenderCommandName", "/submit/SubmitForm");
+
+		template.put("submitFormRenderURL", submitFormRenderURL.toString());
+
+		PortletURL submitFormActionURL = renderResponse.createActionURL();
+
+		submitFormActionURL.setParameter(
+			ActionRequest.ACTION_NAME, "SubmitFormAction");
+
+		template.put("submitFormActionURL", submitFormActionURL.toString());
+		
 		template.put("releaseInfo", ReleaseInfo.getReleaseInfo());
 
 		super.render(renderRequest, renderResponse);
 	}
-
-	@Reference
-	protected LayoutService layoutService;
 
 }

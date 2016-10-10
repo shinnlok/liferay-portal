@@ -1,0 +1,9 @@
+Bundle-Name: Liferay DXP Cloud Web
+Bundle-SymbolicName: com.liferay.dxp.cloud.web
+Bundle-Version: 1.0.0
+Export-Package: com.liferay.dxp.cloud.web.friendly.url.mapper
+Require-Capability: \
+	soy;filter:="(type=metal)",\
+	soy;filter:="(type=dxp-cloud-sidebar)",\
+	soy;filter:="(type=dxp-cloud-topbar)"
+Web-ContextPath: /dxp-cloud-web

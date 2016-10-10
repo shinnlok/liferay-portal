@@ -1,0 +1,31 @@
+.dxp .sidebar {
+	background: #464A5F;
+	margin-top: 60px;
+	height: calc(100vw - 60px);
+}
+
+.dxp .sidebar .sidebar-list {
+	padding-top: 24px;
+}
+
+.dxp .sidebar .sidebar-list-header-title,
+.dxp .sidebar .sidebar-link {
+	color: #fff;
+}
+
+.dxp .sidebar .sidebar-link:hover {
+	background: #41444B;
+}
+
+.dxp .sidebar-list-1 .sidebar-link-selected,
+.dxp .sidebar-list-1 .sidebar-link-selected:hover,
+.dxp .sidebar-list-1 .sidebar-link-selected:focus {
+	border-left: 4px solid #488FFF;
+	background: #41444B;
+	color: #fff;
+}
+
+.dxp .sidebar-offset {
+	background: #F5F5F5;
+	padding-top: 60px;
+}

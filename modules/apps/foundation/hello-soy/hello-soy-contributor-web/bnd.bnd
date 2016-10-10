@@ -1,0 +1,7 @@
+Bundle-Name: Liferay Hello Soy Contributor Web
+Bundle-SymbolicName: com.liferay.hello.soy.contributor.web
+Bundle-Version: 1.0.0
+Provide-Capability:\
+	soy;\
+		type="hello.soy";\
+		version:Version="${Bundle-Version}"

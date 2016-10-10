@@ -1,0 +1,9 @@
+.dxp .topbar {
+	position: fixed;
+	background: #41444B;
+	z-index: 100;
+}
+
+.dxp .topbar .logo img {
+	height: 36px;
+}

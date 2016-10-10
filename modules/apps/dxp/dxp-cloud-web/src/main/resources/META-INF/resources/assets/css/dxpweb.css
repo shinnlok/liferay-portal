@@ -1,0 +1,7 @@
+.dxp {
+	background: #f5f5f5;
+}
+
+.btn-dropdown:focus + .dropdown-menu {
+	display: block;
+}

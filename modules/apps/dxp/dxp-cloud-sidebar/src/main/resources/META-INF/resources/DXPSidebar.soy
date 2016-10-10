@@ -1,0 +1,22 @@
+{namespace DXPSidebar}
+
+/**
+ * Prints the DXP Cloud Sidebar
+ *
+ * @param items
+ * @param mvcRenderCommandName
+ */
+{template .render}
+	<nav class="sidebar">
+		<ul class="sidebar-list sidebar-list-1 toggler-collapsed">
+			{foreach $item in $items}
+				<li class="sidebar-item sidebar-settings-item">
+					<a class="sidebar-link {$mvcRenderCommandName == $item.mvcRenderCommandName ? 'sidebar-link-selected' : ''}" href="{$item.href}">
+						<img src="{$item.icon}">
+						<span>{$item.label}</span>
+					</a>
+				</li>
+			{/foreach}
+		</ul>
+	</nav>
+{/template}

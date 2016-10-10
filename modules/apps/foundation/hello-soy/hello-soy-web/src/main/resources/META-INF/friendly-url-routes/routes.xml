@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE routes PUBLIC "-//Liferay//DTD Friendly URL Routes 7.0.0//EN" "http://www.liferay.com/dtd/liferay-friendly-url-routes_7_0_0.dtd">
+
+<routes>
+	<route>
+		<pattern>/gallery/details</pattern>
+		<implicit-parameter name="mvcRenderCommandName">/gallery/GalleryDetails</implicit-parameter>
+	</route>
+	<route>
+		<pattern>/gallery</pattern>
+		<implicit-parameter name="mvcRenderCommandName">/gallery/GalleryHome</implicit-parameter>
+	</route>
+	<route>
+		<pattern>/home</pattern>
+		<implicit-parameter name="mvcRenderCommandName">Home</implicit-parameter>
+	</route>
+	<route>
+		<pattern>/submit_form</pattern>
+		<implicit-parameter name="mvcRenderCommandName">/submit/SubmitForm</implicit-parameter>
+	</route>
+</routes>

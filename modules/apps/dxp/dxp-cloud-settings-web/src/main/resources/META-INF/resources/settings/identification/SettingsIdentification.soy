@@ -1,0 +1,32 @@
+{namespace SettingsIdentification}
+
+/**
+ * Prints the DXP Cloud Portlet LCS Main View
+ *
+ * @param id
+ * @param mvcRenderCommandName
+ * @param sidebar
+ */
+{template .render}
+	<div id="{$id}">
+		{call DXPTopbar.render data="all"}{/call}
+
+		{if $sidebar}
+			{call DXPSidebar.render}
+				{param mvcRenderCommandName: $mvcRenderCommandName /}
+				{param items: $sidebar.items /}
+			{/call}
+		{/if}
+
+		<div class="sidebar-offset">
+			<div class="container-hybrid topbar-offset">
+				<div class="content-header"></div>
+				<div class="row">
+					<div class="col-xs-16">
+						{call SettingsSections.render data="all" /}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{/template}
