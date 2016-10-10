@@ -76,7 +76,11 @@ public class LanEngine {
 						_lanFileServer.getPort());
 				}
 				catch (Exception e) {
-					_logger.error(e.getMessage(), e);
+					String message = e.getMessage();
+
+					if (!message.equals("Network is unreachable")) {
+						_logger.error(e.getMessage(), e);
+					}
 				}
 			}
 
