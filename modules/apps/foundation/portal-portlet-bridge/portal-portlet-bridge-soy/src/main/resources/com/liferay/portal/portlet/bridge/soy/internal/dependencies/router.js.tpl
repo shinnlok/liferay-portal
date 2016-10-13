@@ -42,6 +42,7 @@
 							element: '#$ELEMENT_ID',
 							friendlyURLRoutes: $FRIENDLY_URL_ROUTES,
 							friendlyURLMapping: '$FRIENDLY_URL_MAPPING',
+							friendlyURLPrefix: $FRIENDLY_URL_PREFIX,
 							portletId: '$PORTLET_ID',
 							portletNamespace: '$PORTLET_NAMESPACE',
 							portletWrapper: '#$PORTLET_WRAPPER_ID',

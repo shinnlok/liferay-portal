@@ -13,6 +13,7 @@ class SoyPortletRouter {
 		this.element = config.element;
 		this.friendlyURLRoutes = config.friendlyURLRoutes;
 		this.friendlyURLMapping = config.friendlyURLMapping;
+		this.friendlyURLPrefix = config.friendlyURLPrefix;
 		this.portletId = config.portletId;
 		this.portletNamespace = config.portletNamespace;
 		this.portletWrapper = config.portletWrapper;
@@ -103,7 +104,7 @@ class SoyPortletRouter {
 
 							var pathname = uri.getPathname();
 
-							var currentPath = pathname.substring(pathname.indexOf('/-/') + 2);
+							var currentPath = pathname.substring(pathname.indexOf('/' + this.friendlyURLMapping + '/'));
 
 							var mappedPath = '/' + this.friendlyURLMapping + friendlyURLRoute.pattern;
 
@@ -122,7 +123,7 @@ class SoyPortletRouter {
 
 				var pathname = uri.getPathname();
 
-				var currentPath = pathname.substring(pathname.indexOf('/-/') + 2);
+				var currentPath = pathname.substring(pathname.indexOf('/' + this.friendlyURLMapping + '/'));
 
 				var mappedPath = '/' + this.friendlyURLMapping + friendlyURLRoute.pattern;
 

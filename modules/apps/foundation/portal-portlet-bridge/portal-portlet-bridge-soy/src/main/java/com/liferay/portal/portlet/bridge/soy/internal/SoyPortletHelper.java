@@ -110,13 +110,15 @@ public class SoyPortletHelper {
 				"$CURRENT_MVC_RENDER_COMMAND_NAME", "$DEFAULT_MVC_COMMAND_NAME",
 				"$ELEMENT_ID", "$MVC_RENDER_COMMAND_NAMES", "$MODULES",
 				"$PORTLET_ID", "$PORTLET_NAMESPACE", "$PORTLET_WRAPPER_ID",
-				"$CONTEXT", "$FRIENDLY_URL_ROUTES", "$FRIENDLY_URL_MAPPING"
+				"$CONTEXT", "$FRIENDLY_URL_ROUTES", "$FRIENDLY_URL_MAPPING",
+				"$FRIENDLY_URL_PREFIX"
 			},
 			new String[] {
 				currentMVCRenderCommandName, _defaultMVCRenderCommandName,
 				elementId, mvcRenderCommandNamesString, modulesString,
 				portletId, portletNamespace, portletWrapperId, contextString,
-				friendlyURLRoutesString, friendlyURLMapping
+				friendlyURLRoutesString, friendlyURLMapping,
+				String.valueOf(friendlyURLMapper.isCheckMappingWithPrefix())
 			});
 	}
 
