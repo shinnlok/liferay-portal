@@ -3,17 +3,17 @@
 /**
  * Prints the DXP Cloud Sidebar
  *
- * @param items
+ * @param sidebar
  * @param mvcRenderCommandName
  */
 {template .render}
 	<nav class="sidebar">
 		<ul class="sidebar-list sidebar-list-1 toggler-collapsed">
-			{foreach $item in $items}
+			{foreach $sidebarItem in $sidebar.sidebarItems}
 				<li class="sidebar-item sidebar-settings-item">
-					<a class="sidebar-link {$mvcRenderCommandName == $item.mvcRenderCommandName ? 'sidebar-link-selected' : ''}" href="{$item.href}">
-						<img src="{$item.icon}">
-						<span>{$item.label}</span>
+					<a class="sidebar-link {$mvcRenderCommandName == $sidebarItem.key ? 'sidebar-link-selected' : ''}" href="{$sidebarItem.href}">
+						<img src="{$sidebarItem.icon}">
+						<span>{$sidebarItem.label}</span>
 					</a>
 				</li>
 			{/foreach}

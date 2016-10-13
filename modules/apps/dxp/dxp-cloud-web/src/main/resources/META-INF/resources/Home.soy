@@ -5,7 +5,7 @@
  *
  * @param id
  * @param mvcRenderCommandName
- * @param? sidebar
+ * @param sidebar
  */
 {template .render}
 	<div id="{$id}">
@@ -14,7 +14,7 @@
 		{if $sidebar}
 			{call DXPSidebar.render}
 				{param mvcRenderCommandName: $mvcRenderCommandName /}
-				{param items: $sidebar.items /}
+				{param sidebar: $sidebar /}
 			{/call}
 		{/if}
 

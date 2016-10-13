@@ -14,6 +14,10 @@
 
 package com.liferay.dxp.cloud.sidebar.internal.context.contributor;
 
+import com.liferay.dxp.cloud.sidebar.api.SidebarCategory;
+import com.liferay.dxp.cloud.sidebar.api.SidebarCategoryRegistry;
+import com.liferay.dxp.cloud.sidebar.api.SidebarItem;
+import com.liferay.dxp.cloud.sidebar.api.SidebarItemRegistry;
 import com.liferay.portal.kernel.template.TemplateContextContributor;
 
 import java.util.ArrayList;
@@ -24,6 +28,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  *
@@ -40,53 +45,39 @@ public class SidebarItemsContextContributor
 	public void prepare(
 		Map<String, Object> contextObjects, HttpServletRequest request) {
 
-		Map<String, Object> sidebarItem1 = new HashMap();
-		sidebarItem1.put("href", "/web/guest/home/-/dxp/home");
-		sidebarItem1.put("icon", "/o/dxp-cloud-sidebar/assets/images/dxp.png");
-		sidebarItem1.put("label", "Home");
-		sidebarItem1.put("mvcRenderCommandName", "Home");
+		List<SidebarCategory> sidebarCategories =
+			_sidebarCategoryRegistry.getSidebarCategories("root");
 
-		Map<String, Object> sidebarItem2 = new HashMap();
-		sidebarItem2.put("href", "/web/guest/home/-/dxp/assets");
-		sidebarItem2.put("icon", "/o/dxp-cloud-sidebar/assets/images/Assets.png");
-		sidebarItem2.put("label", "Assets");
-		sidebarItem2.put("mvcRenderCommandName", "/assets/AssetsHome");
+		List<SidebarItem> sidebarItems = new ArrayList<>();
 
-		Map<String, Object> sidebarItem3 = new HashMap();
-		sidebarItem3.put("href", "/web/guest/home/-/dxp/campaigns");
-		sidebarItem3.put("icon", "/o/dxp-cloud-sidebar/assets/images/Campaigns.png");
-		sidebarItem3.put("label", "Campaigns");
-		sidebarItem3.put("mvcRenderCommandName", "/campaigns/CampaignsHome");
-
-		Map<String, Object> sidebarItem4 = new HashMap();
-		sidebarItem4.put("href", "/web/guest/home/-/dxp/contacts");
-		sidebarItem4.put("icon", "/o/dxp-cloud-sidebar/assets/images/Contacts.png");
-		sidebarItem4.put("label", "Contacts");
-		sidebarItem4.put("mvcRenderCommandName", "/contacts/ContactsHome");
-
-		Map<String, Object> sidebarItem5 = new HashMap();
-		sidebarItem5.put("href", "/web/guest/home/-/dxp/touchpoints");
-		sidebarItem5.put("icon", "/o/dxp-cloud-sidebar/assets/images/Touchpoints.png");
-		sidebarItem5.put("label", "TouchPoints");
-		sidebarItem5.put("mvcRenderCommandName", "/touchpoints/TouchPointsHome");
-
-		Map<String, Object> sidebarItem6 = new HashMap();
-		sidebarItem6.put("href", "/web/guest/home/-/dxp/settings");
-		sidebarItem6.put("icon", "/o/dxp-cloud-sidebar/assets/images/Settings.png");
-		sidebarItem6.put("label", "Settings");
-		sidebarItem6.put("mvcRenderCommandName", "/settings/SettingsHome");
-
-		List<Map<String, Object>> sidebarItems = new ArrayList<>();
-		sidebarItems.add(sidebarItem1);
-		sidebarItems.add(sidebarItem2);
-		sidebarItems.add(sidebarItem3);
-		sidebarItems.add(sidebarItem4);
-		sidebarItems.add(sidebarItem5);
-		sidebarItems.add(sidebarItem6);
+		for (SidebarCategory sidebarCategory : sidebarCategories) {
+			sidebarItems.addAll(
+				_sidebarItemsRegistry.getSidebarItems(
+					sidebarCategory.getKey()));
+		}
 
 		Map<String, Object> sidebar = new HashMap();
-		sidebar.put("items", sidebarItems);
+
+		sidebar.put("sidebarItems", sidebarItems);
 
 		contextObjects.put("sidebar", sidebar);
 	}
+
+	@Reference(unbind = "-")
+	protected void setSidebarCategoryRegistry(
+		SidebarCategoryRegistry sidebarCategoryRegistry) {
+
+		_sidebarCategoryRegistry =	sidebarCategoryRegistry;
+	}
+
+	@Reference(unbind = "-")
+	protected void setSidebarItemsRegistry(
+		SidebarItemRegistry sidebarItemsRegistry) {
+
+		_sidebarItemsRegistry =	sidebarItemsRegistry;
+	}
+
+	private SidebarCategoryRegistry _sidebarCategoryRegistry;
+	private SidebarItemRegistry _sidebarItemsRegistry;
+
 }
