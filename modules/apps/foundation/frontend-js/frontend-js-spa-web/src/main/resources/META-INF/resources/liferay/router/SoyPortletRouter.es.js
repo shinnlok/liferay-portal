@@ -100,8 +100,6 @@ class SoyPortletRouter {
 
 				if (friendlyURLRoute.metalPattern) {
 					path = themeDisplay.getLayoutRelativeURL() + '/' + this.friendlyURLMapping + friendlyURLRoute.metalPattern;
-
-					console.log(path);
 				}
 				else {
 					path = (url) => {
