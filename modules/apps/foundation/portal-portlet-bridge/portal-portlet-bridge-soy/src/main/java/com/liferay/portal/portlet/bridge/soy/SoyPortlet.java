@@ -154,6 +154,8 @@ public class SoyPortlet extends MVCPortlet {
 			else {
 				_callRender(resourceRequest, resourceResponse, portlet);
 
+				template = _getTemplate();
+
 				_prepareTemplate(
 					resourceRequest, resourceResponse, portletNamespace);
 
@@ -242,6 +244,8 @@ public class SoyPortlet extends MVCPortlet {
 			String portletNamespace = portletResponse.getNamespace();
 
 			Writer writer = _getWriter(portletResponse);
+
+			template = _getTemplate();
 
 			_prepareTemplate(portletRequest, portletResponse, portletNamespace);
 
