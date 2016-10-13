@@ -34,7 +34,7 @@ public class CampaignsSidebarItem implements SidebarItem {
 
 	@Override
 	public String getHref() {
-		return "/web/guest/home/-/dxp/campaigns";
+		return "/web/guest/home/dxp/campaigns";
 	}
 
 	@Override

@@ -34,7 +34,7 @@ public class AssetsSidebarItem implements SidebarItem {
 
 	@Override
 	public String getHref() {
-		return "/web/guest/home/-/dxp/assets";
+		return "/web/guest/home/dxp/assets";
 	}
 
 	@Override

@@ -34,7 +34,7 @@ public class TouchPointsSidebarItem implements SidebarItem {
 
 	@Override
 	public String getHref() {
-		return "/web/guest/home/-/dxp/touchpoints";
+		return "/web/guest/home/dxp/touchpoints";
 	}
 
 	@Override

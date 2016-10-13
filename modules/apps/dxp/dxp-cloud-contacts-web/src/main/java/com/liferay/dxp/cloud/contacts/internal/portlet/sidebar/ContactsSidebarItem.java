@@ -34,7 +34,7 @@ public class ContactsSidebarItem implements SidebarItem {
 
 	@Override
 	public String getHref() {
-		return "/web/guest/home/-/dxp/contacts";
+		return "/web/guest/home/dxp/contacts";
 	}
 
 	@Override

@@ -34,7 +34,7 @@ public class SettingsSidebarItem implements SidebarItem {
 
 	@Override
 	public String getHref() {
-		return "/web/guest/home/-/dxp/settings";
+		return "/web/guest/home/dxp/settings";
 	}
 
 	@Override
