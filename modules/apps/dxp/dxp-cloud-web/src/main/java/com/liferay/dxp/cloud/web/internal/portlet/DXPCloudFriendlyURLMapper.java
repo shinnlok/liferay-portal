@@ -58,6 +58,11 @@ public class DXPCloudFriendlyURLMapper extends DefaultFriendlyURLMapper {
 	}
 
 	@Override
+	public boolean isCheckMappingWithPrefix() {
+		return false;
+	}
+
+	@Override
 	public void setRouter(Router router) {
 		if (this.router != null) {
 			return;
