@@ -217,6 +217,10 @@ public interface Route {
 	 */
 	public String parametersToUrl(Map<String, String> parameters);
 
+	public void setProperty(String key, String value);
+
+	public Map<String, String> getProperties();
+
 	/**
 	 * Populates the parameter map with values parsed from the URL if this route
 	 * matches.

@@ -218,8 +218,14 @@ public class FriendlyURLMapperTrackerImpl implements FriendlyURLMapperTracker {
 
 			for (Element routeElement : routeElements) {
 				String pattern = routeElement.elementText("pattern");
+				
+				String patternMetalRouter = routeElement.elementText(
+					"pattern-metal-router");
 
 				Route route = router.addRoute(pattern);
+
+				route.setProperty(
+					"pattern-metal-router", patternMetalRouter);
 
 				for (Element generatedParameterElement :
 						routeElement.elements("generated-parameter")) {

@@ -36,9 +36,20 @@ public class RouteImpl implements Route {
 
 	public RouteImpl(String pattern) {
 		_pattern = pattern;
+		_properties = new HashMap<>();
 		_stringParser = StringParser.create(pattern);
 
 		_stringParser.setStringEncoder(_urlEncoder);
+	}
+	
+	@Override
+	public void setProperty(String key, String value) {
+		_properties.put(key, value);
+	}
+	
+	@Override
+	public Map<String, String> getProperties() {
+		return _properties;
 	}
 
 	@Override
@@ -222,6 +233,7 @@ public class RouteImpl implements Route {
 	private Set<String> _ignoredParameters;
 	private Map<String, String> _implicitParameters;
 	private Map<String, String> _overriddenParameters;
+	private Map<String, String> _properties;
 	private final String _pattern;
 	private final StringParser _stringParser;
 

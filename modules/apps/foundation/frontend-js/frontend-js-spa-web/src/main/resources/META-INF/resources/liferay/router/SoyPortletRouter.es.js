@@ -96,20 +96,31 @@ class SoyPortletRouter {
 					}
 				);
 
+				var path;
+
+				if (friendlyURLRoute.metalPattern) {
+					path = themeDisplay.getLayoutRelativeURL() + '/' + this.friendlyURLMapping + friendlyURLRoute.metalPattern;
+
+					console.log(path);
+				}
+				else {
+					path = (url) => {
+						var uri = new Uri(url);
+
+						var pathname = uri.getPathname();
+
+						var currentPath = pathname.substring(pathname.indexOf('/' + this.friendlyURLMapping + '/'));
+
+						var mappedPath = '/' + this.friendlyURLMapping + friendlyURLRoute.pattern;
+
+						return currentPath === mappedPath;
+					}
+				}
+
 				this.createRoute(
 					route,
 					{
-						path: (url) => {
-							var uri = new Uri(url);
-
-							var pathname = uri.getPathname();
-
-							var currentPath = pathname.substring(pathname.indexOf('/' + this.friendlyURLMapping + '/'));
-
-							var mappedPath = '/' + this.friendlyURLMapping + friendlyURLRoute.pattern;
-
-							return currentPath === mappedPath;
-						}
+						path: path
 					}
 				)
 			}
@@ -149,9 +160,14 @@ class SoyPortletRouter {
 			extendConfig
 		);
 
-		if (config.path(utils.getCurrentBrowserPath())) {
-			config.data = this.context;
-			config.fetch = false;
+		try {
+			if (config.path(utils.getCurrentBrowserPath())) {
+				config.data = this.context;
+				config.fetch = false;
+			}
+		}
+		catch(e) {
+			console.log('path not a function');
 		}
 
 		class DefaultScreen extends Router.defaultScreen {

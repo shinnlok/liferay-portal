@@ -118,7 +118,7 @@ public class SoyPortletHelper {
 				elementId, mvcRenderCommandNamesString, modulesString,
 				portletId, portletNamespace, portletWrapperId, contextString,
 				friendlyURLRoutesString, friendlyURLMapping,
-				String.valueOf(friendlyURLMapper.isCheckMappingWithPrefix())
+				String.valueOf(friendlyURLMapper.isCheckMappingWithPrefix()) 
 			});
 	}
 
@@ -209,9 +209,17 @@ public class SoyPortletHelper {
 
 		for (Route route : routes) {
 			Map<String, Object> mapping = new HashMap<>();
+			
+			Map<String, String> properties = route.getProperties();
 
 			mapping.put("implicitParameters", route.getImplicitParameters());
 			mapping.put("pattern", route.getPattern());
+			
+			String patternMetalRouter = properties.get("pattern-metal-router");
+			
+			if (Validator.isNotNull(patternMetalRouter)) {
+				mapping.put("metalPattern", patternMetalRouter);
+			}
 
 			routesMapping.add(mapping);
 		}
