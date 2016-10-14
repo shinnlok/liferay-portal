@@ -42,15 +42,12 @@ public class UpgradeProcess_3_4_0 extends BaseUpgradeProcess {
 		runSQL(
 			"ALTER TABLE SyncAccount ADD COLUMN lanCertificate " +
 				"VARCHAR(16777216) BEFORE login;");
-
 		runSQL(
 			"ALTER TABLE SyncAccount ADD COLUMN lanEnabled TINYINT BEFORE " +
 				"login;");
-
 		runSQL(
 			"ALTER TABLE SyncAccount ADD COLUMN lanKey VARCHAR(16777216) " +
 				"BEFORE login;");
-
 		runSQL(
 			"ALTER TABLE SyncAccount ADD COLUMN lanServerUuid VARCHAR(255) " +
 				"BEFORE login;");

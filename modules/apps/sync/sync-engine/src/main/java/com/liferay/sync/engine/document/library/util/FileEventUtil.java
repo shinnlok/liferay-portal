@@ -233,8 +233,6 @@ public class FileEventUtil {
 		parameters.put("patch", false);
 		parameters.put("syncFile", syncFile);
 
-		Event event = null;
-
 		SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
 			syncAccountId);
 
@@ -243,13 +241,15 @@ public class FileEventUtil {
 			StringUtils.isNotEmpty(syncFile.getLanTokenKey()) &&
 			(syncFile.getSize() >= (syncAccount.getBatchFileMaxSize() / 10))) {
 
-			event = new LanDownloadFileEvent(syncAccountId, parameters);
+			Event event = new LanDownloadFileEvent(syncAccountId, parameters);
+
+			event.run();
 		}
 		else {
-			event = new DownloadFileEvent(syncAccountId, parameters);
-		}
+			Event event = new DownloadFileEvent(syncAccountId, parameters);
 
-		event.run();
+			event.run();
+		}
 	}
 
 	public static void downloadPatch(

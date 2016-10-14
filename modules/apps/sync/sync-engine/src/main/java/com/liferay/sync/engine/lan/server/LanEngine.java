@@ -51,11 +51,10 @@ public class LanEngine {
 		try {
 			SyncAccountService.registerModelListener(
 				_lanFileServer.getSyncAccountListener());
-
-			_lanFileServer.start();
-
 			SyncAccountService.registerModelListener(
 				LanSession.getSyncAccountListener());
+
+			_lanFileServer.start();
 		}
 		catch (Exception e) {
 			_logger.error(e.getMessage(), e);
@@ -147,7 +146,6 @@ public class LanEngine {
 		if (_lanFileServer != null) {
 			SyncAccountService.unregisterModelListener(
 				_lanFileServer.getSyncAccountListener());
-
 			SyncAccountService.unregisterModelListener(
 				LanSession.getSyncAccountListener());
 

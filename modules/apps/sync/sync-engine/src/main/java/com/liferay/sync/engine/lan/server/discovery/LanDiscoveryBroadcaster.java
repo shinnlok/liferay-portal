@@ -40,11 +40,11 @@ public class LanDiscoveryBroadcaster {
 			_initialize();
 		}
 
-		byte[] jsonBytes = JSONUtil.writeValueAsBytes(
+		byte[] bytes = JSONUtil.writeValueAsBytes(
 			LanClientUtil.createSyncLanClient(port));
 
 		DatagramPacket datagramPacket = new DatagramPacket(
-			Unpooled.copiedBuffer(jsonBytes),
+			Unpooled.copiedBuffer(bytes),
 			new InetSocketAddress(
 				"255.255.255.255", PropsValues.SYNC_LAN_SERVER_PORT));
 
