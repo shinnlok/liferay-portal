@@ -816,23 +816,16 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 			String filePathName)
 		throws Exception {
 
-		String sourceVersion = sourceSyncFile.getVersion();
-		long sourceVersionId = sourceSyncFile.getVersionId();
+		String previousType = sourceSyncFile.getType();
+		String previousVersion = sourceSyncFile.getVersion();
+		long previousVersionId = sourceSyncFile.getVersionId();
+		String previousFilePathName = sourceSyncFile.getFilePathName();
 
-		boolean filePathChanged = processFilePathChange(
-			sourceSyncFile, targetSyncFile);
-
-		boolean typeChanged = false;
-
-		String sourceSyncFileType = sourceSyncFile.getType();
-
-		if (!sourceSyncFileType.equals(targetSyncFile.getType())) {
-			typeChanged = true;
-		}
+		processFilePathChange(sourceSyncFile, targetSyncFile);
 
 		if (sourceSyncFile.getTypePK() != targetSyncFile.getTypePK()) {
 			_logger.error(
-				"Source typePK {} does not match target {} for {}",
+				"Source type pk {} does not match target {} for {}",
 				sourceSyncFile.getTypePK(), targetSyncFile.getTypePK(),
 				sourceSyncFile.getFilePathName());
 		}
@@ -863,8 +856,8 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 
 		Path filePath = Paths.get(targetSyncFile.getFilePathName());
 
-		if (typeChanged) {
-			if (sourceSyncFileType.equals(SyncFile.TYPE_FOLDER)) {
+		if (!previousType.equals(sourceSyncFile.getType())) {
+			if (previousType.equals(SyncFile.TYPE_FOLDER)) {
 				FileUtils.deleteDirectory(filePath.toFile());
 			}
 			else {
@@ -895,17 +888,17 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 				 FileUtil.isModified(targetSyncFile, filePath)) {
 
 			downloadFile(
-				sourceSyncFile, sourceVersion, sourceVersionId,
+				sourceSyncFile, previousVersion, previousVersionId,
 				!IODeltaUtil.isIgnoredFilePatchingExtension(targetSyncFile));
 		}
 		else {
 			sourceSyncFile.setState(SyncFile.STATE_SYNCED);
 
-			if (filePathChanged) {
-				sourceSyncFile.setUiEvent(SyncFile.UI_EVENT_RENAMED_REMOTE);
+			if (previousFilePathName.equals(sourceSyncFile.getFilePathName())) {
+				sourceSyncFile.setUiEvent(SyncFile.UI_EVENT_NONE);
 			}
 			else {
-				sourceSyncFile.setUiEvent(SyncFile.UI_EVENT_NONE);
+				sourceSyncFile.setUiEvent(SyncFile.UI_EVENT_RENAMED_REMOTE);
 			}
 
 			SyncFileService.update(sourceSyncFile);
