@@ -129,7 +129,7 @@ public class DownloadFileHandler extends BaseHandler {
 				FileEventUtil.downloadFile(getSyncAccountId(), syncFile, false);
 			}
 			else {
-				handleBaseException(syncFile);
+				handleException(syncFile);
 			}
 
 			return;
@@ -179,7 +179,7 @@ public class DownloadFileHandler extends BaseHandler {
 
 		removeEvent();
 
-		handleBaseException(syncFile);
+		handleException(syncFile);
 
 		return true;
 	}
@@ -363,7 +363,7 @@ public class DownloadFileHandler extends BaseHandler {
 		}
 	}
 
-	protected void handleBaseException(SyncFile syncFile) {
+	protected void handleException(SyncFile syncFile) {
 		syncFile.setState(SyncFile.STATE_ERROR);
 		syncFile.setUiEvent(SyncFile.UI_EVENT_DOWNLOAD_EXCEPTION);
 
