@@ -8,6 +8,7 @@
  * @param saveURL
  * @param sessionMessages
  * @param sidebar
+ * @param? router
  */
 {template .render}
 	<div id="{$id}">
@@ -28,6 +29,10 @@
 						{call SettingsSections.render data="all" /}
 					</div>
 				</div>
+
+				{if $router and $router.params.section}
+					<h1>{$router.params.section}</h1>
+				{/if}
 
 				{call .form}
 					{param saveURL: $saveURL /}

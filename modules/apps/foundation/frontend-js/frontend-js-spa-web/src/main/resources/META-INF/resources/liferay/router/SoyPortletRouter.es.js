@@ -86,8 +86,18 @@ class SoyPortletRouter {
 	}
 
 	createFriendlyURLRoutes() {
+		var routes = {};
+
 		this.friendlyURLRoutes.forEach(
 			(friendlyURLRoute) => {
+				routes[friendlyURLRoute.pattern] = friendlyURLRoute;
+			}
+		);
+
+		Object.keys(routes).forEach(
+			(pattern) => {
+				var friendlyURLRoute = routes[pattern];
+
 				let implicitParameters = friendlyURLRoute.implicitParameters;
 
 				let route = this.routes.find(
@@ -98,8 +108,8 @@ class SoyPortletRouter {
 
 				var path;
 
-				if (friendlyURLRoute.metalPattern) {
-					path = themeDisplay.getLayoutRelativeURL() + '/' + this.friendlyURLMapping + friendlyURLRoute.metalPattern;
+				if (implicitParameters['pattern-metal-router']) {
+					path = themeDisplay.getLayoutRelativeURL() + '/' + this.friendlyURLMapping + implicitParameters['pattern-metal-router'];
 				}
 				else {
 					path = (url) => {
@@ -109,7 +119,7 @@ class SoyPortletRouter {
 
 						var currentPath = pathname.substring(pathname.indexOf('/' + this.friendlyURLMapping + '/'));
 
-						var mappedPath = '/' + this.friendlyURLMapping + friendlyURLRoute.pattern;
+						var mappedPath = '/' + this.friendlyURLMapping + pattern;
 
 						return currentPath === mappedPath;
 					}
@@ -165,7 +175,6 @@ class SoyPortletRouter {
 			}
 		}
 		catch(e) {
-			console.log('path not a function');
 		}
 
 		class DefaultScreen extends Router.defaultScreen {
