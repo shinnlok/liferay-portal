@@ -8,4 +8,5 @@ Export-Package: com.liferay.petra.json.web.service.client
 	@httpcore-[0-9]*.jar,\
 	@jackson-annotations-[0-9]*.jar,\
 	@jackson-core-[0-9]*.jar,\
-	@jackson-databind-[0-9]*.jar
+	@jackson-databind-[0-9]*.jar,\
+	@jcifs-[0-9]*.jar
