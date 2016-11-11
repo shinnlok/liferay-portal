@@ -41,6 +41,39 @@ public class ResourcePermissionModelListener
 	extends BaseModelListener<ResourcePermission> {
 
 	@Override
+	public void onBeforeCreate(ResourcePermission resourcePermission)
+		throws ModelListenerException {
+
+		try {
+			SyncDLObject syncDLObject = null;
+
+			String modelName = resourcePermission.getName();
+
+			if (modelName.equals(DLFileEntry.class.getName())) {
+				syncDLObject = _syncDLObjectLocalService.fetchSyncDLObject(
+					SyncDLObjectConstants.TYPE_FILE,
+					GetterUtil.getLong(resourcePermission.getPrimKey()));
+			}
+			else if (modelName.equals(DLFolder.class.getName())) {
+				syncDLObject = _syncDLObjectLocalService.fetchSyncDLObject(
+					SyncDLObjectConstants.TYPE_FOLDER,
+					GetterUtil.getLong(resourcePermission.getPrimKey()));
+			}
+
+			if (syncDLObject == null) {
+				return;
+			}
+
+			if (resourcePermission.hasActionId(ActionKeys.VIEW)) {
+				updateSyncDLObject(syncDLObject);
+			}
+		}
+		catch (Exception e) {
+			throw new ModelListenerException(e);
+		}
+	}
+
+	@Override
 	public void onBeforeUpdate(ResourcePermission resourcePermission)
 		throws ModelListenerException {
 
