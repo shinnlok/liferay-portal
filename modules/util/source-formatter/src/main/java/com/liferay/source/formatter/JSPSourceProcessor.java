@@ -28,8 +28,10 @@ import com.liferay.portal.kernel.util.TextFormatter;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.tools.ImportsFormatter;
 import com.liferay.source.formatter.util.FileUtil;
+import com.liferay.source.formatter.util.ThreadSafeClassLibrary;
 
 import com.thoughtworks.qdox.JavaDocBuilder;
+import com.thoughtworks.qdox.model.DefaultDocletTagFactory;
 import com.thoughtworks.qdox.model.JavaClass;
 import com.thoughtworks.qdox.model.JavaMethod;
 import com.thoughtworks.qdox.model.Type;
@@ -837,7 +839,7 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 				}
 
 				if (javaSource &&
-					trimmedLine.matches("^\\} (catch|else|finally) .*")) {
+					trimmedLine.matches("^\\} ?(catch|else|finally) .*")) {
 
 					processMessage(
 						fileName, "There should be a line break after '}'",
@@ -1841,7 +1843,7 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 
 				File file = new File(fileName);
 
-				String absolutePath = getAbsolutePath(file);
+				String absolutePath = getAbsolutePath(fileName);
 
 				String content = FileUtil.read(file);
 
@@ -1978,7 +1980,9 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 					continue;
 				}
 
-				JavaDocBuilder javaDocBuilder = new JavaDocBuilder();
+				JavaDocBuilder javaDocBuilder = new JavaDocBuilder(
+					new DefaultDocletTagFactory(),
+					new ThreadSafeClassLibrary());
 
 				javaDocBuilder.addSource(tagJavaFile);
 

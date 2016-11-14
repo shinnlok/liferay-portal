@@ -14,9 +14,9 @@
 
 package com.liferay.blogs.web.internal.portlet.action;
 
-import com.liferay.blogs.kernel.exception.NoSuchEntryException;
-import com.liferay.blogs.kernel.exception.TrackbackValidationException;
-import com.liferay.blogs.kernel.model.BlogsEntry;
+import com.liferay.blogs.exception.NoSuchEntryException;
+import com.liferay.blogs.exception.TrackbackValidationException;
+import com.liferay.blogs.model.BlogsEntry;
 import com.liferay.blogs.web.constants.BlogsPortletKeys;
 import com.liferay.blogs.web.internal.trackback.Trackback;
 import com.liferay.portal.kernel.log.Log;
@@ -124,7 +124,7 @@ public class TrackbackMVCActionCommand extends BaseMVCActionCommand {
 		throws Exception {
 
 		try {
-			ActionUtil.getEntry(actionRequest);
+			return ActionUtil.getEntry(actionRequest);
 		}
 		catch (PrincipalException pe) {
 			throw new TrackbackValidationException(
@@ -132,8 +132,6 @@ public class TrackbackMVCActionCommand extends BaseMVCActionCommand {
 					"trackbacks",
 				pe);
 		}
-
-		return (BlogsEntry)actionRequest.getAttribute(WebKeys.BLOGS_ENTRY);
 	}
 
 	protected boolean isCommentsEnabled(ActionRequest actionRequest)

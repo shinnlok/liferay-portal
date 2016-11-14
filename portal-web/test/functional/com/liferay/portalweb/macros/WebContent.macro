@@ -183,6 +183,7 @@
 		<execute function="AssertClickNoError" locator1="Button#PUBLISH" value1="Publish" />
 
 		<execute function="Pause" locator1="5000" />
+
 		<execute function="SelectFrame" value1="relative=top" />
 
 		<var name="key_assetTitle" value="${webContentTitle}" />
@@ -497,6 +498,8 @@
 	</command>
 
 	<command name="addWithStructureCP">
+		<execute function="Click" locator1="TextInput#TITLE" />
+
 		<execute function="Type" locator1="TextInput#TITLE" value1="${webContentTitle}" />
 
 		<if>
@@ -876,6 +879,7 @@
 		<execute function="AssertClick" locator1="Button#PUBLISH" value1="Publish" />
 
 		<execute function="Pause" locator1="3000" />
+
 		<execute function="SelectFrame" value1="relative=top" />
 	</command>
 
@@ -979,9 +983,11 @@
 	</command>
 
 	<command name="expireCP">
-		<var name="key_webContentTitle" value="${webContentTitle}" />
-
-		<execute function="Check" locator1="WC#ENTRY_DESCRIPTIVE_CHECKBOX" />
+		<for list="${webContentTitleList}" param="webContentTitle">
+			<execute function="Check" locator1="WC#ENTRY_DESCRIPTIVE_CHECKBOX">
+				<var name="key_webContentTitle" value="${webContentTitle}" />
+			</execute>
+		</for>
 
 		<execute function="Click" locator1="Icon#EXPIRE" />
 	</command>
@@ -1040,6 +1046,40 @@
 		<execute function="Click#waitForMenuToggleJSClick" locator1="Icon#ROW_VERTICAL_ELLIPSIS" />
 
 		<execute function="AssertClick" locator1="MenuItem#VIEW_HISTORY" value1="View History" />
+	</command>
+
+	<command name="moveMultipleToFolderCP">
+		<execute macro="Portlet#changeDisplayStyle">
+			<var name="displayStyle" value="Descriptive" />
+		</execute>
+
+		<for list="${rowEntryCheckList}" param="rowEntry">
+			<execute function="Check" locator1="ContentRow#ENTRY_CONTENT_ENTRY_CHECKBOX">
+				<var name="key_rowEntry" value="${rowEntry}" />
+			</execute>
+		</for>
+
+		<execute function="Click" locator1="Icon#MOVE" />
+
+		<execute function="AssertClick" locator1="Button#SELECT" value1="Select" />
+
+		<execute function="SelectFrame" locator1="IFrame#DIALOG" />
+
+		<execute macro="WebContent#expandFolderTreeCP" />
+
+		<execute function="Click" locator1="WC#SELECT_FOLDER">
+			<var name="key_folderName" value="${folderName}" />
+		</execute>
+
+		<execute function="SelectFrame" value1="relative=top" />
+
+		<execute function="Pause" locator1="5000" />
+
+		<execute macro="Button#clickDone" />
+
+		<execute function="AssertClick" locator1="Button#MOVE" value1="Move" />
+
+		<execute macro="Alert#viewSuccessMessage" />
 	</command>
 
 	<command name="moveToFolderCP">
@@ -1679,7 +1719,7 @@
 		<execute function="AssertTextEquals#assertPartialText" locator1="AP#ASSET_ABSTRACT_DESCRIPTION" value1="${webContentContent}" />
 
 		<if>
-			<isset var="${author}" />
+			<isset var="author" />
 			<then>
 				<var name="key_author" value="${author}" />
 
@@ -1748,6 +1788,7 @@
 		<execute function="AssertClick" locator1="WCDConfiguration#SELECT_WEB_CONTENT_BUTTON" value1="Select" />
 
 		<execute function="SelectFrame" value1="relative=top" />
+
 		<execute function="SelectFrame" locator1="IFrame#DIALOG" />
 
 		<var name="key_webContentTitle" value="${webContentTitle}" />
@@ -1961,6 +2002,7 @@
 		<execute function="AssertTextEquals" locator1="AssetWorkflow#WORKFLOW_STATUS" value1="Pending (${workflowTask})" />
 		<execute function="AssertTextEquals" locator1="TextInput#TITLE" value1="${webContentTitle}" />
 		<execute function="AssertTextEquals" locator1="AlloyEditor#CONTENT_FIELD" value1="${webContentContent}" />
+
 		<execute function="SelectFrameTop" />
 	</command>
 

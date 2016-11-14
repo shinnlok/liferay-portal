@@ -1032,8 +1032,9 @@
 			<var name="siteName" value="Site Name" />
 		</execute>
 
-		<execute macro="AssetPublisherPortlet#configureAnyCategoriesFilterPG">
+		<execute macro="AssetPublisherPortlet#configureCategoriesFilterPG">
 			<var name="categoryName" value="Category Name" />
+			<var name="vocabularyName" value="Vocabulary Name" />
 		</execute>
 
 		<execute macro="Navigator#gotoSitePage">

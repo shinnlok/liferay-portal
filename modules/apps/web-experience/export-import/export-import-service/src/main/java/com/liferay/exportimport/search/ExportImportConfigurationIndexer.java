@@ -14,6 +14,8 @@
 
 package com.liferay.exportimport.search;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.exportimport.kernel.lar.ExportImportHelperUtil;
 import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
 import com.liferay.exportimport.kernel.service.ExportImportConfigurationLocalService;
@@ -54,6 +56,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Akos Thurzo
  */
 @Component(immediate = true, service = Indexer.class)
+@ProviderType
 public class ExportImportConfigurationIndexer
 	extends BaseIndexer<ExportImportConfiguration> {
 
@@ -216,6 +219,12 @@ public class ExportImportConfigurationIndexer
 				layoutIds = ExportImportHelperUtil.getLayoutIds(layoutIdMap);
 			}
 			catch (PortalException pe) {
+
+				// LPS-52675
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(pe, pe);
+				}
 			}
 		}
 

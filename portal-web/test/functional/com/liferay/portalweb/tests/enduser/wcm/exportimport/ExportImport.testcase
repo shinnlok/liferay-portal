@@ -129,7 +129,7 @@
 			<var name="exportTemplateName" value="Export Template Name" />
 		</execute>
 
-		<execute macro="LAR#configureExportTemplateCP">
+		<execute macro="LAR#configureExportOptions">
 			<var name="checkContentNameList" value="Web Content" />
 			<var name="uncheckContentNameList" value="Blogs" />
 		</execute>
@@ -172,8 +172,6 @@
 			<var name="portlet" value="Web Content" />
 		</execute>
 
-		<execute function="Pause" locator1="3000" />
-
 		<execute macro="WebContentNavigator#gotoEditCP">
 			<var name="webContentTitle" value="Web Content Title" />
 		</execute>
@@ -197,7 +195,7 @@
 			<var name="exportTemplateNameEdit" value="Export Template Name Edit" />
 		</execute>
 
-		<execute macro="LAR#configureExportTemplateCP">
+		<execute macro="LAR#configureExportOptions">
 			<var name="checkContentNameList" value="Blogs" />
 		</execute>
 
@@ -1155,7 +1153,7 @@
 			<var name="exportTemplateName" value="Export Template Name" />
 		</execute>
 
-		<execute macro="LAR#configureExportTemplateCP">
+		<execute macro="LAR#configureExportOptions">
 			<var name="uncheckContentNameList" value="Blogs" />
 		</execute>
 

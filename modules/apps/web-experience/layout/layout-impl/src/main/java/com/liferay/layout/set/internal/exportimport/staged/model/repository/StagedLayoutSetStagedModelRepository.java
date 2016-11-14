@@ -24,7 +24,8 @@ import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.model.StagedModel;
@@ -34,9 +35,7 @@ import com.liferay.portal.kernel.service.LayoutSetLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.site.model.adapter.StagedGroup;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -105,24 +104,6 @@ public class StagedLayoutSetStagedModelRepository
 			Collectors.toList());
 	}
 
-	public List<StagedModel> fetchDependencyStagedModels(
-		PortletDataContext portletDataContext,
-		StagedLayoutSet stagedLayoutSet) {
-
-		List<StagedModel> dependencyStagedModels = new ArrayList<>();
-
-		try {
-			Group group = stagedLayoutSet.getGroup();
-
-			dependencyStagedModels.add(
-				ModelAdapterUtil.adapt(group, Group.class, StagedGroup.class));
-		}
-		catch (PortalException pe) {
-		}
-
-		return dependencyStagedModels;
-	}
-
 	public Optional<StagedLayoutSet> fetchExistingLayoutSet(
 		long groupId, boolean privateLayout) {
 
@@ -136,6 +117,12 @@ public class StagedLayoutSetStagedModelRepository
 				layoutSet, LayoutSet.class, StagedLayoutSet.class);
 		}
 		catch (PortalException pe) {
+
+			// LPS-52675
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(pe, pe);
+			}
 		}
 
 		return Optional.ofNullable(stagedLayoutSet);
@@ -154,6 +141,13 @@ public class StagedLayoutSetStagedModelRepository
 				layoutSet, LayoutSet.class, StagedLayoutSet.class);
 		}
 		catch (PortalException pe) {
+
+			// LPS-52675
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(pe, pe);
+			}
+
 			return null;
 		}
 	}
@@ -247,6 +241,9 @@ public class StagedLayoutSetStagedModelRepository
 		return ModelAdapterUtil.adapt(
 			existingLayoutSet, LayoutSet.class, StagedLayoutSet.class);
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		StagedLayoutSetStagedModelRepository.class);
 
 	@Reference
 	private LayoutLocalService _layoutLocalService;

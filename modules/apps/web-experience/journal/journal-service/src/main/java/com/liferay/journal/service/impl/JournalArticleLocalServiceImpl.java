@@ -319,7 +319,7 @@ public class JournalArticleLocalServiceImpl
 
 		// Article
 
-		User user = userPersistence.findByPrimaryKey(userId);
+		User user = userLocalService.getUser(userId);
 		articleId = StringUtil.toUpperCase(articleId.trim());
 
 		Date displayDate = null;
@@ -543,7 +543,7 @@ public class JournalArticleLocalServiceImpl
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		User user = userPersistence.findByPrimaryKey(userId);
+		User user = userLocalService.getUser(userId);
 
 		Calendar calendar = CalendarFactoryUtil.getCalendar(user.getTimeZone());
 
@@ -760,7 +760,7 @@ public class JournalArticleLocalServiceImpl
 
 		// Article
 
-		User user = userPersistence.findByPrimaryKey(userId);
+		User user = userLocalService.getUser(userId);
 		oldArticleId = StringUtil.toUpperCase(oldArticleId.trim());
 		newArticleId = StringUtil.toUpperCase(newArticleId.trim());
 
@@ -1400,6 +1400,17 @@ public class JournalArticleLocalServiceImpl
 				userId, groupId, article.getArticleId(), article.getVersion(),
 				articleURL, serviceContext);
 		}
+	}
+
+	/**
+	 * Returns the web content article with the ID.
+	 *
+	 * @param  id the primary key of the web content article
+	 * @return the web content article with the ID
+	 */
+	@Override
+	public JournalArticle fetchArticle(long id) {
+		return journalArticlePersistence.fetchByPrimaryKey(id);
 	}
 
 	@Override
@@ -5041,7 +5052,7 @@ public class JournalArticleLocalServiceImpl
 			String layoutUuid, ServiceContext serviceContext)
 		throws PortalException {
 
-		User user = userPersistence.findByPrimaryKey(userId);
+		User user = userLocalService.getUser(userId);
 
 		JournalArticle article = journalArticlePersistence.findByG_A_V(
 			groupId, articleId, version);
@@ -5241,7 +5252,7 @@ public class JournalArticleLocalServiceImpl
 
 		// Article
 
-		User user = userPersistence.findByPrimaryKey(userId);
+		User user = userLocalService.getUser(userId);
 		articleId = StringUtil.toUpperCase(articleId.trim());
 
 		byte[] smallImageBytes = null;
@@ -5574,11 +5585,10 @@ public class JournalArticleLocalServiceImpl
 
 		JournalArticle article = null;
 
-		User user = userPersistence.fetchByC_U(
-			oldArticle.getCompanyId(), oldArticle.getUserId());
+		User user = userLocalService.fetchUser(oldArticle.getUserId());
 
 		if (user == null) {
-			user = userPersistence.fetchByC_DU(oldArticle.getCompanyId(), true);
+			user = userLocalService.getDefaultUser(oldArticle.getCompanyId());
 		}
 
 		Locale defaultLocale = getArticleDefaultLocale(content);
@@ -5852,7 +5862,7 @@ public class JournalArticleLocalServiceImpl
 
 		// Article
 
-		User user = userPersistence.findByPrimaryKey(userId);
+		User user = userLocalService.getUser(userId);
 		Date now = new Date();
 
 		if ((status == WorkflowConstants.STATUS_APPROVED) &&
@@ -7466,10 +7476,10 @@ public class JournalArticleLocalServiceImpl
 			return;
 		}
 
-		Company company = companyPersistence.findByPrimaryKey(
+		Company company = companyLocalService.getCompany(
 			article.getCompanyId());
 
-		User user = userPersistence.findByPrimaryKey(article.getUserId());
+		User user = userLocalService.getUser(article.getUserId());
 
 		String fromName = journalGroupServiceConfiguration.emailFromName();
 		String fromAddress =
@@ -7749,7 +7759,7 @@ public class JournalArticleLocalServiceImpl
 				previousApprovedArticle.getModifiedDate());
 			assetEntry.setTitle(previousApprovedArticle.getTitleMapAsXML());
 
-			assetEntryPersistence.update(assetEntry);
+			assetEntryLocalService.updateAssetEntry(assetEntry);
 		}
 	}
 
@@ -8145,17 +8155,27 @@ public class JournalArticleLocalServiceImpl
 			String languageId)
 		throws PortalException {
 
-		long journalArticleLocalizationId = counterLocalService.increment();
-
 		JournalArticleLocalization journalArticleLocalization =
-			journalArticleLocalizationPersistence.create(
-				journalArticleLocalizationId);
+			journalArticleLocalizationPersistence.fetchByA_L(
+				articlePK, languageId);
 
-		journalArticleLocalization.setCompanyId(companyId);
-		journalArticleLocalization.setArticlePK(articlePK);
-		journalArticleLocalization.setTitle(title);
-		journalArticleLocalization.setDescription(description);
-		journalArticleLocalization.setLanguageId(languageId);
+		if (journalArticleLocalization == null) {
+			long journalArticleLocalizationId = counterLocalService.increment();
+
+			journalArticleLocalization =
+				journalArticleLocalizationPersistence.create(
+					journalArticleLocalizationId);
+
+			journalArticleLocalization.setCompanyId(companyId);
+			journalArticleLocalization.setArticlePK(articlePK);
+			journalArticleLocalization.setTitle(title);
+			journalArticleLocalization.setDescription(description);
+			journalArticleLocalization.setLanguageId(languageId);
+		}
+		else {
+			journalArticleLocalization.setTitle(title);
+			journalArticleLocalization.setDescription(description);
+		}
 
 		return journalArticleLocalizationPersistence.update(
 			journalArticleLocalization);
@@ -8176,10 +8196,26 @@ public class JournalArticleLocalServiceImpl
 			Map<Locale, String> descriptionMap)
 		throws PortalException {
 
-		journalArticleLocalizationPersistence.removeByArticlePK(articleId);
+		List<JournalArticleLocalization> oldJournalArticleLocalizations =
+			new ArrayList<>(
+				journalArticleLocalizationPersistence.findByArticlePK(
+					articleId));
 
-		return _addArticleLocalizedFields(
-			companyId, articleId, titleMap, descriptionMap);
+		List<JournalArticleLocalization> newJournalArticleLocalizations =
+			_addArticleLocalizedFields(
+				companyId, articleId, titleMap, descriptionMap);
+
+		oldJournalArticleLocalizations.removeAll(
+			newJournalArticleLocalizations);
+
+		for (JournalArticleLocalization oldJournalArticleLocalization :
+				oldJournalArticleLocalizations) {
+
+			journalArticleLocalizationPersistence.remove(
+				oldJournalArticleLocalization);
+		}
+
+		return newJournalArticleLocalizations;
 	}
 
 	private JournalArticleLocalization _updateArticleLocalizedFields(

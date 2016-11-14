@@ -48,7 +48,7 @@ public class AttachmentLocalServiceImpl extends AttachmentLocalServiceBaseImpl {
 
 		// Attachment
 
-		User user = userPersistence.findByPrimaryKey(userId);
+		User user = userLocalService.getUser(userId);
 		Message message = messagePersistence.findByPrimaryKey(messageId);
 
 		long attachmentId = counterLocalService.increment();
@@ -80,6 +80,12 @@ public class AttachmentLocalServiceImpl extends AttachmentLocalServiceBaseImpl {
 					attachment.getCompanyId(), _REPOSITORY_ID, directoryPath);
 			}
 			catch (DuplicateDirectoryException dde) {
+
+				// LPS-52675
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(dde, dde);
+				}
 			}
 
 			String filePath = getFilePath(attachment.getMessageId(), fileName);

@@ -1,4 +1,8 @@
 <definition>
+	<command name="gotoAuthenticationFacebook">
+		<execute function="AssertClick" locator1="NavTab#FACEBOOK" value1="Facebook" />
+	</command>
+
 	<command name="gotoAuthenticationGoogle">
 		<execute function="AssertClick" locator1="NavTab#GOOGLE" value1="Google" />
 	</command>
@@ -9,6 +13,10 @@
 
 	<command name="gotoAuthenticationOpenID">
 		<execute function="AssertClick" locator1="NavTab#OPENID" value1="OpenID" />
+	</command>
+
+	<command name="gotoAuthenticationOpenSSO">
+		<execute function="AssertClick" locator1="NavTab#OPENSSO" value1="OpenSSO" />
 	</command>
 
 	<command name="gotoLDAP">

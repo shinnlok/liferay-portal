@@ -74,6 +74,14 @@ public interface KBArticleService extends BaseService {
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public KBArticle fetchFirstChildKBArticle(long groupId,
+		long parentResourcePrimKey);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public KBArticle fetchKBArticleByUrlTitle(long groupId, long kbFolderId,
+		java.lang.String urlTitle) throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public KBArticle fetchLatestKBArticle(long resourcePrimKey, int status)
 		throws PortalException;
 
@@ -101,6 +109,10 @@ public interface KBArticleService extends BaseService {
 		Date startDate, Date endDate, boolean andOperator,
 		int[] curStartValues, int cur, int delta,
 		OrderByComparator<KBArticle> orderByComparator)
+		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public KBArticle[] getPreviousAndNextKBArticles(long kbArticleId)
 		throws PortalException;
 
 	public int addKBArticlesMarkdown(long groupId, long parentKBFolderId,

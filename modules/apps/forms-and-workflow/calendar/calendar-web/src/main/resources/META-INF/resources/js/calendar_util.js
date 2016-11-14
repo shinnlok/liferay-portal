@@ -103,6 +103,7 @@ AUI.add(
 						location: calendarBooking.location,
 						parentCalendarBookingId: calendarBooking.parentCalendarBookingId,
 						recurrence: calendarBooking.recurrence,
+						recurringCalendarBookingId: calendarBooking.recurringCalendarBookingId,
 						secondReminder: calendarBooking.secondReminder,
 						secondReminderType: calendarBooking.secondReminderType,
 						startDate: startDate.getTime(),
@@ -199,6 +200,7 @@ AUI.add(
 							calendarResourceId: data.calendarResourceId,
 							parentCalendarBookingId: data.parentCalendarBookingId,
 							recurrence: data.recurrence,
+							recurringCalendarBookingId: data.recurringCalendarBookingId,
 							status: data.status
 						},
 						{
@@ -234,13 +236,13 @@ AUI.add(
 				A.each(
 					schedulerEvents,
 					function(schedulerEvent) {
-						if (calendarBooking.status === CalendarWorkflow.STATUS_DENIED) {
+						if (schedulerEvent.isRecurring()) {
 							var scheduler = schedulerEvent.get('scheduler');
 
-							var eventRecorder = scheduler.get('eventRecorder');
+							scheduler.load();
+						}
 
-							eventRecorder.hidePopover();
-
+						if (calendarBooking.status === CalendarWorkflow.STATUS_DENIED) {
 							CalendarUtil.destroyEvent(schedulerEvent);
 						}
 						else {

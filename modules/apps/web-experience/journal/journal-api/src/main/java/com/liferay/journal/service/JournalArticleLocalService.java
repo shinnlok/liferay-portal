@@ -432,6 +432,15 @@ public interface JournalArticleLocalService extends BaseLocalService,
 	public JournalArticle fetchArticle(long groupId,
 		java.lang.String articleId, double version);
 
+	/**
+	* Returns the web content article with the ID.
+	*
+	* @param id the primary key of the web content article
+	* @return the web content article with the ID
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public JournalArticle fetchArticle(long id);
+
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public JournalArticle fetchArticleByUrlTitle(long groupId,
 		java.lang.String urlTitle);

@@ -333,17 +333,25 @@ public class JournalServiceVerifyProcess extends VerifyLayout {
 		long folderId = GetterUtil.getLong(pathArray[3]);
 		String title = HttpUtil.decodeURL(HtmlUtil.escape(pathArray[4]));
 
-		try {
-			FileEntry fileEntry = _dlAppLocalService.getFileEntry(
-				groupId, folderId, title);
+		FileEntry fileEntry = null;
 
-			Node node = dynamicContentElement.node(0);
+		try {
+			fileEntry = _dlAppLocalService.getFileEntry(
+				groupId, folderId, title);
+		}
+		catch (PortalException pe) {
+			_log.error(
+				"Unable to get file entry with group ID " + groupId +
+					", folder ID " + folderId + ", and title " + title,
+				pe);
+
+			return;
+		}
+
+		Node node = dynamicContentElement.node(0);
 
 			node.setText(
 				context + path + StringPool.SLASH + fileEntry.getUuid());
-		}
-		catch (PortalException pe) {
-		}
 	}
 
 	protected void updateDynamicElements(JournalArticle article)

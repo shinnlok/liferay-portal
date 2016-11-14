@@ -17,6 +17,7 @@ package com.liferay.blogs.internal.service;
 import com.liferay.blogs.kernel.model.BlogsStatsUser;
 import com.liferay.blogs.kernel.service.BlogsStatsUserLocalService;
 import com.liferay.blogs.kernel.service.BlogsStatsUserLocalServiceWrapper;
+import com.liferay.petra.model.adapter.util.ModelAdapterUtil;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
@@ -82,7 +83,9 @@ public class ModularBlogsStatsUserLocalServiceWrapper
 
 	@Override
 	public void deleteStatsUser(BlogsStatsUser statsUsers) {
-		_blogsStatsUserLocalService.deleteStatsUser(statsUsers);
+		_blogsStatsUserLocalService.deleteStatsUser(
+			ModelAdapterUtil.adapt(
+				com.liferay.blogs.model.BlogsStatsUser.class, statsUsers));
 	}
 
 	@Override
@@ -168,8 +171,10 @@ public class ModularBlogsStatsUserLocalServiceWrapper
 	public List<BlogsStatsUser> getCompanyStatsUsers(
 		long companyId, int start, int end) {
 
-		return _blogsStatsUserLocalService.getCompanyStatsUsers(
-			companyId, start, end);
+		return ModelAdapterUtil.adapt(
+			BlogsStatsUser.class,
+			_blogsStatsUserLocalService.getCompanyStatsUsers(
+				companyId, start, end));
 	}
 
 	@Override
@@ -177,8 +182,11 @@ public class ModularBlogsStatsUserLocalServiceWrapper
 		long companyId, int start, int end,
 		OrderByComparator<BlogsStatsUser> obc) {
 
-		return _blogsStatsUserLocalService.getCompanyStatsUsers(
-			companyId, start, end, obc);
+		return ModelAdapterUtil.adapt(
+			BlogsStatsUser.class,
+			_blogsStatsUserLocalService.getCompanyStatsUsers(
+				companyId, start, end,
+				ModelAdapterUtil.adapt(BlogsStatsUser.class, obc)));
 	}
 
 	@Override
@@ -190,16 +198,20 @@ public class ModularBlogsStatsUserLocalServiceWrapper
 	public List<BlogsStatsUser> getGroupsStatsUsers(
 		long companyId, long groupId, int start, int end) {
 
-		return _blogsStatsUserLocalService.getGroupsStatsUsers(
-			companyId, groupId, start, end);
+		return ModelAdapterUtil.adapt(
+			BlogsStatsUser.class,
+			_blogsStatsUserLocalService.getGroupsStatsUsers(
+				companyId, groupId, start, end));
 	}
 
 	@Override
 	public List<BlogsStatsUser> getGroupStatsUsers(
 		long groupId, int start, int end) {
 
-		return _blogsStatsUserLocalService.getGroupStatsUsers(
-			groupId, start, end);
+		return ModelAdapterUtil.adapt(
+			BlogsStatsUser.class,
+			_blogsStatsUserLocalService.getGroupStatsUsers(
+				groupId, start, end));
 	}
 
 	@Override
@@ -207,8 +219,11 @@ public class ModularBlogsStatsUserLocalServiceWrapper
 		long groupId, int start, int end,
 		OrderByComparator<BlogsStatsUser> obc) {
 
-		return _blogsStatsUserLocalService.getGroupStatsUsers(
-			groupId, start, end, obc);
+		return ModelAdapterUtil.adapt(
+			BlogsStatsUser.class,
+			_blogsStatsUserLocalService.getGroupStatsUsers(
+				groupId, start, end,
+				ModelAdapterUtil.adapt(BlogsStatsUser.class, obc)));
 	}
 
 	@Override
@@ -227,8 +242,10 @@ public class ModularBlogsStatsUserLocalServiceWrapper
 	public List<BlogsStatsUser> getOrganizationStatsUsers(
 		long organizationId, int start, int end) {
 
-		return _blogsStatsUserLocalService.getOrganizationStatsUsers(
-			organizationId, start, end);
+		return ModelAdapterUtil.adapt(
+			BlogsStatsUser.class,
+			_blogsStatsUserLocalService.getOrganizationStatsUsers(
+				organizationId, start, end));
 	}
 
 	@Override
@@ -236,8 +253,11 @@ public class ModularBlogsStatsUserLocalServiceWrapper
 		long organizationId, int start, int end,
 		OrderByComparator<BlogsStatsUser> obc) {
 
-		return _blogsStatsUserLocalService.getOrganizationStatsUsers(
-			organizationId, start, end, obc);
+		return ModelAdapterUtil.adapt(
+			BlogsStatsUser.class,
+			_blogsStatsUserLocalService.getOrganizationStatsUsers(
+				organizationId, start, end,
+				ModelAdapterUtil.adapt(BlogsStatsUser.class, obc)));
 	}
 
 	@Override
@@ -262,7 +282,9 @@ public class ModularBlogsStatsUserLocalServiceWrapper
 	public BlogsStatsUser getStatsUser(long groupId, long userId)
 		throws PortalException {
 
-		return _blogsStatsUserLocalService.getStatsUser(groupId, userId);
+		return ModelAdapterUtil.adapt(
+			BlogsStatsUser.class,
+			_blogsStatsUserLocalService.getStatsUser(groupId, userId));
 	}
 
 	@Override

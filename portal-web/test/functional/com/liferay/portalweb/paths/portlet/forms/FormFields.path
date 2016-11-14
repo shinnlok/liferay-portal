@@ -30,7 +30,7 @@
 </tr>
 <tr>
 	<td>FIELD_NAME</td>
-	<td>//div[contains(@class, 'key-value-editor')]</td>
+	<td>//div[contains(@class,'key-value-editor')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -244,6 +244,11 @@
 <tr>
 	<td>SELECT_OPTION</td>
 	<td>//div[contains(@data-fieldname,'${key_fieldName}')]//select/option[contains(.,'${key_selectOption}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SELECT_OPTIONS_OPTION_VALUE_FIELD_VISIBLE</td>
+	<td>//div[@class='input-select-wrapper']//option[${key_rowNumber}]</td>
 	<td></td>
 </tr>
 <tr>

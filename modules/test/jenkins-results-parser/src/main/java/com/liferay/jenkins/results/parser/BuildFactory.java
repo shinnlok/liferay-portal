@@ -34,7 +34,24 @@ public class BuildFactory {
 
 		for (String batchIndicator : _BATCH_INDICATORS) {
 			if (url.contains(batchIndicator)) {
-				return new BatchBuild(url, (TopLevelBuild)parentBuild);
+				BatchBuild batchBuild = new BatchBuild(
+					url, (TopLevelBuild)parentBuild);
+
+				String jobVariant = batchBuild.getParameterValue("JOB_VARIANT");
+
+				if (jobVariant != null) {
+					if (jobVariant.contains("functional")) {
+						batchBuild = new FunctionalBatchBuild(
+							url, (TopLevelBuild)parentBuild);
+					}
+
+					if (jobVariant.contains("modules-integration")) {
+						batchBuild = new ModulesIntegrationBatchBuild(
+							url, (TopLevelBuild)parentBuild);
+					}
+				}
+
+				return batchBuild;
 			}
 		}
 
@@ -58,6 +75,7 @@ public class BuildFactory {
 		return topLevelBuild;
 	}
 
-	private static final String[] _BATCH_INDICATORS = {"-batch", "-dist"};
+	private static final String[] _BATCH_INDICATORS =
+		{"-batch", "-dist", "environment-"};
 
 }
