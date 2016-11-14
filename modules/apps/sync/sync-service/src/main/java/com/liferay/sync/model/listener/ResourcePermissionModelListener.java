@@ -47,18 +47,7 @@ public class ResourcePermissionModelListener
 		try {
 			SyncDLObject syncDLObject = null;
 
-			String modelName = resourcePermission.getName();
-
-			if (modelName.equals(DLFileEntry.class.getName())) {
-				syncDLObject = _syncDLObjectLocalService.fetchSyncDLObject(
-					SyncDLObjectConstants.TYPE_FILE,
-					GetterUtil.getLong(resourcePermission.getPrimKey()));
-			}
-			else if (modelName.equals(DLFolder.class.getName())) {
-				syncDLObject = _syncDLObjectLocalService.fetchSyncDLObject(
-					SyncDLObjectConstants.TYPE_FOLDER,
-					GetterUtil.getLong(resourcePermission.getPrimKey()));
-			}
+			syncDLObject = _fetchSyncDLObject(resourcePermission);
 
 			if (syncDLObject == null) {
 				return;
@@ -80,18 +69,7 @@ public class ResourcePermissionModelListener
 		try {
 			SyncDLObject syncDLObject = null;
 
-			String modelName = resourcePermission.getName();
-
-			if (modelName.equals(DLFileEntry.class.getName())) {
-				syncDLObject = _syncDLObjectLocalService.fetchSyncDLObject(
-					SyncDLObjectConstants.TYPE_FILE,
-					GetterUtil.getLong(resourcePermission.getPrimKey()));
-			}
-			else if (modelName.equals(DLFolder.class.getName())) {
-				syncDLObject = _syncDLObjectLocalService.fetchSyncDLObject(
-					SyncDLObjectConstants.TYPE_FOLDER,
-					GetterUtil.getLong(resourcePermission.getPrimKey()));
-			}
+			syncDLObject = _fetchSyncDLObject(resourcePermission);
 
 			if (syncDLObject == null) {
 				return;
@@ -152,6 +130,27 @@ public class ResourcePermissionModelListener
 		for (SyncDLObject childSyncDLObject : childSyncDLObjects) {
 			updateSyncDLObject(childSyncDLObject);
 		}
+	}
+
+	private SyncDLObject _fetchSyncDLObject(
+		ResourcePermission resourcePermission) {
+
+		SyncDLObject syncDLObject = null;
+
+		String modelName = resourcePermission.getName();
+
+		if (modelName.equals(DLFileEntry.class.getName())) {
+			syncDLObject = _syncDLObjectLocalService.fetchSyncDLObject(
+				SyncDLObjectConstants.TYPE_FILE,
+				GetterUtil.getLong(resourcePermission.getPrimKey()));
+		}
+		else if (modelName.equals(DLFolder.class.getName())) {
+			syncDLObject = _syncDLObjectLocalService.fetchSyncDLObject(
+				SyncDLObjectConstants.TYPE_FOLDER,
+				GetterUtil.getLong(resourcePermission.getPrimKey()));
+		}
+
+		return syncDLObject;
 	}
 
 	private ResourcePermissionLocalService _resourcePermissionLocalService;
