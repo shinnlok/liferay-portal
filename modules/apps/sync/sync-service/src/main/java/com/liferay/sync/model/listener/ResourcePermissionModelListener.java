@@ -44,21 +44,14 @@ public class ResourcePermissionModelListener
 	public void onBeforeCreate(ResourcePermission resourcePermission)
 		throws ModelListenerException {
 
-		try {
-			SyncDLObject syncDLObject = null;
+		SyncDLObject syncDLObject = getSyncDLObject(resourcePermission);
 
-			syncDLObject = _fetchSyncDLObject(resourcePermission);
-
-			if (syncDLObject == null) {
-				return;
-			}
-
-			if (resourcePermission.hasActionId(ActionKeys.VIEW)) {
-				updateSyncDLObject(syncDLObject);
-			}
+		if (syncDLObject == null) {
+			return;
 		}
-		catch (Exception e) {
-			throw new ModelListenerException(e);
+
+		if (resourcePermission.hasActionId(ActionKeys.VIEW)) {
+			updateSyncDLObject(syncDLObject);
 		}
 	}
 
@@ -66,36 +59,48 @@ public class ResourcePermissionModelListener
 	public void onBeforeUpdate(ResourcePermission resourcePermission)
 		throws ModelListenerException {
 
-		try {
-			SyncDLObject syncDLObject = null;
+		SyncDLObject syncDLObject = getSyncDLObject(resourcePermission);
 
-			syncDLObject = _fetchSyncDLObject(resourcePermission);
-
-			if (syncDLObject == null) {
-				return;
-			}
-
-			ResourcePermission originalResourcePermission =
-				_resourcePermissionLocalService.fetchResourcePermission(
-					resourcePermission.getResourcePermissionId());
-
-			if (originalResourcePermission.hasActionId(ActionKeys.VIEW) &&
-				!resourcePermission.hasActionId(ActionKeys.VIEW)) {
-
-				syncDLObject.setModifiedTime(System.currentTimeMillis());
-				syncDLObject.setLastPermissionChangeDate(new Date());
-
-				_syncDLObjectLocalService.updateSyncDLObject(syncDLObject);
-			}
-			else if (!originalResourcePermission.hasActionId(ActionKeys.VIEW) &&
-					 resourcePermission.hasActionId(ActionKeys.VIEW)) {
-
-				updateSyncDLObject(syncDLObject);
-			}
+		if (syncDLObject == null) {
+			return;
 		}
-		catch (Exception e) {
-			throw new ModelListenerException(e);
+
+		ResourcePermission originalResourcePermission =
+			_resourcePermissionLocalService.fetchResourcePermission(
+				resourcePermission.getResourcePermissionId());
+
+		if (originalResourcePermission.hasActionId(ActionKeys.VIEW) &&
+			!resourcePermission.hasActionId(ActionKeys.VIEW)) {
+
+			syncDLObject.setModifiedTime(System.currentTimeMillis());
+			syncDLObject.setLastPermissionChangeDate(new Date());
+
+			_syncDLObjectLocalService.updateSyncDLObject(syncDLObject);
 		}
+		else if (!originalResourcePermission.hasActionId(ActionKeys.VIEW) &&
+				 resourcePermission.hasActionId(ActionKeys.VIEW)) {
+
+			updateSyncDLObject(syncDLObject);
+		}
+	}
+
+	protected SyncDLObject getSyncDLObject(
+		ResourcePermission resourcePermission) {
+
+		String modelName = resourcePermission.getName();
+
+		if (modelName.equals(DLFileEntry.class.getName())) {
+			return _syncDLObjectLocalService.fetchSyncDLObject(
+				SyncDLObjectConstants.TYPE_FILE,
+				GetterUtil.getLong(resourcePermission.getPrimKey()));
+		}
+		else if (modelName.equals(DLFolder.class.getName())) {
+			return _syncDLObjectLocalService.fetchSyncDLObject(
+				SyncDLObjectConstants.TYPE_FOLDER,
+				GetterUtil.getLong(resourcePermission.getPrimKey()));
+		}
+
+		return null;
 	}
 
 	@Reference(unbind = "-")
@@ -130,27 +135,6 @@ public class ResourcePermissionModelListener
 		for (SyncDLObject childSyncDLObject : childSyncDLObjects) {
 			updateSyncDLObject(childSyncDLObject);
 		}
-	}
-
-	private SyncDLObject _fetchSyncDLObject(
-		ResourcePermission resourcePermission) {
-
-		SyncDLObject syncDLObject = null;
-
-		String modelName = resourcePermission.getName();
-
-		if (modelName.equals(DLFileEntry.class.getName())) {
-			syncDLObject = _syncDLObjectLocalService.fetchSyncDLObject(
-				SyncDLObjectConstants.TYPE_FILE,
-				GetterUtil.getLong(resourcePermission.getPrimKey()));
-		}
-		else if (modelName.equals(DLFolder.class.getName())) {
-			syncDLObject = _syncDLObjectLocalService.fetchSyncDLObject(
-				SyncDLObjectConstants.TYPE_FOLDER,
-				GetterUtil.getLong(resourcePermission.getPrimKey()));
-		}
-
-		return syncDLObject;
 	}
 
 	private ResourcePermissionLocalService _resourcePermissionLocalService;
