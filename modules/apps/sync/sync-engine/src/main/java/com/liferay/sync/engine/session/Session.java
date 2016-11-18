@@ -303,7 +303,7 @@ public class Session {
 
 		_buildHttpPostBody(httpPost, parameters);
 
-		_prepareHttpRequest(httpPost);
+		prepareHttpRequest(httpPost);
 
 		return _httpClient.execute(_httpHost, httpPost, _getBasicHttpContext());
 	}
@@ -315,7 +315,7 @@ public class Session {
 
 		_buildHttpPostBody(httpPost, parameters);
 
-		_prepareHttpRequest(httpPost);
+		prepareHttpRequest(httpPost);
 
 		return _httpClient.execute(
 			_httpHost, httpPost, handler, _getBasicHttpContext());
@@ -336,7 +336,7 @@ public class Session {
 			HttpContext httpContext)
 		throws Exception {
 
-		_prepareHttpRequest(httpRequest);
+		prepareHttpRequest(httpRequest);
 
 		return _httpClient.execute(
 			_httpHost, httpRequest, handler, httpContext);
@@ -346,7 +346,7 @@ public class Session {
 			HttpRequest httpRequest, HttpContext httpContext)
 		throws Exception {
 
-		_prepareHttpRequest(httpRequest);
+		prepareHttpRequest(httpRequest);
 
 		return _httpClient.execute(_httpHost, httpRequest, httpContext);
 	}
@@ -377,6 +377,20 @@ public class Session {
 
 	public void incrementUploadedBytes(int bytes) {
 		_uploadedBytes.getAndAdd(bytes);
+	}
+
+	public boolean isOAuthEnabled() {
+		return _oAuthEnabled;
+	}
+
+	public void prepareHttpRequest(HttpRequest httpRequest) throws Exception {
+		if (_oAuthEnabled) {
+			_oAuthConsumer.sign(httpRequest);
+		}
+
+		for (Map.Entry<String, String> entry : _headers.entrySet()) {
+			httpRequest.setHeader(entry.getKey(), entry.getValue());
+		}
 	}
 
 	public void startTrackTransferRate() {
@@ -607,16 +621,6 @@ public class Session {
 		}
 
 		return new UrlEncodedFormEntity(nameValuePairs);
-	}
-
-	private void _prepareHttpRequest(HttpRequest httpRequest) throws Exception {
-		if (_oAuthEnabled) {
-			_oAuthConsumer.sign(httpRequest);
-		}
-
-		for (Map.Entry<String, String> entry : _headers.entrySet()) {
-			httpRequest.setHeader(entry.getKey(), entry.getValue());
-		}
 	}
 
 	private static final Logger _logger = LoggerFactory.getLogger(
