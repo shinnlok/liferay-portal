@@ -48,7 +48,7 @@ public class ServerInfo {
 	}
 
 	public static boolean supportsRedirect(long syncAccountId) {
-		return isCompatible(syncAccountId, "1.3.4", "6.2.0.10");
+		return isCompatible(syncAccountId, "1.3.4", "6.2.0.9");
 	}
 
 	public static boolean supportsRetrieveFromCache(long syncAccountId) {
