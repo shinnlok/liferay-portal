@@ -45,6 +45,8 @@ import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CodingErrorAction;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -482,7 +484,7 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		String line, String fileName, String absolutePath, int lineCount,
 		boolean javaSource) {
 
-		if (isExcludedPath(getRunOutsidePortalExcludes(), absolutePath)) {
+		if (isExcludedPath(RUN_OUTSIDE_PORTAL_EXCLUDES, absolutePath)) {
 			return;
 		}
 
@@ -514,14 +516,16 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		if (_portalLanguageProperties == null) {
 			Properties portalLanguageProperties = new Properties();
 
-			File portalLanguagePropertiesFile = new File(
-				getFile("portal-impl", PORTAL_MAX_DIR_LEVEL),
-				"src/content/Language.properties");
+			File portalLanguagePropertiesFile = getFile(
+				"portal-impl/src/content/Language.properties",
+				PORTAL_MAX_DIR_LEVEL);
 
-			InputStream inputStream = new FileInputStream(
-				portalLanguagePropertiesFile);
+			if (portalLanguagePropertiesFile != null) {
+				InputStream inputStream = new FileInputStream(
+					portalLanguagePropertiesFile);
 
-			portalLanguageProperties.load(inputStream);
+				portalLanguageProperties.load(inputStream);
+			}
 
 			_portalLanguageProperties = portalLanguageProperties;
 		}
@@ -646,9 +650,11 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 	}
 
 	protected void checkResourceUtil(
-		String line, String fileName, int lineCount) {
+		String line, String fileName, String absolutePath, int lineCount) {
 
-		if (!portalSource || fileName.endsWith("ResourceBundleUtil.java")) {
+		if (!portalSource || fileName.endsWith("ResourceBundleUtil.java") ||
+			isExcludedPath(RUN_OUTSIDE_PORTAL_EXCLUDES, absolutePath)) {
+
 			return;
 		}
 
@@ -788,7 +794,9 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 
 		String copyright = _copyright;
 
-		if (fileName.endsWith(".vm") || Validator.isNull(copyright)) {
+		if (fileName.endsWith(".tpl") || fileName.endsWith(".vm") ||
+			Validator.isNull(copyright)) {
+
 			return content;
 		}
 
@@ -1071,6 +1079,24 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		return newContent;
 	}
 
+	protected String fixUnparameterizedClassType(String content) {
+		Matcher matcher = unparameterizedClassTypePattern1.matcher(content);
+
+		if (matcher.find()) {
+			return StringUtil.replaceFirst(
+				content, "Class", "Class<?>", matcher.start());
+		}
+
+		matcher = unparameterizedClassTypePattern2.matcher(content);
+
+		if (matcher.find()) {
+			return StringUtil.replaceFirst(
+				content, "Class", "Class<?>", matcher.start());
+		}
+
+		return content;
+	}
+
 	protected final String format(
 			File file, String fileName, String absolutePath, String content)
 		throws Exception {
@@ -1106,9 +1132,9 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		fileName = StringUtil.replace(
 			fileName, CharPool.BACK_SLASH, CharPool.SLASH);
 
-		File file = new File(fileName);
+		String absolutePath = getAbsolutePath(fileName);
 
-		String absolutePath = getAbsolutePath(file);
+		File file = new File(absolutePath);
 
 		String content = FileUtil.read(file);
 
@@ -1378,9 +1404,9 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 			String javaClassName, String packagePath, File file,
 			String fileName, String absolutePath, String content,
 			String javaClassContent, int javaClassLineCount, String indent,
-			List<String> checkJavaFieldTypesExcludes,
-			List<String> javaTermSortExcludes,
-			List<String> testAnnotationsExcludes)
+			String checkJavaFieldTypesExcludesProperty,
+			String javaTermSortExcludesProperty,
+			String testAnnotationsExcludesProperty)
 		throws Exception {
 
 		JavaSourceProcessor javaSourceProcessor = null;
@@ -1402,8 +1428,8 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 
 		String newJavaClassContent = javaClass.formatJavaTerms(
 			getAnnotationsExclusions(), getImmutableFieldTypes(),
-			checkJavaFieldTypesExcludes, javaTermSortExcludes,
-			testAnnotationsExcludes);
+			checkJavaFieldTypesExcludesProperty, javaTermSortExcludesProperty,
+			testAnnotationsExcludesProperty);
 
 		if (!javaClassContent.equals(newJavaClassContent)) {
 			return StringUtil.replaceFirst(
@@ -1515,12 +1541,12 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 
 		linePart = formatIncorrectSyntax(linePart, "catch(", "catch (", true);
 		linePart = formatIncorrectSyntax(linePart, "else{", "else {", true);
+		linePart = formatIncorrectSyntax(
+			linePart, "else if(", "else if (", true);
 		linePart = formatIncorrectSyntax(linePart, "for(", "for (", true);
 		linePart = formatIncorrectSyntax(linePart, "if(", "if (", true);
 		linePart = formatIncorrectSyntax(linePart, "while(", "while (", true);
 		linePart = formatIncorrectSyntax(linePart, "List <", "List<", false);
-		linePart = formatIncorrectSyntax(linePart, "){", ") {", false);
-		linePart = formatIncorrectSyntax(linePart, "]{", "] {", false);
 
 		if (javaSource) {
 			linePart = formatIncorrectSyntax(linePart, " ...", "...", false);
@@ -1529,6 +1555,8 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 			linePart = formatIncorrectSyntax(linePart, " }", "}", false);
 			linePart = formatIncorrectSyntax(linePart, " )", ")", false);
 			linePart = formatIncorrectSyntax(linePart, "( ", "(", false);
+			linePart = formatIncorrectSyntax(linePart, "){", ") {", false);
+			linePart = formatIncorrectSyntax(linePart, "]{", "] {", false);
 			linePart = formatIncorrectSyntax(linePart, "\\w(( ?)=)");
 			linePart = formatIncorrectSyntax(linePart, "(=( ?))\\w");
 			linePart = formatIncorrectSyntax(linePart, "for \\(.*(( ?):)");
@@ -1650,13 +1678,15 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 			line, StringPool.SPACE + StringPool.TAB, StringPool.TAB, false);
 	}
 
-	protected String getAbsolutePath(File file) throws Exception {
-		String absolutePath = file.getCanonicalPath();
+	protected String getAbsolutePath(String fileName) {
+		Path filePath = Paths.get(fileName);
 
-		absolutePath = StringUtil.replace(
-			absolutePath, CharPool.BACK_SLASH, CharPool.SLASH);
+		filePath = filePath.toAbsolutePath();
 
-		return StringUtil.replace(absolutePath, "/./", StringPool.SLASH);
+		filePath = filePath.normalize();
+
+		return StringUtil.replace(
+			filePath.toString(), CharPool.BACK_SLASH, CharPool.SLASH);
 	}
 
 	protected Set<String> getAnnotationsExclusions() {
@@ -2375,9 +2405,7 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 			pluginBuildFileName = StringUtil.replace(
 				pluginBuildFileName, StringPool.BACK_SLASH, StringPool.SLASH);
 
-			File file = new File(pluginBuildFileName);
-
-			String absolutePath = getAbsolutePath(file);
+			String absolutePath = getAbsolutePath(pluginBuildFileName);
 
 			int x = absolutePath.indexOf("/modules/apps/");
 
@@ -2404,19 +2432,6 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 	protected List<String> getPropertyList(String key) {
 		return ListUtil.fromString(
 			GetterUtil.getString(getProperty(key)), StringPool.COMMA);
-	}
-
-	protected List<String> getRunOutsidePortalExcludes() {
-		if (_runOutsidePortalExcludes != null) {
-			return _runOutsidePortalExcludes;
-		}
-
-		List<String> runOutsidePortalExcludes = getPropertyList(
-			"run.outside.portal.excludes");
-
-		_runOutsidePortalExcludes = runOutsidePortalExcludes;
-
-		return _runOutsidePortalExcludes;
 	}
 
 	protected boolean hasMissingParentheses(String s) {
@@ -2524,6 +2539,43 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		return false;
 	}
 
+	protected boolean isAllowedVariableType(
+		String content, String variableName,
+		String[] variableTypeRegexStrings) {
+
+		if (variableTypeRegexStrings.length == 0) {
+			return true;
+		}
+
+		for (String variableTypeRegex : variableTypeRegexStrings) {
+			StringBundler sb = new StringBundler(5);
+
+			sb.append("[\\s\\S]*\\W");
+			sb.append(variableTypeRegex);
+			sb.append("\\s+");
+			sb.append(variableName);
+			sb.append("\\W[\\s\\S]*");
+
+			if (content.matches(sb.toString())) {
+				return true;
+			}
+
+			sb = new StringBundler(5);
+
+			sb.append("[\\s\\S]*\\W");
+			sb.append(variableName);
+			sb.append(" =\\s+new ");
+			sb.append(variableTypeRegex);
+			sb.append("[\\s\\S]*");
+
+			if (content.matches(sb.toString())) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	protected boolean isAttributName(String attributeName) {
 		if (Validator.isNull(attributeName)) {
 			return false;
@@ -2534,19 +2586,26 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		return matcher.matches();
 	}
 
-	protected boolean isExcludedPath(List<String> excludes, String path) {
-		return isExcludedPath(excludes, path, -1);
+	protected boolean isExcludedPath(String property, String path) {
+		return isExcludedPath(property, path, -1);
 	}
 
 	protected boolean isExcludedPath(
-		List<String> excludes, String path, int lineCount) {
+		String property, String path, int lineCount) {
 
-		return isExcludedPath(excludes, path, lineCount, null);
+		return isExcludedPath(property, path, lineCount, null);
 	}
 
 	protected boolean isExcludedPath(
-		List<String> excludes, String path, int lineCount,
-		String javaTermName) {
+		String property, String path, int lineCount, String javaTermName) {
+
+		List<String> excludes = _exclusionPropertiesMap.get(property);
+
+		if (excludes == null) {
+			excludes = getPropertyList(property);
+
+			_exclusionPropertiesMap.put(property, excludes);
+		}
 
 		if (ListUtil.isEmpty(excludes)) {
 			return false;
@@ -2736,8 +2795,12 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		return line;
 	}
 
-	protected String sortPutOrSetCalls(
-		String content, Pattern codeBlockPattern, Pattern singleLinePattern) {
+	protected String sortMethodCall(
+		String content, String methodName, String... variableTypeRegexStrings) {
+
+		Pattern codeBlockPattern = Pattern.compile(
+			"(\t+(\\w*)\\." + methodName + "\\(\\s*\".*?\\);\n)+",
+			Pattern.DOTALL);
 
 		Matcher codeBlockMatcher = codeBlockPattern.matcher(content);
 
@@ -2745,9 +2808,20 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 			new PutOrSetParameterNameComparator();
 
 		while (codeBlockMatcher.find()) {
+			if (!isAllowedVariableType(
+					content, codeBlockMatcher.group(2),
+					variableTypeRegexStrings)) {
+
+				continue;
+			}
+
 			String codeBlock = codeBlockMatcher.group();
 
-			Matcher singleLineMatcher = singleLinePattern.matcher(codeBlock);
+			Pattern singleLineMethodCallPattern = Pattern.compile(
+				"\t*\\w*\\." + methodName + "\\((.*?)\\);\n", Pattern.DOTALL);
+
+			Matcher singleLineMatcher = singleLineMethodCallPattern.matcher(
+				codeBlock);
 
 			String previousParameters = null;
 			String previousPutOrSetParameterName = null;
@@ -2776,6 +2850,22 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 				previousPutOrSetParameterName = putOrSetParameterName;
 			}
 		}
+
+		return content;
+	}
+
+	protected String sortMethodCalls(String absolutePath, String content) {
+		if (isExcludedPath(METHOD_CALL_SORT_EXCLUDES, absolutePath)) {
+			return content;
+		}
+
+		content = sortMethodCall(
+			content, "add", "ConcurrentSkipListSet<.*>", "HashSet<.*>",
+			"TreeSet<.*>");
+		content = sortMethodCall(
+			content, "put", "ConcurrentHashMap<.*>", "HashMap<.*>",
+			"JSONObject", "TreeMap<.*>");
+		content = sortMethodCall(content, "setAttribute");
 
 		return content;
 	}
@@ -2908,6 +2998,12 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		return line;
 	}
 
+	protected static final String METHOD_CALL_SORT_EXCLUDES =
+		"method.call.sort.excludes";
+
+	protected static final String RUN_OUTSIDE_PORTAL_EXCLUDES =
+		"run.outside.portal.excludes";
+
 	protected static Pattern applyLangMergerPluginPattern = Pattern.compile(
 		"^apply[ \t]+plugin[ \t]*:[ \t]+\"com.liferay.lang.merger\"$",
 		Pattern.MULTILINE);
@@ -2927,10 +3023,6 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		Pattern.DOTALL);
 	protected static Pattern javaSourceInsideJSPLinePattern = Pattern.compile(
 		"<%=(.+?)%>");
-	protected static Pattern jsonObjectPutBlockPattern = Pattern.compile(
-		"(\t*\\w*(json|JSON)Object\\.put\\(\\s*\".*?\\);\n)+", Pattern.DOTALL);
-	protected static Pattern jsonObjectPutPattern = Pattern.compile(
-		"\t*\\w*(?:json|JSON)Object\\.put\\((.*?)\\);\n", Pattern.DOTALL);
 	protected static Pattern languageKeyPattern = Pattern.compile(
 		"LanguageUtil.(?:get|format)\\([^;%]+|Liferay.Language.get\\('([^']+)");
 	protected static Pattern mergeLangPattern = Pattern.compile(
@@ -2948,10 +3040,6 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		"SessionErrors.(?:add|contains|get)\\([^;%&|!]+|".concat(
 			"SessionMessages.(?:add|contains|get)\\([^;%&|!]+"),
 		Pattern.MULTILINE);
-	protected static Pattern setAttributeBlockPattern = Pattern.compile(
-		"(\t*\\w*\\.setAttribute\\(\\s*.*?\\);\n)+", Pattern.DOTALL);
-	protected static Pattern setAttributePattern = Pattern.compile(
-		"\t*\\w*\\.setAttribute\\((.*?)\\);\n", Pattern.DOTALL);
 	protected static Pattern singleLengthStringPattern = Pattern.compile(
 		"^(\".\"|StringPool\\.([A-Z_]+))$");
 	protected static Pattern stringUtilReplacePattern = Pattern.compile(
@@ -2959,6 +3047,10 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 	protected static Pattern taglibSessionKeyPattern = Pattern.compile(
 		"<liferay-ui:error [^>]+>|<liferay-ui:success [^>]+>",
 		Pattern.MULTILINE);
+	protected static Pattern unparameterizedClassTypePattern1 =
+		Pattern.compile("\\Wnew Class[^<\\w]");
+	protected static Pattern unparameterizedClassTypePattern2 =
+		Pattern.compile("\\WClass[\\[\\]]* \\w+ =");
 	protected static Pattern validatorEqualsPattern = Pattern.compile(
 		"\\WValidator\\.equals\\(");
 
@@ -3013,9 +3105,29 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		if (getFile("portal-impl", PORTAL_MAX_DIR_LEVEL) != null) {
 			return true;
 		}
-		else {
-			return false;
+
+		// Subrepositories should be treated as portal
+
+		String baseDirAbsolutePath = getAbsolutePath(
+			sourceFormatterArgs.getBaseDirName());
+
+		int x = baseDirAbsolutePath.length();
+
+		for (int i = 0; i < 2; i++) {
+			x = baseDirAbsolutePath.lastIndexOf(CharPool.FORWARD_SLASH, x - 1);
+
+			if (x == -1) {
+				return false;
+			}
+
+			String dirName = baseDirAbsolutePath.substring(x + 1);
+
+			if (dirName.startsWith("com-liferay-")) {
+				return true;
+			}
 		}
+
+		return false;
 	}
 
 	private String _normalizePattern(String originalPattern) {
@@ -3047,6 +3159,7 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 	private final Pattern _emptyLineInNestedTagsPattern2 = Pattern.compile(
 		"\n(\t*)(.*>)\n\n(\t*)</.*(\n|$)");
 	private String[] _excludes;
+	private Map<String, List<String>> _exclusionPropertiesMap = new HashMap<>();
 	private SourceMismatchException _firstSourceMismatchException;
 	private Set<String> _immutableFieldTypes;
 	private ComparableVersion _mainReleaseComparableVersion;
@@ -3060,7 +3173,6 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 	private List<String> _pluginsInsideModulesDirectoryNames;
 	private Properties _portalLanguageProperties;
 	private Properties _properties;
-	private List<String> _runOutsidePortalExcludes;
 	private SourceFormatterHelper _sourceFormatterHelper;
 	private Map<String, Set<SourceFormatterMessage>>
 		_sourceFormatterMessagesMap = new ConcurrentHashMap<>();
@@ -3094,6 +3206,17 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 
 			if (matcher.find()) {
 				putOrSetParameterName2 = matcher.replaceAll(StringPool.BLANK);
+			}
+
+			if (putOrSetParameterName1.matches("\".*\"") &&
+				putOrSetParameterName2.matches("\".*\"")) {
+
+				String strippedQuotes1 = putOrSetParameterName1.substring(
+					1, putOrSetParameterName1.length() - 1);
+				String strippedQuotes2 = putOrSetParameterName2.substring(
+					1, putOrSetParameterName2.length() - 1);
+
+				return super.compare(strippedQuotes1, strippedQuotes2);
 			}
 
 			int value = super.compare(

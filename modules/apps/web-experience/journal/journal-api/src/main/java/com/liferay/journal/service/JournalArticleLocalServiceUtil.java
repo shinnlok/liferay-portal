@@ -462,6 +462,16 @@ public class JournalArticleLocalServiceUtil {
 		return getService().fetchArticle(groupId, articleId, version);
 	}
 
+	/**
+	* Returns the web content article with the ID.
+	*
+	* @param id the primary key of the web content article
+	* @return the web content article with the ID
+	*/
+	public static com.liferay.journal.model.JournalArticle fetchArticle(long id) {
+		return getService().fetchArticle(id);
+	}
+
 	public static com.liferay.journal.model.JournalArticle fetchArticleByUrlTitle(
 		long groupId, java.lang.String urlTitle) {
 		return getService().fetchArticleByUrlTitle(groupId, urlTitle);

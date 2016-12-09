@@ -26,6 +26,7 @@ long groupId = BeanParamUtil.getLong(recordSet, request, "groupId", scopeGroupId
 long ddmStructureId = BeanParamUtil.getLong(recordSet, request, "DDMStructureId");
 String name = BeanParamUtil.getString(recordSet, request, "name");
 String description = BeanParamUtil.getString(recordSet, request, "description");
+boolean showPublishModal = ParamUtil.getBoolean(request, "showPublishModal");
 
 portletDisplay.setShowBackIcon(true);
 portletDisplay.setURLBack(redirect);
@@ -47,11 +48,16 @@ renderResponse.setTitle((recordSet == null) ? LanguageUtil.get(request, "new-for
 		</aui:nav>
 	</aui:nav-bar>
 
+	<div class="autosave-bar management-bar management-bar-default">
+		<span class="autosave-feedback management-bar-text" id="<portlet:namespace />autosaveMessage"></span>
+	</div>
+
 	<aui:form action="<%= saveRecordSetURL %>" cssClass="ddl-form-builder-form" method="post" name="editForm">
 		<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 		<aui:input name="recordSetId" type="hidden" value="<%= recordSetId %>" />
 		<aui:input name="groupId" type="hidden" value="<%= groupId %>" />
 		<aui:input name="ddmStructureId" type="hidden" value="<%= ddmStructureId %>" />
+		<aui:input name="saveAndPublish" type="hidden" value="<%= true %>" />
 		<aui:input name="serializedSettingsDDMFormValues" type="hidden" value="" />
 
 		<liferay-ui:error exception="<%= DDMFormLayoutValidationException.class %>" message="please-enter-a-valid-form-layout" />
@@ -153,9 +159,13 @@ renderResponse.setTitle((recordSet == null) ? LanguageUtil.get(request, "new-for
 
 		<div class="container-fluid-1280">
 			<aui:button-row cssClass="ddl-form-builder-buttons">
-				<aui:button cssClass="btn-lg ddl-button" id="submit" type="submit" value="save" />
+				<aui:button cssClass="btn-lg ddl-button" id="publish" type="submit" value="publish-form" />
 
-				<aui:button cssClass="btn-lg" href="<%= redirect %>" name="cancelButton" type="cancel" />
+				<aui:button cssClass="btn-lg ddl-button" id="save" value="save-form" />
+
+				<aui:button cssClass="btn-lg btn-link" id="preview" value="preview-form" />
+
+				<aui:button cssClass="btn-lg" href="<%= redirect %>" type="cancel" />
 			</aui:button-row>
 		</div>
 
@@ -163,8 +173,6 @@ renderResponse.setTitle((recordSet == null) ? LanguageUtil.get(request, "new-for
 			<div class="form-group">
 				<label class="control-label ddl-publish-checkbox" for="<portlet:namespace />publishCheckbox">
 					<span class="pull-left">
-						<liferay-ui:message key="publish-form" />
-
 						<small><liferay-ui:message key="make-this-form-public" /></small>
 					</span>
 
@@ -220,18 +228,24 @@ renderResponse.setTitle((recordSet == null) ? LanguageUtil.get(request, "new-for
 							window,
 							'<portlet:namespace />init',
 							function() {
+								var definition = <%= ddlFormAdminDisplayContext.getSerializedDDMForm() %>;
+
 								Liferay.DDM.Renderer.FieldTypes.register(fieldTypes);
 
 								Liferay.component(
 									'formPortlet',
 									new Liferay.DDL.Portlet(
 										{
+											availableLanguageIds: definition.availableLanguageIds,
+											autosaveInterval: '<%= ddlFormAdminDisplayContext.getAutosaveInterval() %>',
 											autosaveURL: '<%= saveRecordSetURL.toString() %>',
-											definition: <%= ddlFormAdminDisplayContext.getSerializedDDMForm() %>,
+											defaultLanguageId: definition.defaultLanguageId,
+											definition: definition,
 											description: '<%= HtmlUtil.escapeJS(description) %>',
 											editForm: event.form,
 											evaluatorURL: '<%= ddlFormAdminDisplayContext.getDDMFormContextProviderServletURL() %>',
 											fieldTypesDefinitions: <%= ddlFormAdminDisplayContext.getDDMFormFieldTypesDefinitionsMap() %>,
+											formURL: '<%= ddlFormAdminDisplayContext.getFormURL() %>',
 											getFieldTypeSettingFormContextURL: '<%= getFieldSettingsDDMFormContext.toString() %>',
 											layout: <%= ddlFormAdminDisplayContext.getSerializedDDMFormLayout() %>,
 											name: '<%= HtmlUtil.escapeJS(name) %>',
@@ -242,6 +256,11 @@ renderResponse.setTitle((recordSet == null) ? LanguageUtil.get(request, "new-for
 										}
 									)
 								);
+
+								<c:if test="<%= showPublishModal %>">
+									Liferay.component('formPortlet').openPublishModal();
+								</c:if>
+
 							},
 							['liferay-ddl-portlet'].concat(systemFieldModules)
 						);

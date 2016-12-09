@@ -123,9 +123,7 @@ public class BNDSourceProcessor extends BaseSourceProcessor {
 					StringUtil.replace(
 						moduleName, CharPool.DASH, CharPool.PERIOD);
 
-			if (!StringUtil.equalsIgnoreCase(
-					bundleSymbolicName, expectedBundleSymbolicName)) {
-
+			if (!bundleSymbolicName.equals(expectedBundleSymbolicName)) {
 				processMessage(
 					fileName,
 					"Incorrect Bundle-SymbolicName '" + bundleSymbolicName +
@@ -143,6 +141,27 @@ public class BNDSourceProcessor extends BaseSourceProcessor {
 					fileName,
 					"Incorrect Web-ContextPath '" + webContextPath + "'");
 			}
+		}
+	}
+
+	protected void checkMissingSchemaVersion(
+		String fileName, String absolutePath, String content) {
+
+		if (content.contains("Liferay-Require-SchemaVersion:") ||
+			!content.contains("Liferay-Service: true")) {
+
+			return;
+		}
+
+		int pos = absolutePath.lastIndexOf(CharPool.SLASH);
+
+		File serviceXMLfile = new File(
+			absolutePath.substring(0, pos + 1) + "service.xml");
+
+		if (serviceXMLfile.exists()) {
+			processMessage(
+				fileName,
+				"Missing 'Liferay-Require-SchemaVersion', see LPS-69385");
 		}
 	}
 
@@ -219,6 +238,8 @@ public class BNDSourceProcessor extends BaseSourceProcessor {
 		}
 
 		checkWildcardImports(fileName, absolutePath, content, _exportsPattern);
+
+		checkMissingSchemaVersion(fileName, absolutePath, content);
 
 		ImportsFormatter importsFormatter = new BNDImportsFormatter();
 
@@ -307,6 +328,15 @@ public class BNDSourceProcessor extends BaseSourceProcessor {
 		}
 
 		String includeResources = matcher.group();
+
+		matcher = _includeResourceJarPattern.matcher(includeResources);
+
+		if (matcher.find()) {
+			String replacement = StringUtil.replace(
+				includeResources, matcher.group(), "-[0-9]*.jar");
+
+			return StringUtil.replace(content, includeResources, replacement);
+		}
 
 		for (String includeResourceDir : _INCLUDE_RESOURCE_DIRS_BLACKLIST) {
 			Pattern includeResourceDirPattern = Pattern.compile(
@@ -491,6 +521,8 @@ public class BNDSourceProcessor extends BaseSourceProcessor {
 	private final Pattern _importsPattern = Pattern.compile(
 		"\nImport-Package:(\\\\\n| )(.*?\n|\\Z)[^\t]",
 		Pattern.DOTALL | Pattern.MULTILINE);
+	private final Pattern _includeResourceJarPattern = Pattern.compile(
+		"-[0-9\\.]+\\.jar");
 	private final Pattern _includeResourcePattern = Pattern.compile(
 		"^(-includeresource|Include-Resource):[\\s\\S]*?([^\\\\]\n|\\Z)",
 		Pattern.MULTILINE);

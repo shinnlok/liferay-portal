@@ -9,9 +9,8 @@ dependencies {
 	provided group: "biz.aQute.bnd", name: "biz.aQute.bndlib", version: "3.1.0"
 	provided group: "com.liferay", name: "com.liferay.dynamic.data.mapping.api", version: "3.0.0"
 	provided group: "com.liferay", name: "com.liferay.dynamic.data.mapping.service", version: "2.0.0"
-	provided group: "com.liferay", name: "com.liferay.exportimport.api", version: "3.0.0-20160907.160400-1"
-	provided group: "com.liferay", name: "com.liferay.exportimport.service", version: "4.0.0-20160913.171549-2"
-	provided group: "com.liferay", name: "com.liferay.journal.lang", version: "2.0.0"
+	provided group: "com.liferay", name: "com.liferay.exportimport.api", version: "2.0.0"
+	provided group: "com.liferay", name: "com.liferay.exportimport.service", version: "3.3.0"
 	provided group: "com.liferay", name: "com.liferay.mobile.device.rules.api", version: "2.0.0"
 	provided group: "com.liferay", name: "com.liferay.osgi.service.tracker.collections", version: "2.0.0"
 	provided group: "com.liferay", name: "com.liferay.osgi.util", version: "3.0.0"
@@ -21,6 +20,7 @@ dependencies {
 	provided group: "com.liferay", name: "com.liferay.portal.configuration.metatype", version: "2.0.0"
 	provided group: "com.liferay", name: "com.liferay.portal.dao.orm.custom.sql", version: "1.0.0"
 	provided group: "com.liferay", name: "com.liferay.portal.instance.lifecycle", version: "3.0.0"
+	provided group: "com.liferay", name: "com.liferay.portal.search", version: "3.4.0"
 	provided group: "com.liferay", name: "com.liferay.portal.spring.extender", version: "2.0.0"
 	provided group: "com.liferay", name: "com.liferay.portal.upgrade", version: "2.0.0"
 	provided group: "com.liferay", name: "com.liferay.registry.api", version: "1.0.0"
@@ -36,4 +36,5 @@ dependencies {
 	provided group: "org.osgi", name: "org.osgi.core", version: "5.0.0"
 	provided group: "org.osgi", name: "org.osgi.service.component.annotations", version: "1.3.0"
 	provided project(":apps:web-experience:journal:journal-api")
+	provided project(":apps:web-experience:journal:journal-lang")
 }

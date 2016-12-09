@@ -17,13 +17,17 @@ package com.liferay.jenkins.results.parser;
 import java.io.File;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Properties;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.tools.ant.Project;
 
 /**
+ * @author Kevin Yen
  * @author Peter Yoo
  */
 public class GitHubMessageUtil {
@@ -149,9 +153,11 @@ public class GitHubMessageUtil {
 				sb.append("s");
 			}
 
-			sb.append(" Failed.</p><pre><code>Completed with the status of ");
-			sb.append(topLevelResult);
-			sb.append(".</code></pre></li>");
+			sb.append(" Failed.</p>");
+			sb.append(
+				FailureMessageUtil.getFailureMessage(
+					project, project.getProperty("env.BUILD_URL")));
+			sb.append("</li>");
 
 			List<String> highPriorityJobFailureContents = new ArrayList<>();
 			List<String> normalPriorityJobFailureContents = new ArrayList<>();
@@ -193,7 +199,11 @@ public class GitHubMessageUtil {
 			sb.append("</ol>");
 		}
 
-		project.setProperty("github.post.comment.body", sb.toString());
+		project.setProperty("github.post.comment.body", redact(sb.toString()));
+	}
+
+	protected static String getRedactTokenKey(int index) {
+		return "github.message.redact.token[" + index + "]";
 	}
 
 	protected static boolean isHighPriorityJobFailure(String content) {
@@ -208,6 +218,35 @@ public class GitHubMessageUtil {
 		}
 
 		return false;
+	}
+
+	protected static String redact(String string) throws Exception {
+		Set<String> redactTokens = new HashSet<>();
+
+		Properties properties = JenkinsResultsParserUtil.getBuildProperties();
+
+		for (int i = 1; properties.containsKey(getRedactTokenKey(i)); i++) {
+			String key = properties.getProperty(getRedactTokenKey(i));
+
+			String redactToken = key;
+
+			if (key.startsWith("${") && key.endsWith("}")) {
+				redactToken = properties.getProperty(
+					key.substring(2, key.length() - 1));
+			}
+
+			if ((redactToken != null) && !redactToken.isEmpty()) {
+				redactTokens.add(redactToken);
+			}
+		}
+
+		redactTokens.remove("test");
+
+		for (String redactToken : redactTokens) {
+			string = string.replace(redactToken, "[REDACTED]");
+		}
+
+		return string;
 	}
 
 	private static final Pattern _pattern = Pattern.compile(

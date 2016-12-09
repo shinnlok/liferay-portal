@@ -684,6 +684,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>SITE_ADMIN_CONTENT_KALEO_FORMS_ADMIN_RESOURCE_PERMISSIONS_KALEO_FORMS_FIELD_SETS_ACTION_CHECKBOX</td>
+	<td>xpath=(//input[contains(@name,'allRowIds')])[4]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>SITE_ADMIN_CONTENT_KALEO_FORMS_ADMIN_RESOURCE_PERMISSIONS_KALEO_FORMS_PROCESS_COMPLETE_FORM</td>
 	<td>//input[contains(@value,'KaleoProcessCOMPLETE_FORM')]</td>
 	<td></td>
@@ -845,6 +850,17 @@
 <tr>
 	<td>SITE_ADMIN_CONTENT_CATEGORIES_RESOURCE_PERMISSIONS_CATEGORY_ADD_CATEGORY_CHECKBOX</td>
 	<td>//label/input[contains(@value,'AssetCategoryADD_CATEGORY')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+<!--SITE_ADMIN_CONTENT_DYNAMIC_DATA_LISTS_GENERAL_PERMISSIONS-->
+<tr>
+	<td>SITE_ADMIN_CONTENT_DYNAMIC_DATA_LISTS_GENERAL_PERMISSIONS_ACTION_CHECKBOX</td>
+	<td>//h4[contains(.,'General Permissions')]/following-sibling::div[contains(@class,'search-container')]//input[contains(@name,'allRowIds')]</td>
 	<td></td>
 </tr>
 <tr>

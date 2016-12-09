@@ -128,6 +128,37 @@ public class KBArticleServiceSoap {
 		}
 	}
 
+	public static com.liferay.knowledge.base.model.KBArticleSoap fetchFirstChildKBArticle(
+		long groupId, long parentResourcePrimKey) throws RemoteException {
+		try {
+			com.liferay.knowledge.base.model.KBArticle returnValue = KBArticleServiceUtil.fetchFirstChildKBArticle(groupId,
+					parentResourcePrimKey);
+
+			return com.liferay.knowledge.base.model.KBArticleSoap.toSoapModel(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static com.liferay.knowledge.base.model.KBArticleSoap fetchKBArticleByUrlTitle(
+		long groupId, long kbFolderId, java.lang.String urlTitle)
+		throws RemoteException {
+		try {
+			com.liferay.knowledge.base.model.KBArticle returnValue = KBArticleServiceUtil.fetchKBArticleByUrlTitle(groupId,
+					kbFolderId, urlTitle);
+
+			return com.liferay.knowledge.base.model.KBArticleSoap.toSoapModel(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
 	public static com.liferay.knowledge.base.model.KBArticleSoap fetchLatestKBArticle(
 		long resourcePrimKey, int status) throws RemoteException {
 		try {
@@ -144,8 +175,9 @@ public class KBArticleServiceSoap {
 	}
 
 	/**
-	* @deprecated As of 1.1.0, replaced by {@link #getAllDescendantKBArticles(
-	long, long, int, OrderByComparator)}
+	* @deprecated As of 1.1.0, replaced by {@link
+	#getAllDescendantKBArticles(long, long, int,
+	OrderByComparator)}
 	*/
 	@Deprecated
 	public static com.liferay.knowledge.base.model.KBArticleSoap[] getAllDescendantKBArticles(
@@ -427,6 +459,20 @@ public class KBArticleServiceSoap {
 		}
 	}
 
+	public static com.liferay.knowledge.base.model.KBArticleSoap[] getPreviousAndNextKBArticles(
+		long kbArticleId) throws RemoteException {
+		try {
+			com.liferay.knowledge.base.model.KBArticle[] returnValue = KBArticleServiceUtil.getPreviousAndNextKBArticles(kbArticleId);
+
+			return com.liferay.knowledge.base.model.KBArticleSoap.toSoapModels(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
 	public static com.liferay.knowledge.base.model.KBArticleSoap[] getSectionsKBArticles(
 		long groupId, java.lang.String[] sections, int status, int start,
 		int end,
@@ -463,8 +509,7 @@ public class KBArticleServiceSoap {
 
 	/**
 	* @deprecated As of 1.1.0, replaced by {@link #getKBArticles(long, long,
-	int, int, int,
-	OrderByComparator)}
+	int, int, int, OrderByComparator)}
 	*/
 	@Deprecated
 	public static com.liferay.knowledge.base.model.KBArticleSoap[] getSiblingKBArticles(

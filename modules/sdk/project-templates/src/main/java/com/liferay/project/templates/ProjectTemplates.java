@@ -284,7 +284,7 @@ public class ProjectTemplates {
 		}
 		else if ((template.equals("mvc-portlet") ||
 				  template.equals("portlet")) &&
-				 className.endsWith("Portlet")) {
+				 (className.length() > 7) && className.endsWith("Portlet")) {
 
 			className = className.substring(0, className.length() - 7);
 		}
@@ -295,6 +295,12 @@ public class ProjectTemplates {
 			Validator.isNotNull(name)) {
 
 			projectTemplatesArgs.setPackageName(_getPackageName(name));
+		}
+
+		String contributorType = projectTemplatesArgs.getContributorType();
+
+		if (Validator.isNull(contributorType)) {
+			projectTemplatesArgs.setContributorType(name);
 		}
 	}
 

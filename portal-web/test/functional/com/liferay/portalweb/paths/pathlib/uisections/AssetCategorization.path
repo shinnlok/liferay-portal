@@ -35,7 +35,7 @@
 </tr>
 <tr>
 	<td>CATEGORY_SELECT</td>
-	<td>//button[contains(@title,'Select') and contains(@title,'${key_vocabularyName}')]</td>
+	<td>//button[contains(@title,'Select') and contains(@title,'${key_vocabularyName}')] | //button[contains(@title,'Select Categories')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -90,12 +90,12 @@
 </tr>
 <tr>
 	<td>CATEGORIES_CATEGORY_CHECKBOX</td>
-	<td>//li[contains(@id,'category') and contains(.,'${key_categoryName}')]//span[contains(@class,'tree-node-checkbox')]</td>
+	<td>//div[contains(@class,'tree-node-content') and span[contains(.,'${key_categoryName}')]]/span[contains(@class,'tree-node-checkbox')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>CATEGORIES_CATEGORY_CHECKBOX_CHECKED</td>
-	<td>//li[contains(@id,'category') and contains(.,'${key_categoryName}')]/div[contains(@class,'checked')]//span[contains(@class,'tree-node-checkbox')]</td>
+	<td>//div[contains(@class,'tree-node-content') and span[contains(.,'${key_categoryName}')]]/span[contains(@class,'tree-node-checkbox')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -106,6 +106,11 @@
 <tr>
 	<td>TAG</td>
 	<td>//div[contains(@class,'lfr-tags-selector-content')]//span[contains(@class,'textboxlistentry-text') and contains(.,'${key_tagName}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>TAG_CHECKBOX</td>
+	<td>//div[contains(.,'${key_tagName}')]//input[@type='checkbox']</td>
 	<td></td>
 </tr>
 <tr>

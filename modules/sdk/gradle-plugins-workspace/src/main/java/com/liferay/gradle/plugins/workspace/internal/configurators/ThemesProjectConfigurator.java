@@ -34,12 +34,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.gradle.api.Project;
+import org.gradle.api.Task;
 import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.CopySpec;
 import org.gradle.api.initialization.Settings;
 import org.gradle.api.plugins.BasePlugin;
 import org.gradle.api.plugins.BasePluginConvention;
 import org.gradle.api.plugins.ExtensionAware;
+import org.gradle.api.tasks.Copy;
 
 /**
  * @author Andrea Di Giorgi
@@ -60,10 +62,10 @@ public class ThemesProjectConfigurator extends BaseProjectConfigurator {
 
 		_configureLiferay(project, workspaceExtension);
 
-		_configureRootTaskDistBundle(
-			project, RootProjectConfigurator.DIST_BUNDLE_TAR_TASK_NAME);
-		_configureRootTaskDistBundle(
-			project, RootProjectConfigurator.DIST_BUNDLE_ZIP_TASK_NAME);
+		Task assembleTask = GradleUtil.getTask(
+			project, BasePlugin.ASSEMBLE_TASK_NAME);
+
+		_configureRootTaskDistBundle(assembleTask);
 	}
 
 	@Override
@@ -118,23 +120,27 @@ public class ThemesProjectConfigurator extends BaseProjectConfigurator {
 		liferayExtension.setAppServerParentDir(workspaceExtension.getHomeDir());
 	}
 
-	private void _configureRootTaskDistBundle(
-		final Project project, String rootTaskName) {
+	private void _configureRootTaskDistBundle(final Task assembleTask) {
+		Project project = assembleTask.getProject();
 
-		CopySpec copySpec = (CopySpec)GradleUtil.getTask(
-			project.getRootProject(), rootTaskName);
+		Copy copy = (Copy)GradleUtil.getTask(
+			project.getRootProject(),
+			RootProjectConfigurator.DIST_BUNDLE_TASK_NAME);
 
-		copySpec.into(
+		copy.dependsOn(assembleTask);
+
+		copy.into(
 			"osgi/modules",
 			new Closure<Void>(project) {
 
 				@SuppressWarnings("unused")
 				public void doCall(CopySpec copySpec) {
+					Project project = assembleTask.getProject();
+
 					ConfigurableFileCollection configurableFileCollection =
 						project.files(_getWarFile(project));
 
-					configurableFileCollection.builtBy(
-						BasePlugin.ASSEMBLE_TASK_NAME);
+					configurableFileCollection.builtBy(assembleTask);
 
 					copySpec.from(_getWarFile(project));
 				}

@@ -23,9 +23,11 @@ import com.liferay.asset.kernel.model.AssetTagModel;
 import com.liferay.asset.kernel.model.AssetTagStatsModel;
 import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.asset.kernel.model.AssetVocabularyModel;
-import com.liferay.blogs.kernel.model.BlogsEntry;
-import com.liferay.blogs.kernel.model.BlogsEntryModel;
-import com.liferay.blogs.kernel.model.BlogsStatsUserModel;
+import com.liferay.blogs.model.BlogsEntry;
+import com.liferay.blogs.model.BlogsEntryModel;
+import com.liferay.blogs.model.BlogsStatsUserModel;
+import com.liferay.blogs.model.impl.BlogsEntryModelImpl;
+import com.liferay.blogs.model.impl.BlogsStatsUserModelImpl;
 import com.liferay.blogs.social.BlogsActivityKeys;
 import com.liferay.blogs.web.constants.BlogsPortletKeys;
 import com.liferay.counter.kernel.model.Counter;
@@ -76,6 +78,8 @@ import com.liferay.dynamic.data.mapping.model.impl.DDMStructureVersionModelImpl;
 import com.liferay.dynamic.data.mapping.model.impl.DDMTemplateLinkModelImpl;
 import com.liferay.dynamic.data.mapping.model.impl.DDMTemplateModelImpl;
 import com.liferay.dynamic.data.mapping.storage.StorageType;
+import com.liferay.friendly.url.model.FriendlyURLModel;
+import com.liferay.friendly.url.model.impl.FriendlyURLModelImpl;
 import com.liferay.journal.constants.JournalPortletKeys;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.model.JournalArticleConstants;
@@ -124,6 +128,7 @@ import com.liferay.portal.kernel.model.LayoutTypePortletConstants;
 import com.liferay.portal.kernel.model.ModelHintsUtil;
 import com.liferay.portal.kernel.model.PortletConstants;
 import com.liferay.portal.kernel.model.PortletPreferencesModel;
+import com.liferay.portal.kernel.model.ReleaseModel;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.ResourcePermission;
 import com.liferay.portal.kernel.model.ResourcePermissionModel;
@@ -165,6 +170,7 @@ import com.liferay.portal.model.impl.LayoutFriendlyURLModelImpl;
 import com.liferay.portal.model.impl.LayoutModelImpl;
 import com.liferay.portal.model.impl.LayoutSetModelImpl;
 import com.liferay.portal.model.impl.PortletPreferencesModelImpl;
+import com.liferay.portal.model.impl.ReleaseModelImpl;
 import com.liferay.portal.model.impl.ResourcePermissionModelImpl;
 import com.liferay.portal.model.impl.RoleModelImpl;
 import com.liferay.portal.model.impl.SubscriptionModelImpl;
@@ -178,8 +184,6 @@ import com.liferay.portlet.asset.model.impl.AssetEntryModelImpl;
 import com.liferay.portlet.asset.model.impl.AssetTagModelImpl;
 import com.liferay.portlet.asset.model.impl.AssetTagStatsModelImpl;
 import com.liferay.portlet.asset.model.impl.AssetVocabularyModelImpl;
-import com.liferay.portlet.blogs.model.impl.BlogsEntryModelImpl;
-import com.liferay.portlet.blogs.model.impl.BlogsStatsUserModelImpl;
 import com.liferay.portlet.documentlibrary.model.impl.DLFileEntryMetadataModelImpl;
 import com.liferay.portlet.documentlibrary.model.impl.DLFileEntryModelImpl;
 import com.liferay.portlet.documentlibrary.model.impl.DLFileEntryTypeModelImpl;
@@ -214,6 +218,7 @@ import com.liferay.wiki.social.WikiActivityKeys;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 
 import java.text.Format;
 
@@ -1678,6 +1683,25 @@ public class DataFactory {
 		return dlFolderModels;
 	}
 
+	public FriendlyURLModel newFriendlyURLModel(
+		BlogsEntryModel blogsEntryModel) {
+
+		FriendlyURLModel friendlyURLModel = new FriendlyURLModelImpl();
+
+		friendlyURLModel.setUuid(SequentialUUID.generate());
+		friendlyURLModel.setFriendlyURLId(_counter.get());
+		friendlyURLModel.setGroupId(blogsEntryModel.getGroupId());
+		friendlyURLModel.setCompanyId(_companyId);
+		friendlyURLModel.setCreateDate(new Date());
+		friendlyURLModel.setModifiedDate(new Date());
+		friendlyURLModel.setClassNameId(getClassNameId(BlogsEntry.class));
+		friendlyURLModel.setClassPK(blogsEntryModel.getEntryId());
+		friendlyURLModel.setUrlTitle(blogsEntryModel.getUrlTitle());
+		friendlyURLModel.setMain(true);
+
+		return friendlyURLModel;
+	}
+
 	public GroupModel newGroupModel(UserModel userModel) throws Exception {
 		return newGroupModel(
 			_counter.get(), getClassNameId(User.class), userModel.getUserId(),
@@ -2202,6 +2226,33 @@ public class DataFactory {
 			newLayoutModel(groupId, "wiki", "", WikiPortletKeys.WIKI + ","));
 
 		return layoutModels;
+	}
+
+	public List<ReleaseModel> newReleaseModels() throws IOException {
+		List<ReleaseModel> releases = new ArrayList<>();
+
+		try (InputStream is = DataFactory.class.getResourceAsStream(
+				"dependencies/releases.txt");
+			Reader reader = new InputStreamReader(is);
+			UnsyncBufferedReader unsyncBufferedReader =
+				new UnsyncBufferedReader(reader)) {
+
+			String line = null;
+
+			while ((line = unsyncBufferedReader.readLine()) != null) {
+				String[] parts = StringUtil.split(line, CharPool.COLON);
+
+				if (parts.length > 0) {
+					String servletContextName = parts[0];
+					String schemaVersion = parts[1];
+
+					releases.add(
+						newReleaseModel(servletContextName, schemaVersion));
+				}
+			}
+		}
+
+		return releases;
 	}
 
 	public List<ResourcePermissionModel> newResourcePermissionModels(
@@ -2766,6 +2817,7 @@ public class DataFactory {
 		blogsEntryModel.setContent("This is test blog " + index + ".");
 		blogsEntryModel.setDisplayDate(new Date());
 		blogsEntryModel.setLastPublishDate(new Date());
+		blogsEntryModel.setStatusByUserId(_sampleUserId);
 		blogsEntryModel.setStatusDate(new Date());
 
 		return blogsEntryModel;
@@ -3096,6 +3148,23 @@ public class DataFactory {
 		portletPreferencesModel.setPreferences(preferences);
 
 		return portletPreferencesModel;
+	}
+
+	protected ReleaseModelImpl newReleaseModel(
+			String servletContextName, String schemaVersion)
+		throws IOException {
+
+		ReleaseModelImpl releaseModel = new ReleaseModelImpl();
+
+		releaseModel.setReleaseId(_counter.get());
+		releaseModel.setCreateDate(new Date());
+		releaseModel.setModifiedDate(new Date());
+		releaseModel.setServletContextName(servletContextName);
+		releaseModel.setSchemaVersion(schemaVersion);
+		releaseModel.setBuildDate(new Date());
+		releaseModel.setVerified(true);
+
+		return releaseModel;
 	}
 
 	protected ResourcePermissionModel newResourcePermissionModel(

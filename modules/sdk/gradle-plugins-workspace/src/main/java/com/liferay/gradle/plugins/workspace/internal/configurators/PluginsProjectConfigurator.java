@@ -16,9 +16,9 @@ package com.liferay.gradle.plugins.workspace.internal.configurators;
 
 import com.liferay.gradle.plugins.workspace.WorkspaceExtension;
 import com.liferay.gradle.plugins.workspace.WorkspacePlugin;
+import com.liferay.gradle.plugins.workspace.internal.util.FileUtil;
 import com.liferay.gradle.plugins.workspace.internal.util.GradleUtil;
 import com.liferay.gradle.plugins.workspace.tasks.UpdatePropertiesTask;
-import com.liferay.gradle.util.FileUtil;
 
 import groovy.lang.Closure;
 
@@ -35,6 +35,7 @@ import org.gradle.api.file.CopySpec;
 import org.gradle.api.initialization.Settings;
 import org.gradle.api.plugins.ExtensionAware;
 import org.gradle.api.plugins.WarPlugin;
+import org.gradle.api.tasks.Copy;
 import org.gradle.language.base.plugins.LifecycleBasePlugin;
 
 /**
@@ -65,12 +66,11 @@ public class PluginsProjectConfigurator extends BaseProjectConfigurator {
 
 		_addTaskBuild(project, updatePropertiesTask);
 
-		_configureTaskWar(project, workspaceExtension, initBundleTask);
+		Task warTask = GradleUtil.getTask(project, WarPlugin.WAR_TASK_NAME);
 
-		_configureRootTaskDistBundle(
-			project, RootProjectConfigurator.DIST_BUNDLE_TAR_TASK_NAME);
-		_configureRootTaskDistBundle(
-			project, RootProjectConfigurator.DIST_BUNDLE_ZIP_TASK_NAME);
+		_configureTaskWar(warTask, workspaceExtension, initBundleTask);
+
+		_configureRootTaskDistBundle(warTask);
 	}
 
 	@Override
@@ -146,22 +146,27 @@ public class PluginsProjectConfigurator extends BaseProjectConfigurator {
 		antBuilder.importBuild("build.xml");
 	}
 
-	private void _configureRootTaskDistBundle(
-		final Project project, String rootTaskName) {
+	private void _configureRootTaskDistBundle(final Task warTask) {
+		Project project = warTask.getProject();
 
-		CopySpec copySpec = (CopySpec)GradleUtil.getTask(
-			project.getRootProject(), rootTaskName);
+		Copy copy = (Copy)GradleUtil.getTask(
+			project.getRootProject(),
+			RootProjectConfigurator.DIST_BUNDLE_TASK_NAME);
 
-		copySpec.into(
+		copy.dependsOn(warTask);
+
+		copy.into(
 			"osgi/modules",
 			new Closure<Void>(project) {
 
 				@SuppressWarnings("unused")
 				public void doCall(CopySpec copySpec) {
+					Project project = warTask.getProject();
+
 					ConfigurableFileTree configurableFileTree =
 						project.fileTree("dist");
 
-					configurableFileTree.builtBy(WarPlugin.WAR_TASK_NAME);
+					configurableFileTree.builtBy(warTask);
 					configurableFileTree.include("*.war");
 
 					copySpec.from(configurableFileTree);
@@ -171,12 +176,10 @@ public class PluginsProjectConfigurator extends BaseProjectConfigurator {
 	}
 
 	private void _configureTaskWar(
-		Project project, final WorkspaceExtension workspaceExtension,
+		Task warTask, final WorkspaceExtension workspaceExtension,
 		final Task initBundleTask) {
 
-		Task task = GradleUtil.getTask(project, WarPlugin.WAR_TASK_NAME);
-
-		task.dependsOn(
+		warTask.dependsOn(
 			new Callable<Task>() {
 
 				@Override

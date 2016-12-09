@@ -119,6 +119,16 @@
 	<td></td>
 </tr>
 <tr>
+	<td>IDENTITY_PROVIDER</td>
+	<td>//ul[contains(@class,'nav-tabs')]/li/a[contains(.,'Identity Provider')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>IDENTITY_PROVIDER_CONNECTION</td>
+	<td>//ul[contains(@class,'nav-tabs')]/li/a[contains(.,'Identity Provider Connection')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>LDAP</td>
 	<td>//ul[contains(@class,'nav-tabs')]/li/a[contains(.,'LDAP')]</td>
 	<td></td>
@@ -199,6 +209,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>SERVICE_PROVIDER_CONNECTIONS</td>
+	<td>//ul[contains(@class,'nav-tabs')]/li/a[contains(.,'Service Provider Connections')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>SHUTDOWN</td>
 	<td>//ul[contains(@class,'nav-tabs')]/li/a[contains(.,'Shutdown')]</td>
 	<td></td>
@@ -211,6 +226,11 @@
 <tr>
 	<td>SITE_MINDER</td>
 	<td>//ul[contains(@class,'nav-tabs')]/li/a[contains(.,'SiteMinder')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SOURCE</td>
+	<td>//ul[contains(@class,'nav-tabs')]/li[contains(.,'Source')]/a</td>
 	<td></td>
 </tr>
 <tr>

@@ -1,6 +1,8 @@
 AUI.add(
 	'liferay-ddl-form-builder-field-support',
 	function(A) {
+		var FieldTypes = Liferay.DDM.Renderer.FieldTypes;
+
 		var CSS_FIELD = A.getClassName('form', 'builder', 'field');
 
 		var CSS_FIELD_CONTENT_TARGET = A.getClassName('form', 'builder', 'field', 'content', 'target');
@@ -46,6 +48,24 @@ AUI.add(
 				);
 			},
 
+			copy: function() {
+				var instance = this;
+
+				var builder = instance.get('builder');
+
+				var config = instance._copyConfiguration();
+
+				var type = instance.get('type');
+
+				var fieldType = FieldTypes.get(type);
+
+				var copy = builder.createField(fieldType, config);
+
+				copy.set('fieldName', copy.generateFieldName(instance.get('fieldName')));
+
+				return copy;
+			},
+
 			generateFieldName: function(key) {
 				var instance = this;
 
@@ -67,7 +87,7 @@ AUI.add(
 							name = key + counter;
 						}
 
-						existingField = builder.findField(name);
+						existingField = builder.findField(name, true);
 
 						counter++;
 					}

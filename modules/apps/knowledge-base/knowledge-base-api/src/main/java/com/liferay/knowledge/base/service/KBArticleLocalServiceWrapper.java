@@ -114,6 +114,13 @@ public class KBArticleLocalServiceWrapper implements KBArticleLocalService,
 	}
 
 	@Override
+	public com.liferay.knowledge.base.model.KBArticle fetchKBArticle(
+		long resourcePrimKey, long groupId, int version) {
+		return _kbArticleLocalService.fetchKBArticle(resourcePrimKey, groupId,
+			version);
+	}
+
+	@Override
 	public com.liferay.knowledge.base.model.KBArticle fetchKBArticleByUrlTitle(
 		long groupId, java.lang.String kbFolderUrlTitle,
 		java.lang.String urlTitle)
@@ -148,6 +155,13 @@ public class KBArticleLocalServiceWrapper implements KBArticleLocalService,
 		long resourcePrimKey, int status) {
 		return _kbArticleLocalService.fetchLatestKBArticle(resourcePrimKey,
 			status);
+	}
+
+	@Override
+	public com.liferay.knowledge.base.model.KBArticle fetchLatestKBArticle(
+		long resourcePrimKey, long groupId) {
+		return _kbArticleLocalService.fetchLatestKBArticle(resourcePrimKey,
+			groupId);
 	}
 
 	@Override
@@ -601,8 +615,7 @@ public class KBArticleLocalServiceWrapper implements KBArticleLocalService,
 
 	/**
 	* @deprecated As of 1.1.0, replaced by {@link #getKBArticles(long, long,
-	int, int, int,
-	OrderByComparator)}
+	int, int, int, OrderByComparator)}
 	*/
 	@Deprecated
 	@Override
