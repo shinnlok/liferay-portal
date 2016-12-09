@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.sync.model.listener;
+package com.liferay.sync.internal.model.listener;
 
 import com.liferay.portal.kernel.exception.ModelListenerException;
 import com.liferay.portal.kernel.model.ModelListener;
