@@ -14,24 +14,17 @@
 
 package com.liferay.sync.model.listener;
 
-import com.liferay.document.library.kernel.model.DLFileEntry;
-import com.liferay.document.library.kernel.model.DLFolder;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.ModelListenerException;
-import com.liferay.portal.kernel.model.BaseModelListener;
 import com.liferay.portal.kernel.model.ModelListener;
 import com.liferay.portal.kernel.model.ResourcePermission;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
-import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.sync.constants.SyncDLObjectConstants;
 import com.liferay.sync.constants.SyncDeviceConstants;
 import com.liferay.sync.model.SyncDLObject;
 import com.liferay.sync.model.SyncDevice;
-import com.liferay.sync.service.SyncDLObjectLocalService;
 import com.liferay.sync.service.SyncDeviceLocalService;
 
 import java.util.Date;
@@ -44,7 +37,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Jonathan McCann
  */
 @Component(immediate = true, service = ModelListener.class)
-public class UserModelListener extends BaseModelListener<User> {
+public class UserModelListener extends SyncBaseModelListener<User> {
 
 	@Override
 	public void onAfterRemove(User user) throws ModelListenerException {
@@ -76,7 +69,7 @@ public class UserModelListener extends BaseModelListener<User> {
 		long roleId = (Long)associationClassPK;
 
 		List<ResourcePermission> resourcePermissions =
-			_resourcePermissionLocalService.getRoleResourcePermissions(roleId);
+			resourcePermissionLocalService.getRoleResourcePermissions(roleId);
 
 		for (ResourcePermission resourcePermission : resourcePermissions) {
 			if (resourcePermission.hasActionId(ActionKeys.VIEW)) {
@@ -104,7 +97,7 @@ public class UserModelListener extends BaseModelListener<User> {
 		long roleId = (Long)associationClassPK;
 
 		List<ResourcePermission> resourcePermissions =
-			_resourcePermissionLocalService.getRoleResourcePermissions(roleId);
+			resourcePermissionLocalService.getRoleResourcePermissions(roleId);
 
 		for (ResourcePermission resourcePermission : resourcePermissions) {
 			if (resourcePermission.hasActionId(ActionKeys.VIEW)) {
@@ -119,7 +112,7 @@ public class UserModelListener extends BaseModelListener<User> {
 				syncDLObject.setModifiedTime(date.getTime());
 				syncDLObject.setLastPermissionChangeDate(date);
 
-				_syncDLObjectLocalService.updateSyncDLObject(syncDLObject);
+				syncDLObjectLocalService.updateSyncDLObject(syncDLObject);
 			}
 		}
 	}
@@ -159,75 +152,10 @@ public class UserModelListener extends BaseModelListener<User> {
 		}
 	}
 
-	protected SyncDLObject getSyncDLObject(
-		ResourcePermission resourcePermission) {
+	@Reference
+	private SyncDeviceLocalService _syncDeviceLocalService;
 
-		String modelName = resourcePermission.getName();
-
-		if (modelName.equals(DLFileEntry.class.getName())) {
-			return _syncDLObjectLocalService.fetchSyncDLObject(
-				SyncDLObjectConstants.TYPE_FILE,
-				GetterUtil.getLong(resourcePermission.getPrimKey()));
-		}
-		else if (modelName.equals(DLFolder.class.getName())) {
-			return _syncDLObjectLocalService.fetchSyncDLObject(
-				SyncDLObjectConstants.TYPE_FOLDER,
-				GetterUtil.getLong(resourcePermission.getPrimKey()));
-		}
-
-		return null;
-	}
-
-	@Reference(unbind = "-")
-	protected void setResourcePermissionLocalService(
-		ResourcePermissionLocalService resourcePermissionLocalService) {
-
-		_resourcePermissionLocalService = resourcePermissionLocalService;
-	}
-
-	@Reference(unbind = "-")
-	protected void setSyncDeviceLocalService(
-		SyncDeviceLocalService syncDeviceLocalService) {
-
-		_syncDeviceLocalService = syncDeviceLocalService;
-	}
-
-	@Reference(unbind = "-")
-	protected void setSyncDLObjectLocalService(
-		SyncDLObjectLocalService syncDLObjectLocalService) {
-
-		_syncDLObjectLocalService = syncDLObjectLocalService;
-	}
-
-	@Reference(unbind = "-")
-	protected void setUserLocalService(UserLocalService userLocalService) {
-		_userLocalService = userLocalService;
-	}
-
-	protected void updateSyncDLObject(SyncDLObject syncDLObject) {
-		syncDLObject.setModifiedTime(System.currentTimeMillis());
-
-		_syncDLObjectLocalService.updateSyncDLObject(syncDLObject);
-
-		String type = syncDLObject.getType();
-
-		if (!type.equals(SyncDLObjectConstants.TYPE_FOLDER)) {
-			return;
-		}
-
-		List<SyncDLObject> childSyncDLObjects =
-			_syncDLObjectLocalService.getSyncDLObjects(
-				syncDLObject.getRepositoryId(), syncDLObject.getTypePK());
-
-		for (SyncDLObject childSyncDLObject : childSyncDLObjects) {
-			updateSyncDLObject(childSyncDLObject);
-		}
-	}
-
-	private static ResourcePermissionLocalService
-		_resourcePermissionLocalService;
-	private static SyncDeviceLocalService _syncDeviceLocalService;
-	private static SyncDLObjectLocalService _syncDLObjectLocalService;
-	private static UserLocalService _userLocalService;
+	@Reference
+	private UserLocalService _userLocalService;
 
 }
