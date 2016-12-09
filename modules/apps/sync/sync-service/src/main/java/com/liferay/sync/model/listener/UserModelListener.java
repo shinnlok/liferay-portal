@@ -83,7 +83,7 @@ public class UserModelListener extends BaseModelListener<User> {
 				SyncDLObject syncDLObject = getSyncDLObject(resourcePermission);
 
 				if (syncDLObject == null) {
-					return;
+					continue;
 				}
 
 				updateSyncDLObject(syncDLObject);
