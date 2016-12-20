@@ -205,11 +205,6 @@ public class StagedGroupStagedModelDataHandler
 			PortletDataContext portletDataContext, StagedGroup stagedGroup)
 		throws Exception {
 
-		// It needs to be here, because portlet export moves the pointer
-		// continuously
-
-		Element rootElement = portletDataContext.getExportDataRootElement();
-
 		// Collect site portlets and initialize the progress bar
 
 		Set<String> dataSiteLevelPortletIds = checkDataSiteLevelPortlets(
@@ -247,8 +242,6 @@ public class StagedGroupStagedModelDataHandler
 		}
 
 		// Layout set with layouts
-
-		portletDataContext.setExportDataRootElement(rootElement);
 
 		List<? extends StagedModel> childStagedModels =
 			_stagedGroupStagedModelRepository.fetchChildrenStagedModels(
@@ -348,8 +341,6 @@ public class StagedGroupStagedModelDataHandler
 		importSiteServices(portletDataContext, siteServiceElements);
 
 		// Import layout set
-
-		portletDataContext.setImportDataRootElement(rootElement);
 
 		Element layoutSetElement = portletDataContext.getImportDataGroupElement(
 			StagedLayoutSet.class);
@@ -743,6 +734,12 @@ public class StagedGroupStagedModelDataHandler
 			}
 		}
 		catch (PortalException pe) {
+
+			// LPS-52675
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(pe, pe);
+			}
 		}
 		catch (Exception e) {
 			_log.error(e, e);

@@ -533,7 +533,7 @@ public class SyncDLObjectServiceImpl extends SyncDLObjectServiceBaseImpl {
 
 			syncContext.setPortletPreferencesMap(getPortletPreferencesMap());
 
-			Bundle bundle = FrameworkUtil.getBundle(this.getClass());
+			Bundle bundle = FrameworkUtil.getBundle(getClass());
 
 			syncContext.setPluginVersion(String.valueOf(bundle.getVersion()));
 
@@ -776,7 +776,7 @@ public class SyncDLObjectServiceImpl extends SyncDLObjectServiceBaseImpl {
 		}
 
 		catch (PortalException pe) {
-			Class clazz = pe.getClass();
+			Class<?> clazz = pe.getClass();
 
 			throw new PortalException(clazz.getName(), pe);
 		}

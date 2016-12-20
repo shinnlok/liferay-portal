@@ -416,8 +416,8 @@ public class DLFileEntryLocalServiceImpl
 				}
 			}
 			catch (PortalException pe) {
-				if ((pe instanceof ExpiredLockException) ||
-					(pe instanceof NoSuchLockException)) {
+				if (pe instanceof ExpiredLockException ||
+					pe instanceof NoSuchLockException) {
 				}
 				else {
 					throw pe;
@@ -987,6 +987,11 @@ public class DLFileEntryLocalServiceImpl
 		long groupId, long folderId, String title) {
 
 		return dlFileEntryPersistence.fetchByG_F_T(groupId, folderId, title);
+	}
+
+	@Override
+	public DLFileEntry fetchFileEntry(String uuid, long groupId) {
+		return dlFileEntryPersistence.fetchByUUID_G(uuid, groupId);
 	}
 
 	@Override
@@ -1603,7 +1608,7 @@ public class DLFileEntryLocalServiceImpl
 
 	/**
 	 * @deprecated As of 7.0.0, replaced by {@link #isKeepFileVersionLabel(long,
-	 * boolean, ServiceContext)}
+	 *             boolean, ServiceContext)}
 	 */
 	@Deprecated
 	@Override
@@ -2116,8 +2121,8 @@ public class DLFileEntryLocalServiceImpl
 			}
 		}
 		catch (PortalException pe) {
-			if ((pe instanceof ExpiredLockException) ||
-				(pe instanceof NoSuchLockException)) {
+			if (pe instanceof ExpiredLockException ||
+				pe instanceof NoSuchLockException) {
 
 				DLFileEntry dlFileEntry = dlFileEntryLocalService.getFileEntry(
 					fileEntryId);
@@ -2410,6 +2415,13 @@ public class DLFileEntryLocalServiceImpl
 			return fileEntryTypeId;
 		}
 		catch (InvalidFileEntryTypeException ifete) {
+
+			// LPS-52675
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(ifete, ifete);
+			}
+
 			return dlFileEntryTypeLocalService.getDefaultFileEntryTypeId(
 				dlFileEntry.getFolderId());
 		}

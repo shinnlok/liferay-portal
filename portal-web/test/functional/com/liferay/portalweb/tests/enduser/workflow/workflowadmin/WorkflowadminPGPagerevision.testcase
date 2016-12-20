@@ -1,5 +1,6 @@
 <definition component-name="portal-workflow">
 	<property name="portal.release" value="true" />
+	<property name="portal.upstream" value="true" />
 	<property name="testray.main.component.name" value="Workflow" />
 
 	<var name="page" value="Public Pages" />
@@ -17,7 +18,7 @@
 		</execute>
 
 		<execute macro="Site#addCP">
-			<var name="siteName" value="${siteName}" />
+			<var name="siteName" value="Site Name" />
 			<var name="siteType" value="Blank" />
 		</execute>
 
@@ -27,12 +28,12 @@
 
 		<execute macro="Page#add">
 			<var name="pageName" value="Site Page Name" />
-			<var name="siteName" value="${siteName}" />
-			<var name="sitePagePrivacy" value="${sitePagePrivacy}" />
+			<var name="siteName" value="Site Name" />
+			<var name="sitePagePrivacy" value="Public" />
 		</execute>
 
 		<execute macro="ProductMenu#gotoSite">
-			<var name="site" value="${siteName}" />
+			<var name="site" value="Site Name" />
 		</execute>
 
 		<execute macro="ProductMenu#gotoSitesPublishing">
@@ -41,11 +42,11 @@
 
 		<execute macro="Staging#activateStagingCP">
 			<var name="pageVersioningEnabled" value="true" />
-			<var name="siteName" value="${siteName}" />
+			<var name="siteName" value="Site Name" />
 		</execute>
 
 		<execute macro="ProductMenu#gotoSite">
-			<var name="site" value="${siteName}" />
+			<var name="site" value="Site Name" />
 		</execute>
 
 		<execute macro="ProductMenu#gotoSitesConfiguration">
@@ -176,6 +177,7 @@
 
 	<command name="ViewApprovedPageAfterStagingDeactivated" priority="5">
 		<description message="This is a use case for LPS-65319." />
+		<property name="portal.acceptance" value="true" />
 
 		<var name="pageName" value="New Site Page Name" />
 
@@ -320,7 +322,7 @@
 
 		<execute macro="Navigator#gotoStagedSitePage">
 			<var name="pageName" value="Site Page Name" />
-			<var name="siteName" value="${siteName}" />
+			<var name="siteName" value="Site Name" />
 		</execute>
 
 		<execute macro="Portlet#addPG">
@@ -351,7 +353,7 @@
 		</execute>
 
 		<execute macro="ProductMenu#gotoSite">
-			<var name="site" value="${siteName}" />
+			<var name="site" value="Site Name" />
 		</execute>
 
 		<execute macro="ProductMenu#gotoSitesConfiguration">

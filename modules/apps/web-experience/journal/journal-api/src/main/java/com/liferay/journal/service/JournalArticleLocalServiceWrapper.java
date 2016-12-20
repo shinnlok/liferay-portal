@@ -470,6 +470,17 @@ public class JournalArticleLocalServiceWrapper
 			version);
 	}
 
+	/**
+	* Returns the web content article with the ID.
+	*
+	* @param id the primary key of the web content article
+	* @return the web content article with the ID
+	*/
+	@Override
+	public com.liferay.journal.model.JournalArticle fetchArticle(long id) {
+		return _journalArticleLocalService.fetchArticle(id);
+	}
+
 	@Override
 	public com.liferay.journal.model.JournalArticle fetchArticleByUrlTitle(
 		long groupId, java.lang.String urlTitle) {

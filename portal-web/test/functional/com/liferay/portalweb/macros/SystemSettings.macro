@@ -14,6 +14,12 @@
 		<execute function="AssertClick" locator1="MenuItem#EDIT" value1="Edit" />
 	</command>
 
+	<command name="editTextAreaSetting">
+		<var name="key_fieldName" value="${settingName}" />
+
+		<execute function="Type" locator1="DDMField#TEXT_BOX" value1="${settingValue}" />
+	</command>
+
 	<command name="enableSetting">
 		<execute function="Check" locator1="SystemSettings#${checkboxSetting}" />
 	</command>

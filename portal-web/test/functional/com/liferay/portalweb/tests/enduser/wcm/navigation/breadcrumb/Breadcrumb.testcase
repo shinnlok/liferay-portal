@@ -1,5 +1,6 @@
 <definition component-name="portal-breadcrumb">
 	<property name="portal.release" value="true" />
+	<property name="portal.upstream" value="true" />
 	<property name="testray.main.component.name" value="Breadcrumb" />
 
 	<set-up>
@@ -204,7 +205,7 @@
 			<var name="subCategoryName" value="MB Subcategory Subcategory Name" />
 		</execute>
 
-		<execute macro="Breadcrumb#viewPG">
+		<execute macro="Breadcrumb#viewSpecificPG">
 			<var name="breadcrumbListNotVisible" value="MB Category Name,MB Subcategory Name,MB Subcategory Subcategory Name" />
 			<var name="breadcrumbListVisible" value="Site Name,Page Name" />
 			<var name="pathLocator" value="EMBEDDED" />

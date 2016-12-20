@@ -2201,7 +2201,7 @@ public class MBDiscussionPersistenceImpl extends BasePersistenceImpl<MBDiscussio
 	 * Returns the message boards discussion where classNameId = &#63; and classPK = &#63; or throws a {@link NoSuchDiscussionException} if it could not be found.
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @return the matching message boards discussion
 	 * @throws NoSuchDiscussionException if a matching message boards discussion could not be found
 	 */
@@ -2237,7 +2237,7 @@ public class MBDiscussionPersistenceImpl extends BasePersistenceImpl<MBDiscussio
 	 * Returns the message boards discussion where classNameId = &#63; and classPK = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @return the matching message boards discussion, or <code>null</code> if a matching message boards discussion could not be found
 	 */
 	@Override
@@ -2249,7 +2249,7 @@ public class MBDiscussionPersistenceImpl extends BasePersistenceImpl<MBDiscussio
 	 * Returns the message boards discussion where classNameId = &#63; and classPK = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param retrieveFromCache whether to retrieve from the finder cache
 	 * @return the matching message boards discussion, or <code>null</code> if a matching message boards discussion could not be found
 	 */
@@ -2340,7 +2340,7 @@ public class MBDiscussionPersistenceImpl extends BasePersistenceImpl<MBDiscussio
 	 * Removes the message boards discussion where classNameId = &#63; and classPK = &#63; from the database.
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @return the message boards discussion that was removed
 	 */
 	@Override
@@ -2355,7 +2355,7 @@ public class MBDiscussionPersistenceImpl extends BasePersistenceImpl<MBDiscussio
 	 * Returns the number of message boards discussions where classNameId = &#63; and classPK = &#63;.
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @return the number of matching message boards discussions
 	 */
 	@Override
@@ -2489,7 +2489,7 @@ public class MBDiscussionPersistenceImpl extends BasePersistenceImpl<MBDiscussio
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((MBDiscussionModelImpl)mbDiscussion);
+		clearUniqueFindersCache((MBDiscussionModelImpl)mbDiscussion, true);
 	}
 
 	@Override
@@ -2501,92 +2501,55 @@ public class MBDiscussionPersistenceImpl extends BasePersistenceImpl<MBDiscussio
 			entityCache.removeResult(MBDiscussionModelImpl.ENTITY_CACHE_ENABLED,
 				MBDiscussionImpl.class, mbDiscussion.getPrimaryKey());
 
-			clearUniqueFindersCache((MBDiscussionModelImpl)mbDiscussion);
+			clearUniqueFindersCache((MBDiscussionModelImpl)mbDiscussion, true);
 		}
 	}
 
 	protected void cacheUniqueFindersCache(
-		MBDiscussionModelImpl mbDiscussionModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					mbDiscussionModelImpl.getUuid(),
-					mbDiscussionModelImpl.getGroupId()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
-				mbDiscussionModelImpl);
-
-			args = new Object[] { mbDiscussionModelImpl.getThreadId() };
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_THREADID, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_THREADID, args,
-				mbDiscussionModelImpl);
-
-			args = new Object[] {
-					mbDiscussionModelImpl.getClassNameId(),
-					mbDiscussionModelImpl.getClassPK()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_C_C, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_C_C, args,
-				mbDiscussionModelImpl);
-		}
-		else {
-			if ((mbDiscussionModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						mbDiscussionModelImpl.getUuid(),
-						mbDiscussionModelImpl.getGroupId()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
-					mbDiscussionModelImpl);
-			}
-
-			if ((mbDiscussionModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_THREADID.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] { mbDiscussionModelImpl.getThreadId() };
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_THREADID, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_THREADID, args,
-					mbDiscussionModelImpl);
-			}
-
-			if ((mbDiscussionModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_C_C.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						mbDiscussionModelImpl.getClassNameId(),
-						mbDiscussionModelImpl.getClassPK()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_C_C, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_C_C, args,
-					mbDiscussionModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(
 		MBDiscussionModelImpl mbDiscussionModelImpl) {
 		Object[] args = new Object[] {
 				mbDiscussionModelImpl.getUuid(),
 				mbDiscussionModelImpl.getGroupId()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
+			mbDiscussionModelImpl, false);
+
+		args = new Object[] { mbDiscussionModelImpl.getThreadId() };
+
+		finderCache.putResult(FINDER_PATH_COUNT_BY_THREADID, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_THREADID, args,
+			mbDiscussionModelImpl, false);
+
+		args = new Object[] {
+				mbDiscussionModelImpl.getClassNameId(),
+				mbDiscussionModelImpl.getClassPK()
+			};
+
+		finderCache.putResult(FINDER_PATH_COUNT_BY_C_C, args, Long.valueOf(1),
+			false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_C_C, args,
+			mbDiscussionModelImpl, false);
+	}
+
+	protected void clearUniqueFindersCache(
+		MBDiscussionModelImpl mbDiscussionModelImpl, boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					mbDiscussionModelImpl.getUuid(),
+					mbDiscussionModelImpl.getGroupId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		}
 
 		if ((mbDiscussionModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					mbDiscussionModelImpl.getOriginalUuid(),
 					mbDiscussionModelImpl.getOriginalGroupId()
 				};
@@ -2595,30 +2558,36 @@ public class MBDiscussionPersistenceImpl extends BasePersistenceImpl<MBDiscussio
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
 		}
 
-		args = new Object[] { mbDiscussionModelImpl.getThreadId() };
-
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_THREADID, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_THREADID, args);
-
-		if ((mbDiscussionModelImpl.getColumnBitmask() &
-				FINDER_PATH_FETCH_BY_THREADID.getColumnBitmask()) != 0) {
-			args = new Object[] { mbDiscussionModelImpl.getOriginalThreadId() };
+		if (clearCurrent) {
+			Object[] args = new Object[] { mbDiscussionModelImpl.getThreadId() };
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_THREADID, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_THREADID, args);
 		}
 
-		args = new Object[] {
-				mbDiscussionModelImpl.getClassNameId(),
-				mbDiscussionModelImpl.getClassPK()
-			};
+		if ((mbDiscussionModelImpl.getColumnBitmask() &
+				FINDER_PATH_FETCH_BY_THREADID.getColumnBitmask()) != 0) {
+			Object[] args = new Object[] {
+					mbDiscussionModelImpl.getOriginalThreadId()
+				};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_C_C, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_C_C, args);
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_THREADID, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_THREADID, args);
+		}
+
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					mbDiscussionModelImpl.getClassNameId(),
+					mbDiscussionModelImpl.getClassPK()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_C_C, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_C_C, args);
+		}
 
 		if ((mbDiscussionModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_C_C.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					mbDiscussionModelImpl.getOriginalClassNameId(),
 					mbDiscussionModelImpl.getOriginalClassPK()
 				};
@@ -2859,8 +2828,8 @@ public class MBDiscussionPersistenceImpl extends BasePersistenceImpl<MBDiscussio
 			MBDiscussionImpl.class, mbDiscussion.getPrimaryKey(), mbDiscussion,
 			false);
 
-		clearUniqueFindersCache(mbDiscussionModelImpl);
-		cacheUniqueFindersCache(mbDiscussionModelImpl, isNew);
+		clearUniqueFindersCache(mbDiscussionModelImpl, false);
+		cacheUniqueFindersCache(mbDiscussionModelImpl);
 
 		mbDiscussion.resetOriginalValues();
 

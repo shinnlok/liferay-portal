@@ -237,17 +237,9 @@ public class HtmlImpl implements Html {
 		for (int i = 0; i < text.length(); i++) {
 			char c = text.charAt(i);
 
-			if (c < 256) {
-				if ((c < 128) && _VALID_CHARS[c]) {
+			if (c < _VALID_CHARS.length) {
+				if (_VALID_CHARS[c]) {
 					sb.append(c);
-				}
-				else if ((mode == ESCAPE_MODE_ATTRIBUTE) &&
-						 ((c == CharPool.TAB) || (c == CharPool.NEW_LINE) ||
-						  (c == CharPool.RETURN))) {
-
-					sb.append(CharPool.SPACE);
-
-					modified = true;
 				}
 				else {
 					sb.append(prefix);
@@ -476,7 +468,8 @@ public class HtmlImpl implements Html {
 
 	@Override
 	public String fromInputSafe(String text) {
-		return StringUtil.replace(text, "&amp;", "&");
+		return StringUtil.replace(
+			text, new String[] {"&amp;", "&quot;"}, new String[] {"&", "\""});
 	}
 
 	@Override
@@ -905,7 +898,7 @@ public class HtmlImpl implements Html {
 
 	private static final char[] _TAG_STYLE = {'s', 't', 'y', 'l', 'e'};
 
-	private static final boolean[] _VALID_CHARS = new boolean[128];
+	private static final boolean[] _VALID_CHARS = new boolean[256];
 
 	// See http://www.w3.org/TR/xpath20/#lexical-structure
 
@@ -917,32 +910,26 @@ public class HtmlImpl implements Html {
 	private static final Map<String, String> _unescapeMap = new HashMap<>();
 
 	static {
-		_unescapeMap.put("lt", "<");
-		_unescapeMap.put("gt", ">");
-		_unescapeMap.put("amp", "&");
-		_unescapeMap.put("rsquo", "\u2019");
 		_unescapeMap.put("#34", "\"");
+		_unescapeMap.put("#35", "#");
+		_unescapeMap.put("#37", "%");
 		_unescapeMap.put("#39", "'");
 		_unescapeMap.put("#40", "(");
 		_unescapeMap.put("#41", ")");
+		_unescapeMap.put("#43", "+");
 		_unescapeMap.put("#44", ",");
-		_unescapeMap.put("#35", "#");
-		_unescapeMap.put("#37", "%");
+		_unescapeMap.put("#45", "-");
 		_unescapeMap.put("#59", ";");
 		_unescapeMap.put("#61", "=");
-		_unescapeMap.put("#43", "+");
-		_unescapeMap.put("#45", "-");
+		_unescapeMap.put("amp", "&");
+		_unescapeMap.put("gt", ">");
+		_unescapeMap.put("lt", "<");
+		_unescapeMap.put("rsquo", "\u2019");
 
-		for (int i = 'a'; i <= 'z'; i++) {
-			_VALID_CHARS[i] = true;
-		}
-
-		for (int i = 'A'; i <= 'Z'; i++) {
-			_VALID_CHARS[i] = true;
-		}
-
-		for (int i = '0'; i <= '9'; i++) {
-			_VALID_CHARS[i] = true;
+		for (int i = 0; i < _VALID_CHARS.length; i++) {
+			if (Character.isLetterOrDigit(i)) {
+				_VALID_CHARS[i] = true;
+			}
 		}
 
 		_VALID_CHARS['-'] = true;

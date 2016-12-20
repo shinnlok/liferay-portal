@@ -1,5 +1,6 @@
 <definition component-name="portal-wcm">
 	<property name="portal.release" value="true" />
+	<property name="portal.upstream" value="true" />
 	<property name="testray.main.component.name" value="Site Administration" />
 
 	<set-up>
@@ -215,6 +216,16 @@
 
 		<execute macro="Site#joinViaMySitesPG">
 			<var name="membershipType" value="Restricted" />
+			<var name="siteName" value="Site Name" />
+		</execute>
+
+		<execute macro="UserBar#gotoDashboard" />
+
+		<execute macro="Navigator#gotoNavItem">
+			<var name="navItem" value="Available Sites" />
+		</execute>
+
+		<execute macro="MySites#viewMembershipRequested">
 			<var name="siteName" value="Site Name" />
 		</execute>
 

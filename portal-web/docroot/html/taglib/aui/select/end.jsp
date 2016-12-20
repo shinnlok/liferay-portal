@@ -38,3 +38,25 @@
 		</label>
 	</c:if>
 </div>
+
+<aui:script sandbox="<%= true %>">
+	var select = $('#<%= namespace + id %>');
+
+	select.on(
+		'keydown',
+		function(event) {
+			if (event.which == 27) {
+				event.stopPropagation();
+			}
+		}
+	);
+
+	<c:if test="<%= BrowserSnifferUtil.isIe(request) && (BrowserSnifferUtil.getMajorVersion(request) == 11.0) %>">
+		select.on(
+			'mousedown',
+			function(event) {
+				event.currentTarget.focus();
+			}
+		);
+	</c:if>
+</aui:script>

@@ -16,6 +16,10 @@ AUI.add(
 		var Blogs = A.Component.create(
 			{
 				ATTRS: {
+					calculateReadingTimeURL: {
+						validator: Lang.isString
+					},
+
 					constants: {
 						validator: Lang.isObject
 					},
@@ -79,6 +83,8 @@ AUI.add(
 						instance._shortenDescription = !customDescriptionEnabled;
 
 						instance.setDescription(window[instance.ns('contentEditor')].getText());
+
+						instance._calculateReadingTimeFn = A.debounce(instance._calculateReadingTime, 500, instance);
 					},
 
 					destructor: function() {
@@ -103,6 +109,26 @@ AUI.add(
 						window[instance.ns('descriptionEditor')].setHTML(description);
 
 						instance._syncDescriptionEditorUI();
+					},
+
+					updateFriendlyURL: function(title) {
+						var instance = this;
+
+						var urlTitleInput = instance.one('#urlTitle');
+
+						var friendlyURLEmpty = !urlTitleInput.val();
+
+						if (instance._automaticURL() && (friendlyURLEmpty || instance._originalFriendlyURLChanged)) {
+							urlTitleInput.val(Liferay.Util.normalizeFriendlyURL(title));
+						}
+
+						instance._originalFriendlyURLChanged = true;
+					},
+
+					updateReadingTime: function(content) {
+						var instance = this;
+
+						instance._calculateReadingTimeFn(content);
 					},
 
 					_bindUI: function() {
@@ -139,7 +165,56 @@ AUI.add(
 							);
 						}
 
+						var urlOptions = instance.one('#urlOptions');
+
+						eventHandles.push(
+							urlOptions.delegate(STR_CHANGE, instance._onChangeURLOptions, 'input[type="radio"]', instance)
+						);
+
 						instance._eventHandles = eventHandles;
+					},
+
+					_calculateReadingTime: function(content) {
+						var instance = this;
+
+						var readingTimeElement = instance.one('#readingTime');
+
+						var data = instance.ns(
+							{
+								'content': content
+							}
+						);
+
+						A.io.request(
+							instance.get('calculateReadingTimeURL'),
+							{
+								data: data,
+								dataType: 'JSON',
+								on: {
+									failure: function() {
+										readingTimeElement.hide();
+									},
+									success: function(event, id, obj) {
+										var message = this.get('responseData');
+
+										if (message.readingTime) {
+											var constants = instance.get('constants');
+
+											var html = Lang.sub(
+												constants.X_MINUTES_READ,
+												[message.readingTime]
+											);
+
+											readingTimeElement.html(html);
+											readingTimeElement.show();
+										}
+										else {
+											readingTimeElement.hide();
+										}
+									}
+								}
+							}
+						);
 					},
 
 					_checkImagesBeforeSave: function(draft, ajax) {
@@ -222,6 +297,27 @@ AUI.add(
 						instance._oldTitle = entry ? entry.title : STR_BLANK;
 					},
 
+					_onChangeURLOptions: function() {
+						var instance = this;
+
+						var urlTitleInput = instance.one('#urlTitle');
+
+						if (instance._automaticURL()) {
+							instance._lastCustomURL = urlTitleInput.val();
+
+							var title = window[instance.ns('titleEditor')].getText();
+
+							instance.updateFriendlyURL(title);
+
+							urlTitleInput.setAttribute('disabled', true);
+						}
+						else {
+							urlTitleInput.val(instance._lastCustomURL || urlTitleInput.val());
+
+							urlTitleInput.removeAttribute('disabled');
+						}
+					},
+
 					_removeCaption: function() {
 						var instance = this;
 
@@ -244,6 +340,7 @@ AUI.add(
 						var description = window[instance.ns('descriptionEditor')].getHTML();
 						var subtitle = window[instance.ns('subtitleEditor')].getHTML();
 						var title = window[instance.ns('titleEditor')].getText();
+						var urlTitle = instance.one('#urlTitle').val();
 
 						var form = instance._getPrincipalForm();
 
@@ -280,6 +377,7 @@ AUI.add(
 										'referringPortletResource': instance.one('#referringPortletResource').val(),
 										'subtitle': subtitle,
 										'title': title,
+										'urlTitle': urlTitle,
 										'workflowAction': constants.ACTION_SAVE_DRAFT
 									}
 								);
@@ -394,6 +492,10 @@ AUI.add(
 						}
 
 						return text;
+					},
+
+					_automaticURL: function() {
+						return this.one('#urlOptions').one("input:checked").val() === 'true';
 					},
 
 					_showCaption: function() {

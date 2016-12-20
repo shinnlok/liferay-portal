@@ -63,6 +63,7 @@ public abstract class BaseMobileDriverImpl
 		}
 	}
 
+	@Override
 	public void clickAt(
 		String locator, String coordString, boolean scrollIntoView) {
 
@@ -112,11 +113,6 @@ public abstract class BaseMobileDriverImpl
 		String locatorOfObjectToBeDragged,
 		String locatorOfDragDestinationObject) {
 
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public void dragdrop(String locator, String movementsString) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -183,6 +179,7 @@ public abstract class BaseMobileDriverImpl
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public String getElementValue(String locator, String timeout)
 		throws Exception {
 
@@ -210,14 +207,17 @@ public abstract class BaseMobileDriverImpl
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public Node getHtmlNode(String locator) {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public String getHtmlNodeHref(String locator) {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public String getHtmlNodeText(String locator) {
 		throw new UnsupportedOperationException();
 	}
@@ -236,6 +236,7 @@ public abstract class BaseMobileDriverImpl
 		return getText(locator, null);
 	}
 
+	@Override
 	public String getText(String locator, String timeout) throws Exception {
 		WebElement webElement = getWebElement(locator, timeout);
 
@@ -593,11 +594,6 @@ public abstract class BaseMobileDriverImpl
 
 	@Override
 	public void waitForPopUp(String windowID, String timeout) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public void windowMaximizeAndWait() {
 		throw new UnsupportedOperationException();
 	}
 

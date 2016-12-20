@@ -8503,7 +8503,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	 * Returns all the message-boards messages where classNameId = &#63; and classPK = &#63;.
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @return the matching message-boards messages
 	 */
 	@Override
@@ -8520,7 +8520,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	 * </p>
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param start the lower bound of the range of message-boards messages
 	 * @param end the upper bound of the range of message-boards messages (not inclusive)
 	 * @return the range of matching message-boards messages
@@ -8539,7 +8539,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	 * </p>
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param start the lower bound of the range of message-boards messages
 	 * @param end the upper bound of the range of message-boards messages (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -8560,7 +8560,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	 * </p>
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param start the lower bound of the range of message-boards messages
 	 * @param end the upper bound of the range of message-boards messages (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -8683,7 +8683,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	 * Returns the first message-boards message in the ordered set where classNameId = &#63; and classPK = &#63;.
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching message-boards message
 	 * @throws NoSuchMessageException if a matching message-boards message could not be found
@@ -8718,7 +8718,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	 * Returns the first message-boards message in the ordered set where classNameId = &#63; and classPK = &#63;.
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching message-boards message, or <code>null</code> if a matching message-boards message could not be found
 	 */
@@ -8739,7 +8739,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	 * Returns the last message-boards message in the ordered set where classNameId = &#63; and classPK = &#63;.
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching message-boards message
 	 * @throws NoSuchMessageException if a matching message-boards message could not be found
@@ -8774,7 +8774,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	 * Returns the last message-boards message in the ordered set where classNameId = &#63; and classPK = &#63;.
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching message-boards message, or <code>null</code> if a matching message-boards message could not be found
 	 */
@@ -8802,7 +8802,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	 *
 	 * @param messageId the primary key of the current message-boards message
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next message-boards message
 	 * @throws NoSuchMessageException if a message-boards message with the primary key could not be found
@@ -8952,7 +8952,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	 * Removes all the message-boards messages where classNameId = &#63; and classPK = &#63; from the database.
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 */
 	@Override
 	public void removeByC_C(long classNameId, long classPK) {
@@ -8966,7 +8966,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	 * Returns the number of message-boards messages where classNameId = &#63; and classPK = &#63;.
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @return the number of matching message-boards messages
 	 */
 	@Override
@@ -14151,7 +14151,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	 *
 	 * @param userId the user ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @return the matching message-boards messages
 	 */
 	@Override
@@ -14170,7 +14170,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	 *
 	 * @param userId the user ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param start the lower bound of the range of message-boards messages
 	 * @param end the upper bound of the range of message-boards messages (not inclusive)
 	 * @return the range of matching message-boards messages
@@ -14190,7 +14190,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	 *
 	 * @param userId the user ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param start the lower bound of the range of message-boards messages
 	 * @param end the upper bound of the range of message-boards messages (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -14213,7 +14213,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	 *
 	 * @param userId the user ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param start the lower bound of the range of message-boards messages
 	 * @param end the upper bound of the range of message-boards messages (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -14343,7 +14343,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	 *
 	 * @param userId the user ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching message-boards message
 	 * @throws NoSuchMessageException if a matching message-boards message could not be found
@@ -14382,7 +14382,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	 *
 	 * @param userId the user ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching message-boards message, or <code>null</code> if a matching message-boards message could not be found
 	 */
@@ -14404,7 +14404,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	 *
 	 * @param userId the user ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching message-boards message
 	 * @throws NoSuchMessageException if a matching message-boards message could not be found
@@ -14443,7 +14443,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	 *
 	 * @param userId the user ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching message-boards message, or <code>null</code> if a matching message-boards message could not be found
 	 */
@@ -14472,7 +14472,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	 * @param messageId the primary key of the current message-boards message
 	 * @param userId the user ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next message-boards message
 	 * @throws NoSuchMessageException if a message-boards message with the primary key could not be found
@@ -14628,7 +14628,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	 *
 	 * @param userId the user ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 */
 	@Override
 	public void removeByU_C_C(long userId, long classNameId, long classPK) {
@@ -14643,7 +14643,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	 *
 	 * @param userId the user ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @return the number of matching message-boards messages
 	 */
 	@Override
@@ -15630,7 +15630,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	 * Returns all the message-boards messages where classNameId = &#63; and classPK = &#63; and status = &#63;.
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param status the status
 	 * @return the matching message-boards messages
 	 */
@@ -15649,7 +15649,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	 * </p>
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param status the status
 	 * @param start the lower bound of the range of message-boards messages
 	 * @param end the upper bound of the range of message-boards messages (not inclusive)
@@ -15669,7 +15669,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	 * </p>
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param status the status
 	 * @param start the lower bound of the range of message-boards messages
 	 * @param end the upper bound of the range of message-boards messages (not inclusive)
@@ -15692,7 +15692,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	 * </p>
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param status the status
 	 * @param start the lower bound of the range of message-boards messages
 	 * @param end the upper bound of the range of message-boards messages (not inclusive)
@@ -15822,7 +15822,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	 * Returns the first message-boards message in the ordered set where classNameId = &#63; and classPK = &#63; and status = &#63;.
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param status the status
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching message-boards message
@@ -15861,7 +15861,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	 * Returns the first message-boards message in the ordered set where classNameId = &#63; and classPK = &#63; and status = &#63;.
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param status the status
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching message-boards message, or <code>null</code> if a matching message-boards message could not be found
@@ -15883,7 +15883,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	 * Returns the last message-boards message in the ordered set where classNameId = &#63; and classPK = &#63; and status = &#63;.
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param status the status
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching message-boards message
@@ -15922,7 +15922,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	 * Returns the last message-boards message in the ordered set where classNameId = &#63; and classPK = &#63; and status = &#63;.
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param status the status
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching message-boards message, or <code>null</code> if a matching message-boards message could not be found
@@ -15951,7 +15951,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	 *
 	 * @param messageId the primary key of the current message-boards message
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param status the status
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next message-boards message
@@ -16107,7 +16107,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	 * Removes all the message-boards messages where classNameId = &#63; and classPK = &#63; and status = &#63; from the database.
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param status the status
 	 */
 	@Override
@@ -16122,7 +16122,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	 * Returns the number of message-boards messages where classNameId = &#63; and classPK = &#63; and status = &#63;.
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param status the status
 	 * @return the number of matching message-boards messages
 	 */
@@ -18306,7 +18306,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	 *
 	 * @param userId the user ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param status the status
 	 * @return the matching message-boards messages
 	 */
@@ -18326,7 +18326,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	 *
 	 * @param userId the user ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param status the status
 	 * @param start the lower bound of the range of message-boards messages
 	 * @param end the upper bound of the range of message-boards messages (not inclusive)
@@ -18348,7 +18348,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	 *
 	 * @param userId the user ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param status the status
 	 * @param start the lower bound of the range of message-boards messages
 	 * @param end the upper bound of the range of message-boards messages (not inclusive)
@@ -18372,7 +18372,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	 *
 	 * @param userId the user ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param status the status
 	 * @param start the lower bound of the range of message-boards messages
 	 * @param end the upper bound of the range of message-boards messages (not inclusive)
@@ -18508,7 +18508,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	 *
 	 * @param userId the user ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param status the status
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching message-boards message
@@ -18551,7 +18551,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	 *
 	 * @param userId the user ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param status the status
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching message-boards message, or <code>null</code> if a matching message-boards message could not be found
@@ -18574,7 +18574,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	 *
 	 * @param userId the user ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param status the status
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching message-boards message
@@ -18617,7 +18617,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	 *
 	 * @param userId the user ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param status the status
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching message-boards message, or <code>null</code> if a matching message-boards message could not be found
@@ -18647,7 +18647,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	 * @param messageId the primary key of the current message-boards message
 	 * @param userId the user ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param status the status
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next message-boards message
@@ -18809,7 +18809,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	 *
 	 * @param userId the user ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param status the status
 	 */
 	@Override
@@ -18826,7 +18826,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	 *
 	 * @param userId the user ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param status the status
 	 * @return the number of matching message-boards messages
 	 */
@@ -18963,7 +18963,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((MBMessageModelImpl)mbMessage);
+		clearUniqueFindersCache((MBMessageModelImpl)mbMessage, true);
 	}
 
 	@Override
@@ -18975,51 +18975,37 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 			entityCache.removeResult(MBMessageModelImpl.ENTITY_CACHE_ENABLED,
 				MBMessageImpl.class, mbMessage.getPrimaryKey());
 
-			clearUniqueFindersCache((MBMessageModelImpl)mbMessage);
+			clearUniqueFindersCache((MBMessageModelImpl)mbMessage, true);
 		}
 	}
 
 	protected void cacheUniqueFindersCache(
-		MBMessageModelImpl mbMessageModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					mbMessageModelImpl.getUuid(),
-					mbMessageModelImpl.getGroupId()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
-				mbMessageModelImpl);
-		}
-		else {
-			if ((mbMessageModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						mbMessageModelImpl.getUuid(),
-						mbMessageModelImpl.getGroupId()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
-					mbMessageModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(
 		MBMessageModelImpl mbMessageModelImpl) {
 		Object[] args = new Object[] {
 				mbMessageModelImpl.getUuid(), mbMessageModelImpl.getGroupId()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
+			mbMessageModelImpl, false);
+	}
+
+	protected void clearUniqueFindersCache(
+		MBMessageModelImpl mbMessageModelImpl, boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					mbMessageModelImpl.getUuid(),
+					mbMessageModelImpl.getGroupId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		}
 
 		if ((mbMessageModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					mbMessageModelImpl.getOriginalUuid(),
 					mbMessageModelImpl.getOriginalGroupId()
 				};
@@ -19775,8 +19761,8 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		entityCache.putResult(MBMessageModelImpl.ENTITY_CACHE_ENABLED,
 			MBMessageImpl.class, mbMessage.getPrimaryKey(), mbMessage, false);
 
-		clearUniqueFindersCache(mbMessageModelImpl);
-		cacheUniqueFindersCache(mbMessageModelImpl, isNew);
+		clearUniqueFindersCache(mbMessageModelImpl, false);
+		cacheUniqueFindersCache(mbMessageModelImpl);
 
 		mbMessage.resetOriginalValues();
 

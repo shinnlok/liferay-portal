@@ -38,6 +38,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
@@ -88,10 +89,10 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.workflow.WorkflowHandlerRegistryUtil;
 import com.liferay.portal.kernel.workflow.WorkflowThreadLocal;
+import com.liferay.portal.linkback.LinkbackProducerUtil;
 import com.liferay.portal.util.LayoutURLUtil;
 import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.portlet.blogs.util.LinkbackProducerUtil;
 import com.liferay.portlet.messageboards.MBGroupServiceSettings;
 import com.liferay.portlet.messageboards.model.impl.MBCategoryImpl;
 import com.liferay.portlet.messageboards.model.impl.MBMessageDisplayImpl;
@@ -116,6 +117,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.portlet.PortletRequest;
@@ -2042,10 +2044,11 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 	}
 
 	protected MBSubscriptionSender getSubscriptionSender(
-		long userId, MBMessage message, String messageURL, String entryTitle,
-		boolean htmlFormat, String messageBody, String categoryName,
-		String inReplyTo, String fromName, String fromAddress,
-		String replyToAddress, String emailAddress, String fullName,
+		long userId, MBCategory category, MBMessage message, String messageURL,
+		String entryTitle, boolean htmlFormat, String messageBody,
+		String messageSubject, String messageSubjectPrefix, String inReplyTo,
+		String fromName, String fromAddress, String replyToAddress,
+		String emailAddress, String fullName,
 		LocalizedValuesMap subjectLocalizedValuesMap,
 		LocalizedValuesMap bodyLocalizedValuesMap,
 		ServiceContext serviceContext) {
@@ -2060,12 +2063,27 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 		subscriptionSender.setCompanyId(message.getCompanyId());
 		subscriptionSender.setContextAttribute(
 			"[$MESSAGE_BODY$]", messageBody, false);
+
+		long groupId = message.getGroupId();
+
+		if (category.getCategoryId() !=
+				MBCategoryConstants.DEFAULT_PARENT_CATEGORY_ID) {
+
+			subscriptionSender.setContextAttribute(
+				"[$CATEGORY_NAME$]", category.getName(), true);
+		}
+		else {
+			subscriptionSender.setLocalizedContextAttributeWithFunction(
+				"[$CATEGORY_NAME$]",
+				locale -> _getLocalizedRootCategoryName(groupId, locale));
+		}
+
 		subscriptionSender.setContextAttributes(
-			"[$CATEGORY_NAME$]", categoryName, "[$MAILING_LIST_ADDRESS$]",
-			replyToAddress, "[$MESSAGE_ID$]", message.getMessageId(),
-			"[$MESSAGE_SUBJECT$]", entryTitle, "[$MESSAGE_URL$]", messageURL,
-			"[$MESSAGE_USER_ADDRESS$]", emailAddress, "[$MESSAGE_USER_NAME$]",
-			fullName);
+			"[$MAILING_LIST_ADDRESS$]", replyToAddress, "[$MESSAGE_ID$]",
+			message.getMessageId(), "[$MESSAGE_SUBJECT$]", messageSubject,
+			"[$MESSAGE_SUBJECT_PREFIX$]", messageSubjectPrefix,
+			"[$MESSAGE_URL$]", messageURL, "[$MESSAGE_USER_ADDRESS$]",
+			emailAddress, "[$MESSAGE_USER_NAME$]", fullName);
 		subscriptionSender.setCurrentUserId(userId);
 		subscriptionSender.setEntryTitle(entryTitle);
 		subscriptionSender.setEntryURL(messageURL);
@@ -2106,7 +2124,7 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 		subscriptionSender.setPortletId(portletId);
 
 		subscriptionSender.setReplyToAddress(replyToAddress);
-		subscriptionSender.setScopeGroupId(message.getGroupId());
+		subscriptionSender.setScopeGroupId(groupId);
 		subscriptionSender.setServiceContext(serviceContext);
 		subscriptionSender.setUniqueMailId(false);
 
@@ -2160,7 +2178,8 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 		subscriptionSender.setClassName(MBDiscussion.class.getName());
 		subscriptionSender.setClassPK(mbDiscussion.getDiscussionId());
 		subscriptionSender.setContextAttribute(
-			"[$COMMENTS_BODY$]", message.getBody(true), false);
+			"[$COMMENTS_BODY$]", message.getBody(message.isFormatBBCode()),
+			false);
 		subscriptionSender.setContextAttributes(
 			"[$COMMENTS_USER_ADDRESS$]", userAddress, "[$COMMENTS_USER_NAME$]",
 			userName, "[$CONTENT_URL$]", contentURL);
@@ -2240,8 +2259,6 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 		Company company = companyPersistence.findByPrimaryKey(
 			message.getCompanyId());
 
-		Group group = groupPersistence.findByPrimaryKey(message.getGroupId());
-
 		User user = userPersistence.findByPrimaryKey(userId);
 
 		String emailAddress = user.getEmailAddress();
@@ -2253,16 +2270,6 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 		}
 
 		MBCategory category = message.getCategory();
-
-		String categoryName = category.getName();
-
-		if (category.getCategoryId() ==
-				MBCategoryConstants.DEFAULT_PARENT_CATEGORY_ID) {
-
-			categoryName = serviceContext.translate("message-boards-home");
-
-			categoryName += " - " + group.getDescriptiveName();
-		}
 
 		List<Long> categoryIds = new ArrayList<>();
 
@@ -2324,12 +2331,14 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 			}
 			catch (Exception e) {
 				_log.error(
-					"Could not parse message " + message.getMessageId() + " " +
+					"Unable to parse message " + message.getMessageId() + ": " +
 						e.getMessage());
 			}
 		}
 
 		String inReplyTo = null;
+		String messageSubject = message.getSubject();
+		String messageSubjectPrefix = StringPool.BLANK;
 
 		if (message.getParentMessageId() !=
 				MBMessageConstants.DEFAULT_PARENT_MESSAGE_ID) {
@@ -2343,13 +2352,23 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 				company.getMx(), MBUtil.MESSAGE_POP_PORTLET_PREFIX,
 				message.getCategoryId(), parentMessage.getMessageId(),
 				modifiedDate.getTime());
+
+			if (messageSubject.startsWith(
+					MBMessageConstants.MESSAGE_SUBJECT_PREFIX_RE)) {
+
+				messageSubjectPrefix =
+					MBMessageConstants.MESSAGE_SUBJECT_PREFIX_RE;
+
+				messageSubject = messageSubject.substring(
+					messageSubjectPrefix.length());
+			}
 		}
 
 		SubscriptionSender subscriptionSender = getSubscriptionSender(
-			userId, message, messageURL, entryTitle, htmlFormat, messageBody,
-			categoryName, inReplyTo, fromName, fromAddress, replyToAddress,
-			emailAddress, fullName, subjectLocalizedValuesMap,
-			bodyLocalizedValuesMap, serviceContext);
+			userId, category, message, messageURL, entryTitle, htmlFormat,
+			messageBody, messageSubject, messageSubjectPrefix, inReplyTo,
+			fromName, fromAddress, replyToAddress, emailAddress, fullName,
+			subjectLocalizedValuesMap, bodyLocalizedValuesMap, serviceContext);
 
 		subscriptionSender.addPersistedSubscribers(
 			MBCategory.class.getName(), message.getGroupId());
@@ -2370,9 +2389,10 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 			for (long categoryId : categoryIds) {
 				MBSubscriptionSender sourceMailingListSubscriptionSender =
 					getSubscriptionSender(
-						userId, message, messageURL, entryTitle, htmlFormat,
-						messageBody, categoryName, inReplyTo, fromName,
-						fromAddress, replyToAddress, emailAddress, fullName,
+						userId, category, message, messageURL, entryTitle,
+						htmlFormat, messageBody, messageSubject,
+						messageSubjectPrefix, inReplyTo, fromName, fromAddress,
+						replyToAddress, emailAddress, fullName,
 						subjectLocalizedValuesMap, bodyLocalizedValuesMap,
 						serviceContext);
 
@@ -2405,7 +2425,7 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 			layoutFullURL + Portal.FRIENDLY_URL_SEPARATOR +
 				"message_boards/view_message/" + message.getMessageId();
 
-		Source source = new Source(message.getBody(true));
+		Source source = new Source(message.getBody(message.isFormatBBCode()));
 
 		List<StartTag> startTags = source.getAllStartTags("a");
 
@@ -2585,6 +2605,21 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 			int max = PropsValues.DISCUSSION_MAX_COMMENTS - 1;
 
 			throw new DiscussionMaxCommentsException(count + " exceeds " + max);
+		}
+	}
+
+	private String _getLocalizedRootCategoryName(long groupId, Locale locale) {
+		try {
+			Group group = groupPersistence.findByPrimaryKey(groupId);
+
+			return LanguageUtil.get(locale, "message-boards-home") + " - " +
+				group.getDescriptiveName(locale);
+		}
+		catch (PortalException pe) {
+			_log.error(
+				"Unable to get descriptive name for group " + groupId, pe);
+
+			return LanguageUtil.get(locale, "message-boards-home");
 		}
 	}
 

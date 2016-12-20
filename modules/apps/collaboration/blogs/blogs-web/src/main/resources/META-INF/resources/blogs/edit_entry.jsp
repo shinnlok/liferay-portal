@@ -64,15 +64,30 @@ if (portletTitleBasedNavigation) {
 	</small>
 </liferay-util:buffer>
 
+<liferay-util:buffer var="readingTime">
+
+	<%
+	int readingTimeInMinutes = (entry == null) ? 0 : com.liferay.blogs.web.internal.util.BlogsUtil.getReadingTimeMinutes(entry.getContent());
+	%>
+
+	<small class="text-capitalize text-muted" id="<portlet:namespace />readingTime">
+		<c:if test="<%= readingTimeInMinutes > 0 %>">
+			&nbsp;-&nbsp;
+			<liferay-ui:message arguments="<%= readingTimeInMinutes %>" key="x-minutes-read" translateArguments="<%= false %>" />
+		</c:if>
+	</small>
+</liferay-util:buffer>
+
 <c:if test="<%= portletTitleBasedNavigation %>">
-	<liferay-frontend:info-bar>
+	<liferay-frontend:info-bar fixed="<%= true %>">
 		<%= saveStatus %>
+		<%= readingTime %>
 	</liferay-frontend:info-bar>
 </c:if>
 
 <portlet:actionURL name="/blogs/edit_entry" var="editEntryURL" />
 
-<div class="container-fluid-1280">
+<div class="container-fluid-1280 entry-body">
 	<aui:form action="<%= editEntryURL %>" cssClass="edit-entry" enctype="multipart/form-data" method="post" name="fm" onSubmit="event.preventDefault();">
 		<aui:input name="<%= Constants.CMD %>" type="hidden" />
 		<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
@@ -84,6 +99,7 @@ if (portletTitleBasedNavigation) {
 			<div class="entry-options">
 				<div class="status">
 					<%= saveStatus %>
+					<%= readingTime %>
 				</div>
 			</div>
 		</c:if>
@@ -156,7 +172,7 @@ if (portletTitleBasedNavigation) {
 
 					<div class="col-md-8 col-md-offset-2">
 						<div class="entry-title">
-							<h1><liferay-ui:input-editor contents="<%= HtmlUtil.escape(title) %>" editorName="alloyeditor" name="titleEditor" placeholder="title" showSource="<%= false %>" /></h1>
+							<h1><liferay-ui:input-editor contents="<%= HtmlUtil.escape(title) %>" editorName="alloyeditor" name="titleEditor" onChangeMethod="OnChangeTitle" placeholder="title" showSource="<%= false %>" /></h1>
 						</div>
 
 						<aui:input name="title" type="hidden" />
@@ -196,7 +212,33 @@ if (portletTitleBasedNavigation) {
 					String friendlyURLPrefix = StringUtil.shorten("/-/" + portlet.getFriendlyURLMapping(), 40) + StringPool.SLASH;
 					%>
 
-					<aui:input cssClass="input-medium" data-customUrl="<%= false %>" helpMessage='<%= LanguageUtil.format(resourceBundle, "for-example-x", "<em>one-day-in-the-life-of-marion-cotillard</em>") %>' ignoreRequestValue="<%= true %>" label="blog-entry-url" name="urlTitle" prefix="<%= friendlyURLPrefix %>" type="text" value="<%= urlTitle %>" />
+					<div class="clearfix form-group">
+
+						<%
+						boolean automaticURL;
+
+						if (entry == null) {
+							automaticURL = Validator.isNull(urlTitle);
+						}
+						else {
+							String uniqueUrlTitle = BlogsEntryLocalServiceUtil.getUniqueUrlTitle(entry);
+
+							automaticURL = uniqueUrlTitle.equals(urlTitle);
+						}
+						%>
+
+						<h4>
+							<liferay-ui:message key="url" />
+						</h4>
+
+						<div class="form-group" id="<portlet:namespace />urlOptions">
+							<aui:input checked="<%= automaticURL %>" helpMessage="the-url-will-be-based-on-the-entry-title" label="automatic" name="automaticURL" type="radio" value="<%= true %>" />
+
+							<aui:input checked="<%= !automaticURL %>" label="custom" name="automaticURL" type="radio" value="<%= false %>" />
+						</div>
+
+						<aui:input cssClass="input-medium" disabled="<%= automaticURL %>" helpMessage='<%= LanguageUtil.format(resourceBundle, "for-example-x", "<em>one-day-in-the-life-of-marion-cotillard</em>") %>' ignoreRequestValue="<%= true %>" label="blog-entry-url" name="urlTitle" prefix="<%= friendlyURLPrefix %>" type="text" value="<%= urlTitle %>" />
+					</div>
 
 					<div class="clearfix form-group">
 						<label><liferay-ui:message key="abstract" /> <liferay-ui:icon-help message="an-abstract-is-a-brief-summary-of-a-blog-entry" /></label>
@@ -279,16 +321,16 @@ if (portletTitleBasedNavigation) {
 					</c:if>
 				</aui:fieldset>
 
-				<liferay-ui:custom-attributes-available className="<%= BlogsEntry.class.getName() %>">
+				<liferay-expando:custom-attributes-available className="<%= BlogsEntry.class.getName() %>">
 					<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="custom-fields">
-						<liferay-ui:custom-attribute-list
+						<liferay-expando:custom-attribute-list
 							className="<%= BlogsEntry.class.getName() %>"
 							classPK="<%= entryId %>"
 							editable="<%= true %>"
 							label="<%= true %>"
 						/>
 					</aui:fieldset>
-				</liferay-ui:custom-attributes-available>
+				</liferay-expando:custom-attributes-available>
 
 				<c:if test="<%= (entry == null) || (entry.getStatus() == WorkflowConstants.STATUS_DRAFT) %>">
 					<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="permissions">
@@ -355,6 +397,16 @@ if (portletTitleBasedNavigation) {
 
 		if (blogs) {
 			blogs.setDescription(html);
+
+			blogs.updateReadingTime(html);
+		}
+	}
+
+	function <portlet:namespace />OnChangeTitle(title) {
+		var blogs = Liferay.component('<portlet:namespace />Blogs');
+
+		if (blogs) {
+			blogs.updateFriendlyURL(title);
 		}
 	}
 
@@ -374,13 +426,15 @@ if (portletTitleBasedNavigation) {
 		'<portlet:namespace />Blogs',
 		new Liferay.Blogs(
 			{
+				calculateReadingTimeURL: '<portlet:resourceURL id="/blogs/calculate_reading_time" />',
 				constants: {
 					'ACTION_PUBLISH': '<%= WorkflowConstants.ACTION_PUBLISH %>',
 					'ACTION_SAVE_DRAFT': '<%= WorkflowConstants.ACTION_SAVE_DRAFT %>',
 					'ADD': '<%= Constants.ADD %>',
 					'CMD': '<%= Constants.CMD %>',
 					'STATUS_DRAFT': '<%= WorkflowConstants.STATUS_DRAFT %>',
-					'UPDATE': '<%= Constants.UPDATE %>'
+					'UPDATE': '<%= Constants.UPDATE %>',
+					'X_MINUTES_READ': '&nbsp;-&nbsp; <%= UnicodeLanguageUtil.get(resourceBundle, "x-minutes-read") %>'
 				},
 				descriptionLength: '<%= pageAbstractLength %>',
 				editEntryURL: '<%= editEntryURL %>',
@@ -403,14 +457,6 @@ if (portletTitleBasedNavigation) {
 		)
 	);
 
-	var clearSaveDraftHandle = function(event) {
-		if (event.portletId === '<%= portletDisplay.getRootPortletId() %>') {
-			blogs.destroy();
-
-			Liferay.detach('destroyPortlet', clearSaveDraftHandle);
-		}
-	};
-
 	var createAbstractEditor = function() {
 		var descriptionEditor = window['<portlet:namespace />descriptionEditor'];
 
@@ -430,16 +476,13 @@ if (portletTitleBasedNavigation) {
 		configurationContentHeader.on('show.bs.collapse', createAbstractEditor);
 	}
 
-	var form = A.one('#<portlet:namespace />fm');
+	var clearSaveDraftHandle = function(event) {
+		if (event.portletId === '<%= portletDisplay.getRootPortletId() %>') {
+			blogs.destroy();
 
-	var urlTitleInput = form.one('#<portlet:namespace />urlTitle');
-
-	urlTitleInput.on(
-		'input',
-		function(event) {
-			event.currentTarget.setAttribute('data-customUrl', urlTitleInput.val() != '');
+			Liferay.detach('destroyPortlet', clearSaveDraftHandle);
 		}
-	);
+	};
 
 	Liferay.on('destroyPortlet', clearSaveDraftHandle);
 </aui:script>

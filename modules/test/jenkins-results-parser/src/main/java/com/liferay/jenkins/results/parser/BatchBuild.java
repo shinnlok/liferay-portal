@@ -22,16 +22,15 @@ import java.util.List;
  */
 public class BatchBuild extends BaseBuild {
 
-	protected BatchBuild(String url) throws Exception {
+	protected BatchBuild(String url) {
 		this(url, null);
 	}
 
-	protected BatchBuild(String url, TopLevelBuild topLevelBuild)
-		throws Exception {
-
+	protected BatchBuild(String url, TopLevelBuild topLevelBuild) {
 		super(url, topLevelBuild);
 	}
 
+	@Override
 	protected List<String> findDownstreamBuildsInConsoleText() {
 		return Collections.emptyList();
 	}

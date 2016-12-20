@@ -346,14 +346,14 @@ while (manageableCalendarsIterator.hasNext()) {
 
 					<aui:input name="location" />
 
-					<liferay-ui:custom-attributes-available className="<%= CalendarBooking.class.getName() %>">
-						<liferay-ui:custom-attribute-list
+					<liferay-expando:custom-attributes-available className="<%= CalendarBooking.class.getName() %>">
+						<liferay-expando:custom-attribute-list
 							className="<%= CalendarBooking.class.getName() %>"
 							classPK="<%= (calendarBooking != null) ? calendarBooking.getCalendarBookingId() : 0 %>"
 							editable="<%= true %>"
 							label="<%= true %>"
 						/>
-					</liferay-ui:custom-attributes-available>
+					</liferay-expando:custom-attributes-available>
 
 					<c:if test="<%= calendarBooking == null %>">
 						<aui:field-wrapper label="permissions">
@@ -420,7 +420,7 @@ while (manageableCalendarsIterator.hasNext()) {
 									<liferay-util:include page="/scheduler.jsp" servletContext="<%= application %>">
 										<liferay-util:param name="activeView" value="<%= activeView %>" />
 										<liferay-util:param name="date" value="<%= String.valueOf(startTime) %>" />
-										<liferay-util:param name="filterCalendarBookings" value='<%= "window." + renderResponse.getNamespace() + "filterCalendarBookings" %>' />
+										<liferay-util:param name="filterCalendarBookings" value='<%= renderResponse.getNamespace() + "filterCalendarBookings" %>' />
 										<liferay-util:param name="hideAgendaView" value="<%= Boolean.TRUE.toString() %>" />
 										<liferay-util:param name="hideMonthView" value="<%= Boolean.TRUE.toString() %>" />
 										<liferay-util:param name="preventPersistence" value="<%= Boolean.TRUE.toString() %>" />
@@ -488,7 +488,7 @@ while (manageableCalendarsIterator.hasNext()) {
 
 <aui:script>
 	function <portlet:namespace />filterCalendarBookings(calendarBooking) {
-		return <%= calendarBookingId %> !== calendarBooking.calendarBookingId;
+		return '<%= calendarBookingId %>' !== calendarBooking.calendarBookingId;
 	}
 
 	function <portlet:namespace />resolver(data) {
@@ -511,9 +511,11 @@ while (manageableCalendarsIterator.hasNext()) {
 			var A = AUI();
 
 			<c:if test="<%= invitable %>">
-				var calendarId = A.one('#<portlet:namespace />calendarId').val();
 				var calendarContainer = Liferay.component('<portlet:namespace />calendarContainer');
+
 				var childCalendarIds = A.Object.keys(calendarContainer.get('availableCalendars'));
+
+				var calendarId = A.one('#<portlet:namespace />calendarId').val();
 
 				A.Array.remove(childCalendarIds, A.Array.indexOf(childCalendarIds, calendarId));
 

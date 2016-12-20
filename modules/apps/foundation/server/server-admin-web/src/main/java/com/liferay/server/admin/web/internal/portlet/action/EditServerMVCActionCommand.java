@@ -23,6 +23,7 @@ import com.liferay.portal.captcha.recaptcha.ReCaptchaImpl;
 import com.liferay.portal.captcha.simplecaptcha.SimpleCaptchaImpl;
 import com.liferay.portal.convert.ConvertException;
 import com.liferay.portal.convert.ConvertProcess;
+import com.liferay.portal.instances.service.PortalInstancesLocalService;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskConstants;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskManager;
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
@@ -84,7 +85,6 @@ import com.liferay.portal.kernel.xuggler.XugglerUtil;
 import com.liferay.portal.security.lang.DoPrivilegedBean;
 import com.liferay.portal.upload.UploadServletRequestImpl;
 import com.liferay.portal.util.MaintenanceUtil;
-import com.liferay.portal.util.PortalInstances;
 import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.ShutdownUtil;
 import com.liferay.portlet.ActionResponseImpl;
@@ -357,7 +357,8 @@ public class EditServerMVCActionCommand extends BaseMVCActionCommand {
 		if (!ParamUtil.getBoolean(actionRequest, "blocking")) {
 			_indexWriterHelper.reindex(
 				themeDisplay.getUserId(), "reindex",
-				PortalInstances.getCompanyIds(), className, taskContextMap);
+				_portalInstancesLocalService.getCompanyIds(), className,
+				taskContextMap);
 
 			return;
 		}
@@ -410,7 +411,8 @@ public class EditServerMVCActionCommand extends BaseMVCActionCommand {
 		try {
 			_indexWriterHelper.reindex(
 				themeDisplay.getUserId(), jobName,
-				PortalInstances.getCompanyIds(), className, taskContextMap);
+				_portalInstancesLocalService.getCompanyIds(), className,
+				taskContextMap);
 
 			countDownLatch.await(
 				ParamUtil.getLong(actionRequest, "timeout", Time.HOUR),
@@ -425,7 +427,7 @@ public class EditServerMVCActionCommand extends BaseMVCActionCommand {
 	protected void reindexDictionaries(ActionRequest actionRequest)
 		throws Exception {
 
-		long[] companyIds = PortalInstances.getCompanyIds();
+		long[] companyIds = _portalInstancesLocalService.getCompanyIds();
 
 		for (long companyId : companyIds) {
 			_indexWriterHelper.indexQuerySuggestionDictionaries(companyId);
@@ -632,14 +634,6 @@ public class EditServerMVCActionCommand extends BaseMVCActionCommand {
 			actionRequest, "journalImageExtensions");
 		long journalImageSmallMaxSize = ParamUtil.getLong(
 			actionRequest, "journalImageSmallMaxSize");
-		String shoppingImageExtensions = getFileExtensions(
-			actionRequest, "shoppingImageExtensions");
-		long shoppingImageLargeMaxSize = ParamUtil.getLong(
-			actionRequest, "shoppingImageLargeMaxSize");
-		long shoppingImageMediumMaxSize = ParamUtil.getLong(
-			actionRequest, "shoppingImageMediumMaxSize");
-		long shoppingImageSmallMaxSize = ParamUtil.getLong(
-			actionRequest, "shoppingImageSmallMaxSize");
 		long uploadServletRequestImplMaxSize = ParamUtil.getLong(
 			actionRequest, "uploadServletRequestImplMaxSize");
 		String uploadServletRequestImplTempDir = ParamUtil.getString(
@@ -665,17 +659,6 @@ public class EditServerMVCActionCommand extends BaseMVCActionCommand {
 		portletPreferences.setValue(
 			PropsKeys.JOURNAL_IMAGE_SMALL_MAX_SIZE,
 			String.valueOf(journalImageSmallMaxSize));
-		portletPreferences.setValue(
-			PropsKeys.SHOPPING_IMAGE_EXTENSIONS, shoppingImageExtensions);
-		portletPreferences.setValue(
-			PropsKeys.SHOPPING_IMAGE_LARGE_MAX_SIZE,
-			String.valueOf(shoppingImageLargeMaxSize));
-		portletPreferences.setValue(
-			PropsKeys.SHOPPING_IMAGE_MEDIUM_MAX_SIZE,
-			String.valueOf(shoppingImageMediumMaxSize));
-		portletPreferences.setValue(
-			PropsKeys.SHOPPING_IMAGE_SMALL_MAX_SIZE,
-			String.valueOf(shoppingImageSmallMaxSize));
 		portletPreferences.setValue(
 			PropsKeys.UPLOAD_SERVLET_REQUEST_IMPL_MAX_SIZE,
 			String.valueOf(uploadServletRequestImplMaxSize));
@@ -857,6 +840,9 @@ public class EditServerMVCActionCommand extends BaseMVCActionCommand {
 	@Reference
 	private OrganizationMembershipPolicyFactory
 		_organizationMembershipPolicyFactory;
+
+	@Reference
+	private PortalInstancesLocalService _portalInstancesLocalService;
 
 	@Reference
 	private PortalUUID _portalUUID;

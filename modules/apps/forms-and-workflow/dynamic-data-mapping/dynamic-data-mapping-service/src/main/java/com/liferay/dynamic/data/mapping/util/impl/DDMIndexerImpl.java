@@ -171,7 +171,7 @@ public class DDMIndexerImpl implements DDMIndexer {
 							double longitude = geolocationJSONObject.getDouble(
 								"longitude");
 
-							document.addGeoLocation(latitude, longitude);
+							document.addGeoLocation(name, latitude, longitude);
 						}
 						else if (type.equals(DDMImpl.TYPE_RADIO) ||
 								 type.equals(DDMImpl.TYPE_SELECT)) {
@@ -261,7 +261,8 @@ public class DDMIndexerImpl implements DDMIndexer {
 				catch (PortalException pe) {
 					throw new IllegalArgumentException(
 						"Unable to obtain index tpe for field " + fieldName +
-							" and DDM structure ID " + ddmStructureId);
+							" and DDM structure ID " + ddmStructureId,
+						pe);
 				}
 			}
 		}
@@ -291,7 +292,7 @@ public class DDMIndexerImpl implements DDMIndexer {
 
 				Serializable value = field.getValue(locale);
 
-				if ((value instanceof Boolean) || (value instanceof Number)) {
+				if (value instanceof Boolean || value instanceof Number) {
 					sb.append(value);
 					sb.append(StringPool.SPACE);
 				}

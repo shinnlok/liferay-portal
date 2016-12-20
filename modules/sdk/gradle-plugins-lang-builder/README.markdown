@@ -3,6 +3,8 @@
 The Lang Builder Gradle plugin lets you run the [Liferay Lang Builder](https://github.com/liferay/liferay-portal/tree/master/modules/util/lang-builder)
 tool in order to sort and translate the language keys in your project.
 
+The plugin has been successfully tested with Gradle 2.5 up to 3.2.1.
+
 ## Usage
 
 To use the plugin, include it in your build script:
@@ -72,13 +74,13 @@ Property Name | Default Value
 
 Property Name | Type | Default Value | Description
 ------------- | ---- | ------------- | -----------
-<a name="langdir"></a>`langDir` | `File` | `null` | The directory where the language properties files are saved.
-`langFileName` | `String` | `"Language"` | The file name prefix of the language properties files (e.g., `Language_it.properties`).
-`plugin` | `boolean` | `true` | Whether to check for duplicate language keys between the project and the portal. If `portalLanguagePropertiesFile` is not set, this property has no effect.
-`portalLanguagePropertiesFile` | `File` | `null` | The `Language.properties` file of the portal.
-`translate` | `boolean` | `true` | Whether to translate the language keys and generate a language properties file for each locale that's supported by Liferay.
-`translateClientId` | `String` | `null` | The client ID that was specified when registering with Azure DataMarket.
-`translateClientSecret` | `String` | `null` | The client secret value that was obtained when registering with Azure DataMarket.
+<a name="langdir"></a>`langDir` | `File` | `null` | The directory where the language properties files are saved. It sets the `lang.dir` argument.
+`langFileName` | `String` | `"Language"` | The file name prefix of the language properties files (e.g., `Language_it.properties`). It sets the `lang.file` argument.
+`plugin` | `boolean` | `true` | Whether to check for duplicate language keys between the project and the portal. If `portalLanguagePropertiesFile` is not set, this property has no effect. It sets the `lang.plugin` argument.
+`portalLanguagePropertiesFile` | `File` | `null` | The `Language.properties` file of the portal. It sets the `lang.portal.language.properties.file` argument.
+`translate` | `boolean` | `true` | Whether to translate the language keys and generate a language properties file for each locale that's supported by Liferay. It sets the `lang.translate` argument.
+`translateClientId` | `String` | `null` | The client ID that was specified when registering with Azure DataMarket. It sets the `lang.translate.client.id` argument.
+`translateClientSecret` | `String` | `null` | The client secret value that was obtained when registering with Azure DataMarket. It sets the `lang.translate.client.secret` argument.
 
 The properties of type `File` support any type that can be resolved by
 [`project.file`](https://docs.gradle.org/current/dsl/org.gradle.api.Project.html#org.gradle.api.Project:file(java.lang.Object)).

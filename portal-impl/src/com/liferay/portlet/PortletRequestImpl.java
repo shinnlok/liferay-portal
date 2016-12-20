@@ -242,6 +242,7 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 		return _request.getMethod();
 	}
 
+	@Override
 	public HttpServletRequest getOriginalHttpServletRequest() {
 		return _originalRequest;
 	}
@@ -301,6 +302,7 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 		return _portalContext;
 	}
 
+	@Override
 	public Portlet getPortlet() {
 		return _portlet;
 	}

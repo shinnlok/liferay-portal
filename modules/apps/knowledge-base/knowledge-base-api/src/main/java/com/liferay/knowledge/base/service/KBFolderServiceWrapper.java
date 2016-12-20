@@ -50,6 +50,21 @@ public class KBFolderServiceWrapper implements KBFolderService,
 	}
 
 	@Override
+	public com.liferay.knowledge.base.model.KBFolder fetchFirstChildKBFolder(
+		long groupId, long kbFolderId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _kbFolderService.fetchFirstChildKBFolder(groupId, kbFolderId);
+	}
+
+	@Override
+	public com.liferay.knowledge.base.model.KBFolder fetchFirstChildKBFolder(
+		long groupId, long kbFolderId,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.knowledge.base.model.KBFolder> obc)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _kbFolderService.fetchFirstChildKBFolder(groupId, kbFolderId, obc);
+	}
+
+	@Override
 	public com.liferay.knowledge.base.model.KBFolder fetchKBFolder(
 		long kbFolderId)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -79,6 +94,12 @@ public class KBFolderServiceWrapper implements KBFolderService,
 			parentKbFolderId, urlTitle);
 	}
 
+	/**
+	* @deprecated As of 1.1.0, replaced by {@link
+	#updateKBFolder(long, long, long, String, String,
+	ServiceContext)}
+	*/
+	@Deprecated
 	@Override
 	public com.liferay.knowledge.base.model.KBFolder updateKBFolder(
 		long parentResourceClassNameId, long parentResourcePrimKey,
@@ -86,6 +107,16 @@ public class KBFolderServiceWrapper implements KBFolderService,
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _kbFolderService.updateKBFolder(parentResourceClassNameId,
 			parentResourcePrimKey, kbFolderId, name, description);
+	}
+
+	@Override
+	public com.liferay.knowledge.base.model.KBFolder updateKBFolder(
+		long parentResourceClassNameId, long parentResourcePrimKey,
+		long kbFolderId, java.lang.String name, java.lang.String description,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _kbFolderService.updateKBFolder(parentResourceClassNameId,
+			parentResourcePrimKey, kbFolderId, name, description, serviceContext);
 	}
 
 	@Override

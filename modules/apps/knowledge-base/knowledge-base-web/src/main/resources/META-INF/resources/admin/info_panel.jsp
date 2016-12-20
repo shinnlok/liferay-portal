@@ -42,6 +42,8 @@ if (ListUtil.isEmpty(kbFolders) && ListUtil.isEmpty(kbArticles)) {
 		kbArticles.add(KBArticleServiceUtil.getLatestKBArticle(parentResourcePrimKey, WorkflowConstants.STATUS_ANY));
 	}
 }
+
+boolean showSidebarHeader = ParamUtil.getBoolean(request, "showSidebarHeader", GetterUtil.getBoolean(request.getAttribute(KBWebKeys.SHOW_SIDEBAR_HEADER)));
 %>
 
 <c:choose>
@@ -54,47 +56,52 @@ if (ListUtil.isEmpty(kbFolders) && ListUtil.isEmpty(kbArticles)) {
 		%>
 
 		<div class="sidebar-header">
-			<ul class="sidebar-header-actions">
+			<ul class="sidebar-actions">
 				<li>
 					<liferay-util:include page="/admin/folder_action.jsp" servletContext="<%= application %>" />
 				</li>
 			</ul>
 
-			<h4><%= (kbFolder != null) ? HtmlUtil.escape(kbFolder.getName()) : LanguageUtil.get(request, "home") %></h4>
+			<h4 class="sidebar-title"><%= (kbFolder != null) ? HtmlUtil.escape(kbFolder.getName()) : LanguageUtil.get(request, "home") %></h4>
 
-			<div>
+			<h5>
 				<liferay-ui:message key="folder" />
-			</div>
+			</h5>
 		</div>
 
-		<aui:nav-bar>
-			<aui:nav cssClass="navbar-nav">
+		<aui:nav-bar cssClass="navbar-no-collapse" markupView="lexicon">
+			<aui:nav collapsible="<%= false %>" cssClass="navbar-nav">
 				<aui:nav-item label="details" selected="<%= true %>" />
 			</aui:nav>
 		</aui:nav-bar>
 
 		<div class="sidebar-body">
-			<h5><liferay-ui:message key="num-of-items" /></h5>
+			<dl class="sidebar-block">
+				<dt class="h5">
+					<liferay-ui:message key="num-of-items" />
+				</dt>
 
-			<%
-			long folderId = KBFolderConstants.DEFAULT_PARENT_FOLDER_ID;
+				<%
+				long folderId = KBFolderConstants.DEFAULT_PARENT_FOLDER_ID;
 
-			if (kbFolder != null) {
-				folderId = kbFolder.getKbFolderId();
-			}
-			%>
+				if (kbFolder != null) {
+					folderId = kbFolder.getKbFolderId();
+				}
+				%>
 
-			<p>
-				<%= KBFolderServiceUtil.getKBFoldersAndKBArticlesCount(scopeGroupId, folderId, WorkflowConstants.STATUS_APPROVED) %>
-			</p>
+				<dd class="h6 sidebar-caption">
+					<%= KBFolderServiceUtil.getKBFoldersAndKBArticlesCount(scopeGroupId, folderId, WorkflowConstants.STATUS_APPROVED) %>
+				</dd>
 
-			<c:if test="<%= kbFolder != null %>">
-				<h5><liferay-ui:message key="created" /></h5>
-
-				<p>
-					<%= HtmlUtil.escape(kbFolder.getUserName()) %>
-				</p>
-			</c:if>
+				<c:if test="<%= kbFolder != null %>">
+					<dt class="h5">
+						<liferay-ui:message key="created" />
+					</dt>
+					<dd class="h6 sidebar-caption">
+						<%= HtmlUtil.escape(kbFolder.getUserName()) %>
+					</dd>
+				</c:if>
+			</dl>
 		</div>
 	</c:when>
 	<c:when test="<%= ListUtil.isEmpty(kbFolders) && ListUtil.isNotEmpty(kbArticles) && (kbArticles.size() == 1) %>">
@@ -106,66 +113,68 @@ if (ListUtil.isEmpty(kbFolders) && ListUtil.isEmpty(kbArticles)) {
 		%>
 
 		<div class="sidebar-header">
-			<ul class="sidebar-header-actions">
-				<li>
-					<liferay-util:include page="/admin/subscribe.jsp" servletContext="<%= application %>" />
-				</li>
-				<li>
-					<liferay-util:include page="/admin/article_action.jsp" servletContext="<%= application %>" />
-				</li>
-			</ul>
+			<c:if test="<%= showSidebarHeader %>">
+				<ul class="sidebar-actions">
+					<li>
+						<liferay-util:include page="/admin/subscribe.jsp" servletContext="<%= application %>" />
+					</li>
+					<li>
+						<liferay-util:include page="/admin/article_action.jsp" servletContext="<%= application %>" />
+					</li>
+				</ul>
+			</c:if>
 
-			<h4><%= HtmlUtil.escape(kbArticle.getTitle()) %></h4>
+			<h4 class="sidebar-title"><%= HtmlUtil.escape(kbArticle.getTitle()) %></h4>
 
-			<div>
+			<h5>
 				<liferay-ui:message key="entry" />
-			</div>
+			</h5>
 		</div>
 
-		<liferay-ui:tabs names="details,versions" refresh="<%= false %>" type="dropdown">
+		<liferay-ui:tabs cssClass="navbar-no-collapse" names="details,versions" refresh="<%= false %>" type="dropdown">
 			<liferay-ui:section>
 				<div class="sidebar-body">
-					<dl>
+					<dl class="sidebar-block">
 						<dt class="h5">
 							<liferay-ui:message key="title" />
 						</dt>
-						<dd>
+						<dd class="h6 sidebar-caption">
 							<%= HtmlUtil.escape(kbArticle.getTitle()) %>
 						</dd>
 						<dt class="h5">
 							<liferay-ui:message key="author" />
 						</dt>
-						<dd>
+						<dd class="h6 sidebar-caption">
 							<%= HtmlUtil.escape(kbArticle.getUserName()) %>
 						</dd>
 						<dt class="h5">
 							<liferay-ui:message key="status" />
 						</dt>
-						<dd>
-							<liferay-ui:message key="<%= KBUtil.getStatusLabel(kbArticle.getStatus()) %>" />
+						<dd class="h6 sidebar-caption">
+							<liferay-ui:message key="<%= WorkflowConstants.getStatusLabel(kbArticle.getStatus()) %>" />
 						</dd>
 						<dt class="h5">
 							<liferay-ui:message key="priority" />
 						</dt>
-						<dd>
+						<dd class="h6 sidebar-caption">
 							<%= kbArticle.getPriority() %>
 						</dd>
 						<dt class="h5">
 							<liferay-ui:message key="create-date" />
 						</dt>
-						<dd>
+						<dd class="h6 sidebar-caption">
 							<%= dateFormatDateTime.format(kbArticle.getCreateDate()) %>
 						</dd>
 						<dt class="h5">
 							<liferay-ui:message key="modified-date" />
 						</dt>
-						<dd>
+						<dd class="h6 sidebar-caption">
 							<%= dateFormatDateTime.format(kbArticle.getModifiedDate()) %>
 						</dd>
 						<dt class="h5">
 							<liferay-ui:message key="views" />
 						</dt>
-						<dd>
+						<dd class="h6 sidebar-caption">
 							<%= kbArticle.getViewCount() %>
 						</dd>
 					</dl>
@@ -181,11 +190,11 @@ if (ListUtil.isEmpty(kbFolders) && ListUtil.isEmpty(kbArticles)) {
 	</c:when>
 	<c:otherwise>
 		<div class="sidebar-header">
-			<h4><liferay-ui:message arguments="<%= kbFolders.size() + kbArticles.size() %>" key="x-items-are-selected" /></h4>
+			<h4 class="sidebar-title"><liferay-ui:message arguments="<%= kbFolders.size() + kbArticles.size() %>" key="x-items-are-selected" /></h4>
 		</div>
 
-		<aui:nav-bar>
-			<aui:nav cssClass="navbar-nav">
+		<aui:nav-bar cssClass="navbar-no-collapse" markupView="lexicon">
+			<aui:nav collapsible="<%= false %>" cssClass="navbar-nav">
 				<aui:nav-item label="details" selected="<%= true %>" />
 			</aui:nav>
 		</aui:nav-bar>

@@ -19,10 +19,8 @@ import com.liferay.taglib.TagSupport;
 import javax.servlet.jsp.JspException;
 
 /**
- * @author Brian Wing Shun Chan
- * @deprecated As of 7.0.0, with no direct replacement
+ * @author     Brian Wing Shun Chan
  */
-@Deprecated
 public class ParamTag extends TagSupport {
 
 	@Override

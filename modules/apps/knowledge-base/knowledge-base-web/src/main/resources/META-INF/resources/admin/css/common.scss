@@ -151,6 +151,10 @@
 		margin-bottom: 15px;
 		text-align: right;
 
+		& > a {
+			display: inline-block;
+		}
+
 		& > span {
 			margin-left: 5px;
 		}
@@ -185,8 +189,6 @@
 	}
 
 	.kb-entity-body {
-		padding: 0 7px;
-
 		img {
 			max-width: 100%;
 		}
@@ -310,6 +312,10 @@
 	.lfr-dynamic-uploader {
 		position: relative;
 		top: 0;
+	}
+
+	.list-group-item h3 {
+		margin-top: 5px;
 	}
 }
 

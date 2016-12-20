@@ -3393,7 +3393,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 	 * Returns all the social activities where classNameId = &#63; and classPK = &#63;.
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @return the matching social activities
 	 */
 	@Override
@@ -3410,7 +3410,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 	 * </p>
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param start the lower bound of the range of social activities
 	 * @param end the upper bound of the range of social activities (not inclusive)
 	 * @return the range of matching social activities
@@ -3429,7 +3429,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 	 * </p>
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param start the lower bound of the range of social activities
 	 * @param end the upper bound of the range of social activities (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -3450,7 +3450,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 	 * </p>
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param start the lower bound of the range of social activities
 	 * @param end the upper bound of the range of social activities (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -3574,7 +3574,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 	 * Returns the first social activity in the ordered set where classNameId = &#63; and classPK = &#63;.
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching social activity
 	 * @throws NoSuchActivityException if a matching social activity could not be found
@@ -3609,7 +3609,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 	 * Returns the first social activity in the ordered set where classNameId = &#63; and classPK = &#63;.
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching social activity, or <code>null</code> if a matching social activity could not be found
 	 */
@@ -3630,7 +3630,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 	 * Returns the last social activity in the ordered set where classNameId = &#63; and classPK = &#63;.
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching social activity
 	 * @throws NoSuchActivityException if a matching social activity could not be found
@@ -3665,7 +3665,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 	 * Returns the last social activity in the ordered set where classNameId = &#63; and classPK = &#63;.
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching social activity, or <code>null</code> if a matching social activity could not be found
 	 */
@@ -3693,7 +3693,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 	 *
 	 * @param activityId the primary key of the current social activity
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next social activity
 	 * @throws NoSuchActivityException if a social activity with the primary key could not be found
@@ -3844,7 +3844,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 	 * Removes all the social activities where classNameId = &#63; and classPK = &#63; from the database.
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 */
 	@Override
 	public void removeByC_C(long classNameId, long classPK) {
@@ -3858,7 +3858,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 	 * Returns the number of social activities where classNameId = &#63; and classPK = &#63;.
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @return the number of matching social activities
 	 */
 	@Override
@@ -3945,7 +3945,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 	 *
 	 * @param mirrorActivityId the mirror activity ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @return the matching social activities
 	 */
 	@Override
@@ -3964,7 +3964,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 	 *
 	 * @param mirrorActivityId the mirror activity ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param start the lower bound of the range of social activities
 	 * @param end the upper bound of the range of social activities (not inclusive)
 	 * @return the range of matching social activities
@@ -3985,7 +3985,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 	 *
 	 * @param mirrorActivityId the mirror activity ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param start the lower bound of the range of social activities
 	 * @param end the upper bound of the range of social activities (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -4008,7 +4008,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 	 *
 	 * @param mirrorActivityId the mirror activity ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param start the lower bound of the range of social activities
 	 * @param end the upper bound of the range of social activities (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -4138,7 +4138,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 	 *
 	 * @param mirrorActivityId the mirror activity ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching social activity
 	 * @throws NoSuchActivityException if a matching social activity could not be found
@@ -4178,7 +4178,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 	 *
 	 * @param mirrorActivityId the mirror activity ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching social activity, or <code>null</code> if a matching social activity could not be found
 	 */
@@ -4201,7 +4201,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 	 *
 	 * @param mirrorActivityId the mirror activity ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching social activity
 	 * @throws NoSuchActivityException if a matching social activity could not be found
@@ -4241,7 +4241,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 	 *
 	 * @param mirrorActivityId the mirror activity ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching social activity, or <code>null</code> if a matching social activity could not be found
 	 */
@@ -4271,7 +4271,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 	 * @param activityId the primary key of the current social activity
 	 * @param mirrorActivityId the mirror activity ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next social activity
 	 * @throws NoSuchActivityException if a social activity with the primary key could not be found
@@ -4430,7 +4430,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 	 *
 	 * @param mirrorActivityId the mirror activity ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 */
 	@Override
 	public void removeByM_C_C(long mirrorActivityId, long classNameId,
@@ -4446,7 +4446,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 	 *
 	 * @param mirrorActivityId the mirror activity ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @return the number of matching social activities
 	 */
 	@Override
@@ -4543,7 +4543,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 	 * Returns all the social activities where classNameId = &#63; and classPK = &#63; and type = &#63;.
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param type the type
 	 * @return the matching social activities
 	 */
@@ -4562,7 +4562,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 	 * </p>
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param type the type
 	 * @param start the lower bound of the range of social activities
 	 * @param end the upper bound of the range of social activities (not inclusive)
@@ -4582,7 +4582,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 	 * </p>
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param type the type
 	 * @param start the lower bound of the range of social activities
 	 * @param end the upper bound of the range of social activities (not inclusive)
@@ -4605,7 +4605,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 	 * </p>
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param type the type
 	 * @param start the lower bound of the range of social activities
 	 * @param end the upper bound of the range of social activities (not inclusive)
@@ -4735,7 +4735,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 	 * Returns the first social activity in the ordered set where classNameId = &#63; and classPK = &#63; and type = &#63;.
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param type the type
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching social activity
@@ -4774,7 +4774,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 	 * Returns the first social activity in the ordered set where classNameId = &#63; and classPK = &#63; and type = &#63;.
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param type the type
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching social activity, or <code>null</code> if a matching social activity could not be found
@@ -4796,7 +4796,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 	 * Returns the last social activity in the ordered set where classNameId = &#63; and classPK = &#63; and type = &#63;.
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param type the type
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching social activity
@@ -4835,7 +4835,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 	 * Returns the last social activity in the ordered set where classNameId = &#63; and classPK = &#63; and type = &#63;.
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param type the type
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching social activity, or <code>null</code> if a matching social activity could not be found
@@ -4864,7 +4864,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 	 *
 	 * @param activityId the primary key of the current social activity
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param type the type
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next social activity
@@ -5021,7 +5021,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 	 * Removes all the social activities where classNameId = &#63; and classPK = &#63; and type = &#63; from the database.
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param type the type
 	 */
 	@Override
@@ -5036,7 +5036,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 	 * Returns the number of social activities where classNameId = &#63; and classPK = &#63; and type = &#63;.
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param type the type
 	 * @return the number of matching social activities
 	 */
@@ -5141,7 +5141,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 	 * @param groupId the group ID
 	 * @param userId the user ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param type the type
 	 * @param receiverUserId the receiver user ID
 	 * @return the matching social activities
@@ -5163,7 +5163,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 	 * @param groupId the group ID
 	 * @param userId the user ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param type the type
 	 * @param receiverUserId the receiver user ID
 	 * @param start the lower bound of the range of social activities
@@ -5188,7 +5188,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 	 * @param groupId the group ID
 	 * @param userId the user ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param type the type
 	 * @param receiverUserId the receiver user ID
 	 * @param start the lower bound of the range of social activities
@@ -5214,7 +5214,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 	 * @param groupId the group ID
 	 * @param userId the user ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param type the type
 	 * @param receiverUserId the receiver user ID
 	 * @param start the lower bound of the range of social activities
@@ -5365,7 +5365,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 	 * @param groupId the group ID
 	 * @param userId the user ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param type the type
 	 * @param receiverUserId the receiver user ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
@@ -5418,7 +5418,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 	 * @param groupId the group ID
 	 * @param userId the user ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param type the type
 	 * @param receiverUserId the receiver user ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
@@ -5445,7 +5445,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 	 * @param groupId the group ID
 	 * @param userId the user ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param type the type
 	 * @param receiverUserId the receiver user ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
@@ -5498,7 +5498,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 	 * @param groupId the group ID
 	 * @param userId the user ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param type the type
 	 * @param receiverUserId the receiver user ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
@@ -5533,7 +5533,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 	 * @param groupId the group ID
 	 * @param userId the user ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param type the type
 	 * @param receiverUserId the receiver user ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
@@ -5707,7 +5707,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 	 * @param groupId the group ID
 	 * @param userId the user ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param type the type
 	 * @param receiverUserId the receiver user ID
 	 */
@@ -5727,7 +5727,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 	 * @param groupId the group ID
 	 * @param userId the user ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param type the type
 	 * @param receiverUserId the receiver user ID
 	 * @return the number of matching social activities
@@ -5838,7 +5838,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 	 * @param userId the user ID
 	 * @param createDate the create date
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param type the type
 	 * @param receiverUserId the receiver user ID
 	 * @return the matching social activity
@@ -5896,7 +5896,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 	 * @param userId the user ID
 	 * @param createDate the create date
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param type the type
 	 * @param receiverUserId the receiver user ID
 	 * @return the matching social activity, or <code>null</code> if a matching social activity could not be found
@@ -5916,7 +5916,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 	 * @param userId the user ID
 	 * @param createDate the create date
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param type the type
 	 * @param receiverUserId the receiver user ID
 	 * @param retrieveFromCache whether to retrieve from the finder cache
@@ -6047,7 +6047,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 	 * @param userId the user ID
 	 * @param createDate the create date
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param type the type
 	 * @param receiverUserId the receiver user ID
 	 * @return the social activity that was removed
@@ -6069,7 +6069,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 	 * @param userId the user ID
 	 * @param createDate the create date
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param type the type
 	 * @param receiverUserId the receiver user ID
 	 * @return the number of matching social activities
@@ -6236,7 +6236,7 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((SocialActivityModelImpl)socialActivity);
+		clearUniqueFindersCache((SocialActivityModelImpl)socialActivity, true);
 	}
 
 	@Override
@@ -6248,88 +6248,21 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 			entityCache.removeResult(SocialActivityModelImpl.ENTITY_CACHE_ENABLED,
 				SocialActivityImpl.class, socialActivity.getPrimaryKey());
 
-			clearUniqueFindersCache((SocialActivityModelImpl)socialActivity);
+			clearUniqueFindersCache((SocialActivityModelImpl)socialActivity,
+				true);
 		}
 	}
 
 	protected void cacheUniqueFindersCache(
-		SocialActivityModelImpl socialActivityModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					socialActivityModelImpl.getMirrorActivityId()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_MIRRORACTIVITYID, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_MIRRORACTIVITYID, args,
-				socialActivityModelImpl);
-
-			args = new Object[] {
-					socialActivityModelImpl.getGroupId(),
-					socialActivityModelImpl.getUserId(),
-					socialActivityModelImpl.getCreateDate(),
-					socialActivityModelImpl.getClassNameId(),
-					socialActivityModelImpl.getClassPK(),
-					socialActivityModelImpl.getType(),
-					socialActivityModelImpl.getReceiverUserId()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_G_U_CD_C_C_T_R, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_G_U_CD_C_C_T_R, args,
-				socialActivityModelImpl);
-		}
-		else {
-			if ((socialActivityModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_MIRRORACTIVITYID.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						socialActivityModelImpl.getMirrorActivityId()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_MIRRORACTIVITYID,
-					args, Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_MIRRORACTIVITYID,
-					args, socialActivityModelImpl);
-			}
-
-			if ((socialActivityModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_G_U_CD_C_C_T_R.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						socialActivityModelImpl.getGroupId(),
-						socialActivityModelImpl.getUserId(),
-						socialActivityModelImpl.getCreateDate(),
-						socialActivityModelImpl.getClassNameId(),
-						socialActivityModelImpl.getClassPK(),
-						socialActivityModelImpl.getType(),
-						socialActivityModelImpl.getReceiverUserId()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_G_U_CD_C_C_T_R,
-					args, Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_G_U_CD_C_C_T_R,
-					args, socialActivityModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(
 		SocialActivityModelImpl socialActivityModelImpl) {
 		Object[] args = new Object[] {
 				socialActivityModelImpl.getMirrorActivityId()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_MIRRORACTIVITYID, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_MIRRORACTIVITYID, args);
-
-		if ((socialActivityModelImpl.getColumnBitmask() &
-				FINDER_PATH_FETCH_BY_MIRRORACTIVITYID.getColumnBitmask()) != 0) {
-			args = new Object[] {
-					socialActivityModelImpl.getOriginalMirrorActivityId()
-				};
-
-			finderCache.removeResult(FINDER_PATH_COUNT_BY_MIRRORACTIVITYID, args);
-			finderCache.removeResult(FINDER_PATH_FETCH_BY_MIRRORACTIVITYID, args);
-		}
+		finderCache.putResult(FINDER_PATH_COUNT_BY_MIRRORACTIVITYID, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_MIRRORACTIVITYID, args,
+			socialActivityModelImpl, false);
 
 		args = new Object[] {
 				socialActivityModelImpl.getGroupId(),
@@ -6341,12 +6274,51 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 				socialActivityModelImpl.getReceiverUserId()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_G_U_CD_C_C_T_R, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_G_U_CD_C_C_T_R, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_G_U_CD_C_C_T_R, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_G_U_CD_C_C_T_R, args,
+			socialActivityModelImpl, false);
+	}
+
+	protected void clearUniqueFindersCache(
+		SocialActivityModelImpl socialActivityModelImpl, boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					socialActivityModelImpl.getMirrorActivityId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_MIRRORACTIVITYID, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_MIRRORACTIVITYID, args);
+		}
+
+		if ((socialActivityModelImpl.getColumnBitmask() &
+				FINDER_PATH_FETCH_BY_MIRRORACTIVITYID.getColumnBitmask()) != 0) {
+			Object[] args = new Object[] {
+					socialActivityModelImpl.getOriginalMirrorActivityId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_MIRRORACTIVITYID, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_MIRRORACTIVITYID, args);
+		}
+
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					socialActivityModelImpl.getGroupId(),
+					socialActivityModelImpl.getUserId(),
+					socialActivityModelImpl.getCreateDate(),
+					socialActivityModelImpl.getClassNameId(),
+					socialActivityModelImpl.getClassPK(),
+					socialActivityModelImpl.getType(),
+					socialActivityModelImpl.getReceiverUserId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_G_U_CD_C_C_T_R, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_G_U_CD_C_C_T_R, args);
+		}
 
 		if ((socialActivityModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_G_U_CD_C_C_T_R.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					socialActivityModelImpl.getOriginalGroupId(),
 					socialActivityModelImpl.getOriginalUserId(),
 					socialActivityModelImpl.getOriginalCreateDate(),
@@ -6707,8 +6679,8 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 			SocialActivityImpl.class, socialActivity.getPrimaryKey(),
 			socialActivity, false);
 
-		clearUniqueFindersCache(socialActivityModelImpl);
-		cacheUniqueFindersCache(socialActivityModelImpl, isNew);
+		clearUniqueFindersCache(socialActivityModelImpl, false);
+		cacheUniqueFindersCache(socialActivityModelImpl);
 
 		socialActivity.resetOriginalValues();
 

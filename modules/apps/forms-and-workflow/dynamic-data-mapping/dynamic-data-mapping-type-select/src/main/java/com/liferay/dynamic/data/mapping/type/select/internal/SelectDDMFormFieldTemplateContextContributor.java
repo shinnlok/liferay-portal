@@ -66,6 +66,7 @@ import org.osgi.service.component.annotations.Reference;
 public class SelectDDMFormFieldTemplateContextContributor
 	implements DDMFormFieldTemplateContextContributor {
 
+	@Override
 	public Map<String, Object> getParameters(
 		DDMFormField ddmFormField,
 		DDMFormFieldRenderingContext ddmFormFieldRenderingContext) {
@@ -128,37 +129,51 @@ public class SelectDDMFormFieldTemplateContextContributor
 			ddmFormFieldOptions.setDefaultLocale(
 				ddmFormFieldRenderingContext.getLocale());
 
-			long ddmDataProviderInstanceId = GetterUtil.getLong(
-				ddmFormField.getProperty("ddmDataProviderInstanceId"));
-
 			try {
-				DDMDataProviderInstance ddmDataProviderInstance =
-					ddmDataProviderInstanceService.getDataProviderInstance(
-						ddmDataProviderInstanceId);
+				String ddmDataProviderInstanceId = GetterUtil.getString(
+					ddmFormField.getProperty("ddmDataProviderInstanceId"));
 
 				DDMDataProvider ddmDataProvider =
-					ddmDataProviderTracker.getDDMDataProvider(
+					ddmDataProviderTracker.getDDMDataProviderByInstanceId(
+						ddmDataProviderInstanceId);
+
+				DDMDataProviderContext ddmDataProviderContext = null;
+
+				if (ddmDataProvider != null) {
+					ddmDataProviderContext = new DDMDataProviderContext(null);
+				}
+				else {
+					DDMDataProviderInstance ddmDataProviderInstance =
+						ddmDataProviderInstanceService.getDataProviderInstance(
+							Long.valueOf(ddmDataProviderInstanceId));
+
+					ddmDataProvider = ddmDataProviderTracker.getDDMDataProvider(
 						ddmDataProviderInstance.getType());
 
-				DDMForm ddmForm = DDMFormFactory.create(
-					ddmDataProvider.getSettings());
+					DDMForm ddmForm = DDMFormFactory.create(
+						ddmDataProvider.getSettings());
 
-				DDMFormValues ddmFormValues =
-					ddmFormValuesJSONDeserializer.deserialize(
-						ddmForm, ddmDataProviderInstance.getDefinition());
+					DDMFormValues ddmFormValues =
+						ddmFormValuesJSONDeserializer.deserialize(
+							ddmForm, ddmDataProviderInstance.getDefinition());
 
-				DDMDataProviderContext ddmDataProviderContext =
-					new DDMDataProviderContext(ddmFormValues);
+					ddmDataProviderContext = new DDMDataProviderContext(
+						ddmFormValues);
 
-				List<DDMDataProviderContextContributor>
-					ddmDataProviderContextContributors =
-						ddmDataProviderTracker.
-							getDDMDataProviderContextContributors(
-								ddmDataProviderInstance.getType());
+					List<DDMDataProviderContextContributor>
+						ddmDataProviderContextContributors =
+					ddmDataProviderTracker.
+					getDDMDataProviderContextContributors(
+						ddmDataProviderInstance.getType());
 
-				addDDMDataProviderContextParameters(
-					ddmFormFieldRenderingContext.getHttpServletRequest(),
-					ddmDataProviderContext, ddmDataProviderContextContributors);
+					addDDMDataProviderContextParameters(
+						ddmFormFieldRenderingContext.getHttpServletRequest(),
+						ddmDataProviderContext,
+						ddmDataProviderContextContributors);
+				}
+
+				ddmDataProviderContext.setHttpServletRequest(
+					ddmFormFieldRenderingContext.getHttpServletRequest());
 
 				DDMDataProviderRequest ddmDataProviderRequest =
 					new DDMDataProviderRequest(ddmDataProviderContext);

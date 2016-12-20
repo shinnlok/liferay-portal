@@ -3,7 +3,7 @@
 ;
 [subrepo]
 	cmdver = liferay
-	commit = c4a75869aa2f7d91be79c72a2618cfb138de1917
+	commit = 4546aa875fe8b602cdfc3563d7e67fb1b21e6ad2
 	mode = push
-	parent = e735d416a15ead701644123c786a33eaf7d457b7
+	parent = 96e86a26d964af1836f7b92b02a08f2860a9870e
 	remote = git@github.com:liferay/com-liferay-ip-geocoder.git

@@ -28,6 +28,10 @@
 
 		<execute macro="Form#save" />
 
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Forms" />
+		</execute>
+
 		<execute macro="FormsAdmin#viewForm">
 			<var name="formDescription" value="Form Description" />
 			<var name="formName" value="Form Name" />
@@ -108,6 +112,8 @@
 		<execute macro="ProductMenu#gotoSitesContent">
 			<var name="portlet" value="Web Content" />
 		</execute>
+
+		<execute macro="WebContentNavigator#gotoManageTemplates" />
 
 		<execute macro="WebContentTemplates#addCP">
 			<var name="templateDescription" value="WC Template Description" />
@@ -434,6 +440,8 @@
 			<var name="key_actionsDescription" value="Reindex all search indexes." />
 		</execute>
 
+		<execute macro="Alert#viewSuccessMessage" />
+
 		<execute function="Pause" locator1="10000" />
 	</command>
 
@@ -522,7 +530,9 @@
 			<var name="eventTitle" value="Calendar Event Title Edited" />
 		</execute>
 
-		<execute macro="CalendarEvent#publish" />
+		<execute macro="CalendarEvent#publishRepeating">
+			<var name="saveOption" value="Entire Series" />
+		</execute>
 
 		<execute macro="Navigator#gotoPage">
 			<var name="pageName" value="Calendar" />

@@ -1,5 +1,7 @@
 <definition component-name="portal-plugins-osgi">
+	<property name="osgi.app.includes" value="my-subscriptions" />
 	<property name="portal.release" value="true" />
+	<property name="portal.upstream" value="true" />
 	<property name="plugins.deployment.type" value="osgi" />
 	<property name="testray.main.component.name" value="My Subscriptions" />
 
@@ -16,8 +18,6 @@
 	</tear-down>
 
 	<command name="MySubscriptionsPortletSmoke" priority="4">
-		<property name="portlet.plugins.includes" value="my-subscriptions-portlet" />
-
 		<var name="appName" value="My Subscriptions" />
 
 		<execute macro="Navigator#gotoPage">

@@ -43,6 +43,7 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -91,8 +92,14 @@ public class DDMFormEvaluatorHelper {
 		DDMFormEvaluationResult ddmFormEvaluationResult =
 			new DDMFormEvaluationResult();
 
+		List<DDMFormFieldEvaluationResult> ddmFormFieldEvaluationResults =
+			getDDMFormFieldEvaluationResults();
+
+		setDDMFormFieldEvaluationResultsValidation(
+			ddmFormFieldEvaluationResults);
+
 		ddmFormEvaluationResult.setDDMFormFieldEvaluationResults(
-			getDDMFormFieldEvaluationResults());
+			ddmFormFieldEvaluationResults);
 
 		return ddmFormEvaluationResult;
 	}
@@ -194,6 +201,25 @@ public class DDMFormEvaluatorHelper {
 		return ddmFormFieldEvaluationResults;
 	}
 
+	protected DDMFormFieldValue getDDMFormFieldValue(
+		String ddmFormFieldName, String instanceId) {
+
+		List<DDMFormFieldValue> ddmFormFieldValues = _ddmFormFieldValuesMap.get(
+			ddmFormFieldName);
+
+		if (ListUtil.isEmpty(ddmFormFieldValues)) {
+			return null;
+		}
+
+		for (DDMFormFieldValue ddmFormFieldValue : ddmFormFieldValues) {
+			if (instanceId.equals(ddmFormFieldValue.getInstanceId())) {
+				return ddmFormFieldValue;
+			}
+		}
+
+		return null;
+	}
+
 	protected boolean getDefaultBooleanPropertyState(
 		String functionName, String ddmFormFieldName, boolean defaultValue) {
 
@@ -218,6 +244,13 @@ public class DDMFormEvaluatorHelper {
 			return jsonArray.getString(0);
 		}
 		catch (JSONException jsone) {
+
+			// LPS-52675
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(jsone, jsone);
+			}
+
 			return valueString;
 		}
 	}
@@ -377,6 +410,23 @@ public class DDMFormEvaluatorHelper {
 			"setRequired", ddmFormField.getName(), ddmFormField.isRequired());
 
 		ddmFormFieldEvaluationResult.setRequired(required);
+	}
+
+	protected void setDDMFormFieldEvaluationResultsValidation(
+		List<DDMFormFieldEvaluationResult> ddmFormFieldEvaluationResults) {
+
+		for (DDMFormFieldEvaluationResult ddmFormFieldEvaluationResult :
+				ddmFormFieldEvaluationResults) {
+
+			String ddmFormFieldName = ddmFormFieldEvaluationResult.getName();
+
+			DDMFormFieldValue ddmFormFieldValue = getDDMFormFieldValue(
+				ddmFormFieldName, ddmFormFieldEvaluationResult.getInstanceId());
+
+			setDDMFormFieldEvaluationResultValidation(
+				ddmFormFieldEvaluationResult,
+				_ddmFormFieldsMap.get(ddmFormFieldName), ddmFormFieldValue);
+		}
 	}
 
 	protected void setDDMFormFieldEvaluationResultValidation(

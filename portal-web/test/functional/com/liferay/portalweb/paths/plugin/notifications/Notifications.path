@@ -72,12 +72,12 @@
 <!--NOTIFICATIONS_CONFIGURATION-->
 <tr>
 	<td>NOTIFICATIONS_CONFIGURATION_EMAIL_SWITCH</td>
-	<td>//div[contains(@id,'${key_contentType}Content')]//td[contains(.,'${key_actionType}')]//following-sibling::td[contains(@class,'table-cell-field')]//span</td>
+	<td>//div[contains(@id,'${key_contentType}Content')]//td[contains(.,'${key_actionType}')]//following-sibling::td[contains(@class,'lfr-email-column')]//span</td>
 	<td></td>
 </tr>
 <tr>
 	<td>NOTIFICATIONS_CONFIGURATION_WEBSITE_SWITCH</td>
-	<td>//div[contains(@id,'${key_contentType}Content')]//td[contains(.,'${key_actionType}')]//following-sibling::td/following-sibling::td[contains(@class,'table-cell-field')]//span</td>
+	<td>//div[contains(@id,'${key_contentType}Content')]//td[contains(.,'${key_actionType}')]//following-sibling::td/following-sibling::td[contains(@class,'lfr-website-column')]//span</td>
 	<td></td>
 </tr>
 <tr>
@@ -139,6 +139,16 @@
 <tr>
 	<td>NOTIFICATION_DELIVERY_TEXT_4</td>
 	<td>//div[contains(@id,'${key_contentType}')]//table//tr[5]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>NOTIFICATION_DELIVERY_CONTACTS_CENTER_WEBSITE_CHECKBOX</td>
+	<td>//table[contains(.,'Contacts Center')]//tr[contains(.,'sends you a social relationship request.')]//label[contains(.,'Website')]/input[@type='checkbox' and contains(@class,'disabled')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>NOTIFICATION_DELIVERY_INVITE_MEMBERS_WEBSITE_CHECKBOX</td>
+	<td>//table[contains(.,'Invite Members')]//tr[contains(.,'sends you a membership request.')]//label[contains(.,'Website')]/input[@type='checkbox' and contains(@class,'disabled')]</td>
 	<td></td>
 </tr>
 <tr>

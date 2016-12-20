@@ -1,5 +1,6 @@
 <definition component-name="portal-search">
 	<property name="portal.release" value="true" />
+	<property name="portal.upstream" value="true" />
 	<property name="testray.main.component.name" value="Web Search" />
 
 	<var name="searchPageName" value="Test Page" />
@@ -1240,11 +1241,6 @@
 	</command>
 
 	<command name="SearchWikiPage" priority="4">
-		<var name="pageName" value="Wiki Test Page" />
-		<var name="portletName" value="Wiki" />
-		<var name="wikiPageContent" value="Wiki Page Content" />
-		<var name="wikiPageTitle" value="Wiki Page Title" />
-
 		<execute macro="Page#add">
 			<var name="pageName" value="Wiki Test Page" />
 		</execute>

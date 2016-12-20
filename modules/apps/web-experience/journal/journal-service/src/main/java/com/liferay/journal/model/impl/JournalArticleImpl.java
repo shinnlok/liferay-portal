@@ -211,33 +211,55 @@ public class JournalArticleImpl extends JournalArticleBaseImpl {
 	public String getContentByLocale(String languageId) {
 		Map<String, String> tokens = new HashMap<>();
 
-		try {
-			DDMStructure ddmStructure = getDDMStructure();
+		DDMStructure ddmStructure = getDDMStructure();
 
+		if (ddmStructure != null) {
 			tokens.put(
 				"ddm_structure_id",
 				String.valueOf(ddmStructure.getStructureId()));
-		}
-		catch (PortalException pe) {
 		}
 
 		return getContentByLocale(getDocument(), languageId, tokens);
 	}
 
 	@Override
-	public DDMStructure getDDMStructure() throws PortalException {
-		return DDMStructureLocalServiceUtil.fetchStructure(
-			PortalUtil.getSiteGroupId(getGroupId()),
-			ClassNameLocalServiceUtil.getClassNameId(JournalArticle.class),
-			getDDMStructureKey(), true);
+	public DDMStructure getDDMStructure() {
+		DDMStructure ddmStructure = null;
+
+		try {
+			ddmStructure = DDMStructureLocalServiceUtil.fetchStructure(
+				PortalUtil.getSiteGroupId(getGroupId()),
+				ClassNameLocalServiceUtil.getClassNameId(JournalArticle.class),
+				getDDMStructureKey(), true);
+		}
+		catch (PortalException pe) {
+			_log.error(
+				"Unable to get DDM structure with DDM structure key " +
+					getDDMStructureKey(),
+				pe);
+		}
+
+		return ddmStructure;
 	}
 
 	@Override
-	public DDMTemplate getDDMTemplate() throws PortalException {
-		return DDMTemplateLocalServiceUtil.fetchTemplate(
-			PortalUtil.getSiteGroupId(getGroupId()),
-			ClassNameLocalServiceUtil.getClassNameId(JournalArticle.class),
-			getDDMStructureKey(), true);
+	public DDMTemplate getDDMTemplate() {
+		DDMTemplate ddmTemplate = null;
+
+		try {
+			ddmTemplate = DDMTemplateLocalServiceUtil.fetchTemplate(
+				PortalUtil.getSiteGroupId(getGroupId()),
+				ClassNameLocalServiceUtil.getClassNameId(JournalArticle.class),
+				getDDMTemplateKey(), true);
+		}
+		catch (PortalException pe) {
+			_log.error(
+				"Unable to get DDM template for DDM structure with" +
+					"DDM structure key " + getDDMStructureKey(),
+				pe);
+		}
+
+		return ddmTemplate;
 	}
 
 	@JSON
@@ -407,7 +429,7 @@ public class JournalArticleImpl extends JournalArticleBaseImpl {
 		}
 		catch (Exception e) {
 			if (_log.isDebugEnabled()) {
-				_log.debug("Unable to find folder for " + getResourcePrimKey());
+				_log.debug("Unable to get folder for " + getResourcePrimKey());
 			}
 		}
 

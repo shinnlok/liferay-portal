@@ -20,14 +20,13 @@ import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateLocalService;
-import com.liferay.exportimport.content.processor.ExportImportContentProcessorController;
-import com.liferay.exportimport.data.handler.base.BaseStagedModelDataHandler;
 import com.liferay.exportimport.kernel.lar.ExportImportPathUtil;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.PortletDataException;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandler;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelModifiedDateComparator;
+import com.liferay.exportimport.lar.BaseStagedModelDataHandler;
 import com.liferay.journal.internal.exportimport.content.processor.JournalArticleExportImportContentProcessor;
 import com.liferay.journal.internal.exportimport.creation.strategy.JournalCreationStrategy;
 import com.liferay.journal.model.JournalArticle;
@@ -309,7 +308,7 @@ public class JournalArticleStagedModelDataHandler
 		if (article.isSmallImage()) {
 			if (Validator.isNotNull(article.getSmallImageURL())) {
 				String smallImageURL =
-					_exportImportContentProcessorController.
+					_journalArticleExportImportContentProcessor.
 						replaceExportContentReferences(
 							portletDataContext, article,
 							article.getSmallImageURL() + StringPool.SPACE, true,
@@ -370,7 +369,7 @@ public class JournalArticleStagedModelDataHandler
 		article.setStatusByUserUuid(article.getStatusByUserUuid());
 
 		String content =
-			_exportImportContentProcessorController.
+			_journalArticleExportImportContentProcessor.
 				replaceExportContentReferences(
 					portletDataContext, article, article.getContent(),
 					portletDataContext.getBooleanParameter(
@@ -490,7 +489,7 @@ public class JournalArticleStagedModelDataHandler
 		String content = article.getContent();
 
 		content =
-			_exportImportContentProcessorController.
+			_journalArticleExportImportContentProcessor.
 				replaceImportContentReferences(
 					portletDataContext, article, content);
 
@@ -622,7 +621,7 @@ public class JournalArticleStagedModelDataHandler
 
 				if (Validator.isNotNull(article.getSmallImageURL())) {
 					String smallImageURL =
-						_exportImportContentProcessorController.
+						_journalArticleExportImportContentProcessor.
 							replaceImportContentReferences(
 								portletDataContext, article,
 								article.getSmallImageURL());
@@ -968,13 +967,13 @@ public class JournalArticleStagedModelDataHandler
 		_imageLocalService = imageLocalService;
 	}
 
-	/**
-	 * @deprecated As of 4.0.0
-	 */
-	@Deprecated
+	@Reference(unbind = "-")
 	protected void setJournalArticleExportImportContentProcessor(
 		JournalArticleExportImportContentProcessor
 			journalArticleExportImportContentProcessor) {
+
+		_journalArticleExportImportContentProcessor =
+			journalArticleExportImportContentProcessor;
 	}
 
 	@Reference(unbind = "-")
@@ -1031,12 +1030,9 @@ public class JournalArticleStagedModelDataHandler
 
 	private DDMStructureLocalService _ddmStructureLocalService;
 	private DDMTemplateLocalService _ddmTemplateLocalService;
-
-	@Reference
-	private ExportImportContentProcessorController
-		_exportImportContentProcessorController;
-
 	private ImageLocalService _imageLocalService;
+	private JournalArticleExportImportContentProcessor
+		_journalArticleExportImportContentProcessor;
 	private JournalArticleLocalService _journalArticleLocalService;
 	private JournalArticleResourceLocalService
 		_journalArticleResourceLocalService;

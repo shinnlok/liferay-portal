@@ -1,5 +1,6 @@
 <definition component-name="portal-collaboration">
 	<property name="portal.release" value="true" />
+	<property name="portal.upstream" value="true" />
 	<property name="custom.properties" value="default.layout.template.id=1_column" />
 	<property name="testray.main.component.name" value="Blogs" />
 
@@ -290,7 +291,7 @@
 		</execute>
 	</command>
 
-	<command name="AddBlogsEntryWithSamePageScope" priority="4">
+	<!-- <command name="AddBlogsEntryWithSamePageScope" priority="4">
 		<execute macro="TestCase#getSiteName">
 			<return from="siteName" name="siteName" />
 			<var name="siteName" value="${siteName}" />
@@ -427,7 +428,7 @@
 		<execute macro="Portlet#viewTitle">
 			<var name="portletName" value="Blogs" />
 		</execute>
-	</command>
+	</command> -->
 
 	<command name="AddBlogsEntryWithSubtitle" priority="4">
 		<execute macro="Navigator#gotoPage">
@@ -1765,6 +1766,10 @@
 			<var name="uploadFileName" value="Document_1.jpg" />
 		</execute>
 
+		<execute function="AssertVisible" locator1="BlogsEntry#ENTRY_COVER_IMAGE_UNPUBLISHED">
+			<var name="key_uploadFileName" value="Document_1" />
+		</execute>
+
 		<execute macro="PortletEntry#publish" />
 
 		<execute macro="Navigator#gotoPage">
@@ -1838,46 +1843,5 @@
 				<var name="roleTitle" value="Owner" />
 			</execute>
 		</for>
-	</command>
-
-	<command name="ViewEntryWithSocialBookmarksSites" priority="3">
-		<property name="hook.plugins.includes" value="social-bookmarks-hook" />
-
-		<execute macro="Navigator#gotoPage">
-			<var name="pageName" value="Blogs Page" />
-		</execute>
-
-		<execute macro="Blogs#addEntry">
-			<var name="entryContent" value="Blogs Entry Content" />
-			<var name="entrySubtitle" value="Blogs Entry Subtitle" />
-			<var name="entryTitle" value="Blogs Entry Title" />
-		</execute>
-
-		<execute macro="Blogs#enableSocialBookmarkSites">
-			<var name="socialBookmarkSites" value="twitter,facebook,plusone,addthis,delicious,digg,evernote,linkedin,newsvine,reddit,slashdot,stumbleupon,tuenti" />
-		</execute>
-
-		<execute macro="Navigator#gotoPage">
-			<var name="pageName" value="Blogs Page" />
-		</execute>
-
-		<execute macro="BlogsNavigator#gotoEntryPG">
-			<var name="entryContent" value="Blogs Entry Content" />
-			<var name="entryTitle" value="Blogs Entry Title" />
-		</execute>
-
-		<execute macro="BlogsEntry#viewEnabledSocialBookmarkSites">
-			<var name="socialBookmarkSites" value="Twitter,Facebook,Google+,LinkedIn,Delicious,Digg,Evernote,Newsvine,Reddit,Slashdot,StumbleUpon,Tuenti" />
-		</execute>
-
-		<execute macro="Blogs#disableSocialBookmarkSites">
-			<var name="socialBookmarkSites" value="twitter,facebook,plusone,addthis,delicious,digg,evernote,linkedin,newsvine,reddit,slashdot,stumbleupon,tuenti" />
-		</execute>
-
-		<execute macro="Navigator#gotoPage">
-			<var name="pageName" value="Blogs Page" />
-		</execute>
-
-		<execute macro="BlogsEntry#viewDisabledSocialBookmarkSites" />
 	</command>
 </definition>

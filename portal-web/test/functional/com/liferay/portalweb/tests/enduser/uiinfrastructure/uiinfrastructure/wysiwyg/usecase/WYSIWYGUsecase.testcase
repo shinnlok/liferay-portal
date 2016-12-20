@@ -1,5 +1,6 @@
 <definition component-name="portal-user-interface">
 	<property name="portal.release" value="true" />
+	<property name="portal.upstream" value="true" />
 	<property name="testray.main.component.name" value="User Interface" />
 
 	<var name="pageName" value="CKEditor Page" />
@@ -45,6 +46,8 @@
 			<var name="uploadFileName" value="Document_1.jpg" />
 		</execute>
 
+		<execute function="Pause" locator1="1000" />
+
 		<execute macro="BlogsEntry#saveAsDraft" />
 
 		<execute function="Click" locator1="BlogsEditEntry#DELETE_COVER_IMAGE_BUTTON" />
@@ -78,7 +81,7 @@
 
 		<execute macro="WebContentNavigator#gotoAddCP" />
 
-		<execute function="Type#mouseOverFocusType" locator1="TextInput#TITLE" value1="Web Content Title" />
+		<execute function="Type" locator1="TextInput#TITLE" value1="Web Content Title" />
 
 		<execute function="Click#pauseClickAt" locator1="AlloyEditor#CONTENT_FIELD" />
 

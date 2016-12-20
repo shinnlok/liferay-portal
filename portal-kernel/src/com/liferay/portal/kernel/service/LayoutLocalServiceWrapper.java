@@ -516,6 +516,12 @@ public class LayoutLocalServiceWrapper implements LayoutLocalService,
 	}
 
 	@Override
+	public com.liferay.portal.kernel.model.Layout fetchLayout(
+		java.lang.String uuid, long groupId, boolean privateLayout) {
+		return _layoutLocalService.fetchLayout(uuid, groupId, privateLayout);
+	}
+
+	@Override
 	public com.liferay.portal.kernel.model.Layout fetchLayout(long groupId,
 		boolean privateLayout, long layoutId) {
 		return _layoutLocalService.fetchLayout(groupId, privateLayout, layoutId);
@@ -531,6 +537,14 @@ public class LayoutLocalServiceWrapper implements LayoutLocalService,
 		long groupId, boolean privateLayout, java.lang.String friendlyURL) {
 		return _layoutLocalService.fetchLayoutByFriendlyURL(groupId,
 			privateLayout, friendlyURL);
+	}
+
+	@Override
+	public com.liferay.portal.kernel.model.Layout fetchLayoutByIconImageId(
+		boolean privateLayout, long iconImageId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _layoutLocalService.fetchLayoutByIconImageId(privateLayout,
+			iconImageId);
 	}
 
 	/**
@@ -1226,6 +1240,12 @@ public class LayoutLocalServiceWrapper implements LayoutLocalService,
 	public java.util.List<com.liferay.portal.kernel.model.Layout> getLayouts(
 		int start, int end) {
 		return _layoutLocalService.getLayouts(start, end);
+	}
+
+	@Override
+	public java.util.List<com.liferay.portal.kernel.model.Layout> getLayouts(
+		long companyId) {
+		return _layoutLocalService.getLayouts(companyId);
 	}
 
 	/**

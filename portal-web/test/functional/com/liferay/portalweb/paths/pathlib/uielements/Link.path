@@ -54,6 +54,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>FACEBOOK_LOGIN</td>
+	<td>//span[contains(.,'Facebook')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>GOOGLE_LOGIN</td>
 	<td>//span[contains(.,'Google')]</td>
 	<td></td>
@@ -126,6 +131,11 @@
 <tr>
 	<td>PERMISSIONS</td>
 	<td>//a/span[contains(@class,'taglib-text') and contains(.,'Permissions')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>REFRESH_COUNTS</td>
+	<td>//a[contains(@id,'rangeLink')]</td>
 	<td></td>
 </tr>
 <tr>

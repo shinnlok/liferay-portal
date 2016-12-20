@@ -116,13 +116,21 @@ public interface DDLRecordSetSettings {
 	public boolean sendEmailNotification();
 
 	@DDMFormField(
-		label = "%select-a-storage-type",
-		properties = {"dataSourceType=manual"}, type = "select"
+		label = "%select-a-storage-type", predefinedValue = "[\"json\"]",
+		properties = {
+			"dataSourceType=data-provider",
+			"ddmDataProviderInstanceId=ddm-storage-types"
+		},
+		type = "select"
 	)
 	public String storageType();
 
 	@DDMFormField(
-		label = "%select-a-workflow", properties = {"dataSourceType=manual"},
+		label = "%select-a-workflow",
+		properties = {
+			"dataSourceType=data-provider",
+			"ddmDataProviderInstanceId=workflow-definitions"
+		},
 		type = "select"
 	)
 	public String workflowDefinition();

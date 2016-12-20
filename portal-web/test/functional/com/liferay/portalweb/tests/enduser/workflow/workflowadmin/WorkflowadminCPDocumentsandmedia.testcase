@@ -1,5 +1,6 @@
 <definition component-name="portal-workflow">
 	<property name="portal.release" value="true" />
+	<property name="portal.upstream" value="true" />
 	<property name="testray.main.component.name" value="Workflow" />
 
 	<set-up>
@@ -801,11 +802,6 @@
 			<var name="workflowAssetTitle" value="DM Document Title" />
 			<var name="workflowAssetType" value="Document" />
 			<var name="workflowTask" value="Review" />
-		</execute>
-
-		<execute macro="Workflow#viewPreviewCategories">
-			<var name="categoryNameList" value="legal,Other" />
-			<var name="vocabularyName" value="Vocabulary Name" />
 		</execute>
 
 		<execute macro="Workflow#gotoPreviewEdit" />

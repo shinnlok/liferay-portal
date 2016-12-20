@@ -1,5 +1,6 @@
 <definition component-name="portal-collaboration">
 	<property name="portal.release" value="true" />
+	<property name="portal.upstream" value="true" />
 	<property name="custom.properties" value="default.layout.template.id=1_column" />
 	<property name="testray.main.component.name" value="Notifications" />
 
@@ -12,15 +13,15 @@
 		<execute macro="User#firstLoginPG" />
 
 		<execute macro="Page#add">
-			<var name="pageName" value="${pageName}" />
+			<var name="pageName" value="Wiki Test Page" />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
-			<var name="pageName" value="${pageName}" />
+			<var name="pageName" value="Wiki Test Page" />
 		</execute>
 
 		<execute macro="Portlet#addPG">
-			<var name="portletName" value="${portletName}" />
+			<var name="portletName" value="Wiki" />
 		</execute>
 
 		<execute macro="ProductMenu#gotoControlPanelUsers">
@@ -99,7 +100,7 @@
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
-			<var name="pageName" value="${pageName}" />
+			<var name="pageName" value="Wiki Test Page" />
 		</execute>
 
 		<execute macro="WikiNavigator#gotoAllPagesPG" />
@@ -148,7 +149,7 @@
 
 	<command name="ViewWebsiteNotificationForUpdatedWikiPage" priority="4">
 		<execute macro="Navigator#gotoPage">
-			<var name="pageName" value="${pageName}" />
+			<var name="pageName" value="Wiki Test Page" />
 		</execute>
 
 		<execute macro="WikiNavigator#gotoAllPagesPG" />
@@ -180,7 +181,7 @@
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
-			<var name="pageName" value="${pageName}" />
+			<var name="pageName" value="Wiki Test Page" />
 		</execute>
 
 		<execute macro="WikiNavigator#gotoAllPagesPG" />

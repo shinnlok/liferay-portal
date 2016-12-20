@@ -1005,7 +1005,7 @@ public class LayoutTypePortletImpl
 				continue;
 			}
 
-			String columnValue = StringPool.BLANK;
+			String columnValue = null;
 
 			if (hasUserPreferences()) {
 				columnValue = getUserPreference(columnId);
@@ -1015,6 +1015,11 @@ public class LayoutTypePortletImpl
 			}
 
 			columnValue = StringUtil.removeFromList(columnValue, portletId);
+
+			if (StringUtil.endsWith(columnValue, StringPool.COMMA)) {
+				columnValue = columnValue.substring(
+					0, columnValue.length() - 1);
+			}
 
 			if (hasUserPreferences()) {
 				setUserPreference(columnId, columnValue);
@@ -1548,12 +1553,9 @@ public class LayoutTypePortletImpl
 
 		String selector1 = StringPool.BLANK;
 
-		Group group = null;
+		Group group = layout.getGroup();
 
-		try {
-			group = layout.getGroup();
-		}
-		catch (PortalException pe) {
+		if (group == null) {
 			_log.error("Unable to get group " + layout.getGroupId());
 
 			return new String[0];

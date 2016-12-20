@@ -1,5 +1,6 @@
 <definition component-name="portal-wcd">
 	<property name="portal.release" value="true" />
+	<property name="portal.upstream" value="true" />
 	<property name="testray.main.component.name" value="Web Content Display" />
 
 	<var name="pageName" value="Web Content Display Page" />
@@ -296,6 +297,8 @@
 			<var name="portlet" value="Web Content" />
 		</execute>
 
+		<execute macro="WebContentNavigator#gotoManageTemplates" />
+
 		<execute macro="WebContentTemplates#addCP">
 			<var name="templateFieldNames" value="Text" />
 			<var name="templateLanguage" value="ftl" />
@@ -370,6 +373,8 @@
 		<execute macro="ProductMenu#gotoSitesContent">
 			<var name="portlet" value="Web Content" />
 		</execute>
+
+		<execute macro="WebContentNavigator#gotoManageTemplates" />
 
 		<execute macro="WebContentTemplates#addCP">
 			<var name="templateFieldNames" value="Content,Content,Content" />
@@ -456,8 +461,6 @@
 	</command>
 
 	<command name="LocalizeWebContent" priority="4">
-		<var name="languageKey" value="zh_CN" />
-
 		<execute macro="Navigator#gotoPage">
 			<var name="pageName" value="Web Content Display Page" />
 		</execute>

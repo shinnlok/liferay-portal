@@ -55,6 +55,21 @@ public class KBArticleServiceWrapper implements KBArticleService,
 	}
 
 	@Override
+	public com.liferay.knowledge.base.model.KBArticle fetchFirstChildKBArticle(
+		long groupId, long parentResourcePrimKey) {
+		return _kbArticleService.fetchFirstChildKBArticle(groupId,
+			parentResourcePrimKey);
+	}
+
+	@Override
+	public com.liferay.knowledge.base.model.KBArticle fetchKBArticleByUrlTitle(
+		long groupId, long kbFolderId, java.lang.String urlTitle)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _kbArticleService.fetchKBArticleByUrlTitle(groupId, kbFolderId,
+			urlTitle);
+	}
+
+	@Override
 	public com.liferay.knowledge.base.model.KBArticle fetchLatestKBArticle(
 		long resourcePrimKey, int status)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -107,6 +122,13 @@ public class KBArticleServiceWrapper implements KBArticleService,
 		return _kbArticleService.getKBArticleSearchDisplay(groupId, title,
 			content, status, startDate, endDate, andOperator, curStartValues,
 			cur, delta, orderByComparator);
+	}
+
+	@Override
+	public com.liferay.knowledge.base.model.KBArticle[] getPreviousAndNextKBArticles(
+		long kbArticleId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _kbArticleService.getPreviousAndNextKBArticles(kbArticleId);
 	}
 
 	@Override
@@ -211,8 +233,9 @@ public class KBArticleServiceWrapper implements KBArticleService,
 	}
 
 	/**
-	* @deprecated As of 1.1.0, replaced by {@link #getAllDescendantKBArticles(
-	long, long, int, OrderByComparator)}
+	* @deprecated As of 1.1.0, replaced by {@link
+	#getAllDescendantKBArticles(long, long, int,
+	OrderByComparator)}
 	*/
 	@Deprecated
 	@Override
@@ -299,8 +322,7 @@ public class KBArticleServiceWrapper implements KBArticleService,
 
 	/**
 	* @deprecated As of 1.1.0, replaced by {@link #getKBArticles(long, long,
-	int, int, int,
-	OrderByComparator)}
+	int, int, int, OrderByComparator)}
 	*/
 	@Deprecated
 	@Override

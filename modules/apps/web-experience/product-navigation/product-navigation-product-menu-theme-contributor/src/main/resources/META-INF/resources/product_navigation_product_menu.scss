@@ -9,7 +9,7 @@ body {
 		}
 	}
 
-	&.open .control-menu {
+	&.open .control-menu, &.open .affix {
 		@include sm() {
 			left: $product-menu-width;
 		}
@@ -42,6 +42,30 @@ body {
 		margin-right: 5px;
 		max-height: 32px;
 		max-width: 32px;
+	}
+}
+
+.product-menu {
+	.form-control {
+		background-color: #1B2228;
+		border-radius: 0;
+		border-width: 0;
+		box-shadow: none;
+		color: #869CAD;
+		height: 40px;
+		padding: 8px 12px;
+
+		@include placeholder {
+			color: #869CAD;
+		}
+
+		&:focus {
+			color: #65B6F0;
+
+			@include placeholder {
+				color: #65B6F0;
+			}
+		}
 	}
 }
 
@@ -358,6 +382,10 @@ body {
 
 	.layouts-tree-container {
 		padding-left: 10px;
+	}
+
+	.layout-tree-options.open > a {
+		background-color: transparent;
 	}
 
 	.layout-set-tabs {

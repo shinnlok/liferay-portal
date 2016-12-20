@@ -73,7 +73,7 @@ public class TemplateRendererTag extends ParamAndPropertyAncestorTagImpl {
 
 	@Override
 	public int doStartTag() {
-		_bundle = FrameworkUtil.getBundle(this.getClass());
+		_bundle = FrameworkUtil.getBundle(getClass());
 
 		try {
 			_template = _getTemplate();
@@ -218,7 +218,7 @@ public class TemplateRendererTag extends ParamAndPropertyAncestorTagImpl {
 
 		return TemplateManagerUtil.getTemplate(
 			TemplateConstants.LANG_TYPE_SOY,
-			soyTemplateResourcesCollector.getTemplateResources(), false);
+			soyTemplateResourcesCollector.getAllTemplateResources(), false);
 	}
 
 	private Bundle _bundle;
