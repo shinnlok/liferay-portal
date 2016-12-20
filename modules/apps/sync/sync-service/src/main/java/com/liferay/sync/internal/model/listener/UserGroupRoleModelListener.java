@@ -41,18 +41,17 @@ public class UserGroupRoleModelListener
 			resourcePermissionLocalService.getRoleResourcePermissions(
 				userGroupRole.getRoleId());
 
-			for (ResourcePermission resourcePermission : resourcePermissions) {
-				if (resourcePermission.hasActionId(ActionKeys.VIEW)) {
-					SyncDLObject syncDLObject = getSyncDLObject(
-						resourcePermission);
+		for (ResourcePermission resourcePermission : resourcePermissions) {
+			if (resourcePermission.hasActionId(ActionKeys.VIEW)) {
+				SyncDLObject syncDLObject = getSyncDLObject(resourcePermission);
 
-					if (syncDLObject == null) {
-						continue;
-					}
-
-					updateSyncDLObject(syncDLObject);
+				if (syncDLObject == null) {
+					continue;
 				}
+
+				updateSyncDLObject(syncDLObject);
 			}
+		}
 	}
 
 	@Override
@@ -63,23 +62,22 @@ public class UserGroupRoleModelListener
 			resourcePermissionLocalService.getRoleResourcePermissions(
 				userGroupRole.getRoleId());
 
-			for (ResourcePermission resourcePermission : resourcePermissions) {
-				if (resourcePermission.hasActionId(ActionKeys.VIEW)) {
-					SyncDLObject syncDLObject = getSyncDLObject(
-						resourcePermission);
+		for (ResourcePermission resourcePermission : resourcePermissions) {
+			if (resourcePermission.hasActionId(ActionKeys.VIEW)) {
+				SyncDLObject syncDLObject = getSyncDLObject(resourcePermission);
 
-					if (syncDLObject == null) {
-						continue;
-					}
-
-					Date date = new Date();
-
-					syncDLObject.setModifiedTime(date.getTime());
-					syncDLObject.setLastPermissionChangeDate(date);
-
-					syncDLObjectLocalService.updateSyncDLObject(syncDLObject);
+				if (syncDLObject == null) {
+					continue;
 				}
+
+				Date date = new Date();
+
+				syncDLObject.setModifiedTime(date.getTime());
+				syncDLObject.setLastPermissionChangeDate(date);
+
+				syncDLObjectLocalService.updateSyncDLObject(syncDLObject);
 			}
+		}
 	}
 
 }
