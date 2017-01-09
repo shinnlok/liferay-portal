@@ -183,7 +183,8 @@ public class ServiceTestUtil {
 				"QuartzSchemaManager)");
 
 		schedulerServiceDependencyManager.registerDependencies(
-			new Class[] {SchedulerEngineHelper.class}, new Filter[] {filter});
+			new Class<?>[] {SchedulerEngineHelper.class},
+			new Filter[] {filter});
 
 		// Verify
 
@@ -259,6 +260,8 @@ public class ServiceTestUtil {
 				DestinationNames.DOCUMENT_LIBRARY_PDF_PROCESSOR);
 			_replaceWithSynchronousDestination(
 				DestinationNames.DOCUMENT_LIBRARY_RAW_METADATA_PROCESSOR);
+			_replaceWithSynchronousDestination(
+				DestinationNames.DOCUMENT_LIBRARY_SYNC_EVENT_PROCESSOR);
 			_replaceWithSynchronousDestination(
 				DestinationNames.DOCUMENT_LIBRARY_VIDEO_PROCESSOR);
 		}

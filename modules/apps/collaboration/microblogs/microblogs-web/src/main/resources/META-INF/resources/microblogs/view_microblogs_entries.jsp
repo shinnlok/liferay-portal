@@ -49,18 +49,9 @@ PortletURL microblogsEntriesURL = (PortletURL)request.getAttribute(WebKeys.MICRO
 <%
 if (microblogsEntries != null) {
 	for (MicroblogsEntry microblogsEntry : microblogsEntries) {
-		String userDisplayURL = StringPool.BLANK;
 		String userFullName = HtmlUtil.escape(PortalUtil.getUserName(microblogsEntry));
-		String userScreenName = StringPool.BLANK;
 
-		try {
-			User curUser = UserLocalServiceUtil.getUserById(microblogsEntry.getUserId());
-
-			userDisplayURL = curUser.getDisplayURL(themeDisplay);
-			userScreenName = curUser.getScreenName();
-		}
-		catch (NoSuchUserException nsue) {
-		}
+		User curUser = UserLocalServiceUtil.fetchUserById(microblogsEntry.getUserId());
 %>
 
 		<div class="microblogs-entry" id="<portlet:namespace />microblogsEntry<%= microblogsEntry.getMicroblogsEntryId() %>">
@@ -73,7 +64,14 @@ if (microblogsEntries != null) {
 
 			<div class="entry-bubble">
 				<div class="user-name">
-					<span><a href="<%= userDisplayURL %>"><%= userFullName %></a></span>
+					<c:choose>
+						<c:when test="<%= (curUser != null) && curUser.isActive() %>">
+							<span><a href="<%= curUser.getDisplayURL(themeDisplay) %>"><%= userFullName %></a></span>
+						</c:when>
+						<c:otherwise>
+							<span><%= userFullName %></span>
+						</c:otherwise>
+					</c:choose>
 
 					<c:if test="<%= microblogsEntry.getType() == MicroblogsEntryConstants.TYPE_REPOST %>">
 						<span class="small"><liferay-ui:message key="reposted-from" /></span> <span><%= HtmlUtil.escape(PortalUtil.getUserName(microblogsEntry.getParentMicroblogsEntryUserId(), StringPool.BLANK)) %></span>
@@ -96,10 +94,11 @@ if (microblogsEntries != null) {
 				<div class="edit-container"><!-- --></div>
 
 				<div class="footer">
-					<span class="modified-date">
+					<div class="modified-date">
 						<%= dateFormatDateTime.format(microblogsEntry.getModifiedDate()) %>
-					</span>
-					<span class="action-container">
+					</div>
+
+					<div class="action-container">
 						<c:if test="<%= microblogsEntry.getType() != MicroblogsEntryConstants.TYPE_REPLY %>">
 
 							<%
@@ -154,7 +153,7 @@ if (microblogsEntries != null) {
 								<a href="<%= deleteURL %>"><liferay-ui:message key="delete" /></a>
 							</span>
 						</c:if>
-					</span>
+					</div>
 				</div>
 			</div>
 

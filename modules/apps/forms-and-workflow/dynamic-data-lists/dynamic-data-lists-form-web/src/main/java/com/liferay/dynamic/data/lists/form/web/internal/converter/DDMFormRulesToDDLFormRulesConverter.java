@@ -37,6 +37,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Stack;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -138,9 +139,17 @@ public class DDMFormRulesToDDLFormRulesConverter {
 			List<Expression> parameters =
 				functionCallExpression.getParameterExpressions();
 
-			String target = doVisit(parameters.get(0));
+			if (Objects.equals(action, "jump-to-page")) {
+				String source = doVisit(parameters.get(0));
+				String target = doVisit(parameters.get(1));
 
-			return new DDLFormRuleAction(action, target);
+				return new DDLFormRuleAction(action, source, target);
+			}
+			else {
+				String target = doVisit(parameters.get(0));
+
+				return new DDLFormRuleAction(action, null, target);
+			}
 		}
 
 		@Override
@@ -156,10 +165,11 @@ public class DDMFormRulesToDDLFormRulesConverter {
 			new HashMap<>();
 
 		static {
-			_functionToActionMap.put("setVisible", "show");
+			_functionToActionMap.put("jumpPage", "jump-to-page");
 			_functionToActionMap.put("setEnabled", "enable");
-			_functionToActionMap.put("setRequired", "require");
 			_functionToActionMap.put("setInvalid", "invalidate");
+			_functionToActionMap.put("setRequired", "require");
+			_functionToActionMap.put("setVisible", "show");
 		}
 
 	}
@@ -198,7 +208,7 @@ public class DDMFormRulesToDDLFormRulesConverter {
 					_operatorMap.get(comparisonExpression.getOperator()),
 					Arrays.asList(leftOperand, rightOperand));
 
-			_conditions.add(ddlFormRuleCondition);
+			_conditions.push(ddlFormRuleCondition);
 
 			return _conditions;
 		}
@@ -229,21 +239,22 @@ public class DDMFormRulesToDDLFormRulesConverter {
 				new DDLFormRuleCondition(
 					_functionNameOperatorMap.get(functionName), operands);
 
-			_conditions.add(ddlFormRuleCondition);
+			_conditions.push(ddlFormRuleCondition);
 
 			return _conditions;
 		}
 
 		@Override
 		public Object visit(NotExpression notExpression) {
-			DDLFormRuleCondition condition = doVisit(
-				notExpression.getOperandExpression());
+			doVisit(notExpression.getOperandExpression());
+
+			DDLFormRuleCondition condition = _conditions.peek();
 
 			String operator = condition.getOperator();
 
 			condition.setOperator("not-" + operator);
 
-			return condition;
+			return _conditions;
 		}
 
 		@Override
@@ -270,11 +281,11 @@ public class DDMFormRulesToDDLFormRulesConverter {
 			Object o2 = doVisit(binaryExpression.getRightOperandExpression());
 
 			if (o1 instanceof DDLFormRuleCondition) {
-				_conditions.add((DDLFormRuleCondition)o1);
+				_conditions.push((DDLFormRuleCondition)o1);
 			}
 
 			if (o2 instanceof DDLFormRuleCondition) {
-				_conditions.add((DDLFormRuleCondition)o2);
+				_conditions.push((DDLFormRuleCondition)o2);
 			}
 
 			return _conditions;
@@ -285,18 +296,17 @@ public class DDMFormRulesToDDLFormRulesConverter {
 		private static final Map<String, String> _operatorMap = new HashMap<>();
 
 		static {
-			_operatorMap.put(">", "greater-than");
-			_operatorMap.put(">=", "greater-than-equals");
 			_operatorMap.put("<", "less-than");
 			_operatorMap.put("<=", "less-than-equals");
+			_operatorMap.put(">", "greater-than");
+			_operatorMap.put(">=", "greater-than-equals");
 
 			_functionNameOperatorMap.put("contains", "contains");
 			_functionNameOperatorMap.put("equals", "equals-to");
 		}
 
 		private boolean _andOperator = true;
-		private final List<DDLFormRuleCondition> _conditions =
-			new ArrayList<>();
+		private final Stack<DDLFormRuleCondition> _conditions = new Stack<>();
 
 	}
 

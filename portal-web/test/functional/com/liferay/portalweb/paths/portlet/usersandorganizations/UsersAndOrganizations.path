@@ -14,21 +14,11 @@
 	<td></td>
 </tr>
 <tr>
-	<td>BREADCRUMB</td>
-	<td>//ul[contains(@class,'breadcrumb')]//a</td>
-	<td></td>
-</tr>
-<tr>
 	<td></td>
 	<td></td>
 	<td></td>
 </tr>
 <!--EDIT_TABS-->
-<tr>
-	<td>IDENTIFICATION</td>
-	<td>//li[contains(@class,'tab')]/a[contains(.,'Identification')]</td>
-	<td></td>
-</tr>
 <tr>
 	<td>MISCELLANEOUS</td>
 	<td>//li[contains(@class,'tab')]/a[contains(.,'Miscellaneous')]</td>
@@ -45,6 +35,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>ORGANIZATION_COUNTRY_NAME</td>
+	<td>//select[contains(@id,'countryId') and contains(.,'${key_countryName}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td></td>
 	<td></td>
 	<td></td>
@@ -52,7 +47,7 @@
 <!--ORGANIZATION_TABLE-->
 <tr>
 	<td>ORGANIZATION_TABLE_NAME</td>
-	<td>//tr[contains(.,'${key_orgName}')]/td[count(//div[contains(@id,'organizationsSearchContainer')]//th[contains(.,'Name')]/preceding-sibling::th) + 1]//a[2]</td>
+	<td>//tr[contains(.,'${key_orgName}')]/td[count(//div[contains(@id,'organizationsSearchContainer')]//th[contains(.,'Name')]/preceding-sibling::th) + 1]//a[1]</td>
 	<td></td>
 </tr>
 <tr>
@@ -83,17 +78,17 @@
 <!--USER_TABLE-->
 <tr>
 	<td>USER_TABLE_CHECKBOX</td>
-	<td>//tr[contains(.,'${key_userScreenName}')]/td[1]//input</td>
+	<td>//tr[contains(.,'${key_userScreenName}')]/td[1]/input</td>
 	<td></td>
 </tr>
 <tr>
 	<td>USER_TABLE_NAME</td>
-	<td>//tr[contains(.,'${key_userScreenName}')]/td[2]//strong</td>
+	<td>//tr[contains(.,'${key_userScreenName}')]/td[2]/a</td>
 	<td></td>
 </tr>
 <tr>
 	<td>USER_TABLE_SCREEN_NAME</td>
-	<td>//tr[contains(.,'${key_userScreenName}')]/td[3]//a</td>
+	<td>//tr[contains(.,'${key_userScreenName}')]/td[3]/a</td>
 	<td></td>
 </tr>
 <tr>

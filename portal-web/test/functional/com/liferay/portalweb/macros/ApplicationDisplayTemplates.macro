@@ -12,8 +12,8 @@
 		<if>
 			<condition function="IsElementPresent" locator1="NavTab#TAB_LINK" />
 			<then>
-				<execute macro="Navigator#gotoTab">
-					<var name="tab" value="Display Settings" />
+				<execute macro="Navigator#gotoNavTab">
+					<var name="navTab" value="Display Settings" />
 				</execute>
 			</then>
 		</if>
@@ -74,7 +74,7 @@
 		<execute function="AssertVisible" locator1="ApplicationDisplayTemplates#RSS_FEEDS" />
 		<execute function="AssertElementPresent" locator1="ApplicationDisplayTemplates#RSS_FEEDS" />
 
-		<execute function="Type#mouseOverFocusType" locator1="TextInput#NAME" value1="RSS Test ADT" />
+		<execute function="Type" locator1="TextInput#NAME" value1="RSS Test ADT" />
 
 		<execute function="Click" locator1="ApplicationDisplayTemplates#RSS_FEEDS" />
 
@@ -121,7 +121,7 @@
 		<execute function="AssertVisible" locator1="ApplicationDisplayTemplates#PORTLET_PREFERENCES" />
 		<execute function="AssertElementPresent" locator1="ApplicationDisplayTemplates#PORTLET_PREFERENCES" />
 
-		<execute function="Type#mouseOverFocusType" locator1="TextInput#NAME" value1="${adtType} Test ADT" />
+		<execute function="Type" locator1="TextInput#NAME" value1="${adtType} Test ADT" />
 
 		<execute function="UploadCommonFile" locator1="DDMEditTemplate#SCRIPT_FILE_FIELD" value1="${adtFile}" />
 

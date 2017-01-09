@@ -1,5 +1,6 @@
 <definition component-name="portal-collaboration">
 	<property name="portal.release" value="true" />
+	<property name="portal.upstream" value="true" />
 	<property name="custom.properties" value="default.layout.template.id=1_column" />
 	<property name="testray.main.component.name" value="Bookmarks" />
 
@@ -271,7 +272,7 @@
 			<var name="bookmarkName" value="Test Bookmark Name" />
 			<var name="bookmarkNameEdit" value="Test Bookmark Name Edit" />
 			<var name="bookmarkURL" value="https://www.liferay.com" />
-			<var name="bookmarkURLEdit" value="http://alloyui.com" />
+			<var name="bookmarkURLEdit" value="https://dev.liferay.com" />
 		</execute>
 	</command>
 

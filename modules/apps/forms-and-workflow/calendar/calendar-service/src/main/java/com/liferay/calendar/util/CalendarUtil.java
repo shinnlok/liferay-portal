@@ -25,6 +25,7 @@ import com.liferay.calendar.service.CalendarResourceLocalServiceUtil;
 import com.liferay.calendar.service.CalendarServiceUtil;
 import com.liferay.calendar.service.permission.CalendarPermission;
 import com.liferay.calendar.util.comparator.CalendarNameComparator;
+import com.liferay.calendar.workflow.CalendarBookingWorkflowConstants;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
@@ -39,6 +40,7 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -286,7 +288,7 @@ public class CalendarUtil {
 		java.util.Calendar startTimeJCalendar = JCalendarUtil.getJCalendar(
 			calendarBooking.getStartTime(), timeZone);
 
-		if (calendarBooking.isRecurring()) {
+		if (Validator.isNotNull(calendarBooking.getRecurrence())) {
 			Recurrence recurrenceObj = RecurrenceUtil.inTimeZone(
 				calendarBooking.getRecurrenceObj(), startTimeJCalendar,
 				timeZone);
@@ -296,6 +298,9 @@ public class CalendarUtil {
 
 		jsonObject.put("recurrence", recurrence);
 
+		jsonObject.put(
+			"recurringCalendarBookingId",
+			calendarBooking.getRecurringCalendarBookingId());
 		jsonObject.put("secondReminder", calendarBooking.getSecondReminder());
 		jsonObject.put(
 			"secondReminderType", calendarBooking.getSecondReminder());
@@ -336,6 +341,13 @@ public class CalendarUtil {
 		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
 
 		for (CalendarBooking calendarBooking : calendarBookings) {
+			if ((calendarBooking.getStatus() ==
+					CalendarBookingWorkflowConstants.STATUS_DRAFT) &&
+				(calendarBooking.getUserId() != themeDisplay.getUserId())) {
+
+				continue;
+			}
+
 			JSONObject jsonObject = toCalendarBookingJSONObject(
 				themeDisplay, calendarBooking, timeZone);
 

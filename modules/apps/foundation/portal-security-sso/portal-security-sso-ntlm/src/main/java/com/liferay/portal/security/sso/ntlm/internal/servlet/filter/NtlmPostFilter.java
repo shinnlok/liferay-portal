@@ -14,19 +14,19 @@
 
 package com.liferay.portal.security.sso.ntlm.internal.servlet.filter;
 
+import com.liferay.portal.instances.service.PortalInstancesLocalService;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.servlet.BaseFilter;
-import com.liferay.portal.kernel.servlet.BrowserSnifferUtil;
+import com.liferay.portal.kernel.servlet.BrowserSniffer;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.servlet.HttpMethods;
 import com.liferay.portal.kernel.settings.CompanyServiceSettingsLocator;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.security.sso.ntlm.configuration.NtlmConfiguration;
 import com.liferay.portal.security.sso.ntlm.constants.NtlmConstants;
-import com.liferay.portal.util.PortalInstances;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -51,8 +51,8 @@ import org.osgi.service.component.annotations.Reference;
 	configurationPid = "com.liferay.portal.security.sso.ntlm.configuration.NtlmConfiguration",
 	immediate = true,
 	property = {
-		"servlet-context-name=", "servlet-filter-name=SSO Ntlm Post Filter",
-		"url-pattern=/*"
+		"after-filter=SSO Ntlm Filter", "servlet-context-name=",
+		"servlet-filter-name=SSO Ntlm Post Filter", "url-pattern=/*"
 	},
 	service = Filter.class
 )
@@ -62,15 +62,17 @@ public class NtlmPostFilter extends BaseFilter {
 	public boolean isFilterEnabled(
 		HttpServletRequest request, HttpServletResponse response) {
 
-		String method = request.getMethod();
-
-		if (!BrowserSnifferUtil.isIe(request) ||
-			!method.equals(HttpMethods.POST)) {
-
+		if (!_browserSniffer.isIe(request)) {
 			return false;
 		}
 
-		long companyId = PortalInstances.getCompanyId(request);
+		String method = request.getMethod();
+
+		if (!method.equals(HttpMethods.POST)) {
+			return false;
+		}
+
+		long companyId = _portalInstancesLocalService.getCompanyId(request);
 
 		try {
 			NtlmConfiguration ntlmConfiguration =
@@ -137,6 +139,15 @@ public class NtlmPostFilter extends BaseFilter {
 
 	private static final Log _log = LogFactoryUtil.getLog(NtlmPostFilter.class);
 
+	@Reference
+	private BrowserSniffer _browserSniffer;
+
 	private ConfigurationProvider _configurationProvider;
+
+	@Reference
+	private NtlmFilter _ntlmFilter;
+
+	@Reference
+	private PortalInstancesLocalService _portalInstancesLocalService;
 
 }

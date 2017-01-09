@@ -68,6 +68,7 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
+import com.liferay.portal.kernel.util.TimeZoneUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -86,6 +87,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TimeZone;
 
 /**
  * @author Eduardo Lundgren
@@ -109,7 +111,7 @@ public class CalendarBookingLocalServiceImpl
 
 		// Calendar booking
 
-		User user = userPersistence.findByPrimaryKey(userId);
+		User user = userLocalService.getUser(userId);
 		Calendar calendar = calendarPersistence.findByPrimaryKey(calendarId);
 
 		long calendarBookingId = counterLocalService.increment();
@@ -124,10 +126,12 @@ public class CalendarBookingLocalServiceImpl
 			descriptionMap.put(entry.getKey(), sanitizedDescription);
 		}
 
+		TimeZone timeZone = getTimeZone(calendar, allDay);
+
 		java.util.Calendar startTimeJCalendar = JCalendarUtil.getJCalendar(
-			startTime);
+			startTime, timeZone);
 		java.util.Calendar endTimeJCalendar = JCalendarUtil.getJCalendar(
-			endTime);
+			endTime, timeZone);
 
 		if (allDay) {
 			startTimeJCalendar = JCalendarUtil.toMidnightJCalendar(
@@ -288,7 +292,7 @@ public class CalendarBookingLocalServiceImpl
 
 		for (CalendarBooking calendarBooking : calendarBookings) {
 			try {
-				Company company = companyPersistence.findByPrimaryKey(
+				Company company = companyLocalService.getCompany(
 					calendarBooking.getCompanyId());
 
 				if (company.isActive()) {
@@ -752,6 +756,88 @@ public class CalendarBookingLocalServiceImpl
 	}
 
 	@Override
+	public CalendarBooking invokeTransition(
+			long userId, CalendarBooking calendarBooking, long startTime,
+			int status, boolean updateInstance, boolean allFollowing,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		if (updateInstance) {
+			long calendarId = calendarBooking.getCalendarId();
+
+			long[] childCalendarIds = getChildCalendarIds(
+				calendarBooking.getCalendarBookingId(), calendarId);
+
+			long duration =
+				calendarBooking.getEndTime() - calendarBooking.getStartTime();
+
+			long endTime = startTime + duration;
+
+			String recurrence = null;
+
+			if (allFollowing) {
+				List<CalendarBooking> recurringCalendarBookings =
+					getRecurringCalendarBookings(calendarBooking, startTime);
+
+				for (CalendarBooking recurringCalendarBooking :
+						recurringCalendarBookings) {
+
+					calendarBookingLocalService.updateStatus(
+						userId, recurringCalendarBooking, status,
+						serviceContext);
+				}
+
+				Recurrence recurrenceObj = calendarBooking.getRecurrenceObj();
+
+				if (recurrenceObj != null) {
+					int count = recurrenceObj.getCount();
+
+					if (count > 0) {
+						int instanceIndex = RecurrenceUtil.getIndexOfInstance(
+							calendarBooking.getRecurrence(),
+							calendarBooking.getStartTime(), startTime);
+
+						recurrenceObj.setCount(count - instanceIndex);
+					}
+				}
+
+				recurrence = RecurrenceSerializer.serialize(recurrenceObj);
+			}
+
+			deleteCalendarBookingInstance(
+				calendarBooking, startTime, allFollowing);
+
+			calendarBooking = addCalendarBooking(
+				userId, calendarId, childCalendarIds, 0,
+				calendarBooking.getRecurringCalendarBookingId(),
+				calendarBooking.getTitleMap(),
+				calendarBooking.getDescriptionMap(),
+				calendarBooking.getLocation(), startTime, endTime,
+				calendarBooking.isAllDay(), recurrence,
+				calendarBooking.getFirstReminder(),
+				calendarBooking.getFirstReminderType(),
+				calendarBooking.getSecondReminder(),
+				calendarBooking.getSecondReminderType(), serviceContext);
+
+			calendarBookingLocalService.updateStatus(
+				userId, calendarBooking, status, serviceContext);
+		}
+		else {
+			List<CalendarBooking> recurringCalendarBookings =
+				getRecurringCalendarBookings(calendarBooking);
+
+			for (CalendarBooking recurringCalendarBooking :
+					recurringCalendarBookings) {
+
+				calendarBookingLocalService.updateStatus(
+					userId, recurringCalendarBooking, status, serviceContext);
+			}
+		}
+
+		return calendarBooking;
+	}
+
+	@Override
 	public CalendarBooking moveCalendarBookingToTrash(
 			long userId, CalendarBooking calendarBooking)
 		throws PortalException {
@@ -1016,10 +1102,12 @@ public class CalendarBookingLocalServiceImpl
 			descriptionMap.put(entry.getKey(), sanitizedDescription);
 		}
 
+		TimeZone timeZone = getTimeZone(calendar, allDay);
+
 		java.util.Calendar startTimeJCalendar = JCalendarUtil.getJCalendar(
-			startTime);
+			startTime, timeZone);
 		java.util.Calendar endTimeJCalendar = JCalendarUtil.getJCalendar(
-			endTime);
+			endTime, timeZone);
 
 		if (allDay) {
 			startTimeJCalendar = JCalendarUtil.toMidnightJCalendar(
@@ -1270,7 +1358,7 @@ public class CalendarBookingLocalServiceImpl
 
 		// Calendar booking
 
-		User user = userPersistence.findByPrimaryKey(userId);
+		User user = userLocalService.getUser(userId);
 		Date now = new Date();
 
 		int oldStatus = calendarBooking.getStatus();
@@ -1542,6 +1630,16 @@ public class CalendarBookingLocalServiceImpl
 		jsonObject.put("title", calendarBooking.getTitle());
 
 		return jsonObject.toString();
+	}
+
+	protected TimeZone getTimeZone(Calendar calendar, boolean allDay) {
+		TimeZone timeZone = calendar.getTimeZone();
+
+		if (allDay) {
+			timeZone = TimeZoneUtil.getTimeZone(StringPool.UTC);
+		}
+
+		return timeZone;
 	}
 
 	protected List<String> getUnmodifiedAttributesNames(

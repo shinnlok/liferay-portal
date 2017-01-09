@@ -28,11 +28,12 @@
 	}
 
 	.dialog-body,
-	.lfr-form-content,
-	.portlet-configuration-body-content,
 	.export-dialog-tree,
 	.lfr-dynamic-uploader,
-	.process-list {
+	.lfr-form-content,
+	.portlet-configuration-body-content,
+	.process-list,
+	.roles-selector-body {
 		> .container-fluid-1280 {
 			padding-top: 20px;
 
@@ -59,6 +60,10 @@
 		right: 0;
 		top: 0;
 		-webkit-overflow-scrolling: touch;
+	}
+
+	.login-container {
+		padding: $modal-inner-padding;
 	}
 
 	.management-bar-default,
@@ -113,7 +118,8 @@
 
 	.export-dialog-tree,
 	.lfr-dynamic-uploader,
-	.process-list {
+	.process-list,
+	.roles-selector-body {
 		bottom: 0;
 		display: block;
 		left: 0;
@@ -179,7 +185,8 @@
 	.export-dialog-tree,
 	.lfr-dynamic-uploader,
 	.lfr-form-content,
-	.portlet-configuration-body-content {
+	.portlet-configuration-body-content,
+	.roles-selector-body {
 		bottom: $dialog-footer-height;
 
 		@include sm {

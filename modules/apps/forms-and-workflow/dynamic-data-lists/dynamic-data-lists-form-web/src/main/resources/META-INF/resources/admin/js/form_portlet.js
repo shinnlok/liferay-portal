@@ -2,15 +2,21 @@ AUI.add(
 	'liferay-ddl-portlet',
 	function(A) {
 		var DefinitionSerializer = Liferay.DDL.DefinitionSerializer;
+
 		var LayoutSerializer = Liferay.DDL.LayoutSerializer;
 
-		var AUTOSAVE_INTERVAL = 60000;
+		var EMPTY_FN = A.Lang.emptyFn;
+
+		var MINUTE = 60000;
 
 		var TPL_BUTTON_SPINNER = '<span aria-hidden="true"><span class="icon-spinner icon-spin"></span></span>';
 
 		var DDLPortlet = A.Component.create(
 			{
 				ATTRS: {
+					autosaveInterval: {
+					},
+
 					autosaveURL: {
 					},
 
@@ -46,6 +52,10 @@ AUI.add(
 						valueFn: '_valueFormBuilder'
 					},
 
+					getDataProviderParametersSettingsURL: {
+						value: ''
+					},
+
 					getFieldTypeSettingFormContextURL: {
 						value: ''
 					},
@@ -66,12 +76,18 @@ AUI.add(
 						value: 0
 					},
 
+					restrictedFormURL: {
+					},
+
 					ruleBuilder: {
 						valueFn: '_valueRuleBuilder'
 					},
 
 					rules: {
 						value: []
+					},
+
+					sharedFormURL: {
 					}
 				},
 
@@ -80,20 +96,6 @@ AUI.add(
 				EXTENDS: A.Base,
 
 				NAME: 'liferay-ddl-portlet',
-
-				openDDMDataProvider: function(dataProviderURL) {
-					Liferay.Util.openWindow(
-						{
-							dialog: {
-								cssClass: 'dynamic-data-mapping-data-providers-modal',
-								destroyOnHide: true
-							},
-							id: 'ddmDataProvider',
-							title: Liferay.Language.get('data-providers'),
-							uri: dataProviderURL
-						}
-					);
-				},
 
 				prototype: {
 					initializer: function() {
@@ -139,22 +141,27 @@ AUI.add(
 					bindUI: function() {
 						var instance = this;
 
-						var editForm = instance.get('editForm');
-
-						editForm.set('onSubmit', A.bind('_onSubmitEditForm', instance));
-
 						var formBuilder = instance.get('formBuilder');
 
 						instance._eventHandlers = [
+							instance.after('autosave', instance._afterAutosave),
 							formBuilder._layoutBuilder.after('layout-builder:moveEnd', A.bind(instance._afterFormBuilderLayoutBuilderMoveEnd, instance)),
 							formBuilder._layoutBuilder.after('layout-builder:moveStart', A.bind(instance._afterFormBuilderLayoutBuilderMoveStart, instance)),
-							instance.one('.btn-cancel').on('click', A.bind('_onCancel', instance)),
+							instance.one('.back-url-link').on('click', A.bind('_onBack', instance)),
+							instance.one('#preview').on('click', A.bind('_onPreviewButtonClick', instance)),
+							instance.one('#publish').on('click', A.bind('_onPublishButtonClick', instance)),
+							instance.one('#save').on('click', A.bind('_onSaveButtonClick', instance)),
 							instance.one('#showRules').on('click', A.bind('_onRulesButtonClick', instance)),
 							instance.one('#showForm').on('click', A.bind('_onFormButtonClick', instance)),
+							instance.one('#requireAuthenticationCheckbox').on('change', A.bind('_onRequireAuthenticationCheckboxChanged', instance)),
 							Liferay.on('destroyPortlet', A.bind('_onDestroyPortlet', instance))
 						];
 
-						instance._intervalId = setInterval(A.bind('_autosave', instance), AUTOSAVE_INTERVAL);
+						var autosaveInterval = instance.get('autosaveInterval');
+
+						if (autosaveInterval > 0) {
+							instance._intervalId = setInterval(A.bind('_autosave', instance), autosaveInterval * MINUTE);
+						}
 					},
 
 					destructor: function() {
@@ -241,11 +248,23 @@ AUI.add(
 
 						return {
 							definition: definition,
-							description: instance.get('description'),
+							description: instance.get('description').trim(),
 							layout: layout,
-							name: instance.get('name'),
+							name: instance.get('name').trim(),
 							rules: rules
 						};
+					},
+
+					isEmpty: function() {
+						var instance = this;
+
+						var state = instance.getState();
+
+						var definition = state.definition;
+
+						var fields = definition.fields;
+
+						return fields.length === 0;
 					},
 
 					openConfirmationModal: function(confirm, cancel) {
@@ -254,7 +273,7 @@ AUI.add(
 						var dialog = Liferay.Util.Window.getWindow(
 							{
 								dialog: {
-									bodyContent: Liferay.Language.get('are-you-sure-you-want-to-cancel'),
+									bodyContent: Liferay.Language.get('any-unsaved-changes-will-be-lost-are-you-sure-you-want-to-leave'),
 									destroyOnHide: true,
 									height: 200,
 									resizable: false,
@@ -262,7 +281,7 @@ AUI.add(
 										footer: [
 											{
 												cssClass: 'btn-lg btn-primary',
-												label: Liferay.Language.get('yes-cancel'),
+												label: Liferay.Language.get('leave'),
 												on: {
 													click: function() {
 														confirm.call(instance, dialog);
@@ -271,7 +290,7 @@ AUI.add(
 											},
 											{
 												cssClass: 'btn-lg btn-link',
-												label: Liferay.Language.get('no-continue'),
+												label: Liferay.Language.get('stay'),
 												on: {
 													click: function() {
 														cancel.call(instance, dialog);
@@ -280,9 +299,9 @@ AUI.add(
 											}
 										]
 									},
-									width: 500
+									width: 600
 								},
-								title: Liferay.Language.get('confirm')
+								title: Liferay.Language.get('leave-form')
 							}
 						);
 
@@ -296,11 +315,15 @@ AUI.add(
 
 						publishCheckbox.setData('previousValue', publishCheckbox.attr('checked'));
 
+						var requireAuthenticationCheckbox = instance.one('#requireAuthenticationCheckbox');
+
+						requireAuthenticationCheckbox.setData('previousValue', requireAuthenticationCheckbox.attr('checked'));
+
 						Liferay.Util.openWindow(
 							{
 								dialog: {
 									cssClass: 'publish-modal-container',
-									height: 400,
+									height: 430,
 									resizable: false,
 									'toolbars.footer': [
 										{
@@ -321,7 +344,7 @@ AUI.add(
 									width: 720
 								},
 								id: instance.ns('publishModalContainer'),
-								title: Liferay.Language.get('publish')
+								title: Liferay.Language.get('publish-form')
 							},
 							function(dialogWindow) {
 								var publishNode = instance.byId(instance.ns('publishModal'));
@@ -333,6 +356,10 @@ AUI.add(
 								}
 							}
 						);
+					},
+
+					publishForm: function() {
+
 					},
 
 					serializeFormBuilder: function() {
@@ -358,6 +385,12 @@ AUI.add(
 
 						publishedField.setValue(publishCheckbox.attr('checked'));
 
+						var requireAuthenticationCheckbox = instance.one('#requireAuthenticationCheckbox');
+
+						var requireAuthenticationField = settingsDDMForm.getField('requireAuthentication');
+
+						requireAuthenticationField.setValue(requireAuthenticationCheckbox.attr('checked'));
+
 						var settings = settingsDDMForm.toJSON();
 
 						var settingsInput = instance.one('#serializedSettingsDDMFormValues');
@@ -374,15 +407,24 @@ AUI.add(
 
 						instance.serializeFormBuilder();
 
-						var submitButton = instance.one('#submit');
-
-						submitButton.html(Liferay.Language.get('saving'));
-
-						submitButton.append(TPL_BUTTON_SPINNER);
-
 						var editForm = instance.get('editForm');
 
 						submitForm(editForm.form);
+					},
+
+					_afterAutosave: function(event) {
+						var instance = this;
+
+						var modifiedDate = new Date(event.modifiedDate);
+
+						var autosaveMessage = A.Lang.sub(
+							Liferay.Language.get('draft-saved-at-x'),
+							[
+								modifiedDate
+							]
+						);
+
+						instance.one('#autosaveMessage').set('innerHTML', autosaveMessage);
 					},
 
 					_afterFormBuilderLayoutBuilderMoveEnd: function() {
@@ -399,36 +441,79 @@ AUI.add(
 						instance.disableNameEditor();
 					},
 
-					_autosave: function() {
+					_autosave: function(callback) {
 						var instance = this;
+
+						callback = callback || EMPTY_FN;
 
 						instance.serializeFormBuilder();
 
 						var state = instance.getState();
 
-						var definition = state.definition;
+						if (!instance.isEmpty()) {
+							if (!instance._isSameState(instance.savedState, state)) {
+								var editForm = instance.get('editForm');
 
-						if ((definition.fields.length > 0) && !instance._isSameState(instance.savedState, state)) {
-							var editForm = instance.get('editForm');
+								var formData = instance._getFormData(A.IO.stringify(editForm.form));
 
-							var formData = instance._getFormData(A.IO.stringify(editForm.form));
+								A.io.request(
+									instance.get('autosaveURL'),
+									{
+										after: {
+											success: function() {
+												var responseData = this.get('responseData');
 
-							A.io.request(
-								instance.get('autosaveURL'),
-								{
-									after: {
-										success: function() {
-											instance._defineIds(this.get('responseData'));
+												instance._defineIds(responseData);
 
-											instance.savedState = state;
-										}
-									},
-									data: formData,
-									dataType: 'JSON',
-									method: 'POST'
-								}
-							);
+												instance.savedState = state;
+
+												instance.fire(
+													'autosave',
+													{
+														modifiedDate: responseData.modifiedDate
+													}
+												);
+
+												callback.call();
+											}
+										},
+										data: formData,
+										dataType: 'JSON',
+										method: 'POST'
+									}
+								);
+							}
+							else {
+								callback.call();
+							}
 						}
+					},
+
+					_createFormURL: function() {
+						var instance = this;
+
+						var formURL;
+
+						var requireAuthenticationCheckbox = instance.one('#requireAuthenticationCheckbox');
+
+						if (requireAuthenticationCheckbox.attr('checked')) {
+							formURL = instance.get('restrictedFormURL');
+						}
+						else {
+							formURL = instance.get('sharedFormURL');
+						}
+
+						var recordSetId = instance.byId('recordSetId').val();
+
+						return formURL + recordSetId;
+					},
+
+					_createPreviewURL: function() {
+						var instance = this;
+
+						var formURL = instance._createFormURL();
+
+						return formURL   + '/preview';
 					},
 
 					_defineIds: function(response) {
@@ -485,7 +570,7 @@ AUI.add(
 						);
 					},
 
-					_onCancel: function(event) {
+					_onBack: function(event) {
 						var instance = this;
 
 						if (!instance._isSameState(instance.getState(), instance.initialState)) {
@@ -511,6 +596,10 @@ AUI.add(
 						var publishCheckbox = instance.one('#publishCheckbox');
 
 						publishCheckbox.attr('checked', publishCheckbox.getData('previousValue'));
+
+						var requireAuthenticationCheckbox = instance.one('#requireAuthenticationCheckbox');
+
+						requireAuthenticationCheckbox.attr('checked', requireAuthenticationCheckbox.getData('previousValue'));
 
 						Liferay.Util.getWindow(instance.ns('publishModalContainer')).hide();
 					},
@@ -543,6 +632,44 @@ AUI.add(
 						instance.one('#showForm').addClass('active');
 					},
 
+					_onPreviewButtonClick: function() {
+						var instance = this;
+
+						instance._autosave(
+							function() {
+								var previewURL = instance._createPreviewURL();
+
+								window.open(previewURL, '_blank');
+							}
+						);
+					},
+
+					_onPublishButtonClick: function(event) {
+						var instance = this;
+
+						event.preventDefault();
+
+						var publishButton = instance.one('#publish');
+
+						publishButton.html(Liferay.Language.get('saving'));
+
+						publishButton.append(TPL_BUTTON_SPINNER);
+
+						var saveAndPublish = instance.one('input[name*="saveAndPublish"]');
+
+						saveAndPublish.set('value', 'true');
+
+						instance.submitForm();
+					},
+
+					_onRequireAuthenticationCheckboxChanged: function() {
+						var instance = this;
+
+						var clipboardInput = instance.one('#clipboard');
+
+						clipboardInput.set('value', instance._createFormURL());
+					},
+
 					_onRulesButtonClick: function() {
 						var instance = this;
 
@@ -557,10 +684,20 @@ AUI.add(
 						instance.one('#showForm').removeClass('active');
 					},
 
-					_onSubmitEditForm: function(event) {
+					_onSaveButtonClick: function(event) {
 						var instance = this;
 
 						event.preventDefault();
+
+						var saveButton = instance.one('#save');
+
+						saveButton.html(Liferay.Language.get('saving'));
+
+						saveButton.append(TPL_BUTTON_SPINNER);
+
+						var saveAndPublish = instance.one('input[name*="saveAndPublish"]');
+
+						saveAndPublish.set('value', 'false');
 
 						instance.submitForm();
 					},

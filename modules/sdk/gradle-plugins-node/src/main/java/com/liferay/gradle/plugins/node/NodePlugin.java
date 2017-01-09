@@ -37,12 +37,16 @@ import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.internal.plugins.osgi.OsgiHelper;
 import org.gradle.api.specs.Spec;
+import org.gradle.api.tasks.Delete;
 import org.gradle.api.tasks.TaskContainer;
+import org.gradle.api.tasks.TaskOutputs;
 
 /**
  * @author Andrea Di Giorgi
  */
 public class NodePlugin implements Plugin<Project> {
+
+	public static final String CLEAN_NPM_TASK_NAME = "cleanNPM";
 
 	public static final String DOWNLOAD_NODE_TASK_NAME = "downloadNode";
 
@@ -60,13 +64,18 @@ public class NodePlugin implements Plugin<Project> {
 		final DownloadNodeTask downloadNodeTask = _addTaskDownloadNode(
 			project, nodeExtension);
 
-		NpmInstallTask npmInstallTask = _addTaskNpmInstall(project);
+		Delete cleanNpmTask = _addTaskCleanNpm(project);
 
-		_addTaskNpmShrinkwrap(project, npmInstallTask);
+		NpmInstallTask npmInstallTask = _addTaskNpmInstall(
+			project, cleanNpmTask);
+
+		_addTaskNpmShrinkwrap(project, cleanNpmTask, npmInstallTask);
 
 		_configureTasksDownloadNodeModule(project, npmInstallTask);
 
-		_configureTasksExecuteNode(project, nodeExtension);
+		_configureTasksExecuteNode(
+			project, nodeExtension, GradleUtil.isRunningInsideDaemon());
+
 		_configureTasksPublishNodeModule(project);
 
 		project.afterEvaluate(
@@ -80,6 +89,16 @@ public class NodePlugin implements Plugin<Project> {
 				}
 
 			});
+	}
+
+	private Delete _addTaskCleanNpm(Project project) {
+		Delete delete = GradleUtil.addTask(
+			project, CLEAN_NPM_TASK_NAME, Delete.class);
+
+		delete.delete("node_modules", "npm-shrinkwrap.json");
+		delete.setDescription("Deletes NPM files from this project.");
+
+		return delete;
 	}
 
 	private DownloadNodeTask _addTaskDownloadNode(
@@ -141,23 +160,39 @@ public class NodePlugin implements Plugin<Project> {
 		return downloadNodeTask;
 	}
 
-	private NpmInstallTask _addTaskNpmInstall(Project project) {
+	private NpmInstallTask _addTaskNpmInstall(
+		Project project, Delete cleanNpmTask) {
+
 		NpmInstallTask npmInstallTask = GradleUtil.addTask(
 			project, NPM_INSTALL_TASK_NAME, NpmInstallTask.class);
 
+		npmInstallTask.mustRunAfter(cleanNpmTask);
 		npmInstallTask.setDescription(
 			"Installs Node packages from package.json.");
+		npmInstallTask.setNpmInstallRetries(2);
+
+		TaskOutputs taskOutputs = npmInstallTask.getOutputs();
+
+		taskOutputs.upToDateWhen(
+			new Spec<Task>() {
+
+				@Override
+				public boolean isSatisfiedBy(Task task) {
+					return false;
+				}
+
+			});
 
 		return npmInstallTask;
 	}
 
 	private NpmShrinkwrapTask _addTaskNpmShrinkwrap(
-		Project project, NpmInstallTask npmInstallTask) {
+		Project project, Delete cleanNpmTask, NpmInstallTask npmInstallTask) {
 
 		NpmShrinkwrapTask npmShrinkwrapTask = GradleUtil.addTask(
 			project, NPM_SHRINKWRAP_TASK_NAME, NpmShrinkwrapTask.class);
 
-		npmShrinkwrapTask.dependsOn(npmInstallTask);
+		npmShrinkwrapTask.dependsOn(cleanNpmTask, npmInstallTask);
 		npmShrinkwrapTask.setDescription(
 			"Locks down the versions of a package's dependencies in order to " +
 				"control which versions of each dependency will be used.");
@@ -273,7 +308,8 @@ public class NodePlugin implements Plugin<Project> {
 	}
 
 	private void _configureTaskExecuteNode(
-		ExecuteNodeTask executeNodeTask, final NodeExtension nodeExtension) {
+		ExecuteNodeTask executeNodeTask, final NodeExtension nodeExtension,
+		boolean useGradleExec) {
 
 		executeNodeTask.setNodeDir(
 			new Callable<File>() {
@@ -288,6 +324,8 @@ public class NodePlugin implements Plugin<Project> {
 				}
 
 			});
+
+		executeNodeTask.setUseGradleExec(useGradleExec);
 	}
 
 	private void _configureTaskExecuteNpm(
@@ -364,7 +402,8 @@ public class NodePlugin implements Plugin<Project> {
 	}
 
 	private void _configureTasksExecuteNode(
-		Project project, final NodeExtension nodeExtension) {
+		Project project, final NodeExtension nodeExtension,
+		final boolean useGradleExec) {
 
 		TaskContainer taskContainer = project.getTasks();
 
@@ -374,7 +413,8 @@ public class NodePlugin implements Plugin<Project> {
 
 				@Override
 				public void execute(ExecuteNodeTask executeNodeTask) {
-					_configureTaskExecuteNode(executeNodeTask, nodeExtension);
+					_configureTaskExecuteNode(
+						executeNodeTask, nodeExtension, useGradleExec);
 				}
 
 			});

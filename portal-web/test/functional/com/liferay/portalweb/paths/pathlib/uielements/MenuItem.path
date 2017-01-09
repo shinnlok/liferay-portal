@@ -24,6 +24,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>ADD_CHILD_PAGE</td>
+	<td>//a[@role='menuitem' and contains(.,'Add Child Page')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>ADD_SHORTCUT</td>
 	<td>//div[contains(@class,'open')]//a[@role='menuitem' and contains(.,'Add Shortcut')]</td>
 	<td></td>
@@ -175,12 +180,17 @@
 </tr>
 <tr>
 	<td>ASSIGN_USERS</td>
-	<td>//a[@role='menuitem' and contains(.,'Assign Users')]</td>
+	<td>//a[@role='menuitem' and contains(.,'Assign Users')] | //div[contains(@class,'open')]/ul[contains(@class,'dropdown')]//a[contains(.,'Assign Users')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>BAN_THIS_USER</td>
 	<td>//a[@role='menuitem' and contains(.,'Ban This User')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>AVAILABLE</td>
+	<td>//a[@role='menuitem' and contains(.,'Available')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -286,6 +296,11 @@
 <tr>
 	<td>COPY_APPLICATIONS</td>
 	<td>//a[@role='menuitem' and contains(.,'Copy Applications')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CURRENT</td>
+	<td>//a[@role='menuitem' and contains(.,'Current')]</td>
 	<td></td>
 </tr>
 <tr>

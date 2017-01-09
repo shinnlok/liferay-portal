@@ -14,7 +14,7 @@
 
 package com.liferay.portal.language;
 
-import com.liferay.portal.kernel.cache.MultiVMPool;
+import com.liferay.portal.kernel.cache.MultiVMPoolUtil;
 import com.liferay.portal.kernel.cache.PortalCache;
 import com.liferay.portal.kernel.cache.PortalCacheMapSynchronizeUtil;
 import com.liferay.portal.kernel.cache.PortalCacheMapSynchronizeUtil.Synchronizer;
@@ -53,10 +53,6 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.registry.Registry;
-import com.liferay.registry.RegistryUtil;
-import com.liferay.registry.dependency.ServiceDependencyListener;
-import com.liferay.registry.dependency.ServiceDependencyManager;
 
 import java.io.Serializable;
 
@@ -108,49 +104,23 @@ import javax.servlet.http.HttpServletResponse;
 public class LanguageImpl implements Language, Serializable {
 
 	public void afterPropertiesSet() {
-		ServiceDependencyManager serviceDependencyManager =
-			new ServiceDependencyManager();
+		_companyLocalesPortalCache = MultiVMPoolUtil.getPortalCache(
+			_COMPANY_LOCALES_PORTAL_CACHE_NAME);
 
-		serviceDependencyManager.addServiceDependencyListener(
-			new ServiceDependencyListener() {
+		PortalCacheMapSynchronizeUtil.synchronize(
+			_companyLocalesPortalCache, _companyLocalesBags,
+			_removeSynchronizer);
 
-				@Override
-				public void dependenciesFulfilled() {
-					Registry registry = RegistryUtil.getRegistry();
+		_groupLocalesPortalCache = MultiVMPoolUtil.getPortalCache(
+			_GROUP_LOCALES_PORTAL_CACHE_NAME);
 
-					MultiVMPool multiVMPool = registry.getService(
-						MultiVMPool.class);
+		PortalCacheMapSynchronizeUtil.synchronize(
+			_groupLocalesPortalCache, _groupLanguageCodeLocalesMapMap,
+			_removeSynchronizer);
 
-					_companyLocalesPortalCache =
-						(PortalCache<Long, Serializable>)
-							multiVMPool.getPortalCache(
-								_COMPANY_LOCALES_PORTAL_CACHE_NAME);
-
-					PortalCacheMapSynchronizeUtil.synchronize(
-						_companyLocalesPortalCache, _companyLocalesBags,
-						_removeSynchronizer);
-
-					_groupLocalesPortalCache =
-						(PortalCache<Long, Serializable>)
-							multiVMPool.getPortalCache(
-								_GROUP_LOCALES_PORTAL_CACHE_NAME);
-
-					PortalCacheMapSynchronizeUtil.synchronize(
-						_groupLocalesPortalCache,
-						_groupLanguageCodeLocalesMapMap, _removeSynchronizer);
-
-					PortalCacheMapSynchronizeUtil.synchronize(
-						_groupLocalesPortalCache, _groupLanguageIdLocalesMap,
-						_removeSynchronizer);
-				}
-
-				@Override
-				public void destroy() {
-				}
-
-			});
-
-		serviceDependencyManager.registerDependencies(MultiVMPool.class);
+		PortalCacheMapSynchronizeUtil.synchronize(
+			_groupLocalesPortalCache, _groupLanguageIdLocalesMap,
+			_removeSynchronizer);
 	}
 
 	/**
@@ -1889,9 +1859,18 @@ public class LanguageImpl implements Language, Serializable {
 						PropsValues.LOCALES_ENABLED);
 				}
 				catch (SystemException se) {
+
+					// LPS-52675
+
+					if (_log.isDebugEnabled()) {
+						_log.debug(se, se);
+					}
+
 					languageIds = PropsValues.LOCALES_ENABLED;
 				}
 			}
+
+			Set<String> duplicateLanguageCodes = new HashSet<>();
 
 			for (String languageId : languageIds) {
 				Locale locale = LocaleUtil.fromLanguageId(languageId, false);
@@ -1905,13 +1884,20 @@ public class LanguageImpl implements Language, Serializable {
 				}
 
 				if (_languageCodeLocalesMap.containsKey(languageCode)) {
-					_duplicateLanguageCodes.add(languageCode);
+					duplicateLanguageCodes.add(languageCode);
 				}
 				else {
 					_languageCodeLocalesMap.put(languageCode, locale);
 				}
 
 				_languageIdLocalesMap.put(languageId, locale);
+			}
+
+			if (duplicateLanguageCodes.isEmpty()) {
+				_duplicateLanguageCodes = Collections.emptySet();
+			}
+			else {
+				_duplicateLanguageCodes = duplicateLanguageCodes;
 			}
 
 			for (String languageId : PropsValues.LOCALES_BETA) {
@@ -1932,7 +1918,7 @@ public class LanguageImpl implements Language, Serializable {
 		}
 
 		private final Set<Locale> _availableLocales;
-		private final Set<String> _duplicateLanguageCodes = new HashSet<>();
+		private final Set<String> _duplicateLanguageCodes;
 		private final Map<String, Locale> _languageCodeLocalesMap =
 			new HashMap<>();
 		private final Map<String, Locale> _languageIdLocalesMap =

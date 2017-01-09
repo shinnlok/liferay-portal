@@ -2,10 +2,17 @@
 	<property name="custom.properties" value="layout.parallel.render.enable=false" />
 	<property name="extraapps.plugins.includes" value="content-targeting" />
 	<property name="ignore.errors" value="IX_DC6100CC" />
+	<property name="portal.release" value="true" />
+	<property name="portal.upstream" value="false" />
+	<property name="test.run.environment" value="EE" />
 	<property name="testray.main.component.name" value="Content Targeting" />
 
 	<set-up>
 		<execute macro="TestCase#setUpPortalInstance" />
+
+		<execute macro="Portlet#shutdownServer" />
+
+		<execute macro="Portlet#startServer" />
 
 		<execute macro="User#firstLoginPG" />
 
@@ -430,8 +437,8 @@
 			<var name="portlet" value="Instance Settings" />
 		</execute>
 
-		<execute macro="Navigator#gotoTab">
-			<var name="tab" value="Configuration" />
+		<execute macro="Navigator#gotoNavTab">
+			<var name="navTab" value="Configuration" />
 		</execute>
 
 		<execute macro="ContentTargeting#enableAnalytics">
@@ -615,8 +622,8 @@
 			<var name="portlet" value="Instance Settings" />
 		</execute>
 
-		<execute macro="Navigator#gotoTab">
-			<var name="tab" value="Configuration" />
+		<execute macro="Navigator#gotoNavTab">
+			<var name="navTab" value="Configuration" />
 		</execute>
 
 		<execute macro="ContentTargeting#enableAnalytics">
@@ -842,8 +849,8 @@
 			<var name="portlet" value="Instance Settings" />
 		</execute>
 
-		<execute macro="Navigator#gotoTab">
-			<var name="tab" value="Configuration" />
+		<execute macro="Navigator#gotoNavTab">
+			<var name="navTab" value="Configuration" />
 		</execute>
 
 		<execute macro="ContentTargeting#enableAnalytics">

@@ -325,6 +325,22 @@ public class SyncFileService {
 		}
 	}
 
+	public static SyncFile fetchSyncFile(
+		long repositoryId, long syncAccountId, long typePK, long versionId) {
+
+		try {
+			return _syncFilePersistence.fetchByR_S_T_V(
+				repositoryId, syncAccountId, typePK, versionId);
+		}
+		catch (SQLException sqle) {
+			if (_logger.isDebugEnabled()) {
+				_logger.debug(sqle.getMessage(), sqle);
+			}
+
+			return null;
+		}
+	}
+
 	public static SyncFile fetchSyncFile(String filePathName) {
 		try {
 			return _syncFilePersistence.fetchByFilePathName(filePathName);
@@ -494,9 +510,9 @@ public class SyncFileService {
 		}
 	}
 
-	public static long getSyncFilesCount(int uiEvent) {
+	public static long getSyncFilesCount(Integer... uiEvents) {
 		try {
-			return _syncFilePersistence.countByUIEvent(uiEvent);
+			return _syncFilePersistence.countByUIEvents(uiEvents);
 		}
 		catch (SQLException sqle) {
 			if (_logger.isDebugEnabled()) {
@@ -718,8 +734,7 @@ public class SyncFileService {
 		Collections.sort(syncFiles, _syncFileFilePathNameComparator);
 
 		for (SyncFile syncFile : syncFiles) {
-			SyncFile localSyncFile = SyncFileService.fetchSyncFile(
-				syncFile.getFilePathName());
+			SyncFile localSyncFile = fetchSyncFile(syncFile.getFilePathName());
 
 			if (localSyncFile != null) {
 				if (localSyncFile.getState() != SyncFile.STATE_UNSYNCED) {
@@ -736,7 +751,7 @@ public class SyncFileService {
 			syncFile.setState(SyncFile.STATE_IN_PROGRESS);
 			syncFile.setUiEvent(SyncFile.UI_EVENT_RESYNCING);
 
-			SyncFileService.update(syncFile);
+			update(syncFile);
 
 			if (isAncestorInList(syncFile, resyncedSyncFileIds)) {
 				continue;
@@ -788,8 +803,7 @@ public class SyncFileService {
 		Collections.sort(syncFiles, _syncFileFilePathNameComparator);
 
 		for (SyncFile syncFile : syncFiles) {
-			SyncFile localSyncFile = SyncFileService.fetchSyncFile(
-				syncFile.getFilePathName());
+			SyncFile localSyncFile = fetchSyncFile(syncFile.getFilePathName());
 
 			if (localSyncFile != null) {
 				if (localSyncFile.getState() == SyncFile.STATE_UNSYNCED) {
@@ -805,7 +819,7 @@ public class SyncFileService {
 			syncFile.setState(SyncFile.STATE_UNSYNCED);
 			syncFile.setUiEvent(SyncFile.UI_EVENT_NONE);
 
-			SyncFileService.update(syncFile);
+			update(syncFile);
 
 			if (isAncestorInList(syncFile, unsyncedSyncFileIds) ||
 				!FileUtil.exists(Paths.get(syncFile.getFilePathName()))) {
@@ -1018,7 +1032,7 @@ public class SyncFileService {
 			return false;
 		}
 
-		SyncFile parentSyncFile = SyncFileService.fetchSyncFile(
+		SyncFile parentSyncFile = fetchSyncFile(
 			syncFile.getRepositoryId(), syncFile.getSyncAccountId(),
 			syncFile.getParentFolderId());
 

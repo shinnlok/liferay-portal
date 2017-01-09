@@ -47,9 +47,8 @@ public class PortletBeanLocatorUtil {
 				"BeanLocator is not set for servlet context " +
 					servletContextName);
 		}
-		else {
-			return beanLocator.locate(name);
-		}
+
+		return beanLocator.locate(name);
 	}
 
 	public static void setBeanLocator(

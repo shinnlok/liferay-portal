@@ -1,5 +1,7 @@
 <definition component-name="portal-plugins-osgi">
+	<property name="osgi.app.includes" value="twitter" />
 	<property name="portal.release" value="true" />
+	<property name="portal.upstream" value="true" />
 	<property name="plugins.deployment.type" value="osgi" />
 	<property name="testray.main.component.name" value="Social Networking" />
 
@@ -16,8 +18,6 @@
 	</tear-down>
 
 	<command name="TwitterPortletSmoke" priority="4">
-		<property name="portlet.plugins.includes" value="twitter-portlet" />
-
 		<var name="appName" value="Twitter" />
 
 		<execute macro="Navigator#gotoPage">
@@ -29,5 +29,37 @@
 		</execute>
 
 		<execute function="AntCommand#antCommand" locator1="build-test.xml" value1="remove-plugin -Dplugin.name=twitter-portlet" />
+	</command>
+
+	<command name="ViewEntry" priority="5">
+		<execute macro="UserBar#gotoProfile" />
+
+		<execute macro="Portlet#addPG">
+			<var name="portletName" value="Twitter" />
+		</execute>
+
+		<execute macro="Twitter#configureUserProfile">
+			<var name="twitterProfileName" value="liferayqa3" />
+		</execute>
+
+		<execute function="Pause" locator1="50000" />
+
+		<execute function="Refresh" />
+
+		<execute macro="Twitter#viewConfiguredScreenName">
+			<var name="twitterProfileName" value="liferayqa3" />
+		</execute>
+
+		<execute macro="Portlet#addPG">
+			<var name="portletName" value="Activities" />
+		</execute>
+
+		<execute function="Pause" locator1="50000" />
+
+		<execute function="Refresh" />
+
+		<execute macro="Twitter#viewFeedEntry">
+			<var name="entryContent" value="This is a tweet sent on Twitter." />
+		</execute>
 	</command>
 </definition>

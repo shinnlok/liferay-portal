@@ -54,16 +54,16 @@ public class HtmlBBCodeTranslatorImpl implements BBCodeTranslator {
 		_bbCodeCharacters = new HashMap<>();
 
 		_bbCodeCharacters.put("&", "&amp;");
-		_bbCodeCharacters.put("<", "&lt;");
-		_bbCodeCharacters.put(">", "&gt;");
-		_bbCodeCharacters.put("\"", "&#034;");
 		_bbCodeCharacters.put("'", "&#039;");
-		_bbCodeCharacters.put("/", "&#047;");
-		_bbCodeCharacters.put("`", "&#096;");
-		_bbCodeCharacters.put("[", "&#91;");
-		_bbCodeCharacters.put("]", "&#93;");
 		_bbCodeCharacters.put("(", "&#40;");
 		_bbCodeCharacters.put(")", "&#41;");
+		_bbCodeCharacters.put("/", "&#047;");
+		_bbCodeCharacters.put("<", "&lt;");
+		_bbCodeCharacters.put(">", "&gt;");
+		_bbCodeCharacters.put("[", "&#91;");
+		_bbCodeCharacters.put("\"", "&#034;");
+		_bbCodeCharacters.put("]", "&#93;");
+		_bbCodeCharacters.put("`", "&#096;");
 
 		for (int i = 0; i < _EMOTICONS.length; i++) {
 			String[] emoticon = _EMOTICONS[i];
@@ -102,9 +102,9 @@ public class HtmlBBCodeTranslatorImpl implements BBCodeTranslator {
 
 		_orderedListStyles = new HashMap<>();
 
+		_orderedListStyles.put("1", "list-style: decimal outside;");
 		_orderedListStyles.put("a", "list-style: lower-alpha outside;");
 		_orderedListStyles.put("A", "list-style: upper-alpha outside;");
-		_orderedListStyles.put("1", "list-style: decimal outside;");
 		_orderedListStyles.put("i", "list-style: lower-roman outside;");
 		_orderedListStyles.put("I", "list-style: upper-roman outside;");
 
@@ -244,7 +244,7 @@ public class HtmlBBCodeTranslatorImpl implements BBCodeTranslator {
 			}
 		}
 		while ((bbCodeItem.getType() != BBCodeParser.TYPE_TAG_END) &&
-			!tag.equals(bbCodeItem.getValue()));
+			   !tag.equals(bbCodeItem.getValue()));
 
 		if (consume) {
 			marker.setValue(index - 1);

@@ -5,6 +5,8 @@ The JS Module Config Generator Gradle plugin lets you run the
 to generate the configuration file needed to load AMD files via combo loader in
 Liferay.
 
+The plugin has been successfully tested with Gradle 2.5 up to 3.2.1.
+
 ## Usage
 
 To use the plugin, include it in your build script:
@@ -12,7 +14,7 @@ To use the plugin, include it in your build script:
 ```gradle
 buildscript {
 	dependencies {
-		classpath group: "com.liferay", name: "com.liferay.gradle.plugins.js.module.config.generator", version: "2.0.3"
+		classpath group: "com.liferay", name: "com.liferay.gradle.plugins.js.module.config.generator", version: "2.1.6"
 	}
 
 	repositories {
@@ -102,11 +104,12 @@ files and creates a configuration file in the location specified by the
 Property Name | Type | Default Value | Description
 ------------- | ---- | ------------- | -----------
 `configVariable` | `String` | `null` | The configuration variable to which the modules should be added. It sets the `--config` argument.
+`customDefine` | `String` | `"Liferay.Loader.define"` | The custom `define(...)` call to use in the JS files.
 `ignorePath` | `boolean` | `false` | Whether not to create module `path` and `fullPath` properties. It sets the `--ignorePath` argument.
 `keepFileExtension` | `boolean` | `false` | Whether to keep the file extension when generating the module name. It sets the `--keepExtension` argument.
 `lowerCase` | `boolean` | `false` | Whether to convert file name to lower case before using it as the module name. It sets the `--lowerCase` argument.
 <a name="moduleconfigfile"></a>`moduleConfigFile` | `File` | `null` | The JSON file which contains configuration data for the modules. It sets the `--moduleConfig` argument.
-`moduleExtension` | `String` | `null` | The extension for the module file (e.g., `.js`). If set, use the provided string as an extension instead to get it automatically from the file name. It sets the `--extension` argument.
+`moduleExtension` | `String` | `null` | The extension for the module file (e.g., `.js`). If specified, use the provided string as an extension instead to get it automatically from the file name. It sets the `--extension` argument.
 `moduleFormat` | `String` | `null` | The regular expression and value to apply to the file name when generating the module name. It sets the `--format` argument.
 <a name="outputfile"></a>`outputFile` | `File` | `null` | The file where the generated configuration is stored. It sets the `--output` argument.
 <a name="sourcedir"></a>`sourceDir` | `File` | `null` | The directory that contains the files to process.

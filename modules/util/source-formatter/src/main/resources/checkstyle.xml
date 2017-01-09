@@ -83,6 +83,9 @@
 		<module name="com.liferay.source.formatter.checkstyle.checks.AnnotationParameterOrder">
 			<message key="annotation.unsortedParameter" value="Annotation parameter ''{0}'' is not sorted alphabetically" />
 		</module>
+		<module name="com.liferay.source.formatter.checkstyle.checks.Arquillian">
+			<message key="import.invalid" value="Use import ''com.liferay.arquillian.extension.junit.bridge.junit.Arquillian'' instead of ''org.jboss.arquillian.junit.Arquillian'', see LPS-68945" />
+		</module>
 		<module name="com.liferay.source.formatter.checkstyle.checks.Chaining">
 			<property name="chainingAllowedFormat" value="(^|.*\.)(bind|stream)\..*" />
 			<message key="chaining.avoid" value="Avoid chaining on method ''{0}'" />
@@ -94,6 +97,12 @@
 			<message key="name.invalidProtectedPublicPattern" value="Protected or public constant ''{0}'' must match pattern ''{1}''" />
 			<message key="name.collectionPrivatePattern" value="Private collection ''{0}'' must match pattern ''{1}''" />
 			<message key="name.collectionProtectedPublicPattern" value="Protected or public collection ''{0}'' must match pattern ''{1}''" />
+		</module>
+		<module name="com.liferay.source.formatter.checkstyle.checks.Indentation">
+			<message key="indentation.incorrect" value="Line starts with ''{0}'' tabs, but ''{1}'' tabs are expected" />
+		</module>
+		<module name="com.liferay.source.formatter.checkstyle.checks.InstanceofOrder">
+			<message key="instanceof.order" value="''{0}'' should come before ''{1}''" />
 		</module>
 		<module name="com.liferay.source.formatter.checkstyle.checks.Javadoc">
 			<message key="javadoc.empty.line" value="First or last line in javadoc should not be empty" />
@@ -131,11 +140,17 @@
 		<module name="com.liferay.source.formatter.checkstyle.checks.MissingModifier">
 			<message key="modifier.missing" value="Missing modifier for ''{0}''" />
 		</module>
+		<module name="com.liferay.source.formatter.checkstyle.checks.MissingOverride">
+			<message key="override.missing" value="Missing @Override" />
+		</module>
 		<module name="com.liferay.source.formatter.checkstyle.checks.NotRequireThis">
 			<message key="variable.not.require.this" value="Reference to variable ''{0}'' does not need ''.this''" />
 		</module>
 		<module name="com.liferay.source.formatter.checkstyle.checks.OperatorOrder">
 			<message key="left.argument.literal.or.num" value="''{0}'' should be on the right hand side of the operator" />
+		</module>
+		<module name="com.liferay.source.formatter.checkstyle.checks.PersistenceCall">
+			<message key="persistence.call.illegal" value="Illegal call to class ''{0}'', see LPS-68923" />
 		</module>
 		<module name="com.liferay.source.formatter.checkstyle.checks.PlusStatement">
 			<property name="maxLineLength" value="80" />
@@ -146,6 +161,9 @@
 			<message key="start.character.invalid" value="When concatenating multiple literal strings using '+', only the first literal string can start with ''{0}''" />
 			<message key="tabbing.incorrect" value="Expected indentation is ''{0}'' tabs" />
 		</module>
+		<module name="com.liferay.source.formatter.checkstyle.checks.SelfReference">
+			<message key="self.reference.unneeded" value="Reference to method ''{0}'' does not need ''{1}''" />
+		</module>
 		<module name="com.liferay.source.formatter.checkstyle.checks.SizeIsZero">
 			<message key="method.use" value="Use method ''{0}'' instead" />
 		</module>
@@ -154,11 +172,20 @@
 			<message key="parameter.invalidName" value="'sub' should be followed by a lowercase character for parameter ''{0}''" />
 			<message key="variable.invalidName" value="'sub' should be followed by a lowercase character for variable ''{0}''" />
 		</module>
+		<module name="com.liferay.source.formatter.checkstyle.checks.TransactionalTestRule">
+			<message key="import.invalid" value="Avoid using import TransactionalTestRule in *StagedModelDataHandlerTest, see LPS-68908" />
+		</module>
+		<module name="com.liferay.source.formatter.checkstyle.checks.UnprocessedException">
+			<message key="exception.unprocessed" value="Unprocessed exception ''{0}'', see LPS-36174" />
+		</module>
 		<module name="com.liferay.source.formatter.checkstyle.checks.UnusedParameter">
 			<message key="parameter.unused" value="Parameter ''{0}'' is unused" />
 		</module>
 		<module name="com.liferay.source.formatter.checkstyle.checks.ValidatorIsNull">
 			<message key="method.invalidName" value="Avoid using method ''{0}''" />
+		</module>
+		<module name="com.liferay.source.formatter.checkstyle.checks.VariableName">
+			<message key="variable.rename" value="Rename variable ''{0}'' to ''{1}''" />
 		</module>
 	</module>
 </module>

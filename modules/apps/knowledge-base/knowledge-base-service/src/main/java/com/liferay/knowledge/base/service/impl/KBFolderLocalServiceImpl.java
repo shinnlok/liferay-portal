@@ -50,7 +50,7 @@ public class KBFolderLocalServiceImpl extends KBFolderLocalServiceBaseImpl {
 
 		// KB folder
 
-		User user = userPersistence.findByPrimaryKey(userId);
+		User user = userLocalService.getUser(userId);
 		Date now = new Date();
 
 		validateName(groupId, parentResourcePrimKey, name);
@@ -73,6 +73,7 @@ public class KBFolderLocalServiceImpl extends KBFolderLocalServiceBaseImpl {
 			getUniqueUrlTitle(
 				groupId, parentResourcePrimKey, kbFolderId, name));
 		kbFolder.setDescription(description);
+		kbFolder.setExpandoBridgeAttributes(serviceContext);
 
 		kbFolderPersistence.update(kbFolder);
 
@@ -108,6 +109,10 @@ public class KBFolderLocalServiceImpl extends KBFolderLocalServiceBaseImpl {
 			deleteKBFolder(childKBFolder.getKbFolderId());
 		}
 
+		// Expando
+
+		expandoRowLocalService.deleteRows(kbFolder.getKbFolderId());
+
 		return kbFolderPersistence.remove(kbFolder);
 	}
 
@@ -115,12 +120,25 @@ public class KBFolderLocalServiceImpl extends KBFolderLocalServiceBaseImpl {
 	public KBFolder fetchFirstChildKBFolder(long groupId, long kbFolderId)
 		throws PortalException {
 
-		return kbFolderPersistence.fetchByG_P_First(groupId, kbFolderId, null);
+		return fetchFirstChildKBFolder(groupId, kbFolderId, null);
+	}
+
+	@Override
+	public KBFolder fetchFirstChildKBFolder(
+			long groupId, long kbFolderId, OrderByComparator<KBFolder> obc)
+		throws PortalException {
+
+		return kbFolderPersistence.fetchByG_P_First(groupId, kbFolderId, obc);
 	}
 
 	@Override
 	public KBFolder fetchKBFolder(long kbFolderId) {
 		return kbFolderPersistence.fetchByPrimaryKey(kbFolderId);
+	}
+
+	@Override
+	public KBFolder fetchKBFolder(String uuid, long groupId) {
+		return kbFolderPersistence.fetchByUUID_G(uuid, groupId);
 	}
 
 	@Override
@@ -199,10 +217,28 @@ public class KBFolderLocalServiceImpl extends KBFolderLocalServiceBaseImpl {
 		kbFolderPersistence.update(kbFolder);
 	}
 
+	/**
+	 * @deprecated As of 1.1.0, replaced by {@link
+	 *             #updateKBFolder(long, long, long, String, String,
+	 *             ServiceContext)}
+	 */
+	@Deprecated
 	@Override
 	public KBFolder updateKBFolder(
 			long parentResourceClassNameId, long parentResourcePrimKey,
 			long kbFolderId, String name, String description)
+		throws PortalException {
+
+		return updateKBFolder(
+			parentResourceClassNameId, parentResourcePrimKey, kbFolderId, name,
+			description, new ServiceContext());
+	}
+
+	@Override
+	public KBFolder updateKBFolder(
+			long parentResourceClassNameId, long parentResourcePrimKey,
+			long kbFolderId, String name, String description,
+			ServiceContext serviceContext)
 		throws PortalException {
 
 		validateParent(parentResourceClassNameId, parentResourcePrimKey);
@@ -213,6 +249,7 @@ public class KBFolderLocalServiceImpl extends KBFolderLocalServiceBaseImpl {
 		kbFolder.setParentKBFolderId(parentResourcePrimKey);
 		kbFolder.setName(name);
 		kbFolder.setDescription(description);
+		kbFolder.setExpandoBridgeAttributes(serviceContext);
 
 		return kbFolderPersistence.update(kbFolder);
 	}

@@ -49,6 +49,7 @@ import org.osgi.framework.Version;
 import org.osgi.framework.wiring.BundleCapability;
 import org.osgi.framework.wiring.BundleWire;
 import org.osgi.framework.wiring.BundleWiring;
+import org.osgi.service.component.ComponentContext;
 
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -455,6 +456,9 @@ public class JSLoaderModulesServletTest extends PowerMockito {
 		JSLoaderModulesServlet jsLoaderModulesServlet =
 			new JSLoaderModulesServlet();
 
+		jsLoaderModulesServlet.activate(
+			mock(ComponentContext.class), mock(Details.class));
+
 		MockServletContext mockServletContext = new MockServletContext();
 
 		mockServletContext.setContextPath("/loader");
@@ -508,7 +512,9 @@ public class JSLoaderModulesServletTest extends PowerMockito {
 			url
 		).when(
 			bundle
-		).getEntry(Details.CONFIG_JSON);
+		).getEntry(
+			Details.CONFIG_JSON
+		);
 
 		doReturn(
 			new Hashtable<String, String>()
@@ -532,7 +538,9 @@ public class JSLoaderModulesServletTest extends PowerMockito {
 			mockBundleWiring(bsn, capability)
 		).when(
 			bundle
-		).adapt(BundleWiring.class);
+		).adapt(
+			BundleWiring.class
+		);
 	}
 
 	protected BundleCapability mockBundleCapability(String bsn) {

@@ -29,6 +29,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>CONFIGURE_TWITTER</td>
+	<td>//a[contains(.,'Please configure your Twitter screen name.')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>CHANGE_EMAIL_ADDRESS</td>
 	<td>//div/a[contains(.,'Change Email Address')]</td>
 	<td></td>
@@ -51,6 +56,11 @@
 <tr>
 	<td>EDIT</td>
 	<td>//a/span[contains(@class,'taglib-text') and contains(.,'Edit')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>FACEBOOK_LOGIN</td>
+	<td>//span[contains(.,'Facebook')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -126,6 +136,11 @@
 <tr>
 	<td>PERMISSIONS</td>
 	<td>//a/span[contains(@class,'taglib-text') and contains(.,'Permissions')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>REFRESH_COUNTS</td>
+	<td>//a[contains(@id,'rangeLink')]</td>
 	<td></td>
 </tr>
 <tr>

@@ -1,5 +1,6 @@
 <definition component-name="portal-wcm">
 	<property name="portal.release" value="true" />
+	<property name="portal.upstream" value="true" />
 	<property name="testray.main.component.name" value="Content and Application Templates" />
 	<property name="custom.properties" value="default.layout.template.id=1_column" />
 
@@ -568,8 +569,6 @@
 	</command>
 
 	<command name="ADTStagingCategoriesNavigation" priority="3">
-		<var name="siteName" value="Test Site Name" />
-
 		<execute macro="ProductMenu#gotoSite">
 			<var name="site" value="Test Site Name" />
 		</execute>

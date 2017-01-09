@@ -228,28 +228,23 @@ public class HtmlImpl implements Html {
 			return escape(text);
 		}
 
-		StringBuilder sb = new StringBuilder(text.length());
-
+		StringBuilder sb = null;
 		char[] hexBuffer = new char[4];
-
-		boolean modified = false;
+		int lastReplacementIndex = 0;
 
 		for (int i = 0; i < text.length(); i++) {
 			char c = text.charAt(i);
 
-			if (c < 256) {
-				if ((c < 128) && _VALID_CHARS[c]) {
-					sb.append(c);
-				}
-				else if ((mode == ESCAPE_MODE_ATTRIBUTE) &&
-						 ((c == CharPool.TAB) || (c == CharPool.NEW_LINE) ||
-						  (c == CharPool.RETURN))) {
+			if (c < _VALID_CHARS.length) {
+				if (!_VALID_CHARS[c]) {
+					if (sb == null) {
+						sb = new StringBuilder(text.length() + 64);
+					}
 
-					sb.append(CharPool.SPACE);
+					if (i > lastReplacementIndex) {
+						sb.append(text, lastReplacementIndex, i);
+					}
 
-					modified = true;
-				}
-				else {
 					sb.append(prefix);
 
 					_appendHexChars(sb, hexBuffer, c);
@@ -268,27 +263,36 @@ public class HtmlImpl implements Html {
 						}
 					}
 
-					modified = true;
+					lastReplacementIndex = i + 1;
 				}
 			}
 			else if ((mode == ESCAPE_MODE_ATTRIBUTE) &&
 					 (!_isValidXmlCharacter(c) ||
 					  _isUnicodeCompatibilityCharacter(c))) {
 
+				if (sb == null) {
+					sb = new StringBuilder(text.length() + 64);
+				}
+
+				if (i > lastReplacementIndex) {
+					sb.append(text, lastReplacementIndex, i);
+				}
+
 				sb.append(CharPool.SPACE);
 
-				modified = true;
-			}
-			else {
-				sb.append(c);
+				lastReplacementIndex = i + 1;
 			}
 		}
 
-		if (modified) {
-			return sb.toString();
+		if (sb == null) {
+			return text;
 		}
 
-		return text;
+		if (lastReplacementIndex < text.length()) {
+			sb.append(text, lastReplacementIndex, text.length());
+		}
+
+		return sb.toString();
 	}
 
 	/**
@@ -476,7 +480,8 @@ public class HtmlImpl implements Html {
 
 	@Override
 	public String fromInputSafe(String text) {
-		return StringUtil.replace(text, "&amp;", "&");
+		return StringUtil.replace(
+			text, new String[] {"&amp;", "&quot;"}, new String[] {"&", "\""});
 	}
 
 	@Override
@@ -905,7 +910,7 @@ public class HtmlImpl implements Html {
 
 	private static final char[] _TAG_STYLE = {'s', 't', 'y', 'l', 'e'};
 
-	private static final boolean[] _VALID_CHARS = new boolean[128];
+	private static final boolean[] _VALID_CHARS = new boolean[256];
 
 	// See http://www.w3.org/TR/xpath20/#lexical-structure
 
@@ -917,32 +922,26 @@ public class HtmlImpl implements Html {
 	private static final Map<String, String> _unescapeMap = new HashMap<>();
 
 	static {
-		_unescapeMap.put("lt", "<");
-		_unescapeMap.put("gt", ">");
-		_unescapeMap.put("amp", "&");
-		_unescapeMap.put("rsquo", "\u2019");
 		_unescapeMap.put("#34", "\"");
+		_unescapeMap.put("#35", "#");
+		_unescapeMap.put("#37", "%");
 		_unescapeMap.put("#39", "'");
 		_unescapeMap.put("#40", "(");
 		_unescapeMap.put("#41", ")");
+		_unescapeMap.put("#43", "+");
 		_unescapeMap.put("#44", ",");
-		_unescapeMap.put("#35", "#");
-		_unescapeMap.put("#37", "%");
+		_unescapeMap.put("#45", "-");
 		_unescapeMap.put("#59", ";");
 		_unescapeMap.put("#61", "=");
-		_unescapeMap.put("#43", "+");
-		_unescapeMap.put("#45", "-");
+		_unescapeMap.put("amp", "&");
+		_unescapeMap.put("gt", ">");
+		_unescapeMap.put("lt", "<");
+		_unescapeMap.put("rsquo", "\u2019");
 
-		for (int i = 'a'; i <= 'z'; i++) {
-			_VALID_CHARS[i] = true;
-		}
-
-		for (int i = 'A'; i <= 'Z'; i++) {
-			_VALID_CHARS[i] = true;
-		}
-
-		for (int i = '0'; i <= '9'; i++) {
-			_VALID_CHARS[i] = true;
+		for (int i = 0; i < _VALID_CHARS.length; i++) {
+			if (Character.isLetterOrDigit(i)) {
+				_VALID_CHARS[i] = true;
+			}
 		}
 
 		_VALID_CHARS['-'] = true;

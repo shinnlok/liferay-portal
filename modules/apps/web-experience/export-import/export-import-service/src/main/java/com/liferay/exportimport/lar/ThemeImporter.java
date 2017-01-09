@@ -14,10 +14,13 @@
 
 package com.liferay.exportimport.lar;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.PortletDataHandlerKeys;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.service.LayoutSetLocalServiceUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -25,9 +28,12 @@ import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.xml.Attribute;
 import com.liferay.portal.kernel.xml.Element;
 
+import java.util.Map;
+
 /**
  * @author Mate Thurzo
  */
+@ProviderType
 public class ThemeImporter {
 
 	public static ThemeImporter getInstance() {
@@ -49,6 +55,12 @@ public class ThemeImporter {
 		if (!importThemeSettings) {
 			return;
 		}
+
+		Map<Long, Long> groupIds =
+			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
+				Group.class);
+
+		long importGroupId = groupIds.get(layoutSet.getGroupId());
 
 		Element importDataRootElement =
 			portletDataContext.getImportDataRootElement();
@@ -74,8 +86,8 @@ public class ThemeImporter {
 		String css = GetterUtil.getString(headerElement.elementText("css"));
 
 		LayoutSetLocalServiceUtil.updateLookAndFeel(
-			layoutSet.getGroupId(), layoutSet.isPrivateLayout(), themeId,
-			colorSchemeId, css);
+			importGroupId, layoutSet.isPrivateLayout(), themeId, colorSchemeId,
+			css);
 	}
 
 	private ThemeImporter() {

@@ -14,21 +14,36 @@
 
 package com.liferay.jenkins.results.parser;
 
+import java.util.Collections;
+import java.util.List;
+
+import org.json.JSONObject;
+
 /**
  * @author Peter Yoo
  */
 public class SourceBuild extends BaseBuild {
 
-	public SourceBuild(String url) throws Exception {
+	public SourceBuild(String url) {
 		super(url);
 	}
 
-	public SourceBuild(String url, Build parentBuild) throws Exception {
+	public SourceBuild(String url, Build parentBuild) {
 		super(url, parentBuild);
 	}
 
 	@Override
 	public void findDownstreamBuilds() {
+	}
+
+	@Override
+	public JSONObject getTestReportJSONObject() {
+		return null;
+	}
+
+	@Override
+	public List<TestResult> getTestResults(String testStatus) {
+		return Collections.emptyList();
 	}
 
 }

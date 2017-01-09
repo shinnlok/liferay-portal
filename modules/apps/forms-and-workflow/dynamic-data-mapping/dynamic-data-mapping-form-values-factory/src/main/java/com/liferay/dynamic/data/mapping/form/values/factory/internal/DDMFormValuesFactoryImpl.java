@@ -287,7 +287,7 @@ public class DDMFormValuesFactoryImpl implements DDMFormValuesFactory {
 		}
 
 		if (availableLocales.isEmpty()) {
-			availableLocales.add(LocaleThreadLocal.getThemeDisplayLocale());
+			availableLocales.add(LocaleThreadLocal.getSiteDefaultLocale());
 		}
 
 		return availableLocales;
@@ -364,7 +364,7 @@ public class DDMFormValuesFactoryImpl implements DDMFormValuesFactory {
 
 		return ddmFormFieldValueRequestParameterRetriever.get(
 			httpServletRequest, sb.toString(),
-			defaultDDMFormFieldParameterValue);
+			GetterUtil.getString(defaultDDMFormFieldParameterValue));
 	}
 
 	protected String getDDMFormFieldPrefix() {
@@ -437,7 +437,7 @@ public class DDMFormValuesFactoryImpl implements DDMFormValuesFactory {
 			httpServletRequest, "defaultLanguageId");
 
 		if (Validator.isNull(defaultLanguageId)) {
-			return LocaleThreadLocal.getThemeDisplayLocale();
+			return LocaleThreadLocal.getSiteDefaultLocale();
 		}
 
 		return LocaleUtil.fromLanguageId(defaultLanguageId);
@@ -472,8 +472,7 @@ public class DDMFormValuesFactoryImpl implements DDMFormValuesFactory {
 			DDMFormFieldValue ddmFormFieldValue = entry.getValue();
 
 			if (key.startsWith(entryKeyPrefix) &&
-				Objects.equals(
-					ddmFormFieldValue.getName(), fieldNameFilter)) {
+				Objects.equals(ddmFormFieldValue.getName(), fieldNameFilter)) {
 
 				entryKeys.add(key);
 			}

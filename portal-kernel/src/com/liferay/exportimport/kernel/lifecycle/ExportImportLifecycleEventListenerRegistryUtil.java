@@ -14,6 +14,9 @@
 
 package com.liferay.exportimport.kernel.lifecycle;
 
+import aQute.bnd.annotation.ProviderType;
+
+import com.liferay.portal.kernel.concurrent.ConcurrentHashSet;
 import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
 import com.liferay.registry.ServiceReference;
@@ -23,13 +26,13 @@ import com.liferay.registry.ServiceTrackerCustomizer;
 import com.liferay.registry.collections.ServiceRegistrationMap;
 import com.liferay.registry.collections.ServiceRegistrationMapImpl;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 /**
  * @author Daniel Kocsis
  */
+@ProviderType
 public class ExportImportLifecycleEventListenerRegistryUtil {
 
 	public static Set<ExportImportLifecycleListener>
@@ -117,14 +120,14 @@ public class ExportImportLifecycleEventListenerRegistryUtil {
 		_instance = new ExportImportLifecycleEventListenerRegistryUtil();
 
 	private final Set<ExportImportLifecycleListener>
-		_asyncExportImportLifecycleListeners = new HashSet<>();
+		_asyncExportImportLifecycleListeners = new ConcurrentHashSet<>();
 	private final ServiceRegistrationMap<ExportImportLifecycleListener>
 		_serviceRegistrations = new ServiceRegistrationMapImpl<>();
 	private final ServiceTracker
 		<ExportImportLifecycleListener, ExportImportLifecycleListener>
 			_serviceTracker;
 	private final Set<ExportImportLifecycleListener>
-		_syncExportImportLifecycleListeners = new HashSet<>();
+		_syncExportImportLifecycleListeners = new ConcurrentHashSet<>();
 
 	private class ExportImportLifecycleListenerServiceTrackerCustomizer
 		implements ServiceTrackerCustomizer

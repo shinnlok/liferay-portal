@@ -53,8 +53,8 @@ request.removeAttribute(WebKeys.SEARCH_CONTAINER_RESULT_ROW);
 					<h4><liferay-ui:message key="sites" /></h4>
 				</div>
 
-				<aui:nav-bar markupView="lexicon">
-					<aui:nav cssClass="navbar-nav">
+				<aui:nav-bar cssClass="navbar-no-collapse" markupView="lexicon">
+					<aui:nav collapsible="<%= false %>" cssClass="navbar-nav">
 						<aui:nav-item label="details" selected="<%= true %>" />
 					</aui:nav>
 				</aui:nav-bar>
@@ -83,8 +83,8 @@ request.removeAttribute(WebKeys.SEARCH_CONTAINER_RESULT_ROW);
 					<h4><%= HtmlUtil.escape(group.getDescriptiveName()) %></h4>
 				</div>
 
-				<aui:nav-bar markupView="lexicon">
-					<aui:nav cssClass="navbar-nav">
+				<aui:nav-bar cssClass="navbar-no-collapse" markupView="lexicon">
+					<aui:nav collapsible="<%= false %>" cssClass="navbar-nav">
 						<portlet:renderURL var="mainURL" />
 
 						<aui:nav-item href="<%= mainURL.toString() %>" label="details" selected="<%= true %>" />
@@ -121,6 +121,7 @@ request.removeAttribute(WebKeys.SEARCH_CONTAINER_RESULT_ROW);
 					PortletURL assignMembersURL = PortalUtil.getControlPanelPortletURL(request, portletId, PortletRequest.RENDER_PHASE);
 
 					assignMembersURL.setParameter("redirect", currentURL);
+					assignMembersURL.setParameter("groupId", String.valueOf(group.getGroupId()));
 					%>
 
 					<c:if test="<%= siteAdminDisplayContext.getUsersCount(group) > 0 %>">
@@ -187,8 +188,8 @@ request.removeAttribute(WebKeys.SEARCH_CONTAINER_RESULT_ROW);
 			<h4><liferay-ui:message arguments="<%= groups.size() %>" key="x-items-are-selected" /></h4>
 		</div>
 
-		<aui:nav-bar>
-			<aui:nav cssClass="navbar-nav">
+		<aui:nav-bar cssClass="navbar-no-collapse" markupView="lexicon">
+			<aui:nav collapsible="<%= false %>" cssClass="navbar-nav">
 				<aui:nav-item label="details" selected="<%= true %>" />
 			</aui:nav>
 		</aui:nav-bar>

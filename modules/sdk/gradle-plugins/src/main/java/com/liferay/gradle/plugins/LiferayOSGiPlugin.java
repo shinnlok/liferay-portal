@@ -22,6 +22,7 @@ import com.liferay.gradle.plugins.extensions.LiferayExtension;
 import com.liferay.gradle.plugins.extensions.LiferayOSGiExtension;
 import com.liferay.gradle.plugins.internal.AlloyTaglibDefaultsPlugin;
 import com.liferay.gradle.plugins.internal.CSSBuilderDefaultsPlugin;
+import com.liferay.gradle.plugins.internal.DBSupportDefaultsPlugin;
 import com.liferay.gradle.plugins.internal.EclipseDefaultsPlugin;
 import com.liferay.gradle.plugins.internal.IdeaDefaultsPlugin;
 import com.liferay.gradle.plugins.internal.JSModuleConfigGeneratorDefaultsPlugin;
@@ -312,6 +313,27 @@ public class LiferayOSGiPlugin implements Plugin<Project> {
 
 				@Override
 				public void execute(Task task) {
+					Logger logger = task.getLogger();
+					Project project = task.getProject();
+
+					project.delete("liferay/logs");
+
+					File liferayDir = project.file("liferay");
+
+					boolean deleted = liferayDir.delete();
+
+					if (!deleted && logger.isInfoEnabled()) {
+						logger.info("Unable to delete " + liferayDir);
+					}
+				}
+
+			});
+
+		directDeployTask.doLast(
+			new Action<Task>() {
+
+				@Override
+				public void execute(Task task) {
 					DirectDeployTask directDeployTask = (DirectDeployTask)task;
 
 					Project project = directDeployTask.getProject();
@@ -590,6 +612,7 @@ public class LiferayOSGiPlugin implements Plugin<Project> {
 
 		AlloyTaglibDefaultsPlugin.INSTANCE.apply(project);
 		CSSBuilderDefaultsPlugin.INSTANCE.apply(project);
+		DBSupportDefaultsPlugin.INSTANCE.apply(project);
 		EclipseDefaultsPlugin.INSTANCE.apply(project);
 		IdeaDefaultsPlugin.INSTANCE.apply(project);
 		JSModuleConfigGeneratorDefaultsPlugin.INSTANCE.apply(project);

@@ -111,8 +111,22 @@ public class LayoutSetLocalServiceWrapper implements LayoutSetLocalService,
 
 	@Override
 	public com.liferay.portal.kernel.model.LayoutSet fetchLayoutSet(
+		long groupId, boolean privateLayout) {
+		return _layoutSetLocalService.fetchLayoutSet(groupId, privateLayout);
+	}
+
+	@Override
+	public com.liferay.portal.kernel.model.LayoutSet fetchLayoutSet(
 		long layoutSetId) {
 		return _layoutSetLocalService.fetchLayoutSet(layoutSetId);
+	}
+
+	@Override
+	public com.liferay.portal.kernel.model.LayoutSet fetchLayoutSetByLogoId(
+		boolean privateLayout, long logoId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _layoutSetLocalService.fetchLayoutSetByLogoId(privateLayout,
+			logoId);
 	}
 
 	@Override

@@ -186,6 +186,17 @@ if (portletTitleBasedNavigation) {
 					</div>
 				</aui:fieldset>
 
+				<liferay-ui:custom-attributes-available className="<%= KBArticle.class.getName() %>">
+					<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="custom-fields">
+						<liferay-ui:custom-attribute-list
+							className="<%= KBArticle.class.getName() %>"
+							classPK="<%= (kbArticle != null) ? kbArticle.getKbArticleId() : 0 %>"
+							editable="<%= true %>"
+							label="<%= true %>"
+						/>
+					</aui:fieldset>
+				</liferay-ui:custom-attributes-available>
+
 				<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="categorization">
 					<liferay-asset:asset-categories-selector className="<%= KBArticle.class.getName() %>" classPK="<%= (kbArticle != null) ? kbArticle.getClassPK() : 0 %>" />
 
@@ -286,15 +297,7 @@ if (portletTitleBasedNavigation) {
 			var customUrl = urlTitleInput.getAttribute('data-customUrl');
 
 			if (customUrl === 'false') {
-				html = html.replace(/[^a-zA-Z0-9_-]/g, '-');
-
-				if (html[0] === '-') {
-					html = html.replace(/^-+/, '');
-				}
-
-				html = html.replace(/--+/g, '-');
-
-				urlTitleInput.value = html.toLowerCase();
+				urlTitleInput.value = Liferay.Util.normalizeFriendlyURL(html);
 			}
 		}
 	</c:if>

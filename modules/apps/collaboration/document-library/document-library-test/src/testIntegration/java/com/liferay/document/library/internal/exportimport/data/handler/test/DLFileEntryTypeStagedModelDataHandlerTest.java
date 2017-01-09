@@ -28,7 +28,6 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.Sync;
 import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
-import com.liferay.portal.kernel.test.rule.TransactionalTestRule;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
@@ -57,8 +56,7 @@ public class DLFileEntryTypeStagedModelDataHandlerTest
 	public static final AggregateTestRule aggregateTestRule =
 		new AggregateTestRule(
 			new LiferayIntegrationTestRule(),
-			SynchronousDestinationTestRule.INSTANCE,
-			TransactionalTestRule.INSTANCE);
+			SynchronousDestinationTestRule.INSTANCE);
 
 	@Override
 	protected Map<String, List<StagedModel>> addDependentStagedModelsMap(
@@ -153,14 +151,14 @@ public class DLFileEntryTypeStagedModelDataHandlerTest
 		super.validateImportedStagedModel(stagedModel, importedStagedModel);
 
 		DLFileEntryType dlFileEntryType = (DLFileEntryType)stagedModel;
-		DLFileEntryType importedDlFileEntryType =
+		DLFileEntryType importedDLFileEntryType =
 			(DLFileEntryType)importedStagedModel;
 
 		Assert.assertEquals(
-			dlFileEntryType.getName(), importedDlFileEntryType.getName());
+			dlFileEntryType.getName(), importedDLFileEntryType.getName());
 		Assert.assertEquals(
 			dlFileEntryType.getDescription(),
-			importedDlFileEntryType.getDescription());
+			importedDLFileEntryType.getDescription());
 	}
 
 }

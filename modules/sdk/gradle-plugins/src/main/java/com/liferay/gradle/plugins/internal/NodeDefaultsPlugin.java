@@ -16,6 +16,7 @@ package com.liferay.gradle.plugins.internal;
 
 import com.liferay.gradle.plugins.BaseDefaultsPlugin;
 import com.liferay.gradle.plugins.internal.util.GradleUtil;
+import com.liferay.gradle.plugins.node.NodeExtension;
 import com.liferay.gradle.plugins.node.NodePlugin;
 import com.liferay.gradle.plugins.node.tasks.ExecuteNodeTask;
 import com.liferay.gradle.plugins.node.tasks.ExecuteNpmTask;
@@ -37,6 +38,7 @@ public class NodeDefaultsPlugin extends BaseDefaultsPlugin<NodePlugin> {
 
 	@Override
 	protected void configureDefaults(Project project, NodePlugin nodePlugin) {
+		_configureNode(project);
 		_configureTasksExecuteNpm(project);
 		_configureTasksNpmInstall(project);
 		_configureTasksPublishNodeModule(project);
@@ -50,6 +52,20 @@ public class NodeDefaultsPlugin extends BaseDefaultsPlugin<NodePlugin> {
 	private NodeDefaultsPlugin() {
 	}
 
+	private void _configureNode(Project project) {
+		NodeExtension nodeExtension = GradleUtil.getExtension(
+			project, NodeExtension.class);
+
+		nodeExtension.setNodeVersion(_NODE_VERSION);
+
+		String npmArgs = GradleUtil.getProperty(
+			project, "nodejs.npm.args", (String)null);
+
+		if (Validator.isNotNull(npmArgs)) {
+			nodeExtension.npmArgs((Object[])npmArgs.split("\\s+"));
+		}
+	}
+
 	private void _configureTaskExecuteNpm(ExecuteNpmTask executeNpmTask) {
 		String registry = GradleUtil.getProperty(
 			executeNpmTask.getProject(), "nodejs.npm.registry", (String)null);
@@ -61,14 +77,6 @@ public class NodeDefaultsPlugin extends BaseDefaultsPlugin<NodePlugin> {
 
 	private void _configureTaskNpmInstall(NpmInstallTask npmInstallTask) {
 		Project project = npmInstallTask.getProject();
-
-		String removeShrinkwrappedUrls = GradleUtil.getProperty(
-			project, "nodejs.npm.remove.shrinkwrapped.urls", (String)null);
-
-		if (Validator.isNotNull(removeShrinkwrappedUrls)) {
-			npmInstallTask.setRemoveShrinkwrappedUrls(
-				Boolean.parseBoolean(removeShrinkwrappedUrls));
-		}
 
 		String sassBinarySite = GradleUtil.getProperty(
 			project, "nodejs.npm.sass.binary.site", (String)null);
@@ -192,6 +200,8 @@ public class NodeDefaultsPlugin extends BaseDefaultsPlugin<NodePlugin> {
 
 		executeNodeTask.args(key + value);
 	}
+
+	private static final String _NODE_VERSION = "6.6.0";
 
 	private static final String _SASS_BINARY_SITE_ARG = "--sass-binary-site=";
 

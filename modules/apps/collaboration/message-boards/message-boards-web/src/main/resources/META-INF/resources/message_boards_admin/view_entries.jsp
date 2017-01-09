@@ -32,6 +32,8 @@ PortletURL portletURL = (PortletURL)request.getAttribute("view.jsp-portletURL");
 if (groupThreadsUserId > 0) {
 	portletURL.setParameter("groupThreadsUserId", String.valueOf(groupThreadsUserId));
 }
+
+boolean portletTitleBasedNavigation = GetterUtil.getBoolean(portletConfig.getInitParameter("portlet-title-based-navigation"));
 %>
 
 <div class="container-fluid-1280 view-entries-container">
@@ -62,10 +64,12 @@ if (groupThreadsUserId > 0) {
 		</portlet:renderURL>
 
 		<%
-		portletDisplay.setShowBackIcon(true);
-		portletDisplay.setURLBack(backURL.toString());
+		if (portletTitleBasedNavigation) {
+			portletDisplay.setShowBackIcon(true);
+			portletDisplay.setURLBack(backURL.toString());
 
-		renderResponse.setTitle(category.getName());
+			renderResponse.setTitle(category.getName());
+		}
 		%>
 
 	</c:if>
@@ -127,7 +131,7 @@ if (groupThreadsUserId > 0) {
 							</h5>
 
 							<%
-							int subcategoriesCount = MBCategoryServiceUtil.getCategoriesCount(scopeGroupId, curCategory.getCategoryId());
+							int subcategoriesCount = MBCategoryServiceUtil.getCategoriesCount(scopeGroupId, curCategory.getCategoryId(), WorkflowConstants.STATUS_APPROVED);
 							int threadsCount = MBThreadServiceUtil.getThreadsCount(scopeGroupId, curCategory.getCategoryId(), WorkflowConstants.STATUS_APPROVED);
 							%>
 
@@ -232,10 +236,6 @@ if (groupThreadsUserId > 0) {
 									<aui:icon cssClass="icon-monospaced" image="question-circle" markupView="lexicon" message="question" />
 								</c:if>
 							</h4>
-
-							<%
-							boolean portletTitleBasedNavigation = GetterUtil.getBoolean(portletConfig.getInitParameter("portlet-title-based-navigation"));
-							%>
 
 							<c:if test="<%= portletTitleBasedNavigation || !message.isApproved() %>">
 								<span class="h6">

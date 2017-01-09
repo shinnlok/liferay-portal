@@ -22,12 +22,12 @@ import com.liferay.portal.kernel.service.permission.ModelPermissions;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
-import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.util.PrefsPropsUtil;
+import com.liferay.portal.spring.extender.service.ServiceReference;
+import com.liferay.shopping.configuration.ShoppingFileUploadsConfiguration;
 import com.liferay.shopping.exception.DuplicateItemFieldNameException;
 import com.liferay.shopping.exception.DuplicateItemSKUException;
 import com.liferay.shopping.exception.ItemLargeImageNameException;
@@ -73,7 +73,7 @@ public class ShoppingItemLocalServiceImpl
 
 		// Item
 
-		User user = userPersistence.findByPrimaryKey(userId);
+		User user = userLocalService.getUser(userId);
 		sku = StringUtil.toUpperCase(sku.trim());
 
 		byte[] smallImageBytes = null;
@@ -467,7 +467,7 @@ public class ShoppingItemLocalServiceImpl
 
 		ShoppingItem item = shoppingItemPersistence.findByPrimaryKey(itemId);
 
-		User user = userPersistence.findByPrimaryKey(userId);
+		User user = userLocalService.getUser(userId);
 		categoryId = getCategory(item, categoryId);
 		sku = StringUtil.toUpperCase(sku.trim());
 
@@ -702,8 +702,8 @@ public class ShoppingItemLocalServiceImpl
 			}
 		}
 
-		String[] imageExtensions = PrefsPropsUtil.getStringArray(
-			PropsKeys.SHOPPING_IMAGE_EXTENSIONS, StringPool.COMMA);
+		String[] imageExtensions =
+			_shoppingFileUploadsConfiguration.imageExtensions();
 
 		// Small image
 
@@ -717,8 +717,7 @@ public class ShoppingItemLocalServiceImpl
 
 				for (String imageExtension : imageExtensions) {
 					if (StringPool.STAR.equals(imageExtension) ||
-						StringUtil.endsWith(
-							smallImageName, imageExtension)) {
+						StringUtil.endsWith(smallImageName, imageExtension)) {
 
 						validSmallImageExtension = true;
 
@@ -731,8 +730,8 @@ public class ShoppingItemLocalServiceImpl
 				}
 			}
 
-			long smallImageMaxSize = PrefsPropsUtil.getLong(
-				PropsKeys.SHOPPING_IMAGE_SMALL_MAX_SIZE);
+			long smallImageMaxSize =
+				_shoppingFileUploadsConfiguration.smallImageMaxSize();
 
 			if ((smallImageMaxSize > 0) &&
 				((smallImageBytes == null) ||
@@ -754,8 +753,7 @@ public class ShoppingItemLocalServiceImpl
 
 				for (String imageExtension : imageExtensions) {
 					if (StringPool.STAR.equals(imageExtension) ||
-						StringUtil.endsWith(
-							mediumImageName, imageExtension)) {
+						StringUtil.endsWith(mediumImageName, imageExtension)) {
 
 						validMediumImageExtension = true;
 
@@ -768,8 +766,8 @@ public class ShoppingItemLocalServiceImpl
 				}
 			}
 
-			long mediumImageMaxSize = PrefsPropsUtil.getLong(
-				PropsKeys.SHOPPING_IMAGE_MEDIUM_MAX_SIZE);
+			long mediumImageMaxSize =
+				_shoppingFileUploadsConfiguration.mediumImageMaxSize();
 
 			if ((mediumImageMaxSize > 0) &&
 				((mediumImageBytes == null) ||
@@ -794,8 +792,7 @@ public class ShoppingItemLocalServiceImpl
 
 			for (String imageExtension : imageExtensions) {
 				if (StringPool.STAR.equals(imageExtension) ||
-					StringUtil.endsWith(
-						largeImageName, imageExtension)) {
+					StringUtil.endsWith(largeImageName, imageExtension)) {
 
 					validLargeImageExtension = true;
 
@@ -808,8 +805,8 @@ public class ShoppingItemLocalServiceImpl
 			}
 		}
 
-		long largeImageMaxSize = PrefsPropsUtil.getLong(
-			PropsKeys.SHOPPING_IMAGE_LARGE_MAX_SIZE);
+		long largeImageMaxSize =
+			_shoppingFileUploadsConfiguration.largeImageMaxSize();
 
 		if ((largeImageMaxSize > 0) &&
 			((largeImageBytes == null) ||
@@ -818,5 +815,8 @@ public class ShoppingItemLocalServiceImpl
 			throw new ItemLargeImageSizeException();
 		}
 	}
+
+	@ServiceReference(type = ShoppingFileUploadsConfiguration.class)
+	private ShoppingFileUploadsConfiguration _shoppingFileUploadsConfiguration;
 
 }

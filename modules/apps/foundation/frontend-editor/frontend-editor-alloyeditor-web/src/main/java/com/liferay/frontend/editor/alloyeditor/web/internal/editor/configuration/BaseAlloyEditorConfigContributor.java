@@ -50,10 +50,14 @@ public class BaseAlloyEditorConfigContributor
 		jsonObject.put(
 			"contentsLanguage", contentsLanguageId.replace("iw_", "he_"));
 
+		jsonObject.put("disableNativeSpellChecker", Boolean.FALSE);
+
 		jsonObject.put(
 			"extraPlugins",
 			"ae_autolink,ae_dragresize,ae_addimages,ae_placeholder," +
 				"ae_selectionregion,ae_tableresize,ae_tabletools,ae_uicore");
+
+		jsonObject.put("imageScaleResize", "scale");
 
 		String languageId = getLanguageId(themeDisplay);
 

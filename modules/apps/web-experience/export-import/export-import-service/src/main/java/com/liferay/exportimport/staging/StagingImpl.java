@@ -14,6 +14,8 @@
 
 package com.liferay.exportimport.staging;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.document.library.kernel.exception.DuplicateFileEntryException;
 import com.liferay.document.library.kernel.exception.FileExtensionException;
 import com.liferay.document.library.kernel.exception.FileNameException;
@@ -160,6 +162,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(immediate = true)
 @DoPrivileged
+@ProviderType
 public class StagingImpl implements Staging {
 
 	@Override
@@ -2464,6 +2467,12 @@ public class StagingImpl implements Staging {
 			return masterLayoutBranch.getLayoutBranchId();
 		}
 		catch (NoSuchLayoutBranchException nslbe) {
+
+			// LPS-52675
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(nslbe, nslbe);
+			}
 		}
 
 		return 0;
@@ -2495,6 +2504,12 @@ public class StagingImpl implements Staging {
 				layoutBranchId = layoutBranch.getLayoutBranchId();
 			}
 			catch (NoSuchLayoutBranchException nslbe) {
+
+				// LPS-52675
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(nslbe, nslbe);
+				}
 			}
 		}
 
@@ -2509,6 +2524,12 @@ public class StagingImpl implements Staging {
 				}
 			}
 			catch (NoSuchLayoutRevisionException nslre) {
+
+				// LPS-52675
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(nslre, nslre);
+				}
 			}
 		}
 
@@ -2967,6 +2988,13 @@ public class StagingImpl implements Staging {
 			}
 		}
 		catch (NoSuchGroupException nsge) {
+
+			// LPS-52675
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(nsge, nsge);
+			}
+
 			RemoteExportException ree = new RemoteExportException(
 				RemoteExportException.NO_GROUP);
 
@@ -2975,6 +3003,13 @@ public class StagingImpl implements Staging {
 			throw ree;
 		}
 		catch (PrincipalException pe) {
+
+			// LPS-52675
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(pe, pe);
+			}
+
 			RemoteExportException ree = new RemoteExportException(
 				RemoteExportException.NO_PERMISSIONS);
 
@@ -2983,11 +3018,25 @@ public class StagingImpl implements Staging {
 			throw ree;
 		}
 		catch (RemoteAuthException rae) {
+
+			// LPS-52675
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(rae, rae);
+			}
+
 			rae.setURL(remoteURL);
 
 			throw rae;
 		}
 		catch (SystemException se) {
+
+			// LPS-52675
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(se, se);
+			}
+
 			RemoteExportException ree = new RemoteExportException(
 				RemoteExportException.BAD_CONNECTION, se.getMessage());
 

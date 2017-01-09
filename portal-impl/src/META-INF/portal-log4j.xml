@@ -132,6 +132,10 @@
 		<priority value="ERROR" />
 	</category>
 
+	<category name="com.liferay.portal.dao.orm.hibernate.VerifySessionFactoryWrapper">
+		<priority value="FATAL" />
+	</category>
+
 	<category name="com.liferay.portal.deploy">
 		<priority value="INFO" />
 	</category>
@@ -956,14 +960,6 @@
 		<priority value="ERROR" />
 	</category>
 
-	<category name="com.liferay.portlet.blogs.service.impl.BlogsEntryLocalServiceImpl">
-		<priority value="INFO" />
-	</category>
-
-	<category name="com.liferay.portlet.blogs.util">
-		<priority value="INFO" />
-	</category>
-
 	<category name="com.liferay.portlet.documentlibrary.lar">
 		<priority value="WARN" />
 	</category>
@@ -1038,10 +1034,6 @@
 
 	<category name="com.liferay.sampletest">
 		<priority value="INFO" />
-	</category>
-
-	<category name="com.liferay.taglib.util.IncludeTag">
-		<priority value="WARN" />
 	</category>
 
 	<category name="com.liferay.testhook">

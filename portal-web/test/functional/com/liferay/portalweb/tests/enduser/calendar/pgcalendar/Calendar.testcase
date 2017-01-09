@@ -1,5 +1,6 @@
 <definition component-name="portal-calendar">
 	<property name="portal.release" value="true" />
+	<property name="portal.upstream" value="true" />
 	<property name="custom.properties" value="default.layout.template.id=1_column${line.separator}company.default.time.zone=America/Los_Angeles" />
 	<property name="testray.main.component.name" value="Calendar" />
 
@@ -409,7 +410,6 @@
 
 		<execute macro="CalendarEvent#addRSVP">
 			<var name="eventTitle" value="Calendar Event All Day Title" />
-			<var name="eventType" value="All Day" />
 			<var name="rsvp" value="Yes" />
 		</execute>
 
@@ -922,7 +922,6 @@
 
 		<execute macro="CalendarEvent#addRSVP">
 			<var name="eventTitle" value="Calendar Event Regular Title" />
-			<var name="eventType" value="Regular" />
 			<var name="rsvp" value="Yes" />
 		</execute>
 
@@ -1299,7 +1298,6 @@
 
 		<execute macro="CalendarEvent#addRSVP">
 			<var name="eventTitle" value="Calendar Event Repeating Title" />
-			<var name="eventType" value="Repeating" />
 			<var name="rsvp" value="Yes" />
 		</execute>
 
@@ -4087,6 +4085,9 @@
 	</command>
 
 	<command name="SearchForOtherCalendars" priority="5">
+		<property name="portal.acceptance" value="pending" />
+		<property name="test.name.skip.portal.instance" value="Calendar#SearchForOtherCalendars" />
+
 		<execute macro="TestCase#getSiteName">
 			<return from="siteName" name="siteName" />
 			<var name="siteName" value="${siteName}" />
@@ -4147,6 +4148,10 @@
 			<var name="calendarName" value="userfn userln" />
 			<var name="eventTitle" value="User Calendar Event 1" />
 			<var name="eventType" value="Regular" />
+		</execute>
+
+		<execute macro="Navigator#gotoPage">
+			<var name="pageName" value="Calendar Page" />
 		</execute>
 
 		<execute macro="CalendarNavigator#gotoAddEvent" />
@@ -4671,6 +4676,32 @@
 
 		<execute macro="Calendar#viewWeekCountViaMonthView">
 			<var name="weekNumber" value="6" />
+		</execute>
+	</command>
+
+	<command name="ViewCreatedEventVisibleOnScheduler" priority="2">
+		<description message="This is a use case for LPS-67400." />
+
+		<execute macro="CalendarNavigator#gotoAddEvent" />
+
+		<var locator="CalendarEditEvent#END_DATE_TIME" name="endDateTime" />
+		<var locator="CalendarEditEvent#START_DATE_TIME" name="startDateTime" />
+
+		<execute macro="CalendarEvent#viewTimes">
+			<var name="endDateTime" value="${endDateTime}" />
+			<var name="startDateTime" value="${startDateTime}" />
+		</execute>
+
+		<execute macro="CalendarEvent#editTitle">
+			<var name="eventTitle" value="Calendar Event" />
+		</execute>
+
+		<execute macro="CalendarEvent#publish" />
+
+		<execute macro="IFrame#closeFrame" />
+
+		<execute macro="CalendarScheduler#selectSpecificEvent">
+			<var name="eventTitle" value="Calendar Event" />
 		</execute>
 	</command>
 
@@ -5204,10 +5235,6 @@
 
 		<execute macro="MyAccount#configureDisplaySettingsLanguage">
 			<var name="languageName" value="español (España)" />
-			<var name="languagePageDisplayMessage" value="Mostrar la página en español (España)." />
-			<var name="myAccount" value="My Account" />
-			<var name="saveButton" value="Save" />
-			<var name="successMessage" value="Su petición ha terminado con éxito." />
 		</execute>
 
 		<execute macro="Navigator#gotoPage">
@@ -5232,10 +5259,8 @@
 		<execute macro="MyAccount#configureDisplaySettingsLanguageLocalized">
 			<var name="category" value="Mi cuenta" />
 			<var name="languageName" value="English (United States)" />
-			<var name="languagePageDisplayMessage" value="Display the page in English (United States)." />
 			<var name="portlet" value="Mi cuenta" />
 			<var name="saveButton" value="Guardar" />
-			<var name="successMessage" value="Your request completed successfully." />
 		</execute>
 	</command>
 

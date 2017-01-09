@@ -3531,7 +3531,7 @@ public class GroupPersistenceImpl extends BasePersistenceImpl<Group>
 	 * Returns the group where companyId = &#63; and friendlyURL = &#63; or throws a {@link NoSuchGroupException} if it could not be found.
 	 *
 	 * @param companyId the company ID
-	 * @param friendlyURL the friendly u r l
+	 * @param friendlyURL the friendly url
 	 * @return the matching group
 	 * @throws NoSuchGroupException if a matching group could not be found
 	 */
@@ -3567,7 +3567,7 @@ public class GroupPersistenceImpl extends BasePersistenceImpl<Group>
 	 * Returns the group where companyId = &#63; and friendlyURL = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
 	 *
 	 * @param companyId the company ID
-	 * @param friendlyURL the friendly u r l
+	 * @param friendlyURL the friendly url
 	 * @return the matching group, or <code>null</code> if a matching group could not be found
 	 */
 	@Override
@@ -3579,7 +3579,7 @@ public class GroupPersistenceImpl extends BasePersistenceImpl<Group>
 	 * Returns the group where companyId = &#63; and friendlyURL = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
 	 *
 	 * @param companyId the company ID
-	 * @param friendlyURL the friendly u r l
+	 * @param friendlyURL the friendly url
 	 * @param retrieveFromCache whether to retrieve from the finder cache
 	 * @return the matching group, or <code>null</code> if a matching group could not be found
 	 */
@@ -3685,7 +3685,7 @@ public class GroupPersistenceImpl extends BasePersistenceImpl<Group>
 	 * Removes the group where companyId = &#63; and friendlyURL = &#63; from the database.
 	 *
 	 * @param companyId the company ID
-	 * @param friendlyURL the friendly u r l
+	 * @param friendlyURL the friendly url
 	 * @return the group that was removed
 	 */
 	@Override
@@ -3700,7 +3700,7 @@ public class GroupPersistenceImpl extends BasePersistenceImpl<Group>
 	 * Returns the number of groups where companyId = &#63; and friendlyURL = &#63;.
 	 *
 	 * @param companyId the company ID
-	 * @param friendlyURL the friendly u r l
+	 * @param friendlyURL the friendly url
 	 * @return the number of matching groups
 	 */
 	@Override
@@ -4867,7 +4867,7 @@ public class GroupPersistenceImpl extends BasePersistenceImpl<Group>
 	 * Returns all the groups where classNameId = &#63; and classPK = &#63;.
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @return the matching groups
 	 */
 	@Override
@@ -4884,7 +4884,7 @@ public class GroupPersistenceImpl extends BasePersistenceImpl<Group>
 	 * </p>
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param start the lower bound of the range of groups
 	 * @param end the upper bound of the range of groups (not inclusive)
 	 * @return the range of matching groups
@@ -4903,7 +4903,7 @@ public class GroupPersistenceImpl extends BasePersistenceImpl<Group>
 	 * </p>
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param start the lower bound of the range of groups
 	 * @param end the upper bound of the range of groups (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -4924,7 +4924,7 @@ public class GroupPersistenceImpl extends BasePersistenceImpl<Group>
 	 * </p>
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param start the lower bound of the range of groups
 	 * @param end the upper bound of the range of groups (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -5047,7 +5047,7 @@ public class GroupPersistenceImpl extends BasePersistenceImpl<Group>
 	 * Returns the first group in the ordered set where classNameId = &#63; and classPK = &#63;.
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching group
 	 * @throws NoSuchGroupException if a matching group could not be found
@@ -5080,7 +5080,7 @@ public class GroupPersistenceImpl extends BasePersistenceImpl<Group>
 	 * Returns the first group in the ordered set where classNameId = &#63; and classPK = &#63;.
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching group, or <code>null</code> if a matching group could not be found
 	 */
@@ -5101,7 +5101,7 @@ public class GroupPersistenceImpl extends BasePersistenceImpl<Group>
 	 * Returns the last group in the ordered set where classNameId = &#63; and classPK = &#63;.
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching group
 	 * @throws NoSuchGroupException if a matching group could not be found
@@ -5134,7 +5134,7 @@ public class GroupPersistenceImpl extends BasePersistenceImpl<Group>
 	 * Returns the last group in the ordered set where classNameId = &#63; and classPK = &#63;.
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching group, or <code>null</code> if a matching group could not be found
 	 */
@@ -5162,7 +5162,7 @@ public class GroupPersistenceImpl extends BasePersistenceImpl<Group>
 	 *
 	 * @param groupId the primary key of the current group
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next group
 	 * @throws NoSuchGroupException if a group with the primary key could not be found
@@ -5312,7 +5312,7 @@ public class GroupPersistenceImpl extends BasePersistenceImpl<Group>
 	 * Removes all the groups where classNameId = &#63; and classPK = &#63; from the database.
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 */
 	@Override
 	public void removeByC_CPK(long classNameId, long classPK) {
@@ -5326,7 +5326,7 @@ public class GroupPersistenceImpl extends BasePersistenceImpl<Group>
 	 * Returns the number of groups where classNameId = &#63; and classPK = &#63;.
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @return the number of matching groups
 	 */
 	@Override
@@ -6341,7 +6341,7 @@ public class GroupPersistenceImpl extends BasePersistenceImpl<Group>
 	 *
 	 * @param companyId the company ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @return the matching group
 	 * @throws NoSuchGroupException if a matching group could not be found
 	 */
@@ -6381,7 +6381,7 @@ public class GroupPersistenceImpl extends BasePersistenceImpl<Group>
 	 *
 	 * @param companyId the company ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @return the matching group, or <code>null</code> if a matching group could not be found
 	 */
 	@Override
@@ -6394,7 +6394,7 @@ public class GroupPersistenceImpl extends BasePersistenceImpl<Group>
 	 *
 	 * @param companyId the company ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @param retrieveFromCache whether to retrieve from the finder cache
 	 * @return the matching group, or <code>null</code> if a matching group could not be found
 	 */
@@ -6492,7 +6492,7 @@ public class GroupPersistenceImpl extends BasePersistenceImpl<Group>
 	 *
 	 * @param companyId the company ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @return the group that was removed
 	 */
 	@Override
@@ -6508,7 +6508,7 @@ public class GroupPersistenceImpl extends BasePersistenceImpl<Group>
 	 *
 	 * @param companyId the company ID
 	 * @param classNameId the class name ID
-	 * @param classPK the class p k
+	 * @param classPK the class pk
 	 * @return the number of matching groups
 	 */
 	@Override
@@ -9488,7 +9488,7 @@ public class GroupPersistenceImpl extends BasePersistenceImpl<Group>
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((GroupModelImpl)group);
+		clearUniqueFindersCache((GroupModelImpl)group, true);
 	}
 
 	@Override
@@ -9500,185 +9500,90 @@ public class GroupPersistenceImpl extends BasePersistenceImpl<Group>
 			entityCache.removeResult(GroupModelImpl.ENTITY_CACHE_ENABLED,
 				GroupImpl.class, group.getPrimaryKey());
 
-			clearUniqueFindersCache((GroupModelImpl)group);
+			clearUniqueFindersCache((GroupModelImpl)group, true);
 		}
 	}
 
-	protected void cacheUniqueFindersCache(GroupModelImpl groupModelImpl,
-		boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					groupModelImpl.getUuid(), groupModelImpl.getGroupId()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
-				groupModelImpl);
-
-			args = new Object[] { groupModelImpl.getLiveGroupId() };
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_LIVEGROUPID, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_LIVEGROUPID, args,
-				groupModelImpl);
-
-			args = new Object[] {
-					groupModelImpl.getCompanyId(), groupModelImpl.getGroupKey()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_C_GK, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_C_GK, args,
-				groupModelImpl);
-
-			args = new Object[] {
-					groupModelImpl.getCompanyId(),
-					groupModelImpl.getFriendlyURL()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_C_F, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_C_F, args, groupModelImpl);
-
-			args = new Object[] {
-					groupModelImpl.getCompanyId(),
-					groupModelImpl.getClassNameId(), groupModelImpl.getClassPK()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_C_C_C, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_C_C_C, args,
-				groupModelImpl);
-
-			args = new Object[] {
-					groupModelImpl.getCompanyId(),
-					groupModelImpl.getLiveGroupId(),
-					groupModelImpl.getGroupKey()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_C_L_GK, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_C_L_GK, args,
-				groupModelImpl);
-
-			args = new Object[] {
-					groupModelImpl.getCompanyId(),
-					groupModelImpl.getClassNameId(),
-					groupModelImpl.getLiveGroupId(),
-					groupModelImpl.getGroupKey()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_C_C_L_GK, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_C_C_L_GK, args,
-				groupModelImpl);
-		}
-		else {
-			if ((groupModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						groupModelImpl.getUuid(), groupModelImpl.getGroupId()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
-					groupModelImpl);
-			}
-
-			if ((groupModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_LIVEGROUPID.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] { groupModelImpl.getLiveGroupId() };
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_LIVEGROUPID, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_LIVEGROUPID, args,
-					groupModelImpl);
-			}
-
-			if ((groupModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_C_GK.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						groupModelImpl.getCompanyId(),
-						groupModelImpl.getGroupKey()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_C_GK, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_C_GK, args,
-					groupModelImpl);
-			}
-
-			if ((groupModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_C_F.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						groupModelImpl.getCompanyId(),
-						groupModelImpl.getFriendlyURL()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_C_F, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_C_F, args,
-					groupModelImpl);
-			}
-
-			if ((groupModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_C_C_C.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						groupModelImpl.getCompanyId(),
-						groupModelImpl.getClassNameId(),
-						groupModelImpl.getClassPK()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_C_C_C, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_C_C_C, args,
-					groupModelImpl);
-			}
-
-			if ((groupModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_C_L_GK.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						groupModelImpl.getCompanyId(),
-						groupModelImpl.getLiveGroupId(),
-						groupModelImpl.getGroupKey()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_C_L_GK, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_C_L_GK, args,
-					groupModelImpl);
-			}
-
-			if ((groupModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_C_C_L_GK.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						groupModelImpl.getCompanyId(),
-						groupModelImpl.getClassNameId(),
-						groupModelImpl.getLiveGroupId(),
-						groupModelImpl.getGroupKey()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_C_C_L_GK, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_C_C_L_GK, args,
-					groupModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(GroupModelImpl groupModelImpl) {
+	protected void cacheUniqueFindersCache(GroupModelImpl groupModelImpl) {
 		Object[] args = new Object[] {
 				groupModelImpl.getUuid(), groupModelImpl.getGroupId()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
+			groupModelImpl, false);
+
+		args = new Object[] { groupModelImpl.getLiveGroupId() };
+
+		finderCache.putResult(FINDER_PATH_COUNT_BY_LIVEGROUPID, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_LIVEGROUPID, args,
+			groupModelImpl, false);
+
+		args = new Object[] {
+				groupModelImpl.getCompanyId(), groupModelImpl.getGroupKey()
+			};
+
+		finderCache.putResult(FINDER_PATH_COUNT_BY_C_GK, args, Long.valueOf(1),
+			false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_C_GK, args, groupModelImpl,
+			false);
+
+		args = new Object[] {
+				groupModelImpl.getCompanyId(), groupModelImpl.getFriendlyURL()
+			};
+
+		finderCache.putResult(FINDER_PATH_COUNT_BY_C_F, args, Long.valueOf(1),
+			false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_C_F, args, groupModelImpl,
+			false);
+
+		args = new Object[] {
+				groupModelImpl.getCompanyId(), groupModelImpl.getClassNameId(),
+				groupModelImpl.getClassPK()
+			};
+
+		finderCache.putResult(FINDER_PATH_COUNT_BY_C_C_C, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_C_C_C, args, groupModelImpl,
+			false);
+
+		args = new Object[] {
+				groupModelImpl.getCompanyId(), groupModelImpl.getLiveGroupId(),
+				groupModelImpl.getGroupKey()
+			};
+
+		finderCache.putResult(FINDER_PATH_COUNT_BY_C_L_GK, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_C_L_GK, args,
+			groupModelImpl, false);
+
+		args = new Object[] {
+				groupModelImpl.getCompanyId(), groupModelImpl.getClassNameId(),
+				groupModelImpl.getLiveGroupId(), groupModelImpl.getGroupKey()
+			};
+
+		finderCache.putResult(FINDER_PATH_COUNT_BY_C_C_L_GK, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_C_C_L_GK, args,
+			groupModelImpl, false);
+	}
+
+	protected void clearUniqueFindersCache(GroupModelImpl groupModelImpl,
+		boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					groupModelImpl.getUuid(), groupModelImpl.getGroupId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		}
 
 		if ((groupModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					groupModelImpl.getOriginalUuid(),
 					groupModelImpl.getOriginalGroupId()
 				};
@@ -9687,29 +9592,33 @@ public class GroupPersistenceImpl extends BasePersistenceImpl<Group>
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
 		}
 
-		args = new Object[] { groupModelImpl.getLiveGroupId() };
-
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_LIVEGROUPID, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_LIVEGROUPID, args);
-
-		if ((groupModelImpl.getColumnBitmask() &
-				FINDER_PATH_FETCH_BY_LIVEGROUPID.getColumnBitmask()) != 0) {
-			args = new Object[] { groupModelImpl.getOriginalLiveGroupId() };
+		if (clearCurrent) {
+			Object[] args = new Object[] { groupModelImpl.getLiveGroupId() };
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_LIVEGROUPID, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_LIVEGROUPID, args);
 		}
 
-		args = new Object[] {
-				groupModelImpl.getCompanyId(), groupModelImpl.getGroupKey()
-			};
+		if ((groupModelImpl.getColumnBitmask() &
+				FINDER_PATH_FETCH_BY_LIVEGROUPID.getColumnBitmask()) != 0) {
+			Object[] args = new Object[] { groupModelImpl.getOriginalLiveGroupId() };
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_C_GK, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_C_GK, args);
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_LIVEGROUPID, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_LIVEGROUPID, args);
+		}
+
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					groupModelImpl.getCompanyId(), groupModelImpl.getGroupKey()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_C_GK, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_C_GK, args);
+		}
 
 		if ((groupModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_C_GK.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					groupModelImpl.getOriginalCompanyId(),
 					groupModelImpl.getOriginalGroupKey()
 				};
@@ -9718,16 +9627,19 @@ public class GroupPersistenceImpl extends BasePersistenceImpl<Group>
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_C_GK, args);
 		}
 
-		args = new Object[] {
-				groupModelImpl.getCompanyId(), groupModelImpl.getFriendlyURL()
-			};
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					groupModelImpl.getCompanyId(),
+					groupModelImpl.getFriendlyURL()
+				};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_C_F, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_C_F, args);
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_C_F, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_C_F, args);
+		}
 
 		if ((groupModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_C_F.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					groupModelImpl.getOriginalCompanyId(),
 					groupModelImpl.getOriginalFriendlyURL()
 				};
@@ -9736,17 +9648,19 @@ public class GroupPersistenceImpl extends BasePersistenceImpl<Group>
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_C_F, args);
 		}
 
-		args = new Object[] {
-				groupModelImpl.getCompanyId(), groupModelImpl.getClassNameId(),
-				groupModelImpl.getClassPK()
-			};
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					groupModelImpl.getCompanyId(),
+					groupModelImpl.getClassNameId(), groupModelImpl.getClassPK()
+				};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_C_C_C, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_C_C_C, args);
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_C_C_C, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_C_C_C, args);
+		}
 
 		if ((groupModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_C_C_C.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					groupModelImpl.getOriginalCompanyId(),
 					groupModelImpl.getOriginalClassNameId(),
 					groupModelImpl.getOriginalClassPK()
@@ -9756,17 +9670,20 @@ public class GroupPersistenceImpl extends BasePersistenceImpl<Group>
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_C_C_C, args);
 		}
 
-		args = new Object[] {
-				groupModelImpl.getCompanyId(), groupModelImpl.getLiveGroupId(),
-				groupModelImpl.getGroupKey()
-			};
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					groupModelImpl.getCompanyId(),
+					groupModelImpl.getLiveGroupId(),
+					groupModelImpl.getGroupKey()
+				};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_C_L_GK, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_C_L_GK, args);
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_C_L_GK, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_C_L_GK, args);
+		}
 
 		if ((groupModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_C_L_GK.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					groupModelImpl.getOriginalCompanyId(),
 					groupModelImpl.getOriginalLiveGroupId(),
 					groupModelImpl.getOriginalGroupKey()
@@ -9776,17 +9693,21 @@ public class GroupPersistenceImpl extends BasePersistenceImpl<Group>
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_C_L_GK, args);
 		}
 
-		args = new Object[] {
-				groupModelImpl.getCompanyId(), groupModelImpl.getClassNameId(),
-				groupModelImpl.getLiveGroupId(), groupModelImpl.getGroupKey()
-			};
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					groupModelImpl.getCompanyId(),
+					groupModelImpl.getClassNameId(),
+					groupModelImpl.getLiveGroupId(),
+					groupModelImpl.getGroupKey()
+				};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_C_C_L_GK, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_C_C_L_GK, args);
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_C_C_L_GK, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_C_C_L_GK, args);
+		}
 
 		if ((groupModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_C_C_L_GK.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					groupModelImpl.getOriginalCompanyId(),
 					groupModelImpl.getOriginalClassNameId(),
 					groupModelImpl.getOriginalLiveGroupId(),
@@ -10203,8 +10124,8 @@ public class GroupPersistenceImpl extends BasePersistenceImpl<Group>
 		entityCache.putResult(GroupModelImpl.ENTITY_CACHE_ENABLED,
 			GroupImpl.class, group.getPrimaryKey(), group, false);
 
-		clearUniqueFindersCache(groupModelImpl);
-		cacheUniqueFindersCache(groupModelImpl, isNew);
+		clearUniqueFindersCache(groupModelImpl, false);
+		cacheUniqueFindersCache(groupModelImpl);
 
 		group.resetOriginalValues();
 

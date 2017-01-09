@@ -73,30 +73,30 @@ public class LiferayThemeDefaultsPlugin implements Plugin<Project> {
 	public void apply(Project project) {
 		GradleUtil.applyPlugin(project, LiferayThemePlugin.class);
 
-		applyPlugins(project);
+		_applyPlugins(project);
 
 		// GRADLE-2427
 
-		addTaskInstall(project);
+		_addTaskInstall(project);
 
-		applyConfigScripts(project);
+		_applyConfigScripts(project);
 
 		LiferayOSGiDefaultsPlugin.configureRepositories(project);
 
 		Configuration frontendCSSCommonConfiguration =
-			addConfigurationFrontendCSSCommon(project);
+			_addConfigurationFrontendCSSCommon(project);
 
-		Project frontendThemeStyledProject = getThemeProject(
+		Project frontendThemeStyledProject = _getThemeProject(
 			project, "frontend-theme-styled");
-		Project frontendThemeUnstyledProject = getThemeProject(
+		Project frontendThemeUnstyledProject = _getThemeProject(
 			project, "frontend-theme-unstyled");
 
-		WriteDigestTask writeDigestTask = addTaskWriteParentThemesDigest(
+		WriteDigestTask writeDigestTask = _addTaskWriteParentThemesDigest(
 			project, frontendThemeStyledProject, frontendThemeUnstyledProject);
 
-		Copy expandFrontendCSSCommonTask = addTaskExpandFrontendCSSCommon(
+		Copy expandFrontendCSSCommonTask = _addTaskExpandFrontendCSSCommon(
 			project, frontendCSSCommonConfiguration);
-		final ReplaceRegexTask updateVersionTask = addTaskUpdateVersion(
+		final ReplaceRegexTask updateVersionTask = _addTaskUpdateVersion(
 			project, writeDigestTask);
 
 		File resourcesImporterArchivesDir = project.file(
@@ -104,18 +104,23 @@ public class LiferayThemeDefaultsPlugin implements Plugin<Project> {
 		File resourcesImporterExpandedArchivesDir = project.file(
 			"resources-importer");
 
-		Task zipResourcesImporterArchivesTask = addTaskZipDirectories(
+		Task zipResourcesImporterArchivesTask = _addTaskZipDirectories(
 			project, ZIP_RESOURCES_IMPORTER_ARCHIVES_TASK_NAME,
 			resourcesImporterExpandedArchivesDir, resourcesImporterArchivesDir,
 			"lar");
 
-		configureDeployDir(project);
-		configureProject(project);
+		_configureDeployDir(project);
+		_configureProject(project);
 
-		configureTasksExecuteGulp(
+		_configureTasksExecuteGulp(
 			project, expandFrontendCSSCommonTask,
 			zipResourcesImporterArchivesTask, frontendThemeStyledProject,
 			frontendThemeUnstyledProject);
+
+		GradleUtil.excludeTasksWithProperty(
+			project, LiferayOSGiDefaultsPlugin.SNAPSHOT_IF_STALE_PROPERTY_NAME,
+			true, MavenPlugin.INSTALL_TASK_NAME,
+			BasePlugin.UPLOAD_ARCHIVES_TASK_NAME);
 
 		project.afterEvaluate(
 			new Action<Project>() {
@@ -128,13 +133,13 @@ public class LiferayThemeDefaultsPlugin implements Plugin<Project> {
 					// configureTaskUploadArchives, because the latter one needs
 					// to know if we are publishing a snapshot or not.
 
-					configureTaskUploadArchives(project, updateVersionTask);
+					_configureTaskUploadArchives(project, updateVersionTask);
 				}
 
 			});
 	}
 
-	protected Configuration addConfigurationFrontendCSSCommon(
+	private Configuration _addConfigurationFrontendCSSCommon(
 		final Project project) {
 
 		Configuration configuration = GradleUtil.addConfiguration(
@@ -145,7 +150,7 @@ public class LiferayThemeDefaultsPlugin implements Plugin<Project> {
 
 				@Override
 				public void execute(DependencySet dependencySet) {
-					addDependenciesFrontendCSSCommon(project);
+					_addDependenciesFrontendCSSCommon(project);
 				}
 
 			});
@@ -159,7 +164,7 @@ public class LiferayThemeDefaultsPlugin implements Plugin<Project> {
 		return configuration;
 	}
 
-	protected void addDependenciesFrontendCSSCommon(Project project) {
+	private void _addDependenciesFrontendCSSCommon(Project project) {
 		String version = PortalTools.getVersion(
 			project, _FRONTEND_COMMON_CSS_NAME);
 
@@ -168,7 +173,7 @@ public class LiferayThemeDefaultsPlugin implements Plugin<Project> {
 			_FRONTEND_COMMON_CSS_NAME, version, false);
 	}
 
-	protected Copy addTaskExpandFrontendCSSCommon(
+	private Copy _addTaskExpandFrontendCSSCommon(
 		final Project project,
 		final Configuration frontendCSSCommonConfguration) {
 
@@ -210,7 +215,7 @@ public class LiferayThemeDefaultsPlugin implements Plugin<Project> {
 		return copy;
 	}
 
-	protected Upload addTaskInstall(Project project) {
+	private Upload _addTaskInstall(Project project) {
 		Upload upload = GradleUtil.addTask(
 			project, MavenPlugin.INSTALL_TASK_NAME, Upload.class);
 
@@ -225,7 +230,7 @@ public class LiferayThemeDefaultsPlugin implements Plugin<Project> {
 		return upload;
 	}
 
-	protected ReplaceRegexTask addTaskUpdateVersion(
+	private ReplaceRegexTask _addTaskUpdateVersion(
 		Project project, WriteDigestTask writeParentThemesDigestTask) {
 
 		ReplaceRegexTask replaceRegexTask = GradleUtil.addTask(
@@ -250,7 +255,7 @@ public class LiferayThemeDefaultsPlugin implements Plugin<Project> {
 		return replaceRegexTask;
 	}
 
-	protected WriteDigestTask addTaskWriteParentThemesDigest(
+	private WriteDigestTask _addTaskWriteParentThemesDigest(
 		Project project, Project... parentThemeProjects) {
 
 		WriteDigestTask writeDigestTask = GradleUtil.addTask(
@@ -279,7 +284,7 @@ public class LiferayThemeDefaultsPlugin implements Plugin<Project> {
 		return writeDigestTask;
 	}
 
-	protected Task addTaskZipDirectories(
+	private Task _addTaskZipDirectories(
 		Project project, String taskName, File rootDir, File destinationDir,
 		String extension) {
 
@@ -301,7 +306,7 @@ public class LiferayThemeDefaultsPlugin implements Plugin<Project> {
 
 		if (dirs != null) {
 			for (File dir : dirs) {
-				Zip zip = addTaskZipDirectory(
+				Zip zip = _addTaskZipDirectory(
 					project, GradleUtil.getTaskName(taskName, dir), dir,
 					destinationDir, extension);
 
@@ -312,7 +317,7 @@ public class LiferayThemeDefaultsPlugin implements Plugin<Project> {
 		return task;
 	}
 
-	protected Zip addTaskZipDirectory(
+	private Zip _addTaskZipDirectory(
 		Project project, String taskName, File dir, File destinationDir,
 		String extension) {
 
@@ -330,7 +335,7 @@ public class LiferayThemeDefaultsPlugin implements Plugin<Project> {
 		return zip;
 	}
 
-	protected void applyConfigScripts(Project project) {
+	private void _applyConfigScripts(Project project) {
 		GradleUtil.applyScript(
 			project,
 			"com/liferay/gradle/plugins/defaults/dependencies" +
@@ -338,15 +343,15 @@ public class LiferayThemeDefaultsPlugin implements Plugin<Project> {
 			project);
 	}
 
-	protected void applyPlugins(Project project) {
+	private void _applyPlugins(Project project) {
 		GradleUtil.applyPlugin(project, MavenPlugin.class);
 	}
 
-	protected void configureDeployDir(Project project) {
+	private void _configureDeployDir(Project project) {
 		final LiferayExtension liferayExtension = GradleUtil.getExtension(
 			project, LiferayExtension.class);
 
-		boolean requiredForStartup = getPluginPackageProperty(
+		boolean requiredForStartup = _getPluginPackageProperty(
 			project, "required-for-startup");
 
 		if (requiredForStartup) {
@@ -375,11 +380,11 @@ public class LiferayThemeDefaultsPlugin implements Plugin<Project> {
 		}
 	}
 
-	protected void configureProject(Project project) {
+	private void _configureProject(Project project) {
 		project.setGroup(_GROUP);
 	}
 
-	protected void configureTaskExecuteGulp(
+	private void _configureTaskExecuteGulp(
 		ExecuteGulpTask executeGulpTask, final Copy expandFrontendCSSCommonTask,
 		Task zipResourcesImporterLARsTask, Project frontendThemeStyledProject,
 		Project frontendThemeUnstyledProject) {
@@ -399,13 +404,13 @@ public class LiferayThemeDefaultsPlugin implements Plugin<Project> {
 		executeGulpTask.dependsOn(
 			expandFrontendCSSCommonTask, zipResourcesImporterLARsTask);
 
-		configureTaskExecuteGulpParentTheme(
+		_configureTaskExecuteGulpParentTheme(
 			executeGulpTask, frontendThemeStyledProject, "styled");
-		configureTaskExecuteGulpParentTheme(
+		_configureTaskExecuteGulpParentTheme(
 			executeGulpTask, frontendThemeUnstyledProject, "unstyled");
 	}
 
-	protected void configureTaskExecuteGulpParentTheme(
+	private void _configureTaskExecuteGulpParentTheme(
 		ExecuteGulpTask executeGulpTask, Project themeProject, String name) {
 
 		if (themeProject == null) {
@@ -430,7 +435,7 @@ public class LiferayThemeDefaultsPlugin implements Plugin<Project> {
 			themeProject.getPath() + ":" + JavaPlugin.CLASSES_TASK_NAME);
 	}
 
-	protected void configureTasksExecuteGulp(
+	private void _configureTasksExecuteGulp(
 		Project project, final Copy expandFrontendCSSCommonTask,
 		final Task assembleResourcesImporterArchivesTask,
 		final Project frontendThemeStyledProject,
@@ -444,7 +449,7 @@ public class LiferayThemeDefaultsPlugin implements Plugin<Project> {
 
 				@Override
 				public void execute(ExecuteGulpTask executeGulpTask) {
-					configureTaskExecuteGulp(
+					_configureTaskExecuteGulp(
 						executeGulpTask, expandFrontendCSSCommonTask,
 						assembleResourcesImporterArchivesTask,
 						frontendThemeStyledProject,
@@ -454,7 +459,7 @@ public class LiferayThemeDefaultsPlugin implements Plugin<Project> {
 			});
 	}
 
-	protected void configureTaskUploadArchives(
+	private void _configureTaskUploadArchives(
 		final Project project, Task updateThemeVersionTask) {
 
 		Task uploadArchivesTask = GradleUtil.getTask(
@@ -479,7 +484,7 @@ public class LiferayThemeDefaultsPlugin implements Plugin<Project> {
 		}
 	}
 
-	protected boolean getPluginPackageProperty(Project project, String key) {
+	private boolean _getPluginPackageProperty(Project project, String key) {
 		File file = project.file(
 			"src/WEB-INF/liferay-plugin-package.properties");
 
@@ -492,7 +497,7 @@ public class LiferayThemeDefaultsPlugin implements Plugin<Project> {
 		return Boolean.parseBoolean(properties.getProperty(key));
 	}
 
-	protected Project getThemeProject(Project project, String name) {
+	private Project _getThemeProject(Project project, String name) {
 		Project parentProject = project.getParent();
 
 		Project themeProject = parentProject.findProject(name);

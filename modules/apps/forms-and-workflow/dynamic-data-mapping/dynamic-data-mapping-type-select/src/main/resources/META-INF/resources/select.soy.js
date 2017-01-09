@@ -20,23 +20,53 @@ soy.$$registerDelegateFn(soy.$$getDelTemplateId('ddm.field'), 'select', 0, ddm._
 
 
 ddm.select = function(opt_data, opt_ignored) {
-  var output = '<div class="form-group' + soy.$$escapeHtmlAttribute(opt_data.visible ? '' : ' hide') + '" data-fieldname="' + soy.$$escapeHtmlAttribute(opt_data.name) + '"><div class="input-select-wrapper">' + ((opt_data.showLabel) ? '<label class="control-label" for="' + soy.$$escapeHtmlAttribute(opt_data.name) + '">' + soy.$$escapeHtml(opt_data.label) + ((opt_data.required) ? '<span class="icon-asterisk text-warning"></span>' : '') + '</label>' + ((opt_data.tip) ? '<p class="liferay-ddm-form-field-tip">' + soy.$$escapeHtml(opt_data.tip) + '</p>' : '') : '') + '<div class="input-group-container"><select class="form-control" dir="' + soy.$$escapeHtmlAttribute(opt_data.dir) + '" ' + ((opt_data.readOnly) ? 'disabled' : '') + ' id="' + soy.$$escapeHtmlAttribute(opt_data.name) + '" name="' + soy.$$escapeHtmlAttribute(opt_data.name) + '" ' + ((opt_data.multiple) ? 'multiple size="' + soy.$$escapeHtmlAttribute(opt_data.options.length) + '"' : '') + '>' + ((! opt_data.readOnly) ? '<option dir="' + soy.$$escapeHtmlAttribute(opt_data.dir) + '" disabled ' + ((opt_data.value.length == 0) ? 'selected' : '') + ' value="">' + soy.$$escapeHtml(opt_data.strings.chooseAnOption) + '</option>' : '');
-  var optionList68 = opt_data.options;
-  var optionListLen68 = optionList68.length;
-  for (var optionIndex68 = 0; optionIndex68 < optionListLen68; optionIndex68++) {
-    var optionData68 = optionList68[optionIndex68];
-    var selected__soy53 = '';
-    var currentValueList57 = opt_data.value;
-    var currentValueListLen57 = currentValueList57.length;
-    for (var currentValueIndex57 = 0; currentValueIndex57 < currentValueListLen57; currentValueIndex57++) {
-      var currentValueData57 = currentValueList57[currentValueIndex57];
-      selected__soy53 += (currentValueData57 == optionData68.value) ? 'selected' : '';
-    }
-    output += '<option dir="' + soy.$$escapeHtmlAttribute(opt_data.dir) + '" ' + soy.$$filterHtmlAttributes(selected__soy53) + ' value="' + soy.$$escapeHtmlAttribute(optionData68.value) + '">' + soy.$$escapeHtml(optionData68.label) + '</option>';
-  }
-  output += '</select></div>' + ((opt_data.childElementsHTML) ? soy.$$filterNoAutoescape(opt_data.childElementsHTML) : '') + '</div></div>';
+  var output = '';
+  var optionsSelected__soy5 = opt_data.value;
+  output += '<div class="form-group' + soy.$$escapeHtmlAttribute(opt_data.visible ? '' : ' hide') + '" data-fieldname="' + soy.$$escapeHtmlAttribute(opt_data.name) + '"><div class="input-select-wrapper">' + ((opt_data.showLabel) ? ddm.select_label(opt_data) : '') + '<div class="form-builder-select-field input-group-container">' + ((! opt_data.readOnly) ? ddm.hidden_select(opt_data) : '') + ((! opt_data.multiple) ? '<a class="form-control select-field-trigger" dir="' + soy.$$escapeHtmlAttribute(opt_data.dir) + '" href="javascript:;" id="' + soy.$$escapeHtmlAttribute(opt_data.name) + '" name="' + soy.$$escapeHtmlAttribute(opt_data.name) + '">' + ((! opt_data.readOnly) ? (optionsSelected__soy5 && optionsSelected__soy5.value) ? '<span class="option-selected">' + soy.$$escapeHtml(optionsSelected__soy5.label) + '</span>' : '<span class="option-selected option-selected-placeholder">' + soy.$$escapeHtml(opt_data.strings.chooseAnOption) + '</span>' : '<span class="option-selected option-selected-placeholder">' + soy.$$escapeHtml(opt_data.strings.chooseAnOption) + '</span>') + '</a>' : '') + ((! opt_data.readOnly) ? '<div class="drop-chosen hide"><div class="search-chosen"><div class="select-search-container">' + ((opt_data.selectSearchIcon) ? '<a class="" href="javascript:;">' + soy.$$filterNoAutoescape(opt_data.selectSearchIcon) + '</a>' : '') + '</div><input autocomplete="off" class="drop-chosen-search" placeholder="Search" type="text"></div><ul class="results-chosen">' + ddm.select_options(opt_data) + '</ul></div>' : '') + ((opt_data.selectCaretDoubleIcon) ? '<a class="select-arrow-down-container" href="javascript:;">' + soy.$$filterNoAutoescape(opt_data.selectCaretDoubleIcon) + '</a>' : '') + '</div>' + ((opt_data.childElementsHTML) ? soy.$$filterNoAutoescape(opt_data.childElementsHTML) : '') + '</div></div>';
   return output;
 };
 if (goog.DEBUG) {
   ddm.select.soyTemplateName = 'ddm.select';
+}
+
+
+ddm.select_label = function(opt_data, opt_ignored) {
+  return '<label class="control-label" for="' + soy.$$escapeHtmlAttribute(opt_data.name) + '">' + soy.$$escapeHtml(opt_data.label) + ((opt_data.required) ? '<span class="icon-asterisk text-warning"></span>' : '') + '</label>' + ((opt_data.tip) ? '<p class="liferay-ddm-form-field-tip">' + soy.$$escapeHtml(opt_data.tip) + '</p>' : '');
+};
+if (goog.DEBUG) {
+  ddm.select_label.soyTemplateName = 'ddm.select_label';
+}
+
+
+ddm.hidden_select = function(opt_data, opt_ignored) {
+  var output = '<select class="form-control hide" dir="' + soy.$$escapeHtmlAttribute(opt_data.dir) + '" id="' + soy.$$escapeHtmlAttribute(opt_data.name) + '" name="' + soy.$$escapeHtmlAttribute(opt_data.name) + '" ' + ((opt_data.multiple) ? 'multiple size="' + soy.$$escapeHtmlAttribute(opt_data.options.length) + '"' : '') + '>' + ((! opt_data.readOnly) ? '<option dir="' + soy.$$escapeHtmlAttribute(opt_data.dir) + '" disabled ' + ((! opt_data.value) ? 'selected' : '') + ' value="">' + soy.$$escapeHtml(opt_data.strings.chooseAnOption) + '</option>' : '');
+  var optionList122 = opt_data.options;
+  var optionListLen122 = optionList122.length;
+  for (var optionIndex122 = 0; optionIndex122 < optionListLen122; optionIndex122++) {
+    var optionData122 = optionList122[optionIndex122];
+    var selectedValue__soy107 = '' + ((opt_data.value && opt_data.value.value) ? soy.$$escapeHtml(opt_data.value.value) : '');
+    output += '<option dir="' + soy.$$escapeHtmlAttribute(opt_data.dir) + '" ' + ((selectedValue__soy107 == optionData122.value) ? 'selected' : '') + ' value="' + soy.$$escapeHtmlAttribute(optionData122.value) + '">' + soy.$$escapeHtml(optionData122.label) + '</option>';
+  }
+  output += '</select>';
+  return output;
+};
+if (goog.DEBUG) {
+  ddm.hidden_select.soyTemplateName = 'ddm.hidden_select';
+}
+
+
+ddm.select_options = function(opt_data, opt_ignored) {
+  var output = '';
+  var optionsSelected__soy126 = opt_data.value;
+  var optionList142 = opt_data.options;
+  var optionListLen142 = optionList142.length;
+  for (var optionIndex142 = 0; optionIndex142 < optionListLen142; optionIndex142++) {
+    var optionData142 = optionList142[optionIndex142];
+    var selectedValue__soy127 = '' + ((optionsSelected__soy126 && optionsSelected__soy126.value) ? soy.$$escapeHtml(optionsSelected__soy126.value) : '');
+    output += '<li class="' + ((selectedValue__soy127 == optionData142.value) ? 'option-selected' : '') + '" data-option-index="' + soy.$$escapeHtmlAttribute(optionIndex142) + '" data-option-value="' + soy.$$escapeHtmlAttribute(optionData142.value) + '">' + soy.$$escapeHtml(optionData142.label) + '</li>';
+  }
+  return output;
+};
+if (goog.DEBUG) {
+  ddm.select_options.soyTemplateName = 'ddm.select_options';
 }

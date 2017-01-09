@@ -36,12 +36,9 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.search.web.constants.SearchPortletParameterNames;
 import com.liferay.portlet.portletconfiguration.util.ConfigurationRenderRequest;
 
-import javax.portlet.MimeResponse;
 import javax.portlet.PortletPreferences;
-import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -132,7 +129,9 @@ public class SearchDisplayContextTest {
 			RandomTestUtil.randomString()
 		).when(
 			jsonArray
-		).getString(0);
+		).getString(
+			0
+		);
 
 		return jsonArray;
 	}
@@ -156,13 +155,17 @@ public class SearchDisplayContextTest {
 			true
 		).when(
 			jsonObject
-		).has("values");
+		).has(
+			"values"
+		);
 
 		Mockito.doReturn(
 			createJSONArray()
 		).when(
 			jsonObject
-		).getJSONArray("values");
+		).getJSONArray(
+			"values"
+		);
 
 		return jsonObject;
 	}
@@ -177,7 +180,9 @@ public class SearchDisplayContextTest {
 			httpServletRequest
 		).when(
 			portal
-		).getHttpServletRequest(renderRequest);
+		).getHttpServletRequest(
+			renderRequest
+		);
 
 		return portal;
 	}
@@ -193,11 +198,10 @@ public class SearchDisplayContextTest {
 		jsonFactoryUtil.setJSONFactory(createJSONFactory());
 
 		return new SearchDisplayContext(
-			renderRequest, Mockito.mock(RenderResponse.class),
-			portletPreferences, createPortal(themeDisplay, renderRequest),
-			Mockito.mock(Html.class), Mockito.mock(Language.class),
-			facetedSearcherManager, Mockito.mock(IndexSearchPropsValues.class),
-			portletURLFactory);
+			renderRequest, portletPreferences,
+			createPortal(themeDisplay, renderRequest), Mockito.mock(Html.class),
+			Mockito.mock(Language.class), facetedSearcherManager,
+			Mockito.mock(IndexSearchPropsValues.class), portletURLFactory);
 	}
 
 	protected ThemeDisplay createThemeDisplay() throws Exception {
@@ -214,7 +218,9 @@ public class SearchDisplayContextTest {
 			Mockito.mock(Hits.class)
 		).when(
 			facetedSearcher
-		).search(Mockito.<SearchContext>any());
+		).search(
+			Mockito.<SearchContext>any()
+		);
 
 		Mockito.doReturn(
 			facetedSearcher
@@ -228,7 +234,9 @@ public class SearchDisplayContextTest {
 			themeDisplay
 		).when(
 			httpServletRequest
-		).getAttribute(WebKeys.THEME_DISPLAY);
+		).getAttribute(
+			WebKeys.THEME_DISPLAY
+		);
 	}
 
 	protected void setUpPortletURLFactory() throws Exception {
@@ -236,8 +244,7 @@ public class SearchDisplayContextTest {
 			Mockito.mock(PortletURL.class)
 		).when(
 			portletURLFactory
-		).getPortletURL(
-			Mockito.<PortletRequest>any(), Mockito.<MimeResponse>any());
+		).getPortletURL();
 	}
 
 	protected void setUpRenderRequest() throws Exception {
@@ -245,7 +252,9 @@ public class SearchDisplayContextTest {
 			themeDisplay
 		).when(
 			renderRequest
-		).getAttribute(WebKeys.THEME_DISPLAY);
+		).getAttribute(
+			WebKeys.THEME_DISPLAY
+		);
 	}
 
 	protected void setUpRequestKeywords(String keywords) {
@@ -253,13 +262,17 @@ public class SearchDisplayContextTest {
 			keywords
 		).when(
 			httpServletRequest
-		).getParameter(SearchPortletParameterNames.KEYWORDS);
+		).getParameter(
+			SearchPortletParameterNames.KEYWORDS
+		);
 
 		Mockito.doReturn(
 			keywords
 		).when(
 			renderRequest
-		).getParameter(SearchPortletParameterNames.KEYWORDS);
+		).getParameter(
+			SearchPortletParameterNames.KEYWORDS
+		);
 	}
 
 	@Mock

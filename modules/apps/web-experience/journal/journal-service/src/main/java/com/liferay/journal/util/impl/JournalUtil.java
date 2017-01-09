@@ -1325,6 +1325,10 @@ public class JournalUtil {
 
 		List<Element> elements = newElement.elements("dynamic-content");
 
+		if ((elements == null) || elements.isEmpty()) {
+			return;
+		}
+
 		Element newContentElement = elements.get(0);
 
 		String newLanguageId = newContentElement.attributeValue("language-id");
@@ -1510,9 +1514,9 @@ public class JournalUtil {
 			"protocol", HttpUtil.getProtocol(themeDisplay.getURLPortal()));
 		tokens.put("root_path", themeDisplay.getPathContext());
 		tokens.put(
-			"site_group_id", String.valueOf(themeDisplay.getSiteGroupId()));
-		tokens.put(
 			"scope_group_id", String.valueOf(themeDisplay.getScopeGroupId()));
+		tokens.put(
+			"site_group_id", String.valueOf(themeDisplay.getSiteGroupId()));
 		tokens.put("theme_image_path", themeDisplay.getPathThemeImages());
 
 		_populateCustomTokens(tokens, themeDisplay.getCompanyId());

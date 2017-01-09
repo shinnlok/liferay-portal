@@ -1,4 +1,21 @@
 <definition>
+	<command name="deleteSpecificMail">
+		<for list="${gmailMessageTitleList}" param="gmailMessageTitle">
+			<var name="key_gmailMessageTitle" value="${gmailMessageTitle}" />
+
+			<if>
+				<condition function="IsElementPresent" locator1="Gmail#GMAIL_HTML_MODE_MAIL_TABLE_SPECIFIC_MESSAGE_TITLE_CHECKBOX" />
+				<then>
+					<execute function="Check" locator1="Gmail#GMAIL_HTML_MODE_MAIL_TABLE_SPECIFIC_MESSAGE_TITLE_CHECKBOX" />
+
+					<execute function="Click" locator1="Gmail#GMAIL_HTML_MODE_MAIL_TABLE_DELETE_BUTTON" />
+
+					<execute function="Pause" locator1="3000" />
+				</then>
+			</if>
+		</for>
+	</command>
+
 	<command name="gotoHtmlMode">
 		<execute function="Open" locator1="https://mail.google.com/mail/?ui=html&amp;zy=h" />
 
@@ -209,6 +226,7 @@
 
 	<command name="viewSocialOfficeMessageMail">
 		<execute function="AssertClick#assertPartialTextClickAt" locator1="Gmail#GMAIL_HTML_MODE_MAIL_TABLE_MESSAGE_TITLE_SOCIAL_OFFICE_MESSAGE" value1="${senderName} sent you a message on Liferay" />
+
 		<execute function="Pause" locator1="3000" />
 
 		<execute function="AssertTextEquals#assertPartialText" locator1="Gmail#GMAIL_HTML_MODE_MESSAGE_BODY_SOCIAL_OFFICE_MESSAGE_SUMMARY" value1="${senderName} sent you a message." />

@@ -84,6 +84,12 @@
 		<execute function="Type" locator1="FormFields#TEXT_FIELD" value1="${fieldValue}" />
 	</command>
 
+	<command name="editTextAlt">
+		<var name="key_fieldName" value="${fieldName}" />
+
+		<execute function="Type" locator1="FormFields#TEXT_FIELD_ALT" value1="${fieldValue}" />
+	</command>
+
 	<command name="editTextMultiline">
 		<var name="key_fieldName" value="${fieldName}" />
 
@@ -112,13 +118,10 @@
 	</command>
 
 	<command name="moveOptionsRow">
-		<var name="key_rowNumber" value="${rowNumberStart}" />
+		<var name="key_rowNumber1" value="${rowNumberStart}" />
+		<var name="key_rowNumber2" value="${rowNumberEnd}" />
 
-		<execute function="MouseDown" locator1="FormFields#OPTIONS_DRAG_ICON" />
-
-		<var name="key_rowNumber" value="${rowNumberEnd}" />
-
-		<execute function="MouseUp" locator1="FormFields#OPTIONS_DRAG_ICON" />
+		<execute function="DragAndDrop" locator1="FormFields#OPTIONS_DRAG_ICON_1" locator2="FormFields#OPTIONS_DRAG_ICON_2" value1="" />
 	</command>
 
 	<command name="removeRepeatableField">
@@ -148,7 +151,19 @@
 	<command name="selectSelectOption">
 		<var name="key_fieldName" value="${fieldName}" />
 
-		<execute function="Select" locator1="FormFields#SELECT_FIELD" value1="${selectOption}" />
+		<execute function="Click" locator1="FormFields#SELECT_FIELD" />
+
+		<var name="key_selectOption" value="${selectOption}" />
+
+		<if>
+			<equals arg1="${fieldName}" arg2="ddmDataProviderInstanceId" />
+			<then>
+				<execute function="AssertClick" locator1="FormFields#SELECT_FIELD_DATA_PROVIDER_LIST" value1="${selectOption}" />
+			</then>
+			<else>
+				<execute function="AssertClick" locator1="FormFields#SELECT_FIELD_OPTIONS_LIST" value1="${selectOption}" />
+			</else>
+		</if>
 	</command>
 
 	<command name="selectSwitcherOption">
@@ -221,8 +236,17 @@
 		<var name="key_fieldLabel" value="${fieldLabel}" />
 		<var name="key_fieldName" value="${fieldName}" />
 
-		<execute function="AssertElementNotPresent#assertNotVisible" locator1="FormFields#DATE_LABEL" />
-		<execute function="AssertElementNotPresent#assertNotVisible" locator1="FormFields#DATE_FIELD" />
+		<if>
+			<condition function="IsElementPresent" locator1="FormFields#DATE_FIELD" />
+			<then>
+				<execute function="AssertElementNotPresent#assertNotVisible" locator1="FormFields#DATE_LABEL" />
+				<execute function="AssertElementNotPresent#assertNotVisible" locator1="FormFields#DATE_FIELD" />
+			</then>
+			<else>
+				<execute function="AssertElementNotPresent" locator1="FormFields#DATE_LABEL" />
+				<execute function="AssertElementNotPresent" locator1="FormFields#DATE_FIELD" />
+			</else>
+		</if>
 	</command>
 
 	<command name="viewDateLabel">
@@ -237,6 +261,12 @@
 		<var name="key_fieldName" value="${fieldName}" />
 
 		<execute function="AssertTextEquals" locator1="FormFields#DATE_FIELD" value1="${fieldValue}" />
+	</command>
+
+	<command name="viewDeletedSelectOptionsRowFieldValue">
+		<var name="key_rowNumber" value="${rowNumber}" />
+
+		<execute function="AssertTextNotPresent" locator1="FormFields#SELECT_OPTIONS_OPTION_VALUE_FIELD_VISIBLE" value1="${fieldValue}" />
 	</command>
 
 	<command name="viewFieldHelpText">
@@ -291,7 +321,15 @@
 	<command name="viewOptionsRowFieldValue">
 		<var name="key_rowNumber" value="${rowNumber}" />
 
-		<execute function="AssertTextEquals" locator1="FormFields#OPTIONS_OPTION_VALUE_FIELD_VISIBLE" value1="${fieldValue}" />
+		<if>
+			<condition function="IsVisible" locator1="FormFields#OPTIONS_OPTION_VALUE_FIELD" />
+			<then>
+				<execute function="AssertTextEquals" locator1="FormFields#OPTIONS_OPTION_VALUE_FIELD" value1="${fieldValue}" />
+			</then>
+			<else>
+				<execute function="AssertTextEquals" locator1="FormFields#OPTIONS_OPTION_VALUE_FIELD_VISIBLE" value1="${fieldValue}" />
+			</else>
+		</if>
 	</command>
 
 	<command name="viewParagraphField">
@@ -396,6 +434,10 @@
 		<execute function="AssertElementPresent#assertVisible" locator1="Icon#ASTERISK" />
 	</command>
 
+	<command name="viewRequiredAsteriskNotPresent">
+		<execute function="AssertElementNotPresent" locator1="Icon#ASTERISK" />
+	</command>
+
 	<command name="viewSelectLabel">
 		<var name="key_fieldName" value="${fieldName}" />
 
@@ -404,9 +446,14 @@
 
 	<command name="viewSelectOption">
 		<var name="key_fieldName" value="${fieldName}" />
-		<var name="key_selectOption" value="${selectOption}" />
 
-		<execute function="AssertTextEquals#assertText" locator1="FormFields#SELECT_OPTION" value1="${selectOption}" />
+		<execute function="AssertTextEquals#assertText" locator1="FormFields#SELECT_FIELD" value1="${selectOption}" />
+	</command>
+
+	<command name="viewSelectOptionsRowFieldValue">
+		<var name="key_rowNumber" value="${rowNumber}" />
+
+		<execute function="AssertTextEquals" locator1="FormFields#SELECT_OPTIONS_OPTION_VALUE_FIELD_VISIBLE" value1="${fieldValue}" />
 	</command>
 
 	<command name="viewSelectValue">
@@ -498,5 +545,11 @@
 		<var name="key_fieldName" value="${fieldName}" />
 
 		<execute function="AssertTextEquals" locator1="FormFields#TEXT_FIELD" value1="${fieldValue}" />
+	</command>
+
+	<command name="viewTextValueAlt">
+		<var name="key_fieldName" value="${fieldName}" />
+
+		<execute function="AssertTextEquals" locator1="FormFields#TEXT_FIELD_ALT" value1="${fieldValue}" />
 	</command>
 </definition>

@@ -603,7 +603,7 @@ public class Validator {
 	 *         <code>false</code> otherwise
 	 */
 	public static boolean isEmailAddress(String emailAddress) {
-		if (Validator.isNull(emailAddress)) {
+		if (isNull(emailAddress)) {
 			return false;
 		}
 
@@ -665,7 +665,7 @@ public class Validator {
 		return true;
 	}
 
-	public static boolean isFilePath(String path, boolean isParentDirAllowed) {
+	public static boolean isFilePath(String path, boolean parentDirAllowed) {
 		if (isNull(path)) {
 			return false;
 		}
@@ -674,7 +674,7 @@ public class Validator {
 			return false;
 		}
 
-		if (isParentDirAllowed) {
+		if (parentDirAllowed) {
 			return true;
 		}
 
@@ -1232,7 +1232,9 @@ public class Validator {
 	 *         <code>false</code> otherwise
 	 */
 	public static boolean isVariableName(String variableName) {
-		if (isNull(variableName)) {
+		if (isNull(variableName) ||
+			ArrayUtil.contains(_JAVA_KEYWORDS, variableName)) {
+
 			return false;
 		}
 
@@ -1325,6 +1327,17 @@ public class Validator {
 		'_', '`', '{', '|', '}', '~'
 	};
 
+	private static final String[] _JAVA_KEYWORDS = new String[] {
+		"abstract", "assert", "boolean", "break", "byte", "case", "catch",
+		"char", "class", "const", "continue", "default", "do", "double", "else",
+		"enum", "extends", "false", "final", "finally", "float", "for", "goto",
+		"if", "implements", "import", "instanceof", "int", "interface", "long",
+		"native", "new", "null", "package", "private", "protected", "public",
+		"return", "short", "static", "strictfp", "super", "switch",
+		"synchronized", "this", "throw", "throws", "transient", "true", "try",
+		"void", "volatile", "while"
+	};
+
 	private static final String _VARIABLE_TERM_BEGIN = "[$";
 
 	private static final String _VARIABLE_TERM_END = "$]";
@@ -1337,6 +1350,9 @@ public class Validator {
 		"[\\w!#$%&'*+/=?^_`{|}~-]+(?:\\.[\\w!#$%&'*+/=?^_`{|}~-]+)*@" +
 			"(?:[a-zA-Z0-9](?:-*[a-zA-Z0-9])?\\.*)+");
 	private static final Pattern _ipv4AddressPattern;
+	private static final Pattern _ipv6AddressPattern;
+	private static final Pattern _variableNamePattern = Pattern.compile(
+		"[_a-zA-Z]+[_a-zA-Z0-9]*");
 
 	static {
 		StringBundler sb = new StringBundler(6);
@@ -1349,15 +1365,8 @@ public class Validator {
 		sb.append("$");
 
 		_ipv4AddressPattern = Pattern.compile(sb.toString());
-	}
 
-	private static final Pattern _ipv6AddressPattern;
-
-	private static final Pattern _variableNamePattern = Pattern.compile(
-		"[_a-zA-Z]+[_a-zA-Z0-9]*");
-
-	static {
-		StringBundler sb = new StringBundler(28);
+		sb = new StringBundler(28);
 
 		sb.append("^");
 		sb.append("\\s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|");

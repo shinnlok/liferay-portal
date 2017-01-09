@@ -47,7 +47,6 @@ import com.liferay.portal.kernel.service.LayoutSetLocalService;
 import com.liferay.portal.kernel.service.LayoutSetPrototypeLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
-import com.liferay.portal.kernel.service.persistence.LayoutUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.DateRange;
@@ -84,6 +83,7 @@ public class StagedLayoutSetStagedModelDataHandler
 	public static final String[] CLASS_NAMES =
 		{StagedLayoutSet.class.getName()};
 
+	@Override
 	public String[] getClassNames() {
 		return CLASS_NAMES;
 	}
@@ -126,7 +126,7 @@ public class StagedLayoutSetStagedModelDataHandler
 				continue;
 			}
 
-			Layout sourcePrototypeLayout = LayoutUtil.fetchByUUID_G_P(
+			Layout sourcePrototypeLayout = _layoutLocalService.fetchLayout(
 				layout.getSourcePrototypeLayoutUuid(),
 				layoutSetPrototype.getGroupId(), true);
 
@@ -196,6 +196,13 @@ public class StagedLayoutSetStagedModelDataHandler
 		Element stagedLayoutSetElement =
 			portletDataContext.getExportDataElement(stagedLayoutSet);
 
+		// Last publish date must not be exported
+
+		UnicodeProperties settingsProperties =
+			stagedLayoutSet.getSettingsProperties();
+
+		settingsProperties.remove("last-publish-date");
+
 		portletDataContext.addClassedModel(
 			stagedLayoutSetElement,
 			ExportImportPathUtil.getModelPath(stagedLayoutSet),
@@ -234,7 +241,16 @@ public class StagedLayoutSetStagedModelDataHandler
 		importedStagedLayoutSet.setGroupId(
 			portletDataContext.getScopeGroupId());
 
-		if (existingLayoutSetOptional.isPresent()) {
+		String layoutsImportMode = MapUtil.getString(
+			portletDataContext.getParameterMap(),
+			PortletDataHandlerKeys.LAYOUTS_IMPORT_MODE,
+			PortletDataHandlerKeys.LAYOUTS_IMPORT_MODE_MERGE_BY_LAYOUT_UUID);
+
+		if (existingLayoutSetOptional.isPresent() &&
+			!layoutsImportMode.equals(
+				PortletDataHandlerKeys.
+					LAYOUTS_IMPORT_MODE_CREATED_FROM_PROTOTYPE)) {
+
 			StagedLayoutSet existingLayoutSet = existingLayoutSetOptional.get();
 
 			importedStagedLayoutSet.setLayoutSetId(
@@ -452,6 +468,10 @@ public class StagedLayoutSetStagedModelDataHandler
 
 		String logoPath = headerElement.attributeValue("logo-path");
 
+		if (Validator.isNull(logoPath)) {
+			return;
+		}
+
 		byte[] iconBytes = portletDataContext.getZipEntryAsByteArray(logoPath);
 
 		try {
@@ -530,7 +550,7 @@ public class StagedLayoutSetStagedModelDataHandler
 			typeSettingsProperties.setProperty(
 				Sites.LAST_MERGE_TIME, String.valueOf(lastMergeTime));
 
-			LayoutUtil.update(layout);
+			_layoutLocalService.updateLayout(layout);
 		}
 
 		// The layout set may be stale because LayoutUtil#update(layout)

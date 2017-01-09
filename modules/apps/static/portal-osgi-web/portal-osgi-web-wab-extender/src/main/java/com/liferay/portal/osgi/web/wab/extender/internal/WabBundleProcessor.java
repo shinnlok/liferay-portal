@@ -28,6 +28,8 @@ import com.liferay.portal.osgi.web.wab.extender.internal.adapter.ModifiableServl
 import com.liferay.portal.osgi.web.wab.extender.internal.adapter.ModifiableServletContextAdapter;
 import com.liferay.portal.osgi.web.wab.extender.internal.adapter.ServletContextListenerExceptionAdapter;
 import com.liferay.portal.osgi.web.wab.extender.internal.adapter.ServletExceptionAdapter;
+import com.liferay.portal.osgi.web.wab.extender.internal.registration.FilterRegistrationImpl;
+import com.liferay.portal.osgi.web.wab.extender.internal.registration.ServletRegistrationImpl;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,6 +46,7 @@ import java.util.Collection;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.EventListener;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
@@ -148,13 +151,54 @@ public class WabBundleProcessor {
 
 			initServletContainerInitializers(_bundle, servletContext);
 
+			ModifiableServletContext modifiableServletContext =
+				(ModifiableServletContext)servletContext;
+
+			Map<String, String> unregisteredInitParameters =
+				modifiableServletContext.getUnregisteredInitParameters();
+
+			if ((unregisteredInitParameters != null) &&
+				!unregisteredInitParameters.isEmpty()) {
+
+				Map<String, Object> attributes = new HashMap<>();
+
+				Enumeration<String> attributeNames =
+					servletContext.getAttributeNames();
+
+				while (attributeNames.hasMoreElements()) {
+					String attributeName = attributeNames.nextElement();
+
+					attributes.put(
+						attributeName,
+						servletContext.getAttribute(attributeName));
+				}
+
+				List<ListenerDefinition> listenerDefinitions =
+					modifiableServletContext.getListenerDefinitions();
+				Map<String, FilterRegistrationImpl> filterRegistrationImpls =
+					modifiableServletContext.getFilterRegistrationImpls();
+				Map<String, ServletRegistrationImpl> servletRegistrationImpls =
+					modifiableServletContext.getServletRegistrationImpls();
+
+				servletContextHelperRegistration.setProperties(
+					unregisteredInitParameters);
+
+				ServletContext newServletContext =
+					servletContextHelperRegistration.getServletContext();
+
+				servletContext = ModifiableServletContextAdapter.createInstance(
+					newServletContext, attributes, listenerDefinitions,
+					filterRegistrationImpls, servletRegistrationImpls,
+					_bundle.getBundleContext(), webXMLDefinition, _logger);
+
+				modifiableServletContext =
+					(ModifiableServletContext)servletContext;
+			}
+
 			scanTLDsForListeners(webXMLDefinition, servletContext);
 
 			initListeners(
 				webXMLDefinition.getListenerDefinitions(), servletContext);
-
-			ModifiableServletContext modifiableServletContext =
-				(ModifiableServletContext)servletContext;
 
 			initListeners(
 				modifiableServletContext.getListenerDefinitions(),
@@ -364,11 +408,9 @@ public class WabBundleProcessor {
 		// The following supported listener is omitted on purpose because it is
 		// registered individually.
 
-		/*
-		if (ServletContextListener.class.isInstance(eventListener)) {
+		/*if (ServletContextListener.class.isInstance(eventListener)) {
 			classNamesList.add(ServletContextListener.class.getName());
-		}
-		*/
+		}*/
 
 		if (ServletRequestAttributeListener.class.isInstance(eventListener)) {
 			classNamesList.add(ServletRequestAttributeListener.class.getName());
@@ -669,7 +711,7 @@ public class WabBundleProcessor {
 		Class<?>[] handledTypesArray = handledTypes.value();
 
 		if (handledTypesArray == null) {
-			handledTypesArray = new Class[0];
+			handledTypesArray = new Class<?>[0];
 		}
 
 		Collection<String> classResources = bundleWiring.listResources(
@@ -749,7 +791,7 @@ public class WabBundleProcessor {
 
 		@Override
 		public Class<?>[] value() {
-			return new Class[0];
+			return new Class<?>[0];
 		}
 
 	};

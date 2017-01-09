@@ -2280,7 +2280,7 @@ public class DLFileEntryMetadataPersistenceImpl extends BasePersistenceImpl<DLFi
 	/**
 	 * Returns the document library file entry metadata where DDMStructureId = &#63; and fileVersionId = &#63; or throws a {@link NoSuchFileEntryMetadataException} if it could not be found.
 	 *
-	 * @param DDMStructureId the d d m structure ID
+	 * @param DDMStructureId the ddm structure ID
 	 * @param fileVersionId the file version ID
 	 * @return the matching document library file entry metadata
 	 * @throws NoSuchFileEntryMetadataException if a matching document library file entry metadata could not be found
@@ -2317,7 +2317,7 @@ public class DLFileEntryMetadataPersistenceImpl extends BasePersistenceImpl<DLFi
 	/**
 	 * Returns the document library file entry metadata where DDMStructureId = &#63; and fileVersionId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
 	 *
-	 * @param DDMStructureId the d d m structure ID
+	 * @param DDMStructureId the ddm structure ID
 	 * @param fileVersionId the file version ID
 	 * @return the matching document library file entry metadata, or <code>null</code> if a matching document library file entry metadata could not be found
 	 */
@@ -2330,7 +2330,7 @@ public class DLFileEntryMetadataPersistenceImpl extends BasePersistenceImpl<DLFi
 	/**
 	 * Returns the document library file entry metadata where DDMStructureId = &#63; and fileVersionId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
 	 *
-	 * @param DDMStructureId the d d m structure ID
+	 * @param DDMStructureId the ddm structure ID
 	 * @param fileVersionId the file version ID
 	 * @param retrieveFromCache whether to retrieve from the finder cache
 	 * @return the matching document library file entry metadata, or <code>null</code> if a matching document library file entry metadata could not be found
@@ -2421,7 +2421,7 @@ public class DLFileEntryMetadataPersistenceImpl extends BasePersistenceImpl<DLFi
 	/**
 	 * Removes the document library file entry metadata where DDMStructureId = &#63; and fileVersionId = &#63; from the database.
 	 *
-	 * @param DDMStructureId the d d m structure ID
+	 * @param DDMStructureId the ddm structure ID
 	 * @param fileVersionId the file version ID
 	 * @return the document library file entry metadata that was removed
 	 */
@@ -2437,7 +2437,7 @@ public class DLFileEntryMetadataPersistenceImpl extends BasePersistenceImpl<DLFi
 	/**
 	 * Returns the number of document library file entry metadatas where DDMStructureId = &#63; and fileVersionId = &#63;.
 	 *
-	 * @param DDMStructureId the d d m structure ID
+	 * @param DDMStructureId the ddm structure ID
 	 * @param fileVersionId the file version ID
 	 * @return the number of matching document library file entry metadatas
 	 */
@@ -2568,7 +2568,8 @@ public class DLFileEntryMetadataPersistenceImpl extends BasePersistenceImpl<DLFi
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((DLFileEntryMetadataModelImpl)dlFileEntryMetadata);
+		clearUniqueFindersCache((DLFileEntryMetadataModelImpl)dlFileEntryMetadata,
+			true);
 	}
 
 	@Override
@@ -2581,52 +2582,40 @@ public class DLFileEntryMetadataPersistenceImpl extends BasePersistenceImpl<DLFi
 				DLFileEntryMetadataImpl.class,
 				dlFileEntryMetadata.getPrimaryKey());
 
-			clearUniqueFindersCache((DLFileEntryMetadataModelImpl)dlFileEntryMetadata);
+			clearUniqueFindersCache((DLFileEntryMetadataModelImpl)dlFileEntryMetadata,
+				true);
 		}
 	}
 
 	protected void cacheUniqueFindersCache(
-		DLFileEntryMetadataModelImpl dlFileEntryMetadataModelImpl, boolean isNew) {
-		if (isNew) {
-			Object[] args = new Object[] {
-					dlFileEntryMetadataModelImpl.getDDMStructureId(),
-					dlFileEntryMetadataModelImpl.getFileVersionId()
-				};
-
-			finderCache.putResult(FINDER_PATH_COUNT_BY_D_F, args,
-				Long.valueOf(1));
-			finderCache.putResult(FINDER_PATH_FETCH_BY_D_F, args,
-				dlFileEntryMetadataModelImpl);
-		}
-		else {
-			if ((dlFileEntryMetadataModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_D_F.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						dlFileEntryMetadataModelImpl.getDDMStructureId(),
-						dlFileEntryMetadataModelImpl.getFileVersionId()
-					};
-
-				finderCache.putResult(FINDER_PATH_COUNT_BY_D_F, args,
-					Long.valueOf(1));
-				finderCache.putResult(FINDER_PATH_FETCH_BY_D_F, args,
-					dlFileEntryMetadataModelImpl);
-			}
-		}
-	}
-
-	protected void clearUniqueFindersCache(
 		DLFileEntryMetadataModelImpl dlFileEntryMetadataModelImpl) {
 		Object[] args = new Object[] {
 				dlFileEntryMetadataModelImpl.getDDMStructureId(),
 				dlFileEntryMetadataModelImpl.getFileVersionId()
 			};
 
-		finderCache.removeResult(FINDER_PATH_COUNT_BY_D_F, args);
-		finderCache.removeResult(FINDER_PATH_FETCH_BY_D_F, args);
+		finderCache.putResult(FINDER_PATH_COUNT_BY_D_F, args, Long.valueOf(1),
+			false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_D_F, args,
+			dlFileEntryMetadataModelImpl, false);
+	}
+
+	protected void clearUniqueFindersCache(
+		DLFileEntryMetadataModelImpl dlFileEntryMetadataModelImpl,
+		boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					dlFileEntryMetadataModelImpl.getDDMStructureId(),
+					dlFileEntryMetadataModelImpl.getFileVersionId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_D_F, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_D_F, args);
+		}
 
 		if ((dlFileEntryMetadataModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_D_F.getColumnBitmask()) != 0) {
-			args = new Object[] {
+			Object[] args = new Object[] {
 					dlFileEntryMetadataModelImpl.getOriginalDDMStructureId(),
 					dlFileEntryMetadataModelImpl.getOriginalFileVersionId()
 				};
@@ -2870,8 +2859,8 @@ public class DLFileEntryMetadataPersistenceImpl extends BasePersistenceImpl<DLFi
 			DLFileEntryMetadataImpl.class, dlFileEntryMetadata.getPrimaryKey(),
 			dlFileEntryMetadata, false);
 
-		clearUniqueFindersCache(dlFileEntryMetadataModelImpl);
-		cacheUniqueFindersCache(dlFileEntryMetadataModelImpl, isNew);
+		clearUniqueFindersCache(dlFileEntryMetadataModelImpl, false);
+		cacheUniqueFindersCache(dlFileEntryMetadataModelImpl);
 
 		dlFileEntryMetadata.resetOriginalValues();
 

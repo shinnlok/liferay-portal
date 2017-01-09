@@ -41,6 +41,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -57,6 +58,82 @@ public class DDMFormEvaluatorHelperTest {
 	@Before
 	public void setUp() {
 		setUpLanguageUtil();
+	}
+
+	@Test
+	public void testJumpPageAction() throws Exception {
+		DDMForm ddmForm = new DDMForm();
+
+		DDMFormField ddmFormField = createDDMFormField(
+			"field0", "text", FieldConstants.NUMBER);
+
+		ddmForm.addDDMFormField(ddmFormField);
+
+		DDMFormValues ddmFormValues = new DDMFormValues(ddmForm);
+
+		ddmFormValues.addDDMFormFieldValue(
+			DDMFormValuesTestUtil.createDDMFormFieldValue(
+				"field0_instanceId", "field0", new UnlocalizedValue("1")));
+
+		String condition = "getValue(\"field0\") >= 1";
+
+		List<String> actions = ListUtil.fromArray(
+			new String[] {"jumpPage(1, 3)"});
+
+		DDMFormRule ddmFormRule = new DDMFormRule(condition, actions);
+
+		ddmForm.addDDMFormRule(ddmFormRule);
+
+		DDMFormEvaluatorHelper ddmFormEvaluatorHelper =
+			new DDMFormEvaluatorHelper(
+				null, null, _ddmExpressionFactory, ddmForm, ddmFormValues, null,
+				_jsonFactory, LocaleUtil.US);
+
+		DDMFormEvaluationResult ddmFormEvaluationResult =
+			ddmFormEvaluatorHelper.evaluate();
+
+		Set<Integer> disabledPagesIndexes =
+			ddmFormEvaluationResult.getDisabledPagesIndexes();
+
+		Assert.assertTrue(disabledPagesIndexes.contains(2));
+	}
+
+	@Test
+	public void testNotCalledJumpPageAction() throws Exception {
+		DDMForm ddmForm = new DDMForm();
+
+		DDMFormField ddmFormField = createDDMFormField(
+			"field0", "text", FieldConstants.NUMBER);
+
+		ddmForm.addDDMFormField(ddmFormField);
+
+		DDMFormValues ddmFormValues = new DDMFormValues(ddmForm);
+
+		ddmFormValues.addDDMFormFieldValue(
+			DDMFormValuesTestUtil.createDDMFormFieldValue(
+				"field0_instanceId", "field0", new UnlocalizedValue("1")));
+
+		String condition = "getValue(\"field0\") > 1";
+
+		List<String> actions = ListUtil.fromArray(
+			new String[] {"jumpPage(1, 3)"});
+
+		DDMFormRule ddmFormRule = new DDMFormRule(condition, actions);
+
+		ddmForm.addDDMFormRule(ddmFormRule);
+
+		DDMFormEvaluatorHelper ddmFormEvaluatorHelper =
+			new DDMFormEvaluatorHelper(
+				null, null, _ddmExpressionFactory, ddmForm, ddmFormValues, null,
+				_jsonFactory, LocaleUtil.US);
+
+		DDMFormEvaluationResult ddmFormEvaluationResult =
+			ddmFormEvaluatorHelper.evaluate();
+
+		Set<Integer> disabledPagesIndexes =
+			ddmFormEvaluationResult.getDisabledPagesIndexes();
+
+		Assert.assertTrue(disabledPagesIndexes.isEmpty());
 	}
 
 	@Test
@@ -148,6 +225,62 @@ public class DDMFormEvaluatorHelperTest {
 			StringPool.BLANK,
 			field1DDMFormFieldEvaluationResult.getErrorMessage());
 		Assert.assertTrue(field1DDMFormFieldEvaluationResult.isValid());
+	}
+
+	@Test
+	public void testRequiredValidationWithinRuleAction() throws Exception {
+		DDMForm ddmForm = new DDMForm();
+
+		DDMFormField ddmFormField0 = createDDMFormField(
+			"field0", "text", FieldConstants.NUMBER);
+
+		DDMFormField ddmFormField1 = createDDMFormField(
+			"field1", "text", FieldConstants.STRING);
+
+		ddmForm.addDDMFormField(ddmFormField0);
+		ddmForm.addDDMFormField(ddmFormField1);
+
+		String condition = "getValue(\"field0\") > 10";
+
+		List<String> actions = ListUtil.fromArray(
+			new String[] {"setRequired(\"field1\", true)"});
+
+		DDMFormRule ddmFormRule = new DDMFormRule(condition, actions);
+
+		ddmForm.addDDMFormRule(ddmFormRule);
+
+		DDMFormValues ddmFormValues = new DDMFormValues(ddmForm);
+
+		ddmFormValues.addDDMFormFieldValue(
+			DDMFormValuesTestUtil.createDDMFormFieldValue(
+				"field0_instanceId", "field0", new UnlocalizedValue("11")));
+
+		ddmFormValues.addDDMFormFieldValue(
+			DDMFormValuesTestUtil.createDDMFormFieldValue(
+				"field1_instanceId", "field1", new UnlocalizedValue("")));
+
+		DDMFormEvaluatorHelper ddmFormEvaluatorHelper =
+			new DDMFormEvaluatorHelper(
+				null, null, _ddmExpressionFactory, ddmForm, ddmFormValues, null,
+				_jsonFactory, LocaleUtil.US);
+
+		DDMFormEvaluationResult ddmFormEvaluationResult =
+			ddmFormEvaluatorHelper.evaluate();
+
+		Map<String, DDMFormFieldEvaluationResult>
+			ddmFormFieldEvaluationResultMap =
+				ddmFormEvaluationResult.getDDMFormFieldEvaluationResultsMap();
+
+		Assert.assertEquals(2, ddmFormFieldEvaluationResultMap.size());
+
+		DDMFormFieldEvaluationResult ddmFormFieldEvaluationResult =
+			ddmFormEvaluationResult.geDDMFormFieldEvaluationResult(
+				"field1", "field1_instanceId");
+
+		Assert.assertEquals(
+			"This field is required.",
+			ddmFormFieldEvaluationResult.getErrorMessage());
+		Assert.assertFalse(ddmFormFieldEvaluationResult.isValid());
 	}
 
 	@Test
@@ -522,15 +655,17 @@ public class DDMFormEvaluatorHelperTest {
 
 		// Properties
 
+		Object expectedValue = expectedDDMFormFieldEvaluationResult.getValue();
+		Object actualValue = actualDDMFormFieldEvaluationResult.getValue();
+
+		Assert.assertEquals(expectedValue, actualValue);
+
 		Assert.assertEquals(
 			expectedDDMFormFieldEvaluationResult.getErrorMessage(),
 			actualDDMFormFieldEvaluationResult.getErrorMessage());
 		Assert.assertEquals(
 			expectedDDMFormFieldEvaluationResult.isValid(),
 			actualDDMFormFieldEvaluationResult.isValid());
-		Assert.assertEquals(
-			expectedDDMFormFieldEvaluationResult.getValue(),
-			actualDDMFormFieldEvaluationResult.getValue());
 		Assert.assertEquals(
 			expectedDDMFormFieldEvaluationResult.isVisible(),
 			actualDDMFormFieldEvaluationResult.isVisible());

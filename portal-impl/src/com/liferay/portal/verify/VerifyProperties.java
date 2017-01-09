@@ -1488,22 +1488,6 @@ public class VerifyProperties extends VerifyProcess {
 			"com.liferay.shopping.service"
 		},
 		new String[] {
-			"shopping.image.extensions", "image.extensions",
-			"com.liferay.shopping.service"
-		},
-		new String[] {
-			"shopping.image.large.max.size", "image.large.max.size",
-			"com.liferay.shopping.service"
-		},
-		new String[] {
-			"shopping.image.medium.max.size", "image.medium.max.size",
-			"com.liferay.shopping.service"
-		},
-		new String[] {
-			"shopping.image.small.max.size", "image.small.max.size",
-			"com.liferay.shopping.service"
-		},
-		new String[] {
 			"shopping.insurance", "insurance", "com.liferay.shopping.service"
 		},
 		new String[] {
@@ -1780,7 +1764,8 @@ public class VerifyProperties extends VerifyProcess {
 		"hibernate.cache.use_minimal_puts", "hibernate.cache.use_query_cache",
 		"hibernate.cache.use_second_level_cache",
 		"hibernate.cache.use_structured_entries", "icq.jar", "icq.login",
-		"icq.password", "index.filter.search.limit", "index.read.only",
+		"icq.password", "index.filter.search.limit",
+		"index.portal.field.analyzer.enabled", "index.read.only",
 		"invitation.email.max.recipients", "invitation.email.message.body",
 		"invitation.email.message.subject", "javax.persistence.validation.mode",
 		"jbi.workflow.url", "json.deserializer.strict.mode",
@@ -1824,6 +1809,7 @@ public class VerifyProperties extends VerifyProcess {
 		"message.boards.thread.locking.enabled",
 		"message.boards.thread.previous.and.next.navigation.enabled",
 		"message.boards.thread.views", "message.boards.thread.views.default",
+		"microsoft.translator.client.id", "microsoft.translator.client.secret",
 		"mobile.device.styling.wap.enabled", "module.framework.initial.bundles",
 		"msn.login", "msn.password", "multicast.group.address[\"hibernate\"]",
 		"multicast.group.port[\"hibernate\"]",
@@ -1846,7 +1832,9 @@ public class VerifyProperties extends VerifyProcess {
 		"sc.product.comments.enabled", "scheduler.classes",
 		"schema.run.minimal", "search.container.page.iterator.page.values",
 		"service.builder.service.read.only.prefixes", "shard.available.names",
-		"shard.default.name", "shard.selector", "siteminder.auth.enabled",
+		"shard.default.name", "shard.selector", "shopping.image.extensions",
+		"shopping.image.large.max.size", "shopping.image.medium.max.size",
+		"shopping.image.small.max.size", "siteminder.auth.enabled",
 		"siteminder.import.from.ldap", "siteminder.user.header",
 		"sites.form.add.advanced", "sites.form.add.main",
 		"sites.form.add.miscellaneous", "sites.form.add.seo",

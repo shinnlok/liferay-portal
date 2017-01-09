@@ -24,10 +24,13 @@ import com.liferay.document.library.kernel.model.DLFileEntryType;
 import com.liferay.document.library.kernel.model.DLFileEntryTypeConstants;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
+import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
 import com.liferay.document.library.kernel.service.DLFileEntryTypeLocalService;
 import com.liferay.document.library.web.constants.DLPortletKeys;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.LiferayPortletURL;
@@ -97,13 +100,21 @@ public class DLFileEntryAssetRendererFactory
 			}
 		}
 		catch (NoSuchFileEntryException nsfee) {
+
+			// LPS-52675
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(nsfee, nsfee);
+			}
+
 			fileVersion = _dlAppLocalService.getFileVersion(classPK);
 
 			fileEntry = fileVersion.getFileEntry();
 		}
 
 		DLFileEntryAssetRenderer dlFileEntryAssetRenderer =
-			new DLFileEntryAssetRenderer(fileEntry, fileVersion);
+			new DLFileEntryAssetRenderer(
+				fileEntry, fileVersion, _dlFileEntryLocalService);
 
 		dlFileEntryAssetRenderer.setAssetRendererType(type);
 
@@ -229,13 +240,24 @@ public class DLFileEntryAssetRendererFactory
 	}
 
 	@Reference(unbind = "-")
+	protected void setDLFileEntryLocalService(
+		DLFileEntryLocalService dlFileEntryLocalService) {
+
+		_dlFileEntryLocalService = dlFileEntryLocalService;
+	}
+
+	@Reference(unbind = "-")
 	protected void setDLFileEntryTypeLocalService(
 		DLFileEntryTypeLocalService dlFileEntryTypeLocalService) {
 
 		_dlFileEntryTypeLocalService = dlFileEntryTypeLocalService;
 	}
 
+	private static final Log _log = LogFactoryUtil.getLog(
+		DLFileEntryAssetRendererFactory.class);
+
 	private DLAppLocalService _dlAppLocalService;
+	private DLFileEntryLocalService _dlFileEntryLocalService;
 	private DLFileEntryTypeLocalService _dlFileEntryTypeLocalService;
 
 }

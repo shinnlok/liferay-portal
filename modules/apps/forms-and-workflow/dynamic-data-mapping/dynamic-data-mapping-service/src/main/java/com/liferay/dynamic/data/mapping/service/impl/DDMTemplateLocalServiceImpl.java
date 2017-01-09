@@ -43,7 +43,6 @@ import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.permission.ModelPermissions;
-import com.liferay.portal.kernel.service.persistence.ImageUtil;
 import com.liferay.portal.kernel.settings.GroupServiceSettingsLocator;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.template.TemplateConstants;
@@ -178,7 +177,7 @@ public class DDMTemplateLocalServiceImpl
 
 		// Template
 
-		User user = userPersistence.findByPrimaryKey(userId);
+		User user = userLocalService.getUser(userId);
 
 		if (Validator.isNull(templateKey)) {
 			templateKey = String.valueOf(counterLocalService.increment());
@@ -1336,14 +1335,14 @@ public class DDMTemplateLocalServiceImpl
 	 */
 	@Override
 	public DDMTemplate updateTemplate(
-			long userId, long templateId, long classPK, Map<Locale,
-			String> nameMap, Map<Locale, String> descriptionMap, String type,
-			String mode, String language, String script, boolean cacheable,
-			boolean smallImage, String smallImageURL, File smallImageFile,
-			ServiceContext serviceContext)
+			long userId, long templateId, long classPK,
+			Map<Locale, String> nameMap, Map<Locale, String> descriptionMap,
+			String type, String mode, String language, String script,
+			boolean cacheable, boolean smallImage, String smallImageURL,
+			File smallImageFile, ServiceContext serviceContext)
 		throws PortalException {
 
-		User user = userPersistence.findByPrimaryKey(userId);
+		User user = userLocalService.getUser(userId);
 
 		script = formatScript(type, language, script);
 
@@ -1556,7 +1555,7 @@ public class DDMTemplateLocalServiceImpl
 		if (template.isSmallImage() &&
 			Validator.isNull(template.getSmallImageURL())) {
 
-			Image smallImage = ImageUtil.fetchByPrimaryKey(
+			Image smallImage = imageLocalService.fetchImage(
 				template.getSmallImageId());
 
 			if (smallImage != null) {
@@ -1635,8 +1634,7 @@ public class DDMTemplateLocalServiceImpl
 				ddmGroupServiceConfiguration.smallImageExtensions()) {
 
 			if (StringPool.STAR.equals(smallImageExtension) ||
-				StringUtil.endsWith(
-					smallImageName, smallImageExtension)) {
+				StringUtil.endsWith(smallImageName, smallImageExtension)) {
 
 				validSmallImageExtension = true;
 

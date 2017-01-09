@@ -1,5 +1,6 @@
 <definition component-name="portal-wcm">
 	<property name="portal.release" value="true" />
+	<property name="portal.upstream" value="true" />
 	<property name="testray.main.component.name" value="Site Administration" />
 
 	<set-up>
@@ -254,6 +255,7 @@
 			<var name="orgName" value="Site Organization Name" />
 			<var name="userFirstName" value="Test" />
 			<var name="userLastName" value="Test" />
+			<var name="userName" value="Test Test" />
 			<var name="userScreenName" value="test" />
 		</execute>
 
@@ -617,6 +619,12 @@
 
 		<var locator="Gmail#EMAIL_VERIFICATION_CODE" name="emailVerification" />
 
+		<execute macro="Gmail#gotoHtmlMode" />
+
+		<execute macro="Gmail#deleteSpecificMail">
+			<var name="gmailMessageTitleList" value="Email Address Verification, Your New Account, Your New Password" />
+		</execute>
+
 		<execute macro="Navigator#openSpecificURL">
 			<var name="url" value="http://www.baker.com:8080/" />
 		</execute>
@@ -667,6 +675,12 @@
 
 		<execute function="SelectWindow" locator1="title=Verify Email Address - ${siteName}" />
 		<execute function="AssertLocation" value1="${emailAddressVerificationURL}" />
+
+		<execute macro="Gmail#gotoHtmlMode" />
+
+		<execute macro="Gmail#deleteSpecificMail">
+			<var name="gmailMessageTitleList" value="Email Address Verification, Your New Account, Your New Password" />
+		</execute>
 	</command>
 
 	<command name="SiteFriendlyURLLayoutImporter" priority="3">

@@ -1377,10 +1377,10 @@ public class GroupFinderImpl
 		joinMap.put(
 			"layoutSet", _removeWhere(CustomSQLUtil.get(JOIN_BY_LAYOUT_SET)));
 		joinMap.put(
-			"pageCount", _removeWhere(CustomSQLUtil.get(JOIN_BY_PAGE_COUNT)));
-		joinMap.put(
 			"membershipRestriction",
 			_removeWhere(CustomSQLUtil.get(JOIN_BY_MEMBERSHIP_RESTRICTION)));
+		joinMap.put(
+			"pageCount", _removeWhere(CustomSQLUtil.get(JOIN_BY_PAGE_COUNT)));
 		joinMap.put(
 			"rolePermissions_6",
 			_removeWhere(CustomSQLUtil.get(JOIN_BY_ROLE_RESOURCE_PERMISSIONS)));
@@ -1507,20 +1507,24 @@ public class GroupFinderImpl
 			params1.put("classNameIds", groupOrganizationClassNameIds);
 			params2.put("classNameIds", organizationClassNameId);
 			params3.put("classNameIds", groupClassNameId);
-			params4.put("classNameIds", groupClassNameId);
+			params4.put("classNameIds", groupOrganizationClassNameIds);
 		}
 		else {
 			params1.put("classNameIds", classNameIds);
 
 			if (ArrayUtil.contains(classNameIds, organizationClassNameId)) {
 				params2.put("classNameIds", organizationClassNameId);
-			}
 
-			if (ArrayUtil.contains(classNameIds, groupClassNameId)) {
+				if (ArrayUtil.contains(classNameIds, groupClassNameId)) {
+					params3.put("classNameIds", groupClassNameId);
+					params4.put("classNameIds", groupOrganizationClassNameIds);
+				}
+				else {
+					params4.put("classNameIds", organizationClassNameId);
+				}
+			}
+			else if (ArrayUtil.contains(classNameIds, groupClassNameId)) {
 				params3.put("classNameIds", groupClassNameId);
-			}
-
-			if (ArrayUtil.contains(classNameIds, groupClassNameId)) {
 				params4.put("classNameIds", groupClassNameId);
 			}
 		}

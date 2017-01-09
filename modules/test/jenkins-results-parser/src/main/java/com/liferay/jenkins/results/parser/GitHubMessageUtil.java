@@ -24,6 +24,7 @@ import java.util.regex.Pattern;
 import org.apache.tools.ant.Project;
 
 /**
+ * @author Kevin Yen
  * @author Peter Yoo
  */
 public class GitHubMessageUtil {
@@ -149,9 +150,11 @@ public class GitHubMessageUtil {
 				sb.append("s");
 			}
 
-			sb.append(" Failed.</p><pre><code>Completed with the status of ");
-			sb.append(topLevelResult);
-			sb.append(".</code></pre></li>");
+			sb.append(" Failed.</p>");
+			sb.append(
+				FailureMessageUtil.getFailureMessage(
+					project, project.getProperty("env.BUILD_URL")));
+			sb.append("</li>");
 
 			List<String> highPriorityJobFailureContents = new ArrayList<>();
 			List<String> normalPriorityJobFailureContents = new ArrayList<>();
@@ -193,7 +196,9 @@ public class GitHubMessageUtil {
 			sb.append("</ol>");
 		}
 
-		project.setProperty("github.post.comment.body", sb.toString());
+		project.setProperty(
+			"github.post.comment.body",
+			JenkinsResultsParserUtil.redact(sb.toString()));
 	}
 
 	protected static boolean isHighPriorityJobFailure(String content) {

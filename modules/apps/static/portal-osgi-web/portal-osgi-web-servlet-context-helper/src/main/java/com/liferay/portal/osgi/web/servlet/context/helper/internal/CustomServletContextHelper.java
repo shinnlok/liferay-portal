@@ -20,11 +20,13 @@ import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.osgi.web.servlet.context.helper.definition.WebResourceCollectionDefinition;
+import com.liferay.portal.servlet.delegate.ServletContextDelegate;
 
 import java.io.IOException;
 
 import java.net.URL;
 
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Objects;
 
@@ -36,6 +38,8 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.felix.utils.log.Logger;
+
 import org.osgi.framework.Bundle;
 import org.osgi.service.http.context.ServletContextHelper;
 
@@ -46,14 +50,14 @@ public class CustomServletContextHelper
 	extends ServletContextHelper implements ServletContextListener {
 
 	public CustomServletContextHelper(
-		Bundle bundle, Boolean wabShapedBundle,
+		Bundle bundle, Logger logger,
 		List<WebResourceCollectionDefinition>
 			webResourceCollectionDefinitions) {
 
 		super(bundle);
 
 		_bundle = bundle;
-		_wabShapedBundle = wabShapedBundle;
+		_logger = logger;
 		_webResourceCollectionDefinitions = webResourceCollectionDefinitions;
 
 		Class<?> clazz = getClass();
@@ -68,7 +72,8 @@ public class CustomServletContextHelper
 
 	@Override
 	public void contextInitialized(ServletContextEvent servletContextEvent) {
-		_servletContext = servletContextEvent.getServletContext();
+		_servletContext = ServletContextDelegate.create(
+			servletContextEvent.getServletContext());
 	}
 
 	@Override
@@ -91,9 +96,27 @@ public class CustomServletContextHelper
 
 		URL url = BundleUtil.getResourceInBundleOrFragments(_bundle, name);
 
-		if ((url == null) && !_wabShapedBundle) {
-			return BundleUtil.getResourceInBundleOrFragments(
+		if (url == null) {
+			url = BundleUtil.getResourceInBundleOrFragments(
 				_bundle, "/META-INF/resources" + name);
+		}
+
+		if (url == null) {
+			try {
+				Enumeration<URL> enumeration = _bundle.getResources(
+					"/META-INF/resources" + name);
+
+				if ((enumeration != null) && enumeration.hasMoreElements()) {
+					url = enumeration.nextElement();
+				}
+			}
+			catch (IOException ioe) {
+				_logger.log(
+					Logger.LOG_ERROR,
+					"Unable to get resource name " + name + " on bundle " +
+						_bundle,
+					ioe);
+			}
 		}
 
 		return url;
@@ -256,9 +279,9 @@ public class CustomServletContextHelper
 	}
 
 	private final Bundle _bundle;
+	private final Logger _logger;
 	private ServletContext _servletContext;
 	private final String _string;
-	private final boolean _wabShapedBundle;
 	private final List<WebResourceCollectionDefinition>
 		_webResourceCollectionDefinitions;
 

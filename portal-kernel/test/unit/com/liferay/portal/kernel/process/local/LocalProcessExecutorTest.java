@@ -1486,6 +1486,9 @@ public class LocalProcessExecutorTest {
 			arguments.add("-Djvm.debug=true");
 		}
 
+		arguments.add("-Dliferay.mode=test");
+		arguments.add("-Dsun.zip.disableMemoryMapping=true");
+
 		String whipAgentLine = System.getProperty("whip.agent");
 
 		if (Validator.isNotNull(whipAgentLine)) {
@@ -1727,7 +1730,7 @@ public class LocalProcessExecutorTest {
 				Thread heartbeatThread = _getHeartbeatThread(false);
 
 				while (heartbeatThread.getState() !=
-					Thread.State.TIMED_WAITING);
+							Thread.State.TIMED_WAITING);
 
 				ProcessContext.detach();
 

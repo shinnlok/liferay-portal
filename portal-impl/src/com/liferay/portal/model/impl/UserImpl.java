@@ -304,7 +304,7 @@ public class UserImpl extends UserBaseImpl {
 
 		String profileFriendlyURL = getProfileFriendlyURL();
 
-		if (Validator.isNotNull(profileFriendlyURL)) {
+		if (profileFriendlyURL != null) {
 			return portalURL.concat(PortalUtil.getPathContext()).concat(
 				profileFriendlyURL);
 		}
@@ -387,7 +387,7 @@ public class UserImpl extends UserBaseImpl {
 
 		String profileFriendlyURL = getProfileFriendlyURL();
 
-		if (Validator.isNotNull(profileFriendlyURL)) {
+		if (profileFriendlyURL != null) {
 			return PortalUtil.addPreservedParameters(
 				themeDisplay,
 				portalURL.concat(
@@ -838,7 +838,7 @@ public class UserImpl extends UserBaseImpl {
 
 	@Override
 	public boolean isEmailAddressVerificationComplete() {
-		if (isDefaultUser()) {
+		if (isDefaultUser() || isEmailAddressVerified()) {
 			return true;
 		}
 
@@ -855,7 +855,7 @@ public class UserImpl extends UserBaseImpl {
 		}
 
 		if (emailAddressVerificationRequired) {
-			return super.isEmailAddressVerified();
+			return false;
 		}
 
 		return true;
@@ -911,7 +911,7 @@ public class UserImpl extends UserBaseImpl {
 
 	@Override
 	public boolean isTermsOfUseComplete() {
-		if (isDefaultUser()) {
+		if (isDefaultUser() || isAgreedToTermsOfUse()) {
 			return true;
 		}
 
@@ -920,7 +920,7 @@ public class UserImpl extends UserBaseImpl {
 			PropsValues.TERMS_OF_USE_REQUIRED);
 
 		if (termsOfUseRequired) {
-			return super.isAgreedToTermsOfUse();
+			return false;
 		}
 
 		return true;
@@ -955,7 +955,7 @@ public class UserImpl extends UserBaseImpl {
 	}
 
 	protected String getProfileFriendlyURL() {
-		if (Validator.isNull(PropsValues.USERS_PROFILE_FRIENDLY_URL)) {
+		if (!_hasUsersProfileFriendlyURL) {
 			return null;
 		}
 
@@ -968,6 +968,9 @@ public class UserImpl extends UserBaseImpl {
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(UserImpl.class);
+
+	private static final boolean _hasUsersProfileFriendlyURL = Validator.isNull(
+		PropsValues.USERS_PROFILE_FRIENDLY_URL);
 
 	private Locale _locale;
 	private boolean _passwordModified;

@@ -39,6 +39,9 @@ import javax.portlet.PortletURL;
 import javax.servlet.http.HttpServletRequest;
 
 /**
+ * Provides utility methods moved from the trash entry model container's JSP
+ * file to reduce the complexity of that particular view.
+ *
  * @author Jürgen Kappler
  */
 public class TrashContainerModelDisplayContext {
@@ -294,8 +297,8 @@ public class TrashContainerModelDisplayContext {
 	}
 
 	public boolean isShowBackIcon() throws PortalException {
-		if (_isShowBackIcon != null) {
-			return _isShowBackIcon;
+		if (_showBackIcon != null) {
+			return _showBackIcon;
 		}
 
 		TrashHandler containerTrashHandler =
@@ -309,15 +312,15 @@ public class TrashContainerModelDisplayContext {
 				getContainerModelId());
 		}
 
-		boolean isShowBackIcon = false;
+		boolean showBackIcon = false;
 
 		if (containerModel != null) {
-			isShowBackIcon = true;
+			showBackIcon = true;
 		}
 
-		_isShowBackIcon = isShowBackIcon;
+		_showBackIcon = showBackIcon;
 
-		return _isShowBackIcon;
+		return _showBackIcon;
 	}
 
 	private String _backURL;
@@ -331,13 +334,13 @@ public class TrashContainerModelDisplayContext {
 	private List<ContainerModel> _containerModels;
 	private Integer _containerModelsCount;
 	private String _eventName;
-	private Boolean _isShowBackIcon;
 	private final LiferayPortletRequest _liferayPortletRequest;
 	private final LiferayPortletResponse _liferayPortletResponse;
 	private Object[] _missingContainerMessageArguments;
 	private String _redirect;
 	private final HttpServletRequest _request;
 	private SearchContainer _searchContainer;
+	private Boolean _showBackIcon;
 	private TrashHandler _trashHandler;
 	private TrashRenderer _trashRenderer;
 

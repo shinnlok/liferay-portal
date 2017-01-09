@@ -49,6 +49,12 @@ AssetEntry layoutAssetEntry = AssetEntryLocalServiceUtil.getEntry(CalendarBookin
 		<aui:fieldset markupView="lexicon">
 			<dl class="property-list">
 				<dt>
+					<liferay-ui:message key="status" />:
+				</dt>
+				<dd>
+					<aui:workflow-status markupView="lexicon" model="<%= CalendarBooking.class %>" showHelpMessage="<%= false %>" showIcon="<%= false %>" showLabel="<%= false %>" status="<%= calendarBooking.getStatus() %>" />
+				</dd>
+				<dt>
 					<liferay-ui:message key="starts" />:
 				</dt>
 				<dd>
@@ -94,7 +100,7 @@ AssetEntry layoutAssetEntry = AssetEntryLocalServiceUtil.getEntry(CalendarBookin
 					</dd>
 				</c:if>
 
-				<c:if test="<%= calendarBooking.isRecurring() %>">
+				<c:if test="<%= Validator.isNotNull(calendarBooking.getRecurrence()) %>">
 					<dt>
 						<liferay-ui:message key="repeat" />:
 					</dt>
@@ -104,14 +110,14 @@ AssetEntry layoutAssetEntry = AssetEntryLocalServiceUtil.getEntry(CalendarBookin
 				</c:if>
 			</dl>
 
-			<liferay-ui:custom-attributes-available className="<%= CalendarBooking.class.getName() %>">
-				<liferay-ui:custom-attribute-list
+			<liferay-expando:custom-attributes-available className="<%= CalendarBooking.class.getName() %>">
+				<liferay-expando:custom-attribute-list
 					className="<%= CalendarBooking.class.getName() %>"
 					classPK="<%= calendarBooking.getCalendarBookingId() %>"
 					editable="<%= false %>"
 					label="<%= true %>"
 				/>
-			</liferay-ui:custom-attributes-available>
+			</liferay-expando:custom-attributes-available>
 
 			<p>
 				<%= calendarBooking.getDescription(locale) %>
@@ -165,7 +171,7 @@ AssetEntry layoutAssetEntry = AssetEntryLocalServiceUtil.getEntry(CalendarBookin
 
 		<portlet:actionURL name="invokeTransition" var="invokeTransitionURL" />
 
-		<c:if test="<%= calendarBooking.isRecurring() %>">
+		<c:if test="<%= Validator.isNotNull(calendarBooking.getRecurrence()) %>">
 			<%@ include file="/calendar_booking_recurrence_language_keys.jspf" %>
 
 			<aui:script use="liferay-calendar-recurrence-util">
@@ -237,7 +243,10 @@ AssetEntry layoutAssetEntry = AssetEntryLocalServiceUtil.getEntry(CalendarBookin
 	<aui:form action="<%= invokeTransitionURL %>" method="post" name="fm">
 		<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
 		<aui:input name="calendarBookingId" type="hidden" value="<%= calendarBooking.getCalendarBookingId() %>" />
+		<aui:input name="startTime" type="hidden" value="<%= calendarBooking.getStartTime() %>" />
 		<aui:input name="status" type="hidden" />
+		<aui:input name="updateInstance" type="hidden" value="false" />
+		<aui:input name="allFollowing" type="hidden" value="false" />
 
 		<aui:button-row>
 
@@ -266,7 +275,27 @@ AssetEntry layoutAssetEntry = AssetEntryLocalServiceUtil.getEntry(CalendarBookin
 		function <portlet:namespace />invokeTransition(status) {
 			document.<portlet:namespace />fm.<portlet:namespace />status.value = status;
 
-			submitForm(document.<portlet:namespace />fm);
+			if (<%= calendarBooking.isRecurring() %>) {
+				Liferay.RecurrenceUtil.openConfirmationPanel(
+					'invokeTransition',
+					function() {
+						document.<portlet:namespace />fm.<portlet:namespace />updateInstance.value = 'true';
+						document.<portlet:namespace />fm.<portlet:namespace />allFollowing.value = 'false';
+						submitForm(document.<portlet:namespace />fm);
+					},
+					function() {
+						document.<portlet:namespace />fm.<portlet:namespace />updateInstance.value = 'true';
+						document.<portlet:namespace />fm.<portlet:namespace />allFollowing.value = 'true';
+						submitForm(document.<portlet:namespace />fm);
+					},
+					function() {
+						submitForm(document.<portlet:namespace />fm);
+					}
+				);
+			}
+			else {
+				submitForm(document.<portlet:namespace />fm);
+			}
 		}
 	</aui:script>
 </div>

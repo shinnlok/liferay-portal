@@ -14,19 +14,23 @@
 
 package com.liferay.gradle.plugins.defaults.tasks;
 
+import com.liferay.gradle.plugins.baseline.BaselinePlugin;
 import com.liferay.gradle.plugins.change.log.builder.BuildChangeLogTask;
 import com.liferay.gradle.plugins.change.log.builder.ChangeLogBuilderPlugin;
-import com.liferay.gradle.plugins.defaults.LiferayOSGiDefaultsPlugin;
 import com.liferay.gradle.plugins.defaults.internal.util.FileUtil;
 import com.liferay.gradle.plugins.defaults.internal.util.GradleUtil;
+import com.liferay.gradle.plugins.wsdd.builder.WSDDBuilderPlugin;
 import com.liferay.gradle.util.Validator;
 
 import java.io.File;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.gradle.api.DefaultTask;
@@ -94,6 +98,23 @@ public class PrintArtifactPublishCommandsTask extends DefaultTask {
 	}
 
 	@Input
+	public Map<String, FileCollection> getPrepNextCommitFiles() {
+		Project project = getProject();
+
+		Map<String, FileCollection> prepNextCommitFileCollections =
+			new LinkedHashMap<>();
+
+		for (Map.Entry<String, Set<Object>> entry :
+				_prepNextCommitFiles.entrySet()) {
+
+			prepNextCommitFileCollections.put(
+				entry.getKey(), project.files(entry.getValue()));
+		}
+
+		return prepNextCommitFileCollections;
+	}
+
+	@Input
 	public FileCollection getPrepNextFiles() {
 		Project project = getProject();
 
@@ -112,6 +133,22 @@ public class PrintArtifactPublishCommandsTask extends DefaultTask {
 	@Input
 	public boolean isGradleDaemon() {
 		return _gradleDaemon;
+	}
+
+	public PrintArtifactPublishCommandsTask prepNextCommitFile(
+		String message, File file) {
+
+		Set<Object> files = _prepNextCommitFiles.get(message);
+
+		if (files == null) {
+			files = new HashSet<>();
+
+			_prepNextCommitFiles.put(message, files);
+		}
+
+		files.add(file);
+
+		return this;
 	}
 
 	public PrintArtifactPublishCommandsTask prepNextFiles(
@@ -140,45 +177,44 @@ public class PrintArtifactPublishCommandsTask extends DefaultTask {
 
 		// Publish if the artifact has never been published
 
-		if (!isPublished()) {
-			addPublishCommands(commands, true);
+		if (!_isPublished()) {
+			_addPublishCommands(commands, true);
 		}
 
 		// Change log
 
-		BuildChangeLogTask buildChangeLogTask = (BuildChangeLogTask)getTask(
+		BuildChangeLogTask buildChangeLogTask = (BuildChangeLogTask)_getTask(
 			ChangeLogBuilderPlugin.BUILD_CHANGE_LOG_TASK_NAME);
 
 		if (buildChangeLogTask != null) {
-			commands.add(getGradleCommand(buildChangeLogTask));
+			commands.add(_getGradleCommand(buildChangeLogTask));
 
 			commands.add(
 				"git add " +
-					getRelativePath(buildChangeLogTask.getChangeLogFile()));
+					_getRelativePath(buildChangeLogTask.getChangeLogFile()));
 
-			commands.add(getGitCommitCommand("change log", false, true, true));
+			commands.add(_getGitCommitCommand("change log", false, true, true));
 		}
 
 		// Baseline
 
-		Task baselineTask = getTask(
-			LiferayOSGiDefaultsPlugin.BASELINE_TASK_NAME);
+		Task baselineTask = _getTask(BaselinePlugin.BASELINE_TASK_NAME);
 
 		if (baselineTask != null) {
-			commands.add(getGradleCommand(baselineTask));
+			commands.add(_getGradleCommand(baselineTask));
 
 			commands.add(
-				"git add --all " + getRelativePath(project.getProjectDir()));
+				"git add --all " + _getRelativePath(project.getProjectDir()));
 
 			commands.add(
-				getGitCommitCommand("packageinfo", false, false, true));
+				_getGitCommitCommand("packageinfo", false, false, true));
 		}
 
 		// Publish the artifact since there will either be change log or
 		// baseline changes
 
 		if ((baselineTask != null) || (buildChangeLogTask != null)) {
-			addPublishCommands(commands, false);
+			_addPublishCommands(commands, false);
 		}
 
 		System.out.println();
@@ -233,13 +269,35 @@ public class PrintArtifactPublishCommandsTask extends DefaultTask {
 		setPrepNextFiles(Arrays.asList(prepNextFiles));
 	}
 
-	protected void addPublishCommands(
+	private void _addPrepNextCommitCommands(
+		List<String> commands, String message, Iterable<File> files,
+		boolean checkExistence) {
+
+		boolean prepNext = false;
+
+		for (File file : files) {
+			if (checkExistence && !file.exists()) {
+				continue;
+			}
+
+			prepNext = true;
+
+			commands.add("git add " + _getRelativePath(file));
+		}
+
+		if (!checkExistence || prepNext) {
+			commands.add(
+				_getGitCommitCommand(message, false, true, !checkExistence));
+		}
+	}
+
+	private void _addPublishCommands(
 		List<String> commands, boolean firstPublish) {
 
 		// Publish snapshot
 
 		commands.add(
-			getGradleCommand(
+			_getGradleCommand(
 				BasePlugin.UPLOAD_ARCHIVES_TASK_NAME,
 				"-P" + GradleUtil.SNAPSHOT_PROPERTY_NAME));
 
@@ -248,7 +306,7 @@ public class PrintArtifactPublishCommandsTask extends DefaultTask {
 		String[] arguments = new String[0];
 
 		if (firstPublish) {
-			Task task = getTask(getFirstPublishExcludedTaskName());
+			Task task = _getTask(getFirstPublishExcludedTaskName());
 
 			if (task != null) {
 				arguments = new String[] {"-x", task.getPath()};
@@ -256,24 +314,23 @@ public class PrintArtifactPublishCommandsTask extends DefaultTask {
 		}
 
 		commands.add(
-			getGradleCommand(BasePlugin.UPLOAD_ARCHIVES_TASK_NAME, arguments));
+			_getGradleCommand(BasePlugin.UPLOAD_ARCHIVES_TASK_NAME, arguments));
 
 		// Commit "prep next"
 
-		boolean prepNext = false;
+		_addPrepNextCommitCommands(
+			commands, "prep next", getPrepNextFiles(), true);
 
-		for (File file : getPrepNextFiles()) {
-			if (!file.exists()) {
-				continue;
-			}
+		// Other "prep next" commits
 
-			prepNext = true;
+		Map<String, FileCollection> prepNextCommitFileCollections =
+			getPrepNextCommitFiles();
 
-			commands.add("git add " + getRelativePath(file));
-		}
+		for (Map.Entry<String, FileCollection> entry :
+				prepNextCommitFileCollections.entrySet()) {
 
-		if (prepNext) {
-			commands.add(getGitCommitCommand("prep next", false, true, false));
+			_addPrepNextCommitCommands(
+				commands, entry.getKey(), entry.getValue(), false);
 		}
 
 		// Commit "artifact properties"
@@ -281,26 +338,48 @@ public class PrintArtifactPublishCommandsTask extends DefaultTask {
 		File artifactPropertiesFile = getArtifactPropertiesFile();
 
 		if (artifactPropertiesFile != null) {
-			commands.add("git add " + getRelativePath(artifactPropertiesFile));
+			commands.add("git add " + _getRelativePath(artifactPropertiesFile));
 
 			commands.add(
-				getGitCommitCommand("artifact properties", false, true, false));
+				_getGitCommitCommand(
+					"artifact properties", false, true, false));
+		}
+
+		// WSDD
+
+		Task buildWSDDTask = _getTask(WSDDBuilderPlugin.BUILD_WSDD_TASK_NAME);
+
+		if ((buildWSDDTask != null) && buildWSDDTask.getEnabled()) {
+			Project project = getProject();
+
+			String command =
+				"git add --all " + _getRelativePath(project.getProjectDir()) +
+					File.separator;
+
+			commands.add(command + "*.wsdd");
+			commands.add(
+				_getQuietCommand(command + "**" + File.separator + "*.wsdd"));
+
+			commands.add(_getGitCommitCommand("wsdd", false, false, true));
 		}
 
 		// Commit other changed files
 
-		commands.add(getGitCommitCommand("apply", true, false, true));
+		commands.add(_getGitCommitCommand("apply", true, false, true));
 	}
 
-	protected String getGitCommitCommand(
+	private String _getGitCommitCommand(
 		String message, boolean all, boolean ignored, boolean quiet) {
 
 		StringBuilder sb = new StringBuilder();
 
 		Project project = getProject();
 
-		if (all || quiet) {
-			sb.append("(git diff-index --quiet HEAD || ");
+		if (all) {
+			sb.append("(git diff --quiet || ");
+		}
+		else if (quiet) {
+			sb.append("(git diff --cached --quiet || ");
 		}
 
 		sb.append("git commit ");
@@ -331,16 +410,16 @@ public class PrintArtifactPublishCommandsTask extends DefaultTask {
 		return sb.toString();
 	}
 
-	protected String getGradleCommand(String taskName, String... arguments) {
+	private String _getGradleCommand(String taskName, String... arguments) {
 		Task task = GradleUtil.getTask(getProject(), taskName);
 
-		return getGradleCommand(task, arguments);
+		return _getGradleCommand(task, arguments);
 	}
 
-	protected String getGradleCommand(Task task, String... arguments) {
+	private String _getGradleCommand(Task task, String... arguments) {
 		StringBuilder sb = new StringBuilder();
 
-		sb.append(getGradleRelativePath());
+		sb.append(_getGradleRelativePath());
 		sb.append(' ');
 		sb.append(task.getPath());
 
@@ -349,8 +428,7 @@ public class PrintArtifactPublishCommandsTask extends DefaultTask {
 		}
 
 		if (isForcedCache() &&
-			!LiferayOSGiDefaultsPlugin.BASELINE_TASK_NAME.equals(
-				task.getName())) {
+			!BaselinePlugin.BASELINE_TASK_NAME.equals(task.getName())) {
 
 			sb.append(" -Dforced.cache.enabled=true");
 		}
@@ -363,15 +441,19 @@ public class PrintArtifactPublishCommandsTask extends DefaultTask {
 		return sb.toString();
 	}
 
-	protected File getGradleFile() {
+	private File _getGradleFile() {
 		return new File(getGradleDir(), "gradlew");
 	}
 
-	protected String getGradleRelativePath() {
-		return getRelativePath(getGradleFile());
+	private String _getGradleRelativePath() {
+		return _getRelativePath(_getGradleFile());
 	}
 
-	protected String getRelativePath(Object object) {
+	private String _getQuietCommand(String command) {
+		return "(" + command + " || true)";
+	}
+
+	private String _getRelativePath(Object object) {
 		Project project = getProject();
 
 		File file = project.file(object);
@@ -381,7 +463,7 @@ public class PrintArtifactPublishCommandsTask extends DefaultTask {
 		return rootProject.relativePath(file);
 	}
 
-	protected Task getTask(String name) {
+	private Task _getTask(String name) {
 		if (Validator.isNull(name)) {
 			return null;
 		}
@@ -393,7 +475,7 @@ public class PrintArtifactPublishCommandsTask extends DefaultTask {
 		return taskContainer.findByName(name);
 	}
 
-	protected boolean isPublished() {
+	private boolean _isPublished() {
 		Project project = getProject();
 
 		String version = String.valueOf(project.getVersion());
@@ -417,6 +499,8 @@ public class PrintArtifactPublishCommandsTask extends DefaultTask {
 	private boolean _gradleDaemon;
 	private Object _gradleDir;
 	private Object _lowestPublishedVersion = "1.0.0";
+	private final Map<String, Set<Object>> _prepNextCommitFiles =
+		new LinkedHashMap<>();
 	private final Set<Object> _prepNextFiles = new LinkedHashSet<>();
 
 }

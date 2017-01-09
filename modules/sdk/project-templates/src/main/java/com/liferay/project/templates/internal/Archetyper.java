@@ -72,7 +72,9 @@ public class Archetyper {
 		throws Exception {
 
 		String artifactId = projectTemplatesArgs.getName();
+		String author = projectTemplatesArgs.getAuthor();
 		String className = projectTemplatesArgs.getClassName();
+		String contributorType = projectTemplatesArgs.getContributorType();
 		String hostBundleSymbolicName =
 			projectTemplatesArgs.getHostBundleSymbolicName();
 		String hostBundleVersion = projectTemplatesArgs.getHostBundleVersion();
@@ -132,8 +134,10 @@ public class Archetyper {
 			_setProperty(properties, "apiPath", apiPath);
 		}
 
+		_setProperty(properties, "author", author);
 		_setProperty(properties, "buildType", "gradle");
 		_setProperty(properties, "className", className);
+		_setProperty(properties, "contributorType", contributorType);
 		_setProperty(
 			properties, "hostBundleSymbolicName", hostBundleSymbolicName);
 		_setProperty(properties, "hostBundleVersion", hostBundleVersion);

@@ -99,10 +99,10 @@ public class DLFileEntryServiceImpl extends DLFileEntryServiceBaseImpl {
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		boolean isLocked = LockManagerUtil.isLocked(
+		boolean locked = LockManagerUtil.isLocked(
 			DLFileEntry.class.getName(), fileEntryId);
 
-		if (isLocked && !hasFileEntryLock(fileEntryId)) {
+		if (locked && !hasFileEntryLock(fileEntryId)) {
 			throw new FileEntryLockException.MustOwnLock();
 		}
 
@@ -576,7 +576,7 @@ public class DLFileEntryServiceImpl extends DLFileEntryServiceBaseImpl {
 
 	/**
 	 * @deprecated As of 7.0.0, replaced by {@link #isKeepFileVersionLabel(long,
-	 * boolean, ServiceContext)}
+	 *             boolean, ServiceContext)}
 	 */
 	@Deprecated
 	@Override

@@ -323,8 +323,6 @@
 
 		<execute function="Select" locator1="ReportContent#REASON_SELECT" value1="${flagReason}" />
 
-		<execute function="Type" locator1="TextInput#EMAIL" value1="${userEmailAddress}" />
-
 		<execute macro="Button#clickSave" />
 
 		<execute function="AssertTextEquals#assertPartialText" locator1="ReportContent#SUCCESS_MESSAGE" value1="Although we cannot disclose our final decision, we do review every report and appreciate your effort to make sure ${siteName} is a safe environment for everyone." />
@@ -468,6 +466,14 @@
 		<execute macro="Alert#viewSuccessMessage" />
 	</command>
 
+	<command name="saveAsDraftAndWait">
+		<execute function="AssertClick" locator1="Button#SAVE_AS_DRAFT" value1="Save as Draft" />
+
+		<execute function="Pause" locator1="3000" />
+
+		<execute macro="Alert#viewSuccessMessage" />
+	</command>
+
 	<command name="scheduleBlogEntry">
 		<var locator="TextInput#DISPLAY_DATE_DAY" name="displayDateDay" />
 		<var locator="TextInput#DISPLAY_DATE_MONTH" name="displayDateMonth" />
@@ -542,7 +548,9 @@
 		<var name="key_entryTitle" value="${entryTitle}" />
 
 		<execute function="Type" locator1="TextInput#SEARCH" value1="${entrySearchTerm}" />
+
 		<execute function="AssertClick" locator1="Button#SEARCH" value1="Search" />
+
 		<execute function="AssertTextEquals" locator1="Message#INFO" value1="No entries were found that matched the keywords: ${entrySearchTerm}." />
 
 		<if>

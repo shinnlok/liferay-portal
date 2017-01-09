@@ -45,9 +45,6 @@ public class FailureMessageUtilTest extends BaseJenkinsResultsParserTestCase {
 		downloadSample(
 			"plugin-compile-2", "0,label_exp=!master", "1953",
 			"test-portal-acceptance-pullrequest-batch(master)", "test-4-1");
-		downloadSample(
-			"sourceformat-1", "1,label_exp=!master", "7031",
-			"test-portal-acceptance-pullrequest-batch(master)", "test-1-14");
 	}
 
 	@Test
@@ -99,10 +96,9 @@ public class FailureMessageUtilTest extends BaseJenkinsResultsParserTestCase {
 	protected Project getProject() {
 		Project project = new Project();
 
+		project.setProperty("github.origin.name", "junit-pr-origin-username");
 		project.setProperty(
-			"github.pull.request.head.branch", "junit-pr-head-branch");
-		project.setProperty(
-			"github.pull.request.head.username", "junit-pr-head-username");
+			"github.sender.branch.name", "junit-pr-sender-branch");
 		project.setProperty("plugins.branch.name", "junit-plugins-branch-name");
 		project.setProperty("plugins.repository", "junit-plugins-repository");
 		project.setProperty("portal.repository", "junit-portal-repository");

@@ -21,6 +21,7 @@
 <%@ taglib uri="http://liferay.com/tld/asset" prefix="liferay-asset" %><%@
 taglib uri="http://liferay.com/tld/aui" prefix="aui" %><%@
 taglib uri="http://liferay.com/tld/ddm" prefix="liferay-ddm" %><%@
+taglib uri="http://liferay.com/tld/expando" prefix="liferay-expando" %><%@
 taglib uri="http://liferay.com/tld/flags" prefix="liferay-flags" %><%@
 taglib uri="http://liferay.com/tld/frontend" prefix="liferay-frontend" %><%@
 taglib uri="http://liferay.com/tld/item-selector" prefix="liferay-item-selector" %><%@
@@ -39,20 +40,22 @@ page import="com.liferay.asset.kernel.service.AssetEntryServiceUtil" %><%@
 page import="com.liferay.asset.kernel.service.AssetTagLocalServiceUtil" %><%@
 page import="com.liferay.blogs.configuration.BlogsGroupServiceOverriddenConfiguration" %><%@
 page import="com.liferay.blogs.constants.BlogsConstants" %><%@
+page import="com.liferay.blogs.exception.EntryContentException" %><%@
+page import="com.liferay.blogs.exception.EntryCoverImageCropException" %><%@
+page import="com.liferay.blogs.exception.EntryDescriptionException" %><%@
+page import="com.liferay.blogs.exception.EntrySmallImageNameException" %><%@
+page import="com.liferay.blogs.exception.EntrySmallImageScaleException" %><%@
+page import="com.liferay.blogs.exception.EntryTitleException" %><%@
 page import="com.liferay.blogs.exception.EntryUrlTitleException" %><%@
-page import="com.liferay.blogs.kernel.exception.EntryContentException" %><%@
-page import="com.liferay.blogs.kernel.exception.EntryCoverImageCropException" %><%@
-page import="com.liferay.blogs.kernel.exception.EntryDescriptionException" %><%@
-page import="com.liferay.blogs.kernel.exception.EntrySmallImageNameException" %><%@
-page import="com.liferay.blogs.kernel.exception.EntrySmallImageScaleException" %><%@
-page import="com.liferay.blogs.kernel.exception.EntryTitleException" %><%@
-page import="com.liferay.blogs.kernel.exception.NoSuchEntryException" %><%@
-page import="com.liferay.blogs.kernel.model.BlogsEntry" %><%@
-page import="com.liferay.blogs.kernel.util.comparator.EntryModifiedDateComparator" %><%@
+page import="com.liferay.blogs.exception.NoSuchEntryException" %><%@
+page import="com.liferay.blogs.model.BlogsEntry" %><%@
 page import="com.liferay.blogs.service.BlogsEntryLocalServiceUtil" %><%@
 page import="com.liferay.blogs.service.BlogsEntryServiceUtil" %><%@
 page import="com.liferay.blogs.service.permission.BlogsEntryPermission" %><%@
+page import="com.liferay.blogs.service.permission.BlogsPermission" %><%@
 page import="com.liferay.blogs.settings.BlogsGroupServiceSettings" %><%@
+page import="com.liferay.blogs.util.BlogsUtil" %><%@
+page import="com.liferay.blogs.util.comparator.EntryModifiedDateComparator" %><%@
 page import="com.liferay.blogs.web.configuration.BlogsPortletInstanceConfiguration" %><%@
 page import="com.liferay.blogs.web.constants.BlogsPortletKeys" %><%@
 page import="com.liferay.blogs.web.constants.BlogsWebKeys" %><%@
@@ -136,8 +139,6 @@ page import="com.liferay.portal.kernel.workflow.WorkflowConstants" %><%@
 page import="com.liferay.portal.upload.LiferayFileItem" %><%@
 page import="com.liferay.portal.util.PropsValues" %><%@
 page import="com.liferay.portlet.asset.util.AssetUtil" %><%@
-page import="com.liferay.portlet.blogs.service.permission.BlogsPermission" %><%@
-page import="com.liferay.portlet.blogs.util.BlogsUtil" %><%@
 page import="com.liferay.taglib.search.ResultRow" %><%@
 page import="com.liferay.trash.kernel.util.TrashUtil" %>
 

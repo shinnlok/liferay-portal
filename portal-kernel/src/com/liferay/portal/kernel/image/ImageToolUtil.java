@@ -104,6 +104,14 @@ public class ImageToolUtil {
 		getImageTool().encodeWBMP(renderedImage, os);
 	}
 
+	public static RenderedImage flipHorizontal(RenderedImage renderedImage) {
+		return getImageTool().flipHorizontal(renderedImage);
+	}
+
+	public static RenderedImage flipVertical(RenderedImage renderedImage) {
+		return getImageTool().flipVertical(renderedImage);
+	}
+
 	/**
 	 * Returns the rendered image as a {@link BufferedImage}.
 	 *
@@ -185,9 +193,8 @@ public class ImageToolUtil {
 	}
 
 	/**
-	 * Detects the image format and creates an {@link
-	 * ImageBag} containing the {@link
-	 * RenderedImage} and image type.
+	 * Detects the image format and creates an {@link ImageBag} containing the
+	 * {@link RenderedImage} and image type.
 	 *
 	 * @param  bytes the bytes to read
 	 * @return the {@link ImageBag}
@@ -204,9 +211,8 @@ public class ImageToolUtil {
 	}
 
 	/**
-	 * Detects the image format and creates an {@link
-	 * ImageBag} containing the {@link
-	 * RenderedImage} and image type.
+	 * Detects the image format and creates an {@link ImageBag} containing the
+	 * {@link RenderedImage} and image type.
 	 *
 	 * @param  file the file to read
 	 * @return the {@link ImageBag}
@@ -226,6 +232,12 @@ public class ImageToolUtil {
 		throws ImageResolutionException, IOException {
 
 		return getImageTool().read(inputStream);
+	}
+
+	public static RenderedImage rotate(
+		RenderedImage renderedImage, int degrees) {
+
+		return getImageTool().rotate(renderedImage, degrees);
 	}
 
 	/**

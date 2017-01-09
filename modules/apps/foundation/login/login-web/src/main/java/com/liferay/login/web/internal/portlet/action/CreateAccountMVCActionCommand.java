@@ -44,6 +44,8 @@ import com.liferay.portal.kernel.exception.UserPasswordException;
 import com.liferay.portal.kernel.exception.UserScreenNameException;
 import com.liferay.portal.kernel.exception.UserSmsException;
 import com.liferay.portal.kernel.exception.WebsiteURLException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.model.Layout;
@@ -51,7 +53,7 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
-import com.liferay.portal.kernel.security.auth.session.AuthenticatedSessionManagerUtil;
+import com.liferay.portal.kernel.security.auth.session.AuthenticatedSessionManager;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
@@ -302,6 +304,12 @@ public class CreateAccountMVCActionCommand extends BaseMVCActionCommand {
 			sendRedirect(actionRequest, actionResponse, redirect);
 		}
 		catch (NoSuchLayoutException nsle) {
+
+			// LPS-52675
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(nsle, nsle);
+			}
 		}
 	}
 
@@ -363,7 +371,7 @@ public class CreateAccountMVCActionCommand extends BaseMVCActionCommand {
 			HttpServletResponse response = PortalUtil.getHttpServletResponse(
 				actionResponse);
 
-			AuthenticatedSessionManagerUtil.login(
+			_authenticatedSessionManager.login(
 				request, response, login, password, false, null);
 		}
 		else {
@@ -515,6 +523,12 @@ public class CreateAccountMVCActionCommand extends BaseMVCActionCommand {
 	}
 
 	private static final boolean _AUTO_SCREEN_NAME = false;
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		CreateAccountMVCActionCommand.class);
+
+	@Reference
+	private AuthenticatedSessionManager _authenticatedSessionManager;
 
 	private LayoutLocalService _layoutLocalService;
 	private UserLocalService _userLocalService;

@@ -40,11 +40,11 @@ if (threadId > 0) {
 		curParentMessage = MBMessageLocalServiceUtil.getMessage(parentMessageId);
 
 		if (Validator.isNull(subject)) {
-			if (curParentMessage.getSubject().startsWith("RE: ")) {
+			if (curParentMessage.getSubject().startsWith(MBMessageConstants.MESSAGE_SUBJECT_PREFIX_RE)) {
 				subject = curParentMessage.getSubject();
 			}
 			else {
-				subject = "RE: " + curParentMessage.getSubject();
+				subject = MBMessageConstants.MESSAGE_SUBJECT_PREFIX_RE + curParentMessage.getSubject();
 			}
 		}
 	}
@@ -216,7 +216,7 @@ if (portletTitleBasedNavigation) {
 
 				<aui:model-context bean="<%= message %>" model="<%= MBMessage.class %>" />
 
-				<aui:input autoFocus="<%= (windowState.equals(WindowState.MAXIMIZED) && !themeDisplay.isFacebook()) %>" name="subject" value="<%= subject %>" />
+				<aui:input autoFocus="<%= windowState.equals(WindowState.MAXIMIZED) %>" name="subject" value="<%= subject %>" />
 
 				<aui:field-wrapper label="body">
 					<c:choose>
@@ -232,16 +232,16 @@ if (portletTitleBasedNavigation) {
 				</aui:field-wrapper>
 			</aui:fieldset>
 
-			<liferay-ui:custom-attributes-available className="<%= MBMessage.class.getName() %>">
+			<liferay-expando:custom-attributes-available className="<%= MBMessage.class.getName() %>">
 				<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="custom-fields">
-					<liferay-ui:custom-attribute-list
+					<liferay-expando:custom-attribute-list
 						className="<%= MBMessage.class.getName() %>"
 						classPK="<%= messageId %>"
 						editable="<%= true %>"
 						label="<%= true %>"
 					/>
 				</aui:fieldset>
-			</liferay-ui:custom-attributes-available>
+			</liferay-expando:custom-attributes-available>
 
 			<c:if test="<%= MBCategoryPermission.contains(permissionChecker, scopeGroupId, categoryId, ActionKeys.ADD_FILE) %>">
 				<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="attachments">
@@ -349,6 +349,8 @@ if (portletTitleBasedNavigation) {
 				<c:if test="<%= curParentMessage == null %>">
 
 					<%
+					MBCategory category = MBCategoryLocalServiceUtil.getCategory(categoryId);
+
 					boolean disabled = false;
 					boolean question = threadAsQuestionByDefault;
 
@@ -357,15 +359,15 @@ if (portletTitleBasedNavigation) {
 
 						if (thread.isQuestion() || message.isAnswer()) {
 							question = true;
+
+							if ((category != null) && category.getDisplayStyle().equals("question")) {
+								disabled = true;
+							}
 						}
 					}
-					else {
-						MBCategory category = MBCategoryLocalServiceUtil.getCategory(categoryId);
-
-						if ((category != null) && category.getDisplayStyle().equals("question")) {
-							disabled = true;
-							question = true;
-						}
+					else if ((category != null) && category.getDisplayStyle().equals("question")) {
+						disabled = true;
+						question = true;
 					}
 					%>
 
@@ -430,7 +432,7 @@ if (portletTitleBasedNavigation) {
 			<c:if test="<%= (message == null) && PropsValues.CAPTCHA_CHECK_PORTLET_MESSAGE_BOARDS_EDIT_MESSAGE %>">
 				<portlet:resourceURL id="/message_boards/captcha" var="captchaURL" />
 
-				<liferay-ui:captcha url="<%= captchaURL %>" />
+				<liferay-captcha:captcha url="<%= captchaURL %>" />
 			</c:if>
 		</aui:fieldset-group>
 
