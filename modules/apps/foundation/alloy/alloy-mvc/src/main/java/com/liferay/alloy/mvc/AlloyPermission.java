@@ -17,6 +17,8 @@ package com.liferay.alloy.mvc;
 import com.liferay.portal.kernel.bean.BeanPropertiesUtil;
 import com.liferay.portal.kernel.exception.NoSuchResourceActionException;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
@@ -76,6 +78,10 @@ public class AlloyPermission {
 			ResourceActionsUtil.checkAction(name, actionId);
 		}
 		catch (NoSuchResourceActionException nsrae) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(nsrae, nsrae);
+			}
+
 			return true;
 		}
 
@@ -192,5 +198,8 @@ public class AlloyPermission {
 
 		return BeanPropertiesUtil.getLongSilent(baseModel, "userId");
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		AlloyPermission.class);
 
 }
