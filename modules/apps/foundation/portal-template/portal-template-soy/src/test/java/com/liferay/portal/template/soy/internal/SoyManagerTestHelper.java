@@ -14,8 +14,6 @@
 
 package com.liferay.portal.template.soy.internal;
 
-import com.liferay.portal.json.JSONDeserializerImpl;
-import com.liferay.portal.json.JSONSerializerImpl;
 import com.liferay.portal.kernel.template.Template;
 import com.liferay.portal.kernel.template.TemplateResource;
 import com.liferay.portal.kernel.template.URLTemplateResource;
@@ -76,17 +74,6 @@ public class SoyManagerTestHelper {
 
 	protected void setUpSoyManager() throws Exception {
 		_soyManager = new SoyManager();
-
-		SoyTemplateContextHelper soyTemplateContextHelper =
-			new SoyTemplateContextHelper();
-
-		ReflectionTestUtil.setFieldValue(
-			soyTemplateContextHelper, "_jsonDeserializer",
-			new JSONDeserializerImpl<>());
-
-		ReflectionTestUtil.setFieldValue(
-			soyTemplateContextHelper, "_jsonSerializer",
-			new JSONSerializerImpl());
 
 		_soyManager.setTemplateContextHelper(soyTemplateContextHelper);
 
