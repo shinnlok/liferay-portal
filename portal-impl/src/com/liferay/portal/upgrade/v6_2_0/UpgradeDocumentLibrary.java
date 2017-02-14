@@ -15,13 +15,13 @@
 package com.liferay.portal.upgrade.v6_2_0;
 
 import com.liferay.document.library.kernel.model.DLFileEntryTypeConstants;
-import com.liferay.document.library.kernel.model.DLFolder;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.store.DLStoreUtil;
 import com.liferay.portal.kernel.dao.jdbc.AutoBatchPreparedStatementUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.TreeModel;
 import com.liferay.portal.kernel.security.auth.FullNameGenerator;
 import com.liferay.portal.kernel.security.auth.FullNameGeneratorFactory;
 import com.liferay.portal.kernel.tree.TreeModelTasksAdapter;
@@ -38,7 +38,8 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.upgrade.v6_2_0.util.DLFileEntryTypeTable;
 import com.liferay.portal.util.PortalInstances;
-import com.liferay.portlet.documentlibrary.model.impl.DLFolderImpl;
+
+import java.io.Serializable;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -153,14 +154,14 @@ public class UpgradeDocumentLibrary extends UpgradeProcess {
 			TreePathUtil.rebuildTree(
 				companyId, DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 				StringPool.SLASH,
-				new TreeModelTasksAdapter<DLFolder>() {
+				new TreeModelTasksAdapter<DLFolderTreeModel>() {
 
 					@Override
-					public List<DLFolder> findTreeModels(
+					public List<DLFolderTreeModel> findTreeModels(
 						long previousId, long companyId, long parentPrimaryKey,
 						int size) {
 
-						List<DLFolder> list = new ArrayList<>();
+						List<DLFolderTreeModel> list = new ArrayList<>();
 
 						try {
 							try (PreparedStatement ps =
@@ -176,29 +177,12 @@ public class UpgradeDocumentLibrary extends UpgradeProcess {
 								try (ResultSet rs = ps.executeQuery()) {
 									while (rs.next()) {
 										long folderId = rs.getLong(1);
-										DLFolder folder = new DLFolderImpl() {
 
-											@Override
-											public void updateTreePath(
-												String str) {
+										DLFolderTreeModel folder =
+											new DLFolderTreeModel(psFolder);
 
-												try {
-													psFolder.setString(1, str);
-													psFolder.setLong(
-														2, getFolderId());
-													psFolder.addBatch();
-												}
-												catch (SQLException sqle) {
-													_log.error(
-														"Error updating " +
-															"treepath: " + str,
-														sqle);
-												}
-											}
+										folder.setPrimaryKeyObj(folderId);
 
-										};
-
-										folder.setFolderId(folderId);
 										list.add(folder);
 									}
 								}
@@ -393,5 +377,47 @@ public class UpgradeDocumentLibrary extends UpgradeProcess {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		UpgradeDocumentLibrary.class);
+
+	private class DLFolderTreeModel implements TreeModel {
+
+		public DLFolderTreeModel(PreparedStatement ps) {
+			_ps = ps;
+		}
+
+		@Override
+		public String buildTreePath() throws PortalException {
+			return null;
+		}
+
+		@Override
+		public Serializable getPrimaryKeyObj() {
+			return _folderId;
+		}
+
+		@Override
+		public String getTreePath() {
+			return null;
+		}
+
+		public void setPrimaryKeyObj(Serializable primaryKeyObj) {
+			_folderId = ((Long)primaryKeyObj).longValue();
+		}
+
+		@Override
+		public void updateTreePath(String treePath) {
+			try {
+				_ps.setString(1, treePath);
+				_ps.setLong(2, _folderId);
+				_ps.addBatch();
+			}
+			catch (SQLException sqle) {
+				_log.error("Error updating treepath: " + treePath, sqle);
+			}
+		}
+
+		private long _folderId;
+		private final PreparedStatement _ps;
+
+	}
 
 }
