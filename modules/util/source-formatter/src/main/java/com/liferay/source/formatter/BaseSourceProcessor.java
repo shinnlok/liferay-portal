@@ -2690,7 +2690,7 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 	protected boolean isModulesFile(
 		String absolutePath, boolean includePlugins) {
 
-		if (_isSubrepository()) {
+		if (subrepository) {
 			return true;
 		}
 
