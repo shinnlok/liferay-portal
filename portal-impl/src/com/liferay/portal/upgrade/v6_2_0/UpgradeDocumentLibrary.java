@@ -102,6 +102,7 @@ public class UpgradeDocumentLibrary extends UpgradeProcess {
 		// DLFolder
 
 		updateDLFolderUserName();
+
 		updateTreePath();
 	}
 
@@ -146,102 +147,105 @@ public class UpgradeDocumentLibrary extends UpgradeProcess {
 	}
 
 	protected void rebuildTree(
-		long companyId, PreparedStatement psFolder,
-		PreparedStatement psFileEntry, PreparedStatement psFileVersion,
-		PreparedStatement psFileShortcut) {
+			long companyId, PreparedStatement folderPreparedStatement,
+			PreparedStatement fileEntryPreparedStatement,
+			PreparedStatement fileVersionPreparedStatement,
+			PreparedStatement fileShortcutPreparedStatement)
+		throws PortalException {
 
-		try {
-			TreePathUtil.rebuildTree(
-				companyId, DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
-				StringPool.SLASH,
-				new TreeModelTasksAdapter<DLFolderTreeModel>() {
+		TreePathUtil.rebuildTree(
+			companyId, DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+			StringPool.SLASH,
+			new TreeModelTasksAdapter<DLFolderTreeModel>() {
 
-					@Override
-					public List<DLFolderTreeModel> findTreeModels(
-						long previousId, long companyId, long parentPrimaryKey,
-						int size) {
+				@Override
+				public List<DLFolderTreeModel> findTreeModels(
+					long previousId, long companyId, long parentPrimaryKey,
+					int size) {
 
-						List<DLFolderTreeModel> list = new ArrayList<>();
+					List<DLFolderTreeModel> treeModels = new ArrayList<>();
 
-						try (PreparedStatement ps = connection.prepareStatement(
-								_SELECT_DLFOLDER_BY_PARENT)) {
+					try (PreparedStatement ps = connection.prepareStatement(
+							_SELECT_DLFOLDER_BY_PARENT)) {
 
-							ps.setLong(1, previousId);
-							ps.setLong(2, companyId);
-							ps.setLong(3, parentPrimaryKey);
-							ps.setInt(4, WorkflowConstants.STATUS_IN_TRASH);
-							ps.setFetchSize(size);
+						ps.setLong(1, previousId);
+						ps.setLong(2, companyId);
+						ps.setLong(3, parentPrimaryKey);
+						ps.setInt(4, WorkflowConstants.STATUS_IN_TRASH);
+						ps.setFetchSize(size);
 
-							try (ResultSet rs = ps.executeQuery()) {
-								while (rs.next()) {
-									long folderId = rs.getLong(1);
+						try (ResultSet rs = ps.executeQuery()) {
+							while (rs.next()) {
+								long folderId = rs.getLong(1);
 
-									DLFolderTreeModel folder =
-										new DLFolderTreeModel(psFolder);
+								DLFolderTreeModel treeModel =
+									new DLFolderTreeModel(
+										folderPreparedStatement);
 
-									folder.setPrimaryKeyObj(folderId);
+								treeModel.setPrimaryKeyObj(folderId);
 
-									list.add(folder);
-								}
+								treeModels.add(treeModel);
 							}
 						}
-						catch (SQLException sqle) {
-							_log.error(
-								"Unable to get folders with parentId: " +
-									parentPrimaryKey,
-								sqle);
-						}
-
-						return list;
+					}
+					catch (SQLException sqle) {
+						_log.error(
+							"Unable to get folders with parentId " +
+								parentPrimaryKey,
+							sqle);
 					}
 
-					@Override
-					public void rebuildDependentModelsTreePaths(
-							long parentPrimaryKey, String treePath)
-						throws PortalException {
+					return treeModels;
+				}
 
-						try {
-							psFileEntry.setString(1, treePath);
-							psFileEntry.setLong(2, parentPrimaryKey);
-							psFileEntry.addBatch();
-						}
-						catch (SQLException sqle) {
-							_log.error(
-								"Error updating treepath: " + treePath +
-									" on DLFileEntries",
-								sqle);
-						}
+				@Override
+				public void rebuildDependentModelsTreePaths(
+						long parentPrimaryKey, String treePath)
+					throws PortalException {
 
-						try {
-							psFileVersion.setString(1, treePath);
-							psFileVersion.setLong(2, parentPrimaryKey);
-							psFileVersion.addBatch();
-						}
-						catch (SQLException sqle) {
-							_log.error(
-								"Error updating treepath: " + treePath +
-									" on DLFileVersions",
-								sqle);
-						}
+					try {
+						fileEntryPreparedStatement.setString(1, treePath);
+						fileEntryPreparedStatement.setLong(2, parentPrimaryKey);
 
-						try {
-							psFileShortcut.setString(1, treePath);
-							psFileShortcut.setLong(2, parentPrimaryKey);
-							psFileShortcut.addBatch();
-						}
-						catch (SQLException sqle) {
-							_log.error(
-								"Error updating treepath: " + treePath +
-									" on DLFileShortCuts",
-								sqle);
-						}
+						fileEntryPreparedStatement.addBatch();
+					}
+					catch (SQLException sqle) {
+						_log.error(
+							"Unable to update DL file entries with tree path " +
+								treePath,
+							sqle);
 					}
 
-				});
-		}
-		catch (PortalException pe) {
-			_log.error("Error updating treePath on company " + companyId, pe);
-		}
+					try {
+						fileVersionPreparedStatement.setString(1, treePath);
+						fileVersionPreparedStatement.setLong(
+							2, parentPrimaryKey);
+
+						fileVersionPreparedStatement.addBatch();
+					}
+					catch (SQLException sqle) {
+						_log.error(
+							"Unable to update DL file versions with tree " +
+								"path " + treePath,
+							sqle);
+					}
+
+					try {
+						fileShortcutPreparedStatement.setString(1, treePath);
+						fileShortcutPreparedStatement.setLong(
+							2, parentPrimaryKey);
+
+						fileShortcutPreparedStatement.addBatch();
+					}
+					catch (SQLException sqle) {
+						_log.error(
+							"Unable to update DL file shortcuts with tree " +
+								"path " + treePath,
+							sqle);
+					}
+				}
+
+			});
 	}
 
 	protected void updateDLFolderUserName() throws Exception {
@@ -327,33 +331,51 @@ public class UpgradeDocumentLibrary extends UpgradeProcess {
 			long[] companyIds = PortalInstances.getCompanyIdsBySQL();
 
 			for (long companyId : companyIds) {
-				try (PreparedStatement psFolder =
+				try (PreparedStatement folderPreparedStatement =
 						AutoBatchPreparedStatementUtil.concurrentAutoBatch(
-							connection, _UPDATE_DLFOLDER_TREEPATH);
-					PreparedStatement psFileEntry =
+							connection,
+							"update DLFolder set treePath = ? where folderId " +
+								"= ?");
+					PreparedStatement fileEntryPreparedStatement =
 						AutoBatchPreparedStatementUtil.concurrentAutoBatch(
-							connection, _UPDATE_DLFILEENTRY_TREEPATH);
-					PreparedStatement psFileVersion =
+							connection,
+							"update DLFileEntry set treePath = ? where " +
+								"folderId = ?");
+					PreparedStatement fileVersionPreparedStatement =
 						AutoBatchPreparedStatementUtil.concurrentAutoBatch(
-							connection, _UPDATE_DLFILEVERSION_TREEPATH);
-					PreparedStatement psFileShortcut =
+							connection,
+							"update DLFileVersion set treePath = ? where " +
+								"folderId = ?");
+					PreparedStatement fileShortcutPreparedStatement =
 						AutoBatchPreparedStatementUtil.concurrentAutoBatch(
-							connection, _UPDATE_DLFILESHORTCUT_TREEPATH)) {
+							connection,
+							"update DLFileShortcut set treePath = ? where " +
+								"folderId = ?")) {
 
-					rebuildTree(
-						companyId, psFolder, psFileEntry, psFileVersion,
-						psFileShortcut);
+					try {
+						rebuildTree(
+							companyId, folderPreparedStatement,
+							fileEntryPreparedStatement,
+							fileVersionPreparedStatement,
+							fileShortcutPreparedStatement);
+					}
+					catch (PortalException pe) {
+						_log.error(
+							"Unable to update tree paths on company " +
+								companyId,
+							pe);
+					}
 
-					psFolder.executeBatch();
+					folderPreparedStatement.executeBatch();
 
-					psFileEntry.executeBatch();
-					psFileVersion.executeBatch();
-					psFileShortcut.executeBatch();
+					fileEntryPreparedStatement.executeBatch();
+					fileVersionPreparedStatement.executeBatch();
+					fileShortcutPreparedStatement.executeBatch();
 				}
 			}
 		}
 		catch (SQLException sqle) {
-			_log.error("Error updating treePath", sqle);
+			_log.error("Unable to update tree paths", sqle);
 		}
 	}
 
@@ -361,18 +383,6 @@ public class UpgradeDocumentLibrary extends UpgradeProcess {
 		"select folderId from DLFolder dlFolder where dlFolder.folderId > ? " +
 			"and dlFolder.companyId = ? and dlFolder.parentFolderId = ? and " +
 				"dlFolder.status != ?";
-
-	private static final String _UPDATE_DLFILEENTRY_TREEPATH =
-		"update DLFileEntry set treePath = ? where folderId = ?";
-
-	private static final String _UPDATE_DLFILESHORTCUT_TREEPATH =
-		"update DLFileShortcut set treePath = ? where folderId = ?";
-
-	private static final String _UPDATE_DLFILEVERSION_TREEPATH =
-		"update DLFileVersion set treePath = ? where folderId = ?";
-
-	private static final String _UPDATE_DLFOLDER_TREEPATH =
-		"update DLFolder set treePath = ? where folderId = ?";
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		UpgradeDocumentLibrary.class);
@@ -399,7 +409,7 @@ public class UpgradeDocumentLibrary extends UpgradeProcess {
 		}
 
 		public void setPrimaryKeyObj(Serializable primaryKeyObj) {
-			_folderId = ((Long)primaryKeyObj).longValue();
+			_folderId = (Long)primaryKeyObj;
 		}
 
 		@Override
@@ -407,10 +417,11 @@ public class UpgradeDocumentLibrary extends UpgradeProcess {
 			try {
 				_ps.setString(1, treePath);
 				_ps.setLong(2, _folderId);
+
 				_ps.addBatch();
 			}
 			catch (SQLException sqle) {
-				_log.error("Error updating treepath: " + treePath, sqle);
+				_log.error("Unable to update tree path: " + treePath, sqle);
 			}
 		}
 
