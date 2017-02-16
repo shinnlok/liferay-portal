@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+
+<ivy-module
+	version="2.0"
+	xmlns:m2="http://ant.apache.org/ivy/maven"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd"
+>
+	<info module="${ivy.module.name}" organisation="com.liferay">
+		<extends extendType="configurations,description,info" location="${sdk.dir}/ivy.xml" module="com.liferay.sdk" organisation="com.liferay" revision="latest.integration" />
+	</info>
+
+	<dependencies defaultconf="default">
+		<dependency name="cometd-java-client" org="org.cometd.java" rev="2.3.1" />
+		<dependency name="force-apex-api" org="com.force.api" rev="39.0.0" />
+		<dependency name="force-metadata-api" org="com.force.api" rev="39.0.0" />
+		<dependency name="force-partner-api" org="com.force.api" rev="39.0.0" />
+		<dependency name="jetty-client" org="org.eclipse.jetty" rev="7.4.4.v20110707" />
+		<dependency name="slf4j-api" org="org.slf4j" rev="1.7.2" />
+	</dependencies>
+</ivy-module>
