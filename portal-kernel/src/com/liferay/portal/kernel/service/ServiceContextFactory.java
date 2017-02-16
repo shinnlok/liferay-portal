@@ -21,15 +21,14 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
-import com.liferay.portal.kernel.model.PortletPreferencesIds;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.service.permission.ModelPermissions;
 import com.liferay.portal.kernel.service.permission.ModelPermissionsFactory;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.Constants;
+import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -69,14 +68,22 @@ public class ServiceContextFactory {
 		if (themeDisplay != null) {
 			serviceContext.setCompanyId(themeDisplay.getCompanyId());
 			serviceContext.setLanguageId(themeDisplay.getLanguageId());
-			serviceContext.setLayoutFullURL(
-				PortalUtil.getCanonicalURL(
-					PortalUtil.getLayoutFullURL(themeDisplay), themeDisplay,
-					themeDisplay.getLayout(), true));
-			serviceContext.setLayoutURL(
-				PortalUtil.getCanonicalURL(
-					PortalUtil.getLayoutURL(themeDisplay), themeDisplay,
-					themeDisplay.getLayout(), true));
+
+			String layoutURL = PortalUtil.getLayoutURL(themeDisplay);
+
+			String canonicalURL = PortalUtil.getCanonicalURL(
+				layoutURL, themeDisplay, themeDisplay.getLayout(), true);
+
+			String fullCanonicalURL = canonicalURL;
+
+			if (!HttpUtil.hasProtocol(layoutURL)) {
+				fullCanonicalURL = PortalUtil.getCanonicalURL(
+					PortalUtil.getPortalURL(themeDisplay) + layoutURL,
+					themeDisplay, themeDisplay.getLayout(), true);
+			}
+
+			serviceContext.setLayoutFullURL(fullCanonicalURL);
+			serviceContext.setLayoutURL(canonicalURL);
 			serviceContext.setPlid(themeDisplay.getPlid());
 			serviceContext.setScopeGroupId(themeDisplay.getScopeGroupId());
 			serviceContext.setSignedIn(themeDisplay.isSignedIn());
@@ -88,19 +95,16 @@ public class ServiceContextFactory {
 			serviceContext.setUserId(user.getUserId());
 		}
 		else {
-			long companyId = PortalUtil.getCompanyId(request);
-
-			serviceContext.setCompanyId(companyId);
+			serviceContext.setCompanyId(PortalUtil.getCompanyId(request));
 
 			Group guestGroup = GroupLocalServiceUtil.getGroup(
 				serviceContext.getCompanyId(), GroupConstants.GUEST);
 
 			serviceContext.setScopeGroupId(guestGroup.getGroupId());
 
-			long plid = LayoutLocalServiceUtil.getDefaultPlid(
-				serviceContext.getScopeGroupId(), false);
-
-			serviceContext.setPlid(plid);
+			serviceContext.setPlid(
+				LayoutLocalServiceUtil.getDefaultPlid(
+					serviceContext.getScopeGroupId(), false));
 
 			User user = null;
 
@@ -160,24 +164,18 @@ public class ServiceContextFactory {
 
 		// Command
 
-		String cmd = ParamUtil.getString(request, Constants.CMD);
-
-		serviceContext.setCommand(cmd);
+		serviceContext.setCommand(ParamUtil.getString(request, Constants.CMD));
 
 		// Current URL
 
-		String currentURL = PortalUtil.getCurrentURL(request);
-
-		serviceContext.setCurrentURL(currentURL);
+		serviceContext.setCurrentURL(PortalUtil.getCurrentURL(request));
 
 		// Form date
 
 		long formDateLong = ParamUtil.getLong(request, "formDate");
 
 		if (formDateLong > 0) {
-			Date formDate = new Date(formDateLong);
-
-			serviceContext.setFormDate(formDate);
+			serviceContext.setFormDate(new Date(formDateLong));
 		}
 
 		// Permissions
@@ -189,17 +187,14 @@ public class ServiceContextFactory {
 			serviceContext.setModelPermissions(modelPermissions);
 		}
 		else {
-			boolean addGroupPermissions = ParamUtil.getBoolean(
-				request, "addGroupPermissions");
-			boolean addGuestPermissions = ParamUtil.getBoolean(
-				request, "addGuestPermissions");
-			String[] groupPermissions = PortalUtil.getGroupPermissions(request);
-			String[] guestPermissions = PortalUtil.getGuestPermissions(request);
-
-			serviceContext.setAddGroupPermissions(addGroupPermissions);
-			serviceContext.setAddGuestPermissions(addGuestPermissions);
-			serviceContext.setGroupPermissions(groupPermissions);
-			serviceContext.setGuestPermissions(guestPermissions);
+			serviceContext.setAddGroupPermissions(
+				ParamUtil.getBoolean(request, "addGroupPermissions"));
+			serviceContext.setAddGuestPermissions(
+				ParamUtil.getBoolean(request, "addGuestPermissions"));
+			serviceContext.setGroupPermissions(
+				PortalUtil.getGroupPermissions(request));
+			serviceContext.setGuestPermissions(
+				PortalUtil.getGuestPermissions(request));
 		}
 
 		// Portlet preferences ids
@@ -207,11 +202,7 @@ public class ServiceContextFactory {
 		String portletId = PortalUtil.getPortletId(request);
 
 		if (Validator.isNotNull(portletId)) {
-			PortletPreferencesIds portletPreferencesIds =
-				PortletPreferencesFactoryUtil.getPortletPreferencesIds(
-					request, portletId);
-
-			serviceContext.setPortletPreferencesIds(portletPreferencesIds);
+			serviceContext.setPortletId(portletId);
 		}
 
 		// Request
@@ -258,46 +249,38 @@ public class ServiceContextFactory {
 		}
 
 		if (updateAssetCategoryIds) {
-			long[] assetCategoryIds = ArrayUtil.toArray(
-				assetCategoryIdsList.toArray(
-					new Long[assetCategoryIdsList.size()]));
-
-			serviceContext.setAssetCategoryIds(assetCategoryIds);
+			serviceContext.setAssetCategoryIds(
+				ArrayUtil.toArray(
+					assetCategoryIdsList.toArray(
+						new Long[assetCategoryIdsList.size()])));
 		}
 
-		boolean assetEntryVisible = ParamUtil.getBoolean(
-			request, "assetEntryVisible", true);
-
-		serviceContext.setAssetEntryVisible(assetEntryVisible);
+		serviceContext.setAssetEntryVisible(
+			ParamUtil.getBoolean(request, "assetEntryVisible", true));
 
 		String assetLinkEntryIdsString = request.getParameter(
 			"assetLinksSearchContainerPrimaryKeys");
 
 		if (assetLinkEntryIdsString != null) {
-			long[] assetLinkEntryIds = StringUtil.split(
-				assetLinkEntryIdsString, 0L);
-
-			serviceContext.setAssetLinkEntryIds(assetLinkEntryIds);
+			serviceContext.setAssetLinkEntryIds(
+				StringUtil.split(assetLinkEntryIdsString, 0L));
 		}
 
-		Double assetPriority = ParamUtil.getDouble(request, "assetPriority");
-
-		serviceContext.setAssetPriority(assetPriority);
+		serviceContext.setAssetPriority(
+			ParamUtil.getDouble(request, "assetPriority"));
 
 		String assetTagNamesString = request.getParameter("assetTagNames");
 
 		if (assetTagNamesString != null) {
-			String[] assetTagNames = StringUtil.split(assetTagNamesString);
-
-			serviceContext.setAssetTagNames(assetTagNames);
+			serviceContext.setAssetTagNames(
+				StringUtil.split(assetTagNamesString));
 		}
 
 		// Workflow
 
-		int workflowAction = ParamUtil.getInteger(
-			request, "workflowAction", WorkflowConstants.ACTION_PUBLISH);
-
-		serviceContext.setWorkflowAction(workflowAction);
+		serviceContext.setWorkflowAction(
+			ParamUtil.getInteger(
+				request, "workflowAction", WorkflowConstants.ACTION_PUBLISH));
 
 		return serviceContext;
 	}
@@ -419,13 +402,7 @@ public class ServiceContextFactory {
 		HttpServletRequest request = PortalUtil.getHttpServletRequest(
 			portletRequest);
 
-		String portletId = PortalUtil.getPortletId(portletRequest);
-
-		PortletPreferencesIds portletPreferencesIds =
-			PortletPreferencesFactoryUtil.getPortletPreferencesIds(
-				request, portletId);
-
-		serviceContext.setPortletPreferencesIds(portletPreferencesIds);
+		serviceContext.setPortletId(PortalUtil.getPortletId(portletRequest));
 
 		// Request
 

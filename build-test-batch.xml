@@ -474,7 +474,7 @@ app.server.type=@{app.server.type}]]></echo>
 						<![CDATA[
 							git add -A
 
-							git diff --cached --name-only | grep -v -E '^bundles/|^modules/\.gitignore' | xargs -n 1000 zip -v liferay-portal-source.zip
+							git diff --cached --name-only | grep -v -E '^\.gitignore|bundles/|^modules/\.gitignore' | xargs -n 1000 zip -v liferay-portal-source.zip
 						]]>
 					</execute>
 				</then>
@@ -1729,6 +1729,30 @@ app.server.type=@{app.server.type}]]></echo>
 		<run-functional-test app.server.type="wildfly" database.type="mariadb" />
 	</target>
 
+	<target name="gradle-plugins-test-jdk8">
+		<run-batch-test>
+			<test-action>
+				<for param="gradle.plugin.dir">
+					<path>
+						<dirset
+							dir="modules/sdk"
+							excludes="${gradle.plugins.test.excludes}"
+							includes="gradle-plugins-*"
+						/>
+					</path>
+					<sequential>
+						<if>
+							<resourcecontains resource="@{gradle.plugin.dir}/build.gradle" substring="gradleTest" />
+							<then>
+								<gradle-execute dir="@{gradle.plugin.dir}" task="gradleTest" />
+							</then>
+						</if>
+					</sequential>
+				</for>
+			</test-action>
+		</run-batch-test>
+	</target>
+
 	<target name="integration-db2105-jdk8">
 		<run-integration-test database.type="db2" />
 	</target>
@@ -2498,7 +2522,6 @@ information. Make sure to commit in all build services results.
 				<move file="${module.base.dir}/settings.gradle" tofile="${module.base.dir}/settings.gradle.temp" />
 
 				<gradle-execute dir="${module.base.dir}" task="checkSourceFormatting">
-					<arg value="-Pcom.liferay.source.formatter.ignore.local=true" />
 					<arg value="-PdependencyCheckerIgnoreFailures=false" />
 				</gradle-execute>
 			</try>
@@ -2526,6 +2549,8 @@ information. Make sure to commit in all build services results.
 				<fail message="${failure.property}" />
 			</catch>
 			<finally>
+				<merge-test-results />
+
 				<move file="${module.base.dir}/settings.gradle.temp" tofile="${module.base.dir}/settings.gradle" />
 			</finally>
 		</trycatch>

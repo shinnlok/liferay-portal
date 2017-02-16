@@ -212,6 +212,16 @@ public class BufferedIndexerInvocationHandler implements InvocationHandler {
 			IndexerRequestBuffer indexerRequestBuffer)
 		throws Exception {
 
+		if (_indexStatusManager.isIndexReadOnly(className)) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					"Skipping indexer request buffer because index for " +
+						className + " is read only");
+			}
+
+			return;
+		}
+
 		IndexerRequest indexerRequest = new IndexerRequest(
 			methodKey.getMethod(), _indexer, className, classPK);
 
@@ -223,15 +233,13 @@ public class BufferedIndexerInvocationHandler implements InvocationHandler {
 			IndexerRequestBuffer indexerRequestBuffer)
 		throws Exception {
 
-		indexerRequestBuffer.add(indexerRequest);
+		IndexerRequestBufferHandler indexerRequestBufferHandler =
+			new IndexerRequestBufferHandler(
+				_indexerRequestBufferOverflowHandler,
+				_indexerRegistryConfiguration);
 
-		if (indexerRequestBuffer.size() >
-				_indexerRegistryConfiguration.maxBufferSize()) {
-
-			_indexerRequestBufferOverflowHandler.bufferOverflowed(
-				indexerRequestBuffer,
-				_indexerRegistryConfiguration.maxBufferSize());
-		}
+		indexerRequestBufferHandler.bufferRequest(
+			indexerRequest, indexerRequestBuffer);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

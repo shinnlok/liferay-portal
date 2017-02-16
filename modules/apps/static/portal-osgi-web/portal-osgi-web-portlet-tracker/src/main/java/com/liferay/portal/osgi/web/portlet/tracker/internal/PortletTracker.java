@@ -121,10 +121,10 @@ public class PortletTracker
 			portletName = clazz.getName();
 		}
 
-		String portletId = _portal.getJsSafePortletId(portletName);
+		String portletId = StringUtil.replace(
+			portletName, new char[] {'.', '$'}, new char[] {'_', '_'});
 
-		portletId = StringUtil.replace(
-			portletId, new char[] {'$'}, new char[] {'_'});
+		portletId = _portal.getJsSafePortletId(portletId);
 
 		if (portletId.length() >
 				PortletInstance.PORTLET_INSTANCE_KEY_MAX_LENGTH) {
@@ -1037,17 +1037,15 @@ public class PortletTracker
 
 		Properties properties = configuration.getProperties();
 
-		String[] resourceActionConfigs = StringUtil.split(
-			properties.getProperty(PropsKeys.RESOURCE_ACTIONS_CONFIGS));
-
-		for (String resourceActionConfig : resourceActionConfigs) {
-			try {
-				ResourceActionsUtil.read(
-					null, classLoader, resourceActionConfig);
-			}
-			catch (Exception e) {
-				_log.error(e, e);
-			}
+		try {
+			ResourceActionsUtil.read(
+				null, classLoader,
+				StringUtil.split(
+					properties.getProperty(
+						PropsKeys.RESOURCE_ACTIONS_CONFIGS)));
+		}
+		catch (Exception e) {
+			_log.error(e, e);
 		}
 	}
 

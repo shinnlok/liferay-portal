@@ -18,6 +18,7 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 
 import com.liferay.portal.tools.bundle.support.internal.util.FileUtil;
+import com.liferay.portal.tools.bundle.support.util.StreamLogger;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,7 +28,6 @@ import java.net.URL;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 /**
  * @author David Truong
@@ -37,18 +37,28 @@ import java.nio.file.Paths;
 	commandDescription = "Download and expand a new bundle.",
 	commandNames = "initBundle"
 )
-public class InitBundleCommand extends BaseCommand {
+public class InitBundleCommand extends BaseCommand implements StreamLogger {
 
 	@Override
 	public void execute() throws Exception {
 		_deleteBundle();
 
+		Path cacheDirPath = null;
+
+		if (_cacheDir != null) {
+			cacheDirPath = _cacheDir.toPath();
+		}
+
 		Path path = FileUtil.downloadFile(
-			_url.toURI(), _userName, _password, bundlesCacheDirPath);
+			_url.toURI(), _userName, _password, cacheDirPath, this);
 
 		FileUtil.unpack(path, getLiferayHomePath(), _stripComponents);
 
 		_copyConfigs();
+	}
+
+	public File getCacheDir() {
+		return _cacheDir;
 	}
 
 	public File getConfigsDir() {
@@ -75,6 +85,36 @@ public class InitBundleCommand extends BaseCommand {
 		return _userName;
 	}
 
+	@Override
+	public void onCompleted() {
+		System.out.println();
+	}
+
+	@Override
+	public void onProgress(long completed, long length) {
+		StringBuilder sb = new StringBuilder();
+
+		sb.append(FileUtil.getFileLength(completed));
+
+		if (length > 0) {
+			sb.append('/');
+			sb.append(FileUtil.getFileLength(length));
+		}
+
+		sb.append(" downloaded");
+
+		onProgress(sb.toString());
+	}
+
+	@Override
+	public void onStarted() {
+		onStarted("Download " + _url);
+	}
+
+	public void setCacheDir(File cacheDir) {
+		_cacheDir = cacheDir;
+	}
+
 	public void setConfigsDir(File configsDir) {
 		_configsDir = configsDir;
 	}
@@ -97,6 +137,14 @@ public class InitBundleCommand extends BaseCommand {
 
 	public void setUserName(String userName) {
 		_userName = userName;
+	}
+
+	protected void onProgress(String message) {
+		System.out.print("\r" + message);
+	}
+
+	protected void onStarted(String message) {
+		System.out.println(message);
 	}
 
 	private void _copyConfigs() throws IOException {
@@ -128,9 +176,6 @@ public class InitBundleCommand extends BaseCommand {
 		}
 	}
 
-	protected static final Path bundlesCacheDirPath = Paths.get(
-		System.getProperty("user.home"), ".liferay/bundles");
-
 	private static final int _DEFAULT_STRIP_COMPONENTS = 1;
 
 	private static final URL _DEFAULT_URL;
@@ -138,9 +183,8 @@ public class InitBundleCommand extends BaseCommand {
 	static {
 		try {
 			_DEFAULT_URL = new URL(
-				"https://sourceforge.net/projects/lportal/files/Liferay%20" +
-					"Portal/7.0.2%20GA3/liferay-ce-portal-tomcat-7.0-ga3-" +
-						"20160804222206210.zip");
+				"https://cdn.lfrs.sl/releases.liferay.com/portal/7.0.2-ga3" +
+					"/liferay-ce-portal-tomcat-7.0-ga3-20160804222206210.zip");
 		}
 		catch (MalformedURLException murle) {
 			throw new ExceptionInInitializerError(murle);
@@ -148,36 +192,43 @@ public class InitBundleCommand extends BaseCommand {
 	}
 
 	@Parameter(
+		description = "The directory where to cache the downloaded bundles.",
+		names = "--cache-dir"
+	)
+	private File _cacheDir = new File(
+		System.getProperty("user.home"), ".liferay/bundles");
+
+	@Parameter(
 		description = "The directory that contains the configuration files.",
-		names = {"--configs"}
+		names = "--configs"
 	)
 	private File _configsDir;
 
-	@Parameter (
+	@Parameter(
 		description = "The environment of your Liferay home deployment.",
-		names = {"--environment"}
+		names = "--environment"
 	)
 	private String _environment;
 
-	@Parameter (
+	@Parameter(
 		description = "The password if your URL requires authentication.",
 		names = {"-p", "--password"}, password = true
 	)
 	private String _password;
 
-	@Parameter (
+	@Parameter(
 		description = "The number of directories to strip when expanding your bundle.",
-		names = {"--strip-components"}
+		names = "--strip-components"
 	)
 	private int _stripComponents = _DEFAULT_STRIP_COMPONENTS;
 
-	@Parameter (
+	@Parameter(
 		description = "The URL of the Liferay Bundle to expand.",
-		names = {"--url"}
+		names = "--url"
 	)
 	private URL _url = _DEFAULT_URL;
 
-	@Parameter (
+	@Parameter(
 		description = "The user name if your URL requires authentication.",
 		names = {"-u", "--username", "--user-name"}
 	)

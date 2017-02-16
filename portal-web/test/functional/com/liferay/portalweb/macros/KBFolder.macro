@@ -10,9 +10,24 @@
 	<command name="addCP">
 		<execute macro="KBFolder#_gotoAddFolder" />
 
-		<execute function="Type" locator1="TextInput#NAME" value1="${kbFolderName}" />
+		<execute macro="PortletEntry#inputName">
+			<var name="name" value="${kbFolderName}" />
+		</execute>
 
-		<execute function="Type" locator1="TextArea#DESCRIPTION" value1="${kbFolderDescription}" />
+		<execute macro="PortletEntry#inputDescription">
+			<var name="description" value="${kbFolderDescription}" />
+		</execute>
+
+		<if>
+			<isset var="customField" />
+			<then>
+				<execute macro="Panel#expandPanel">
+					<var name="panelHeading" value="Custom Fields" />
+				</execute>
+
+				<execute function="Type" locator1="TextInput#CUSTOM_FIELD" value1="${customField}" />
+			</then>
+		</if>
 
 		<execute macro="Button#clickSave" />
 
@@ -48,9 +63,13 @@
 
 		<execute function="AssertClick" locator1="MenuItem#EDIT" value1="Edit" />
 
-		<execute function="Type" locator1="TextInput#NAME" value1="${kbFolderEditedName}" />
+		<execute macro="PortletEntry#inputName">
+			<var name="name" value="${kbFolderEditedName}" />
+		</execute>
 
-		<execute function="Type" locator1="TextArea#DESCRIPTION" value1="${kbFolderDescription}" />
+		<execute macro="PortletEntry#inputDescription">
+			<var name="description" value="${kbFolderDescription}" />
+		</execute>
 
 		<execute macro="PortletEntry#save" />
 	</command>

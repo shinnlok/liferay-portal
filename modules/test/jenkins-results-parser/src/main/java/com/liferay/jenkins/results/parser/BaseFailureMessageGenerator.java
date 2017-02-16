@@ -20,7 +20,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.dom4j.Element;
-import org.dom4j.tree.DefaultElement;
 
 /**
  * @author Peter Yoo
@@ -40,10 +39,10 @@ public abstract class BaseFailureMessageGenerator
 
 		sb.append("https://github.com/");
 
-		String baseRepositoryName = topLevelBuild.getRepositoryName();
+		String baseRepositoryName = topLevelBuild.getBaseRepositoryName();
 
 		Map<String, String> baseRepositoryGitDetailsTempMap =
-			topLevelBuild.getGitRepositoryDetailsTempMap(baseRepositoryName);
+			topLevelBuild.getBaseGitRepositoryDetailsTempMap();
 
 		sb.append(baseRepositoryGitDetailsTempMap.get("github.origin.name"));
 
@@ -108,25 +107,19 @@ public abstract class BaseFailureMessageGenerator
 	protected Element getGitCommitPluginsAnchorElement(
 		TopLevelBuild topLevelBuild) {
 
-		String portalRepositoryName = "liferay-portal";
-
-		String repositoryName = topLevelBuild.getRepositoryName();
-
-		if (repositoryName.endsWith("-ee")) {
-			portalRepositoryName += "-ee";
-		}
+		String repositoryName = topLevelBuild.getBaseRepositoryName();
 
 		Map<String, String> portalRepositoryGitDetailsTempMap =
-			topLevelBuild.getGitRepositoryDetailsTempMap(portalRepositoryName);
+			topLevelBuild.getBaseGitRepositoryDetailsTempMap();
 
-		Element gitCommitPluginsAnchorElement = new DefaultElement("a");
+		Element gitCommitPluginsAnchorElement = Dom4JUtil.getNewElement("a");
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("https://github.com/");
 		sb.append(portalRepositoryGitDetailsTempMap.get("github.origin.name"));
 		sb.append("/");
-		sb.append(portalRepositoryName);
+		sb.append(repositoryName);
 		sb.append("/blob/");
 		sb.append(
 			portalRepositoryGitDetailsTempMap.get("github.sender.branch.name"));

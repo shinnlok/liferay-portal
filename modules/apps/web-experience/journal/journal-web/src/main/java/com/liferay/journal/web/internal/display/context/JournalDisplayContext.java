@@ -31,12 +31,12 @@ import com.liferay.journal.service.JournalArticleServiceUtil;
 import com.liferay.journal.service.JournalFolderLocalServiceUtil;
 import com.liferay.journal.service.JournalFolderServiceUtil;
 import com.liferay.journal.util.JournalConverter;
+import com.liferay.journal.util.comparator.FolderArticleArticleIdComparator;
 import com.liferay.journal.util.comparator.FolderArticleDisplayDateComparator;
 import com.liferay.journal.util.comparator.FolderArticleModifiedDateComparator;
 import com.liferay.journal.util.comparator.FolderArticleTitleComparator;
 import com.liferay.journal.web.configuration.JournalWebConfiguration;
 import com.liferay.journal.web.internal.portlet.action.ActionUtil;
-import com.liferay.journal.web.internal.search.ArticleSearch;
 import com.liferay.journal.web.internal.search.EntriesChecker;
 import com.liferay.journal.web.internal.search.EntriesMover;
 import com.liferay.journal.web.internal.search.JournalSearcher;
@@ -57,6 +57,7 @@ import com.liferay.portal.kernel.portlet.PortalPreferences;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
 import com.liferay.portal.kernel.search.Document;
+import com.liferay.portal.kernel.search.DocumentImpl;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.Indexer;
@@ -517,6 +518,21 @@ public class JournalDisplayContext {
 		return _orderByType;
 	}
 
+	public String[] getOrderColumns() {
+		JournalWebConfiguration journalWebConfiguration =
+			(JournalWebConfiguration)_request.getAttribute(
+				JournalWebConfiguration.class.getName());
+
+		String[] orderColumns =
+			new String[] {"display-date", "modified-date", "title"};
+
+		if (!journalWebConfiguration.journalArticleForceAutogenerateId()) {
+			orderColumns = ArrayUtil.append(orderColumns, "id");
+		}
+
+		return orderColumns;
+	}
+
 	public PortletURL getPortletURL() throws PortalException {
 		PortletURL portletURL = _liferayPortletResponse.createRenderURL();
 
@@ -541,6 +557,12 @@ public class JournalDisplayContext {
 			portletURL.setParameter("status", String.valueOf(getStatus()));
 		}
 
+		String delta = ParamUtil.getString(_request, "delta");
+
+		if (Validator.isNotNull(delta)) {
+			portletURL.setParameter("delta", delta);
+		}
+
 		String deltaEntry = ParamUtil.getString(_request, "deltaEntry");
 
 		if (Validator.isNotNull(deltaEntry)) {
@@ -557,6 +579,18 @@ public class JournalDisplayContext {
 
 		if (Validator.isNotNull(keywords)) {
 			portletURL.setParameter("keywords", keywords);
+		}
+
+		String orderByCol = getOrderByCol();
+
+		if (Validator.isNotNull(orderByCol)) {
+			portletURL.setParameter("orderByCol", orderByCol);
+		}
+
+		String orderByType = getOrderByType();
+
+		if (Validator.isNotNull(orderByType)) {
+			portletURL.setParameter("orderByType", orderByType);
 		}
 
 		if (!isShowEditActions()) {
@@ -584,7 +618,7 @@ public class JournalDisplayContext {
 		return _restrictionType;
 	}
 
-	public ArticleSearch getSearchContainer() throws PortalException {
+	public SearchContainer getSearchContainer() throws PortalException {
 		if (_articleSearchContainer != null) {
 			return _articleSearchContainer;
 		}
@@ -592,8 +626,8 @@ public class JournalDisplayContext {
 		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		ArticleSearch articleSearchContainer = new ArticleSearch(
-			_liferayPortletRequest, getPortletURL());
+		SearchContainer articleSearchContainer = new SearchContainer(
+			_liferayPortletRequest, getPortletURL(), null, null);
 
 		if (!isSearch()) {
 			articleSearchContainer.setEmptyResultsMessageCssClass(
@@ -721,6 +755,11 @@ public class JournalDisplayContext {
 				if (Objects.equals(getOrderByCol(), "display-date")) {
 					sort = new Sort("displayDate", Sort.LONG_TYPE, orderByAsc);
 				}
+				else if (Objects.equals(getOrderByCol(), "id")) {
+					sort = new Sort(
+						DocumentImpl.getSortableFieldName(Field.ARTICLE_ID),
+						Sort.STRING_TYPE, !orderByAsc);
+				}
 				else if (Objects.equals(getOrderByCol(), "modified-date")) {
 					sort = new Sort(
 						Field.MODIFIED_DATE, Sort.LONG_TYPE, orderByAsc);
@@ -824,6 +863,10 @@ public class JournalDisplayContext {
 				folderOrderByComparator =
 					new FolderArticleDisplayDateComparator(orderByAsc);
 			}
+			else if (Objects.equals(getOrderByCol(), "id")) {
+				folderOrderByComparator = new FolderArticleArticleIdComparator(
+					orderByAsc);
+			}
 			else if (Objects.equals(getOrderByCol(), "modified-date")) {
 				folderOrderByComparator =
 					new FolderArticleModifiedDateComparator(orderByAsc);
@@ -872,7 +915,7 @@ public class JournalDisplayContext {
 	}
 
 	public int getTotal() throws PortalException {
-		ArticleSearch articleSearch = getSearchContainer();
+		SearchContainer articleSearch = getSearchContainer();
 
 		return articleSearch.getTotal();
 	}
@@ -1180,7 +1223,7 @@ public class JournalDisplayContext {
 
 	private String[] _addMenuFavItems;
 	private JournalArticle _article;
-	private ArticleSearch _articleSearchContainer;
+	private SearchContainer _articleSearchContainer;
 	private DDMFormValues _ddmFormValues;
 	private String _ddmStructureKey;
 	private String _ddmStructureName;

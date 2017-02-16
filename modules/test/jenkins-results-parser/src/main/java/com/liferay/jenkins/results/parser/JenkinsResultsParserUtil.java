@@ -15,14 +15,12 @@
 package com.liferay.jenkins.results.parser;
 
 import java.io.BufferedReader;
-import java.io.CharArrayWriter;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
-import java.io.Writer;
 
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
@@ -50,10 +48,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.dom4j.Element;
-import org.dom4j.io.OutputFormat;
-import org.dom4j.io.XMLWriter;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -74,6 +68,22 @@ public class JenkinsResultsParserUtil {
 		"http://mirrors-no-cache.lax.liferay.com/github.com/liferay" +
 			"/liferay-portal/test.properties"
 	};
+
+	public static boolean debug;
+
+	public static String combine(String...strings) {
+		if ((strings == null) || (strings.length == 0)) {
+			return "";
+		}
+
+		StringBuilder sb = new StringBuilder();
+
+		for (String string : strings) {
+			sb.append(string);
+		}
+
+		return sb.toString();
+	}
 
 	public static JSONObject createJSONObject(String jsonString)
 		throws IOException {
@@ -100,8 +110,6 @@ public class JenkinsResultsParserUtil {
 
 		if ((jsonObject.getInt("duration") == 0) && result.equals("FAILURE")) {
 			String actualResult = getActualResult(url);
-
-			System.out.println("Actual Result: " + actualResult);
 
 			jsonObject.putOpt("result", actualResult);
 		}
@@ -178,12 +186,14 @@ public class JenkinsResultsParserUtil {
 
 		Process process = runtime.exec(bashCommands);
 
-		System.out.println(
-			"Output stream: " + readInputStream(process.getInputStream()));
+		if (debug) {
+			System.out.println(
+				"Output stream: " + readInputStream(process.getInputStream()));
+		}
 
 		int returnCode = process.waitFor();
 
-		if (returnCode != 0) {
+		if (debug && (returnCode != 0)) {
 			System.out.println(
 				"Error stream: " + readInputStream(process.getErrorStream()));
 		}
@@ -280,23 +290,6 @@ public class JenkinsResultsParserUtil {
 		url = url.replace("]", "%5D");
 
 		return url;
-	}
-
-	public static String format(Element element) throws IOException {
-		return format(element, true);
-	}
-
-	public static String format(Element element, boolean pretty)
-		throws IOException {
-
-		Writer writer = new CharArrayWriter();
-
-		XMLWriter xmlWriter = pretty ? new XMLWriter(
-			writer, OutputFormat.createPrettyPrint()) : new XMLWriter(writer);
-
-		xmlWriter.write(element);
-
-		return writer.toString();
 	}
 
 	public static String getActualResult(String buildURL) throws IOException {
@@ -816,7 +809,9 @@ public class JenkinsResultsParserUtil {
 		if (checkCache && _toStringCache.containsKey(key) &&
 			!url.startsWith("file:")) {
 
-			System.out.println("Loading " + url);
+			if (debug) {
+				System.out.println("Loading " + url);
+			}
 
 			String response = _toStringCache.get(key);
 
@@ -831,7 +826,9 @@ public class JenkinsResultsParserUtil {
 
 		while (true) {
 			try {
-				System.out.println("Downloading " + url);
+				if (debug) {
+					System.out.println("Downloading " + url);
+				}
 
 				StringBuilder sb = new StringBuilder();
 
@@ -899,7 +896,9 @@ public class JenkinsResultsParserUtil {
 					throw ioe;
 				}
 
-				System.out.println("Retry in " + retryPeriod + " seconds");
+				if (debug) {
+					System.out.println("Retry in " + retryPeriod + " seconds");
+				}
 
 				sleep(1000 * retryPeriod);
 			}
@@ -907,13 +906,17 @@ public class JenkinsResultsParserUtil {
 	}
 
 	public static void write(File file, String content) throws IOException {
-		System.out.println(
-			"Write file " + file + " with length " + content.length());
+		if (debug) {
+			System.out.println(
+				"Write file " + file + " with length " + content.length());
+		}
 
 		File parentDir = file.getParentFile();
 
 		if ((parentDir != null) && !parentDir.exists()) {
-			System.out.println("Make parent directories for " + file);
+			if (debug) {
+				System.out.println("Make parent directories for " + file);
+			}
 
 			parentDir.mkdirs();
 		}
@@ -935,7 +938,7 @@ public class JenkinsResultsParserUtil {
 
 	protected static final String DEPENDENCIES_URL_HTTP =
 		"http://mirrors-no-cache.lax.liferay.com/github.com/liferay" +
-			"/liferay-jenkins-results-parser-samples-ee/1/";
+			"/liferay-jenkins-results-parser-samples-ee/4/";
 
 	static {
 		File dependenciesDir = new File("src/test/resources/dependencies/");

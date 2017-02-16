@@ -325,6 +325,23 @@ public class DDMStructurePersistenceTest {
 	}
 
 	@Test
+	public void testCountByG_C_N_D() throws Exception {
+		_persistence.countByG_C_N_D(RandomTestUtil.nextLong(),
+			RandomTestUtil.nextLong(), StringPool.BLANK, StringPool.BLANK);
+
+		_persistence.countByG_C_N_D(0L, 0L, StringPool.NULL, StringPool.NULL);
+
+		_persistence.countByG_C_N_D(0L, 0L, (String)null, (String)null);
+	}
+
+	@Test
+	public void testCountByG_C_N_DArrayable() throws Exception {
+		_persistence.countByG_C_N_D(new long[] { RandomTestUtil.nextLong(), 0L },
+			RandomTestUtil.nextLong(), RandomTestUtil.randomString(),
+			RandomTestUtil.randomString());
+	}
+
+	@Test
 	public void testFindByPrimaryKeyExisting() throws Exception {
 		DDMStructure newDDMStructure = addDDMStructure();
 
@@ -358,8 +375,8 @@ public class DDMStructurePersistenceTest {
 			"userId", true, "userName", true, "versionUserId", true,
 			"versionUserName", true, "createDate", true, "modifiedDate", true,
 			"parentStructureId", true, "classNameId", true, "structureKey",
-			true, "version", true, "storageType", true, "type", true,
-			"lastPublishDate", true);
+			true, "version", true, "name", true, "storageType", true, "type",
+			true, "lastPublishDate", true);
 	}
 
 	@Test

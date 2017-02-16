@@ -86,8 +86,8 @@
 		<execute macro="FormRules#configureActionOptions">
 			<var name="action" value="Jump to Page" />
 			<var name="actionRowNumber" value="1" />
-			<var name="actionTarget" value="Page 1" />
-			<var name="actionTarget2" value="Page 3" />
+			<var name="actionTarget" value="1 Page 1" />
+			<var name="actionTarget2" value="3 Page 3" />
 		</execute>
 
 		<execute macro="FormRules#save" />
@@ -105,8 +105,8 @@
 		<execute macro="FormRules#configureActionOptions">
 			<var name="action" value="Jump to Page" />
 			<var name="actionRowNumber" value="1" />
-			<var name="actionTarget" value="Page 1" />
-			<var name="actionTarget2" value="Page 4" />
+			<var name="actionTarget" value="1 Page 1" />
+			<var name="actionTarget2" value="4 Page 4" />
 		</execute>
 
 		<execute macro="FormRules#save" />
@@ -137,6 +137,32 @@
 			</else>
 		</if>
 	</tear-down>
+
+	<command name="ViewFormRulesSummary" priority="4">
+		<description message="This is a use case for LPS-68227." />
+
+		<execute macro="FormsAdminNavigator#gotoRules" />
+
+		<execute macro="FormRules#viewSummary">
+			<var name="action" value="Jump from page" />
+			<var name="actionTarget" value="1 Page 1" />
+			<var name="actionTarget2" value="3 Page 3" />
+			<var name="conditionField" value="Choose Your Destiny" />
+			<var name="conditionFieldConstant" value="Destiny 2" />
+			<var name="conditionOperator" value="equal to" />
+			<var name="ruleNumber" value="1" />
+		</execute>
+
+		<execute macro="FormRules#viewSummary">
+			<var name="action" value="Jump from page" />
+			<var name="actionTarget" value="1 Page 1" />
+			<var name="actionTarget2" value="4 Page 4" />
+			<var name="conditionField" value="Choose Your Destiny" />
+			<var name="conditionFieldConstant" value="Destiny 3" />
+			<var name="conditionOperator" value="equal to" />
+			<var name="ruleNumber" value="2" />
+		</execute>
+	</command>
 
 	<command name="ViewPagesAfterJump" priority="5">
 		<description message="This is a use case for LPS-69372." />
@@ -214,6 +240,7 @@
 		</execute>
 
 		<execute macro="Form#editFieldLabel">
+			<var name="fieldName" value="ChooseYourDestiny" />
 			<var name="fieldValue" value="Edit Label" />
 		</execute>
 
@@ -229,7 +256,7 @@
 
 		<var name="key_conditionRowNumber" value="1" />
 
-		<execute function="AssertTextEquals" locator1="Form#RULE_BUILDER_CONDITION_FIELD" value1="Edit Label" />
+		<execute function="AssertTextEquals" locator1="FormRules#RULE_BUILDER_CONDITION_FIELD" value1="Edit Label" />
 	</command>
 
 	<command ignore="true" name="ViewRuleAfterOptionValueEdit" priority="3">
@@ -257,7 +284,7 @@
 
 		<var name="key_conditionRowNumber" value="1" />
 
-		<execute function="AssertTextEquals" locator1="Form#RULE_BUILDER_CONDITION_VALUE_FIELD" value1="Edited Destiny" />
+		<execute function="AssertTextEquals" locator1="FormRules#RULE_BUILDER_CONDITION_VALUE_FIELD" value1="Edited Destiny" />
 	</command>
 
 	<command name="ViewRuleAfterPageNameChange" priority="4">
@@ -281,6 +308,6 @@
 
 		<var name="key_actionRowNumber" value="1" />
 
-		<execute function="AssertTextEquals" locator1="Form#RULE_BUILDER_ACTION_TARGET_FIELD_2" value1="Renamed Page" />
+		<execute function="AssertTextEquals" locator1="FormRules#RULE_BUILDER_ACTION_TARGET_FIELD_2" value1="3 Renamed Page" />
 	</command>
 </definition>

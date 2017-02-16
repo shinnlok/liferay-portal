@@ -32,10 +32,15 @@ public class OmniAdminUserDemoDataCreatorImpl
 	extends BaseUserDemoDataCreator implements OmniAdminUserDemoDataCreator {
 
 	@Override
+	public User create(long companyId) throws PortalException {
+		return create(companyId, null);
+	}
+
+	@Override
 	public User create(long companyId, String emailAddress)
 		throws PortalException {
 
-		User user = createBaseUser(companyId, emailAddress);
+		User user = createUser(companyId, emailAddress);
 
 		Role role = _roleLocalService.getRole(
 			companyId, RoleConstants.ADMINISTRATOR);

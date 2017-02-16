@@ -18,7 +18,6 @@ import java.util.Hashtable;
 import java.util.Map;
 
 import org.dom4j.Element;
-import org.dom4j.tree.DefaultElement;
 
 /**
  * @author Peter Yoo
@@ -74,15 +73,14 @@ public class PluginGitIDFailureMessageGenerator
 		int end = consoleText.indexOf("merge-test-results:");
 		TopLevelBuild topLevelBuild = build.getTopLevelBuild();
 
-		Element messageElement = new DefaultElement("p");
-
-		Dom4JUtil.addToElement(
-			messageElement, "Please update ",
-			Dom4JUtil.wrapWithNewElement(
-				getGitCommitPluginsAnchorElement(topLevelBuild), "strong"),
+		Element messageElement = Dom4JUtil.getNewElement(
+			"p", null, "Please update ",
+			Dom4JUtil.getNewElement(
+				"strong", null,
+				getGitCommitPluginsAnchorElement(topLevelBuild)),
 			" to an existing Git ID from ",
-			Dom4JUtil.wrapWithNewElement(
-				getPluginsBranchAnchorElement(topLevelBuild), "strong"),
+			Dom4JUtil.getNewElement(
+				"strong", null, getPluginsBranchAnchorElement(topLevelBuild)),
 			".", getConsoleOutputSnippetElement(consoleText, true, end));
 
 		return messageElement;
@@ -91,7 +89,7 @@ public class PluginGitIDFailureMessageGenerator
 	protected Element getPluginsBranchAnchorElement(
 		TopLevelBuild topLevelBuild) {
 
-		String repositoryName = topLevelBuild.getRepositoryName();
+		String repositoryName = topLevelBuild.getBaseRepositoryName();
 
 		String pluginsRepositoryName = "liferay-plugins";
 
@@ -100,9 +98,7 @@ public class PluginGitIDFailureMessageGenerator
 		}
 
 		Map<String, String> pluginsRepositoryGitDetailsTempMap =
-			topLevelBuild.getGitRepositoryDetailsTempMap(pluginsRepositoryName);
-
-		Element pluginsBranchAnchorElement = new DefaultElement("a");
+			topLevelBuild.getBaseGitRepositoryDetailsTempMap();
 
 		StringBuilder sb = new StringBuilder();
 
@@ -113,15 +109,10 @@ public class PluginGitIDFailureMessageGenerator
 			pluginsRepositoryGitDetailsTempMap.get(
 				"github.upstream.branch.name"));
 
-		pluginsBranchAnchorElement.addAttribute("href", sb.toString());
-
-		pluginsBranchAnchorElement.addText(pluginsRepositoryName);
-		pluginsBranchAnchorElement.addText("/");
-		pluginsBranchAnchorElement.addText(
+		return Dom4JUtil.getNewAnchorElement(
+			sb.toString(), pluginsRepositoryName, "/",
 			pluginsRepositoryGitDetailsTempMap.get(
 				"github.upstream.branch.name"));
-
-		return pluginsBranchAnchorElement;
 	}
 
 }
