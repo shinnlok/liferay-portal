@@ -149,8 +149,8 @@ public class UpgradeDocumentLibrary extends UpgradeProcess {
 	protected void rebuildTree(
 			long companyId, PreparedStatement folderPreparedStatement,
 			PreparedStatement fileEntryPreparedStatement,
-			PreparedStatement fileVersionPreparedStatement,
-			PreparedStatement fileShortcutPreparedStatement)
+			PreparedStatement fileShortcutPreparedStatement,
+			PreparedStatement fileVersionPreparedStatement)
 		throws PortalException {
 
 		TreePathUtil.rebuildTree(
@@ -217,20 +217,6 @@ public class UpgradeDocumentLibrary extends UpgradeProcess {
 					}
 
 					try {
-						fileVersionPreparedStatement.setString(1, treePath);
-						fileVersionPreparedStatement.setLong(
-							2, parentPrimaryKey);
-
-						fileVersionPreparedStatement.addBatch();
-					}
-					catch (SQLException sqle) {
-						_log.error(
-							"Unable to update DL file versions with tree " +
-								"path " + treePath,
-							sqle);
-					}
-
-					try {
 						fileShortcutPreparedStatement.setString(1, treePath);
 						fileShortcutPreparedStatement.setLong(
 							2, parentPrimaryKey);
@@ -240,6 +226,20 @@ public class UpgradeDocumentLibrary extends UpgradeProcess {
 					catch (SQLException sqle) {
 						_log.error(
 							"Unable to update DL file shortcuts with tree " +
+								"path " + treePath,
+							sqle);
+					}
+
+					try {
+						fileVersionPreparedStatement.setString(1, treePath);
+						fileVersionPreparedStatement.setLong(
+							2, parentPrimaryKey);
+
+						fileVersionPreparedStatement.addBatch();
+					}
+					catch (SQLException sqle) {
+						_log.error(
+							"Unable to update DL file versions with tree " +
 								"path " + treePath,
 							sqle);
 					}
@@ -341,23 +341,23 @@ public class UpgradeDocumentLibrary extends UpgradeProcess {
 							connection,
 							"update DLFileEntry set treePath = ? where " +
 								"folderId = ?");
-					PreparedStatement fileVersionPreparedStatement =
-						AutoBatchPreparedStatementUtil.concurrentAutoBatch(
-							connection,
-							"update DLFileVersion set treePath = ? where " +
-								"folderId = ?");
 					PreparedStatement fileShortcutPreparedStatement =
 						AutoBatchPreparedStatementUtil.concurrentAutoBatch(
 							connection,
 							"update DLFileShortcut set treePath = ? where " +
+								"folderId = ?");
+					PreparedStatement fileVersionPreparedStatement =
+						AutoBatchPreparedStatementUtil.concurrentAutoBatch(
+							connection,
+							"update DLFileVersion set treePath = ? where " +
 								"folderId = ?")) {
 
 					try {
 						rebuildTree(
 							companyId, folderPreparedStatement,
 							fileEntryPreparedStatement,
-							fileVersionPreparedStatement,
-							fileShortcutPreparedStatement);
+							fileShortcutPreparedStatement,
+							fileVersionPreparedStatement);
 					}
 					catch (PortalException pe) {
 						_log.error(
@@ -369,8 +369,8 @@ public class UpgradeDocumentLibrary extends UpgradeProcess {
 					folderPreparedStatement.executeBatch();
 
 					fileEntryPreparedStatement.executeBatch();
-					fileVersionPreparedStatement.executeBatch();
 					fileShortcutPreparedStatement.executeBatch();
+					fileVersionPreparedStatement.executeBatch();
 				}
 			}
 		}
