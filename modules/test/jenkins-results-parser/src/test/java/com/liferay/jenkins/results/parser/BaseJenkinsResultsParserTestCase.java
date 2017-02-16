@@ -35,17 +35,14 @@ import org.junit.Assert;
  */
 public abstract class BaseJenkinsResultsParserTestCase {
 
-	protected void assertSample(File caseDir) throws Exception {
-		System.out.print("Asserting sample " + caseDir.getName() + ": ");
+	protected void assertSample(File sampleDir) throws Exception {
+		System.out.print("Asserting sample " + sampleDir.getName() + ": ");
 
-		File expectedMessageFile = new File(caseDir, "expected_message.html");
+		File expectedMessageFile = new File(sampleDir, "expected_message.html");
 
 		String expectedMessage = read(expectedMessageFile);
 
-		String actualMessage = fixMessage(
-			getMessage(
-				"${dependencies.url}/" + getSimpleClassName() + "/" +
-					caseDir.getName() + "/"));
+		String actualMessage = fixMessage(getMessage(sampleDir));
 
 		boolean value = expectedMessage.equals(actualMessage);
 
@@ -178,8 +175,7 @@ public abstract class BaseJenkinsResultsParserTestCase {
 			throw newDE;
 		}
 
-		String formattedXML = JenkinsResultsParserUtil.format(
-			document.getRootElement());
+		String formattedXML = Dom4JUtil.format(document.getRootElement());
 
 		for (int i = 0; i < _XML_REPLACEMENTS.length; i++) {
 			formattedXML = formattedXML.replace(
@@ -189,7 +185,7 @@ public abstract class BaseJenkinsResultsParserTestCase {
 		return formattedXML;
 	}
 
-	protected abstract String getMessage(String urlString) throws Exception;
+	protected abstract String getMessage(File sampleDir) throws Exception;
 
 	protected String getSimpleClassName() {
 		Class<?> clazz = getClass();
@@ -236,7 +232,7 @@ public abstract class BaseJenkinsResultsParserTestCase {
 	protected void writeExpectedMessage(File sampleDir) throws Exception {
 		File expectedMessageFile = new File(sampleDir, "expected_message.html");
 
-		String expectedMessage = fixMessage(getMessage(toURLString(sampleDir)));
+		String expectedMessage = fixMessage(getMessage(sampleDir));
 
 		JenkinsResultsParserUtil.write(expectedMessageFile, expectedMessage);
 	}

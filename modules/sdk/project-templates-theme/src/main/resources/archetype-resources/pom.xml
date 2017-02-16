@@ -42,7 +42,7 @@
 			<plugin>
 				<groupId>com.liferay</groupId>
 				<artifactId>com.liferay.css.builder</artifactId>
-				<version>1.0.23</version>
+				<version>@com.liferay.css.builder.version@</version>
 				<executions>
 					<execution>
 						<id>default-build-css</id>
@@ -54,13 +54,13 @@
 				</executions>
 				<configuration>
 					<docrootDirName>${com.liferay.portal.tools.theme.builder.outputDir}</docrootDirName>
-					<precision>5</precision>
+					<precision>9</precision>
 				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>com.liferay</groupId>
 				<artifactId>com.liferay.portal.tools.theme.builder</artifactId>
-				<version>1.1.1</version>
+				<version>@com.liferay.portal.tools.theme.builder.version@</version>
 				<executions>
 					<execution>
 						<phase>generate-resources</phase>

@@ -22,7 +22,6 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Tuple;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.tools.ImportsFormatter;
 import com.liferay.portal.tools.JavaImportsFormatter;
@@ -52,18 +51,30 @@ import org.apache.maven.artifact.versioning.ComparableVersion;
  */
 public class JavaSourceProcessor extends BaseSourceProcessor {
 
-	@Override
-	public String[] getIncludes() {
-		return _INCLUDES;
-	}
-
 	protected String applyDiamondOperator(String content) {
 		Matcher matcher = _diamondOperatorPattern.matcher(content);
 
 		while (matcher.find()) {
 			String match = matcher.group();
-			String whitespace = matcher.group(4);
+
+			if (match.contains("{\n")) {
+				continue;
+			}
+
+			String className = matcher.group(3);
 			String parameterType = matcher.group(5);
+
+			// LPS-70579
+
+			if ((className.equals("AutoResetThreadLocal") ||
+				 className.equals("InitialThreadLocal")) &&
+				(parameterType.startsWith("Map<") ||
+				 parameterType.startsWith("Set<"))) {
+
+				continue;
+			}
+
+			String whitespace = matcher.group(4);
 
 			String replacement = StringUtil.replaceFirst(
 				match, whitespace + "<" + parameterType + ">", "<>");
@@ -384,6 +395,34 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 						lineCount);
 				}
 			}
+
+			x = trimmedLine.length() + 1;
+
+			while (true) {
+				x = trimmedLine.lastIndexOf(StringPool.COMMA, x - 1);
+
+				if (x == -1) {
+					break;
+				}
+
+				if (ToolsUtil.isInsideQuotes(trimmedLine, x)) {
+					continue;
+				}
+
+				String linePart = trimmedLine.substring(x);
+
+				if ((getLevel(linePart) == 1) &&
+					(getLevel(linePart, "<", ">") == 0)) {
+
+					processMessage(
+						fileName,
+						"There should be a line break after '" +
+							trimmedLine.substring(0, x + 1) + "'",
+						lineCount);
+
+					break;
+				}
+			}
 		}
 
 		if (trimmedLine.matches("\\)\\..*\\([^)].*")) {
@@ -548,6 +587,8 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 	protected void checkPackagePath(String fileName, String packagePath) {
 		if (Validator.isNull(packagePath)) {
 			processMessage(fileName, "Missing package");
+
+			return;
 		}
 
 		int pos = fileName.lastIndexOf(CharPool.SLASH);
@@ -560,6 +601,13 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 				fileName,
 				"The declared package '" + packagePath +
 					"' does not match the expected package");
+
+			return;
+		}
+
+		if (packagePath.matches(".*\\.internal\\.([\\w.]+\\.)?impl")) {
+			processMessage(
+				fileName, "Do not use 'impl' inside 'internal', see LPS-70113");
 		}
 	}
 
@@ -1307,20 +1355,31 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 
 	@Override
 	protected List<String> doGetFileNames() throws Exception {
+		String[] includes = getIncludes();
+
+		if (ArrayUtil.isEmpty(includes)) {
+			return new ArrayList<>();
+		}
+
 		Collection<String> fileNames = null;
 
 		if (portalSource || subrepository) {
-			fileNames = getPortalJavaFiles();
+			fileNames = getPortalJavaFiles(includes);
 
 			_checkRegistryInTestClasses = GetterUtil.getBoolean(
 				System.getProperty(
 					"source.formatter.check.registry.in.test.classes"));
 		}
 		else {
-			fileNames = getPluginJavaFiles();
+			fileNames = getPluginJavaFiles(includes);
 		}
 
 		return new ArrayList<>(fileNames);
+	}
+
+	@Override
+	protected String[] doGetIncludes() {
+		return _INCLUDES;
 	}
 
 	protected String fixDataAccessConnection(String className, String content) {
@@ -4099,11 +4158,12 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 		};
 	}
 
-	protected Collection<String> getPluginJavaFiles() throws Exception {
+	protected Collection<String> getPluginJavaFiles(String[] includes)
+		throws Exception {
+
 		Collection<String> fileNames = new TreeSet<>();
 
 		String[] excludes = getPluginExcludes(StringPool.BLANK);
-		String[] includes = new String[] {"**/*.java"};
 
 		fileNames.addAll(getFileNames(excludes, includes));
 
@@ -4136,7 +4196,9 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 		return _portalCustomSQLContent;
 	}
 
-	protected Collection<String> getPortalJavaFiles() throws Exception {
+	protected Collection<String> getPortalJavaFiles(String[] includes)
+		throws Exception {
+
 		Collection<String> fileNames = new TreeSet<>();
 
 		String[] excludes = new String[] {
@@ -4150,8 +4212,6 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 			excludes = ArrayUtil.append(
 				excludes, getPluginExcludes("**" + directoryName));
 		}
-
-		String[] includes = getIncludes();
 
 		fileNames.addAll(getFileNames(excludes, includes));
 
@@ -4654,7 +4714,9 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 		"(\n\\s*\\* @deprecated)( As of ([0-9\\.]+)(.*?)\n\\s*\\*( @|/))?",
 		Pattern.DOTALL);
 	private final Pattern _diamondOperatorPattern = Pattern.compile(
-		"(return|=)\n?(\t+| )new ([A-Za-z]+)(\\s*)<(.+)>\\(\n*\t*.*\\);\n");
+		"(return|=)\n?(\t+| )new ([A-Za-z]+)(\\s*)<([^>][^;]*?)>" +
+			"\\(\n*\t*.*?\\);\n",
+		Pattern.DOTALL);
 	private final Pattern _fetchByPrimaryKeysMethodPattern = Pattern.compile(
 		"@Override\n\tpublic Map<(.+)> fetchByPrimaryKeys\\(");
 	private final Pattern _ifStatementCriteriaPattern = Pattern.compile(
