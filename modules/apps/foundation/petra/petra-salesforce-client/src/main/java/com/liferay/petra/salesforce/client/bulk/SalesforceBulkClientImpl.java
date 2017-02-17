@@ -12,9 +12,9 @@
  * details.
  */
 
-package com.liferay.osb.salesforce.client.bulk;
+package com.liferay.petra.salesforce.client.bulk;
 
-import com.liferay.osb.salesforce.client.SalesforceConnector;
+import com.liferay.petra.salesforce.client.SalesforceConnector;
 
 import com.sforce.async.AsyncApiException;
 import com.sforce.async.AsyncExceptionCode;
