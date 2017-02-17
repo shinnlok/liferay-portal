@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.osb.salesforce.client.partner;
+package com.liferay.petra.salesforce.client.partner;
 
 import com.sforce.soap.partner.DeleteResult;
 import com.sforce.soap.partner.DescribeGlobalResult;

@@ -12,9 +12,9 @@
  * details.
  */
 
-package com.liferay.osb.salesforce.client.streaming;
+package com.liferay.petra.salesforce.client.streaming;
 
-import com.liferay.osb.salesforce.client.SalesforceConnector;
+import com.liferay.petra.salesforce.client.SalesforceConnector;
 
 import org.cometd.bayeux.Channel;
 

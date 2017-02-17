@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.osb.salesforce.client;
+package com.liferay.petra.salesforce.client;
 
 import com.sforce.ws.ConnectorConfig;
 

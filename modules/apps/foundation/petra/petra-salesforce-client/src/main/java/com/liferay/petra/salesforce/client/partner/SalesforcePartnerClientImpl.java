@@ -12,9 +12,9 @@
  * details.
  */
 
-package com.liferay.osb.salesforce.client.partner;
+package com.liferay.petra.salesforce.client.partner;
 
-import com.liferay.osb.salesforce.client.SalesforceConnector;
+import com.liferay.petra.salesforce.client.SalesforceConnector;
 
 import com.sforce.soap.partner.Connector;
 import com.sforce.soap.partner.DeleteResult;
