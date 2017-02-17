@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.osb.salesforce.client.bulk;
+package com.liferay.petra.salesforce.client.bulk;
 
 import com.sforce.async.AsyncApiException;
 import com.sforce.async.BatchInfo;
