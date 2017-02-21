@@ -32,54 +32,6 @@ import org.slf4j.LoggerFactory;
  */
 public class BaseSalesforceClientImpl implements BaseSalesforceClient {
 
-	public void afterPropertiesSet() {
-		_connectorConfig.setAuthEndpoint(getAuthEndpoint());
-		_connectorConfig.setConnectionTimeout(
-			getConnectionTimeout() * _TIME_MINUTE);
-		_connectorConfig.setPassword(getPassword());
-		_connectorConfig.setReadTimeout(getReadTimeout() * _TIME_MINUTE);
-		_connectorConfig.setUsername(getUserName());
-
-		if (isDebugEnabled()) {
-			_connectorConfig.setPrettyPrintXml(true);
-			_connectorConfig.setTraceMessage(true);
-
-			String baseDir = System.getProperty("default.liferay.home");
-
-			if (baseDir == null) {
-				baseDir = System.getProperty("user.dir") + "/liferay";
-			}
-
-			String path = baseDir + "/logs/salesforce.log";
-
-			if (_logger.isInfoEnabled()) {
-				_logger.info("Salesforce log file: " + path);
-			}
-
-			File file = new File(path);
-
-			if (!file.exists()) {
-				File parentFile = file.getParentFile();
-
-				parentFile.mkdirs();
-
-				try {
-					file.createNewFile();
-				}
-				catch (IOException ioe) {
-					_logger.error("Unable to create log file", ioe);
-				}
-			}
-
-			try {
-				_connectorConfig.setTraceFile(path);
-			}
-			catch (FileNotFoundException fnfe) {
-				_logger.error("File not found", fnfe);
-			}
-		}
-	}
-
 	@Override
 	public String getAuthEndpoint() {
 		return _authEndpoint;
@@ -92,6 +44,10 @@ public class BaseSalesforceClientImpl implements BaseSalesforceClient {
 
 	@Override
 	public ConnectorConfig getConnectorConfig() {
+		if (_connectorConfig == null) {
+			afterPropertiesSet();
+		}
+
 		return _connectorConfig;
 	}
 
@@ -145,13 +101,68 @@ public class BaseSalesforceClientImpl implements BaseSalesforceClient {
 		_userName = userName;
 	}
 
+	protected void afterPropertiesSet() {
+		_connectorConfig = new ConnectorConfig();
+
+		_connectorConfig.setAuthEndpoint(_authEndpoint);
+		_connectorConfig.setConnectionTimeout(_connectionTimeout * 60000);
+		_connectorConfig.setPassword(_password);
+		_connectorConfig.setReadTimeout(_readTimeout * 60000);
+		_connectorConfig.setUsername(_userName);
+
+		if (_debugEnabled) {
+			_connectorConfig.setPrettyPrintXml(true);
+			_connectorConfig.setTraceMessage(true);
+
+			String baseDirName = System.getProperty("default.liferay.home");
+
+			if (baseDirName == null) {
+				baseDirName = System.getProperty("user.dir");
+			}
+
+			String filePathName = baseDirName + "/logs/salesforce.log";
+
+			if (_logger.isInfoEnabled()) {
+				_logger.info("Salesforce log file: {}", filePathName);
+			}
+
+			File file = new File(filePathName);
+
+			if (!file.exists()) {
+				File parentFile = file.getParentFile();
+
+				parentFile.mkdirs();
+
+				try {
+					file.createNewFile();
+				}
+				catch (IOException ioe) {
+					_logger.error("Unable to create log file", ioe);
+				}
+			}
+
+			try {
+				_connectorConfig.setTraceFile(filePathName);
+			}
+			catch (FileNotFoundException fnfe) {
+				_logger.error("File not found", fnfe);
+			}
+		}
+	}
+
 	protected PartnerConnection getPartnerConnection()
 		throws ConnectionException {
+
+		if (_partnerConnection != null) {
+			return _partnerConnection;
+		}
 
 		ConnectorConfig connectorConfig = getConnectorConfig();
 
 		try {
-			return Connector.newConnection(connectorConfig);
+			_partnerConnection = Connector.newConnection(connectorConfig);
+
+			return _partnerConnection;
 		}
 		catch (ConnectionException ce1) {
 			for (int i = 0; i < _SALESFORCE_CONNECTION_RETRY_COUNT; i++) {
@@ -175,15 +186,14 @@ public class BaseSalesforceClientImpl implements BaseSalesforceClient {
 
 	private static final int _SALESFORCE_CONNECTION_RETRY_COUNT = 3;
 
-	private static final int _TIME_MINUTE = 1000 * 60;
-
 	private static final Logger _logger = LoggerFactory.getLogger(
 		BaseSalesforceClientImpl.class);
 
 	private String _authEndpoint;
 	private int _connectionTimeout = 1;
-	private final ConnectorConfig _connectorConfig = new ConnectorConfig();
+	private ConnectorConfig _connectorConfig;
 	private boolean _debugEnabled;
+	private PartnerConnection _partnerConnection;
 	private String _password;
 	private int _readTimeout = 1;
 	private String _userName;

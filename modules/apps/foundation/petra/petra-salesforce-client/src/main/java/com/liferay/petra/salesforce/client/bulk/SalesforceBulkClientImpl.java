@@ -50,7 +50,9 @@ public class SalesforceBulkClientImpl
 		throws AsyncApiException, ConnectionException {
 
 		try {
-			return getBulkConnection().abortJob(jobInfoId);
+			BulkConnection bulkConnection = getBulkConnection();
+
+			return bulkConnection.abortJob(jobInfoId);
 		}
 		catch (AsyncApiException aae) {
 			if (retryCount <= 0) {
@@ -69,7 +71,9 @@ public class SalesforceBulkClientImpl
 		throws AsyncApiException, ConnectionException {
 
 		try {
-			return getBulkConnection().closeJob(jobInfoId);
+			BulkConnection bulkConnection = getBulkConnection();
+
+			return bulkConnection.closeJob(jobInfoId);
 		}
 		catch (AsyncApiException aae) {
 			if (retryCount <= 0) {
@@ -89,8 +93,9 @@ public class SalesforceBulkClientImpl
 		throws AsyncApiException, ConnectionException {
 
 		try {
-			return getBulkConnection().createBatchFromStream(
-				jobInfo, inputStream);
+			BulkConnection bulkConnection = getBulkConnection();
+
+			return bulkConnection.createBatchFromStream(jobInfo, inputStream);
 		}
 		catch (AsyncApiException aae) {
 			if (retryCount <= 0) {
@@ -110,7 +115,9 @@ public class SalesforceBulkClientImpl
 		throws AsyncApiException, ConnectionException {
 
 		try {
-			return getBulkConnection().createJob(jobInfo);
+			BulkConnection bulkConnection = getBulkConnection();
+
+			return bulkConnection.createJob(jobInfo);
 		}
 		catch (AsyncApiException aae) {
 			if (retryCount <= 0) {
@@ -130,7 +137,9 @@ public class SalesforceBulkClientImpl
 		throws AsyncApiException, ConnectionException {
 
 		try {
-			return getBulkConnection().getBatchInfo(jobInfoId, batchInfoId);
+			BulkConnection bulkConnection = getBulkConnection();
+
+			return bulkConnection.getBatchInfo(jobInfoId, batchInfoId);
 		}
 		catch (AsyncApiException aae) {
 			if (retryCount <= 0) {
@@ -150,8 +159,9 @@ public class SalesforceBulkClientImpl
 		throws AsyncApiException, ConnectionException {
 
 		try {
-			return getBulkConnection().getQueryResultList(
-				jobInfoId, batchInfoId);
+			BulkConnection bulkConnection = getBulkConnection();
+
+			return bulkConnection.getQueryResultList(jobInfoId, batchInfoId);
 		}
 		catch (AsyncApiException aae) {
 			if (retryCount <= 0) {
@@ -173,7 +183,9 @@ public class SalesforceBulkClientImpl
 		throws AsyncApiException, ConnectionException {
 
 		try {
-			return getBulkConnection().getQueryResultStream(
+			BulkConnection bulkConnection = getBulkConnection();
+
+			return bulkConnection.getQueryResultStream(
 				jobInfoId, batchInfoId, queryResultId);
 		}
 		catch (AsyncApiException aae) {
@@ -192,30 +204,44 @@ public class SalesforceBulkClientImpl
 	protected BulkConnection getBulkConnection()
 		throws AsyncApiException, ConnectionException {
 
+		if (_bulkConnection != null) {
+			return _bulkConnection;
+		}
+
 		PartnerConnection partnerConnection = getPartnerConnection();
 
 		ConnectorConfig connectorConfig = partnerConnection.getConfig();
 
-		String auth = connectorConfig.getAuthEndpoint();
-		String service = connectorConfig.getServiceEndpoint();
-
-		StringBuilder sb = new StringBuilder(3);
-
-		sb.append(service.substring(0, service.indexOf("/Soap/")));
-		sb.append("/async/");
-		sb.append(auth.substring(auth.lastIndexOf("/") + 1));
-
 		connectorConfig.setCompression(true);
+
+		StringBuilder sb = new StringBuilder();
+
+		String serviceEndpoint = connectorConfig.getServiceEndpoint();
+
+		sb.append(
+			serviceEndpoint.substring(0, serviceEndpoint.indexOf("/Soap/")));
+
+		sb.append("/async/");
+
+		String authEndpoint = connectorConfig.getAuthEndpoint();
+
+		sb.append(authEndpoint.substring(authEndpoint.lastIndexOf("/") + 1));
+
 		connectorConfig.setRestEndpoint(sb.toString());
+
 		connectorConfig.setSessionId(connectorConfig.getSessionId());
 
-		return new BulkConnection(connectorConfig);
+		_bulkConnection = new BulkConnection(connectorConfig);
+
+		return _bulkConnection;
 	}
 
 	protected Method getMethod(String methodName, Class<?>... parameterTypes)
 		throws AsyncApiException, ConnectionException {
 
-		Class<?> declaringClass = getBulkConnection().getClass();
+		BulkConnection bulkConnection = getBulkConnection();
+
+		Class<?> declaringClass = bulkConnection.getClass();
 
 		MethodKey methodKey = new MethodKey(
 			declaringClass, methodName, parameterTypes);
@@ -279,8 +305,8 @@ public class SalesforceBulkClientImpl
 	private static final Logger _logger = LoggerFactory.getLogger(
 		SalesforceBulkClientImpl.class);
 
-	private Map<MethodKey, Method> _methods =
-		new ConcurrentHashMap<MethodKey, Method>();
+	private BulkConnection _bulkConnection;
+	private final Map<MethodKey, Method> _methods = new ConcurrentHashMap<>();
 
 	private class MethodKey {
 
@@ -316,8 +342,8 @@ public class SalesforceBulkClientImpl
 		}
 
 		private Class<?> _declaringClass;
-		private String _methodName;
-		private Class<?>[] _parameterTypes;
+		private final String _methodName;
+		private final Class<?>[] _parameterTypes;
 
 	}
 
