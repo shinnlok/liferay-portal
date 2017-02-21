@@ -16,6 +16,8 @@ package com.liferay.petra.salesforce.client.streaming;
 
 import com.liferay.petra.salesforce.client.BaseSalesforceClient;
 
+import com.sforce.ws.ConnectionException;
+
 import org.cometd.bayeux.Channel;
 
 /**
@@ -25,7 +27,7 @@ import org.cometd.bayeux.Channel;
  */
 public interface SalesforceStreamingClient extends BaseSalesforceClient {
 
-	public boolean connect();
+	public boolean connect() throws ConnectionException;
 
 	public boolean disconnect();
 

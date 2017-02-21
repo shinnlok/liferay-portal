@@ -22,6 +22,7 @@ import com.sforce.soap.partner.DescribeSObjectResult;
 import com.sforce.soap.partner.GetDeletedResult;
 import com.sforce.soap.partner.GetUpdatedResult;
 import com.sforce.soap.partner.LoginResult;
+import com.sforce.soap.partner.PartnerConnection;
 import com.sforce.soap.partner.QueryResult;
 import com.sforce.soap.partner.SaveResult;
 import com.sforce.soap.partner.UpsertResult;
@@ -52,7 +53,9 @@ public class SalesforcePartnerClientImpl
 	public List<SaveResult> create(SObject[] sObjects)
 		throws ConnectionException {
 
-		SaveResult[] saveResults = getPartnerConnection().create(sObjects);
+		PartnerConnection partnerConnection = getPartnerConnection();
+
+		SaveResult[] saveResults = partnerConnection.create(sObjects);
 
 		return toList(saveResults);
 	}
@@ -61,8 +64,9 @@ public class SalesforcePartnerClientImpl
 	public List<DeleteResult> delete(String[] salesforceKeys)
 		throws ConnectionException {
 
-		DeleteResult[] deleteResults = getPartnerConnection().delete(
-			salesforceKeys);
+		PartnerConnection partnerConnection = getPartnerConnection();
+
+		DeleteResult[] deleteResults = partnerConnection.delete(salesforceKeys);
 
 		return toList(deleteResults);
 	}
@@ -72,7 +76,9 @@ public class SalesforcePartnerClientImpl
 		throws ConnectionException {
 
 		try {
-			return getPartnerConnection().describeGlobal();
+			PartnerConnection partnerConnection = getPartnerConnection();
+
+			return partnerConnection.describeGlobal();
 		}
 		catch (ConnectionException ce) {
 			if (retryCount <= 0) {
@@ -91,8 +97,10 @@ public class SalesforcePartnerClientImpl
 		throws ConnectionException {
 
 		try {
+			PartnerConnection partnerConnection = getPartnerConnection();
+
 			DescribeSObjectResult[] describeSObjectResults =
-				getPartnerConnection().describeSObjects(typeNames);
+				partnerConnection.describeSObjects(typeNames);
 
 			return toList(describeSObjectResults);
 		}
@@ -118,7 +126,9 @@ public class SalesforcePartnerClientImpl
 		throws ConnectionException {
 
 		try {
-			return getPartnerConnection().getDeleted(
+			PartnerConnection partnerConnection = getPartnerConnection();
+
+			return partnerConnection.getDeleted(
 				typeName, startCalendar, endCalendar);
 		}
 		catch (ConnectionException ce) {
@@ -141,7 +151,9 @@ public class SalesforcePartnerClientImpl
 		throws ConnectionException {
 
 		try {
-			return getPartnerConnection().getUpdated(
+			PartnerConnection partnerConnection = getPartnerConnection();
+
+			return partnerConnection.getUpdated(
 				typeName, startCalendar, endCalendar);
 		}
 		catch (ConnectionException ce) {
@@ -162,7 +174,9 @@ public class SalesforcePartnerClientImpl
 		throws ConnectionException {
 
 		try {
-			return getPartnerConnection().login(username, password);
+			PartnerConnection partnerConnection = getPartnerConnection();
+
+			return partnerConnection.login(username, password);
 		}
 		catch (ConnectionException ce) {
 			if (retryCount <= 0) {
@@ -181,7 +195,9 @@ public class SalesforcePartnerClientImpl
 		throws ConnectionException {
 
 		try {
-			return getPartnerConnection().query(queryString);
+			PartnerConnection partnerConnection = getPartnerConnection();
+
+			return partnerConnection.query(queryString);
 		}
 		catch (ConnectionException ce) {
 			if (retryCount <= 0) {
@@ -200,7 +216,9 @@ public class SalesforcePartnerClientImpl
 		throws ConnectionException {
 
 		try {
-			return getPartnerConnection().queryAll(queryString);
+			PartnerConnection partnerConnection = getPartnerConnection();
+
+			return partnerConnection.queryAll(queryString);
 		}
 		catch (ConnectionException ce) {
 			if (retryCount <= 0) {
@@ -219,7 +237,9 @@ public class SalesforcePartnerClientImpl
 		throws ConnectionException {
 
 		try {
-			return getPartnerConnection().queryMore(queryLocator);
+			PartnerConnection partnerConnection = getPartnerConnection();
+
+			return partnerConnection.queryMore(queryLocator);
 		}
 		catch (ConnectionException ce) {
 			if (retryCount <= 0) {
@@ -240,7 +260,9 @@ public class SalesforcePartnerClientImpl
 		throws ConnectionException {
 
 		try {
-			SObject[] sObjects = getPartnerConnection().retrieve(
+			PartnerConnection partnerConnection = getPartnerConnection();
+
+			SObject[] sObjects = partnerConnection.retrieve(
 				fieldNames, typeName, salesforceKeys);
 
 			return toList(sObjects);
@@ -264,7 +286,9 @@ public class SalesforcePartnerClientImpl
 	public List<SaveResult> update(SObject[] sObjects)
 		throws ConnectionException {
 
-		SaveResult[] saveResults = getPartnerConnection().update(sObjects);
+		PartnerConnection partnerConnection = getPartnerConnection();
+
+		SaveResult[] saveResults = partnerConnection.update(sObjects);
 
 		return toList(saveResults);
 	}
@@ -274,7 +298,9 @@ public class SalesforcePartnerClientImpl
 			String salesforceExternalKeyFieldName, SObject[] sObjects)
 		throws ConnectionException {
 
-		UpsertResult[] upsertResults = getPartnerConnection().upsert(
+		PartnerConnection partnerConnection = getPartnerConnection();
+
+		UpsertResult[] upsertResults = partnerConnection.upsert(
 			salesforceExternalKeyFieldName, sObjects);
 
 		return toList(upsertResults);
@@ -283,7 +309,9 @@ public class SalesforcePartnerClientImpl
 	protected Method getMethod(String methodName, Class<?>... parameterTypes)
 		throws ConnectionException {
 
-		Class<?> declaringClass = getPartnerConnection().getClass();
+		PartnerConnection partnerConnection = getPartnerConnection();
+
+		Class<?> declaringClass = partnerConnection.getClass();
 
 		MethodKey methodKey = new MethodKey(
 			declaringClass, methodName, parameterTypes);

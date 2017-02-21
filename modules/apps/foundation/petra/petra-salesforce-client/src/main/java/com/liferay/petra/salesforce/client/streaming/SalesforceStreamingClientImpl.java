@@ -17,6 +17,7 @@ package com.liferay.petra.salesforce.client.streaming;
 import com.liferay.petra.salesforce.client.BaseSalesforceClientImpl;
 
 import com.sforce.soap.partner.PartnerConnection;
+import com.sforce.ws.ConnectionException;
 import com.sforce.ws.ConnectorConfig;
 
 import java.net.URL;
@@ -46,7 +47,83 @@ import org.slf4j.LoggerFactory;
 public class SalesforceStreamingClientImpl
 	extends BaseSalesforceClientImpl implements SalesforceStreamingClient {
 
-	public void afterPropertiesSet() {
+	@Override
+	public boolean connect() throws ConnectionException {
+		if (_bayeuxClient == null) {
+			afterPropertiesSet();
+		}
+
+		if (_bayeuxClient == null) {
+			throw new ConnectionException();
+		}
+
+		if (_bayeuxClient.isConnected()) {
+			return true;
+		}
+
+		_bayeuxClient.handshake();
+
+		boolean connected = _bayeuxClient.waitFor(
+			10000, BayeuxClient.State.CONNECTED);
+
+		if (_logger.isInfoEnabled()) {
+			_logger.info("Connected: " + connected);
+		}
+
+		return connected;
+	}
+
+	public void destroy() {
+		if (_bayeuxClient.isConnected()) {
+			boolean disconnected = false;
+
+			while (!disconnected) {
+				disconnected = disconnect();
+			}
+		}
+
+		try {
+			_httpClient.stop();
+		}
+		catch (Exception e) {
+			_logger.error("Unable to stop http client", e);
+		}
+	}
+
+	@Override
+	public boolean disconnect() {
+		if (_bayeuxClient.isDisconnected()) {
+			return true;
+		}
+
+		_bayeuxClient.disconnect();
+
+		boolean disconnected = _bayeuxClient.waitFor(
+			10000, BayeuxClient.State.DISCONNECTED);
+
+		if (_logger.isInfoEnabled()) {
+			_logger.info("Disconnected: " + disconnected);
+		}
+
+		return disconnected;
+	}
+
+	@Override
+	public Channel getChannel(String name) {
+		return _bayeuxClient.getChannel(name);
+	}
+
+	@Override
+	public int getTransportTimeout() {
+		return _transportTimeout;
+	}
+
+	@Override
+	public void setTransportTimeout(int transportTimeout) {
+		_transportTimeout = transportTimeout;
+	}
+
+	protected void afterPropertiesSet() {
 		super.afterPropertiesSet();
 
 		try {
@@ -54,19 +131,19 @@ public class SalesforceStreamingClientImpl
 
 			ConnectorConfig connectorConfig = partnerConnection.getConfig();
 
-			String sessionId = connectorConfig.getSessionId();
-			int transportTimeout = getTransportTimeout() * _TIME_MINUTE;
-			URL url = new URL(connectorConfig.getServiceEndpoint());
-
 			Map<String, Object> options = new HashMap<>();
 
-			options.put(ClientTransport.TIMEOUT_OPTION, transportTimeout);
+			options.put(
+				ClientTransport.TIMEOUT_OPTION, _transportTimeout * 6000);
 
 			_httpClient.start();
 
+			URL url = new URL(connectorConfig.getServiceEndpoint());
+
 			_bayeuxClient = new BayeuxClient(
 				url.getProtocol() + "://" + url.getHost() + "/cometd/37.0",
-				new SalesforceTransport(sessionId, options, _httpClient));
+				new SalesforceTransport(
+					connectorConfig.getSessionId(), options, _httpClient));
 
 			ClientSessionChannel handshakeClientSessionChannel =
 				_bayeuxClient.getChannel(Channel.META_HANDSHAKE);
@@ -90,85 +167,6 @@ public class SalesforceStreamingClientImpl
 			_logger.error(e.getMessage(), e);
 		}
 	}
-
-	@Override
-	public boolean connect() {
-		if (_bayeuxClient == null) {
-			afterPropertiesSet();
-		}
-
-		boolean b = true;
-
-		if (!_bayeuxClient.isConnected()) {
-			_bayeuxClient.handshake();
-
-			int x = 10 * _TIME_SECOND;
-
-			b = _bayeuxClient.waitFor(x, BayeuxClient.State.CONNECTED);
-		}
-
-		if (_logger.isInfoEnabled()) {
-			_logger.info("Connected: " + b);
-		}
-
-		return b;
-	}
-
-	public void destroy() {
-		if (_bayeuxClient.isConnected()) {
-			boolean disconnected = false;
-
-			do {
-				disconnected = disconnect();
-			}
-			while (!disconnected);
-		}
-
-		try {
-			_httpClient.stop();
-		}
-		catch (Exception e) {
-			_logger.error("Unable to stop http client", e);
-		}
-	}
-
-	@Override
-	public boolean disconnect() {
-		boolean b = true;
-
-		if (!_bayeuxClient.isDisconnected()) {
-			_bayeuxClient.disconnect();
-
-			int x = 10 * _TIME_SECOND;
-
-			b = _bayeuxClient.waitFor(x, BayeuxClient.State.DISCONNECTED);
-		}
-
-		if (_logger.isInfoEnabled()) {
-			_logger.info("Disconnected: " + b);
-		}
-
-		return b;
-	}
-
-	@Override
-	public Channel getChannel(String name) {
-		return _bayeuxClient.getChannel(name);
-	}
-
-	@Override
-	public int getTransportTimeout() {
-		return _transportTimeout;
-	}
-
-	@Override
-	public void setTransportTimeout(int transportTimeout) {
-		_transportTimeout = transportTimeout;
-	}
-
-	private static final int _TIME_MINUTE = 1000 * 60;
-
-	private static final int _TIME_SECOND = 1000;
 
 	private static final Logger _logger = LoggerFactory.getLogger(
 		SalesforceStreamingClientImpl.class);
