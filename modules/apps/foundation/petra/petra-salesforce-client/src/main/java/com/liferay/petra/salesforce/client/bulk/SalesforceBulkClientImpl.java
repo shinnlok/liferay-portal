@@ -14,7 +14,7 @@
 
 package com.liferay.petra.salesforce.client.bulk;
 
-import com.liferay.petra.salesforce.client.SalesforceConnector;
+import com.liferay.petra.salesforce.client.BaseSalesforceClientImpl;
 
 import com.sforce.async.AsyncApiException;
 import com.sforce.async.AsyncExceptionCode;
@@ -22,7 +22,6 @@ import com.sforce.async.BatchInfo;
 import com.sforce.async.BulkConnection;
 import com.sforce.async.JobInfo;
 import com.sforce.async.QueryResultList;
-import com.sforce.soap.partner.Connector;
 import com.sforce.soap.partner.PartnerConnection;
 import com.sforce.ws.ConnectionException;
 import com.sforce.ws.ConnectorConfig;
@@ -43,7 +42,8 @@ import org.slf4j.LoggerFactory;
  * @author Brian Wing Shun Chan
  * @author Peter Shin
  */
-public class SalesforceBulkClientImpl implements SalesforceBulkClient {
+public class SalesforceBulkClientImpl
+	extends BaseSalesforceClientImpl implements SalesforceBulkClient {
 
 	@Override
 	public JobInfo abortJob(String jobInfoId, int retryCount)
@@ -189,18 +189,6 @@ public class SalesforceBulkClientImpl implements SalesforceBulkClient {
 		return (InputStream)invoke(method, arguments, retryCount);
 	}
 
-	@Override
-	public SalesforceConnector getSalesforceConnector() {
-		return _salesforceConnector;
-	}
-
-	@Override
-	public void setSalesforceConnector(
-		SalesforceConnector salesforceConnector) {
-
-		_salesforceConnector = salesforceConnector;
-	}
-
 	protected BulkConnection getBulkConnection()
 		throws AsyncApiException, ConnectionException {
 
@@ -251,35 +239,6 @@ public class SalesforceBulkClientImpl implements SalesforceBulkClient {
 		return method;
 	}
 
-	protected PartnerConnection getPartnerConnection()
-		throws ConnectionException {
-
-		ConnectorConfig connectorConfig =
-			getSalesforceConnector().getConnectorConfig();
-
-		try {
-			return Connector.newConnection(connectorConfig);
-		}
-		catch (ConnectionException ce1) {
-			for (int i = 0; i < _SALESFORCE_CONNECTION_RETRY_COUNT; i++) {
-				if (_logger.isInfoEnabled()) {
-					_logger.info("Retrying new connection: " + (i + 1));
-				}
-
-				try {
-					return Connector.newConnection(connectorConfig);
-				}
-				catch (ConnectionException ce2) {
-					if ((i + 1) >= _SALESFORCE_CONNECTION_RETRY_COUNT) {
-						throw ce2;
-					}
-				}
-			}
-
-			throw ce1;
-		}
-	}
-
 	protected Object invoke(Method method, Object[] arguments, int retryCount)
 		throws AsyncApiException, ConnectionException {
 
@@ -317,14 +276,11 @@ public class SalesforceBulkClientImpl implements SalesforceBulkClient {
 		return null;
 	}
 
-	private static final int _SALESFORCE_CONNECTION_RETRY_COUNT = 3;
-
 	private static final Logger _logger = LoggerFactory.getLogger(
 		SalesforceBulkClientImpl.class);
 
 	private Map<MethodKey, Method> _methods =
 		new ConcurrentHashMap<MethodKey, Method>();
-	private SalesforceConnector _salesforceConnector;
 
 	private class MethodKey {
 

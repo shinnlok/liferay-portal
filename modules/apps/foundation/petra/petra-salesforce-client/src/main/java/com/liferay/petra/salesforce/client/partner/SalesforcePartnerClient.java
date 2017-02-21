@@ -14,7 +14,7 @@
 
 package com.liferay.petra.salesforce.client.partner;
 
-import com.liferay.petra.salesforce.client.SalesforceConnector;
+import com.liferay.petra.salesforce.client.BaseSalesforceClient;
 
 import com.sforce.soap.partner.DeleteResult;
 import com.sforce.soap.partner.DescribeGlobalResult;
@@ -35,7 +35,7 @@ import java.util.List;
  * @author Brian Wing Shun Chan
  * @author Peter Shin
  */
-public interface SalesforcePartnerClient {
+public interface SalesforcePartnerClient extends BaseSalesforceClient {
 
 	public List<SaveResult> create(SObject[] sObjects)
 		throws ConnectionException;
@@ -54,8 +54,6 @@ public interface SalesforcePartnerClient {
 			String typeName, Calendar startCalendar, Calendar endCalendar,
 			int retryCount)
 		throws ConnectionException;
-
-	public SalesforceConnector getSalesforceConnector();
 
 	public GetUpdatedResult getUpdated(
 			String typeName, Calendar startCalendar, Calendar endCalendar,
@@ -78,8 +76,6 @@ public interface SalesforcePartnerClient {
 			String fieldNames, String typeName, String[] salesforceKeys,
 			int retryCount)
 		throws ConnectionException;
-
-	public void setSalesforceConnector(SalesforceConnector salesforceConnector);
 
 	public List<SaveResult> update(SObject[] sObjects)
 		throws ConnectionException;

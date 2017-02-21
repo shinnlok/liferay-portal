@@ -14,22 +14,19 @@
 
 package com.liferay.petra.salesforce.client.partner;
 
-import com.liferay.petra.salesforce.client.SalesforceConnector;
+import com.liferay.petra.salesforce.client.BaseSalesforceClientImpl;
 
-import com.sforce.soap.partner.Connector;
 import com.sforce.soap.partner.DeleteResult;
 import com.sforce.soap.partner.DescribeGlobalResult;
 import com.sforce.soap.partner.DescribeSObjectResult;
 import com.sforce.soap.partner.GetDeletedResult;
 import com.sforce.soap.partner.GetUpdatedResult;
 import com.sforce.soap.partner.LoginResult;
-import com.sforce.soap.partner.PartnerConnection;
 import com.sforce.soap.partner.QueryResult;
 import com.sforce.soap.partner.SaveResult;
 import com.sforce.soap.partner.UpsertResult;
 import com.sforce.soap.partner.sobject.SObject;
 import com.sforce.ws.ConnectionException;
-import com.sforce.ws.ConnectorConfig;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -48,7 +45,8 @@ import org.slf4j.LoggerFactory;
  * @author Brian Wing Shun Chan
  * @author Peter Shin
  */
-public class SalesforcePartnerClientImpl implements SalesforcePartnerClient {
+public class SalesforcePartnerClientImpl
+	extends BaseSalesforceClientImpl implements SalesforcePartnerClient {
 
 	@Override
 	public List<SaveResult> create(SObject[] sObjects)
@@ -134,11 +132,6 @@ public class SalesforcePartnerClientImpl implements SalesforcePartnerClient {
 		Object[] arguments = {typeName, startCalendar, endCalendar};
 
 		return (GetDeletedResult)invoke(method, arguments, retryCount);
-	}
-
-	@Override
-	public SalesforceConnector getSalesforceConnector() {
-		return _salesforceConnector;
 	}
 
 	@Override
@@ -268,13 +261,6 @@ public class SalesforcePartnerClientImpl implements SalesforcePartnerClient {
 	}
 
 	@Override
-	public void setSalesforceConnector(
-		SalesforceConnector salesforceConnector) {
-
-		_salesforceConnector = salesforceConnector;
-	}
-
-	@Override
 	public List<SaveResult> update(SObject[] sObjects)
 		throws ConnectionException {
 
@@ -320,35 +306,6 @@ public class SalesforcePartnerClientImpl implements SalesforcePartnerClient {
 		return method;
 	}
 
-	protected PartnerConnection getPartnerConnection()
-		throws ConnectionException {
-
-		ConnectorConfig connectorConfig =
-			getSalesforceConnector().getConnectorConfig();
-
-		try {
-			return Connector.newConnection(connectorConfig);
-		}
-		catch (ConnectionException ce1) {
-			for (int i = 0; i < _SALESFORCE_CONNECTION_RETRY_COUNT; i++) {
-				if (_logger.isInfoEnabled()) {
-					_logger.info("Retrying new connection: " + (i + 1));
-				}
-
-				try {
-					return Connector.newConnection(connectorConfig);
-				}
-				catch (ConnectionException ce2) {
-					if ((i + 1) >= _SALESFORCE_CONNECTION_RETRY_COUNT) {
-						throw ce2;
-					}
-				}
-			}
-
-			throw ce1;
-		}
-	}
-
 	protected Object invoke(Method method, Object[] arguments, int retryCount)
 		throws ConnectionException {
 
@@ -383,20 +340,16 @@ public class SalesforcePartnerClientImpl implements SalesforcePartnerClient {
 
 	protected <E> List<E> toList(E[] array) {
 		if ((array == null) || (array.length == 0)) {
-			return new ArrayList<E>();
+			return new ArrayList<>();
 		}
 
-		return new ArrayList<E>(Arrays.asList(array));
+		return new ArrayList<>(Arrays.asList(array));
 	}
-
-	private static final int _SALESFORCE_CONNECTION_RETRY_COUNT = 3;
 
 	private static final Logger _logger = LoggerFactory.getLogger(
 		SalesforcePartnerClientImpl.class);
 
-	private Map<MethodKey, Method> _methods =
-		new ConcurrentHashMap<MethodKey, Method>();
-	private SalesforceConnector _salesforceConnector;
+	private final Map<MethodKey, Method> _methods = new ConcurrentHashMap<>();
 
 	private class MethodKey {
 
@@ -432,8 +385,8 @@ public class SalesforcePartnerClientImpl implements SalesforcePartnerClient {
 		}
 
 		private Class<?> _declaringClass;
-		private String _methodName;
-		private Class<?>[] _parameterTypes;
+		private final String _methodName;
+		private final Class<?>[] _parameterTypes;
 
 	}
 
