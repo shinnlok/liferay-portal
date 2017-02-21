@@ -14,7 +14,7 @@
 
 package com.liferay.petra.salesforce.client.streaming;
 
-import com.liferay.petra.salesforce.client.SalesforceConnector;
+import com.liferay.petra.salesforce.client.BaseSalesforceClient;
 
 import org.cometd.bayeux.Channel;
 
@@ -23,7 +23,7 @@ import org.cometd.bayeux.Channel;
  * @author Rachael Koestartyo
  * @author Peter Shin
  */
-public interface SalesforceStreamingClient {
+public interface SalesforceStreamingClient extends BaseSalesforceClient {
 
 	public boolean connect();
 
@@ -31,11 +31,7 @@ public interface SalesforceStreamingClient {
 
 	public Channel getChannel(String name);
 
-	public SalesforceConnector getSalesforceConnector();
-
 	public int getTransportTimeout();
-
-	public void setSalesforceConnector(SalesforceConnector salesforceConnector);
 
 	public void setTransportTimeout(int transportTimeout);
 

@@ -14,6 +14,9 @@
 
 package com.liferay.petra.salesforce.client;
 
+import com.sforce.soap.partner.Connector;
+import com.sforce.soap.partner.PartnerConnection;
+import com.sforce.ws.ConnectionException;
 import com.sforce.ws.ConnectorConfig;
 
 import java.io.File;
@@ -27,7 +30,7 @@ import org.slf4j.LoggerFactory;
  * @author Brian Wing Shun Chan
  * @author Peter Shin
  */
-public class SalesforceConnectorImpl implements SalesforceConnector {
+public class BaseSalesforceClientImpl implements BaseSalesforceClient {
 
 	public void afterPropertiesSet() {
 		_connectorConfig.setAuthEndpoint(getAuthEndpoint());
@@ -142,14 +145,44 @@ public class SalesforceConnectorImpl implements SalesforceConnector {
 		_userName = userName;
 	}
 
+	protected PartnerConnection getPartnerConnection()
+		throws ConnectionException {
+
+		ConnectorConfig connectorConfig = getConnectorConfig();
+
+		try {
+			return Connector.newConnection(connectorConfig);
+		}
+		catch (ConnectionException ce1) {
+			for (int i = 0; i < _SALESFORCE_CONNECTION_RETRY_COUNT; i++) {
+				if (_logger.isInfoEnabled()) {
+					_logger.info("Retrying new connection: " + (i + 1));
+				}
+
+				try {
+					return Connector.newConnection(connectorConfig);
+				}
+				catch (ConnectionException ce2) {
+					if ((i + 1) >= _SALESFORCE_CONNECTION_RETRY_COUNT) {
+						throw ce2;
+					}
+				}
+			}
+
+			throw ce1;
+		}
+	}
+
+	private static final int _SALESFORCE_CONNECTION_RETRY_COUNT = 3;
+
 	private static final int _TIME_MINUTE = 1000 * 60;
 
 	private static final Logger _logger = LoggerFactory.getLogger(
-		SalesforceConnectorImpl.class);
+		BaseSalesforceClientImpl.class);
 
 	private String _authEndpoint;
 	private int _connectionTimeout = 1;
-	private ConnectorConfig _connectorConfig = new ConnectorConfig();
+	private final ConnectorConfig _connectorConfig = new ConnectorConfig();
 	private boolean _debugEnabled;
 	private String _password;
 	private int _readTimeout = 1;
