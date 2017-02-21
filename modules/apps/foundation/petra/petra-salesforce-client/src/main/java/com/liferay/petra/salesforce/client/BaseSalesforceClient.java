@@ -20,7 +20,7 @@ import com.sforce.ws.ConnectorConfig;
  * @author Brian Wing Shun Chan
  * @author Peter Shin
  */
-public interface SalesforceConnector {
+public interface BaseSalesforceClient {
 
 	public String getAuthEndpoint();
 

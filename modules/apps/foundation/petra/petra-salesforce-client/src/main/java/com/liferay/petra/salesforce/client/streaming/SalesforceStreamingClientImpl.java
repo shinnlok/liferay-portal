@@ -14,11 +14,9 @@
 
 package com.liferay.petra.salesforce.client.streaming;
 
-import com.liferay.petra.salesforce.client.SalesforceConnector;
+import com.liferay.petra.salesforce.client.BaseSalesforceClientImpl;
 
-import com.sforce.soap.partner.Connector;
 import com.sforce.soap.partner.PartnerConnection;
-import com.sforce.ws.ConnectionException;
 import com.sforce.ws.ConnectorConfig;
 
 import java.net.URL;
@@ -46,48 +44,59 @@ import org.slf4j.LoggerFactory;
  * @author Peter Shin
  */
 public class SalesforceStreamingClientImpl
-	implements SalesforceStreamingClient {
+	extends BaseSalesforceClientImpl implements SalesforceStreamingClient {
 
-	public void afterPropertiesSet() throws Exception {
-		PartnerConnection partnerConnection = getPartnerConnection();
+	public void afterPropertiesSet() {
+		super.afterPropertiesSet();
 
-		ConnectorConfig connectorConfig = partnerConnection.getConfig();
+		try {
+			PartnerConnection partnerConnection = getPartnerConnection();
 
-		String sessionId = connectorConfig.getSessionId();
-		int transportTimeout = getTransportTimeout() * _TIME_MINUTE;
-		URL url = new URL(connectorConfig.getServiceEndpoint());
+			ConnectorConfig connectorConfig = partnerConnection.getConfig();
 
-		Map<String, Object> options = new HashMap<String, Object>();
+			String sessionId = connectorConfig.getSessionId();
+			int transportTimeout = getTransportTimeout() * _TIME_MINUTE;
+			URL url = new URL(connectorConfig.getServiceEndpoint());
 
-		options.put(ClientTransport.TIMEOUT_OPTION, transportTimeout);
+			Map<String, Object> options = new HashMap<>();
 
-		_httpClient.start();
+			options.put(ClientTransport.TIMEOUT_OPTION, transportTimeout);
 
-		_bayeuxClient = new BayeuxClient(
-			url.getProtocol() + "://" + url.getHost() + "/cometd/37.0",
-			new SalesforceTransport(sessionId, options, _httpClient));
+			_httpClient.start();
 
-		ClientSessionChannel handshakeClientSessionChannel =
-			_bayeuxClient.getChannel(Channel.META_HANDSHAKE);
+			_bayeuxClient = new BayeuxClient(
+				url.getProtocol() + "://" + url.getHost() + "/cometd/37.0",
+				new SalesforceTransport(sessionId, options, _httpClient));
 
-		handshakeClientSessionChannel.addListener(
-			new SalesforceMessageListener());
+			ClientSessionChannel handshakeClientSessionChannel =
+				_bayeuxClient.getChannel(Channel.META_HANDSHAKE);
 
-		ClientSessionChannel connectClientSessionChannel =
-			_bayeuxClient.getChannel(Channel.META_CONNECT);
+			handshakeClientSessionChannel.addListener(
+				new SalesforceMessageListener());
 
-		connectClientSessionChannel.addListener(
-			new SalesforceMessageListener());
+			ClientSessionChannel connectClientSessionChannel =
+				_bayeuxClient.getChannel(Channel.META_CONNECT);
 
-		ClientSessionChannel subscribeClientSessionChannel =
-			_bayeuxClient.getChannel(Channel.META_SUBSCRIBE);
+			connectClientSessionChannel.addListener(
+				new SalesforceMessageListener());
 
-		subscribeClientSessionChannel.addListener(
-			new SalesforceMessageListener());
+			ClientSessionChannel subscribeClientSessionChannel =
+				_bayeuxClient.getChannel(Channel.META_SUBSCRIBE);
+
+			subscribeClientSessionChannel.addListener(
+				new SalesforceMessageListener());
+		}
+		catch (Exception e) {
+			_logger.error(e.getMessage(), e);
+		}
 	}
 
 	@Override
 	public boolean connect() {
+		if (_bayeuxClient == null) {
+			afterPropertiesSet();
+		}
+
 		boolean b = true;
 
 		if (!_bayeuxClient.isConnected()) {
@@ -148,57 +157,14 @@ public class SalesforceStreamingClientImpl
 	}
 
 	@Override
-	public SalesforceConnector getSalesforceConnector() {
-		return _salesforceConnector;
-	}
-
-	@Override
 	public int getTransportTimeout() {
 		return _transportTimeout;
-	}
-
-	@Override
-	public void setSalesforceConnector(
-		SalesforceConnector salesforceConnector) {
-
-		_salesforceConnector = salesforceConnector;
 	}
 
 	@Override
 	public void setTransportTimeout(int transportTimeout) {
 		_transportTimeout = transportTimeout;
 	}
-
-	protected PartnerConnection getPartnerConnection()
-		throws ConnectionException {
-
-		ConnectorConfig connectorConfig =
-			getSalesforceConnector().getConnectorConfig();
-
-		try {
-			return Connector.newConnection(connectorConfig);
-		}
-		catch (ConnectionException ce1) {
-			for (int i = 0; i < _SALESFORCE_CONNECTION_RETRY_COUNT; i++) {
-				if (_logger.isInfoEnabled()) {
-					_logger.info("Retrying new connection: " + (i + 1));
-				}
-
-				try {
-					return Connector.newConnection(connectorConfig);
-				}
-				catch (ConnectionException ce2) {
-					if ((i + 1) >= _SALESFORCE_CONNECTION_RETRY_COUNT) {
-						throw ce2;
-					}
-				}
-			}
-
-			throw ce1;
-		}
-	}
-
-	private static final int _SALESFORCE_CONNECTION_RETRY_COUNT = 3;
 
 	private static final int _TIME_MINUTE = 1000 * 60;
 
@@ -208,8 +174,7 @@ public class SalesforceStreamingClientImpl
 		SalesforceStreamingClientImpl.class);
 
 	private BayeuxClient _bayeuxClient;
-	private HttpClient _httpClient = new HttpClient();
-	private SalesforceConnector _salesforceConnector;
+	private final HttpClient _httpClient = new HttpClient();
 	private int _transportTimeout = 1;
 
 	private class SalesforceMessageListener implements MessageListener {
@@ -259,7 +224,7 @@ public class SalesforceStreamingClientImpl
 			exchange.addRequestHeader("Authorization", "OAuth " + _sessionId);
 		}
 
-		private String _sessionId;
+		private final String _sessionId;
 
 	}
 
