@@ -14,6 +14,7 @@
 
 package com.liferay.petra.salesforce.client;
 
+import com.sforce.async.AsyncApiException;
 import com.sforce.soap.partner.Connector;
 import com.sforce.soap.partner.PartnerConnection;
 import com.sforce.ws.ConnectionException;
@@ -167,7 +168,7 @@ public class BaseSalesforceClientImpl implements BaseSalesforceClient {
 		catch (ConnectionException ce1) {
 			for (int i = 0; i < _SALESFORCE_CONNECTION_RETRY_COUNT; i++) {
 				if (_logger.isInfoEnabled()) {
-					_logger.info("Retrying new connection: " + (i + 1));
+					_logger.info("Retrying new connection: {}", i + 1);
 				}
 
 				try {
@@ -182,6 +183,44 @@ public class BaseSalesforceClientImpl implements BaseSalesforceClient {
 
 			throw ce1;
 		}
+	}
+
+	protected int getRetryCount(int retryCount) {
+		retryCount--;
+
+		if (_logger.isInfoEnabled()) {
+			Thread thread = Thread.currentThread();
+
+			StackTraceElement stackTraceElement = thread.getStackTrace()[3];
+
+			_logger.info(
+				"Retrying: {} ({})", stackTraceElement.getMethodName(),
+				retryCount);
+		}
+
+		return retryCount;
+	}
+
+	protected int getRetryCount(
+			int retryCount, AsyncApiException asyncApiException)
+		throws AsyncApiException {
+
+		if (retryCount <= 0) {
+			throw asyncApiException;
+		}
+
+		return getRetryCount(retryCount);
+	}
+
+	protected int getRetryCount(
+			int retryCount, ConnectionException connectionException)
+		throws ConnectionException {
+
+		if (retryCount <= 0) {
+			throw connectionException;
+		}
+
+		return getRetryCount(retryCount);
 	}
 
 	private static final int _SALESFORCE_CONNECTION_RETRY_COUNT = 3;

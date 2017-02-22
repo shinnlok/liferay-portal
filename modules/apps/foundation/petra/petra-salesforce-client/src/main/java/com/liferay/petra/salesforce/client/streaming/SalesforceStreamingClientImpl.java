@@ -67,7 +67,7 @@ public class SalesforceStreamingClientImpl
 			10000, BayeuxClient.State.CONNECTED);
 
 		if (_logger.isInfoEnabled()) {
-			_logger.info("Connected: " + connected);
+			_logger.info("Connected: {}", connected);
 		}
 
 		return connected;
@@ -102,7 +102,7 @@ public class SalesforceStreamingClientImpl
 			10000, BayeuxClient.State.DISCONNECTED);
 
 		if (_logger.isInfoEnabled()) {
-			_logger.info("Disconnected: " + disconnected);
+			_logger.info("Disconnected: {}", disconnected);
 		}
 
 		return disconnected;
@@ -182,7 +182,7 @@ public class SalesforceStreamingClientImpl
 			ClientSessionChannel clientSessionChannel, Message message) {
 
 			if (_logger.isInfoEnabled()) {
-				_logger.info("Received message: " + message);
+				_logger.info("Received message: {}", message);
 			}
 
 			if (!message.isSuccessful()) {
