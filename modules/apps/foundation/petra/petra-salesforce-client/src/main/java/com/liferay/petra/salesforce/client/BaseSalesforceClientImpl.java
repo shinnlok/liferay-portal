@@ -160,10 +160,16 @@ public abstract class BaseSalesforceClientImpl implements SalesforceClient {
 		}
 	}
 
-	protected PartnerConnection getPartnerConnection(boolean reset)
+	protected PartnerConnection getPartnerConnection()
 		throws ConnectionException {
 
-		if (!reset && (_partnerConnection != null)) {
+		return getPartnerConnection(false);
+	}
+
+	protected PartnerConnection getPartnerConnection(boolean newConnection)
+		throws ConnectionException {
+
+		if (!newConnection && (_partnerConnection != null)) {
 			return _partnerConnection;
 		}
 
