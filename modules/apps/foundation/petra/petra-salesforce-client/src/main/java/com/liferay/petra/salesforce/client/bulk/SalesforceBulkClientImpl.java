@@ -39,7 +39,7 @@ public class SalesforceBulkClientImpl
 		throws AsyncApiException, ConnectionException {
 
 		try {
-			BulkConnection bulkConnection = getBulkConnection();
+			BulkConnection bulkConnection = _getBulkConnection();
 
 			return bulkConnection.abortJob(jobInfoId);
 		}
@@ -53,7 +53,7 @@ public class SalesforceBulkClientImpl
 		throws AsyncApiException, ConnectionException {
 
 		try {
-			BulkConnection bulkConnection = getBulkConnection();
+			BulkConnection bulkConnection = _getBulkConnection();
 
 			return bulkConnection.closeJob(jobInfoId);
 		}
@@ -68,7 +68,7 @@ public class SalesforceBulkClientImpl
 		throws AsyncApiException, ConnectionException {
 
 		try {
-			BulkConnection bulkConnection = getBulkConnection();
+			BulkConnection bulkConnection = _getBulkConnection();
 
 			return bulkConnection.createBatchFromStream(jobInfo, inputStream);
 		}
@@ -83,7 +83,7 @@ public class SalesforceBulkClientImpl
 		throws AsyncApiException, ConnectionException {
 
 		try {
-			BulkConnection bulkConnection = getBulkConnection();
+			BulkConnection bulkConnection = _getBulkConnection();
 
 			return bulkConnection.createJob(jobInfo);
 		}
@@ -98,7 +98,7 @@ public class SalesforceBulkClientImpl
 		throws AsyncApiException, ConnectionException {
 
 		try {
-			BulkConnection bulkConnection = getBulkConnection();
+			BulkConnection bulkConnection = _getBulkConnection();
 
 			return bulkConnection.getBatchInfo(jobInfoId, batchInfoId);
 		}
@@ -114,7 +114,7 @@ public class SalesforceBulkClientImpl
 		throws AsyncApiException, ConnectionException {
 
 		try {
-			BulkConnection bulkConnection = getBulkConnection();
+			BulkConnection bulkConnection = _getBulkConnection();
 
 			return bulkConnection.getQueryResultList(jobInfoId, batchInfoId);
 		}
@@ -131,7 +131,7 @@ public class SalesforceBulkClientImpl
 		throws AsyncApiException, ConnectionException {
 
 		try {
-			BulkConnection bulkConnection = getBulkConnection();
+			BulkConnection bulkConnection = _getBulkConnection();
 
 			return bulkConnection.getQueryResultStream(
 				jobInfoId, batchInfoId, queryResultId);
@@ -143,7 +143,7 @@ public class SalesforceBulkClientImpl
 		}
 	}
 
-	protected BulkConnection getBulkConnection()
+	private BulkConnection _getBulkConnection()
 		throws AsyncApiException, ConnectionException {
 
 		if (_bulkConnection != null) {

@@ -163,10 +163,32 @@ public abstract class BaseSalesforceClientImpl implements SalesforceClient {
 	protected PartnerConnection getPartnerConnection()
 		throws ConnectionException {
 
-		return getPartnerConnection(false);
+		return _getPartnerConnection(false);
 	}
 
-	protected PartnerConnection getPartnerConnection(boolean newConnection)
+	protected int getRetryCount(
+			int retryCount, AsyncApiException asyncApiException)
+		throws AsyncApiException {
+
+		if (retryCount <= 0) {
+			throw asyncApiException;
+		}
+
+		return _getRetryCount(retryCount);
+	}
+
+	protected int getRetryCount(
+			int retryCount, ConnectionException connectionException)
+		throws ConnectionException {
+
+		if (retryCount <= 0) {
+			throw connectionException;
+		}
+
+		return _getRetryCount(retryCount);
+	}
+
+	private PartnerConnection _getPartnerConnection(boolean newConnection)
 		throws ConnectionException {
 
 		if (!newConnection && (_partnerConnection != null)) {
@@ -203,7 +225,7 @@ public abstract class BaseSalesforceClientImpl implements SalesforceClient {
 		}
 	}
 
-	protected int getRetryCount(int retryCount) {
+	private int _getRetryCount(int retryCount) {
 		retryCount--;
 
 		if (_logger.isInfoEnabled()) {
@@ -217,28 +239,6 @@ public abstract class BaseSalesforceClientImpl implements SalesforceClient {
 		}
 
 		return retryCount;
-	}
-
-	protected int getRetryCount(
-			int retryCount, AsyncApiException asyncApiException)
-		throws AsyncApiException {
-
-		if (retryCount <= 0) {
-			throw asyncApiException;
-		}
-
-		return getRetryCount(retryCount);
-	}
-
-	protected int getRetryCount(
-			int retryCount, ConnectionException connectionException)
-		throws ConnectionException {
-
-		if (retryCount <= 0) {
-			throw connectionException;
-		}
-
-		return getRetryCount(retryCount);
 	}
 
 	private static final int _SALESFORCE_CONNECTION_RETRY_COUNT = 3;
@@ -262,7 +262,7 @@ public abstract class BaseSalesforceClientImpl implements SalesforceClient {
 				ConnectorConfig connectorConfig)
 			throws ConnectionException {
 
-			_partnerConnection = getPartnerConnection(true);
+			_partnerConnection = _getPartnerConnection(true);
 
 			SessionRenewalHeader sessionRenewalHeader =
 				new SessionRenewalHeader();

@@ -49,7 +49,7 @@ public class SalesforcePartnerClientImpl
 
 		SaveResult[] saveResults = partnerConnection.create(sObjects);
 
-		return toList(saveResults);
+		return _toList(saveResults);
 	}
 
 	@Override
@@ -60,7 +60,7 @@ public class SalesforcePartnerClientImpl
 
 		DeleteResult[] deleteResults = partnerConnection.delete(salesforceKeys);
 
-		return toList(deleteResults);
+		return _toList(deleteResults);
 	}
 
 	@Override
@@ -88,7 +88,7 @@ public class SalesforcePartnerClientImpl
 			DescribeSObjectResult[] describeSObjectResults =
 				partnerConnection.describeSObjects(typeNames);
 
-			return toList(describeSObjectResults);
+			return _toList(describeSObjectResults);
 		}
 		catch (ConnectionException ce) {
 			return describeSObjects(typeNames, getRetryCount(retryCount, ce));
@@ -201,7 +201,7 @@ public class SalesforcePartnerClientImpl
 			SObject[] sObjects = partnerConnection.retrieve(
 				fieldNames, typeName, salesforceKeys);
 
-			return toList(sObjects);
+			return _toList(sObjects);
 		}
 		catch (ConnectionException ce) {
 			return retrieve(
@@ -218,7 +218,7 @@ public class SalesforcePartnerClientImpl
 
 		SaveResult[] saveResults = partnerConnection.update(sObjects);
 
-		return toList(saveResults);
+		return _toList(saveResults);
 	}
 
 	@Override
@@ -231,10 +231,10 @@ public class SalesforcePartnerClientImpl
 		UpsertResult[] upsertResults = partnerConnection.upsert(
 			salesforceExternalKeyFieldName, sObjects);
 
-		return toList(upsertResults);
+		return _toList(upsertResults);
 	}
 
-	protected <E> List<E> toList(E[] array) {
+	private <E> List<E> _toList(E[] array) {
 		if ((array == null) || (array.length == 0)) {
 			return new ArrayList<>();
 		}
