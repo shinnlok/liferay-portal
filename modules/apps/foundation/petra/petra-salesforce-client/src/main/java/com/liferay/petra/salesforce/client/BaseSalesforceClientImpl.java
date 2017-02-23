@@ -134,17 +134,19 @@ public abstract class BaseSalesforceClientImpl implements SalesforceClient {
 				_logger.info("Salesforce log file: {}", filePathName);
 			}
 
-			Path path = Paths.get(filePathName);
+			Path filePath = Paths.get(filePathName);
 
-			if ((path != null) && !Files.exists(path)) {
-				Path parentPath = path.getParent();
+			if ((filePath != null) && !Files.exists(filePath)) {
+				Path parentFilePath = filePath.getParent();
 
 				try {
-					if ((parentPath != null) && !Files.exists(parentPath)) {
-						Files.createDirectories(parentPath);
+					if ((parentFilePath != null) &&
+						!Files.exists(parentFilePath)) {
+
+						Files.createDirectories(parentFilePath);
 					}
 
-					Files.createFile(path);
+					Files.createFile(filePath);
 				}
 				catch (IOException ioe) {
 					_logger.error("Unable to create log file", ioe);
@@ -160,10 +162,10 @@ public abstract class BaseSalesforceClientImpl implements SalesforceClient {
 		}
 	}
 
-	protected PartnerConnection getPartnerConnection()
+	protected PartnerConnection getPartnerConnection(boolean reset)
 		throws ConnectionException {
 
-		if (_partnerConnection != null) {
+		if (!reset && (_partnerConnection != null)) {
 			return _partnerConnection;
 		}
 
@@ -256,30 +258,7 @@ public abstract class BaseSalesforceClientImpl implements SalesforceClient {
 				ConnectorConfig connectorConfig)
 			throws ConnectionException {
 
-			connectorConfig = getConnectorConfig();
-
-			try {
-				_partnerConnection = Connector.newConnection(connectorConfig);
-			}
-			catch (ConnectionException ce1) {
-				for (int i = 0; i < _SALESFORCE_CONNECTION_RETRY_COUNT; i++) {
-					if (_logger.isInfoEnabled()) {
-						_logger.info("Retrying new connection: {}", i + 1);
-					}
-
-					try {
-						_partnerConnection = Connector.newConnection(
-							connectorConfig);
-					}
-					catch (ConnectionException ce2) {
-						if ((i + 1) >= _SALESFORCE_CONNECTION_RETRY_COUNT) {
-							throw ce2;
-						}
-					}
-				}
-
-				throw ce1;
-			}
+			_partnerConnection = getPartnerConnection(true);
 
 			SessionRenewalHeader sessionRenewalHeader =
 				new SessionRenewalHeader();
