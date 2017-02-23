@@ -127,7 +127,7 @@ public class SalesforceStreamingClientImpl
 		super.afterPropertiesSet();
 
 		try {
-			PartnerConnection partnerConnection = getPartnerConnection(false);
+			PartnerConnection partnerConnection = getPartnerConnection();
 
 			ConnectorConfig connectorConfig = partnerConnection.getConfig();
 
