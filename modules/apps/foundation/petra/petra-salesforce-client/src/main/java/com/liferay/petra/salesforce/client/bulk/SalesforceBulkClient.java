@@ -14,7 +14,7 @@
 
 package com.liferay.petra.salesforce.client.bulk;
 
-import com.liferay.petra.salesforce.client.BaseSalesforceClient;
+import com.liferay.petra.salesforce.client.SalesforceClient;
 
 import com.sforce.async.AsyncApiException;
 import com.sforce.async.BatchInfo;
@@ -28,7 +28,7 @@ import java.io.InputStream;
  * @author Brian Wing Shun Chan
  * @author Peter Shin
  */
-public interface SalesforceBulkClient extends BaseSalesforceClient {
+public interface SalesforceBulkClient extends SalesforceClient {
 
 	public JobInfo abortJob(String jobInfoId, int retryCount)
 		throws AsyncApiException, ConnectionException;

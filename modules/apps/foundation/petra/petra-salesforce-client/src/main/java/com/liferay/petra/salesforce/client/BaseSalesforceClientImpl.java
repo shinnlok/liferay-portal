@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
  * @author Brian Wing Shun Chan
  * @author Peter Shin
  */
-public class BaseSalesforceClientImpl implements BaseSalesforceClient {
+public abstract class BaseSalesforceClientImpl implements SalesforceClient {
 
 	@Override
 	public String getAuthEndpoint() {
