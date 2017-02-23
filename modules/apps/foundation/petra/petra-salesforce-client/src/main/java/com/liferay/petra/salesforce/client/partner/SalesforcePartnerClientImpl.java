@@ -45,7 +45,7 @@ public class SalesforcePartnerClientImpl
 	public List<SaveResult> create(SObject[] sObjects)
 		throws ConnectionException {
 
-		PartnerConnection partnerConnection = getPartnerConnection(false);
+		PartnerConnection partnerConnection = getPartnerConnection();
 
 		SaveResult[] saveResults = partnerConnection.create(sObjects);
 
@@ -56,7 +56,7 @@ public class SalesforcePartnerClientImpl
 	public List<DeleteResult> delete(String[] salesforceKeys)
 		throws ConnectionException {
 
-		PartnerConnection partnerConnection = getPartnerConnection(false);
+		PartnerConnection partnerConnection = getPartnerConnection();
 
 		DeleteResult[] deleteResults = partnerConnection.delete(salesforceKeys);
 
@@ -68,7 +68,7 @@ public class SalesforcePartnerClientImpl
 		throws ConnectionException {
 
 		try {
-			PartnerConnection partnerConnection = getPartnerConnection(false);
+			PartnerConnection partnerConnection = getPartnerConnection();
 
 			return partnerConnection.describeGlobal();
 		}
@@ -83,7 +83,7 @@ public class SalesforcePartnerClientImpl
 		throws ConnectionException {
 
 		try {
-			PartnerConnection partnerConnection = getPartnerConnection(false);
+			PartnerConnection partnerConnection = getPartnerConnection();
 
 			DescribeSObjectResult[] describeSObjectResults =
 				partnerConnection.describeSObjects(typeNames);
@@ -102,7 +102,7 @@ public class SalesforcePartnerClientImpl
 		throws ConnectionException {
 
 		try {
-			PartnerConnection partnerConnection = getPartnerConnection(false);
+			PartnerConnection partnerConnection = getPartnerConnection();
 
 			return partnerConnection.getDeleted(
 				typeName, startCalendar, endCalendar);
@@ -121,7 +121,7 @@ public class SalesforcePartnerClientImpl
 		throws ConnectionException {
 
 		try {
-			PartnerConnection partnerConnection = getPartnerConnection(false);
+			PartnerConnection partnerConnection = getPartnerConnection();
 
 			return partnerConnection.getUpdated(
 				typeName, startCalendar, endCalendar);
@@ -138,7 +138,7 @@ public class SalesforcePartnerClientImpl
 		throws ConnectionException {
 
 		try {
-			PartnerConnection partnerConnection = getPartnerConnection(false);
+			PartnerConnection partnerConnection = getPartnerConnection();
 
 			return partnerConnection.login(username, password);
 		}
@@ -152,7 +152,7 @@ public class SalesforcePartnerClientImpl
 		throws ConnectionException {
 
 		try {
-			PartnerConnection partnerConnection = getPartnerConnection(false);
+			PartnerConnection partnerConnection = getPartnerConnection();
 
 			return partnerConnection.query(queryString);
 		}
@@ -166,7 +166,7 @@ public class SalesforcePartnerClientImpl
 		throws ConnectionException {
 
 		try {
-			PartnerConnection partnerConnection = getPartnerConnection(false);
+			PartnerConnection partnerConnection = getPartnerConnection();
 
 			return partnerConnection.queryAll(queryString);
 		}
@@ -180,7 +180,7 @@ public class SalesforcePartnerClientImpl
 		throws ConnectionException {
 
 		try {
-			PartnerConnection partnerConnection = getPartnerConnection(false);
+			PartnerConnection partnerConnection = getPartnerConnection();
 
 			return partnerConnection.queryMore(queryLocator);
 		}
@@ -196,7 +196,7 @@ public class SalesforcePartnerClientImpl
 		throws ConnectionException {
 
 		try {
-			PartnerConnection partnerConnection = getPartnerConnection(false);
+			PartnerConnection partnerConnection = getPartnerConnection();
 
 			SObject[] sObjects = partnerConnection.retrieve(
 				fieldNames, typeName, salesforceKeys);
@@ -214,7 +214,7 @@ public class SalesforcePartnerClientImpl
 	public List<SaveResult> update(SObject[] sObjects)
 		throws ConnectionException {
 
-		PartnerConnection partnerConnection = getPartnerConnection(false);
+		PartnerConnection partnerConnection = getPartnerConnection();
 
 		SaveResult[] saveResults = partnerConnection.update(sObjects);
 
@@ -226,7 +226,7 @@ public class SalesforcePartnerClientImpl
 			String salesforceExternalKeyFieldName, SObject[] sObjects)
 		throws ConnectionException {
 
-		PartnerConnection partnerConnection = getPartnerConnection(false);
+		PartnerConnection partnerConnection = getPartnerConnection();
 
 		UpsertResult[] upsertResults = partnerConnection.upsert(
 			salesforceExternalKeyFieldName, sObjects);

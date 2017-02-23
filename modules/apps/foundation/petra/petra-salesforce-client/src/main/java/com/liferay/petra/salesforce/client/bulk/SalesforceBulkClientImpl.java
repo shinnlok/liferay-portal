@@ -150,7 +150,7 @@ public class SalesforceBulkClientImpl
 			return _bulkConnection;
 		}
 
-		PartnerConnection partnerConnection = getPartnerConnection(false);
+		PartnerConnection partnerConnection = getPartnerConnection();
 
 		ConnectorConfig connectorConfig = partnerConnection.getConfig();
 
