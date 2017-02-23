@@ -19,6 +19,7 @@ import com.sforce.soap.partner.Connector;
 import com.sforce.soap.partner.PartnerConnection;
 import com.sforce.ws.ConnectionException;
 import com.sforce.ws.ConnectorConfig;
+import com.sforce.ws.SessionRenewer;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -26,6 +27,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import javax.xml.namespace.QName;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,6 +115,7 @@ public abstract class BaseSalesforceClientImpl implements SalesforceClient {
 		_connectorConfig.setConnectionTimeout(_connectionTimeout * 60000);
 		_connectorConfig.setPassword(_password);
 		_connectorConfig.setReadTimeout(_readTimeout * 60000);
+		_connectorConfig.setSessionRenewer(new SalesforceSessionRenewer());
 		_connectorConfig.setUsername(_userName);
 
 		if (_debugEnabled) {
@@ -241,5 +245,50 @@ public abstract class BaseSalesforceClientImpl implements SalesforceClient {
 	private String _password;
 	private int _readTimeout = 1;
 	private String _userName;
+
+	private class SalesforceSessionRenewer implements SessionRenewer {
+
+		@Override
+		public SessionRenewalHeader renewSession(
+				ConnectorConfig connectorConfig)
+			throws ConnectionException {
+
+			connectorConfig = getConnectorConfig();
+
+			try {
+				_partnerConnection = Connector.newConnection(connectorConfig);
+			}
+			catch (ConnectionException ce1) {
+				for (int i = 0; i < _SALESFORCE_CONNECTION_RETRY_COUNT; i++) {
+					if (_logger.isInfoEnabled()) {
+						_logger.info("Retrying new connection: {}", i + 1);
+					}
+
+					try {
+						_partnerConnection = Connector.newConnection(
+							connectorConfig);
+					}
+					catch (ConnectionException ce2) {
+						if ((i + 1) >= _SALESFORCE_CONNECTION_RETRY_COUNT) {
+							throw ce2;
+						}
+					}
+				}
+
+				throw ce1;
+			}
+
+			SessionRenewalHeader sessionRenewalHeader =
+				new SessionRenewalHeader();
+
+			sessionRenewalHeader.headerElement =
+				_partnerConnection.getSessionHeader();
+			sessionRenewalHeader.name = new QName(
+				"urn:partner.soap.sforce.com", "SessionHeader");
+
+			return sessionRenewalHeader;
+		}
+
+	}
 
 }
