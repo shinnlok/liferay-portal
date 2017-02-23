@@ -181,7 +181,10 @@ public abstract class BaseSalesforceClientImpl implements SalesforceClient {
 				}
 
 				try {
-					return Connector.newConnection(connectorConfig);
+					_partnerConnection = Connector.newConnection(
+						connectorConfig);
+
+					return _partnerConnection;
 				}
 				catch (ConnectionException ce2) {
 					if ((i + 1) >= _SALESFORCE_CONNECTION_RETRY_COUNT) {
