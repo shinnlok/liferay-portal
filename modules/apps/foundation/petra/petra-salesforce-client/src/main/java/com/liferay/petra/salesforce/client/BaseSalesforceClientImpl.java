@@ -136,13 +136,11 @@ public abstract class BaseSalesforceClientImpl implements SalesforceClient {
 
 			Path filePath = Paths.get(filePathName);
 
-			if ((filePath != null) && !Files.exists(filePath)) {
-				Path parentFilePath = filePath.getParent();
-
+			if (!Files.exists(filePath)) {
 				try {
-					if ((parentFilePath != null) &&
-						!Files.exists(parentFilePath)) {
+					Path parentFilePath = filePath.getParent();
 
+					if (!Files.exists(parentFilePath)) {
 						Files.createDirectories(parentFilePath);
 					}
 
