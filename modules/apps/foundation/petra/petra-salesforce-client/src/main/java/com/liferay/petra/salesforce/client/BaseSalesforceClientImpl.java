@@ -20,9 +20,12 @@ import com.sforce.soap.partner.PartnerConnection;
 import com.sforce.ws.ConnectionException;
 import com.sforce.ws.ConnectorConfig;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -127,15 +130,17 @@ public abstract class BaseSalesforceClientImpl implements SalesforceClient {
 				_logger.info("Salesforce log file: {}", filePathName);
 			}
 
-			File file = new File(filePathName);
+			Path path = Paths.get(filePathName);
 
-			if (!file.exists()) {
-				File parentFile = file.getParentFile();
-
-				parentFile.mkdirs();
+			if ((path != null) && !Files.exists(path)) {
+				Path parentPath = path.getParent();
 
 				try {
-					file.createNewFile();
+					if ((parentPath != null) && !Files.exists(parentPath)) {
+						Files.createDirectories(parentPath);
+					}
+
+					Files.createFile(path);
 				}
 				catch (IOException ioe) {
 					_logger.error("Unable to create log file", ioe);
