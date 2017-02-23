@@ -14,7 +14,7 @@
 
 package com.liferay.petra.salesforce.client.partner;
 
-import com.liferay.petra.salesforce.client.BaseSalesforceClient;
+import com.liferay.petra.salesforce.client.SalesforceClient;
 
 import com.sforce.soap.partner.DeleteResult;
 import com.sforce.soap.partner.DescribeGlobalResult;
@@ -35,7 +35,7 @@ import java.util.List;
  * @author Brian Wing Shun Chan
  * @author Peter Shin
  */
-public interface SalesforcePartnerClient extends BaseSalesforceClient {
+public interface SalesforcePartnerClient extends SalesforceClient {
 
 	public List<SaveResult> create(SObject[] sObjects)
 		throws ConnectionException;
