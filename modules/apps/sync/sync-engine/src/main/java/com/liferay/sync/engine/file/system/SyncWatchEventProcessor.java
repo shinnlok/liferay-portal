@@ -361,6 +361,16 @@ public class SyncWatchEventProcessor implements Runnable {
 			FileKeyUtil.writeFileKey(
 				targetFilePath, String.valueOf(syncFile.getSyncFileId()), true);
 		}
+		else if (targetFilePath.toString().equalsIgnoreCase(
+					sourceFilePath.toString())) {
+
+			// Handle edge case where changing filename case will trigger
+			// a create event after a rename event
+
+			queueSyncWatchEvent(syncFile.getFilePathName(), syncWatchEvent);
+
+			return;
+		}
 		else if (FileUtil.exists(sourceFilePath)) {
 			SyncFileService.addFolderSyncFile(
 				targetFilePath, parentSyncFile.getTypePK(),
