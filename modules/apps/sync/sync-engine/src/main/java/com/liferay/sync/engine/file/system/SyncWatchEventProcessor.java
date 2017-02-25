@@ -355,6 +355,12 @@ public class SyncWatchEventProcessor implements Runnable {
 			return;
 		}
 
+		if (syncFile.getState() == SyncFile.STATE_IN_PROGRESS) {
+			queueSyncWatchEvent(syncFile.getFilePathName(), syncWatchEvent);
+
+			return;
+		}
+
 		Path sourceFilePath = Paths.get(syncFile.getFilePathName());
 
 		if (targetFilePath.equals(sourceFilePath)) {
