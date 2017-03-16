@@ -361,6 +361,12 @@ public class SyncWatchEventProcessor implements Runnable {
 		Path sourceFilePath = Paths.get(syncFile.getFilePathName());
 
 		if (targetFilePath.equals(sourceFilePath)) {
+			if (isPendingTypePK(syncFile)) {
+				queueSyncWatchEvent(syncFile.getFilePathName(), syncWatchEvent);
+
+				return;
+			}
+
 			FileKeyUtil.writeFileKey(
 				targetFilePath, String.valueOf(syncFile.getSyncFileId()), true);
 		}
