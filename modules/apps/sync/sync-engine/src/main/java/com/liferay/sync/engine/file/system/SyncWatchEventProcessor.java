@@ -806,14 +806,17 @@ public class SyncWatchEventProcessor implements Runnable {
 	}
 
 	protected void renameFile(SyncWatchEvent syncWatchEvent) throws Exception {
+		Path sourceFilePath = Paths.get(
+			syncWatchEvent.getPreviousFilePathName());
+
+		SyncFile syncFile = SyncFileService.fetchSyncFile(
+			sourceFilePath.toString());
+
 		Path targetFilePath = Paths.get(syncWatchEvent.getFilePathName());
 
 		if (sanitizeFileName(targetFilePath)) {
 			return;
 		}
-
-		SyncFile syncFile = SyncFileService.fetchSyncFile(
-			FileKeyUtil.getFileKey(targetFilePath));
 
 		if (syncFile == null) {
 			if (Files.isDirectory(targetFilePath)) {
