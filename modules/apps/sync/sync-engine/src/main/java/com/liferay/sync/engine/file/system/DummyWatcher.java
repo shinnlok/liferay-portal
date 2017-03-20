@@ -34,6 +34,10 @@ public class DummyWatcher extends Watcher {
 	}
 
 	@Override
+	public void addRenamedFilePathName(String filePathName) {
+	}
+
+	@Override
 	public void close() {
 	}
 
@@ -47,6 +51,10 @@ public class DummyWatcher extends Watcher {
 
 	@Override
 	public void removeDownloadedFilePathName(String filePathName) {
+	}
+
+	@Override
+	public void removeRenamedFilePathName(String filePathName) {
 	}
 
 	@Override

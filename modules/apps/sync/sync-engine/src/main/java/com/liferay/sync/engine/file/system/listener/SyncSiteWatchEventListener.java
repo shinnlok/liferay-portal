@@ -34,6 +34,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +47,30 @@ public class SyncSiteWatchEventListener extends BaseWatchEventListener {
 
 	public SyncSiteWatchEventListener(long syncAccountId) {
 		super(syncAccountId);
+	}
+
+	public void addDeletedFilePathName(String filePathName) {
+		_deletedFilePathNames.add(filePathName);
+	}
+
+	public void addDownloadedFilePathName(String filePathName) {
+		_downloadedFilePathNames.add(filePathName);
+	}
+
+	public void addRenamedFilePathName(String filePathName) {
+		_renamedFilePathNames.add(filePathName);
+	}
+
+	public void removeDeletedFilePathName(String filePathName) {
+		_deletedFilePathNames.remove(filePathName);
+	}
+
+	public void removeDownloadedFilePathName(String filePathName) {
+		_downloadedFilePathNames.remove(filePathName);
+	}
+
+	public void removeRenamedFilePathName(String filePathName) {
+		_renamedFilePathNames.remove(filePathName);
 	}
 
 	@Override
@@ -113,6 +139,12 @@ public class SyncSiteWatchEventListener extends BaseWatchEventListener {
 			}
 
 			if (!eventType.equals(SyncWatchEvent.EVENT_TYPE_RENAME_TO)) {
+				if (_deletedFilePathNames.remove(filePath.toString()) ||
+					_downloadedFilePathNames.remove(filePath.toString())) {
+
+					return;
+				}
+
 				SyncWatchEventService.addSyncWatchEvent(
 					eventType, filePathName, getFileType(eventType, filePath),
 					null, getSyncAccountId());
@@ -144,6 +176,10 @@ public class SyncSiteWatchEventListener extends BaseWatchEventListener {
 				(previousRepositoryId != repositoryId)) {
 
 				eventType = SyncWatchEvent.EVENT_TYPE_CREATE;
+
+				if (_downloadedFilePathNames.remove(filePath.toString())) {
+					return;
+				}
 
 				SyncWatchEventService.addSyncWatchEvent(
 					eventType, filePathName, getFileType(eventType, filePath),
@@ -179,6 +215,10 @@ public class SyncSiteWatchEventListener extends BaseWatchEventListener {
 					return;
 				}
 
+				if (_renamedFilePathNames.remove(filePath.toString())) {
+					return;
+				}
+
 				lastSyncWatchEvent.setEventType(
 					SyncWatchEvent.EVENT_TYPE_RENAME);
 				lastSyncWatchEvent.setFilePathName(filePathName);
@@ -211,6 +251,10 @@ public class SyncSiteWatchEventListener extends BaseWatchEventListener {
 					watchEvent(SyncWatchEvent.EVENT_TYPE_DELETE, filePath);
 				}
 				else {
+					if (_renamedFilePathNames.remove(filePath.toString())) {
+						return;
+					}
+
 					lastSyncWatchEvent.setEventType(
 						SyncWatchEvent.EVENT_TYPE_MOVE);
 					lastSyncWatchEvent.setFilePathName(filePathName);
@@ -287,5 +331,12 @@ public class SyncSiteWatchEventListener extends BaseWatchEventListener {
 
 	private static final Logger _logger = LoggerFactory.getLogger(
 		SyncWatchEventService.class);
+
+	private final List<String> _deletedFilePathNames =
+		new CopyOnWriteArrayList<>();
+	private final List<String> _downloadedFilePathNames =
+		new CopyOnWriteArrayList<>();
+	private final List<String> _renamedFilePathNames =
+		new CopyOnWriteArrayList<>();
 
 }
