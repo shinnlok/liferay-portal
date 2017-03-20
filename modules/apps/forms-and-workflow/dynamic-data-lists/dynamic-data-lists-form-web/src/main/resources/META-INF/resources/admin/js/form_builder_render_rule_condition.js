@@ -109,7 +109,8 @@ AUI.add(
 								condition.operands.push(
 									{
 										type: 'constant',
-										value: instance._getSecondOperandValue(index, 'input')
+										value: instance._getSecondOperandValue(index, 'input'),
+										visible: true
 									}
 								);
 							}
@@ -118,7 +119,8 @@ AUI.add(
 									{
 										label: instance._getOptionsLabel(instance._getSecondOperand(index, 'options'), instance._getSecondOperandValue(index, 'options')),
 										type: 'constant',
-										value: instance._getSecondOperandValue(index, 'options')
+										value: instance._getSecondOperandValue(index, 'options'),
+										visible: true
 									}
 								);
 							}
@@ -127,10 +129,18 @@ AUI.add(
 							condition.operands.push(
 								{
 									type: 'field',
-									value: instance._getSecondOperandValue(index, 'fields')
+									value: instance._getSecondOperandValue(index, 'fields'),
+									visible: true
 								}
 							);
 						}
+					}
+					else if (instance._isUnaryCondition(index)) {
+						condition.operands.push(
+							{
+								visible: false
+							}
+						);
 					}
 
 					conditions.push(condition);
@@ -259,18 +269,20 @@ AUI.add(
 
 				var fieldName = field.get('fieldName');
 
-				var index = fieldName.split('-')[0];
+				if (fieldName && fieldName.match('-condition')) {
+					var index = fieldName.split('-')[0];
 
-				if (fieldName.match('-condition-first-operand')) {
-					instance._updateOperatorList(field.get('dataType'), index);
-					instance._updateSecondOperandFieldVisibility(index);
-				}
-				else if (fieldName.match('-condition-operator')) {
-					instance._updateTypeFieldVisibility(index);
-					instance._updateSecondOperandFieldVisibility(index);
-				}
-				else if (fieldName.match('-condition-second-operand-type')) {
-					instance._updateSecondOperandFieldVisibility(index);
+					if (fieldName.match('-first-operand')) {
+						instance._updateOperatorList(field.get('dataType'), index);
+						instance._updateSecondOperandFieldVisibility(index);
+					}
+					else if (fieldName.match('-operator')) {
+						instance._updateTypeFieldVisibility(index);
+						instance._updateSecondOperandFieldVisibility(index);
+					}
+					else if (fieldName.match('-second-operand-type')) {
+						instance._updateSecondOperandFieldVisibility(index);
+					}
 				}
 			},
 
@@ -329,7 +341,7 @@ AUI.add(
 
 				var value = instance._getOperatorValue(index);
 
-				return value === 'is-email-address' || value === 'is-url';
+				return value === 'is-email-address' || value === 'is-url' || value === 'is-empty' || value === 'not-is-empty';
 			},
 
 			_isValidLogicOperator: function(operator) {

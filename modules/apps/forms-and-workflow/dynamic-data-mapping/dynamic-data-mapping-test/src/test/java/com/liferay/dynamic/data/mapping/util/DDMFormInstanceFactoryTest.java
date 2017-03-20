@@ -49,13 +49,13 @@ public class DDMFormInstanceFactoryTest {
 			DDMFormValuesTestUtil.createUnlocalizedDDMFormFieldValue(
 				"boolean", Boolean.toString(expectedBooleanValue)));
 
-		double expectedDoubleValue = 2.5d;
+		double expectedDoubleValue = 2.5D;
 
 		primitiveTypesDDMFormFieldValue.addNestedDDMFormFieldValue(
 			DDMFormValuesTestUtil.createUnlocalizedDDMFormFieldValue(
 				"double", Double.toString(expectedDoubleValue)));
 
-		float expectedFloatValue = 3.5f;
+		float expectedFloatValue = 3.5F;
 
 		primitiveTypesDDMFormFieldValue.addNestedDDMFormFieldValue(
 			DDMFormValuesTestUtil.createUnlocalizedDDMFormFieldValue(
@@ -244,13 +244,13 @@ public class DDMFormInstanceFactoryTest {
 			DDMFormValuesTestUtil.createUnlocalizedDDMFormFieldValue(
 				"boolean", Boolean.toString(expectedBooleanValue)));
 
-		double expectedDoubleValue = 2.5d;
+		double expectedDoubleValue = 2.5D;
 
 		ddmFormValues.addDDMFormFieldValue(
 			DDMFormValuesTestUtil.createUnlocalizedDDMFormFieldValue(
 				"double", Double.toString(expectedDoubleValue)));
 
-		float expectedFloatValue = 3.5f;
+		float expectedFloatValue = 3.5F;
 
 		ddmFormValues.addDDMFormFieldValue(
 			DDMFormValuesTestUtil.createUnlocalizedDDMFormFieldValue(
@@ -408,9 +408,9 @@ public class DDMFormInstanceFactoryTest {
 		Assert.assertEquals(
 			false, dynamicFormWithPrimitiveTypes.booleanValue());
 		Assert.assertEquals(
-			0.0d, dynamicFormWithPrimitiveTypes.doubleValue(), 0.1);
+			0.0D, dynamicFormWithPrimitiveTypes.doubleValue(), 0.1);
 		Assert.assertEquals(
-			0.0f, dynamicFormWithPrimitiveTypes.floatValue(), 0.1);
+			0.0F, dynamicFormWithPrimitiveTypes.floatValue(), 0.1);
 		Assert.assertEquals(0, dynamicFormWithPrimitiveTypes.integerValue());
 		Assert.assertEquals(0, dynamicFormWithPrimitiveTypes.longValue());
 		Assert.assertEquals(0, dynamicFormWithPrimitiveTypes.shortValue());
@@ -436,11 +436,11 @@ public class DDMFormInstanceFactoryTest {
 			true,
 			dynamicFormWithPrimitiveTypesWithPredefinedValue.booleanValue());
 		Assert.assertEquals(
-			1.0d,
+			1.0D,
 			dynamicFormWithPrimitiveTypesWithPredefinedValue.doubleValue(),
 			0.1);
 		Assert.assertEquals(
-			1.0f, dynamicFormWithPrimitiveTypesWithPredefinedValue.floatValue(),
+			1.0F, dynamicFormWithPrimitiveTypesWithPredefinedValue.floatValue(),
 			0.1);
 		Assert.assertEquals(
 			1, dynamicFormWithPrimitiveTypesWithPredefinedValue.integerValue());

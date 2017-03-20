@@ -256,11 +256,9 @@
 			<var name="panelHeading" value="Configuration" />
 		</execute>
 
-		<execute function="Click" locator1="Radio#CUSTOM_ABSTRACT" />
-
-		<execute function="Click" locator1="AlloyEditor#DESCRIPTION_FIELD" />
-
-		<execute function="Type#typeEditor" locator1="AlloyEditor#DESCRIPTION_FIELD" value1="${entryAbstractDescription}" />
+		<execute macro="BlogsEntry#addCustomAbstract">
+			<var name="entryAbstractDescription" value="${entryAbstractDescription}" />
+		</execute>
 
 		<execute macro="PortletEntry#publish" />
 	</command>

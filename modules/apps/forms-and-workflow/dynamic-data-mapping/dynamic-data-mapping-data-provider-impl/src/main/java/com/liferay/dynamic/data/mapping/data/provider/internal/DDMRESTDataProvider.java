@@ -31,6 +31,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.KeyValuePair;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -62,8 +63,11 @@ public class DDMRESTDataProvider implements DDMDataProvider {
 		throws DDMDataProviderException {
 
 		try {
+			DDMDataProviderRequest ddmDataProviderRequest =
+				new DDMDataProviderRequest(ddmDataProviderContext);
+
 			DDMDataProviderResponse ddmDataProviderResponse = doGetData(
-				ddmDataProviderContext);
+				ddmDataProviderRequest);
 
 			List<KeyValuePair> results = new ArrayList<>();
 
@@ -89,10 +93,7 @@ public class DDMRESTDataProvider implements DDMDataProvider {
 		throws DDMDataProviderException {
 
 		try {
-			DDMDataProviderContext ddmDataProviderContext =
-				ddmDataProviderRequest.getDDMDataProviderContext();
-
-			return doGetData(ddmDataProviderContext);
+			return doGetData(ddmDataProviderRequest);
 		}
 		catch (PortalException pe) {
 			throw new DDMDataProviderException(pe);
@@ -105,7 +106,11 @@ public class DDMRESTDataProvider implements DDMDataProvider {
 	}
 
 	protected DDMDataProviderResponse createDDMDataProviderResponse(
-		JSONArray jsonArray, DDMDataProviderContext ddmDataProviderContext) {
+		JSONArray jsonArray, DDMDataProviderRequest ddmDataProviderRequest,
+		DDMRESTDataProviderSettings ddmRESTDataProviderSettings) {
+
+		DDMDataProviderContext ddmDataProviderContext =
+			ddmDataProviderRequest.getDDMDataProviderContext();
 
 		List<Map<Object, Object>> data = new ArrayList<>();
 
@@ -124,12 +129,25 @@ public class DDMRESTDataProvider implements DDMDataProvider {
 			}
 		}
 
+		if (ddmRESTDataProviderSettings.pagination()) {
+			int start = ddmDataProviderRequest.getPaginationStart();
+
+			int end = ddmDataProviderRequest.getPaginationEnd();
+
+			if (data.size() > (end - start)) {
+				data = ListUtil.subList(data, start, end);
+			}
+		}
+
 		return new DDMDataProviderResponse(data);
 	}
 
 	protected DDMDataProviderResponse doGetData(
-			DDMDataProviderContext ddmDataProviderContext)
+			DDMDataProviderRequest ddmDataProviderRequest)
 		throws JSONException {
+
+		DDMDataProviderContext ddmDataProviderContext =
+			ddmDataProviderRequest.getDDMDataProviderContext();
 
 		DDMRESTDataProviderSettings ddmRESTDataProviderSettings =
 			ddmDataProviderContext.getSettingsInstance(
@@ -144,13 +162,8 @@ public class DDMRESTDataProvider implements DDMDataProvider {
 				ddmRESTDataProviderSettings.password());
 		}
 
-		httpRequest.query(ddmDataProviderContext.getParameters());
-
-		if (ddmRESTDataProviderSettings.filterable()) {
-			httpRequest.query(
-				ddmRESTDataProviderSettings.filterParameterName(),
-				ddmDataProviderContext.getParameter("filterParameterValue"));
-		}
+		setRequestParameters(
+			ddmDataProviderRequest, ddmRESTDataProviderSettings, httpRequest);
 
 		String cacheKey = getCacheKey(httpRequest);
 
@@ -168,7 +181,8 @@ public class DDMRESTDataProvider implements DDMDataProvider {
 		JSONArray jsonArray = getValue(httpResponse.body());
 
 		DDMDataProviderResponse ddmDataProviderResponse =
-			createDDMDataProviderResponse(jsonArray, ddmDataProviderContext);
+			createDDMDataProviderResponse(
+				jsonArray, ddmDataProviderRequest, ddmRESTDataProviderSettings);
 
 		if (ddmRESTDataProviderSettings.cacheable()) {
 			_portalCache.put(
@@ -237,6 +251,32 @@ public class DDMRESTDataProvider implements DDMDataProvider {
 		_portalCache =
 			(PortalCache<String, DDMRESTDataProviderResult>)
 				multiVMPool.getPortalCache(DDMRESTDataProvider.class.getName());
+	}
+
+	protected void setRequestParameters(
+		DDMDataProviderRequest ddmDataProviderRequest,
+		DDMRESTDataProviderSettings ddmRESTDataProviderSettings,
+		HttpRequest httpRequest) {
+
+		DDMDataProviderContext ddmDataProviderContext =
+			ddmDataProviderRequest.getDDMDataProviderContext();
+
+		if (ddmRESTDataProviderSettings.filterable()) {
+			httpRequest.query(
+				ddmRESTDataProviderSettings.filterParameterName(),
+				ddmDataProviderContext.getParameter("filterParameterValue"));
+		}
+
+		if (ddmRESTDataProviderSettings.pagination()) {
+			httpRequest.query(
+				ddmRESTDataProviderSettings.paginationEndParameterName(),
+				ddmDataProviderRequest.getPaginationStart());
+			httpRequest.query(
+				ddmRESTDataProviderSettings.paginationEndParameterName(),
+				ddmDataProviderRequest.getPaginationEnd());
+		}
+
+		httpRequest.query(ddmDataProviderContext.getParameters());
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

@@ -671,6 +671,7 @@ Error-Prone was automatically installed. Please rerun your task.
 		<attribute default="${basedir}" name="dir" />
 		<attribute default="true" name="failonerror" />
 		<attribute default="true" name="forcedcacheenabled" />
+		<attribute default="" name="outputproperty" />
 		<attribute name="task" />
 		<element implicit="true" name="args" optional="true" />
 
@@ -697,6 +698,7 @@ Error-Prone was automatically installed. Please rerun your task.
 				<arg value="-Dliferay.home=${liferay.home}" />
 				<arg value="@{task}" />
 				<env key="GRADLE_OPTS" value="${env.ANT_OPTS}" />
+				<redirector errorproperty="@{outputproperty}.error" outputproperty="@{outputproperty}" unless:blank="@{outputproperty}" />
 			</exec>
 		</sequential>
 	</macrodef>
@@ -708,16 +710,24 @@ Error-Prone was automatically installed. Please rerun your task.
 		<element implicit="true" name="attach-files" optional="true" />
 
 		<sequential>
+			<local name="build.repository.local.actual.dir" />
+			<local name="snapshot.version.suffix" />
+
+			<condition else="${build.repository.local.dir}" property="build.repository.local.actual.dir" value="${user.home}/.m2/repository">
+				<equals arg1="${build.repository.local.dir}" arg2="" />
+			</condition>
+
 			<condition else="" property="snapshot.version.suffix" value="-SNAPSHOT">
 				<istrue value="@{snapshot}" />
 			</condition>
 
 			<prepare-portal-artifact-pom snapshot.version.suffix="${snapshot.version.suffix}" />
 
-			<delete dir="${user.home}/.m2/repository/com/liferay/portal/com.liferay.${processed.artifact.name}" />
+			<delete dir="${build.repository.local.actual.dir}/com/liferay/portal/com.liferay.${processed.artifact.name}" />
 
 			<artifact:install file="${artifact.name}.@{packaging}">
 				<attach-files />
+				<localRepository path="${build.repository.local.dir}" unless:blank="${build.repository.local.dir}" />
 				<pom file="pom.xml" />
 			</artifact:install>
 
@@ -1067,11 +1077,19 @@ Error-Prone was automatically installed. Please rerun your task.
 
 	<macrodef name="setup-sdk">
 		<sequential>
+			<gradle-execute forcedcacheenabled="true" outputproperty="sdk.zip.file" task="printDependencyPath">
+				<arg value="--build-file=${project.dir}/modules/util.gradle" />
+				<arg value="--quiet" />
+				<arg value="-PdependencyNotation=com.liferay.portal:com.liferay.portal.plugins.sdk:${build.sdk.version}" />
+			</gradle-execute>
+
+			<dirname file="${sdk.zip.file}" property="sdk.zip.dir" />
+
 			<if>
 				<not>
 					<uptodate>
 						<mapper to="${sdk.dir}" type="merge" />
-						<srcfiles dir="${project.dir}/tools" includes="com.liferay.portal.plugins.sdk-7.0.0.zip" />
+						<srcfiles dir="${sdk.zip.dir}" includes="com.liferay.portal.plugins.sdk-${build.sdk.version}.zip" />
 					</uptodate>
 				</not>
 				<then>
@@ -1079,11 +1097,11 @@ Error-Prone was automatically installed. Please rerun your task.
 
 					<unzip
 						dest="${project.dir}/tools"
-						src="${project.dir}/tools/com.liferay.portal.plugins.sdk-7.0.0.zip"
+						src="${sdk.zip.dir}/com.liferay.portal.plugins.sdk-${build.sdk.version}.zip"
 					>
 						<mapper
 							type="glob"
-							from="com.liferay.portal.plugins.sdk-7.0.0/*"
+							from="com.liferay.portal.plugins.sdk-${build.sdk.version}/*"
 							to="sdk/*"
 						/>
 					</unzip>
@@ -1342,6 +1360,7 @@ rerun your task.
 					<propertyref name="source.formatter.max.line.length" />
 					<propertyref name="source.formatter.processor.thread.count" />
 					<propertyref name="timeout.app.server.wait" />
+					<propertyref name="upgrade.table.dir" />
 					<propertyref prefix="ivy.pom." />
 					<propertyref prefix="nodejs.npm." />
 					<propertyref prefix="sonatype." />
@@ -1382,8 +1401,10 @@ rerun your task.
 				<entry key="database.jdbc.drivers.url" value="${test.jdbc.drivers.url}" />
 				<entry key="database.jdbc.oracle.driver" value="${jdbc.oracle.driver}" />
 				<entry key="database.oracle.version" value="${database.oracle.version}" />
+				<entry key="jsp.precompile.from.source" value="${build.marketplace.apps.enabled}" />
 				<entry key="systemProp.build.bnd.print.enabled" value="${build.bnd.print.enabled}" />
 				<entry key="systemProp.build.performance.logger.enabled" value="${build.performance.logger.enabled}" />
+				<entry key="systemProp.maven.repo.local" value="${build.repository.local.dir}" unless:blank="${build.repository.local.dir}" />
 				<entry key="systemProp.repository.private.password" value="${build.repository.private.password}" />
 				<entry key="systemProp.repository.private.url" value="${build.repository.private.proxied.url}" />
 				<entry key="systemProp.repository.private.username" value="${build.repository.private.username}" />

@@ -40,6 +40,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>THREAD_REPLY_EDITOR</td>
+	<td>//div[(contains(@id,'replyMessageBody') or contains(@id,'content')) and contains(@class,'alloy-editor-container')]//div[contains(@class,'alloy-editor-placeholder')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>THREAD_SUBJECT</td>
 	<td>//div[@class='panel-heading' and contains(.,'${key_threadSubject}')]//h4[contains(.,'${key_threadSubject}')]</td>
 	<td></td>

@@ -350,6 +350,22 @@ echo "Sent notification."]]>
 		<sequential>
 			<antcall target="merge-test-results" />
 
+			<local name="testsuite.element" />
+
+			<property name="testsuite.element"><![CDATA[<testsuite errors="0" failures="0" hostname="localhost" name="com.liferay.jenkins.JenkinsLogAsserterTest" skipped="0" tests="1" time="0.0">
+	<properties />
+	<testcase classname="com.liferay.jenkins.JenkinsLogAsserterTest" name="testScanJenkinsLog" time="0.0" />
+	<system-out></system-out>
+	<system-err></system-err>
+</testsuite>]]></property>
+
+			<replaceregexp
+				byline="true"
+				file="test-results/TESTS-TestSuites.xml"
+				match="&lt;testsuites /&gt;"
+				replace="${testsuite.element}"
+			/>
+
 			<if>
 				<isset property="env.WORKSPACE" />
 				<then>
@@ -645,7 +661,7 @@ app.server.type=@{app.server.type}]]></echo>
 									<ant dir="${portal.legacy.dir}" target="export-database">
 										<property name="data.archive.type" value="${data.archive.type}" />
 										<property name="database.type" value="@{database.type}" />
-										<property name="database.version" value="${database.version}" />
+										<property name="database.version" value="@{database.version}" />
 										<property name="test.class" value="${test.class}" />
 									</ant>
 								</then>
@@ -727,38 +743,22 @@ app.server.type=@{app.server.type}]]></echo>
 								<available file="liferay-portal-source.zip" />
 							</and>
 							<then>
-								<execute>
-									<![CDATA[
-										unzip -oq liferay-portal-source.zip
-
-										unzip -oq liferay-portal-bundle-@{app.server.type}.zip
-
-										chmod -R a+x bundles
-									]]>
-								</execute>
+								<prepare-test-environment app.server.type="${app.server.type}" />
 							</then>
 						</elseif>
 						<else>
+							<antcall target="compile" />
+
 							<if>
-								<isset property="env.DIST_PATH" />
+								<or>
+									<equals arg1="${app.server.type}" arg2="weblogic" />
+									<equals arg1="${app.server.type}" arg2="websphere" />
+								</or>
 								<then>
-									<prepare-test-environment app.server.type="${app.server.type}" />
+									<prepare-test-build-custom />
 								</then>
 								<else>
-									<antcall target="compile" />
-
-									<if>
-										<or>
-											<equals arg1="${app.server.type}" arg2="weblogic" />
-											<equals arg1="${app.server.type}" arg2="websphere" />
-										</or>
-										<then>
-											<prepare-test-build-custom />
-										</then>
-										<else>
-											<ant antfile="build-dist.xml" target="build-dist-${app.server.type}" />
-										</else>
-									</if>
+									<ant antfile="build-dist.xml" target="build-dist-${app.server.type}" />
 								</else>
 							</if>
 
@@ -1746,7 +1746,7 @@ app.server.type=@{app.server.type}]]></echo>
 	<target name="gradle-plugins-test-jdk8">
 		<run-batch-test>
 			<test-action>
-				<for param="gradle.plugin.dir">
+				<for keepgoing="true" param="gradle.plugin.dir">
 					<path>
 						<dirset
 							dir="modules/sdk"
@@ -2017,9 +2017,7 @@ ${output.content}</echo>
 
 		<run-batch-test>
 			<test-action>
-				<exec dir="${test.base.dir.name}" executable="npm" failonerror="true">
-					<arg value="test" />
-				</exec>
+				<gradle-execute dir="${test.base.dir.name}" task="testJS" />
 			</test-action>
 
 			<test-set-up>
@@ -2034,11 +2032,6 @@ ${output.content}</echo>
 				/>
 
 				<generate-gulp-user-config-json portlet.name="${portlet.name}" />
-
-				<exec dir="${test.base.dir.name}" executable="npm" failonerror="true">
-					<arg value="install" />
-					<arg value="--proxy http://squid.lax.liferay.com:3128" />
-				</exec>
 			</test-set-up>
 		</run-batch-test>
 	</target>
@@ -2284,13 +2277,6 @@ ${output.content}</echo>
 				<prepare-test-build />
 
 				<if>
-					<available file="${env.TOP_LEVEL_SHARED_DIR}/modules.base.dir.names.properties" />
-					<then>
-						<property file="${env.TOP_LEVEL_SHARED_DIR}/modules.base.dir.names.properties" />
-					</then>
-				</if>
-
-				<if>
 					<isset property="modules.base.dir.names.with.changes" />
 					<then>
 						<for list="${modules.base.dir.names.with.changes}" param="module.base.dir.name">
@@ -2410,6 +2396,7 @@ information. Make sure to commit in all build services results.
 				</if>
 
 				<ant dir="portal-impl" target="format-source">
+					<property name="show.documentation" value="false" />
 					<property name="source.auto.fix" value="false" />
 					<property name="source.fail.on.error" value="true" />
 					<property name="source.formatter.excludes" value="${source.formatter.excludes}" />

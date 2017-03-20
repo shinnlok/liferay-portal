@@ -31,16 +31,11 @@ public class SumFunction implements DDMExpressionFunction {
 	public Object evaluate(Object... parameters) {
 		Object[] values = null;
 
-		if ((parameters.length == 1) && parameters[0].getClass().isArray()) {
+		if ((parameters.length == 1) && isArray(parameters[0])) {
 			values = (Object[])parameters[0];
 		}
 		else {
 			values = parameters;
-		}
-
-		if (values.length < 2) {
-			throw new IllegalArgumentException(
-				"Two or more parameters are expected");
 		}
 
 		double sum = 0;
@@ -48,13 +43,12 @@ public class SumFunction implements DDMExpressionFunction {
 		boolean integerSum = true;
 
 		for (Object value : values) {
-			if (!Integer.class.isInstance(value)) {
-				integerSum = false;
+			if (!Number.class.isInstance(value)) {
+				continue;
 			}
 
-			if (!Number.class.isInstance(value)) {
-				throw new IllegalArgumentException(
-					"The parameters should be numbers");
+			if (!Integer.class.isInstance(value)) {
+				integerSum = false;
 			}
 
 			Number number = (Number)value;
@@ -67,6 +61,12 @@ public class SumFunction implements DDMExpressionFunction {
 		}
 
 		return sum;
+	}
+
+	protected boolean isArray(Object parameter) {
+		Class<?> clazz = parameter.getClass();
+
+		return clazz.isArray();
 	}
 
 }

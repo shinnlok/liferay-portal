@@ -69,10 +69,10 @@ public class LiferayThemePlugin implements Plugin<Project> {
 		LiferayExtension liferayExtension = GradleUtil.getExtension(
 			project, LiferayExtension.class);
 
-		Map<String, Object> packageJson = _getPackageJson(project);
+		Map<String, Object> packageJsonMap = _getPackageJsonMap(project);
 
-		_configureArchivesBaseName(project, packageJson);
-		_configureVersion(project, packageJson);
+		_configureArchivesBaseName(project, packageJsonMap);
+		_configureVersion(project, packageJsonMap);
 
 		// liferay-theme-tasks already uses the "build" directory
 
@@ -147,9 +147,20 @@ public class LiferayThemePlugin implements Plugin<Project> {
 	}
 
 	private void _configureArchivesBaseName(
-		Project project, Map<String, Object> packageJson) {
+		Project project, Map<String, Object> packageJsonMap) {
 
-		String name = (String)packageJson.get("name");
+		String name = null;
+
+		Map<String, Object> liferayThemeMap =
+			(Map<String, Object>)packageJsonMap.get("liferayTheme");
+
+		if (liferayThemeMap != null) {
+			name = (String)liferayThemeMap.get("distName");
+		}
+
+		if (Validator.isNull(name)) {
+			name = (String)packageJsonMap.get("name");
+		}
 
 		if (Validator.isNull(name)) {
 			return;
@@ -225,16 +236,16 @@ public class LiferayThemePlugin implements Plugin<Project> {
 	}
 
 	private void _configureVersion(
-		Project project, Map<String, Object> packageJson) {
+		Project project, Map<String, Object> packageJsonMap) {
 
-		String version = (String)packageJson.get("version");
+		String version = (String)packageJsonMap.get("version");
 
 		if (Validator.isNotNull(version)) {
 			project.setVersion(version);
 		}
 	}
 
-	private Map<String, Object> _getPackageJson(Project project) {
+	private Map<String, Object> _getPackageJsonMap(Project project) {
 		File file = project.file("package.json");
 
 		if (!file.exists()) {

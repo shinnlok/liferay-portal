@@ -679,7 +679,7 @@
 			</else>
 		</if>
 
-		<execute function="Type#typeEditor" locator1="AlloyEditor#CONTENT_FIELD" value1="${threadReplyBody}" />
+		<execute function="Type#typeEditor" locator1="MessageBoardsThread#THREAD_REPLY_EDITOR" value1="${threadReplyBody}" />
 
 		<if>
 			<equals arg1="${anonymous}" arg2="true" />
@@ -709,7 +709,7 @@
 
 		<execute function="AssertClick" locator1="MessageBoardsThread#THREAD_REPLY_BUTTON" value1="Reply to Main Thread" />
 
-		<execute function="Type#typeEditor" locator1="AlloyEditor#CONTENT_FIELD" value1="${threadReplyBody}" />
+		<execute function="Type#typeEditor" locator1="MessageBoardsThread#THREAD_REPLY_EDITOR" value1="${threadReplyBody}" />
 
 		<execute function="AssertClick" locator1="Button#ADVANCED_REPLY" value1="Advanced Reply" />
 

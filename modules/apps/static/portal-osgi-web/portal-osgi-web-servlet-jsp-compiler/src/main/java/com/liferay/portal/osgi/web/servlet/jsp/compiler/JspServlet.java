@@ -15,7 +15,6 @@
 package com.liferay.portal.osgi.web.servlet.jsp.compiler;
 
 import com.liferay.portal.kernel.util.CharPool;
-import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
@@ -24,6 +23,7 @@ import com.liferay.portal.osgi.web.servlet.jsp.compiler.internal.JspBundleClassl
 import com.liferay.portal.osgi.web.servlet.jsp.compiler.internal.JspServletContext;
 import com.liferay.portal.osgi.web.servlet.jsp.compiler.internal.JspTagHandlerPool;
 import com.liferay.portal.servlet.delegate.ServletContextDelegate;
+import com.liferay.portal.util.PropsValues;
 import com.liferay.taglib.servlet.JspFactorySwapper;
 
 import java.io.File;
@@ -563,8 +563,7 @@ public class JspServlet extends HttpServlet {
 	};
 
 	private static final String _WORK_DIR =
-		PropsUtil.get(PropsKeys.LIFERAY_HOME) + File.separator + "work" +
-			File.separator;
+		PropsValues.LIFERAY_HOME + File.separator + "work" + File.separator;
 
 	private static final Map<Method, Method> _contextAdapterMethods;
 	private static final Properties _initParams = PropsUtil.getProperties(
@@ -820,7 +819,7 @@ public class JspServlet extends HttpServlet {
 					}
 				}
 
-				return _jspBundle.getEntry(path);
+				return _jspBundle.getResource(path);
 			}
 			catch (MalformedURLException murle) {
 			}

@@ -92,11 +92,15 @@ public interface LiferaySelenium {
 
 	public void assertPartialConfirmation(String pattern) throws Exception;
 
+	public void assertPartialLocation(String pattern) throws Exception;
+
 	public void assertPartialText(String locator, String pattern)
 		throws Exception;
 
 	public void assertPartialTextAceEditor(String locator, String pattern)
 		throws Exception;
+
+	public void assertPrompt(String pattern, String value) throws Exception;
 
 	public void assertSelectedLabel(String selectLocator, String pattern)
 		throws Exception;
@@ -153,6 +157,8 @@ public interface LiferaySelenium {
 	public String getBodyText();
 
 	public String getConfirmation();
+
+	public String getConfirmation(String value);
 
 	public String getCurrentDay();
 

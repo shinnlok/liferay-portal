@@ -44,6 +44,7 @@ AUI.add(
 								{
 									action: act,
 									boundingBox: container,
+									bubbleTargets: [instance],
 									index: index,
 									options: instance.get('fields'),
 									type: type
@@ -55,6 +56,7 @@ AUI.add(
 								{
 									action: act,
 									boundingBox: container,
+									bubbleTargets: [instance],
 									index: index,
 									options: instance.get('pages')
 								}
@@ -70,6 +72,17 @@ AUI.add(
 									getDataProviders: instance.get('getDataProviders'),
 									index: index,
 									options: instance.get('dataProviders'),
+									portletNamespace: instance.get('portletNamespace')
+								}
+							);
+						}
+						else if (type === 'calculate') {
+							action = new Liferay.DDL.FormBuilderActionCalculate(
+								{
+									action: act,
+									boundingBox: container,
+									index: index,
+									options: instance.get('fields'),
 									portletNamespace: instance.get('portletNamespace')
 								}
 							);

@@ -590,6 +590,10 @@ public interface DDMStructureLocalService extends BaseLocalService,
 		java.lang.String name, java.lang.String description,
 		java.lang.String storageType, int type, int status, boolean andOperator);
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int searchCount(long companyId, long[] groupIds, long classNameId,
+		long classPK, java.lang.String keywords) throws PortalException;
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -996,6 +1000,12 @@ public interface DDMStructureLocalService extends BaseLocalService,
 		java.lang.String storageType, int type, int status,
 		boolean andOperator, int start, int end,
 		OrderByComparator<DDMStructure> orderByComparator);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<DDMStructure> search(long companyId, long[] groupIds,
+		long classNameId, long classPK, java.lang.String keywords, int start,
+		int end, OrderByComparator<DDMStructure> orderByComparator)
+		throws PortalException;
 
 	/**
 	* Returns the number of rows matching the dynamic query.

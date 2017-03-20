@@ -24,6 +24,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>CONFIGURATION</td>
+	<td>//div[${key_counter}]//textarea[contains(@id,'configuration')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>DESCRIPTION</td>
 	<td>//textarea[contains(@id,'description')]</td>
 	<td></td>

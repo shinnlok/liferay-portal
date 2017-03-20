@@ -11,6 +11,8 @@
 }
 
 .lfr-ddm-form-container {
+	word-break: normal;
+
 	.form-control-feedback {
 		margin-left: -20px;
 	}
@@ -116,6 +118,10 @@
 	}
 }
 
+.liferay-ddm-form-field-checkbox .checkbox {
+	margin-bottom: 2px;
+}
+
 .liferay-ddm-form-field-paragraph, .liferay-ddm-form-field-tip {
 	color: #869CAD;
 	line-height: 16px;
@@ -123,6 +129,9 @@
 
 .liferay-ddm-form-field-paragraph {
 	font-size: 14px;
+}
+
+.liferay-ddm-form-field-numeric {
 }
 
 .liferay-ddm-form-field-tip {

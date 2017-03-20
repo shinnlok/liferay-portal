@@ -15,6 +15,8 @@
 package com.liferay.dynamic.data.mapping.type.grid.internal;
 
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldValueAccessor;
+import com.liferay.dynamic.data.mapping.model.DDMFormField;
+import com.liferay.dynamic.data.mapping.model.DDMFormFieldOptions;
 import com.liferay.dynamic.data.mapping.model.Value;
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.portal.kernel.json.JSONException;
@@ -23,7 +25,11 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Locale;
+import java.util.Set;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -44,12 +50,36 @@ public class GridDDMFormFieldValueAccessor
 	public JSONObject getValue(
 		DDMFormFieldValue ddmFormFieldValue, Locale locale) {
 
-		Value value = ddmFormFieldValue.getValue();
+		return getValue(ddmFormFieldValue.getValue(), locale);
+	}
 
-		String valueString = value.getString(locale);
+	@Override
+	public boolean isEmpty(
+		DDMFormField ddmFormField, Value value, Locale locale) {
 
+		JSONObject jsonObject = getValue(value, locale);
+
+		Iterator<String> keys = jsonObject.keys();
+
+		Set<String> keyValues = new HashSet<>();
+
+		while (keys.hasNext()) {
+			keyValues.add(keys.next());
+		}
+
+		DDMFormFieldOptions ddmFormFieldOptions =
+			(DDMFormFieldOptions)ddmFormField.getProperty("rows");
+
+		Set<String> optionsValues = ddmFormFieldOptions.getOptionsValues();
+
+		Stream<String> stream = optionsValues.stream();
+
+		return stream.anyMatch(rowValue -> !keyValues.contains(rowValue));
+	}
+
+	protected JSONObject createJSONObject(String json) {
 		try {
-			return jsonFactory.createJSONObject(valueString);
+			return jsonFactory.createJSONObject(json);
 		}
 		catch (JSONException jsone) {
 			if (_log.isDebugEnabled()) {
@@ -58,6 +88,10 @@ public class GridDDMFormFieldValueAccessor
 
 			return jsonFactory.createJSONObject();
 		}
+	}
+
+	protected JSONObject getValue(Value value, Locale locale) {
+		return createJSONObject(value.getString(locale));
 	}
 
 	@Reference

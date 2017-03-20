@@ -602,7 +602,8 @@ public class DDMFormEvaluatorHelperTest {
 			"getValue(\"field0\") > 0 && getValue(\"field1\") > 0";
 
 		String action =
-			"setValue(\"field2\", getValue(\"field0\") * getValue(\"field1\"))";
+			"calculate(\"field2\", getValue(\"field0\") * " +
+				"getValue(\"field1\"))";
 
 		DDMFormRule ddmFormRule = new DDMFormRule(
 			condition, Arrays.asList(action));

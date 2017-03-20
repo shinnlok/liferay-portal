@@ -738,6 +738,14 @@ public class DDMStructureLocalServiceWrapper implements DDMStructureLocalService
 			andOperator);
 	}
 
+	@Override
+	public int searchCount(long companyId, long[] groupIds, long classNameId,
+		long classPK, java.lang.String keywords)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _ddmStructureLocalService.searchCount(companyId, groupIds,
+			classNameId, classPK, keywords);
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -1232,6 +1240,16 @@ public class DDMStructureLocalServiceWrapper implements DDMStructureLocalService
 		return _ddmStructureLocalService.search(companyId, groupIds,
 			classNameId, name, description, storageType, type, status,
 			andOperator, start, end, orderByComparator);
+	}
+
+	@Override
+	public java.util.List<com.liferay.dynamic.data.mapping.model.DDMStructure> search(
+		long companyId, long[] groupIds, long classNameId, long classPK,
+		java.lang.String keywords, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.dynamic.data.mapping.model.DDMStructure> orderByComparator)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _ddmStructureLocalService.search(companyId, groupIds,
+			classNameId, classPK, keywords, start, end, orderByComparator);
 	}
 
 	/**

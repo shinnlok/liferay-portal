@@ -35,7 +35,7 @@ public class SumFunctionTest {
 	public void testEvaluateArray2() throws Exception {
 		SumFunction sumFunction = new SumFunction();
 
-		Object parameters = new Double[] {3.8, 5d, 7d};
+		Object parameters = new Double[] {3.8, 5D, 7D};
 
 		Assert.assertEquals(15.8, sumFunction.evaluate(parameters));
 	}
@@ -52,20 +52,6 @@ public class SumFunctionTest {
 		SumFunction sumFunction = new SumFunction();
 
 		Assert.assertEquals(21.4D, sumFunction.evaluate(1, 13.4, 7));
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public void testEvaluateInvalid1() throws Exception {
-		SumFunction sumFunction = new SumFunction();
-
-		sumFunction.evaluate(2);
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public void testEvaluateInvalid2() throws Exception {
-		SumFunction sumFunction = new SumFunction();
-
-		sumFunction.evaluate(2, "text");
 	}
 
 }

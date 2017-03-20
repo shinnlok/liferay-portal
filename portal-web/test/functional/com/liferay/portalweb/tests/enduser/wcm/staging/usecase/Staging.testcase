@@ -45,6 +45,15 @@
 			<var name="siteName" value="Site Name" />
 		</execute>
 
+		<execute macro="Page#add">
+			<var name="pageName" value="Private Staging Page" />
+			<var name="sitePagePrivacy" value="Private" />
+		</execute>
+
+		<execute macro="Navigator#openSiteURL">
+			<var name="siteName" value="Site Name" />
+		</execute>
+
 		<execute macro="ProductMenu#gotoSitesConfiguration">
 			<var name="portlet" value="Site Settings" />
 		</execute>
@@ -119,6 +128,24 @@
 
 		<execute macro="Staging#deletePublishTemplate">
 			<var name="publishTemplateName" value="Publish Template Name" />
+		</execute>
+	</command>
+
+	<command name="ModifyInitalPageVariationSetup" priority="3">
+		<execute macro="ProductMenu#gotoSitesPublishing">
+			<var name="portlet" value="Staging" />
+		</execute>
+
+		<execute macro="Staging#activateStagingCP">
+			<var name="siteName" value="Site Name" />
+		</execute>
+
+		<execute macro="ProductMenu#gotoSitesPublishing">
+			<var name="portlet" value="Staging" />
+		</execute>
+
+		<execute macro="Staging#modifyVariation">
+			<var name="enableOnPublicPages" value="true" />
 		</execute>
 	</command>
 

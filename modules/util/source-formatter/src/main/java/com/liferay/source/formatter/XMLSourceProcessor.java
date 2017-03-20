@@ -25,6 +25,8 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.tools.ImportPackage;
+import com.liferay.source.formatter.checks.FileCheck;
+import com.liferay.source.formatter.checks.XMLWhitespaceCheck;
 import com.liferay.source.formatter.util.FileUtil;
 import com.liferay.util.ContentUtil;
 import com.liferay.util.xml.Dom4jUtil;
@@ -386,24 +388,13 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 			File file, String fileName, String absolutePath, String content)
 		throws Exception {
 
-		if (isExcludedPath(_XML_EXCLUDES, absolutePath)) {
-			return content;
-		}
-
 		String newContent = content;
-
-		if (!fileName.startsWith(
-				sourceFormatterArgs.getBaseDirName() + "build") &&
-			!fileName.contains("/build")) {
-
-			newContent = trimContent(newContent, false);
-		}
 
 		if (fileName.startsWith(
 				sourceFormatterArgs.getBaseDirName() + "build") ||
 			(fileName.contains("/build") && !fileName.contains("/tools/"))) {
 
-			newContent = formatAntXML(fileName, absolutePath, newContent);
+			formatAntXML(fileName, absolutePath, newContent);
 		}
 		else if (fileName.contains("/custom-sql/")) {
 			newContent = formatCustomSQLXML(fileName, newContent);
@@ -473,17 +464,23 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 		}
 		else if ((portalSource || subrepository) &&
 				 fileName.endsWith("/tiles-defs.xml")) {
+
 			formatTilesDefsXML(fileName, newContent);
+		}
+		else if (fileName.endsWith(".toggle")) {
+			newContent = formatToggleXML(fileName, newContent);
 		}
 		else if (((portalSource || subrepository) &&
 				  fileName.endsWith("portal-web/docroot/WEB-INF/web.xml")) ||
 				 (!portalSource && !subrepository &&
 				  fileName.endsWith("/web.xml"))) {
 
-			newContent = newContent = formatWebXML(fileName, newContent);
+			newContent = formatWebXML(fileName, newContent);
 		}
 
 		newContent = sortAttributes(fileName, newContent);
+
+		newContent = fixEmptyLinesInMultiLineTags(newContent);
 
 		newContent = fixEmptyLinesInNestedTags(newContent);
 
@@ -684,11 +681,9 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 		return content;
 	}
 
-	protected String formatAntXML(
+	protected void formatAntXML(
 			String fileName, String absolutePath, String content)
 		throws Exception {
-
-		String newContent = trimContent(content, true);
 
 		Document document = readXML(content);
 
@@ -714,11 +709,9 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 			processMessage(fileName, "Macrodefs go before targets");
 		}
 
-		checkImportFiles(fileName, newContent);
+		checkImportFiles(fileName, content);
 
 		checkTargetNames(fileName, absolutePath, content);
-
-		return newContent;
 	}
 
 	protected String formatCustomSQLXML(String fileName, String content)
@@ -1179,6 +1172,18 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 		return fixEmptyLinesBetweenTags(content, true);
 	}
 
+	protected String formatToggleXML(String fileName, String content)
+		throws Exception {
+
+		Document document = readXML(content);
+
+		checkOrder(
+			fileName, document.getRootElement(), "toggle", null,
+			new ElementComparator());
+
+		return fixEmptyLinesBetweenTags(content, false);
+	}
+
 	protected String formatWebXML(String fileName, String content)
 		throws Exception {
 
@@ -1333,6 +1338,14 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 		}
 
 		return elements;
+	}
+
+	@Override
+	protected List<FileCheck> getFileChecks() {
+		return Arrays.asList(
+			new FileCheck[] {
+				new XMLWhitespaceCheck(sourceFormatterArgs.getBaseDirName())
+			});
 	}
 
 	protected String getTablesContent(String fileName, String absolutePath)
@@ -1622,7 +1635,7 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 
 	private static final String[] _INCLUDES = new String[] {
 		"**/*.action", "**/*.function", "**/*.jrxml", "**/*.macro",
-		"**/*.testcase", "**/*.xml"
+		"**/*.testcase", "**/*.toggle", "**/*.xml"
 	};
 
 	private static final String _NUMERICAL_PORTLET_NAME_ELEMENT_EXCLUDES =
@@ -1630,8 +1643,6 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 
 	private static final String _SERVICE_FINDER_COLUMN_SORT_EXCLUDES =
 		"service.finder.column.sort.excludes";
-
-	private static final String _XML_EXCLUDES = "xml.excludes";
 
 	private static final Pattern _commentPattern1 = Pattern.compile(
 		">\n\t+<!--[\n ]");

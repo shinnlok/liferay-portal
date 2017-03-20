@@ -48,6 +48,10 @@ public class BelongsToRoleFunction implements DDMExpressionFunction {
 			Company company = PortalUtil.getCompany(_request);
 			User user = PortalUtil.getUser(_request);
 
+			if (user == null) {
+				return false;
+			}
+
 			for (Object parameter : parameters) {
 				boolean belongsTo = _userLocalService.hasRoleUser(
 					company.getCompanyId(), String.valueOf(parameter),

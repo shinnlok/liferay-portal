@@ -59,11 +59,15 @@ public abstract class Watcher implements Runnable {
 	}
 
 	public void addDeletedFilePathName(String filePathName) {
-		_deletedFilePathNames.add(filePathName);
+		_watchEventListener.addDeletedFilePathName(filePathName);
 	}
 
 	public void addDownloadedFilePathName(String filePathName) {
-		_downloadedFilePathNames.add(filePathName);
+		_watchEventListener.addDownloadedFilePathName(filePathName);
+	}
+
+	public void addRenamedFilePathName(String filePathName) {
+		_watchEventListener.addRenamedFilePathName(filePathName);
 	}
 
 	public void close() {
@@ -73,11 +77,15 @@ public abstract class Watcher implements Runnable {
 	public abstract void registerFilePath(Path filePath) throws IOException;
 
 	public void removeDeletedFilePathName(String filePathName) {
-		_deletedFilePathNames.remove(filePathName);
+		_watchEventListener.removeDeletedFilePathName(filePathName);
 	}
 
 	public void removeDownloadedFilePathName(String filePathName) {
-		_downloadedFilePathNames.remove(filePathName);
+		_watchEventListener.removeDownloadedFilePathName(filePathName);
+	}
+
+	public void removeRenamedFilePathName(String filePathName) {
+		_watchEventListener.removeRenamedFilePathName(filePathName);
 	}
 
 	public abstract void unregisterFilePath(Path filePath);
@@ -321,10 +329,6 @@ public abstract class Watcher implements Runnable {
 
 			addCreatedFilePathName(filePath.toString());
 
-			if (_downloadedFilePathNames.remove(filePath.toString())) {
-				return;
-			}
-
 			fireWatchEventListener(eventType, filePath);
 
 			if (!OSDetector.isApple() && Files.isDirectory(filePath)) {
@@ -338,8 +342,7 @@ public abstract class Watcher implements Runnable {
 
 			removeCreatedFilePathName(filePath.toString());
 
-			if (_deletedFilePathNames.remove(filePath.toString()) ||
-				FileUtil.isIgnoredFileName(
+			if (FileUtil.isIgnoredFileName(
 					String.valueOf(filePath.getFileName())) ||
 				FileUtil.isTempFile(filePath)) {
 
@@ -355,8 +358,7 @@ public abstract class Watcher implements Runnable {
 			fireWatchEventListener(SyncWatchEvent.EVENT_TYPE_DELETE, filePath);
 		}
 		else if (eventType.equals(SyncWatchEvent.EVENT_TYPE_MODIFY)) {
-			if (_downloadedFilePathNames.remove(filePath.toString()) ||
-				(removeCreatedFilePathName(filePath.toString()) &&
+			if ((removeCreatedFilePathName(filePath.toString()) &&
 				 !FileUtil.isValidChecksum(filePath)) ||
 				FileUtil.isIgnoredFileName(
 					String.valueOf(filePath.getFileName())) ||
@@ -382,10 +384,6 @@ public abstract class Watcher implements Runnable {
 				SyncWatchEvent.EVENT_TYPE_RENAME_FROM, filePath);
 		}
 		else if (eventType.equals(SyncWatchEvent.EVENT_TYPE_RENAME_TO)) {
-			if (_downloadedFilePathNames.remove(filePath.toString())) {
-				return;
-			}
-
 			if (FileUtil.isIgnoredFileName(
 					String.valueOf(filePath.getFileName())) ||
 				FileUtil.isHidden(filePath) || FileUtil.isShortcut(filePath)) {
@@ -419,10 +417,6 @@ public abstract class Watcher implements Runnable {
 	private final Path _baseFilePath;
 	private final ConcurrentNavigableMap<Long, String> _createdFilePathNames =
 		new ConcurrentSkipListMap<>();
-	private final List<String> _deletedFilePathNames =
-		new CopyOnWriteArrayList<>();
-	private final List<String> _downloadedFilePathNames =
-		new CopyOnWriteArrayList<>();
 	private final List<Path> _failedFilePaths = new CopyOnWriteArrayList<>();
 	private final WatchEventListener _watchEventListener;
 

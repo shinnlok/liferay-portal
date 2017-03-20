@@ -10,6 +10,8 @@
 
 	<command name="addRule">
 		<execute function="Click" locator1="FormRules#RULE_BUILDER_ADD_RULE_BUTTON" />
+
+		<execute macro="FormRules#viewInactiveSaveButton" />
 	</command>
 
 	<command name="configureActionOptions">
@@ -19,9 +21,9 @@
 		</execute>
 
 		<execute macro="FormRules#selectActionTarget">
+			<var name="action" value="${action}" />
 			<var name="actionRowNumber" value="${actionRowNumber}" />
 			<var name="actionTarget" value="${actionTarget}" />
-			<var name="actionTarget2" value="${actionTarget2}" />
 		</execute>
 	</command>
 
@@ -97,20 +99,17 @@
 		<var name="key_actionRowNumber" value="${actionRowNumber}" />
 		<var name="key_actionTarget" value="${actionTarget}" />
 
-		<execute function="Click" locator1="FormRules#RULE_BUILDER_ACTION_TARGET_FIELD" />
+		<if>
+			<equals arg1="${action}" arg2="Jump to Page" />
+			<then>
+				<execute function="Click" locator1="FormRules#RULE_BUILDER_JUMP_TO_PAGE_ACTION_TARGET" />
+			</then>
+			<else>
+				<execute function="Click" locator1="FormRules#RULE_BUILDER_ACTION_TARGET_FIELD" />
+			</else>
+		</if>
 
 		<execute function="AssertClick" locator1="FormRules#RULE_BUILDER_SELECT_ACTION_TARGET" value1="${actionTarget}" />
-
-		<if>
-			<isset var="actionTarget2" />
-			<then>
-				<execute function="Click" locator1="FormRules#RULE_BUILDER_ACTION_TARGET_FIELD_2" />
-
-				<var name="key_actionTarget" value="${actionTarget2}" />
-
-				<execute function="AssertClick" locator1="FormRules#RULE_BUILDER_SELECT_ACTION_TARGET" value1="${actionTarget2}" />
-			</then>
-		</if>
 	</command>
 
 	<command name="selectAutofillOutput">
@@ -171,15 +170,6 @@
 		<var name="key_ruleNumber" value="${ruleNumber}" />
 
 		<execute function="AssertTextEquals" locator1="FormRules#RULE_BUILDER_SUMMARY_ACTION_TARGET" value1="${actionTarget}" />
-
-		<if>
-			<isset var="actionTarget2" />
-			<then>
-				<var name="key_actionTarget" value="${actionTarget2}" />
-
-				<execute function="AssertTextEquals" locator1="FormRules#RULE_BUILDER_SUMMARY_ACTION_TARGET" value1="${actionTarget2}" />
-			</then>
-		</if>
 	</command>
 
 	<command name="viewConditionFieldConstantSummary">
@@ -228,6 +218,10 @@
 		<execute function="AssertTextEquals#assertPartialText" locator1="FormRules#RULE_BUILDER_SUMMARY_CONDITION_OPERATOR" value1="${conditionOperator}" />
 	</command>
 
+	<command name="viewInactiveSaveButton">
+		<execute function="AssertElementPresent" locator1="FormRules#RULE_BUILDER_SAVE_BUTTON_DISABLED" />
+	</command>
+
 	<command name="viewSummary">
 		<execute macro="FormRules#viewConditionFieldSummary">
 			<var name="conditionField" value="${conditionField}" />
@@ -252,7 +246,6 @@
 		<execute macro="FormRules#viewActionTargetSummary">
 			<var name="action" value="${action}" />
 			<var name="actionTarget" value="${actionTarget}" />
-			<var name="actionTarget2" value="${actionTarget2}" />
 			<var name="ruleNumber" value="${ruleNumber}" />
 		</execute>
 	</command>

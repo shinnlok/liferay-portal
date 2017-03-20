@@ -27,6 +27,10 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TextFormatter;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.tools.ImportsFormatter;
+import com.liferay.source.formatter.checks.FileCheck;
+import com.liferay.source.formatter.checks.JSPEmptyLinesCheck;
+import com.liferay.source.formatter.checks.JSPIfStatementCheck;
+import com.liferay.source.formatter.checks.JSPWhitespaceCheck;
 import com.liferay.source.formatter.util.FileUtil;
 import com.liferay.source.formatter.util.ThreadSafeClassLibrary;
 
@@ -241,31 +245,6 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 		}
 	}
 
-	protected void checkIfClauseParentheses(
-		String trimmedLine, String fileName, int lineCount,
-		boolean javaSource) {
-
-		if (javaSource) {
-			if ((trimmedLine.startsWith("if (") ||
-				 trimmedLine.startsWith("else if (") ||
-				 trimmedLine.startsWith("while (")) &&
-				trimmedLine.endsWith(") {")) {
-
-				checkIfClauseParentheses(trimmedLine, fileName, lineCount);
-			}
-
-			return;
-		}
-
-		Matcher matcher = _testTagPattern.matcher(trimmedLine);
-
-		if (matcher.find()) {
-			String ifClause = "if (" + matcher.group(2) + ") {";
-
-			checkIfClauseParentheses(ifClause, fileName, lineCount);
-		}
-	}
-
 	protected void checkSubnames(String fileName, String content) {
 		Matcher matcher = _subnamePattern.matcher(content);
 
@@ -343,6 +322,8 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 
 		newContent = fixCompatClassImports(absolutePath, newContent);
 
+		newContent = fixEmptyLinesInMultiLineTags(newContent);
+
 		newContent = fixEmptyLinesInNestedTags(newContent);
 
 		newContent = fixEmptyLinesBetweenTags(newContent);
@@ -355,15 +336,7 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 
 		newContent = fixUnparameterizedClassType(newContent);
 
-		Matcher matcher = _missingEmptyLinePattern.matcher(newContent);
-
-		if (matcher.find()) {
-			newContent = StringUtil.replaceFirst(
-				newContent, StringPool.NEW_LINE, StringPool.BLANK,
-				matcher.start(1));
-		}
-
-		matcher = _directiveLinePattern.matcher(newContent);
+		Matcher matcher = _directiveLinePattern.matcher(newContent);
 
 		while (matcher.find()) {
 			String directiveLine = matcher.group();
@@ -708,12 +681,6 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 			while ((line = unsyncBufferedReader.readLine()) != null) {
 				lineCount++;
 
-				if (!fileName.contains("jsonw") ||
-					!fileName.endsWith("action.jsp")) {
-
-					line = trimLine(line, false);
-				}
-
 				if (line.contains("<aui:button ") &&
 					line.contains("type=\"button\"")) {
 
@@ -843,9 +810,6 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 						lineCount);
 				}
 
-				checkIfClauseParentheses(
-					trimmedLine, fileName, lineCount, javaSource);
-
 				Matcher matcher = _jspTaglibPattern.matcher(line);
 
 				while (matcher.find()) {
@@ -941,10 +905,6 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 				if (lineCount > 1) {
 					sb.append(previousLine);
 					sb.append("\n");
-
-					if (addExtraEmptyLine(previousLine, line, javaSource)) {
-						sb.append("\n");
-					}
 				}
 
 				previousLine = line;
@@ -954,28 +914,6 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 		}
 
 		content = sb.toString();
-
-		while (true) {
-			Matcher matcher = _incorrectEmptyLinePattern1.matcher(content);
-
-			if (matcher.find()) {
-				content = StringUtil.replaceFirst(
-					content, "\n\n", "\n", matcher.start());
-
-				continue;
-			}
-
-			matcher = _incorrectEmptyLinePattern2.matcher(content);
-
-			if (matcher.find()) {
-				content = StringUtil.replaceFirst(
-					content, "\n\n", "\n", matcher.start());
-
-				continue;
-			}
-
-			break;
-		}
 
 		if (content.endsWith("\n")) {
 			content = content.substring(0, content.length() - 1);
@@ -1298,6 +1236,18 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 		}
 
 		return content;
+	}
+
+	@Override
+	protected List<FileCheck> getFileChecks() {
+		List<FileCheck> fileChecks = new ArrayList<>();
+
+		fileChecks.add(new JSPWhitespaceCheck());
+
+		fileChecks.add(new JSPEmptyLinesCheck());
+		fileChecks.add(new JSPIfStatementCheck());
+
+		return fileChecks;
 	}
 
 	protected List<String> getJSPDuplicateImports(
@@ -2148,10 +2098,6 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 		"\\s*@\\s*include\\s*file=['\"](.*)['\"]");
 	private final Pattern _incorrectClosingTagPattern = Pattern.compile(
 		"\n(\t*)\t((?!<\\w).)* />\n");
-	private final Pattern _incorrectEmptyLinePattern1 = Pattern.compile(
-		"[\n\t]<%\n\n(\t*)[^/\n\t]");
-	private final Pattern _incorrectEmptyLinePattern2 = Pattern.compile(
-		"([\n\t])([^/\n\t])(.*)\n\n\t*%>");
 	private Pattern _javaClassPattern = Pattern.compile(
 		"\n(private|protected|public).* class ([A-Za-z0-9]+) " +
 			"([\\s\\S]*?)\n\\}\n");
@@ -2164,8 +2110,6 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 		"Log _log = LogFactoryUtil\\.getLog\\(\"(.*?)\"\\)");
 	private final Pattern _missingEmptyLineBetweenDefineOjbectsPattern =
 		Pattern.compile("<.*:defineObjects />\n<.*:defineObjects />\n");
-	private final Pattern _missingEmptyLinePattern = Pattern.compile(
-		"[\n\t](catch |else |finally |for |if |try |while ).*\\{\n\n\t+\\w");
 	private boolean _moveFrequentlyUsedImportsToCommonInit;
 	private final Pattern _multilineTagPattern = Pattern.compile(
 		"(\\s+)<[-\\w]+:[-\\w]+\n.*?(/?>)(\n|$)", Pattern.DOTALL);
@@ -2193,8 +2137,6 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 		"<%@\\s+taglib uri=.* prefix=\"(.*?)\" %>");
 	private final Pattern _taglibVariablePattern = Pattern.compile(
 		"(\n\t*String (taglib\\w+) = (.*);)\n\\s*%>\\s+(<[\\S\\s]*?>)\n");
-	private final Pattern _testTagPattern = Pattern.compile(
-		"^<c:(if|when) test=['\"]<%= (.+) %>['\"]>$");
 	private final Pattern _uncompressedJSPImportPattern = Pattern.compile(
 		"(<.*page import=\".*>\n*)+", Pattern.MULTILINE);
 	private final Pattern _uncompressedJSPTaglibPattern = Pattern.compile(

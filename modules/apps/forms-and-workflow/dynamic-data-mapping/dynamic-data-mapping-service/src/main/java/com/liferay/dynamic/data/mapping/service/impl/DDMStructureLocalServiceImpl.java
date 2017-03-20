@@ -1179,6 +1179,18 @@ public class DDMStructureLocalServiceImpl
 			structureVersion.getDDMFormLayout(), serviceContext);
 	}
 
+	@Override
+	public List<DDMStructure> search(
+			long companyId, long[] groupIds, long classNameId, long classPK,
+			String keywords, int start, int end,
+			OrderByComparator<DDMStructure> orderByComparator)
+		throws PortalException {
+
+		return ddmStructureFinder.findByKeywords(
+			companyId, groupIds, classNameId, classPK, keywords, start, end,
+			orderByComparator);
+	}
+
 	/**
 	 * Returns an ordered range of all the structures matching the groups and
 	 * class name IDs, and matching the keywords in the structure names and
@@ -1259,6 +1271,16 @@ public class DDMStructureLocalServiceImpl
 		return ddmStructureFinder.findByC_G_C_N_D_S_T_S(
 			companyId, groupIds, classNameId, name, description, storageType,
 			type, status, andOperator, start, end, orderByComparator);
+	}
+
+	@Override
+	public int searchCount(
+			long companyId, long[] groupIds, long classNameId, long classPK,
+			String keywords)
+		throws PortalException {
+
+		return ddmStructureFinder.countByKeywords(
+			companyId, groupIds, classNameId, classPK, keywords);
 	}
 
 	/**
@@ -1982,7 +2004,7 @@ public class DDMStructureLocalServiceImpl
 	protected DDMXML ddmXML;
 
 	private final Pattern _callFunctionPattern = Pattern.compile(
-		"call\\(\\s*\"([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-" +
-			"[0-9a-f]{12})\"\\s*,\\s*\"(.*)\"\\s*,\\s*\"(.*)\"\\s*\\)");
+		"call\\(\\s*\'([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-" +
+			"[0-9a-f]{12})\'\\s*,\\s*\'(.*)\'\\s*,\\s*\'(.*)\'\\s*\\)");
 
 }

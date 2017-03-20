@@ -1025,6 +1025,8 @@ public interface PropsKeys {
 
 	public static final String JSONWS_WEB_SERVICE_STRICT_HTTP_METHOD = "jsonws.web.service.strict.http.method";
 
+	public static final String JSP_PAGE_CONTEXT_FORCE_GET_ATTRIBUTE = "jsp.page.context.force.get.attribute";
+
 	public static final String JSP_WRITER_BUFFER_SIZE = "jsp.writer.buffer.size";
 
 	public static final String LAYOUT_AJAX_RENDER_ENABLE = "layout.ajax.render.enable";
@@ -1396,6 +1398,8 @@ public interface PropsKeys {
 	public static final String MODULE_FRAMEWORK_SERVICES_IGNORED_INTERFACES = "module.framework.services.ignored.interfaces";
 
 	public static final String MODULE_FRAMEWORK_STATE_DIR = "module.framework.state.dir";
+
+	public static final String MODULE_FRAMEWORK_STATIC_JARS = "module.framework.static.jars";
 
 	public static final String MODULE_FRAMEWORK_STOP_WAIT_TIMEOUT = "module.framework.stop.wait.timeout";
 
@@ -2315,6 +2319,12 @@ public interface PropsKeys {
 	 */
 	@Deprecated
 	public static final String USERS_IMAGE_CHECK_TOKEN = "users.image.check.token";
+
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
+	public static final String USERS_IMAGE_DEFAULT_USE_INITIALS = "users.image.default.use.initials";
 
 	/**
 	 * @deprecated As of 7.0.0, with no direct replacement

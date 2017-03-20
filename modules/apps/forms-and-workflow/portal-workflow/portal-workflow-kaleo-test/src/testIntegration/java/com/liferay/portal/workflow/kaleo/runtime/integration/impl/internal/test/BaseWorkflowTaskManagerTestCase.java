@@ -89,7 +89,7 @@ import org.junit.Before;
 /**
  * @author Inácio Nery
  */
-public class BaseWorkflowTaskManagerTestCase {
+public abstract class BaseWorkflowTaskManagerTestCase {
 
 	@Before
 	public void setUp() throws Exception {
@@ -244,6 +244,7 @@ public class BaseWorkflowTaskManagerTestCase {
 		try (CaptureAppender captureAppender =
 				Log4JLoggerTestUtil.configureLog4JLogger(
 					_MAIL_ENGINE_CLASS_NAME, Level.OFF)) {
+
 			WorkflowTask workflowTask = getWorkflowTask();
 
 			PermissionChecker userPermissionChecker =
@@ -298,6 +299,7 @@ public class BaseWorkflowTaskManagerTestCase {
 		try (CaptureAppender captureAppender =
 				Log4JLoggerTestUtil.configureLog4JLogger(
 					_MAIL_ENGINE_CLASS_NAME, Level.OFF)) {
+
 			WorkflowTask workflowTask = getWorkflowTask();
 
 			PermissionChecker userPermissionChecker =

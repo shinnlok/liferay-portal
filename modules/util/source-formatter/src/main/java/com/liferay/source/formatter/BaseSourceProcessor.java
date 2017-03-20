@@ -14,7 +14,6 @@
 
 package com.liferay.source.formatter;
 
-import com.liferay.portal.kernel.io.unsync.UnsyncBufferedReader;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringReader;
 import com.liferay.portal.kernel.nio.charset.CharsetDecoderUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -29,10 +28,14 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TextFormatter;
+import com.liferay.portal.kernel.util.Tuple;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.tools.ToolsUtil;
 import com.liferay.portal.xml.SAXReaderFactory;
+import com.liferay.source.formatter.checks.FileCheck;
 import com.liferay.source.formatter.util.FileUtil;
+
+import java.awt.Desktop;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -40,6 +43,8 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import java.lang.reflect.Field;
+
+import java.net.URI;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.CharsetDecoder;
@@ -93,6 +98,10 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 
 	@Override
 	public final void format() throws Exception {
+		if (sourceFormatterArgs.isShowDocumentation()) {
+			System.setProperty("java.awt.headless", "false");
+		}
+
 		List<String> fileNames = getFileNames();
 
 		if (fileNames.isEmpty()) {
@@ -185,17 +194,25 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 
 	@Override
 	public void processMessage(String fileName, String message, int lineCount) {
-		Set<SourceFormatterMessage> sourceFormatterMessages =
-			_sourceFormatterMessagesMap.get(fileName);
+		processMessage(fileName, message, null, lineCount);
+	}
 
-		if (sourceFormatterMessages == null) {
-			sourceFormatterMessages = new TreeSet<>();
-		}
+	@Override
+	public void processMessage(
+		String fileName, String message, String markdownFileName) {
 
-		sourceFormatterMessages.add(
-			new SourceFormatterMessage(fileName, message, lineCount));
+		processMessage(fileName, message, markdownFileName, -1);
+	}
 
-		_sourceFormatterMessagesMap.put(fileName, sourceFormatterMessages);
+	@Override
+	public void processMessage(
+		String fileName, String message, String markdownFileName,
+		int lineCount) {
+
+		processMessage(
+			fileName,
+			new SourceFormatterMessage(
+				fileName, message, markdownFileName, lineCount));
 	}
 
 	@Override
@@ -210,82 +227,6 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		this.sourceFormatterArgs = sourceFormatterArgs;
 
 		_init();
-	}
-
-	protected boolean addExtraEmptyLine(
-		String previousLine, String line, boolean javaSource) {
-
-		String trimmedLine = StringUtil.trimLeading(line);
-		String trimmedPreviousLine = StringUtil.trimLeading(previousLine);
-
-		if (this instanceof JSPSourceProcessor) {
-			if (trimmedPreviousLine.matches("(--)?%>") &&
-				Validator.isNotNull(line) && !trimmedLine.equals("-->")) {
-
-				return true;
-			}
-
-			if (Validator.isNotNull(previousLine) &&
-				!trimmedPreviousLine.equals("<!--") &&
-				trimmedLine.matches("<%(--)?")) {
-
-				return true;
-			}
-
-			if (trimmedPreviousLine.equals("<%") &&
-				trimmedLine.startsWith("//")) {
-
-				return true;
-			}
-
-			if (trimmedPreviousLine.startsWith("//") &&
-				trimmedLine.equals("%>")) {
-
-				return true;
-			}
-		}
-
-		if (!javaSource) {
-			return false;
-		}
-
-		if (Validator.isNull(previousLine) || Validator.isNull(line) ||
-			previousLine.contains("/*") || previousLine.endsWith("*/")) {
-
-			return false;
-		}
-
-		if ((trimmedPreviousLine.startsWith("// ") &&
-			 !trimmedLine.startsWith("// ")) ||
-			(!trimmedPreviousLine.startsWith("// ") &&
-			 trimmedLine.startsWith("// "))) {
-
-			return true;
-		}
-
-		if (!trimmedPreviousLine.endsWith(StringPool.OPEN_CURLY_BRACE) &&
-			!trimmedPreviousLine.endsWith(StringPool.COLON) &&
-			(trimmedLine.startsWith("for (") ||
-			 trimmedLine.startsWith("if (") ||
-			 trimmedLine.startsWith("try {"))) {
-
-			return true;
-		}
-
-		if (previousLine.endsWith(
-				StringPool.TAB + StringPool.CLOSE_CURLY_BRACE) &&
-			!trimmedLine.startsWith(StringPool.CLOSE_CURLY_BRACE) &&
-			!trimmedLine.startsWith(StringPool.CLOSE_PARENTHESIS) &&
-			!trimmedLine.startsWith(StringPool.DOUBLE_SLASH) &&
-			!trimmedLine.equals("*/") && !trimmedLine.startsWith("catch ") &&
-			!trimmedLine.startsWith("else ") &&
-			!trimmedLine.startsWith("finally ") &&
-			!trimmedLine.startsWith("while ")) {
-
-			return true;
-		}
-
-		return false;
 	}
 
 	protected int adjustLevel(int level, String text, String s, int diff) {
@@ -340,6 +281,10 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		Matcher matcher = getterUtilGetPattern.matcher(content);
 
 		while (matcher.find()) {
+			if (ToolsUtil.isInsideQuotes(content, matcher.start())) {
+				continue;
+			}
+
 			List<String> parametersList = getParameterList(matcher.group());
 
 			if (parametersList.size() != 2) {
@@ -366,108 +311,6 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 					"No need to pass default value '" + parametersList.get(1) +
 						"'",
 					getLineCount(content, matcher.start()));
-			}
-		}
-	}
-
-	protected void checkIfClauseParentheses(
-		String ifClause, String fileName, int lineCount) {
-
-		ifClause = stripQuotes(ifClause);
-
-		if (ifClause.matches(
-				"[^()]*\\((\\(?\\w+ instanceof \\w+\\)?( \\|\\| )?)+" +
-					"\\)[^()]*") &&
-			!ifClause.matches("[^()]*\\([^()]*\\)[^()]*")) {
-
-			processMessage(
-				fileName, "Redundant parentheses in if-statement", lineCount);
-
-			return;
-		}
-
-		if (ifClause.contains(StringPool.DOUBLE_SLASH) ||
-			ifClause.contains("/*") || ifClause.contains("*/")) {
-
-			return;
-		}
-
-		if (hasRedundantParentheses(ifClause, "||", "&&") ||
-			hasRedundantParentheses(ifClause, "&&", "||")) {
-
-			processMessage(
-				fileName, "Redundant parentheses in if-statement", lineCount);
-
-			return;
-		}
-
-		int previousParenthesisPos = -1;
-
-		for (int i = 0; i < ifClause.length(); i++) {
-			char c = ifClause.charAt(i);
-
-			if ((c != CharPool.OPEN_PARENTHESIS) &&
-				(c != CharPool.CLOSE_PARENTHESIS)) {
-
-				continue;
-			}
-
-			if (previousParenthesisPos != -1) {
-				String s = ifClause.substring(previousParenthesisPos + 1, i);
-
-				if (hasMissingParentheses(s)) {
-					processMessage(
-						fileName, "Missing parentheses in if-statement",
-						lineCount);
-
-					return;
-				}
-			}
-
-			if (previousParenthesisPos == -1) {
-				previousParenthesisPos = i;
-
-				continue;
-			}
-
-			previousParenthesisPos = i;
-
-			if (c != CharPool.OPEN_PARENTHESIS) {
-				continue;
-			}
-
-			char previousChar = ifClause.charAt(i - 1);
-
-			if ((previousChar != CharPool.OPEN_PARENTHESIS) &&
-				(previousChar != CharPool.SPACE)) {
-
-				continue;
-			}
-
-			int j = i;
-
-			while (true) {
-				j = ifClause.indexOf(StringPool.CLOSE_PARENTHESIS, j + 1);
-
-				String s = ifClause.substring(i + 1, j);
-
-				if (getLevel(s) == 0) {
-					char nextChar = ifClause.charAt(j + 1);
-
-					if (((previousChar == CharPool.OPEN_PARENTHESIS) &&
-						 (nextChar == CharPool.CLOSE_PARENTHESIS)) ||
-						(((nextChar == CharPool.CLOSE_PARENTHESIS) ||
-						  (nextChar == CharPool.SPACE)) &&
-						 hasRedundantParentheses(s))) {
-
-						processMessage(
-							fileName,
-							"Redundant parentheses in if-statement",
-							lineCount);
-					}
-
-					break;
-				}
 			}
 		}
 	}
@@ -735,6 +578,10 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		Matcher matcher = stringUtilReplacePattern.matcher(content);
 
 		while (matcher.find()) {
+			if (ToolsUtil.isInsideQuotes(content, matcher.start())) {
+				continue;
+			}
+
 			List<String> parametersList = getParameterList(matcher.group());
 
 			if (parametersList.size() != 3) {
@@ -971,6 +818,41 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 			}
 		}
 
+		matcher = _missingEmptyLineBetweenTagsPattern1.matcher(content);
+
+		while (matcher.find()) {
+			String tabs1 = matcher.group(1);
+			String tabs2 = matcher.group(2);
+
+			if (tabs1.equals(tabs2)) {
+				return StringUtil.replaceFirst(
+					content, "\n", "\n\n", matcher.end(1));
+			}
+		}
+
+		matcher = _missingEmptyLineBetweenTagsPattern2.matcher(content);
+
+		while (matcher.find()) {
+			String tabs1 = matcher.group(1);
+			String tabs2 = matcher.group(2);
+
+			if (tabs1.equals(tabs2)) {
+				return StringUtil.replaceFirst(
+					content, "\n", "\n\n", matcher.end(1));
+			}
+		}
+
+		return content;
+	}
+
+	protected String fixEmptyLinesInMultiLineTags(String content) {
+		Matcher matcher = _emtpyLineInMultiLineTagsPattern.matcher(content);
+
+		if (matcher.find()) {
+			return StringUtil.replaceFirst(
+				content, "\n\n", "\n", matcher.start());
+		}
+
 		return content;
 	}
 
@@ -1190,6 +1072,8 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		}
 
 		String newContent = doFormat(file, fileName, absolutePath, content);
+
+		newContent = processFileChecks(fileName, absolutePath, newContent);
 
 		newContent = StringUtil.replace(
 			newContent, StringPool.RETURN, StringPool.BLANK);
@@ -1913,10 +1797,26 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		return null;
 	}
 
+	protected List<String> getExcludes(String property) {
+		List<String> excludes = _exclusionPropertiesMap.get(property);
+
+		if (excludes != null) {
+			return excludes;
+		}
+
+		excludes = getPropertyList(property);
+
+		_exclusionPropertiesMap.put(property, excludes);
+
+		return excludes;
+	}
+
 	protected File getFile(String fileName, int level) {
 		return _sourceFormatterHelper.getFile(
 			sourceFormatterArgs.getBaseDirName(), fileName, level);
 	}
+
+	protected abstract List<FileCheck> getFileChecks();
 
 	protected List<String> getFileNames(
 			String basedir, List<String> recentChangesFileNames,
@@ -2448,115 +2348,6 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 			GetterUtil.getString(getProperty(key)), StringPool.COMMA);
 	}
 
-	protected boolean hasMissingParentheses(String s) {
-		if (Validator.isNull(s)) {
-			return false;
-		}
-
-		boolean containsAndOperator = s.contains("&&");
-		boolean containsOrOperator = s.contains("||");
-
-		if (containsAndOperator && containsOrOperator) {
-			return true;
-		}
-
-		boolean containsCompareOperator = false;
-
-		if ((s.contains(" == ") || s.contains(" != ") || s.contains(" < ") ||
-			 s.contains(" > ") || s.contains(" =< ") || s.contains(" => ") ||
-			 s.contains(" <= ") || s.contains(" >= "))) {
-
-			containsCompareOperator = true;
-		}
-
-		boolean containsMathOperator = false;
-
-		if ((s.contains(" = ") || s.contains(" - ") || s.contains(" + ") ||
-			 s.contains(" & ") || s.contains(" % ") || s.contains(" * ") ||
-			 s.contains(" / "))) {
-
-			containsMathOperator = true;
-		}
-
-		if (containsCompareOperator &&
-			(containsAndOperator || containsOrOperator ||
-			 (containsMathOperator && !s.contains(StringPool.OPEN_BRACKET)))) {
-
-			return true;
-		}
-
-		return false;
-	}
-
-	protected boolean hasRedundantParentheses(String s) {
-		//if (s.matches("\\w+ instanceof \\w+")) {
-		//	return true;
-		//}
-
-		int x = -1;
-
-		while (true) {
-			x = s.indexOf(StringPool.SPACE, x + 1);
-
-			if (x == -1) {
-				break;
-			}
-
-			if (getLevel(s.substring(0, x)) == 0) {
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	protected boolean hasRedundantParentheses(
-		String s, String operator1, String operator2) {
-
-		while (true) {
-			int x = s.indexOf("!(");
-
-			if (x == -1) {
-				break;
-			}
-
-			int y = x;
-
-			while (true) {
-				y = s.indexOf(")", y + 1);
-
-				String linePart = s.substring(x, y + 1);
-
-				if (getLevel(linePart) == 0) {
-					break;
-				}
-			}
-
-			s = StringUtil.replaceFirst(s, ")", StringPool.BLANK, y);
-			s = StringUtil.replaceFirst(s, "!(", StringPool.BLANK, x);
-		}
-
-		String[] parts = StringUtil.split(s, operator1);
-
-		if (parts.length < 3) {
-			return false;
-		}
-
-		for (int i = 1; i < (parts.length - 1); i++) {
-			String part = parts[i];
-
-			if (part.contains(operator2)) {
-				continue;
-			}
-
-			if (Math.abs(getLevel(part)) == 1) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
 	protected boolean isAllowedVariableType(
 		String content, String variableName,
 		String[] variableTypeRegexStrings) {
@@ -2745,9 +2536,37 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		}
 	}
 
+	protected String processFileChecks(
+			String fileName, String absolutePath, String content)
+		throws Exception {
+
+		List<FileCheck> fileChecks = getFileChecks();
+
+		if (fileChecks == null) {
+			return content;
+		}
+
+		for (FileCheck fileCheck : fileChecks) {
+			Tuple tuple = fileCheck.process(fileName, absolutePath, content);
+
+			content = (String)tuple.getObject(0);
+
+			Set<SourceFormatterMessage> sourceFormatterMessages =
+				(Set<SourceFormatterMessage>)tuple.getObject(1);
+
+			for (SourceFormatterMessage sourceFormatterMessage :
+					sourceFormatterMessages) {
+
+				processMessage(fileName, sourceFormatterMessage);
+			}
+		}
+
+		return content;
+	}
+
 	protected void processFormattedFile(
 			File file, String fileName, String content, String newContent)
-		throws IOException {
+		throws Exception {
 
 		if (!content.equals(newContent)) {
 			if (sourceFormatterArgs.isPrintErrors()) {
@@ -2773,11 +2592,45 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 
 					_sourceFormatterHelper.printError(
 						fileName, sourceFormatterMessage.toString());
+
+					if (_browserStarted ||
+						!sourceFormatterArgs.isShowDocumentation() ||
+						!Desktop.isDesktopSupported()) {
+
+						continue;
+					}
+
+					String markdownFileName =
+						sourceFormatterMessage.getMarkdownFileName();
+
+					if (Validator.isNotNull(markdownFileName)) {
+						Desktop desktop = Desktop.getDesktop();
+
+						desktop.browse(
+							new URI(_DOCUMENTATION_URL + markdownFileName));
+
+						_browserStarted = true;
+					}
 				}
 			}
 		}
 
 		_modifiedFileNames.add(file.getAbsolutePath());
+	}
+
+	protected void processMessage(
+		String fileName, SourceFormatterMessage sourceFormatterMessage) {
+
+		Set<SourceFormatterMessage> sourceFormatterMessages =
+			_sourceFormatterMessagesMap.get(fileName);
+
+		if (sourceFormatterMessages == null) {
+			sourceFormatterMessages = new TreeSet<>();
+		}
+
+		sourceFormatterMessages.add(sourceFormatterMessage);
+
+		_sourceFormatterMessagesMap.put(fileName, sourceFormatterMessages);
 	}
 
 	protected void putBNDSettings(BNDSettings bndSettings) {
@@ -3011,55 +2864,6 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		return sb.toString();
 	}
 
-	protected String trimContent(String content, boolean allowLeadingSpaces)
-		throws IOException {
-
-		StringBundler sb = new StringBundler();
-
-		try (UnsyncBufferedReader unsyncBufferedReader =
-				new UnsyncBufferedReader(new UnsyncStringReader(content))) {
-
-			String line = null;
-
-			while ((line = unsyncBufferedReader.readLine()) != null) {
-				sb.append(trimLine(line, allowLeadingSpaces));
-				sb.append("\n");
-			}
-		}
-
-		content = sb.toString();
-
-		if (content.endsWith("\n")) {
-			content = content.substring(0, content.length() - 1);
-		}
-
-		return content;
-	}
-
-	protected String trimLine(String line, boolean allowLeadingSpaces) {
-		if (line.trim().length() == 0) {
-			return StringPool.BLANK;
-		}
-
-		line = StringUtil.trimTrailing(line);
-
-		if (allowLeadingSpaces || line.startsWith(" *")) {
-			return line;
-		}
-
-		while (line.matches("^\t*    .*")) {
-			line = StringUtil.replaceFirst(
-				line, StringPool.FOUR_SPACES, StringPool.TAB);
-		}
-
-		while (line.startsWith(StringPool.SPACE)) {
-			line = StringUtil.replaceFirst(
-				line, StringPool.SPACE, StringPool.BLANK);
-		}
-
-		return line;
-	}
-
 	protected static final String LANGUAGE_KEYS_CHECK_EXCLUDES =
 		"language.keys.check.excludes";
 
@@ -3228,15 +3032,22 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		return pattern;
 	}
 
+	private static final String _DOCUMENTATION_URL =
+		"https://github.com/liferay/liferay-portal/blob/master/modules/util" +
+			"/source-formatter/documentation/";
+
 	private Set<String> _annotationsExclusions;
 	private Map<String, BNDSettings> _bndSettingsMap =
 		new ConcurrentHashMap<>();
+	private boolean _browserStarted;
 	private Map<String, String> _compatClassNamesMap;
 	private String _copyright;
 	private final Pattern _definitionPattern = Pattern.compile(
 		"^([A-Za-z-]+?)[:=](\n|[\\s\\S]*?([^\\\\]\n|\\Z))", Pattern.MULTILINE);
 	private final Pattern _emptyLineBetweenTagsPattern = Pattern.compile(
-		"\n(\t*)</([-\\w:]+)>(\n*)(\t*)<([-\\w:]+)[> ]");
+		"\n(\t*)</([-\\w:]+)>(\n*)(\t*)<([-\\w:]+)[> \n]");
+	private final Pattern _emtpyLineInMultiLineTagsPattern = Pattern.compile(
+		"\n\t*<[-\\w:#]+\n\n\t*\\w");
 	private final Pattern _emptyLineInNestedTagsPattern1 = Pattern.compile(
 		"\n(\t*)(?:<\\w.*[^/])?>\n\n(\t*)(<.*)\n");
 	private final Pattern _emptyLineInNestedTagsPattern2 = Pattern.compile(
@@ -3246,6 +3057,11 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 	private SourceMismatchException _firstSourceMismatchException;
 	private Set<String> _immutableFieldTypes;
 	private ComparableVersion _mainReleaseComparableVersion;
+	private final Pattern _missingEmptyLineBetweenTagsPattern1 =
+		Pattern.compile("\n(\t*)/>\n(\t*)<[-\\w:]+[> \n]");
+	private final Pattern _missingEmptyLineBetweenTagsPattern2 =
+		Pattern.compile(
+			"\n(\t*)<.* />\n(\t*)<([-\\w:]+|\\w((?!</| />).)*[^/]>)\n");
 	private final List<String> _modifiedFileNames =
 		new CopyOnWriteArrayList<>();
 	private final Map<String, Properties> _moduleLangLanguageProperties =

@@ -274,19 +274,18 @@ public class AuthenticatedSessionManagerImpl
 			domain = null;
 		}
 
-		deleteCookie(request, response, CookieKeys.COMPANY_ID, domain);
-		deleteCookie(request, response, CookieKeys.GUEST_LANGUAGE_ID, domain);
-		deleteCookie(request, response, CookieKeys.ID, domain);
-		deleteCookie(request, response, CookieKeys.PASSWORD, domain);
-
 		boolean rememberMe = GetterUtil.getBoolean(
-			CookieKeys.getCookie(request, CookieKeys.REMEMBER_ME));
+			CookieKeys.getCookie(request, CookieKeys.REMEMBER_ME, false));
+
+		CookieKeys.deleteCookies(
+			request, response, domain, CookieKeys.COMPANY_ID,
+			CookieKeys.GUEST_LANGUAGE_ID, CookieKeys.ID, CookieKeys.PASSWORD,
+			CookieKeys.REMEMBER_ME);
 
 		if (!rememberMe) {
-			deleteCookie(request, response, CookieKeys.LOGIN, domain);
+			CookieKeys.deleteCookies(
+				request, response, domain, CookieKeys.LOGIN);
 		}
-
-		deleteCookie(request, response, CookieKeys.REMEMBER_ME, domain);
 
 		try {
 			session.invalidate();
@@ -374,22 +373,6 @@ public class AuthenticatedSessionManagerImpl
 		}
 	}
 
-	protected void deleteCookie(
-		HttpServletRequest request, HttpServletResponse response,
-		String cookieName, String domain) {
-
-		Cookie cookie = new Cookie(cookieName, StringPool.BLANK);
-
-		if (domain != null) {
-			cookie.setDomain(domain);
-		}
-
-		cookie.setMaxAge(0);
-		cookie.setPath(StringPool.SLASH);
-
-		CookieKeys.addCookie(request, response, cookie);
-	}
-
 	private User _getAuthenticatedUser(
 			HttpServletRequest request, String login, String password,
 			String authType)
@@ -453,8 +436,12 @@ public class AuthenticatedSessionManagerImpl
 					parameterMap, resultsMap);
 			}
 
+			User user = (User)resultsMap.get("user");
+
 			if (authResult != Authenticator.SUCCESS) {
-				User user = UserLocalServiceUtil.fetchUser(userId);
+				if (user != null) {
+					user = UserLocalServiceUtil.fetchUser(user.getUserId());
+				}
 
 				if (user != null) {
 					UserLocalServiceUtil.checkLockout(user);
@@ -463,7 +450,7 @@ public class AuthenticatedSessionManagerImpl
 				throw new AuthException();
 			}
 
-			return (User)resultsMap.get("user");
+			return user;
 		}
 	}
 

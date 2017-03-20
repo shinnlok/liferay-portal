@@ -73,7 +73,7 @@ public class DDMDataProviderContextFactoryImpl
 		}
 		catch (PortalException pe) {
 			_log.error(
-				"Unable to create DDMDataProviderContext with instance ID " +
+				"Unable to create DDM data provider context with instance ID " +
 					ddmDataProviderInstanceId,
 				pe);
 

@@ -109,6 +109,10 @@ public class DDMFormFieldTemplateContextFactory {
 		setDDMFormFieldTemplateContextDataType(
 			ddmFormFieldTemplateContext, ddmFormField.getDataType());
 
+		setDDMFormFieldTemplateContextDataProviderSettings(
+			ddmFormFieldTemplateContext,
+			_ddmFormRenderingContext.getProperty("dataProviderSettings"),
+			ddmFormFieldValue.getName());
 		setDDMFormFieldTemplateContextDir(ddmFormFieldTemplateContext);
 		setDDMFormFieldTemplateContextEvaluable(
 			ddmFormFieldTemplateContext, ddmFormFieldEvaluationResult,
@@ -314,6 +318,21 @@ public class DDMFormFieldTemplateContextFactory {
 		ddmFormFieldTemplateContext.putAll(contributedParameters);
 	}
 
+	protected void setDDMFormFieldTemplateContextDataProviderSettings(
+		Map<String, Object> ddmFormFieldTemplateContext,
+		Map<String, Map<String, Object>> dataProviderSettings,
+		String fieldName) {
+
+		if ((dataProviderSettings == null) ||
+			!dataProviderSettings.containsKey(fieldName)) {
+
+			return;
+		}
+
+		ddmFormFieldTemplateContext.put(
+			"dataProviderSettings", dataProviderSettings.get(fieldName));
+	}
+
 	protected void setDDMFormFieldTemplateContextDataType(
 		Map<String, Object> ddmFormFieldTemplateContext, String dataType) {
 
@@ -453,9 +472,11 @@ public class DDMFormFieldTemplateContextFactory {
 		Map<String, Object> ddmFormFieldTemplateContext, Value value) {
 
 		if (ddmFormFieldEvaluationResult.getValue() != null) {
+			Object evaluationResultValue =
+				ddmFormFieldEvaluationResult.getValue();
+
 			ddmFormFieldTemplateContext.put(
-				"value",
-				String.valueOf(ddmFormFieldEvaluationResult.getValue()));
+				"value", evaluationResultValue.toString());
 		}
 		else if (value != null) {
 			ddmFormFieldTemplateContext.put("value", value.getString(_locale));

@@ -494,7 +494,11 @@ public class WebServerServlet extends HttpServlet {
 					PermissionChecker permissionChecker =
 						PermissionCheckerFactoryUtil.create(user);
 
-					if (!GroupPermissionUtil.contains(
+					Group group = layoutSet.getGroup();
+
+					if (!group.isShowSite(
+							permissionChecker, layoutSet.isPrivateLayout()) &&
+						!GroupPermissionUtil.contains(
 							permissionChecker, layoutSet.getGroupId(),
 							ActionKeys.VIEW)) {
 

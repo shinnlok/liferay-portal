@@ -384,14 +384,6 @@ public class WorkflowTaskDisplayContext {
 		return _orderByType;
 	}
 
-	public long[] getPooledActorsIds(WorkflowTask workflowTask)
-		throws PortalException {
-
-		return WorkflowTaskManagerUtil.getPooledActorsIds(
-			_workflowTaskRequestHelper.getCompanyId(),
-			workflowTask.getWorkflowTaskId());
-	}
-
 	public PortletURL getPortletURL() {
 		PortletURL portletURL = _liferayPortletResponse.createRenderURL();
 
@@ -979,6 +971,14 @@ public class WorkflowTaskDisplayContext {
 		}
 
 		return curParam;
+	}
+
+	protected long[] getPooledActorsIds(WorkflowTask workflowTask)
+		throws PortalException {
+
+		return WorkflowTaskManagerUtil.getPooledActorsIds(
+			_workflowTaskRequestHelper.getCompanyId(),
+			workflowTask.getWorkflowTaskId());
 	}
 
 	protected Role getRole(long roleId) throws PortalException {

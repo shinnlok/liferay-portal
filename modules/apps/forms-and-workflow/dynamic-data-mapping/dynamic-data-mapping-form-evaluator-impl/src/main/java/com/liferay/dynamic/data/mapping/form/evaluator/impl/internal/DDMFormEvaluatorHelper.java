@@ -382,6 +382,10 @@ public class DDMFormEvaluatorHelper {
 			"belongsTo",
 			new BelongsToRoleFunction(_request, _userLocalService));
 		ddmFormRuleEvaluator.setDDMExpressionFunction(
+			"calculate",
+			new SetPropertyFunction(
+				_ddmFormFieldEvaluationResultsMap, "value"));
+		ddmFormRuleEvaluator.setDDMExpressionFunction(
 			"call",
 			new CallFunction(
 				_ddmDataProviderTracker, _ddmDataProviderInstanceService,
@@ -436,13 +440,7 @@ public class DDMFormEvaluatorHelper {
 
 			String dataType = ddmFormField.getDataType();
 
-			if (ddmFormField.getDataType().equals(FieldConstants.INTEGER)) {
-				if (Validator.isNotNull(valueString)) {
-					ddmExpression.setIntegerVariableValue(
-						ddmFormFieldName, GetterUtil.getInteger(valueString));
-				}
-			}
-			else if (ddmFormField.getDataType().equals(FieldConstants.DOUBLE)) {
+			if (FieldConstants.isNumericType(ddmFormField.getDataType())) {
 				if (Validator.isNotNull(valueString)) {
 					ddmExpression.setDoubleVariableValue(
 						ddmFormFieldName, GetterUtil.getDouble(valueString));

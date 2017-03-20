@@ -21,7 +21,19 @@ import java.nio.file.Path;
  */
 public interface WatchEventListener {
 
+	public void addDeletedFilePathName(String filePathName);
+
+	public void addDownloadedFilePathName(String filePathName);
+
+	public void addRenamedFilePathName(String filePathName);
+
 	public long getSyncAccountId();
+
+	public void removeDeletedFilePathName(String filePathName);
+
+	public void removeDownloadedFilePathName(String filePathName);
+
+	public void removeRenamedFilePathName(String filePathName);
 
 	public void watchEvent(String eventType, Path filePath);
 

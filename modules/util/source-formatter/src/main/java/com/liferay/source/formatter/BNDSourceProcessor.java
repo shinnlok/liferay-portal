@@ -19,13 +19,19 @@ import aQute.bnd.osgi.Constants;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.NaturalOrderStringComparator;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.tools.ImportPackage;
 import com.liferay.portal.tools.ImportsFormatter;
+import com.liferay.portal.tools.ToolsUtil;
+import com.liferay.source.formatter.checks.FileCheck;
+import com.liferay.source.formatter.checks.WhitespaceCheck;
 
 import java.io.File;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -40,14 +46,6 @@ public class BNDSourceProcessor extends BaseSourceProcessor {
 
 	protected void checkDirectoryAndBundleName(
 		String fileName, String absolutePath, String content) {
-
-		if ((!portalSource && !subrepository) || !isModulesFile(absolutePath) ||
-			!fileName.endsWith("/bnd.bnd") ||
-			absolutePath.contains("/testIntegration/") ||
-			absolutePath.contains("/third-party/")) {
-
-			return;
-		}
 
 		int x = absolutePath.lastIndexOf(StringPool.SLASH);
 
@@ -78,11 +76,9 @@ public class BNDSourceProcessor extends BaseSourceProcessor {
 					"'");
 		}
 
-		Matcher matcher = _bundleNamePattern.matcher(content);
+		String bundleName = getDefinitionValue(content, "Bundle-Name");
 
-		if (matcher.find()) {
-			String bundleName = matcher.group(1);
-
+		if (bundleName != null) {
 			String strippedBundleName = StringUtil.removeChars(
 				bundleName, CharPool.DASH, CharPool.SPACE);
 
@@ -108,11 +104,10 @@ public class BNDSourceProcessor extends BaseSourceProcessor {
 			return;
 		}
 
-		matcher = _bundleSymbolicNamePattern.matcher(content);
+		String bundleSymbolicName = getDefinitionValue(
+			content, "Bundle-SymbolicName");
 
-		if (matcher.find()) {
-			String bundleSymbolicName = matcher.group(1);
-
+		if (bundleSymbolicName != null) {
 			String expectedBundleSymbolicName =
 				"com.liferay." +
 					StringUtil.replace(
@@ -126,16 +121,64 @@ public class BNDSourceProcessor extends BaseSourceProcessor {
 			}
 		}
 
-		matcher = _webContextPathNamePattern.matcher(content);
+		String webContextPath = getDefinitionValue(content, "Web-ContextPath");
 
-		if (matcher.find()) {
-			String webContextPath = matcher.group(1);
+		if ((webContextPath != null) &&
+			!webContextPath.equals("/" + moduleName)) {
 
-			if (!webContextPath.equals("/" + moduleName)) {
-				processMessage(
-					fileName,
-					"Incorrect Web-ContextPath '" + webContextPath + "'");
+			processMessage(
+				fileName, "Incorrect Web-ContextPath '" + webContextPath + "'");
+		}
+	}
+
+	protected void checkExports(
+		String fileName, String content, Pattern pattern,
+		String definitionKey) {
+
+		String bundleSymbolicName = getDefinitionValue(
+			content, "Bundle-SymbolicName");
+
+		if ((bundleSymbolicName == null) ||
+			bundleSymbolicName.endsWith(".compat")) {
+
+			return;
+		}
+
+		Matcher matcher = _apiOrServiceBundleSymbolicNamePattern.matcher(
+			bundleSymbolicName);
+
+		bundleSymbolicName = matcher.replaceAll(StringPool.BLANK);
+
+		matcher = pattern.matcher(content);
+
+		if (!matcher.find()) {
+			return;
+		}
+
+		String[] lines = StringUtil.splitLines(matcher.group(2));
+
+		for (int i = 0; i < lines.length; i++) {
+			String line = StringUtil.removeChar(
+				StringUtil.trim(lines[i]), CharPool.BACK_SLASH);
+
+			if (Validator.isNull(line) || !line.startsWith("com.liferay.") ||
+				line.startsWith(bundleSymbolicName)) {
+
+				continue;
 			}
+
+			StringBundler sb = new StringBundler(6);
+
+			sb.append(definitionKey);
+			sb.append(" '");
+			sb.append(line);
+			sb.append("' should match Bundle-SymbolicName '");
+			sb.append(bundleSymbolicName);
+			sb.append("'");
+
+			processMessage(
+				fileName, sb.toString(),
+				getLineCount(content, matcher.start(2)) + i);
 		}
 	}
 
@@ -174,6 +217,7 @@ public class BNDSourceProcessor extends BaseSourceProcessor {
 		String fileName, String absolutePath, String content, Pattern pattern) {
 
 		if (absolutePath.contains("/portal-kernel/") ||
+			absolutePath.contains("/third-party/") ||
 			absolutePath.contains("/util-bridges/") ||
 			absolutePath.contains("/util-java/") ||
 			absolutePath.contains("/util-taglib/") ||
@@ -188,7 +232,7 @@ public class BNDSourceProcessor extends BaseSourceProcessor {
 			return;
 		}
 
-		String imports = matcher.group(2);
+		String imports = matcher.group(3);
 
 		matcher = _wilcardImportPattern.matcher(imports);
 
@@ -209,8 +253,6 @@ public class BNDSourceProcessor extends BaseSourceProcessor {
 			File file, String fileName, String absolutePath, String content)
 		throws Exception {
 
-		content = trimContent(content, false);
-
 		content = StringUtil.replace(
 			content, new String[] {"/\n", "/,\\\n"},
 			new String[] {"\n", ",\\\n"});
@@ -228,7 +270,15 @@ public class BNDSourceProcessor extends BaseSourceProcessor {
 
 		content = StringUtil.replace(content, " \\\n", "\\\n");
 
-		Matcher matcher = _incorrectTabPattern.matcher(content);
+		Matcher matcher = _trailingSemiColonPattern.matcher(content);
+
+		if (matcher.find()) {
+			content = StringUtil.replaceFirst(
+				content, StringPool.SEMICOLON, StringPool.BLANK,
+				matcher.start());
+		}
+
+		matcher = _incorrectTabPattern.matcher(content);
 
 		if (matcher.find()) {
 			content = StringUtil.replaceFirst(
@@ -242,16 +292,29 @@ public class BNDSourceProcessor extends BaseSourceProcessor {
 				content, matcher.group(1), StringPool.SPACE, matcher.start());
 		}
 
+		checkWildcardImports(
+			fileName, absolutePath, content, _exportContentsPattern);
 		checkWildcardImports(fileName, absolutePath, content, _exportsPattern);
 
 		checkMissingSchemaVersion(fileName, absolutePath, content);
 
 		ImportsFormatter importsFormatter = new BNDImportsFormatter();
 
+		content = importsFormatter.format(content, _exportContentsPattern);
 		content = importsFormatter.format(content, _exportsPattern);
 		content = importsFormatter.format(content, _importsPattern);
 
-		checkDirectoryAndBundleName(fileName, absolutePath, content);
+		if ((portalSource || subrepository) && isModulesFile(absolutePath) &&
+			fileName.endsWith("/bnd.bnd") &&
+			!absolutePath.contains("/testIntegration/") &&
+			!absolutePath.contains("/third-party/")) {
+
+			checkDirectoryAndBundleName(fileName, absolutePath, content);
+
+			checkExports(
+				fileName, content, _exportContentsPattern, "-exportcontents");
+			checkExports(fileName, content, _exportsPattern, "Export-Package");
+		}
 
 		content = formatBundleClassPath(content);
 
@@ -269,6 +332,9 @@ public class BNDSourceProcessor extends BaseSourceProcessor {
 
 			content = formatIncludeResource(content);
 		}
+
+		content = formatCapability(content, "Provide-Capability");
+		content = formatCapability(content, "Require-Capability");
 
 		return sortDefinitions(fileName, content, new DefinitionComparator());
 	}
@@ -292,6 +358,56 @@ public class BNDSourceProcessor extends BaseSourceProcessor {
 		}
 
 		return content;
+	}
+
+	protected String formatCapability(String content, String definitionKey) {
+		Pattern pattern = Pattern.compile(
+			"^" + definitionKey + ":[\\s\\S]*?([^\\\\]\n|\\Z)",
+			Pattern.MULTILINE);
+
+		Matcher matcher = pattern.matcher(content);
+
+		if (!matcher.find()) {
+			return content;
+		}
+
+		String match = matcher.group();
+
+		String replacement = StringUtil.replace(match, ": ", ":\\\n\t");
+
+		outerLoop:
+		while (true) {
+			matcher = _capabilityLineBreakPattern1.matcher(replacement);
+
+			while (matcher.find()) {
+				if (!ToolsUtil.isInsideQuotes(replacement, matcher.start())) {
+					replacement = StringUtil.replaceFirst(
+						replacement, ",", ",\\\n\t", matcher.start());
+
+					continue outerLoop;
+				}
+			}
+
+			break;
+		}
+
+		outerLoop:
+		while (true) {
+			matcher = _capabilityLineBreakPattern2.matcher(replacement);
+
+			while (matcher.find()) {
+				if (!ToolsUtil.isInsideQuotes(replacement, matcher.start())) {
+					replacement = StringUtil.replaceFirst(
+						replacement, ";", ";\\\n\t\t", matcher.start());
+
+					continue outerLoop;
+				}
+			}
+
+			break;
+		}
+
+		return StringUtil.replace(content, match, replacement);
 	}
 
 	@Override
@@ -328,7 +444,8 @@ public class BNDSourceProcessor extends BaseSourceProcessor {
 		}
 
 		if (correctKey.equals(definitionKey)) {
-			return content;
+			return StringUtil.replace(
+				content, definitionKey + "=", definitionKey + ":");
 		}
 
 		if (content.startsWith(definitionKey)) {
@@ -486,6 +603,24 @@ public class BNDSourceProcessor extends BaseSourceProcessor {
 		return _definitionKeysMap;
 	}
 
+	protected String getDefinitionValue(String content, String key) {
+		Pattern pattern = Pattern.compile(
+			"^" + key + ": (.*)(\n|\\Z)", Pattern.MULTILINE);
+
+		Matcher matcher = pattern.matcher(content);
+
+		if (matcher.find()) {
+			return matcher.group(1);
+		}
+
+		return null;
+	}
+
+	@Override
+	protected List<FileCheck> getFileChecks() {
+		return Arrays.asList(new FileCheck[] {new WhitespaceCheck()});
+	}
+
 	protected Map<String, Map<String, String>>
 		getFileSpecificDefinitionKeysMap() {
 
@@ -511,8 +646,9 @@ public class BNDSourceProcessor extends BaseSourceProcessor {
 			populateDefinitionKeysMap(
 				"-metatype-inherit", "Can-Redefine-Classes",
 				"Can-Retransform-Classes", "Implementation-Version",
-				"JPM-Command", "Liferay-Export-JS-Submodules",
-				"Liferay-JS-Config", "Liferay-Releng-App-Description",
+				"JPM-Command", "Liferay-Configuration-Path",
+				"Liferay-Export-JS-Submodules", "Liferay-JS-Config",
+				"Liferay-Releng-App-Description",
 				"Liferay-Releng-Module-Group-Description",
 				"Liferay-Releng-Module-Group-Title",
 				"Liferay-Require-SchemaVersion", "Liferay-Service",
@@ -593,19 +729,24 @@ public class BNDSourceProcessor extends BaseSourceProcessor {
 
 	private static final String[] _INCLUDES = new String[] {"**/*.bnd"};
 
+	private final Pattern _apiOrServiceBundleSymbolicNamePattern =
+		Pattern.compile("\\.(api|service)$");
 	private final Pattern _bundleClassPathPattern = Pattern.compile(
 		"^Bundle-ClassPath:[\\s\\S]*?([^\\\\]\n|\\Z)", Pattern.MULTILINE);
-	private final Pattern _bundleNamePattern = Pattern.compile(
-		"^Bundle-Name: (.*)\n", Pattern.MULTILINE);
-	private final Pattern _bundleSymbolicNamePattern = Pattern.compile(
-		"^Bundle-SymbolicName: (.*)\n", Pattern.MULTILINE);
+	private final Pattern _capabilityLineBreakPattern1 = Pattern.compile(
+		",[^\\\\]");
+	private final Pattern _capabilityLineBreakPattern2 = Pattern.compile(
+		";[^\\\\]");
 	private Map<String, String> _definitionKeysMap;
+	private final Pattern _exportContentsPattern = Pattern.compile(
+		"\n-exportcontents:(\\\\\n| )((.*?)(\n[^\t]|\\Z))",
+		Pattern.DOTALL | Pattern.MULTILINE);
 	private final Pattern _exportsPattern = Pattern.compile(
-		"\nExport-Package:(\\\\\n| )(.*?\n|\\Z)[^\t]",
+		"\nExport-Package:(\\\\\n| )((.*?)(\n[^\t]|\\Z))",
 		Pattern.DOTALL | Pattern.MULTILINE);
 	private Map<String, Map<String, String>> _fileSpecificDefinitionKeysMap;
 	private final Pattern _importsPattern = Pattern.compile(
-		"\nImport-Package:(\\\\\n| )(.*?\n|\\Z)[^\t]",
+		"\nImport-Package:(\\\\\n| )((.*?)(\n[^\t]|\\Z))",
 		Pattern.DOTALL | Pattern.MULTILINE);
 	private final Pattern _includeResourceJarPattern = Pattern.compile(
 		"-[0-9\\.]+\\.jar");
@@ -616,8 +757,8 @@ public class BNDSourceProcessor extends BaseSourceProcessor {
 		"\n[^\t].*:\\\\\n(\t{2,})[^\t]");
 	private final Pattern _singleValueOnMultipleLinesPattern = Pattern.compile(
 		"\n.*:(\\\\\n\t).*(\n[^\t]|\\Z)");
-	private final Pattern _webContextPathNamePattern = Pattern.compile(
-		"^Web-ContextPath: (.*)\n", Pattern.MULTILINE);
+	private final Pattern _trailingSemiColonPattern = Pattern.compile(
+		";(\n|\\Z)");
 	private final Pattern _wilcardImportPattern = Pattern.compile(
 		"(\\S+\\*)(,\\\\\n|\n|\\Z)");
 

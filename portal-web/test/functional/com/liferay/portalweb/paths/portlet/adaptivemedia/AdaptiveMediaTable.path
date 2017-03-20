@@ -1,0 +1,34 @@
+<html>
+<head>
+<title>AdaptiveMediaTable</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">AdaptiveMediaTable</td></tr>
+</thead>
+<tbody>
+<tr>
+	<td>NAME</td>
+	<td>//td[contains(@class,'name-column')]/a[contains(.,'${key_imageName}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MAX_WIDTH</td>
+	<td>//a[contains(.,'${key_imageName}')]/../..//td[contains(@class,'max-width')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MAX_HEIGHT</td>
+	<td>//a[contains(.,'${key_imageName}')]/../..//td[contains(@class,'max-height')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PROGRESS</td>
+	<td>//a[contains(.,'${key_imageName}')]/../..//div[@class='progress']/div</td>
+	<td></td>
+</tr>
+</tbody>
+</table>
+</body>
+</html>

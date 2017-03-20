@@ -40,6 +40,7 @@ AUI.add(
 						value: {
 							and: Liferay.Language.get('and'),
 							autofill: Liferay.Language.get('autofill'),
+							calculate: Liferay.Language.get('calculate'),
 							cancel: Liferay.Language.get('cancel'),
 							description: Liferay.Language.get('define-condition-and-action-to-change-fields-and-elements-on-the-form'),
 							enable: Liferay.Language.get('enable'),
@@ -73,6 +74,7 @@ AUI.add(
 
 						instance._actionFactory = new Liferay.DDL.FormBuilderActionFactory(
 							{
+								bubbleTargets: [instance],
 								fields: instance.get('fields'),
 								getDataProviderParametersSettingsURL: instance.get('getDataProviderParametersSettingsURL'),
 								getDataProviders: instance.get('getDataProviders'),
@@ -80,6 +82,8 @@ AUI.add(
 								portletNamespace: instance.get('portletNamespace')
 							}
 						);
+
+						instance._validator = new Liferay.DDL.FormBuilderRuleValidator();
 					},
 
 					bindUI: function() {
@@ -90,15 +94,17 @@ AUI.add(
 						boundingBox.delegate('click', A.bind(instance._handleAddActionClick, instance), '.form-builder-rule-add-action');
 						boundingBox.delegate('click', A.bind(instance._handleCancelClick, instance), '.form-builder-rule-settings-cancel');
 						boundingBox.delegate('click', A.bind(instance._handleDeleteActionClick, instance), '.action-card-delete');
-
 						boundingBox.delegate('click', A.bind(instance._handleSaveClick, instance), '.form-builder-rule-settings-save');
 
 						instance.after(instance._toggleShowRemoveButton, instance, '_addAction');
 
 						instance.after('fieldsChange', A.bind(instance._afterFieldsChange, instance));
 						instance.after('pagesChange', A.bind(instance._afterPagesChange, instance));
+						instance.after('*:valueChange', A.bind(instance._afterValueChange, instance));
 
 						instance.on('*:valueChange', A.bind(instance._handleActionChange, instance));
+
+						instance.on('*:valueChange', A.bind(instance._handleActionUpdates, instance));
 					},
 
 					render: function(rule) {
@@ -123,6 +129,8 @@ AUI.add(
 						instance._renderConditions(rule.conditions);
 						instance._renderActions(rule.actions);
 
+						instance._validateRule();
+
 						return FormBuilderRenderRule.superclass.render.apply(instance, []);
 					},
 
@@ -146,6 +154,12 @@ AUI.add(
 						var instance = this;
 
 						instance._actionFactory.set('pages', event.newVal);
+					},
+
+					_afterValueChange: function() {
+						var instance = this;
+
+						instance._validateRule();
 					},
 
 					_canDeleteCondition: function() {
@@ -196,11 +210,13 @@ AUI.add(
 
 						var target = instance._actionFactory.createAction(type, index, action, container);
 
+						target.render(container);
+
+						target.conditionChange(instance._getConditionSelectedFieldsPage());
+
 						if (action && action.target) {
 							target.set('value', action.target);
 						}
-
-						target.render(container);
 
 						instance._actions[index + '-action'] = target;
 					},
@@ -214,6 +230,10 @@ AUI.add(
 							{
 								label: strings.autofill,
 								value: 'auto-fill'
+							},
+							{
+								label: strings.calculate,
+								value: 'calculate'
 							},
 							{
 								label: strings.show,
@@ -244,12 +264,37 @@ AUI.add(
 						for (var i = indexes.length - 1; i >= 0; i--) {
 							var currentIndex = indexes[i];
 
-							var action = instance._actions[currentIndex + '-action'];
+							var targetAction = instance._actions[currentIndex + '-action'];
 
-							actions.push(action.getValue());
+							actions.push(
+								A.merge(
+									{
+										action: instance._actions[currentIndex + '-target'].getValue()
+									},
+									targetAction ? targetAction.getValue() : undefined
+								)
+							);
 						}
 
 						return actions;
+					},
+
+					_getConditionSelectedFieldsPage: function() {
+						var instance = this;
+
+						var fields = [];
+
+						for (var conditionKey in instance._conditions) {
+							if (!!conditionKey.match('-condition-second-operand-select') || !!conditionKey.match('-condition-first-operand')) {
+								var fieldName = instance._conditions[conditionKey].getValue();
+
+								if (fieldName) {
+									fields.push(instance._getFieldPageIndex(fieldName));
+								}
+							}
+						}
+
+						return fields;
 					},
 
 					_getFieldDataType: function(fieldName) {
@@ -262,6 +307,18 @@ AUI.add(
 						);
 
 						return field.dataType;
+					},
+
+					_getFieldPageIndex: function(fieldName) {
+						var instance = this;
+
+						var field = instance.get('fields').find(
+							function(field) {
+								return field.value === fieldName;
+							}
+						);
+
+						return field.pageIndex;
 					},
 
 					_getOptionsLabel: function(field, optionValue) {
@@ -286,6 +343,7 @@ AUI.add(
 								actions: rule ? rule.actions : [],
 								conditions: rule ? rule.conditions : [],
 								deleteIcon: Liferay.Util.getLexiconIconTpl('trash', 'icon-monospaced'),
+								invalid: !instance._isValidRule(rule),
 								logicalOperator: instance.get('logicOperator'),
 								plusIcon: Liferay.Util.getLexiconIconTpl('plus', 'icon-monospaced'),
 								showLabel: false,
@@ -301,10 +359,30 @@ AUI.add(
 
 						var fieldName = field.get('fieldName');
 
-						var index = fieldName.split('-')[0];
+						if (fieldName && fieldName.match('-target')) {
+							var index = fieldName.split('-')[0];
 
-						if (fieldName.match('-target')) {
 							instance._createTargetSelect(index, event.newVal[0]);
+						}
+					},
+
+					_handleActionUpdates: function(event) {
+						var instance = this;
+
+						var field = event.target;
+
+						var fieldName = field.get('fieldName');
+
+						if (field.getValue() && fieldName &&
+							(fieldName.match('-condition-first-operand') ||
+							fieldName.match('-condition-second-operand-select'))) {
+							for (var key in instance._actions) {
+								var action = instance._actions[key];
+
+								if (key.match('-action') && action.get('type') === 'jump-to-page') {
+									action.conditionChange(instance._getConditionSelectedFieldsPage());
+								}
+							}
 						}
 					},
 
@@ -380,6 +458,14 @@ AUI.add(
 						);
 					},
 
+					_isValidRule: function(rule) {
+						var instance = this;
+
+						var validator = instance._validator;
+
+						return validator.isValidRule(rule);
+					},
+
 					_renderActions: function(actions) {
 						var instance = this;
 
@@ -410,6 +496,27 @@ AUI.add(
 						conditionList.toggleClass(CSS_CAN_REMOVE_ITEM, conditionItems.size() > 2);
 
 						actionList.toggleClass(CSS_CAN_REMOVE_ITEM, actionItems.size() > 2);
+					},
+
+					_validateRule: function() {
+						var instance = this;
+
+						var contentBox = instance.get('contentBox');
+
+						var saveButton = contentBox.one('.form-builder-rule-settings-save');
+
+						var rule = {
+							actions: instance._getActions(),
+							condition: instance._getConditions(),
+							'logical-operator': instance.get('logicOperator')
+						};
+
+						if (instance._isValidRule(rule)) {
+							saveButton.removeAttribute('disabled');
+						}
+						else {
+							saveButton.setAttribute('disabled', '');
+						}
 					}
 				}
 			}

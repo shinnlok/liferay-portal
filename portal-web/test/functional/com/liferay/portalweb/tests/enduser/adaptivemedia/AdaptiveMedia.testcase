@@ -1,0 +1,112 @@
+<definition component-name="portal-collaboration">
+	<property name="portal.release" value="false" />
+	<property name="portal.upstream" value="true" />
+	<property name="custom.properties" value="default.layout.template.id=1_column" />
+	<property name="testray.main.component.name" value="Adaptive Media" />
+
+	<set-up>
+		<execute macro="TestCase#setUpPortalInstance" />
+
+		<execute macro="User#firstLoginPG" />
+	</set-up>
+
+	<tear-down>
+		<var method="TestPropsUtil#get('test.portal.instance')" name="testPortalInstance" />
+	</tear-down>
+
+	<command name="AddImageVariantsForBlogEntry" priority="5">
+		<execute macro="ProductMenu#gotoControlPanelConfiguration">
+			<var name="portlet" value="Adaptive Media" />
+		</execute>
+
+		<execute macro="AdaptiveMedia#addImageResolution">
+			<var name="imageName" value="Small Image Variant" />
+			<var name="maxHeight" value="100" />
+			<var name="maxWidth" value="100" />
+		</execute>
+
+		<execute macro="Alert#viewSuccessMessage" />
+
+		<execute macro="AdaptiveMedia#addImageResolution">
+			<var name="imageName" value="Large Image Variant" />
+			<var name="maxHeight" value="1000" />
+			<var name="maxWidth" value="1000" />
+		</execute>
+
+		<execute macro="Alert#viewSuccessMessage" />
+
+		<execute macro="AdaptiveMedia#viewImageResolutionTableEntry">
+			<var name="imageName" value="Small Image Variant" />
+			<var name="maxHeight" value="100" />
+			<var name="maxWidth" value="100" />
+			<var name="percentOptimized" value="0%" />
+		</execute>
+
+		<execute macro="AdaptiveMedia#viewImageResolutionTableEntry">
+			<var name="imageName" value="Large Image Variant" />
+			<var name="maxHeight" value="1000" />
+			<var name="maxWidth" value="1000" />
+			<var name="percentOptimized" value="0%" />
+		</execute>
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Documents and Media" />
+		</execute>
+
+		<execute macro="DMDocument#addCP">
+			<var name="dmDocumentDescription" value="Adaptive Media Image Description" />
+			<var name="dmDocumentFile" value="high_resolution_photo.jpg" />
+			<var name="dmDocumentTitle" value="high_resolution_photo.jpg" />
+		</execute>
+
+		<execute function="Pause" locator1="3000" />
+
+		<execute macro="ProductMenu#gotoControlPanelConfiguration">
+			<var name="portlet" value="Adaptive Media" />
+		</execute>
+
+		<execute macro="AdaptiveMedia#viewImageResolutionTableEntry">
+			<var name="imageName" value="Small Image Variant" />
+			<var name="maxHeight" value="100" />
+			<var name="maxWidth" value="100" />
+			<var name="percentOptimized" value="100%" />
+		</execute>
+
+		<execute macro="AdaptiveMedia#viewImageResolutionTableEntry">
+			<var name="imageName" value="Large Image Variant" />
+			<var name="maxHeight" value="1000" />
+			<var name="maxWidth" value="1000" />
+			<var name="percentOptimized" value="100%" />
+		</execute>
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Blogs" />
+		</execute>
+
+		<execute macro="BlogsNavigator#gotoAddEntry" />
+
+		<execute macro="BlogsEntry#addTitle">
+			<var name="entryTitle" value="Blogs Entry With Adaptive Media Image" />
+		</execute>
+
+		<execute macro="ItemSelector#gotoItemSelectorViaAlloyEditor" />
+
+		<execute macro="ItemSelector#selectDMImage">
+			<var name="imageFileName" value="high_resolution_photo.jpg" />
+		</execute>
+
+		<execute function="Pause" locator1="2000" />
+
+		<execute macro="AdaptiveMedia#viewImageVariantURL">
+			<var name="dmDocumentTitle" value="high_resolution_photo.jpg" />
+			<var name="imageName" value="large-image-variant" />
+		</execute>
+
+		<execute macro="AdaptiveMedia#viewImageVariantURL">
+			<var name="dmDocumentTitle" value="high_resolution_photo.jpg" />
+			<var name="imageName" value="small-image-variant" />
+		</execute>
+
+		<execute macro="Button#clickPublish" />
+	</command>
+</definition>

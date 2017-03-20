@@ -37,6 +37,7 @@ dependencies {
 	projectTemplates project(":sdk:project-templates-control-menu-entry")
 	projectTemplates project(":sdk:project-templates-form-field")
 	projectTemplates project(":sdk:project-templates-fragment")
+	projectTemplates project(":sdk:project-templates-layout-template")
 	projectTemplates project(":sdk:project-templates-mvc-portlet")
 	projectTemplates project(":sdk:project-templates-panel-app")
 	projectTemplates project(":sdk:project-templates-portlet")
@@ -97,9 +98,11 @@ test {
 	jvmArgs "-XX:MaxMetaspaceSize=256m"
 	maxHeapSize = "1024m"
 
-	systemProperty "repository.url", System.properties["repository.url"]
 	systemProperty "http.proxyHost", System.properties["http.proxyHost"]
 	systemProperty "http.proxyPort", System.properties["http.proxyPort"]
+	systemProperty "maven.debug", System.properties["maven.debug"]
+	systemProperty "maven.repo.local", System.properties["maven.repo.local"]
+	systemProperty "repository.url", System.properties["repository.url"]
 
 	systemProperties projectTemplateTokens
 }

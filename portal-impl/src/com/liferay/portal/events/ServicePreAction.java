@@ -24,6 +24,7 @@ import com.liferay.portal.kernel.events.Action;
 import com.liferay.portal.kernel.events.ActionException;
 import com.liferay.portal.kernel.exception.LayoutPermissionException;
 import com.liferay.portal.kernel.exception.NoSuchGroupException;
+import com.liferay.portal.kernel.exception.NoSuchLayoutException;
 import com.liferay.portal.kernel.exception.NoSuchUserException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.interval.IntervalActionProcessor;
@@ -291,9 +292,15 @@ public class ServicePreAction extends Action {
 		// Permission checker
 
 		PermissionChecker permissionChecker =
-			PermissionCheckerFactoryUtil.create(user);
+			PermissionThreadLocal.getPermissionChecker();
 
-		PermissionThreadLocal.setPermissionChecker(permissionChecker);
+		if ((permissionChecker == null) ||
+			(permissionChecker.getUserId() != user.getUserId())) {
+
+			permissionChecker = PermissionCheckerFactoryUtil.create(user);
+
+			PermissionThreadLocal.setPermissionChecker(permissionChecker);
+		}
 
 		// Cookie support
 
@@ -439,7 +446,7 @@ public class ServicePreAction extends Action {
 					_log.warn(sb.toString());
 				}
 
-				throw new PrincipalException();
+				throw new NoSuchLayoutException(sb.toString());
 			}
 			else if (isLoginRequest(request) && !viewableGroup) {
 				layout = null;

@@ -448,6 +448,16 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 	}
 
 	@Override
+	public void assertPartialLocation(String pattern) throws Exception {
+		String location = getLocation();
+
+		if (!location.contains(pattern)) {
+			throw new Exception(
+				"\"" + location + "\" does not contain \"" + pattern + "\"");
+		}
+	}
+
+	@Override
 	public void assertPartialText(String locator, String pattern)
 		throws Exception {
 
@@ -474,6 +484,17 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 			throw new Exception(
 				"\"" + text + "\" does not contain \"" + pattern + "\" at \"" +
 					locator + "\"");
+		}
+	}
+
+	@Override
+	public void assertPrompt(String pattern, String value) throws Exception {
+		String confirmation = getConfirmation(value);
+
+		if (!pattern.equals(confirmation)) {
+			throw new Exception(
+				"Expected text \"" + pattern +
+					"\" does not match actual text \"" + confirmation + "\"");
 		}
 	}
 
@@ -846,7 +867,12 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 
 	@Override
 	public String getConfirmation() {
-		return WebDriverHelper.getConfirmation(this);
+		return getConfirmation(null);
+	}
+
+	@Override
+	public String getConfirmation(String value) {
+		return WebDriverHelper.getConfirmation(this, value);
 	}
 
 	@Override

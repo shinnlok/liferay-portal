@@ -1567,13 +1567,13 @@ jdbc.counter.connectionProperties=oracle.jdbc.ReadTimeout=0;oracle.net.CONNECT_T
 			<echo file="${liferay.home}/osgi/portal/com.liferay.portal.search.elasticsearch.configuration.ElasticsearchConfiguration.cfg">
 				additionalConfigurations=\
 					cluster.routing.allocation.disk.threshold_enabled: false\n\
-					cluster.service.slow_task_logging_threshold: 600s\n\
+					cluster.service.slow_task_logging_threshold: 1800s\n\
 					httpEnabled: false\n\
-					index.indexing.slowlog.threshold.index.warn: 600s\n\
-					index.search.slowlog.threshold.fetch.warn: 600s\n\
-					index.search.slowlog.threshold.query.warn: 600s\n\
-					monitor.jvm.gc.old.warn: 600s\n\
-					monitor.jvm.gc.young.warn: 600s\n\
+					index.indexing.slowlog.threshold.index.warn: 1800s\n\
+					index.search.slowlog.threshold.fetch.warn: 1800s\n\
+					index.search.slowlog.threshold.query.warn: 1800s\n\
+					monitor.jvm.gc.old.warn: 1800s\n\
+					monitor.jvm.gc.young.warn: 1800s\n\
 					threadpool.bulk.size: 1\n\
 					threadpool.fetch_shard_started.size: 1\n\
 					threadpool.fetch_shard_store.size: 1\n\
@@ -2407,9 +2407,11 @@ ${tomcat-gc-log}
 								"modules/apps/static/portal-lpkg-deployer/portal-lpkg-deployer-test/src/test/java/com/liferay/portal/lpkg/LPKGVersionChangeLogAssertorTest.java",
 								"modules/apps/static/portal-lpkg-deployer/portal-lpkg-deployer-test/src/testIntegration/java/com/liferay/portal/lpkg/deployer/test/LPKGDeployerCleanStartupTest.java",
 								"modules/apps/static/portal-lpkg-deployer/portal-lpkg-deployer-test/src/testIntegration/java/com/liferay/portal/lpkg/deployer/test/LPKGDeployerDowngradeTest.java",
+								"modules/apps/static/portal-lpkg-deployer/portal-lpkg-deployer-test/src/testIntegration/java/com/liferay/portal/lpkg/deployer/test/LPKGDeployerTest.java",
 								"modules/apps/static/portal-lpkg-deployer/portal-lpkg-deployer-test/src/testIntegration/java/com/liferay/portal/lpkg/deployer/test/LPKGDeployerUpgradeTest.java",
 								"modules/apps/static/portal-lpkg-deployer/portal-lpkg-deployer-test/src/testIntegration/java/com/liferay/portal/lpkg/override/test/LPKGOverrideVerifyCleanStartupTest.java",
 								"modules/apps/static/portal-lpkg-deployer/portal-lpkg-deployer-test/src/testIntegration/java/com/liferay/portal/lpkg/override/test/LPKGOverrideVerifySecondStartupTest.java",
+								"modules/apps/static/portal-lpkg-deployer/portal-lpkg-deployer-test/src/testIntegration/java/com/liferay/portal/lpkg/override/test/LPKGOverrideVerifyTest.java",
 								"modules/apps/static/portal-lpkg-deployer/portal-lpkg-deployer-test/src/testIntegration/java/com/liferay/portal/lpkg/override/test/LPKGRevertOverrideVerifyTest.java",
 								"modules/apps/web-experience/export-import/export-import-resources-importer-test/src/testIntegration/java/com/liferay/exportimport/resources/importer/test/ResourcesImporterTest.java",
 								"modules/private/apps/osb-lcs/**",
@@ -2679,13 +2681,13 @@ ${tomcat-gc-log}
 
 									<delete dir="${tstamp.value}" />
 								</then>
+								<else>
+									<propertyfile file="${project.dir}/modules/private/apps/documentum/documentum-hook/docroot/WEB-INF/src/dfc.properties">
+										<entry key="dfc.docbroker.host[0]" value="${cmis.repository.vm.host.name}" />
+									</propertyfile>
+								</else>
 							</if>
 						</then>
-						<else>
-							<propertyfile file="${project.dir}/modules/private/apps/documentum/documentum-hook/docroot/WEB-INF/src/dfc.properties">
-								<entry key="dfc.docbroker.host[0]" value="${cmis.repository.vm.host.name}" />
-							</propertyfile>
-						</else>
 					</if>
 				</then>
 			</if>
@@ -4903,13 +4905,33 @@ go]]></replacevalue>
 						/>
 
 						<if>
-							<available file="${project.dir}/plugins/marketplace/${app.file.name}" />
+							<and>
+								<available file="${project.dir}/plugins/marketplace/${app.file.name}" />
+								<not>
+									<contains string="${test.latest.marketplace.apps.exclude}" substring="${app.file.name}" />
+								</not>
+							</and>
 							<then>
-								<echo>Copying ${project.dir}/plugins/marketplace/${app.file.name} to ${liferay.home}/osgi/marketplace/${app.file.name}</echo>
+								<echo>Copying ${project.dir}/plugins/marketplace/${app.file.name} to ${liferay.home}/osgi/marketplace/${app.file.name}.</echo>
 
 								<delete file="${liferay.home}/osgi/marketplace/${app.file.name}" />
 
 								<copy file="${project.dir}/plugins/marketplace/${app.file.name}" tofile="${liferay.home}/osgi/marketplace/${app.file.name}" />
+							</then>
+						</if>
+					</sequential>
+				</for>
+
+				<for list="${test.latest.marketplace.apps.include}" param="app.file.name">
+					<sequential>
+						<if>
+							<available file="${project.dir}/plugins/marketplace/@{app.file.name}" />
+							<then>
+								<echo>Copying ${project.dir}/plugins/marketplace/@{app.file.name} to ${liferay.home}/osgi/marketplace/@{app.file.name}.</echo>
+
+								<delete failonerror="false" file="${liferay.home}/osgi/marketplace/@{app.file.name}" />
+
+								<copy file="${project.dir}/plugins/marketplace/@{app.file.name}" tofile="${liferay.home}/osgi/marketplace/@{app.file.name}" />
 							</then>
 						</if>
 					</sequential>
@@ -5015,7 +5037,16 @@ go]]></replacevalue>
 									<else>
 										<echo>Deploying all relevant modules that make up ${Liferay-Releng-App-Title}.lpkg.</echo>
 
-										<gradle-execute dir="@{app.dir}" task="deploy" />
+										<gradle-execute dir="@{app.dir}" task="deploy">
+											<arg value="clean" />
+										</gradle-execute>
+
+										<ant antfile="build.xml" dir="modules" target="build-app-lpkg">
+											<property name="app.name" value="${osgi.app.name}" />
+											<property name="osgi.dir" value="${liferay.home}/osgi" />
+										</ant>
+
+										<gradle-execute dir="@{app.dir}" task="clean" />
 									</else>
 								</if>
 							</sequential>
@@ -5096,6 +5127,15 @@ go]]></replacevalue>
 
 						<dirname file="${osgi.module.build.file}" property="osgi.module.dir" />
 
+						<if>
+							<equals arg1="@{osgi.module}" arg2="documentum-hook" />
+							<then>
+								<propertyfile file="${osgi.module.dir}/docroot/WEB-INF/src/dfc.properties">
+									<entry key="dfc.docbroker.host[0]" value="${cmis.repository.vm.host.name}" />
+								</propertyfile>
+							</then>
+						</if>
+
 						<gradle-execute dir="${osgi.module.dir}" task="deploy">
 							<arg value="clean" />
 						</gradle-execute>
@@ -5110,6 +5150,18 @@ go]]></replacevalue>
 		<!--
 		Deploy plugin files to the deploy directory.
 		-->
+
+		<get-testcase-property property.name="ext.plugins.includes" />
+
+		<if>
+			<isset property="ext.plugins.includes" />
+			<then>
+				<ant antfile="build-test-plugins.xml" target="deploy-simple-server-plugins">
+					<property name="plugin.types" value="ext" />
+					<property name="plugins.includes" value="${ext.plugins.includes}" />
+				</ant>
+			</then>
+		</if>
 
 		<get-testcase-property property.name="hook.plugins.includes" />
 
@@ -7841,6 +7893,8 @@ ANT_OPTS=${env.ANT_OPTS}</echo>
 	</target>
 
 	<target name="prepare-test-bundle">
+		<setup-libs />
+
 		<if>
 			<not>
 				<isset property="app.server.name" />
@@ -7925,8 +7979,6 @@ ANT_OPTS=${env.ANT_OPTS}</echo>
 				/>
 
 				<delete dir="dist" />
-
-				<ant antfile="build.xml" inheritAll="false" target="deploy-additional-jars" />
 
 				<ant antfile="build.xml" inheritAll="false" target="update-app-server-scripts" />
 
@@ -8427,6 +8479,8 @@ if (ppstate.equals("normal")) {
 	</target>
 
 	<target name="record-test-case-method-names">
+		<setup-libs />
+
 		<delete failonerror="false" file="${test.ext.properties.file}" />
 
 		<if>
@@ -8502,6 +8556,8 @@ if (ppstate.equals("normal")) {
 	</target>
 
 	<target name="record-test-generated-properties">
+		<setup-libs />
+
 		<delete failonerror="false" file="${test.ext.properties.file}" />
 
 		<if>

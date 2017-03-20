@@ -1,0 +1,32 @@
+<definition>
+	<command name="addImageResolution">
+		<execute function="Click" locator1="Button#PLUS" />
+
+		<execute function="Type" locator1="TextInput#NAME" value1="${imageName}" />
+
+		<execute function="Type" locator1="TextInput#MAX_WIDTH" value1="${maxWidth}" />
+
+		<execute function="Type" locator1="TextInput#MAX_HEIGHT" value1="${maxHeight}" />
+
+		<execute function="AssertClick" locator1="Button#SAVE" value1="Save" />
+	</command>
+
+	<command name="viewImageResolutionTableEntry">
+		<var name="key_imageName" value="${imageName}" />
+
+		<execute function="AssertTextEquals" locator1="AdaptiveMediaTable#NAME" value1="${imageName}" />
+
+		<execute function="AssertTextEquals" locator1="AdaptiveMediaTable#PROGRESS" value1="${percentOptimized}" />
+
+		<execute function="AssertTextEquals" locator1="AdaptiveMediaTable#MAX_WIDTH" value1="${maxWidth}" />
+
+		<execute function="AssertTextEquals" locator1="AdaptiveMediaTable#MAX_HEIGHT" value1="${maxHeight}" />
+	</command>
+
+	<command name="viewImageVariantURL">
+		<var name="key_dmDocumentTitle" value="${dmDocumentTitle}" />
+		<var name="key_imageName" value="${imageName}" />
+
+		<execute function="AssertElementPresent" locator1="AdaptiveMedia#IMAGE_VARIANT_SOURCE_URL" />
+	</command>
+</definition>

@@ -134,7 +134,7 @@ String searchContainerId = ParamUtil.getString(request, "searchContainerId");
 									<liferay-frontend:vertical-card
 										actionJsp='<%= journalDisplayContext.isShowEditActions() ? "/article_action.jsp" : null %>'
 										actionJspServletContext="<%= application %>"
-										imageUrl="<%= articleImageURL %>"
+										imageUrl="<%= HtmlUtil.escape(articleImageURL) %>"
 										onClick="<%= taglibOnClick %>"
 										resultRow="<%= row %>"
 										rowChecker="<%= articleSearchContainer.getRowChecker() %>"

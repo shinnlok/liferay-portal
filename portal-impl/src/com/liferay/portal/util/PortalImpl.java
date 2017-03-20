@@ -74,6 +74,7 @@ import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.ResourcePermission;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.RoleConstants;
+import com.liferay.portal.kernel.model.Team;
 import com.liferay.portal.kernel.model.Theme;
 import com.liferay.portal.kernel.model.Ticket;
 import com.liferay.portal.kernel.model.TicketConstants;
@@ -715,6 +716,13 @@ public class PortalImpl implements Portal {
 			HttpServletRequest request, Portlet portlet)
 		throws PortalException {
 
+		String name = ResourceActionsUtil.getPortletBaseResource(
+			portlet.getRootPortletId());
+
+		if (Validator.isNull(name)) {
+			return;
+		}
+
 		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
@@ -729,7 +737,7 @@ public class PortalImpl implements Portal {
 			groupId = getScopeGroupId(layout, portlet.getPortletId());
 		}
 
-		addRootModelResource(themeDisplay.getCompanyId(), groupId, portlet);
+		addRootModelResource(themeDisplay.getCompanyId(), groupId, name);
 	}
 
 	@Override
@@ -737,9 +745,16 @@ public class PortalImpl implements Portal {
 			long companyId, Layout layout, Portlet portlet)
 		throws PortalException {
 
+		String name = ResourceActionsUtil.getPortletBaseResource(
+			portlet.getRootPortletId());
+
+		if (Validator.isNull(name)) {
+			return;
+		}
+
 		long groupId = getScopeGroupId(layout, portlet.getPortletId());
 
-		addRootModelResource(companyId, groupId, portlet);
+		addRootModelResource(companyId, groupId, name);
 	}
 
 	@Override
@@ -1409,7 +1424,8 @@ public class PortalImpl implements Portal {
 		}
 
 		groupFriendlyURL = getGroupFriendlyURL(
-			layout.getLayoutSet(), themeDisplay, true);
+			layout.getLayoutSet(), themeDisplay, true,
+			layout.isTypeControlPanel());
 
 		return groupFriendlyURL.concat(canonicalLayoutFriendlyURL).concat(
 			parametersURL);
@@ -2390,7 +2406,7 @@ public class PortalImpl implements Portal {
 			LayoutSet layoutSet, ThemeDisplay themeDisplay)
 		throws PortalException {
 
-		return getGroupFriendlyURL(layoutSet, themeDisplay, false);
+		return getGroupFriendlyURL(layoutSet, themeDisplay, false, false);
 	}
 
 	@Override
@@ -2767,7 +2783,8 @@ public class PortalImpl implements Portal {
 		}
 
 		String groupFriendlyURL = getGroupFriendlyURL(
-			layout.getLayoutSet(), themeDisplay, false);
+			layout.getLayoutSet(), themeDisplay, false,
+			layout.isTypeControlPanel());
 
 		return groupFriendlyURL.concat(
 			layout.getFriendlyURL(themeDisplay.getLocale()));
@@ -6029,6 +6046,7 @@ public class PortalImpl implements Portal {
 			"[$CLASS_NAME_ID_COM.LIFERAY.PORTAL.MODEL.LAYOUT$]",
 			"[$CLASS_NAME_ID_COM.LIFERAY.PORTAL.MODEL.ORGANIZATION$]",
 			"[$CLASS_NAME_ID_COM.LIFERAY.PORTAL.MODEL.ROLE$]",
+			"[$CLASS_NAME_ID_COM.LIFERAY.PORTAL.MODEL.TEAM$]",
 			"[$CLASS_NAME_ID_COM.LIFERAY.PORTAL.MODEL.USER$]",
 			"[$CLASS_NAME_ID_COM.LIFERAY.PORTAL.MODEL.USERGROUP$]",
 			"[$CLASS_NAME_ID_COM.LIFERAY.PORTLET.DOCUMENTLIBRARY.MODEL." +
@@ -6060,10 +6078,11 @@ public class PortalImpl implements Portal {
 		Object[] customSqlValues = new Object[] {
 			getClassNameId(Group.class), getClassNameId(Layout.class),
 			getClassNameId(Organization.class), getClassNameId(Role.class),
-			getClassNameId(User.class), getClassNameId(UserGroup.class),
-			getClassNameId(DLFileEntry.class), getClassNameId(DLFolder.class),
-			getClassNameId(MBMessage.class), getClassNameId(MBThread.class),
-			ResourceConstants.SCOPE_COMPANY, ResourceConstants.SCOPE_GROUP,
+			getClassNameId(Team.class), getClassNameId(User.class),
+			getClassNameId(UserGroup.class), getClassNameId(DLFileEntry.class),
+			getClassNameId(DLFolder.class), getClassNameId(MBMessage.class),
+			getClassNameId(MBThread.class), ResourceConstants.SCOPE_COMPANY,
+			ResourceConstants.SCOPE_GROUP,
 			ResourceConstants.SCOPE_GROUP_TEMPLATE,
 			ResourceConstants.SCOPE_INDIVIDUAL,
 			SocialRelationConstants.TYPE_BI_COWORKER,
@@ -7347,6 +7366,11 @@ public class PortalImpl implements Portal {
 		addRootModelResource(companyId, groupId, portlet);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             #addRootModelResource(long, long, String)}
+	 */
+	@Deprecated
 	protected void addRootModelResource(
 			long companyId, long groupId, Portlet portlet)
 		throws PortalException {
@@ -7357,6 +7381,13 @@ public class PortalImpl implements Portal {
 		if (Validator.isNull(name)) {
 			return;
 		}
+
+		addRootModelResource(companyId, groupId, name);
+	}
+
+	protected void addRootModelResource(
+			long companyId, long groupId, String name)
+		throws PortalException {
 
 		Group group = GroupLocalServiceUtil.fetchGroup(groupId);
 
@@ -7716,6 +7747,15 @@ public class PortalImpl implements Portal {
 			boolean canonicalURL)
 		throws PortalException {
 
+		return getGroupFriendlyURL(
+			layoutSet, themeDisplay, canonicalURL, false);
+	}
+
+	protected String getGroupFriendlyURL(
+			LayoutSet layoutSet, ThemeDisplay themeDisplay,
+			boolean canonicalURL, boolean controlPanel)
+		throws PortalException {
+
 		Group group = layoutSet.getGroup();
 
 		boolean privateLayoutSet = layoutSet.getPrivateLayout();
@@ -7761,7 +7801,10 @@ public class PortalImpl implements Portal {
 					canonicalDomain, themeDisplay.getServerPort(),
 					themeDisplay.isSecure());
 
-				if (canonicalURL || canonicalDomain.startsWith(portalDomain)) {
+				if ((canonicalURL ||
+					 canonicalDomain.startsWith(portalDomain)) &&
+					!controlPanel) {
+
 					String path = StringPool.BLANK;
 
 					if (themeDisplay.isWidget()) {

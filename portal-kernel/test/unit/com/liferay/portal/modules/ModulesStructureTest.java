@@ -152,6 +152,9 @@ public class ModulesStructureTest {
 		final String themeGitIgnoreTemplate = StringUtil.read(
 			classLoader,
 			"com/liferay/portal/modules/dependencies/theme_gitignore.tmpl");
+		final String themeNpmIgnoreTemplate = StringUtil.read(
+			classLoader,
+			"com/liferay/portal/modules/dependencies/theme_npmignore.tmpl");
 
 		Files.walkFileTree(
 			_modulesDirPath,
@@ -182,7 +185,9 @@ public class ModulesStructureTest {
 					else if (dirName.startsWith("frontend-theme-") &&
 							 Files.exists(dirPath.resolve("gulpfile.js"))) {
 
-						_testThemeIgnoreFiles(dirPath, themeGitIgnoreTemplate);
+						_testThemeIgnoreFiles(
+							dirPath, themeGitIgnoreTemplate,
+							themeNpmIgnoreTemplate);
 					}
 
 					return FileVisitResult.CONTINUE;
@@ -581,6 +586,12 @@ public class ModulesStructureTest {
 			String gitAttributesTemplate, String settingsGradleTemplate)
 		throws IOException {
 
+		for (String fileName : _GRADLE_WRAPPER_FILE_NAMES) {
+			Path path = dirPath.resolve(fileName);
+
+			Assert.assertFalse("Forbidden " + path, Files.exists(path));
+		}
+
 		Path buildGradlePath = dirPath.resolve("build.gradle");
 		Path gradlePropertiesPath = dirPath.resolve("gradle.properties");
 		Path settingsGradlePath = dirPath.resolve("settings.gradle");
@@ -726,7 +737,8 @@ public class ModulesStructureTest {
 			"Missing " + gulpfileJsPath, Files.exists(gulpfileJsPath));
 	}
 
-	private void _testThemeIgnoreFiles(Path dirPath, String gitIgnoreTemplate)
+	private void _testThemeIgnoreFiles(
+			Path dirPath, String gitIgnoreTemplate, String npmIgnoreTemplate)
 		throws IOException {
 
 		Path resourcesImporterDirPath = dirPath.resolve("resources-importer");
@@ -746,6 +758,15 @@ public class ModulesStructureTest {
 
 		Assert.assertEquals(
 			"Incorrect " + gitIgnorePath, gitIgnoreTemplate, gitIgnore);
+
+		if (!dirPath.startsWith("private")) {
+			Path npmIgnorePath = dirPath.resolve(".npmignore");
+
+			String npmIgnore = _read(npmIgnorePath);
+
+			Assert.assertEquals(
+				"Incorrect " + npmIgnorePath, npmIgnoreTemplate, npmIgnore);
+		}
 	}
 
 	private static final String _APP_BUILD_GRADLE =
@@ -761,6 +782,10 @@ public class ModulesStructureTest {
 
 	private static final String _GIT_REPO_GRADLE_PROJECT_PATH_PREFIX_KEY =
 		"project.path.prefix";
+
+	private static final String[] _GRADLE_WRAPPER_FILE_NAMES = {
+		"gradle", "gradlew", "gradlew.bat"
+	};
 
 	private static final String _SOURCE_FORMATTER_IGNORE_FILE_NAME =
 		"source_formatter.ignore";

@@ -398,12 +398,23 @@
 			<var name="webContentTitle" value="WC WebContent Title" />
 		</execute>
 
-		<execute macro="WebContent#addTranslation">
-			<var name="localizedLanguage" value="Spanish (Spain)" />
-			<var name="localizedText" value="Text Spanish" />
-			<var name="localizedTextBox" value="Text Box Spanish" />
-			<var name="localizedTitle" value="Title Spanish" />
-			<var name="webContentTitle" value="WC WebContent Title" />
+		<execute macro="WebContent#addLocale">
+			<var name="language" value="Spanish (Spain)" />
+			<var name="locale" value="es-ES" />
+		</execute>
+
+		<execute macro="WebContent#addCP">
+			<var name="webContentTitle" value="Title Spanish" />
+		</execute>
+
+		<execute macro="FormFields#editText">
+			<var name="fieldName" value="Text" />
+			<var name="fieldValue" value="Text Spanish" />
+		</execute>
+
+		<execute macro="FormFields#editTextMultiline">
+			<var name="fieldName" value="TextBox" />
+			<var name="fieldValue" value="Text Box Spanish" />
 		</execute>
 
 		<execute macro="PortletEntry#publish" />
@@ -623,9 +634,7 @@
 		</execute>
 	</command>
 
-	<command name="AddWebContent" priority="5">
-		<property name="portal.acceptance" value="true" />
-
+	<command name="AddWebContent" priority="4">
 		<execute macro="Navigator#openURL" />
 
 		<execute macro="ProductMenu#gotoSitesContent">
@@ -1248,6 +1257,54 @@
 		<execute macro="Alert#viewExpireContentFailedMessage" />
 	</command>
 
+	<command name="CompareWebContentVersionsHistory" priority="4">
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Web Content" />
+		</execute>
+
+		<execute macro="WebContentNavigator#gotoAddCP" />
+
+		<execute macro="WebContent#addCP">
+			<var name="webContentContent" value="WC WebContent Content" />
+			<var name="webContentTitle" value="WC WebContent Title" />
+		</execute>
+
+		<execute macro="PortletEntry#publish" />
+
+		<execute macro="WebContent#viewTitle">
+			<var name="webContentTitle" value="WC WebContent Title" />
+		</execute>
+
+		<execute macro="WebContentNavigator#gotoEditCP">
+			<var name="webContentTitle" value="WC WebContent Title" />
+		</execute>
+
+		<execute macro="WebContent#editCP">
+			<var name="webContentContentEdit" value="WC WebContent New Content" />
+			<var name="webContentTitle" value="WC WebContent Title" />
+			<var name="webContentTitleEdit" value="WC WebContent New Title" />
+		</execute>
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Web Content" />
+		</execute>
+
+		<execute macro="LexiconEntry#gotoEntryMenuItem">
+			<var name="menuItem" value="View History" />
+			<var name="rowEntry" value="WC WebContent New Title" />
+		</execute>
+
+		<execute macro="LexiconEntry#gotoEntryMenuItem">
+			<var name="menuItem" value="Compare to..." />
+			<var name="rowEntry" value="WC WebContent Title" />
+		</execute>
+
+		<execute macro="WebContent#viewCompareVersions">
+			<var name="newContent" value="WC WebContent New Content" />
+			<var name="version" value="1.1" />
+		</execute>
+	</command>
+
 	<command name="DeleteWebContent" priority="5">
 		<property name="portal.acceptance" value="true" />
 
@@ -1334,6 +1391,8 @@
 		<execute macro="WebContentStructures#saveCP">
 			<var name="structureName" value="Basic Web Content Edit" />
 		</execute>
+
+		<execute macro="Navigator#openURL" />
 
 		<execute macro="ProductMenu#gotoSitesContent">
 			<var name="portlet" value="Web Content" />
@@ -1496,11 +1555,14 @@
 			<var name="webContentTitle" value="WC WebContent Title" />
 		</execute>
 
-		<execute macro="WebContent#addTranslation">
-			<var name="localizedContent" value="WC Contenido de la web Contenido" />
-			<var name="localizedLanguage" value="Spanish (Spain)" />
-			<var name="localizedTitle" value="WC Contenido de la web Titulo" />
-			<var name="webContentTitle" value="WC WebContent Title" />
+		<execute macro="WebContent#addLocale">
+			<var name="language" value="Spanish (Spain)" />
+			<var name="locale" value="es-ES" />
+		</execute>
+
+		<execute macro="WebContent#addCP">
+			<var name="webContentContent" value="WC Contenido de la web Contenido" />
+			<var name="webContentTitle" value="WC Contenido de la web Titulo" />
 		</execute>
 
 		<execute macro="PortletEntry#publish" />
@@ -1514,11 +1576,13 @@
 			<var name="webContentTitle" value="WC WebContent Title" />
 		</execute>
 
-		<execute macro="WebContent#viewTranslation">
-			<var name="localizedContent" value="WC Contenido de la web Contenido" />
-			<var name="localizedLanguage" value="Spanish (Spain)" />
-			<var name="localizedTitle" value="WC Contenido de la web Titulo" />
-			<var name="webContentTitle" value="WC WebContent Title" />
+		<execute macro="WebContent#selectLocale">
+			<var name="locale" value="es-ES" />
+		</execute>
+
+		<execute macro="WebContent#viewCP">
+			<var name="webContentContent" value="WC Contenido de la web Contenido" />
+			<var name="webContentTitle" value="WC Contenido de la web Titulo" />
 		</execute>
 	</command>
 
