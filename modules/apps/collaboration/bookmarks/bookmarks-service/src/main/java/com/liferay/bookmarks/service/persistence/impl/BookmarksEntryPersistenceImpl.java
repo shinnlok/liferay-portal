@@ -14,8 +14,6 @@
 
 package com.liferay.bookmarks.service.persistence.impl;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.bookmarks.exception.NoSuchEntryException;
 import com.liferay.bookmarks.model.BookmarksEntry;
 import com.liferay.bookmarks.model.impl.BookmarksEntryImpl;
@@ -72,7 +70,6 @@ import java.util.Set;
  * @see com.liferay.bookmarks.service.persistence.BookmarksEntryUtil
  * @generated
  */
-@ProviderType
 public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<BookmarksEntry>
 	implements BookmarksEntryPersistence {
 	/*

@@ -14,8 +14,6 @@
 
 package com.liferay.bookmarks.service.persistence.impl;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.bookmarks.exception.NoSuchFolderException;
 import com.liferay.bookmarks.model.BookmarksFolder;
 import com.liferay.bookmarks.model.impl.BookmarksFolderImpl;
@@ -69,7 +67,6 @@ import java.util.Set;
  * @see com.liferay.bookmarks.service.persistence.BookmarksFolderUtil
  * @generated
  */
-@ProviderType
 public class BookmarksFolderPersistenceImpl extends BasePersistenceImpl<BookmarksFolder>
 	implements BookmarksFolderPersistence {
 	/*

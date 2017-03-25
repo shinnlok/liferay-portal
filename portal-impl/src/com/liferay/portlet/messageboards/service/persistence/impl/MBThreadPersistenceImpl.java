@@ -14,8 +14,6 @@
 
 package com.liferay.portlet.messageboards.service.persistence.impl;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.message.boards.kernel.exception.NoSuchThreadException;
 import com.liferay.message.boards.kernel.model.MBThread;
 import com.liferay.message.boards.kernel.service.persistence.MBThreadPersistence;
@@ -78,7 +76,6 @@ import java.util.Set;
  * @see com.liferay.message.boards.kernel.service.persistence.MBThreadUtil
  * @generated
  */
-@ProviderType
 public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 	implements MBThreadPersistence {
 	/*

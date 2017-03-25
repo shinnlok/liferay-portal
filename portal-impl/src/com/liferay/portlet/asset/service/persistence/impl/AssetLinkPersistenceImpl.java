@@ -14,8 +14,6 @@
 
 package com.liferay.portlet.asset.service.persistence.impl;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.asset.kernel.exception.NoSuchLinkException;
 import com.liferay.asset.kernel.model.AssetLink;
 import com.liferay.asset.kernel.service.persistence.AssetLinkPersistence;
@@ -65,7 +63,6 @@ import java.util.Set;
  * @see com.liferay.asset.kernel.service.persistence.AssetLinkUtil
  * @generated
  */
-@ProviderType
 public class AssetLinkPersistenceImpl extends BasePersistenceImpl<AssetLink>
 	implements AssetLinkPersistence {
 	/*

@@ -14,8 +14,6 @@
 
 package com.liferay.portlet.asset.service.persistence.impl;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.asset.kernel.exception.NoSuchVocabularyException;
 import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.asset.kernel.service.persistence.AssetVocabularyPersistence;
@@ -77,7 +75,6 @@ import java.util.Set;
  * @see com.liferay.asset.kernel.service.persistence.AssetVocabularyUtil
  * @generated
  */
-@ProviderType
 public class AssetVocabularyPersistenceImpl extends BasePersistenceImpl<AssetVocabulary>
 	implements AssetVocabularyPersistence {
 	/*

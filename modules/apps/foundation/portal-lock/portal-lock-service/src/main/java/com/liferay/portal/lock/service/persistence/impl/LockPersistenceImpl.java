@@ -14,8 +14,6 @@
 
 package com.liferay.portal.lock.service.persistence.impl;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -67,7 +65,6 @@ import java.util.Set;
  * @see com.liferay.portal.lock.service.persistence.LockUtil
  * @generated
  */
-@ProviderType
 public class LockPersistenceImpl extends BasePersistenceImpl<Lock>
 	implements LockPersistence {
 	/*
