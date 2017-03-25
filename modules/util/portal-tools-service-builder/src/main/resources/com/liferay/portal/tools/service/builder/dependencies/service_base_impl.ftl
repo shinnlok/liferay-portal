@@ -1,7 +1,5 @@
 package ${packagePath}.service.base;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.exportimport.kernel.lar.ExportImportHelperUtil;
 import com.liferay.exportimport.kernel.lar.ManifestSummary;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
@@ -105,7 +103,6 @@ import ${apiPackagePath}.service.${entity.name}${sessionTypeName}Service;
 	@Deprecated
 </#if>
 
-	@ProviderType
 	public abstract class ${entity.name}LocalServiceBaseImpl extends BaseLocalServiceImpl implements ${entity.name}LocalService, IdentifiableOSGiService {
 
 		/*
