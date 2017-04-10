@@ -42,6 +42,8 @@ import com.liferay.sync.util.SyncUtil;
 import java.util.Date;
 import java.util.List;
 
+import org.osgi.service.component.annotations.Reference;
+
 /**
  * @author Michael Young
  * @author Dennis Ju
@@ -393,7 +395,7 @@ public class SyncDLObjectLocalServiceImpl
 
 					if (!type.equals(SyncDLObjectConstants.TYPE_FOLDER)) {
 						syncDLObject.setLanTokenKey(
-							SyncUtil.getLanTokenKey(
+							_syncUtil.getLanTokenKey(
 								parentSyncDLObject.getModifiedTime(),
 								syncDLObject.getTypePK(), false));
 					}
@@ -463,5 +465,8 @@ public class SyncDLObjectLocalServiceImpl
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		SyncDLObjectLocalServiceImpl.class);
+
+	@Reference
+	private SyncUtil _syncUtil;
 
 }
