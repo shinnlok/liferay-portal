@@ -64,6 +64,7 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.comparator.GroupNameComparator;
 import com.liferay.portal.kernel.zip.ZipReader;
 import com.liferay.portal.kernel.zip.ZipReaderFactoryUtil;
+import com.liferay.portal.spring.extender.service.ServiceReference;
 import com.liferay.sync.constants.SyncConstants;
 import com.liferay.sync.constants.SyncDLObjectConstants;
 import com.liferay.sync.constants.SyncDeviceConstants;
@@ -98,7 +99,6 @@ import jodd.util.NameValue;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Michael Young
@@ -1678,7 +1678,7 @@ public class SyncDLObjectServiceImpl extends SyncDLObjectServiceBaseImpl {
 	private static final Log _log = LogFactoryUtil.getLog(
 		SyncDLObjectServiceImpl.class);
 
-	@Reference
+	@ServiceReference(type = SyncUtil.class)
 	private SyncUtil _syncUtil;
 
 }

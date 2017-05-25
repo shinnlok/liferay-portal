@@ -717,34 +717,22 @@ public class SyncUtil {
 		throw new PortalException("Folder must be an instance of DLFolder");
 	}
 
-	@Reference(unbind = "-")
-	protected void setDLFileVersionLocalService(
-		DLFileVersionLocalService dlFileVersionLocalService) {
-
-		_dlFileVersionLocalService = dlFileVersionLocalService;
-	}
-
-	@Reference(unbind = "-")
-	protected void setGroupLocalService(GroupLocalService groupLocalService) {
-		_groupLocalService = groupLocalService;
-	}
-
-	@Reference(unbind = "-")
-	protected void setSyncDLObjectLocalService(
-		SyncDLObjectLocalService syncDLObjectLocalService) {
-
-		_syncDLObjectLocalService = syncDLObjectLocalService;
-	}
-
 	private static final Log _log = LogFactoryUtil.getLog(SyncUtil.class);
 
 	private static final Map<String, String> _checksums =
 		new ConcurrentHashMap<>();
+
+	@Reference
 	private static DLFileVersionLocalService _dlFileVersionLocalService;
+
+	@Reference
 	private static GroupLocalService _groupLocalService;
+
 	private static final Map<String, String> _lanTokenKeys =
 		new ConcurrentHashMap<>();
 	private static final Provider _provider = new BouncyCastleProvider();
+
+	@Reference
 	private static SyncDLObjectLocalService _syncDLObjectLocalService;
 
 }
