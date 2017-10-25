@@ -22,6 +22,8 @@ import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
+import com.liferay.portal.kernel.service.ExceptionRetryAcceptor;
+import com.liferay.portal.kernel.spring.aop.Retry;
 
 import java.util.List;
 
@@ -32,6 +34,15 @@ public class DLSyncEventLocalServiceImpl
 	extends DLSyncEventLocalServiceBaseImpl {
 
 	@Override
+	@Retry(
+		acceptor = ExceptionRetryAcceptor.class,
+		properties = {
+			@com.liferay.portal.kernel.spring.aop.Property(
+				name = ExceptionRetryAcceptor.EXCEPTION_NAME,
+				value = "org.hibernate.exception.LockAcquisitionException"
+			)
+		}
+	)
 	public DLSyncEvent addDLSyncEvent(String event, String type, long typePK) {
 		DLSyncEvent dlSyncEvent = dlSyncEventPersistence.fetchByTypePK(typePK);
 
