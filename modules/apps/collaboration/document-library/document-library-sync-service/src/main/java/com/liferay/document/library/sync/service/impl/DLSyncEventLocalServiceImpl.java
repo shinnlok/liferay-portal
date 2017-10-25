@@ -33,19 +33,14 @@ public class DLSyncEventLocalServiceImpl
 
 	@Override
 	public DLSyncEvent addDLSyncEvent(String event, String type, long typePK) {
-		DLSyncEvent dlSyncEvent = dlSyncEventPersistence.fetchByTypePK(typePK);
+		long dlSyncEventId = counterLocalService.increment();
 
-		if (dlSyncEvent == null) {
-			long dlSyncEventId = counterLocalService.increment();
-
-			dlSyncEvent = dlSyncEventPersistence.create(dlSyncEventId);
-
-			dlSyncEvent.setType(type);
-			dlSyncEvent.setTypePK(typePK);
-		}
+		DLSyncEvent dlSyncEvent = dlSyncEventPersistence.create(dlSyncEventId);
 
 		dlSyncEvent.setModifiedTime(System.currentTimeMillis());
 		dlSyncEvent.setEvent(event);
+		dlSyncEvent.setType(type);
+		dlSyncEvent.setTypePK(typePK);
 
 		return dlSyncEventPersistence.update(dlSyncEvent);
 	}
