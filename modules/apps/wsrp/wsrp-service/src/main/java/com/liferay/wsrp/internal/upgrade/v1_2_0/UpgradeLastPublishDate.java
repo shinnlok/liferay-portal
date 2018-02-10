@@ -14,28 +14,31 @@
 
 package com.liferay.wsrp.internal.upgrade.v1_2_0;
 
-import com.liferay.portal.kernel.upgrade.BaseUpgradeLastPublishDate;
+import com.liferay.portal.kernel.util.LoggingTimer;
+import com.liferay.wsrp.constants.WSRPPortletKeys;
 
 /**
  * @author Mate Thurzo
  */
-public class UpgradeLastPublishDate extends BaseUpgradeLastPublishDate {
+public class UpgradeLastPublishDate
+	extends com.liferay.portal.upgrade.v7_0_0.UpgradeLastPublishDate {
+
+	protected void addLastPublishDateColumns() throws Exception {
+		try (LoggingTimer loggingTimer = new LoggingTimer()) {
+			addLastPublishDateColumn("WSRP_WSRPConsumerPortlet");
+			addLastPublishDateColumn("WSRP_WSRPConsumer");
+			addLastPublishDateColumn("WSRP_WSRPProducer");
+		}
+	}
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		runSQL(
-			"alter table WSRP_WSRPConsumerPortlet add lastPublishDate DATE " +
-				"null");
+		addLastPublishDateColumns();
 
-		updateLastPublishDates("1_WAR_wsrpportlet", "WSRP_WSRPConsumerPortlet");
-
-		runSQL("alter table WSRP_WSRPConsumer add lastPublishDate DATE null");
-
-		updateLastPublishDates("1_WAR_wsrpportlet", "WSRP_WSRPConsumer");
-
-		runSQL("alter table WSRP_WSRPProducer add lastPublishDate DATE null");
-
-		updateLastPublishDates("1_WAR_wsrpportlet", "WSRP_WSRPProducer");
+		updateLastPublishDates(
+			WSRPPortletKeys.WSRP_ADMIN, "WSRP_WSRPConsumerPortlet");
+		updateLastPublishDates(WSRPPortletKeys.WSRP_ADMIN, "WSRP_WSRPConsumer");
+		updateLastPublishDates(WSRPPortletKeys.WSRP_ADMIN, "WSRP_WSRPProducer");
 	}
 
 }
