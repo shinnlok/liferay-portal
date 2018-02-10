@@ -19,9 +19,7 @@ import com.liferay.portal.kernel.upgrade.DummyUpgradeStep;
 import com.liferay.portal.kernel.upgrade.UpgradeException;
 import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
 import com.liferay.portal.upgrade.release.BaseUpgradeServiceModuleRelease;
-import com.liferay.portal.upgrade.release.BaseUpgradeWebModuleRelease;
 import com.liferay.wsrp.internal.upgrade.v1_0_0.UpgradeLastPublishDate;
-import com.liferay.wsrp.internal.upgrade.v1_0_0.UpgradePortletId;
 import com.liferay.wsrp.internal.upgrade.v1_0_0.UpgradeUuid;
 import com.liferay.wsrp.internal.upgrade.v1_0_0.UpgradeWSRP;
 
@@ -63,33 +61,8 @@ public class WSRPServiceUpgrade implements UpgradeStepRegistrator {
 			throw new RuntimeException(ue);
 		}
 
-		BaseUpgradeWebModuleRelease upgradeWebModuleRelease =
-			new BaseUpgradeWebModuleRelease() {
-
-				@Override
-				protected String getBundleSymbolicName() {
-					return "com.liferay.wsrp.web";
-				}
-
-				@Override
-				protected String[] getPortletIds() {
-					return new String[] {"2_WAR_wsrpportlet"};
-				}
-
-			};
-
-		try {
-			upgradeWebModuleRelease.upgrade();
-		}
-		catch (UpgradeException ue) {
-			throw new RuntimeException(ue);
-		}
-
 		registry.register(
 			"com.liferay.wsrp.web", "0.0.0", "1.0.0", new DummyUpgradeStep());
-
-		registry.register(
-			"com.liferay.wsrp.web", "0.0.1", "0.0.2", new UpgradePortletId());
 
 		registry.register(
 			"com.liferay.wsrp.web", "0.0.2", "0.0.3",
