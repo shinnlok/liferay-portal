@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.upgrade.DummyUpgradeStep;
 import com.liferay.portal.kernel.upgrade.UpgradeException;
 import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
+import com.liferay.portal.upgrade.release.BaseUpgradeServiceModuleRelease;
 import com.liferay.portal.upgrade.release.BaseUpgradeWebModuleRelease;
 import com.liferay.wsrp.internal.upgrade.v1_0_0.UpgradeLastPublishDate;
 import com.liferay.wsrp.internal.upgrade.v1_0_0.UpgradePortletId;
@@ -35,45 +36,32 @@ public class WSRPServiceUpgrade implements UpgradeStepRegistrator {
 
 	@Override
 	public void register(Registry registry) {
-		registry.register(
-			"com.liferay.wsrp.service", "1.0.0", "1.0.11",
-			new DummyUpgradeStep());
+		BaseUpgradeServiceModuleRelease upgradeServiceModuleRelease =
+			new BaseUpgradeServiceModuleRelease() {
 
-		registry.register(
-			"com.liferay.wsrp.service", "1.0.2", "1.0.11",
-			new DummyUpgradeStep());
+				@Override
+				protected String getNamespace() {
+					return "WSRP";
+				}
 
-		registry.register(
-			"com.liferay.wsrp.service", "1.0.3", "1.0.11",
-			new DummyUpgradeStep());
+				@Override
+				protected String getNewBundleSymbolicName() {
+					return "com.liferay.wsrp.service";
+				}
 
-		registry.register(
-			"com.liferay.wsrp.service", "1.0.4", "1.0.11",
-			new DummyUpgradeStep());
+				@Override
+				protected String getOldBundleSymbolicName() {
+					return "wsrp-portlet";
+				}
 
-		registry.register(
-			"com.liferay.wsrp.service", "1.0.5", "1.0.11",
-			new DummyUpgradeStep());
+			};
 
-		registry.register(
-			"com.liferay.wsrp.service", "1.0.6", "1.0.11",
-			new DummyUpgradeStep());
-
-		registry.register(
-			"com.liferay.wsrp.service", "1.0.7", "1.0.11",
-			new DummyUpgradeStep());
-
-		registry.register(
-			"com.liferay.wsrp.service", "1.0.8", "1.0.11",
-			new DummyUpgradeStep());
-
-		registry.register(
-			"com.liferay.wsrp.service", "1.0.9", "1.0.11",
-			new DummyUpgradeStep());
-
-		registry.register(
-			"com.liferay.wsrp.service", "1.0.10", "1.0.11",
-			new DummyUpgradeStep());
+		try {
+			upgradeServiceModuleRelease.upgrade();
+		}
+		catch (UpgradeException ue) {
+			throw new RuntimeException(ue);
+		}
 
 		BaseUpgradeWebModuleRelease upgradeWebModuleRelease =
 			new BaseUpgradeWebModuleRelease() {
