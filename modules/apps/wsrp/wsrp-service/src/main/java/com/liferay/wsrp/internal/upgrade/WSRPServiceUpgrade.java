@@ -15,9 +15,7 @@
 package com.liferay.wsrp.internal.upgrade;
 
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
-import com.liferay.portal.kernel.upgrade.UpgradeException;
 import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
-import com.liferay.portal.upgrade.release.BaseUpgradeServiceModuleRelease;
 import com.liferay.wsrp.internal.upgrade.v1_0_0.UpgradeWSRP;
 import com.liferay.wsrp.internal.upgrade.v1_1_0.UpgradeUuid;
 import com.liferay.wsrp.internal.upgrade.v1_2_0.UpgradeLastPublishDate;
@@ -33,33 +31,6 @@ public class WSRPServiceUpgrade implements UpgradeStepRegistrator {
 
 	@Override
 	public void register(Registry registry) {
-		BaseUpgradeServiceModuleRelease upgradeServiceModuleRelease =
-			new BaseUpgradeServiceModuleRelease() {
-
-				@Override
-				protected String getNamespace() {
-					return "WSRP";
-				}
-
-				@Override
-				protected String getNewBundleSymbolicName() {
-					return "com.liferay.wsrp.service";
-				}
-
-				@Override
-				protected String getOldBundleSymbolicName() {
-					return "wsrp-portlet";
-				}
-
-			};
-
-		try {
-			upgradeServiceModuleRelease.upgrade();
-		}
-		catch (UpgradeException ue) {
-			throw new RuntimeException(ue);
-		}
-
 		registry.register(
 			"com.liferay.wsrp.service", "0.0.1", "1.0.0", new UpgradeWSRP());
 
