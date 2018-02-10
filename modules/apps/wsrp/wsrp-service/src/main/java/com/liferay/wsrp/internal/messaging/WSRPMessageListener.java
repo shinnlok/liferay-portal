@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.DestinationNames;
 import com.liferay.portal.kernel.messaging.HotDeployMessageListener;
 import com.liferay.portal.kernel.messaging.MessageListener;
+import com.liferay.portal.kernel.model.Release;
 import com.liferay.wsrp.internal.jmx.WSRPConsumerPortletManager;
 import com.liferay.wsrp.internal.util.ExtensionHelperUtil;
 import com.liferay.wsrp.service.WSRPConsumerPortletLocalService;
@@ -135,6 +136,13 @@ public class WSRPMessageListener extends HotDeployMessageListener {
 			MBeanServer mBeanServer) {
 		}
 
+	}
+
+	@Reference(
+		target = "(&(release.bundle.symbolic.name=com.liferay.wsrp.service)(release.schema.version=1.2.0))",
+		unbind = "-"
+	)
+	protected void setRelease(Release release) {
 	}
 
 }
