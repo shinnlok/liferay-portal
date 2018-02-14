@@ -21,7 +21,8 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.DestinationNames;
 import com.liferay.portal.kernel.messaging.HotDeployMessageListener;
 import com.liferay.portal.kernel.messaging.MessageListener;
-import com.liferay.portal.kernel.model.Release;
+import com.liferay.portal.kernel.model.Portlet;
+import com.liferay.wsrp.constants.WSRPPortletKeys;
 import com.liferay.wsrp.internal.jmx.WSRPConsumerPortletManager;
 import com.liferay.wsrp.internal.util.ExtensionHelperUtil;
 import com.liferay.wsrp.service.WSRPConsumerPortletLocalService;
@@ -48,10 +49,6 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 )
 public class WSRPMessageListener extends HotDeployMessageListener {
 
-	public void destroy() {
-		_serviceTracker.close();
-	}
-
 	@Activate
 	protected void activate(BundleContext bundleContext) {
 		_bundleContext = bundleContext;
@@ -65,7 +62,7 @@ public class WSRPMessageListener extends HotDeployMessageListener {
 		ExtensionHelperUtil.initialize();
 
 		try {
-			_wSRPConsumerPortletLocalService.destroyWSRPConsumerPortlets();
+			_wsrpConsumerPortletLocalService.destroyWSRPConsumerPortlets();
 		}
 		catch (PortalException pe) {
 			if (_log.isWarnEnabled()) {
@@ -73,19 +70,37 @@ public class WSRPMessageListener extends HotDeployMessageListener {
 			}
 		}
 
-		_wSRPConsumerPortletLocalService.initWSRPConsumerPortlets();
+		Thread thread = new Thread() {
+
+			@Override
+			public void run() {
+				_wsrpConsumerPortletLocalService.initWSRPConsumerPortlets();
+			}
+
+		};
+
+		thread.start();
 	}
 
 	@Deactivate
-	protected void deactivate(BundleContext bundleContext) {
+	protected void deactivate() {
 		try {
-			_wSRPConsumerPortletLocalService.destroyWSRPConsumerPortlets();
+			_wsrpConsumerPortletLocalService.destroyWSRPConsumerPortlets();
 		}
 		catch (PortalException pe) {
 			if (_log.isWarnEnabled()) {
 				_log.warn("Unable to destroy WSRP consumer portlets", pe);
 			}
 		}
+
+		_serviceTracker.close();
+	}
+
+	@Reference(
+		target = "(javax.portlet.name=" + WSRPPortletKeys.WSRP_CONSUMER + ")",
+		unbind = "-"
+	)
+	protected void setPortlet(Portlet portlet) {
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -95,7 +110,7 @@ public class WSRPMessageListener extends HotDeployMessageListener {
 	private ServiceTracker<MBeanServer, MBeanServer> _serviceTracker;
 
 	@Reference
-	private WSRPConsumerPortletLocalService _wSRPConsumerPortletLocalService;
+	private WSRPConsumerPortletLocalService _wsrpConsumerPortletLocalService;
 
 	private class MBeanServerServiceTrackerCustomizer
 		implements ServiceTrackerCustomizer<MBeanServer, MBeanServer> {
@@ -136,13 +151,6 @@ public class WSRPMessageListener extends HotDeployMessageListener {
 			MBeanServer mBeanServer) {
 		}
 
-	}
-
-	@Reference(
-		target = "(&(release.bundle.symbolic.name=com.liferay.wsrp.service)(release.schema.version=1.2.0))",
-		unbind = "-"
-	)
-	protected void setRelease(Release release) {
 	}
 
 }
