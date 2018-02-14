@@ -18,9 +18,6 @@ import com.liferay.osgi.util.ServiceTrackerFactory;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.messaging.DestinationNames;
-import com.liferay.portal.kernel.messaging.HotDeployMessageListener;
-import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.wsrp.constants.WSRPPortletKeys;
 import com.liferay.wsrp.internal.jmx.WSRPConsumerPortletManager;
@@ -43,11 +40,8 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
  * @author Shuyang Zhou
  * @author Peter Fellwock
  */
-@Component(
-	immediate = true, property = {"destination.name=" + DestinationNames.WSRP},
-	service = MessageListener.class
-)
-public class WSRPMessageListener extends HotDeployMessageListener {
+@Component(immediate = true)
+public class WSRPActivator {
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
@@ -70,14 +64,8 @@ public class WSRPMessageListener extends HotDeployMessageListener {
 			}
 		}
 
-		Thread thread = new Thread() {
-
-			@Override
-			public void run() {
-				_wsrpConsumerPortletLocalService.initWSRPConsumerPortlets();
-			}
-
-		};
+		Thread thread = new Thread(
+			() -> _wsrpConsumerPortletLocalService.initWSRPConsumerPortlets());
 
 		thread.start();
 	}
@@ -103,8 +91,7 @@ public class WSRPMessageListener extends HotDeployMessageListener {
 	protected void setPortlet(Portlet portlet) {
 	}
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		WSRPMessageListener.class);
+	private static final Log _log = LogFactoryUtil.getLog(WSRPActivator.class);
 
 	private BundleContext _bundleContext;
 	private ServiceTracker<MBeanServer, MBeanServer> _serviceTracker;
