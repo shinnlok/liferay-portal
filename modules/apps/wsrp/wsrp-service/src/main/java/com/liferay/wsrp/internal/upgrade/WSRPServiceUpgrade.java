@@ -18,7 +18,6 @@ import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
 import com.liferay.wsrp.internal.upgrade.v1_1_0.UpgradeUuid;
 import com.liferay.wsrp.internal.upgrade.v1_2_0.UpgradeLastPublishDate;
-import com.liferay.wsrp.internal.upgrade.v1_2_0.UpgradeWSRP;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -40,7 +39,8 @@ public class WSRPServiceUpgrade implements UpgradeStepRegistrator {
 
 		registry.register(
 			"com.liferay.wsrp.service", "1.1.0", "1.2.0",
-			new UpgradeLastPublishDate(), new UpgradeWSRP());
+			new UpgradeLastPublishDate(),
+			new com.liferay.wsrp.internal.upgrade.v1_2_0.UpgradeWSRP());
 	}
 
 	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED)
