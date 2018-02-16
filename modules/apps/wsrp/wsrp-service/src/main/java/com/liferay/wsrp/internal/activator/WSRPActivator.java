@@ -12,27 +12,36 @@
  * details.
  */
 
-package com.liferay.wsrp.internal.messaging;
+package com.liferay.wsrp.internal.activator;
 
 import com.liferay.osgi.util.ServiceTrackerFactory;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Portlet;
+import com.liferay.portal.kernel.servlet.PortletServlet;
+import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.wsrp.constants.WSRPPortletKeys;
 import com.liferay.wsrp.internal.jmx.WSRPConsumerPortletManager;
 import com.liferay.wsrp.internal.util.ExtensionHelperUtil;
 import com.liferay.wsrp.service.WSRPConsumerPortletLocalService;
 
+import java.util.Dictionary;
+
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
+import javax.servlet.Servlet;
+
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.http.whiteboard.HttpWhiteboardConstants;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
@@ -68,10 +77,31 @@ public class WSRPActivator {
 			() -> _wsrpConsumerPortletLocalService.initWSRPConsumerPortlets());
 
 		thread.start();
+
+		createPortletServlet();
+	}
+
+	protected void createPortletServlet() {
+		Dictionary<String, Object> properties = new HashMapDictionary<>();
+
+		properties.put(
+			HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT,
+			"(osgi.http.whiteboard.context.name=wsrp-service)");
+		properties.put(
+			HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_NAME,
+			PortletServlet.class.getName());
+		properties.put(
+			HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_PATTERN,
+			StringPool.FORWARD_SLASH + WSRPPortletKeys.WSRP_CONSUMER + "/*");
+
+		_servletServiceRegistration = _bundleContext.registerService(
+			Servlet.class, new PortletServlet() {}, properties);
 	}
 
 	@Deactivate
 	protected void deactivate() {
+		_servletServiceRegistration.unregister();
+
 		try {
 			_wsrpConsumerPortletLocalService.destroyWSRPConsumerPortlets();
 		}
@@ -95,6 +125,7 @@ public class WSRPActivator {
 
 	private BundleContext _bundleContext;
 	private ServiceTracker<MBeanServer, MBeanServer> _serviceTracker;
+	private ServiceRegistration<Servlet> _servletServiceRegistration;
 
 	@Reference
 	private WSRPConsumerPortletLocalService _wsrpConsumerPortletLocalService;
