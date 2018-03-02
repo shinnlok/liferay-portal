@@ -53,7 +53,6 @@ import com.liferay.portal.kernel.util.TransientValue;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.wsrp.configuration.WSRPGroupServiceConfiguration;
-import com.liferay.wsrp.constants.WSRPPortletKeys;
 import com.liferay.wsrp.internal.axis.WSRPHTTPSender;
 import com.liferay.wsrp.internal.proxy.Stub;
 import com.liferay.wsrp.internal.servlet.ServiceHolder;
@@ -87,7 +86,6 @@ import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.EventRequest;
 import javax.portlet.EventResponse;
-import javax.portlet.Portlet;
 import javax.portlet.PortletConfig;
 import javax.portlet.PortletException;
 import javax.portlet.PortletMode;
@@ -153,7 +151,6 @@ import oasis.names.tc.wsrp.v2.types.UserProfile;
 import org.apache.axis.message.MessageElement;
 
 import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
 
 /**
@@ -161,28 +158,6 @@ import org.osgi.service.component.annotations.Modified;
  * @author Michael Young
  * @author Peter Fellwock
  */
-@Component(
-	immediate = true,
-	property = {
-		"com.liferay.portlet.add-default-resource=true",
-		"com.liferay.portlet.display-category=category.hidden",
-		"com.liferay.portlet.private-request-attributes=false",
-		"com.liferay.portlet.private-session-attributes=false",
-		"com.liferay.portlet.render-weight=50",
-		"com.liferay.portlet.requires-namespaced-parameters=false",
-		"com.liferay.portlet.use-default-template=true",
-		"javax.portlet.display-name=WSRP Consumer",
-		"javax.portlet.expiration-cache=0",
-		"javax.portlet.name=" + WSRPPortletKeys.WSRP_CONSUMER,
-		"javax.portlet.portlet-info.keywords=WSRP Consumer",
-		"javax.portlet.portlet-info.short-title=WSRP Consumer",
-		"javax.portlet.portlet-info.title=WSRP Consumer",
-		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=administrator,guest,power-user,user",
-		"javax.portlet.supports.mime-type=text/html"
-	},
-	service = Portlet.class
-)
 public class ConsumerPortlet extends MVCPortlet {
 
 	public static final String PORTLET_NAME_PREFIX = "WSRP_";

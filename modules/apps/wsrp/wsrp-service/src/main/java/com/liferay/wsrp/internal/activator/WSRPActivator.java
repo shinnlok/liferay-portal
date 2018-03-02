@@ -28,6 +28,7 @@ import com.liferay.wsrp.internal.util.ExtensionHelperUtil;
 import com.liferay.wsrp.service.WSRPConsumerPortletLocalService;
 
 import java.util.Dictionary;
+import java.util.concurrent.FutureTask;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -73,8 +74,18 @@ public class WSRPActivator {
 			}
 		}
 
+		_initConsumerPortletsFutureTask = new FutureTask<>(
+			() -> {
+				_wsrpConsumerPortletLocalService.initWSRPConsumerPortlets();
+
+				return null;
+			});
+
 		Thread thread = new Thread(
-			() -> _wsrpConsumerPortletLocalService.initWSRPConsumerPortlets());
+			_initConsumerPortletsFutureTask,
+			"WSRP Init Consumer Portlets Thread");
+
+		thread.setDaemon(true);
 
 		thread.start();
 
@@ -112,6 +123,8 @@ public class WSRPActivator {
 		}
 
 		_serviceTracker.close();
+
+		_initConsumerPortletsFutureTask.cancel(true);
 	}
 
 	@Reference(
@@ -124,6 +137,7 @@ public class WSRPActivator {
 	private static final Log _log = LogFactoryUtil.getLog(WSRPActivator.class);
 
 	private BundleContext _bundleContext;
+	private FutureTask<Void> _initConsumerPortletsFutureTask;
 	private ServiceTracker<MBeanServer, MBeanServer> _serviceTracker;
 	private ServiceRegistration<Servlet> _servletServiceRegistration;
 
