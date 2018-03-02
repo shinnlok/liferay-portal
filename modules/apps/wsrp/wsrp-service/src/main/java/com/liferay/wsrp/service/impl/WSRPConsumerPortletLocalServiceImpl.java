@@ -45,6 +45,7 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.kernel.xml.Namespace;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.spring.extender.service.ServiceReference;
+import com.liferay.portlet.PortletBagFactory;
 import com.liferay.wsrp.constants.WSRPPortletKeys;
 import com.liferay.wsrp.exception.NoSuchConsumerPortletException;
 import com.liferay.wsrp.exception.WSRPConsumerPortletHandleException;
@@ -598,11 +599,18 @@ public class WSRPConsumerPortletLocalServiceImpl
 
 		_portletsPool.put(wsrpConsumerPortletUuid, portlet);
 
-		PortletBag portletBag = PortletBagPool.get(_CONSUMER_PORTLET_ID);
+		PortletBagFactory portletBagFactory = new PortletBagFactory();
 
-		portletBag = (PortletBag)portletBag.clone();
+		portletBagFactory.setClassLoader(getClassLoader());
 
-		portletBag.setPortletName(portletId);
+		PortletBag rootPortletBag = PortletBagPool.get(_CONSUMER_PORTLET_ID);
+
+		portletBagFactory.setServletContext(rootPortletBag.getServletContext());
+
+		portletBagFactory.setWARFile(false);
+
+		PortletBag portletBag = portletBagFactory.create(portlet, true);
+
 		portletBag.setPortletInstance(getConsumerPortletInstance());
 
 		PortletBagPool.put(portletId, portletBag);
