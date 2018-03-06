@@ -17,13 +17,13 @@ package com.liferay.petra.json.web.service.client.internal;
 import com.liferay.petra.json.web.service.client.BaseJSONWebServiceClientImpl;
 import com.liferay.petra.json.web.service.client.JSONWebServiceTransportException;
 
+import java.io.IOException;
 import java.security.KeyStore;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.nio.reactor.IOReactorException;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -39,9 +39,7 @@ import org.slf4j.LoggerFactory;
 public class JSONWebServiceClientImpl extends BaseJSONWebServiceClientImpl {
 
 	@Activate
-	public void activate(Map<String, Object> properties)
-		throws IOReactorException {
-
+	public void activate(Map<String, Object> properties) throws IOException {
 		_setHeaders(_getString("headers", properties));
 
 		setHostName(_getString("hostName", properties));
@@ -69,7 +67,7 @@ public class JSONWebServiceClientImpl extends BaseJSONWebServiceClientImpl {
 	}
 
 	@Override
-	public void afterPropertiesSet() throws IOReactorException {
+	public void afterPropertiesSet() throws IOException {
 		super.afterPropertiesSet();
 	}
 

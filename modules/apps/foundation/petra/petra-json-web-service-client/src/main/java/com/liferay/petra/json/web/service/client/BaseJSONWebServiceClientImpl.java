@@ -105,7 +105,7 @@ import org.slf4j.LoggerFactory;
 public abstract class BaseJSONWebServiceClientImpl
 	implements JSONWebServiceClient {
 
-	public void afterPropertiesSet() throws IOReactorException {
+	public void afterPropertiesSet() throws IOException {
 		HttpAsyncClientBuilder httpAsyncClientBuilder =
 			HttpAsyncClients.custom();
 
@@ -580,8 +580,8 @@ public abstract class BaseJSONWebServiceClientImpl
 		try {
 			afterPropertiesSet();
 		}
-		catch (IOReactorException iore) {
-			_logger.error(iore.getMessage());
+		catch (IOException ioe) {
+			_logger.error(ioe.getMessage());
 		}
 	}
 
