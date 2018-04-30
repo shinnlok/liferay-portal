@@ -61,7 +61,7 @@ public class UserModelListener extends SyncBaseModelListener<User> {
 		if (associationClassName.equals(Role.class.getName())) {
 			User user = _userLocalService.fetchUser((Long)classPK);
 
-			if (user == null || !user.isActive()) {
+			if ((user == null) || !user.isActive()) {
 				return;
 			}
 
@@ -78,7 +78,7 @@ public class UserModelListener extends SyncBaseModelListener<User> {
 		if (associationClassName.equals(Role.class.getName())) {
 			User user = _userLocalService.fetchUser((Long)classPK);
 
-			if (user == null || !user.isActive()) {
+			if ((user == null) || !user.isActive()) {
 				return;
 			}
 
