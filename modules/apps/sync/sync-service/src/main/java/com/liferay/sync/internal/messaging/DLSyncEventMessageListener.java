@@ -160,6 +160,8 @@ public class DLSyncEventMessageListener extends BaseMessageListener {
 			syncDLObject = _syncHelper.toSyncDLObject(
 				dlFileEntry, event, calculateChecksum);
 
+			syncDLObject.setModifiedTime(modifiedTime);
+
 			if (checksum != null) {
 				syncDLObject.setChecksum(checksum);
 			}
@@ -168,7 +170,6 @@ public class DLSyncEventMessageListener extends BaseMessageListener {
 				setUser(syncDLObject);
 			}
 
-			syncDLObject.setModifiedTime(modifiedTime);
 			syncDLObject.setLanTokenKey(
 				_syncHelper.getLanTokenKey(modifiedTime, typePK, false));
 		}
