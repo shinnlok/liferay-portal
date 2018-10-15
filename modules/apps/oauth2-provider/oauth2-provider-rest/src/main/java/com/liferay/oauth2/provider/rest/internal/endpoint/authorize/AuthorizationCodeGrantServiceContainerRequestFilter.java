@@ -79,9 +79,6 @@ public class AuthorizationCodeGrantServiceContainerRequestFilter
 			User user = _portal.getUser(_httpServletRequest);
 
 			if ((user != null) && !user.isDefaultUser()) {
-				SecurityContext securityContext =
-					requestContext.getSecurityContext();
-
 				requestContext.setSecurityContext(
 					new PortalCXFSecurityContext() {
 
@@ -93,7 +90,7 @@ public class AuthorizationCodeGrantServiceContainerRequestFilter
 
 						@Override
 						public boolean isSecure() {
-							return securityContext.isSecure();
+							return _portal.isSecure(_httpServletRequest);
 						}
 
 					});
