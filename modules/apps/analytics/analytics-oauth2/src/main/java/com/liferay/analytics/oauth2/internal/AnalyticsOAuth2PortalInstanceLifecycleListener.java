@@ -18,11 +18,14 @@ import com.liferay.oauth2.provider.constants.ClientProfile;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.instance.lifecycle.BasePortalInstanceLifecycleListener;
+import com.liferay.portal.instance.lifecycle.PortalInstanceLifecycleListener;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.io.BigEndianCodec;
+import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.SecureRandomUtil;
 import com.liferay.portal.kernel.service.CompanyService;
@@ -45,33 +48,31 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Shinn Lok
  */
-@Component(immediate = true, service = {})
-public class AnalyticsOAuth2Activator {
+@Component(immediate = true, service = PortalInstanceLifecycleListener.class)
+public class AnalyticsOAuth2PortalInstanceLifecycleListener
+	extends BasePortalInstanceLifecycleListener {
 
-	@Activate
-	protected void activate() throws Exception {
-		long companyId = _portal.getDefaultCompanyId();
-
-		if (_hasOAuth2Application(companyId)) {
+	@Override
+	public void portalInstanceRegistered(Company company) throws Exception {
+		if (_hasOAuth2Application(company.getCompanyId())) {
 			return;
 		}
 
-		User user = _userLocalService.getDefaultUser(companyId);
+		User user = _userLocalService.getDefaultUser(company.getCompanyId());
 
-		_addSAPEntry(companyId, user.getUserId());
+		_addSAPEntry(company.getCompanyId(), user.getUserId());
 
 		ClientProfile clientProfile = ClientProfile.WEB_APPLICATION;
 
 		OAuth2Application oAuth2Application =
 			_oAuth2ApplicationLocalService.addOAuth2Application(
-				companyId, user.getUserId(), user.getScreenName(),
+				company.getCompanyId(), user.getUserId(), user.getScreenName(),
 				new ArrayList<>(clientProfile.grantTypes()),
 				_generateRandomId(), clientProfile.id(),
 				_generateRandomSecret(), null,
