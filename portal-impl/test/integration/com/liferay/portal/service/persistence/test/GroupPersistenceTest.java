@@ -360,6 +360,17 @@ public class GroupPersistenceTest {
 	}
 
 	@Test
+	public void testCountByC_LikeN_S() throws Exception {
+		_persistence.countByC_LikeN_S(RandomTestUtil.nextLong(), "",
+			RandomTestUtil.randomBoolean());
+
+		_persistence.countByC_LikeN_S(0L, "null", RandomTestUtil.randomBoolean());
+
+		_persistence.countByC_LikeN_S(0L, (String)null,
+			RandomTestUtil.randomBoolean());
+	}
+
+	@Test
 	public void testCountByC_S_A() throws Exception {
 		_persistence.countByC_S_A(RandomTestUtil.nextLong(),
 			RandomTestUtil.randomBoolean(), RandomTestUtil.randomBoolean());
