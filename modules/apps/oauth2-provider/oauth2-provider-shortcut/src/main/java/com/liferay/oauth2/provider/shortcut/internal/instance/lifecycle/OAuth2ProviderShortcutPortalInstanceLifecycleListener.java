@@ -217,7 +217,7 @@ public class OAuth2ProviderShortcutPortalInstanceLifecycleListener
 				GroupService.class.getName(), "#getGroups\n",
 				GroupService.class.getName(), "#getGroupsCount\n",
 				GroupService.class.getName(), "#getGtGroups\n",
-				OrganizationService.class.getName(), "#fetchOrganizations\n",
+				OrganizationService.class.getName(), "#fetchOrganization\n",
 				OrganizationService.class.getName(), "#getGtOrganizations\n",
 				OrganizationService.class.getName(), "#getOrganization\n",
 				OrganizationService.class.getName(), "#getOrganizations\n",
