@@ -245,6 +245,8 @@ public abstract class BaseSalesforceClientImpl implements SalesforceClient {
 					_logger.info("Session has expired and will be renewed now");
 				}
 			}
+
+			_connectorConfig = null;
 		}
 
 		ConnectorConfig connectorConfig = getConnectorConfig();
