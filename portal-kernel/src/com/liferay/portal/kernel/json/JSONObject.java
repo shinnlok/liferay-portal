@@ -61,6 +61,8 @@ public interface JSONObject extends Externalizable, JSONSerializable {
 
 	public JSONArray names();
 
+	public Object opt(String key);
+
 	public JSONObject put(String key, boolean value);
 
 	public JSONObject put(String key, Date value);

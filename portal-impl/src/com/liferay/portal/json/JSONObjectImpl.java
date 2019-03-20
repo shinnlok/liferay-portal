@@ -84,6 +84,11 @@ public class JSONObjectImpl implements JSONObject {
 	}
 
 	@Override
+	public Object opt(String key) {
+		return get(key);
+	}
+
+	@Override
 	public Object get(String key) {
 		Object value = _jsonObject.opt(key);
 
