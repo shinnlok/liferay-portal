@@ -15,6 +15,7 @@
 package com.liferay.portal.kernel.json;
 
 import com.liferay.petra.function.UnsafeFunction;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 
 import java.lang.reflect.Array;
@@ -58,7 +59,11 @@ public class JSONUtil {
 		for (int i = 0; i < jsonArray.length(); i++) {
 			JSONObject jsonObject = jsonArray.getJSONObject(i);
 
-			collection.add(jsonObject.getString(jsonObjectKey));
+			Object value = jsonObject.opt(jsonObjectKey);
+
+			if (value != null) {
+				collection.add((String)value);
+			}
 		}
 	}
 
@@ -272,15 +277,9 @@ public class JSONUtil {
 			return new long[0];
 		}
 
-		long[] values = new long[jsonArray.length()];
+		List<Long> values = toLongList(jsonArray, jsonObjectKey);
 
-		for (int i = 0; i < jsonArray.length(); i++) {
-			JSONObject jsonObject = jsonArray.getJSONObject(i);
-
-			values[i] = jsonObject.getLong(jsonObjectKey);
-		}
-
-		return values;
+		return ArrayUtil.toArray(values.toArray(new Long[values.size()]));
 	}
 
 	public static List<Long> toLongList(JSONArray jsonArray) {
@@ -309,7 +308,11 @@ public class JSONUtil {
 		for (int i = 0; i < jsonArray.length(); i++) {
 			JSONObject jsonObject = jsonArray.getJSONObject(i);
 
-			values.add(jsonObject.getLong(jsonObjectKey));
+			Object value = jsonObject.opt(jsonObjectKey);
+
+			if (value != null) {
+				values.add(jsonObject.getLong(jsonObjectKey));
+			}
 		}
 
 		return values;
@@ -341,7 +344,11 @@ public class JSONUtil {
 		for (int i = 0; i < jsonArray.length(); i++) {
 			JSONObject jsonObject = jsonArray.getJSONObject(i);
 
-			values.add(jsonObject.getLong(jsonObjectKey));
+			Object value = jsonObject.opt(jsonObjectKey);
+
+			if (value != null) {
+				values.add(jsonObject.getLong(jsonObjectKey));
+			}
 		}
 
 		return values;
@@ -368,15 +375,9 @@ public class JSONUtil {
 			return new Object[0];
 		}
 
-		Object[] values = new Object[jsonArray.length()];
+		List<Object> values = toObjectList(jsonArray, jsonObjectKey);
 
-		for (int i = 0; i < jsonArray.length(); i++) {
-			JSONObject jsonObject = jsonArray.getJSONObject(i);
-
-			values[i] = jsonObject.get(jsonObjectKey);
-		}
-
-		return values;
+		return values.toArray(new Object[values.size()]);
 	}
 
 	public static List<Object> toObjectList(JSONArray jsonArray) {
@@ -405,7 +406,11 @@ public class JSONUtil {
 		for (int i = 0; i < jsonArray.length(); i++) {
 			JSONObject jsonObject = jsonArray.getJSONObject(i);
 
-			values.add(jsonObject.get(jsonObjectKey));
+			Object value = jsonObject.opt(jsonObjectKey);
+
+			if (value != null) {
+				values.add(value);
+			}
 		}
 
 		return values;
@@ -437,7 +442,11 @@ public class JSONUtil {
 		for (int i = 0; i < jsonArray.length(); i++) {
 			JSONObject jsonObject = jsonArray.getJSONObject(i);
 
-			values.add(jsonObject.get(jsonObjectKey));
+			Object value = jsonObject.opt(jsonObjectKey);
+
+			if (value != null) {
+				values.add(value);
+			}
 		}
 
 		return values;
@@ -464,15 +473,9 @@ public class JSONUtil {
 			return new String[0];
 		}
 
-		String[] values = new String[jsonArray.length()];
+		List<String> values = toStringList(jsonArray, jsonObjectKey);
 
-		for (int i = 0; i < jsonArray.length(); i++) {
-			JSONObject jsonObject = jsonArray.getJSONObject(i);
-
-			values[i] = jsonObject.getString(jsonObjectKey);
-		}
-
-		return values;
+		return values.toArray(new String[values.size()]);
 	}
 
 	public static List<String> toStringList(JSONArray jsonArray) {
@@ -501,7 +504,11 @@ public class JSONUtil {
 		for (int i = 0; i < jsonArray.length(); i++) {
 			JSONObject jsonObject = jsonArray.getJSONObject(i);
 
-			values.add(jsonObject.getString(jsonObjectKey));
+			Object value = jsonObject.opt(jsonObjectKey);
+
+			if (value != null) {
+				values.add((String)value);
+			}
 		}
 
 		return values;
@@ -533,7 +540,11 @@ public class JSONUtil {
 		for (int i = 0; i < jsonArray.length(); i++) {
 			JSONObject jsonObject = jsonArray.getJSONObject(i);
 
-			values.add(jsonObject.getString(jsonObjectKey));
+			Object value = jsonObject.opt(jsonObjectKey);
+
+			if (value != null) {
+				values.add((String)value);
+			}
 		}
 
 		return values;
