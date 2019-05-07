@@ -1080,12 +1080,12 @@ public class StringUtilTest {
 
 	@Test
 	public void testUnquote() {
+		Assert.assertEquals("", StringUtil.unquote(""));
+		Assert.assertEquals("Hello World", StringUtil.unquote("'Hello World'"));
+		Assert.assertEquals("'Hello World", StringUtil.unquote("'Hello World"));
 		Assert.assertEquals(
 			"Hello World", StringUtil.unquote("\"Hello World\""));
-
-		// String with single character
-
-		Assert.assertEquals("\"", StringUtil.unquote("\""));
+		Assert.assertEquals("Hello World", StringUtil.unquote("Hello World"));
 	}
 
 	@Test
