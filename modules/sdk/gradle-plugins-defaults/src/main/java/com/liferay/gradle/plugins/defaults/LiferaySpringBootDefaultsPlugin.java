@@ -40,9 +40,12 @@ import org.gradle.api.tasks.testing.logging.TestLoggingContainer;
 import org.gradle.language.base.plugins.LifecycleBasePlugin;
 import org.gradle.plugins.ide.eclipse.EclipsePlugin;
 import org.gradle.plugins.ide.idea.IdeaPlugin;
+import org.gradle.testing.jacoco.plugins.JacocoPlugin;
+import org.gradle.testing.jacoco.plugins.JacocoTaskExtension;
 
 import org.springframework.boot.gradle.plugin.SpringBootPlugin;
-import org.springframework.boot.gradle.run.BootRunTask;
+import org.springframework.boot.gradle.tasks.bundling.BootJar;
+import org.springframework.boot.gradle.tasks.run.BootRun;
 
 /**
  * @author Peter Shin
@@ -63,6 +66,7 @@ public class LiferaySpringBootDefaultsPlugin implements Plugin<Project> {
 
 		_addTaskRun(project);
 
+		_configureTaskBootJar(project);
 		_configureTaskBootRun(project);
 		_configureTaskCheck(project);
 		_configureTaskTest(project);
@@ -72,8 +76,7 @@ public class LiferaySpringBootDefaultsPlugin implements Plugin<Project> {
 	private Task _addTaskRun(Project project) {
 		Task task = project.task(ApplicationPlugin.TASK_RUN_NAME);
 
-		BootRunTask bootRunTask = (BootRunTask)GradleUtil.getTask(
-			project, "bootRun");
+		BootRun bootRunTask = (BootRun)GradleUtil.getTask(project, "bootRun");
 
 		task.dependsOn(bootRunTask);
 		task.setDescription(
@@ -87,6 +90,7 @@ public class LiferaySpringBootDefaultsPlugin implements Plugin<Project> {
 	private void _applyPlugins(Project project) {
 		GradleUtil.applyPlugin(project, EclipsePlugin.class);
 		GradleUtil.applyPlugin(project, IdeaPlugin.class);
+		GradleUtil.applyPlugin(project, JacocoPlugin.class);
 		GradleUtil.applyPlugin(project, JavaPlugin.class);
 		GradleUtil.applyPlugin(project, SourceFormatterDefaultsPlugin.class);
 		GradleUtil.applyPlugin(project, SourceFormatterPlugin.class);
@@ -101,11 +105,20 @@ public class LiferaySpringBootDefaultsPlugin implements Plugin<Project> {
 		project.setGroup(group);
 	}
 
+	private void _configureTaskBootJar(Project project) {
+		BootJar bootJarTask = (BootJar)GradleUtil.getTask(
+			project, SpringBootPlugin.BOOT_JAR_TASK_NAME);
+
+		if (bootJarTask.isEnabled()) {
+			bootJarTask.setClassifier("exec");
+		}
+	}
+
 	private void _configureTaskBootRun(Project project) {
 		String springBootJavaOpts = System.getenv("SPRING_BOOT_JAVA_OPTS");
 
 		if (Validator.isNotNull(springBootJavaOpts)) {
-			BootRunTask bootRunTask = (BootRunTask)GradleUtil.getTask(
+			BootRun bootRunTask = (BootRun)GradleUtil.getTask(
 				project, "bootRun");
 
 			bootRunTask.setJvmArgs(Collections.singleton(springBootJavaOpts));
@@ -128,6 +141,7 @@ public class LiferaySpringBootDefaultsPlugin implements Plugin<Project> {
 
 		test.setIgnoreFailures(false);
 
+		_configureTaskTestJacoco(test);
 		_configureTaskTestLogging(test);
 	}
 
@@ -137,7 +151,18 @@ public class LiferaySpringBootDefaultsPlugin implements Plugin<Project> {
 
 		test.setIgnoreFailures(false);
 
+		_configureTaskTestJacoco(test);
 		_configureTaskTestLogging(test);
+	}
+
+	private void _configureTaskTestJacoco(Test test) {
+		JacocoTaskExtension jacocoTaskExtension = GradleUtil.getExtension(
+			test, JacocoTaskExtension.class);
+
+		Project project = test.getProject();
+
+		jacocoTaskExtension.setDestinationFile(
+			new File(project.getBuildDir(), "jacoco/jacocoTest.exec"));
 	}
 
 	private void _configureTaskTestLogging(Test test) {
