@@ -91,39 +91,7 @@ public class AnalyticsCloudPortalInstanceLifecycleListener
 
 	@Override
 	public void portalInstanceRegistered(Company company) throws Exception {
-		if (_hasOAuth2Application(company.getCompanyId())) {
-			return;
-		}
-
-		User user = _userLocalService.getDefaultUser(company.getCompanyId());
-
-		_addSAPEntries(company.getCompanyId(), user.getUserId());
-
-		OAuth2Application oAuth2Application =
-			_oAuth2ApplicationLocalService.addOAuth2Application(
-				company.getCompanyId(), user.getUserId(), user.getScreenName(),
-				new ArrayList<GrantType>() {
-					{
-						add(GrantType.AUTHORIZATION_CODE);
-						add(GrantType.REFRESH_TOKEN);
-					}
-				},
-				user.getUserId(),
-				OAuth2SecureRandomGenerator.generateClientId(),
-				ClientProfile.WEB_APPLICATION.id(),
-				OAuth2SecureRandomGenerator.generateClientSecret(), null, null,
-				"https://analytics.liferay.com", 0, _APPLICATION_NAME, null,
-				Collections.singletonList(
-					"https://analytics.liferay.com/oauth/receive"),
-				_scopeAliasesList, new ServiceContext());
-
-		Class<?> clazz = getClass();
-
-		InputStream inputStream = clazz.getResourceAsStream(
-			"dependencies/logo.png");
-
-		_oAuth2ApplicationLocalService.updateIcon(
-			oAuth2Application.getOAuth2ApplicationId(), inputStream);
+		_addOAuth2Application(company);
 	}
 
 	@Activate
@@ -156,6 +124,55 @@ public class AnalyticsCloudPortalInstanceLifecycleListener
 	@Deactivate
 	protected void deactivate() {
 		_serviceRegistration.unregister();
+	}
+
+	private void _addOAuth2Application(Company company) throws Exception {
+		DynamicQuery dynamicQuery =
+			_oAuth2ApplicationLocalService.dynamicQuery();
+
+		Property companyIdProperty = PropertyFactoryUtil.forName("companyId");
+
+		dynamicQuery.add(companyIdProperty.eq(company.getCompanyId()));
+
+		Property nameProperty = PropertyFactoryUtil.forName("name");
+
+		dynamicQuery.add(nameProperty.eq(_APPLICATION_NAME));
+
+		if (_oAuth2ApplicationLocalService.dynamicQueryCount(dynamicQuery) >
+				0) {
+
+			return;
+		}
+
+		User user = _userLocalService.getDefaultUser(company.getCompanyId());
+
+		_addSAPEntries(company.getCompanyId(), user.getUserId());
+
+		OAuth2Application oAuth2Application =
+			_oAuth2ApplicationLocalService.addOAuth2Application(
+				company.getCompanyId(), user.getUserId(), user.getScreenName(),
+				new ArrayList<GrantType>() {
+					{
+						add(GrantType.AUTHORIZATION_CODE);
+						add(GrantType.REFRESH_TOKEN);
+					}
+				},
+				user.getUserId(),
+				OAuth2SecureRandomGenerator.generateClientId(),
+				ClientProfile.WEB_APPLICATION.id(),
+				OAuth2SecureRandomGenerator.generateClientSecret(), null, null,
+				"https://analytics.liferay.com", 0, _APPLICATION_NAME, null,
+				Collections.singletonList(
+					"https://analytics.liferay.com/oauth/receive"),
+				_scopeAliasesList, new ServiceContext());
+
+		Class<?> clazz = getClass();
+
+		InputStream inputStream = clazz.getResourceAsStream(
+			"dependencies/logo.png");
+
+		_oAuth2ApplicationLocalService.updateIcon(
+			oAuth2Application.getOAuth2ApplicationId(), inputStream);
 	}
 
 	private void _addSAPEntries(long companyId, long userId)
