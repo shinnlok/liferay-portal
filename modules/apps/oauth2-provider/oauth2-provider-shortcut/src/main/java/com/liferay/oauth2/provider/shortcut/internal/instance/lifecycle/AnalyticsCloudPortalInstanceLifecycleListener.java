@@ -17,6 +17,7 @@ package com.liferay.oauth2.provider.shortcut.internal.instance.lifecycle;
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.oauth2.provider.constants.ClientProfile;
 import com.liferay.oauth2.provider.constants.GrantType;
+import com.liferay.oauth2.provider.constants.OAuth2ProviderActionKeys;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.scope.spi.application.descriptor.ApplicationDescriptor;
 import com.liferay.oauth2.provider.scope.spi.prefix.handler.PrefixHandlerFactory;
@@ -35,13 +36,20 @@ import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.model.ResourceConstants;
+import com.liferay.portal.kernel.model.ResourcePermission;
+import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.search.Indexer;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.CompanyService;
 import com.liferay.portal.kernel.service.ContactService;
 import com.liferay.portal.kernel.service.GroupService;
 import com.liferay.portal.kernel.service.OrganizationService;
 import com.liferay.portal.kernel.service.PortalService;
+import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
+import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserGroupService;
 import com.liferay.portal.kernel.service.UserLocalService;
@@ -91,7 +99,9 @@ public class AnalyticsCloudPortalInstanceLifecycleListener
 
 	@Override
 	public void portalInstanceRegistered(Company company) throws Exception {
-		_addOAuth2Application(company);
+		OAuth2Application oAuth2Application = _addOAuth2Application(company);
+
+		_addResourcePermissions(oAuth2Application);
 	}
 
 	@Activate
@@ -180,6 +190,38 @@ public class AnalyticsCloudPortalInstanceLifecycleListener
 		return oAuth2Application;
 	}
 
+	private void _addResourcePermissions(OAuth2Application oAuth2Application)
+		throws Exception {
+
+		Role role = _roleLocalService.fetchRole(
+			oAuth2Application.getCompanyId(),
+			RoleConstants.ANALYTICS_ADMINISTRATOR);
+
+		if (role == null) {
+			return;
+		}
+
+		ResourcePermission resourcePermission =
+			_resourcePermissionLocalService.fetchResourcePermission(
+				oAuth2Application.getCompanyId(),
+				OAuth2Application.class.getName(),
+				ResourceConstants.SCOPE_INDIVIDUAL,
+				String.valueOf(oAuth2Application.getPrimaryKey()),
+				role.getRoleId());
+
+		if (resourcePermission != null) {
+			return;
+		}
+
+		_resourcePermissionLocalService.setResourcePermissions(
+			oAuth2Application.getCompanyId(), OAuth2Application.class.getName(),
+			ResourceConstants.SCOPE_INDIVIDUAL,
+			String.valueOf(oAuth2Application.getPrimaryKey()), role.getRoleId(),
+			new String[] {
+				ActionKeys.VIEW, OAuth2ProviderActionKeys.ACTION_CREATE_TOKEN
+			});
+	}
+
 	private void _addSAPEntries(long companyId, long userId)
 		throws PortalException {
 
@@ -266,6 +308,12 @@ public class AnalyticsCloudPortalInstanceLifecycleListener
 
 	@Reference
 	private Portal _portal;
+
+	@Reference
+	private ResourcePermissionLocalService _resourcePermissionLocalService;
+
+	@Reference
+	private RoleLocalService _roleLocalService;
 
 	@Reference
 	private SAPEntryLocalService _sapEntryLocalService;
