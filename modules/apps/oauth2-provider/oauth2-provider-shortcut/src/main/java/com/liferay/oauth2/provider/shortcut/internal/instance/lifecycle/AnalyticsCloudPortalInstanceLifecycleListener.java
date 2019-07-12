@@ -126,7 +126,9 @@ public class AnalyticsCloudPortalInstanceLifecycleListener
 		_serviceRegistration.unregister();
 	}
 
-	private void _addOAuth2Application(Company company) throws Exception {
+	private OAuth2Application _addOAuth2Application(Company company)
+		throws Exception {
+
 		DynamicQuery dynamicQuery =
 			_oAuth2ApplicationLocalService.dynamicQuery();
 
@@ -138,10 +140,11 @@ public class AnalyticsCloudPortalInstanceLifecycleListener
 
 		dynamicQuery.add(nameProperty.eq(_APPLICATION_NAME));
 
-		if (_oAuth2ApplicationLocalService.dynamicQueryCount(dynamicQuery) >
-				0) {
+		List<OAuth2Application> oAuth2Applications =
+			_oAuth2ApplicationLocalService.dynamicQuery(dynamicQuery);
 
-			return;
+		if (!oAuth2Applications.isEmpty()) {
+			return oAuth2Applications.get(0);
 		}
 
 		User user = _userLocalService.getDefaultUser(company.getCompanyId());
@@ -173,6 +176,8 @@ public class AnalyticsCloudPortalInstanceLifecycleListener
 
 		_oAuth2ApplicationLocalService.updateIcon(
 			oAuth2Application.getOAuth2ApplicationId(), inputStream);
+
+		return oAuth2Application;
 	}
 
 	private void _addSAPEntries(long companyId, long userId)
@@ -204,27 +209,6 @@ public class AnalyticsCloudPortalInstanceLifecycleListener
 				userId, sapEntryObjectArray[1], false, true, sapEntryName,
 				titleMap, new ServiceContext());
 		}
-	}
-
-	private boolean _hasOAuth2Application(long companyId) {
-		DynamicQuery dynamicQuery =
-			_oAuth2ApplicationLocalService.dynamicQuery();
-
-		Property companyIdProperty = PropertyFactoryUtil.forName("companyId");
-
-		dynamicQuery.add(companyIdProperty.eq(companyId));
-
-		Property nameProperty = PropertyFactoryUtil.forName("name");
-
-		dynamicQuery.add(nameProperty.eq(_APPLICATION_NAME));
-
-		if (_oAuth2ApplicationLocalService.dynamicQueryCount(dynamicQuery) >
-				0) {
-
-			return true;
-		}
-
-		return false;
 	}
 
 	private static final String _APPLICATION_NAME = "Analytics Cloud";
