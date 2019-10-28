@@ -75,6 +75,10 @@ class Analytics {
 			instance = this;
 		}
 
+		if (this._isTrackingDisabled()) {
+			return instance;
+		}
+
 		const {endpointUrl, flushInterval} = config;
 
 		const client = new Client(endpointUrl);
@@ -151,6 +155,10 @@ class Analytics {
 		}
 
 		return newUserIdRequired;
+	}
+
+	_isTrackingDisabled() {
+		return window['ac_client_disable_tracking'];
 	}
 
 	/**
@@ -311,6 +319,12 @@ class Analytics {
 	 * sent or no pending data was left to be sent
 	 */
 	flush() {
+		if (this._isTrackingDisabled()) {
+			this.disposeInternal();
+
+			return;
+		}
+
 		let result;
 
 		if (!this.isFlushInProgress && this.events.length) {
@@ -409,6 +423,10 @@ class Analytics {
 	 * @param {object} eventProps Complementary information about the event
 	 */
 	send(eventId, applicationId, eventProps) {
+		if (this._isTrackingDisabled()) {
+			return;
+		}
+
 		const currentContext = this._getContext();
 		const currentContextHash = hash(currentContext);
 
@@ -443,6 +461,10 @@ class Analytics {
 	 * @return {Promise} A promise resolved with the generated identity hash
 	 */
 	setIdentity(identity) {
+		if (this._isTrackingDisabled()) {
+			return;
+		}
+
 		this.config.identity = identity;
 
 		return this._getUserId().then(userId =>
