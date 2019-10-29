@@ -158,7 +158,11 @@ class Analytics {
 	}
 
 	_isTrackingDisabled() {
-		return window['ac_client_disable_tracking'] || navigator.doNotTrack;
+		if (window.ac_client_disable_tracking || navigator.doNotTrack) {
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
