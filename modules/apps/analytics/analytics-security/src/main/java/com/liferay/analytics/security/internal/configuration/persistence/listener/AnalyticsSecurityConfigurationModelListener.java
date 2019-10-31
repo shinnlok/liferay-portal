@@ -1,22 +1,22 @@
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
- * The contents of this file are subject to the terms of the Liferay Enterprise
- * Subscription License ("License"). You may not use this file except in
- * compliance with the License. You can obtain a copy of the License by
- * contacting Liferay, Inc. See the License for the specific language governing
- * permissions and limitations under the License, including but not limited to
- * distribution rights of the Software.
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
  *
- *
- *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
  */
 
 package com.liferay.analytics.security.internal.configuration.persistence.listener;
 
-import com.liferay.analytics.security.internal.configuration.AnalyticsConnectorConfiguration;
 import com.liferay.analytics.security.internal.constants.AnalyticsSecurityConstants;
 import com.liferay.analytics.security.internal.security.auth.verifier.AnalyticsSecurityAuthVerifier;
+import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
 import com.liferay.portal.configuration.persistence.listener.ConfigurationModelListener;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -55,7 +55,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	immediate = true,
-	property = "model.class.name=com.liferay.analytics.security.internal.configuration.AnalyticsConnectorConfiguration.scoped",
+	property = "model.class.name=com.liferay.analytics.settings.configuration.AnalyticsConfiguration.scoped",
 	service = ConfigurationModelListener.class
 )
 public class AnalyticsSecurityConfigurationModelListener
@@ -63,7 +63,7 @@ public class AnalyticsSecurityConfigurationModelListener
 
 	@Override
 	public void onAfterSave(String pid, Dictionary<String, Object> properties) {
-		if (Validator.isNull((String)properties.get("code"))) {
+		if (Validator.isNull((String)properties.get("token"))) {
 			_disable((long)properties.get("companyId"));
 		}
 		else {
@@ -183,8 +183,7 @@ public class AnalyticsSecurityConfigurationModelListener
 
 	private boolean _hasConfiguration() throws Exception {
 		Configuration[] configurations = _configurationAdmin.listConfigurations(
-			"(service.pid=" + AnalyticsConnectorConfiguration.class.getName() +
-				"*)");
+			"(service.pid=" + AnalyticsConfiguration.class.getName() + "*)");
 
 		for (Configuration configuration : configurations) {
 			Dictionary<String, Object> properties =

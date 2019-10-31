@@ -31,10 +31,19 @@ import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClass
 public interface AnalyticsConfiguration {
 
 	@Meta.AD(required = false)
+	public String analyticsURL();
+
+	@Meta.AD(required = false)
 	public String dataSourceId();
 
 	@Meta.AD(required = false)
 	public String siteReportingGrouping();
+
+	@Meta.AD(required = false)
+	public String hostsAllowed();
+
+	@Meta.AD(required = false)
+	public String publicKey();
 
 	@Meta.AD(required = false)
 	public boolean syncAllContacts();

@@ -1,23 +1,22 @@
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
- * The contents of this file are subject to the terms of the Liferay Enterprise
- * Subscription License ("License"). You may not use this file except in
- * compliance with the License. You can obtain a copy of the License by
- * contacting Liferay, Inc. See the License for the specific language governing
- * permissions and limitations under the License, including but not limited to
- * distribution rights of the Software.
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
  *
- *
- *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
  */
 
 package com.liferay.analytics.security.internal.security.auth.verifier;
 
-import com.liferay.analytics.security.internal.configuration.AnalyticsConnectorConfiguration;
 import com.liferay.analytics.security.internal.constants.AnalyticsSecurityConstants;
+import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
-import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -33,7 +32,6 @@ import com.liferay.portal.kernel.util.Base64;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.Validator;
 
 import java.security.KeyFactory;
 import java.security.Signature;
@@ -86,10 +84,12 @@ public class AnalyticsSecurityAuthVerifier implements AuthVerifier {
 		}
 
 		try {
-			JSONObject jsonObject = _getConfigurationJSONObject(
-				_portal.getCompanyId(httpServletRequest));
+			AnalyticsConfiguration analyticsConfiguration =
+				_configurationProvider.getCompanyConfiguration(
+					AnalyticsConfiguration.class,
+					_portal.getCompanyId(httpServletRequest));
 
-			if (jsonObject == null) {
+			if (analyticsConfiguration.token() == null) {
 				if (_log.isDebugEnabled()) {
 					_log.debug("Missing security configuration");
 				}
@@ -98,7 +98,8 @@ public class AnalyticsSecurityAuthVerifier implements AuthVerifier {
 			}
 
 			Set<String> hostsAllowed = JSONUtil.toStringSet(
-				jsonObject.getJSONArray("hostsAllowed"));
+				JSONFactoryUtil.createJSONArray(
+					analyticsConfiguration.hostsAllowed()));
 
 			if (!hostsAllowed.isEmpty() &&
 				!hostsAllowed.contains(httpServletRequest.getRemoteAddr())) {
@@ -126,7 +127,7 @@ public class AnalyticsSecurityAuthVerifier implements AuthVerifier {
 			}
 
 			if (!_validateSignature(
-					httpServletRequest, jsonObject.getString("publicKey"),
+					httpServletRequest, analyticsConfiguration.publicKey(),
 					signature, timestamp)) {
 
 				if (_log.isDebugEnabled()) {
@@ -163,23 +164,6 @@ public class AnalyticsSecurityAuthVerifier implements AuthVerifier {
 			companyId, AnalyticsSecurityConstants.SCREEN_NAME_ANALYTICS_ADMIN);
 
 		return user.getUserId();
-	}
-
-	private JSONObject _getConfigurationJSONObject(long companyId)
-		throws Exception {
-
-		AnalyticsConnectorConfiguration analyticsConnectorConfiguration =
-			_configurationProvider.getCompanyConfiguration(
-				AnalyticsConnectorConfiguration.class, companyId);
-
-		String code = analyticsConnectorConfiguration.code();
-
-		if (Validator.isNotNull(code)) {
-			return JSONFactoryUtil.createJSONObject(
-				new String(Base64.decode(code)));
-		}
-
-		return null;
 	}
 
 	private boolean _validateSignature(

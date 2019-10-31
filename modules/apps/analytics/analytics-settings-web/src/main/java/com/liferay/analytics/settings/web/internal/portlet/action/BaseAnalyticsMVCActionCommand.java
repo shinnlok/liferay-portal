@@ -137,8 +137,9 @@ public abstract class BaseAnalyticsMVCActionCommand
 	}
 
 	protected abstract void updateConfigurationProperties(
-		ActionRequest actionRequest,
-		Dictionary<String, Object> configurationProperties);
+			ActionRequest actionRequest,
+			Dictionary<String, Object> configurationProperties)
+		throws Exception;
 
 	@Reference
 	protected ConfigurationProvider configurationProvider;

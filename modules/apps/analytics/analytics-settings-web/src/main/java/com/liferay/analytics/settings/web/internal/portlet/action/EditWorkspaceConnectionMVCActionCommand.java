@@ -15,10 +15,14 @@
 package com.liferay.analytics.settings.web.internal.portlet.action;
 
 import com.liferay.configuration.admin.constants.ConfigurationAdminPortletKeys;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
+import com.liferay.portal.kernel.util.Base64;
 import com.liferay.portal.kernel.util.ParamUtil;
 
 import java.util.Dictionary;
+import java.util.Iterator;
 
 import javax.portlet.ActionRequest;
 
@@ -39,15 +43,24 @@ public class EditWorkspaceConnectionMVCActionCommand
 
 	@Override
 	protected void updateConfigurationProperties(
-		ActionRequest actionRequest,
-		Dictionary<String, Object> configurationProperties) {
+			ActionRequest actionRequest,
+			Dictionary<String, Object> configurationProperties)
+		throws Exception {
 
-		// TODO Add REST call to get dataSourceId
+		String token = ParamUtil.getString(actionRequest, "token");
 
-		configurationProperties.put("dataSourceId", "dataSourceId");
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
+			new String(Base64.decode(token)));
 
-		configurationProperties.put(
-			"token", ParamUtil.getString(actionRequest, "token"));
+		Iterator<String> keys = jsonObject.keys();
+
+		while (keys.hasNext()) {
+			String key = keys.next();
+
+			configurationProperties.put(key, jsonObject.getString(key));
+		}
+
+		configurationProperties.put("token", token);
 	}
 
 }
