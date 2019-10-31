@@ -14,7 +14,7 @@
 
 package com.liferay.analytics.settings.web.internal.settings.definition;
 
-import com.liferay.analytics.settings.web.internal.configuration.AnalyticsConfiguration;
+import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
 import com.liferay.portal.kernel.settings.definition.ConfigurationBeanDeclaration;
 
 import org.osgi.service.component.annotations.Component;

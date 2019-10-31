@@ -16,7 +16,7 @@ package com.liferay.analytics.settings.web.internal.portlet.action;
 
 import aQute.bnd.annotation.metatype.Meta;
 
-import com.liferay.analytics.settings.web.internal.configuration.AnalyticsConfiguration;
+import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
