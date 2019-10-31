@@ -42,9 +42,12 @@ public class EditWorkspaceConnectionMVCActionCommand
 		ActionRequest actionRequest,
 		Dictionary<String, Object> configurationProperties) {
 
-		String token = ParamUtil.getString(actionRequest, "token");
+		// TODO Add REST call to get dataSourceId
 
-		configurationProperties.put("token", token);
+		configurationProperties.put("dataSourceId", "dataSourceId");
+
+		configurationProperties.put(
+			"token", ParamUtil.getString(actionRequest, "token"));
 	}
 
 }
