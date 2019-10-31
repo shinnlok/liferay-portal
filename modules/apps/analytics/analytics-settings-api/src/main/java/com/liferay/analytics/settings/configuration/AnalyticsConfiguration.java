@@ -26,24 +26,23 @@ import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClass
 	scope = ExtendedObjectClassDefinition.Scope.COMPANY
 )
 @Meta.OCD(
-	id = "com.liferay.analytics.settings.configuration.AnalyticsConfiguration",
-	localization = "content/Language", name = "analytics-configuration-name"
+	id = "com.liferay.analytics.settings.configuration.AnalyticsConfiguration"
 )
 public interface AnalyticsConfiguration {
 
-	@Meta.AD(name = "data-source-id", required = false)
+	@Meta.AD(required = false)
 	public String dataSourceId();
 
-	@Meta.AD(name = "site-reporting-grouping", required = false)
+	@Meta.AD(required = false)
 	public String siteReportingGrouping();
 
-	@Meta.AD(name = "sync-all-contacts", required = false)
+	@Meta.AD(required = false)
 	public boolean syncAllContacts();
 
-	@Meta.AD(name = "synced-group-ids", required = false)
+	@Meta.AD(required = false)
 	public String[] syncedGroupIds();
 
-	@Meta.AD(name = "token", required = false)
+	@Meta.AD(required = false)
 	public String token();
 
 }
