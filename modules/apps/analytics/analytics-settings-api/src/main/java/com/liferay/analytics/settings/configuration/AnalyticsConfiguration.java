@@ -31,16 +31,16 @@ import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClass
 )
 public interface AnalyticsConfiguration {
 
-	@Meta.AD(name = "token", required = false)
-	public String token();
-
-	@Meta.AD(name = "syncedGroupIds", required = false)
-	public String[] syncedGroupIds();
-
-	@Meta.AD(name = "siteReportingGrouping", required = false)
+	@Meta.AD(name = "site-reporting-grouping", required = false)
 	public String siteReportingGrouping();
 
-	@Meta.AD(name = "syncAllContacts", required = false)
+	@Meta.AD(name = "sync-all-contacts", required = false)
 	public boolean syncAllContacts();
+
+	@Meta.AD(name = "synced-group-ids", required = false)
+	public String[] syncedGroupIds();
+
+	@Meta.AD(name = "token", required = false)
+	public String token();
 
 }
