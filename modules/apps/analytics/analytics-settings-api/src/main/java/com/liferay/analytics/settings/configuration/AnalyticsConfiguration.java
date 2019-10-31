@@ -31,6 +31,9 @@ import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClass
 )
 public interface AnalyticsConfiguration {
 
+	@Meta.AD(name = "data-source-id", required = false)
+	public String dataSourceId();
+
 	@Meta.AD(name = "site-reporting-grouping", required = false)
 	public String siteReportingGrouping();
 
