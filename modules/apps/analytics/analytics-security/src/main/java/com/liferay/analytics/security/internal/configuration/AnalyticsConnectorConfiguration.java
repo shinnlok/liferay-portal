@@ -12,7 +12,7 @@
  *
  */
 
-package com.liferay.analytics.connector.web.internal.configuration;
+package com.liferay.analytics.security.internal.configuration;
 
 import aQute.bnd.annotation.metatype.Meta;
 
@@ -25,7 +25,7 @@ import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClass
 	category = "analytics", scope = ExtendedObjectClassDefinition.Scope.COMPANY
 )
 @Meta.OCD(
-	id = "com.liferay.analytics.connector.web.internal.configuration.AnalyticsConnectorConfiguration",
+	id = "com.liferay.analytics.security.internal.configuration.AnalyticsConnectorConfiguration",
 	localization = "content/Language",
 	name = "analytics-connector-configuration-name"
 )

@@ -12,9 +12,9 @@
  *
  */
 
-package com.liferay.analytics.connector.web.internal.settings.definition;
+package com.liferay.analytics.security.internal.settings.definition;
 
-import com.liferay.analytics.connector.web.internal.configuration.AnalyticsConnectorConfiguration;
+import com.liferay.analytics.security.internal.configuration.AnalyticsConnectorConfiguration;
 import com.liferay.portal.kernel.settings.definition.ConfigurationBeanDeclaration;
 
 import org.osgi.service.component.annotations.Component;

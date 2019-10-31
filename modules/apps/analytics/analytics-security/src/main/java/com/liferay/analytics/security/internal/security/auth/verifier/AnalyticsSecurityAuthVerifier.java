@@ -12,10 +12,10 @@
  *
  */
 
-package com.liferay.analytics.connector.web.internal.security.auth.verifier;
+package com.liferay.analytics.security.internal.security.auth.verifier;
 
-import com.liferay.analytics.connector.web.internal.configuration.AnalyticsConnectorConfiguration;
-import com.liferay.analytics.connector.web.internal.constants.AnalyticsConnectorConstants;
+import com.liferay.analytics.security.internal.configuration.AnalyticsConnectorConfiguration;
+import com.liferay.analytics.security.internal.constants.AnalyticsSecurityConstants;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
@@ -56,10 +56,10 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	enabled = false,
-	property = "auth.verifier.AnalyticsConnectorAuthVerifier.urls.includes=/api/jsonws/*",
+	property = "auth.verifier.AnalyticsSecurityAuthVerifier.urls.includes=/api/jsonws/*",
 	service = AuthVerifier.class
 )
-public class AnalyticsConnectorAuthVerifier implements AuthVerifier {
+public class AnalyticsSecurityAuthVerifier implements AuthVerifier {
 
 	@Override
 	public String getAuthType() {
@@ -144,7 +144,7 @@ public class AnalyticsConnectorAuthVerifier implements AuthVerifier {
 					value -> new ArrayList<>());
 
 			serviceAccessPolicyNames.add(
-				AnalyticsConnectorConstants.SERVICE_ACCESS_POLICY_NAME);
+				AnalyticsSecurityConstants.SERVICE_ACCESS_POLICY_NAME);
 
 			authVerifierResult.setState(AuthVerifierResult.State.SUCCESS);
 			authVerifierResult.setUserId(
@@ -160,7 +160,7 @@ public class AnalyticsConnectorAuthVerifier implements AuthVerifier {
 
 	private long _getAnalyticsAdminUserId(long companyId) {
 		User user = _userLocalService.fetchUserByScreenName(
-			companyId, AnalyticsConnectorConstants.SCREEN_NAME_ANALYTICS_ADMIN);
+			companyId, AnalyticsSecurityConstants.SCREEN_NAME_ANALYTICS_ADMIN);
 
 		return user.getUserId();
 	}
@@ -226,7 +226,7 @@ public class AnalyticsConnectorAuthVerifier implements AuthVerifier {
 	private static final long _EXPIRATION = 10 * 60 * 1000;
 
 	private static final Log _log = LogFactoryUtil.getLog(
-		AnalyticsConnectorAuthVerifier.class);
+		AnalyticsSecurityAuthVerifier.class);
 
 	@Reference
 	private ConfigurationProvider _configurationProvider;

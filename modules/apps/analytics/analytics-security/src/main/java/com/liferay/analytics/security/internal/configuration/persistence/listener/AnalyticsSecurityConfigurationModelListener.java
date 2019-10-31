@@ -12,11 +12,11 @@
  *
  */
 
-package com.liferay.analytics.connector.web.internal.configuration.persistence.listener;
+package com.liferay.analytics.security.internal.configuration.persistence.listener;
 
-import com.liferay.analytics.connector.web.internal.configuration.AnalyticsConnectorConfiguration;
-import com.liferay.analytics.connector.web.internal.constants.AnalyticsConnectorConstants;
-import com.liferay.analytics.connector.web.internal.security.auth.verifier.AnalyticsConnectorAuthVerifier;
+import com.liferay.analytics.security.internal.configuration.AnalyticsConnectorConfiguration;
+import com.liferay.analytics.security.internal.constants.AnalyticsSecurityConstants;
+import com.liferay.analytics.security.internal.security.auth.verifier.AnalyticsSecurityAuthVerifier;
 import com.liferay.portal.configuration.persistence.listener.ConfigurationModelListener;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -55,10 +55,10 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	immediate = true,
-	property = "model.class.name=com.liferay.analytics.connector.web.internal.configuration.AnalyticsConnectorConfiguration.scoped",
+	property = "model.class.name=com.liferay.analytics.security.internal.configuration.AnalyticsConnectorConfiguration.scoped",
 	service = ConfigurationModelListener.class
 )
-public class AnalyticsConnectorConfigurationModelListener
+public class AnalyticsSecurityConfigurationModelListener
 	implements ConfigurationModelListener {
 
 	@Override
@@ -84,7 +84,7 @@ public class AnalyticsConnectorConfigurationModelListener
 
 	private void _addAnalyticsAdmin(long companyId) throws Exception {
 		User user = _userLocalService.fetchUserByScreenName(
-			companyId, AnalyticsConnectorConstants.SCREEN_NAME_ANALYTICS_ADMIN);
+			companyId, AnalyticsSecurityConstants.SCREEN_NAME_ANALYTICS_ADMIN);
 
 		if (user != null) {
 			return;
@@ -97,7 +97,7 @@ public class AnalyticsConnectorConfigurationModelListener
 
 		user = _userLocalService.addUser(
 			0, companyId, true, null, null, false,
-			AnalyticsConnectorConstants.SCREEN_NAME_ANALYTICS_ADMIN,
+			AnalyticsSecurityConstants.SCREEN_NAME_ANALYTICS_ADMIN,
 			"analytics.administrator@" + company.getMx(), 0, "",
 			LocaleUtil.getDefault(), "Analytics", "", "Administrator", 0, 0,
 			true, 0, 1, 1970, "", null, null, new long[] {role.getRoleId()},
@@ -125,7 +125,7 @@ public class AnalyticsConnectorConfigurationModelListener
 
 	private void _deleteAnalyticsAdmin(long companyId) throws Exception {
 		User user = _userLocalService.fetchUserByScreenName(
-			companyId, AnalyticsConnectorConstants.SCREEN_NAME_ANALYTICS_ADMIN);
+			companyId, AnalyticsSecurityConstants.SCREEN_NAME_ANALYTICS_ADMIN);
 
 		if (user != null) {
 			_userLocalService.deleteUser(user);
@@ -134,7 +134,7 @@ public class AnalyticsConnectorConfigurationModelListener
 
 	private void _deleteSAPEntry(long companyId) throws Exception {
 		SAPEntry sapEntry = _sapEntryLocalService.fetchSAPEntry(
-			companyId, AnalyticsConnectorConstants.SERVICE_ACCESS_POLICY_NAME);
+			companyId, AnalyticsSecurityConstants.SERVICE_ACCESS_POLICY_NAME);
 
 		if (sapEntry != null) {
 			_sapEntryLocalService.deleteSAPEntry(sapEntry);
@@ -155,7 +155,7 @@ public class AnalyticsConnectorConfigurationModelListener
 	private void _disableAuthVerifier() throws Exception {
 		if (!_hasConfiguration() && _authVerifierEnabled) {
 			_componentContext.disableComponent(
-				AnalyticsConnectorAuthVerifier.class.getName());
+				AnalyticsSecurityAuthVerifier.class.getName());
 
 			_authVerifierEnabled = false;
 		}
@@ -175,7 +175,7 @@ public class AnalyticsConnectorConfigurationModelListener
 	private void _enableAuthVerifier() {
 		if (!_authVerifierEnabled) {
 			_componentContext.enableComponent(
-				AnalyticsConnectorAuthVerifier.class.getName());
+				AnalyticsSecurityAuthVerifier.class.getName());
 
 			_authVerifierEnabled = true;
 		}
@@ -199,7 +199,7 @@ public class AnalyticsConnectorConfigurationModelListener
 	}
 
 	private static final String[] _SAP_ENTRY_OBJECT = {
-		AnalyticsConnectorConstants.SERVICE_ACCESS_POLICY_NAME,
+		AnalyticsSecurityConstants.SERVICE_ACCESS_POLICY_NAME,
 		StringBundler.concat(
 			"com.liferay.portal.security.audit.storage.service.",
 			"AuditEventService#getAuditEvents\n",
@@ -237,7 +237,7 @@ public class AnalyticsConnectorConfigurationModelListener
 	};
 
 	private static final Log _log = LogFactoryUtil.getLog(
-		AnalyticsConnectorConfigurationModelListener.class);
+		AnalyticsSecurityConfigurationModelListener.class);
 
 	private boolean _authVerifierEnabled;
 

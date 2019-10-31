@@ -12,12 +12,12 @@
  *
  */
 
-package com.liferay.analytics.connector.web.internal.constants;
+package com.liferay.analytics.security.internal.constants;
 
 /**
  * @author Shinn Lok
  */
-public class AnalyticsConnectorConstants {
+public class AnalyticsSecurityConstants {
 
 	public static final String SCREEN_NAME_ANALYTICS_ADMIN =
 		"analytics.administrator";
