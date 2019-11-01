@@ -37,13 +37,13 @@ public interface AnalyticsConfiguration {
 	public String dataSourceId();
 
 	@Meta.AD(required = false)
-	public String siteReportingGrouping();
-
-	@Meta.AD(required = false)
 	public String hostsAllowed();
 
 	@Meta.AD(required = false)
 	public String publicKey();
+
+	@Meta.AD(required = false)
+	public String siteReportingGrouping();
 
 	@Meta.AD(required = false)
 	public boolean syncAllContacts();
