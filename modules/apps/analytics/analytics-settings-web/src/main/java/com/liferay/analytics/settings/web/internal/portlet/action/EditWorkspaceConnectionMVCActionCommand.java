@@ -18,8 +18,10 @@ import com.liferay.configuration.admin.constants.ConfigurationAdminPortletKeys;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Base64;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.Dictionary;
 import java.util.Iterator;
@@ -46,6 +48,11 @@ public class EditWorkspaceConnectionMVCActionCommand
 			ActionRequest actionRequest,
 			Dictionary<String, Object> configurationProperties)
 		throws Exception {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		configurationProperties.put("companyId", themeDisplay.getCompanyId());
 
 		String token = ParamUtil.getString(actionRequest, "token");
 
