@@ -185,11 +185,15 @@ public class AnalyticsSecurityConfigurationModelListener
 		Configuration[] configurations = _configurationAdmin.listConfigurations(
 			"(service.pid=" + AnalyticsConfiguration.class.getName() + "*)");
 
+		if (configurations == null) {
+			return false;
+		}
+
 		for (Configuration configuration : configurations) {
 			Dictionary<String, Object> properties =
 				configuration.getProperties();
 
-			if (Validator.isNotNull(properties.get("code"))) {
+			if (Validator.isNotNull(properties.get("token"))) {
 				return true;
 			}
 		}
