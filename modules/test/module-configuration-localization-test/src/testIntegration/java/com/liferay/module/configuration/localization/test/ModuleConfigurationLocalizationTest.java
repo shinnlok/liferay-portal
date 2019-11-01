@@ -117,19 +117,8 @@ public class ModuleConfigurationLocalizationTest {
 				extendedMetaTypeInformation.getObjectClassDefinition(
 					iterator.next(), locale.getLanguage());
 
-			for (String extensionUri :
-					extendedObjectClassDefinition.getExtensionUris()) {
-
-				Map<String, String> extensionAttributes =
-					extendedObjectClassDefinition.getExtensionAttributes(
-						extensionUri);
-
-				boolean generateUI = GetterUtil.getBoolean(
-					extensionAttributes.get("generateUI"), true);
-
-				if (!generateUI) {
-					iterator.remove();
-				}
+			if (!_isGenerateUI(extendedObjectClassDefinition)) {
+				iterator.remove();
 			}
 		}
 
@@ -231,6 +220,27 @@ public class ModuleConfigurationLocalizationTest {
 		}
 
 		return sb.toString();
+	}
+
+	private boolean _isGenerateUI(
+		ExtendedObjectClassDefinition extendedObjectClassDefinition) {
+
+		for (String extensionUri :
+				extendedObjectClassDefinition.getExtensionUris()) {
+
+			Map<String, String> extensionAttributes =
+				extendedObjectClassDefinition.getExtensionAttributes(
+					extensionUri);
+
+			boolean generateUI = GetterUtil.getBoolean(
+				extensionAttributes.get("generateUI"), true);
+
+			if (!generateUI) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	@Inject
