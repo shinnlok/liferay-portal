@@ -12,32 +12,28 @@
  * details.
  */
 
-package com.liferay.analytics.message.sender.internal.model.listener;
+package com.liferay.analytics.message.sender.internal.configuration.persistence.listener;
 
-import com.liferay.portal.kernel.exception.ModelListenerException;
-import com.liferay.portal.kernel.model.BaseModelListener;
-import com.liferay.portal.kernel.model.Contact;
-import com.liferay.portal.kernel.model.ModelListener;
+import com.liferay.portal.configuration.persistence.listener.ConfigurationModelListener;
+
+import java.util.Dictionary;
 
 import org.osgi.service.component.annotations.Component;
 
 /**
  * @author Rachael Koestartyo
  */
-@Component(immediate = true, service = ModelListener.class)
-public class ContactModelListener extends BaseModelListener<Contact> {
+@Component(
+	immediate = true,
+	property = "model.class.name=com.liferay.analytics.settings.configuration.AnalyticsConfiguration.scoped",
+	service = ConfigurationModelListener.class
+)
+public class AnalyticsConfigurationModelListener
+	implements ConfigurationModelListener {
 
 	@Override
-	public void onAfterCreate(Contact contact) throws ModelListenerException {
-	}
-
-	@Override
-	public void onBeforeRemove(Contact contact) throws ModelListenerException {
-	}
-
-	@Override
-	public void onBeforeUpdate(Contact newContact)
-		throws ModelListenerException {
+	public void onBeforeSave(
+		String pid, Dictionary<String, Object> properties) {
 	}
 
 }
