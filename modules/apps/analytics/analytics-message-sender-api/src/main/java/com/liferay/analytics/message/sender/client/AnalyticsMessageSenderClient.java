@@ -26,7 +26,7 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface AnalyticsMessageSenderClient {
 
-	public Object send(List<AnalyticsMessage> analyticsMessages)
+	public Object send(List<AnalyticsMessage> analyticsMessages, long companyId)
 		throws Exception;
 
 }
