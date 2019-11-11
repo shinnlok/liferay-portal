@@ -47,11 +47,10 @@ public class AnalyticsConfigurationTrackerImpl
 		_unmapPid(pid);
 	}
 
-	public AnalyticsConfiguration getCompanyAnalyticsConfiguration(
-		long companyId) {
-
-		if (_companyConfigurationBeans.containsKey(companyId)) {
-			return _companyConfigurationBeans.get(companyId);
+	@Override
+	public AnalyticsConfiguration getAnalyticsConfiguration(long companyId) {
+		if (_analyticsConfigurations.containsKey(companyId)) {
+			return _analyticsConfigurations.get(companyId);
 		}
 
 		return _systemAnalyticsConfiguration;
@@ -73,7 +72,7 @@ public class AnalyticsConfigurationTrackerImpl
 		if (companyId != CompanyConstants.SYSTEM) {
 			_pidCompanyIdMapping.put(pid, companyId);
 
-			_companyConfigurationBeans.put(
+			_analyticsConfigurations.put(
 				companyId,
 				ConfigurableUtil.createConfigurable(
 					AnalyticsConfiguration.class, dictionary));
@@ -91,11 +90,11 @@ public class AnalyticsConfigurationTrackerImpl
 		if (_pidCompanyIdMapping.containsKey(pid)) {
 			long companyId = _pidCompanyIdMapping.remove(pid);
 
-			_companyConfigurationBeans.remove(companyId);
+			_analyticsConfigurations.remove(companyId);
 		}
 	}
 
-	private final Map<Long, AnalyticsConfiguration> _companyConfigurationBeans =
+	private final Map<Long, AnalyticsConfiguration> _analyticsConfigurations =
 		new ConcurrentHashMap<>();
 	private final Map<String, Long> _pidCompanyIdMapping =
 		new ConcurrentHashMap<>();

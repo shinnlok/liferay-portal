@@ -70,11 +70,6 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 		}
 	}
 
-	protected AnalyticsConfiguration getAnalyticsConfiguration(long companyId) {
-		return analyticsConfigurationTracker.getCompanyAnalyticsConfiguration(
-			companyId);
-	}
-
 	protected abstract List<String> getAttributes();
 
 	protected abstract T getOriginalModel(T model) throws Exception;
@@ -91,21 +86,10 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 	protected UserLocalService userLocalService;
 
 	private String _getDataSourceId(long companyId) {
-		try {
-			AnalyticsConfiguration analyticsConfiguration =
-				getAnalyticsConfiguration(companyId);
+		AnalyticsConfiguration analyticsConfiguration =
+			analyticsConfigurationTracker.getAnalyticsConfiguration(companyId);
 
-			return analyticsConfiguration.dataSourceId();
-		}
-		catch (Exception e) {
-			if (_log.isInfoEnabled()) {
-				_log.info(
-					"Unable to find analytics configuration for company ID " +
-						companyId);
-			}
-
-			return null;
-		}
+		return analyticsConfiguration.dataSourceId();
 	}
 
 	private List<String> _getModifiedAttributes(

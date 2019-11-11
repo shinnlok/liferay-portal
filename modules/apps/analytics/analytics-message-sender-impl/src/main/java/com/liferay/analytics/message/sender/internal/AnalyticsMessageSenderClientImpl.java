@@ -47,7 +47,7 @@ public class AnalyticsMessageSenderClientImpl
 		throws Exception {
 
 		JSONWebServiceClient jsonWebServiceClient = _getJSONWebServiceClient(
-			_analyticsConfigurationTracker.getCompanyAnalyticsConfiguration(
+			_analyticsConfigurationTracker.getAnalyticsConfiguration(
 				companyId));
 
 		JSONSerializer jsonSerializer = JSONFactoryUtil.createJSONSerializer();

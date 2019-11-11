@@ -19,7 +19,6 @@ package com.liferay.analytics.settings.configuration;
  */
 public interface AnalyticsConfigurationTracker {
 
-	public AnalyticsConfiguration getCompanyAnalyticsConfiguration(
-		long companyId);
+	public AnalyticsConfiguration getAnalyticsConfiguration(long companyId);
 
 }
