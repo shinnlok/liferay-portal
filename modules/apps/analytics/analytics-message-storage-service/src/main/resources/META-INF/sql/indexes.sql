@@ -1,0 +1,1 @@
+create index IX_DF6F2F7 on AnalyticsMessageEntry (companyId, status);
