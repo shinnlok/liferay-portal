@@ -1,0 +1,1 @@
+create index IX_66525511 on AnalyticsMessageEntry (companyId);
