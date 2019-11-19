@@ -14,8 +14,8 @@
 
 package com.liferay.analytics.message.sender.internal.model.listener;
 
-import com.liferay.analytics.message.sender.client.AnalyticsMessageSenderClient;
 import com.liferay.analytics.message.sender.model.AnalyticsMessage;
+import com.liferay.analytics.message.storage.service.AnalyticsMessageLocalService;
 import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
 import com.liferay.analytics.settings.configuration.AnalyticsConfigurationTracker;
 import com.liferay.portal.kernel.bean.BeanPropertiesUtil;
@@ -45,12 +45,12 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 
 	@Override
 	public void onAfterCreate(T model) throws ModelListenerException {
-		_send("add", getAttributes(), model);
+		_addAnalyticsMessage("add", getAttributes(), model);
 	}
 
 	@Override
 	public void onBeforeRemove(T model) throws ModelListenerException {
-		_send("delete", new ArrayList<>(), model);
+		_addAnalyticsMessage("delete", new ArrayList<>(), model);
 	}
 
 	@Override
@@ -63,7 +63,7 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 				return;
 			}
 
-			_send("update", modifiedAttributes, model);
+			_addAnalyticsMessage("update", modifiedAttributes, model);
 		}
 		catch (Exception e) {
 			throw new ModelListenerException(e);
@@ -84,7 +84,7 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 	protected AnalyticsConfigurationTracker analyticsConfigurationTracker;
 
 	@Reference
-	protected AnalyticsMessageSenderClient analyticsMessageSenderClient;
+	protected AnalyticsMessageLocalService analyticsMessageLocalService;
 
 	@Reference
 	protected UserLocalService userLocalService;
@@ -115,7 +115,7 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 		return modifiedAttributes;
 	}
 
-	private void _send(
+	private void _addAnalyticsMessage(
 		String eventType, List<String> includeAttributes, T model) {
 
 		JSONObject jsonObject = _serialize(includeAttributes, model);
