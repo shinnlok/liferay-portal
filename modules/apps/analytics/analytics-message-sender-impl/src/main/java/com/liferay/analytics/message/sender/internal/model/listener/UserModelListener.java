@@ -44,7 +44,11 @@ public class UserModelListener extends BaseEntityModelListener<User> {
 	}
 
 	private static final List<String> _attributes = Arrays.asList(
-		"active", "agreedToTermsOfUse", "comments", "emailAddress",
-		"languageId", "screenName", "timeZoneId");
+		"agreedToTermsOfUse", "comments", "companyId", "contactId",
+		"createDate", "defaultUser", "emailAddress", "emailAddressVerified",
+		"externalReferenceCode", "facebookId", "firstName", "googleUserId",
+		"greeting", "jobTitle", "languageId", "lastName", "ldapServerId",
+		"middleName", "openId", "portraitId", "screenName", "status",
+		"timeZoneId", "uuid");
 
 }

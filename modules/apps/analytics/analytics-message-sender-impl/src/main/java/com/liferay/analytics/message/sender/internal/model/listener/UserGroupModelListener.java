@@ -46,7 +46,9 @@ public class UserGroupModelListener extends BaseEntityModelListener<UserGroup> {
 	}
 
 	private static final List<String> _attributes = Arrays.asList(
-		"description", "name");
+		"addedByLDAPImport", "companyId", "createDate", "description",
+		"externalReferenceCode", "name", "parentUserGroupId", "userId",
+		"userName", "uuid");
 
 	@Reference
 	private UserGroupLocalService _userGroupLocalService;

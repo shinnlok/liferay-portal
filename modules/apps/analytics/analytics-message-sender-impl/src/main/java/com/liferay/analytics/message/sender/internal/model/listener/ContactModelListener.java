@@ -46,10 +46,11 @@ public class ContactModelListener extends BaseEntityModelListener<Contact> {
 	}
 
 	private static final List<String> _attributes = Arrays.asList(
-		"birthday", "employeeNumber", "employeeStatusId", "facebookSn",
+		"accountId", "birthday", "classNameId", "classPK", "companyId",
+		"createDate", "employeeNumber", "employeeStatusId", "facebookSn",
 		"firstName", "hoursOfOperation", "jabberSn", "jobClass", "jobTitle",
-		"lastName", "male", "middleName", "prefixId", "skypeSn", "smsSn",
-		"suffixId", "twitterSn");
+		"lastName", "male", "middleName", "parentContactId", "prefixId",
+		"skypeSn", "smsSn", "suffixId", "twitterSn", "userId", "userName");
 
 	@Reference
 	private ContactLocalService _contactLocalService;
