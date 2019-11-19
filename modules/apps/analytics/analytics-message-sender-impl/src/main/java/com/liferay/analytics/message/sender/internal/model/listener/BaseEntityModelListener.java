@@ -70,6 +70,10 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 		}
 	}
 
+	protected boolean exclude(T model) {
+		return false;
+	}
+
 	protected abstract List<String> getAttributes();
 
 	protected abstract T getOriginalModel(T model) throws Exception;
