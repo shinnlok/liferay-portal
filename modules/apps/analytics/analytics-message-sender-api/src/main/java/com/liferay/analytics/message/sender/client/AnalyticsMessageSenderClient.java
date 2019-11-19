@@ -14,10 +14,6 @@
 
 package com.liferay.analytics.message.sender.client;
 
-import com.liferay.analytics.message.sender.model.AnalyticsMessage;
-
-import java.util.List;
-
 import org.osgi.annotation.versioning.ProviderType;
 
 /**
@@ -26,7 +22,6 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface AnalyticsMessageSenderClient {
 
-	public Object send(List<AnalyticsMessage> analyticsMessages, long companyId)
-		throws Exception;
+	public Object send(String body, long companyId) throws Exception;
 
 }
