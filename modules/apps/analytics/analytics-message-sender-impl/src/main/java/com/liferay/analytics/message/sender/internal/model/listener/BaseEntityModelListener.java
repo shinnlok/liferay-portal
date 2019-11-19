@@ -29,8 +29,9 @@ import com.liferay.portal.kernel.model.BaseModelListener;
 import com.liferay.portal.kernel.model.ShardedModel;
 import com.liferay.portal.kernel.service.UserLocalService;
 
+import java.nio.charset.Charset;
+
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -118,6 +119,10 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 	private void _addAnalyticsMessage(
 		String eventType, List<String> includeAttributes, T model) {
 
+		if (exclude(model)) {
+			return;
+		}
+
 		JSONObject jsonObject = _serialize(includeAttributes, model);
 
 		ShardedModel shardedModel = (ShardedModel)model;
@@ -131,15 +136,18 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 			analyticsMessageBuilder.action(eventType);
 			analyticsMessageBuilder.object(jsonObject);
 
-			analyticsMessageSenderClient.send(
-				Collections.singletonList(analyticsMessageBuilder.build()),
-				shardedModel.getCompanyId());
+			String analyticsMessageJSON =
+				analyticsMessageBuilder.buildJSONString();
+
+			analyticsMessageLocalService.addAnalyticsMessage(
+				shardedModel.getCompanyId(),
+				userLocalService.getDefaultUserId(shardedModel.getCompanyId()),
+				analyticsMessageJSON.getBytes(Charset.defaultCharset()));
 		}
 		catch (Exception e) {
 			if (_log.isInfoEnabled()) {
 				_log.info(
-					"Unable to send analytics message " +
-						jsonObject.toString());
+					"Unable to add analytics message " + jsonObject.toString());
 			}
 		}
 	}
