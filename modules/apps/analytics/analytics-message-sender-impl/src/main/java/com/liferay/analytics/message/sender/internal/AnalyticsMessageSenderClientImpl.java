@@ -15,19 +15,15 @@
 package com.liferay.analytics.message.sender.internal;
 
 import com.liferay.analytics.message.sender.client.AnalyticsMessageSenderClient;
-import com.liferay.analytics.message.sender.model.AnalyticsMessage;
 import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
 import com.liferay.analytics.settings.configuration.AnalyticsConfigurationTracker;
 import com.liferay.petra.json.web.service.client.JSONWebServiceClient;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
-import com.liferay.portal.kernel.json.JSONSerializer;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 
 import java.net.URL;
 
 import java.util.Dictionary;
-import java.util.List;
 import java.util.Properties;
 
 import org.osgi.service.component.ComponentFactory;
@@ -43,17 +39,12 @@ public class AnalyticsMessageSenderClientImpl
 	implements AnalyticsMessageSenderClient {
 
 	@Override
-	public Object send(List<AnalyticsMessage> analyticsMessages, long companyId)
-		throws Exception {
-
+	public Object send(String body, long companyId) throws Exception {
 		JSONWebServiceClient jsonWebServiceClient = _getJSONWebServiceClient(
 			_analyticsConfigurationTracker.getAnalyticsConfiguration(
 				companyId));
 
-		JSONSerializer jsonSerializer = JSONFactoryUtil.createJSONSerializer();
-
-		return jsonWebServiceClient.doPostAsJSON(
-			"/dxp-entities", jsonSerializer.serializeDeep(analyticsMessages));
+		return jsonWebServiceClient.doPostAsJSON("/dxp-entities", body);
 	}
 
 	private JSONWebServiceClient _getJSONWebServiceClient(
