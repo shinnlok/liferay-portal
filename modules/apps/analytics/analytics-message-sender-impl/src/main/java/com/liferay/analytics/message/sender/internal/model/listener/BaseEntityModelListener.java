@@ -90,32 +90,6 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 	@Reference
 	protected UserLocalService userLocalService;
 
-	private String _getDataSourceId(long companyId) {
-		AnalyticsConfiguration analyticsConfiguration =
-			analyticsConfigurationTracker.getAnalyticsConfiguration(companyId);
-
-		return analyticsConfiguration.dataSourceId();
-	}
-
-	private List<String> _getModifiedAttributes(
-		List<String> attributeNames, T model, T originalModel) {
-
-		List<String> modifiedAttributes = new ArrayList<>();
-
-		for (String attributeName : attributeNames) {
-			String value = String.valueOf(
-				BeanPropertiesUtil.getObject(model, attributeName));
-			String originalValue = String.valueOf(
-				BeanPropertiesUtil.getObject(originalModel, attributeName));
-
-			if (!Objects.equals(value, originalValue)) {
-				modifiedAttributes.add(attributeName);
-			}
-		}
-
-		return modifiedAttributes;
-	}
-
 	private void _addAnalyticsMessage(
 		String eventType, List<String> includeAttributes, T model) {
 
@@ -150,6 +124,32 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 					"Unable to add analytics message " + jsonObject.toString());
 			}
 		}
+	}
+
+	private String _getDataSourceId(long companyId) {
+		AnalyticsConfiguration analyticsConfiguration =
+			analyticsConfigurationTracker.getAnalyticsConfiguration(companyId);
+
+		return analyticsConfiguration.dataSourceId();
+	}
+
+	private List<String> _getModifiedAttributes(
+		List<String> attributeNames, T model, T originalModel) {
+
+		List<String> modifiedAttributes = new ArrayList<>();
+
+		for (String attributeName : attributeNames) {
+			String value = String.valueOf(
+				BeanPropertiesUtil.getObject(model, attributeName));
+			String originalValue = String.valueOf(
+				BeanPropertiesUtil.getObject(originalModel, attributeName));
+
+			if (!Objects.equals(value, originalValue)) {
+				modifiedAttributes.add(attributeName);
+			}
+		}
+
+		return modifiedAttributes;
 	}
 
 	private JSONObject _serialize(List<String> includeAttributes, T model) {
