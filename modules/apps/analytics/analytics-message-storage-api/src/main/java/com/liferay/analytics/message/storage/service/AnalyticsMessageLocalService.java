@@ -72,6 +72,10 @@ public interface AnalyticsMessageLocalService
 	public AnalyticsMessage addAnalyticsMessage(
 		AnalyticsMessage analyticsMessage);
 
+	public AnalyticsMessage addAnalyticsMessage(
+			long companyId, long userId, byte[] body)
+		throws PortalException;
+
 	/**
 	 * Creates a new analytics message with the primary key. Does not add the analytics message to the database.
 	 *
