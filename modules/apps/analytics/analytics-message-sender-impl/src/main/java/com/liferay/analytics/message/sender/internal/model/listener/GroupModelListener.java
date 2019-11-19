@@ -31,6 +31,15 @@ import org.osgi.service.component.annotations.Reference;
 public class GroupModelListener extends BaseEntityModelListener<Group> {
 
 	@Override
+	protected boolean exclude(Group group) {
+		if (!group.isSite()) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
 	protected List<String> getAttributes() {
 		return _attributes;
 	}
