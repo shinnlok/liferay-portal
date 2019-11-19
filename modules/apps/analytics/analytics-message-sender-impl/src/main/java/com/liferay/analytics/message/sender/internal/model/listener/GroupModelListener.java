@@ -55,7 +55,12 @@ public class GroupModelListener extends BaseEntityModelListener<Group> {
 	}
 
 	private static final List<String> _attributes = Arrays.asList(
-		"description", "descriptiveName", "friendlyURL", "name");
+		"active", "classNameId", "classPK", "companyId", "creatorUserId",
+		"description", "descriptionCurrentValue", "descriptiveName",
+		"friendlyURL", "groupKey", "inheritContent", "liveGroupId",
+		"manualMembership", "membershipRestriction", "name", "nameCurrentValue",
+		"parentGroupId", "remoteStagingGroupCount", "site", "treePath", "type",
+		"uuid");
 
 	@Reference
 	private GroupLocalService _groupLocalService;

@@ -50,7 +50,10 @@ public class OrganizationModelListener
 	}
 
 	private static final List<String> _attributes = Arrays.asList(
-		"comments", "countryId", "name", "parentOrganizationId", "regionId");
+		"comments", "companyId", "countryId", "createDate",
+		"externalReferenceCode", "logoId", "name", "parentOrganizationId",
+		"recursable", "regionId", "statusId", "treePath", "type", "userId",
+		"userName", "uuid");
 
 	@Reference
 	private OrganizationLocalService _organizationLocalService;
