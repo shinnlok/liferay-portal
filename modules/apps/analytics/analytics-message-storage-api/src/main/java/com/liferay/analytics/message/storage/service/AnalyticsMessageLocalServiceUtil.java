@@ -52,6 +52,13 @@ public class AnalyticsMessageLocalServiceUtil {
 		return getService().addAnalyticsMessage(analyticsMessage);
 	}
 
+	public static com.liferay.analytics.message.storage.model.AnalyticsMessage
+			addAnalyticsMessage(long companyId, long userId, byte[] body)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return getService().addAnalyticsMessage(companyId, userId, body);
+	}
+
 	/**
 	 * Creates a new analytics message with the primary key. Does not add the analytics message to the database.
 	 *
