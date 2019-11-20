@@ -31,15 +31,6 @@ import org.osgi.service.component.annotations.Reference;
 public class GroupModelListener extends BaseEntityModelListener<Group> {
 
 	@Override
-	protected boolean exclude(Group group) {
-		if (!group.isSite()) {
-			return true;
-		}
-
-		return false;
-	}
-
-	@Override
 	protected List<String> getAttributes() {
 		return _attributes;
 	}
@@ -52,6 +43,15 @@ public class GroupModelListener extends BaseEntityModelListener<Group> {
 	@Override
 	protected String getPrimaryKeyName() {
 		return "groupId";
+	}
+
+	@Override
+	protected boolean isExcluded(Group group) {
+		if (!group.isSite()) {
+			return true;
+		}
+
+		return false;
 	}
 
 	private static final List<String> _attributes = Arrays.asList(

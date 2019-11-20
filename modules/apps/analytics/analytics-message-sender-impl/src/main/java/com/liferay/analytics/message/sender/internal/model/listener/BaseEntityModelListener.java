@@ -71,15 +71,15 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 		}
 	}
 
-	protected boolean exclude(T model) {
-		return false;
-	}
-
 	protected abstract List<String> getAttributes();
 
 	protected abstract T getOriginalModel(T model) throws Exception;
 
 	protected abstract String getPrimaryKeyName();
+
+	protected boolean isExcluded(T model) {
+		return false;
+	}
 
 	@Reference
 	protected AnalyticsConfigurationTracker analyticsConfigurationTracker;
@@ -93,7 +93,7 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 	private void _addAnalyticsMessage(
 		String eventType, List<String> includeAttributes, T model) {
 
-		if (exclude(model)) {
+		if (isExcluded(model)) {
 			return;
 		}
 
