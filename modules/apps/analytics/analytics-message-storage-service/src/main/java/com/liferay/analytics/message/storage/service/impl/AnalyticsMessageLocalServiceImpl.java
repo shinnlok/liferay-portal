@@ -18,11 +18,17 @@ import com.liferay.analytics.message.storage.model.AnalyticsMessage;
 import com.liferay.analytics.message.storage.service.base.AnalyticsMessageLocalServiceBaseImpl;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.jdbc.OutputBlob;
+import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.Property;
+import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.util.GetterUtil;
 
 import java.util.Date;
+import java.util.List;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -55,6 +61,45 @@ public class AnalyticsMessageLocalServiceImpl
 			new OutputBlob(new UnsyncByteArrayInputStream(body), body.length));
 
 		return analyticsMessagePersistence.update(analyticsMessage);
+	}
+
+	public void deleteAnalyticsMessages(
+		List<AnalyticsMessage> analyticsMessages) {
+
+		for (AnalyticsMessage analyticsMessage : analyticsMessages) {
+			analyticsMessagePersistence.remove(analyticsMessage);
+		}
+	}
+
+	public void deleteAnalyticsMessages(long companyId) {
+		analyticsMessagePersistence.removeByCompanyId(companyId);
+	}
+
+	public List<AnalyticsMessage> getAnalyticsMessages(
+		long companyId, int start, int end) {
+
+		return analyticsMessagePersistence.findByCompanyId(
+			companyId, start, end);
+	}
+
+	public int getAnalyticsMessagesCount(long companyId) {
+		DynamicQuery dynamicQuery = dynamicQuery();
+
+		Property companyIdProperty = PropertyFactoryUtil.forName("companyId");
+
+		dynamicQuery.add(companyIdProperty.eq(companyId));
+
+		return GetterUtil.getInteger(dynamicQueryCount(dynamicQuery));
+	}
+
+	public List<Long> getCompanyIds() {
+		DynamicQuery dynamicQuery = dynamicQuery();
+
+		dynamicQuery.setProjection(
+			ProjectionFactoryUtil.distinct(
+				ProjectionFactoryUtil.property("companyId")));
+
+		return analyticsMessagePersistence.findWithDynamicQuery(dynamicQuery);
 	}
 
 }
