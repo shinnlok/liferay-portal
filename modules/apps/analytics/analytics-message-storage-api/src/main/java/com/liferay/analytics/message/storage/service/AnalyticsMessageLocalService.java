@@ -106,6 +106,11 @@ public interface AnalyticsMessageLocalService
 	public AnalyticsMessage deleteAnalyticsMessage(long analyticsMessageId)
 		throws PortalException;
 
+	public void deleteAnalyticsMessages(
+		List<AnalyticsMessage> analyticsMessages);
+
+	public void deleteAnalyticsMessages(long companyId);
+
 	/**
 	 * @throws PortalException
 	 */
@@ -210,6 +215,10 @@ public interface AnalyticsMessageLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<AnalyticsMessage> getAnalyticsMessages(int start, int end);
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<AnalyticsMessage> getAnalyticsMessages(
+		long companyId, int start, int end);
+
 	/**
 	 * Returns the number of analytics messages.
 	 *
@@ -219,8 +228,14 @@ public interface AnalyticsMessageLocalService
 	public int getAnalyticsMessagesCount();
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getAnalyticsMessagesCount(long companyId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public AnalyticsMessageBodyBlobModel getBodyBlobModel(
 		Serializable primaryKey);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<Long> getCompanyIds();
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery();

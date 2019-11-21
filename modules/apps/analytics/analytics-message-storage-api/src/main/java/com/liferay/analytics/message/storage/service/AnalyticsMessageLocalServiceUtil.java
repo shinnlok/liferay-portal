@@ -99,6 +99,18 @@ public class AnalyticsMessageLocalServiceUtil {
 		return getService().deleteAnalyticsMessage(analyticsMessageId);
 	}
 
+	public static void deleteAnalyticsMessages(
+		java.util.List
+			<com.liferay.analytics.message.storage.model.AnalyticsMessage>
+				analyticsMessages) {
+
+		getService().deleteAnalyticsMessages(analyticsMessages);
+	}
+
+	public static void deleteAnalyticsMessages(long companyId) {
+		getService().deleteAnalyticsMessages(companyId);
+	}
+
 	/**
 	 * @throws PortalException
 	 */
@@ -239,6 +251,13 @@ public class AnalyticsMessageLocalServiceUtil {
 		return getService().getAnalyticsMessages(start, end);
 	}
 
+	public static java.util.List
+		<com.liferay.analytics.message.storage.model.AnalyticsMessage>
+			getAnalyticsMessages(long companyId, int start, int end) {
+
+		return getService().getAnalyticsMessages(companyId, start, end);
+	}
+
 	/**
 	 * Returns the number of analytics messages.
 	 *
@@ -248,12 +267,20 @@ public class AnalyticsMessageLocalServiceUtil {
 		return getService().getAnalyticsMessagesCount();
 	}
 
+	public static int getAnalyticsMessagesCount(long companyId) {
+		return getService().getAnalyticsMessagesCount(companyId);
+	}
+
 	public static
 		com.liferay.analytics.message.storage.model.
 			AnalyticsMessageBodyBlobModel getBodyBlobModel(
 				java.io.Serializable primaryKey) {
 
 		return getService().getBodyBlobModel(primaryKey);
+	}
+
+	public static java.util.List<Long> getCompanyIds() {
+		return getService().getCompanyIds();
 	}
 
 	public static
