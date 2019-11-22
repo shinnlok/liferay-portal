@@ -87,15 +87,15 @@ public class SendAnalyticsMessagesMessageListener extends BaseMessageListener {
 	}
 
 	private void _process(long companyId) throws Exception {
-		int count = _analyticsMessageLocalService.getAnalyticsMessagesCount(
-			companyId);
+		while (true) {
+			int count = _analyticsMessageLocalService.getAnalyticsMessagesCount(
+				companyId);
 
-		int pages = count / _BATCH_SIZE;
+			if (count == 0) {
+				return;
+			}
 
-		for (int i = 0; i <= pages; i++) {
-			int start = i * _BATCH_SIZE;
-
-			int end = start + _BATCH_SIZE - 1;
+			int end = _BATCH_SIZE;
 
 			if (count < end) {
 				end = count;
@@ -105,7 +105,7 @@ public class SendAnalyticsMessagesMessageListener extends BaseMessageListener {
 
 			List<AnalyticsMessage> analyticsMessages =
 				_analyticsMessageLocalService.getAnalyticsMessages(
-					companyId, start, end);
+					companyId, 0, end);
 
 			for (AnalyticsMessage analyticsMessage : analyticsMessages) {
 				Blob body = analyticsMessage.getBody();
