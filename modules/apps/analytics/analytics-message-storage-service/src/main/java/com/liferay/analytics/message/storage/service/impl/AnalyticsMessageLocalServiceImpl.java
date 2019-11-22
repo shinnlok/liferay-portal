@@ -37,6 +37,7 @@ import org.osgi.service.component.annotations.Component;
 public class AnalyticsMessageLocalServiceImpl
 	extends AnalyticsMessageLocalServiceBaseImpl {
 
+	@Override
 	public AnalyticsMessage addAnalyticsMessage(
 			long companyId, long userId, byte[] body)
 		throws PortalException {
@@ -58,6 +59,7 @@ public class AnalyticsMessageLocalServiceImpl
 		return analyticsMessagePersistence.update(analyticsMessage);
 	}
 
+	@Override
 	public void deleteAnalyticsMessages(
 		List<AnalyticsMessage> analyticsMessages) {
 
@@ -66,10 +68,12 @@ public class AnalyticsMessageLocalServiceImpl
 		}
 	}
 
+	@Override
 	public void deleteAnalyticsMessages(long companyId) {
 		analyticsMessagePersistence.removeByCompanyId(companyId);
 	}
 
+	@Override
 	public List<AnalyticsMessage> getAnalyticsMessages(
 		long companyId, int start, int end) {
 
@@ -77,6 +81,7 @@ public class AnalyticsMessageLocalServiceImpl
 			companyId, start, end);
 	}
 
+	@Override
 	public int getAnalyticsMessagesCount(long companyId) {
 		return analyticsMessagePersistence.countByCompanyId(companyId);
 	}
