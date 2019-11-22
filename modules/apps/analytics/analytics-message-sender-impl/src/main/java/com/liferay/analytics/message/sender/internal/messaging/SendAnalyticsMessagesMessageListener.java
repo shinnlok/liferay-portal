@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.scheduler.SchedulerEntryImpl;
 import com.liferay.portal.kernel.scheduler.TimeUnit;
 import com.liferay.portal.kernel.scheduler.Trigger;
 import com.liferay.portal.kernel.scheduler.TriggerFactory;
+import com.liferay.portal.util.PortalInstances;
 
 import java.sql.Blob;
 
@@ -74,9 +75,7 @@ public class SendAnalyticsMessagesMessageListener extends BaseMessageListener {
 
 	@Override
 	protected void doReceive(Message message) throws Exception {
-		List<Long> companyIds = _analyticsMessageLocalService.getCompanyIds();
-
-		for (long companyId : companyIds) {
+		for (long companyId : PortalInstances.getCompanyIds()) {
 			_process(companyId);
 		}
 	}

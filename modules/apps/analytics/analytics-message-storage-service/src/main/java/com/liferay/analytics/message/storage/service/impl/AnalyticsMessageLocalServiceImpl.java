@@ -18,8 +18,6 @@ import com.liferay.analytics.message.storage.model.AnalyticsMessage;
 import com.liferay.analytics.message.storage.service.base.AnalyticsMessageLocalServiceBaseImpl;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.jdbc.OutputBlob;
-import com.liferay.portal.kernel.dao.orm.DynamicQuery;
-import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
 import com.liferay.portal.kernel.model.User;
@@ -81,16 +79,6 @@ public class AnalyticsMessageLocalServiceImpl
 
 	public int getAnalyticsMessagesCount(long companyId) {
 		return analyticsMessagePersistence.countByCompanyId(companyId);
-	}
-
-	public List<Long> getCompanyIds() {
-		DynamicQuery dynamicQuery = dynamicQuery();
-
-		dynamicQuery.setProjection(
-			ProjectionFactoryUtil.distinct(
-				ProjectionFactoryUtil.property("companyId")));
-
-		return analyticsMessagePersistence.findWithDynamicQuery(dynamicQuery);
 	}
 
 }
