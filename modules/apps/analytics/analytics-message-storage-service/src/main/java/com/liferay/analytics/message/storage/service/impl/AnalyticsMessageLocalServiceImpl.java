@@ -81,9 +81,4 @@ public class AnalyticsMessageLocalServiceImpl
 			companyId, start, end);
 	}
 
-	@Override
-	public int getAnalyticsMessagesCount(long companyId) {
-		return analyticsMessagePersistence.countByCompanyId(companyId);
-	}
-
 }

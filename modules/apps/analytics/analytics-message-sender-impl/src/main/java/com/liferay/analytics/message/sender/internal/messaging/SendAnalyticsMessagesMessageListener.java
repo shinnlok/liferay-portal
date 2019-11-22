@@ -87,24 +87,15 @@ public class SendAnalyticsMessagesMessageListener extends BaseMessageListener {
 
 	private void _process(long companyId) throws Exception {
 		while (true) {
-			int count = _analyticsMessageLocalService.getAnalyticsMessagesCount(
-				companyId);
+			List<AnalyticsMessage> analyticsMessages =
+				_analyticsMessageLocalService.getAnalyticsMessages(
+					companyId, 0, _BATCH_SIZE);
 
-			if (count == 0) {
+			if (analyticsMessages.isEmpty()) {
 				return;
 			}
 
-			int end = _BATCH_SIZE;
-
-			if (count < end) {
-				end = count;
-			}
-
 			JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
-
-			List<AnalyticsMessage> analyticsMessages =
-				_analyticsMessageLocalService.getAnalyticsMessages(
-					companyId, 0, end);
 
 			for (AnalyticsMessage analyticsMessage : analyticsMessages) {
 				Blob body = analyticsMessage.getBody();
