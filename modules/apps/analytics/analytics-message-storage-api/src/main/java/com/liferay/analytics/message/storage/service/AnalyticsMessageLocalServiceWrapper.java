@@ -292,23 +292,12 @@ public class AnalyticsMessageLocalServiceWrapper
 	}
 
 	@Override
-	public int getAnalyticsMessagesCount(long companyId) {
-		return _analyticsMessageLocalService.getAnalyticsMessagesCount(
-			companyId);
-	}
-
-	@Override
 	public
 		com.liferay.analytics.message.storage.model.
 			AnalyticsMessageBodyBlobModel getBodyBlobModel(
 				java.io.Serializable primaryKey) {
 
 		return _analyticsMessageLocalService.getBodyBlobModel(primaryKey);
-	}
-
-	@Override
-	public java.util.List<Long> getCompanyIds() {
-		return _analyticsMessageLocalService.getCompanyIds();
 	}
 
 	@Override

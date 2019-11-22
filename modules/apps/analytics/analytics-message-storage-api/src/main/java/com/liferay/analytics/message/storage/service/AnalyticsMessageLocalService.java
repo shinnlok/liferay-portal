@@ -228,14 +228,8 @@ public interface AnalyticsMessageLocalService
 	public int getAnalyticsMessagesCount();
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int getAnalyticsMessagesCount(long companyId);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public AnalyticsMessageBodyBlobModel getBodyBlobModel(
 		Serializable primaryKey);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<Long> getCompanyIds();
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery();

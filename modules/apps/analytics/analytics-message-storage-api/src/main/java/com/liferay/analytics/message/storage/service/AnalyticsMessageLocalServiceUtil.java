@@ -267,20 +267,12 @@ public class AnalyticsMessageLocalServiceUtil {
 		return getService().getAnalyticsMessagesCount();
 	}
 
-	public static int getAnalyticsMessagesCount(long companyId) {
-		return getService().getAnalyticsMessagesCount(companyId);
-	}
-
 	public static
 		com.liferay.analytics.message.storage.model.
 			AnalyticsMessageBodyBlobModel getBodyBlobModel(
 				java.io.Serializable primaryKey) {
 
 		return getService().getBodyBlobModel(primaryKey);
-	}
-
-	public static java.util.List<Long> getCompanyIds() {
-		return getService().getCompanyIds();
 	}
 
 	public static
