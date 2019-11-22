@@ -19,7 +19,6 @@ import com.liferay.analytics.message.storage.model.AnalyticsMessage;
 import com.liferay.analytics.message.storage.service.AnalyticsMessageLocalService;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
-import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.messaging.BaseMessageListener;
 import com.liferay.portal.kernel.messaging.DestinationNames;
 import com.liferay.portal.kernel.messaging.Message;
@@ -35,7 +34,6 @@ import com.liferay.portal.util.PortalInstances;
 import java.sql.Blob;
 
 import java.util.List;
-import java.util.Map;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -53,7 +51,7 @@ public class SendAnalyticsMessagesMessageListener extends BaseMessageListener {
 
 	@Activate
 	@Modified
-	protected void activate(Map<String, Object> properties) {
+	protected void activate() {
 		Class<?> clazz = getClass();
 
 		String className = clazz.getName();
@@ -100,21 +98,15 @@ public class SendAnalyticsMessagesMessageListener extends BaseMessageListener {
 			for (AnalyticsMessage analyticsMessage : analyticsMessages) {
 				Blob body = analyticsMessage.getBody();
 
-				byte[] bodyBytes = body.getBytes(1, (int)body.length());
-
-				JSONObject bodyJSONObject = JSONFactoryUtil.createJSONObject(
-					new String(bodyBytes));
-
-				jsonArray.put(bodyJSONObject);
+				jsonArray.put(
+					JSONFactoryUtil.createJSONObject(
+						new String(body.getBytes(1, (int)body.length()))));
 			}
 
-			if (jsonArray.length() > 0) {
-				_analyticsMessageSenderClient.send(
-					jsonArray.toString(), companyId);
+			_analyticsMessageSenderClient.send(jsonArray.toString(), companyId);
 
-				_analyticsMessageLocalService.deleteAnalyticsMessages(
-					analyticsMessages);
-			}
+			_analyticsMessageLocalService.deleteAnalyticsMessages(
+				analyticsMessages);
 		}
 	}
 
