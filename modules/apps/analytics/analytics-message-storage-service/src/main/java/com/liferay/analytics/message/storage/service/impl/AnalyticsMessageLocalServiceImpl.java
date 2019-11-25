@@ -81,4 +81,14 @@ public class AnalyticsMessageLocalServiceImpl
 			companyId, start, end);
 	}
 
+	public List<Long> getCompanyIds() {
+		DynamicQuery dynamicQuery = dynamicQuery();
+
+		dynamicQuery.setProjection(
+			ProjectionFactoryUtil.distinct(
+				ProjectionFactoryUtil.property("companyId")));
+
+		return analyticsMessagePersistence.findWithDynamicQuery(dynamicQuery);
+	}
+
 }
