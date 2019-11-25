@@ -301,6 +301,11 @@ public class AnalyticsMessageLocalServiceWrapper
 	}
 
 	@Override
+	public java.util.List<Long> getCompanyIds() {
+		return _analyticsMessageLocalService.getCompanyIds();
+	}
+
+	@Override
 	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery
 		getIndexableActionableDynamicQuery() {
 

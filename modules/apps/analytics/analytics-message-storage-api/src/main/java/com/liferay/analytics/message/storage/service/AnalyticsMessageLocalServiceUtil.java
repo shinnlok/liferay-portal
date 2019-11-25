@@ -275,6 +275,10 @@ public class AnalyticsMessageLocalServiceUtil {
 		return getService().getBodyBlobModel(primaryKey);
 	}
 
+	public static java.util.List<Long> getCompanyIds() {
+		return getService().getCompanyIds();
+	}
+
 	public static
 		com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery
 			getIndexableActionableDynamicQuery() {
