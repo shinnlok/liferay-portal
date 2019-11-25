@@ -73,7 +73,7 @@ public class SendAnalyticsMessagesMessageListener extends BaseMessageListener {
 
 	@Override
 	protected void doReceive(Message message) throws Exception {
-		for (long companyId : _portal.getCompanyIds()) {
+		for (long companyId : _analyticsMessageLocalService.getCompanyIds()) {
 			_process(companyId);
 		}
 	}
@@ -117,9 +117,6 @@ public class SendAnalyticsMessagesMessageListener extends BaseMessageListener {
 
 	@Reference
 	private AnalyticsMessageSenderClient _analyticsMessageSenderClient;
-
-	@Reference
-	private Portal _portal;
 
 	@Reference
 	private SchedulerEngineHelper _schedulerEngineHelper;
