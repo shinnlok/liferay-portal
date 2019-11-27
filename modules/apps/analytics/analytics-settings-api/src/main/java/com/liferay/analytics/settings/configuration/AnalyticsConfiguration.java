@@ -52,6 +52,12 @@ public interface AnalyticsConfiguration {
 	public String[] syncedGroupIds();
 
 	@Meta.AD(required = false)
+	public String[] syncedOrganizationIds();
+
+	@Meta.AD(required = false)
+	public String[] syncedUserGroupIds();
+
+	@Meta.AD(required = false)
 	public String token();
 
 }
