@@ -64,7 +64,7 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 				return;
 			}
 
-			_addAnalyticsMessage("update", modifiedAttributeNames, model);
+			_addAnalyticsMessage("update", getAttributeNames(), model);
 		}
 		catch (Exception e) {
 			throw new ModelListenerException(e);
