@@ -14,9 +14,11 @@
 
 package com.liferay.analytics.message.sender.internal.model.listener;
 
+import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
 import com.liferay.portal.kernel.model.ModelListener;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.service.OrganizationLocalService;
+import com.liferay.portal.kernel.util.ArrayUtil;
 
 import java.util.Arrays;
 import java.util.List;
@@ -47,6 +49,22 @@ public class OrganizationModelListener
 	@Override
 	protected String getPrimaryKeyName() {
 		return "organizationId";
+	}
+
+	@Override
+	protected boolean isExcluded(Organization organization) {
+		AnalyticsConfiguration analyticsConfiguration =
+			analyticsConfigurationTracker.getAnalyticsConfiguration(
+				organization.getCompanyId());
+
+		if (!ArrayUtil.contains(
+				analyticsConfiguration.syncedOrganizationIds(),
+				organization.getOrganizationId())) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	private static final List<String> _attributeNames = Arrays.asList(

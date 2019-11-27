@@ -14,9 +14,11 @@
 
 package com.liferay.analytics.message.sender.internal.model.listener;
 
+import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.ModelListener;
 import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.util.ArrayUtil;
 
 import java.util.Arrays;
 import java.util.List;
@@ -48,6 +50,16 @@ public class GroupModelListener extends BaseEntityModelListener<Group> {
 	@Override
 	protected boolean isExcluded(Group group) {
 		if (!group.isSite()) {
+			return true;
+		}
+
+		AnalyticsConfiguration analyticsConfiguration =
+			analyticsConfigurationTracker.getAnalyticsConfiguration(
+				group.getCompanyId());
+
+		if (!ArrayUtil.contains(
+				analyticsConfiguration.syncedGroupIds(), group.getGroupId())) {
+
 			return true;
 		}
 

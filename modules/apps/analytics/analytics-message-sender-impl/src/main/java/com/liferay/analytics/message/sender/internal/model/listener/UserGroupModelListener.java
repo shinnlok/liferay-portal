@@ -14,9 +14,11 @@
 
 package com.liferay.analytics.message.sender.internal.model.listener;
 
+import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
 import com.liferay.portal.kernel.model.ModelListener;
 import com.liferay.portal.kernel.model.UserGroup;
 import com.liferay.portal.kernel.service.UserGroupLocalService;
+import com.liferay.portal.kernel.util.ArrayUtil;
 
 import java.util.Arrays;
 import java.util.List;
@@ -43,6 +45,22 @@ public class UserGroupModelListener extends BaseEntityModelListener<UserGroup> {
 	@Override
 	protected String getPrimaryKeyName() {
 		return "userGroupId";
+	}
+
+	@Override
+	protected boolean isExcluded(UserGroup userGroup) {
+		AnalyticsConfiguration analyticsConfiguration =
+			analyticsConfigurationTracker.getAnalyticsConfiguration(
+				userGroup.getCompanyId());
+
+		if (!ArrayUtil.contains(
+				analyticsConfiguration.syncedUserGroupIds(),
+				userGroup.getUserGroupId())) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	private static final List<String> _attributeNames = Arrays.asList(
