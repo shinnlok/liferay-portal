@@ -20,6 +20,7 @@ import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
 import com.liferay.analytics.settings.configuration.AnalyticsConfigurationTracker;
 import com.liferay.portal.kernel.bean.BeanPropertiesUtil;
 import com.liferay.portal.kernel.exception.ModelListenerException;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
@@ -27,7 +28,9 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.BaseModelListener;
 import com.liferay.portal.kernel.model.ShardedModel;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.util.ArrayUtil;
 
 import java.nio.charset.Charset;
 
@@ -76,6 +79,31 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 	protected abstract T getOriginalModel(T model) throws Exception;
 
 	protected abstract String getPrimaryKeyName();
+
+	protected boolean isExcluded(
+			AnalyticsConfiguration analyticsConfiguration, User user)
+		throws PortalException {
+
+		for (long organizationId : user.getOrganizationIds()) {
+			if (ArrayUtil.contains(
+					analyticsConfiguration.syncedOrganizationIds(),
+					String.valueOf(organizationId))) {
+
+				return true;
+			}
+		}
+
+		for (long userGroupId : user.getUserGroupIds()) {
+			if (ArrayUtil.contains(
+					analyticsConfiguration.syncedUserGroupIds(),
+					String.valueOf(userGroupId))) {
+
+				return true;
+			}
+		}
+
+		return false;
+	}
 
 	protected boolean isExcluded(T model) {
 		return false;

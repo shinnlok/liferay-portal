@@ -15,9 +15,10 @@
 package com.liferay.analytics.message.sender.internal.model.listener;
 
 import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.ModelListener;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.util.ArrayUtil;
 
 import java.util.Arrays;
 import java.util.List;
@@ -56,30 +57,19 @@ public class UserModelListener extends BaseEntityModelListener<User> {
 		}
 
 		try {
-			for (long organizationId : user.getOrganizationIds()) {
-				if (ArrayUtil.contains(
-						analyticsConfiguration.syncedOrganizationIds(),
-						String.valueOf(organizationId))) {
-
-					return false;
-				}
-			}
-
-			for (long userGroupId : user.getUserGroupIds()) {
-				if (ArrayUtil.contains(
-						analyticsConfiguration.syncedUserGroupIds(),
-						String.valueOf(userGroupId))) {
-
-					return false;
-				}
-			}
+			return isExcluded(analyticsConfiguration, user);
 		}
 		catch (Exception e) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(e, e);
+			}
+
 			return true;
 		}
-
-		return true;
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		UserModelListener.class);
 
 	private static final List<String> _attributeNames = Arrays.asList(
 		"agreedToTermsOfUse", "comments", "companyId", "contactId",
