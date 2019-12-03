@@ -44,6 +44,10 @@ public class AnalyticsMessageSenderClientImpl
 			_analyticsConfigurationTracker.getAnalyticsConfiguration(
 				companyId));
 
+		if (jsonWebServiceClient == null) {
+			return null;
+		}
+
 		return jsonWebServiceClient.doPostAsJSON("/dxp-entities", body);
 	}
 
