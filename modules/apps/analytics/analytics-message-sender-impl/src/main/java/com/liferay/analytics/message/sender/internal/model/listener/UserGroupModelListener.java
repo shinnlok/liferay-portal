@@ -53,14 +53,14 @@ public class UserGroupModelListener extends BaseEntityModelListener<UserGroup> {
 			analyticsConfigurationTracker.getAnalyticsConfiguration(
 				userGroup.getCompanyId());
 
-		if (!ArrayUtil.contains(
+		if (ArrayUtil.contains(
 				analyticsConfiguration.syncedUserGroupIds(),
 				userGroup.getUserGroupId())) {
 
-			return true;
+			return false;
 		}
 
-		return false;
+		return true;
 	}
 
 	private static final List<String> _attributeNames = Arrays.asList(

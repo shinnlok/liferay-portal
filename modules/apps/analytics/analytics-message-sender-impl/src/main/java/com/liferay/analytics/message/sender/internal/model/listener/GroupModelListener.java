@@ -57,13 +57,13 @@ public class GroupModelListener extends BaseEntityModelListener<Group> {
 			analyticsConfigurationTracker.getAnalyticsConfiguration(
 				group.getCompanyId());
 
-		if (!ArrayUtil.contains(
+		if (ArrayUtil.contains(
 				analyticsConfiguration.syncedGroupIds(), group.getGroupId())) {
 
-			return true;
+			return false;
 		}
 
-		return false;
+		return true;
 	}
 
 	private static final List<String> _attributeNames = Arrays.asList(

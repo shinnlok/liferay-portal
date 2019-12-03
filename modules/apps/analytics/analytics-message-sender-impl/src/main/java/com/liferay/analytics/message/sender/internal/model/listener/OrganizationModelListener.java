@@ -57,14 +57,14 @@ public class OrganizationModelListener
 			analyticsConfigurationTracker.getAnalyticsConfiguration(
 				organization.getCompanyId());
 
-		if (!ArrayUtil.contains(
+		if (ArrayUtil.contains(
 				analyticsConfiguration.syncedOrganizationIds(),
 				organization.getOrganizationId())) {
 
-			return true;
+			return false;
 		}
 
-		return false;
+		return true;
 	}
 
 	private static final List<String> _attributeNames = Arrays.asList(
