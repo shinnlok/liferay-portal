@@ -89,7 +89,7 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 					analyticsConfiguration.syncedOrganizationIds(),
 					String.valueOf(organizationId))) {
 
-				return true;
+				return false;
 			}
 		}
 
@@ -98,11 +98,11 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 					analyticsConfiguration.syncedUserGroupIds(),
 					String.valueOf(userGroupId))) {
 
-				return true;
+				return false;
 			}
 		}
 
-		return false;
+		return true;
 	}
 
 	protected boolean isExcluded(T model) {
