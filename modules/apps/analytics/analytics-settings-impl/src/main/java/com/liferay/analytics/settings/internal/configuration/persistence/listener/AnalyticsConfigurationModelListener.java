@@ -12,11 +12,11 @@
  * details.
  */
 
-package com.liferay.analytics.security.internal.configuration.persistence.listener;
+package com.liferay.analytics.settings.internal.configuration.persistence.listener;
 
-import com.liferay.analytics.security.internal.constants.AnalyticsSecurityConstants;
-import com.liferay.analytics.security.internal.security.auth.verifier.AnalyticsSecurityAuthVerifier;
 import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
+import com.liferay.analytics.settings.internal.security.auth.verifier.AnalyticsSecurityAuthVerifier;
+import com.liferay.analytics.settings.security.constants.AnalyticsSecurityConstants;
 import com.liferay.portal.configuration.persistence.listener.ConfigurationModelListener;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -58,7 +58,7 @@ import org.osgi.service.component.annotations.Reference;
 	property = "model.class.name=com.liferay.analytics.settings.configuration.AnalyticsConfiguration.scoped",
 	service = ConfigurationModelListener.class
 )
-public class AnalyticsSecurityConfigurationModelListener
+public class AnalyticsConfigurationModelListener
 	implements ConfigurationModelListener {
 
 	@Override
@@ -240,7 +240,7 @@ public class AnalyticsSecurityConfigurationModelListener
 	};
 
 	private static final Log _log = LogFactoryUtil.getLog(
-		AnalyticsSecurityConfigurationModelListener.class);
+		AnalyticsConfigurationModelListener.class);
 
 	private boolean _authVerifierEnabled;
 
