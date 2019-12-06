@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.analytics.settings.web.internal.configuration;
+package com.liferay.analytics.settings.internal.configuration;
 
 import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
 import com.liferay.analytics.settings.configuration.AnalyticsConfigurationTracker;

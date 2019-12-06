@@ -12,17 +12,23 @@
  * details.
  */
 
-package com.liferay.analytics.security.internal.constants;
+package com.liferay.analytics.settings.internal.settings.definition;
+
+import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
+import com.liferay.portal.kernel.settings.definition.ConfigurationBeanDeclaration;
+
+import org.osgi.service.component.annotations.Component;
 
 /**
- * @author Shinn Lok
+ * @author Marcellus Tavares
  */
-public class AnalyticsSecurityConstants {
+@Component(immediate = true, service = ConfigurationBeanDeclaration.class)
+public class AnalyticsCompanyServiceConfigurationBeanDeclaration
+	implements ConfigurationBeanDeclaration {
 
-	public static final String SCREEN_NAME_ANALYTICS_ADMIN =
-		"analytics.administrator";
-
-	public static final String SERVICE_ACCESS_POLICY_NAME =
-		"ANALYTICS_CLOUD_TOKEN";
+	@Override
+	public Class<?> getConfigurationBeanClass() {
+		return AnalyticsConfiguration.class;
+	}
 
 }
