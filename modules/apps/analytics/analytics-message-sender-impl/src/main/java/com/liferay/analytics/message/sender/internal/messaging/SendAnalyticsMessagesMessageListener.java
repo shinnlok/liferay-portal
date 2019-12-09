@@ -30,7 +30,13 @@ import com.liferay.portal.kernel.scheduler.TimeUnit;
 import com.liferay.portal.kernel.scheduler.Trigger;
 import com.liferay.portal.kernel.scheduler.TriggerFactory;
 
-import java.sql.Blob;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import java.util.List;
 
@@ -95,11 +101,22 @@ public class SendAnalyticsMessagesMessageListener extends BaseMessageListener {
 			JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
 
 			for (AnalyticsMessage analyticsMessage : analyticsMessages) {
-				Blob body = analyticsMessage.getBody();
+				StringBuilder sb = new StringBuilder();
 
-				jsonArray.put(
-					JSONFactoryUtil.createJSONObject(
-						new String(body.getBytes(1, (int)body.length()))));
+				InputStreamReader inputStreamReader = new InputStreamReader(
+					_analyticsMessageLocalService.openBodyInputStream(
+						analyticsMessage.getAnalyticsMessageId()),
+					Charset.forName(StandardCharsets.UTF_8.name()));
+
+				try (Reader reader = new BufferedReader(inputStreamReader)) {
+					int character = 0;
+
+					while ((character = reader.read()) != -1) {
+						sb.append((char)character);
+					}
+				}
+
+				jsonArray.put(JSONFactoryUtil.createJSONObject(sb.toString()));
 			}
 
 			_analyticsMessageSenderClient.send(jsonArray.toString(), companyId);
