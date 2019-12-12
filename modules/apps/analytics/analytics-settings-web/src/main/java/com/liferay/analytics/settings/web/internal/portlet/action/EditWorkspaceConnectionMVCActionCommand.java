@@ -14,6 +14,7 @@
 
 package com.liferay.analytics.settings.web.internal.portlet.action;
 
+import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
 import com.liferay.configuration.admin.constants.ConfigurationAdminPortletKeys;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -69,6 +70,23 @@ public class EditWorkspaceConnectionMVCActionCommand
 			WebKeys.THEME_DISPLAY);
 
 		String token = ParamUtil.getString(actionRequest, "token");
+
+		if ((token == null) || token.isEmpty()) {
+			_companyService.removePreferences(
+				themeDisplay.getCompanyId(),
+				new String[] {
+					"liferayAnalyticsDataSourceId",
+					"liferayAnalyticsEndpointURL",
+					"liferayAnalyticsFaroBackendSecuritySignature",
+					"liferayAnalyticsFaroBackendURL",
+					"liferayAnalyticsGroupIds", "liferayAnalyticsURL"
+				});
+
+			configurationProvider.deleteCompanyConfiguration(
+				AnalyticsConfiguration.class, themeDisplay.getCompanyId());
+
+			return;
+		}
 
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
 			new String(Base64.decode(token)));
