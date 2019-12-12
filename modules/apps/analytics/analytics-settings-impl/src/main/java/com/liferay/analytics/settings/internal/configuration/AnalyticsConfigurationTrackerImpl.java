@@ -57,6 +57,24 @@ public class AnalyticsConfigurationTrackerImpl
 	}
 
 	@Override
+	public AnalyticsConfiguration getAnalyticsConfiguration(String pid) {
+		if (!_pidCompanyIdMapping.containsKey(pid)) {
+			return _systemAnalyticsConfiguration;
+		}
+
+		return getAnalyticsConfiguration(_pidCompanyIdMapping.get(pid));
+	}
+
+	@Override
+	public long getCompanyId(String pid) {
+		if (!_pidCompanyIdMapping.containsKey(pid)) {
+			return CompanyConstants.SYSTEM;
+		}
+
+		return _pidCompanyIdMapping.get(pid);
+	}
+
+	@Override
 	public String getName() {
 		return "com.liferay.analytics.settings.configuration." +
 			"AnalyticsConfiguration.scoped";

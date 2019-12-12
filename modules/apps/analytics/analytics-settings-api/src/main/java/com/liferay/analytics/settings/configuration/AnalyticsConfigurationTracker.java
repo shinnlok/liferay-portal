@@ -21,4 +21,8 @@ public interface AnalyticsConfigurationTracker {
 
 	public AnalyticsConfiguration getAnalyticsConfiguration(long companyId);
 
+	public AnalyticsConfiguration getAnalyticsConfiguration(String pid);
+
+	public long getCompanyId(String pid);
+
 }
