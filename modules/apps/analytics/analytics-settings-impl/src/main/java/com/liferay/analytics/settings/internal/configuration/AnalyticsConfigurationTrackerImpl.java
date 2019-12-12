@@ -49,29 +49,24 @@ public class AnalyticsConfigurationTrackerImpl
 
 	@Override
 	public AnalyticsConfiguration getAnalyticsConfiguration(long companyId) {
-		if (_analyticsConfigurations.containsKey(companyId)) {
-			return _analyticsConfigurations.get(companyId);
-		}
-
-		return _systemAnalyticsConfiguration;
+		return _analyticsConfigurations.getOrDefault(
+			companyId, _systemAnalyticsConfiguration);
 	}
 
 	@Override
 	public AnalyticsConfiguration getAnalyticsConfiguration(String pid) {
-		if (!_pidCompanyIdMapping.containsKey(pid)) {
+		Long companyId = _pidCompanyIdMapping.get(pid);
+
+		if (companyId == null) {
 			return _systemAnalyticsConfiguration;
 		}
 
-		return getAnalyticsConfiguration(_pidCompanyIdMapping.get(pid));
+		return getAnalyticsConfiguration(companyId);
 	}
 
 	@Override
 	public long getCompanyId(String pid) {
-		if (!_pidCompanyIdMapping.containsKey(pid)) {
-			return CompanyConstants.SYSTEM;
-		}
-
-		return _pidCompanyIdMapping.get(pid);
+		return _pidCompanyIdMapping.getOrDefault(pid, CompanyConstants.SYSTEM);
 	}
 
 	@Override
@@ -105,9 +100,9 @@ public class AnalyticsConfigurationTrackerImpl
 	}
 
 	private void _unmapPid(String pid) {
-		if (_pidCompanyIdMapping.containsKey(pid)) {
-			long companyId = _pidCompanyIdMapping.remove(pid);
+		Long companyId = _pidCompanyIdMapping.remove(pid);
 
+		if (companyId != null) {
 			_analyticsConfigurations.remove(companyId);
 		}
 	}
