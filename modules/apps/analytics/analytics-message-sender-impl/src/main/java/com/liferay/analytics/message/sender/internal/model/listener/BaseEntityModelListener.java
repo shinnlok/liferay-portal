@@ -158,7 +158,7 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 		AnalyticsConfiguration analyticsConfiguration =
 			analyticsConfigurationTracker.getAnalyticsConfiguration(companyId);
 
-		return analyticsConfiguration.dataSourceId();
+		return analyticsConfiguration.liferayAnalyticsDataSourceId();
 	}
 
 	private List<String> _getModifiedAttributeNames(

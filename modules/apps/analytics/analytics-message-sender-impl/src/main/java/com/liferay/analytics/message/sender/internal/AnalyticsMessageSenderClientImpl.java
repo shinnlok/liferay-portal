@@ -59,7 +59,7 @@ public class AnalyticsMessageSenderClientImpl
 		String protocol = null;
 
 		try {
-			URL url = new URL(analyticsConfiguration.analyticsURL());
+			URL url = new URL(analyticsConfiguration.liferayAnalyticsURL());
 
 			hostName = url.getHost();
 			hostPort = url.getPort();
