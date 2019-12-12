@@ -15,12 +15,14 @@
 package com.liferay.analytics.settings.internal.configuration.persistence.listener;
 
 import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
+import com.liferay.analytics.settings.configuration.AnalyticsConfigurationTracker;
 import com.liferay.analytics.settings.internal.security.auth.verifier.AnalyticsSecurityAuthVerifier;
 import com.liferay.analytics.settings.security.constants.AnalyticsSecurityConstants;
 import com.liferay.portal.configuration.persistence.listener.ConfigurationModelListener;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.CompanyLocalService;
@@ -69,6 +71,17 @@ public class AnalyticsConfigurationModelListener
 		else {
 			_enable((long)properties.get("companyId"));
 		}
+	}
+
+	@Override
+	public void onBeforeDelete(String pid) {
+		long companyId = _analyticsConfigurationTracker.getCompanyId(pid);
+
+		if (companyId == CompanyConstants.SYSTEM) {
+			return;
+		}
+
+		_disable(companyId);
 	}
 
 	@Activate
@@ -241,6 +254,9 @@ public class AnalyticsConfigurationModelListener
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		AnalyticsConfigurationModelListener.class);
+
+	@Reference
+	private AnalyticsConfigurationTracker _analyticsConfigurationTracker;
 
 	private boolean _authVerifierEnabled;
 
