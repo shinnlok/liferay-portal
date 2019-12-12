@@ -74,10 +74,8 @@ public class EditWorkspaceConnectionMVCActionCommand
 			new String(Base64.decode(token)));
 
 		_connect(
-			themeDisplay, jsonObject.getString("token"),
-			jsonObject.getString("url"));
-
-		configurationProperties.put("companyId", themeDisplay.getCompanyId());
+			configurationProperties, themeDisplay,
+			jsonObject.getString("token"), jsonObject.getString("url"));
 
 		Iterator<String> keys = jsonObject.keys();
 
@@ -90,7 +88,9 @@ public class EditWorkspaceConnectionMVCActionCommand
 		configurationProperties.put("token", token);
 	}
 
-	private void _connect(ThemeDisplay themeDisplay, String token, String url)
+	private void _connect(
+			Dictionary<String, Object> configurationProperties,
+			ThemeDisplay themeDisplay, String token, String url)
 		throws Exception {
 
 		HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
@@ -116,18 +116,21 @@ public class EditWorkspaceConnectionMVCActionCommand
 				throw new PortalException("Invalid token");
 			}
 
-			_updateCompanyPreferences(
-				themeDisplay.getCompanyId(),
+			JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
 				EntityUtils.toString(closeableHttpResponse.getEntity()));
+
+			_updateCompanyPreferences(themeDisplay.getCompanyId(), jsonObject);
+			_updateConfigurationProperties(
+				themeDisplay.getCompanyId(), configurationProperties,
+				jsonObject);
 		}
 	}
 
-	private void _updateCompanyPreferences(long companyId, String json)
+	private void _updateCompanyPreferences(
+			long companyId, JSONObject jsonObject)
 		throws Exception {
 
 		UnicodeProperties unicodeProperties = new UnicodeProperties(true);
-
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(json);
 
 		Iterator<String> keys = jsonObject.keys();
 
@@ -138,6 +141,21 @@ public class EditWorkspaceConnectionMVCActionCommand
 		}
 
 		_companyService.updatePreferences(companyId, unicodeProperties);
+	}
+
+	private void _updateConfigurationProperties(
+		long companyId, Dictionary<String, Object> configurationProperties,
+		JSONObject jsonObject) {
+
+		configurationProperties.put("companyId", companyId);
+
+		Iterator<String> keys = jsonObject.keys();
+
+		while (keys.hasNext()) {
+			String key = keys.next();
+
+			configurationProperties.put(key, jsonObject.getString(key));
+		}
 	}
 
 	@Reference
