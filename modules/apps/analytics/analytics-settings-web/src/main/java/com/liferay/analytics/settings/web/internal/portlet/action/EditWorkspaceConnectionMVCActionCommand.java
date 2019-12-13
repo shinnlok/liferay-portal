@@ -84,15 +84,12 @@ public class EditWorkspaceConnectionMVCActionCommand
 			Dictionary<String, Object> configurationProperties)
 		throws Exception {
 
-		JSONObject tokenJSONObject = _createTokenJSONObject(actionRequest);
-
 		String dataSourceConnectionJSON = _connectDataSource(
-			actionRequest, tokenJSONObject);
+			actionRequest, _createTokenJSONObject(actionRequest));
 
 		_updateCompanyPreferences(actionRequest, dataSourceConnectionJSON);
-
 		_updateConfigurationProperties(
-			actionRequest, configurationProperties, tokenJSONObject);
+			actionRequest, configurationProperties, dataSourceConnectionJSON);
 	}
 
 	private String _connectDataSource(
@@ -252,25 +249,29 @@ public class EditWorkspaceConnectionMVCActionCommand
 	}
 
 	private void _updateConfigurationProperties(
-		ActionRequest actionRequest,
-		Dictionary<String, Object> configurationProperties,
-		JSONObject tokenJSONObject) {
+			ActionRequest actionRequest,
+			Dictionary<String, Object> configurationProperties,
+			String dataSourceConnectionJSON)
+		throws Exception {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
 		configurationProperties.put("companyId", themeDisplay.getCompanyId());
 
-		Iterator<String> keys = tokenJSONObject.keys();
+		configurationProperties.put(
+			"token", ParamUtil.getString(actionRequest, "token"));
+
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
+			dataSourceConnectionJSON);
+
+		Iterator<String> keys = jsonObject.keys();
 
 		while (keys.hasNext()) {
 			String key = keys.next();
 
-			configurationProperties.put(key, tokenJSONObject.getString(key));
+			configurationProperties.put(key, jsonObject.getString(key));
 		}
-
-		configurationProperties.put(
-			"token", ParamUtil.getString(actionRequest, "token"));
 	}
 
 	@Reference
