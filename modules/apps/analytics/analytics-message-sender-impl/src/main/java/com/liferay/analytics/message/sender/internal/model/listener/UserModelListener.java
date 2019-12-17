@@ -20,9 +20,6 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.ModelListener;
 import com.liferay.portal.kernel.model.User;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.osgi.service.component.annotations.Component;
 
 /**
@@ -32,18 +29,8 @@ import org.osgi.service.component.annotations.Component;
 public class UserModelListener extends BaseEntityModelListener<User> {
 
 	@Override
-	protected List<String> getAttributeNames() {
-		return _attributeNames;
-	}
-
-	@Override
 	protected User getOriginalModel(User user) throws Exception {
 		return userLocalService.getUser(user.getUserId());
-	}
-
-	@Override
-	protected String getPrimaryKeyName() {
-		return "userId";
 	}
 
 	@Override
@@ -70,13 +57,5 @@ public class UserModelListener extends BaseEntityModelListener<User> {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		UserModelListener.class);
-
-	private static final List<String> _attributeNames = Arrays.asList(
-		"agreedToTermsOfUse", "comments", "companyId", "contactId",
-		"createDate", "defaultUser", "emailAddress", "emailAddressVerified",
-		"externalReferenceCode", "facebookId", "firstName", "googleUserId",
-		"greeting", "jobTitle", "languageId", "lastName", "ldapServerId",
-		"middleName", "openId", "portraitId", "screenName", "status",
-		"timeZoneId", "uuid");
 
 }

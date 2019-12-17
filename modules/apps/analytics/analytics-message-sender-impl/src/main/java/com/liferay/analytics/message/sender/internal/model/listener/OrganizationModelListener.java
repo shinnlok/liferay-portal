@@ -20,9 +20,6 @@ import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.service.OrganizationLocalService;
 import com.liferay.portal.kernel.util.ArrayUtil;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -34,21 +31,11 @@ public class OrganizationModelListener
 	extends BaseEntityModelListener<Organization> {
 
 	@Override
-	protected List<String> getAttributeNames() {
-		return _attributeNames;
-	}
-
-	@Override
 	protected Organization getOriginalModel(Organization organization)
 		throws Exception {
 
 		return _organizationLocalService.getOrganization(
 			organization.getOrganizationId());
-	}
-
-	@Override
-	protected String getPrimaryKeyName() {
-		return "organizationId";
 	}
 
 	@Override
@@ -66,12 +53,6 @@ public class OrganizationModelListener
 
 		return false;
 	}
-
-	private static final List<String> _attributeNames = Arrays.asList(
-		"comments", "companyId", "countryId", "createDate",
-		"externalReferenceCode", "logoId", "name", "parentOrganizationId",
-		"recursable", "regionId", "statusId", "treePath", "type", "userId",
-		"userName", "uuid");
 
 	@Reference
 	private OrganizationLocalService _organizationLocalService;

@@ -20,9 +20,6 @@ import com.liferay.portal.kernel.model.UserGroup;
 import com.liferay.portal.kernel.service.UserGroupLocalService;
 import com.liferay.portal.kernel.util.ArrayUtil;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -33,18 +30,8 @@ import org.osgi.service.component.annotations.Reference;
 public class UserGroupModelListener extends BaseEntityModelListener<UserGroup> {
 
 	@Override
-	protected List<String> getAttributeNames() {
-		return _attributeNames;
-	}
-
-	@Override
 	protected UserGroup getOriginalModel(UserGroup userGroup) throws Exception {
 		return _userGroupLocalService.getUserGroup(userGroup.getUserGroupId());
-	}
-
-	@Override
-	protected String getPrimaryKeyName() {
-		return "userGroupId";
 	}
 
 	@Override
@@ -62,11 +49,6 @@ public class UserGroupModelListener extends BaseEntityModelListener<UserGroup> {
 
 		return false;
 	}
-
-	private static final List<String> _attributeNames = Arrays.asList(
-		"addedByLDAPImport", "companyId", "createDate", "description",
-		"externalReferenceCode", "name", "parentUserGroupId", "userId",
-		"userName", "uuid");
 
 	@Reference
 	private UserGroupLocalService _userGroupLocalService;

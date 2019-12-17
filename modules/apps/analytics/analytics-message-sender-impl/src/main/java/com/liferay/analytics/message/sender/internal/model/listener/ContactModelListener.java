@@ -22,9 +22,6 @@ import com.liferay.portal.kernel.model.ModelListener;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ContactLocalService;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -35,18 +32,8 @@ import org.osgi.service.component.annotations.Reference;
 public class ContactModelListener extends BaseEntityModelListener<Contact> {
 
 	@Override
-	protected List<String> getAttributeNames() {
-		return _attributeNames;
-	}
-
-	@Override
 	protected Contact getOriginalModel(Contact contact) throws Exception {
 		return _contactLocalService.getContact(contact.getContactId());
-	}
-
-	@Override
-	protected String getPrimaryKeyName() {
-		return "contactId";
 	}
 
 	@Override
@@ -75,14 +62,6 @@ public class ContactModelListener extends BaseEntityModelListener<Contact> {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		ContactModelListener.class);
-
-	private static final List<String> _attributeNames = Arrays.asList(
-		"accountId", "birthday", "classNameId", "classPK", "companyId",
-		"createDate", "emailAddress", "employeeNumber", "employeeStatusId",
-		"facebookSn", "firstName", "hoursOfOperation", "jabberSn", "jobClass",
-		"jobTitle", "lastName", "male", "middleName", "parentContactId",
-		"prefixId", "skypeSn", "smsSn", "suffixId", "twitterSn", "userId",
-		"userName");
 
 	@Reference
 	private ContactLocalService _contactLocalService;

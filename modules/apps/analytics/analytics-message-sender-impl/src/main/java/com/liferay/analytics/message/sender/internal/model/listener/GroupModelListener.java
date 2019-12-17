@@ -20,9 +20,6 @@ import com.liferay.portal.kernel.model.ModelListener;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.util.ArrayUtil;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -33,18 +30,8 @@ import org.osgi.service.component.annotations.Reference;
 public class GroupModelListener extends BaseEntityModelListener<Group> {
 
 	@Override
-	protected List<String> getAttributeNames() {
-		return _attributeNames;
-	}
-
-	@Override
 	protected Group getOriginalModel(Group group) throws Exception {
 		return _groupLocalService.getGroup(group.getGroupId());
-	}
-
-	@Override
-	protected String getPrimaryKeyName() {
-		return "groupId";
 	}
 
 	@Override
@@ -65,14 +52,6 @@ public class GroupModelListener extends BaseEntityModelListener<Group> {
 
 		return false;
 	}
-
-	private static final List<String> _attributeNames = Arrays.asList(
-		"active", "classNameId", "classPK", "companyId", "creatorUserId",
-		"description", "descriptionCurrentValue", "descriptiveName",
-		"friendlyURL", "groupKey", "inheritContent", "liveGroupId",
-		"manualMembership", "membershipRestriction", "name", "nameCurrentValue",
-		"parentGroupId", "remoteStagingGroupCount", "site", "treePath", "type",
-		"uuid");
 
 	@Reference
 	private GroupLocalService _groupLocalService;
