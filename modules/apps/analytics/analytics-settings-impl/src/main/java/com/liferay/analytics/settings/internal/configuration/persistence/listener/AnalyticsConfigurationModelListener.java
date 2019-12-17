@@ -28,12 +28,14 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.CompanyConstants;
+import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.CompanyService;
 import com.liferay.portal.kernel.service.ContactService;
 import com.liferay.portal.kernel.service.GroupService;
+import com.liferay.portal.kernel.service.OrganizationLocalService;
 import com.liferay.portal.kernel.service.OrganizationService;
 import com.liferay.portal.kernel.service.PortalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
@@ -112,6 +114,12 @@ public class AnalyticsConfigurationModelListener
 
 		_syncContacts(
 			analyticsConfiguration, companyId, dataSourceId, syncAllContacts);
+
+		if (!syncAllContacts) {
+			_syncOrganizations(
+				analyticsConfiguration, companyId, dataSourceId,
+				(String[])properties.get("syncedOrganizationIds"));
+		}
 	}
 
 	@Activate
@@ -308,6 +316,87 @@ public class AnalyticsConfigurationModelListener
 		}
 	}
 
+	private void _syncOrganizations(
+		AnalyticsConfiguration analyticsConfiguration, long companyId,
+		String dataSourceId, String[] syncedOrganizationIds) {
+
+		String[] oldSyncedOrganizationIds =
+			analyticsConfiguration.syncedOrganizationIds();
+
+		if (oldSyncedOrganizationIds != null) {
+			Arrays.sort(oldSyncedOrganizationIds);
+		}
+		else {
+			oldSyncedOrganizationIds = new String[0];
+		}
+
+		if (syncedOrganizationIds != null) {
+			Arrays.sort(syncedOrganizationIds);
+		}
+
+		if (Arrays.equals(oldSyncedOrganizationIds, syncedOrganizationIds)) {
+			return;
+		}
+
+		for (String oldSyncedOrganizationId : oldSyncedOrganizationIds) {
+			syncedOrganizationIds = ArrayUtil.remove(
+				syncedOrganizationIds, oldSyncedOrganizationId);
+		}
+
+		List<Organization> organizations = new ArrayList<>();
+
+		for (String syncedOrganizationId : syncedOrganizationIds) {
+			try {
+				Organization organization =
+					_organizationLocalService.getOrganization(
+						Long.valueOf(syncedOrganizationId));
+
+				organizations.add(organization);
+			}
+			catch (Exception e) {
+				if (_log.isInfoEnabled()) {
+					_log.info(
+						"Unable to get organization " + syncedOrganizationId);
+				}
+			}
+		}
+
+		if (!organizations.isEmpty()) {
+			_addAnalyticsMessages(companyId, dataSourceId, organizations);
+		}
+
+		for (String syncedOrganizationId : syncedOrganizationIds) {
+			int count = _userLocalService.getOrganizationUsersCount(
+				Long.valueOf(syncedOrganizationId));
+
+			int pages = count / _DEFAULT_DELTA;
+
+			for (int i = 0; i <= pages; i++) {
+				int start = i * _DEFAULT_DELTA;
+
+				int end = start + _DEFAULT_DELTA;
+
+				if (end > count) {
+					end = count;
+				}
+
+				try {
+					List<User> users = _userLocalService.getOrganizationUsers(
+						Long.valueOf(syncedOrganizationId), start, end);
+
+					_addAnalyticsMessages(companyId, dataSourceId, users);
+				}
+				catch (Exception e) {
+					if (_log.isInfoEnabled()) {
+						_log.info(
+							"Unable to get organization users for " +
+								"organization " + syncedOrganizationId);
+					}
+				}
+			}
+		}
+	}
+
 	private static final int _DEFAULT_DELTA = 500;
 
 	private static final String[] _SAP_ENTRY_OBJECT = {
@@ -366,6 +455,9 @@ public class AnalyticsConfigurationModelListener
 
 	@Reference
 	private ConfigurationAdmin _configurationAdmin;
+
+	@Reference
+	private OrganizationLocalService _organizationLocalService;
 
 	@Reference
 	private RoleLocalService _roleLocalService;
