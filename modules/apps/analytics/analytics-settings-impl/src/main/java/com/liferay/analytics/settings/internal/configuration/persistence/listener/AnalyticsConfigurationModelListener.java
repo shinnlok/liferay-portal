@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.CompanyConstants;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
@@ -35,6 +36,7 @@ import com.liferay.portal.kernel.model.UserGroup;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.CompanyService;
 import com.liferay.portal.kernel.service.ContactService;
+import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.GroupService;
 import com.liferay.portal.kernel.service.OrganizationLocalService;
 import com.liferay.portal.kernel.service.OrganizationService;
@@ -125,6 +127,10 @@ public class AnalyticsConfigurationModelListener
 				analyticsConfiguration, companyId, dataSourceId,
 				(String[])properties.get("syncedUserGroupIds"));
 		}
+
+		_syncGroups(
+			analyticsConfiguration, companyId, dataSourceId,
+			(String[])properties.get("syncedGroupIds"));
 	}
 
 	@Activate
@@ -318,6 +324,52 @@ public class AnalyticsConfigurationModelListener
 				companyId, start, end);
 
 			_addAnalyticsMessages(companyId, dataSourceId, users);
+		}
+	}
+
+	private void _syncGroups(
+		AnalyticsConfiguration analyticsConfiguration, long companyId,
+		String dataSourceId, String[] syncedGroupIds) {
+
+		String[] oldSyncedGroupIds = analyticsConfiguration.syncedGroupIds();
+
+		if (oldSyncedGroupIds != null) {
+			Arrays.sort(oldSyncedGroupIds);
+		}
+		else {
+			oldSyncedGroupIds = new String[0];
+		}
+
+		if (syncedGroupIds != null) {
+			Arrays.sort(syncedGroupIds);
+		}
+
+		if (Arrays.equals(oldSyncedGroupIds, syncedGroupIds)) {
+			return;
+		}
+
+		for (String oldSyncedGroupId : oldSyncedGroupIds) {
+			syncedGroupIds = ArrayUtil.remove(syncedGroupIds, oldSyncedGroupId);
+		}
+
+		List<Group> groups = new ArrayList<>();
+
+		for (String syncedGroupId : syncedGroupIds) {
+			try {
+				Group group = _groupLocalService.getGroup(
+					Long.valueOf(syncedGroupId));
+
+				groups.add(group);
+			}
+			catch (Exception e) {
+				if (_log.isInfoEnabled()) {
+					_log.info("Unable to get group " + syncedGroupId);
+				}
+			}
+		}
+
+		if (!groups.isEmpty()) {
+			_addAnalyticsMessages(companyId, dataSourceId, groups);
 		}
 	}
 
@@ -530,6 +582,9 @@ public class AnalyticsConfigurationModelListener
 
 	@Reference
 	private ConfigurationAdmin _configurationAdmin;
+
+	@Reference
+	private GroupLocalService _groupLocalService;
 
 	@Reference
 	private OrganizationLocalService _organizationLocalService;
