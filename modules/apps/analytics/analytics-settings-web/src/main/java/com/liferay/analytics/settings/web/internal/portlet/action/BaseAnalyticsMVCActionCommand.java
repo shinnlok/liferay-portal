@@ -131,9 +131,13 @@ public abstract class BaseAnalyticsMVCActionCommand
 
 		updateConfigurationProperties(actionRequest, configurationProperties);
 
-		configurationProvider.saveCompanyConfiguration(
-			AnalyticsConfiguration.class, themeDisplay.getCompanyId(),
-			configurationProperties);
+		String token = (String)configurationProperties.get("token");
+
+		if ((token != null) && !token.isEmpty()) {
+			configurationProvider.saveCompanyConfiguration(
+				AnalyticsConfiguration.class, themeDisplay.getCompanyId(),
+				configurationProperties);
+		}
 	}
 
 	protected abstract void updateConfigurationProperties(
