@@ -14,13 +14,18 @@
 
 package com.liferay.analytics.settings.internal.configuration.persistence.listener;
 
+import com.liferay.analytics.message.sender.model.AnalyticsMessage;
+import com.liferay.analytics.message.sender.util.AnalyticsMessageUtil;
+import com.liferay.analytics.message.storage.service.AnalyticsMessageLocalService;
 import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
 import com.liferay.analytics.settings.configuration.AnalyticsConfigurationTracker;
 import com.liferay.analytics.settings.internal.security.auth.verifier.AnalyticsSecurityAuthVerifier;
 import com.liferay.analytics.settings.security.constants.AnalyticsSecurityConstants;
 import com.liferay.portal.configuration.persistence.listener.ConfigurationModelListener;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.model.Role;
@@ -36,14 +41,20 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserGroupService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.UserService;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.security.service.access.policy.model.SAPEntry;
 import com.liferay.portal.security.service.access.policy.service.SAPEntryLocalService;
 
+import java.nio.charset.Charset;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Dictionary;
+import java.util.List;
 
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
@@ -84,6 +95,25 @@ public class AnalyticsConfigurationModelListener
 		_disable(companyId);
 	}
 
+	@Override
+	public void onBeforeSave(
+		String pid, Dictionary<String, Object> properties) {
+
+		long companyId = _analyticsConfigurationTracker.getCompanyId(pid);
+
+		AnalyticsConfiguration analyticsConfiguration =
+			_analyticsConfigurationTracker.getAnalyticsConfiguration(pid);
+
+		String dataSourceId =
+			analyticsConfiguration.liferayAnalyticsDataSourceId();
+
+		boolean syncAllContacts = Boolean.valueOf(
+			(String)properties.get("syncAllContacts"));
+
+		_syncContacts(
+			analyticsConfiguration, companyId, dataSourceId, syncAllContacts);
+	}
+
 	@Activate
 	protected void activate(ComponentContext componentContext)
 		throws Exception {
@@ -117,6 +147,40 @@ public class AnalyticsConfigurationModelListener
 			null, false, new ServiceContext());
 
 		_userLocalService.updateUser(user);
+	}
+
+	private void _addAnalyticsMessages(
+		long companyId, String dataSourceId, List<?> objects) {
+
+		for (Object object : objects) {
+			BaseModel<?> baseModel = (BaseModel<?>)object;
+
+			JSONObject jsonObject = AnalyticsMessageUtil.serialize(
+				baseModel, AnalyticsMessageUtil.getAttributeNames(baseModel));
+
+			try {
+				AnalyticsMessage.Builder analyticsMessageBuilder =
+					AnalyticsMessage.builder(
+						dataSourceId, baseModel.getModelClassName());
+
+				analyticsMessageBuilder.action("update");
+				analyticsMessageBuilder.object(jsonObject);
+
+				String analyticsMessageJSON =
+					analyticsMessageBuilder.buildJSONString();
+
+				_analyticsMessageLocalService.addAnalyticsMessage(
+					companyId, _userLocalService.getDefaultUserId(companyId),
+					analyticsMessageJSON.getBytes(Charset.defaultCharset()));
+			}
+			catch (Exception e) {
+				if (_log.isInfoEnabled()) {
+					_log.info(
+						"Unable to add analytics message " +
+							jsonObject.toString());
+				}
+			}
+		}
 	}
 
 	private void _addSAPEntry(long companyId) throws Exception {
@@ -214,6 +278,38 @@ public class AnalyticsConfigurationModelListener
 		return false;
 	}
 
+	private void _syncContacts(
+		AnalyticsConfiguration analyticsConfiguration, long companyId,
+		String dataSourceId, boolean syncAllContacts) {
+
+		if ((analyticsConfiguration.syncAllContacts() == syncAllContacts) ||
+			!syncAllContacts) {
+
+			return;
+		}
+
+		int count = _userLocalService.getCompanyUsersCount(companyId);
+
+		int pages = count / _DEFAULT_DELTA;
+
+		for (int i = 0; i <= pages; i++) {
+			int start = i * _DEFAULT_DELTA;
+
+			int end = start + _DEFAULT_DELTA;
+
+			if (end > count) {
+				end = count;
+			}
+
+			List<User> users = _userLocalService.getCompanyUsers(
+				companyId, start, end);
+
+			_addAnalyticsMessages(companyId, dataSourceId, users);
+		}
+	}
+
+	private static final int _DEFAULT_DELTA = 500;
+
 	private static final String[] _SAP_ENTRY_OBJECT = {
 		AnalyticsSecurityConstants.SERVICE_ACCESS_POLICY_NAME,
 		StringBundler.concat(
@@ -257,6 +353,9 @@ public class AnalyticsConfigurationModelListener
 
 	@Reference
 	private AnalyticsConfigurationTracker _analyticsConfigurationTracker;
+
+	@Reference
+	private AnalyticsMessageLocalService _analyticsMessageLocalService;
 
 	private boolean _authVerifierEnabled;
 
