@@ -15,13 +15,13 @@
 package com.liferay.analytics.message.sender.internal.model.listener;
 
 import com.liferay.analytics.message.sender.model.AnalyticsMessage;
+import com.liferay.analytics.message.sender.util.AnalyticsMessageUtil;
 import com.liferay.analytics.message.storage.service.AnalyticsMessageLocalService;
 import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
 import com.liferay.analytics.settings.configuration.AnalyticsConfigurationTracker;
 import com.liferay.portal.kernel.bean.BeanPropertiesUtil;
 import com.liferay.portal.kernel.exception.ModelListenerException;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -36,7 +36,6 @@ import java.nio.charset.Charset;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import org.osgi.service.component.annotations.Reference;
@@ -49,7 +48,7 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 
 	@Override
 	public void onAfterCreate(T model) throws ModelListenerException {
-		_addAnalyticsMessage("add", getAttributeNames(), model);
+		_addAnalyticsMessage("add", getAttributeNames(model), model);
 	}
 
 	@Override
@@ -61,24 +60,24 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 	public void onBeforeUpdate(T model) throws ModelListenerException {
 		try {
 			List<String> modifiedAttributeNames = _getModifiedAttributeNames(
-				getAttributeNames(), model, getOriginalModel(model));
+				getAttributeNames(model), model, getOriginalModel(model));
 
 			if (modifiedAttributeNames.isEmpty()) {
 				return;
 			}
 
-			_addAnalyticsMessage("update", getAttributeNames(), model);
+			_addAnalyticsMessage("update", getAttributeNames(model), model);
 		}
 		catch (Exception e) {
 			throw new ModelListenerException(e);
 		}
 	}
 
-	protected abstract List<String> getAttributeNames();
+	protected List<String> getAttributeNames(T model) {
+		return AnalyticsMessageUtil.getAttributeNames(model);
+	}
 
 	protected abstract T getOriginalModel(T model) throws Exception;
-
-	protected abstract String getPrimaryKeyName();
 
 	protected boolean isExcluded(
 			AnalyticsConfiguration analyticsConfiguration, User user)
@@ -125,7 +124,8 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 			return;
 		}
 
-		JSONObject jsonObject = _serialize(includeAttributeNames, model);
+		JSONObject jsonObject = AnalyticsMessageUtil.serialize(
+			model, includeAttributeNames);
 
 		ShardedModel shardedModel = (ShardedModel)model;
 
@@ -178,23 +178,6 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 		}
 
 		return modifiedAttributeNames;
-	}
-
-	private JSONObject _serialize(List<String> includeAttributeNames, T model) {
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
-
-		Map<String, Object> modelAttributes = model.getModelAttributes();
-
-		for (String includeAttributeName : includeAttributeNames) {
-			jsonObject.put(
-				includeAttributeName,
-				modelAttributes.get(includeAttributeName));
-		}
-
-		jsonObject.put(
-			getPrimaryKeyName(), String.valueOf(model.getPrimaryKeyObj()));
-
-		return jsonObject;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
