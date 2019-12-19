@@ -47,6 +47,42 @@ import org.osgi.service.component.annotations.Reference;
 public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 	extends BaseModelListener<T> {
 
+	public void addAnalyticsMessage(
+		String eventType, List<String> includeAttributeNames, T model) {
+
+		if (isExcluded(model)) {
+			return;
+		}
+
+		JSONObject jsonObject = _serialize(includeAttributeNames, model);
+
+		ShardedModel shardedModel = (ShardedModel)model;
+
+		try {
+			AnalyticsMessage.Builder analyticsMessageBuilder =
+				AnalyticsMessage.builder(
+					_getDataSourceId(shardedModel.getCompanyId()),
+					model.getModelClassName());
+
+			analyticsMessageBuilder.action(eventType);
+			analyticsMessageBuilder.object(jsonObject);
+
+			String analyticsMessageJSON =
+				analyticsMessageBuilder.buildJSONString();
+
+			analyticsMessageLocalService.addAnalyticsMessage(
+				shardedModel.getCompanyId(),
+				userLocalService.getDefaultUserId(shardedModel.getCompanyId()),
+				analyticsMessageJSON.getBytes(Charset.defaultCharset()));
+		}
+		catch (Exception e) {
+			if (_log.isInfoEnabled()) {
+				_log.info(
+					"Unable to add analytics message " + jsonObject.toString());
+			}
+		}
+	}
+
 	@Override
 	public void onAfterCreate(T model) throws ModelListenerException {
 		_addAnalyticsMessage("add", getAttributeNames(), model);
@@ -117,42 +153,6 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 
 	@Reference
 	protected UserLocalService userLocalService;
-
-	private void _addAnalyticsMessage(
-		String eventType, List<String> includeAttributeNames, T model) {
-
-		if (isExcluded(model)) {
-			return;
-		}
-
-		JSONObject jsonObject = _serialize(includeAttributeNames, model);
-
-		ShardedModel shardedModel = (ShardedModel)model;
-
-		try {
-			AnalyticsMessage.Builder analyticsMessageBuilder =
-				AnalyticsMessage.builder(
-					_getDataSourceId(shardedModel.getCompanyId()),
-					model.getModelClassName());
-
-			analyticsMessageBuilder.action(eventType);
-			analyticsMessageBuilder.object(jsonObject);
-
-			String analyticsMessageJSON =
-				analyticsMessageBuilder.buildJSONString();
-
-			analyticsMessageLocalService.addAnalyticsMessage(
-				shardedModel.getCompanyId(),
-				userLocalService.getDefaultUserId(shardedModel.getCompanyId()),
-				analyticsMessageJSON.getBytes(Charset.defaultCharset()));
-		}
-		catch (Exception e) {
-			if (_log.isInfoEnabled()) {
-				_log.info(
-					"Unable to add analytics message " + jsonObject.toString());
-			}
-		}
-	}
 
 	private String _getDataSourceId(long companyId) {
 		AnalyticsConfiguration analyticsConfiguration =
