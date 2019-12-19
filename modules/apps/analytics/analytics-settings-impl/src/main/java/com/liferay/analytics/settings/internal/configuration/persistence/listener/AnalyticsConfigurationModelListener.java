@@ -27,12 +27,14 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.CompanyConstants;
+import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.CompanyService;
 import com.liferay.portal.kernel.service.ContactService;
 import com.liferay.portal.kernel.service.GroupService;
+import com.liferay.portal.kernel.service.OrganizationLocalService;
 import com.liferay.portal.kernel.service.OrganizationService;
 import com.liferay.portal.kernel.service.PortalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
@@ -40,12 +42,16 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserGroupService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.UserService;
+import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.security.service.access.policy.model.SAPEntry;
 import com.liferay.portal.security.service.access.policy.service.SAPEntryLocalService;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.List;
@@ -102,6 +108,12 @@ public class AnalyticsConfigurationModelListener
 		_syncContacts(
 			analyticsConfiguration,
 			_analyticsConfigurationTracker.getCompanyId(pid), syncAllContacts);
+
+		if (!syncAllContacts) {
+			_syncOrganizations(
+				analyticsConfiguration,
+				(String[])properties.get("syncedOrganizationIds"));
+		}
 	}
 
 	@Activate
@@ -278,6 +290,87 @@ public class AnalyticsConfigurationModelListener
 		}
 	}
 
+	private void _syncOrganizations(
+		AnalyticsConfiguration analyticsConfiguration,
+		String[] syncedOrganizationIds) {
+
+		String[] oldSyncedOrganizationIds =
+			analyticsConfiguration.syncedOrganizationIds();
+
+		if (oldSyncedOrganizationIds != null) {
+			Arrays.sort(oldSyncedOrganizationIds);
+		}
+		else {
+			oldSyncedOrganizationIds = new String[0];
+		}
+
+		if (syncedOrganizationIds != null) {
+			Arrays.sort(syncedOrganizationIds);
+		}
+
+		if (Arrays.equals(oldSyncedOrganizationIds, syncedOrganizationIds)) {
+			return;
+		}
+
+		for (String oldSyncedOrganizationId : oldSyncedOrganizationIds) {
+			syncedOrganizationIds = ArrayUtil.remove(
+				syncedOrganizationIds, oldSyncedOrganizationId);
+		}
+
+		List<Organization> organizations = new ArrayList<>();
+
+		for (String syncedOrganizationId : syncedOrganizationIds) {
+			try {
+				Organization organization =
+					_organizationLocalService.getOrganization(
+						GetterUtil.getLong(syncedOrganizationId));
+
+				organizations.add(organization);
+			}
+			catch (Exception e) {
+				if (_log.isInfoEnabled()) {
+					_log.info(
+						"Unable to get organization " + syncedOrganizationId);
+				}
+			}
+		}
+
+		if (!organizations.isEmpty()) {
+			_addAnalyticsMessages(organizations);
+		}
+
+		for (String syncedOrganizationId : syncedOrganizationIds) {
+			int count = _userLocalService.getOrganizationUsersCount(
+				GetterUtil.getLong(syncedOrganizationId));
+
+			int pages = count / _DEFAULT_DELTA;
+
+			for (int i = 0; i <= pages; i++) {
+				int start = i * _DEFAULT_DELTA;
+
+				int end = start + _DEFAULT_DELTA;
+
+				if (end > count) {
+					end = count;
+				}
+
+				try {
+					List<User> users = _userLocalService.getOrganizationUsers(
+						GetterUtil.getLong(syncedOrganizationId), start, end);
+
+					_addAnalyticsMessages(users);
+				}
+				catch (Exception e) {
+					if (_log.isInfoEnabled()) {
+						_log.info(
+							"Unable to get organization users for " +
+								"organization " + syncedOrganizationId);
+					}
+				}
+			}
+		}
+	}
+
 	private static final int _DEFAULT_DELTA = 500;
 
 	private static final String[] _SAP_ENTRY_OBJECT = {
@@ -339,6 +432,9 @@ public class AnalyticsConfigurationModelListener
 
 	@Reference
 	private EntityModelListenerRegistry _entityModelListenerRegistry;
+
+	@Reference
+	private OrganizationLocalService _organizationLocalService;
 
 	@Reference
 	private RoleLocalService _roleLocalService;
