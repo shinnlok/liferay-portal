@@ -33,6 +33,8 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringBundler;
 
+import java.nio.charset.Charset;
+
 import java.security.KeyFactory;
 import java.security.Signature;
 import java.security.spec.X509EncodedKeySpec;
@@ -202,7 +204,7 @@ public class AnalyticsSecurityAuthVerifier implements AuthVerifier {
 
 		String requestContent = sb.toString();
 
-		signature.update(requestContent.getBytes());
+		signature.update(requestContent.getBytes(Charset.defaultCharset()));
 
 		return signature.verify(Base64.decode(signatureString));
 	}
