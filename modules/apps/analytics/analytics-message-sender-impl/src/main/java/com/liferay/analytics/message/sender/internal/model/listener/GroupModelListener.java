@@ -14,6 +14,7 @@
 
 package com.liferay.analytics.message.sender.internal.model.listener;
 
+import com.liferay.analytics.message.sender.model.EntityModelListenerHelper;
 import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.ModelListener;
@@ -29,11 +30,14 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Rachael Koestartyo
  */
-@Component(immediate = true, service = ModelListener.class)
+@Component(
+	immediate = true,
+	service = {EntityModelListenerHelper.class, ModelListener.class}
+)
 public class GroupModelListener extends BaseEntityModelListener<Group> {
 
 	@Override
-	protected List<String> getAttributeNames() {
+	public List<String> getAttributeNames() {
 		return _attributeNames;
 	}
 
