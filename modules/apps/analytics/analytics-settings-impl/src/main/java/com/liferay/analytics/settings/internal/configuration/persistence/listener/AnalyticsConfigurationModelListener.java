@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.model.UserGroup;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.CompanyService;
 import com.liferay.portal.kernel.service.ContactService;
@@ -39,6 +40,7 @@ import com.liferay.portal.kernel.service.OrganizationService;
 import com.liferay.portal.kernel.service.PortalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.UserGroupLocalService;
 import com.liferay.portal.kernel.service.UserGroupService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.UserService;
@@ -113,6 +115,9 @@ public class AnalyticsConfigurationModelListener
 			_syncOrganizations(
 				analyticsConfiguration,
 				(String[])properties.get("syncedOrganizationIds"));
+			_syncUserGroups(
+				analyticsConfiguration,
+				(String[])properties.get("syncedUserGroupIds"));
 		}
 	}
 
@@ -371,6 +376,76 @@ public class AnalyticsConfigurationModelListener
 		}
 	}
 
+	private void _syncUserGroups(
+		AnalyticsConfiguration analyticsConfiguration,
+		String[] syncedUserGroupIds) {
+
+		String[] oldSyncedUserGroupIds =
+			analyticsConfiguration.syncedUserGroupIds();
+
+		if (oldSyncedUserGroupIds != null) {
+			Arrays.sort(oldSyncedUserGroupIds);
+		}
+		else {
+			oldSyncedUserGroupIds = new String[0];
+		}
+
+		if (syncedUserGroupIds != null) {
+			Arrays.sort(syncedUserGroupIds);
+		}
+
+		if (Arrays.equals(oldSyncedUserGroupIds, syncedUserGroupIds)) {
+			return;
+		}
+
+		for (String oldSyncedUserGroupId : oldSyncedUserGroupIds) {
+			syncedUserGroupIds = ArrayUtil.remove(
+				syncedUserGroupIds, oldSyncedUserGroupId);
+		}
+
+		List<UserGroup> userGroups = new ArrayList<>();
+
+		for (String syncedUserGroupId : syncedUserGroupIds) {
+			try {
+				UserGroup userGroup = _userGroupLocalService.getUserGroup(
+					GetterUtil.getLong(syncedUserGroupId));
+
+				userGroups.add(userGroup);
+			}
+			catch (Exception e) {
+				if (_log.isInfoEnabled()) {
+					_log.info("Unable to get user group " + syncedUserGroupId);
+				}
+			}
+		}
+
+		if (!userGroups.isEmpty()) {
+			_addAnalyticsMessages(userGroups);
+		}
+
+		for (String syncedUserGroupId : syncedUserGroupIds) {
+			int count = _userLocalService.getUserGroupUsersCount(
+				GetterUtil.getLong(syncedUserGroupId));
+
+			int pages = count / _DEFAULT_DELTA;
+
+			for (int i = 0; i <= pages; i++) {
+				int start = i * _DEFAULT_DELTA;
+
+				int end = start + _DEFAULT_DELTA;
+
+				if (end > count) {
+					end = count;
+				}
+
+				List<User> users = _userLocalService.getUserGroupUsers(
+					GetterUtil.getLong(syncedUserGroupId), start, end);
+
+				_addAnalyticsMessages(users);
+			}
+		}
+	}
+
 	private static final int _DEFAULT_DELTA = 500;
 
 	private static final String[] _SAP_ENTRY_OBJECT = {
@@ -441,6 +516,9 @@ public class AnalyticsConfigurationModelListener
 
 	@Reference
 	private SAPEntryLocalService _sapEntryLocalService;
+
+	@Reference
+	private UserGroupLocalService _userGroupLocalService;
 
 	@Reference
 	private UserLocalService _userLocalService;
