@@ -15,6 +15,7 @@
 package com.liferay.analytics.message.sender.internal.model.listener;
 
 import com.liferay.analytics.message.sender.model.AnalyticsMessage;
+import com.liferay.analytics.message.sender.model.EntityModelListenerHelper;
 import com.liferay.analytics.message.storage.service.AnalyticsMessageLocalService;
 import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
 import com.liferay.analytics.settings.configuration.AnalyticsConfigurationTracker;
@@ -45,12 +46,14 @@ import org.osgi.service.component.annotations.Reference;
  * @author Rachael Koestartyo
  */
 public abstract class BaseEntityModelListener<T extends BaseModel<T>>
-	extends BaseModelListener<T> {
+	extends BaseModelListener<T> implements EntityModelListenerHelper<T> {
 
+	@Override
 	public void addAnalyticsMessage(
-		String eventType, List<String> includeAttributeNames, T model) {
+		boolean checkExclude, String eventType,
+		List<String> includeAttributeNames, T model) {
 
-		if (isExcluded(model)) {
+		if (checkExclude && isExcluded(model)) {
 			return;
 		}
 
@@ -85,12 +88,12 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 
 	@Override
 	public void onAfterCreate(T model) throws ModelListenerException {
-		_addAnalyticsMessage("add", getAttributeNames(), model);
+		addAnalyticsMessage(true, "add", getAttributeNames(), model);
 	}
 
 	@Override
 	public void onBeforeRemove(T model) throws ModelListenerException {
-		_addAnalyticsMessage("delete", new ArrayList<>(), model);
+		addAnalyticsMessage(true, "delete", new ArrayList<>(), model);
 	}
 
 	@Override
@@ -103,14 +106,12 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 				return;
 			}
 
-			_addAnalyticsMessage("update", getAttributeNames(), model);
+			addAnalyticsMessage(true, "update", getAttributeNames(), model);
 		}
 		catch (Exception e) {
 			throw new ModelListenerException(e);
 		}
 	}
-
-	protected abstract List<String> getAttributeNames();
 
 	protected abstract T getOriginalModel(T model) throws Exception;
 
