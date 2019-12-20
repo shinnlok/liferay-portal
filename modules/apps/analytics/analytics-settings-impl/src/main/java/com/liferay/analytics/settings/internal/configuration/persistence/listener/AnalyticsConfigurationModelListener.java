@@ -46,7 +46,6 @@ import com.liferay.portal.kernel.service.UserGroupLocalService;
 import com.liferay.portal.kernel.service.UserGroupService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.UserService;
-import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -58,7 +57,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Dictionary;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
@@ -250,6 +251,22 @@ public class AnalyticsConfigurationModelListener
 		}
 	}
 
+	private Set<String> _getDifferences(String[] current, String[] previous) {
+		if (current == null) {
+			return Collections.emptySet();
+		}
+
+		Set<String> currentSet = new HashSet<>(Arrays.asList(current));
+
+		if (previous == null) {
+			return currentSet;
+		}
+
+		currentSet.removeAll(new HashSet<>(Arrays.asList(previous)));
+
+		return currentSet;
+	}
+
 	private boolean _hasConfiguration() throws Exception {
 		Configuration[] configurations = _configurationAdmin.listConfigurations(
 			"(service.pid=" + AnalyticsConfiguration.class.getName() + "*)");
@@ -301,42 +318,23 @@ public class AnalyticsConfigurationModelListener
 	}
 
 	private void _syncGroups(
-		AnalyticsConfiguration analyticsConfiguration,
-		String[] syncedGroupIds) {
-
-		String[] oldSyncedGroupIds = analyticsConfiguration.syncedGroupIds();
-
-		if (oldSyncedGroupIds != null) {
-			Arrays.sort(oldSyncedGroupIds);
-		}
-		else {
-			oldSyncedGroupIds = new String[0];
-		}
-
-		if (syncedGroupIds != null) {
-			Arrays.sort(syncedGroupIds);
-		}
-
-		if (Arrays.equals(oldSyncedGroupIds, syncedGroupIds)) {
-			return;
-		}
-
-		for (String oldSyncedGroupId : oldSyncedGroupIds) {
-			syncedGroupIds = ArrayUtil.remove(syncedGroupIds, oldSyncedGroupId);
-		}
+		AnalyticsConfiguration analyticsConfiguration, String[] groupIds) {
 
 		List<Group> groups = new ArrayList<>();
 
-		for (String syncedGroupId : syncedGroupIds) {
+		for (String groupId :
+				_getDifferences(
+					groupIds, analyticsConfiguration.syncedGroupIds())) {
+
 			try {
 				Group group = _groupLocalService.getGroup(
-					GetterUtil.getLong(syncedGroupId));
+					GetterUtil.getLong(groupId));
 
 				groups.add(group);
 			}
 			catch (Exception e) {
 				if (_log.isInfoEnabled()) {
-					_log.info("Unable to get group " + syncedGroupId);
+					_log.info("Unable to get group " + groupId);
 				}
 			}
 		}
@@ -348,45 +346,25 @@ public class AnalyticsConfigurationModelListener
 
 	private void _syncOrganizations(
 		AnalyticsConfiguration analyticsConfiguration,
-		String[] syncedOrganizationIds) {
-
-		String[] oldSyncedOrganizationIds =
-			analyticsConfiguration.syncedOrganizationIds();
-
-		if (oldSyncedOrganizationIds != null) {
-			Arrays.sort(oldSyncedOrganizationIds);
-		}
-		else {
-			oldSyncedOrganizationIds = new String[0];
-		}
-
-		if (syncedOrganizationIds != null) {
-			Arrays.sort(syncedOrganizationIds);
-		}
-
-		if (Arrays.equals(oldSyncedOrganizationIds, syncedOrganizationIds)) {
-			return;
-		}
-
-		for (String oldSyncedOrganizationId : oldSyncedOrganizationIds) {
-			syncedOrganizationIds = ArrayUtil.remove(
-				syncedOrganizationIds, oldSyncedOrganizationId);
-		}
+		String[] organizationIds) {
 
 		List<Organization> organizations = new ArrayList<>();
 
-		for (String syncedOrganizationId : syncedOrganizationIds) {
+		for (String organizationId :
+				_getDifferences(
+					organizationIds,
+					analyticsConfiguration.syncedOrganizationIds())) {
+
 			try {
 				Organization organization =
 					_organizationLocalService.getOrganization(
-						GetterUtil.getLong(syncedOrganizationId));
+						GetterUtil.getLong(organizationId));
 
 				organizations.add(organization);
 			}
 			catch (Exception e) {
 				if (_log.isInfoEnabled()) {
-					_log.info(
-						"Unable to get organization " + syncedOrganizationId);
+					_log.info("Unable to get organization " + organizationId);
 				}
 			}
 		}
@@ -395,9 +373,9 @@ public class AnalyticsConfigurationModelListener
 			_addAnalyticsMessages(organizations);
 		}
 
-		for (String syncedOrganizationId : syncedOrganizationIds) {
+		for (String organizationId : organizationIds) {
 			int count = _userLocalService.getOrganizationUsersCount(
-				GetterUtil.getLong(syncedOrganizationId));
+				GetterUtil.getLong(organizationId));
 
 			int pages = count / _DEFAULT_DELTA;
 
@@ -412,7 +390,7 @@ public class AnalyticsConfigurationModelListener
 
 				try {
 					List<User> users = _userLocalService.getOrganizationUsers(
-						GetterUtil.getLong(syncedOrganizationId), start, end);
+						GetterUtil.getLong(organizationId), start, end);
 
 					_addAnalyticsMessages(users);
 				}
@@ -420,7 +398,7 @@ public class AnalyticsConfigurationModelListener
 					if (_log.isInfoEnabled()) {
 						_log.info(
 							"Unable to get organization users for " +
-								"organization " + syncedOrganizationId);
+								"organization " + organizationId);
 					}
 				}
 			}
@@ -428,44 +406,24 @@ public class AnalyticsConfigurationModelListener
 	}
 
 	private void _syncUserGroups(
-		AnalyticsConfiguration analyticsConfiguration,
-		String[] syncedUserGroupIds) {
-
-		String[] oldSyncedUserGroupIds =
-			analyticsConfiguration.syncedUserGroupIds();
-
-		if (oldSyncedUserGroupIds != null) {
-			Arrays.sort(oldSyncedUserGroupIds);
-		}
-		else {
-			oldSyncedUserGroupIds = new String[0];
-		}
-
-		if (syncedUserGroupIds != null) {
-			Arrays.sort(syncedUserGroupIds);
-		}
-
-		if (Arrays.equals(oldSyncedUserGroupIds, syncedUserGroupIds)) {
-			return;
-		}
-
-		for (String oldSyncedUserGroupId : oldSyncedUserGroupIds) {
-			syncedUserGroupIds = ArrayUtil.remove(
-				syncedUserGroupIds, oldSyncedUserGroupId);
-		}
+		AnalyticsConfiguration analyticsConfiguration, String[] userGroupIds) {
 
 		List<UserGroup> userGroups = new ArrayList<>();
 
-		for (String syncedUserGroupId : syncedUserGroupIds) {
+		for (String userGroupId :
+				_getDifferences(
+					userGroupIds,
+					analyticsConfiguration.syncedUserGroupIds())) {
+
 			try {
 				UserGroup userGroup = _userGroupLocalService.getUserGroup(
-					GetterUtil.getLong(syncedUserGroupId));
+					GetterUtil.getLong(userGroupId));
 
 				userGroups.add(userGroup);
 			}
 			catch (Exception e) {
 				if (_log.isInfoEnabled()) {
-					_log.info("Unable to get user group " + syncedUserGroupId);
+					_log.info("Unable to get user group " + userGroupId);
 				}
 			}
 		}
@@ -474,9 +432,9 @@ public class AnalyticsConfigurationModelListener
 			_addAnalyticsMessages(userGroups);
 		}
 
-		for (String syncedUserGroupId : syncedUserGroupIds) {
+		for (String userGroupId : userGroupIds) {
 			int count = _userLocalService.getUserGroupUsersCount(
-				GetterUtil.getLong(syncedUserGroupId));
+				GetterUtil.getLong(userGroupId));
 
 			int pages = count / _DEFAULT_DELTA;
 
@@ -490,7 +448,7 @@ public class AnalyticsConfigurationModelListener
 				}
 
 				List<User> users = _userLocalService.getUserGroupUsers(
-					GetterUtil.getLong(syncedUserGroupId), start, end);
+					GetterUtil.getLong(userGroupId), start, end);
 
 				_addAnalyticsMessages(users);
 			}
