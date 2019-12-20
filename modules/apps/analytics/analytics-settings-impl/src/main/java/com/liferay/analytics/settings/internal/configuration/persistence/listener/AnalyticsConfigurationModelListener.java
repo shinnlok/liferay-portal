@@ -14,6 +14,9 @@
 
 package com.liferay.analytics.settings.internal.configuration.persistence.listener;
 
+import com.liferay.analytics.message.sender.model.EntityModelListenerHelper;
+import com.liferay.analytics.message.sender.util.EntityModelListenerRegistry;
+import com.liferay.analytics.message.storage.service.AnalyticsMessageLocalService;
 import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
 import com.liferay.analytics.settings.configuration.AnalyticsConfigurationTracker;
 import com.liferay.analytics.settings.internal.security.auth.verifier.AnalyticsSecurityAuthVerifier;
@@ -21,6 +24,7 @@ import com.liferay.analytics.settings.security.constants.AnalyticsSecurityConsta
 import com.liferay.portal.configuration.persistence.listener.ConfigurationModelListener;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.model.Role;
@@ -44,6 +48,7 @@ import com.liferay.portal.security.service.access.policy.service.SAPEntryLocalSe
 
 import java.util.Collections;
 import java.util.Dictionary;
+import java.util.List;
 
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
@@ -84,6 +89,21 @@ public class AnalyticsConfigurationModelListener
 		_disable(companyId);
 	}
 
+	@Override
+	public void onBeforeSave(
+		String pid, Dictionary<String, Object> properties) {
+
+		AnalyticsConfiguration analyticsConfiguration =
+			_analyticsConfigurationTracker.getAnalyticsConfiguration(pid);
+
+		boolean syncAllContacts = Boolean.parseBoolean(
+			(String)properties.get("syncAllContacts"));
+
+		_syncContacts(
+			analyticsConfiguration,
+			_analyticsConfigurationTracker.getCompanyId(pid), syncAllContacts);
+	}
+
 	@Activate
 	protected void activate(ComponentContext componentContext)
 		throws Exception {
@@ -117,6 +137,20 @@ public class AnalyticsConfigurationModelListener
 			null, false, new ServiceContext());
 
 		_userLocalService.updateUser(user);
+	}
+
+	private void _addAnalyticsMessages(List<?> objects) {
+		for (Object object : objects) {
+			BaseModel<?> baseModel = (BaseModel<?>)object;
+
+			EntityModelListenerHelper entityModelListenerHelper =
+				_entityModelListenerRegistry.getEntityModelListenerHelper(
+					baseModel.getModelClassName());
+
+			entityModelListenerHelper.addAnalyticsMessage(
+				false, "update", entityModelListenerHelper.getAttributeNames(),
+				baseModel);
+		}
 	}
 
 	private void _addSAPEntry(long companyId) throws Exception {
@@ -214,6 +248,38 @@ public class AnalyticsConfigurationModelListener
 		return false;
 	}
 
+	private void _syncContacts(
+		AnalyticsConfiguration analyticsConfiguration, long companyId,
+		boolean syncAllContacts) {
+
+		if ((analyticsConfiguration.syncAllContacts() == syncAllContacts) ||
+			!syncAllContacts) {
+
+			return;
+		}
+
+		int count = _userLocalService.getCompanyUsersCount(companyId);
+
+		int pages = count / _DEFAULT_DELTA;
+
+		for (int i = 0; i <= pages; i++) {
+			int start = i * _DEFAULT_DELTA;
+
+			int end = start + _DEFAULT_DELTA;
+
+			if (end > count) {
+				end = count;
+			}
+
+			List<User> users = _userLocalService.getCompanyUsers(
+				companyId, start, end);
+
+			_addAnalyticsMessages(users);
+		}
+	}
+
+	private static final int _DEFAULT_DELTA = 500;
+
 	private static final String[] _SAP_ENTRY_OBJECT = {
 		AnalyticsSecurityConstants.SERVICE_ACCESS_POLICY_NAME,
 		StringBundler.concat(
@@ -258,6 +324,9 @@ public class AnalyticsConfigurationModelListener
 	@Reference
 	private AnalyticsConfigurationTracker _analyticsConfigurationTracker;
 
+	@Reference
+	private AnalyticsMessageLocalService _analyticsMessageLocalService;
+
 	private boolean _authVerifierEnabled;
 
 	@Reference
@@ -267,6 +336,9 @@ public class AnalyticsConfigurationModelListener
 
 	@Reference
 	private ConfigurationAdmin _configurationAdmin;
+
+	@Reference
+	private EntityModelListenerRegistry _entityModelListenerRegistry;
 
 	@Reference
 	private RoleLocalService _roleLocalService;
