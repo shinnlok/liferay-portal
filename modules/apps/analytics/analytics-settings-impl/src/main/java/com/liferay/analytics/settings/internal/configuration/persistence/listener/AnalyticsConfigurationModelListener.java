@@ -14,7 +14,7 @@
 
 package com.liferay.analytics.settings.internal.configuration.persistence.listener;
 
-import com.liferay.analytics.message.sender.model.EntityModelListenerHelper;
+import com.liferay.analytics.message.sender.model.EntityModelListener;
 import com.liferay.analytics.message.sender.util.EntityModelListenerRegistry;
 import com.liferay.analytics.message.storage.service.AnalyticsMessageLocalService;
 import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
@@ -165,12 +165,12 @@ public class AnalyticsConfigurationModelListener
 		for (Object object : objects) {
 			BaseModel<?> baseModel = (BaseModel<?>)object;
 
-			EntityModelListenerHelper entityModelListenerHelper =
-				_entityModelListenerRegistry.getEntityModelListenerHelper(
+			EntityModelListener entityModelListener =
+				_entityModelListenerRegistry.getEntityModelListener(
 					baseModel.getModelClassName());
 
-			entityModelListenerHelper.addAnalyticsMessage(
-				false, "update", entityModelListenerHelper.getAttributeNames(),
+			entityModelListener.addAnalyticsMessage(
+				false, "update", entityModelListener.getAttributeNames(),
 				baseModel);
 		}
 	}

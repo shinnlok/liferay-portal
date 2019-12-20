@@ -21,10 +21,10 @@ import java.util.List;
 /**
  * @author Rachael Koestartyo
  */
-public interface EntityModelListenerHelper<T extends BaseModel<T>> {
+public interface EntityModelListener<T extends BaseModel<T>> {
 
 	public void addAnalyticsMessage(
-		boolean checkExclude, String eventType,
+		boolean checkExclusions, String eventType,
 		List<String> includeAttributeNames, T model);
 
 	public List<String> getAttributeNames();

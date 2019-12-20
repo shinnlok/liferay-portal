@@ -14,7 +14,7 @@
 
 package com.liferay.analytics.message.sender.internal.model.listener;
 
-import com.liferay.analytics.message.sender.model.EntityModelListenerHelper;
+import com.liferay.analytics.message.sender.model.EntityModelListener;
 import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -33,8 +33,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Rachael Koestartyo
  */
 @Component(
-	immediate = true,
-	service = {EntityModelListenerHelper.class, ModelListener.class}
+	immediate = true, service = {EntityModelListener.class, ModelListener.class}
 )
 public class ContactModelListener extends BaseEntityModelListener<Contact> {
 

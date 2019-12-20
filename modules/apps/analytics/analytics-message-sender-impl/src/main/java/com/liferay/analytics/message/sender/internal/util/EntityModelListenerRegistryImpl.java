@@ -14,7 +14,7 @@
 
 package com.liferay.analytics.message.sender.internal.util;
 
-import com.liferay.analytics.message.sender.model.EntityModelListenerHelper;
+import com.liferay.analytics.message.sender.model.EntityModelListener;
 import com.liferay.analytics.message.sender.util.EntityModelListenerRegistry;
 import com.liferay.osgi.service.tracker.collections.map.ServiceReferenceMapper;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
@@ -38,9 +38,7 @@ public class EntityModelListenerRegistryImpl
 	implements EntityModelListenerRegistry {
 
 	@Override
-	public EntityModelListenerHelper getEntityModelListenerHelper(
-		String className) {
-
+	public EntityModelListener getEntityModelListener(String className) {
 		return _serviceTrackerMap.getService(className);
 	}
 
@@ -49,8 +47,8 @@ public class EntityModelListenerRegistryImpl
 		_bundleContext = bundleContext;
 
 		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
-			bundleContext, EntityModelListenerHelper.class, null,
-			new EntityModelListenerHelperServiceReferenceMapper());
+			bundleContext, EntityModelListener.class, null,
+			new EntityModelListenerServiceReferenceMapper());
 	}
 
 	@Deactivate
@@ -59,24 +57,22 @@ public class EntityModelListenerRegistryImpl
 	}
 
 	private BundleContext _bundleContext;
-	private ServiceTrackerMap<String, EntityModelListenerHelper>
-		_serviceTrackerMap;
+	private ServiceTrackerMap<String, EntityModelListener> _serviceTrackerMap;
 
-	private class EntityModelListenerHelperServiceReferenceMapper
+	private class EntityModelListenerServiceReferenceMapper
 		<T extends BaseModel<T>>
-			implements ServiceReferenceMapper
-				<String, EntityModelListenerHelper<T>> {
+			implements ServiceReferenceMapper<String, EntityModelListener<T>> {
 
 		@Override
 		public void map(
-			ServiceReference<EntityModelListenerHelper<T>> serviceReference,
+			ServiceReference<EntityModelListener<T>> serviceReference,
 			Emitter<String> emitter) {
 
-			EntityModelListenerHelper entityModelListenerHelper =
-				_bundleContext.getService(serviceReference);
+			EntityModelListener entityModelListener = _bundleContext.getService(
+				serviceReference);
 
 			Class<?> clazz = _getParameterizedClass(
-				entityModelListenerHelper.getClass());
+				entityModelListener.getClass());
 
 			try {
 				emitter.emit(clazz.getName());

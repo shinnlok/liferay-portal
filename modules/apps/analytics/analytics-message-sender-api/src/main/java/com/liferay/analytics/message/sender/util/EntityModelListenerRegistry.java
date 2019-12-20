@@ -14,14 +14,13 @@
 
 package com.liferay.analytics.message.sender.util;
 
-import com.liferay.analytics.message.sender.model.EntityModelListenerHelper;
+import com.liferay.analytics.message.sender.model.EntityModelListener;
 
 /**
  * @author Rachael Koestartyo
  */
 public interface EntityModelListenerRegistry {
 
-	public EntityModelListenerHelper getEntityModelListenerHelper(
-		String className);
+	public EntityModelListener getEntityModelListener(String className);
 
 }

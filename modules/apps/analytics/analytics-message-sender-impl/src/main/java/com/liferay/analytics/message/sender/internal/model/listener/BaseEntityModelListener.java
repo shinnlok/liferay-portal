@@ -15,7 +15,7 @@
 package com.liferay.analytics.message.sender.internal.model.listener;
 
 import com.liferay.analytics.message.sender.model.AnalyticsMessage;
-import com.liferay.analytics.message.sender.model.EntityModelListenerHelper;
+import com.liferay.analytics.message.sender.model.EntityModelListener;
 import com.liferay.analytics.message.storage.service.AnalyticsMessageLocalService;
 import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
 import com.liferay.analytics.settings.configuration.AnalyticsConfigurationTracker;
@@ -46,14 +46,14 @@ import org.osgi.service.component.annotations.Reference;
  * @author Rachael Koestartyo
  */
 public abstract class BaseEntityModelListener<T extends BaseModel<T>>
-	extends BaseModelListener<T> implements EntityModelListenerHelper<T> {
+	extends BaseModelListener<T> implements EntityModelListener<T> {
 
 	@Override
 	public void addAnalyticsMessage(
-		boolean checkExclude, String eventType,
+		boolean checkExclusions, String eventType,
 		List<String> includeAttributeNames, T model) {
 
-		if (checkExclude && isExcluded(model)) {
+		if (checkExclusions && isExcluded(model)) {
 			return;
 		}
 
