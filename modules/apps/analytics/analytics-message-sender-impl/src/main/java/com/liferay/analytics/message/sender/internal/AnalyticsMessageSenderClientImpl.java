@@ -71,7 +71,8 @@ public class AnalyticsMessageSenderClientImpl
 		String protocol = null;
 
 		try {
-			URL url = new URL(analyticsConfiguration.liferayAnalyticsURL());
+			URL url = new URL(
+				analyticsConfiguration.liferayAnalyticsEndpointURL());
 
 			hostName = url.getHost();
 			hostPort = url.getPort();
@@ -79,7 +80,7 @@ public class AnalyticsMessageSenderClientImpl
 		}
 		catch (Exception e) {
 			if (_log.isInfoEnabled()) {
-				_log.info("Unable to parse analytics URL");
+				_log.info("Unable to parse analytics endpoint URL");
 			}
 
 			return null;
