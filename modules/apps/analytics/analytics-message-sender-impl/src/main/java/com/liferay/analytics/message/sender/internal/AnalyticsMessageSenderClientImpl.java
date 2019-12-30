@@ -20,6 +20,7 @@ import com.liferay.analytics.settings.configuration.AnalyticsConfigurationTracke
 import com.liferay.petra.json.web.service.client.JSONWebServiceClient;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 
 import java.net.URL;
 
@@ -40,15 +41,23 @@ public class AnalyticsMessageSenderClientImpl
 
 	@Override
 	public Object send(String body, long companyId) throws Exception {
+		AnalyticsConfiguration analyticsConfiguration =
+			_analyticsConfigurationTracker.getAnalyticsConfiguration(companyId);
+
 		JSONWebServiceClient jsonWebServiceClient = _getJSONWebServiceClient(
-			_analyticsConfigurationTracker.getAnalyticsConfiguration(
-				companyId));
+			analyticsConfiguration);
 
 		if (jsonWebServiceClient == null) {
 			return null;
 		}
 
-		return jsonWebServiceClient.doPostAsJSON("/dxp-entities", body);
+		return jsonWebServiceClient.doPostAsJSON(
+			"/dxp-entities", body,
+			HashMapBuilder.put(
+				"OSB-Asah-Faro-Backend-Security-Signature",
+				analyticsConfiguration.
+					liferayAnalyticsFaroBackendSecuritySignature()
+			).build());
 	}
 
 	private JSONWebServiceClient _getJSONWebServiceClient(
