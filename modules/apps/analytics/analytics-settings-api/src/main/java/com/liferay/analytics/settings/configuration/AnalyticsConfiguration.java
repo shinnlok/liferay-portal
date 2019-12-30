@@ -37,6 +37,12 @@ public interface AnalyticsConfiguration {
 	public String liferayAnalyticsDataSourceId();
 
 	@Meta.AD(required = false)
+	public String liferayAnalyticsEndpointURL();
+
+	@Meta.AD(required = false)
+	public String liferayAnalyticsFaroBackendSecuritySignature();
+
+	@Meta.AD(required = false)
 	public String liferayAnalyticsURL();
 
 	@Meta.AD(required = false)
