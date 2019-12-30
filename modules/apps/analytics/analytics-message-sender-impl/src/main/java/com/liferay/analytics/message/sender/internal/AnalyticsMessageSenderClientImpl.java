@@ -24,6 +24,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import java.net.URL;
 
 import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.Properties;
 
 import org.osgi.service.component.ComponentFactory;
@@ -40,15 +41,26 @@ public class AnalyticsMessageSenderClientImpl
 
 	@Override
 	public Object send(String body, long companyId) throws Exception {
+		AnalyticsConfiguration analyticsConfiguration =
+			_analyticsConfigurationTracker.getAnalyticsConfiguration(companyId);
+
 		JSONWebServiceClient jsonWebServiceClient = _getJSONWebServiceClient(
-			_analyticsConfigurationTracker.getAnalyticsConfiguration(
-				companyId));
+			analyticsConfiguration);
 
 		if (jsonWebServiceClient == null) {
 			return null;
 		}
 
-		return jsonWebServiceClient.doPostAsJSON("/dxp-entities", body);
+		return jsonWebServiceClient.doPostAsJSON(
+			"/dxp-entities", body,
+			new HashMap<String, String>() {
+				{
+					put(
+						"OSB-Asah-Faro-Backend-Security-Signature",
+						analyticsConfiguration.
+							liferayAnalyticsFaroBackendSecuritySignature());
+				}
+			});
 	}
 
 	private JSONWebServiceClient _getJSONWebServiceClient(
