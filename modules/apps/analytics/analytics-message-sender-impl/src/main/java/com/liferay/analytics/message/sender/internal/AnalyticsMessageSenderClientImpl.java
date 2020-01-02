@@ -20,11 +20,11 @@ import com.liferay.analytics.settings.configuration.AnalyticsConfigurationTracke
 import com.liferay.petra.json.web.service.client.JSONWebServiceClient;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 
 import java.net.URL;
 
 import java.util.Dictionary;
-import java.util.HashMap;
 import java.util.Properties;
 
 import org.osgi.service.component.ComponentFactory;
@@ -53,14 +53,11 @@ public class AnalyticsMessageSenderClientImpl
 
 		return jsonWebServiceClient.doPostAsJSON(
 			"/dxp-entities", body,
-			new HashMap<String, String>() {
-				{
-					put(
-						"OSB-Asah-Faro-Backend-Security-Signature",
-						analyticsConfiguration.
-							liferayAnalyticsFaroBackendSecuritySignature());
-				}
-			});
+			HashMapBuilder.put(
+				"OSB-Asah-Faro-Backend-Security-Signature",
+				analyticsConfiguration.
+					liferayAnalyticsFaroBackendSecuritySignature()
+			).build());
 	}
 
 	private JSONWebServiceClient _getJSONWebServiceClient(
