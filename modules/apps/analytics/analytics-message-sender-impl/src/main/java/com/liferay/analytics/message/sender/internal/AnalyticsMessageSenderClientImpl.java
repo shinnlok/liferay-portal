@@ -17,18 +17,12 @@ package com.liferay.analytics.message.sender.internal;
 import com.liferay.analytics.message.sender.client.AnalyticsMessageSenderClient;
 import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
 import com.liferay.analytics.settings.configuration.AnalyticsConfigurationTracker;
-import com.liferay.petra.json.web.service.client.JSONWebServiceClient;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.HashMapBuilder;
 
-import java.net.URL;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 
-import java.util.Dictionary;
-import java.util.Properties;
-
-import org.osgi.service.component.ComponentFactory;
-import org.osgi.service.component.ComponentInstance;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -41,76 +35,31 @@ public class AnalyticsMessageSenderClientImpl
 
 	@Override
 	public Object send(String body, long companyId) throws Exception {
-		AnalyticsConfiguration analyticsConfiguration =
-			_analyticsConfigurationTracker.getAnalyticsConfiguration(companyId);
+		HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
 
-		JSONWebServiceClient jsonWebServiceClient = _getJSONWebServiceClient(
-			analyticsConfiguration);
+		try (CloseableHttpClient closeableHttpClient =
+				httpClientBuilder.build()) {
 
-		if (jsonWebServiceClient == null) {
-			return null;
-		}
+			AnalyticsConfiguration analyticsConfiguration =
+				_analyticsConfigurationTracker.getAnalyticsConfiguration(
+					companyId);
 
-		return jsonWebServiceClient.doPostAsJSON(
-			"/dxp-entities", body,
-			HashMapBuilder.put(
+			HttpPost httpPost = new HttpPost(
+				analyticsConfiguration.liferayAnalyticsEndpointURL() +
+					"/dxp-entities");
+
+			httpPost.setEntity(new StringEntity(body));
+			httpPost.setHeader("Content-Type", "application/json");
+			httpPost.setHeader(
 				"OSB-Asah-Faro-Backend-Security-Signature",
 				analyticsConfiguration.
-					liferayAnalyticsFaroBackendSecuritySignature()
-			).build());
+					liferayAnalyticsFaroBackendSecuritySignature());
+
+			return closeableHttpClient.execute(httpPost);
+		}
 	}
-
-	private JSONWebServiceClient _getJSONWebServiceClient(
-		AnalyticsConfiguration analyticsConfiguration) {
-
-		String hostName = null;
-		int hostPort = -1;
-		String protocol = null;
-
-		try {
-			URL url = new URL(
-				analyticsConfiguration.liferayAnalyticsEndpointURL());
-
-			hostName = url.getHost();
-			hostPort = url.getPort();
-			protocol = url.getProtocol();
-		}
-		catch (Exception e) {
-			if (_log.isInfoEnabled()) {
-				_log.info("Unable to parse analytics endpoint URL");
-			}
-
-			return null;
-		}
-
-		if (hostPort == -1) {
-			if (protocol.equals("https")) {
-				hostPort = 443;
-			}
-			else {
-				hostPort = 80;
-			}
-		}
-
-		Properties properties = new Properties();
-
-		properties.setProperty("hostName", hostName);
-		properties.setProperty("hostPort", String.valueOf(hostPort));
-		properties.setProperty("protocol", protocol);
-
-		ComponentInstance componentInstance = _componentFactory.newInstance(
-			(Dictionary)properties);
-
-		return (JSONWebServiceClient)componentInstance.getInstance();
-	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		AnalyticsMessageSenderClientImpl.class);
 
 	@Reference
 	private AnalyticsConfigurationTracker _analyticsConfigurationTracker;
-
-	@Reference(target = "(component.factory=JSONWebServiceClient)")
-	private ComponentFactory _componentFactory;
 
 }
