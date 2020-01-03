@@ -455,41 +455,7 @@ public class AnalyticsConfigurationModelListener
 	private static final int _DEFAULT_DELTA = 500;
 
 	private static final String[] _SAP_ENTRY_OBJECT = {
-		AnalyticsSecurityConstants.SERVICE_ACCESS_POLICY_NAME,
-		StringBundler.concat(
-			"com.liferay.portal.security.audit.storage.service.",
-			"AuditEventService#getAuditEvents\n",
-			ContactService.class.getName(), "#getContact\n",
-			CompanyService.class.getName(), "#updatePreferences\n",
-			GroupService.class.getName(), "#getGroup\n",
-			GroupService.class.getName(), "#getGroups\n",
-			GroupService.class.getName(), "#getGroupsCount\n",
-			GroupService.class.getName(), "#getGtGroups\n",
-			OrganizationService.class.getName(), "#fetchOrganization\n",
-			OrganizationService.class.getName(), "#getGtOrganizations\n",
-			OrganizationService.class.getName(), "#getOrganization\n",
-			OrganizationService.class.getName(), "#getOrganizations\n",
-			OrganizationService.class.getName(), "#getOrganizationsCount\n",
-			OrganizationService.class.getName(), "#getUserOrganizations\n",
-			PortalService.class.getName(), "#getBuildNumber\n",
-			UserService.class.getName(), "#getCompanyUsers\n",
-			UserService.class.getName(), "#getCompanyUsersCount\n",
-			UserService.class.getName(), "#getCurrentUser\n",
-			UserService.class.getName(), "#getGtCompanyUsers\n",
-			UserService.class.getName(), "#getGtOrganizationUsers\n",
-			UserService.class.getName(), "#getGtUserGroupUsers\n",
-			UserService.class.getName(), "#getOrganizationUsers\n",
-			UserService.class.getName(), "#getOrganizationUsersCount\n",
-			UserService.class.getName(),
-			"#getOrganizationsAndUserGroupsUsersCount\n",
-			UserService.class.getName(), "#getUserById\n",
-			UserService.class.getName(), "#getUserGroupUsers\n",
-			UserGroupService.class.getName(), "#fetchUserGroup\n",
-			UserGroupService.class.getName(), "#getGtUserGroups\n",
-			UserGroupService.class.getName(), "#getUserGroup\n",
-			UserGroupService.class.getName(), "#getUserGroups\n",
-			UserGroupService.class.getName(), "#getUserGroupsCount\n",
-			UserGroupService.class.getName(), "#getUserUserGroups")
+		AnalyticsSecurityConstants.SERVICE_ACCESS_POLICY_NAME, ""
 	};
 
 	private static final Log _log = LogFactoryUtil.getLog(
