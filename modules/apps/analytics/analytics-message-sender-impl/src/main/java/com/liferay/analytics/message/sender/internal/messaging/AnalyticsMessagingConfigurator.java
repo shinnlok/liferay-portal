@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.analytics.message.sender.internal.messaging.config;
+package com.liferay.analytics.message.sender.internal.messaging;
 
 import com.liferay.analytics.message.sender.constants.AnalyticsMessageDestinationNames;
 import com.liferay.portal.kernel.messaging.Destination;
@@ -33,7 +33,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Rachael Koestartyo
  */
 @Component(immediate = true, service = {})
-public class MessagingConfigurator {
+public class AnalyticsMessagingConfigurator {
 
 	@Activate
 	protected void activate(BundleContext bundleContext) throws Exception {
