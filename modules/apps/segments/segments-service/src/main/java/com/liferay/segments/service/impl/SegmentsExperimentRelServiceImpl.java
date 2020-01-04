@@ -16,6 +16,7 @@ package com.liferay.segments.service.impl;
 
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -103,8 +104,17 @@ public class SegmentsExperimentRelServiceImpl
 			long segmentsExperimentId)
 		throws PortalException {
 
-		_segmentsExperimentResourcePermission.check(
-			getPermissionChecker(), segmentsExperimentId, ActionKeys.VIEW);
+		SegmentsExperiment segmentsExperiment =
+			segmentsExperimentPersistence.findByPrimaryKey(
+				segmentsExperimentId);
+
+		if (!userLocalService.hasRoleUser(
+				segmentsExperiment.getCompanyId(),
+				RoleConstants.ANALYTICS_ADMINISTRATOR, getUserId(), true)) {
+
+			_segmentsExperimentResourcePermission.check(
+				getPermissionChecker(), segmentsExperimentId, ActionKeys.VIEW);
+		}
 
 		return segmentsExperimentRelLocalService.getSegmentsExperimentRels(
 			segmentsExperimentId);
