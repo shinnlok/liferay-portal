@@ -107,6 +107,11 @@ public class AnalyticsConfigurationTrackerImpl
 	}
 
 	@Override
+	public Map<Long, AnalyticsConfiguration> getAnalyticsConfigurations() {
+		return _analyticsConfigurations;
+	}
+
+	@Override
 	public long getCompanyId(String pid) {
 		return _pidCompanyIdMapping.getOrDefault(pid, CompanyConstants.SYSTEM);
 	}
