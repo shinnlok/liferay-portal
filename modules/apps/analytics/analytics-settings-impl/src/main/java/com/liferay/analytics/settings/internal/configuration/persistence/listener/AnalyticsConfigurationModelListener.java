@@ -188,6 +188,28 @@ public class AnalyticsConfigurationModelListener
 			});
 	}
 
+	private void _addContactsAnalyticsMessages(List<User> users) {
+		List<Contact> contacts = new ArrayList<>();
+
+		for (User user : users) {
+			try {
+				Contact contact = _contactLocalService.getContact(
+					user.getContactId());
+
+				contacts.add(contact);
+			}
+			catch (Exception e) {
+				if (_log.isInfoEnabled()) {
+					_log.info(
+						"Unable to get contact for user ID " +
+							user.getUserId());
+				}
+			}
+		}
+
+		_addAnalyticsMessages(contacts);
+	}
+
 	private void _addSAPEntry(long companyId) throws Exception {
 		String sapEntryName = _SAP_ENTRY_OBJECT[0];
 
@@ -326,25 +348,7 @@ public class AnalyticsConfigurationModelListener
 				companyId, start, end);
 
 			_addAnalyticsMessages(users);
-		}
-
-		count = _contactLocalService.getCompanyContactsCount(companyId);
-
-		pages = count / _DEFAULT_DELTA;
-
-		for (int i = 0; i <= pages; i++) {
-			int start = i * _DEFAULT_DELTA;
-
-			int end = start + _DEFAULT_DELTA;
-
-			if (end > count) {
-				end = count;
-			}
-
-			List<Contact> contacts = _contactLocalService.getCompanyContacts(
-				companyId, start, end);
-
-			_addAnalyticsMessages(contacts);
+			_addContactsAnalyticsMessages(users);
 		}
 	}
 
@@ -424,6 +428,7 @@ public class AnalyticsConfigurationModelListener
 						GetterUtil.getLong(organizationId), start, end);
 
 					_addAnalyticsMessages(users);
+					_addContactsAnalyticsMessages(users);
 				}
 				catch (Exception e) {
 					if (_log.isInfoEnabled()) {
@@ -482,6 +487,7 @@ public class AnalyticsConfigurationModelListener
 					GetterUtil.getLong(userGroupId), start, end);
 
 				_addAnalyticsMessages(users);
+				_addContactsAnalyticsMessages(users);
 			}
 		}
 	}
