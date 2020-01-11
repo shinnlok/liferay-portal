@@ -15,6 +15,7 @@
 package com.liferay.analytics.message.sender.internal;
 
 import com.liferay.analytics.message.sender.client.AnalyticsMessageSenderClient;
+import com.liferay.analytics.message.storage.service.AnalyticsMessageLocalService;
 import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
 import com.liferay.analytics.settings.configuration.AnalyticsConfigurationTracker;
 import com.liferay.analytics.settings.security.constants.AnalyticsSecurityConstants;
@@ -189,6 +190,9 @@ public class AnalyticsMessageSenderClientImpl
 
 			if (message.equals("INVALID_TOKEN")) {
 				_disconnectDataSource(companyId);
+
+				_analyticsMessageLocalService.deleteAnalyticsMessages(
+					companyId);
 			}
 
 			return closeableHttpResponse;
@@ -200,6 +204,9 @@ public class AnalyticsMessageSenderClientImpl
 
 	@Reference
 	private AnalyticsConfigurationTracker _analyticsConfigurationTracker;
+
+	@Reference
+	private AnalyticsMessageLocalService _analyticsMessageLocalService;
 
 	@Reference
 	private CompanyService _companyService;
