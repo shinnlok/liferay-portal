@@ -192,18 +192,10 @@ public class AnalyticsConfigurationModelListener
 		List<Contact> contacts = new ArrayList<>();
 
 		for (User user : users) {
-			try {
-				Contact contact = _contactLocalService.getContact(
-					user.getContactId());
+			Contact contact = user.fetchContact();
 
+			if (contact != null) {
 				contacts.add(contact);
-			}
-			catch (Exception e) {
-				if (_log.isInfoEnabled()) {
-					_log.info(
-						"Unable to get contact for user ID " +
-							user.getUserId());
-				}
 			}
 		}
 
