@@ -288,7 +288,7 @@ public class AnalyticsConfigurationModelListener
 			return currentSet;
 		}
 
-		currentSet.removeAll(new HashSet<>(Arrays.asList(previous)));
+		currentSet.removeAll(Arrays.asList(previous));
 
 		return currentSet;
 	}
