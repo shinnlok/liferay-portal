@@ -77,17 +77,7 @@ public class AnalyticsConfigurationModelListener
 	implements ConfigurationModelListener {
 
 	@Override
-	public void onAfterSave(String pid, Dictionary<String, Object> properties) {
-		if (Validator.isNull((String)properties.get("token"))) {
-			_disable((long)properties.get("companyId"));
-		}
-		else {
-			_enable((long)properties.get("companyId"));
-		}
-	}
-
-	@Override
-	public void onBeforeDelete(String pid) {
+	public void onAfterDelete(String pid) {
 		long companyId = _analyticsConfigurationTracker.getCompanyId(pid);
 
 		if (companyId == CompanyConstants.SYSTEM) {
@@ -95,6 +85,16 @@ public class AnalyticsConfigurationModelListener
 		}
 
 		_disable(companyId);
+	}
+
+	@Override
+	public void onAfterSave(String pid, Dictionary<String, Object> properties) {
+		if (Validator.isNull((String)properties.get("token"))) {
+			_disable((long)properties.get("companyId"));
+		}
+		else {
+			_enable((long)properties.get("companyId"));
+		}
 	}
 
 	@Override
