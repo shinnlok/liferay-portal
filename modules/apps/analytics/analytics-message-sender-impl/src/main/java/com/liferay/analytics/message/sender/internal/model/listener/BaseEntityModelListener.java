@@ -238,6 +238,10 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 		List<String> modifiedAttributeNames = new ArrayList<>();
 
 		for (String attributeName : attributeNames) {
+			if (attributeName.equalsIgnoreCase("modifiedDate")) {
+				continue;
+			}
+
 			String value = String.valueOf(
 				BeanPropertiesUtil.getObject(model, attributeName));
 			String originalValue = String.valueOf(
