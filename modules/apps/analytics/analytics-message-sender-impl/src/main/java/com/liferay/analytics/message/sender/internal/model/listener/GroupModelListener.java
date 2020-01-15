@@ -81,9 +81,9 @@ public class GroupModelListener extends BaseEntityModelListener<Group> {
 		"active", "classNameId", "classPK", "companyId", "creatorUserId",
 		"description", "descriptionCurrentValue", "descriptiveName",
 		"friendlyURL", "groupKey", "inheritContent", "liveGroupId",
-		"manualMembership", "membershipRestriction", "name", "nameCurrentValue",
-		"parentGroupId", "remoteStagingGroupCount", "site", "treePath", "type",
-		"uuid");
+		"manualMembership", "membershipRestriction", "modifiedDate",
+		"name", "nameCurrentValue", "parentGroupId", "remoteStagingGroupCount",
+		"site", "treePath", "type", "uuid");
 
 	@Reference
 	private GroupLocalService _groupLocalService;
