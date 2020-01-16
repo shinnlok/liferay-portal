@@ -14,8 +14,11 @@
 
 package com.liferay.analytics.settings.internal.search.spi.model.query.contributor;
 
+import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.filter.BooleanFilter;
+import com.liferay.portal.kernel.search.filter.TermsFilter;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.search.spi.model.query.contributor.ModelPreFilterContributor;
 import com.liferay.portal.search.spi.model.registrar.ModelSearchSettings;
 
@@ -46,6 +49,42 @@ public class UserModelPreFilterContributor
 				(boolean)searchContext.getAttribute(
 					"isAnalyticsAdministrator"));
 		}
+
+		BooleanFilter curBooleanFilter = new BooleanFilter();
+
+		long[] selectedOrganizationIds = (long[])searchContext.getAttribute(
+			"selectedOrganizationIds");
+
+		if (!ArrayUtil.isEmpty(selectedOrganizationIds)) {
+			curBooleanFilter.add(
+				_createTermsFilter(
+					"organizationIds",
+					ArrayUtil.toStringArray(selectedOrganizationIds)),
+				BooleanClauseOccur.SHOULD);
+		}
+
+		long[] selectedUserGroupIds = (long[])searchContext.getAttribute(
+			"selectedUserGroupIds");
+
+		if (!ArrayUtil.isEmpty(selectedUserGroupIds)) {
+			curBooleanFilter.add(
+				_createTermsFilter(
+					"userGroupIds",
+					ArrayUtil.toStringArray(selectedUserGroupIds)),
+				BooleanClauseOccur.SHOULD);
+		}
+
+		if (curBooleanFilter.hasClauses()) {
+			booleanFilter.add(curBooleanFilter, BooleanClauseOccur.MUST);
+		}
+	}
+
+	private TermsFilter _createTermsFilter(String filterName, String[] values) {
+		TermsFilter termsFilter = new TermsFilter(filterName);
+
+		termsFilter.addValues(values);
+
+		return termsFilter;
 	}
 
 }
