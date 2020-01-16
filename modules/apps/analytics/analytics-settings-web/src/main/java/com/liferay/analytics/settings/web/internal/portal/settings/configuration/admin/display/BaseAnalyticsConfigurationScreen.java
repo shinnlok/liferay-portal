@@ -15,6 +15,7 @@
 package com.liferay.analytics.settings.web.internal.portal.settings.configuration.admin.display;
 
 import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
+import com.liferay.analytics.settings.util.AnalyticsUsersManager;
 import com.liferay.analytics.settings.web.internal.constants.AnalyticsSettingsWebKeys;
 import com.liferay.configuration.admin.display.ConfigurationScreen;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -94,7 +95,14 @@ public abstract class BaseAnalyticsConfigurationScreen
 			AnalyticsSettingsWebKeys.ANALYTICS_CONFIGURATION,
 			configurationProvider.getCompanyConfiguration(
 				AnalyticsConfiguration.class, themeDisplay.getCompanyId()));
+
+		httpServletRequest.setAttribute(
+			AnalyticsSettingsWebKeys.ANALYTICS_USERS_MANAGER,
+			analyticsUsersManager);
 	}
+
+	@Reference
+	protected AnalyticsUsersManager analyticsUsersManager;
 
 	@Reference
 	protected ConfigurationProvider configurationProvider;

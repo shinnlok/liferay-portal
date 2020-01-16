@@ -15,6 +15,7 @@
 package com.liferay.analytics.settings.web.internal.portlet.action;
 
 import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
+import com.liferay.analytics.settings.util.AnalyticsUsersManager;
 import com.liferay.analytics.settings.web.internal.constants.AnalyticsSettingsWebKeys;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -83,7 +84,14 @@ public abstract class BaseAnalyticsMVCRenderCommand
 			AnalyticsSettingsWebKeys.ANALYTICS_CONFIGURATION,
 			configurationProvider.getCompanyConfiguration(
 				AnalyticsConfiguration.class, themeDisplay.getCompanyId()));
+
+		httpServletRequest.setAttribute(
+			AnalyticsSettingsWebKeys.ANALYTICS_USERS_MANAGER,
+			analyticsUsersManager);
 	}
+
+	@Reference
+	protected AnalyticsUsersManager analyticsUsersManager;
 
 	@Reference
 	protected ConfigurationProvider configurationProvider;
