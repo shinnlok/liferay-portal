@@ -40,10 +40,8 @@ public class AnalyticsMessagingConfigurator {
 		_bundleContext = bundleContext;
 
 		DestinationConfiguration destinationConfiguration =
-			new DestinationConfiguration(
-				DestinationConfiguration.DESTINATION_TYPE_PARALLEL,
-				AnalyticsMessageDestinationNames.
-					ANALYTICS_MESSAGES_PROCESSOR);
+			DestinationConfiguration.createSerialDestinationConfiguration(
+				AnalyticsMessageDestinationNames.ANALYTICS_MESSAGES_PROCESSOR);
 
 		Destination destination = _destinationFactory.createDestination(
 			destinationConfiguration);
