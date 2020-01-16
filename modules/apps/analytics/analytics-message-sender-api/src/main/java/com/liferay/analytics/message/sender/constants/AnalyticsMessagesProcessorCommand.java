@@ -15,11 +15,10 @@
 package com.liferay.analytics.message.sender.constants;
 
 /**
- * @author Rachael Koestartyo
+ * @author Shinn lok
  */
-public class AnalyticsMessageDestinationNames {
+public enum AnalyticsMessagesProcessorCommand {
 
-	public static final String ANALYTICS_MESSAGES_PROCESSOR =
-		"liferay/analytics_messages_processor";
+	ADD, SEND
 
 }

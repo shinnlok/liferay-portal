@@ -14,7 +14,8 @@
 
 package com.liferay.analytics.message.sender.internal.messaging;
 
-import com.liferay.analytics.message.sender.constants.AnalyticsMessageDestinationNames;
+import com.liferay.analytics.message.sender.constants.AnalyticsMessagesDestinationNames;
+import com.liferay.analytics.message.sender.constants.AnalyticsMessagesProcessorCommand;
 import com.liferay.analytics.message.sender.model.EntityModelListener;
 import com.liferay.portal.kernel.messaging.BaseMessageListener;
 import com.liferay.portal.kernel.messaging.Message;
@@ -30,13 +31,22 @@ import org.osgi.service.component.annotations.Component;
  */
 @Component(
 	immediate = true,
-	property = "destination.name=" + AnalyticsMessageDestinationNames.ANALYTICS_MESSAGES_PROCESSOR,
+	property = "destination.name=" + AnalyticsMessagesDestinationNames.ANALYTICS_MESSAGES_PROCESSOR,
 	service = MessageListener.class
 )
 public class AddAnalyticsMessagesMessageListener extends BaseMessageListener {
 
 	@Override
 	protected void doReceive(Message message) {
+		AnalyticsMessagesProcessorCommand analyticsMessagesProcessorCommand =
+			(AnalyticsMessagesProcessorCommand)message.get("command");
+
+		if (analyticsMessagesProcessorCommand !=
+				AnalyticsMessagesProcessorCommand.ADD) {
+
+			return;
+		}
+
 		EntityModelListener entityModelListener =
 			(EntityModelListener)message.get("entityModelListener");
 

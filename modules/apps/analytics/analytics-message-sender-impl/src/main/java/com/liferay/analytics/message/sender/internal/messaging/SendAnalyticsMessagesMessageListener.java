@@ -15,6 +15,8 @@
 package com.liferay.analytics.message.sender.internal.messaging;
 
 import com.liferay.analytics.message.sender.client.AnalyticsMessageSenderClient;
+import com.liferay.analytics.message.sender.constants.AnalyticsMessagesDestinationNames;
+import com.liferay.analytics.message.sender.constants.AnalyticsMessagesProcessorCommand;
 import com.liferay.analytics.message.storage.model.AnalyticsMessage;
 import com.liferay.analytics.message.storage.service.AnalyticsMessageLocalService;
 import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
@@ -25,6 +27,7 @@ import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.messaging.BaseMessageListener;
 import com.liferay.portal.kernel.messaging.DestinationNames;
 import com.liferay.portal.kernel.messaging.Message;
+import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.scheduler.SchedulerEngineHelper;
 import com.liferay.portal.kernel.scheduler.SchedulerEntry;
@@ -47,7 +50,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Rachael Koestartyo
  */
 @Component(
-	immediate = true, service = SendAnalyticsMessagesMessageListener.class
+	immediate = true,
+	property = "destination.name=" + AnalyticsMessagesDestinationNames.ANALYTICS_MESSAGES_PROCESSOR,
+	service = MessageListener.class
 )
 public class SendAnalyticsMessagesMessageListener extends BaseMessageListener {
 
@@ -75,6 +80,16 @@ public class SendAnalyticsMessagesMessageListener extends BaseMessageListener {
 
 	@Override
 	protected void doReceive(Message message) throws Exception {
+		AnalyticsMessagesProcessorCommand analyticsMessagesProcessorCommand =
+			(AnalyticsMessagesProcessorCommand)message.get("command");
+
+		if ((analyticsMessagesProcessorCommand != null) &&
+			(analyticsMessagesProcessorCommand !=
+				AnalyticsMessagesProcessorCommand.ADD)) {
+
+			return;
+		}
+
 		for (long companyId : _analyticsMessageLocalService.getCompanyIds()) {
 			_process(companyId);
 		}

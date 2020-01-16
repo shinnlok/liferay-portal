@@ -14,7 +14,8 @@
 
 package com.liferay.analytics.settings.internal.configuration.persistence.listener;
 
-import com.liferay.analytics.message.sender.constants.AnalyticsMessageDestinationNames;
+import com.liferay.analytics.message.sender.constants.AnalyticsMessagesDestinationNames;
+import com.liferay.analytics.message.sender.constants.AnalyticsMessagesProcessorCommand;
 import com.liferay.analytics.message.sender.util.EntityModelListenerRegistry;
 import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
 import com.liferay.analytics.settings.configuration.AnalyticsConfigurationTracker;
@@ -122,6 +123,20 @@ public class AnalyticsConfigurationModelListener
 
 		_syncGroups(
 			analyticsConfiguration, (String[])properties.get("syncedGroupIds"));
+
+		Message message = new Message();
+
+		message.put("command", AnalyticsMessagesProcessorCommand.SEND);
+
+		TransactionCommitCallbackUtil.registerCallback(
+			() -> {
+				_messageBus.sendMessage(
+					AnalyticsMessagesDestinationNames.
+						ANALYTICS_MESSAGES_PROCESSOR,
+					message);
+
+				return null;
+			});
 	}
 
 	@Activate
@@ -166,6 +181,8 @@ public class AnalyticsConfigurationModelListener
 
 		Message message = new Message();
 
+		message.put("command", AnalyticsMessagesProcessorCommand.ADD);
+
 		BaseModel baseModel = baseModels.get(0);
 
 		message.put(
@@ -178,7 +195,7 @@ public class AnalyticsConfigurationModelListener
 		TransactionCommitCallbackUtil.registerCallback(
 			() -> {
 				_messageBus.sendMessage(
-					AnalyticsMessageDestinationNames.
+					AnalyticsMessagesDestinationNames.
 						ANALYTICS_MESSAGES_PROCESSOR,
 					message);
 

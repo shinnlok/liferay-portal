@@ -14,7 +14,7 @@
 
 package com.liferay.analytics.message.sender.internal.messaging;
 
-import com.liferay.analytics.message.sender.constants.AnalyticsMessageDestinationNames;
+import com.liferay.analytics.message.sender.constants.AnalyticsMessagesDestinationNames;
 import com.liferay.portal.kernel.messaging.Destination;
 import com.liferay.portal.kernel.messaging.DestinationConfiguration;
 import com.liferay.portal.kernel.messaging.DestinationFactory;
@@ -41,7 +41,7 @@ public class AnalyticsMessagingConfigurator {
 
 		DestinationConfiguration destinationConfiguration =
 			DestinationConfiguration.createSerialDestinationConfiguration(
-				AnalyticsMessageDestinationNames.ANALYTICS_MESSAGES_PROCESSOR);
+				AnalyticsMessagesDestinationNames.ANALYTICS_MESSAGES_PROCESSOR);
 
 		Destination destination = _destinationFactory.createDestination(
 			destinationConfiguration);
