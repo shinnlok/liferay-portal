@@ -19,7 +19,7 @@ package com.liferay.analytics.message.sender.constants;
  */
 public class AnalyticsMessageDestinationNames {
 
-	public static final String ADD_ANALYTICS_MESSAGES_PROCESSOR =
-		"liferay/add_analytics_messages_processor";
+	public static final String ANALYTICS_MESSAGES_PROCESSOR =
+		"liferay/analytics_messages_processor";
 
 }

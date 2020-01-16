@@ -30,7 +30,7 @@ import org.osgi.service.component.annotations.Component;
  */
 @Component(
 	immediate = true,
-	property = "destination.name=" + AnalyticsMessageDestinationNames.ADD_ANALYTICS_MESSAGES_PROCESSOR,
+	property = "destination.name=" + AnalyticsMessageDestinationNames.ANALYTICS_MESSAGES_PROCESSOR,
 	service = MessageListener.class
 )
 public class AddAnalyticsMessagesMessageListener extends BaseMessageListener {

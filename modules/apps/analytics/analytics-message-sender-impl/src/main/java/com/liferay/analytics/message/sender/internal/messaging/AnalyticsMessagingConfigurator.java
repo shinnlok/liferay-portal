@@ -43,7 +43,7 @@ public class AnalyticsMessagingConfigurator {
 			new DestinationConfiguration(
 				DestinationConfiguration.DESTINATION_TYPE_PARALLEL,
 				AnalyticsMessageDestinationNames.
-					ADD_ANALYTICS_MESSAGES_PROCESSOR);
+					ANALYTICS_MESSAGES_PROCESSOR);
 
 		Destination destination = _destinationFactory.createDestination(
 			destinationConfiguration);

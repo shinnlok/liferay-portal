@@ -174,14 +174,14 @@ public class AnalyticsConfigurationModelListener
 				baseModel.getModelClassName()));
 
 		message.setDestinationName(
-			AnalyticsMessageDestinationNames.ADD_ANALYTICS_MESSAGES_PROCESSOR);
+			AnalyticsMessageDestinationNames.ANALYTICS_MESSAGES_PROCESSOR);
 		message.setPayload(baseModels);
 
 		TransactionCommitCallbackUtil.registerCallback(
 			() -> {
 				_messageBus.sendMessage(
 					AnalyticsMessageDestinationNames.
-						ADD_ANALYTICS_MESSAGES_PROCESSOR,
+						ANALYTICS_MESSAGES_PROCESSOR,
 					message);
 
 				return null;
