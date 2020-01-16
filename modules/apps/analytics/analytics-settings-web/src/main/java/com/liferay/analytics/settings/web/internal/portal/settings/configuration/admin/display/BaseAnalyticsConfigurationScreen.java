@@ -15,7 +15,7 @@
 package com.liferay.analytics.settings.web.internal.portal.settings.configuration.admin.display;
 
 import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
-import com.liferay.analytics.settings.util.AnalyticsUsersManager;
+import com.liferay.analytics.settings.user.AnalyticsUsersManager;
 import com.liferay.analytics.settings.web.internal.constants.AnalyticsSettingsWebKeys;
 import com.liferay.configuration.admin.display.ConfigurationScreen;
 import com.liferay.portal.kernel.language.LanguageUtil;
