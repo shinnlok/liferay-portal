@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.search.filter.TermsFilter;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.search.spi.model.query.contributor.ModelPreFilterContributor;
 import com.liferay.portal.search.spi.model.registrar.ModelSearchSettings;
 
@@ -40,14 +41,14 @@ public class UserModelPreFilterContributor
 		BooleanFilter booleanFilter, ModelSearchSettings modelSearchSettings,
 		SearchContext searchContext) {
 
-		Object isAnalyticsAdministrator = searchContext.getAttribute(
-			"isAnalyticsAdministrator");
+		long[] excludedRoleIds = GetterUtil.getLongValues(
+			searchContext.getAttribute("excludedRoleIds"));
 
-		if (isAnalyticsAdministrator != null) {
-			booleanFilter.addRequiredTerm(
-				"isAnalyticsAdministrator",
-				(boolean)searchContext.getAttribute(
-					"isAnalyticsAdministrator"));
+		if (!ArrayUtil.isEmpty(excludedRoleIds)) {
+			booleanFilter.add(
+				_createTermsFilter(
+					"roleIds", ArrayUtil.toStringArray(excludedRoleIds)),
+				BooleanClauseOccur.MUST_NOT);
 		}
 
 		BooleanFilter curBooleanFilter = new BooleanFilter();
