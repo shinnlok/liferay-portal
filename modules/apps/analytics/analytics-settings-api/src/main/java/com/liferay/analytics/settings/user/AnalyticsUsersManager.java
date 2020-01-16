@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.analytics.settings.util;
+package com.liferay.analytics.settings.user;
 
 import com.liferay.portal.kernel.model.User;
 

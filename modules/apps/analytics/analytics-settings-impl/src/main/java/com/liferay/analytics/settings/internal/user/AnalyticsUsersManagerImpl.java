@@ -12,9 +12,9 @@
  * details.
  */
 
-package com.liferay.analytics.settings.internal.util;
+package com.liferay.analytics.settings.internal.user;
 
-import com.liferay.analytics.settings.util.AnalyticsUsersManager;
+import com.liferay.analytics.settings.user.AnalyticsUsersManager;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;

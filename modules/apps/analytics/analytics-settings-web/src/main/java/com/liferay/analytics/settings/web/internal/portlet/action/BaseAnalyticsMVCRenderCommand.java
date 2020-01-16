@@ -15,7 +15,7 @@
 package com.liferay.analytics.settings.web.internal.portlet.action;
 
 import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
-import com.liferay.analytics.settings.util.AnalyticsUsersManager;
+import com.liferay.analytics.settings.user.AnalyticsUsersManager;
 import com.liferay.analytics.settings.web.internal.constants.AnalyticsSettingsWebKeys;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
