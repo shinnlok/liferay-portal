@@ -23,53 +23,42 @@ import java.util.List;
  */
 public class AnalyticsUsersHelperUtil {
 
-	public static AnalyticsUsersHelper getAnalyticsUsersHelper() {
-		if (_analyticsUsersHelper == null) {
-			throw new NullPointerException("Analytics users helper is null");
-		}
-
-		return _analyticsUsersHelper;
-	}
-
 	public static List<User> getCompanyUsers(
 		long companyId, int start, int end) {
 
-		return getAnalyticsUsersHelper().getCompanyUsers(companyId, start, end);
+		return _analyticsUsersHelper.getCompanyUsers(companyId, start, end);
 	}
 
 	public static long getCompanyUsersCount(long companyId) {
-		return getAnalyticsUsersHelper().getCompanyUsersCount(companyId);
+		return _analyticsUsersHelper.getCompanyUsersCount(companyId);
 	}
 
 	public static long getOrganizationsAndUserGroupsUsersCount(
 		long[] organizationIds, long[] userGroupIds) {
 
-		return getAnalyticsUsersHelper().
-			getOrganizationsAndUserGroupsUsersCount(
-				organizationIds, userGroupIds);
+		return _analyticsUsersHelper.getOrganizationsAndUserGroupsUsersCount(
+			organizationIds, userGroupIds);
 	}
 
 	public static List<User> getOrganizationUsers(
 		long organizationId, int start, int end) {
 
-		return getAnalyticsUsersHelper().getOrganizationUsers(
+		return _analyticsUsersHelper.getOrganizationUsers(
 			organizationId, start, end);
 	}
 
 	public static long getOrganizationUsersCount(long organizationId) {
-		return getAnalyticsUsersHelper().getOrganizationUsersCount(
-			organizationId);
+		return _analyticsUsersHelper.getOrganizationUsersCount(organizationId);
 	}
 
 	public static List<User> getUserGroupUsers(
 		long userGroupId, int start, int end) {
 
-		return getAnalyticsUsersHelper().getUserGroupUsers(
-			userGroupId, start, end);
+		return _analyticsUsersHelper.getUserGroupUsers(userGroupId, start, end);
 	}
 
 	public static long getUserGroupUsersCount(long userGroupId) {
-		return getAnalyticsUsersHelper().getUserGroupUsersCount(userGroupId);
+		return _analyticsUsersHelper.getUserGroupUsersCount(userGroupId);
 	}
 
 	public static void setAnalyticsUsersHelper(
