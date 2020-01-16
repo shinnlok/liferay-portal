@@ -33,7 +33,7 @@ if (analyticsConfiguration != null) {
 	}
 
 	if (analyticsConfiguration.syncAllContacts()) {
-		totalContactsSelected = AnalyticsUsersHelperUtil.getCompanyUsersCount(themeDisplay.getCompanyId());
+		totalContactsSelected = AnalyticsUsersManagerUtil.getCompanyUsersCount(themeDisplay.getCompanyId());
 	}
 	else {
 		String[] syncedOrganizationIds = analyticsConfiguration.syncedOrganizationIds();
@@ -52,7 +52,7 @@ if (analyticsConfiguration != null) {
 			syncedUserGroupIdsLong[i] = Long.parseLong(syncedUserGroupIds[i]);
 		}
 
-		totalContactsSelected = AnalyticsUsersHelperUtil.getOrganizationsAndUserGroupsUsersCount(syncedOrganizationIdsLong, syncedUserGroupIdsLong);
+		totalContactsSelected = AnalyticsUsersManagerUtil.getOrganizationsAndUserGroupsUsersCount(syncedOrganizationIdsLong, syncedUserGroupIdsLong);
 	}
 }
 %>

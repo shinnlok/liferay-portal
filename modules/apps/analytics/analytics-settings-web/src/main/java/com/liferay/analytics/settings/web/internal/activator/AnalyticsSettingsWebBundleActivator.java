@@ -14,8 +14,8 @@
 
 package com.liferay.analytics.settings.web.internal.activator;
 
-import com.liferay.analytics.settings.util.AnalyticsUsersHelper;
-import com.liferay.analytics.settings.util.AnalyticsUsersHelperUtil;
+import com.liferay.analytics.settings.util.AnalyticsUsersManager;
+import com.liferay.analytics.settings.util.AnalyticsUsersManagerUtil;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -30,20 +30,20 @@ public class AnalyticsSettingsWebBundleActivator implements BundleActivator {
 	@Override
 	public void start(BundleContext bundleContext) {
 		_serviceTracker =
-			new ServiceTracker<AnalyticsUsersHelper, AnalyticsUsersHelper>(
-				bundleContext, AnalyticsUsersHelper.class, null) {
+			new ServiceTracker<AnalyticsUsersManager, AnalyticsUsersManager>(
+				bundleContext, AnalyticsUsersManager.class, null) {
 
 				@Override
-				public AnalyticsUsersHelper addingService(
-					ServiceReference<AnalyticsUsersHelper> serviceReference) {
+				public AnalyticsUsersManager addingService(
+					ServiceReference<AnalyticsUsersManager> serviceReference) {
 
-					AnalyticsUsersHelper analyticsUsersHelper =
+					AnalyticsUsersManager analyticsUsersManager =
 						bundleContext.getService(serviceReference);
 
-					AnalyticsUsersHelperUtil.setAnalyticsUsersHelper(
-						analyticsUsersHelper);
+					AnalyticsUsersManagerUtil.setAnalyticsUsersManager(
+						analyticsUsersManager);
 
-					return analyticsUsersHelper;
+					return analyticsUsersManager;
 				}
 
 			};
@@ -56,7 +56,7 @@ public class AnalyticsSettingsWebBundleActivator implements BundleActivator {
 		_serviceTracker.close();
 	}
 
-	private ServiceTracker<AnalyticsUsersHelper, AnalyticsUsersHelper>
+	private ServiceTracker<AnalyticsUsersManager, AnalyticsUsersManager>
 		_serviceTracker;
 
 }

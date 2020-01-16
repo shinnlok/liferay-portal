@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * @author Rachael Koestartyo
  */
-public interface AnalyticsUsersHelper {
+public interface AnalyticsUsersManager {
 
 	public List<User> getCompanyUsers(long companyId, int start, int end);
 

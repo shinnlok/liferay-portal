@@ -14,7 +14,7 @@
 
 package com.liferay.analytics.settings.internal.util;
 
-import com.liferay.analytics.settings.util.AnalyticsUsersHelper;
+import com.liferay.analytics.settings.util.AnalyticsUsersManager;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
@@ -41,8 +41,8 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Rachael Koestartyo
  */
-@Component(immediate = true, service = AnalyticsUsersHelper.class)
-public class AnalyticsUsersHelperImpl implements AnalyticsUsersHelper {
+@Component(immediate = true, service = AnalyticsUsersManager.class)
+public class AnalyticsUsersManagerImpl implements AnalyticsUsersManager {
 
 	@Override
 	public List<User> getCompanyUsers(long companyId, int start, int end) {

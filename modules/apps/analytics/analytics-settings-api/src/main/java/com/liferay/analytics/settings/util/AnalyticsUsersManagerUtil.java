@@ -21,56 +21,57 @@ import java.util.List;
 /**
  * @author Rachael Koestartyo
  */
-public class AnalyticsUsersHelperUtil {
+public class AnalyticsUsersManagerUtil {
 
 	public static List<User> getCompanyUsers(
 		long companyId, int start, int end) {
 
-		return _analyticsUsersHelper.getCompanyUsers(companyId, start, end);
+		return _analyticsUsersManager.getCompanyUsers(companyId, start, end);
 	}
 
 	public static long getCompanyUsersCount(long companyId) {
-		return _analyticsUsersHelper.getCompanyUsersCount(companyId);
+		return _analyticsUsersManager.getCompanyUsersCount(companyId);
 	}
 
 	public static long getOrganizationsAndUserGroupsUsersCount(
 		long[] organizationIds, long[] userGroupIds) {
 
-		return _analyticsUsersHelper.getOrganizationsAndUserGroupsUsersCount(
+		return _analyticsUsersManager.getOrganizationsAndUserGroupsUsersCount(
 			organizationIds, userGroupIds);
 	}
 
 	public static List<User> getOrganizationUsers(
 		long organizationId, int start, int end) {
 
-		return _analyticsUsersHelper.getOrganizationUsers(
+		return _analyticsUsersManager.getOrganizationUsers(
 			organizationId, start, end);
 	}
 
 	public static long getOrganizationUsersCount(long organizationId) {
-		return _analyticsUsersHelper.getOrganizationUsersCount(organizationId);
+		return _analyticsUsersManager.getOrganizationUsersCount(organizationId);
 	}
 
 	public static List<User> getUserGroupUsers(
 		long userGroupId, int start, int end) {
 
-		return _analyticsUsersHelper.getUserGroupUsers(userGroupId, start, end);
+		return _analyticsUsersManager.getUserGroupUsers(
+			userGroupId, start, end);
 	}
 
 	public static long getUserGroupUsersCount(long userGroupId) {
-		return _analyticsUsersHelper.getUserGroupUsersCount(userGroupId);
+		return _analyticsUsersManager.getUserGroupUsersCount(userGroupId);
 	}
 
-	public static void setAnalyticsUsersHelper(
-		AnalyticsUsersHelper analyticsUsersHelper) {
+	public static void setAnalyticsUsersManager(
+		AnalyticsUsersManager analyticsUsersManager) {
 
-		if (_analyticsUsersHelper != null) {
+		if (_analyticsUsersManager != null) {
 			return;
 		}
 
-		_analyticsUsersHelper = analyticsUsersHelper;
+		_analyticsUsersManager = analyticsUsersManager;
 	}
 
-	private static AnalyticsUsersHelper _analyticsUsersHelper;
+	private static AnalyticsUsersManager _analyticsUsersManager;
 
 }

@@ -21,7 +21,7 @@ import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
 import com.liferay.analytics.settings.configuration.AnalyticsConfigurationTracker;
 import com.liferay.analytics.settings.internal.security.auth.verifier.AnalyticsSecurityAuthVerifier;
 import com.liferay.analytics.settings.security.constants.AnalyticsSecurityConstants;
-import com.liferay.analytics.settings.util.AnalyticsUsersHelper;
+import com.liferay.analytics.settings.util.AnalyticsUsersManager;
 import com.liferay.portal.configuration.persistence.listener.ConfigurationModelListener;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -339,7 +339,7 @@ public class AnalyticsConfigurationModelListener
 			return;
 		}
 
-		int count = _analyticsUsersHelper.getCompanyUsersCount(companyId);
+		int count = _analyticsUsersManager.getCompanyUsersCount(companyId);
 
 		int pages = count / _DEFAULT_DELTA;
 
@@ -352,7 +352,7 @@ public class AnalyticsConfigurationModelListener
 				end = count;
 			}
 
-			List<User> users = _analyticsUsersHelper.getCompanyUsers(
+			List<User> users = _analyticsUsersManager.getCompanyUsers(
 				companyId, start, end);
 
 			_addAnalyticsMessages(users);
@@ -417,7 +417,7 @@ public class AnalyticsConfigurationModelListener
 		}
 
 		for (String organizationId : organizationIds) {
-			int count = _analyticsUsersHelper.getOrganizationUsersCount(
+			int count = _analyticsUsersManager.getOrganizationUsersCount(
 				GetterUtil.getLong(organizationId));
 
 			int pages = count / _DEFAULT_DELTA;
@@ -433,7 +433,7 @@ public class AnalyticsConfigurationModelListener
 
 				try {
 					List<User> users =
-						_analyticsUsersHelper.getOrganizationUsers(
+						_analyticsUsersManager.getOrganizationUsers(
 							GetterUtil.getLong(organizationId), start, end);
 
 					_addAnalyticsMessages(users);
@@ -478,7 +478,7 @@ public class AnalyticsConfigurationModelListener
 		}
 
 		for (String userGroupId : userGroupIds) {
-			int count = _analyticsUsersHelper.getUserGroupUsersCount(
+			int count = _analyticsUsersManager.getUserGroupUsersCount(
 				GetterUtil.getLong(userGroupId));
 
 			int pages = count / _DEFAULT_DELTA;
@@ -492,7 +492,7 @@ public class AnalyticsConfigurationModelListener
 					end = count;
 				}
 
-				List<User> users = _analyticsUsersHelper.getUserGroupUsers(
+				List<User> users = _analyticsUsersManager.getUserGroupUsers(
 					GetterUtil.getLong(userGroupId), start, end);
 
 				_addAnalyticsMessages(users);
@@ -521,7 +521,7 @@ public class AnalyticsConfigurationModelListener
 	private AnalyticsConfigurationTracker _analyticsConfigurationTracker;
 
 	@Reference
-	private AnalyticsUsersHelper _analyticsUsersHelper;
+	private AnalyticsUsersManager _analyticsUsersManager;
 
 	private boolean _authVerifierEnabled;
 
