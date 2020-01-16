@@ -16,10 +16,13 @@ package com.liferay.analytics.settings.internal.util;
 
 import com.liferay.analytics.settings.util.AnalyticsUsersHelper;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.search.BaseModelSearchResult;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
+import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.search.document.Document;
 import com.liferay.portal.search.hits.SearchHits;
@@ -219,8 +222,18 @@ public class AnalyticsUsersHelperImpl implements AnalyticsUsersHelper {
 	}
 
 	private void _populateSearchContext(SearchContext searchContext) {
-		searchContext.setAttribute("isAnalyticsAdministrator", Boolean.FALSE);
+		Role role = _roleLocalService.fetchRole(
+			CompanyThreadLocal.getCompanyId(),
+			RoleConstants.ANALYTICS_ADMINISTRATOR);
+
+		if (role != null) {
+			searchContext.setAttribute(
+				"excludedRoleIds", new long[] {role.getRoleId()});
+		}
 	}
+
+	@Reference
+	private RoleLocalService _roleLocalService;
 
 	@Reference
 	private Searcher _searcher;
