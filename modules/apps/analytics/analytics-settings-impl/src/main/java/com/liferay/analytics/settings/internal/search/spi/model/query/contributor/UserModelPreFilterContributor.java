@@ -51,32 +51,32 @@ public class UserModelPreFilterContributor
 				BooleanClauseOccur.MUST_NOT);
 		}
 
-		BooleanFilter curBooleanFilter = new BooleanFilter();
+		BooleanFilter innerBooleanFilter = new BooleanFilter();
 
-		long[] selectedOrganizationIds = (long[])searchContext.getAttribute(
-			"selectedOrganizationIds");
+		long[] selectedOrganizationIds = GetterUtil.getLongValues(
+			searchContext.getAttribute("selectedOrganizationIds"));
 
 		if (!ArrayUtil.isEmpty(selectedOrganizationIds)) {
-			curBooleanFilter.add(
+			innerBooleanFilter.add(
 				_createTermsFilter(
 					"organizationIds",
 					ArrayUtil.toStringArray(selectedOrganizationIds)),
 				BooleanClauseOccur.SHOULD);
 		}
 
-		long[] selectedUserGroupIds = (long[])searchContext.getAttribute(
-			"selectedUserGroupIds");
+		long[] selectedUserGroupIds = GetterUtil.getLongValues(
+			searchContext.getAttribute("selectedUserGroupIds"));
 
 		if (!ArrayUtil.isEmpty(selectedUserGroupIds)) {
-			curBooleanFilter.add(
+			innerBooleanFilter.add(
 				_createTermsFilter(
 					"userGroupIds",
 					ArrayUtil.toStringArray(selectedUserGroupIds)),
 				BooleanClauseOccur.SHOULD);
 		}
 
-		if (curBooleanFilter.hasClauses()) {
-			booleanFilter.add(curBooleanFilter, BooleanClauseOccur.MUST);
+		if (innerBooleanFilter.hasClauses()) {
+			booleanFilter.add(innerBooleanFilter, BooleanClauseOccur.MUST);
 		}
 	}
 
