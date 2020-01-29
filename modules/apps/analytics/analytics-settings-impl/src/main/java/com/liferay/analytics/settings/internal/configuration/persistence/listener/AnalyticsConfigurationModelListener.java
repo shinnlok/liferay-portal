@@ -16,6 +16,7 @@ package com.liferay.analytics.settings.internal.configuration.persistence.listen
 
 import com.liferay.analytics.message.sender.constants.AnalyticsMessagesDestinationNames;
 import com.liferay.analytics.message.sender.constants.AnalyticsMessagesProcessorCommand;
+import com.liferay.analytics.message.sender.model.EntityModelListener;
 import com.liferay.analytics.message.sender.util.EntityModelListenerRegistry;
 import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
 import com.liferay.analytics.settings.configuration.AnalyticsConfigurationTracker;
@@ -30,18 +31,11 @@ import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.model.Contact;
-import com.liferay.portal.kernel.model.Group;
-import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.model.UserGroup;
 import com.liferay.portal.kernel.service.CompanyLocalService;
-import com.liferay.portal.kernel.service.ContactLocalService;
-import com.liferay.portal.kernel.service.GroupLocalService;
-import com.liferay.portal.kernel.service.OrganizationLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.UserGroupLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -52,12 +46,10 @@ import com.liferay.portal.security.service.access.policy.model.SAPEntry;
 import com.liferay.portal.security.service.access.policy.service.SAPEntryLocalService;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Dictionary;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
@@ -105,6 +97,24 @@ public class AnalyticsConfigurationModelListener
 		AnalyticsConfiguration analyticsConfiguration =
 			_analyticsConfigurationTracker.getAnalyticsConfiguration(pid);
 
+		if (Validator.isNotNull(properties.get("token")) &&
+			Validator.isNull(analyticsConfiguration.token())) {
+
+			Collection<EntityModelListener> entityModelListeners =
+				_entityModelListenerRegistry.getEntityModelListeners();
+
+			for (EntityModelListener entityModelListener :
+					entityModelListeners) {
+
+				try {
+					entityModelListener.syncAll();
+				}
+				catch (Exception exception) {
+					_log.error(exception, exception);
+				}
+			}
+		}
+
 		boolean syncAllContacts = Boolean.parseBoolean(
 			(String)properties.get("syncAllContacts"));
 
@@ -113,16 +123,10 @@ public class AnalyticsConfigurationModelListener
 			_analyticsConfigurationTracker.getCompanyId(pid), syncAllContacts);
 
 		if (!syncAllContacts) {
-			_syncOrganizations(
-				analyticsConfiguration,
+			_syncOrganizationUsers(
 				(String[])properties.get("syncedOrganizationIds"));
-			_syncUserGroups(
-				analyticsConfiguration,
-				(String[])properties.get("syncedUserGroupIds"));
+			_syncUserGroupUsers((String[])properties.get("syncedUserGroupIds"));
 		}
-
-		_syncGroups(
-			analyticsConfiguration, (String[])properties.get("syncedGroupIds"));
 
 		Message message = new Message();
 
@@ -292,22 +296,6 @@ public class AnalyticsConfigurationModelListener
 		}
 	}
 
-	private Set<String> _getDifferences(String[] current, String[] previous) {
-		if (current == null) {
-			return Collections.emptySet();
-		}
-
-		Set<String> currentSet = new HashSet<>(Arrays.asList(current));
-
-		if (previous == null) {
-			return currentSet;
-		}
-
-		currentSet.removeAll(Arrays.asList(previous));
-
-		return currentSet;
-	}
-
 	private boolean _hasConfiguration() throws Exception {
 		Configuration[] configurations = _configurationAdmin.listConfigurations(
 			"(service.pid=" + AnalyticsConfiguration.class.getName() + "*)");
@@ -359,62 +347,7 @@ public class AnalyticsConfigurationModelListener
 		}
 	}
 
-	private void _syncGroups(
-		AnalyticsConfiguration analyticsConfiguration, String[] groupIds) {
-
-		List<Group> groups = new ArrayList<>();
-
-		for (String groupId :
-				_getDifferences(
-					groupIds, analyticsConfiguration.syncedGroupIds())) {
-
-			try {
-				Group group = _groupLocalService.getGroup(
-					GetterUtil.getLong(groupId));
-
-				groups.add(group);
-			}
-			catch (Exception exception) {
-				if (_log.isInfoEnabled()) {
-					_log.info("Unable to get group " + groupId);
-				}
-			}
-		}
-
-		if (!groups.isEmpty()) {
-			_addAnalyticsMessages(groups);
-		}
-	}
-
-	private void _syncOrganizations(
-		AnalyticsConfiguration analyticsConfiguration,
-		String[] organizationIds) {
-
-		List<Organization> organizations = new ArrayList<>();
-
-		for (String organizationId :
-				_getDifferences(
-					organizationIds,
-					analyticsConfiguration.syncedOrganizationIds())) {
-
-			try {
-				Organization organization =
-					_organizationLocalService.getOrganization(
-						GetterUtil.getLong(organizationId));
-
-				organizations.add(organization);
-			}
-			catch (Exception exception) {
-				if (_log.isInfoEnabled()) {
-					_log.info("Unable to get organization " + organizationId);
-				}
-			}
-		}
-
-		if (!organizations.isEmpty()) {
-			_addAnalyticsMessages(organizations);
-		}
-
+	private void _syncOrganizationUsers(String[] organizationIds) {
 		for (String organizationId : organizationIds) {
 			int count = _userLocalService.getOrganizationUsersCount(
 				GetterUtil.getLong(organizationId));
@@ -448,33 +381,7 @@ public class AnalyticsConfigurationModelListener
 		}
 	}
 
-	private void _syncUserGroups(
-		AnalyticsConfiguration analyticsConfiguration, String[] userGroupIds) {
-
-		List<UserGroup> userGroups = new ArrayList<>();
-
-		for (String userGroupId :
-				_getDifferences(
-					userGroupIds,
-					analyticsConfiguration.syncedUserGroupIds())) {
-
-			try {
-				UserGroup userGroup = _userGroupLocalService.getUserGroup(
-					GetterUtil.getLong(userGroupId));
-
-				userGroups.add(userGroup);
-			}
-			catch (Exception exception) {
-				if (_log.isInfoEnabled()) {
-					_log.info("Unable to get user group " + userGroupId);
-				}
-			}
-		}
-
-		if (!userGroups.isEmpty()) {
-			_addAnalyticsMessages(userGroups);
-		}
-
+	private void _syncUserGroupUsers(String[] userGroupIds) {
 		for (String userGroupId : userGroupIds) {
 			int count = _userLocalService.getUserGroupUsersCount(
 				GetterUtil.getLong(userGroupId));
@@ -529,28 +436,16 @@ public class AnalyticsConfigurationModelListener
 	private ConfigurationAdmin _configurationAdmin;
 
 	@Reference
-	private ContactLocalService _contactLocalService;
-
-	@Reference
 	private EntityModelListenerRegistry _entityModelListenerRegistry;
 
 	@Reference
-	private GroupLocalService _groupLocalService;
-
-	@Reference
 	private MessageBus _messageBus;
-
-	@Reference
-	private OrganizationLocalService _organizationLocalService;
 
 	@Reference
 	private RoleLocalService _roleLocalService;
 
 	@Reference
 	private SAPEntryLocalService _sapEntryLocalService;
-
-	@Reference
-	private UserGroupLocalService _userGroupLocalService;
 
 	@Reference
 	private UserLocalService _userLocalService;

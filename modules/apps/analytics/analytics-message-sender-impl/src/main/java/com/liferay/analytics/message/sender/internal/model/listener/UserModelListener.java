@@ -42,8 +42,8 @@ public class UserModelListener extends BaseEntityModelListener<User> {
 	}
 
 	@Override
-	protected User getOriginalModel(User user) throws Exception {
-		return userLocalService.getUser(user.getUserId());
+	protected User getModel(long id) throws Exception {
+		return userLocalService.getUser(id);
 	}
 
 	@Override

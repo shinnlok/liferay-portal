@@ -28,4 +28,6 @@ public interface EntityModelListener<T extends BaseModel<T>> {
 
 	public List<String> getAttributeNames();
 
+	public void syncAll() throws Exception;
+
 }

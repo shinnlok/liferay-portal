@@ -19,8 +19,10 @@ import com.liferay.analytics.message.sender.model.EntityModelListener;
 import com.liferay.analytics.message.storage.service.AnalyticsMessageLocalService;
 import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
 import com.liferay.analytics.settings.configuration.AnalyticsConfigurationTracker;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.bean.BeanPropertiesUtil;
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.exception.ModelListenerException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -30,11 +32,15 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.BaseModelListener;
 import com.liferay.portal.kernel.model.ShardedModel;
+import com.liferay.portal.kernel.model.TreeModel;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.service.CompanyService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
@@ -45,6 +51,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
@@ -107,7 +114,8 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 	public void onBeforeUpdate(T model) throws ModelListenerException {
 		try {
 			List<String> modifiedAttributeNames = _getModifiedAttributeNames(
-				getAttributeNames(), model, getOriginalModel(model));
+				getAttributeNames(), model,
+				getModel((Long)model.getPrimaryKeyObj()));
 
 			if (modifiedAttributeNames.isEmpty()) {
 				return;
@@ -120,7 +128,26 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 		}
 	}
 
-	protected abstract T getOriginalModel(T model) throws Exception;
+	@Override
+	public void syncAll() throws Exception {
+		ActionableDynamicQuery actionableDynamicQuery =
+			getActionableDynamicQuery();
+
+		if (actionableDynamicQuery == null) {
+			return;
+		}
+
+		actionableDynamicQuery.setPerformActionMethod(
+			(T t) -> addAnalyticsMessage("add", getAttributeNames(), t));
+
+		actionableDynamicQuery.performActions();
+	}
+
+	protected ActionableDynamicQuery getActionableDynamicQuery() {
+		return null;
+	}
+
+	protected abstract T getModel(long id) throws Exception;
 
 	protected abstract String getPrimaryKeyName();
 
@@ -224,6 +251,23 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 	@Reference
 	protected UserLocalService userLocalService;
 
+	private String _buildNameTreePath(String[] ids) {
+		int size = ids.length;
+
+		StringBundler sb = new StringBundler((ids.length * 4) + 1);
+
+		sb.append(_getName(GetterUtil.getLong(ids[0])));
+
+		for (int i = 1; i < size; i++) {
+			sb.append(StringPool.SPACE);
+			sb.append(StringPool.GREATER_THAN);
+			sb.append(StringPool.SPACE);
+			sb.append(_getName(GetterUtil.getLong(ids[i])));
+		}
+
+		return sb.toString();
+	}
+
 	private String _getDataSourceId(long companyId) {
 		AnalyticsConfiguration analyticsConfiguration =
 			analyticsConfigurationTracker.getAnalyticsConfiguration(companyId);
@@ -254,21 +298,73 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 		return modifiedAttributeNames;
 	}
 
+	private String _getName(long id) {
+		try {
+			T model = getModel(GetterUtil.getLong(id));
+
+			Map<String, Object> modelAttributes = model.getModelAttributes();
+
+			return _getName(String.valueOf(modelAttributes.get("name")));
+		}
+		catch (Exception exception) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(exception, exception);
+			}
+		}
+
+		return null;
+	}
+
+	private String _getName(String name) {
+		if (!name.startsWith("<?xml")) {
+			return name;
+		}
+
+		Locale locale = LocaleUtil.getDefault();
+
+		return LocalizationUtil.getLocalization(name, locale.getLanguage());
+	}
+
 	private JSONObject _serialize(List<String> includeAttributeNames, T model) {
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
 		Map<String, Object> modelAttributes = model.getModelAttributes();
 
 		for (String includeAttributeName : includeAttributeNames) {
-			if (modelAttributes.get(includeAttributeName) instanceof Date) {
-				Date date = (Date)modelAttributes.get(includeAttributeName);
+			if (includeAttributeName.equals("treePath") &&
+				(model instanceof TreeModel)) {
+
+				TreeModel treeModel = (TreeModel)model;
+
+				String treePath = treeModel.getTreePath();
+
+				String[] ids = StringUtil.split(
+					treePath.substring(1), StringPool.SLASH);
+
+				if (ids.length > 1) {
+					jsonObject.put(
+						"parentName",
+						_getName(GetterUtil.getLong(ids[ids.length - 2])));
+				}
+
+				jsonObject.put("nameTreePath", _buildNameTreePath(ids));
+
+				continue;
+			}
+
+			Object value = modelAttributes.get(includeAttributeName);
+
+			if (value instanceof Date) {
+				Date date = (Date)value;
 
 				jsonObject.put(includeAttributeName, date.getTime());
 			}
 			else {
-				jsonObject.put(
-					includeAttributeName,
-					modelAttributes.get(includeAttributeName));
+				if (includeAttributeName.equals("name")) {
+					value = _getName(String.valueOf(value));
+				}
+
+				jsonObject.put(includeAttributeName, value);
 			}
 		}
 
