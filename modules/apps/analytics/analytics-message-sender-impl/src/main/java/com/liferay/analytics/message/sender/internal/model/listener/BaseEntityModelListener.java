@@ -138,7 +138,8 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 		}
 
 		actionableDynamicQuery.setPerformActionMethod(
-			(T t) -> addAnalyticsMessage("add", getAttributeNames(), t));
+			(T model) -> addAnalyticsMessage(
+				"add", getAttributeNames(), model));
 
 		actionableDynamicQuery.performActions();
 	}
@@ -341,13 +342,13 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 				String[] ids = StringUtil.split(
 					treePath.substring(1), StringPool.SLASH);
 
+				jsonObject.put("nameTreePath", _buildNameTreePath(ids));
+
 				if (ids.length > 1) {
 					jsonObject.put(
 						"parentName",
 						_getName(GetterUtil.getLong(ids[ids.length - 2])));
 				}
-
-				jsonObject.put("nameTreePath", _buildNameTreePath(ids));
 
 				continue;
 			}
