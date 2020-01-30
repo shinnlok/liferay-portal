@@ -21,7 +21,7 @@ import com.liferay.portal.kernel.model.ModelListener;
 import com.liferay.portal.kernel.model.UserGroup;
 import com.liferay.portal.kernel.service.UserGroupLocalService;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.osgi.service.component.annotations.Component;
@@ -64,10 +64,8 @@ public class UserGroupModelListener extends BaseEntityModelListener<UserGroup> {
 		return "userGroupId";
 	}
 
-	private static final List<String> _attributeNames = Arrays.asList(
-		"addedByLDAPImport", "companyId", "createDate", "description",
-		"externalReferenceCode", "modifiedDate", "name", "parentUserGroupId",
-		"userId", "userName", "uuid");
+	private static final List<String> _attributeNames =
+		Collections.singletonList("name");
 
 	@Reference
 	private UserGroupLocalService _userGroupLocalService;

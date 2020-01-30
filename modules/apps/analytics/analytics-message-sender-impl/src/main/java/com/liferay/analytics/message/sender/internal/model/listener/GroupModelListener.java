@@ -21,7 +21,7 @@ import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.ModelListener;
 import com.liferay.portal.kernel.service.GroupLocalService;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.osgi.service.component.annotations.Component;
@@ -71,13 +71,8 @@ public class GroupModelListener extends BaseEntityModelListener<Group> {
 		return false;
 	}
 
-	private static final List<String> _attributeNames = Arrays.asList(
-		"active", "classNameId", "classPK", "companyId", "creatorUserId",
-		"description", "descriptionCurrentValue", "descriptiveName",
-		"friendlyURL", "groupKey", "inheritContent", "liveGroupId",
-		"manualMembership", "membershipRestriction", "modifiedDate", "name",
-		"nameCurrentValue", "parentGroupId", "remoteStagingGroupCount", "site",
-		"treePath", "type", "uuid");
+	private static final List<String> _attributeNames =
+		Collections.singletonList("name");
 
 	@Reference
 	private GroupLocalService _groupLocalService;
