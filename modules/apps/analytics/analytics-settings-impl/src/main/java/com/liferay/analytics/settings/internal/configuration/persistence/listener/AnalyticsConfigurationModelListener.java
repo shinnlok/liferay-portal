@@ -18,6 +18,7 @@ import com.liferay.analytics.message.sender.constants.AnalyticsMessagesDestinati
 import com.liferay.analytics.message.sender.constants.AnalyticsMessagesProcessorCommand;
 import com.liferay.analytics.message.sender.model.EntityModelListener;
 import com.liferay.analytics.message.sender.util.EntityModelListenerRegistry;
+import com.liferay.analytics.message.storage.service.AnalyticsMessageLocalService;
 import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
 import com.liferay.analytics.settings.configuration.AnalyticsConfigurationTracker;
 import com.liferay.analytics.settings.internal.security.auth.verifier.AnalyticsSecurityAuthVerifier;
@@ -87,6 +88,20 @@ public class AnalyticsConfigurationModelListener
 		}
 		else {
 			_enable((long)properties.get("companyId"));
+
+			Message message = new Message();
+
+			message.put("command", AnalyticsMessagesProcessorCommand.SEND);
+
+			TransactionCommitCallbackUtil.registerCallback(
+				() -> {
+					_messageBus.sendMessage(
+						AnalyticsMessagesDestinationNames.
+							ANALYTICS_MESSAGES_PROCESSOR,
+						message);
+
+					return null;
+				});
 		}
 	}
 
@@ -127,20 +142,6 @@ public class AnalyticsConfigurationModelListener
 				(String[])properties.get("syncedOrganizationIds"));
 			_syncUserGroupUsers((String[])properties.get("syncedUserGroupIds"));
 		}
-
-		Message message = new Message();
-
-		message.put("command", AnalyticsMessagesProcessorCommand.SEND);
-
-		TransactionCommitCallbackUtil.registerCallback(
-			() -> {
-				_messageBus.sendMessage(
-					AnalyticsMessagesDestinationNames.
-						ANALYTICS_MESSAGES_PROCESSOR,
-					message);
-
-				return null;
-			});
 	}
 
 	@Activate
@@ -257,6 +258,8 @@ public class AnalyticsConfigurationModelListener
 	}
 
 	private void _disable(long companyId) {
+		_analyticsMessageLocalService.deleteAnalyticsMessages(companyId);
+
 		try {
 			_deleteAnalyticsAdmin(companyId);
 			_deleteSAPEntry(companyId);
@@ -424,6 +427,9 @@ public class AnalyticsConfigurationModelListener
 
 	@Reference
 	private AnalyticsConfigurationTracker _analyticsConfigurationTracker;
+
+	@Reference
+	private AnalyticsMessageLocalService _analyticsMessageLocalService;
 
 	private boolean _authVerifierEnabled;
 
