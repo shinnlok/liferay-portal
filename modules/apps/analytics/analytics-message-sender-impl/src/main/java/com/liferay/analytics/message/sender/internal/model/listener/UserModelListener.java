@@ -89,7 +89,7 @@ public class UserModelListener extends BaseEntityModelListener<User> {
 		"createDate", "defaultUser", "emailAddress", "emailAddressVerified",
 		"externalReferenceCode", "facebookId", "firstName", "googleUserId",
 		"greeting", "jobTitle", "languageId", "lastName", "ldapServerId",
-		"middleName", "modifiedDate", "openId", "portraitId", "screenName",
-		"status", "timeZoneId", "uuid");
+		"memberships", "middleName", "modifiedDate", "openId", "portraitId",
+		"screenName", "status", "timeZoneId", "uuid");
 
 }

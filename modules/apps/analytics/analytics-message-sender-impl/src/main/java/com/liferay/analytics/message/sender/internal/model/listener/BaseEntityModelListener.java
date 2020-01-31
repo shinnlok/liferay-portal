@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.exception.ModelListenerException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.BaseModel;
@@ -101,8 +102,40 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 	}
 
 	@Override
+	public long[] getMembershipIds(User user) throws Exception {
+		return new long[0];
+	}
+
+	@Override
+	public String getModelClassName() {
+		return null;
+	}
+
+	@Override
+	public void onAfterAddAssociation(
+			Object classPK, String associationClassName,
+			Object associationClassPK)
+		throws ModelListenerException {
+
+		_onAfterUpdateAssociation(
+			classPK, associationClassName, associationClassPK,
+			"addAssociation");
+	}
+
+	@Override
 	public void onAfterCreate(T model) throws ModelListenerException {
 		addAnalyticsMessage("add", getAttributeNames(), model);
+	}
+
+	@Override
+	public void onAfterRemoveAssociation(
+			Object classPK, String associationClassName,
+			Object associationClassPK)
+		throws ModelListenerException {
+
+		_onAfterUpdateAssociation(
+			classPK, associationClassName, associationClassPK,
+			"deleteAssociation");
 	}
 
 	@Override
@@ -115,7 +148,7 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 		try {
 			List<String> modifiedAttributeNames = _getModifiedAttributeNames(
 				getAttributeNames(), model,
-				getModel((Long)model.getPrimaryKeyObj()));
+				getModel((long)model.getPrimaryKeyObj()));
 
 			if (modifiedAttributeNames.isEmpty()) {
 				return;
@@ -282,7 +315,9 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 		List<String> modifiedAttributeNames = new ArrayList<>();
 
 		for (String attributeName : attributeNames) {
-			if (attributeName.equalsIgnoreCase("modifiedDate")) {
+			if (attributeName.equalsIgnoreCase("memberships") ||
+				attributeName.equalsIgnoreCase("modifiedDate")) {
+
 				continue;
 			}
 
@@ -311,9 +346,9 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 			if (_log.isWarnEnabled()) {
 				_log.warn(exception, exception);
 			}
-		}
 
-		return null;
+			return null;
+		}
 	}
 
 	private String _getName(String name) {
@@ -324,6 +359,59 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 		Locale locale = LocaleUtil.getDefault();
 
 		return LocalizationUtil.getLocalization(name, locale.getLanguage());
+	}
+
+	private void _onAfterUpdateAssociation(
+		Object classPK, String associationClassName, Object associationClassPK,
+		String eventType) {
+
+		String modelClassName = getModelClassName();
+
+		if ((modelClassName == null) ||
+			!associationClassName.equals(User.class.getName())) {
+
+			return;
+		}
+
+		try {
+			T model = getModel((long)classPK);
+
+			if (isExcluded(model)) {
+				return;
+			}
+
+			Map<String, Object> modelAttributes = model.getModelAttributes();
+
+			long companyId = (long)modelAttributes.get("companyId");
+
+			AnalyticsMessage.Builder analyticsMessageBuilder =
+				AnalyticsMessage.builder(
+					_getDataSourceId(companyId), getModelClassName());
+
+			analyticsMessageBuilder.action(eventType);
+
+			analyticsMessageBuilder.object(
+				JSONUtil.put(
+					"classPK", classPK
+				).put(
+					"userId", associationClassPK
+				));
+
+			String analyticsMessageJSON =
+				analyticsMessageBuilder.buildJSONString();
+
+			analyticsMessageLocalService.addAnalyticsMessage(
+				companyId, userLocalService.getDefaultUserId(companyId),
+				analyticsMessageJSON.getBytes(Charset.defaultCharset()));
+		}
+		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					StringBundler.concat(
+						"Unable to get ", modelClassName, StringPool.SPACE,
+						classPK));
+			}
+		}
 	}
 
 	private JSONObject _serialize(List<String> includeAttributeNames, T model) {

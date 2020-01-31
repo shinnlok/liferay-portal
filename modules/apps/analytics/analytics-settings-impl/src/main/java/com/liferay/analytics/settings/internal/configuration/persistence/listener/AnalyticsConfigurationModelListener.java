@@ -21,6 +21,7 @@ import com.liferay.analytics.message.sender.util.EntityModelListenerRegistry;
 import com.liferay.analytics.message.storage.service.AnalyticsMessageLocalService;
 import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
 import com.liferay.analytics.settings.configuration.AnalyticsConfigurationTracker;
+import com.liferay.analytics.settings.internal.model.AnalyticsUserImpl;
 import com.liferay.analytics.settings.internal.security.auth.verifier.AnalyticsSecurityAuthVerifier;
 import com.liferay.analytics.settings.security.constants.AnalyticsSecurityConstants;
 import com.liferay.portal.configuration.persistence.listener.ConfigurationModelListener;
@@ -50,7 +51,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
@@ -208,20 +211,6 @@ public class AnalyticsConfigurationModelListener
 			});
 	}
 
-	private void _addContactsAnalyticsMessages(List<User> users) {
-		List<Contact> contacts = new ArrayList<>();
-
-		for (User user : users) {
-			Contact contact = user.fetchContact();
-
-			if (contact != null) {
-				contacts.add(contact);
-			}
-		}
-
-		_addAnalyticsMessages(contacts);
-	}
-
 	private void _addSAPEntry(long companyId) throws Exception {
 		String sapEntryName = _SAP_ENTRY_OBJECT[0];
 
@@ -237,6 +226,47 @@ public class AnalyticsConfigurationModelListener
 			false, true, sapEntryName,
 			Collections.singletonMap(LocaleUtil.getDefault(), sapEntryName),
 			new ServiceContext());
+	}
+
+	private void _addUsersAnalyticsMessages(List<User> users) {
+		List<AnalyticsUserImpl> analyticsUsers = new ArrayList<>(users.size());
+
+		List<Contact> contacts = new ArrayList<>(users.size());
+
+		for (User user : users) {
+			Map<String, long[]> memberships = new HashMap<>();
+
+			for (EntityModelListener entityModelListener :
+					_entityModelListenerRegistry.getEntityModelListeners()) {
+
+				try {
+					long[] membershipIds = entityModelListener.getMembershipIds(
+						user);
+
+					if (membershipIds.length == 0) {
+						continue;
+					}
+
+					memberships.put(
+						entityModelListener.getModelClassName(), membershipIds);
+				}
+				catch (Exception exception) {
+					_log.error(exception, exception);
+				}
+			}
+
+			analyticsUsers.add(new AnalyticsUserImpl(user, memberships));
+
+			Contact contact = user.fetchContact();
+
+			if (contact != null) {
+				contacts.add(contact);
+			}
+		}
+
+		_addAnalyticsMessages(analyticsUsers);
+
+		_addAnalyticsMessages(contacts);
 	}
 
 	private void _deleteAnalyticsAdmin(long companyId) throws Exception {
@@ -345,8 +375,7 @@ public class AnalyticsConfigurationModelListener
 			List<User> users = _userLocalService.getCompanyUsers(
 				companyId, start, end);
 
-			_addAnalyticsMessages(users);
-			_addContactsAnalyticsMessages(users);
+			_addUsersAnalyticsMessages(users);
 		}
 	}
 
@@ -370,8 +399,7 @@ public class AnalyticsConfigurationModelListener
 					List<User> users = _userLocalService.getOrganizationUsers(
 						GetterUtil.getLong(organizationId), start, end);
 
-					_addAnalyticsMessages(users);
-					_addContactsAnalyticsMessages(users);
+					_addUsersAnalyticsMessages(users);
 				}
 				catch (Exception exception) {
 					if (_log.isInfoEnabled()) {
@@ -403,8 +431,7 @@ public class AnalyticsConfigurationModelListener
 				List<User> users = _userLocalService.getUserGroupUsers(
 					GetterUtil.getLong(userGroupId), start, end);
 
-				_addAnalyticsMessages(users);
-				_addContactsAnalyticsMessages(users);
+				_addUsersAnalyticsMessages(users);
 			}
 		}
 	}

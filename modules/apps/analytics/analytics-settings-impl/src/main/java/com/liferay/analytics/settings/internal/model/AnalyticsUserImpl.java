@@ -12,27 +12,33 @@
  * details.
  */
 
-package com.liferay.analytics.message.sender.model;
+package com.liferay.analytics.settings.internal.model;
 
-import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.model.UserWrapper;
 
-import java.util.List;
+import java.util.Map;
 
 /**
- * @author Rachael Koestartyo
+ * @author Shinn Lok
  */
-public interface EntityModelListener<T extends BaseModel<T>> {
+public class AnalyticsUserImpl extends UserWrapper {
 
-	public void addAnalyticsMessage(
-		String eventType, List<String> includeAttributeNames, T model);
+	public AnalyticsUserImpl(User user, Map<String, long[]> memberships) {
+		super(user);
 
-	public List<String> getAttributeNames();
+		_memberships = memberships;
+	}
 
-	public long[] getMembershipIds(User user) throws Exception;
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> modelAttributes = super.getModelAttributes();
 
-	public String getModelClassName();
+		modelAttributes.put("memberships", _memberships);
 
-	public void syncAll() throws Exception;
+		return modelAttributes;
+	}
+
+	private final Map<String, long[]> _memberships;
 
 }
