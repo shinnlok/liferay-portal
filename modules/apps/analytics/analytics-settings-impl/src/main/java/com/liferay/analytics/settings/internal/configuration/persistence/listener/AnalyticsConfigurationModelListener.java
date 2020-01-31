@@ -86,25 +86,17 @@ public class AnalyticsConfigurationModelListener
 
 	@Override
 	public void onAfterSave(String pid, Dictionary<String, Object> properties) {
-		if (Validator.isNull((String)properties.get("token"))) {
-			_disable((long)properties.get("companyId"));
+		if (Validator.isNull(properties.get("token"))) {
+			if (Validator.isNotNull(properties.get("previousToken"))) {
+				_disable((long)properties.get("companyId"));
+			}
 		}
 		else {
-			_enable((long)properties.get("companyId"));
+			if (Validator.isNull(properties.get("previousToken"))) {
+				_enable((long)properties.get("companyId"));
+			}
 
-			Message message = new Message();
-
-			message.put("command", AnalyticsMessagesProcessorCommand.SEND);
-
-			TransactionCommitCallbackUtil.registerCallback(
-				() -> {
-					_messageBus.sendMessage(
-						AnalyticsMessagesDestinationNames.
-							ANALYTICS_MESSAGES_PROCESSOR,
-						message);
-
-					return null;
-				});
+			_sync(properties);
 		}
 	}
 
@@ -115,35 +107,14 @@ public class AnalyticsConfigurationModelListener
 		AnalyticsConfiguration analyticsConfiguration =
 			_analyticsConfigurationTracker.getAnalyticsConfiguration(pid);
 
-		if (Validator.isNotNull(properties.get("token")) &&
-			Validator.isNull(analyticsConfiguration.token())) {
+		properties.put(
+			"previousSyncAllContacts",
+			analyticsConfiguration.syncAllContacts());
 
-			Collection<EntityModelListener> entityModelListeners =
-				_entityModelListenerRegistry.getEntityModelListeners();
+		String token = analyticsConfiguration.token();
 
-			for (EntityModelListener entityModelListener :
-					entityModelListeners) {
-
-				try {
-					entityModelListener.syncAll();
-				}
-				catch (Exception exception) {
-					_log.error(exception, exception);
-				}
-			}
-		}
-
-		boolean syncAllContacts = Boolean.parseBoolean(
-			(String)properties.get("syncAllContacts"));
-
-		_syncContacts(
-			analyticsConfiguration,
-			_analyticsConfigurationTracker.getCompanyId(pid), syncAllContacts);
-
-		if (!syncAllContacts) {
-			_syncOrganizationUsers(
-				(String[])properties.get("syncedOrganizationIds"));
-			_syncUserGroupUsers((String[])properties.get("syncedUserGroupIds"));
+		if (token != null) {
+			properties.put("previousToken", token);
 		}
 	}
 
@@ -349,16 +320,56 @@ public class AnalyticsConfigurationModelListener
 		return false;
 	}
 
-	private void _syncContacts(
-		AnalyticsConfiguration analyticsConfiguration, long companyId,
-		boolean syncAllContacts) {
+	private void _sync(Dictionary<String, Object> properties) {
+		if (Validator.isNotNull(properties.get("token")) &&
+			Validator.isNull(properties.get("previousToken"))) {
 
-		if ((analyticsConfiguration.syncAllContacts() == syncAllContacts) ||
-			!syncAllContacts) {
+			Collection<EntityModelListener> entityModelListeners =
+				_entityModelListenerRegistry.getEntityModelListeners();
 
-			return;
+			for (EntityModelListener entityModelListener :
+					entityModelListeners) {
+
+				try {
+					entityModelListener.syncAll();
+				}
+				catch (Exception exception) {
+					_log.error(exception, exception);
+				}
+			}
 		}
 
+		if (GetterUtil.getBoolean(properties.get("syncAllContacts"))) {
+			if (GetterUtil.getBoolean(
+					properties.get("previousSyncAllContacts"))) {
+
+				_syncContacts((long)properties.get("companyId"));
+
+				return;
+			}
+		}
+		else {
+			_syncOrganizationUsers(
+				(String[])properties.get("syncedOrganizationIds"));
+			_syncUserGroupUsers((String[])properties.get("syncedUserGroupIds"));
+		}
+
+		Message message = new Message();
+
+		message.put("command", AnalyticsMessagesProcessorCommand.SEND);
+
+		TransactionCommitCallbackUtil.registerCallback(
+			() -> {
+				_messageBus.sendMessage(
+					AnalyticsMessagesDestinationNames.
+						ANALYTICS_MESSAGES_PROCESSOR,
+					message);
+
+				return null;
+			});
+	}
+
+	private void _syncContacts(long companyId) {
 		int count = _userLocalService.getCompanyUsersCount(companyId);
 
 		int pages = count / _DEFAULT_DELTA;
