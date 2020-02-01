@@ -426,6 +426,8 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 				JSONUtil.put(
 					"classPK", classPK
 				).put(
+					"emailAddress", user.getEmailAddress()
+				).put(
 					"userId", associationClassPK
 				));
 
