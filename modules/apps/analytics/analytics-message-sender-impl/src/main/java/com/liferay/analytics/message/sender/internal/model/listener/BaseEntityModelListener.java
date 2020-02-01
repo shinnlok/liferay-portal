@@ -78,9 +78,7 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 
 		try {
 			AnalyticsMessage.Builder analyticsMessageBuilder =
-				AnalyticsMessage.builder(
-					_getDataSourceId(shardedModel.getCompanyId()),
-					model.getModelClassName());
+				AnalyticsMessage.builder(model.getModelClassName());
 
 			analyticsMessageBuilder.action(eventType);
 			analyticsMessageBuilder.object(jsonObject);
@@ -328,13 +326,6 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 		return sb.toString();
 	}
 
-	private String _getDataSourceId(long companyId) {
-		AnalyticsConfiguration analyticsConfiguration =
-			analyticsConfigurationTracker.getAnalyticsConfiguration(companyId);
-
-		return analyticsConfiguration.liferayAnalyticsDataSourceId();
-	}
-
 	private List<String> _getModifiedAttributeNames(
 		List<String> attributeNames, T model, T originalModel) {
 
@@ -417,11 +408,9 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 			long companyId = (long)modelAttributes.get("companyId");
 
 			AnalyticsMessage.Builder analyticsMessageBuilder =
-				AnalyticsMessage.builder(
-					_getDataSourceId(companyId), getModelClassName());
+				AnalyticsMessage.builder(getModelClassName());
 
 			analyticsMessageBuilder.action(eventType);
-
 			analyticsMessageBuilder.object(
 				JSONUtil.put(
 					"classPK", classPK
