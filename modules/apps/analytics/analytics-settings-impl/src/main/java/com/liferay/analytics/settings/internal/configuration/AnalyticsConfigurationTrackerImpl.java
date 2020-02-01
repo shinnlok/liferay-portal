@@ -437,6 +437,7 @@ public class AnalyticsConfigurationTrackerImpl
 		Message message = new Message();
 
 		message.put("command", AnalyticsMessagesProcessorCommand.SEND);
+		message.put("companyId", dictionary.get("companyId"));
 
 		TransactionCommitCallbackUtil.registerCallback(
 			() -> {
