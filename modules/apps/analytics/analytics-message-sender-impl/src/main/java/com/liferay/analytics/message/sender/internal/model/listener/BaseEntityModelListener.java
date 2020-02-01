@@ -406,6 +406,12 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 				return;
 			}
 
+			User user = userLocalService.fetchUser((long)associationClassPK);
+
+			if (isUserExcluded(user)) {
+				return;
+			}
+
 			Map<String, Object> modelAttributes = model.getModelAttributes();
 
 			long companyId = (long)modelAttributes.get("companyId");
