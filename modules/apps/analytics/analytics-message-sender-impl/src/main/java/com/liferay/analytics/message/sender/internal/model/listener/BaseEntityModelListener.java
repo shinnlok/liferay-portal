@@ -19,12 +19,12 @@ import com.liferay.analytics.message.sender.model.EntityModelListener;
 import com.liferay.analytics.message.storage.service.AnalyticsMessageLocalService;
 import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
 import com.liferay.analytics.settings.configuration.AnalyticsConfigurationTracker;
+import com.liferay.analytics.settings.security.constants.AnalyticsSecurityConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.bean.BeanPropertiesUtil;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.exception.ModelListenerException;
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
@@ -185,11 +185,41 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 
 	protected abstract String getPrimaryKeyName();
 
-	protected boolean isExcluded(
-			AnalyticsConfiguration analyticsConfiguration, User user)
-		throws PortalException {
+	protected boolean isExcluded(T model) {
+		return false;
+	}
 
-		for (long organizationId : user.getOrganizationIds()) {
+	protected boolean isUserExcluded(User user) {
+		if ((user == null) || !user.isActive() ||
+			Objects.equals(
+				user.getScreenName(),
+				AnalyticsSecurityConstants.SCREEN_NAME_ANALYTICS_ADMIN)) {
+
+			return true;
+		}
+
+		AnalyticsConfiguration analyticsConfiguration =
+			analyticsConfigurationTracker.getAnalyticsConfiguration(
+				user.getCompanyId());
+
+		if (analyticsConfiguration.syncAllContacts()) {
+			return false;
+		}
+
+		long[] organizationIds = null;
+
+		try {
+			organizationIds = user.getOrganizationIds();
+		}
+		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
+
+			return true;
+		}
+
+		for (long organizationId : organizationIds) {
 			if (ArrayUtil.contains(
 					analyticsConfiguration.syncedOrganizationIds(),
 					String.valueOf(organizationId))) {
@@ -208,10 +238,6 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 		}
 
 		return true;
-	}
-
-	protected boolean isExcluded(T model) {
-		return false;
 	}
 
 	protected void updateConfigurationProperties(
