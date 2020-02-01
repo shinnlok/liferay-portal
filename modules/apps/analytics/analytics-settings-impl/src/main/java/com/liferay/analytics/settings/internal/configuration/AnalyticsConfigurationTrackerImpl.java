@@ -53,6 +53,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -175,6 +176,14 @@ public class AnalyticsConfigurationTrackerImpl
 				companyId,
 				ConfigurableUtil.createConfigurable(
 					AnalyticsConfiguration.class, dictionary));
+		}
+
+		if (!_initializedCompanyIds.contains(companyId)) {
+			_initializedCompanyIds.add(companyId);
+
+			if (Validator.isNotNull(dictionary.get("previousToken"))) {
+				return;
+			}
 		}
 
 		if (Validator.isNull(dictionary.get("token"))) {
@@ -560,6 +569,8 @@ public class AnalyticsConfigurationTrackerImpl
 
 	@Reference
 	private EntityModelListenerRegistry _entityModelListenerRegistry;
+
+	private final Set<Long> _initializedCompanyIds = new HashSet<>();
 
 	@Reference
 	private MessageBus _messageBus;
