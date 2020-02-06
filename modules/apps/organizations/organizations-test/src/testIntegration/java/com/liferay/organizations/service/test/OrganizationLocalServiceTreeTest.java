@@ -15,6 +15,7 @@
 package com.liferay.organizations.service.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.OrganizationConstants;
 import com.liferay.portal.kernel.model.TreeModel;
@@ -25,7 +26,6 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.local.service.tree.test.util.BaseLocalServiceTreeTestCase;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
-
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
@@ -58,7 +58,7 @@ public class OrganizationLocalServiceTreeTest
 		Organization organization = OrganizationTestUtil.addOrganization(
 			parentOrganizationId, RandomTestUtil.randomString(), false);
 
-		organization.setTreePath(null);
+		organization.setTreePath("/0/");
 
 		return OrganizationLocalServiceUtil.updateOrganization(organization);
 	}

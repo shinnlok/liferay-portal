@@ -35,16 +35,15 @@ import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Shinn Lok
@@ -105,7 +104,7 @@ public class DLFileVersionLocalServiceTreeTest {
 					fileEntry.getFileEntryId(),
 					DLFileEntryConstants.VERSION_DEFAULT);
 
-			dlFileVersion.setTreePath(null);
+			dlFileVersion.setTreePath("/0/");
 
 			DLFileVersionLocalServiceUtil.updateDLFileVersion(dlFileVersion);
 		}
