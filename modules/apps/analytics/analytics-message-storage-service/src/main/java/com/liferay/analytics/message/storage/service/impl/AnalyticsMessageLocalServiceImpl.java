@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.util.OrderByComparator;
 
 import java.util.Date;
 import java.util.List;
@@ -80,7 +81,30 @@ public class AnalyticsMessageLocalServiceImpl
 		long companyId, int start, int end) {
 
 		return analyticsMessagePersistence.findByCompanyId(
-			companyId, start, end);
+			companyId, start, end,
+			new OrderByComparator<AnalyticsMessage>() {
+
+				@Override
+				public int compare(
+					AnalyticsMessage analyticsMessage1,
+					AnalyticsMessage analyticsMessage2) {
+
+					return Long.compare(
+						analyticsMessage1.getAnalyticsMessageId(),
+						analyticsMessage2.getAnalyticsMessageId());
+				}
+
+				@Override
+				public String getOrderBy() {
+					return "AnalyticsMessage.analyticsMessageId ASC";
+				}
+
+				@Override
+				public String[] getOrderByFields() {
+					return new String[] {"analyticsMessageId"};
+				}
+
+			});
 	}
 
 	@Override
