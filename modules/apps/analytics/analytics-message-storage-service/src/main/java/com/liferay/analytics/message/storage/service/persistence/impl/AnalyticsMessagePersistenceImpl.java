@@ -1183,8 +1183,7 @@ public class AnalyticsMessagePersistenceImpl
 			entityCacheEnabled, finderCacheEnabled, AnalyticsMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByCompanyId",
 			new String[] {Long.class.getName()},
-			AnalyticsMessageModelImpl.COMPANYID_COLUMN_BITMASK |
-			AnalyticsMessageModelImpl.CREATEDATE_COLUMN_BITMASK);
+			AnalyticsMessageModelImpl.COMPANYID_COLUMN_BITMASK);
 
 		_finderPathCountByCompanyId = new FinderPath(
 			entityCacheEnabled, finderCacheEnabled, Long.class,
