@@ -22,6 +22,8 @@ import com.liferay.analytics.message.storage.service.AnalyticsMessageLocalServic
 import com.liferay.petra.io.StreamUtil;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.BaseMessageListener;
 import com.liferay.portal.kernel.messaging.DestinationNames;
 import com.liferay.portal.kernel.messaging.Message;
@@ -115,6 +117,10 @@ public class SendAnalyticsMessagesMessageListener extends BaseMessageListener {
 					companyId, 0, _BATCH_SIZE);
 
 			if (analyticsMessages.isEmpty()) {
+				if (_log.isInfoEnabled()) {
+					_log.info("No more analytics messages to process");
+				}
+
 				return;
 			}
 
@@ -130,14 +136,37 @@ public class SendAnalyticsMessagesMessageListener extends BaseMessageListener {
 				jsonArray.put(JSONFactoryUtil.createJSONObject(json));
 			}
 
-			_analyticsMessageSenderClient.send(jsonArray.toString(), companyId);
+			try {
+				_analyticsMessageSenderClient.send(
+					jsonArray.toString(), companyId);
+
+				if (_log.isInfoEnabled()) {
+					_log.info(
+						"Sent " + jsonArray.length() + " analytics messages");
+				}
+			}
+			catch (Exception exception) {
+				_log.error(
+					"Unable to send analytics messages for company ID " +
+						companyId,
+					exception);
+			}
 
 			_analyticsMessageLocalService.deleteAnalyticsMessages(
 				analyticsMessages);
+
+			if (_log.isInfoEnabled()) {
+				_log.info(
+					"Deleted " + analyticsMessages.size() +
+						" analytics messages");
+			}
 		}
 	}
 
 	private static final int _BATCH_SIZE = 100;
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		SendAnalyticsMessagesMessageListener.class);
 
 	@Reference
 	private AnalyticsMessageLocalService _analyticsMessageLocalService;

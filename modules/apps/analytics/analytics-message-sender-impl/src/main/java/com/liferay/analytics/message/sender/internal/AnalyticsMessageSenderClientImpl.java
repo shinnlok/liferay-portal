@@ -19,6 +19,7 @@ import com.liferay.analytics.message.storage.service.AnalyticsMessageLocalServic
 import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
 import com.liferay.analytics.settings.configuration.AnalyticsConfigurationTracker;
 import com.liferay.analytics.settings.security.constants.AnalyticsSecurityConstants;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
@@ -193,10 +194,23 @@ public class AnalyticsMessageSenderClientImpl
 			String message = responseJSONObject.getString("message");
 
 			if (message.equals("INVALID_TOKEN")) {
+				if (_log.isWarnEnabled()) {
+					_log.warn(
+						StringBundler.concat(
+							"Disconnecting data source for company ID ",
+							companyId, ". Cause: ", message));
+				}
+
 				_disconnectDataSource(companyId);
 
 				_analyticsMessageLocalService.deleteAnalyticsMessages(
 					companyId);
+
+				if (_log.isInfoEnabled()) {
+					_log.info(
+						"Deleted all analytics messages for company ID " +
+							companyId);
+				}
 			}
 
 			return closeableHttpResponse;

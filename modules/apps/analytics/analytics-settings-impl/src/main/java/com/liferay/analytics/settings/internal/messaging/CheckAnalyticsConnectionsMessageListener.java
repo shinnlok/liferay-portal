@@ -17,6 +17,8 @@ package com.liferay.analytics.settings.internal.messaging;
 import com.liferay.analytics.message.sender.client.AnalyticsMessageSenderClient;
 import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
 import com.liferay.analytics.settings.configuration.AnalyticsConfigurationTracker;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.BaseMessageListener;
 import com.liferay.portal.kernel.messaging.DestinationNames;
 import com.liferay.portal.kernel.messaging.Message;
@@ -80,8 +82,18 @@ public class CheckAnalyticsConnectionsMessageListener
 				analyticsConfigurationEntry :
 					analyticsConfigurations.entrySet()) {
 
-			_analyticsMessageSenderClient.validateConnection(
-				analyticsConfigurationEntry.getKey());
+			try {
+				_analyticsMessageSenderClient.validateConnection(
+					analyticsConfigurationEntry.getKey());
+			}
+			catch (Exception exception) {
+				_log.error(
+					"Unable to validate connection to analytics cloud for " +
+						"company ID " + analyticsConfigurationEntry.getKey(),
+					exception);
+
+				throw exception;
+			}
 		}
 	}
 
@@ -89,6 +101,9 @@ public class CheckAnalyticsConnectionsMessageListener
 	protected void setModuleServiceLifecycle(
 		ModuleServiceLifecycle moduleServiceLifecycle) {
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		CheckAnalyticsConnectionsMessageListener.class);
 
 	@Reference
 	private AnalyticsConfigurationTracker _analyticsConfigurationTracker;

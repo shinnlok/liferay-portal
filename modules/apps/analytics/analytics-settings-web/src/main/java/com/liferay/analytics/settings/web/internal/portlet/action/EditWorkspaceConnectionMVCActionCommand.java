@@ -19,6 +19,8 @@ import com.liferay.configuration.admin.constants.ConfigurationAdminPortletKeys;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -126,6 +128,10 @@ public class EditWorkspaceConnectionMVCActionCommand
 			StatusLine statusLine = closeableHttpResponse.getStatusLine();
 
 			if (statusLine.getStatusCode() != HttpStatus.SC_OK) {
+				_log.error(
+					"Unable to connect to analytics cloud at " +
+						tokenJSONObject.getString("url"));
+
 				throw new PortalException("Invalid token");
 			}
 
@@ -147,6 +153,8 @@ public class EditWorkspaceConnectionMVCActionCommand
 				new String(Base64.decode(token)));
 		}
 		catch (Exception exception) {
+			_log.error("Invalid token", exception);
+
 			throw new PortalException("Invalid token", exception);
 		}
 	}
@@ -194,6 +202,8 @@ public class EditWorkspaceConnectionMVCActionCommand
 		}
 
 		if (statusLine.getStatusCode() != HttpStatus.SC_OK) {
+			_log.error("Unable to disconnect data source");
+
 			throw new PortalException("Unable to disconnect data source");
 		}
 
@@ -252,6 +262,9 @@ public class EditWorkspaceConnectionMVCActionCommand
 			configurationProperties.put(key, jsonObject.getString(key));
 		}
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		EditWorkspaceConnectionMVCActionCommand.class);
 
 	@Reference
 	private Portal _portal;
