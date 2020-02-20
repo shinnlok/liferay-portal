@@ -129,7 +129,7 @@ public class EditWorkspaceConnectionMVCActionCommand
 
 			if (statusLine.getStatusCode() != HttpStatus.SC_OK) {
 				_log.error(
-					"Unable to connect to analytics cloud at " +
+					"Unable to connect to Analytics Cloud at " +
 						tokenJSONObject.getString("url"));
 
 				throw new PortalException("Invalid token");

@@ -88,8 +88,8 @@ public class CheckAnalyticsConnectionsMessageListener
 			}
 			catch (Exception exception) {
 				_log.error(
-					"Unable to validate connection to analytics cloud for " +
-						"company ID " + analyticsConfigurationEntry.getKey(),
+					"Unable to connect Analytics Cloud for company ID " +
+						analyticsConfigurationEntry.getKey(),
 					exception);
 
 				throw exception;

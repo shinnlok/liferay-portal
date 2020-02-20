@@ -110,7 +110,7 @@ public class EditSyncedSitesMVCActionCommand
 		}
 
 		if (statusLine.getStatusCode() != HttpStatus.SC_OK) {
-			_log.error("Unable to notify analytics cloud");
+			_log.error("Unable to notify Analytics Cloud");
 
 			throw new PortalException("Invalid token");
 		}

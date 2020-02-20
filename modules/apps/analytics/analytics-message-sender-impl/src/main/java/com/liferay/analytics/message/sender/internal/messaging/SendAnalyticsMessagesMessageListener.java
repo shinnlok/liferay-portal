@@ -118,7 +118,7 @@ public class SendAnalyticsMessagesMessageListener extends BaseMessageListener {
 
 			if (analyticsMessages.isEmpty()) {
 				if (_log.isInfoEnabled()) {
-					_log.info("No more analytics messages to process");
+					_log.info("Finished processing analytics messages");
 				}
 
 				return;
