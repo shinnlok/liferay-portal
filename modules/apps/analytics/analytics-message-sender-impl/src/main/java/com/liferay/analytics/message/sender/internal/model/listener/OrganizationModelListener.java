@@ -77,7 +77,8 @@ public class OrganizationModelListener
 	}
 
 	private static final List<String> _attributeNames = Arrays.asList(
-		"modifiedDate", "name", "parentOrganizationId", "treePath", "type");
+		"expando", "modifiedDate", "name", "parentOrganizationId", "treePath",
+		"type");
 
 	@Reference
 	private OrganizationLocalService _organizationLocalService;
