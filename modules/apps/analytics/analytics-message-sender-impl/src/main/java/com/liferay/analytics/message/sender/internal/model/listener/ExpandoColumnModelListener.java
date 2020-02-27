@@ -16,13 +16,22 @@ package com.liferay.analytics.message.sender.internal.model.listener;
 
 import com.liferay.analytics.message.sender.model.EntityModelListener;
 import com.liferay.expando.kernel.model.ExpandoColumn;
+import com.liferay.expando.kernel.model.ExpandoTable;
+import com.liferay.expando.kernel.model.ExpandoTableConstants;
+import com.liferay.expando.kernel.service.ExpandoTableLocalService;
 import com.liferay.portal.kernel.exception.ModelListenerException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.ModelListener;
+import com.liferay.portal.kernel.model.Organization;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.service.ClassNameLocalService;
 
 import java.util.Arrays;
 import java.util.List;
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Rachael Koestartyo
@@ -48,11 +57,55 @@ public class ExpandoColumnModelListener
 		return "name";
 	}
 
+	@Override
+	protected boolean isExcluded(ExpandoColumn expandoColumn) {
+		if (_isCustomField(Organization.class.getName(), expandoColumn) ||
+			_isCustomField(User.class.getName(), expandoColumn)) {
+
+			return false;
+		}
+
+		return true;
+	}
+
+	private boolean _isCustomField(
+		String className, ExpandoColumn expandoColumn) {
+
+		long classNameId = _classNameLocalService.getClassNameId(className);
+
+		try {
+			ExpandoTable expandoTable = _expandoTableLocalService.getTable(
+				expandoColumn.getTableId());
+
+			if (ExpandoTableConstants.DEFAULT_TABLE_NAME.equals(
+					expandoTable.getName()) &&
+				(expandoTable.getClassNameId() == classNameId)) {
+
+				return true;
+			}
+		}
+		catch (Exception exception) {
+			if (_log.isInfoEnabled()) {
+				_log.info(
+					"Unable to get expando table " +
+						expandoColumn.getTableId());
+			}
+		}
+
+		return false;
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		ExpandoColumnModelListener.class);
 
 	private static final List<String> _attributeNames = Arrays.asList(
 		"className", "companyId", "dataType", "displayType", "name",
 		"typeLabel");
+
+	@Reference
+	private ClassNameLocalService _classNameLocalService;
+
+	@Reference
+	private ExpandoTableLocalService _expandoTableLocalService;
 
 }
