@@ -47,15 +47,20 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 
+import java.io.Serializable;
+
 import java.nio.charset.Charset;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Reference;
 
@@ -327,6 +332,47 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 		return sb.toString();
 	}
 
+	private boolean _equals(
+		ExpandoBridge expandoBridge1, ExpandoBridge expandoBridge2) {
+
+		Map<String, Serializable> expandoBridge1Attributes =
+			expandoBridge1.getAttributes(false);
+		Map<String, Serializable> expandoBridge2Attributes =
+			expandoBridge2.getAttributes(false);
+
+		Set<Map.Entry<String, Serializable>> entrySet =
+			expandoBridge1Attributes.entrySet();
+
+		Stream<Map.Entry<String, Serializable>> stream = entrySet.stream();
+
+		return stream.filter(
+			expandoBridge1Attribute -> !expandoBridge1Attribute.equals(
+				"modifiedDate")
+		).allMatch(
+			expandoBridge1Attribute -> {
+				Serializable expandoBridge1Value =
+					expandoBridge1Attribute.getValue();
+				Serializable expandoBridge2Value = expandoBridge2Attributes.get(
+					expandoBridge1Attribute.getKey());
+
+				if (expandoBridge1Value instanceof JSONObject) {
+					return JSONUtil.equals(
+						(JSONObject)expandoBridge1Value,
+						(JSONObject)expandoBridge2Value);
+				}
+				else if (expandoBridge1Value instanceof Object[]) {
+					return Arrays.equals(
+						(Object[])expandoBridge1Value,
+						(Object[])expandoBridge2Value);
+				}
+
+				return expandoBridge1Value.equals(
+					expandoBridge2Attributes.get(
+						expandoBridge1Attribute.getKey()));
+			}
+		);
+	}
+
 	private List<String> _getModifiedAttributeNames(
 		List<String> attributeNames, T model, T originalModel) {
 
@@ -335,6 +381,17 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 		for (String attributeName : attributeNames) {
 			if (attributeName.equalsIgnoreCase("memberships") ||
 				attributeName.equalsIgnoreCase("modifiedDate")) {
+
+				continue;
+			}
+
+			if (attributeName.equalsIgnoreCase("expando")) {
+				if (!_equals(
+						originalModel.getExpandoBridge(),
+						model.getExpandoBridge())) {
+
+					modifiedAttributeNames.add(attributeName);
+				}
 
 				continue;
 			}
