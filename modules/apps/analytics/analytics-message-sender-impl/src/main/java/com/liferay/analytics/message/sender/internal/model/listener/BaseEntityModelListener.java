@@ -20,6 +20,7 @@ import com.liferay.analytics.message.storage.service.AnalyticsMessageLocalServic
 import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
 import com.liferay.analytics.settings.configuration.AnalyticsConfigurationTracker;
 import com.liferay.analytics.settings.security.constants.AnalyticsSecurityConstants;
+import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.bean.BeanPropertiesUtil;
@@ -443,6 +444,14 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 		Map<String, Object> modelAttributes = model.getModelAttributes();
 
 		for (String includeAttributeName : includeAttributeNames) {
+			if (includeAttributeName.equals("expando")) {
+				ExpandoBridge expandoBridge = model.getExpandoBridge();
+
+				jsonObject.put("expando", expandoBridge.getAttributes(false));
+
+				continue;
+			}
+
 			if (includeAttributeName.equals("treePath") &&
 				(model instanceof TreeModel)) {
 
