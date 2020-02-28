@@ -39,6 +39,7 @@ import com.liferay.portal.kernel.service.ClassNameLocalService;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -55,6 +56,25 @@ public class ExpandoColumnModelListener
 	@Override
 	public List<String> getAttributeNames() {
 		return _attributeNames;
+	}
+
+	@Override
+	public void onBeforeUpdate(ExpandoColumn expandoColumn)
+		throws ModelListenerException {
+
+		ExpandoColumn oldExpandoColumn =
+			_expandoColumnLocalService.fetchExpandoColumn(
+				expandoColumn.getColumnId());
+
+		if (Objects.equals(
+				oldExpandoColumn.getName(), expandoColumn.getName()) &&
+			Objects.equals(
+				oldExpandoColumn.getType(), expandoColumn.getType())) {
+
+			return;
+		}
+
+		addAnalyticsMessage("update", getAttributeNames(), expandoColumn);
 	}
 
 	@Override
