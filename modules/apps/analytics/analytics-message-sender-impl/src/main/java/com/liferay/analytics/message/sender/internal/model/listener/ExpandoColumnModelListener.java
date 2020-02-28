@@ -18,7 +18,14 @@ import com.liferay.analytics.message.sender.model.EntityModelListener;
 import com.liferay.expando.kernel.model.ExpandoColumn;
 import com.liferay.expando.kernel.model.ExpandoTable;
 import com.liferay.expando.kernel.model.ExpandoTableConstants;
+import com.liferay.expando.kernel.service.ExpandoColumnLocalService;
 import com.liferay.expando.kernel.service.ExpandoTableLocalService;
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.Property;
+import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.ModelListenerException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -48,6 +55,31 @@ public class ExpandoColumnModelListener
 	}
 
 	@Override
+	protected ActionableDynamicQuery getActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery =
+			_expandoColumnLocalService.getActionableDynamicQuery();
+
+		actionableDynamicQuery.setAddCriteriaMethod(
+			dynamicQuery -> {
+				Property tableProperty = PropertyFactoryUtil.forName("tableId");
+
+				long organizationClassNameId =
+					_classNameLocalService.getClassNameId(
+						Organization.class.getName());
+				long userClassNameId = _classNameLocalService.getClassNameId(
+					User.class.getName());
+
+				dynamicQuery.add(
+					tableProperty.in(
+						_getTableDynamicQuery(
+							organizationClassNameId, userClassNameId,
+							ExpandoTableConstants.DEFAULT_TABLE_NAME)));
+			});
+
+		return actionableDynamicQuery;
+	}
+
+	@Override
 	protected ExpandoColumn getModel(long id) throws Exception {
 		return _expandoColumnLocalService.getColumn(id);
 	}
@@ -66,6 +98,28 @@ public class ExpandoColumnModelListener
 		}
 
 		return true;
+	}
+
+	private DynamicQuery _getTableDynamicQuery(
+		long organizationClassNameId, long userClassNameId, String name) {
+
+		DynamicQuery dynamicQuery = _expandoTableLocalService.dynamicQuery();
+
+		Property classNameIdProperty = PropertyFactoryUtil.forName(
+			"classNameId");
+
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.or(
+				classNameIdProperty.eq(organizationClassNameId),
+				classNameIdProperty.eq(userClassNameId)));
+
+		Property nameProperty = PropertyFactoryUtil.forName("name");
+
+		dynamicQuery.add(nameProperty.eq(name));
+
+		dynamicQuery.setProjection(ProjectionFactoryUtil.property("tableId"));
+
+		return dynamicQuery;
 	}
 
 	private boolean _isCustomField(
@@ -104,6 +158,9 @@ public class ExpandoColumnModelListener
 
 	@Reference
 	private ClassNameLocalService _classNameLocalService;
+
+	@Reference
+	private ExpandoColumnLocalService _expandoColumnLocalService;
 
 	@Reference
 	private ExpandoTableLocalService _expandoTableLocalService;
