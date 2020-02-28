@@ -78,7 +78,7 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 			return;
 		}
 
-		JSONObject jsonObject = _serialize(includeAttributeNames, model);
+		JSONObject jsonObject = serialize(includeAttributeNames, model);
 
 		ShardedModel shardedModel = (ShardedModel)model;
 
@@ -243,6 +243,64 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 		}
 
 		return true;
+	}
+
+	protected JSONObject serialize(
+		List<String> includeAttributeNames, T model) {
+
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
+
+		Map<String, Object> modelAttributes = model.getModelAttributes();
+
+		for (String includeAttributeName : includeAttributeNames) {
+			if (includeAttributeName.equals("expando")) {
+				ExpandoBridge expandoBridge = model.getExpandoBridge();
+
+				jsonObject.put("expando", expandoBridge.getAttributes(false));
+
+				continue;
+			}
+
+			if (includeAttributeName.equals("treePath") &&
+				(model instanceof TreeModel)) {
+
+				TreeModel treeModel = (TreeModel)model;
+
+				String treePath = treeModel.getTreePath();
+
+				String[] ids = StringUtil.split(
+					treePath.substring(1), StringPool.SLASH);
+
+				jsonObject.put("nameTreePath", _buildNameTreePath(ids));
+
+				if (ids.length > 1) {
+					jsonObject.put(
+						"parentName",
+						_getName(GetterUtil.getLong(ids[ids.length - 2])));
+				}
+
+				continue;
+			}
+
+			Object value = modelAttributes.get(includeAttributeName);
+
+			if (value instanceof Date) {
+				Date date = (Date)value;
+
+				jsonObject.put(includeAttributeName, date.getTime());
+			}
+			else {
+				if (includeAttributeName.equals("name")) {
+					value = _getName(String.valueOf(value));
+				}
+
+				jsonObject.put(includeAttributeName, value);
+			}
+		}
+
+		jsonObject.put(getPrimaryKeyName(), model.getPrimaryKeyObj());
+
+		return jsonObject;
 	}
 
 	protected void updateConfigurationProperties(
@@ -493,62 +551,6 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 						classPK));
 			}
 		}
-	}
-
-	private JSONObject _serialize(List<String> includeAttributeNames, T model) {
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
-
-		Map<String, Object> modelAttributes = model.getModelAttributes();
-
-		for (String includeAttributeName : includeAttributeNames) {
-			if (includeAttributeName.equals("expando")) {
-				ExpandoBridge expandoBridge = model.getExpandoBridge();
-
-				jsonObject.put("expando", expandoBridge.getAttributes(false));
-
-				continue;
-			}
-
-			if (includeAttributeName.equals("treePath") &&
-				(model instanceof TreeModel)) {
-
-				TreeModel treeModel = (TreeModel)model;
-
-				String treePath = treeModel.getTreePath();
-
-				String[] ids = StringUtil.split(
-					treePath.substring(1), StringPool.SLASH);
-
-				jsonObject.put("nameTreePath", _buildNameTreePath(ids));
-
-				if (ids.length > 1) {
-					jsonObject.put(
-						"parentName",
-						_getName(GetterUtil.getLong(ids[ids.length - 2])));
-				}
-
-				continue;
-			}
-
-			Object value = modelAttributes.get(includeAttributeName);
-
-			if (value instanceof Date) {
-				Date date = (Date)value;
-
-				jsonObject.put(includeAttributeName, date.getTime());
-			}
-			else {
-				if (includeAttributeName.equals("name")) {
-					value = _getName(String.valueOf(value));
-				}
-
-				jsonObject.put(includeAttributeName, value);
-			}
-		}
-
-		jsonObject.put(getPrimaryKeyName(), model.getPrimaryKeyObj());
-
-		return jsonObject;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
