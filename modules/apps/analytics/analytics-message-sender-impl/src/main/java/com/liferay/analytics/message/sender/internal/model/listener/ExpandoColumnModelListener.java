@@ -16,6 +16,7 @@ package com.liferay.analytics.message.sender.internal.model.listener;
 
 import com.liferay.analytics.message.sender.model.EntityModelListener;
 import com.liferay.expando.kernel.model.ExpandoColumn;
+import com.liferay.expando.kernel.model.ExpandoColumnConstants;
 import com.liferay.expando.kernel.model.ExpandoTable;
 import com.liferay.expando.kernel.model.ExpandoTableConstants;
 import com.liferay.expando.kernel.service.ExpandoColumnLocalService;
@@ -27,6 +28,8 @@ import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.ModelListenerException;
+import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.ModelListener;
@@ -98,6 +101,36 @@ public class ExpandoColumnModelListener
 		}
 
 		return true;
+	}
+
+	@Override
+	protected JSONObject serialize(
+		List<String> includeAttributeNames, ExpandoColumn expandoColumn) {
+
+		String className = User.class.getName();
+
+		if (_isCustomField(Organization.class.getName(), expandoColumn)) {
+			className = Organization.class.getName();
+		}
+
+		return JSONUtil.put(
+			"className", className
+		).put(
+			"companyId", expandoColumn.getColumnId()
+		).put(
+			"dataType",
+			ExpandoColumnConstants.getDataType(expandoColumn.getType())
+		).put(
+			"displayType",
+			ExpandoColumnConstants.getDefaultDisplayTypeProperty(
+				expandoColumn.getType(),
+				expandoColumn.getTypeSettingsProperties())
+		).put(
+			"name", expandoColumn.getName()
+		).put(
+			"typeLabel",
+			ExpandoColumnConstants.getTypeLabel(expandoColumn.getType())
+		);
 	}
 
 	private DynamicQuery _getTableDynamicQuery(
