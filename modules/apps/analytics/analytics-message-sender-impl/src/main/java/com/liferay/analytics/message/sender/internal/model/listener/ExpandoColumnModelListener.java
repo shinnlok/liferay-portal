@@ -84,18 +84,16 @@ public class ExpandoColumnModelListener
 
 		actionableDynamicQuery.setAddCriteriaMethod(
 			dynamicQuery -> {
-				Property tableProperty = PropertyFactoryUtil.forName("tableId");
-
-				long organizationClassNameId =
-					_classNameLocalService.getClassNameId(
-						Organization.class.getName());
-				long userClassNameId = _classNameLocalService.getClassNameId(
-					User.class.getName());
+				Property tableIdProperty = PropertyFactoryUtil.forName(
+					"tableId");
 
 				dynamicQuery.add(
-					tableProperty.in(
+					tableIdProperty.in(
 						_getTableDynamicQuery(
-							organizationClassNameId, userClassNameId,
+							_classNameLocalService.getClassNameId(
+								Organization.class.getName()),
+							_classNameLocalService.getClassNameId(
+								User.class.getName()),
 							ExpandoTableConstants.DEFAULT_TABLE_NAME)));
 			});
 
@@ -184,7 +182,8 @@ public class ExpandoColumnModelListener
 			ExpandoTable expandoTable = _expandoTableLocalService.getTable(
 				expandoColumn.getTableId());
 
-			if (ExpandoTableConstants.DEFAULT_TABLE_NAME.equals(
+			if (Objects.equals(
+					ExpandoTableConstants.DEFAULT_TABLE_NAME,
 					expandoTable.getName()) &&
 				(expandoTable.getClassNameId() == classNameId)) {
 
