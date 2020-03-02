@@ -17,10 +17,13 @@ package com.liferay.analytics.message.sender.internal.model.listener;
 import com.liferay.analytics.message.sender.model.EntityModelListener;
 import com.liferay.expando.kernel.model.ExpandoRow;
 import com.liferay.expando.kernel.service.ExpandoRowLocalService;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.ModelListener;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.service.OrganizationLocalService;
 
 import java.util.Collections;
 import java.util.List;
@@ -69,7 +72,39 @@ public class ExpandoRowModelListener
 		return true;
 	}
 
+	@Override
+	protected JSONObject serialize(
+		List<String> includeAttributeNames, BaseModel baseModel) {
+
+		ExpandoRow expandoRow = (ExpandoRow)baseModel;
+
+		if (isCustomField(
+				Organization.class.getName(), expandoRow.getTableId())) {
+
+			Organization organization =
+				_organizationLocalService.fetchOrganization(
+					expandoRow.getClassPK());
+
+			if (organization != null) {
+				return super.serialize(
+					getOrganizationAttributeNames(), organization);
+			}
+		}
+		else if (isCustomField(User.class.getName(), expandoRow.getTableId())) {
+			User user = userLocalService.fetchUser(expandoRow.getClassPK());
+
+			if (user != null) {
+				return super.serialize(getUserAttributeNames(), user);
+			}
+		}
+
+		return JSONFactoryUtil.createJSONObject();
+	}
+
 	@Reference
 	private ExpandoRowLocalService _expandoRowLocalService;
+
+	@Reference
+	private OrganizationLocalService _organizationLocalService;
 
 }
