@@ -21,6 +21,10 @@ import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
 import com.liferay.analytics.settings.configuration.AnalyticsConfigurationTracker;
 import com.liferay.analytics.settings.security.constants.AnalyticsSecurityConstants;
 import com.liferay.expando.kernel.model.ExpandoBridge;
+import com.liferay.expando.kernel.model.ExpandoRow;
+import com.liferay.expando.kernel.model.ExpandoTable;
+import com.liferay.expando.kernel.model.ExpandoTableConstants;
+import com.liferay.expando.kernel.service.ExpandoTableLocalService;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.bean.BeanPropertiesUtil;
@@ -37,6 +41,7 @@ import com.liferay.portal.kernel.model.ShardedModel;
 import com.liferay.portal.kernel.model.TreeModel;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
+import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.CompanyService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -196,6 +201,29 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 
 	protected List<String> getUserAttributeNames() {
 		return _userAttributeNames;
+	}
+
+	protected boolean isCustomField(String className, long tableId) {
+		long classNameId = classNameLocalService.getClassNameId(className);
+
+		try {
+			ExpandoTable expandoTable = expandoTableLocalService.getTable(
+				tableId);
+
+			if (ExpandoTableConstants.DEFAULT_TABLE_NAME.equals(
+					expandoTable.getName()) &&
+				(expandoTable.getClassNameId() == classNameId)) {
+
+				return true;
+			}
+		}
+		catch (Exception exception) {
+			if (_log.isInfoEnabled()) {
+				_log.info("Unable to get expando table " + tableId);
+			}
+		}
+
+		return false;
 	}
 
 	protected boolean isExcluded(T model) {
@@ -372,10 +400,16 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 	protected AnalyticsMessageLocalService analyticsMessageLocalService;
 
 	@Reference
+	protected ClassNameLocalService classNameLocalService;
+
+	@Reference
 	protected CompanyService companyService;
 
 	@Reference
 	protected ConfigurationProvider configurationProvider;
+
+	@Reference
+	protected ExpandoTableLocalService expandoTableLocalService;
 
 	@Reference
 	protected UserLocalService userLocalService;

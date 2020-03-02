@@ -17,10 +17,8 @@ package com.liferay.analytics.message.sender.internal.model.listener;
 import com.liferay.analytics.message.sender.model.EntityModelListener;
 import com.liferay.expando.kernel.model.ExpandoColumn;
 import com.liferay.expando.kernel.model.ExpandoColumnConstants;
-import com.liferay.expando.kernel.model.ExpandoTable;
 import com.liferay.expando.kernel.model.ExpandoTableConstants;
 import com.liferay.expando.kernel.service.ExpandoColumnLocalService;
-import com.liferay.expando.kernel.service.ExpandoTableLocalService;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
@@ -30,12 +28,10 @@ import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.ModelListenerException;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.ModelListener;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.service.ClassNameLocalService;
 
 import java.util.Arrays;
 import java.util.List;
@@ -90,9 +86,9 @@ public class ExpandoColumnModelListener
 				dynamicQuery.add(
 					tableIdProperty.in(
 						_getTableDynamicQuery(
-							_classNameLocalService.getClassNameId(
+							classNameLocalService.getClassNameId(
 								Organization.class.getName()),
-							_classNameLocalService.getClassNameId(
+							classNameLocalService.getClassNameId(
 								User.class.getName()),
 							ExpandoTableConstants.DEFAULT_TABLE_NAME)));
 			});
@@ -112,8 +108,9 @@ public class ExpandoColumnModelListener
 
 	@Override
 	protected boolean isExcluded(ExpandoColumn expandoColumn) {
-		if (_isCustomField(Organization.class.getName(), expandoColumn) ||
-			_isCustomField(User.class.getName(), expandoColumn)) {
+		if (isCustomField(
+				Organization.class.getName(), expandoColumn.getTableId()) ||
+			isCustomField(User.class.getName(), expandoColumn.getTableId())) {
 
 			return false;
 		}
@@ -127,7 +124,9 @@ public class ExpandoColumnModelListener
 
 		String className = User.class.getName();
 
-		if (_isCustomField(Organization.class.getName(), expandoColumn)) {
+		if (isCustomField(
+				Organization.class.getName(), expandoColumn.getTableId())) {
+
 			className = Organization.class.getName();
 		}
 
@@ -154,7 +153,7 @@ public class ExpandoColumnModelListener
 	private DynamicQuery _getTableDynamicQuery(
 		long organizationClassNameId, long userClassNameId, String name) {
 
-		DynamicQuery dynamicQuery = _expandoTableLocalService.dynamicQuery();
+		DynamicQuery dynamicQuery = expandoTableLocalService.dynamicQuery();
 
 		Property classNameIdProperty = PropertyFactoryUtil.forName(
 			"classNameId");
@@ -173,48 +172,11 @@ public class ExpandoColumnModelListener
 		return dynamicQuery;
 	}
 
-	private boolean _isCustomField(
-		String className, ExpandoColumn expandoColumn) {
-
-		long classNameId = _classNameLocalService.getClassNameId(className);
-
-		try {
-			ExpandoTable expandoTable = _expandoTableLocalService.getTable(
-				expandoColumn.getTableId());
-
-			if (Objects.equals(
-					ExpandoTableConstants.DEFAULT_TABLE_NAME,
-					expandoTable.getName()) &&
-				(expandoTable.getClassNameId() == classNameId)) {
-
-				return true;
-			}
-		}
-		catch (Exception exception) {
-			if (_log.isInfoEnabled()) {
-				_log.info(
-					"Unable to get expando table " +
-						expandoColumn.getTableId());
-			}
-		}
-
-		return false;
-	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		ExpandoColumnModelListener.class);
-
 	private static final List<String> _attributeNames = Arrays.asList(
 		"className", "companyId", "dataType", "displayType", "name",
 		"typeLabel");
 
 	@Reference
-	private ClassNameLocalService _classNameLocalService;
-
-	@Reference
 	private ExpandoColumnLocalService _expandoColumnLocalService;
-
-	@Reference
-	private ExpandoTableLocalService _expandoTableLocalService;
 
 }
