@@ -79,7 +79,7 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 			return;
 		}
 
-		JSONObject jsonObject = serialize(includeAttributeNames, model);
+		JSONObject jsonObject = serialize(model, includeAttributeNames);
 
 		ShardedModel shardedModel = (ShardedModel)model;
 
@@ -278,24 +278,24 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 	}
 
 	protected JSONObject serialize(
-		List<String> includeAttributeNames, BaseModel model) {
+		BaseModel baseModel, List<String> includeAttributeNames) {
 
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
-		Map<String, Object> modelAttributes = model.getModelAttributes();
+		Map<String, Object> modelAttributes = baseModel.getModelAttributes();
 
 		for (String includeAttributeName : includeAttributeNames) {
 			if (includeAttributeName.equals("expando")) {
-				ExpandoBridge expandoBridge = model.getExpandoBridge();
+				ExpandoBridge expandoBridge = baseModel.getExpandoBridge();
 
 				jsonObject.put("expando", expandoBridge.getAttributes(false));
 
 				continue;
 			}
 			else if (includeAttributeName.equals("treePath") &&
-					 (model instanceof TreeModel)) {
+					 (baseModel instanceof TreeModel)) {
 
-				TreeModel treeModel = (TreeModel)model;
+				TreeModel treeModel = (TreeModel)baseModel;
 
 				String treePath = treeModel.getTreePath();
 

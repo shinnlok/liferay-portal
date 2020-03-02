@@ -74,7 +74,7 @@ public class ExpandoRowModelListener
 
 	@Override
 	protected JSONObject serialize(
-		List<String> includeAttributeNames, BaseModel baseModel) {
+		BaseModel baseModel, List<String> includeAttributeNames) {
 
 		ExpandoRow expandoRow = (ExpandoRow)baseModel;
 
@@ -87,14 +87,14 @@ public class ExpandoRowModelListener
 
 			if (organization != null) {
 				return super.serialize(
-					getOrganizationAttributeNames(), organization);
+					organization, getOrganizationAttributeNames());
 			}
 		}
 		else if (isCustomField(User.class.getName(), expandoRow.getTableId())) {
 			User user = userLocalService.fetchUser(expandoRow.getClassPK());
 
 			if (user != null) {
-				return super.serialize(getUserAttributeNames(), user);
+				return super.serialize(user, getUserAttributeNames());
 			}
 		}
 
