@@ -19,6 +19,8 @@ import com.liferay.expando.kernel.model.ExpandoRow;
 import com.liferay.expando.kernel.service.ExpandoRowLocalService;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.ModelListener;
+import com.liferay.portal.kernel.model.Organization;
+import com.liferay.portal.kernel.model.User;
 
 import java.util.Collections;
 import java.util.List;
@@ -48,6 +50,23 @@ public class ExpandoRowModelListener
 	@Override
 	protected String getPrimaryKeyName() {
 		return "userId";
+	}
+
+	@Override
+	protected boolean isExcluded(ExpandoRow expandoRow) {
+		if (isCustomField(
+				Organization.class.getName(), expandoRow.getTableId())) {
+
+			return false;
+		}
+
+		if (isCustomField(User.class.getName(), expandoRow.getTableId())) {
+			User user = userLocalService.fetchUser(expandoRow.getClassPK());
+
+			return super.isUserExcluded(user);
+		}
+
+		return true;
 	}
 
 	@Reference
