@@ -25,7 +25,7 @@ import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.OrganizationLocalService;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 import org.osgi.service.component.annotations.Component;
@@ -42,7 +42,7 @@ public class ExpandoRowModelListener
 
 	@Override
 	public List<String> getAttributeNames() {
-		return Collections.emptyList();
+		return Arrays.asList("modifiedDate");
 	}
 
 	@Override
@@ -52,7 +52,7 @@ public class ExpandoRowModelListener
 
 	@Override
 	protected String getPrimaryKeyName() {
-		return "userId";
+		return "classPK";
 	}
 
 	@Override
