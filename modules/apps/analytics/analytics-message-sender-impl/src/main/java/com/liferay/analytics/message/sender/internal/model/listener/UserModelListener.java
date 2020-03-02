@@ -18,7 +18,6 @@ import com.liferay.analytics.message.sender.model.EntityModelListener;
 import com.liferay.portal.kernel.model.ModelListener;
 import com.liferay.portal.kernel.model.User;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.osgi.service.component.annotations.Component;
@@ -33,7 +32,7 @@ public class UserModelListener extends BaseEntityModelListener<User> {
 
 	@Override
 	public List<String> getAttributeNames() {
-		return _attributeNames;
+		return getUserAttributeNames();
 	}
 
 	@Override
@@ -50,13 +49,5 @@ public class UserModelListener extends BaseEntityModelListener<User> {
 	protected boolean isExcluded(User user) {
 		return super.isUserExcluded(user);
 	}
-
-	private static final List<String> _attributeNames = Arrays.asList(
-		"agreedToTermsOfUse", "comments", "companyId", "contactId",
-		"createDate", "defaultUser", "emailAddress", "emailAddressVerified",
-		"expando", "externalReferenceCode", "facebookId", "firstName",
-		"googleUserId", "greeting", "jobTitle", "languageId", "lastName",
-		"ldapServerId", "memberships", "middleName", "modifiedDate", "openId",
-		"portraitId", "screenName", "status", "timeZoneId", "uuid");
 
 }

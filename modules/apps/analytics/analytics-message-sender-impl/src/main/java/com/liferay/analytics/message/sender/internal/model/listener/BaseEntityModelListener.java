@@ -188,7 +188,15 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 
 	protected abstract T getModel(long id) throws Exception;
 
+	protected List<String> getOrganizationAttributeNames() {
+		return _organizationAttributeNames;
+	}
+
 	protected abstract String getPrimaryKeyName();
+
+	protected List<String> getUserAttributeNames() {
+		return _userAttributeNames;
+	}
 
 	protected boolean isExcluded(T model) {
 		return false;
@@ -554,5 +562,17 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		BaseEntityModelListener.class);
+
+	private static final List<String> _organizationAttributeNames =
+		Arrays.asList(
+			"expando", "modifiedDate", "name", "parentOrganizationId",
+			"treePath", "type");
+	private static final List<String> _userAttributeNames = Arrays.asList(
+		"agreedToTermsOfUse", "comments", "companyId", "contactId",
+		"createDate", "defaultUser", "emailAddress", "emailAddressVerified",
+		"expando", "externalReferenceCode", "facebookId", "firstName",
+		"googleUserId", "greeting", "jobTitle", "languageId", "lastName",
+		"ldapServerId", "memberships", "middleName", "modifiedDate", "openId",
+		"portraitId", "screenName", "status", "timeZoneId", "uuid");
 
 }

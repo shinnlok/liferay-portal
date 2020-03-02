@@ -22,7 +22,6 @@ import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.OrganizationLocalService;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.osgi.service.component.annotations.Component;
@@ -39,7 +38,7 @@ public class OrganizationModelListener
 
 	@Override
 	public List<String> getAttributeNames() {
-		return _attributeNames;
+		return getOrganizationAttributeNames();
 	}
 
 	@Override
@@ -75,10 +74,6 @@ public class OrganizationModelListener
 	protected String getPrimaryKeyName() {
 		return "organizationId";
 	}
-
-	private static final List<String> _attributeNames = Arrays.asList(
-		"expando", "modifiedDate", "name", "parentOrganizationId", "treePath",
-		"type");
 
 	@Reference
 	private OrganizationLocalService _organizationLocalService;
