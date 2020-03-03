@@ -37,6 +37,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.BaseModelListener;
+import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.ShardedModel;
 import com.liferay.portal.kernel.model.TreeModel;
 import com.liferay.portal.kernel.model.User;
@@ -83,9 +84,24 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 
 		ShardedModel shardedModel = (ShardedModel)model;
 
+		String modelClassName = model.getModelClassName();
+
+		if (modelClassName.equals(ExpandoRow.class.getName())) {
+			ExpandoRow expandoRow = (ExpandoRow)model;
+
+			if (isCustomField(
+					Organization.class.getName(), expandoRow.getTableId())) {
+
+				modelClassName = Organization.class.getName();
+			}
+			else {
+				modelClassName = User.class.getName();
+			}
+		}
+
 		try {
 			AnalyticsMessage.Builder analyticsMessageBuilder =
-				AnalyticsMessage.builder(model.getModelClassName());
+				AnalyticsMessage.builder(modelClassName);
 
 			analyticsMessageBuilder.action(eventType);
 			analyticsMessageBuilder.object(jsonObject);
