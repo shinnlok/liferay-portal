@@ -86,15 +86,25 @@ public class ExpandoRowModelListener
 					expandoRow.getClassPK());
 
 			if (organization != null) {
-				return super.serialize(
+				JSONObject jsonObject = super.serialize(
 					organization, getOrganizationAttributeNames());
+
+				jsonObject.remove(getPrimaryKeyName());
+
+				return jsonObject.put(
+					"organizationId", organization.getPrimaryKeyObj());
 			}
 		}
 		else if (isCustomField(User.class.getName(), expandoRow.getTableId())) {
 			User user = userLocalService.fetchUser(expandoRow.getClassPK());
 
 			if (user != null) {
-				return super.serialize(user, getUserAttributeNames());
+				JSONObject jsonObject = super.serialize(
+					user, getUserAttributeNames());
+
+				jsonObject.remove(getPrimaryKeyName());
+
+				return jsonObject.put("userId", user.getPrimaryKeyObj());
 			}
 		}
 
