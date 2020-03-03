@@ -222,7 +222,8 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 			ExpandoTable expandoTable = expandoTableLocalService.getTable(
 				tableId);
 
-			if (ExpandoTableConstants.DEFAULT_TABLE_NAME.equals(
+			if (Objects.equals(
+					ExpandoTableConstants.DEFAULT_TABLE_NAME,
 					expandoTable.getName()) &&
 				(expandoTable.getClassNameId() == classNameId)) {
 
@@ -294,7 +295,7 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 	}
 
 	protected JSONObject serialize(
-		BaseModel baseModel, List<String> includeAttributeNames) {
+		BaseModel<?> baseModel, List<String> includeAttributeNames) {
 
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
@@ -451,7 +452,8 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 		for (String attributeName : attributeNames) {
 			if (attributeName.equalsIgnoreCase("expando") ||
 				attributeName.equalsIgnoreCase("memberships") ||
-				((model.getModelClassName() != ExpandoRow.class.getName()) &&
+				(Objects.equals(
+					model.getModelClassName(), ExpandoRow.class.getName()) &&
 				 attributeName.equalsIgnoreCase("modifiedDate"))) {
 
 				continue;

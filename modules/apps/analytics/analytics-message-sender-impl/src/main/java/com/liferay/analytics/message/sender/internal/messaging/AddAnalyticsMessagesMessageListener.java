@@ -55,7 +55,7 @@ public class AddAnalyticsMessagesMessageListener extends BaseMessageListener {
 		List<? extends BaseModel> baseModels =
 			(List<? extends BaseModel>)message.getPayload();
 
-		for (BaseModel baseModel : baseModels) {
+		for (BaseModel<?> baseModel : baseModels) {
 			entityModelListener.addAnalyticsMessage(
 				"update", entityModelListener.getAttributeNames(), baseModel);
 		}

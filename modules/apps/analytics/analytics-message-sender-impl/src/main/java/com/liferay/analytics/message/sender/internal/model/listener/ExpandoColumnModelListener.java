@@ -120,7 +120,7 @@ public class ExpandoColumnModelListener
 
 	@Override
 	protected JSONObject serialize(
-		BaseModel baseModel, List<String> includeAttributeNames) {
+		BaseModel<?> baseModel, List<String> includeAttributeNames) {
 
 		ExpandoColumn expandoColumn = (ExpandoColumn)baseModel;
 
