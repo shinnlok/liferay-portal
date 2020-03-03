@@ -116,11 +116,13 @@ public class AnalyticsMessageSenderClientImpl
 			httpUriRequest = httpPost;
 		}
 
-		httpUriRequest.setHeader("Content-Type", "application/json");
-		httpUriRequest.setHeader("OSB-Asah-Data-Source-ID", dataSourceId);
-		httpUriRequest.setHeader(
-			"OSB-Asah-Faro-Backend-Security-Signature",
-			faroBackendSecuritySignature);
+		if (httpUriRequest != null) {
+			httpUriRequest.setHeader("Content-Type", "application/json");
+			httpUriRequest.setHeader("OSB-Asah-Data-Source-ID", dataSourceId);
+			httpUriRequest.setHeader(
+				"OSB-Asah-Faro-Backend-Security-Signature",
+				faroBackendSecuritySignature);
+		}
 
 		return httpUriRequest;
 	}
