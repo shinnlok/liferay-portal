@@ -240,6 +240,16 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 	}
 
 	protected boolean isExcluded(T model) {
+		try {
+			ShardedModel shardedModel = (ShardedModel)model;
+
+			analyticsConfigurationTracker.getAnalyticsConfigurationProperties(
+				shardedModel.getCompanyId());
+		}
+		catch (Exception exception) {
+			return true;
+		}
+
 		return false;
 	}
 
