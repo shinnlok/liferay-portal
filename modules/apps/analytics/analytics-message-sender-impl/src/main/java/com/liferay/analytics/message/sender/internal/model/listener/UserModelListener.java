@@ -47,7 +47,7 @@ public class UserModelListener extends BaseEntityModelListener<User> {
 
 	@Override
 	protected boolean isExcluded(User user) {
-		return super.isUserExcluded(user);
+		return isUserExcluded(user);
 	}
 
 }
