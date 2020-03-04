@@ -66,7 +66,7 @@ public class ExpandoRowModelListener
 		if (isCustomField(User.class.getName(), expandoRow.getTableId())) {
 			User user = userLocalService.fetchUser(expandoRow.getClassPK());
 
-			return super.isUserExcluded(user);
+			return isUserExcluded(user);
 		}
 
 		return true;
