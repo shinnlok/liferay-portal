@@ -342,6 +342,7 @@ public class AnalyticsConfigurationTrackerImpl
 			}
 
 			_disableAuthVerifier();
+			_disableEntityModelListeners();
 		}
 		catch (Exception exception) {
 			_log.error(exception, exception);
@@ -357,11 +358,36 @@ public class AnalyticsConfigurationTrackerImpl
 		}
 	}
 
+	private void _disableEntityModelListeners() throws Exception {
+		if (!_hasConfiguration() && _entityModelListenersEnabled) {
+			_entityModelListenersEnabled = false;
+
+			Message message = new Message();
+
+			message.put("command", AnalyticsMessagesProcessorCommand.DISABLE);
+
+			if (_log.isInfoEnabled()) {
+				_log.info("Queueing disabling entity model listeners");
+			}
+
+			TransactionCommitCallbackUtil.registerCallback(
+				() -> {
+					_messageBus.sendMessage(
+						AnalyticsMessagesDestinationNames.
+							ANALYTICS_MESSAGES_PROCESSOR,
+						message);
+
+					return null;
+				});
+		}
+	}
+
 	private void _enable(long companyId) {
 		try {
 			_addAnalyticsAdmin(companyId);
 			_addSAPEntry(companyId);
 			_enableAuthVerifier();
+			_enableEntityModelListeners();
 		}
 		catch (Exception exception) {
 			_log.error(exception, exception);
@@ -374,6 +400,30 @@ public class AnalyticsConfigurationTrackerImpl
 				AnalyticsSecurityAuthVerifier.class.getName());
 
 			_authVerifierEnabled = true;
+		}
+	}
+
+	private void _enableEntityModelListeners() {
+		if (!_entityModelListenersEnabled) {
+			_entityModelListenersEnabled = true;
+
+			Message message = new Message();
+
+			message.put("command", AnalyticsMessagesProcessorCommand.ENABLE);
+
+			if (_log.isInfoEnabled()) {
+				_log.info("Queueing enabling entity model listeners");
+			}
+
+			TransactionCommitCallbackUtil.registerCallback(
+				() -> {
+					_messageBus.sendMessage(
+						AnalyticsMessagesDestinationNames.
+							ANALYTICS_MESSAGES_PROCESSOR,
+						message);
+
+					return null;
+				});
 		}
 	}
 
@@ -571,6 +621,7 @@ public class AnalyticsConfigurationTrackerImpl
 	@Reference
 	private EntityModelListenerRegistry _entityModelListenerRegistry;
 
+	private boolean _entityModelListenersEnabled;
 	private final Set<Long> _initializedCompanyIds = new HashSet<>();
 
 	@Reference
