@@ -35,7 +35,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Rachael Koestartyo
  */
 @Component(
-	immediate = true, service = {EntityModelListener.class, ModelListener.class}
+	enabled = false, service = {EntityModelListener.class, ModelListener.class}
 )
 public class ExpandoRowModelListener
 	extends BaseEntityModelListener<ExpandoRow> {
@@ -66,7 +66,7 @@ public class ExpandoRowModelListener
 		if (isCustomField(User.class.getName(), expandoRow.getTableId())) {
 			User user = userLocalService.fetchUser(expandoRow.getClassPK());
 
-			return super.isUserExcluded(user);
+			return isUserExcluded(user);
 		}
 
 		return true;

@@ -34,7 +34,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Shinn Lok
  */
 @Component(
-	immediate = true, service = {EntityModelListener.class, ModelListener.class}
+	enabled = false, service = {EntityModelListener.class, ModelListener.class}
 )
 public class RoleModelListener extends BaseEntityModelListener<Role> {
 
