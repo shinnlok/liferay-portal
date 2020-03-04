@@ -27,7 +27,8 @@ public interface AnalyticsConfigurationTracker {
 	public AnalyticsConfiguration getAnalyticsConfiguration(String pid);
 
 	public Dictionary<String, Object> getAnalyticsConfigurationProperties(
-		long companyId);
+			long companyId)
+		throws Exception;
 
 	public Map<Long, AnalyticsConfiguration> getAnalyticsConfigurations();
 
