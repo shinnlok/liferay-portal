@@ -55,6 +55,10 @@ public class UserGroupModelListener extends BaseEntityModelListener<UserGroup> {
 	public void onAfterRemove(UserGroup userGroup)
 		throws ModelListenerException {
 
+		if (isExcluded(userGroup)) {
+			return;
+		}
+
 		updateConfigurationProperties(
 			userGroup.getCompanyId(), "syncedUserGroupIds",
 			String.valueOf(userGroup.getUserGroupId()), null);

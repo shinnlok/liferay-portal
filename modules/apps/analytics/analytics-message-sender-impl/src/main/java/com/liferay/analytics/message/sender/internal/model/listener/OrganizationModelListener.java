@@ -55,6 +55,10 @@ public class OrganizationModelListener
 	public void onAfterRemove(Organization organization)
 		throws ModelListenerException {
 
+		if (isExcluded(organization)) {
+			return;
+		}
+
 		updateConfigurationProperties(
 			organization.getCompanyId(), "syncedOrganizationIds",
 			String.valueOf(organization.getOrganizationId()), null);
