@@ -115,7 +115,8 @@ public class AnalyticsConfigurationTrackerImpl
 
 	@Override
 	public Dictionary<String, Object> getAnalyticsConfigurationProperties(
-		long companyId) {
+			long companyId)
+		throws Exception {
 
 		Set<Map.Entry<String, Long>> entries = _pidCompanyIdMapping.entrySet();
 
@@ -130,20 +131,10 @@ public class AnalyticsConfigurationTrackerImpl
 			null
 		);
 
-		try {
-			Configuration configuration = _configurationAdmin.getConfiguration(
-				pid, StringPool.QUESTION);
+		Configuration configuration = _configurationAdmin.getConfiguration(
+			pid, StringPool.QUESTION);
 
-			return configuration.getProperties();
-		}
-		catch (Exception exception) {
-			if (_log.isInfoEnabled()) {
-				_log.info(
-					"Unable to get configuration for company " + companyId);
-			}
-
-			return null;
-		}
+		return configuration.getProperties();
 	}
 
 	@Override
