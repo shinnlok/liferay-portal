@@ -23,6 +23,10 @@ import java.util.Collection;
  */
 public interface EntityModelListenerRegistry {
 
+	public void disableEntityModelListeners();
+
+	public void enableEntityModelListeners();
+
 	public EntityModelListener getEntityModelListener(String className);
 
 	public Collection<EntityModelListener> getEntityModelListeners();
