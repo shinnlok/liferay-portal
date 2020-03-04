@@ -19,6 +19,6 @@ package com.liferay.analytics.message.sender.constants;
  */
 public enum AnalyticsMessagesProcessorCommand {
 
-	ADD, SEND
+	ADD, DISABLE, ENABLE, SEND
 
 }
