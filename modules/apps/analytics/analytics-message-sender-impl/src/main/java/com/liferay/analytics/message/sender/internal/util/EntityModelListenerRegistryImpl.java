@@ -16,25 +16,21 @@ package com.liferay.analytics.message.sender.internal.util;
 
 import com.liferay.analytics.message.sender.model.EntityModelListener;
 import com.liferay.analytics.message.sender.util.EntityModelListenerRegistry;
-import com.liferay.osgi.service.tracker.collections.map.ServiceReferenceMapper;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
-import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.util.ArrayUtil;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
 import java.util.Collection;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
-import org.osgi.service.component.ComponentContext;
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 import org.osgi.service.component.runtime.ServiceComponentRuntime;
 import org.osgi.service.component.runtime.dto.ComponentDescriptionDTO;
 
@@ -57,28 +53,45 @@ public class EntityModelListenerRegistryImpl
 
 	@Override
 	public EntityModelListener getEntityModelListener(String className) {
-		return _serviceTrackerMap.getService(className);
+		return _entityModelListeners.get(className);
 	}
 
 	@Override
 	public Collection<EntityModelListener> getEntityModelListeners() {
-		return _serviceTrackerMap.values();
+		return _entityModelListeners.values();
 	}
 
-	@Activate
-	protected void activate(
-		BundleContext bundleContext, ComponentContext componentContext) {
+	@Reference(
+		cardinality = ReferenceCardinality.MULTIPLE,
+		policy = ReferencePolicy.DYNAMIC,
+		policyOption = ReferencePolicyOption.GREEDY,
+		unbind = "_removeEntityModelListener"
+	)
+	private void _addEntityModelListener(
+		EntityModelListener<?> entityModelListener) {
 
-		_bundleContext = bundleContext;
-
-		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
-			bundleContext, EntityModelListener.class, null,
-			new EntityModelListenerServiceReferenceMapper());
+		_entityModelListeners.put(
+			_getParameterizedClassName(entityModelListener.getClass()),
+			entityModelListener);
 	}
 
-	@Deactivate
-	protected void deactivate() {
-		_serviceTrackerMap.close();
+	private String _getParameterizedClassName(Class<?> clazz) {
+		ParameterizedType parameterizedType =
+			(ParameterizedType)clazz.getGenericSuperclass();
+
+		Type[] types = parameterizedType.getActualTypeArguments();
+
+		Class<?> typeClass = (Class<?>)types[0];
+
+		return typeClass.getName();
+	}
+
+	private void _removeEntityModelListener(
+		EntityModelListener<?> entityModelListener) {
+
+		_entityModelListeners.remove(
+			_getParameterizedClassName(entityModelListener.getClass()),
+			entityModelListener);
 	}
 
 	private void _toggleEntityModelListeners(
@@ -96,45 +109,10 @@ public class EntityModelListenerRegistryImpl
 		}
 	}
 
-	private BundleContext _bundleContext;
+	private final Map<String, EntityModelListener> _entityModelListeners =
+		new ConcurrentHashMap<>();
 
 	@Reference
 	private ServiceComponentRuntime _serviceComponentRuntime;
-
-	private ServiceTrackerMap<String, EntityModelListener> _serviceTrackerMap;
-
-	private class EntityModelListenerServiceReferenceMapper
-		<T extends BaseModel<T>>
-			implements ServiceReferenceMapper<String, EntityModelListener<T>> {
-
-		@Override
-		public void map(
-			ServiceReference<EntityModelListener<T>> serviceReference,
-			Emitter<String> emitter) {
-
-			EntityModelListener entityModelListener = _bundleContext.getService(
-				serviceReference);
-
-			Class<?> clazz = _getParameterizedClass(
-				entityModelListener.getClass());
-
-			try {
-				emitter.emit(clazz.getName());
-			}
-			finally {
-				_bundleContext.ungetService(serviceReference);
-			}
-		}
-
-		private Class<?> _getParameterizedClass(Class<?> clazz) {
-			ParameterizedType parameterizedType =
-				(ParameterizedType)clazz.getGenericSuperclass();
-
-			Type[] types = parameterizedType.getActualTypeArguments();
-
-			return (Class<?>)types[0];
-		}
-
-	}
 
 }
