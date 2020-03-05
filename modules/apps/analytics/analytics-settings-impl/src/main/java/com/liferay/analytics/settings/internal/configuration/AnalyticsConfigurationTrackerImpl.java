@@ -360,25 +360,17 @@ public class AnalyticsConfigurationTrackerImpl
 
 	private void _disableEntityModelListeners() throws Exception {
 		if (!_hasConfiguration() && _entityModelListenersEnabled) {
-			_entityModelListenersEnabled = false;
-
-			Message message = new Message();
-
-			message.put("command", AnalyticsMessagesProcessorCommand.DISABLE);
-
 			if (_log.isInfoEnabled()) {
-				_log.info("Queueing disabling entity model listeners");
+				_log.info("Disabling entity model listeners");
 			}
 
-			TransactionCommitCallbackUtil.registerCallback(
-				() -> {
-					_messageBus.sendMessage(
-						AnalyticsMessagesDestinationNames.
-							ANALYTICS_MESSAGES_PROCESSOR,
-						message);
+			_entityModelListenerRegistry.disableEntityModelListeners();
 
-					return null;
-				});
+			if (_log.isInfoEnabled()) {
+				_log.info("Entity model listeners disabled successfully");
+			}
+
+			_entityModelListenersEnabled = false;
 		}
 	}
 
@@ -405,25 +397,17 @@ public class AnalyticsConfigurationTrackerImpl
 
 	private void _enableEntityModelListeners() {
 		if (!_entityModelListenersEnabled) {
-			_entityModelListenersEnabled = true;
-
-			Message message = new Message();
-
-			message.put("command", AnalyticsMessagesProcessorCommand.ENABLE);
-
 			if (_log.isInfoEnabled()) {
-				_log.info("Queueing enabling entity model listeners");
+				_log.info("Enabling entity model listeners");
 			}
 
-			TransactionCommitCallbackUtil.registerCallback(
-				() -> {
-					_messageBus.sendMessage(
-						AnalyticsMessagesDestinationNames.
-							ANALYTICS_MESSAGES_PROCESSOR,
-						message);
+			_entityModelListenerRegistry.enableEntityModelListeners();
 
-					return null;
-				});
+			if (_log.isInfoEnabled()) {
+				_log.info("Entity model listeners enabled successfully");
+			}
+
+			_entityModelListenersEnabled = true;
 		}
 	}
 
