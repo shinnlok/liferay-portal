@@ -14,28 +14,19 @@
 
 package com.liferay.analytics.message.sender.internal.util;
 
-import com.liferay.analytics.message.sender.internal.model.listener.ContactModelListener;
-import com.liferay.analytics.message.sender.internal.model.listener.ExpandoColumnModelListener;
-import com.liferay.analytics.message.sender.internal.model.listener.ExpandoRowModelListener;
-import com.liferay.analytics.message.sender.internal.model.listener.GroupModelListener;
-import com.liferay.analytics.message.sender.internal.model.listener.OrganizationModelListener;
-import com.liferay.analytics.message.sender.internal.model.listener.RoleModelListener;
-import com.liferay.analytics.message.sender.internal.model.listener.TeamModelListener;
-import com.liferay.analytics.message.sender.internal.model.listener.UserGroupModelListener;
-import com.liferay.analytics.message.sender.internal.model.listener.UserModelListener;
 import com.liferay.analytics.message.sender.model.EntityModelListener;
 import com.liferay.analytics.message.sender.util.EntityModelListenerRegistry;
 import com.liferay.osgi.service.tracker.collections.map.ServiceReferenceMapper;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.portal.kernel.model.BaseModel;
+import com.liferay.portal.kernel.util.ArrayUtil;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
+import java.util.function.Function;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -43,6 +34,9 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.runtime.ServiceComponentRuntime;
+import org.osgi.service.component.runtime.dto.ComponentDescriptionDTO;
 
 /**
  * @author Rachael Koestartyo
@@ -53,16 +47,12 @@ public class EntityModelListenerRegistryImpl
 
 	@Override
 	public void disableEntityModelListeners() {
-		for (String className : _entityModelListenersClassNames) {
-			_componentContext.disableComponent(className);
-		}
+		_toggleEntityModelListeners(_serviceComponentRuntime::disableComponent);
 	}
 
 	@Override
 	public void enableEntityModelListeners() {
-		for (String className : _entityModelListenersClassNames) {
-			_componentContext.enableComponent(className);
-		}
+		_toggleEntityModelListeners(_serviceComponentRuntime::enableComponent);
 	}
 
 	@Override
@@ -80,7 +70,6 @@ public class EntityModelListenerRegistryImpl
 		BundleContext bundleContext, ComponentContext componentContext) {
 
 		_bundleContext = bundleContext;
-		_componentContext = componentContext;
 
 		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
 			bundleContext, EntityModelListener.class, null,
@@ -92,20 +81,26 @@ public class EntityModelListenerRegistryImpl
 		_serviceTrackerMap.close();
 	}
 
-	private static final List<String> _entityModelListenersClassNames =
-		Arrays.asList(
-			ContactModelListener.class.getName(),
-			ExpandoColumnModelListener.class.getName(),
-			ExpandoRowModelListener.class.getName(),
-			GroupModelListener.class.getName(),
-			OrganizationModelListener.class.getName(),
-			RoleModelListener.class.getName(),
-			TeamModelListener.class.getName(),
-			UserGroupModelListener.class.getName(),
-			UserModelListener.class.getName());
+	private void _toggleEntityModelListeners(
+		Function<ComponentDescriptionDTO, Object> function) {
+
+		for (ComponentDescriptionDTO componentDescriptionDTO :
+				_serviceComponentRuntime.getComponentDescriptionDTOs()) {
+
+			if (ArrayUtil.contains(
+					componentDescriptionDTO.serviceInterfaces,
+					EntityModelListener.class.getName())) {
+
+				function.apply(componentDescriptionDTO);
+			}
+		}
+	}
 
 	private BundleContext _bundleContext;
-	private ComponentContext _componentContext;
+
+	@Reference
+	private ServiceComponentRuntime _serviceComponentRuntime;
+
 	private ServiceTrackerMap<String, EntityModelListener> _serviceTrackerMap;
 
 	private class EntityModelListenerServiceReferenceMapper
