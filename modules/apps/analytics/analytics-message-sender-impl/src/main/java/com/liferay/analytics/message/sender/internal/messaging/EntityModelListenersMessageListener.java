@@ -49,26 +49,26 @@ public class EntityModelListenersMessageListener extends BaseMessageListener {
 				AnalyticsMessagesProcessorCommand.DISABLE) {
 
 			if (_log.isInfoEnabled()) {
-				_log.info("Disabling entity model listeners...");
+				_log.info("Disabling entity model listeners");
 			}
 
 			_entityModelListenerRegistry.disableEntityModelListeners();
 
 			if (_log.isInfoEnabled()) {
-				_log.info("Entity model listeners were disabled successfully");
+				_log.info("Entity model listeners disabled successfully");
 			}
 		}
 		else if (analyticsMessagesProcessorCommand ==
 					AnalyticsMessagesProcessorCommand.ENABLE) {
 
 			if (_log.isInfoEnabled()) {
-				_log.info("Enabling entity model listeners...");
+				_log.info("Enabling entity model listeners");
 			}
 
 			_entityModelListenerRegistry.enableEntityModelListeners();
 
 			if (_log.isInfoEnabled()) {
-				_log.info("Entity model listeners were enabled successfully");
+				_log.info("Entity model listeners enabled successfully");
 			}
 		}
 	}
