@@ -87,7 +87,8 @@ public class ExpandoRowModelListener
 
 			if (organization != null) {
 				JSONObject jsonObject = super.serialize(
-					organization, getOrganizationAttributeNames());
+					organization,
+					_organizationModelListener.getAttributeNames());
 
 				jsonObject.remove(getPrimaryKeyName());
 
@@ -100,7 +101,7 @@ public class ExpandoRowModelListener
 
 			if (user != null) {
 				JSONObject jsonObject = super.serialize(
-					user, getUserAttributeNames());
+					user, _contactModelListener.getAttributeNames());
 
 				jsonObject.remove(getPrimaryKeyName());
 
@@ -112,9 +113,15 @@ public class ExpandoRowModelListener
 	}
 
 	@Reference
+	private ContactModelListener _contactModelListener;
+
+	@Reference
 	private ExpandoRowLocalService _expandoRowLocalService;
 
 	@Reference
 	private OrganizationLocalService _organizationLocalService;
+
+	@Reference
+	private OrganizationModelListener _organizationModelListener;
 
 }
