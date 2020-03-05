@@ -85,12 +85,18 @@ public class AnalyticsConfigurationTrackerImpl
 
 	@Override
 	public void deleted(String pid) {
-		long companyId = getCompanyId(pid);
+		Thread thread = new Thread(() -> {
+			long companyId = getCompanyId(pid);
 
-		_unmapPid(pid);
+			_unmapPid(pid);
 
-		_disable(companyId);
-	}
+			_disable(companyId);
+		});
+
+		thread.setDaemon(true);
+
+		thread.start();
+	};
 
 	@Override
 	public AnalyticsConfiguration getAnalyticsConfiguration(long companyId) {
@@ -151,40 +157,46 @@ public class AnalyticsConfigurationTrackerImpl
 
 	@Override
 	public void updated(String pid, Dictionary<String, ?> dictionary) {
-		_unmapPid(pid);
+		Thread thread = new Thread(() -> {
+			_unmapPid(pid);
 
-		long companyId = GetterUtil.getLong(
-			dictionary.get("companyId"), CompanyConstants.SYSTEM);
+			long companyId = GetterUtil.getLong(
+				dictionary.get("companyId"), CompanyConstants.SYSTEM);
 
-		if (companyId != CompanyConstants.SYSTEM) {
-			_pidCompanyIdMapping.put(pid, companyId);
+			if (companyId != CompanyConstants.SYSTEM) {
+				_pidCompanyIdMapping.put(pid, companyId);
 
-			_analyticsConfigurations.put(
-				companyId,
-				ConfigurableUtil.createConfigurable(
-					AnalyticsConfiguration.class, dictionary));
-		}
-
-		if (!_initializedCompanyIds.contains(companyId)) {
-			_initializedCompanyIds.add(companyId);
-
-			if (Validator.isNotNull(dictionary.get("previousToken"))) {
-				return;
-			}
-		}
-
-		if (Validator.isNull(dictionary.get("token"))) {
-			if (Validator.isNotNull(dictionary.get("previousToken"))) {
-				_disable((Long)dictionary.get("companyId"));
-			}
-		}
-		else {
-			if (Validator.isNull(dictionary.get("previousToken"))) {
-				_enable((Long)dictionary.get("companyId"));
+				_analyticsConfigurations.put(
+					companyId,
+					ConfigurableUtil.createConfigurable(
+						AnalyticsConfiguration.class, dictionary));
 			}
 
-			_sync(dictionary);
-		}
+			if (!_initializedCompanyIds.contains(companyId)) {
+				_initializedCompanyIds.add(companyId);
+
+				if (Validator.isNotNull(dictionary.get("previousToken"))) {
+					return;
+				}
+			}
+
+			if (Validator.isNull(dictionary.get("token"))) {
+				if (Validator.isNotNull(dictionary.get("previousToken"))) {
+					_disable((Long)dictionary.get("companyId"));
+				}
+			}
+			else {
+				if (Validator.isNull(dictionary.get("previousToken"))) {
+					_enable((Long)dictionary.get("companyId"));
+				}
+
+				_sync(dictionary);
+			}
+		});
+
+		thread.setDaemon(true);
+
+		thread.start();
 	}
 
 	@Activate
