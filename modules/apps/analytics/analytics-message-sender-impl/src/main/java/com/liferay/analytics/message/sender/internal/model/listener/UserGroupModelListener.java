@@ -32,7 +32,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Rachael Koestartyo
  */
 @Component(
-	immediate = true, service = {EntityModelListener.class, ModelListener.class}
+	enabled = false, service = {EntityModelListener.class, ModelListener.class}
 )
 public class UserGroupModelListener extends BaseEntityModelListener<UserGroup> {
 
@@ -54,6 +54,10 @@ public class UserGroupModelListener extends BaseEntityModelListener<UserGroup> {
 	@Override
 	public void onAfterRemove(UserGroup userGroup)
 		throws ModelListenerException {
+
+		if (isExcluded(userGroup)) {
+			return;
+		}
 
 		updateConfigurationProperties(
 			userGroup.getCompanyId(), "syncedUserGroupIds",

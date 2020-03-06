@@ -31,7 +31,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Rachael Koestartyo
  */
 @Component(
-	immediate = true, service = {EntityModelListener.class, ModelListener.class}
+	enabled = false, service = {EntityModelListener.class, ModelListener.class}
 )
 public class OrganizationModelListener
 	extends BaseEntityModelListener<Organization> {
@@ -54,6 +54,10 @@ public class OrganizationModelListener
 	@Override
 	public void onAfterRemove(Organization organization)
 		throws ModelListenerException {
+
+		if (isExcluded(organization)) {
+			return;
+		}
 
 		updateConfigurationProperties(
 			organization.getCompanyId(), "syncedOrganizationIds",

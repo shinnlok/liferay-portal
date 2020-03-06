@@ -85,13 +85,9 @@ public class AnalyticsConfigurationTrackerImpl
 
 	@Override
 	public void deleted(String pid) {
-		_unmapPid(pid);
-
 		long companyId = getCompanyId(pid);
 
-		if (companyId == CompanyConstants.SYSTEM) {
-			return;
-		}
+		_unmapPid(pid);
 
 		_disable(companyId);
 	}
@@ -115,7 +111,8 @@ public class AnalyticsConfigurationTrackerImpl
 
 	@Override
 	public Dictionary<String, Object> getAnalyticsConfigurationProperties(
-		long companyId) {
+			long companyId)
+		throws Exception {
 
 		Set<Map.Entry<String, Long>> entries = _pidCompanyIdMapping.entrySet();
 
@@ -130,20 +127,10 @@ public class AnalyticsConfigurationTrackerImpl
 			null
 		);
 
-		try {
-			Configuration configuration = _configurationAdmin.getConfiguration(
-				pid, StringPool.QUESTION);
+		Configuration configuration = _configurationAdmin.getConfiguration(
+			pid, StringPool.QUESTION);
 
-			return configuration.getProperties();
-		}
-		catch (Exception exception) {
-			if (_log.isInfoEnabled()) {
-				_log.info(
-					"Unable to get configuration for company " + companyId);
-			}
-
-			return null;
-		}
+		return configuration.getProperties();
 	}
 
 	@Override
@@ -346,11 +333,16 @@ public class AnalyticsConfigurationTrackerImpl
 
 	private void _disable(long companyId) {
 		try {
-			_analyticsMessageLocalService.deleteAnalyticsMessages(companyId);
+			if (companyId != CompanyConstants.SYSTEM) {
+				_analyticsMessageLocalService.deleteAnalyticsMessages(
+					companyId);
 
-			_deleteAnalyticsAdmin(companyId);
-			_deleteSAPEntry(companyId);
+				_deleteAnalyticsAdmin(companyId);
+				_deleteSAPEntry(companyId);
+			}
+
 			_disableAuthVerifier();
+			_disableEntityModelListeners();
 		}
 		catch (Exception exception) {
 			_log.error(exception, exception);
@@ -366,11 +358,36 @@ public class AnalyticsConfigurationTrackerImpl
 		}
 	}
 
+	private void _disableEntityModelListeners() throws Exception {
+		if (!_hasConfiguration() && _entityModelListenersEnabled) {
+			_entityModelListenersEnabled = false;
+
+			Message message = new Message();
+
+			message.put("command", AnalyticsMessagesProcessorCommand.DISABLE);
+
+			if (_log.isInfoEnabled()) {
+				_log.info("Queueing disabling entity model listeners");
+			}
+
+			TransactionCommitCallbackUtil.registerCallback(
+				() -> {
+					_messageBus.sendMessage(
+						AnalyticsMessagesDestinationNames.
+							ANALYTICS_MESSAGES_PROCESSOR,
+						message);
+
+					return null;
+				});
+		}
+	}
+
 	private void _enable(long companyId) {
 		try {
 			_addAnalyticsAdmin(companyId);
 			_addSAPEntry(companyId);
 			_enableAuthVerifier();
+			_enableEntityModelListeners();
 		}
 		catch (Exception exception) {
 			_log.error(exception, exception);
@@ -383,6 +400,30 @@ public class AnalyticsConfigurationTrackerImpl
 				AnalyticsSecurityAuthVerifier.class.getName());
 
 			_authVerifierEnabled = true;
+		}
+	}
+
+	private void _enableEntityModelListeners() {
+		if (!_entityModelListenersEnabled) {
+			_entityModelListenersEnabled = true;
+
+			Message message = new Message();
+
+			message.put("command", AnalyticsMessagesProcessorCommand.ENABLE);
+
+			if (_log.isInfoEnabled()) {
+				_log.info("Queueing enabling entity model listeners");
+			}
+
+			TransactionCommitCallbackUtil.registerCallback(
+				() -> {
+					_messageBus.sendMessage(
+						AnalyticsMessagesDestinationNames.
+							ANALYTICS_MESSAGES_PROCESSOR,
+						message);
+
+					return null;
+				});
 		}
 	}
 
@@ -580,6 +621,7 @@ public class AnalyticsConfigurationTrackerImpl
 	@Reference
 	private EntityModelListenerRegistry _entityModelListenerRegistry;
 
+	private boolean _entityModelListenersEnabled;
 	private final Set<Long> _initializedCompanyIds = new HashSet<>();
 
 	@Reference

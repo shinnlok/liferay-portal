@@ -240,6 +240,16 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 	}
 
 	protected boolean isExcluded(T model) {
+		try {
+			ShardedModel shardedModel = (ShardedModel)model;
+
+			analyticsConfigurationTracker.getAnalyticsConfigurationProperties(
+				shardedModel.getCompanyId());
+		}
+		catch (Exception exception) {
+			return true;
+		}
+
 		return false;
 	}
 
@@ -355,9 +365,21 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 		long companyId, String configurationPropertyName, String modelId,
 		String preferencePropertyName) {
 
-		Dictionary<String, Object> configurationProperties =
-			analyticsConfigurationTracker.getAnalyticsConfigurationProperties(
-				companyId);
+		Dictionary<String, Object> configurationProperties = null;
+
+		try {
+			configurationProperties =
+				analyticsConfigurationTracker.
+					getAnalyticsConfigurationProperties(companyId);
+		}
+		catch (Exception exception) {
+			if (_log.isInfoEnabled()) {
+				_log.info(
+					"Unable to get configuration for company " + companyId);
+			}
+
+			return;
+		}
 
 		if (configurationProperties == null) {
 			return;
