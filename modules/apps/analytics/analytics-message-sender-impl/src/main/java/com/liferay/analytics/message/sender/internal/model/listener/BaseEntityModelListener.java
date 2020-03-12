@@ -138,6 +138,10 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 			Object associationClassPK)
 		throws ModelListenerException {
 
+		if (!analyticsConfigurationTracker.isActive()) {
+			return;
+		}
+
 		_onAfterUpdateAssociation(
 			classPK, associationClassName, associationClassPK,
 			"addAssociation");
@@ -145,6 +149,10 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 
 	@Override
 	public void onAfterCreate(T model) throws ModelListenerException {
+		if (!analyticsConfigurationTracker.isActive()) {
+			return;
+		}
+
 		addAnalyticsMessage("add", getAttributeNames(), model);
 	}
 
@@ -154,6 +162,10 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 			Object associationClassPK)
 		throws ModelListenerException {
 
+		if (!analyticsConfigurationTracker.isActive()) {
+			return;
+		}
+
 		_onAfterUpdateAssociation(
 			classPK, associationClassName, associationClassPK,
 			"deleteAssociation");
@@ -161,11 +173,19 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 
 	@Override
 	public void onBeforeRemove(T model) throws ModelListenerException {
+		if (!analyticsConfigurationTracker.isActive()) {
+			return;
+		}
+
 		addAnalyticsMessage("delete", new ArrayList<>(), model);
 	}
 
 	@Override
 	public void onBeforeUpdate(T model) throws ModelListenerException {
+		if (!analyticsConfigurationTracker.isActive()) {
+			return;
+		}
+
 		try {
 			List<String> modifiedAttributeNames = _getModifiedAttributeNames(
 				getAttributeNames(), model,

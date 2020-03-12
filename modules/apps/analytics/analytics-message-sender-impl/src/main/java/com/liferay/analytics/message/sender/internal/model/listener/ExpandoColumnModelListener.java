@@ -58,6 +58,10 @@ public class ExpandoColumnModelListener
 	public void onBeforeUpdate(ExpandoColumn expandoColumn)
 		throws ModelListenerException {
 
+		if (!analyticsConfigurationTracker.isActive()) {
+			return;
+		}
+
 		ExpandoColumn oldExpandoColumn =
 			_expandoColumnLocalService.fetchExpandoColumn(
 				expandoColumn.getColumnId());
