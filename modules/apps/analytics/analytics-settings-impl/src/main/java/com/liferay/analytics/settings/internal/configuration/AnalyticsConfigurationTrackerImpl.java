@@ -150,6 +150,24 @@ public class AnalyticsConfigurationTrackerImpl
 	}
 
 	@Override
+	public boolean isActive() {
+		try {
+			if (!_active && _hasConfiguration()) {
+				_active = true;
+			}
+		}
+		catch (Exception exception) {
+			if (_log.isInfoEnabled()) {
+				_log.info("Unable to check analytics configurations");
+			}
+
+			return false;
+		}
+
+		return _active;
+	}
+
+	@Override
 	public void updated(String pid, Dictionary<String, ?> dictionary) {
 		_unmapPid(pid);
 

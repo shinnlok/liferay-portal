@@ -34,4 +34,6 @@ public interface AnalyticsConfigurationTracker {
 
 	public long getCompanyId(String pid);
 
+	public boolean isActive();
+
 }
