@@ -19,6 +19,7 @@ import com.liferay.analytics.message.sender.constants.AnalyticsMessagesDestinati
 import com.liferay.analytics.message.sender.constants.AnalyticsMessagesProcessorCommand;
 import com.liferay.analytics.message.storage.model.AnalyticsMessage;
 import com.liferay.analytics.message.storage.service.AnalyticsMessageLocalService;
+import com.liferay.analytics.settings.configuration.AnalyticsConfigurationTracker;
 import com.liferay.petra.io.StreamUtil;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -80,6 +81,10 @@ public class SendAnalyticsMessagesMessageListener extends BaseMessageListener {
 
 	@Override
 	protected void doReceive(Message message) throws Exception {
+		if (!_analyticsConfigurationTracker.isActive()) {
+			return;
+		}
+
 		AnalyticsMessagesProcessorCommand analyticsMessagesProcessorCommand =
 			(AnalyticsMessagesProcessorCommand)message.get("command");
 
@@ -167,6 +172,9 @@ public class SendAnalyticsMessagesMessageListener extends BaseMessageListener {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		SendAnalyticsMessagesMessageListener.class);
+
+	@Reference
+	private AnalyticsConfigurationTracker _analyticsConfigurationTracker;
 
 	@Reference
 	private AnalyticsMessageLocalService _analyticsMessageLocalService;
