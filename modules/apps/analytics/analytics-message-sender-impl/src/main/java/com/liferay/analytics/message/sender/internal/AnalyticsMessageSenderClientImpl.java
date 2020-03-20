@@ -159,7 +159,8 @@ public class AnalyticsMessageSenderClientImpl
 			if (_log.isWarnEnabled()) {
 				_log.warn(
 					"Unable to remove analytics preferences for company " +
-						companyId);
+						companyId,
+					exception);
 			}
 		}
 
@@ -171,7 +172,8 @@ public class AnalyticsMessageSenderClientImpl
 			if (_log.isWarnEnabled()) {
 				_log.warn(
 					"Unable to remove analytics configuration for company " +
-						companyId);
+						companyId,
+					exception);
 			}
 		}
 	}

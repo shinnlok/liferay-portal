@@ -130,6 +130,10 @@ public class AnalyticsConfigurationTrackerImpl
 			null
 		);
 
+		if (pid == null) {
+			return null;
+		}
+
 		try {
 			Configuration configuration = _configurationAdmin.getConfiguration(
 				pid, StringPool.QUESTION);
@@ -139,7 +143,8 @@ public class AnalyticsConfigurationTrackerImpl
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
 				_log.warn(
-					"Unable to get configuration for company " + companyId);
+					"Unable to get configuration for company " + companyId,
+					exception);
 			}
 		}
 
@@ -420,7 +425,7 @@ public class AnalyticsConfigurationTrackerImpl
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn("Unable to list analytics configurations");
+				_log.warn("Unable to list analytics configurations", exception);
 			}
 		}
 
@@ -537,10 +542,11 @@ public class AnalyticsConfigurationTrackerImpl
 					_addUsersAnalyticsMessages(users);
 				}
 				catch (Exception exception) {
-					if (_log.isInfoEnabled()) {
-						_log.info(
+					if (_log.isWarnEnabled()) {
+						_log.warn(
 							"Unable to get organization users for " +
-								"organization " + organizationId);
+								"organization " + organizationId,
+							exception);
 					}
 				}
 			}

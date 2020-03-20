@@ -246,8 +246,8 @@ public abstract class BaseAnalyticsMVCActionCommand
 			}
 		}
 		catch (Exception exception) {
-			if (_log.isInfoEnabled()) {
-				_log.info("Analytics configuration not found");
+			if (_log.isWarnEnabled()) {
+				_log.warn("Analytics configuration not found", exception);
 			}
 
 			return;
