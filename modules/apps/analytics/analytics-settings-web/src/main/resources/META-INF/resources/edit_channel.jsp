@@ -50,8 +50,8 @@ PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(resourceBundle, "
 </div>
 
 <aui:form action="<%= editChannelURL %>" method="post" name="fm">
-	<aui:input name="channelId" type="hidden" value="<%= channelId %>" />
 	<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
+	<aui:input name="channelId" type="hidden" value="<%= channelId %>" />
 
 	<div class="portlet-analytics-settings sheet sheet-lg">
 		<h2 class="autofit-row">
