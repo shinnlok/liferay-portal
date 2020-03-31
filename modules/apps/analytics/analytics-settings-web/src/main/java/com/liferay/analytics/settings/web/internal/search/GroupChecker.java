@@ -16,7 +16,7 @@ package com.liferay.analytics.settings.web.internal.search;
 
 import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.model.Group;
-import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.util.StringUtil;
 
 import java.util.Objects;
 import java.util.Set;
@@ -31,19 +31,23 @@ import javax.servlet.http.HttpServletRequest;
 public class GroupChecker extends EmptyOnClickRowChecker {
 
 	public GroupChecker(
-		RenderResponse renderResponse, String channelId, Set<String> ids) {
+		RenderResponse renderResponse, String channelId, Set<String> ids,
+		String mvcRenderCommandName) {
 
 		super(renderResponse);
 
 		_channelId = channelId;
 		_ids = ids;
+		_mvcRenderCommandName = mvcRenderCommandName;
 	}
 
 	@Override
 	public boolean isChecked(Object obj) {
 		Group group = (Group)obj;
 
-		if (Validator.isNull(_channelId)) {
+		if (StringUtil.equalsIgnoreCase(
+				_mvcRenderCommandName, "/analytics/edit_synced_sites")) {
+
 			return _ids.contains(String.valueOf(group.getGroupId()));
 		}
 
@@ -57,7 +61,9 @@ public class GroupChecker extends EmptyOnClickRowChecker {
 		boolean disabled, String name, String value, String checkBoxRowIds,
 		String checkBoxAllRowIds, String checkBoxPostOnClick) {
 
-		if (Validator.isNull(_channelId)) {
+		if (StringUtil.equalsIgnoreCase(
+				_mvcRenderCommandName, "/analytics/edit_synced_sites")) {
+
 			return super.getRowCheckBox(
 				httpServletRequest, checked, disabled, name, value,
 				checkBoxRowIds, checkBoxAllRowIds, checkBoxPostOnClick);
@@ -74,5 +80,6 @@ public class GroupChecker extends EmptyOnClickRowChecker {
 
 	private final String _channelId;
 	private final Set<String> _ids;
+	private final String _mvcRenderCommandName;
 
 }

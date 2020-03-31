@@ -113,8 +113,8 @@ public class GroupDisplayContext {
 			groupSearch.setRowChecker(
 				new GroupChecker(
 					_renderResponse, null,
-					SetUtil.fromArray(
-						_analyticsConfiguration.syncedGroupIds())));
+					SetUtil.fromArray(_analyticsConfiguration.syncedGroupIds()),
+					_mvcRenderCommandName));
 		}
 		else {
 			_fetchChannelNames(groups);
@@ -123,7 +123,7 @@ public class GroupDisplayContext {
 				new GroupChecker(
 					_renderResponse,
 					ParamUtil.getString(_renderRequest, "channelId"),
-					_getDisabledGroupIds()));
+					_getDisabledGroupIds(), _mvcRenderCommandName));
 		}
 
 		int total = GroupServiceUtil.searchCount(
