@@ -41,6 +41,7 @@ import com.liferay.portal.kernel.util.comparator.GroupNameComparator;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -241,7 +242,20 @@ public class GroupDisplayContext {
 			return Collections.emptySet();
 		}
 
-		return _channelNames.keySet();
+		Set<String> disabledGroupIds = new HashSet<>();
+
+		for (Map.Entry<String, String> entry : _channelNames.entrySet()) {
+			if (Objects.equals(
+					entry.getValue(),
+					ParamUtil.getString(_renderRequest, "channelName"))) {
+
+				continue;
+			}
+
+			disabledGroupIds.add(entry.getKey());
+		}
+
+		return disabledGroupIds;
 	}
 
 	private LinkedHashMap<String, Object> _getGroupParams() {
