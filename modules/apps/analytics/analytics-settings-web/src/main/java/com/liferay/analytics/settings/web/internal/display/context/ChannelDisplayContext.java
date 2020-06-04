@@ -14,8 +14,6 @@
 
 package com.liferay.analytics.settings.web.internal.display.context;
 
-import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
-import com.liferay.analytics.settings.web.internal.constants.AnalyticsSettingsWebKeys;
 import com.liferay.analytics.settings.web.internal.model.Channel;
 import com.liferay.analytics.settings.web.internal.search.ChannelSearch;
 import com.liferay.analytics.settings.web.internal.util.AnalyticsSettingsUtil;
@@ -52,9 +50,6 @@ public class ChannelDisplayContext {
 	public ChannelDisplayContext(
 		RenderRequest renderRequest, RenderResponse renderResponse) {
 
-		_analyticsConfiguration =
-			(AnalyticsConfiguration)renderRequest.getAttribute(
-				AnalyticsSettingsWebKeys.ANALYTICS_CONFIGURATION);
 		_renderRequest = renderRequest;
 		_renderResponse = renderResponse;
 	}
@@ -155,7 +150,6 @@ public class ChannelDisplayContext {
 	private static final Log _log = LogFactoryUtil.getLog(
 		ChannelDisplayContext.class);
 
-	private final AnalyticsConfiguration _analyticsConfiguration;
 	private String _keywords;
 	private final RenderRequest _renderRequest;
 	private final RenderResponse _renderResponse;
