@@ -60,6 +60,15 @@ public class ChannelDisplayContext {
 	}
 
 	public ChannelSearch getChannelSearch() {
+		ThemeDisplay themeDisplay = (ThemeDisplay)_renderRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		if (!AnalyticsSettingsUtil.isAnalyticsEnabled(
+				themeDisplay.getCompanyId())) {
+
+			return null;
+		}
+
 		try {
 			ChannelSearch channelSearch = new ChannelSearch(
 				_renderRequest, getPortletURL());
