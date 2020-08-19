@@ -43,6 +43,11 @@ import javax.portlet.RenderResponse;
  */
 public class FieldDisplayContext {
 
+	public static final List<String> requiredContactFieldNames = Arrays.asList(
+		"classPK", "contactId", "createDate", "emailAddress", "modifiedDate");
+	public static final List<String> requiredUserFieldNames = Arrays.asList(
+		"createDate", "emailAddress", "modifiedDate", "userId", "uuid");
+
 	public FieldDisplayContext(
 		String mvcRenderCommandName, RenderRequest renderRequest,
 		RenderResponse renderResponse) {
@@ -74,7 +79,7 @@ public class FieldDisplayContext {
 				_mvcRenderCommandName,
 				"/analytics_settings/edit_synced_contacts_fields")) {
 
-			for (String fieldName : _requiredContactFieldNames) {
+			for (String fieldName : requiredContactFieldNames) {
 				fields.add(
 					new Field(
 						"Default Field", _contactFieldNames.get(fieldName),
@@ -84,7 +89,7 @@ public class FieldDisplayContext {
 			for (Map.Entry<String, String> entry :
 					_contactFieldNames.entrySet()) {
 
-				if (_requiredContactFieldNames.contains(entry.getKey())) {
+				if (requiredContactFieldNames.contains(entry.getKey())) {
 					continue;
 				}
 
@@ -96,17 +101,17 @@ public class FieldDisplayContext {
 			fieldSearch.setRowChecker(
 				new FieldChecker(
 					_mvcRenderCommandName, _renderResponse,
-					SetUtil.fromList(_requiredContactFieldNames),
+					SetUtil.fromList(requiredContactFieldNames),
 					SetUtil.fromArray(
 						_analyticsConfiguration.syncedContactFieldNames())));
 			fieldSearch.setTotal(
-				_contactFieldNames.size() - _requiredContactFieldNames.size());
+				_contactFieldNames.size() - requiredContactFieldNames.size());
 		}
 		else if (StringUtil.equalsIgnoreCase(
 					_mvcRenderCommandName,
 					"/analytics_settings/edit_synced_users_fields")) {
 
-			for (String fieldName : _requiredUserFieldNames) {
+			for (String fieldName : requiredUserFieldNames) {
 				fields.add(
 					new Field(
 						"Default Field", _userFieldNames.get(fieldName),
@@ -114,7 +119,7 @@ public class FieldDisplayContext {
 			}
 
 			for (Map.Entry<String, String> entry : _userFieldNames.entrySet()) {
-				if (_requiredUserFieldNames.contains(entry.getKey())) {
+				if (requiredUserFieldNames.contains(entry.getKey())) {
 					continue;
 				}
 
@@ -137,12 +142,12 @@ public class FieldDisplayContext {
 			fieldSearch.setRowChecker(
 				new FieldChecker(
 					_mvcRenderCommandName, _renderResponse,
-					SetUtil.fromList(_requiredUserFieldNames),
+					SetUtil.fromList(requiredUserFieldNames),
 					SetUtil.fromArray(
 						_analyticsConfiguration.syncedUserFieldNames())));
 			fieldSearch.setTotal(
 				_userFieldNames.size() + userCustomFieldNames.size() -
-					_requiredUserFieldNames.size());
+					requiredUserFieldNames.size());
 		}
 
 		fieldSearch.setResults(fields);
@@ -268,12 +273,6 @@ public class FieldDisplayContext {
 		).put(
 			"twitterSn", "String"
 		).build();
-	private static final List<String> _requiredContactFieldNames =
-		Arrays.asList(
-			"classPK", "contactId", "createDate", "emailAddress",
-			"modifiedDate");
-	private static final List<String> _requiredUserFieldNames = Arrays.asList(
-		"createDate", "emailAddress", "modifiedDate", "userId", "uuid");
 	private static final Map<String, String> _userFieldNames =
 		TreeMapBuilder.put(
 			"agreedToTermsOfUse", "Boolean"
