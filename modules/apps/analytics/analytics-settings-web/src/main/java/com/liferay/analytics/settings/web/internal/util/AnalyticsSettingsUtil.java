@@ -121,6 +121,11 @@ public class AnalyticsSettingsUtil {
 			companyId, "liferayAnalyticsFaroBackendURL");
 	}
 
+	public static String getConnectionType(long companyId) {
+		return PrefsPropsUtil.getString(
+			companyId, "liferayAnalyticsConnectionType");
+	}
+
 	public static boolean isAnalyticsEnabled(long companyId) {
 		if (Validator.isNull(getAsahFaroBackendDataSourceId(companyId)) ||
 			Validator.isNull(getAsahFaroBackendSecuritySignature(companyId)) ||

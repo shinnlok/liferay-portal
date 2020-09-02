@@ -76,15 +76,30 @@ public class EditWorkspaceConnectionMVCActionCommand
 
 		if (Objects.equals(cmd, "disconnect")) {
 			_disconnect(actionRequest, configurationProperties);
+
+			return;
 		}
-		else {
-			_connect(actionRequest, configurationProperties);
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		long companyId = themeDisplay.getCompanyId();
+
+		boolean upgrade = false;
+
+		if (AnalyticsSettingsUtil.isAnalyticsEnabled(companyId) &&
+			Validator.isBlank(
+				AnalyticsSettingsUtil.getConnectionType(companyId))) {
+
+			upgrade = true;
 		}
+
+		_connect(actionRequest, configurationProperties, upgrade);
 	}
 
 	private void _connect(
 			ActionRequest actionRequest,
-			Dictionary<String, Object> configurationProperties)
+			Dictionary<String, Object> configurationProperties, boolean upgrade)
 		throws Exception {
 
 		String dataSourceConnectionJSON = _connectDataSource(
@@ -92,7 +107,8 @@ public class EditWorkspaceConnectionMVCActionCommand
 
 		_updateCompanyPreferences(actionRequest, dataSourceConnectionJSON);
 		_updateConfigurationProperties(
-			actionRequest, configurationProperties, dataSourceConnectionJSON);
+			actionRequest, configurationProperties, dataSourceConnectionJSON,
+			upgrade);
 	}
 
 	private String _connectDataSource(
@@ -240,7 +256,7 @@ public class EditWorkspaceConnectionMVCActionCommand
 	private void _updateConfigurationProperties(
 			ActionRequest actionRequest,
 			Dictionary<String, Object> configurationProperties,
-			String dataSourceConnectionJSON)
+			String dataSourceConnectionJSON, boolean upgrade)
 		throws Exception {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
@@ -250,6 +266,31 @@ public class EditWorkspaceConnectionMVCActionCommand
 
 		configurationProperties.put(
 			"token", ParamUtil.getString(actionRequest, "token"));
+
+		if (upgrade) {
+			configurationProperties.put(
+				"syncedContactFieldNames",
+				new String[] {
+					"accountId", "birthday", "classNameId", "classPK",
+					"companyId", "contactId", "createDate", "emailAddress",
+					"employeeNumber", "employeeStatusId", "facebookSn",
+					"firstName", "hoursOfOperation", "jabberSn", "jobClass",
+					"jobTitle", "lastName", "male", "middleName",
+					"modifiedDate", "parentContactId", "prefixId", "skypeSn",
+					"smsSn", "suffixId", "twitterSn", "userId", "userName"
+				});
+			configurationProperties.put(
+				"syncedUserFieldNames",
+				new String[] {
+					"agreedToTermsOfUse", "comments", "companyId", "contactId",
+					"createDate", "defaultUser", "emailAddress",
+					"emailAddressVerified", "externalReferenceCode",
+					"facebookId", "firstName", "googleUserId", "greeting",
+					"jobTitle", "languageId", "lastName", "ldapServerId",
+					"middleName", "modifiedDate", "openId", "portraitId",
+					"screenName", "status", "timeZoneId", "userId", "uuid"
+				});
+		}
 
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
 			dataSourceConnectionJSON);
