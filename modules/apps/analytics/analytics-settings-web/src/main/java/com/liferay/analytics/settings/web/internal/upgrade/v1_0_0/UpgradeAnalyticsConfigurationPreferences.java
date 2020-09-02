@@ -16,6 +16,8 @@ package com.liferay.analytics.settings.web.internal.upgrade.v1_0_0;
 
 import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
+import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 
 import java.util.Dictionary;
 
@@ -47,6 +49,16 @@ public class UpgradeAnalyticsConfigurationPreferences extends UpgradeProcess {
 				configuration.getProperties();
 
 			if (properties == null) {
+				continue;
+			}
+
+			if (ArrayUtil.isNotEmpty(
+					GetterUtil.getStringValues(
+						properties.get("syncedContactFieldNames"))) ||
+				ArrayUtil.isNotEmpty(
+					GetterUtil.getStringValues(
+						properties.get("syncedUserFieldNames")))) {
+
 				continue;
 			}
 
