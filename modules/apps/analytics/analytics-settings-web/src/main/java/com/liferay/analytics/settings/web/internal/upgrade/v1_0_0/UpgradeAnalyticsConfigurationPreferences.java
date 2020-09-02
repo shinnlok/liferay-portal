@@ -14,8 +14,12 @@
 
 package com.liferay.analytics.settings.web.internal.upgrade.v1_0_0;
 
+import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 
+import java.util.Dictionary;
+
+import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 
 /**
@@ -31,8 +35,45 @@ public class UpgradeAnalyticsConfigurationPreferences extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		return;
+		Configuration[] configurations = _configurationAdmin.listConfigurations(
+			"(service.pid=" + AnalyticsConfiguration.class.getName() + "*)");
+
+		if (ArrayUtil.isEmpty(configurations)) {
+			return;
+		}
+
+		for (Configuration configuration : configurations) {
+			Dictionary<String, Object> properties =
+				configuration.getProperties();
+
+			if (properties == null) {
+				continue;
+			}
+
+			properties.put("syncedContactFieldNames", _CONTACT_FIELD_NAMES);
+			properties.put("syncedUserFieldNames", _USER_FIELD_NAMES);
+
+			configuration.update(properties);
+		}
 	}
+
+	private static final String[] _CONTACT_FIELD_NAMES = {
+		"accountId", "birthday", "classNameId", "classPK", "companyId",
+		"contactId", "createDate", "emailAddress", "employeeNumber",
+		"employeeStatusId", "facebookSn", "firstName", "hoursOfOperation",
+		"jabberSn", "jobClass", "jobTitle", "lastName", "male", "middleName",
+		"modifiedDate", "parentContactId", "prefixId", "skypeSn", "smsSn",
+		"suffixId", "twitterSn", "userId", "userName"
+	};
+
+	private static final String[] _USER_FIELD_NAMES = {
+		"agreedToTermsOfUse", "comments", "companyId", "contactId",
+		"createDate", "defaultUser", "emailAddress", "emailAddressVerified",
+		"externalReferenceCode", "facebookId", "firstName", "googleUserId",
+		"greeting", "jobTitle", "languageId", "lastName", "ldapServerId",
+		"middleName", "modifiedDate", "openId", "portraitId", "screenName",
+		"status", "timeZoneId", "userId", "uuid"
+	};
 
 	private final ConfigurationAdmin _configurationAdmin;
 
