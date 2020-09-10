@@ -14,6 +14,7 @@
 
 package com.liferay.analytics.settings.web.internal.portlet.action;
 
+import com.liferay.analytics.settings.web.internal.display.context.FieldDisplayContext;
 import com.liferay.analytics.settings.web.internal.util.AnalyticsSettingsUtil;
 import com.liferay.configuration.admin.constants.ConfigurationAdminPortletKeys;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -58,6 +59,7 @@ public class EditSyncedContactsMVCActionCommand
 			Dictionary<String, Object> configurationProperties)
 		throws Exception {
 
+		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
 		boolean syncAllContacts = ParamUtil.getBoolean(
 			actionRequest, "syncAllContacts");
 		String[] syncedOrganizationIds = ParamUtil.getStringValues(
@@ -69,8 +71,6 @@ public class EditSyncedContactsMVCActionCommand
 			"syncAllContacts", String.valueOf(syncAllContacts));
 
 		if (!syncAllContacts) {
-			String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
-
 			if (Objects.equals(cmd, "update_synced_groups")) {
 				configurationProperties.put(
 					"syncedUserGroupIds", syncedUserGroupIds);
@@ -85,6 +85,23 @@ public class EditSyncedContactsMVCActionCommand
 				syncedUserGroupIds = GetterUtil.getStringValues(
 					configurationProperties.get("syncedUserGroupIds"));
 			}
+		}
+
+		if (Objects.equals(cmd, "update_synced_contacts_fields")) {
+			String[] syncedContactFieldNames = ArrayUtil.append(
+				FieldDisplayContext.REQUIRED_CONTACT_FIELD_NAMES,
+				ParamUtil.getStringValues(
+					actionRequest, "syncedContactFieldNames"));
+
+			String[] syncedUserFieldNames = ArrayUtil.append(
+				FieldDisplayContext.REQUIRED_USER_FIELD_NAMES,
+				ParamUtil.getStringValues(
+					actionRequest, "syncedUserFieldNames"));
+
+			configurationProperties.put(
+				"syncedContactFieldNames", syncedContactFieldNames);
+			configurationProperties.put(
+				"syncedUserFieldNames", syncedUserFieldNames);
 		}
 
 		_notifyAnalyticsCloud(
