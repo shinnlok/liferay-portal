@@ -71,14 +71,22 @@ public class EditSyncedContactsMVCActionCommand
 			"syncAllContacts", String.valueOf(syncAllContacts));
 
 		if (!syncAllContacts) {
-			if (Objects.equals(cmd, "update_synced_groups")) {
+			boolean includeSyncContactsFields = ParamUtil.getBoolean(
+				actionRequest, "includeSyncContactsFields");
+			String referrer = ParamUtil.getString(actionRequest, "referrer");
+
+			if (!includeSyncContactsFields) {
+				referrer = cmd;
+			}
+
+			if (Objects.equals(referrer, "update_synced_groups")) {
 				configurationProperties.put(
 					"syncedUserGroupIds", syncedUserGroupIds);
 
 				syncedOrganizationIds = GetterUtil.getStringValues(
 					configurationProperties.get("syncedOrganizationIds"));
 			}
-			else if (Objects.equals(cmd, "update_synced_organizations")) {
+			else if (Objects.equals(referrer, "update_synced_organizations")) {
 				configurationProperties.put(
 					"syncedOrganizationIds", syncedOrganizationIds);
 
