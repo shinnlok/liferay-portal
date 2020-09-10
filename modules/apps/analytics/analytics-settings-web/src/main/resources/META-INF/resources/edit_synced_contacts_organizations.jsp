@@ -17,19 +17,32 @@
 <%@ include file="/init.jsp" %>
 
 <%
-boolean includeSyncContactsFields = ParamUtil.getBoolean(request, "includeSyncContactsFields");
-
 PortletURL portletURL = renderResponse.createRenderURL();
 
 portletURL.setParameter("mvcRenderCommandName", "/view_configuration_screen");
-portletURL.setParameter("configurationScreenKey", "synced-contacts");
 
-String redirect = portletURL.toString();
+boolean includeSyncContactsFields = ParamUtil.getBoolean(request, "includeSyncContactsFields");
+
+if (includeSyncContactsFields) {
+	portletURL.setParameter("configurationScreenKey", "synced-contact-data");
+}
+else {
+	portletURL.setParameter("configurationScreenKey", "synced-contacts");
+}
+
+String redirect = ParamUtil.getString(request, "redirect", portletURL.toString());
 
 portletDisplay.setShowBackIcon(true);
 portletDisplay.setURLBack(ParamUtil.getString(request, "backURL", redirect));
 
-PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(resourceBundle, "select-contacts"), redirect);
+if (includeSyncContactsFields) {
+	PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(resourceBundle, "select-contact-data"), portletURL.toString());
+	PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(resourceBundle, "select-contacts"), redirect);
+}
+else {
+	PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(resourceBundle, "select-contacts"), portletURL.toString());
+}
+
 PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(resourceBundle, "sync-by-organizations"), currentURL);
 %>
 

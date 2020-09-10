@@ -17,6 +17,13 @@
 <%@ include file="/init.jsp" %>
 
 <%
+PortletURL portletURL = renderResponse.createRenderURL();
+
+portletURL.setParameter("mvcRenderCommandName", "/view_configuration_screen");
+portletURL.setParameter("configurationScreenKey", "synced-contact-data");
+
+String redirect = portletURL.toString();
+
 boolean includeSyncContactsFields = ParamUtil.getBoolean(request, "includeSyncContactsFields");
 
 AnalyticsConfiguration analyticsConfiguration = (AnalyticsConfiguration)request.getAttribute(AnalyticsSettingsWebKeys.ANALYTICS_CONFIGURATION);
@@ -31,6 +38,12 @@ if (!Validator.isBlank(analyticsConfiguration.token())) {
 boolean syncAllContacts = analyticsConfiguration.syncAllContacts();
 Set<String> syncedOrganizationIds = SetUtil.fromArray(analyticsConfiguration.syncedOrganizationIds());
 Set<String> syncedUserGroupIds = SetUtil.fromArray(analyticsConfiguration.syncedUserGroupIds());
+
+portletDisplay.setShowBackIcon(true);
+portletDisplay.setURLBack(ParamUtil.getString(request, "backURL", redirect));
+
+PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(resourceBundle, "select-contact-data"), redirect);
+PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(resourceBundle, "select-contacts"), currentURL);
 %>
 
 <portlet:actionURL name="/analytics_settings/edit_synced_contacts" var="editSyncedContactsURL" />
@@ -38,6 +51,25 @@ Set<String> syncedUserGroupIds = SetUtil.fromArray(analyticsConfiguration.synced
 <portlet:renderURL var="editSyncedContactsFieldsURL">
 	<portlet:param name="mvcRenderCommandName" value="/analytics_settings/edit_synced_contacts_fields" />
 </portlet:renderURL>
+
+<c:if test="<%= includeSyncContactsFields %>">
+	<clay:container-fluid>
+		<clay:row>
+			<clay:col
+				size="12"
+			>
+				<div id="breadcrumb">
+					<liferay-ui:breadcrumb
+						showCurrentGroup="<%= false %>"
+						showGuestGroup="<%= false %>"
+						showLayout="<%= false %>"
+						showPortletBreadcrumb="<%= true %>"
+					/>
+				</div>
+			</clay:col>
+		</clay:row>
+	</clay:container-fluid>
+</c:if>
 
 <clay:sheet
 	cssClass="portlet-analytics-settings"

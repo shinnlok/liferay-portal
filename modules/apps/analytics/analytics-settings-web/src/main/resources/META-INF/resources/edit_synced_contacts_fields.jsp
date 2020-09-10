@@ -22,7 +22,7 @@ PortletURL portletURL = renderResponse.createRenderURL();
 portletURL.setParameter("mvcRenderCommandName", "/view_configuration_screen");
 portletURL.setParameter("configurationScreenKey", "synced-contact-data");
 
-String redirect = portletURL.toString();
+String redirect = ParamUtil.getString(request, "redirect", portletURL.toString());
 
 String cmd = ParamUtil.getString(request, Constants.CMD);
 boolean syncAllContacts = ParamUtil.getBoolean(request, "syncAllContacts");
@@ -38,9 +38,40 @@ if (analyticsConfiguration != null) {
 	syncedContactFieldNames = analyticsConfiguration.syncedContactFieldNames();
 	syncedUserFieldNames = analyticsConfiguration.syncedUserFieldNames();
 }
+
+portletDisplay.setShowBackIcon(true);
+portletDisplay.setURLBack(ParamUtil.getString(request, "backURL", redirect));
+
+PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(resourceBundle, "select-contact-data"), portletURL.toString());
+
+if (StringUtil.equals(cmd, "update_synced_groups")) {
+	PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(resourceBundle, "sync-by-user-groups"), redirect);
+}
+else if (StringUtil.equals(cmd, "update_synced_organizations")) {
+	PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(resourceBundle, "sync-by-organizations"), redirect);
+}
+
+PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(resourceBundle, "select-data-fields"), currentURL);
 %>
 
 <portlet:actionURL name="/analytics_settings/edit_synced_contacts" var="editSyncedContactsURL" />
+
+<clay:container-fluid>
+	<clay:row>
+		<clay:col
+			size="12"
+		>
+			<div id="breadcrumb">
+				<liferay-ui:breadcrumb
+					showCurrentGroup="<%= false %>"
+					showGuestGroup="<%= false %>"
+					showLayout="<%= false %>"
+					showPortletBreadcrumb="<%= true %>"
+				/>
+			</div>
+		</clay:col>
+	</clay:row>
+</clay:container-fluid>
 
 <clay:sheet
 	cssClass="portlet-analytics-settings"
