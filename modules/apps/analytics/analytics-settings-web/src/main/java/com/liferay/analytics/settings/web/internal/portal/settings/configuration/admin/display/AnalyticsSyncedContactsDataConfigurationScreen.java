@@ -25,7 +25,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Rachael Koestartyo
  */
 @Component(immediate = true, service = ConfigurationScreen.class)
-public class AnalyticsSyncedContactsFieldsConfigurationScreen
+public class AnalyticsSyncedContactsDataConfigurationScreen
 	extends BaseAnalyticsConfigurationScreen {
 
 	@Override
@@ -40,7 +40,7 @@ public class AnalyticsSyncedContactsFieldsConfigurationScreen
 
 	@Override
 	protected String getJspPath() {
-		return "/edit_synced_contacts_fields.jsp";
+		return "/edit_synced_contacts_data.jsp";
 	}
 
 	@Override
