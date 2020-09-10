@@ -17,6 +17,8 @@
 <%@ include file="/init.jsp" %>
 
 <%
+boolean includeSyncContactsFields = ParamUtil.getBoolean(request, "includeSyncContactsFields");
+
 AnalyticsConfiguration analyticsConfiguration = (AnalyticsConfiguration)request.getAttribute(AnalyticsSettingsWebKeys.ANALYTICS_CONFIGURATION);
 AnalyticsUsersManager analyticsUsersManager = (AnalyticsUsersManager)request.getAttribute(AnalyticsSettingsWebKeys.ANALYTICS_USERS_MANAGER);
 
@@ -33,6 +35,10 @@ Set<String> syncedUserGroupIds = SetUtil.fromArray(analyticsConfiguration.synced
 
 <portlet:actionURL name="/analytics_settings/edit_synced_contacts" var="editSyncedContactsURL" />
 
+<portlet:renderURL var="editSyncedContactsFieldsURL">
+	<portlet:param name="mvcRenderCommandName" value="/analytics_settings/edit_synced_contacts_fields" />
+</portlet:renderURL>
+
 <clay:sheet
 	cssClass="portlet-analytics-settings"
 >
@@ -40,7 +46,7 @@ Set<String> syncedUserGroupIds = SetUtil.fromArray(analyticsConfiguration.synced
 		<liferay-ui:message key="contact-data" />
 	</h2>
 
-	<aui:form action="<%= editSyncedContactsURL %>" method="post" name="fm">
+	<aui:form action="<%= includeSyncContactsFields ? editSyncedContactsFieldsURL : editSyncedContactsURL %>" method="post" name="fm">
 		<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
 
 		<fieldset <%= connected ? "" : "disabled" %>>
@@ -78,6 +84,7 @@ Set<String> syncedUserGroupIds = SetUtil.fromArray(analyticsConfiguration.synced
 					<portlet:renderURL var="createUserGroupURL">
 						<portlet:param name="mvcRenderCommandName" value="/analytics_settings/edit_synced_contacts_groups" />
 						<portlet:param name="redirect" value="<%= currentURL %>" />
+						<portlet:param name="includeSyncContactsFields" value="<%= String.valueOf(includeSyncContactsFields) %>" />
 					</portlet:renderURL>
 
 					<a class="d-flex m-4 p-2 text-decoration-none" href=<%= createUserGroupURL %>>
@@ -119,6 +126,7 @@ Set<String> syncedUserGroupIds = SetUtil.fromArray(analyticsConfiguration.synced
 					<portlet:renderURL var="createOrganizationsURL">
 						<portlet:param name="mvcRenderCommandName" value="/analytics_settings/edit_synced_contacts_organizations" />
 						<portlet:param name="redirect" value="<%= currentURL %>" />
+						<portlet:param name="includeSyncContactsFields" value="<%= String.valueOf(includeSyncContactsFields) %>" />
 					</portlet:renderURL>
 
 					<a class="d-flex m-4 p-2 text-decoration-none" href=<%= createOrganizationsURL %>>
@@ -157,7 +165,7 @@ Set<String> syncedUserGroupIds = SetUtil.fromArray(analyticsConfiguration.synced
 		<fieldset>
 
 		<aui:button-row>
-			<aui:button disabled="<%= !connected %>" type="submit" value="save" />
+			<aui:button disabled="<%= !connected %>" type="submit" value='<%= includeSyncContactsFields ? "save-and-next" : "save" %>' />
 		</aui:button-row>
 	</aui:form>
 </clay:sheet>

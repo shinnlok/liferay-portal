@@ -17,6 +17,8 @@
 <%@ include file="/init.jsp" %>
 
 <%
+boolean includeSyncContactsFields = ParamUtil.getBoolean(request, "includeSyncContactsFields");
+
 PortletURL portletURL = renderResponse.createRenderURL();
 
 portletURL.setParameter("mvcRenderCommandName", "/view_configuration_screen");
@@ -32,6 +34,10 @@ PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(resourceBundle, "
 %>
 
 <portlet:actionURL name="/analytics_settings/edit_synced_contacts" var="editSyncedContactsURL" />
+
+<portlet:renderURL var="editSyncedContactsFieldsURL">
+	<portlet:param name="mvcRenderCommandName" value="/analytics_settings/edit_synced_contacts_fields" />
+</portlet:renderURL>
 
 <clay:container-fluid>
 	<clay:row>
@@ -69,7 +75,7 @@ PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(resourceBundle, "
 		displayContext="<%= new UserGroupManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, userGroupDisplayContext) %>"
 	/>
 
-	<aui:form action="<%= editSyncedContactsURL %>" method="post" name="fm">
+	<aui:form action="<%= includeSyncContactsFields ? editSyncedContactsFieldsURL : editSyncedContactsURL %>" method="post" name="fm">
 		<aui:input name="<%= Constants.CMD %>" type="hidden" value="update_synced_groups" />
 		<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 
@@ -98,7 +104,7 @@ PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(resourceBundle, "
 		</liferay-ui:search-container>
 
 		<aui:button-row>
-			<aui:button type="submit" value="save" />
+			<aui:button type="submit" value='<%= includeSyncContactsFields ? "save-and-next" : "save" %>' />
 			<aui:button href="<%= redirect %>" type="cancel" value="cancel" />
 		</aui:button-row>
 	</aui:form>
