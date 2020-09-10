@@ -24,6 +24,11 @@ portletURL.setParameter("configurationScreenKey", "synced-contact-data");
 
 String redirect = portletURL.toString();
 
+String cmd = ParamUtil.getString(request, Constants.CMD);
+boolean syncAllContacts = ParamUtil.getBoolean(request, "syncAllContacts");
+String[] syncedOrganizationIds = ParamUtil.getStringValues(request, "syncedOrganizationIds");
+String[] syncedUserGroupIds = ParamUtil.getStringValues(request, "syncedUserGroupIds");
+
 AnalyticsConfiguration analyticsConfiguration = (AnalyticsConfiguration)request.getAttribute(AnalyticsSettingsWebKeys.ANALYTICS_CONFIGURATION);
 
 String[] syncedContactFieldNames = new String[0];
@@ -51,6 +56,10 @@ if (analyticsConfiguration != null) {
 	<aui:form action="<%= editSyncedContactsURL %>" method="post" name="fm">
 		<aui:input name="<%= Constants.CMD %>" type="hidden" value="update_synced_contacts_fields" />
 		<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
+		<aui:input name="referrer" type="hidden" value="<%= cmd %>" />
+		<aui:input name="syncAllContacts" type="hidden" value="<%= syncAllContacts %>" />
+		<aui:input name="syncedOrganizationIds" type="hidden" value="<%= StringUtil.merge(syncedOrganizationIds) %>" />
+		<aui:input name="syncedUserGroupIds" type="hidden" value="<%= StringUtil.merge(syncedUserGroupIds) %>" />
 
 		<liferay-ui:tabs
 			names='<%= LanguageUtil.format(resourceBundle, "contact-x", syncedContactFieldNames.length, false) + "," + LanguageUtil.format(resourceBundle, "user-x", syncedUserFieldNames.length, false) %>'
