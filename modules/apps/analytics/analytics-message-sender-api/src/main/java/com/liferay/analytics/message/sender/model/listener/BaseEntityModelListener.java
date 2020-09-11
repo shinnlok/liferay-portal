@@ -611,6 +611,9 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 				return;
 			}
 
+			addAnalyticsMessage(
+				"update", getUserAttributeNames(user.getCompanyId()), (T)user);
+
 			Map<String, Object> modelAttributes = model.getModelAttributes();
 
 			long companyId = (long)modelAttributes.get("companyId");
