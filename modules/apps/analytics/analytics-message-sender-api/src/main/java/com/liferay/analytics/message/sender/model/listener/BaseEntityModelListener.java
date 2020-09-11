@@ -607,12 +607,17 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 
 			User user = userLocalService.fetchUser((long)associationClassPK);
 
-			if (isUserExcluded(user)) {
+			if (!eventType.equals("deleteAssociation") &&
+				isUserExcluded(user)) {
+
 				return;
 			}
 
-			addAnalyticsMessage(
-				"update", getUserAttributeNames(user.getCompanyId()), (T)user);
+			if (!eventType.equals("deleteAssociation")) {
+				addAnalyticsMessage(
+					"update", getUserAttributeNames(user.getCompanyId()),
+					(T)user);
+			}
 
 			Map<String, Object> modelAttributes = model.getModelAttributes();
 
