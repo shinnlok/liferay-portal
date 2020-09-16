@@ -37,7 +37,9 @@ import com.liferay.portal.kernel.settings.Settings;
 import com.liferay.portal.kernel.settings.SettingsDescriptor;
 import com.liferay.portal.kernel.settings.SettingsFactory;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
@@ -47,6 +49,7 @@ import java.nio.charset.Charset;
 
 import java.util.Dictionary;
 import java.util.Hashtable;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.portlet.ActionRequest;
@@ -127,6 +130,22 @@ public abstract class BaseAnalyticsMVCActionCommand
 			checkPermissions(themeDisplay);
 
 			saveCompanyConfiguration(actionRequest, themeDisplay);
+
+			String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
+
+			if (Objects.equals(cmd, "update_synced_contacts_fields")) {
+				boolean exit = ParamUtil.getBoolean(actionRequest, "exit");
+
+				if (exit) {
+					SessionErrors.add(actionRequest, "unsavedContactsFields");
+
+					hideDefaultErrorMessage(actionRequest);
+				}
+
+				sendRedirect(
+					actionRequest, actionResponse,
+					ParamUtil.getString(actionRequest, "redirect"));
+			}
 		}
 		catch (PrincipalException principalException) {
 			_log.error(principalException, principalException);
