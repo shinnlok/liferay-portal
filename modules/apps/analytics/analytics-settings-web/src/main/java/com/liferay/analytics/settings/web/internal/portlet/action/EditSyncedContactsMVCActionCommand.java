@@ -85,15 +85,15 @@ public class EditSyncedContactsMVCActionCommand
 				configurationProperties.put(
 					"syncedUserGroupIds", syncedUserGroupIds);
 
-				syncedOrganizationIds = GetterUtil.getStringValues(
-					configurationProperties.get("syncedOrganizationIds"));
+				syncedUserGroupIds = GetterUtil.getStringValues(
+					configurationProperties.get("syncedUserGroupIds"));
 			}
 			else if (Objects.equals(referrer, "update_synced_organizations")) {
 				configurationProperties.put(
 					"syncedOrganizationIds", syncedOrganizationIds);
 
-				syncedUserGroupIds = GetterUtil.getStringValues(
-					configurationProperties.get("syncedUserGroupIds"));
+				syncedOrganizationIds = GetterUtil.getStringValues(
+					configurationProperties.get("syncedOrganizationIds"));
 			}
 		}
 
