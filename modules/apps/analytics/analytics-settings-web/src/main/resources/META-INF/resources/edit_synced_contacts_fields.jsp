@@ -84,6 +84,7 @@ PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(resourceBundle, "
 	<aui:form action="<%= editSyncedContactsURL %>" method="post" name="fm">
 		<aui:input name="<%= Constants.CMD %>" type="hidden" value="update_synced_contacts_fields" />
 		<aui:input name="redirect" type="hidden" value="<%= portletURL.toString() %>" />
+		<aui:input name="exit" type="hidden" value="false" />
 		<aui:input name="includeSyncContactsFields" type="hidden" value="<%= String.valueOf(includeSyncContactsFields) %>" />
 		<aui:input name="referrer" type="hidden" value="<%= cmd %>" />
 		<aui:input name="syncAllContacts" type="hidden" value="<%= String.valueOf(syncAllContacts) %>" />
@@ -225,6 +226,24 @@ PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(resourceBundle, "
 								on: {
 									click: function () {
 										dialog.hide();
+									},
+								},
+							},
+							{
+								cssClass: 'btn-primary',
+								label: '<liferay-ui:message key="exit" />',
+								on: {
+									click: function () {
+										var form = document.getElementById('<portlet:namespace />fm');
+
+										var exit = form.querySelector('#<portlet:namespace />exit');
+
+										if (exit) {
+											exit.setAttribute('value', 'true');
+										}
+
+										submitForm(
+											form, '<portlet:actionURL name="/analytics_settings/edit_synced_contacts" var="editSyncedContactsURL" />');
 									},
 								},
 							},
