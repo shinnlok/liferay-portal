@@ -83,10 +83,10 @@ PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(resourceBundle, "
 
 	<aui:form action="<%= editSyncedContactsURL %>" method="post" name="fm">
 		<aui:input name="<%= Constants.CMD %>" type="hidden" value="update_synced_contacts_fields" />
-		<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
+		<aui:input name="redirect" type="hidden" value="<%= portletURL.toString() %>" />
 		<aui:input name="includeSyncContactsFields" type="hidden" value="<%= String.valueOf(includeSyncContactsFields) %>" />
 		<aui:input name="referrer" type="hidden" value="<%= cmd %>" />
-		<aui:input name="syncAllContacts" type="hidden" value="<%= syncAllContacts %>" />
+		<aui:input name="syncAllContacts" type="hidden" value="<%= String.valueOf(syncAllContacts) %>" />
 		<aui:input name="syncedOrganizationIds" type="hidden" value="<%= StringUtil.merge(syncedOrganizationIds) %>" />
 		<aui:input name="syncedUserGroupIds" type="hidden" value="<%= StringUtil.merge(syncedUserGroupIds) %>" />
 
