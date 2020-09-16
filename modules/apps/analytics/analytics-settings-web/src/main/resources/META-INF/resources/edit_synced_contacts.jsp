@@ -88,6 +88,7 @@ if (includeSyncContactsFields) {
 
 	<aui:form action="<%= includeSyncContactsFields ? editSyncedContactsFieldsURL : editSyncedContactsURL %>" method="post" name="fm">
 		<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
+		<aui:input name="includeSyncContactsFields" type="hidden" value="<%= String.valueOf(includeSyncContactsFields) %>" />
 
 		<fieldset <%= connected ? "" : "disabled" %>>
 			<label class="control-label">

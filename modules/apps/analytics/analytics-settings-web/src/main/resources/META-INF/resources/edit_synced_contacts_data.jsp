@@ -28,7 +28,9 @@ if (!Validator.isBlank(analyticsConfiguration.token())) {
 
 boolean syncAllContacts = analyticsConfiguration.syncAllContacts();
 Set<String> syncedContactFieldNames = SetUtil.fromArray(analyticsConfiguration.syncedContactFieldNames());
+Set<String> syncedOrganizationIds = SetUtil.fromArray(analyticsConfiguration.syncedOrganizationIds());
 Set<String> syncedUserFieldNames = SetUtil.fromArray(analyticsConfiguration.syncedUserFieldNames());
+Set<String> syncedUserGroupIds = SetUtil.fromArray(analyticsConfiguration.syncedUserGroupIds());
 
 long totalContactsSelected = 0;
 
@@ -36,20 +38,20 @@ if (analyticsConfiguration.syncAllContacts()) {
 	totalContactsSelected = analyticsUsersManager.getCompanyUsersCount(themeDisplay.getCompanyId());
 }
 else {
-	String[] syncedOrganizationIds = GetterUtil.getStringValues(analyticsConfiguration.syncedOrganizationIds());
+	String[] syncedOrganizationIdsArray = GetterUtil.getStringValues(analyticsConfiguration.syncedOrganizationIds());
 
-	long[] syncedOrganizationIdsLong = new long[syncedOrganizationIds.length];
+	long[] syncedOrganizationIdsLong = new long[syncedOrganizationIdsArray.length];
 
-	for (int i = 0; i < syncedOrganizationIds.length; i++) {
-		syncedOrganizationIdsLong[i] = GetterUtil.getLong(syncedOrganizationIds[i]);
+	for (int i = 0; i < syncedOrganizationIdsArray.length; i++) {
+		syncedOrganizationIdsLong[i] = GetterUtil.getLong(syncedOrganizationIdsArray[i]);
 	}
 
-	String[] syncedUserGroupIds = GetterUtil.getStringValues(analyticsConfiguration.syncedUserGroupIds());
+	String[] syncedUserGroupIdsArray = GetterUtil.getStringValues(analyticsConfiguration.syncedUserGroupIds());
 
-	long[] syncedUserGroupIdsLong = new long[syncedUserGroupIds.length];
+	long[] syncedUserGroupIdsLong = new long[syncedUserGroupIdsArray.length];
 
-	for (int i = 0; i < syncedUserGroupIds.length; i++) {
-		syncedUserGroupIdsLong[i] = GetterUtil.getLong(syncedUserGroupIds[i]);
+	for (int i = 0; i < syncedUserGroupIdsArray.length; i++) {
+		syncedUserGroupIdsLong[i] = GetterUtil.getLong(syncedUserGroupIdsArray[i]);
 	}
 
 	totalContactsSelected = analyticsUsersManager.getOrganizationsAndUserGroupsUsersCount(syncedOrganizationIdsLong, syncedUserGroupIdsLong);
@@ -121,6 +123,9 @@ else {
 				<portlet:renderURL var="editSyncedContactsFieldsURL">
 					<portlet:param name="mvcRenderCommandName" value="/analytics_settings/edit_synced_contacts_fields" />
 					<portlet:param name="redirect" value="<%= currentURL %>" />
+					<portlet:param name="syncAllContacts" value="<%= String.valueOf(syncAllContacts) %>" />
+					<portlet:param name="syncedOrganizationIds" value="<%= StringUtil.merge(syncedOrganizationIds) %>" />
+					<portlet:param name="syncedUserGroupIds" value="<%= StringUtil.merge(syncedUserGroupIds) %>" />
 				</portlet:renderURL>
 
 				<a class="d-flex m-4 p-2 text-decoration-none" href=<%= editSyncedContactsFieldsURL %>>

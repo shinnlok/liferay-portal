@@ -26,6 +26,7 @@ portletURL.setParameter("configurationScreenKey", "synced-contact-data");
 
 String redirect = ParamUtil.getString(request, "redirect", portletURL.toString());
 
+boolean includeSyncContactsFields = ParamUtil.getBoolean(request, "includeSyncContactsFields");
 boolean syncAllContacts = ParamUtil.getBoolean(request, "syncAllContacts");
 String[] syncedOrganizationIds = ParamUtil.getStringValues(request, "syncedOrganizationIds");
 String[] syncedUserGroupIds = ParamUtil.getStringValues(request, "syncedUserGroupIds");
@@ -83,6 +84,7 @@ PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(resourceBundle, "
 	<aui:form action="<%= editSyncedContactsURL %>" method="post" name="fm">
 		<aui:input name="<%= Constants.CMD %>" type="hidden" value="update_synced_contacts_fields" />
 		<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
+		<aui:input name="includeSyncContactsFields" type="hidden" value="<%= String.valueOf(includeSyncContactsFields) %>" />
 		<aui:input name="referrer" type="hidden" value="<%= cmd %>" />
 		<aui:input name="syncAllContacts" type="hidden" value="<%= syncAllContacts %>" />
 		<aui:input name="syncedOrganizationIds" type="hidden" value="<%= StringUtil.merge(syncedOrganizationIds) %>" />
