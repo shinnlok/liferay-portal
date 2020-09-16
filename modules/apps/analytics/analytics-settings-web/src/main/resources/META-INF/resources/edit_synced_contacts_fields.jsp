@@ -193,7 +193,61 @@ PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(resourceBundle, "
 
 		<aui:button-row>
 			<aui:button type="submit" value="save" />
-			<aui:button href="<%= redirect %>" type="cancel" value="cancel" />
+
+			<c:choose>
+				<c:when test="<%= includeSyncContactsFields %>">
+					<aui:button href="" onClick='<%= liferayPortletResponse.getNamespace() + "showConfirmationModal(this);" %>' value="cancel" />
+				</c:when>
+				<c:otherwise>
+					<aui:button href="<%= redirect %>" type="cancel" value="cancel" />
+				</c:otherwise>
+			</c:choose>
 		</aui:button-row>
 	</aui:form>
 </clay:sheet>
+
+<aui:script>
+	Liferay.provide(
+		window,
+		'<portlet:namespace />showConfirmationModal',
+		function (event) {
+			var dialog = Liferay.Util.Window.getWindow({
+				dialog: {
+					bodyContent: '<div><h2><liferay-ui:message key="exit-without-saving" /></h2><p class="mt-3 text-secondary"><liferay-ui:message key="exit-without-saving-help" /></p></div>',
+					destroyOnHide: true,
+					height: 300,
+					resizable: false,
+					toolbars: {
+						footer: [
+							{
+								cssClass: 'btn-cancel',
+								label: '<liferay-ui:message key="cancel" />',
+								on: {
+									click: function () {
+										dialog.hide();
+									},
+								},
+							},
+						],
+						header: [
+							{
+								cssClass: 'close',
+								discardDefaultButtonCssClasses: true,
+								labelHTML:
+									'<span aria-hidden="true">&times;</span>',
+								on: {
+									click: function (event) {
+										dialog.hide();
+									},
+								},
+							},
+						],
+					},
+					width: 500,
+				},
+				title: '<%= LanguageUtil.get(resourceBundle, "unsaved-changes") %>',
+			});
+		},
+		['aui-base', 'liferay-util-window']
+	);
+</aui:script>
