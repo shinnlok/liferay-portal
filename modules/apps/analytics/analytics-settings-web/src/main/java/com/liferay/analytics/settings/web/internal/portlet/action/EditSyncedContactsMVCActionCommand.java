@@ -98,20 +98,45 @@ public class EditSyncedContactsMVCActionCommand
 		}
 
 		if (Objects.equals(cmd, "update_synced_contacts_fields")) {
-			String[] syncedContactFieldNames = ArrayUtil.append(
-				FieldDisplayContext.REQUIRED_CONTACT_FIELD_NAMES,
-				ParamUtil.getStringValues(
-					actionRequest, "syncedContactFieldNames"));
+			boolean exit = ParamUtil.getBoolean(actionRequest, "exit");
 
-			String[] syncedUserFieldNames = ArrayUtil.append(
-				FieldDisplayContext.REQUIRED_USER_FIELD_NAMES,
-				ParamUtil.getStringValues(
-					actionRequest, "syncedUserFieldNames"));
+			if (exit) {
+				if (ArrayUtil.isEmpty(
+						GetterUtil.getStringValues(
+							configurationProperties.get(
+								"syncedContactFieldNames")))) {
 
-			configurationProperties.put(
-				"syncedContactFieldNames", syncedContactFieldNames);
-			configurationProperties.put(
-				"syncedUserFieldNames", syncedUserFieldNames);
+					configurationProperties.put(
+						"syncedContactFieldNames",
+						FieldDisplayContext.REQUIRED_CONTACT_FIELD_NAMES);
+				}
+
+				if (ArrayUtil.isEmpty(
+						GetterUtil.getStringValues(
+							configurationProperties.get(
+								"syncedUserFieldNames")))) {
+
+					configurationProperties.put(
+						"syncedUserFieldNames",
+						FieldDisplayContext.REQUIRED_USER_FIELD_NAMES);
+				}
+			}
+			else {
+				String[] syncedContactFieldNames = ArrayUtil.append(
+					FieldDisplayContext.REQUIRED_CONTACT_FIELD_NAMES,
+					ParamUtil.getStringValues(
+						actionRequest, "syncedContactFieldNames"));
+
+				String[] syncedUserFieldNames = ArrayUtil.append(
+					FieldDisplayContext.REQUIRED_USER_FIELD_NAMES,
+					ParamUtil.getStringValues(
+						actionRequest, "syncedUserFieldNames"));
+
+				configurationProperties.put(
+					"syncedContactFieldNames", syncedContactFieldNames);
+				configurationProperties.put(
+					"syncedUserFieldNames", syncedUserFieldNames);
+			}
 		}
 
 		_notifyAnalyticsCloud(
