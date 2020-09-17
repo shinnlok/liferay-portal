@@ -214,7 +214,8 @@ PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(resourceBundle, "
 		function (event) {
 			var dialog = Liferay.Util.Window.getWindow({
 				dialog: {
-					bodyContent: '<div><h2><liferay-ui:message key="exit-without-saving" /></h2><p class="mt-3 text-secondary"><liferay-ui:message key="exit-without-saving-help" /></p></div>',
+					bodyContent:
+						'<div><h2><liferay-ui:message key="exit-without-saving" /></h2><p class="mt-3 text-secondary"><liferay-ui:message key="exit-without-saving-help" /></p></div>',
 					destroyOnHide: true,
 					height: 300,
 					resizable: false,
@@ -234,16 +235,22 @@ PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(resourceBundle, "
 								label: '<liferay-ui:message key="exit" />',
 								on: {
 									click: function () {
-										var form = document.getElementById('<portlet:namespace />fm');
+										var form = document.getElementById(
+											'<portlet:namespace />fm'
+										);
 
-										var exit = form.querySelector('#<portlet:namespace />exit');
+										var exit = form.querySelector(
+											'#<portlet:namespace />exit'
+										);
 
 										if (exit) {
 											exit.setAttribute('value', 'true');
 										}
 
 										submitForm(
-											form, '<portlet:actionURL name="/analytics_settings/edit_synced_contacts" var="editSyncedContactsURL" />');
+											form,
+											'<portlet:actionURL name="/analytics_settings/edit_synced_contacts" var="editSyncedContactsURL" />'
+										);
 									},
 								},
 							},
