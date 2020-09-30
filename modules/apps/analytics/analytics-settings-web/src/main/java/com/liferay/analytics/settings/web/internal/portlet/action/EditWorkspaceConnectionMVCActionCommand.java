@@ -91,7 +91,7 @@ public class EditWorkspaceConnectionMVCActionCommand
 			Validator.isBlank(
 				AnalyticsSettingsUtil.getConnectionType(companyId))) {
 
-			upgrade = false;
+			upgrade = true;
 		}
 
 		_connect(actionRequest, configurationProperties, upgrade);
