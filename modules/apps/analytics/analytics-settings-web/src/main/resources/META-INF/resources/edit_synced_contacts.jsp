@@ -99,6 +99,8 @@ if (includeSyncContactsFields) {
 				<liferay-ui:message key="sync-all-contacts" />
 			</label>
 
+			<br />
+
 			<label class="mb-5 mt-3 toggle-switch">
 				<input class="toggle-switch-check" name="<portlet:namespace />syncAllContacts" type="checkbox" <%= syncAllContacts ? "checked" : "" %> />
 
