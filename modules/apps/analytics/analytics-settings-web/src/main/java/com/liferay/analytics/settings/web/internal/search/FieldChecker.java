@@ -29,7 +29,8 @@ public class FieldChecker extends EmptyOnClickRowChecker {
 
 	public FieldChecker(
 		String mvcRenderCommandName, RenderResponse renderResponse,
-		Set<String> requiredFieldNames, Set<String> selectedFieldNames) {
+		Set<String> recommendedFieldNames, Set<String> requiredFieldNames,
+		Set<String> selectedFieldNames) {
 
 		super(renderResponse);
 
@@ -46,6 +47,7 @@ public class FieldChecker extends EmptyOnClickRowChecker {
 			setRowIds("syncedUserFieldNames");
 		}
 
+		_recommendedFieldNames = recommendedFieldNames;
 		_requiredFieldNames = requiredFieldNames;
 		_selectedFieldNames = selectedFieldNames;
 	}
@@ -53,6 +55,10 @@ public class FieldChecker extends EmptyOnClickRowChecker {
 	@Override
 	public boolean isChecked(Object object) {
 		Field field = (Field)object;
+
+		if (_recommendedFieldNames.contains(field.getName())) {
+			return true;
+		}
 
 		if (_requiredFieldNames.contains(field.getName())) {
 			return true;
@@ -76,6 +82,7 @@ public class FieldChecker extends EmptyOnClickRowChecker {
 		return super.isDisabled(object);
 	}
 
+	private final Set<String> _recommendedFieldNames;
 	private final Set<String> _requiredFieldNames;
 	private final Set<String> _selectedFieldNames;
 
