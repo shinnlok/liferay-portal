@@ -30,8 +30,10 @@ import com.liferay.portal.kernel.util.TreeMapBuilder;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import javax.portlet.PortletURL;
@@ -42,6 +44,14 @@ import javax.portlet.RenderResponse;
  * @author Rachael Koestartyo
  */
 public class FieldDisplayContext {
+
+	public static final String[] RECOMMENDED_CONTACT_FIELD_NAMES = {
+		"birthday", "firstName", "jobTitle", "lastName"
+	};
+
+	public static final String[] RECOMMENDED_USER_FIELD_NAMES = {
+		"firstName", "jobTitle", "lastName", "timeZoneId"
+	};
 
 	public static final String[] REQUIRED_CONTACT_FIELD_NAMES = {
 		"classPK", "contactId", "createDate", "emailAddress", "modifiedDate"
@@ -89,11 +99,31 @@ public class FieldDisplayContext {
 						fieldName));
 			}
 
+			Set<String> recommendedContactFieldNames = new HashSet<>();
+
+			Set<String> syncedContactFieldNames = SetUtil.fromArray(
+				_analyticsConfiguration.syncedContactFieldNames());
+
+			if (syncedContactFieldNames.size() <=
+					REQUIRED_CONTACT_FIELD_NAMES.length) {
+
+				recommendedContactFieldNames = SetUtil.fromArray(
+					RECOMMENDED_CONTACT_FIELD_NAMES);
+
+				for (String fieldName : RECOMMENDED_CONTACT_FIELD_NAMES) {
+					fields.add(
+						new Field(
+							"Default Field", _contactFieldNames.get(fieldName),
+							fieldName));
+				}
+			}
+
 			for (Map.Entry<String, String> entry :
 					_contactFieldNames.entrySet()) {
 
 				if (ArrayUtil.contains(
-						REQUIRED_CONTACT_FIELD_NAMES, entry.getKey())) {
+						REQUIRED_CONTACT_FIELD_NAMES, entry.getKey()) ||
+					recommendedContactFieldNames.contains(entry.getKey())) {
 
 					continue;
 				}
@@ -106,9 +136,9 @@ public class FieldDisplayContext {
 			fieldSearch.setRowChecker(
 				new FieldChecker(
 					_mvcRenderCommandName, _renderResponse,
+					recommendedContactFieldNames,
 					SetUtil.fromArray(REQUIRED_CONTACT_FIELD_NAMES),
-					SetUtil.fromArray(
-						_analyticsConfiguration.syncedContactFieldNames())));
+					syncedContactFieldNames));
 			fieldSearch.setTotal(
 				_contactFieldNames.size() -
 					REQUIRED_CONTACT_FIELD_NAMES.length);
@@ -124,9 +154,29 @@ public class FieldDisplayContext {
 						fieldName));
 			}
 
+			Set<String> recommendedUserFieldNames = new HashSet<>();
+
+			Set<String> syncedUserFieldNames = SetUtil.fromArray(
+				_analyticsConfiguration.syncedUserFieldNames());
+
+			if (syncedUserFieldNames.size() <=
+					RECOMMENDED_USER_FIELD_NAMES.length) {
+
+				recommendedUserFieldNames = SetUtil.fromArray(
+					RECOMMENDED_USER_FIELD_NAMES);
+
+				for (String fieldName : RECOMMENDED_USER_FIELD_NAMES) {
+					fields.add(
+						new Field(
+							"Default Field", _userFieldNames.get(fieldName),
+							fieldName));
+				}
+			}
+
 			for (Map.Entry<String, String> entry : _userFieldNames.entrySet()) {
 				if (ArrayUtil.contains(
-						REQUIRED_USER_FIELD_NAMES, entry.getKey())) {
+						REQUIRED_USER_FIELD_NAMES, entry.getKey()) ||
+					recommendedUserFieldNames.contains(entry.getKey())) {
 
 					continue;
 				}
@@ -150,9 +200,9 @@ public class FieldDisplayContext {
 			fieldSearch.setRowChecker(
 				new FieldChecker(
 					_mvcRenderCommandName, _renderResponse,
+					recommendedUserFieldNames,
 					SetUtil.fromArray(REQUIRED_USER_FIELD_NAMES),
-					SetUtil.fromArray(
-						_analyticsConfiguration.syncedUserFieldNames())));
+					syncedUserFieldNames));
 			fieldSearch.setTotal(
 				_userFieldNames.size() + userCustomFieldNames.size() -
 					REQUIRED_USER_FIELD_NAMES.length);
