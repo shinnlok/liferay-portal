@@ -149,12 +149,12 @@ if (analyticsConfiguration != null) {
 		</small>
 
 		<aui:button-row>
-			<liferay-portlet:renderURL varImpl="selectContactsURL">
+			<liferay-portlet:renderURL varImpl="selectContactDataURL">
 				<portlet:param name="mvcRenderCommandName" value="/view_configuration_screen" />
-				<portlet:param name="configurationScreenKey" value="2-synced-contacts" />
+				<portlet:param name="configurationScreenKey" value="2-synced-contact-data" />
 			</liferay-portlet:renderURL>
 
-			<aui:button disabled="<%= !connected %>" href="<%= selectContactsURL.toString() %>" primary="<%= true %>" value="select-contacts" />
+			<aui:button disabled="<%= !connected %>" href="<%= selectContactDataURL.toString() %>" primary="<%= true %>" value="select-contacts" />
 		</aui:button-row>
 	</aui:fieldset>
 </clay:sheet>
