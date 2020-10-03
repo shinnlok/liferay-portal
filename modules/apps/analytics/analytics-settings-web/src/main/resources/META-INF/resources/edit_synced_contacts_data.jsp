@@ -62,6 +62,7 @@ else {
 	<aui:script>
 		Liferay.Util.openToast({
 			message: '<liferay-ui:message key="synced-fields-have-not-been-saved" />',
+			title: Liferay.Language.get('warning'),
 			toastProps: {
 				autoClose: 5000,
 			},
