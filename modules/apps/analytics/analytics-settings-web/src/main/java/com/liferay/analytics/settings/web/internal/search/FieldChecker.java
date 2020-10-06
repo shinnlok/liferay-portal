@@ -16,9 +16,8 @@ package com.liferay.analytics.settings.web.internal.search;
 
 import com.liferay.analytics.settings.web.internal.model.Field;
 import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-
-import java.util.Set;
 
 import javax.portlet.RenderResponse;
 
@@ -29,8 +28,8 @@ public class FieldChecker extends EmptyOnClickRowChecker {
 
 	public FieldChecker(
 		String mvcRenderCommandName, RenderResponse renderResponse,
-		Set<String> recommendedFieldNames, Set<String> requiredFieldNames,
-		Set<String> selectedFieldNames) {
+		String[] recommendedFieldNames, String[] requiredFieldNames,
+		String[] selectedFieldNames) {
 
 		super(renderResponse);
 
@@ -56,15 +55,15 @@ public class FieldChecker extends EmptyOnClickRowChecker {
 	public boolean isChecked(Object object) {
 		Field field = (Field)object;
 
-		if (_recommendedFieldNames.contains(field.getName())) {
+		if (ArrayUtil.contains(_recommendedFieldNames, field.getName())) {
 			return true;
 		}
 
-		if (_requiredFieldNames.contains(field.getName())) {
+		if (ArrayUtil.contains(_requiredFieldNames, field.getName())) {
 			return true;
 		}
 
-		if (_selectedFieldNames.contains(field.getName())) {
+		if (ArrayUtil.contains(_selectedFieldNames, field.getName())) {
 			return true;
 		}
 
@@ -75,15 +74,15 @@ public class FieldChecker extends EmptyOnClickRowChecker {
 	public boolean isDisabled(Object object) {
 		Field field = (Field)object;
 
-		if (_requiredFieldNames.contains(field.getName())) {
+		if (ArrayUtil.contains(_requiredFieldNames, field.getName())) {
 			return true;
 		}
 
 		return super.isDisabled(object);
 	}
 
-	private final Set<String> _recommendedFieldNames;
-	private final Set<String> _requiredFieldNames;
-	private final Set<String> _selectedFieldNames;
+	private final String[] _recommendedFieldNames;
+	private final String[] _requiredFieldNames;
+	private final String[] _selectedFieldNames;
 
 }
