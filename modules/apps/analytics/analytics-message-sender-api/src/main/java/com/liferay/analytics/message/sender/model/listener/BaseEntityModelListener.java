@@ -437,7 +437,9 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 			}
 		}
 
-		jsonObject.put(getPrimaryKeyName(), baseModel.getPrimaryKeyObj());
+		if (modelAttributes.containsKey(getPrimaryKeyName())) {
+			jsonObject.put(getPrimaryKeyName(), baseModel.getPrimaryKeyObj());
+		}
 
 		return jsonObject;
 	}
@@ -619,9 +621,12 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 			}
 
 			if (!eventType.equals("deleteAssociation")) {
-				addAnalyticsMessage(
-					"update", getUserAttributeNames(user.getCompanyId()),
-					(T)user);
+				List<String> userAttributeNames = getUserAttributeNames(
+					user.getCompanyId());
+
+				userAttributeNames.add("userId");
+
+				addAnalyticsMessage("update", userAttributeNames, (T)user);
 			}
 
 			Map<String, Object> modelAttributes = model.getModelAttributes();
