@@ -627,6 +627,18 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 				userAttributeNames.add("userId");
 
 				addAnalyticsMessage("update", userAttributeNames, (T)user);
+
+				if (user.fetchContact() != null) {
+					AnalyticsConfiguration analyticsConfiguration =
+						analyticsConfigurationTracker.getAnalyticsConfiguration(
+							user.getCompanyId());
+
+					addAnalyticsMessage(
+						"update",
+						Arrays.asList(
+							analyticsConfiguration.syncedContactFieldNames()),
+						(T)user.fetchContact());
+				}
 			}
 
 			Map<String, Object> modelAttributes = model.getModelAttributes();
