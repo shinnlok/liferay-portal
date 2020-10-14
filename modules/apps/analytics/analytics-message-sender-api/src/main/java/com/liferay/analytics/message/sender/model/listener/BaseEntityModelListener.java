@@ -36,6 +36,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.BaseModelListener;
+import com.liferay.portal.kernel.model.Contact;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.Role;
@@ -85,15 +86,29 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 	public void addAnalyticsMessage(
 		String eventType, List<String> includeAttributeNames, T model) {
 
-		if (isExcluded(model)) {
+		String modelClassName = model.getModelClassName();
+
+		if (modelClassName.equals(Contact.class.getName())) {
+			Contact contact = (Contact)model;
+
+			if (isUserExcluded(
+					userLocalService.fetchUser(contact.getClassPK()))) {
+
+				return;
+			}
+		}
+		else if (modelClassName.equals(User.class.getName())) {
+			if (isUserExcluded((User)model)) {
+				return;
+			}
+		}
+		else if (isExcluded(model)) {
 			return;
 		}
 
 		JSONObject jsonObject = serialize(model, includeAttributeNames);
 
 		ShardedModel shardedModel = (ShardedModel)model;
-
-		String modelClassName = model.getModelClassName();
 
 		if (modelClassName.equals(ExpandoRow.class.getName())) {
 			ExpandoRow expandoRow = (ExpandoRow)model;
