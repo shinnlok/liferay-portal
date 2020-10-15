@@ -394,36 +394,9 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 		Map<String, Object> modelAttributes = baseModel.getModelAttributes();
 
 		for (String includeAttributeName : includeAttributeNames) {
-			if (includeAttributeName.equals("expando")) {
-				if (StringUtil.equals(
-						baseModel.getModelClassName(), User.class.getName())) {
-
-					ShardedModel shardedModel = (ShardedModel)baseModel;
-
-					AnalyticsConfiguration analyticsConfiguration =
-						analyticsConfigurationTracker.getAnalyticsConfiguration(
-							shardedModel.getCompanyId());
-
-					jsonObject.put(
-						"expando",
-						AnalyticsExpandoBridgeUtil.getAttributes(
-							baseModel.getExpandoBridge(),
-							ListUtil.fromArray(
-								analyticsConfiguration.
-									syncedUserFieldNames())));
-				}
-				else {
-					jsonObject.put(
-						"expando",
-						AnalyticsExpandoBridgeUtil.getAttributes(
-							baseModel.getExpandoBridge(), null));
-				}
-
-				continue;
-			}
-			else if (includeAttributeName.equals("memberships") &&
-					 StringUtil.equals(
-						 baseModel.getModelClassName(), User.class.getName())) {
+			if (includeAttributeName.equals("associations") &&
+				StringUtil.equals(
+					baseModel.getModelClassName(), User.class.getName())) {
 
 				Map<String, long[]> memberships = new HashMap<>();
 
@@ -477,6 +450,33 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 				}
 
 				jsonObject.put("memberships", memberships);
+
+				continue;
+			}
+			else if (includeAttributeName.equals("expando")) {
+				if (StringUtil.equals(
+						baseModel.getModelClassName(), User.class.getName())) {
+
+					ShardedModel shardedModel = (ShardedModel)baseModel;
+
+					AnalyticsConfiguration analyticsConfiguration =
+						analyticsConfigurationTracker.getAnalyticsConfiguration(
+							shardedModel.getCompanyId());
+
+					jsonObject.put(
+						"expando",
+						AnalyticsExpandoBridgeUtil.getAttributes(
+							baseModel.getExpandoBridge(),
+							ListUtil.fromArray(
+								analyticsConfiguration.
+									syncedUserFieldNames())));
+				}
+				else {
+					jsonObject.put(
+						"expando",
+						AnalyticsExpandoBridgeUtil.getAttributes(
+							baseModel.getExpandoBridge(), null));
+				}
 
 				continue;
 			}
@@ -704,6 +704,7 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 				List<String> userAttributeNames = getUserAttributeNames(
 					user.getCompanyId());
 
+				userAttributeNames.add("associations");
 				userAttributeNames.add("userId");
 
 				addAnalyticsMessage("update", userAttributeNames, (T)user);
