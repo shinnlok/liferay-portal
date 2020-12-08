@@ -587,16 +587,16 @@ public class AnalyticsConfigurationTrackerImpl
 				"name", fieldName
 			);
 
-			AnalyticsMessage.Builder analyticsMessageBuilder =
-				AnalyticsMessage.builder(User.class.getName() + ".field");
-
-			analyticsMessageBuilder.action("add");
-			analyticsMessageBuilder.object(jsonObject);
-
-			String analyticsMessageJSON =
-				analyticsMessageBuilder.buildJSONString();
-
 			try {
+				AnalyticsMessage.Builder analyticsMessageBuilder =
+					AnalyticsMessage.builder(User.class.getName() + ".field");
+
+				analyticsMessageBuilder.action("add");
+				analyticsMessageBuilder.object(jsonObject);
+
+				String analyticsMessageJSON =
+					analyticsMessageBuilder.buildJSONString();
+
 				_analyticsMessageLocalService.addAnalyticsMessage(
 					companyId, _userLocalService.getDefaultUserId(companyId),
 					analyticsMessageJSON.getBytes(Charset.defaultCharset()));
