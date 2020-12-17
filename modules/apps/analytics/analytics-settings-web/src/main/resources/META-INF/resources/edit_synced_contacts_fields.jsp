@@ -26,7 +26,6 @@ portletURL.setParameter("configurationScreenKey", "2-synced-contact-data");
 
 String redirect = ParamUtil.getString(request, "redirect", portletURL.toString());
 
-boolean includeSyncContactsFields = ParamUtil.getBoolean(request, "includeSyncContactsFields");
 boolean syncAllContacts = ParamUtil.getBoolean(request, "syncAllContacts");
 String[] syncedOrganizationIds = ParamUtil.getStringValues(request, "syncedOrganizationIds");
 String[] syncedUserGroupIds = ParamUtil.getStringValues(request, "syncedUserGroupIds");
@@ -85,7 +84,6 @@ PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(resourceBundle, "
 		<aui:input name="<%= Constants.CMD %>" type="hidden" value="update_synced_contacts_fields" />
 		<aui:input name="redirect" type="hidden" value="<%= portletURL.toString() %>" />
 		<aui:input name="exit" type="hidden" value="<%= false %>" />
-		<aui:input name="includeSyncContactsFields" type="hidden" value="<%= String.valueOf(includeSyncContactsFields) %>" />
 		<aui:input name="referrer" type="hidden" value="<%= cmd %>" />
 		<aui:input name="syncAllContacts" type="hidden" value="<%= String.valueOf(syncAllContacts) %>" />
 		<aui:input name="syncedOrganizationIds" type="hidden" value="<%= StringUtil.merge(syncedOrganizationIds) %>" />
@@ -194,14 +192,7 @@ PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(resourceBundle, "
 
 		<div class="text-right">
 			<aui:button-row>
-				<c:choose>
-					<c:when test="<%= includeSyncContactsFields %>">
-						<aui:button href="" onClick='<%= liferayPortletResponse.getNamespace() + "showConfirmationModal(this);" %>' value="cancel" />
-					</c:when>
-					<c:otherwise>
-						<aui:button href="<%= redirect %>" type="cancel" value="cancel" />
-					</c:otherwise>
-				</c:choose>
+				<aui:button href="" onClick='<%= liferayPortletResponse.getNamespace() + "showConfirmationModal(this);" %>' value="cancel" />
 
 				<aui:button type="submit" value="save" />
 			</aui:button-row>
