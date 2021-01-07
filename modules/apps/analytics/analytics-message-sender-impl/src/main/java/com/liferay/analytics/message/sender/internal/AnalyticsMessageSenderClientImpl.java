@@ -57,6 +57,7 @@ public class AnalyticsMessageSenderClientImpl
 			analyticsConfiguration.
 				liferayAnalyticsFaroBackendSecuritySignature(),
 			HttpMethods.POST,
+			analyticsConfiguration.liferayAnalyticsProjectId(),
 			analyticsConfiguration.liferayAnalyticsEndpointURL() +
 				"/dxp-entities");
 
@@ -77,6 +78,7 @@ public class AnalyticsMessageSenderClientImpl
 			analyticsConfiguration.
 				liferayAnalyticsFaroBackendSecuritySignature(),
 			HttpMethods.GET,
+			analyticsConfiguration.liferayAnalyticsProjectId(),
 			analyticsConfiguration.liferayAnalyticsEndpointURL() +
 				"/api/1.0/data-sources/" +
 					analyticsConfiguration.liferayAnalyticsDataSourceId());
@@ -86,7 +88,8 @@ public class AnalyticsMessageSenderClientImpl
 
 	private HttpUriRequest _buildHttpUriRequest(
 			String body, String dataSourceId,
-			String faroBackendSecuritySignature, String method, String url)
+			String faroBackendSecuritySignature, String method,
+			String projectId, String url)
 		throws Exception {
 
 		HttpUriRequest httpUriRequest = null;
@@ -111,6 +114,7 @@ public class AnalyticsMessageSenderClientImpl
 			httpUriRequest.setHeader(
 				"OSB-Asah-Faro-Backend-Security-Signature",
 				faroBackendSecuritySignature);
+			httpUriRequest.setHeader("OSB-Asah-Project-ID", projectId);
 		}
 
 		return httpUriRequest;

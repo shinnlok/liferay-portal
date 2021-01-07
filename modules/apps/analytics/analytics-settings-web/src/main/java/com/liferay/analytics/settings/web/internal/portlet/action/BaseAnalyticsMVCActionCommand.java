@@ -246,7 +246,7 @@ public abstract class BaseAnalyticsMVCActionCommand
 				"liferayAnalyticsDataSourceId", "liferayAnalyticsEndpointURL",
 				"liferayAnalyticsFaroBackendSecuritySignature",
 				"liferayAnalyticsFaroBackendURL", "liferayAnalyticsGroupIds",
-				"liferayAnalyticsURL"
+				"liferayAnalyticsProjectId", "liferayAnalyticsURL"
 			});
 	}
 

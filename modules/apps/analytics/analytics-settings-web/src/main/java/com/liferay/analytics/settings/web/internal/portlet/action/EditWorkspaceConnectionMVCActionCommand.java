@@ -189,6 +189,7 @@ public class EditWorkspaceConnectionMVCActionCommand
 
 		String dataSourceId = null;
 		String liferayAnalyticsFaroBackendURL = null;
+		String projectId = null;
 
 		if (!AnalyticsSettingsUtil.isAnalyticsEnabled(companyId)) {
 			if (Validator.isNotNull(
@@ -201,16 +202,20 @@ public class EditWorkspaceConnectionMVCActionCommand
 					configurationProperties.get(
 						"liferayAnalyticsFaroBackendURL"),
 					null);
+				projectId = GetterUtil.getString(
+					configurationProperties.get("liferayAnalyticsProjectId"),
+					null);
 			}
 		}
 		else {
 			dataSourceId = AnalyticsSettingsUtil.getAsahFaroBackendDataSourceId(
 				companyId);
+			projectId = AnalyticsSettingsUtil.getAsahProjectId(companyId);
 		}
 
 		try {
 			HttpResponse httpResponse = AnalyticsSettingsUtil.doPost(
-				liferayAnalyticsFaroBackendURL, null, companyId,
+				liferayAnalyticsFaroBackendURL, projectId, null, companyId,
 				String.format(
 					"api/1.0/data-sources/%s/disconnect", dataSourceId));
 
