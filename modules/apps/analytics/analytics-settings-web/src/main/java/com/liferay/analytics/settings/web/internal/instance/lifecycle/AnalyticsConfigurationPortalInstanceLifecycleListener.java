@@ -17,6 +17,7 @@ package com.liferay.analytics.settings.web.internal.instance.lifecycle;
 import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
 import com.liferay.analytics.settings.security.constants.AnalyticsSecurityConstants;
 import com.liferay.expando.kernel.model.ExpandoBridge;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.instance.lifecycle.BasePortalInstanceLifecycleListener;
 import com.liferay.portal.instance.lifecycle.PortalInstanceLifecycleListener;
 import com.liferay.portal.kernel.model.Company;
@@ -46,7 +47,9 @@ public class AnalyticsConfigurationPortalInstanceLifecycleListener
 	@Override
 	public void portalInstanceRegistered(Company company) throws Exception {
 		Configuration[] configurations = _configurationAdmin.listConfigurations(
-			"(service.pid=" + AnalyticsConfiguration.class.getName() + "*)");
+			StringBundler.concat(
+				"(&(service.pid=", AnalyticsConfiguration.class.getName(),
+				"*)(companyId=", company.getCompanyId(), "))"));
 
 		if (ArrayUtil.isEmpty(configurations)) {
 			return;
