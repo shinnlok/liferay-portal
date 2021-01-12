@@ -23,14 +23,19 @@ import com.liferay.portal.instance.lifecycle.PortalInstanceLifecycleListener;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
+import com.liferay.portal.kernel.service.CompanyService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.UnicodeProperties;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
 import java.util.Dictionary;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
@@ -63,25 +68,49 @@ public class AnalyticsConfigurationPortalInstanceLifecycleListener
 				continue;
 			}
 
-			if (ArrayUtil.isNotEmpty(
+			boolean updated = false;
+
+			if (Validator.isNull(properties.get("liferayAnalyticsProjectId"))) {
+				String faroBackendURL = GetterUtil.getString(
+					properties.get("liferayAnalyticsFaroBackendURL"));
+
+				String projectId = _getProjectId(faroBackendURL);
+
+				properties.put("liferayAnalyticsProjectId", projectId);
+
+				UnicodeProperties unicodeProperties = new UnicodeProperties(
+					true);
+
+				unicodeProperties.setProperty(
+					"liferayAnalyticsProjectId", projectId);
+
+				_companyService.updatePreferences(
+					company.getCompanyId(), unicodeProperties);
+
+				updated = true;
+			}
+
+			if (ArrayUtil.isEmpty(
 					GetterUtil.getStringValues(
-						properties.get("syncedContactFieldNames"))) ||
-				ArrayUtil.isNotEmpty(
+						properties.get("syncedContactFieldNames"))) &&
+				ArrayUtil.isEmpty(
 					GetterUtil.getStringValues(
 						properties.get("syncedUserFieldNames")))) {
 
-				continue;
+				properties.put("syncedContactFieldNames", _CONTACT_FIELD_NAMES);
+				properties.put(
+					"syncedUserFieldNames",
+					ArrayUtil.append(
+						_USER_FIELD_NAMES,
+						_getExpandoAttributeNames(
+							GetterUtil.getLong(properties.get("companyId")))));
+
+				updated = true;
 			}
 
-			properties.put("syncedContactFieldNames", _CONTACT_FIELD_NAMES);
-			properties.put(
-				"syncedUserFieldNames",
-				ArrayUtil.append(
-					_USER_FIELD_NAMES,
-					_getExpandoAttributeNames(
-						GetterUtil.getLong(properties.get("companyId")))));
-
-			configuration.update(properties);
+			if (updated) {
+				configuration.update(properties);
+			}
 		}
 	}
 
@@ -108,6 +137,16 @@ public class AnalyticsConfigurationPortalInstanceLifecycleListener
 		return ArrayUtil.toStringArray(attributes.keySet());
 	}
 
+	private String _getProjectId(String faroBackendURL) {
+		Matcher matcher = _pattern.matcher(faroBackendURL);
+
+		if (matcher.find()) {
+			return matcher.group(1);
+		}
+
+		return null;
+	}
+
 	private static final String[] _CONTACT_FIELD_NAMES = {
 		"accountId", "birthday", "classNameId", "classPK", "companyId",
 		"contactId", "createDate", "emailAddress", "employeeNumber",
@@ -125,6 +164,12 @@ public class AnalyticsConfigurationPortalInstanceLifecycleListener
 		"middleName", "modifiedDate", "openId", "portraitId", "screenName",
 		"status", "timeZoneId", "userId", "uuid"
 	};
+
+	private static final Pattern _pattern = Pattern.compile(
+		"https://osbasah(?:.*)-(.*)\\.lfr\\.cloud");
+
+	@Reference
+	private CompanyService _companyService;
 
 	@Reference
 	private ConfigurationAdmin _configurationAdmin;
