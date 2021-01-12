@@ -80,6 +80,9 @@ public class AnalyticsTopHeadJSPDynamicInclude extends BaseJSPDynamicInclude {
 				).put(
 					"endpointUrl",
 					_getLiferayAnalyticsEndpointURL(themeDisplay.getCompany())
+				).put(
+					"projectId",
+					_getLiferayAnalyticsProjectId(themeDisplay.getCompany())
 				).build()));
 
 		httpServletRequest.setAttribute(
@@ -154,6 +157,11 @@ public class AnalyticsTopHeadJSPDynamicInclude extends BaseJSPDynamicInclude {
 	private String _getLiferayAnalyticsEndpointURL(Company company) {
 		return PrefsPropsUtil.getString(
 			company.getCompanyId(), "liferayAnalyticsEndpointURL");
+	}
+
+	private String _getLiferayAnalyticsProjectId(Company company) {
+		return PrefsPropsUtil.getString(
+			company.getCompanyId(), "liferayAnalyticsProjectId");
 	}
 
 	private boolean _isAnalyticsTrackingEnabled(
