@@ -14,13 +14,10 @@
 
 package com.liferay.analytics.settings.web.internal.upgrade;
 
-import com.liferay.analytics.settings.web.internal.upgrade.v1_0_0.UpgradeAnalyticsConfigurationPreferences;
 import com.liferay.portal.kernel.upgrade.DummyUpgradeStep;
 import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
 
-import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Rachael Koestartyo
@@ -30,14 +27,7 @@ public class AnalyticsSettingsWebUpgrade implements UpgradeStepRegistrator {
 
 	@Override
 	public void register(Registry registry) {
-		registry.register("0.0.0", "0.0.1", new DummyUpgradeStep());
-
-		registry.register(
-			"0.0.1", "1.0.0",
-			new UpgradeAnalyticsConfigurationPreferences(_configurationAdmin));
+		registry.register("0.0.0", "1.0.0", new DummyUpgradeStep());
 	}
-
-	@Reference
-	private ConfigurationAdmin _configurationAdmin;
 
 }
