@@ -48,8 +48,8 @@ public class AnalyticsConfigurationPortalInstanceLifecycleListener
 	public void portalInstanceRegistered(Company company) throws Exception {
 		Configuration[] configurations = _configurationAdmin.listConfigurations(
 			StringBundler.concat(
-				"(&(service.pid=", AnalyticsConfiguration.class.getName(),
-				"*)(companyId=", company.getCompanyId(), "))"));
+				"(&(companyId=", company.getCompanyId(), ")(service.pid=",
+				AnalyticsConfiguration.class.getName(), "*))"));
 
 		if (ArrayUtil.isEmpty(configurations)) {
 			return;
