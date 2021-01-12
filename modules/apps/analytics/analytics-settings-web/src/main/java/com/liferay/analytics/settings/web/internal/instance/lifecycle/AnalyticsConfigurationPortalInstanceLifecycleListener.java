@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.analytics.settings.web.internal.upgrade;
+package com.liferay.analytics.settings.web.internal.instance.lifecycle;
 
 import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
 import com.liferay.analytics.settings.security.constants.AnalyticsSecurityConstants;
@@ -40,7 +40,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Rachael Koestartyo
  */
 @Component(immediate = true, service = PortalInstanceLifecycleListener.class)
-public class UpgradeAnalyticsConfigurationPortalInstanceLifecycleListener
+public class AnalyticsConfigurationPortalInstanceLifecycleListener
 	extends BasePortalInstanceLifecycleListener {
 
 	@Override
