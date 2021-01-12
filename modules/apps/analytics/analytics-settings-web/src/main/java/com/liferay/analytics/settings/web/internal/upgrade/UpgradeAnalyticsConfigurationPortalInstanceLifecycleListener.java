@@ -12,14 +12,17 @@
  * details.
  */
 
-package com.liferay.analytics.settings.web.internal.upgrade.v1_0_0;
+package com.liferay.analytics.settings.web.internal.upgrade;
 
 import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
 import com.liferay.analytics.settings.security.constants.AnalyticsSecurityConstants;
 import com.liferay.expando.kernel.model.ExpandoBridge;
+import com.liferay.portal.instance.lifecycle.BasePortalInstanceLifecycleListener;
+import com.liferay.portal.instance.lifecycle.PortalInstanceLifecycleListener;
+import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.service.UserLocalServiceUtil;
-import com.liferay.portal.kernel.upgrade.UpgradeProcess;
+import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 
@@ -30,20 +33,18 @@ import java.util.Map;
 
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Rachael Koestartyo
  */
-public class UpgradeAnalyticsConfigurationPreferences extends UpgradeProcess {
-
-	public UpgradeAnalyticsConfigurationPreferences(
-		ConfigurationAdmin configurationAdmin) {
-
-		_configurationAdmin = configurationAdmin;
-	}
+@Component(immediate = true, service = PortalInstanceLifecycleListener.class)
+public class UpgradeAnalyticsConfigurationPortalInstanceLifecycleListener
+	extends BasePortalInstanceLifecycleListener {
 
 	@Override
-	protected void doUpgrade() throws Exception {
+	public void portalInstanceRegistered(Company company) throws Exception {
 		Configuration[] configurations = _configurationAdmin.listConfigurations(
 			"(service.pid=" + AnalyticsConfiguration.class.getName() + "*)");
 
@@ -81,8 +82,15 @@ public class UpgradeAnalyticsConfigurationPreferences extends UpgradeProcess {
 		}
 	}
 
+	@Reference(
+		target = ModuleServiceLifecycle.PORTLETS_INITIALIZED, unbind = "-"
+	)
+	protected void setModuleServiceLifecycle(
+		ModuleServiceLifecycle moduleServiceLifecycle) {
+	}
+
 	private String[] _getExpandoAttributeNames(long companyId) {
-		User user = UserLocalServiceUtil.fetchUserByScreenName(
+		User user = _userLocalServiceUtil.fetchUserByScreenName(
 			companyId, AnalyticsSecurityConstants.SCREEN_NAME_ANALYTICS_ADMIN);
 
 		if (user == null) {
@@ -115,6 +123,10 @@ public class UpgradeAnalyticsConfigurationPreferences extends UpgradeProcess {
 		"status", "timeZoneId", "userId", "uuid"
 	};
 
-	private final ConfigurationAdmin _configurationAdmin;
+	@Reference
+	private ConfigurationAdmin _configurationAdmin;
+
+	@Reference
+	private UserLocalService _userLocalServiceUtil;
 
 }
