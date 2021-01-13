@@ -12,18 +12,14 @@
  * details.
  */
 
-package com.liferay.analytics.settings.web.internal.instance.lifecycle;
+package com.liferay.analytics.settings.web.internal.upgrade.v1_0_0;
 
 import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
 import com.liferay.analytics.settings.security.constants.AnalyticsSecurityConstants;
 import com.liferay.expando.kernel.model.ExpandoBridge;
-import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.instance.lifecycle.BasePortalInstanceLifecycleListener;
-import com.liferay.portal.instance.lifecycle.PortalInstanceLifecycleListener;
-import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
-import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.service.UserLocalServiceUtil;
+import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 
@@ -34,22 +30,22 @@ import java.util.Map;
 
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Rachael Koestartyo
  */
-@Component(immediate = true, service = PortalInstanceLifecycleListener.class)
-public class AnalyticsConfigurationPortalInstanceLifecycleListener
-	extends BasePortalInstanceLifecycleListener {
+public class UpgradeAnalyticsConfigurationPreferences extends UpgradeProcess {
+
+	public UpgradeAnalyticsConfigurationPreferences(
+		ConfigurationAdmin configurationAdmin) {
+
+		_configurationAdmin = configurationAdmin;
+	}
 
 	@Override
-	public void portalInstanceRegistered(Company company) throws Exception {
+	protected void doUpgrade() throws Exception {
 		Configuration[] configurations = _configurationAdmin.listConfigurations(
-			StringBundler.concat(
-				"(&(companyId=", company.getCompanyId(), ")(service.pid=",
-				AnalyticsConfiguration.class.getName(), "*))"));
+			"(service.pid=" + AnalyticsConfiguration.class.getName() + "*)");
 
 		if (ArrayUtil.isEmpty(configurations)) {
 			return;
@@ -85,15 +81,8 @@ public class AnalyticsConfigurationPortalInstanceLifecycleListener
 		}
 	}
 
-	@Reference(
-		target = ModuleServiceLifecycle.PORTLETS_INITIALIZED, unbind = "-"
-	)
-	protected void setModuleServiceLifecycle(
-		ModuleServiceLifecycle moduleServiceLifecycle) {
-	}
-
 	private String[] _getExpandoAttributeNames(long companyId) {
-		User user = _userLocalServiceUtil.fetchUserByScreenName(
+		User user = UserLocalServiceUtil.fetchUserByScreenName(
 			companyId, AnalyticsSecurityConstants.SCREEN_NAME_ANALYTICS_ADMIN);
 
 		if (user == null) {
@@ -126,10 +115,6 @@ public class AnalyticsConfigurationPortalInstanceLifecycleListener
 		"status", "timeZoneId", "userId", "uuid"
 	};
 
-	@Reference
-	private ConfigurationAdmin _configurationAdmin;
-
-	@Reference
-	private UserLocalService _userLocalServiceUtil;
+	private final ConfigurationAdmin _configurationAdmin;
 
 }
