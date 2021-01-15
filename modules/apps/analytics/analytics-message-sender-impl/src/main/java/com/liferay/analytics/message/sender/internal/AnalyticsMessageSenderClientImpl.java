@@ -30,6 +30,8 @@ import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 
+import java.net.UnknownHostException;
+
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
@@ -74,7 +76,7 @@ public class AnalyticsMessageSenderClientImpl
 			analyticsConfiguration.liferayAnalyticsEndpointURL() +
 				"/dxp-entities");
 
-		return _execute(companyId, httpUriRequest);
+		return _execute(analyticsConfiguration, companyId, httpUriRequest);
 	}
 
 	@Override
@@ -97,7 +99,7 @@ public class AnalyticsMessageSenderClientImpl
 				"/api/1.0/data-sources/" +
 					analyticsConfiguration.liferayAnalyticsDataSourceId());
 
-		_execute(companyId, httpUriRequest);
+		_execute(analyticsConfiguration, companyId, httpUriRequest);
 	}
 
 	@Reference
@@ -192,7 +194,8 @@ public class AnalyticsMessageSenderClientImpl
 	}
 
 	private CloseableHttpResponse _execute(
-			long companyId, HttpUriRequest httpUriRequest)
+			AnalyticsConfiguration analyticsConfiguration, long companyId,
+			HttpUriRequest httpUriRequest)
 		throws Exception {
 
 		try (CloseableHttpClient closeableHttpClient =
@@ -216,6 +219,11 @@ public class AnalyticsMessageSenderClientImpl
 				companyId, responseJSONObject.getString("message"));
 
 			return closeableHttpResponse;
+		}
+		catch (UnknownHostException unknownHostException) {
+			_checkEndpoints(analyticsConfiguration, companyId);
+
+			throw unknownHostException;
 		}
 	}
 
