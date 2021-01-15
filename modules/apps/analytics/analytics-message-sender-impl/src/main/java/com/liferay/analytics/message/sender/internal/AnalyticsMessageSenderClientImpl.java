@@ -18,6 +18,7 @@ import com.liferay.analytics.message.sender.client.AnalyticsMessageSenderClient;
 import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.model.Release;
 import com.liferay.portal.kernel.servlet.HttpMethods;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -35,6 +36,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Rachael Koestartyo
@@ -77,13 +79,19 @@ public class AnalyticsMessageSenderClientImpl
 			null, analyticsConfiguration.liferayAnalyticsDataSourceId(),
 			analyticsConfiguration.
 				liferayAnalyticsFaroBackendSecuritySignature(),
-			HttpMethods.GET,
-			analyticsConfiguration.liferayAnalyticsProjectId(),
+			HttpMethods.GET, analyticsConfiguration.liferayAnalyticsProjectId(),
 			analyticsConfiguration.liferayAnalyticsEndpointURL() +
 				"/api/1.0/data-sources/" +
 					analyticsConfiguration.liferayAnalyticsDataSourceId());
 
 		_execute(companyId, httpUriRequest);
+	}
+
+	@Reference(
+		target = "(&(release.bundle.symbolic.name=com.liferay.analytics.settings.web)(release.schema.version>=1.0.1))",
+		unbind = "-"
+	)
+	protected void setRelease(Release release) {
 	}
 
 	private HttpUriRequest _buildHttpUriRequest(
