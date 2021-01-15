@@ -14,16 +14,29 @@
 
 package com.liferay.analytics.message.sender.internal;
 
+import aQute.bnd.annotation.metatype.Meta;
+
 import com.liferay.analytics.message.sender.client.AnalyticsMessageSenderClient;
 import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.Release;
 import com.liferay.portal.kernel.servlet.HttpMethods;
+import com.liferay.portal.kernel.settings.CompanyServiceSettingsLocator;
+import com.liferay.portal.kernel.settings.Settings;
+import com.liferay.portal.kernel.settings.SettingsDescriptor;
+import com.liferay.portal.kernel.settings.SettingsFactory;
+import com.liferay.portal.kernel.util.PrefsPropsUtil;
+import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+
+import java.util.Dictionary;
+import java.util.Hashtable;
+import java.util.Set;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
@@ -74,6 +87,8 @@ public class AnalyticsMessageSenderClientImpl
 
 		AnalyticsConfiguration analyticsConfiguration =
 			analyticsConfigurationTracker.getAnalyticsConfiguration(companyId);
+
+		_checkEndpoints(analyticsConfiguration, companyId);
 
 		HttpUriRequest httpUriRequest = _buildHttpUriRequest(
 			null, analyticsConfiguration.liferayAnalyticsDataSourceId(),
@@ -128,6 +143,62 @@ public class AnalyticsMessageSenderClientImpl
 		return httpUriRequest;
 	}
 
+	private void _checkEndpoints(
+			AnalyticsConfiguration analyticsConfiguration, long companyId)
+		throws Exception {
+
+		HttpGet httpGet = new HttpGet(
+			analyticsConfiguration.liferayAnalyticsURL() + "/endpoints/" +
+				analyticsConfiguration.liferayAnalyticsProjectId());
+
+		try (CloseableHttpClient closeableHttpClient =
+				getCloseableHttpClient()) {
+
+			CloseableHttpResponse closeableHttpResponse =
+				closeableHttpClient.execute(httpGet);
+
+			JSONObject responseJSONObject = JSONFactoryUtil.createJSONObject(
+				EntityUtils.toString(
+					closeableHttpResponse.getEntity(),
+					Charset.defaultCharset()));
+
+			String liferayAnalyticsEndpointURL = responseJSONObject.getString(
+				"liferayAnalyticsEndpointURL");
+			String liferayAnalyticsFaroBackendURL =
+				responseJSONObject.getString("liferayAnalyticsFaroBackendURL");
+
+			if (liferayAnalyticsEndpointURL.equals(
+					PrefsPropsUtil.getString(
+						companyId, "liferayAnalyticsEndpointURL")) &&
+				liferayAnalyticsFaroBackendURL.equals(
+					PrefsPropsUtil.getString(
+						companyId, "liferayAnalyticsFaroBackendURL"))) {
+
+				return;
+			}
+
+			UnicodeProperties unicodeProperties = new UnicodeProperties(true);
+
+			unicodeProperties.setProperty(
+				"liferayAnalyticsEndpointURL", liferayAnalyticsEndpointURL);
+			unicodeProperties.setProperty(
+				"liferayAnalyticsFaroBackendURL",
+				liferayAnalyticsFaroBackendURL);
+
+			companyLocalService.updatePreferences(companyId, unicodeProperties);
+
+			Dictionary<String, Object> configurationProperties =
+				_getConfigurationProperties(companyId);
+
+			configurationProperties.put(
+				"liferayAnalyticsEndpointURL", liferayAnalyticsEndpointURL);
+
+			configurationProvider.saveCompanyConfiguration(
+				AnalyticsConfiguration.class, companyId,
+				configurationProperties);
+		}
+	}
+
 	private CloseableHttpResponse _execute(
 			long companyId, HttpUriRequest httpUriRequest)
 		throws Exception {
@@ -155,5 +226,48 @@ public class AnalyticsMessageSenderClientImpl
 			return closeableHttpResponse;
 		}
 	}
+
+	private Dictionary<String, Object> _getConfigurationProperties(
+			long companyId)
+		throws Exception {
+
+		Dictionary<String, Object> configurationProperties = new Hashtable<>();
+
+		Class<?> clazz = AnalyticsConfiguration.class;
+
+		Meta.OCD ocd = clazz.getAnnotation(Meta.OCD.class);
+
+		Settings settings = _settingsFactory.getSettings(
+			new CompanyServiceSettingsLocator(companyId, ocd.id()));
+
+		SettingsDescriptor settingsDescriptor =
+			_settingsFactory.getSettingsDescriptor(ocd.id());
+
+		if (settingsDescriptor == null) {
+			return configurationProperties;
+		}
+
+		Set<String> multiValuedKeys = settingsDescriptor.getMultiValuedKeys();
+
+		for (String multiValuedKey : multiValuedKeys) {
+			configurationProperties.put(
+				multiValuedKey,
+				settings.getValues(multiValuedKey, new String[0]));
+		}
+
+		Set<String> keys = settingsDescriptor.getAllKeys();
+
+		keys.removeAll(multiValuedKeys);
+
+		for (String key : keys) {
+			configurationProperties.put(
+				key, settings.getValue(key, StringPool.BLANK));
+		}
+
+		return configurationProperties;
+	}
+
+	@Reference
+	private SettingsFactory _settingsFactory;
 
 }
