@@ -15,7 +15,7 @@
 package com.liferay.analytics.settings.web.internal.upgrade.v1_0_1;
 
 import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
-import com.liferay.portal.kernel.service.CompanyService;
+import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -35,9 +35,10 @@ import org.osgi.service.cm.ConfigurationAdmin;
 public class UpgradeAnalyticsConfigurationPreferences extends UpgradeProcess {
 
 	public UpgradeAnalyticsConfigurationPreferences(
-		CompanyService companyService, ConfigurationAdmin configurationAdmin) {
+		CompanyLocalService companyLocalService,
+		ConfigurationAdmin configurationAdmin) {
 
-		_companyService = companyService;
+		_companyLocalService = companyLocalService;
 		_configurationAdmin = configurationAdmin;
 	}
 
@@ -78,7 +79,7 @@ public class UpgradeAnalyticsConfigurationPreferences extends UpgradeProcess {
 			unicodeProperties.setProperty(
 				"liferayAnalyticsProjectId", projectId);
 
-			_companyService.updatePreferences(
+			_companyLocalService.updatePreferences(
 				GetterUtil.getLong(properties.get("companyId")),
 				unicodeProperties);
 		}
@@ -97,7 +98,7 @@ public class UpgradeAnalyticsConfigurationPreferences extends UpgradeProcess {
 	private static final Pattern _pattern = Pattern.compile(
 		"https://osbasah(?:.*)-(.*)\\.lfr\\.cloud");
 
-	private final CompanyService _companyService;
+	private final CompanyLocalService _companyLocalService;
 	private final ConfigurationAdmin _configurationAdmin;
 
 }

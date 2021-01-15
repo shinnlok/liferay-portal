@@ -14,7 +14,7 @@
 
 package com.liferay.analytics.settings.web.internal.upgrade;
 
-import com.liferay.portal.kernel.service.CompanyService;
+import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
 
 import org.osgi.service.cm.ConfigurationAdmin;
@@ -38,11 +38,11 @@ public class AnalyticsSettingsWebUpgrade implements UpgradeStepRegistrator {
 			"1.0.0", "1.0.1",
 			new com.liferay.analytics.settings.web.internal.upgrade.v1_0_1.
 				UpgradeAnalyticsConfigurationPreferences(
-					_companyService, _configurationAdmin));
+					_companyLocalService, _configurationAdmin));
 	}
 
 	@Reference
-	private CompanyService _companyService;
+	private CompanyLocalService _companyLocalService;
 
 	@Reference
 	private ConfigurationAdmin _configurationAdmin;
