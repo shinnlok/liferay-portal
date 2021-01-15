@@ -17,15 +17,13 @@ package com.liferay.analytics.message.sender.internal;
 import com.liferay.analytics.message.storage.service.AnalyticsMessageLocalService;
 import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
 import com.liferay.analytics.settings.configuration.AnalyticsConfigurationTracker;
-import com.liferay.analytics.settings.security.constants.AnalyticsSecurityConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
-import com.liferay.portal.kernel.service.CompanyService;
+import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.UnicodeProperties;
-import com.liferay.portal.security.permission.PermissionCheckerUtil;
 
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -95,7 +93,7 @@ public abstract class BaseAnalyticsClientImpl {
 	protected AnalyticsMessageLocalService analyticsMessageLocalService;
 
 	@Reference
-	protected CompanyService companyService;
+	protected CompanyLocalService companyLocalService;
 
 	@Reference
 	protected ConfigurationProvider configurationProvider;
@@ -104,11 +102,6 @@ public abstract class BaseAnalyticsClientImpl {
 	protected UserLocalService userLocalService;
 
 	private void _disconnectDataSource(long companyId) {
-		PermissionCheckerUtil.setThreadValues(
-			userLocalService.fetchUserByScreenName(
-				companyId,
-				AnalyticsSecurityConstants.SCREEN_NAME_ANALYTICS_ADMIN));
-
 		UnicodeProperties unicodeProperties = new UnicodeProperties(true);
 
 		unicodeProperties.setProperty("liferayAnalyticsConnectionType", "");
@@ -122,7 +115,7 @@ public abstract class BaseAnalyticsClientImpl {
 		unicodeProperties.setProperty("liferayAnalyticsURL", "");
 
 		try {
-			companyService.updatePreferences(companyId, unicodeProperties);
+			companyLocalService.updatePreferences(companyId, unicodeProperties);
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
