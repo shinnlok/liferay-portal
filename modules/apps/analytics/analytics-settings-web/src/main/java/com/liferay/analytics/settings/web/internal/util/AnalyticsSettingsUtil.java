@@ -153,8 +153,7 @@ public class AnalyticsSettingsUtil {
 	public static boolean isAnalyticsEnabled(long companyId) {
 		if (Validator.isNull(getDataSourceId(companyId)) ||
 			Validator.isNull(getFaroBackendSecuritySignature(companyId)) ||
-			Validator.isNull(getFaroBackendURL(companyId)) ||
-			Validator.isNull(getProjectId(companyId))) {
+			Validator.isNull(getFaroBackendURL(companyId))) {
 
 			return false;
 		}
