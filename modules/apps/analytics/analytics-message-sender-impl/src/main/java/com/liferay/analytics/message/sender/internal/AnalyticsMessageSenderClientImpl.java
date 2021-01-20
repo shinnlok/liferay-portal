@@ -21,6 +21,8 @@ import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Release;
 import com.liferay.portal.kernel.servlet.HttpMethods;
 import com.liferay.portal.kernel.settings.CompanyServiceSettingsLocator;
@@ -159,10 +161,20 @@ public class AnalyticsMessageSenderClientImpl
 			CloseableHttpResponse closeableHttpResponse =
 				closeableHttpClient.execute(httpGet);
 
-			JSONObject responseJSONObject = JSONFactoryUtil.createJSONObject(
-				EntityUtils.toString(
-					closeableHttpResponse.getEntity(),
-					Charset.defaultCharset()));
+			JSONObject responseJSONObject = null;
+
+			try {
+				responseJSONObject = JSONFactoryUtil.createJSONObject(
+					EntityUtils.toString(
+						closeableHttpResponse.getEntity(),
+						Charset.defaultCharset()));
+			}
+			catch (Exception exception) {
+				_log.error(
+					"Unable to check Analytics Cloud endpoints", exception);
+
+				return;
+			}
 
 			String liferayAnalyticsEndpointURL = responseJSONObject.getString(
 				"liferayAnalyticsEndpointURL");
@@ -274,6 +286,9 @@ public class AnalyticsMessageSenderClientImpl
 
 		return configurationProperties;
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		AnalyticsMessageSenderClientImpl.class);
 
 	@Reference
 	private SettingsFactory _settingsFactory;
