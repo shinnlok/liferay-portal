@@ -202,7 +202,9 @@ public class AnalyticsSettingsUtil {
 				projectId = getProjectId(companyId);
 			}
 
-			httpRequestBase.setHeader("OSB-Asah-Project-ID", projectId);
+			if (projectId != null) {
+				httpRequestBase.setHeader("OSB-Asah-Project-ID", projectId);
+			}
 
 			HttpResponse httpResponse = closeableHttpClient.execute(
 				httpRequestBase);
