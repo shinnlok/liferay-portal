@@ -42,6 +42,10 @@ public class AsahUtil {
 			companyId, "liferayAnalyticsFaroBackendURL");
 	}
 
+	public static String getAsahProjectId(long companyId) {
+		return PrefsPropsUtil.getString(companyId, "liferayAnalyticsProjectId");
+	}
+
 	public static boolean isAnalyticsEnabled(long companyId) {
 		if (Validator.isNull(getAsahFaroBackendDataSourceId(companyId)) ||
 			Validator.isNull(getAsahFaroBackendSecuritySignature(companyId)) ||
