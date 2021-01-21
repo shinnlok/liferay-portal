@@ -19,6 +19,7 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.NestableRuntimeException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -40,7 +41,6 @@ import com.liferay.segments.asah.connector.internal.util.AsahUtil;
 import java.io.IOException;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -270,9 +270,18 @@ public class AsahFaroBackendClientImpl implements AsahFaroBackendClient {
 	}
 
 	private Map<String, String> _getHeaders(long companyId) {
-		return Collections.singletonMap(
+		HashMapBuilder hashMapBuilder = new HashMapBuilder();
+
+		String projectId = AsahUtil.getAsahProjectId(companyId);
+
+		if (projectId != null) {
+			hashMapBuilder.put("OSB-Asah-Project-ID", projectId);
+		}
+
+		return hashMapBuilder.put(
 			"OSB-Asah-Faro-Backend-Security-Signature",
-			AsahUtil.getAsahFaroBackendSecuritySignature(companyId));
+			AsahUtil.getAsahFaroBackendSecuritySignature(companyId)
+		).build();
 	}
 
 	private MultivaluedMap<String, Object> _getParameters(
