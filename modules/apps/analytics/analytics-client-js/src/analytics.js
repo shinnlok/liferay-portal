@@ -178,7 +178,7 @@ class Analytics {
 	static dispose() {
 		const self = ENV.Analytics;
 
-		if (self) {
+		if (self && !self._isTrackingDisabled()) {
 			self.disposeInternal();
 		}
 	}
@@ -191,6 +191,10 @@ class Analytics {
 	 * Clear event queue and set stored context to the current context.
 	 */
 	reset() {
+		if (this._isTrackingDisabled()) {
+			return;
+		}
+
 		this._eventQueue.reset();
 
 		this.resetContext();
@@ -435,15 +439,11 @@ class Analytics {
 	}
 
 	_isTrackingDisabled() {
-		if (
+		return (
 			ENV.ac_client_disable_tracking ||
 			navigator.doNotTrack == '1' ||
 			navigator.doNotTrack == 'yes'
-		) {
-			return true;
-		}
-
-		return false;
+		);
 	}
 
 	/**
