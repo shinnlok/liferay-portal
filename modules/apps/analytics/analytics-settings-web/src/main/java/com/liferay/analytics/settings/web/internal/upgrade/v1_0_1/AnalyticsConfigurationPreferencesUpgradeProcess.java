@@ -71,6 +71,13 @@ public class AnalyticsConfigurationPreferencesUpgradeProcess
 
 			String projectId = _getProjectId(faroBackendURL);
 
+			if (projectId == null) {
+				String liferayAnalyticsEndpointURL = GetterUtil.getString(
+					properties.get("liferayAnalyticsEndpointURL"));
+
+				projectId = _getProjectId(liferayAnalyticsEndpointURL);
+			}
+
 			properties.put("liferayAnalyticsProjectId", projectId);
 
 			configuration.update(properties);
